@@ -137,7 +137,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   char grid[40], metr[40], grid_old[40];
 
-  if (gr==0 && me>1)
+  if (gr == 0 && me > 1)
     {
       for (int i=0; i<40; i++)
         grid_old[i] = grid[i];
@@ -146,12 +146,11 @@ double VariationalMeshSmoother::smooth(unsigned int)
       metr_data_gen(grid, metr, _dim, me);
     }
 
-  // Initialize the _n_nodes member variable
+  // Initialize the _n_nodes and _n_cells member variables
   this->_n_nodes = _mesh.n_nodes();
   this->_n_cells = _mesh.n_active_elem();
 
-  // I wish I could do this in readgr... but the way she allocs
-  // memory we need to do this here... or pass a lot of things around
+  // Initialize the _n_hanging_edges member variable
   MeshTools::find_hanging_nodes_and_parents(_mesh, _hanging_nodes);
   this->_n_hanging_edges = _hanging_nodes.size();
 
@@ -173,7 +172,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
       return _dist_norm;
     }
 
-  if (me>1)
+  if (me > 1)
     vms_err = readmetr(metr, H);
 
   if (vms_err < 0)
@@ -189,9 +188,9 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   // grid optimization
   _logfile << "Starting Grid Optimization" << std::endl;
-  clock_t ticks1=clock();
+  clock_t ticks1 = clock();
   full_smooth(R, mask, cells, mcells, edges, hnodes, theta, iter, me, H, adp, gr);
-  clock_t ticks2=clock();
+  clock_t ticks2 = clock();
   _logfile << "full_smooth took ("
            << ticks2
            << "-"
@@ -323,9 +322,11 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
                 // Calculate the thetas
                 for (; ne != ne_end; ne++)
                   {
+                    const Node& neighbor = *(*ne);
+
                     // Note that the x and y values of this node are subtracted off
                     // this centers the system around this node
-                    theta = atan2((*(*ne))(1)-y,(*(*ne))(0)-x);
+                    theta = atan2(neighbor(1)-y, neighbor(0)-x);
 
                     // Save it for later
                     thetas.push_back(theta);
@@ -346,8 +347,8 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
                         if (on_boundary[neighbors[a]->id()] &&
                             on_boundary[neighbors[b]->id()] &&
                            (
-                            (std::abs(thetas[a]-(thetas[b] + (libMesh::pi))) < .001) ||
-                            (std::abs(thetas[a]-(thetas[b] - (libMesh::pi))) < .001)
+                            (std::abs(thetas[a] - (thetas[b] + (libMesh::pi))) < .001) ||
+                            (std::abs(thetas[a] - (thetas[b] - (libMesh::pi))) < .001)
                             )
                            )
                           {
@@ -384,7 +385,7 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
         // 10 for 3D
         // If there are actually less than that -1 must be used
         // to fill out the rest
-        int num=0;
+        int num = 0;
         /*
           int num_necessary = 0;
 
@@ -401,8 +402,9 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
                 // Grab nodes that do exist
               case 3:  // Tri
                 for (unsigned int k=0; k<elem->n_vertices(); k++)
-                  cells[i][k]=(*it)->node(k);
-                num=(*it)->n_vertices();
+                  cells[i][k] = elem->node(k);
+
+                num = elem->n_vertices();
                 break;
 
               case 4:  // Quad 4
@@ -410,7 +412,7 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
                 cells[i][1] = elem->node(1);
                 cells[i][2] = elem->node(3); // Note that 2 and 3 are switched!
                 cells[i][3] = elem->node(2);
-                num=4;
+                num = 4;
                 break;
 
               default:
@@ -453,8 +455,7 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
 
         // Mask it with 0 to state that this is an active element
         // FIXME: Could be something other than zero
-        mcells[i]=0;
-
+        mcells[i] = 0;
         i++;
       }
   }
@@ -539,10 +540,10 @@ float VariationalMeshSmoother::adapt_minimum() const
 void VariationalMeshSmoother::adjust_adapt_data()
 {
   // For convenience
-  const UnstructuredMesh & aoe_mesh=*_area_of_interest;
+  const UnstructuredMesh & aoe_mesh = *_area_of_interest;
   std::vector<float>& adapt_data = *_adapt_data;
 
-  float min=adapt_minimum();
+  float min = adapt_minimum();
 
   MeshBase::const_element_iterator       el     = _mesh.elements_begin();
   const MeshBase::const_element_iterator end_el = _mesh.elements_end();
@@ -551,25 +552,25 @@ void VariationalMeshSmoother::adjust_adapt_data()
   const MeshBase::const_element_iterator aoe_end_el = aoe_mesh.elements_end();
 
   // Counter to keep track of which spot in adapt_data we're looking at
-  for (int i=0; el != end_el; el++)
+  for (int i=0; el!=end_el; el++)
     {
       // Only do this for active elements
       if (adapt_data[i])
         {
-          Point centroid=(*el)->centroid();
-          bool in_aoe=false;
+          Point centroid = (*el)->centroid();
+          bool in_aoe = false;
 
           // See if the elements centroid lies in the aoe mesh
           // for (aoe_el=aoe_mesh.elements_begin(); aoe_el != aoe_end_el; ++aoe_el)
           // {
           if ((*aoe_el)->contains_point(centroid))
-            in_aoe=true;
+            in_aoe = true;
           // }
 
           // If the element is not in the area of interest... then set
           // it's adaptivity value to the minimum.
           if (!in_aoe)
-            adapt_data[i]=min;
+            adapt_data[i] = min;
         }
       i++;
     }
@@ -587,11 +588,11 @@ int VariationalMeshSmoother::read_adp(std::vector<double>& afun)
 
   int m = adapt_data.size();
 
-  int j=0;
+  int j =0 ;
   for (int i=0; i<m; i++)
     if (adapt_data[i] != 0)
       {
-        afun[j]=adapt_data[i];
+        afun[j] = adapt_data[i];
         j++;
       }
 
@@ -634,150 +635,187 @@ int VariationalMeshSmoother::basisA(Array2D<double>& Q,
 {
   Array2D<double> U(_dim, nvert);
 
-  if (_dim==2)
+  // Some useful constants
+  const double
+    sqrt3 = std::sqrt(3.0),
+    sqrt6 = std::sqrt(6.0);
+
+  if (_dim == 2)
     {
-    if (nvert==4)
-      {
-        // quad
-        U[0][0] = (-(1-K[1]));
-        U[0][1] = ( (1-K[1]));
-        U[0][2] = (-    K[1]);
-        U[0][3] = (     K[1]);
-        U[1][0] = (-(1-K[0]));
-        U[1][1] = (-    K[0]);
-        U[1][2] = ( (1-K[0]));
-        U[1][3] = (     K[0]);
-      }
-    else if (nvert==3)
-      {
-        // tri
-        // for right target triangle
-        // U[0][0]=-1.0; U[1][0]=-1.0;
-        // U[0][1]=1.0;  U[1][1]=0.0;
-        // U[0][2]=0.0;  U[1][2]=1.0;
+      if (nvert == 4)
+        {
+          // quad
+          U[0][0] = -(1-K[1]);
+          U[0][1] =  (1-K[1]);
+          U[0][2] = -K[1];
+          U[0][3] =  K[1];
 
-        // for regular triangle
-        U[0][0]=-1.0; U[1][0]=-1.0/std::sqrt(3.0);
-        U[0][1]= 1.0; U[1][1]=-1.0/std::sqrt(3.0);
-        U[0][2]=   0; U[1][2]= 2.0/std::sqrt(3.0);
-      }
-    else if (nvert==6)
-      {
-        // curved triangle
-        U[0][0] = -3*(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])+K[1];
-        U[0][1] = -(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])*3-K[1];
-        U[0][2] = 0;
-        U[0][3] = K[1]*4;
-        U[0][4] = -4*K[1];
-        U[0][5] = 4*(1-K[0]-K[1]*0.5)-4*(K[0]-0.5*K[1]);
-        U[1][0] = (1-K[2]-K[3]*0.5)*(-1.5)+(K[2]-0.5*K[3])*(0.5)+K[3]*(0.5);
-        U[1][1] = (1-K[2]-K[3]*0.5)*(0.5)+(K[2]-0.5*K[3])*(-1.5)+K[3]*(0.5);
-        U[1][2] = (1-K[2]-K[3]*0.5)*(-1)+(K[2]-0.5*K[3])*(-1)+K[3]*(3);
-        U[1][3] = (K[2]-0.5*K[3])*(4.0)+K[3]*(-2.0);
-        U[1][4] = (1-K[2]-K[3]*0.5)*(4.0)+K[3]*(-2.0);
-        U[1][5] = (1-K[2]-K[3]*0.5)*(-2.0)+(K[2]-0.5*K[3])*(-2.0);
-      }
-    else
-      libmesh_error_msg("Invalid nvert = " << nvert);
-    }
+          U[1][0] = -(1-K[0]);
+          U[1][1] = -K[0];
+          U[1][2] =  (1-K[0]);
+          U[1][3] =  K[0];
+        }
+      else if (nvert == 3)
+        {
+          // tri
+          // for right target triangle
+          // U[0][0] = -1.0; U[1][0] = -1.0;
+          // U[0][1] = 1.0;  U[1][1] = 0.0;
+          // U[0][2] = 0.0;  U[1][2] = 1.0;
 
-  if (_dim==3)
-    {
-      if (nvert==8)
-        {
-          // hex
-          U[0][0] = (-(1-K[0])*(1-K[1]));
-          U[0][1] = ( (1-K[0])*(1-K[1]));
-          U[0][2] = (-    K[0]*(1-K[1]));
-          U[0][3] = (     K[0]*(1-K[1]));
-          U[0][4] = (-(1-K[0])*    K[1]);
-          U[0][5] = ( (1-K[0])*    K[1]);
-          U[0][6] = (-    K[0]*    K[1]);
-          U[0][7] = (     K[0]*    K[1]);
-          U[1][0] = (-(1-K[2])*(1-K[3]));
-          U[1][1] = (-    K[2]*(1-K[3]));
-          U[1][2] = ( (1-K[2])*(1-K[3]));
-          U[1][3] = (     K[2]*(1-K[3]));
-          U[1][4] = (-(1-K[2])*    K[3]);
-          U[1][5] = (-    K[2]*    K[3]);
-          U[1][6] = ( (1-K[2])*    K[3]);
-          U[1][7] = (     K[2]*    K[3]);
-          U[2][0] = (-(1-K[4])*(1-K[5]));
-          U[2][1] = (-    K[4]*(1-K[5]));
-          U[2][2] = (-(1-K[4])*    K[5]);
-          U[2][3] = (-    K[4]*    K[5]);
-          U[2][4] = ( (1-K[4])*(1-K[5]));
-          U[2][5] = (     K[4]*(1-K[5]));
-          U[2][6] = ( (1-K[4])*    K[5]);
-          U[2][7] = (     K[4]*    K[5]);
-        }
-      else if (nvert==4)
-        {
-          // linear tetr
-          // for regular reference tetrahedron
-          U[0][0] = -1; U[1][0] = -1.0/std::sqrt(3.0); U[2][0] = -1.0/std::sqrt(6.0);
-          U[0][1] = 1;  U[1][1] = -1.0/std::sqrt(3.0); U[2][1] = -1.0/std::sqrt(6.0);
-          U[0][2] = 0;  U[1][2] = 2.0/std::sqrt(3.0);  U[2][2] = -1.0/std::sqrt(6.0);
-          U[0][3] = 0;  U[1][3] = 0;              U[2][3] = 3.0/std::sqrt(6.0);
+          // for regular triangle
+          U[0][0] = -1.0;
+          U[0][1] =  1.0;
+          U[0][2] =    0;
 
-          // for right corner reference tetrahedron
-          // U[0][0]=-1; U[1][0]=-1; U[2][0]=-1;
-          // U[0][1]=1;  U[1][1]=0;  U[2][1]=0;
-          // U[0][2]=0;  U[1][2]=1;  U[2][2]=0;
-          // U[0][3]=0;  U[1][3]=0;  U[2][3]=1;
+          U[1][0] = -1.0/sqrt3;
+          U[1][1] = -1.0/sqrt3;
+          U[1][2] =  2.0/sqrt3;
         }
-      else if (nvert==6)
+      else if (nvert == 6)
         {
-          // prism
-          // for regular triangle in the prism base
-          U[0][0] = -1+K[0]; U[1][0] = (-1+K[1])/2.0; U[2][0] = -1+K[2]+K[3]/2.0;
-          U[0][1] = 1-K[0];  U[1][1] = (-1+K[1])/2.0; U[2][1] = -K[2]+K[3]/2.0;
-          U[0][2] = 0;       U[1][2] = (1-K[1]);      U[2][2] = -K[3];
-          U[0][3] = -K[0];   U[1][3] = (-K[1])/2.0;   U[2][3] = 1-K[2]-K[3]/2.0;
-          U[0][4] = K[0];    U[1][4] = (-K[1])/2.0;   U[2][4] = K[2]-K[3]/2.0;
-          U[0][5] = 0;       U[1][5] = K[1];          U[2][5] = K[3];
-        }
-      else if (nvert==10)
-        {
-          // quad tetr
-          U[0][0] = (1-K[0]-K[1]/2-K[2]/3)*(-3)+(K[0]-K[1]/2-K[2]/3)+(K[1]-K[2]/3)+K[2];
-          U[0][1] = (1-K[0]-K[1]/2-K[2]/3)*(-1)+(K[0]-K[1]/2-K[2]/3)*3-(K[1]-K[2]/3)-K[2];
+          // curved triangle
+          U[0][0] = -3*(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])+K[1];
+          U[0][1] = -(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])*3-K[1];
           U[0][2] = 0;
-          U[0][3] = 0;
-          U[0][4] = 4*(K[1]-K[2]/3);
-          U[0][5] = -4*(K[1]-K[2]/3);
-          U[0][6] = 4*(1-K[0]-K[1]/2-K[2]/3)-4*(K[0]-K[1]/2-K[2]/3);
-          U[0][7] = 4*K[2];
-          U[0][8] = 0;
-          U[0][9] = -4*K[2];
+          U[0][3] = K[1]*4;
+          U[0][4] = -4*K[1];
+          U[0][5] = 4*(1-K[0]-K[1]*0.5)-4*(K[0]-0.5*K[1]);
 
-          U[1][0] = (1-K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[3]-K[4]/2-K[5]/3)/2+(K[4]-K[5]/3)/2+K[5]/2;
-          U[1][1] = (1-K[3]-K[4]/2-K[5]/3)/2+(K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[4]-K[5]/3)/2+K[5]/2;
-          U[1][2] = -(1-K[3]-K[4]/2-K[5]/3)-(K[3]-K[4]/2-K[5]/3)+3*(K[4]-K[5]/3)-K[5];
-          U[1][3] = 0;
-          U[1][4] = 4*(K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
-          U[1][5] = 4*(1-K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
-          U[1][6] = -2*(1-K[3]-K[4]/2-K[5]/3)-2*(K[3]-K[4]/2-K[5]/3);
-          U[1][7] = -2*K[5];
-          U[1][8] = 4*K[5];
-          U[1][9] = -2*K[5];
-
-          U[2][0] = -(1-K[6]-K[7]/2-K[8]/3)+(K[6]-K[7]/2-K[8]/3)/3+(K[7]-K[8]/3)/3+K[8]/3;
-          U[2][1] = (1-K[6]-K[7]/2-K[8]/3)/3-(K[6]-K[7]/2-K[8]/3)+(K[7]-K[8]/3)/3+K[8]/3;
-          U[2][2] = (1-K[6]-K[7]/2-K[8]/3)/3+(K[6]-K[7]/2-K[8]/3)/3-(K[7]-K[8]/3)+K[8]/3;
-          U[2][3] = -(1-K[6]-K[7]/2-K[8]/3)-(K[6]-K[7]/2-K[8]/3)-(K[7]-K[8]/3)+3*K[8];
-          U[2][4] = -4*(K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
-          U[2][5] = -4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
-          U[2][6] = -4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[6]-K[7]/2-K[8]/3)/3;
-          U[2][7] = 4*(K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
-          U[2][8] = 4*(K[7]-K[8]/3)-4*K[8]/3;
-          U[2][9] = 4*(1-K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
+          U[1][0] = (1-K[2]-K[3]*0.5)*(-1.5)+(K[2]-0.5*K[3])*(0.5)+K[3]*(0.5);
+          U[1][1] = (1-K[2]-K[3]*0.5)*(0.5)+(K[2]-0.5*K[3])*(-1.5)+K[3]*(0.5);
+          U[1][2] = (1-K[2]-K[3]*0.5)*(-1)+(K[2]-0.5*K[3])*(-1)+K[3]*(3);
+          U[1][3] = (K[2]-0.5*K[3])*(4.0)+K[3]*(-2.0);
+          U[1][4] = (1-K[2]-K[3]*0.5)*(4.0)+K[3]*(-2.0);
+          U[1][5] = (1-K[2]-K[3]*0.5)*(-2.0)+(K[2]-0.5*K[3])*(-2.0);
         }
       else
         libmesh_error_msg("Invalid nvert = " << nvert);
     }
 
-  if (me==1)
+  if (_dim == 3)
+    {
+      if (nvert == 8)
+        {
+          // hex
+          U[0][0] = -(1-K[0])*(1-K[1]);
+          U[0][1] =  (1-K[0])*(1-K[1]);
+          U[0][2] = -K[0]*(1-K[1]);
+          U[0][3] =  K[0]*(1-K[1]);
+          U[0][4] = -(1-K[0])*K[1];
+          U[0][5] =  (1-K[0])*K[1];
+          U[0][6] = -K[0]*K[1];
+          U[0][7] =  K[0]*K[1];
+
+          U[1][0] = -(1-K[2])*(1-K[3]);
+          U[1][1] = -K[2]*(1-K[3]);
+          U[1][2] =  (1-K[2])*(1-K[3]);
+          U[1][3] =  K[2]*(1-K[3]);
+          U[1][4] = -(1-K[2])*K[3];
+          U[1][5] = -K[2]*K[3];
+          U[1][6] =  (1-K[2])*K[3];
+          U[1][7] =  K[2]*K[3];
+
+          U[2][0] = -(1-K[4])*(1-K[5]);
+          U[2][1] = -K[4]*(1-K[5]);
+          U[2][2] = -(1-K[4])*K[5];
+          U[2][3] = -K[4]*K[5];
+          U[2][4] =  (1-K[4])*(1-K[5]);
+          U[2][5] =  K[4]*(1-K[5]);
+          U[2][6] =  (1-K[4])*K[5];
+          U[2][7] =  K[4]*K[5];
+        }
+      else if (nvert == 4)
+        {
+          // linear tetr
+          // for regular reference tetrahedron
+          U[0][0] = -1;
+          U[0][1] = 1;
+          U[0][2] = 0;
+          U[0][3] = 0;
+
+          U[1][0] = -1.0/sqrt3;
+          U[1][1] = -1.0/sqrt3;
+          U[1][2] = 2.0/sqrt3;
+          U[1][3] = 0;
+
+          U[2][0] = -1.0/sqrt6;
+          U[2][1] = -1.0/sqrt6;
+          U[2][2] = -1.0/sqrt6;
+          U[2][3] = 3.0/sqrt6;
+
+          // for right corner reference tetrahedron
+          // U[0][0] = -1; U[1][0] = -1; U[2][0] = -1;
+          // U[0][1] = 1;  U[1][1] = 0;  U[2][1] = 0;
+          // U[0][2] = 0;  U[1][2] = 1;  U[2][2] = 0;
+          // U[0][3] = 0;  U[1][3] = 0;  U[2][3] = 1;
+        }
+      else if (nvert == 6)
+        {
+          // prism
+          // for regular triangle in the prism base
+          U[0][0] = -1+K[0];
+          U[0][1] = 1-K[0];
+          U[0][2] = 0;
+          U[0][3] = -K[0];
+          U[0][4] = K[0];
+          U[0][5] = 0;
+
+          U[1][0] = 0.5*(-1+K[1]);
+          U[1][1] = 0.5*(-1+K[1]);
+          U[1][2] = (1-K[1]);
+          U[1][3] = -0.5*K[1];
+          U[1][4] = -0.5*K[1];
+          U[1][5] = K[1];
+
+          U[2][0] = -1. + K[2] + 0.5*K[3];
+          U[2][1] = -K[2] + 0.5*K[3];
+          U[2][2] = -K[3];
+          U[2][3] = 1 - K[2] - 0.5*K[3];
+          U[2][4] = K[2] - 0.5*K[3];
+          U[2][5] = K[3];
+        }
+      else if (nvert == 10)
+        {
+          // quad tetr
+          U[0][0] = (1-K[0]-K[1]/2-K[2]/3)*(-3) + (K[0]-K[1]/2-K[2]/3) + (K[1]-K[2]/3) + K[2];
+          U[0][1] = (1-K[0]-K[1]/2-K[2]/3)*(-1) + (K[0]-K[1]/2-K[2]/3)*3 - (K[1]-K[2]/3) - K[2];
+          U[0][2] = 0;
+          U[0][3] = 0;
+          U[0][4] = 4*(K[1]-K[2]/3);
+          U[0][5] = -4*(K[1]-K[2]/3);
+          U[0][6] = 4*(1-K[0]-K[1]/2-K[2]/3) - 4*(K[0]-K[1]/2-K[2]/3);
+          U[0][7] = 4*K[2];
+          U[0][8] = 0;
+          U[0][9] = -4*K[2];
+
+          U[1][0] = (1-K[3]-K[4]/2-K[5]/3)*(-3/2) + (K[3]-K[4]/2-K[5]/3)/2 + (K[4]-K[5]/3)/2 + K[5]/2;
+          U[1][1] = (1-K[3]-K[4]/2-K[5]/3)/2 + (K[3]-K[4]/2-K[5]/3)*(-3/2) + (K[4]-K[5]/3)/2+K[5]/2;
+          U[1][2] = -(1-K[3]-K[4]/2-K[5]/3) - (K[3]-K[4]/2-K[5]/3) + 3*(K[4]-K[5]/3) - K[5];
+          U[1][3] = 0;
+          U[1][4] = 4*(K[3]-K[4]/2-K[5]/3) - 2*(K[4]-K[5]/3);
+          U[1][5] = 4*(1-K[3]-K[4]/2-K[5]/3) - 2*(K[4]-K[5]/3);
+          U[1][6] = -2*(1-K[3]-K[4]/2-K[5]/3) - 2*(K[3]-K[4]/2-K[5]/3);
+          U[1][7] = -2*K[5];
+          U[1][8] = 4*K[5];
+          U[1][9] = -2*K[5];
+
+          U[2][0] = -(1-K[6]-K[7]/2-K[8]/3) + (K[6]-K[7]/2-K[8]/3)/3 + (K[7]-K[8]/3)/3 + K[8]/3;
+          U[2][1] = (1-K[6]-K[7]/2-K[8]/3)/3 - (K[6]-K[7]/2-K[8]/3) + (K[7]-K[8]/3)/3 + K[8]/3;
+          U[2][2] = (1-K[6]-K[7]/2-K[8]/3)/3 + (K[6]-K[7]/2-K[8]/3)/3 - (K[7]-K[8]/3)+K[8]/3;
+          U[2][3] = -(1-K[6]-K[7]/2-K[8]/3) - (K[6]-K[7]/2-K[8]/3) - (K[7]-K[8]/3) + 3*K[8];
+          U[2][4] = -4*(K[6]-K[7]/2-K[8]/3)/3 - 4*(K[7]-K[8]/3)/3;
+          U[2][5] = -4*(1-K[6]-K[7]/2-K[8]/3)/3 - 4*(K[7]-K[8]/3)/3;
+          U[2][6] = -4*(1-K[6]-K[7]/2-K[8]/3)/3 - 4*(K[6]-K[7]/2-K[8]/3)/3;
+          U[2][7] = 4*(K[6]-K[7]/2-K[8]/3) - 4*K[8]/3;
+          U[2][8] = 4*(K[7]-K[8]/3) - 4*K[8]/3;
+          U[2][9] = 4*(1-K[6]-K[7]/2-K[8]/3) - 4*K[8]/3;
+        }
+      else
+        libmesh_error_msg("Invalid nvert = " << nvert);
+    }
+
+  if (me == 1)
     {
       for (unsigned i=0; i<_dim; i++)
         for (int j=0; j<nvert; j++)
@@ -807,7 +845,7 @@ void VariationalMeshSmoother::adp_renew(const Array2D<double>& R,
                                         int adp)
 {
   // evaluates given adaptive function on the provided mesh
-  if (adp<0)
+  if (adp < 0)
     {
       for (unsigned i=0; i<_n_cells; i++)
         {
@@ -815,22 +853,23 @@ void VariationalMeshSmoother::adp_renew(const Array2D<double>& R,
             x = 0.,
             y = 0.,
             z = 0.;
-          int nvert=0;
+          int nvert = 0;
+
           while (cells[i][nvert] >= 0)
             {
               x += R[cells[i][nvert]][0];
               y += R[cells[i][nvert]][1];
-              if (_dim==3)
+              if (_dim == 3)
                 z += R[cells[i][nvert]][2];
               nvert++;
             }
 
           // adaptive function, cell based
-          afun[i] = 5*(x+y+z);
+          afun[i] = 5.*(x+y+z);
         }
     }
 
-  else if (adp>0)
+  else if (adp > 0)
     {
       for (unsigned i=0; i<_n_nodes; i++)
         {
@@ -861,7 +900,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
                                           int gr)
 {
   // Control the amount of print statements in this funcion
-  int msglev=1;
+  int msglev = 1;
 
   int afun_size = 0;
 
@@ -887,29 +926,29 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
   // Boundary node counting
   int NBN=0;
   for (unsigned i=0; i<_n_nodes; i++)
-    if (mask[i]==2 || mask[i]==1)
+    if (mask[i] == 2 || mask[i] == 1)
       NBN++;
 
-  if (NBN>0)
+  if (NBN > 0)
     {
-      if (msglev>=1)
+      if (msglev >= 1)
         _logfile << "# of Boundary Nodes=" << NBN << std::endl;
 
       NBN=0;
       for (unsigned i=0; i<_n_nodes; i++)
-        if (mask[i]==2)
+        if (mask[i] == 2)
           NBN++;
 
-      if (msglev>=1)
+      if (msglev >= 1)
         _logfile << "# of moving Boundary Nodes=" << NBN << std::endl;
     }
 
   for (unsigned i=0; i<_n_nodes; i++)
     {
       if ((mask[i]==1) || (mask[i]==2))
-        maskf[i]=1;
+        maskf[i] = 1;
       else
-        maskf[i]=0;
+        maskf[i] = 0;
     }
 
   // determination of min jacobian
@@ -939,7 +978,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
   double Enm1 = 1.0;
 
   // read adaptive function from file
-  if (adp*gr!=0)
+  if (adp*gr != 0)
     read_adp(afun);
 
   {
@@ -947,38 +986,40 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
       counter = 0,
       ii = 0;
 
-    while (((qmin<=0) || (counter<iter[0]) || (std::abs(emax-Enm1)>1e-3)) && (ii < iter[1]) && (counter < iter[1]))
+    while (((qmin <= 0) || (counter < iter[0]) || (std::abs(emax-Enm1) > 1e-3)) &&
+           (ii < iter[1]) &&
+           (counter < iter[1]))
       {
         libmesh_assert_less (counter, iter[1]);
 
         Enm1 = emax;
 
-        if ((ii>=0) && (ii%2==0))
+        if ((ii >= 0) && (ii % 2 == 0))
           {
-            if (qmin<0)
-              eps=std::sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol);
+            if (qmin < 0)
+              eps = std::sqrt(epsilon*epsilon + 0.004*qmin*qmin*vol*vol);
             else
-              eps=epsilon;
+              eps = epsilon;
           }
 
         int ladp = adp;
 
-        if ((qmin<=0) || (counter<ii))
-          ladp=0;
+        if ((qmin <= 0) || (counter < ii))
+          ladp = 0;
 
         // update adaptation function before each iteration
-        if ((ladp!=0) && (gr==0))
+        if ((ladp != 0) && (gr == 0))
           adp_renew(R, cells, afun, adp);
 
         double Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes,
                          msglev, Vmin, emax, qmin, ladp, afun);
 
-        if (qmin>0)
+        if (qmin > 0)
           counter++;
         else
           ii++;
 
-        if (msglev>=1)
+        if (msglev >= 1)
           _logfile << "niter=" << counter
                    << ", qmin*G/vol=" << qmin
                    << ", Vmin=" << Vmin
@@ -990,17 +1031,17 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
   }
 
   // BN correction - 2D only!
-  epsilon=0.000000001;
-  if (NBN>0)
+  epsilon = 1.e-9;
+  if (NBN > 0)
     for (int counter=0; counter<iter[2]; counter++)
       {
         // update adaptation function before each iteration
-        if ((adp!=0) && (gr==0))
+        if ((adp != 0) && (gr == 0))
           adp_renew(R, cells, afun, adp);
 
         double Jk = minJ_BC(R, mask, cells, mcells, eps, w, me, H, vol, msglev, Vmin, emax, qmin, adp, afun, NBN);
 
-        if (msglev>=1)
+        if (msglev >= 1)
           _logfile << "NBC niter=" << counter
                    << ", qmin*G/vol=" << qmin
                    << ", Vmin=" << Vmin
@@ -1008,24 +1049,24 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
                    << std::endl;
 
         // Outrageous Enm1 to make sure we hit this at least once
-        Enm1=99999;
+        Enm1 = 99999;
 
         // Now that we've moved the boundary nodes (or not) we need to resmoooth
         for (int j=0; j<iter[1]; j++)
           {
-            if (std::abs(emax-Enm1)<1e-2)
+            if (std::abs(emax-Enm1) < 1e-2)
               break;
 
             // Save off the error from the previous smoothing step
-            Enm1=emax;
+            Enm1 = emax;
 
             // update adaptation function before each iteration
-            if ((adp!=0) && (gr==0))
+            if ((adp != 0) && (gr == 0))
               adp_renew(R, cells, afun, adp);
 
             Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes, msglev, Vmin, emax, qmin, adp, afun);
 
-            if (msglev>=1)
+            if (msglev >= 1)
               _logfile << "  Re-smooth: niter=" << j
                        << ", qmin*G/vol=" << qmin
                        << ", Vmin=" << Vmin
@@ -1034,7 +1075,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
                        << std::endl;
           }
 
-        if (msglev>=1)
+        if (msglev >= 1)
           _logfile << "NBC smoothed niter=" << counter
                    << ", qmin*G/vol=" << qmin
                    << ", Vmin=" << Vmin
@@ -1065,14 +1106,14 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
     vmin = 1.e32;
 
   for (unsigned ii=0; ii<_n_cells; ii++)
-    if (mcells[ii]>=0)
+    if (mcells[ii] >= 0)
       {
         // Final value of E will be saved in Gamma at the end of this loop
         double E = 0.0;
 
-        if (_dim==2)
+        if (_dim == 2)
           {
-            if (cells[ii][3]==-1)
+            if (cells[ii][3] == -1)
               {
                 // tri
                 basisA(Q, 3, K, H[ii], me);
@@ -1088,7 +1129,7 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                 double det = jac2(a1[0], a1[1], a2[0], a2[1]);
                 double tr = 0.5*(a1[0]*a1[0] + a2[0]*a2[0] + a1[1]*a1[1] + a2[1]*a2[1]);
                 double chi = 0.5*(det+std::sqrt(det*det+epsilon*epsilon));
-                E = (1-w)*tr/chi+0.5*w*(v+det*det/v)/chi;
+                E = (1-w)*tr/chi + 0.5*w*(v + det*det/v)/chi;
 
                 if (E > gemax)
                   gemax = E;
@@ -1096,15 +1137,15 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                   vmin = det;
 
               }
-            else if (cells[ii][4]==-1)
+            else if (cells[ii][4] == -1)
               {
                 // quad
                 for (int i=0; i<2; i++)
                   {
-                    K[0]=i;
+                    K[0] = i;
                     for (int j=0; j<2; j++)
                       {
-                        K[1]=j;
+                        K[1] = j;
                         basisA(Q, 4, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
@@ -1118,7 +1159,7 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                         double det = jac2(a1[0],a1[1],a2[0],a2[1]);
                         double tr = 0.5*(a1[0]*a1[0] + a2[0]*a2[0] + a1[1]*a1[1] + a2[1]*a2[1]);
                         double chi = 0.5*(det+std::sqrt(det*det+epsilon*epsilon));
-                        E += 0.25*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
+                        E += 0.25*((1-w)*tr/chi + 0.5*w*(v + det*det/v)/chi);
 
                         if (vmin > det)
                           vmin = det;
@@ -1126,22 +1167,22 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                   }
 
                 if (E > gemax)
-                  gemax=E;
+                  gemax = E;
               }
             else
               {
                 // quad tri
                 for (int i=0; i<3; i++)
                   {
-                    K[0]=i*0.5;
+                    K[0] = i*0.5;
                     int k = i/2;
-                    K[1]=static_cast<double>(k);
+                    K[1] = static_cast<double>(k);
 
                     for (int j=0; j<3; j++)
                       {
-                        K[2]=j*0.5;
-                        k=j/2;
-                        K[3]=static_cast<double>(k);
+                        K[2] = j*0.5;
+                        k = j/2;
+                        K[3] = static_cast<double>(k);
 
                         basisA(Q, 6, K, H[ii], me);
 
@@ -1154,14 +1195,14 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                             }
 
                         double det = jac2(a1[0],a1[1],a2[0],a2[1]);
-                        double sigma = 1.0/24.;
+                        double sigma = 1./24.;
 
                         if (i==j)
-                          sigma = 1.0/12;
+                          sigma = 1./12.;
 
                         double tr = 0.5*(a1[0]*a1[0] + a2[0]*a2[0] + a1[1]*a1[1] + a2[1]*a2[1]);
-                        double chi = 0.5*(det+std::sqrt(det*det+epsilon*epsilon));
-                        E += sigma*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
+                        double chi = 0.5*(det + std::sqrt(det*det + epsilon*epsilon));
+                        E += sigma*((1-w)*tr/chi + 0.5*w*(v + det*det/v)/chi);
                         if (vmin > det)
                           vmin = det;
                       }
@@ -1172,9 +1213,9 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
               }
           }
 
-        if (_dim==3)
+        if (_dim == 3)
           {
-            if (cells[ii][4]==-1)
+            if (cells[ii][4] == -1)
               {
                 // tetr
                 basisA(Q, 4, K, H[ii], me);
@@ -1196,7 +1237,7 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                   tr += (a1[k]*a1[k] + a2[k]*a2[k] + a3[k]*a3[k])/3.0;
 
                 double chi = 0.5*(det+std::sqrt(det*det+epsilon*epsilon));
-                E = (1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi;
+                E = (1-w)*pow(tr,1.5)/chi + 0.5*w*(v + det*det/v)/chi;
 
                 if (E > gemax)
                   gemax = E;
@@ -1204,15 +1245,15 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                 if (vmin > det)
                   vmin = det;
               }
-            else if (cells[ii][6]==-1)
+            else if (cells[ii][6] == -1)
               {
                 // prism
                 for (int i=0; i<2; i++)
                   {
-                    K[0]=i;
+                    K[0] = i;
                     for (int j=0; j<2; j++)
                       {
-                        K[1]=j;
+                        K[1] = j;
                         for (int k=0; k<3; k++)
                           {
                             K[2]=static_cast<double>(k)/2.0;
@@ -1233,10 +1274,10 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                                               a3[0], a3[1], a3[2]);
                             double tr = 0;
                             for (int kk=0; kk<3; kk++)
-                              tr += (a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
+                              tr += (a1[kk]*a1[kk] + a2[kk]*a2[kk] + a3[kk]*a3[kk])/3.0;
 
                             double chi = 0.5*(det+std::sqrt(det*det+epsilon*epsilon));
-                            E += ((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)/12.0;
+                            E += ((1-w)*pow(tr,1.5)/chi + 0.5*w*(v + det*det/v)/chi)/12.0;
                             if (vmin > det)
                               vmin = det;
                           }
@@ -1246,27 +1287,27 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                 if (E > gemax)
                   gemax = E;
               }
-            else if (cells[ii][8]==-1)
+            else if (cells[ii][8] == -1)
               {
                 // hex
                 for (int i=0; i<2; i++)
                   {
-                    K[0]=i;
+                    K[0] = i;
                     for (int j=0; j<2; j++)
                       {
-                        K[1]=j;
+                        K[1] = j;
                         for (int k=0; k<2; k++)
                           {
-                            K[2]=k;
+                            K[2] = k;
                             for (int l=0; l<2; l++)
                               {
-                                K[3]=l;
+                                K[3] = l;
                                 for (int m=0; m<2; m++)
                                   {
-                                    K[4]=m;
+                                    K[4] = m;
                                     for (int nn=0; nn<2; nn++)
                                       {
-                                        K[5]=nn;
+                                        K[5] = nn;
                                         basisA(Q, 8, K, H[ii], me);
 
                                         std::vector<double> a1(3), a2(3), a3(3);
@@ -1286,21 +1327,25 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                                         if ((i==nn) && (j==l) && (k==m))
                                           sigma = 1./27.;
 
-                                        if (((i==nn) && (j==l) && (k!=m)) || ((i==nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k==m)))
-                                          sigma = 1./(27.*2.);
+                                        if (((i==nn) && (j==l) && (k!=m)) ||
+                                            ((i==nn) && (j!=l) && (k==m)) ||
+                                            ((i!=nn) && (j==l) && (k==m)))
+                                          sigma = 1./54.;
 
-                                        if (((i==nn) && (j!=l) && (k!=m)) || ((i!=nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k!=m)))
-                                          sigma = 1./(27.*4.);
+                                        if (((i==nn) && (j!=l) && (k!=m)) ||
+                                            ((i!=nn) && (j!=l) && (k==m)) ||
+                                            ((i!=nn) && (j==l) && (k!=m)))
+                                          sigma = 1./108.;
 
                                         if ((i!=nn) && (j!=l) && (k!=m))
-                                          sigma = 1./(27.*8.);
+                                          sigma = 1./216.;
 
                                         double tr = 0;
                                         for (int kk=0; kk<3; kk++)
                                           tr += (a1[kk]*a1[kk] + a2[kk]*a2[kk] + a3[kk]*a3[kk])/3.0;
 
-                                        double chi = 0.5*(det+std::sqrt(det*det+epsilon*epsilon));
-                                        E += ((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
+                                        double chi = 0.5*(det+std::sqrt(det*det + epsilon*epsilon));
+                                        E += ((1-w)*pow(tr,1.5)/chi + 0.5*w*(v + det*det/v)/chi)*sigma;
                                         if (vmin > det)
                                           vmin = det;
                                       }
@@ -1324,35 +1369,73 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                             switch (i)
                               {
                               case 0:
-                                K[0]=0;  K[1]=0;  K[2]=0;  break;
+                                K[0] = 0;
+                                K[1] = 0;
+                                K[2] = 0;
+                                break;
                               case 1:
-                                K[0]=1;  K[1]=0;  K[2]=0;  break;
+                                K[0] = 1;
+                                K[1] = 0;
+                                K[2] = 0;
+                                break;
                               case 2:
-                                K[0]=1.0/2;  K[1]=1;  K[2]=0;  break;
+                                K[0] = 0.5;
+                                K[1] = 1;
+                                K[2] = 0;
+                                break;
                               case 3:
-                                K[0]=1.0/2;  K[1]=1.0/3;  K[2]=1;  break;
+                                K[0] = 0.5;
+                                K[1] = 1./3.;
+                                K[2] = 1;
+                                break;
                               }
+
                             switch (j)
                               {
                               case 0:
-                                K[3]=0;  K[4]=0;  K[5]=0;  break;
+                                K[3] = 0;
+                                K[4] = 0;
+                                K[5] = 0;
+                                break;
                               case 1:
-                                K[3]=1;  K[4]=0;  K[5]=0;  break;
+                                K[3] = 1;
+                                K[4] = 0;
+                                K[5] = 0;
+                                break;
                               case 2:
-                                K[3]=1.0/2;  K[4]=1;  K[5]=0;  break;
+                                K[3] = 0.5;
+                                K[4] = 1;
+                                K[5] = 0;
+                                break;
                               case 3:
-                                K[3]=1.0/2;  K[4]=1.0/3;  K[5]=1;  break;
+                                K[3] = 0.5;
+                                K[4] = 1./3.;
+                                K[5] = 1;
+                                break;
                               }
+
                             switch (k)
                               {
                               case 0:
-                                K[6]=0;  K[7]=0;  K[8]=0;  break;
+                                K[6] = 0;
+                                K[7] = 0;
+                                K[8] = 0;
+                                break;
                               case 1:
-                                K[6]=1;  K[7]=0;  K[8]=0;  break;
+                                K[6] = 1;
+                                K[7] = 0;
+                                K[8] = 0;
+                                break;
                               case 2:
-                                K[6]=1.0/2;  K[7]=1;  K[8]=0;  break;
+                                K[6] = 0.5;
+                                K[7] = 1;
+                                K[8] = 0;
+                                break;
                               case 3:
-                                K[6]=1.0/2;  K[7]=1.0/3;  K[8]=1;  break;
+                                K[6] = 0.5;
+                                K[7] = 1./3.;
+                                K[8] = 1;
+                                break;
                               }
 
                             basisA(Q, 10, K, H[ii], me);
@@ -1372,18 +1455,18 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                             double sigma = 0.;
 
                             if ((i==j) && (j==k))
-                              sigma = 1.0/120;
+                              sigma = 1./120.;
                             else if ((i==j) || (j==k) || (i==k))
-                              sigma = 1.0/360;
+                              sigma = 1./360.;
                             else
-                              sigma = 1.0/720;
+                              sigma = 1./720.;
 
                             double tr = 0;
                             for (int kk=0; kk<3; kk++)
                               tr += (a1[kk]*a1[kk] + a2[kk]*a2[kk] + a3[kk]*a3[kk])/3.0;
 
                             double chi = 0.5*(det+std::sqrt(det*det+epsilon*epsilon));
-                            E += ((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
+                            E += ((1-w)*pow(tr,1.5)/chi + 0.5*w*(v+det*det/v)/chi)*sigma;
                             if (vmin > det)
                               vmin = det;
                           }
@@ -1391,7 +1474,7 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                   }
 
                 if (E > gemax)
-                  gemax=E;
+                  gemax = E;
               }
           }
         Gamma[ii] = E;
@@ -1421,12 +1504,12 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
   double gqmin = 1.e32;
 
   for (unsigned ii=0; ii<_n_cells; ii++)
-    if (mcells[ii]>=0)
+    if (mcells[ii] >= 0)
       {
-        if (_dim==2)
+        if (_dim == 2)
           {
             // 2D
-            if (cells[ii][3]==-1)
+            if (cells[ii][3] == -1)
               {
                 // tri
                 basisA(Q, 3, K, H[ii], me);
@@ -1448,16 +1531,16 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
 
                 v += det;
               }
-            else if (cells[ii][4]==-1)
+            else if (cells[ii][4] == -1)
               {
                 // quad
                 double vcell = 0.;
                 for (int i=0; i<2; i++)
                   {
-                    K[0]=i;
+                    K[0] = i;
                     for (int j=0; j<2; j++)
                       {
-                        K[1]=j;
+                        K[1] = j;
                         basisA(Q, 4, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
@@ -1477,7 +1560,7 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
                       }
                   }
                 if (vmin > vcell)
-                  vmin=vcell;
+                  vmin = vcell;
               }
             else
               {
@@ -1485,15 +1568,15 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
                 double vcell = 0.0;
                 for (int i=0; i<3; i++)
                   {
-                    K[0]=i*0.5;
-                    int k=i/2;
-                    K[1]=static_cast<double>(k);
+                    K[0] = i*0.5;
+                    int k = i/2;
+                    K[1] = static_cast<double>(k);
 
                     for (int j=0; j<3; j++)
                       {
-                        K[2]=j*0.5;
-                        k=j/2;
-                        K[3]=static_cast<double>(k);
+                        K[2] = j*0.5;
+                        k = j/2;
+                        K[3] = static_cast<double>(k);
                         basisA(Q, 6, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
@@ -1504,26 +1587,26 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
                               a2[k] += Q[k][l]*R[cells[ii][l]][1];
                             }
 
-                        double det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                        double det = jac2(a1[0], a1[1], a2[0], a2[1]);
                         if (gqmin > det)
                           gqmin = det;
 
-                        double sigma = 1.0/24;
-                        if (i==j)
-                          sigma = 1.0/12;
+                        double sigma = 1./24.;
+                        if (i == j)
+                          sigma = 1./12.;
 
-                        v+=sigma*det;
-                        vcell+=sigma*det;
+                        v += sigma*det;
+                        vcell += sigma*det;
                       }
                   }
-                if (vmin>vcell)
-                  vmin=vcell;
+                if (vmin > vcell)
+                  vmin = vcell;
               }
           }
-        if (_dim==3)
+        if (_dim == 3)
           {
             // 3D
-            if (cells[ii][4]==-1)
+            if (cells[ii][4] == -1)
               {
                 // tetr
                 basisA(Q, 4, K, H[ii], me);
@@ -1546,23 +1629,23 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
 
                 if (vmin > det)
                   vmin = det;
-                v+=det;
+                v += det;
               }
-            else if (cells[ii][6]==-1)
+            else if (cells[ii][6] == -1)
               {
                 // prism
                 double vcell = 0.0;
                 for (int i=0; i<2; i++)
                   {
-                    K[0]=i;
+                    K[0] = i;
                     for (int j=0; j<2; j++)
                       {
-                        K[1]=j;
+                        K[1] = j;
 
                         for (int k=0; k<3; k++)
                           {
-                            K[2]=static_cast<double>(k)/2.0;
-                            K[3]=static_cast<double>(k%2);
+                            K[2] = 0.5*k;
+                            K[3] = static_cast<double>(k%2);
                             basisA(Q, 6, K, H[ii], me);
 
                             std::vector<double> a1(3), a2(3), a3(3);
@@ -1577,40 +1660,40 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
                             double det = jac3(a1[0], a1[1], a1[2],
                                               a2[0], a2[1], a2[2],
                                               a3[0], a3[1], a3[2]);
-                            if (gqmin>det)
-                              gqmin=det;
+                            if (gqmin > det)
+                              gqmin = det;
 
-                            double sigma = 1.0/12.0;
-                            v+=sigma*det;
-                            vcell+=sigma*det;
+                            double sigma = 1./12.;
+                            v += sigma*det;
+                            vcell += sigma*det;
                           }
                       }
                   }
-                if (vmin>vcell)
-                  vmin=vcell;
+                if (vmin > vcell)
+                  vmin = vcell;
               }
-            else if (cells[ii][8]==-1)
+            else if (cells[ii][8] == -1)
               {
                 // hex
-                double vcell = 0.0;
+                double vcell = 0.;
                 for (int i=0; i<2; i++)
                   {
-                    K[0]=i;
+                    K[0] = i;
                     for (int j=0; j<2; j++)
                       {
-                        K[1]=j;
+                        K[1] = j;
                         for (int k=0; k<2; k++)
                           {
-                            K[2]=k;
+                            K[2] = k;
                             for (int l=0; l<2; l++)
                               {
-                                K[3]=l;
+                                K[3] = l;
                                 for (int m=0; m<2; m++)
                                   {
-                                    K[4]=m;
+                                    K[4] = m;
                                     for (int nn=0; nn<2; nn++)
                                       {
-                                        K[5]=nn;
+                                        K[5] = nn;
                                         basisA(Q, 8, K, H[ii], me);
 
                                         std::vector<double> a1(3), a2(3), a3(3);
@@ -1626,25 +1709,29 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
                                                           a2[0], a2[1], a2[2],
                                                           a3[0], a3[1], a3[2]);
 
-                                        if (gqmin>det)
-                                          gqmin=det;
+                                        if (gqmin > det)
+                                          gqmin = det;
 
                                         double sigma = 0.0;
 
                                         if ((i==nn) && (j==l) && (k==m))
                                           sigma = 1./27.;
 
-                                        if (((i==nn) && (j==l) && (k!=m)) || ((i==nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k==m)))
-                                          sigma = 1./(27.*2.);
+                                        if (((i==nn) && (j==l) && (k!=m)) ||
+                                            ((i==nn) && (j!=l) && (k==m)) ||
+                                            ((i!=nn) && (j==l) && (k==m)))
+                                          sigma = 1./54.;
 
-                                        if (((i==nn) && (j!=l) && (k!=m)) || ((i!=nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k!=m)))
-                                          sigma = 1./(27.*4.);
+                                        if (((i==nn) && (j!=l) && (k!=m)) ||
+                                            ((i!=nn) && (j!=l) && (k==m)) ||
+                                            ((i!=nn) && (j==l) && (k!=m)))
+                                          sigma = 1./108.;
 
                                         if ((i!=nn) && (j!=l) && (k!=m))
-                                          sigma = 1./(27.*8.);
+                                          sigma = 1./216.;
 
-                                        v+=sigma*det;
-                                        vcell+=sigma*det;
+                                        v += sigma*det;
+                                        vcell += sigma*det;
                                       }
                                   }
                               }
@@ -1658,7 +1745,7 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
             else
               {
                 // quad tetr
-                double vcell = 0.0;
+                double vcell = 0.;
                 for (int i=0; i<4; i++)
                   {
                     for (int j=0; j<4; j++)
@@ -1668,35 +1755,82 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
                             switch (i)
                               {
                               case 0:
-                                K[0]=0;  K[1]=0;  K[2]=0;  break;
+                                K[0] = 0;
+                                K[1] = 0;
+                                K[2] = 0;
+                                break;
+
                               case 1:
-                                K[0]=1;  K[1]=0;  K[2]=0;  break;
+                                K[0] = 1;
+                                K[1] = 0;
+                                K[2] = 0;
+                                break;
+
                               case 2:
-                                K[0]=1.0/2;  K[1]=1;  K[2]=0;  break;
+                                K[0] = 0.5;
+                                K[1] = 1;
+                                K[2] = 0;
+                                break;
+
                               case 3:
-                                K[0]=1.0/2;  K[1]=1.0/3;  K[2]=1;  break;
+                                K[0] = 0.5;
+                                K[1] = 1./3.;
+                                K[2] = 1;
+                                break;
+
                               }
                             switch (j)
                               {
                               case 0:
-                                K[3]=0;  K[4]=0;  K[5]=0;  break;
+                                K[3] = 0;
+                                K[4] = 0;
+                                K[5] = 0;
+                                break;
+
                               case 1:
-                                K[3]=1;  K[4]=0;  K[5]=0;  break;
+                                K[3] = 1;
+                                K[4] = 0;
+                                K[5] = 0;
+                                break;
+
                               case 2:
-                                K[3]=1.0/2;  K[4]=1;  K[5]=0;  break;
+                                K[3] = 0.5;
+                                K[4] = 1;
+                                K[5] = 0;
+                                break;
+
                               case 3:
-                                K[3]=1.0/2;  K[4]=1.0/3;  K[5]=1;  break;
+                                K[3] = 0.5;
+                                K[4] = 1./3.;
+                                K[5] = 1;
+                                break;
+
                               }
                             switch (k)
                               {
                               case 0:
-                                K[6]=0;  K[7]=0;  K[8]=0;  break;
+                                K[6] = 0;
+                                K[7] = 0;
+                                K[8] = 0;
+                                break;
+
                               case 1:
-                                K[6]=1;  K[7]=0;  K[8]=0;  break;
+                                K[6] = 1;
+                                K[7] = 0;
+                                K[8] = 0;
+                                break;
+
                               case 2:
-                                K[6]=1.0/2;  K[7]=1;  K[8]=0;  break;
+                                K[6] = 0.5;
+                                K[7] = 1;
+                                K[8] = 0;
+                                break;
+
                               case 3:
-                                K[6]=1.0/2;  K[7]=1.0/3;  K[8]=1;  break;
+                                K[6] = 0.5;
+                                K[7] = 1./3.;
+                                K[8] = 1;
+                                break;
                               }
 
                             basisA(Q, 10, K, H[ii], me);
@@ -1713,20 +1847,22 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
                             double det = jac3(a1[0], a1[1], a1[2],
                                               a2[0], a2[1], a2[2],
                                               a3[0], a3[1], a3[2]);
-                            if (gqmin>det)
-                              gqmin=det;
+                            if (gqmin > det)
+                              gqmin = det;
 
                             double sigma = 0.0;
 
                             if ((i==j) && (j==k))
-                              sigma = 1.0/120;
-                            else if ((i==j) || (j==k) || (i==k))
-                              sigma = 1.0/360;
-                            else
-                              sigma = 1.0/720;
+                              sigma = 1./120.;
 
-                            v+=sigma*det;
-                            vcell+=sigma*det;
+                            else if ((i==j) || (j==k) || (i==k))
+                              sigma = 1./360.;
+
+                            else
+                              sigma = 1./720.;
+
+                            v += sigma*det;
+                            vcell += sigma*det;
                           }
                       }
                   }
@@ -1808,14 +1944,14 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
   for (unsigned i=0; i<_n_cells; i++)
     {
       int nvert = 0;
-      while (cells[i][nvert]>=0)
+      while (cells[i][nvert] >= 0)
         nvert++;
 
       // determination of local matrices on each cell
       for (unsigned j=0; j<_dim; j++)
         {
-          G[i][j]=0;  // adaptation metric G is held constant throughout minJ run
-          if (adp<0)
+          G[i][j] = 0;  // adaptation metric G is held constant throughout minJ run
+          if (adp < 0)
             {
               for (int k=0; k<std::abs(adp); k++)
                 G[i][j] += afun[i*(-adp)+k];  // cell-based adaptivity is computed here
@@ -1826,13 +1962,13 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
           // initialise local matrices
           for (unsigned k=0; k<3*_dim + _dim%2; k++)
             {
-              F[index][k]=0;
+              F[index][k] = 0;
 
               for (unsigned j=0; j<3*_dim + _dim%2; j++)
-                W[index][k][j]=0;
+                W[index][k][j] = 0;
             }
         }
-      if (mcells[i]>=0)
+      if (mcells[i] >= 0)
         {
           // if cell is not excluded
           double lVmin, lqmin;
@@ -1853,17 +1989,18 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
             {
               for (int m=0; m<nvert; m++)
                 {
-                if ((W[index][l][m]!=0) && (cells[i][m]>=cells[i][l]))
+                if ((W[index][l][m] != 0) &&
+                    (cells[i][m] >= cells[i][l]))
                   {
                     int sch = 0;
                     int ind = 1;
-                    while (ind!=0)
+                    while (ind != 0)
                       {
-                        if (A[cells[i][l]+index*_n_nodes][sch]!=0)
+                        if (A[cells[i][l] + index*_n_nodes][sch] != 0)
                           {
-                            if (JA[cells[i][l]+index*_n_nodes][sch] == static_cast<int>(cells[i][m]+index*_n_nodes))
+                            if (JA[cells[i][l] + index*_n_nodes][sch] == static_cast<int>(cells[i][m] + index*_n_nodes))
                               {
-                                A[cells[i][l]+index*_n_nodes][sch] = A[cells[i][l]+index*_n_nodes][sch] + W[index][l][m];
+                                A[cells[i][l] + index*_n_nodes][sch] = A[cells[i][l] + index*_n_nodes][sch] + W[index][l][m];
                                 ind=0;
                               }
                             else
@@ -1871,12 +2008,12 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
                           }
                         else
                           {
-                            A[cells[i][l]+index*_n_nodes][sch] = W[index][l][m];
-                            JA[cells[i][l]+index*_n_nodes][sch] = cells[i][m]+index*_n_nodes;
+                            A[cells[i][l] + index*_n_nodes][sch] = W[index][l][m];
+                            JA[cells[i][l] + index*_n_nodes][sch] = cells[i][m] + index*_n_nodes;
                             ind = 0;
                           }
 
-                        if (sch>columns-1)
+                        if (sch > columns-1)
                           _logfile << "error: # of nonzero entries in the "
                                    << cells[i][l]
                                    << " row of Hessian ="
@@ -1887,7 +2024,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
                       }
                   }
                 }
-              b[cells[i][l]+index*_n_nodes] = b[cells[i][l]+index*_n_nodes] - F[index][l];
+              b[cells[i][l] + index*_n_nodes] = b[cells[i][l] + index*_n_nodes] - F[index][l];
             }
         }
       // end of matrix A
@@ -1896,7 +2033,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
   // HN correction
 
   // tolerance for HN being the mid-edge node for its parents
-  double Tau_hn = pow(vol,1.0/static_cast<double>(_dim))*1e-10;
+  double Tau_hn = pow(vol, 1.0/static_cast<double>(_dim))*1e-10;
   for (unsigned i=0; i<_n_hanging_edges; i++)
     {
       int ind_i = hnodes[i];
@@ -1905,7 +2042,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 
       for (unsigned j=0; j<_dim; j++)
         {
-          int g_i = R[ind_i][j]-0.5*(R[ind_j][j]+R[ind_k][j]);
+          int g_i = R[ind_i][j] - 0.5*(R[ind_j][j]+R[ind_k][j]);
           Jpr += g_i*g_i/(2*Tau_hn);
           b[ind_i + j*_n_nodes] -= g_i/Tau_hn;
           b[ind_j + j*_n_nodes] += 0.5*g_i/Tau_hn;
@@ -1914,71 +2051,74 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 
       for (int ind=0; ind<columns; ind++)
         {
-          if (JA[ind_i][ind]==ind_i)
-            A[ind_i][ind]+=1.0/Tau_hn;
+          if (JA[ind_i][ind] == ind_i)
+            A[ind_i][ind] += 1.0/Tau_hn;
 
           if (JA[ind_i+_n_nodes][ind] == static_cast<int>(ind_i+_n_nodes))
-            A[ind_i+_n_nodes][ind]+=1.0/Tau_hn;
+            A[ind_i+_n_nodes][ind] += 1.0/Tau_hn;
 
-          if (_dim==3)
+          if (_dim == 3)
             if (JA[ind_i+2*_n_nodes][ind] == static_cast<int>(ind_i+2*_n_nodes))
-              A[ind_i+2*_n_nodes][ind]+=1.0/Tau_hn;
+              A[ind_i+2*_n_nodes][ind] += 1.0/Tau_hn;
 
-          if ((JA[ind_i][ind]==ind_j)||(JA[ind_i][ind]==ind_k))
-            A[ind_i][ind]-=0.5/Tau_hn;
+          if ((JA[ind_i][ind] == ind_j) ||
+              (JA[ind_i][ind] == ind_k))
+            A[ind_i][ind] -= 0.5/Tau_hn;
 
           if ((JA[ind_i+_n_nodes][ind] == static_cast<int>(ind_j+_n_nodes)) ||
               (JA[ind_i+_n_nodes][ind] == static_cast<int>(ind_k+_n_nodes)))
-            A[ind_i+_n_nodes][ind]-=0.5/Tau_hn;
+            A[ind_i+_n_nodes][ind] -= 0.5/Tau_hn;
 
-          if (_dim==3)
+          if (_dim == 3)
             if ((JA[ind_i+2*_n_nodes][ind] == static_cast<int>(ind_j+2*_n_nodes)) ||
                 (JA[ind_i+2*_n_nodes][ind] == static_cast<int>(ind_k+2*_n_nodes)))
-              A[ind_i+2*_n_nodes][ind]-=0.5/Tau_hn;
+              A[ind_i+2*_n_nodes][ind] -= 0.5/Tau_hn;
 
-          if (JA[ind_j][ind]==ind_i)
-            A[ind_j][ind]-=0.5/Tau_hn;
+          if (JA[ind_j][ind] == ind_i)
+            A[ind_j][ind] -= 0.5/Tau_hn;
 
-          if (JA[ind_k][ind]==ind_i)
-            A[ind_k][ind]-=0.5/Tau_hn;
+          if (JA[ind_k][ind] == ind_i)
+            A[ind_k][ind] -= 0.5/Tau_hn;
 
           if (JA[ind_j+_n_nodes][ind] == static_cast<int>(ind_i+_n_nodes))
-            A[ind_j+_n_nodes][ind]-=0.5/Tau_hn;
+            A[ind_j+_n_nodes][ind] -= 0.5/Tau_hn;
 
           if (JA[ind_k+_n_nodes][ind] == static_cast<int>(ind_i+_n_nodes))
-            A[ind_k+_n_nodes][ind]-=0.5/Tau_hn;
+            A[ind_k+_n_nodes][ind] -= 0.5/Tau_hn;
 
-          if (_dim==3)
+          if (_dim == 3)
             if (JA[ind_j+2*_n_nodes][ind] == static_cast<int>(ind_i+2*_n_nodes))
-              A[ind_j+2*_n_nodes][ind]-=0.5/Tau_hn;
+              A[ind_j+2*_n_nodes][ind] -= 0.5/Tau_hn;
 
-          if (_dim==3)
+          if (_dim == 3)
             if (JA[ind_k+2*_n_nodes][ind] == static_cast<int>(ind_i+2*_n_nodes))
-              A[ind_k+2*_n_nodes][ind]-=0.5/Tau_hn;
+              A[ind_k+2*_n_nodes][ind] -= 0.5/Tau_hn;
 
-          if ((JA[ind_j][ind]==ind_j) || (JA[ind_j][ind]==ind_k))
-            A[ind_j][ind]+=0.25/Tau_hn;
+          if ((JA[ind_j][ind] == ind_j) ||
+              (JA[ind_j][ind] == ind_k))
+            A[ind_j][ind] += 0.25/Tau_hn;
 
-          if ((JA[ind_k][ind]==ind_j)||(JA[ind_k][ind]==ind_k))
-            A[ind_k][ind]+=0.25/Tau_hn;
+          if ((JA[ind_k][ind] == ind_j) ||
+              (JA[ind_k][ind] == ind_k))
+            A[ind_k][ind] += 0.25/Tau_hn;
 
           if ((JA[ind_j+_n_nodes][ind] == static_cast<int>(ind_j+_n_nodes)) ||
               (JA[ind_j+_n_nodes][ind] == static_cast<int>(ind_k+_n_nodes)))
-            A[ind_j+_n_nodes][ind]+=0.25/Tau_hn;
+            A[ind_j+_n_nodes][ind] += 0.25/Tau_hn;
 
           if ((JA[ind_k+_n_nodes][ind] == static_cast<int>(ind_j+_n_nodes)) ||
               (JA[ind_k+_n_nodes][ind] == static_cast<int>(ind_k+_n_nodes)))
-            A[ind_k+_n_nodes][ind]+=0.25/Tau_hn;
+            A[ind_k+_n_nodes][ind] += 0.25/Tau_hn;
 
-          if (_dim==3)
+          if (_dim == 3)
             if ((JA[ind_j+2*_n_nodes][ind] == static_cast<int>(ind_j+2*_n_nodes)) ||
                 (JA[ind_j+2*_n_nodes][ind] == static_cast<int>(ind_k+2*_n_nodes)))
-              A[ind_j+2*_n_nodes][ind]+=0.25/Tau_hn;
+              A[ind_j+2*_n_nodes][ind] += 0.25/Tau_hn;
 
           if (_dim==3)
             if ((JA[ind_k+2*_n_nodes][ind] == static_cast<int>(ind_j+2*_n_nodes)) ||
                 (JA[ind_k+2*_n_nodes][ind] == static_cast<int>(ind_k+2*_n_nodes)))
-              A[ind_k+2*_n_nodes][ind]+=0.25/Tau_hn;
+              A[ind_k+2*_n_nodes][ind] += 0.25/Tau_hn;
         }
     }
 
@@ -1993,7 +2133,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
         {
           for (int k=0; k<j; k++)
             {
-              if (JA[i][k]>JA[i][k+1])
+              if (JA[i][k] > JA[i][k+1])
                 {
                   int sch = JA[i][k];
                   JA[i][k] = JA[i][k+1];
@@ -2009,7 +2149,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
   double eps = std::sqrt(vol)*1e-9;
 
   // solver for P (unconstrained)
-  ia[0]=0;
+  ia[0] = 0;
   {
     int j = 0;
     for (unsigned i=0; i<_dim*_n_nodes; i++)
@@ -2021,8 +2161,8 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
             if (A[i][k] != 0)
               {
                 nz++;
-                ja[j]=JA[i][k]+1;
-                a[j]=A[i][k];
+                ja[j] = JA[i][k]+1;
+                a[j] = A[i][k];
                 j++;
               }
           }
@@ -2041,14 +2181,14 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
     {
       //ensure fixed nodes are not moved
       for (unsigned index=0; index<_dim; index++)
-        if (mask[i]==1)
-          P[i][index]=0;
+        if (mask[i] == 1)
+          P[i][index] = 0;
         else
-          P[i][index]=u[i+index*_n_nodes];
+          P[i][index] = u[i+index*_n_nodes];
     }
 
   // P is determined
-  if (msglev>=4)
+  if (msglev >= 4)
     {
     for (unsigned i=0; i<_n_nodes; i++)
       {
@@ -2059,7 +2199,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
     }
 
   // local minimization problem, determination of tau
-  if (msglev>=3)
+  if (msglev >= 3)
     _logfile << "dJ=" << std::sqrt(nonzero) << " J0=" << Jpr << std::endl;
 
   double
@@ -2071,26 +2211,26 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 
   int j = 1;
 
-  while ((Jpr<=J) && (j>-30))
+  while ((Jpr <= J) && (j > -30))
     {
       j = j-1;
 
       // search through finite # of values for tau
-      tau=pow(2.0,j);
+      tau = pow(2.0, j);
       for (unsigned i=0; i<_n_nodes; i++)
         for (unsigned k=0; k<_dim; k++)
           Rpr[i][k] = R[i][k] + tau*P[i][k];
 
       J = 0;
-      gVmin=1e32;
-      gemax=-1e32;
-      gqmin=1e32;
+      gVmin = 1e32;
+      gemax = -1e32;
+      gqmin = 1e32;
       for (unsigned i=0; i<_n_cells; i++)
         {
-          if (mcells[i]>=0)
+          if (mcells[i] >= 0)
             {
-              int nvert=0;
-              while (cells[i][nvert]>=0)
+              int nvert = 0;
+              while (cells[i][nvert] >= 0)
                 nvert++;
 
               double lVmin, lqmin;
@@ -2098,13 +2238,13 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 
               J += lemax;
               if (gVmin > lVmin)
-                gVmin=lVmin;
+                gVmin = lVmin;
 
               if (gemax < lemax)
-                gemax=lemax;
+                gemax = lemax;
 
               if (gqmin > lqmin)
-                gqmin=lqmin;
+                gqmin = lqmin;
 
               // HN correction
               for (unsigned ii=0; ii<_n_hanging_edges; ii++)
@@ -2114,13 +2254,13 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
                   int ind_k = edges[2*ii+1];
                   for (unsigned jj=0; jj<_dim; jj++)
                     {
-                      int g_i = Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
-                      J+=g_i*g_i/(2*Tau_hn);
+                      int g_i = Rpr[ind_i][jj] - 0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
+                      J += g_i*g_i/(2*Tau_hn);
                     }
                 }
             }
         }
-      if (msglev>=3)
+      if (msglev >= 3)
         _logfile << "tau=" << tau << " J=" << J << std::endl;
     }
 
@@ -2139,15 +2279,15 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
           Rpr[i][k] = R[i][k] + tau*0.5*P[i][k];
 
       J = 0;
-      gtmin0=1e32;
-      gtmax0=-1e32;
-      gqmin0=1e32;
+      gtmin0 = 1e32;
+      gtmax0 = -1e32;
+      gqmin0 = 1e32;
       for (unsigned i=0; i<_n_cells; i++)
         {
-          if (mcells[i]>=0)
+          if (mcells[i] >= 0)
             {
-              int nvert=0;
-              while (cells[i][nvert]>=0)
+              int nvert = 0;
+              while (cells[i][nvert] >= 0)
                 nvert++;
 
               double lVmin, lqmin;
@@ -2173,7 +2313,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
                   for (unsigned jj=0; jj<_dim; jj++)
                     {
                       int g_i = Rpr[ind_i][jj] - 0.5*(Rpr[ind_j][jj] + Rpr[ind_k][jj]);
-                      J+=g_i*g_i/(2*Tau_hn);
+                      J += g_i*g_i/(2*Tau_hn);
                     }
                 }
             }
@@ -2182,7 +2322,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 
   if (Jpr > J)
     {
-      T=0.5*tau;
+      T = 0.5*tau;
       // Set up return values passed by reference
       Vmin = gtmin0;
       emax = gtmax0;
@@ -2190,8 +2330,8 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
     }
   else
     {
-      T=tau;
-      J=Jpr;
+      T = tau;
+      J = Jpr;
       // Set up return values passed by reference
       Vmin = gVmin;
       emax = gemax;
@@ -2206,7 +2346,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
         nonzero += T*P[j][k]*T*P[j][k];
       }
 
-  if (msglev>=2)
+  if (msglev >= 2)
     _logfile << "tau=" << T << ", J=" << J << std::endl;
 
   return std::sqrt(nonzero);
@@ -2235,8 +2375,8 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                                         int NCN)
 {
   // new form of matrices, 5 iterations for minL
-  double tau=0.0, J=0.0, T, Jpr, L, lVmin, lqmin, gVmin=0.0, gqmin=0.0, gVmin0=0.0,
-    gqmin0=0.0, lemax, gemax=0.0, gemax0=0.0;
+  double tau = 0.0, J = 0.0, T, Jpr, L, lVmin, lqmin, gVmin = 0.0, gqmin = 0.0, gVmin0 = 0.0,
+    gqmin0 = 0.0, lemax, gemax = 0.0, gemax0 = 0.0;
 
   // array of sliding BN
   std::vector<int> Bind(NCN);
@@ -2260,14 +2400,14 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
   const double eps = std::sqrt(vol)*1e-9;
 
   for (int i=0; i<4*NCN; i++)
-    constr[i]=1.0/eps;
+    constr[i] = 1.0/eps;
 
   {
     int I = 0;
     for (unsigned i=0; i<_n_nodes; i++)
-      if (mask[i]==2)
+      if (mask[i] == 2)
         {
-          Bind[I]=i;
+          Bind[I] = i;
           I++;
         }
   }
@@ -2290,17 +2430,17 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         {
           int nvert = 0;
 
-          while (cells[l][nvert]>=0)
+          while (cells[l][nvert] >= 0)
             nvert++;
 
           switch (nvert)
             {
             case 3: // tri
-              if (i==cells[l][0])
+              if (i == cells[l][0])
                 {
-                  if (mask[cells[l][1]]>0)
+                  if (mask[cells[l][1]] > 0)
                     {
-                      if (ind==0)
+                      if (ind == 0)
                         {
                           j = cells[l][1];
                           ind++;
@@ -2312,9 +2452,9 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                         }
                     }
 
-                  if (mask[cells[l][2]]>0)
+                  if (mask[cells[l][2]] > 0)
                     {
-                      if (ind==0)
+                      if (ind == 0)
                         {
                           j = cells[l][2];
                           ind++;
@@ -2327,61 +2467,243 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                     }
                 }
 
-              if (i==cells[l][1])
+              if (i == cells[l][1])
                 {
-                  if (mask[cells[l][0]]>0) {if (ind==0) {j=cells[l][0];   ind++;  } else {k=cells[l][0];   ind++;  }}
-                  if (mask[cells[l][2]]>0) {if (ind==0) {j=cells[l][2];   ind++;  } else {k=cells[l][2];   ind++;  }}
+                  if (mask[cells[l][0]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][0];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][0];
+                          ind++;
+                        }
+                    }
+
+                  if (mask[cells[l][2]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][2];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][2];
+                          ind++;
+                        }
+                    }
                 }
-              if (i==cells[l][2])
+              if (i == cells[l][2])
                 {
-                  if (mask[cells[l][1]]>0) {if (ind==0) {j=cells[l][1];   ind++;  } else {k=cells[l][1];   ind++;  }}
-                  if (mask[cells[l][0]]>0) {if (ind==0) {j=cells[l][0];   ind++;  } else {k=cells[l][0];   ind++;  }}
+                  if (mask[cells[l][1]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][1];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][1];
+                          ind++;
+                        }
+                    }
+
+                  if (mask[cells[l][0]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][0];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][0];
+                          ind++;
+                        }
+                    }
                 }
               break;
 
             case 4: // quad
-              if ((i==cells[l][0])||(i==cells[l][3]))
+              if ((i == cells[l][0]) ||
+                  (i == cells[l][3]))
                 {
-                  if (mask[cells[l][1]]>0) {if (ind==0) {j=cells[l][1];   ind++;  } else {k=cells[l][1];   ind++;  }}
-                  if (mask[cells[l][2]]>0) {if (ind==0) {j=cells[l][2];   ind++;  } else {k=cells[l][2];   ind++;  }}
+                  if (mask[cells[l][1]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][1];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][1];
+                          ind++;
+                        }
+                    }
+
+                  if (mask[cells[l][2]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][2];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][2];
+                          ind++;
+                        }
+                    }
                 }
-              if ((i==cells[l][1])||(i==cells[l][2]))
+
+              if ((i == cells[l][1]) ||
+                  (i == cells[l][2]))
                 {
-                  if (mask[cells[l][0]]>0) {if (ind==0) {j=cells[l][0];   ind++;  } else {k=cells[l][0];   ind++;  }}
-                  if (mask[cells[l][3]]>0) {if (ind==0) {j=cells[l][3];   ind++;  } else {k=cells[l][3];   ind++;  }}
+                  if (mask[cells[l][0]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][0];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][0];
+                          ind++;
+                        }
+                    }
+
+                  if (mask[cells[l][3]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][3];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][3];
+                          ind++;
+                        }
+                    }
                 }
               break;
 
             case 6: //quad tri
-              if (i==cells[l][0])
+              if (i == cells[l][0])
                 {
-                  if (mask[cells[l][1]]>0) {if (ind==0) {j=cells[l][5];   ind++;  } else {k=cells[l][5];   ind++;  }}
-                  if (mask[cells[l][2]]>0) {if (ind==0) {j=cells[l][4];   ind++;  } else {k=cells[l][4];   ind++;  }}
+                  if (mask[cells[l][1]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][5];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][5];
+                          ind++;
+                        }
+                    }
+
+                  if (mask[cells[l][2]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][4];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][4];
+                          ind++;
+                        }
+                    }
                 }
-              if (i==cells[l][1])
+
+              if (i == cells[l][1])
                 {
-                  if (mask[cells[l][0]]>0) {if (ind==0) {j=cells[l][5];   ind++;  } else {k=cells[l][5];   ind++;  }}
-                  if (mask[cells[l][2]]>0) {if (ind==0) {j=cells[l][3];   ind++;  } else {k=cells[l][3];   ind++;  }}
+                  if (mask[cells[l][0]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][5];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][5];
+                          ind++;
+                        }
+                    }
+
+                  if (mask[cells[l][2]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][3];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][3];
+                          ind++;
+                        }
+                    }
                 }
-              if (i==cells[l][2])
+
+              if (i == cells[l][2])
                 {
-                  if (mask[cells[l][1]]>0) {if (ind==0) {j=cells[l][3];   ind++;  } else {k=cells[l][3];   ind++;  }}
-                  if (mask[cells[l][0]]>0) {if (ind==0) {j=cells[l][4];   ind++;  } else {k=cells[l][4];   ind++;  }}
+                  if (mask[cells[l][1]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][3];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][3];
+                          ind++;
+                        }
+                    }
+                  if (mask[cells[l][0]] > 0)
+                    {
+                      if (ind == 0)
+                        {
+                          j = cells[l][4];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][4];
+                          ind++;
+                        }
+                    }
                 }
-              if (i==cells[l][3])
+
+              if (i == cells[l][3])
                 {
-                  j=cells[l][1];
-                  k=cells[l][2];
+                  j = cells[l][1];
+                  k = cells[l][2];
                 }
-              if (i==cells[l][4])
+
+              if (i == cells[l][4])
                 {
-                  j=cells[l][2];
-                  k=cells[l][0];
+                  j = cells[l][2];
+                  k = cells[l][0];
                 }
-              if (i==cells[l][5])
+
+              if (i == cells[l][5])
                 {
-                  j=cells[l][0];
-                  k=cells[l][1];
+                  j = cells[l][0];
+                  k = cells[l][1];
                 }
               break;
 
@@ -2394,44 +2716,49 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
       double del1 = R[j][0] - R[i][0];
       double del2 = R[i][0] - R[k][0];
 
-      if ((std::abs(del1)<eps)&&(std::abs(del2)<eps))
+      if ((std::abs(del1) < eps) &&
+          (std::abs(del2) < eps))
         {
-          constr[I*4]=1;
-          constr[I*4+1]=0;
-          constr[I*4+2]=R[i][0];
-          constr[I*4+3]=R[i][1];
+          constr[I*4] = 1;
+          constr[I*4+1] = 0;
+          constr[I*4+2] = R[i][0];
+          constr[I*4+3] = R[i][1];
         }
       else
         {
-          del1=R[j][1]-R[i][1];
-          del2=R[i][1]-R[k][1];
-          if ((std::abs(del1)<eps)&&(std::abs(del2)<eps))
+          del1 = R[j][1] - R[i][1];
+          del2 = R[i][1] - R[k][1];
+          if ((std::abs(del1) < eps) &&
+              (std::abs(del2) < eps))
             {
-              constr[I*4]=0;
-              constr[I*4+1]=1;
-              constr[I*4+2]=R[i][0];
-              constr[I*4+3]=R[i][1];
+              constr[I*4] = 0;
+              constr[I*4+1] = 1;
+              constr[I*4+2] = R[i][0];
+              constr[I*4+3] = R[i][1];
             }
           else
             {
-              J=(R[i][0]-R[j][0])*(R[k][1]-R[j][1])-(R[k][0]-R[j][0])*(R[i][1]-R[j][1]);
-              if (std::abs(J)<eps)
+              J =
+                (R[i][0]-R[j][0])*(R[k][1]-R[j][1]) -
+                (R[k][0]-R[j][0])*(R[i][1]-R[j][1]);
+
+              if (std::abs(J) < eps)
                 {
-                  constr[I*4]=1.0/(R[k][0]-R[j][0]);
-                  constr[I*4+1]=-1.0/(R[k][1]-R[j][1]);
-                  constr[I*4+2]=R[i][0];
-                  constr[I*4+3]=R[i][1];
+                  constr[I*4] = 1.0/(R[k][0]-R[j][0]);
+                  constr[I*4+1] = -1.0/(R[k][1]-R[j][1]);
+                  constr[I*4+2] = R[i][0];
+                  constr[I*4+3] = R[i][1];
                 }
               else
                 {
                   // circle
-                  double x0 = ((R[k][1]-R[j][1])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
+                  double x0 = ((R[k][1]-R[j][1])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1]) +
                                (R[j][1]-R[i][1])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
-                  double y0 = ((R[j][0]-R[k][0])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
+                  double y0 = ((R[j][0]-R[k][0])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1]) +
                                (R[i][0]-R[j][0])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
                   constr[I*4] = x0;
                   constr[I*4+1] = y0;
-                  constr[I*4+2]=(R[i][0]-x0)*(R[i][0]-x0)+(R[i][1]-y0)*(R[i][1]-y0);
+                  constr[I*4+2] = (R[i][0]-x0)*(R[i][0]-x0) + (R[i][1]-y0)*(R[i][1]-y0);
                 }
             }
         }
@@ -2444,7 +2771,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
 
   // initial values
   for (int i=0; i<NCN; i++)
-    lam[i]=0;
+    lam[i] = 0;
 
   // Eventual return value
   double nonzero = 0.;
@@ -2456,24 +2783,24 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
     {
       // find H and -grad J
       nonzero = 0.0;
-      Jpr=0;
+      Jpr = 0;
       for (unsigned i=0; i<2*_n_nodes; i++)
         {
           b[i] = 0;
-          hm[i]=0;
+          hm[i] = 0;
         }
 
       for (unsigned i=0; i<_n_cells; i++)
         {
           int nvert = 0;
 
-          while (cells[i][nvert]>=0)
+          while (cells[i][nvert] >= 0)
             nvert++;
 
           for (int j=0; j<nvert; j++)
             {
-              G[i][j]=0;
-              if (adp<0)
+              G[i][j] = 0;
+              if (adp < 0)
                 for (int k=0; k<std::abs(adp); k++)
                   G[i][j] += afun[i*(-adp) + k];
             }
@@ -2481,12 +2808,12 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
           for (int index=0; index<2; index++)
             for (int k=0; k<nvert; k++)
               {
-                F[index][k]=0;
+                F[index][k] = 0;
                 for (int j=0; j<nvert; j++)
                   W[index][k][j] = 0;
               }
 
-          if (mcells[i]>=0)
+          if (mcells[i] >= 0)
             Jpr += localP(W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
                           me, vol, 0, lVmin, lqmin, adp, afun, G[i]);
 
@@ -2519,19 +2846,21 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
             By = 0.,
             g = 0.;
 
-          if (constr[4*I+3]<0.5/eps)
+          if (constr[4*I+3] < 0.5/eps)
             {
               Bx = constr[4*I];
               By = constr[4*I+1];
-              g = (R[i][0]-constr[4*I+2])*constr[4*I]+(R[i][1]-constr[4*I+3])*constr[4*I+1];
+              g = (R[i][0]-constr[4*I+2])*constr[4*I] + (R[i][1]-constr[4*I+3])*constr[4*I+1];
             }
           else
             {
-              Bx = 2*(R[i][0]-constr[4*I]);
-              By = 2*(R[i][1]-constr[4*I+1]);
+              Bx = 2*(R[i][0] - constr[4*I]);
+              By = 2*(R[i][1] - constr[4*I+1]);
               hm[i] += 2*lam[I];
               hm[i+_n_nodes] += 2*lam[I];
-              g = (R[i][0]-constr[4*I])*(R[i][0]-constr[4*I])+(R[i][1]-constr[4*I+1])*(R[i][1]-constr[4*I+1])-constr[4*I+2];
+              g =
+                (R[i][0] - constr[4*I])*(R[i][0]-constr[4*I]) +
+                (R[i][1] - constr[4*I+1])*(R[i][1]-constr[4*I+1]) - constr[4*I+2];
             }
 
           Jpr += lam[I]*g;
@@ -2558,11 +2887,11 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
       // correct solution
       for (unsigned i=0; i<_n_nodes; i++)
         for (unsigned j=0; j<2; j++)
-          if ((std::abs(P[i][j])<eps) || (mask[i]==1))
+          if ((std::abs(P[i][j]) < eps) || (mask[i] == 1))
             P[i][j] = 0;
 
       // P is determined
-      if (msglev>=3)
+      if (msglev >= 3)
         {
           for (unsigned i=0; i<_n_nodes; i++)
             for (unsigned j=0; j<2; j++)
@@ -2571,46 +2900,46 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         }
 
       // local minimization problem, determination of tau
-      if (msglev>=3)
+      if (msglev >= 3)
         _logfile << "dJ=" << std::sqrt(nonzero) << " L0=" << Jpr << std::endl;
 
-      L=1e32;
+      L = 1.e32;
       int j = 1;
 
-      while ((Jpr<=L) && (j>-30))
+      while ((Jpr <= L) && (j > -30))
         {
-          j=j-1;
-          tau=pow(2.0,j);
+          j = j-1;
+          tau = pow(2.0,j);
           for (unsigned i=0; i<_n_nodes; i++)
             for (unsigned k=0; k<2; k++)
               Rpr[i][k] = R[i][k] + tau*P[i][k];
 
-          J=0;
-          gVmin=1e32;
-          gemax=-1e32;
-          gqmin=1e32;
+          J = 0;
+          gVmin = 1.e32;
+          gemax = -1.e32;
+          gqmin = 1.e32;
           for (unsigned i=0; i<_n_cells; i++)
-            if (mcells[i]>=0)
+            if (mcells[i] >= 0)
               {
                 int nvert = 0;
-                while (cells[i][nvert]>=0)
+                while (cells[i][nvert] >= 0)
                   nvert++;
 
                 lemax = localP(W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, lVmin,
                                lqmin, adp, afun, G[i]);
-                J+=lemax;
+                J += lemax;
 
-                if (gVmin>lVmin)
-                  gVmin=lVmin;
+                if (gVmin > lVmin)
+                  gVmin = lVmin;
 
-                if (gemax<lemax)
-                  gemax=lemax;
+                if (gemax < lemax)
+                  gemax = lemax;
 
-                if (gqmin>lqmin)
-                  gqmin=lqmin;
+                if (gqmin > lqmin)
+                  gqmin = lqmin;
               }
 
-          L=J;
+          L = J;
 
           // constraints contribution
           for (int I=0; I<NCN; I++)
@@ -2618,58 +2947,58 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
               int i = Bind[I];
               double g = 0.0;
 
-              if (constr[4*I+3]<0.5/eps)
-                g = (Rpr[i][0]-constr[4*I+2])*constr[4*I]+(Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
+              if (constr[4*I+3] < 0.5/eps)
+                g = (Rpr[i][0] - constr[4*I+2])*constr[4*I] + (Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
 
               else
                 g = (Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I]) +
-                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1])-constr[4*I+2];
+                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1]) - constr[4*I+2];
 
               L += (lam[I] + tau*Plam[I])*g;
             }
 
           // end of constraints
-          if (msglev>=3)
+          if (msglev >= 3)
             _logfile << " tau=" << tau << " J=" << J << std::endl;
         } // end while
 
-      if (j==-30)
-        T=0;
+      if (j == -30)
+        T = 0;
       else
         {
-          Jpr=L;
-          qq=J;
+          Jpr = L;
+          qq = J;
           for (unsigned i=0; i<_n_nodes; i++)
             for (unsigned k=0; k<2; k++)
               Rpr[i][k] = R[i][k] + tau*0.5*P[i][k];
 
-          J=0;
-          gVmin0=1e32;
-          gemax0=-1e32;
-          gqmin0=1e32;
+          J = 0;
+          gVmin0 = 1.e32;
+          gemax0 = -1.e32;
+          gqmin0 = 1.e32;
 
           for (unsigned i=0; i<_n_cells; i++)
-            if (mcells[i]>=0)
+            if (mcells[i] >= 0)
               {
-                int nvert=0;
-                while (cells[i][nvert]>=0)
+                int nvert = 0;
+                while (cells[i][nvert] >= 0)
                   nvert++;
 
                 lemax = localP(W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, lVmin,
                                lqmin, adp, afun, G[i]);
-                J+=lemax;
+                J += lemax;
 
-                if (gVmin0>lVmin)
-                  gVmin0=lVmin;
+                if (gVmin0 > lVmin)
+                  gVmin0 = lVmin;
 
-                if (gemax0<lemax)
-                  gemax0=lemax;
+                if (gemax0 < lemax)
+                  gemax0 = lemax;
 
-                if (gqmin0>lqmin)
-                  gqmin0=lqmin;
+                if (gqmin0 > lqmin)
+                  gqmin0 = lqmin;
               }
 
-          L=J;
+          L = J;
 
           // constraints contribution
           for (int I=0; I<NCN; I++)
@@ -2677,21 +3006,21 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
               int i = Bind[I];
               double g = 0.0;
 
-              if (constr[4*I+3]<0.5/eps)
-                g = (Rpr[i][0]-constr[4*I+2])*constr[4*I]+(Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
+              if (constr[4*I+3] < 0.5/eps)
+                g = (Rpr[i][0]-constr[4*I+2])*constr[4*I] + (Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
 
               else
                 g = (Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I]) +
-                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1])-constr[4*I+2];
+                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1]) - constr[4*I+2];
 
-              L += (lam[I]+tau*0.5*Plam[I])*g;
+              L += (lam[I] + tau*0.5*Plam[I])*g;
             }
           // end of constraints
         }
 
-      if (Jpr>L)
+      if (Jpr > L)
         {
-          T=0.5*tau;
+          T = 0.5*tau;
           // Set return values by reference
           Vmin = gVmin0;
           emax = gemax0;
@@ -2699,9 +3028,9 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         }
       else
         {
-          T=tau;
-          L=Jpr;
-          J=qq;
+          T = tau;
+          L = Jpr;
+          J = qq;
           // Set return values by reference
           Vmin = gVmin;
           emax = gemax;
@@ -2717,7 +3046,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
 
     } // end Lagrangian iter
 
-  if (msglev>=2)
+  if (msglev >= 2)
     _logfile << "tau=" << T << ", J=" << J << ", L=" << L << std::endl;
 
   return std::sqrt(nonzero);
@@ -2750,14 +3079,14 @@ double VariationalMeshSmoother::localP(Array3D<double>& W,
   // f - flag, f=0 for determination of Hessian and gradient of the functional,
   // f=1 for determination of the functional value only;
   // adaptivity is determined on the first step for adp>0 (nodal based)
-  if (f==0)
+  if (f == 0)
     {
-      if (adp>0)
+      if (adp > 0)
         avertex(afun, Gloc, R, cell_in, nvert, adp);
-      if (adp==0)
+      if (adp == 0)
         {
           for (unsigned i=0; i<_dim; i++)
-            Gloc[i]=1.0;
+            Gloc[i] = 1.0;
         }
     }
 
@@ -2769,33 +3098,33 @@ double VariationalMeshSmoother::localP(Array3D<double>& W,
     lqmin = 0.;
 
   // cell integration depending on cell type
-  if (_dim==2)
+  if (_dim == 2)
     {
-      //2D
-      if (nvert==3)
+      // 2D
+      if (nvert == 3)
         {
-          //tri
-          sigma=1.0;
+          // tri
+          sigma = 1.0;
           fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me, vol, f, lqmin, adp, Gloc, sigma);
-          g+=sigma*lqmin;
-          if (gqmin>lqmin)
-            gqmin=lqmin;
+          g += sigma*lqmin;
+          if (gqmin > lqmin)
+            gqmin = lqmin;
         }
-      if (nvert==4)
+      if (nvert == 4)
         {
           //quad
           for (unsigned i=0; i<2; i++)
             {
-              K[0]=i;
+              K[0] = i;
               for (unsigned j=0; j<2; j++)
                 {
-                  K[1]=j;
-                  sigma=0.25;
+                  K[1] = j;
+                  sigma = 0.25;
                   fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
                                 vol, f, lqmin, adp, Gloc, sigma);
-                  g+=sigma*lqmin;
-                  if (gqmin>lqmin)
-                    gqmin=lqmin;
+                  g += sigma*lqmin;
+                  if (gqmin > lqmin)
+                    gqmin = lqmin;
                 }
             }
         }
@@ -2804,105 +3133,109 @@ double VariationalMeshSmoother::localP(Array3D<double>& W,
           // quad tri
           for (unsigned i=0; i<3; i++)
             {
-              K[0]=i*0.5;
-              unsigned k=i/2;
-              K[1]=static_cast<double>(k);
+              K[0] = i*0.5;
+              unsigned k = i/2;
+              K[1] = static_cast<double>(k);
 
               for (unsigned j=0; j<3; j++)
                 {
-                  K[2]=j*0.5;
-                  k=j/2;
-                  K[3]=static_cast<double>(k);
-                  if (i==j)
-                    sigma=1.0/12;
+                  K[2] = j*0.5;
+                  k = j/2;
+                  K[3] = static_cast<double>(k);
+                  if (i == j)
+                    sigma = 1./12.;
                   else
-                    sigma=1.0/24;
+                    sigma = 1./24.;
 
                   fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
                                 vol, f, lqmin, adp, Gloc, sigma);
-                  g+=sigma*lqmin;
-                  if (gqmin>lqmin)
-                    gqmin=lqmin;
+                  g += sigma*lqmin;
+                  if (gqmin > lqmin)
+                    gqmin = lqmin;
                 }
             }
         }
     }
-  if (_dim==3)
+  if (_dim == 3)
     {
-      //3D
-      if (nvert==4)
+      // 3D
+      if (nvert == 4)
         {
-          //tetr
-          sigma=1.0;
+          // tetr
+          sigma = 1.0;
           fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
                         vol, f, lqmin, adp, Gloc, sigma);
-          g+=sigma*lqmin;
-          if (gqmin>lqmin)
-            gqmin=lqmin;
+          g += sigma*lqmin;
+          if (gqmin > lqmin)
+            gqmin = lqmin;
         }
-      if (nvert==6)
+      if (nvert == 6)
         {
           //prism
           for (unsigned i=0; i<2; i++)
             {
-              K[0]=i;
+              K[0] = i;
               for (unsigned j=0; j<2; j++)
                 {
-                  K[1]=j;
+                  K[1] = j;
                   for (unsigned k=0; k<3; k++)
                     {
-                      K[2]=static_cast<double>(k)/2.0;
-                      K[3]=static_cast<double>(k%2);
-                      sigma=1.0/12.0;
+                      K[2] = 0.5*static_cast<double>(k);
+                      K[3] = static_cast<double>(k % 2);
+                      sigma = 1./12.;
                       fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
                                     vol, f, lqmin, adp, Gloc, sigma);
-                      g+=sigma*lqmin;
-                      if (gqmin>lqmin)
-                        gqmin=lqmin;
+                      g += sigma*lqmin;
+                      if (gqmin > lqmin)
+                        gqmin = lqmin;
                     }
                 }
             }
         }
-      if (nvert==8)
+      if (nvert == 8)
         {
-          //hex
+          // hex
           for (unsigned i=0; i<2; i++)
             {
-              K[0]=i;
+              K[0] = i;
               for (unsigned j=0; j<2; j++)
                 {
-                  K[1]=j;
+                  K[1] = j;
                   for (unsigned k=0; k<2; k++)
                     {
-                      K[2]=k;
+                      K[2] = k;
                       for (unsigned l=0; l<2; l++)
                         {
-                          K[3]=l;
+                          K[3] = l;
                           for (unsigned m=0; m<2; m++)
                             {
-                              K[4]=m;
+                              K[4] = m;
                               for (unsigned nn=0; nn<2; nn++)
                                 {
-                                  K[5]=nn;
+                                  K[5] = nn;
 
-                                  if ((i==nn)&&(j==l)&&(k==m))
-                                    sigma=1./27.;
+                                  if ((i==nn) && (j==l) && (k==m))
+                                    sigma = 1./27.;
 
-                                  if (((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m)))
-                                    sigma=1./(27.*2.);
+                                  if (((i==nn) && (j==l) && (k!=m)) ||
+                                      ((i==nn) && (j!=l) && (k==m)) ||
+                                      ((i!=nn) && (j==l) && (k==m)))
+                                    sigma = 1./54.;
 
-                                  if (((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m)))
-                                    sigma=1./(27.*4.);
+                                  if (((i==nn) && (j!=l) && (k!=m)) ||
+                                      ((i!=nn) && (j!=l) && (k==m)) ||
+                                      ((i!=nn) && (j==l) && (k!=m)))
+                                    sigma = 1./108.;
 
-                                  if ((i!=nn)&&(j!=l)&&(k!=m))
-                                    sigma=1./(27.*8.);
+                                  if ((i!=nn) && (j!=l) && (k!=m))
+                                    sigma=1./216.;
 
                                   fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
                                                 vol, f, lqmin, adp, Gloc, sigma);
-                                  g+=sigma*lqmin;
+                                  g += sigma*lqmin;
 
-                                  if (gqmin>lqmin)
-                                    gqmin=lqmin;
+                                  if (gqmin > lqmin)
+                                    gqmin = lqmin;
                                 }
                             }
                         }
@@ -2922,49 +3255,101 @@ double VariationalMeshSmoother::localP(Array3D<double>& W,
                       switch (i)
                         {
                         case 0:
-                          K[0]=0;  K[1]=0;  K[2]=0;  break;
+                          K[0] = 0;
+                          K[1] = 0;
+                          K[2] = 0;
+                          break;
+
                         case 1:
-                          K[0]=1;  K[1]=0;  K[2]=0;  break;
+                          K[0] = 1;
+                          K[1] = 0;
+                          K[2] = 0;
+                          break;
+
                         case 2:
-                          K[0]=1.0/2;  K[1]=1;  K[2]=0;  break;
+                          K[0] = 0.5;
+                          K[1] = 1;
+                          K[2] = 0;
+                          break;
+
                         case 3:
-                          K[0]=1.0/2;  K[1]=1.0/3;  K[2]=1;  break;
+                          K[0] = 0.5;
+                          K[1] = 1./3.;
+                          K[2] = 1;
+                          break;
                         }
+
                       switch (j)
                         {
                         case 0:
-                          K[3]=0;  K[4]=0;  K[5]=0;  break;
+                          K[3] = 0;
+                          K[4] = 0;
+                          K[5] = 0;
+                          break;
+
                         case 1:
-                          K[3]=1;  K[4]=0;  K[5]=0;  break;
+                          K[3] = 1;
+                          K[4] = 0;
+                          K[5] = 0;
+                          break;
+
                         case 2:
-                          K[3]=1.0/2;  K[4]=1;  K[5]=0;  break;
+                          K[3] = 0.5;
+                          K[4] = 1;
+                          K[5] = 0;
+                          break;
+
                         case 3:
-                          K[3]=1.0/2;  K[4]=1.0/3;  K[5]=1;  break;
+                          K[3] = 0.5;
+                          K[4] = 1./3.;
+                          K[5] = 1;
+                          break;
+
                         }
+
                       switch (k)
                         {
                         case 0:
-                          K[6]=0;  K[7]=0;  K[8]=0;  break;
+                          K[6] = 0;
+                          K[7] = 0;
+                          K[8] = 0;
+                          break;
+
                         case 1:
-                          K[6]=1;  K[7]=0;  K[8]=0;  break;
+                          K[6] = 1;
+                          K[7] = 0;
+                          K[8] = 0;
+                          break;
+
                         case 2:
-                          K[6]=1.0/2;  K[7]=1;  K[8]=0;  break;
+                          K[6] = 0.5;
+                          K[7] = 1;
+                          K[8] = 0;
+                          break;
+
                         case 3:
-                          K[6]=1.0/2;  K[7]=1.0/3;  K[8]=1;  break;
+                          K[6] = 0.5;
+                          K[7] = 1./3.;
+                          K[8] = 1;
+                          break;
+
                         }
 
-                      if ((i==j)&&(j==k))
-                        sigma=1.0/120;
-                      else if ((i==j)||(j==k)||(i==k))
-                        sigma=1.0/360;
+                      if ((i==j) && (j==k))
+                        sigma = 1./120.;
+
+                      else if ((i==j) || (j==k) || (i==k))
+                        sigma = 1./360.;
+
                       else
-                        sigma=1.0/720;
+                        sigma = 1./720.;
 
                       fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
                                     vol, f, lqmin, adp, Gloc, sigma);
-                      g+=sigma*lqmin;
-                      if (gqmin>lqmin)
-                        gqmin=lqmin;
+
+                      g += sigma*lqmin;
+                      if (gqmin > lqmin)
+                        gqmin = lqmin;
                     }
                 }
             }
@@ -2974,18 +3359,18 @@ double VariationalMeshSmoother::localP(Array3D<double>& W,
   // fixed nodes correction
   for (int ii=0; ii<nvert; ii++)
     {
-      if (mask[cell_in[ii]]==1)
+      if (mask[cell_in[ii]] == 1)
         {
           for (unsigned kk=0; kk<_dim; kk++)
             {
               for (int jj=0; jj<nvert; jj++)
                 {
-                  W[kk][ii][jj]=0;
-                  W[kk][jj][ii]=0;
+                  W[kk][ii][jj] = 0;
+                  W[kk][jj][ii] = 0;
                 }
 
-              W[kk][ii][ii]=1;
-              F[kk][ii]=0;
+              W[kk][ii][ii] = 1;
+              F[kk][ii] = 0;
             }
         }
     }
@@ -3021,7 +3406,7 @@ double VariationalMeshSmoother::avertex(const std::vector<double>& afun,
       {
         a1[i] += Q[i][j]*R[cell_in[j]][0];
         a2[i] += Q[i][j]*R[cell_in[j]][1];
-        if (_dim==3)
+        if (_dim == 3)
           a3[i] += Q[i][j]*R[cell_in[j]][2];
 
         qu[i] += Q[i][j]*afun[cell_in[j]];
@@ -3029,7 +3414,7 @@ double VariationalMeshSmoother::avertex(const std::vector<double>& afun,
 
   double det = 0.0;
 
-  if (_dim==2)
+  if (_dim == 2)
     det = jac2(a1[0], a1[1],
                a2[0], a2[1]);
   else
@@ -3040,19 +3425,19 @@ double VariationalMeshSmoother::avertex(const std::vector<double>& afun,
   // Return val
   double g = 0.0;
 
-  if (det!=0)
+  if (det != 0)
     {
-      if (_dim==2)
+      if (_dim == 2)
         {
           double df0 = jac2(qu[0], qu[1], a2[0], a2[1])/det;
           double df1 = jac2(a1[0], a1[1], qu[0], qu[1])/det;
-          g = (1 + df0*df0 + df1*df1);
+          g = (1. + df0*df0 + df1*df1);
 
-          if (adp==2)
+          if (adp == 2)
             {
               // directional adaptation G=diag(g_i)
-              G[0] = 1 + df0*df0;
-              G[1] = 1 + df1*df1;
+              G[0] = 1. + df0*df0;
+              G[1] = 1. + df1*df1;
             }
           else
             {
@@ -3065,13 +3450,13 @@ double VariationalMeshSmoother::avertex(const std::vector<double>& afun,
           double df0 = (qu[0]*(a2[1]*a3[2]-a2[2]*a3[1]) + qu[1]*(a2[2]*a3[0]-a2[0]*a3[2]) + qu[2]*(a2[0]*a3[1]-a2[1]*a3[0]))/det;
           double df1 = (qu[0]*(a3[1]*a1[2]-a3[2]*a1[1]) + qu[1]*(a3[2]*a1[0]-a3[0]*a1[2]) + qu[2]*(a3[0]*a1[1]-a3[1]*a1[0]))/det;
           double df2 = (qu[0]*(a1[1]*a2[2]-a1[2]*a2[1]) + qu[1]*(a1[2]*a2[0]-a1[0]*a2[2]) + qu[2]*(a1[0]*a2[1]-a1[1]*a2[0]))/det;
-          g = 1 + df0*df0 + df1*df1 + df2*df2;
-          if (adp==2)
+          g = 1. + df0*df0 + df1*df1 + df2*df2;
+          if (adp == 2)
             {
               // directional adaptation G=diag(g_i)
-              G[0] = 1 + df0*df0;
-              G[1] = 1 + df1*df1;
-              G[2] = 1 + df2*df2;
+              G[0] = 1. + df0*df0;
+              G[1] = 1. + df1*df1;
+              G[2] = 1. + df2*df2;
             }
           else
             {
@@ -3120,13 +3505,13 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
       {
         a1[i] += Q[i][j]*R[cell_in[j]][0];
         a2[i] += Q[i][j]*R[cell_in[j]][1];
-        if (_dim==3)
+        if (_dim == 3)
           a3[i] += Q[i][j]*R[cell_in[j]][2];
       }
 
   // account for adaptation
   double G = 0.0;
-  if (adp<2)
+  if (adp < 2)
     G = g[0];
   else
     {
@@ -3135,7 +3520,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
         {
           a1[i] *= std::sqrt(g[0]);
           a2[i] *= std::sqrt(g[1]);
-          if (_dim==3)
+          if (_dim == 3)
             a3[i] *= std::sqrt(g[2]);
         }
     }
@@ -3147,7 +3532,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
 
   std::vector<double> av1(3), av2(3), av3(3);
 
-  if (_dim==2)
+  if (_dim == 2)
     {
       av1[0] =  a2[1];
       av1[1] = -a2[0];
@@ -3160,7 +3545,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
       phit = (1-w)*tr + w*(vol/G + det*det*G/vol)/2.;
     }
 
-  if (_dim==3)
+  if (_dim == 3)
     {
       av1[0] = a2[1]*a3[2] - a2[2]*a3[1];
       av1[1] = a2[2]*a3[0] - a2[0]*a3[2];
@@ -3184,22 +3569,22 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
       phit = (1-w)*pow(tr,1.5) + w*(vol/G + det*det*G/vol)/2.;
     }
 
-  double dchi = 0.5 + det*0.5/std::sqrt(epsilon*epsilon+det*det);
-  double chi = 0.5*(det+std::sqrt(epsilon*epsilon+det*det));
-  double fet = (chi != 0.0) ? phit/chi : 1.e32;
+  double dchi = 0.5 + det*0.5/std::sqrt(epsilon*epsilon + det*det);
+  double chi = 0.5*(det + std::sqrt(epsilon*epsilon + det*det));
+  double fet = (chi != 0.) ? phit/chi : 1.e32;
 
   // Set return value reference
   qmin = det*G;
 
   // gradient and Hessian
-  if (f==0)
+  if (f == 0)
     {
       Array3D<double> P(3, 3, 3);
       Array3D<double> d2phi(3, 3, 3);
       Array2D<double> dphi(3, 3);
       Array2D<double> dfe(3, 3);
 
-      if (_dim==2)
+      if (_dim == 2)
         {
           for (int i=0; i<2; i++)
             {
@@ -3213,7 +3598,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
                 d2phi[0][i][j] = w*G*av1[i]*av1[j]/vol;
                 d2phi[1][i][j] = w*G*av2[i]*av2[j]/vol;
 
-                if (i==j)
+                if (i == j)
                   for (int k=0; k<2; k++)
                     d2phi[k][i][j] += 1.-w;
               }
@@ -3232,7 +3617,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
               }
         }
 
-      if (_dim==3)
+      if (_dim == 3)
         {
           for (int i=0; i<3; i++)
             {
@@ -3243,7 +3628,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
 
           for (int i=0; i<3; i++)
             {
-              if (tr!=0)
+              if (tr != 0)
                 {
                   d2phi[0][i][i] = (1-w)/(3.*std::sqrt(tr))*a1[i]*a1[i] + w*G*av1[i]*av1[i]/vol;
                   d2phi[1][i][i] = (1-w)/(3.*std::sqrt(tr))*a2[i]*a2[i] + w*G*av2[i]*av2[i]/vol;
@@ -3358,14 +3743,14 @@ int VariationalMeshSmoother::pcg_par_check(int n,
 {
   int i, j, jj, k;
 
-  if (n<=0)
+  if (n <= 0)
     {
-      if (msglev>0)
+      if (msglev > 0)
         _logfile << "sol_pcg: incorrect input parameter: n =" << n << std::endl;
       return -1;
     }
 
-  if (ia[0]!=0)
+  if (ia[0] != 0)
     {
       if (msglev > 0)
         _logfile << "sol_pcg: incorrect input parameter: ia(1) =" << ia[0] << std::endl;
@@ -3374,9 +3759,9 @@ int VariationalMeshSmoother::pcg_par_check(int n,
 
   for (i=0; i<n; i++)
     {
-      if (ia[i+1]<ia[i])
+      if (ia[i+1] < ia[i])
         {
-          if (msglev>=1)
+          if (msglev >= 1)
             _logfile << "sol_pcg: incorrect input parameter: i ="
                      << i+1
                      << "; ia(i) ="
@@ -3390,9 +3775,9 @@ int VariationalMeshSmoother::pcg_par_check(int n,
 
   for (i=0; i<n; i++)
     {
-      if (ja[ia[i]]!=(i+1))
+      if (ja[ia[i]] != (i+1))
         {
-          if (msglev>=1)
+          if (msglev >= 1)
             _logfile << "sol_pcg: incorrect input parameter: i ="
                      << i+1
                      << " ; ia(i) ="
@@ -3411,9 +3796,9 @@ int VariationalMeshSmoother::pcg_par_check(int n,
       for (k=ia[i]; k<ia[i+1]; k++)
         {
           j=ja[k];
-          if ((j<(i+1))||(j>n))
+          if ((j<(i+1)) || (j>n))
             {
-              if (msglev>=1)
+              if (msglev >= 1)
                 _logfile << "sol_pcg: incorrect input parameter: i ="
                          << i+1
                          << " ; ia(i) ="
@@ -3429,7 +3814,7 @@ int VariationalMeshSmoother::pcg_par_check(int n,
 
               return -3;
             }
-          if (j<=jj)
+          if (j <= jj)
             {
               if (msglev >= 1)
                 _logfile << "sol_pcg: incorrect input parameter: i ="
@@ -3448,15 +3833,15 @@ int VariationalMeshSmoother::pcg_par_check(int n,
 
               return -3;
             }
-          jj=j;
+          jj = j;
         }
     }
 
   for (i=0; i<n; i++)
     {
-      if (a[ia[i]]<=0.0e0)
+      if (a[ia[i]] <= 0.0)
         {
-          if (msglev>=1)
+          if (msglev >= 1)
             _logfile << "sol_pcg: incorrect input parameter: i ="
                      << i+1
                      << " ; ia(i) ="
@@ -3470,19 +3855,20 @@ int VariationalMeshSmoother::pcg_par_check(int n,
         }
     }
 
-  if (eps<0.0e0)
+  if (eps < 0.0)
     {
-      if (msglev>0)
+      if (msglev > 0)
         _logfile << "sol_pcg: incorrect input parameter: eps =" << eps << std::endl;
       return -7;
     }
 
-  if (maxite<1)
+  if (maxite < 1)
     {
-      if (msglev>0)
+      if (msglev > 0)
         _logfile << "sol_pcg: incorrect input parameter: maxite =" << maxite << std::endl;
       return -8;
     }
+
   return 0;
 }
 
@@ -3629,9 +4015,9 @@ void VariationalMeshSmoother::gener(char grid[],
       int mask = 0;
       for (int j=0; j<n; j++)
         {
-          int ii = k%n1;
-          if ((ii==0) || (ii==n1-1))
-            mask=1;
+          int ii = k % n1;
+          if ((ii == 0) || (ii == n1-1))
+            mask = 1;
 
           outfile << static_cast<double>(ii)*x << " ";
           k /= n1;
@@ -3670,7 +4056,7 @@ void VariationalMeshSmoother::gener(char grid[],
 
 
 
-// Metric Generration
+// Metric Generation
 void VariationalMeshSmoother::metr_data_gen(char grid[],
                                             char metr[],
                                             int n,
@@ -3678,7 +4064,6 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
 {
   double a1[3], a2[3], a3[3];
   double det, g1, g2, g3, det_o, g1_o, g2_o, g3_o, eps=1e-3;
-  int Ncells;
 
   std::vector<double> K(9);
   Array2D<double> Q(3, 3*n + n%2);
@@ -3704,550 +4089,673 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
 
   // genetrate metric file
   FILE* stream = fopen(metr,"w+");
-  Ncells=0;
-  det_o=1.0; g1_o=1.0; g2_o=1.0; g3_o=1.0;
+  int Ncells = 0;
+  det_o = 1.0;
+  g1_o = 1.0;
+  g2_o = 1.0;
+  g3_o = 1.0;
   for (int i=0; i<ncells; i++)
-    if (mcells[i]>=0)
+    if (mcells[i] >= 0)
       {
         int nvert=0;
-        while (cells[i][nvert]>=0)
+        while (cells[i][nvert] >= 0)
           nvert++;
 
-        if (n==2)
+        if (n == 2)
           {
             // 2D - tri and quad
-            if (nvert==3)
+            if (nvert == 3)
               {
                 // tri
                 basisA(Q, 3, K, Q, 1);
                 for (int k=0; k<2; k++)
                   {
-                    a1[k]=0;
-                    a2[k]=0;
+                    a1[k] = 0;
+                    a2[k] = 0;
 
                     for (int l=0; l<3; l++)
                       {
-                        a1[k]=a1[k]+Q[k][l]*R[cells[i][l]][0];
-                        a2[k]=a2[k]+Q[k][l]*R[cells[i][l]][1];
+                        a1[k] += Q[k][l]*R[cells[i][l]][0];
+                        a2[k] += Q[k][l]*R[cells[i][l]][1];
                       }
                   }
 
-                det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]);
-                g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]);
+                det = jac2(a1[0], a1[1], a2[0], a2[1]);
+                g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0]);
+                g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1]);
 
                 // need to keep data from previous cell
-                if ((std::abs(det)<eps*eps*det_o)||(det<0))
-                  det=det_o;
+                if ((std::abs(det) < eps*eps*det_o) || (det < 0))
+                  det = det_o;
 
-                if ((std::abs(g1)<eps*g1_o)||(g1<0))
-                  g1=g1_o;
+                if ((std::abs(g1) < eps*g1_o) || (g1<0))
+                  g1 = g1_o;
 
-                if ((std::abs(g2)<eps*g2_o)||(g2<0))
-                  g2=g2_o;
+                if ((std::abs(g2) < eps*g2_o) || (g2<0))
+                  g2 = g2_o;
 
                 // write to file
-                if (me==2)
-                  fprintf(stream,"%e 0.000000e+00 \n0.000000e+00 %e \n",1.0/std::sqrt(det),1.0/std::sqrt(det));
+                if (me == 2)
+                  fprintf(stream,"%e 0.000000e+00 \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 1.0/std::sqrt(det));
 
-                if (me==3)
-                  fprintf(stream,"%e 0.000000e+00 \n0.000000e+00 %e \n",1.0/g1,1.0/g2);
+                if (me == 3)
+                  fprintf(stream,"%e 0.000000e+00 \n0.000000e+00 %e \n", 1.0/g1, 1.0/g2);
 
-                det_o=det; g1_o=g1; g2_o=g2;
+                det_o = det;
+                g1_o = g1;
+                g2_o = g2;
                 Ncells++;
               }
 
-            if (nvert==4)
+            if (nvert == 4)
               {
                 // quad
-                a1[0]=R[cells[i][1]][0]-R[cells[i][0]][0];
-                a1[1]=R[cells[i][2]][0]-R[cells[i][0]][0];
-                a2[0]=R[cells[i][1]][1]-R[cells[i][0]][1];
-                a2[1]=R[cells[i][2]][1]-R[cells[i][0]][1];
-                det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]);
-                g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]);
+                a1[0] = R[cells[i][1]][0] - R[cells[i][0]][0];
+                a1[1] = R[cells[i][2]][0] - R[cells[i][0]][0];
+                a2[0] = R[cells[i][1]][1] - R[cells[i][0]][1];
+                a2[1] = R[cells[i][2]][1] - R[cells[i][0]][1];
+                det = jac2(a1[0], a1[1], a2[0], a2[1]);
+                g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0]);
+                g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1]);
 
                 // need to keep data from previous cell
-                if ((std::abs(det)<eps*eps*det_o)||(det<0))
-                  det=det_o;
+                if ((std::abs(det) < eps*eps*det_o) || (det < 0))
+                  det = det_o;
 
-                if ((std::abs(g1)<eps*g1_o)||(g1<0))
-                  g1=g1_o;
+                if ((std::abs(g1) < eps*g1_o) || (g1<0))
+                  g1 = g1_o;
 
-                if ((std::abs(g2)<eps*g2_o)||(g2<0))
-                  g2=g2_o;
+                if ((std::abs(g2) < eps*g2_o) || (g2<0))
+                  g2 = g2_o;
 
                 // write to file
-                if (me==2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/std::sqrt(det),0.5/std::sqrt(det),0.5*std::sqrt(3.0/det));
+                if (me == 2)
+                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
 
-                if (me==3)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/g1,0.5/g2,0.5*std::sqrt(3.0)/g2);
+                if (me == 3)
+                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
 
-                det_o=det;
-                g1_o=g1;
-                g2_o=g2;
+                det_o = det;
+                g1_o = g1;
+                g2_o = g2;
                 Ncells++;
-                a1[0]=R[cells[i][3]][0]-R[cells[i][1]][0];
-                a1[1]=R[cells[i][0]][0]-R[cells[i][1]][0];
-                a2[0]=R[cells[i][3]][1]-R[cells[i][1]][1];
-                a2[1]=R[cells[i][0]][1]-R[cells[i][1]][1];
-                det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]);
-                g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]);
+                a1[0] = R[cells[i][3]][0] - R[cells[i][1]][0];
+                a1[1] = R[cells[i][0]][0] - R[cells[i][1]][0];
+                a2[0] = R[cells[i][3]][1] - R[cells[i][1]][1];
+                a2[1] = R[cells[i][0]][1] - R[cells[i][1]][1];
+                det = jac2(a1[0], a1[1], a2[0], a2[1]);
+                g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0]);
+                g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1]);
 
                 // need to keep data from previous cell
-                if ((std::abs(det)<eps*eps*det_o)||(det<0))
-                  det=det_o;
+                if ((std::abs(det) < eps*eps*det_o) || (det < 0))
+                  det = det_o;
 
-                if ((std::abs(g1)<eps*g1_o)||(g1<0))
-                  g1=g1_o;
+                if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+                  g1 = g1_o;
 
-                if ((std::abs(g2)<eps*g2_o)||(g2<0))
-                  g2=g2_o;
+                if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+                  g2 = g2_o;
 
                 // write to file
-                if (me==2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/std::sqrt(det),0.5/std::sqrt(det),0.5*std::sqrt(3.0/det));
+                if (me == 2)
+                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
 
-                if (me==3)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/g1,0.5/g2,0.5*std::sqrt(3.0)/g2);
+                if (me == 3)
+                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
 
-                det_o=det;
-                g1_o=g1;
-                g2_o=g2;
+                det_o = det;
+                g1_o = g1;
+                g2_o = g2;
                 Ncells++;
-                a1[0]=R[cells[i][2]][0]-R[cells[i][3]][0];
-                a1[1]=R[cells[i][1]][0]-R[cells[i][3]][0];
-                a2[0]=R[cells[i][2]][1]-R[cells[i][3]][1];
-                a2[1]=R[cells[i][1]][1]-R[cells[i][3]][1];
-                det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]);
-                g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]);
+                a1[0] = R[cells[i][2]][0] - R[cells[i][3]][0];
+                a1[1] = R[cells[i][1]][0] - R[cells[i][3]][0];
+                a2[0] = R[cells[i][2]][1] - R[cells[i][3]][1];
+                a2[1] = R[cells[i][1]][1] - R[cells[i][3]][1];
+                det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0]);
+                g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1]);
 
                 // need to keep data from previous cell
-                if ((std::abs(det)<eps*eps*det_o)||(det<0))
-                  det=det_o;
+                if ((std::abs(det) < eps*eps*det_o) || (det < 0))
+                  det = det_o;
 
-                if ((std::abs(g1)<eps*g1_o)||(g1<0))
-                  g1=g1_o;
+                if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+                  g1 = g1_o;
 
-                if ((std::abs(g2)<eps*g2_o)||(g2<0))
-                  g2=g2_o;
+                if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+                  g2 = g2_o;
 
                 // write to file
-                if (me==2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/std::sqrt(det),0.5/std::sqrt(det),0.5*std::sqrt(3.0/det));
+                if (me == 2)
+                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
 
-                if (me==3)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/g1,0.5/g2,0.5*std::sqrt(3.0)/g2);
+                if (me == 3)
+                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
 
-                det_o=det;
-                g1_o=g1;
-                g2_o=g2;
+                det_o = det;
+                g1_o = g1;
+                g2_o = g2;
                 Ncells++;
-                a1[0]=R[cells[i][0]][0]-R[cells[i][2]][0];
-                a1[1]=R[cells[i][3]][0]-R[cells[i][2]][0];
-                a2[0]=R[cells[i][0]][1]-R[cells[i][2]][1];
-                a2[1]=R[cells[i][3]][1]-R[cells[i][2]][1];
-                det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]);
-                g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]);
+                a1[0] = R[cells[i][0]][0] - R[cells[i][2]][0];
+                a1[1] = R[cells[i][3]][0] - R[cells[i][2]][0];
+                a2[0] = R[cells[i][0]][1] - R[cells[i][2]][1];
+                a2[1] = R[cells[i][3]][1] - R[cells[i][2]][1];
+                det = jac2(a1[0], a1[1], a2[0], a2[1]);
+                g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0]);
+                g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1]);
 
                 // need to keep data from previous cell
-                if ((std::abs(det)<eps*eps*det_o)||(det<0))
-                  det=det_o;
+                if ((std::abs(det) < eps*eps*det_o) || (det < 0))
+                  det = det_o;
 
-                if ((std::abs(g1)<eps*g1_o)||(g1<0))
-                  g1=g1_o;
+                if ((std::abs(g1) < eps*g1_o) || (g1<0))
+                  g1 = g1_o;
 
-                if ((std::abs(g2)<eps*g2_o)||(g2<0))
-                  g2=g2_o;
+                if ((std::abs(g2) < eps*g2_o) || (g2<0))
+                  g2 = g2_o;
 
                 // write to file
-                if (me==2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/std::sqrt(det),0.5/std::sqrt(det),0.5*std::sqrt(3.0/det));
+                if (me == 2)
+                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
 
-                if (me==3)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n",1.0/g1,0.5/g2,0.5*std::sqrt(3.0)/g2);
+                if (me == 3)
+                  fprintf(stream, "%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
 
-                det_o=det;
-                g1_o=g1;
-                g2_o=g2;
+                det_o = det;
+                g1_o = g1;
+                g2_o = g2;
                 Ncells++;
               }
           }
 
-      if (n==3)
+      if (n == 3)
         {
           // 3D - tetr and hex
 
-          if (nvert==4)
+          if (nvert == 4)
             {
               // tetr
               basisA(Q, 4, K, Q, 1);
               for (int k=0; k<3; k++)
                 {
-                  a1[k]=0;
-                  a2[k]=0;
-                  a3[k]=0;
+                  a1[k] = 0;
+                  a2[k] = 0;
+                  a3[k] = 0;
 
                   for (int l=0; l<4; l++)
                     {
-                      a1[k]=a1[k]+Q[k][l]*R[cells[i][l]][0];
-                      a2[k]=a2[k]+Q[k][l]*R[cells[i][l]][1];
-                      a3[k]=a3[k]+Q[k][l]*R[cells[i][l]][2];
+                      a1[k] += Q[k][l]*R[cells[i][l]][0];
+                      a2[k] += Q[k][l]*R[cells[i][l]][1];
+                      a3[k] += Q[k][l]*R[cells[i][l]][2];
                     }
                 }
 
-              det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-              g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-              g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-              g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+              det = jac3(a1[0], a1[1], a1[2],
+                         a2[0], a2[1], a2[2],
+                         a3[0], a3[1], a3[2]);
+              g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+              g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+              g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
               // need to keep data from previous cell
-              if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-                det=det_o;
+              if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+                det = det_o;
 
-              if ((std::abs(g1)<eps*g1_o)||(g1<0))
-                g1=g1_o;
+              if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+                g1 = g1_o;
 
-              if ((std::abs(g2)<eps*g2_o)||(g2<0))
-                g2=g2_o;
+              if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+                g2 = g2_o;
 
-              if ((std::abs(g3)<eps*g3_o)||(g3<0))
-                g3=g3_o;
+              if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+                g3 = g3_o;
 
               // write to file
-              if (me==2)
-                fprintf(stream,"%e 0.000000e+00  0.000000e+00\n0.000000e+00 %e 0.000000e+00\n  0.000000e+00 0.000000e+00 %e\n",1.0/pow(det,1.0/3.0),1.0/pow(det,1.0/3.0),1.0/pow(det,1.0/3.0));
+              if (me == 2)
+                fprintf(stream, "%e 0.000000e+00  0.000000e+00\n0.000000e+00 %e 0.000000e+00\n  0.000000e+00 0.000000e+00 %e\n", 1.0/pow(det, 1.0/3.0), 1.0/pow(det, 1.0/3.0), 1.0/pow(det, 1.0/3.0));
 
-              if (me==3)
-                fprintf(stream,"%e 0.000000e+00  0.000000e+00\n0.000000e+00 %e 0.000000e+00\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,1.0/g2,1.0/g3);
+              if (me == 3)
+                fprintf(stream, "%e 0.000000e+00  0.000000e+00\n0.000000e+00 %e 0.000000e+00\n  0.000000e+00 0.000000e+00 %e\n", 1.0/g1, 1.0/g2, 1.0/g3);
 
-              det_o=det;
-              g1_o=g1;
-              g2_o=g2;
-              g3_o=g3;
+              det_o = det;
+              g1_o = g1;
+              g2_o = g2;
+              g3_o = g3;
               Ncells++;
             }
 
-        if (nvert==8)
+        if (nvert == 8)
           {
             // hex
-            a1[0]=R[cells[i][1]][0]-R[cells[i][0]][0];
-            a1[1]=R[cells[i][2]][0]-R[cells[i][0]][0];
-            a1[2]=R[cells[i][4]][0]-R[cells[i][0]][0];
-            a2[0]=R[cells[i][1]][1]-R[cells[i][0]][1];
-            a2[1]=R[cells[i][2]][1]-R[cells[i][0]][1];
-            a2[2]=R[cells[i][4]][1]-R[cells[i][0]][1];
-            a3[0]=R[cells[i][1]][2]-R[cells[i][0]][2];
-            a3[1]=R[cells[i][2]][2]-R[cells[i][0]][2];
-            a3[2]=R[cells[i][4]][2]-R[cells[i][0]][2];
-            det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-            g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-            g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-            g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+            a1[0] = R[cells[i][1]][0] - R[cells[i][0]][0];
+            a1[1] = R[cells[i][2]][0] - R[cells[i][0]][0];
+            a1[2] = R[cells[i][4]][0] - R[cells[i][0]][0];
+            a2[0] = R[cells[i][1]][1] - R[cells[i][0]][1];
+            a2[1] = R[cells[i][2]][1] - R[cells[i][0]][1];
+            a2[2] = R[cells[i][4]][1] - R[cells[i][0]][1];
+            a3[0] = R[cells[i][1]][2] - R[cells[i][0]][2];
+            a3[1] = R[cells[i][2]][2] - R[cells[i][0]][2];
+            a3[2] = R[cells[i][4]][2] - R[cells[i][0]][2];
+            det = jac3(a1[0], a1[1], a1[2],
+                       a2[0], a2[1], a2[2],
+                       a3[0], a3[1], a3[2]);
+            g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+            g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+            g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
             // need to keep data from previous cell
-            if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-              det=det_o;
+            if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+              det = det_o;
 
-            if ((std::abs(g1)<eps*g1_o)||(g1<0))
-              g1=g1_o;
+            if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+              g1 = g1_o;
 
-            if ((std::abs(g2)<eps*g2_o)||(g2<0))
-              g2=g2_o;
+            if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+              g2 = g2_o;
 
-            if ((std::abs(g3)<eps*g3_o)||(g3<0))
-              g3=g3_o;
+            if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+              g3 = g3_o;
 
           // write to file
-          if (me==2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+          if (me == 2)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/pow(det, 1.0/3.0),
+                    0.5/pow(det, 1.0/3.0),
+                    0.5/pow(det, 1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det, 1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det, 1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det, 1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
-          a1[0]=R[cells[i][3]][0]-R[cells[i][1]][0];
-          a1[1]=R[cells[i][0]][0]-R[cells[i][1]][0];
-          a1[2]=R[cells[i][5]][0]-R[cells[i][1]][0];
-          a2[0]=R[cells[i][3]][1]-R[cells[i][1]][1];
-          a2[1]=R[cells[i][0]][1]-R[cells[i][1]][1];
-          a2[2]=R[cells[i][5]][1]-R[cells[i][1]][1];
-          a3[0]=R[cells[i][3]][2]-R[cells[i][1]][2];
-          a3[1]=R[cells[i][0]][2]-R[cells[i][1]][2];
-          a3[2]=R[cells[i][5]][2]-R[cells[i][1]][2];
-          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-          g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-          g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-          g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+          a1[0] = R[cells[i][3]][0] - R[cells[i][1]][0];
+          a1[1] = R[cells[i][0]][0] - R[cells[i][1]][0];
+          a1[2] = R[cells[i][5]][0] - R[cells[i][1]][0];
+          a2[0] = R[cells[i][3]][1] - R[cells[i][1]][1];
+          a2[1] = R[cells[i][0]][1] - R[cells[i][1]][1];
+          a2[2] = R[cells[i][5]][1] - R[cells[i][1]][1];
+          a3[0] = R[cells[i][3]][2] - R[cells[i][1]][2];
+          a3[1] = R[cells[i][0]][2] - R[cells[i][1]][2];
+          a3[2] = R[cells[i][5]][2] - R[cells[i][1]][2];
+
+          det = jac3(a1[0], a1[1], a1[2],
+                     a2[0], a2[1], a2[2],
+                     a3[0], a3[1], a3[2]);
+
+          g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+          g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+          g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
           // need to keep data from previous cell
-          if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-            det=det_o;
+          if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+            det = det_o;
 
-          if ((std::abs(g1)<eps*g1_o)||(g1<0))
-            g1=g1_o;
+          if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+            g1 = g1_o;
 
-          if ((std::abs(g2)<eps*g2_o)||(g2<0))
-            g2=g2_o;
+          if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+            g2 = g2_o;
 
-          if ((std::abs(g3)<eps*g3_o)||(g3<0))
-            g3=g3_o;
+          if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+            g3 = g3_o;
 
           // write to file
-          if (me==2)
+          if (me == 2)
             fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+                    1.0/pow(det, 1.0/3.0),
+                    0.5/pow(det, 1.0/3.0),
+                    0.5/pow(det, 1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det, 1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det, 1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det, 1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
-          a1[0]=R[cells[i][2]][0]-R[cells[i][3]][0];
-          a1[1]=R[cells[i][1]][0]-R[cells[i][3]][0];
-          a1[2]=R[cells[i][7]][0]-R[cells[i][3]][0];
-          a2[0]=R[cells[i][2]][1]-R[cells[i][3]][1];
-          a2[1]=R[cells[i][1]][1]-R[cells[i][3]][1];
-          a2[2]=R[cells[i][7]][1]-R[cells[i][3]][1];
-          a3[0]=R[cells[i][2]][2]-R[cells[i][3]][2];
-          a3[1]=R[cells[i][1]][2]-R[cells[i][3]][2];
-          a3[2]=R[cells[i][7]][2]-R[cells[i][3]][2];
-          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-          g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-          g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-          g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+          a1[0] = R[cells[i][2]][0] - R[cells[i][3]][0];
+          a1[1] = R[cells[i][1]][0] - R[cells[i][3]][0];
+          a1[2] = R[cells[i][7]][0] - R[cells[i][3]][0];
+          a2[0] = R[cells[i][2]][1] - R[cells[i][3]][1];
+          a2[1] = R[cells[i][1]][1] - R[cells[i][3]][1];
+          a2[2] = R[cells[i][7]][1] - R[cells[i][3]][1];
+          a3[0] = R[cells[i][2]][2] - R[cells[i][3]][2];
+          a3[1] = R[cells[i][1]][2] - R[cells[i][3]][2];
+          a3[2] = R[cells[i][7]][2] - R[cells[i][3]][2];
+
+          det = jac3(a1[0], a1[1], a1[2],
+                     a2[0], a2[1], a2[2],
+                     a3[0], a3[1], a3[2]);
+
+          g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+          g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+          g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
           // need to keep data from previous cell
-          if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-            det=det_o;
+          if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+            det = det_o;
 
-          if ((std::abs(g1)<eps*g1_o)||(g1<0))
-            g1=g1_o;
+          if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+            g1 = g1_o;
 
-          if ((std::abs(g2)<eps*g2_o)||(g2<0))
-            g2=g2_o;
+          if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+            g2 = g2_o;
 
-          if ((std::abs(g3)<eps*g3_o)||(g3<0))
-            g3=g3_o;
+          if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+            g3 = g3_o;
 
           // write to file
-          if (me==2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+          if (me == 2)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
-          a1[0]=R[cells[i][0]][0]-R[cells[i][2]][0];
-          a1[1]=R[cells[i][3]][0]-R[cells[i][2]][0];
-          a1[2]=R[cells[i][6]][0]-R[cells[i][2]][0];
-          a2[0]=R[cells[i][0]][1]-R[cells[i][2]][1];
-          a2[1]=R[cells[i][3]][1]-R[cells[i][2]][1];
-          a2[2]=R[cells[i][6]][1]-R[cells[i][2]][1];
-          a3[0]=R[cells[i][0]][2]-R[cells[i][2]][2];
-          a3[1]=R[cells[i][3]][2]-R[cells[i][2]][2];
-          a3[2]=R[cells[i][6]][2]-R[cells[i][2]][2];
-          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-          g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-          g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-          g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+          a1[0] = R[cells[i][0]][0] - R[cells[i][2]][0];
+          a1[1] = R[cells[i][3]][0] - R[cells[i][2]][0];
+          a1[2] = R[cells[i][6]][0] - R[cells[i][2]][0];
+          a2[0] = R[cells[i][0]][1] - R[cells[i][2]][1];
+          a2[1] = R[cells[i][3]][1] - R[cells[i][2]][1];
+          a2[2] = R[cells[i][6]][1] - R[cells[i][2]][1];
+          a3[0] = R[cells[i][0]][2] - R[cells[i][2]][2];
+          a3[1] = R[cells[i][3]][2] - R[cells[i][2]][2];
+          a3[2] = R[cells[i][6]][2] - R[cells[i][2]][2];
+          det = jac3(a1[0], a1[1], a1[2],
+                     a2[0], a2[1], a2[2],
+                     a3[0], a3[1], a3[2]);
+          g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+          g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+          g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
           // need to keep data from previous cell
-          if ((std::abs(det)<eps*eps*eps*det_o)||(det<0)) det=det_o;
-          if ((std::abs(g1)<eps*g1_o)||(g1<0)) g1=g1_o;
-          if ((std::abs(g2)<eps*g2_o)||(g2<0)) g2=g2_o;
-          if ((std::abs(g3)<eps*g3_o)||(g3<0)) g3=g3_o;
+          if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+            det = det_o;
+
+          if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+            g1 = g1_o;
+
+          if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+            g2 = g2_o;
+
+          if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+            g3 = g3_o;
 
           // write to file
-          if (me==2)
+          if (me == 2)
             fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+                    1.0/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
-          a1[0]=R[cells[i][6]][0]-R[cells[i][4]][0];
-          a1[1]=R[cells[i][5]][0]-R[cells[i][4]][0];
-          a1[2]=R[cells[i][0]][0]-R[cells[i][4]][0];
-          a2[0]=R[cells[i][6]][1]-R[cells[i][4]][1];
-          a2[1]=R[cells[i][5]][1]-R[cells[i][4]][1];
-          a2[2]=R[cells[i][0]][1]-R[cells[i][4]][1];
-          a3[0]=R[cells[i][6]][2]-R[cells[i][4]][2];
-          a3[1]=R[cells[i][5]][2]-R[cells[i][4]][2];
-          a3[2]=R[cells[i][0]][2]-R[cells[i][4]][2];
-          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-          g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-          g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-          g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+          a1[0] = R[cells[i][6]][0] - R[cells[i][4]][0];
+          a1[1] = R[cells[i][5]][0] - R[cells[i][4]][0];
+          a1[2] = R[cells[i][0]][0] - R[cells[i][4]][0];
+          a2[0] = R[cells[i][6]][1] - R[cells[i][4]][1];
+          a2[1] = R[cells[i][5]][1] - R[cells[i][4]][1];
+          a2[2] = R[cells[i][0]][1] - R[cells[i][4]][1];
+          a3[0] = R[cells[i][6]][2] - R[cells[i][4]][2];
+          a3[1] = R[cells[i][5]][2] - R[cells[i][4]][2];
+          a3[2] = R[cells[i][0]][2] - R[cells[i][4]][2];
+          det = jac3(a1[0], a1[1], a1[2],
+                     a2[0], a2[1], a2[2],
+                     a3[0], a3[1], a3[2]);
+          g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+          g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+          g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
           // need to keep data from previous cell
-          if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-            det=det_o;
+          if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+            det = det_o;
 
-          if ((std::abs(g1)<eps*g1_o)||(g1<0))
-            g1=g1_o;
+          if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+            g1 = g1_o;
 
-          if ((std::abs(g2)<eps*g2_o)||(g2<0))
-            g2=g2_o;
+          if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+            g2 = g2_o;
 
-          if ((std::abs(g3)<eps*g3_o)||(g3<0))
-            g3=g3_o;
+          if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+            g3 = g3_o;
 
           // write to file
-          if (me==2)
+          if (me == 2)
             fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+                    1.0/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
-          a1[0]=R[cells[i][4]][0]-R[cells[i][5]][0];
-          a1[1]=R[cells[i][7]][0]-R[cells[i][5]][0];
-          a1[2]=R[cells[i][1]][0]-R[cells[i][5]][0];
-          a2[0]=R[cells[i][4]][1]-R[cells[i][5]][1];
-          a2[1]=R[cells[i][7]][1]-R[cells[i][5]][1];
-          a2[2]=R[cells[i][1]][1]-R[cells[i][5]][1];
-          a3[0]=R[cells[i][4]][2]-R[cells[i][5]][2];
-          a3[1]=R[cells[i][7]][2]-R[cells[i][5]][2];
-          a3[2]=R[cells[i][1]][2]-R[cells[i][5]][2];
-          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-          g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-          g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-          g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+          a1[0] = R[cells[i][4]][0] - R[cells[i][5]][0];
+          a1[1] = R[cells[i][7]][0] - R[cells[i][5]][0];
+          a1[2] = R[cells[i][1]][0] - R[cells[i][5]][0];
+          a2[0] = R[cells[i][4]][1] - R[cells[i][5]][1];
+          a2[1] = R[cells[i][7]][1] - R[cells[i][5]][1];
+          a2[2] = R[cells[i][1]][1] - R[cells[i][5]][1];
+          a3[0] = R[cells[i][4]][2] - R[cells[i][5]][2];
+          a3[1] = R[cells[i][7]][2] - R[cells[i][5]][2];
+          a3[2] = R[cells[i][1]][2] - R[cells[i][5]][2];
+          det = jac3(a1[0], a1[1], a1[2],
+                     a2[0], a2[1], a2[2],
+                     a3[0], a3[1], a3[2]);
+
+          g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+          g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+          g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
           // need to keep data from previous cell
-          if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-            det=det_o;
+          if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+            det = det_o;
 
-          if ((std::abs(g1)<eps*g1_o)||(g1<0))
-            g1=g1_o;
+          if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+            g1 = g1_o;
 
-          if ((std::abs(g2)<eps*g2_o)||(g2<0))
-            g2=g2_o;
+          if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+            g2 = g2_o;
 
-          if ((std::abs(g3)<eps*g3_o)||(g3<0))
-            g3=g3_o;
+          if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+            g3 = g3_o;
 
           // write to file
-          if (me==2)
+          if (me == 2)
             fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+                    1.0/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
-          a1[0]=R[cells[i][5]][0]-R[cells[i][7]][0];
-          a1[1]=R[cells[i][6]][0]-R[cells[i][7]][0];
-          a1[2]=R[cells[i][3]][0]-R[cells[i][7]][0];
-          a2[0]=R[cells[i][5]][1]-R[cells[i][7]][1];
-          a2[1]=R[cells[i][6]][1]-R[cells[i][7]][1];
-          a2[2]=R[cells[i][3]][1]-R[cells[i][7]][1];
-          a3[0]=R[cells[i][5]][2]-R[cells[i][7]][2];
-          a3[1]=R[cells[i][6]][2]-R[cells[i][7]][2];
-          a3[2]=R[cells[i][3]][2]-R[cells[i][7]][2];
-          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-          g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-          g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-          g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+          a1[0] = R[cells[i][5]][0] - R[cells[i][7]][0];
+          a1[1] = R[cells[i][6]][0] - R[cells[i][7]][0];
+          a1[2] = R[cells[i][3]][0] - R[cells[i][7]][0];
+          a2[0] = R[cells[i][5]][1] - R[cells[i][7]][1];
+          a2[1] = R[cells[i][6]][1] - R[cells[i][7]][1];
+          a2[2] = R[cells[i][3]][1] - R[cells[i][7]][1];
+          a3[0] = R[cells[i][5]][2] - R[cells[i][7]][2];
+          a3[1] = R[cells[i][6]][2] - R[cells[i][7]][2];
+          a3[2] = R[cells[i][3]][2] - R[cells[i][7]][2];
+          det = jac3(a1[0], a1[1], a1[2],
+                     a2[0], a2[1], a2[2],
+                     a3[0], a3[1], a3[2]);
+          g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+          g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+          g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
           // need to keep data from previous cell
-          if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-            det=det_o;
+          if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+            det = det_o;
 
-          if ((std::abs(g1)<eps*g1_o)||(g1<0))
-            g1=g1_o;
+          if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+            g1 = g1_o;
 
-          if ((std::abs(g2)<eps*g2_o)||(g2<0))
-            g2=g2_o;
+          if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+            g2 = g2_o;
 
-          if ((std::abs(g3)<eps*g3_o)||(g3<0))
-            g3=g3_o;
+          if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+            g3 = g3_o;
 
           // write to file
-          if (me==2)
+          if (me == 2)
             fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+                    1.0/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
-          a1[0]=R[cells[i][6]][0]-R[cells[i][6]][0];
-          a1[1]=R[cells[i][4]][0]-R[cells[i][6]][0];
-          a1[2]=R[cells[i][2]][0]-R[cells[i][6]][0];
-          a2[0]=R[cells[i][6]][1]-R[cells[i][6]][1];
-          a2[1]=R[cells[i][4]][1]-R[cells[i][6]][1];
-          a2[2]=R[cells[i][2]][1]-R[cells[i][6]][1];
-          a3[0]=R[cells[i][6]][2]-R[cells[i][6]][2];
-          a3[1]=R[cells[i][4]][2]-R[cells[i][6]][2];
-          a3[2]=R[cells[i][2]][2]-R[cells[i][6]][2];
-          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-          g1=std::sqrt(a1[0]*a1[0]+a2[0]*a2[0]+a3[0]*a3[0]);
-          g2=std::sqrt(a1[1]*a1[1]+a2[1]*a2[1]+a3[1]*a3[1]);
-          g3=std::sqrt(a1[2]*a1[2]+a2[2]*a2[2]+a3[2]*a3[2]);
+          a1[0] = R[cells[i][6]][0] - R[cells[i][6]][0];
+          a1[1] = R[cells[i][4]][0] - R[cells[i][6]][0];
+          a1[2] = R[cells[i][2]][0] - R[cells[i][6]][0];
+          a2[0] = R[cells[i][6]][1] - R[cells[i][6]][1];
+          a2[1] = R[cells[i][4]][1] - R[cells[i][6]][1];
+          a2[2] = R[cells[i][2]][1] - R[cells[i][6]][1];
+          a3[0] = R[cells[i][6]][2] - R[cells[i][6]][2];
+          a3[1] = R[cells[i][4]][2] - R[cells[i][6]][2];
+          a3[2] = R[cells[i][2]][2] - R[cells[i][6]][2];
+          det = jac3(a1[0], a1[1], a1[2],
+                     a2[0], a2[1], a2[2],
+                     a3[0], a3[1], a3[2]);
+          g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0] + a3[0]*a3[0]);
+          g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1] + a3[1]*a3[1]);
+          g3 = std::sqrt(a1[2]*a1[2] + a2[2]*a2[2] + a3[2]*a3[2]);
 
           // need to keep data from previous cell
-          if ((std::abs(det)<eps*eps*eps*det_o)||(det<0))
-            det=det_o;
+          if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+            det = det_o;
 
-          if ((std::abs(g1)<eps*g1_o)||(g1<0))
-            g1=g1_o;
+          if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+            g1 = g1_o;
 
-          if ((std::abs(g2)<eps*g2_o)||(g2<0))
-            g2=g2_o;
+          if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+            g2 = g2_o;
 
-          if ((std::abs(g3)<eps*g3_o)||(g3<0))
-            g3=g3_o;
+          if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+            g3 = g3_o;
 
           // write to file
-          if (me==2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5/pow(det,1.0/3.0),0.5*std::sqrt(3.0)/pow(det,1.0/3.0),0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),std::sqrt(2/3.0)/pow(det,1.0/3.0));
+          if (me == 2)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5/pow(det,1.0/3.0),
+                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
+                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
+                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
 
-          if (me==3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",1.0/g1,0.5/g2,0.5/g3,0.5*std::sqrt(3.0)/g2,0.5/(std::sqrt(3.0)*g3),std::sqrt(2/3.0)/g3);
+          if (me == 3)
+            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
+                    1.0/g1,
+                    0.5/g2,
+                    0.5/g3,
+                    0.5*std::sqrt(3.0)/g2,
+                    0.5/(std::sqrt(3.0)*g3),
+                    std::sqrt(2/3.0)/g3);
 
-          det_o=det;
-          g1_o=g1;
-          g2_o=g2;
-          g3_o=g3;
+          det_o = det;
+          g1_o = g1;
+          g2_o = g2;
+          g3_o = g3;
           Ncells++;
           }
         }
@@ -4255,61 +4763,61 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
   fclose(stream);
 
   // write new grid connectivity
-  grid[0]=grid[1];
-  grid[2]=grid[3];
+  grid[0] = grid[1];
+  grid[2] = grid[3];
 
-  stream=fopen(grid,"w+");
-  fprintf(stream,"%d \n%d \n%d \n0 \n",n,N,Ncells);
+  stream = fopen(grid,"w+");
+  fprintf(stream,"%d \n%d \n%d \n0 \n", n, N, Ncells);
 
   for (int i=0; i<N; i++)
     {
       // node coordinates
       for (int j=0; j<n; j++)
-        fprintf(stream,"%e ",R[i][j]);
+        fprintf(stream, "%e ", R[i][j]);
 
-      fprintf(stream,"%d \n",mask[i]);
+      fprintf(stream, "%d \n", mask[i]);
     }
 
   for (int i=0; i<ncells; i++)
-    if (mcells[i]>=0)
+    if (mcells[i] >= 0)
       {
         // cell connectivity
-        int nvert=0;
-        while (cells[i][nvert]>=0)
+        int nvert = 0;
+        while (cells[i][nvert] >= 0)
           nvert++;
 
-        if ((nvert==3)||((n==3)&&(nvert==4)))
+        if ((nvert == 3) || ((n == 3) && (nvert == 4)))
           {
             // tri & tetr
             for (int j=0; j<nvert; j++)
-              fprintf(stream,"%d ",cells[i][j]);
+              fprintf(stream,"%d ", cells[i][j]);
 
             for (int j=nvert; j<3*n+n%2; j++)
-              fprintf(stream,"-1 ");
+              fprintf(stream, "-1 ");
 
-            fprintf(stream,"%d \n",mcells[i]);
+            fprintf(stream,"%d \n", mcells[i]);
           }
 
-        if ((n==2)&&(nvert==4))
+        if ((n == 2) && (nvert == 4))
           {
             // quad
-            fprintf(stream,"%d %d %d -1 -1 -1 0\n",cells[i][0],cells[i][1],cells[i][2]);
-            fprintf(stream,"%d %d %d -1 -1 -1 0\n",cells[i][1],cells[i][3],cells[i][0]);
-            fprintf(stream,"%d %d %d -1 -1 -1 0\n",cells[i][3],cells[i][2],cells[i][1]);
-            fprintf(stream,"%d %d %d -1 -1 -1 0\n",cells[i][2],cells[i][0],cells[i][3]);
+            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][0], cells[i][1], cells[i][2]);
+            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][1], cells[i][3], cells[i][0]);
+            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][3], cells[i][2], cells[i][1]);
+            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][2], cells[i][0], cells[i][3]);
           }
 
-        if (nvert==8)
+        if (nvert == 8)
           {
             // hex
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][0],cells[i][1],cells[i][2],cells[i][4]);
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][1],cells[i][3],cells[i][0],cells[i][5]);
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][3],cells[i][2],cells[i][1],cells[i][7]);
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][2],cells[i][0],cells[i][3],cells[i][6]);
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][4],cells[i][6],cells[i][5],cells[i][0]);
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][5],cells[i][4],cells[i][7],cells[i][1]);
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][7],cells[i][5],cells[i][6],cells[i][3]);
-            fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][6],cells[i][7],cells[i][4],cells[i][2]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][0], cells[i][1], cells[i][2], cells[i][4]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][1], cells[i][3], cells[i][0], cells[i][5]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][3], cells[i][2], cells[i][1], cells[i][7]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][2], cells[i][0], cells[i][3], cells[i][6]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][4], cells[i][6], cells[i][5], cells[i][0]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][5], cells[i][4], cells[i][7], cells[i][1]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][7], cells[i][5], cells[i][6], cells[i][3]);
+            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][6], cells[i][7], cells[i][4], cells[i][2]);
           }
       }
 
