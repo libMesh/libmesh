@@ -18,10 +18,6 @@
 #ifndef LIBMESH_HASHWORD_H
 #define LIBMESH_HASHWORD_H
 
-// All functions in this file by Bob Jenkins, May 2006, Public Domain.
-
-#include <stdint.h> // uint32_t
-
 // ::size_t is defined in the backward compatibility header stddef.h.
 // It's been part of ANSI/ISO C and ISO C++ since their very
 // beginning. Every C++ implementation has to ship with stddef.h
@@ -31,7 +27,9 @@
 //
 // http://stackoverflow.com/questions/237370/does-stdsize-t-make-sense-in-c
 #include <stddef.h>
+#include <stdint.h> // uint32_t, uint64_t
 
+#include "libmesh_common.h" // libmesh_error_msg()
 
 // Anonymous namespace for utility functions used locally
 namespace
@@ -76,6 +74,48 @@ void final(uint32_t& a, uint32_t& b, uint32_t& c)
   b ^= a; b -= rot(a,14);
   c ^= b; c -= rot(b,24);
 }
+
+
+// fnv_64_buf - perform a 64 bit Fowler/Noll/Vo hash on a buffer.
+// http://www.isthe.com/chongo/tech/comp/fnv/index.html
+// Code is in the public domain.
+//
+// Authors:
+// Phong Vo (http://www.research.att.com/info/kpv/)
+// Glenn Fowler (http://www.research.att.com/~gsf/)
+// Landon Curt Noll (http://www.isthe.com/chongo/)
+//
+// input:
+// buf - start of buffer to hash
+// len - length of buffer in octets
+//
+// returns: 64 bit hash as a static hash type
+uint64_t fnv_64_buf(const void *buf, size_t len)
+{
+  // Initializing hval with this value corresponds to the FNV-1 hash algorithm.
+  uint64_t hval = static_cast<uint64_t>(0xcbf29ce484222325ULL);
+
+  // start of buffer
+  const unsigned char *bp = static_cast<const unsigned char *>(buf);
+
+  // beyond end of buffer
+  const unsigned char *be = bp + len;
+
+  // FNV-1 hash each octet of the buffer
+  while (bp < be)
+    {
+      hval +=
+        (hval << 1) + (hval << 4) + (hval << 5) +
+        (hval << 7) + (hval << 8) + (hval << 40);
+
+      // xor the bottom with the current octet
+      hval ^= static_cast<uint64_t>(*bp++);
+    }
+
+  // return our new hash value
+  return hval;
+}
+
 } // end anonymous namespace
 
 
@@ -141,11 +181,17 @@ uint32_t hashword2(const uint32_t& first, const uint32_t& second, uint32_t initv
   return c;
 }
 
-// Homegrown implementations if we don't have 32-bit unsigned ints
+// Call the 64-bit FNV hash function.
 inline
 uint64_t hashword2(const uint64_t first, const uint64_t second)
 {
-  return (first%65449 + (second<<5)%65449);
+  // This isn't optimal (it would be nice to avoid this packing step)
+  // but we are going to go ahead and conform to the 32-bit
+  // hashword2() interface.
+  uint64_t k[2] = {first, second};
+
+  // len is the total number of bytes in two 64-bit ints
+  return fnv_64_buf(k, /*len=*/8*2);
 }
 
 inline
@@ -154,22 +200,11 @@ uint16_t hashword2(const uint16_t first, const uint16_t second)
   return (first%65449 + (second<<5)%65449);
 }
 
-// Another homegrown implementation for 64-bit unsigned ints
+// Call the 64-bit FNV hash function.
 inline
 uint64_t hashword(const uint64_t *k, size_t length)
 {
-  // big prime number
-  const unsigned int bp = 65449;
-
-  uint64_t c = 0;
-  unsigned int shift=0;
-  for (size_t i=0; i != length; ++i)
-    {
-      c += (k[i] << shift) % bp;
-      shift += 5;
-    }
-
-  return c;
+  return fnv_64_buf(k, 8*length);
 }
 
 // In a personal communication from Bob Jenkins, he recommended using
