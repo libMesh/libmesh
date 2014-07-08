@@ -6,7 +6,7 @@ For generic installation instructions, refer also to the INSTALL file.
 Build Process
 -------------
 0. ./bootstrap
-   (optional, needed if you will modify the GNU autotools build system)
+   (optional, needed *only* if you add/modify m4 files or configure.ac)
    
 1. ./configure --prefix=/path/to/libmesh/install
 
