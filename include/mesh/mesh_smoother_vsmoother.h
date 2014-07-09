@@ -92,18 +92,18 @@ public:
                           unsigned miniterBC=5,
                           double percent_to_move=1);
 
-  enum metric_type
+  enum MetricType
     {
-      uniform=1,
-      volumetric=2,
-      directional=3
+      UNIFORM = 1,
+      VOLUMETRIC = 2,
+      DIRECTIONAL = 3
     };
 
-  enum adapt_type
+  enum AdaptType
     {
-      cell=-1,
-      none=0,
-      node=1
+      CELL = -1,
+      NONE = 0,
+      NODE = 1
     };
 
   /**
@@ -130,6 +130,16 @@ public:
    * @return max distance a node moved during the last smooth.
    */
   double distance_moved() const { return _distance; }
+
+  /**
+   * Allow user to control whether the metric is generated from the initial mesh.
+   */
+  void set_generate_data(bool b) { _generate_data = b; }
+
+  /**
+   * Allow user to control the smoothing metric used.
+   */
+  void set_metric(MetricType t) { _metric = t; }
 
 private:
 
@@ -165,10 +175,10 @@ private:
   const unsigned _miniter;
   const unsigned _maxiter;
   const unsigned _miniterBC;
-  const metric_type _metric;
-  const adapt_type _adaptive_func;
+  MetricType _metric;
+  AdaptType _adaptive_func;
   const double _theta;
-  const bool _generate_data;
+  bool _generate_data;
 
   /**
    * The number of nodes in the Mesh at the time of smoothing.
@@ -258,7 +268,7 @@ private:
              std::vector<int>& edges,
              std::vector<int>& hnodes);
 
-  int readmetr(char *name,
+  int readmetr(std::string name,
                Array3D<double>& H);
 
   int read_adp(std::vector<double>& afun);
@@ -390,9 +400,8 @@ private:
                 const std::vector<double>& g,
                 double sigma);
 
-  void metr_data_gen(char grid[],
-                     char metr[],
-                     int n,
+  void metr_data_gen(std::string grid,
+                     std::string metr,
                      int me);
 
   int solver(int n,

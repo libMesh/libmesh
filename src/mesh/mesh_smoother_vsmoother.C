@@ -46,13 +46,14 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
                                                  unsigned miniterBC) :
   MeshSmoother(mesh),
   _percent_to_move(1),
+  _dist_norm(0.),
   _adapt_data(NULL),
   _dim(mesh.mesh_dimension()),
   _miniter(miniter),
   _maxiter(maxiter),
   _miniterBC(miniterBC),
-  _metric(uniform),
-  _adaptive_func(none),
+  _metric(UNIFORM),
+  _adaptive_func(NONE),
   _theta(theta),
   _generate_data(false),
   _n_nodes(0),
@@ -73,13 +74,14 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
                                                  double percent_to_move) :
   MeshSmoother(mesh),
   _percent_to_move(percent_to_move),
+  _dist_norm(0.),
   _adapt_data(adapt_data),
   _dim(mesh.mesh_dimension()),
   _miniter(miniter),
   _maxiter(maxiter),
   _miniterBC(miniterBC),
-  _metric(uniform),
-  _adaptive_func(cell),
+  _metric(UNIFORM),
+  _adaptive_func(CELL),
   _theta(theta),
   _generate_data(false),
   _n_nodes(0),
@@ -100,13 +102,14 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
                                                  double percent_to_move) :
   MeshSmoother(mesh),
   _percent_to_move(percent_to_move),
+  _dist_norm(0.),
   _adapt_data(adapt_data),
   _dim(mesh.mesh_dimension()),
   _miniter(miniter),
   _maxiter(maxiter),
   _miniterBC(miniterBC),
-  _metric(uniform),
-  _adaptive_func(cell),
+  _metric(UNIFORM),
+  _adaptive_func(CELL),
   _theta(theta),
   _generate_data(false),
   _n_nodes(0),
@@ -135,15 +138,15 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   double theta = _theta;
 
-  char grid[40], metr[40], grid_old[40];
-
+  // Metric file name
+  std::string metric_filename = "smoother.metric";
   if (gr == 0 && me > 1)
     {
-      for (int i=0; i<40; i++)
-        grid_old[i] = grid[i];
+      // grid filename
+      std::string grid_filename = "smoother.grid";
 
-      // generate metric from initial mesh (me=2,3)
-      metr_data_gen(grid, metr, _dim, me);
+      // generate metric from initial mesh (me = 2,3)
+      metr_data_gen(grid_filename, metric_filename, me);
     }
 
   // Initialize the _n_nodes and _n_cells member variables
@@ -173,7 +176,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
     }
 
   if (me > 1)
-    vms_err = readmetr(metr, H);
+    vms_err = readmetr(metric_filename, H);
 
   if (vms_err < 0)
     {
@@ -492,25 +495,21 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
 
 
 // Read Metrics
-int VariationalMeshSmoother::readmetr(char *name,
+int VariationalMeshSmoother::readmetr(std::string name,
                                       Array3D<double>& H)
 {
-  FILE *stream = fopen(name,"r");
+  std::ifstream infile(name.c_str());
+  std::string dummy;
+
   for (unsigned i=0; i<_n_cells; i++)
     for (unsigned j=0; j<_dim; j++)
       {
         for (unsigned k=0; k<_dim; k++)
-          {
-            double d;
-            int scanned = fscanf(stream,"%le ", &d);
-            libmesh_assert_not_equal_to (scanned, EOF);
-            H[i][j][k] = d;
-          }
-        int scanned = fscanf(stream,"\n");
-        libmesh_assert_not_equal_to (scanned, EOF);
-      }
+          infile >> H[i][j][k];
 
-  fclose(stream);
+        // Read to end of line and discard
+        std::getline(infile, dummy);
+      }
 
   return 0;
 }
@@ -778,50 +777,46 @@ int VariationalMeshSmoother::basisA(Array2D<double>& Q,
       else if (nvert == 10)
         {
           // quad tetr
-          U[0][0] = (1-K[0]-K[1]/2-K[2]/3)*(-3) + (K[0]-K[1]/2-K[2]/3) + (K[1]-K[2]/3) + K[2];
-          U[0][1] = (1-K[0]-K[1]/2-K[2]/3)*(-1) + (K[0]-K[1]/2-K[2]/3)*3 - (K[1]-K[2]/3) - K[2];
-          U[0][2] = 0;
-          U[0][3] = 0;
-          U[0][4] = 4*(K[1]-K[2]/3);
-          U[0][5] = -4*(K[1]-K[2]/3);
-          U[0][6] = 4*(1-K[0]-K[1]/2-K[2]/3) - 4*(K[0]-K[1]/2-K[2]/3);
-          U[0][7] = 4*K[2];
-          U[0][8] = 0;
-          U[0][9] = -4*K[2];
+          U[0][0] = -3.*(1 - K[0] - 0.5*K[1] - K[2]/3.) + (K[0] - 0.5*K[1] - K[2]/3.)    + (K[1] - K[2]/3.) + K[2];
+          U[0][1] = -1.*(1 - K[0] - 0.5*K[1] - K[2]/3.) + 3.*(K[0] - 0.5*K[1] - K[2]/3.) - (K[1] - K[2]/3.) - K[2];
+          U[0][2] = 0.;
+          U[0][3] = 0.;
+          U[0][4] = 4.*(K[1] - K[2]/3.);
+          U[0][5] = -4.*(K[1] - K[2]/3.);
+          U[0][6] = 4.*(1. - K[0] - 0.5*K[1] - K[2]/3.) - 4.*(K[0] - 0.5*K[1] - K[2]/3.);
+          U[0][7] = 4.*K[2];
+          U[0][8] = 0.;
+          U[0][9] = -4.*K[2];
 
-          U[1][0] = (1-K[3]-K[4]/2-K[5]/3)*(-3/2) + (K[3]-K[4]/2-K[5]/3)/2 + (K[4]-K[5]/3)/2 + K[5]/2;
-          U[1][1] = (1-K[3]-K[4]/2-K[5]/3)/2 + (K[3]-K[4]/2-K[5]/3)*(-3/2) + (K[4]-K[5]/3)/2+K[5]/2;
-          U[1][2] = -(1-K[3]-K[4]/2-K[5]/3) - (K[3]-K[4]/2-K[5]/3) + 3*(K[4]-K[5]/3) - K[5];
-          U[1][3] = 0;
-          U[1][4] = 4*(K[3]-K[4]/2-K[5]/3) - 2*(K[4]-K[5]/3);
-          U[1][5] = 4*(1-K[3]-K[4]/2-K[5]/3) - 2*(K[4]-K[5]/3);
-          U[1][6] = -2*(1-K[3]-K[4]/2-K[5]/3) - 2*(K[3]-K[4]/2-K[5]/3);
-          U[1][7] = -2*K[5];
-          U[1][8] = 4*K[5];
-          U[1][9] = -2*K[5];
+          U[1][0] = -1.5*(1. - K[3] - K[4]*0.5 - K[5]/3.) + 0.5*(K[3] - 0.5*K[4] - K[5]/3.) + 0.5*(K[4] - K[5]/3.) + 0.5*K[5];
+          U[1][1] =  0.5*(1. - K[3] - K[4]*0.5 - K[5]/3.) - 1.5*(K[3] - 0.5*K[4] - K[5]/3.) + 0.5*(K[4] - K[5]/3.) + 0.5*K[5];
+          U[1][2] = -1.0*(1. - K[3] - K[4]*0.5 - K[5]/3.) - (K[3] - 0.5*K[4] - K[5]/3.) + 3.*(K[4] - K[5]/3.) - K[5];
+          U[1][3] = 0.;
+          U[1][4] =  4.*(     K[3] - 0.5*K[4] - K[5]/3.) - 2.*(K[4] - K[5]/3.);
+          U[1][5] =  4.*(1. - K[3] - 0.5*K[4] - K[5]/3.) - 2.*(K[4] - K[5]/3.);
+          U[1][6] = -2.*(1. - K[3] - 0.5*K[4] - K[5]/3.) - 2.*(K[3] - 0.5*K[4] - K[5]/3.);
+          U[1][7] = -2.*K[5];
+          U[1][8] = 4.*K[5];
+          U[1][9] = -2.*K[5];
 
-          U[2][0] = -(1-K[6]-K[7]/2-K[8]/3) + (K[6]-K[7]/2-K[8]/3)/3 + (K[7]-K[8]/3)/3 + K[8]/3;
-          U[2][1] = (1-K[6]-K[7]/2-K[8]/3)/3 - (K[6]-K[7]/2-K[8]/3) + (K[7]-K[8]/3)/3 + K[8]/3;
-          U[2][2] = (1-K[6]-K[7]/2-K[8]/3)/3 + (K[6]-K[7]/2-K[8]/3)/3 - (K[7]-K[8]/3)+K[8]/3;
-          U[2][3] = -(1-K[6]-K[7]/2-K[8]/3) - (K[6]-K[7]/2-K[8]/3) - (K[7]-K[8]/3) + 3*K[8];
-          U[2][4] = -4*(K[6]-K[7]/2-K[8]/3)/3 - 4*(K[7]-K[8]/3)/3;
-          U[2][5] = -4*(1-K[6]-K[7]/2-K[8]/3)/3 - 4*(K[7]-K[8]/3)/3;
-          U[2][6] = -4*(1-K[6]-K[7]/2-K[8]/3)/3 - 4*(K[6]-K[7]/2-K[8]/3)/3;
-          U[2][7] = 4*(K[6]-K[7]/2-K[8]/3) - 4*K[8]/3;
-          U[2][8] = 4*(K[7]-K[8]/3) - 4*K[8]/3;
-          U[2][9] = 4*(1-K[6]-K[7]/2-K[8]/3) - 4*K[8]/3;
+          U[2][0] = -(1. - K[6] - 0.5*K[7] - K[8]/3.)    + (K[6] - 0.5*K[7] - K[8]/3.)/3. + (K[7] - K[8]/3.)/3. + K[8]/3.;
+          U[2][1] =  (1. - K[6] - 0.5*K[7] - K[8]/3.)/3. - (K[6] - 0.5*K[7] - K[8]/3.)    + (K[7] - K[8]/3.)/3. + K[8]/3.;
+          U[2][2] =  (1. - K[6] - 0.5*K[7] - K[8]/3.)/3. + (K[6] - 0.5*K[7] - K[8]/3.)/3. - (K[7] - K[8]/3.)    + K[8]/3.;
+          U[2][3] = -(1. - K[6] - 0.5*K[7] - K[8]/3.)    - (K[6] - 0.5*K[7] - K[8]/3.)    - (K[7] - K[8]/3.)    + 3.*K[8];
+          U[2][4] = -4.*(K[6] - K[7]*0.5 - K[8]/3.)/3. - 4.*(K[7] - K[8]/3.)/3.;
+          U[2][5] = -4.*(1. - K[6] - K[7]*0.5 - K[8]/3.)/3. - 4.*(           K[7] - K[8]/3.)/3.;
+          U[2][6] = -4.*(1. - K[6] - K[7]*0.5 - K[8]/3.)/3. - 4.*(K[6] - 0.5*K[7] - K[8]/3.)/3.;
+          U[2][7] =  4.*(K[6] - K[7]*0.5 - K[8]/3.) - 4.*K[8]/3.;
+          U[2][8] =  4.*(K[7] - K[8]/3.) - 4.*K[8]/3.;
+          U[2][9] =  4.*(1. - K[6] - K[7]*0.5 - K[8]/3.) - 4.*K[8]/3.;
         }
       else
         libmesh_error_msg("Invalid nvert = " << nvert);
     }
 
   if (me == 1)
-    {
-      for (unsigned i=0; i<_dim; i++)
-        for (int j=0; j<nvert; j++)
-          Q[i][j] = U[i][j];
+    Q = U;
 
-    }
   else
     {
       for (unsigned i=0; i<_dim; i++)
@@ -1256,8 +1251,8 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
                         K[1] = j;
                         for (int k=0; k<3; k++)
                           {
-                            K[2]=static_cast<double>(k)/2.0;
-                            K[3]=static_cast<double>(k%2);
+                            K[2] = 0.5*static_cast<double>(k);
+                            K[3] = static_cast<double>(k % 2);
                             basisA(Q, 6, K, H[ii], me);
 
                             std::vector<double> a1(3), a2(3), a3(3);
@@ -2441,29 +2436,19 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                   if (mask[cells[l][1]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][1];
-                          ind++;
-                        }
+                        j = cells[l][1];
                       else
-                        {
-                          k = cells[l][1];
-                          ind++;
-                        }
+                        k = cells[l][1];
+                      ind++;
                     }
 
                   if (mask[cells[l][2]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][2];
-                          ind++;
-                        }
+                        j = cells[l][2];
                       else
-                        {
-                          k = cells[l][2];
-                          ind++;
-                        }
+                        k = cells[l][2];
+                      ind++;
                     }
                 }
 
@@ -2472,59 +2457,40 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                   if (mask[cells[l][0]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][0];
-                          ind++;
-                        }
+                        j = cells[l][0];
                       else
-                        {
-                          k = cells[l][0];
-                          ind++;
-                        }
+                        k = cells[l][0];
+                      ind++;
                     }
 
                   if (mask[cells[l][2]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][2];
-                          ind++;
-                        }
+                        j = cells[l][2];
                       else
-                        {
-                          k = cells[l][2];
-                          ind++;
-                        }
+                        k = cells[l][2];
+                      ind++;
                     }
                 }
+
               if (i == cells[l][2])
                 {
                   if (mask[cells[l][1]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][1];
-                          ind++;
-                        }
+                        j = cells[l][1];
                       else
-                        {
-                          k = cells[l][1];
-                          ind++;
-                        }
+                        k = cells[l][1];
+                      ind++;
                     }
 
                   if (mask[cells[l][0]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][0];
-                          ind++;
-                        }
+                        j = cells[l][0];
                       else
-                        {
-                          k = cells[l][0];
-                          ind++;
-                        }
+                        k = cells[l][0];
+                      ind++;
                     }
                 }
               break;
@@ -2536,29 +2502,19 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                   if (mask[cells[l][1]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][1];
-                          ind++;
-                        }
+                        j = cells[l][1];
                       else
-                        {
-                          k = cells[l][1];
-                          ind++;
-                        }
+                        k = cells[l][1];
+                      ind++;
                     }
 
                   if (mask[cells[l][2]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][2];
-                          ind++;
-                        }
+                        j = cells[l][2];
                       else
-                        {
-                          k = cells[l][2];
-                          ind++;
-                        }
+                        k = cells[l][2];
+                      ind++;
                     }
                 }
 
@@ -2568,29 +2524,19 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                   if (mask[cells[l][0]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][0];
-                          ind++;
-                        }
+                        j = cells[l][0];
                       else
-                        {
-                          k = cells[l][0];
-                          ind++;
-                        }
+                        k = cells[l][0];
+                      ind++;
                     }
 
                   if (mask[cells[l][3]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][3];
-                          ind++;
-                        }
+                        j = cells[l][3];
                       else
-                        {
-                          k = cells[l][3];
-                          ind++;
-                        }
+                        k = cells[l][3];
+                      ind++;
                     }
                 }
               break;
@@ -2601,29 +2547,19 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                   if (mask[cells[l][1]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][5];
-                          ind++;
-                        }
+                        j = cells[l][5];
                       else
-                        {
-                          k = cells[l][5];
-                          ind++;
-                        }
+                        k = cells[l][5];
+                      ind++;
                     }
 
                   if (mask[cells[l][2]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][4];
-                          ind++;
-                        }
+                        j = cells[l][4];
                       else
-                        {
-                          k = cells[l][4];
-                          ind++;
-                        }
+                        k = cells[l][4];
+                      ind++;
                     }
                 }
 
@@ -2632,29 +2568,19 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                   if (mask[cells[l][0]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][5];
-                          ind++;
-                        }
+                        j = cells[l][5];
                       else
-                        {
-                          k = cells[l][5];
-                          ind++;
-                        }
+                        k = cells[l][5];
+                      ind++;
                     }
 
                   if (mask[cells[l][2]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][3];
-                          ind++;
-                        }
+                        j = cells[l][3];
                       else
-                        {
-                          k = cells[l][3];
-                          ind++;
-                        }
+                        k = cells[l][3];
+                      ind++;
                     }
                 }
 
@@ -2663,28 +2589,19 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                   if (mask[cells[l][1]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][3];
-                          ind++;
-                        }
+                        j = cells[l][3];
                       else
-                        {
-                          k = cells[l][3];
-                          ind++;
-                        }
+                        k = cells[l][3];
+                      ind++;
                     }
+
                   if (mask[cells[l][0]] > 0)
                     {
                       if (ind == 0)
-                        {
-                          j = cells[l][4];
-                          ind++;
-                        }
+                        j = cells[l][4];
                       else
-                        {
-                          k = cells[l][4];
-                          ind++;
-                        }
+                        k = cells[l][4];
+                      ind++;
                     }
                 }
 
@@ -3542,7 +3459,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
       for (int i=0; i<2; i++)
         tr += 0.5*(a1[i]*a1[i] + a2[i]*a2[i]);
 
-      phit = (1-w)*tr + w*(vol/G + det*det*G/vol)/2.;
+      phit = (1-w)*tr + w*0.5*(vol/G + det*det*G/vol);
     }
 
   if (_dim == 3)
@@ -3566,7 +3483,7 @@ double VariationalMeshSmoother::vertex(Array3D<double>& W,
       for (int i=0; i<3; i++)
         tr += (1./3.)*(a1[i]*a1[i] + a2[i]*a2[i] + a3[i]*a3[i]);
 
-      phit = (1-w)*pow(tr,1.5) + w*(vol/G + det*det*G/vol)/2.;
+      phit = (1-w)*pow(tr,1.5) + w*0.5*(vol/G + det*det*G/vol);
     }
 
   double dchi = 0.5 + det*0.5/std::sqrt(epsilon*epsilon + det*det);
@@ -4034,13 +3951,13 @@ void VariationalMeshSmoother::gener(char grid[],
       int jj = nc%(n1-1);
       int kk = nc/(n1-1);
 
-      if (n==2)
+      if (n == 2)
         outfile << ii+n1*jj << " "
                 << ii+1+jj*n1 << " "
                 << ii+(jj+1)*n1 << " "
                 << ii+1+(jj+1)*n1 << " ";
 
-      if (n==3)
+      if (n == 3)
         outfile << ii+n1*jj+n1*n1*kk << " "
                 << ii+1+jj*n1+n1*n1*kk << " "
                 << ii+(jj+1)*n1+n1*n1*kk << " "
@@ -4057,51 +3974,47 @@ void VariationalMeshSmoother::gener(char grid[],
 
 
 // Metric Generation
-void VariationalMeshSmoother::metr_data_gen(char grid[],
-                                            char metr[],
-                                            int n,
+void VariationalMeshSmoother::metr_data_gen(std::string grid,
+                                            std::string metr,
                                             int me)
 {
   double a1[3], a2[3], a3[3];
   double det, g1, g2, g3, det_o, g1_o, g2_o, g3_o, eps=1e-3;
 
   std::vector<double> K(9);
-  Array2D<double> Q(3, 3*n + n%2);
+  Array2D<double> Q(3, 3*_dim + _dim%2);
 
-  // read the initial mesh
-  int N, ncells;
-  {
-    int dummy1, dummy2;
-    FILE *stream = fopen(grid,"r");
-    int scanned = fscanf(stream, "%d \n%d \n%d \n%d \n", &dummy1, &N, &ncells, &dummy2);
-    libmesh_assert_not_equal_to (scanned, EOF);
-    fclose(stream);
-  }
+  // Use _mesh to determine N and ncells
+  this->_n_nodes = _mesh.n_nodes();
+  this->_n_cells = _mesh.n_active_elem();
 
   std::vector<int>
-    mask(N),
-    mcells(ncells);
+    mask(_n_nodes),
+    mcells(_n_cells);
 
-  Array2D<int> cells(ncells, 3*n + n%2);
-  Array2D<double> R(N,n);
+  Array2D<int> cells(_n_cells, 3*_dim + _dim%2);
+  Array2D<double> R(_n_nodes,_dim);
 
   readgr(R, mask, cells, mcells, mcells, mcells);
 
   // genetrate metric file
-  FILE* stream = fopen(metr,"w+");
+  FILE* stream = fopen(metr.c_str(), "w+");
+  if (!stream)
+    libmesh_error_msg("Error opening file: " << metr);
+
   int Ncells = 0;
   det_o = 1.0;
   g1_o = 1.0;
   g2_o = 1.0;
   g3_o = 1.0;
-  for (int i=0; i<ncells; i++)
+  for (unsigned i=0; i<_n_cells; i++)
     if (mcells[i] >= 0)
       {
         int nvert=0;
         while (cells[i][nvert] >= 0)
           nvert++;
 
-        if (n == 2)
+        if (_dim == 2)
           {
             // 2D - tri and quad
             if (nvert == 3)
@@ -4269,7 +4182,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
               }
           }
 
-      if (n == 3)
+      if (_dim == 3)
         {
           // 3D - tetr and hex
 
@@ -4523,12 +4436,12 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
           // write to file
           if (me == 2)
             fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
+                    1.0/pow(det, 1./3.),
+                    0.5/pow(det, 1./3.),
+                    0.5/pow(det, 1./3.),
+                    0.5*std::sqrt(3.)/pow(det, 1./3.),
+                    0.5/(std::sqrt(3.)*pow(det, 1./3.)),
+                    std::sqrt(2./3.)/pow(det, 1./3.));
 
           if (me == 3)
             fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
@@ -4762,23 +4675,27 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
       }
   fclose(stream);
 
-  // write new grid connectivity
+  // write new grid connectivity - this is changing the filename in a
+  // somewhat arbitrary way...
   grid[0] = grid[1];
   grid[2] = grid[3];
 
-  stream = fopen(grid,"w+");
-  fprintf(stream,"%d \n%d \n%d \n0 \n", n, N, Ncells);
+  stream = fopen(grid.c_str(), "w+");
+  if (!stream)
+    libmesh_error_msg("Error opening file: " << grid);
 
-  for (int i=0; i<N; i++)
+  fprintf(stream,"%d \n%d \n%d \n0 \n", _dim, _n_nodes, Ncells);
+
+  for (unsigned i=0; i<_n_nodes; i++)
     {
       // node coordinates
-      for (int j=0; j<n; j++)
+      for (unsigned j=0; j<_dim; j++)
         fprintf(stream, "%e ", R[i][j]);
 
       fprintf(stream, "%d \n", mask[i]);
     }
 
-  for (int i=0; i<ncells; i++)
+  for (unsigned i=0; i<_n_cells; i++)
     if (mcells[i] >= 0)
       {
         // cell connectivity
@@ -4786,19 +4703,19 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
         while (cells[i][nvert] >= 0)
           nvert++;
 
-        if ((nvert == 3) || ((n == 3) && (nvert == 4)))
+        if ((nvert == 3) || ((_dim == 3) && (nvert == 4)))
           {
             // tri & tetr
             for (int j=0; j<nvert; j++)
               fprintf(stream,"%d ", cells[i][j]);
 
-            for (int j=nvert; j<3*n+n%2; j++)
+            for (unsigned j=nvert; j<3*_dim + _dim%2; j++)
               fprintf(stream, "-1 ");
 
             fprintf(stream,"%d \n", mcells[i]);
           }
 
-        if ((n == 2) && (nvert == 4))
+        if ((_dim == 2) && (nvert == 4))
           {
             // quad
             fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][0], cells[i][1], cells[i][2]);
