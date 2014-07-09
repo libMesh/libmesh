@@ -21,6 +21,7 @@
 // C++ includes
 #include <time.h> // for clock_t, clock()
 #include <cmath>
+#include <iomanip>
 
 // Local includes
 #include "libmesh/mesh_smoother_vsmoother.h"
@@ -3998,9 +3999,12 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
   readgr(R, mask, cells, mcells, mcells, mcells);
 
   // genetrate metric file
-  FILE* stream = fopen(metr.c_str(), "w+");
-  if (!stream)
-    libmesh_error_msg("Error opening file: " << metr);
+  std::ofstream metric_file(metr.c_str());
+  if (!metric_file.good())
+    libmesh_error_msg("Error opening metric output file.");
+
+  // Use scientific notation with 6 digits
+  metric_file << std::scientific << std::setprecision(6);
 
   int Ncells = 0;
   det_o = 1.0;
@@ -4049,10 +4053,10 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
                 // write to file
                 if (me == 2)
-                  fprintf(stream,"%e 0.000000e+00 \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 1.0/std::sqrt(det));
+                  metric_file << 1.0/std::sqrt(det) << " 0.000000e+00 \n0.000000e+00 " << 1.0/std::sqrt(det) << std::endl;
 
                 if (me == 3)
-                  fprintf(stream,"%e 0.000000e+00 \n0.000000e+00 %e \n", 1.0/g1, 1.0/g2);
+                  metric_file << 1.0/g1 << " 0.000000e+00 \n0.000000e+00 " << 1.0/g2 << std::endl;
 
                 det_o = det;
                 g1_o = g1;
@@ -4083,10 +4087,10 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
                 // write to file
                 if (me == 2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
+                  metric_file << 1.0/std::sqrt(det) << " " << 0.5/std::sqrt(det) << " \n0.000000e+00 " << 0.5*std::sqrt(3.0/det) << std::endl;
 
                 if (me == 3)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
+                  metric_file << 1.0/g1 << " " << 0.5/g2 << "\n0.000000e+00 " << 0.5*std::sqrt(3.0)/g2 << std::endl;
 
                 det_o = det;
                 g1_o = g1;
@@ -4112,10 +4116,10 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
                 // write to file
                 if (me == 2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
+                  metric_file << 1.0/std::sqrt(det) << " " << 0.5/std::sqrt(det) << " \n0.000000e+00 " << 0.5*std::sqrt(3.0/det) << std::endl;
 
                 if (me == 3)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
+                  metric_file << 1.0/g1 << " " << 0.5/g2 << " \n0.000000e+00 " << 0.5*std::sqrt(3.0)/g2 << std::endl;
 
                 det_o = det;
                 g1_o = g1;
@@ -4125,7 +4129,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
                 a1[1] = R[cells[i][1]][0] - R[cells[i][3]][0];
                 a2[0] = R[cells[i][2]][1] - R[cells[i][3]][1];
                 a2[1] = R[cells[i][1]][1] - R[cells[i][3]][1];
-                det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                det = jac2(a1[0], a1[1], a2[0], a2[1]);
                 g1 = std::sqrt(a1[0]*a1[0] + a2[0]*a2[0]);
                 g2 = std::sqrt(a1[1]*a1[1] + a2[1]*a2[1]);
 
@@ -4141,10 +4145,10 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
                 // write to file
                 if (me == 2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
+                  metric_file << 1.0/std::sqrt(det) << " " << 0.5/std::sqrt(det) << " \n0.000000e+00 " << 0.5*std::sqrt(3.0/det) << std::endl;
 
                 if (me == 3)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
+                  metric_file << 1.0/g1 << " " << 0.5/g2 << " \n0.000000e+00 " << 0.5*std::sqrt(3.0)/g2 << std::endl;
 
                 det_o = det;
                 g1_o = g1;
@@ -4170,10 +4174,10 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
                 // write to file
                 if (me == 2)
-                  fprintf(stream,"%e %e \n0.000000e+00 %e \n", 1.0/std::sqrt(det), 0.5/std::sqrt(det), 0.5*std::sqrt(3.0/det));
+                  metric_file << 1.0/std::sqrt(det) << " " << 0.5/std::sqrt(det) << " \n0.000000e+00 " << 0.5*std::sqrt(3.0/det) << std::endl;
 
                 if (me == 3)
-                  fprintf(stream, "%e %e \n0.000000e+00 %e \n", 1.0/g1, 0.5/g2, 0.5*std::sqrt(3.0)/g2);
+                  metric_file << 1.0/g1 << " " << 0.5/g2 << " \n0.000000e+00 " << 0.5*std::sqrt(3.0)/g2 << std::endl;
 
                 det_o = det;
                 g1_o = g1;
@@ -4226,10 +4230,20 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
               // write to file
               if (me == 2)
-                fprintf(stream, "%e 0.000000e+00  0.000000e+00\n0.000000e+00 %e 0.000000e+00\n  0.000000e+00 0.000000e+00 %e\n", 1.0/pow(det, 1.0/3.0), 1.0/pow(det, 1.0/3.0), 1.0/pow(det, 1.0/3.0));
+                metric_file << 1./pow(det, 1./3.)
+                            << " 0.000000e+00  0.000000e+00\n0.000000e+00 "
+                            << 1./pow(det, 1./3.)
+                            << " 0.000000e+00\n  0.000000e+00 0.000000e+00 "
+                            << 1./pow(det, 1./3.)
+                            << std::endl;
 
               if (me == 3)
-                fprintf(stream, "%e 0.000000e+00  0.000000e+00\n0.000000e+00 %e 0.000000e+00\n  0.000000e+00 0.000000e+00 %e\n", 1.0/g1, 1.0/g2, 1.0/g3);
+                metric_file << 1./g1
+                            << " 0.000000e+00  0.000000e+00\n0.000000e+00 "
+                            << 1./g2
+                            << " 0.000000e+00\n  0.000000e+00 0.000000e+00 "
+                            << 1./g3
+                            << std::endl;
 
               det_o = det;
               g1_o = g1;
@@ -4272,22 +4286,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det, 1.0/3.0),
-                    0.5/pow(det, 1.0/3.0),
-                    0.5/pow(det, 1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det, 1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det, 1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det, 1.0/3.0));
+            metric_file << 1./pow(det, 1./3.) << " "
+                        << 0.5/pow(det, 1./3.) << " "
+                        << 0.5/pow(det, 1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det, 1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det, 1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2/3.)/pow(det, 1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4327,22 +4341,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det, 1.0/3.0),
-                    0.5/pow(det, 1.0/3.0),
-                    0.5/pow(det, 1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det, 1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det, 1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det, 1.0/3.0));
+            metric_file << 1./pow(det, 1./3.) << " "
+                        << 0.5/pow(det, 1./3.) << " "
+                        << 0.5/pow(det, 1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det, 1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det, 1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/pow(det, 1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4382,22 +4396,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
+            metric_file << 1./pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det,1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det,1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/pow(det,1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4435,22 +4449,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det, 1./3.),
-                    0.5/pow(det, 1./3.),
-                    0.5/pow(det, 1./3.),
-                    0.5*std::sqrt(3.)/pow(det, 1./3.),
-                    0.5/(std::sqrt(3.)*pow(det, 1./3.)),
-                    std::sqrt(2./3.)/pow(det, 1./3.));
+            metric_file << 1./pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det,1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det,1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/pow(det,1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4488,22 +4502,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
+            metric_file << 1./pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det,1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det,1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/pow(det,1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4542,22 +4556,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
+            metric_file << 1./pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det,1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det,1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/pow(det,1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4595,22 +4609,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream,"%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
+            metric_file << 1./pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det,1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det,1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/pow(det,1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4648,22 +4662,22 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
           // write to file
           if (me == 2)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5/pow(det,1.0/3.0),
-                    0.5*std::sqrt(3.0)/pow(det,1.0/3.0),
-                    0.5/(std::sqrt(3.0)*pow(det,1.0/3.0)),
-                    std::sqrt(2/3.0)/pow(det,1.0/3.0));
+            metric_file << 1./pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << " "
+                        << 0.5/pow(det,1./3.) << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/pow(det,1./3.) << " "
+                        << 0.5/(std::sqrt(3.)*pow(det,1./3.)) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/pow(det,1./3.)
+                        << std::endl;
 
           if (me == 3)
-            fprintf(stream, "%e %e %e\n0.000000e+00 %e %e\n  0.000000e+00 0.000000e+00 %e\n",
-                    1.0/g1,
-                    0.5/g2,
-                    0.5/g3,
-                    0.5*std::sqrt(3.0)/g2,
-                    0.5/(std::sqrt(3.0)*g3),
-                    std::sqrt(2/3.0)/g3);
+            metric_file << 1./g1 << " "
+                        << 0.5/g2 << " "
+                        << 0.5/g3 << "\n0.000000e+00 "
+                        << 0.5*std::sqrt(3.)/g2 << " "
+                        << 0.5/(std::sqrt(3.)*g3) << "\n  0.000000e+00 0.000000e+00 "
+                        << std::sqrt(2./3.)/g3
+                        << std::endl;
 
           det_o = det;
           g1_o = g1;
@@ -4673,26 +4687,31 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
           }
         }
       }
-  fclose(stream);
+
+  // Done with the metric file
+  metric_file.close();
 
   // write new grid connectivity - this is changing the filename in a
   // somewhat arbitrary way...
   grid[0] = grid[1];
   grid[2] = grid[3];
 
-  stream = fopen(grid.c_str(), "w+");
-  if (!stream)
+  std::ofstream grid_file(grid.c_str());
+  if (!grid_file.good())
     libmesh_error_msg("Error opening file: " << grid);
 
-  fprintf(stream,"%d \n%d \n%d \n0 \n", _dim, _n_nodes, Ncells);
+  grid_file << _dim << "\n" << _n_nodes << "\n" << Ncells << "\n0" << std::endl;
+
+  // Use scientific notation with 6 digits
+  grid_file << std::scientific << std::setprecision(6);
 
   for (unsigned i=0; i<_n_nodes; i++)
     {
       // node coordinates
       for (unsigned j=0; j<_dim; j++)
-        fprintf(stream, "%e ", R[i][j]);
+        grid_file << R[i][j] << " ";
 
-      fprintf(stream, "%d \n", mask[i]);
+      grid_file << mask[i] << std::endl;
     }
 
   for (unsigned i=0; i<_n_cells; i++)
@@ -4707,38 +4726,36 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
           {
             // tri & tetr
             for (int j=0; j<nvert; j++)
-              fprintf(stream,"%d ", cells[i][j]);
+              grid_file << cells[i][j] << " ";
 
             for (unsigned j=nvert; j<3*_dim + _dim%2; j++)
-              fprintf(stream, "-1 ");
+              grid_file << "-1 ";
 
-            fprintf(stream,"%d \n", mcells[i]);
+            grid_file << mcells[i] << std::endl;
           }
 
         if ((_dim == 2) && (nvert == 4))
           {
             // quad
-            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][0], cells[i][1], cells[i][2]);
-            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][1], cells[i][3], cells[i][0]);
-            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][3], cells[i][2], cells[i][1]);
-            fprintf(stream, "%d %d %d -1 -1 -1 0\n", cells[i][2], cells[i][0], cells[i][3]);
+            grid_file << cells[i][0] << " " << cells[i][1] << " " << cells[i][2] << " -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][1] << " " << cells[i][3] << " " << cells[i][0] << " -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][3] << " " << cells[i][2] << " " << cells[i][1] << " -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][2] << " " << cells[i][0] << " " << cells[i][3] << " -1 -1 -1 0" << std::endl;
           }
 
         if (nvert == 8)
           {
             // hex
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][0], cells[i][1], cells[i][2], cells[i][4]);
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][1], cells[i][3], cells[i][0], cells[i][5]);
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][3], cells[i][2], cells[i][1], cells[i][7]);
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][2], cells[i][0], cells[i][3], cells[i][6]);
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][4], cells[i][6], cells[i][5], cells[i][0]);
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][5], cells[i][4], cells[i][7], cells[i][1]);
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][7], cells[i][5], cells[i][6], cells[i][3]);
-            fprintf(stream, "%d %d %d %d -1 -1 -1 -1 -1 -1 0\n", cells[i][6], cells[i][7], cells[i][4], cells[i][2]);
+            grid_file << cells[i][0] << " " << cells[i][1] << " " << cells[i][2] << " " << cells[i][4] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][1] << " " << cells[i][3] << " " << cells[i][0] << " " << cells[i][5] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][3] << " " << cells[i][2] << " " << cells[i][1] << " " << cells[i][7] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][2] << " " << cells[i][0] << " " << cells[i][3] << " " << cells[i][6] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][4] << " " << cells[i][6] << " " << cells[i][5] << " " << cells[i][0] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][5] << " " << cells[i][4] << " " << cells[i][7] << " " << cells[i][1] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][7] << " " << cells[i][5] << " " << cells[i][6] << " " << cells[i][3] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
+            grid_file << cells[i][6] << " " << cells[i][7] << " " << cells[i][4] << " " << cells[i][2] << " -1 -1 -1 -1 -1 -1 0" << std::endl;
           }
       }
-
-  fclose(stream);
 }
 
 } // namespace libMesh
