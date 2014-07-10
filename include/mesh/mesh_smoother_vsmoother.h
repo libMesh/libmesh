@@ -37,9 +37,11 @@ namespace libMesh
 {
 
 /**
- * This is an implementation of Larisa Branets' smoothing
- * algorithms.  The initial implementation was done by her,
- * the adaptation to libmesh was completed by Derek Gaston.
+ * This is an implementation of Larisa Branets' smoothing algorithms.
+ * The initial implementation was done by her, the adaptation to
+ * libmesh was completed by Derek Gaston.  The code was heavily
+ * refactored into something more closely resembling C++ by John
+ * Peterson in 2014.
  *
  * Here are the relevant publications:
  * 1) L. Branets, G. Carey, "Extension of a mesh quality metric for
@@ -213,10 +215,6 @@ private:
 
   void adjust_adapt_data();
   float adapt_minimum() const;
-
-  /**
-   * Imported stuff
-   */
 
   /**
    * 2D array type for interfacing with C APIs.
