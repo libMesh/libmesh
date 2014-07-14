@@ -31,24 +31,17 @@
 #include <cstddef>
 #include <vector>
 #include <map>
+#include <fstream>
 
 namespace libMesh
 {
 
-//jj
-typedef double     * LPDOUBLE;
-typedef LPDOUBLE   * LPLPDOUBLE;
-typedef LPLPDOUBLE   * LPLPLPDOUBLE;
-typedef void     * LPVOID;
-typedef LPVOID   * LPLPVOID;
-typedef int  * LPINT;
-typedef LPINT  * LPLPINT;
-typedef unsigned int uint;
-
 /**
- * This is an implementation of Larisa Branets smoothing
- * algorithms.  The initial implementation was done by her,
- * the adaptation to libmesh was completed by Derek Gaston.
+ * This is an implementation of Larisa Branets' smoothing algorithms.
+ * The initial implementation was done by her, the adaptation to
+ * libmesh was completed by Derek Gaston.  The code was heavily
+ * refactored into something more closely resembling C++ by John
+ * Peterson in 2014.
  *
  * Here are the relevant publications:
  * 1) L. Branets, G. Carey, "Extension of a mesh quality metric for
@@ -58,16 +51,12 @@ typedef unsigned int uint;
  * 2) L. Branets, G. Carey, "A local cell quality metric and variational grid
  * smoothing algorithm", Engineering with Computers, vol. 21, pp.19-28, 2005.
  *
- * 3) L.V. Branets, "A variational grid optimization algorithm based on a local
+ * 3) L. Branets, "A variational grid optimization algorithm based on a local
  * cell quality metric", Ph.D. thesis, The University of Texas at Austin, 2005.
  *
  * \author Derek R. Gaston
  * \date 2006
  */
-
-
-// ------------------------------------------------------------
-// VariationalMeshSmoother class definition
 class VariationalMeshSmoother : public MeshSmoother
 {
 public:
@@ -75,81 +64,48 @@ public:
   /**
    * Simple constructor to use for smoothing purposes
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh, const double theta=0.5, const uint miniter=2,
-                          const uint maxiter=5, const uint miniterBC=5)
-    :MeshSmoother(mesh),
-     _percent_to_move(1),
-     _adapt_data(NULL),
-     _dim(mesh.mesh_dimension()),
-     _miniter(miniter),
-     _maxiter(maxiter),
-     _miniterBC(miniterBC),
-
-     _metric(uniform),
-     _adaptive_func(none),
-     _theta(theta),
-     _generate_data(false),
-
-     _area_of_interest(NULL)
-  {}
+  VariationalMeshSmoother(UnstructuredMesh& mesh,
+                          double theta=0.5,
+                          unsigned miniter=2,
+                          unsigned maxiter=5,
+                          unsigned miniterBC=5);
 
   /**
    * Slightly more complicated constructor for mesh redistribution based on adapt_data
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh, std::vector<float>* adapt_data, const double theta=0.5,
-                          const uint miniter=2, const uint maxiter=5, const uint miniterBC=5,
-                          const double percent_to_move=1)
-    :MeshSmoother(mesh),
-     _percent_to_move(percent_to_move),
-     _adapt_data(adapt_data),
-     _dim(mesh.mesh_dimension()),
-     _miniter(miniter),
-     _maxiter(maxiter),
-     _miniterBC(miniterBC),
-
-     _metric(uniform),
-     _adaptive_func(cell),
-     _theta(theta),
-     _generate_data(false),
-
-     _area_of_interest(NULL)
-  {}
+  VariationalMeshSmoother(UnstructuredMesh& mesh,
+                          std::vector<float>* adapt_data,
+                          double theta=0.5,
+                          unsigned miniter=2,
+                          unsigned maxiter=5,
+                          unsigned miniterBC=5,
+                          double percent_to_move=1);
 
   /**
    * Even more complicated constructor for mesh redistribution based on adapt_data with an
    * area of interest
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh, const UnstructuredMesh* area_of_interest, std::vector<float>* adapt_data,
-                          const double theta=0.5, const uint miniter=2, const uint maxiter=5,
-                          const uint miniterBC=5, const double percent_to_move=1)
-    :MeshSmoother(mesh),
-     _percent_to_move(percent_to_move),
-     _adapt_data(adapt_data),
-     _dim(mesh.mesh_dimension()),
-     _miniter(miniter),
-     _maxiter(maxiter),
-     _miniterBC(miniterBC),
+  VariationalMeshSmoother(UnstructuredMesh& mesh,
+                          const UnstructuredMesh* area_of_interest,
+                          std::vector<float>* adapt_data,
+                          double theta=0.5,
+                          unsigned miniter=2,
+                          unsigned maxiter=5,
+                          unsigned miniterBC=5,
+                          double percent_to_move=1);
 
-     _metric(uniform),
-     _adaptive_func(cell),
-     _theta(theta),
-     _generate_data(false),
-
-     _area_of_interest(area_of_interest)
-  {}
-
-  enum metric_type
+  enum MetricType
     {
-      uniform=1,
-      volumetric=2,
-      directional=3
+      UNIFORM = 1,
+      VOLUMETRIC = 2,
+      DIRECTIONAL = 3
     };
 
-  enum adapt_type
+  enum AdaptType
     {
-      cell=-1,
-      none=0,
-      node=1
+      CELL = -1,
+      NONE = 0,
+      NODE = 1
     };
 
   /**
@@ -173,11 +129,19 @@ public:
   double smooth(unsigned int n_iterations);
 
   /**
-   * @brief Member function <code>distanceMoved</code>
-   *
-   * @return a <code>double</code> max distance a node moved during the last smooth.
+   * @return max distance a node moved during the last smooth.
    */
-  double distanceMoved() const {return _distance;}
+  double distance_moved() const { return _distance; }
+
+  /**
+   * Allow user to control whether the metric is generated from the initial mesh.
+   */
+  void set_generate_data(bool b) { _generate_data = b; }
+
+  /**
+   * Allow user to control the smoothing metric used.
+   */
+  void set_metric(MetricType t) { _metric = t; }
 
 private:
 
@@ -209,11 +173,40 @@ private:
   /**
    * Smoother control variables
    */
-  const uint _dim,_miniter,_maxiter,_miniterBC;
-  const metric_type _metric;
-  const adapt_type _adaptive_func;
+  const unsigned _dim;
+  const unsigned _miniter;
+  const unsigned _maxiter;
+  const unsigned _miniterBC;
+  MetricType _metric;
+  AdaptType _adaptive_func;
   const double _theta;
-  const bool _generate_data;
+  bool _generate_data;
+
+  /**
+   * The number of nodes in the Mesh at the time of smoothing.
+   * Not set until smooth() is actually called to mimic the
+   * original code's behavior.
+   */
+  unsigned _n_nodes;
+
+  /**
+   * The number of active elements in the Mesh at the time of smoothing.
+   * Not set until smooth() is actually called to mimic the
+   * original code's behavior.
+   */
+  unsigned _n_cells;
+
+  /**
+   * The number of hanging node edges in the Mesh at the time of smoothing.
+   * Not set until smooth() is actually called to mimic the
+   * original code's behavior.
+   */
+  unsigned _n_hanging_edges;
+
+  /**
+   * All output (including debugging) is sent to the _logfile.
+   */
+  std::ofstream _logfile;
 
   /**
    * Area of Interest Mesh
@@ -224,88 +217,224 @@ private:
   float adapt_minimum() const;
 
   /**
-   *Imported stuff: ..........
+   * 2D array type for interfacing with C APIs.
    */
+  template <typename T>
+  struct Array2D
+  {
+    Array2D(unsigned nx, unsigned ny)
+    {
+      _data.resize(nx, std::vector<T>(ny));
+    }
 
-  /*-- allocate memory --*/
-  LPDOUBLE alloc_d_n1(int m1)              { return((LPDOUBLE)malloc(m1*sizeof(double))); }
-  LPINT alloc_i_n1(int m1)                 { return((LPINT)malloc(m1*sizeof(int))); }
-  LPLPINT alloc_i_n1_n2(int m1, int)    { return((LPLPINT)malloc(m1*sizeof(LPINT))); }
-  LPLPDOUBLE alloc_d_n1_n2(int m1, int) { return((LPLPDOUBLE)malloc(m1*sizeof(LPDOUBLE))); }
-  LPLPLPDOUBLE alloc_d_n1_n2_n3(int m1, int, int) { return((LPLPLPDOUBLE)malloc(m1*sizeof(LPLPDOUBLE))); }
+    // Accessors
+    std::vector<T>& operator[](unsigned i) {return _data[i];}
+    const std::vector<T>& operator[](unsigned i) const {return _data[i];}
 
-  int writegr(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells,
-              LPINT mcells, int nedges, LPINT edges, LPINT hnodes, const char grid[],
-              int me, const char grid_old[], FILE *sout);
+  private:
+    std::vector<std::vector<T> > _data;
+  };
 
-  int readgr(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells,
-             LPLPINT cells, LPINT mcells, int nedges, LPINT edges, LPINT hnodes, FILE *sout);
 
-  int readmetr(char *name, LPLPLPDOUBLE H, int ncells, int n, FILE *sout);
 
-  int read_adp(LPDOUBLE afun, char *adap, FILE *sout);
+  /**
+   * 3D array type for interfacing with C APIs.
+   */
+  template <typename T>
+  struct Array3D
+  {
+    Array3D(unsigned nx, unsigned ny, unsigned nz)
+    {
+      _data.resize(nx, Array2D<T>(ny,nz));
+    }
 
-  double jac3(double x1,double y1,double z1,double x2,double y2,
-              double z2,double x3,double y3,double z3);
+    // Accessors
+    Array2D<T>& operator[](unsigned i) {return _data[i];}
+    const Array2D<T>& operator[](unsigned i) const {return _data[i];}
 
-  double jac2(double x1,double y1,double x2,double y2);
+  private:
+    std::vector<Array2D<T> > _data;
+  };
 
-  int basisA(int n, LPLPDOUBLE Q, int nvert, LPDOUBLE K, LPLPDOUBLE H, int me);
 
-  void adp_renew(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells,
-                 LPDOUBLE afun, int adp, FILE *sout);
+  int writegr(const Array2D<double>& R);
 
-  void full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                   int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
-                   LPLPLPDOUBLE H, int adp, char *adap, int gr, FILE *sout);
+  int readgr(Array2D<double>& R,
+             std::vector<int>& mask,
+             Array2D<int>& cells,
+             std::vector<int>& mcells,
+             std::vector<int>& edges,
+             std::vector<int>& hnodes);
 
-  double maxE(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells,
-              int me, LPLPLPDOUBLE H, double v, double epsilon, double w, LPDOUBLE Gamma,
-              double *qmin, FILE *sout);
+  int readmetr(std::string name,
+               Array3D<double>& H);
 
-  double minq(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells,
-              int me, LPLPLPDOUBLE H, double *vol, double *Vmin, FILE *sout);
+  int read_adp(std::vector<double>& afun);
 
-  double minJ(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-              double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
-              LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
-              int adp, LPDOUBLE afun, FILE *sout);
+  double jac3(double x1, double y1, double z1,
+              double x2, double y2, double z2,
+              double x3, double y3, double z3);
 
-  double minJ_BC(int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                 double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev,
-                 double *Vmin, double *emax, double *qmin, int adp, LPDOUBLE afun, int NCN, FILE *sout);
+  double jac2(double x1, double y1,
+              double x2, double y2);
 
-  double localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell, LPINT mask, double epsilon,
-                double w, int nvert, LPLPDOUBLE H, int me, double vol, int f, double *Vmin,
-                double *qmin, int adp, LPDOUBLE afun, LPDOUBLE Gloc, FILE *sout);
+  int basisA(Array2D<double>& Q,
+             int nvert,
+             const std::vector<double>& K,
+             const Array2D<double>& H,
+             int me);
 
-  double avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDOUBLE R, LPINT cell, int nvert, int adp, FILE *sout);
+  void adp_renew(const Array2D<double>& R,
+                 const Array2D<int>& cells,
+                 std::vector<double>& afun,
+                 int adp);
 
-  double vertex(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell,
-                double epsilon, double w, int nvert, LPDOUBLE K,
-                LPLPDOUBLE H, int me, double vol, int f, double *Vmin, int adp,
-                LPDOUBLE G, double sigma, FILE *sout);
+  void full_smooth(Array2D<double>& R,
+                   const std::vector<int>& mask,
+                   const Array2D<int>& cells,
+                   const std::vector<int>& mcells,
+                   const std::vector<int>& edges,
+                   const std::vector<int>& hnodes,
+                   double w,
+                   const std::vector<int>& iter,
+                   int me,
+                   const Array3D<double>& H,
+                   int adp,
+                   int gr);
 
-  void metr_data_gen(char grid[], char metr[], int n, int me, FILE *sout);
+  double maxE(Array2D<double>& R,
+              const Array2D<int>& cells,
+              const std::vector<int>& mcells,
+              int me,
+              const Array3D<double>& H,
+              double v,
+              double epsilon,
+              double w,
+              std::vector<double>& Gamma,
+              double& qmin);
 
-  int solver(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOUBLE x, LPDOUBLE b, double eps,
-             int maxite, int msglev, FILE *sout);
+  double minq(const Array2D<double>& R,
+              const Array2D<int>& cells,
+              const std::vector<int>& mcells,
+              int me,
+              const Array3D<double>& H,
+              double& vol,
+              double& Vmin);
 
-  int pcg_ic0(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOUBLE u, LPDOUBLE x, LPDOUBLE b, LPDOUBLE r,
-              LPDOUBLE p, LPDOUBLE z, double eps, int maxite, int msglev, FILE *sout);
+  double minJ(Array2D<double>& R,
+              const std::vector<int>& mask,
+              const Array2D<int>& cells,
+              const std::vector<int>& mcells,
+              double epsilon,
+              double w,
+              int me,
+              const Array3D<double>& H,
+              double vol,
+              const std::vector<int>& edges,
+              const std::vector<int>& hnodes,
+              int msglev,
+              double& Vmin,
+              double& emax,
+              double& qmin,
+              int adp,
+              const std::vector<double>& afun);
 
-  int pcg_par_check(int n, LPINT ia, LPINT ja, LPDOUBLE a, double eps, int maxite, int msglev, FILE *sout);
+  double minJ_BC(Array2D<double>& R,
+                 const std::vector<int>& mask,
+                 const Array2D<int>& cells,
+                 const std::vector<int>& mcells,
+                 double epsilon,
+                 double w,
+                 int me,
+                 const Array3D<double>& H,
+                 double vol,
+                 int msglev,
+                 double& Vmin,
+                 double& emax,
+                 double& qmin,
+                 int adp,
+                 const std::vector<double>& afun,
+                 int NCN);
 
-  void gener(char grid[], int n, FILE *sout);
+  double localP(Array3D<double>& W,
+                Array2D<double>& F,
+                Array2D<double>& R,
+                const std::vector<int>& cell_in,
+                const std::vector<int>& mask,
+                double epsilon,
+                double w,
+                int nvert,
+                const Array2D<double>& H,
+                int me,
+                double vol,
+                int f,
+                double& Vmin,
+                double& qmin,
+                int adp,
+                const std::vector<double>& afun,
+                std::vector<double>& Gloc);
 
-  void local_sweep(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                   int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
-                   LPLPLPDOUBLE H, int adp, int OPT, FILE *sout);
+  double avertex(const std::vector<double>& afun,
+                 std::vector<double>& G,
+                 const Array2D<double>& R,
+                 const std::vector<int>& cell_in,
+                 int nvert,
+                 int adp);
 
-  double minJ_l(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
-                LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
-                int adp, LPDOUBLE afun, FILE *sout);
+  double vertex(Array3D<double>& W,
+                Array2D<double>& F,
+                const Array2D<double>& R,
+                const std::vector<int>& cell_in,
+                double epsilon,
+                double w,
+                int nvert,
+                const std::vector<double>& K,
+                const Array2D<double>& H,
+                int me,
+                double vol,
+                int f,
+                double& Vmin,
+                int adp,
+                const std::vector<double>& g,
+                double sigma);
+
+  void metr_data_gen(std::string grid,
+                     std::string metr,
+                     int me);
+
+  int solver(int n,
+             const std::vector<int>& ia,
+             const std::vector<int>& ja,
+             const std::vector<double>& a,
+             std::vector<double>& x,
+             const std::vector<double>& b,
+             double eps,
+             int maxite,
+             int msglev);
+
+  int pcg_ic0(int n,
+              const std::vector<int>& ia,
+              const std::vector<int>& ja,
+              const std::vector<double>& a,
+              const std::vector<double>& u,
+              std::vector<double>& x,
+              const std::vector<double>& b,
+              std::vector<double>& r,
+              std::vector<double>& p,
+              std::vector<double>& z,
+              double eps,
+              int maxite,
+              int msglev);
+
+  int pcg_par_check(int n,
+                    const std::vector<int>& ia,
+                    const std::vector<int>& ja,
+                    const std::vector<double>& a,
+                    double eps,
+                    int maxite,
+                    int msglev);
+
+  void gener(char grid[], int n);
 };
 
 } // namespace libMesh
