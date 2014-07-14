@@ -271,7 +271,13 @@ public:
      * The DiffSolver failed to find a descent direction
      * by backtracking (See newton_solver.C)
      */
-    DIVERGED_BACKTRACKING_FAILURE = 128
+    DIVERGED_BACKTRACKING_FAILURE = 128,
+
+    /**
+     * The linear solver used by the DiffSolver failed to
+     * find a solution.
+     */
+    DIVERGED_LINEAR_SOLVER_FAILURE = 256
   };
 
   /**

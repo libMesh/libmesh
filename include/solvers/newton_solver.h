@@ -112,6 +112,15 @@ public:
   bool brent_line_search;
 
   /**
+   * If set to true, check for convergence of the linear solve. If no
+   * convergence is acquired during the linear solve, the nonlinear solve
+   * fails with DiffSolver::DIVERGED_LINEAR_SOLVER_FAILURE.
+   * Enabled by default as nonlinear convergence is very difficult, if the
+   * linear solver is not converged.
+   */
+  bool track_linear_convergence;
+
+  /**
    * If the quasi-Newton step length must be reduced to below this
    * factor to give a residual reduction, then the Newton solver
    * dies with an error message.
