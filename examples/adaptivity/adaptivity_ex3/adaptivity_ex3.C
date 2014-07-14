@@ -407,6 +407,16 @@ int main(int argc, char** argv)
 
           else if (uniform_refine == 1)
             {
+              // Debugging: Test the ErrorVector's plot_error capability while doing uniform refinement...
+              {
+                ErrorVector error;
+                KellyErrorEstimator error_estimator;
+                error_estimator.estimate_error (system, error);
+                std::ostringstream ss;
+                ss << "debug_error_" << r_step << ".e";
+                error.plot_error( ss.str(), mesh );
+              }
+
               if (refine_type == "h" || refine_type == "hp" ||
                   refine_type == "matchedhp")
                 mesh_refinement.uniformly_refine(1);
