@@ -20,6 +20,7 @@
 
 // C++ includes
 #include <time.h> // for clock_t, clock()
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 #include <iomanip>
 
