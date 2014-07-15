@@ -29,6 +29,10 @@ EXTERN_C_FOR_PETSC_BEGIN
 EXTERN_C_FOR_PETSC_END
 #endif
 
+#if (LIBMESH_HAVE_SLEPC && LIBMESH_USE_REAL_NUMBERS)
+#include <slepcblaslapack.h>
+#endif
+
 namespace libMesh
 {
 
@@ -508,6 +512,161 @@ void DenseMatrix<T>::_svd_helper (char,
 
 
 
+#if (LIBMESH_HAVE_SLEPC && LIBMESH_USE_REAL_NUMBERS)
+
+template<typename T>
+void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag)
+{
+  // The calling sequence for dgeev is:
+  // DGEEVX( BALANC, JOBVL, JOBVR, SENSE, N, A, LDA, WR, WI, VL, LDVL, VR,
+  //         LDVR, ILO, IHI, SCALE, ABNRM, RCONDE, RCONDV, WORK, LWORK, IWORK, INFO )
+
+
+  //  BALANC  (input) CHARACTER*1
+  //          Indicates how the input matrix should be diagonally scaled
+  //          and/or permuted to improve the conditioning of its
+  //          eigenvalues.
+  //          = 'N': Do not diagonally scale or permute;
+  char BALANC = 'N';
+
+  //  JOBVL   (input) CHARACTER*1
+  //          = 'N': left eigenvectors of A are not computed;
+  //          = 'V': left eigenvectors of A are computed.
+  char JOBVL = 'N';
+
+  //  JOBVR   (input) CHARACTER*1
+  //          = 'N': right eigenvectors of A are not computed;
+  //          = 'V': right eigenvectors of A are computed.
+  char JOBVR = 'N';
+
+  //  SENSE   (input) CHARACTER*1
+  //          Determines which reciprocal condition numbers are computed.
+  //          = 'N': None are computed;
+  //          = 'E': Computed for eigenvalues only;
+  //          = 'V': Computed for right eigenvectors only;
+  //          = 'B': Computed for eigenvalues and right eigenvectors.
+  char SENSE = 'N';
+
+  //    N       (input) int*
+  //            The number of rows/cols of the matrix A.  N >= 0.
+  libmesh_assert( this->m() == this->n() );
+  int N = this->m();
+
+  //  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)
+  //          On entry, the N-by-N matrix A.
+  //          On exit, A has been overwritten.
+  // Here, we pass &(_val[0]).
+
+  //    LDA     (input) int*
+  //            The leading dimension of the array A.  LDA >= max(1,N).
+  int LDA = N;
+
+  //  WR      (output) DOUBLE PRECISION array, dimension (N)
+  //  WI      (output) DOUBLE PRECISION array, dimension (N)
+  //          WR and WI contain the real and imaginary parts,
+  //          respectively, of the computed eigenvalues.  Complex
+  //          conjugate pairs of eigenvalues appear consecutively
+  //          with the eigenvalue having the positive imaginary part
+  //          first.
+  std::vector<T> lambda_real_val(N);
+  std::vector<T> lambda_imag_val(N);
+
+  //  VL      (output) DOUBLE PRECISION array, dimension (LDVL,N)
+  //          If JOBVL = 'V', the left eigenvectors u(j) are stored one
+  //          after another in the columns of VL, in the same order
+  //          as their eigenvalues.
+  //          If JOBVL = 'N', VL is not referenced.
+  //          If the j-th eigenvalue is real, then u(j) = VL(:,j),
+  //          the j-th column of VL.
+  //          If the j-th and (j+1)-st eigenvalues form a complex
+  //          conjugate pair, then u(j) = VL(:,j) + i*VL(:,j+1) and
+  //          u(j+1) = VL(:,j) - i*VL(:,j+1).
+  // Just set to NULL here.
+
+  //  LDVL    (input) INTEGER
+  //          The leading dimension of the array VL.  LDVL >= 1; if
+  //          JOBVL = 'V', LDVL >= N.
+  int LDVL = 1;
+
+  //  VR      (output) DOUBLE PRECISION array, dimension (LDVR,N)
+  //          If JOBVR = 'V', the right eigenvectors v(j) are stored one
+  //          after another in the columns of VR, in the same order
+  //          as their eigenvalues.
+  //          If JOBVR = 'N', VR is not referenced.
+  //          If the j-th eigenvalue is real, then v(j) = VR(:,j),
+  //          the j-th column of VR.
+  //          If the j-th and (j+1)-st eigenvalues form a complex
+  //          conjugate pair, then v(j) = VR(:,j) + i*VR(:,j+1) and
+  //          v(j+1) = VR(:,j) - i*VR(:,j+1).
+  // Just set to NULL here.
+
+  //  LDVR    (input) INTEGER
+  //          The leading dimension of the array VR.  LDVR >= 1; if
+  //          JOBVR = 'V', LDVR >= N.
+  int LDVR = 1;
+
+  // Outputs (unused)
+  int ILO = 0;
+  int IHI = 0;
+  std::vector<T> SCALE(N);
+  T ABNRM;
+  std::vector<T> RCONDE(N);
+  std::vector<T> RCONDV(N);
+
+  //  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+  //          On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
+  //
+  //  LWORK   (input) INTEGER
+  //          The dimension of the array WORK.
+  int LWORK = 3*N;
+  std::vector<T> WORK( LWORK );
+
+  //  IWORK   (workspace) INTEGER array, dimension (2*N-2)
+  //          If SENSE = 'N' or 'E', not referenced.
+  // Just set to NULL
+
+
+  //  INFO    (output) INTEGER
+  //          = 0:  successful exit
+  //          < 0:  if INFO = -i, the i-th argument had an illegal value.
+  //          > 0:  if INFO = i, the QR algorithm failed to compute all the
+  //                eigenvalues, and no eigenvectors or condition numbers
+  //                have been computed; elements 1:ILO-1 and i+1:N of WR
+  //                and WI contain eigenvalues which have converged.
+  int INFO = 0;
+
+  // Ready to call the actual factorization routine through SLEPc's interface
+  LAPACKgeevx_( &BALANC, &JOBVL, &JOBVR, &SENSE, &N, &(_val[0]), &LDA, &lambda_real_val[0],
+                &lambda_imag_val[0], NULL, &LDVL, NULL, &LDVR, &ILO, &IHI, &SCALE[0], &ABNRM,
+                &RCONDE[0], &RCONDV[0], &WORK[0], &LWORK, NULL, &INFO );
+
+  // Check return value for errors
+  if (INFO != 0)
+    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack eigenvalue calculation!");
+
+  // Load the singular values into sigma, ignore U_val and VT_val
+  lambda_real.resize(lambda_real_val.size());
+  for (unsigned int i=0; i<lambda_real.size(); i++)
+    lambda_real(i) = lambda_real_val[i];
+
+  lambda_imag.resize(lambda_imag_val.size());
+  for (unsigned int i=0; i<lambda_imag.size(); i++)
+    lambda_imag(i) = lambda_imag_val[i];
+}
+
+#else
+
+template<typename T>
+void DenseMatrix<T>::_evd_lapack (DenseVector<T>& , DenseVector<T>& )
+{
+  libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
+}
+
+#endif
+
+
+
+
 
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
@@ -737,6 +896,7 @@ template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real>&, DenseMatrix<Rea
 template void DenseMatrix<Real>::_svd_helper (char, char, std::vector<Real>&,
                                               std::vector<Real>&,
                                               std::vector<Real>& );
+template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real>&, DenseVector<Real>&);
 
 #if !(LIBMESH_USE_REAL_NUMBERS)
 template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number>&, _BLAS_Multiply_Flag);
@@ -752,6 +912,8 @@ template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&, DenseMatrix
 template void DenseMatrix<Number>::_svd_helper (char, char, std::vector<Number>&,
                                                 std::vector<Number>&,
                                                 std::vector<Number>& );
+template void DenseMatrix<Number>::_evd_lapack(DenseVector<Real>&, DenseVector<Real>&);
+
 #endif
 
 } // namespace libMesh

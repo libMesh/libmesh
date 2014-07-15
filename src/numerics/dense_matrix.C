@@ -797,6 +797,15 @@ void DenseMatrix<T>::svd (DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<
 
 
 template<typename T>
+void DenseMatrix<T>::evd (DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag)
+{
+  // We use the LAPACK eigenvalue problem implementation
+  _evd_lapack(lambda_real, lambda_imag);
+}
+
+
+
+template<typename T>
 T DenseMatrix<T>::det ()
 {
   switch(this->_decomposition_type)
