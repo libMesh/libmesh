@@ -1,5 +1,5 @@
 # Maximum number of refinement steps
-max_r_steps = 6
+max_r_steps = 10
 
 # Maximum h refinement level for an element.
 max_r_level = 15
@@ -13,7 +13,7 @@ coarsen_percentage = 0.0
 # Option to uniformly or adaptively refine.
 # If uniform_refine == 1, uniform refinement is done.
 # If uniform_refine == 0, adaptive refinement is done.
-uniform_refine = 1
+uniform_refine = 0
 
 # Basis function type (as named in enum_fe_family.h)
 approx_type = LAGRANGE
