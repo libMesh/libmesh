@@ -568,8 +568,8 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& l
   //          conjugate pairs of eigenvalues appear consecutively
   //          with the eigenvalue having the positive imaginary part
   //          first.
-  std::vector<T> lambda_real_val(N);
-  std::vector<T> lambda_imag_val(N);
+  lambda_real.resize(N);
+  lambda_imag.resize(N);
 
   //  VL      (output) DOUBLE PRECISION array, dimension (LDVL,N)
   //          If JOBVL = 'V', the left eigenvectors u(j) are stored one
@@ -635,6 +635,10 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& l
   //                and WI contain eigenvalues which have converged.
   int INFO = 0;
 
+  // Get references to raw data
+  std::vector<T>& lambda_real_val = lambda_real.get_values();
+  std::vector<T>& lambda_imag_val = lambda_imag.get_values();
+
   // Ready to call the actual factorization routine through SLEPc's interface
   LAPACKgeevx_( &BALANC, &JOBVL, &JOBVR, &SENSE, &N, &(_val[0]), &LDA, &lambda_real_val[0],
                 &lambda_imag_val[0], NULL, &LDVL, NULL, &LDVR, &ILO, &IHI, &SCALE[0], &ABNRM,
@@ -643,15 +647,6 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T>& lambda_real, DenseVector<T>& l
   // Check return value for errors
   if (INFO != 0)
     libmesh_error_msg("INFO=" << INFO << ", Error during Lapack eigenvalue calculation!");
-
-  // Load the singular values into sigma, ignore U_val and VT_val
-  lambda_real.resize(lambda_real_val.size());
-  for (unsigned int i=0; i<lambda_real.size(); i++)
-    lambda_real(i) = lambda_real_val[i];
-
-  lambda_imag.resize(lambda_imag_val.size());
-  for (unsigned int i=0; i<lambda_imag.size(); i++)
-    lambda_imag(i) = lambda_imag_val[i];
 }
 
 #else
