@@ -95,7 +95,7 @@ typedef std::map<dof_id_type, Real,
 class DofConstraints : public std::map<dof_id_type,
                                        DofConstraintRow,
                                        std::less<dof_id_type>,
-                                       Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
+                                       Threads::scalable_allocator<std::pair<const dof_id_type, DofConstraintRow> > >
 {
 };
 
