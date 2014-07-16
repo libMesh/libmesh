@@ -406,6 +406,15 @@ public:
 
 
   /**
+   * Compute the eigenvalues (both real and imaginary parts) of a general matrix.
+   *
+   * The implementation requires the LAPACKgeevx_ which is wrapped by
+   * SLEPc, and throws an error if called when SLEPc is not available.
+   */
+  void evd(DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag);
+
+
+  /**
    * @returns the determinant of the matrix.  Note that this means
    * doing an LU decomposition and then computing the product of the
    * diagonal terms.  Therefore this is a non-const method.
@@ -541,6 +550,13 @@ private:
                     std::vector<T>& sigma_val,
                     std::vector<T>& U_val,
                     std::vector<T>& VT_val);
+
+  /**
+   * Computes the eigenvalues of the matrix using the
+   * Lapack routine "DGEEV".
+   * [ Implementation in dense_matrix_blas_lapack.C ]
+   */
+  void _evd_lapack(DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag);
 
   /**
    * This array is used to store pivot indices.  May be used
