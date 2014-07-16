@@ -2168,11 +2168,10 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
       }
   }
 
-  int nz = ia[_dim*_n_nodes];
   int m = _dim*_n_nodes;
   int sch = (msglev >= 3) ? 1 : 0;
 
-  nz = solver(m, ia, ja, a, u, b, eps, 100, sch);
+  solver(m, ia, ja, a, u, b, eps, 100, sch);
   // sol_pcg_pj(m, ia, ja, a, u, b, eps, 100, sch);
 
   for (unsigned i=0; i<_n_nodes; i++)
