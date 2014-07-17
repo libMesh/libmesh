@@ -234,6 +234,7 @@ NewtonSolver::NewtonSolver (sys_type& s)
     require_residual_reduction(true),
     require_finite_residual(true),
     brent_line_search(true),
+    track_linear_convergence(false),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
     linear_solver(LinearSolver<Number>::build(s.comm()))
@@ -364,6 +365,22 @@ unsigned int NewtonSolver::solve()
         linear_solver->solve (matrix, _system.request_matrix("Preconditioner"),
                               linear_solution, rhs, current_linear_tolerance,
                               max_linear_iterations);
+
+      if (track_linear_convergence)
+        {
+          LinearConvergenceReason linear_c_reason = linear_solver->get_converged_reason();
+
+          // Check if something went wrong during the linear solve
+          if (linear_c_reason < 0)
+            {
+              // The linear solver failed somehow
+              _solve_result |= DiffSolver::DIVERGED_LINEAR_SOLVER_FAILURE;
+              // Print a message
+              libMesh::out << "Linear solver failed during Newton step, dropping out."
+                           << std::endl;
+              break;
+            }
+        }
 
       // We may need to localize a parallel solution
       _system.update ();
