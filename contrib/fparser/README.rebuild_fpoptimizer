@@ -1,0 +1,6 @@
+User the upstream Makefile to rebuild the fpoptimizer.cc file (only necessary after changes to source files in the ./fpoptimizer directory)
+
+> rm .dep fpoptimizer.cc
+> make -f Makefile.orig fpoptimizer.cc
+
+Note that the upstream Makefile is patched to add the include path necessary to find libmesh_config.h
