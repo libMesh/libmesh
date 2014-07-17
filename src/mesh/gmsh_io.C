@@ -78,6 +78,7 @@ void init_eletypes ()
 
       // POINT (only Gmsh)
       {
+        eledef.type    = NODEELEM;
         eledef.exptype = 15;
         eledef.dim     = 0;
         eledef.nnodes  = 1;
@@ -481,12 +482,15 @@ void GmshIO::read_mesh(std::istream& in)
                         }
                     }
 
-                  // consult the import element table which element to build
-                  const elementDefinition& eletype = eletypes_imp[type];
+                  // Consult the import element table to determine which element to build
+                  std::map<unsigned int, elementDefinition>::iterator eletypes_it = eletypes_imp.find(type);
 
-                  // If type wasn't recognized, it will default-construct and return an invalid one...
-                  if (eletype.nnodes == 0)
-                    libmesh_error_msg("Unrecognized element type " << type);
+                  // Make sure we actually found something
+                  if (eletypes_it == eletypes_imp.end())
+                    libmesh_error_msg("Element type " << type << " not found!");
+
+                  // Get a reference to the elementDefinition
+                  const elementDefinition& eletype = eletypes_it->second;
 
                   // If we read nnodes, make sure it matches the number in eletype.nnodes
                   if (nnodes != 0 && nnodes != eletype.nnodes)
@@ -495,50 +499,69 @@ void GmshIO::read_mesh(std::istream& in)
                   // Assign the value from the eletype object.
                   nnodes = eletype.nnodes;
 
-                  // Record this element dimension as being "seen".
-                  // We will treat all elements with dimension <
-                  // max(dimension) as specifying boundary conditions,
-                  // but we won't know what max_elem_dimension_seen is
-                  // until we read the entire file.
-                  elem_dimensions_seen[eletype.dim-1] = 1;
+                  // Don't add 0-dimensional "point" elements to the
+                  // Mesh.  They should *always* be treated as boundary
+                  // "nodeset" data.
+                  if (eletype.dim > 0)
+                    {
+                      // Record this element dimension as being "seen".
+                      // We will treat all elements with dimension <
+                      // max(dimension) as specifying boundary conditions,
+                      // but we won't know what max_elem_dimension_seen is
+                      // until we read the entire file.
+                      elem_dimensions_seen[eletype.dim-1] = 1;
 
-                  // Add the element to the mesh
-                  {
-                    Elem* elem = Elem::build(eletype.type).release();
-                    elem->set_id(iel);
-                    elem = mesh.add_elem(elem);
-
-                    // Make sure that the libmesh element we added has nnodes nodes.
-                    if (elem->n_nodes() != nnodes)
-                      libmesh_error_msg("Number of nodes for element " \
-                                        << id \
-                                        << " of type " << eletypes_imp[type].type \
-                                        << " (Gmsh type " << type \
-                                        << ") does not match Libmesh definition. " \
-                                        << "I expected " << elem->n_nodes() \
-                                        << " nodes, but got " << nnodes);
-
-                    // Add node pointers to the elements.
-                    // If there is a node translation table, use it.
-                    if (eletype.nodes.size() > 0)
-                      for (unsigned int i=0; i<nnodes; i++)
-                        {
-                          in >> node_id;
-                          elem->set_node(eletype.nodes[i]) = mesh.node_ptr(nodetrans[node_id]);
-                        }
-                    else
+                      // Add the element to the mesh
                       {
-                        for (unsigned int i=0; i<nnodes; i++)
-                          {
-                            in >> node_id;
-                            elem->set_node(i) = mesh.node_ptr(nodetrans[node_id]);
-                          }
-                      }
+                        Elem* elem = Elem::build(eletype.type).release();
+                        elem->set_id(iel);
+                        elem = mesh.add_elem(elem);
 
-                    // Finally, set the subdomain ID to physical.  If this is a lower-dimension element, this ID will
-                    // eventually go into the Mesh's BoundaryInfo object.
-                    elem->subdomain_id() = static_cast<subdomain_id_type>(physical);
-                  }
+                        // Make sure that the libmesh element we added has nnodes nodes.
+                        if (elem->n_nodes() != nnodes)
+                          libmesh_error_msg("Number of nodes for element " \
+                                            << id \
+                                            << " of type " << eletypes_imp[type].type \
+                                            << " (Gmsh type " << type \
+                                            << ") does not match Libmesh definition. " \
+                                            << "I expected " << elem->n_nodes() \
+                                            << " nodes, but got " << nnodes);
+
+                        // Add node pointers to the elements.
+                        // If there is a node translation table, use it.
+                        if (eletype.nodes.size() > 0)
+                          for (unsigned int i=0; i<nnodes; i++)
+                            {
+                              in >> node_id;
+                              elem->set_node(eletype.nodes[i]) = mesh.node_ptr(nodetrans[node_id]);
+                            }
+                        else
+                          {
+                            for (unsigned int i=0; i<nnodes; i++)
+                              {
+                                in >> node_id;
+                                elem->set_node(i) = mesh.node_ptr(nodetrans[node_id]);
+                              }
+                          }
+
+                        // Finally, set the subdomain ID to physical.  If this is a lower-dimension element, this ID will
+                        // eventually go into the Mesh's BoundaryInfo object.
+                        elem->subdomain_id() = static_cast<subdomain_id_type>(physical);
+                      }
+                    }
+
+                  // Handle 0-dimensional elements (points) by adding
+                  // them to the BoundaryInfo object with
+                  // boundary_id == physical.
+                  else
+                    {
+                      // This seems like it should always be the same
+                      // number as the 'id' we already read in on this
+                      // line.  At least it was in the example gmsh
+                      // file I had...
+                      in >> node_id;
+                      mesh.boundary_info->add_node(nodetrans[node_id], physical);
+                    }
                 } // element loop
 
               // read the $ENDELM delimiter
