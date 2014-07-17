@@ -234,7 +234,7 @@ NewtonSolver::NewtonSolver (sys_type& s)
     require_residual_reduction(true),
     require_finite_residual(true),
     brent_line_search(true),
-    track_linear_convergence(true),
+    track_linear_convergence(false),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
     linear_solver(LinearSolver<Number>::build(s.comm()))
