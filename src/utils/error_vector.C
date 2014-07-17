@@ -219,6 +219,10 @@ void ErrorVector::plot_error(const std::string& filename,
 {
   AutoPtr<MeshBase> meshptr = oldmesh.clone();
   MeshBase &mesh = *meshptr;
+
+  // The all_first_order routine requires that renumbering be allowed
+  mesh.allow_renumbering(true);
+
   mesh.all_first_order();
   EquationSystems temp_es (mesh);
   ExplicitSystem& error_system
