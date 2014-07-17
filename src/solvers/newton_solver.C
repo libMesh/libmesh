@@ -368,18 +368,18 @@ unsigned int NewtonSolver::solve()
 
       if (track_linear_convergence)
         {
-        LinearConvergenceReason linear_c_reason = linear_solver->get_converged_reason();
+          LinearConvergenceReason linear_c_reason = linear_solver->get_converged_reason();
 
-        // Check if something went wrong during the linear solve
-        if (linear_c_reason < 0)
-          {
-            // The linear solver failed somehow
-            _solve_result |= DiffSolver::DIVERGED_LINEAR_SOLVER_FAILURE;
-            // Print a message
-            libMesh::out << "Linear solver failed during Newton step, dropping out."
-                         << std::endl;
-            break;
-          }
+          // Check if something went wrong during the linear solve
+          if (linear_c_reason < 0)
+            {
+              // The linear solver failed somehow
+              _solve_result |= DiffSolver::DIVERGED_LINEAR_SOLVER_FAILURE;
+              // Print a message
+              libMesh::out << "Linear solver failed during Newton step, dropping out."
+                           << std::endl;
+              break;
+            }
         }
 
       // We may need to localize a parallel solution
