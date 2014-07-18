@@ -7,7 +7,7 @@
 # The optimizer code generator requires bison.
 #===========================================================================
 
-RELEASE_VERSION=4.5
+RELEASE_VERSION=4.5.1
 
 # The FP_FEATURE_FLAGS is set by run_full_release_testing.sh, but can be
 # used otherwise as well.
@@ -28,13 +28,16 @@ FEATURE_FLAGS += -DFP_SUPPORT_COMPLEX_DOUBLE_TYPE
 FEATURE_FLAGS += -DFP_SUPPORT_COMPLEX_FLOAT_TYPE
 FEATURE_FLAGS += -DFP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
 FEATURE_FLAGS += -DFP_USE_STRTOLD
+#FEATURE_FLAGS += -DFP_SUPPORT_CPLUSPLUS11_MATH_FUNCS
 else
 FEATURE_FLAGS = $(FP_FEATURE_FLAGS)
 endif
 
-OPTIMIZATION=-O3 -ffast-math -march=native -fexpensive-optimizations \
-	-fvpt -fomit-frame-pointer -ffunction-cse
+OPTIMIZATION=-O3 -ffast-math -march=native
 #       -ffunction-sections -fdata-sections
+
+# For GCC (not clang):
+OPTIMIZATION += -fexpensive-optimizations -fvpt -fomit-frame-pointer -ffunction-cse
 
 #OPTIMIZATION+=-g
 #OPTIMIZATION=-g -O0 -fno-inline
@@ -44,9 +47,12 @@ OPTIMIZATION=-O3 -ffast-math -march=native -fexpensive-optimizations \
 #OPTIMIZATION=-g -pg
 
 CXX=g++
+#CXX=clang++
 # -m32 -mfpmath=sse
 # -m32 -mfpmath=387
+
 LD=g++
+#LD=clang++
 #LD=g++ -g
 # -m32 -mfpmath=sse
 # -m32 -mfpmath=387
@@ -66,7 +72,11 @@ FEATURE_FLAGS += -DFUNCTIONPARSER_SUPPORT_DEBUGGING
 
 #LD +=  -fprofile -fprofile-values -fprofile-generate -ftest-coverage 
 
-CPPFLAGS=$(FEATURE_FLAGS)
+# Try to guess the location of an installed libmesh, taking it from the
+# environment if it exists.
+LIBMESH_DIR ?= ../../installed
+
+CPPFLAGS=$(FEATURE_FLAGS) -I$(LIBMESH_DIR)/include/libmesh
 CXXFLAGS=-Wall -W -pedantic -ansi $(OPTIMIZATION)
 #CXXFLAGS += -Wunreachable-code
 #CXXFLAGS += -std=c++0x
@@ -92,6 +102,10 @@ else
 ifneq (,$(findstring -DFP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA,$(FEATURE_FLAGS)))
 BOOST_THREAD_LIB = -lboost_thread-mt
 endif
+endif
+
+ifneq (,$(findstring -DFP_SUPPORT_CPLUSPLUS11_MATH_FUNCS,$(FEATURE_FLAGS)))
+CXXFLAGS += -std=c++0x
 endif
 
 #LD += -Xlinker --gc-sections
