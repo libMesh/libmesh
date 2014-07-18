@@ -72,7 +72,11 @@ FEATURE_FLAGS += -DFUNCTIONPARSER_SUPPORT_DEBUGGING
 
 #LD +=  -fprofile -fprofile-values -fprofile-generate -ftest-coverage 
 
-CPPFLAGS=$(FEATURE_FLAGS) -I../../installed/include/libmesh/
+# Try to guess the location of an installed libmesh, taking it from the
+# environment if it exists.
+LIBMESH_DIR ?= ../../installed
+
+CPPFLAGS=$(FEATURE_FLAGS) -I$(LIBMESH_DIR)/include/libmesh
 CXXFLAGS=-Wall -W -pedantic -ansi $(OPTIMIZATION)
 #CXXFLAGS += -Wunreachable-code
 #CXXFLAGS += -std=c++0x
