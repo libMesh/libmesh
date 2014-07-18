@@ -28,6 +28,7 @@
 #include "libmesh/unv_io.h"
 #include "libmesh/mesh_data.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
@@ -450,6 +451,9 @@ void UNVIO::count_elements (std::istream& in_file)
   std::string data;
   unsigned int fe_id;
 
+  // A dummy string for ignoring lines
+  std::string dummy;
+
   while (!in_file.eof())
     {
       // read element label
@@ -464,21 +468,22 @@ void UNVIO::count_elements (std::istream& in_file)
 
       // Skip related data,
       // and node number list
-      in_file.ignore (256,'\n');
-      in_file.ignore (256,'\n');
+      std::getline(in_file, dummy);
+      std::getline(in_file, dummy);
 
       // For some elements the node numbers
       // are given more than one record
 
-      // TET10 or QUAD9
-      if (fe_id == 118 || fe_id == 300)
-        in_file.ignore (256,'\n');
+      // "beam" elements (fe_id < 25) have an extra line of IDs we need to ignore
+      // TET10 or QUAD9 - have so many nodes we need to skip an extra line
+      if (fe_id < 25 || fe_id == 118 || fe_id == 300)
+        std::getline(in_file, dummy);
 
-      // HEX20
+      // HEX20 - has so many nodes we have to skip two more lines
       if (fe_id == 116)
         {
-          in_file.ignore (256,'\n');
-          in_file.ignore (256,'\n');
+          std::getline(in_file, dummy);
+          std::getline(in_file, dummy);
         }
 
       this->_n_elements++;
@@ -643,7 +648,6 @@ void UNVIO::element_in (std::istream& in_file)
   // to prevent confusion, this way we can store elements with up to 20 nodes
   unsigned int assign_elem_nodes[21];
 
-
   // Get the beginning and end of the _assign_nodes vector
   // to eliminate repeated function calls
   const std::vector<dof_id_type>::const_iterator it_begin =
@@ -664,6 +668,24 @@ void UNVIO::element_in (std::istream& in_file)
               >> color                   // (not supported yet)
               >> n_nodes;                // read number of nodes on element
 
+      // For "beam" type elements, the next three numbers are:
+      // .) beam orientation node number
+      // .) beam fore-end cross section number
+      // .) beam aft-end cross section number
+      // which we discard in libmesh.  The "beam" type elements:
+      // 11  Rod
+      // 21  Linear beam
+      // 22  Tapered beam
+      // 23  Curved beam
+      // 24  Parabolic beam
+      // all have fe_descriptor_id < 25.
+      // http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2412.htm
+      if (fe_descriptor_id < 25)
+        {
+          unsigned dummy;
+          in_file >> dummy >> dummy >> dummy;
+        }
+
       for (unsigned int j=1; j<=n_nodes; j++)
         in_file >> node_labels[j];       // read node labels
 
@@ -671,6 +693,14 @@ void UNVIO::element_in (std::istream& in_file)
 
       switch (fe_descriptor_id)
         {
+        case 11: // Rod
+          {
+            elem = new Edge2;
+
+            assign_elem_nodes[1]=0;
+            assign_elem_nodes[2]=1;
+            break;
+          }
 
         case 41: // Plane Stress Linear Triangle
         case 91: // Thin Shell   Linear Triangle
