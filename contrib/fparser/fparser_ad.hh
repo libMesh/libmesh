@@ -2,7 +2,6 @@
 #define ONCE_FPARSERAD_H_
 
 #include "fparser.hh"
-//#include "libmesh_common.h"
 #include <exception>
 
 template<typename Value_t>
@@ -55,8 +54,23 @@ protected:
   /**
    * A list of opcodes and immediate values
    */
-  typedef std::pair<unsigned, Value_t> OpcodeDataPair;
-  typedef std::vector<OpcodeDataPair> DiffProgramFragment;
+  struct OpcodePacket {
+    unsigned first, index;
+    Value_t second;
+    OpcodePacket() : first(0), index(0), second(Value_t()) {}
+    OpcodePacket(unsigned _first, Value_t _second, unsigned _index) : first(_first), index(_index), second(_second) {}
+  };
+  struct OpcodePlain : OpcodePacket {
+    OpcodePlain(unsigned _first) : OpcodePacket(_first, Value_t(), 0) {}
+  };
+  struct OpcodeImmediate : OpcodePacket {
+    OpcodeImmediate(Value_t _second);
+  };
+  struct OpcodeFCall : OpcodePacket {
+    OpcodeFCall(unsigned _index);
+  };
+
+  typedef std::vector<OpcodePacket> DiffProgramFragment;
   typedef std::pair<typename DiffProgramFragment::const_iterator,
                     typename DiffProgramFragment::const_iterator> Interval;
 
@@ -69,7 +83,7 @@ protected:
   /**
    * how much does the current opcode move the stack pointer
    */
-  int OpcodeSize(unsigned op);
+  int OpcodeSize(const OpcodePacket & p);
 
 private:
   typename FunctionParserBase<Value_t>::Data * mData;
@@ -103,6 +117,12 @@ private:
    * We silence all AutoDiff exceptions in that case to avoid confusing the user.
    */
   bool mSilenceErrors;
+
+  /// the function index of the plog function
+  unsigned mFPlog;
+
+  // user function plog
+  static Value_t fp_plog(const Value_t * params);
 
   // Exceptions
   class UnsupportedOpcode : public std::exception {

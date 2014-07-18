@@ -2,12 +2,22 @@
 // (c) 2014 by Daniel Schwen
 // =======================================================
 
+// $CXX -o autodiff autodiff.cc -I $LIBMESH_DIR/include/libmesh -DFUNCTIONPARSER_SUPPORT_DEBUGGING ../../../build_dev/contrib/fparser/.libs/*.o
+
 #include "../fparser_ad.hh"
 
+#include <fstream>
 #include <iostream>
 #include <string>
 
-// clang++ autodiff.cc -o autodiff -L../../../build/contrib/fparser/.libs -lopt -I ../../../installed/include/libmesh/ -DFUNCTIONPARSER_SUPPORT_DEBUGGING
+void write(const char *fname, FunctionParserAD & F)
+{
+  std::ofstream file;
+  file.open(fname);
+  for (double x = -1.0; x <= 1.0; x+=0.01)
+    file << x << ' ' << F.Eval(&x) << '\n';
+  file.close();
+}
 
 int main()
 {
@@ -31,9 +41,15 @@ int main()
   //std::string func = "x^2+x^2*3";
 
   //std::string func = "sin(x-2)";
-  std::string func = "sin(3*x)+x*5*sin(3*x)+x^2*(3+sin(3*x))+x^3*cos(x)-log(x+2*x^2+3.1*x^3)-x^5*(2+x-cos(x-x^2))";
+  //std::string func = "sin(3*x)+x*5*sin(3*x)+x^2*(3+sin(3*x))+x^3*cos(x)-log(x+2*x^2+3.1*x^3)-x^5*(2+x-cos(x-x^2))";
   //std::string func = "if(x<x*x,x^(-1/2),5)";
   //std::string func = "5+if(x<x*x,1,3)*6+x";
+  //std::string func = "sin(x^2)";
+  //std::string func = "sin(3*x)+x*5*sin(3*x)+x^2*(3+sin(3*x))";
+  //std::string func = "if(x<x*x,x^(-1/2),5)";
+  //std::string func = "5+if(x<x*x,1,3)*6+x";
+  //std::string func = "1+2*plog(3,4)";
+  std::string func = "1+2*plog(x,0.3)";
 
 
   // Parse the input expression into bytecode
@@ -41,12 +57,14 @@ int main()
   std::cout << "Input Expression:\n" << func << std::endl;
   fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
+  write("input_orig.dat", fparser);
 
   // output optimized version
   fparser.Optimize();
   std::cout << "Optimized Input Expression:\n" << func << std::endl;
   fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
+  write("input_opt.dat", fparser);
 
   // Get a copy of the original function
   FunctionParserAD fparser2(fparser);
@@ -56,28 +74,29 @@ int main()
   std::cout << "Unsimplified derivative:\n";
   fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
+  write("first_orig.dat", fparser);
 
   // Run the bytecode optimizer on the derivative
   fparser.Optimize();
   std::cout << "Simplified derivative:\n";
   fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
+  write("first_opt.dat", fparser);
 
   // Check if the copied instance is still the original function
-  std::cout << "Copy of the original:\n";
+  /*std::cout << "Copy of the original:\n";
   fparser2.PrintByteCode(std::cout);
+  std::cout << std::endl;*/
+
+  // Generate derivative with respect to x
+  std::cout << "AutoDiff 2nd time returned " << fparser.AutoDiff("x") << std::endl;
+  std::cout << "Simplified second derivative:\n";
+  fparser.Optimize();
+  fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
 
-  double p[1];
-
-  for (p[0]=0.0; p[0]<3.141; p[0]+=0.1)
-    std::cout << fparser2.Eval(p) << '\n';
-
   fparser2.JITCompile();
-  std::cout << "\nJIT\n\n";
-
-  for (p[0]=0.0; p[0]<3.141; p[0]+=0.1)
-    std::cout << fparser2.Eval(p) << '\n';
+  write("input_jit.dat", fparser2);
 
   return 0;
 }
