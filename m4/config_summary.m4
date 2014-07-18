@@ -153,6 +153,10 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$enablepetsc" = "xyes"); then
   echo '     'version....................... : $petscversion
   fi
+  echo '  'slepc............................ : $enableslepc
+  if (test "x$enableslepc" = "xyes"); then
+  echo '     'version....................... : $slepcversion
+  fi
   echo '  'pthreads......................... : $enablepthreads
   echo '  'qhull............................ : $enableqhull
   echo '  'sfcurves......................... : $enablesfc
