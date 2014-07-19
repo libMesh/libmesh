@@ -87,8 +87,8 @@ private:
   /// write the DiffProgramFragement into the internal bytecode storage
   void Commit(const DiffProgramFragment & code);
 
-  /// the function indices of the plog dplog and step functions
-  unsigned mFStep, mFPlog;
+  /// the function index of the plog function
+  unsigned mFPlog;
 
   /**
    * In certain applications derivatives are built proactively and may never be used.
@@ -96,8 +96,7 @@ private:
    */
   bool mSilenceErrors;
 
-  // user functions plog and step
-  static Value_t fp_step(const Value_t * params);
+  // user function plog
   static Value_t fp_plog(const Value_t * params);
 
   // Exceptions

@@ -27,12 +27,6 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
 }
 
 template<typename Value_t>
-Value_t FunctionParserADBase<Value_t>::fp_step(const Value_t * params)
-{
-  return params[0] > Value_t(0.0) ? Value_t(1.0) : Value_t(0.0);
-}
-
-template<typename Value_t>
 Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
 {
   return params[0] < params[1] ? fp_log(params[1]) + (params[0] - params[1]) / params[1] : fp_log(params[0]);
