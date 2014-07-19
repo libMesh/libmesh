@@ -13,8 +13,6 @@ FunctionParserADBase<Value_t>::FunctionParserADBase() :
     mData(this->getParserData()),
     mSilenceErrors(false)
 {
-  mFStep  = mData->mFuncPtrs.size();
-  this->AddFunction("step", fp_step, 1);
   mFPlog  = mData->mFuncPtrs.size();
   this->AddFunction("plog", fp_plog, 2);
 }
@@ -25,7 +23,6 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     mData(this->getParserData()),
     mSilenceErrors(cpy.mSilenceErrors)
 {
-  mFStep  = cpy.mFStep;
   mFPlog  = cpy.mFPlog;
 }
 
@@ -48,7 +45,7 @@ int FunctionParserADBase<Value_t>::OpcodeSize(const OpcodePacket & p)
 
   if (int(op) >= VarBegin || op == cImmed) {
     return -1;
-  } else if (op == cFCall && (index == mFStep || index == mFPlog)) {
+  } else if (op == cFCall && index == mFPlog) {
     return mData->mFuncPtrs[index].mParams;
   } else {
     switch(op)
@@ -68,12 +65,10 @@ int FunctionParserADBase<Value_t>::OpcodeSize(const OpcodePacket & p)
       case cAdd: case cSub: case cRSub:
       case cMul: case cDiv: case cRDiv:
       case cPow: case cHypot:
+      case cLess: case cLessOrEq: case cGreater: case cGreaterOrEq:
         return 2;
 
       default:
-        std::cout << std::endl << "OpcodeSize " << op << ' ' << cFCall << std::endl;
-        std::cout << "mFStep " << index << ' ' << mFStep << std::endl;
-        std::cout << "mFPlog " << index << ' ' << mFPlog << std::endl;
         throw UnsupportedOpcodeException;
     }
   }
@@ -431,23 +426,21 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodePlain(cDiv));
       return outer;
 
+    // no idea why anyone would like to diff those
+    // (I'll pretend the discontinuities don't exist -
+    // FP could not deal with them in a useful way in any case)
     case cInt:
     case cFloor:
     case cCeil:
     case cTrunc:
-      // no idea why anyone would like to diff those
-      // (I'll pretend the discontinuities don't exist -
-      // FP could not deal with them in a useful way in any case)
+    case cLess:
+    case cLessOrEq:
+    case cGreater:
+    case cGreaterOrEq:
       outer.push_back(OpcodeImmediate(Value_t(0)));
       return outer;
     case cFCall:
-      if (findex == mFStep)
-      {
-        // ignore step function discontinuity (works out well for the second plog derivative)
-        outer.push_back(OpcodeImmediate(Value_t(0)));
-        return outer;
-      }
-      else if (findex == mFPlog)
+      if (findex == mFPlog)
       {
         // we assume that the second argument to plog is constant for now (TODO?).
         // da/a
@@ -455,21 +448,19 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         outer = prog_da;
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
         outer.push_back(OpcodePlain(cDiv));
-        // step(a-b)
+        // a>b
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cSub));
-        outer.push_back(OpcodeFCall(mFStep));
+        outer.push_back(OpcodePlain(cGreater));
         // *
         outer.push_back(OpcodePlain(cMul));
         // 1/b
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
         outer.push_back(OpcodePlain(cInv));
-        // step(b-a)
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        // a<=
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.push_back(OpcodePlain(cSub));
-        outer.push_back(OpcodeFCall(mFStep));
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cLessOrEq));
         // *
         outer.push_back(OpcodePlain(cMul));
         // *
