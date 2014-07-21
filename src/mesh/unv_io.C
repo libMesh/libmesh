@@ -55,6 +55,7 @@ namespace libMesh
 // UNVIO class static members
 const std::string UNVIO::_label_dataset_nodes    = "2411";
 const std::string UNVIO::_label_dataset_elements = "2412";
+const std::string UNVIO::_label_dataset_groups   = "2467";
 
 
 
@@ -141,10 +142,10 @@ void UNVIO::read_implementation (std::istream& in_stream)
       libMesh::out << "  Counting nodes and elements" << std::endl;
 
 
-    //    bool reached_eof = false;
+    // bool reached_eof = false;
     bool found_node  = false;
     bool found_elem  = false;
-
+    bool found_group = false;
 
     std::string olds, news;
 
@@ -160,13 +161,6 @@ void UNVIO::read_implementation (std::istream& in_stream)
             in_stream >> news;
           }
 
-        //  if (in_stream.eof())
-        //    {
-        //      reached_eof = true;
-        //      break;
-        //    }
-
-
         // if beginning of dataset, buffer it in
         // temp_buffer, if desired
         if (news == _label_dataset_nodes)
@@ -174,12 +168,6 @@ void UNVIO::read_implementation (std::istream& in_stream)
             found_node = true;
             order_of_datasets.push_back (_label_dataset_nodes);
             this->count_nodes (in_stream);
-
-            // we can save some time scanning the file
-            // when we know we already have everything
-            // we want
-            if (found_elem)
-              break;
           }
 
         else if (news == _label_dataset_elements)
@@ -187,30 +175,38 @@ void UNVIO::read_implementation (std::istream& in_stream)
             found_elem = true;
             order_of_datasets.push_back (_label_dataset_elements);
             this->count_elements (in_stream);
-
-            // we can save some time scanning the file
-            // when we know we already have everything
-            // we want
-            if (found_node)
-              break;
           }
+
+        else if (news == _label_dataset_groups)
+          {
+            found_group = true;
+            order_of_datasets.push_back (_label_dataset_groups);
+            // TODO: We can't currently read the groups until we've
+            // read the nodes and elements, unless we want to store
+            // the boundary info independently of the BoundaryInfo
+            // object.  When we evnetually switch over to not reading
+            // the input file twice, we can call groups_in() here.
+            // this->groups_in(in_stream);
+          }
+
+        // We can stop reading once we've found the nodes, elements,
+        // and group sections.
+        if (found_node && found_elem && found_group)
+          break;
       }
 
-
-    // Here we should better have found
-    // the datasets for nodes and elements,
-    // otherwise the unv files is bad!
+    // Here, we better have found the datasets for nodes and elements,
+    // otherwise the unv file is bad!
     if (!found_elem)
       libmesh_error_msg("ERROR: Could not find elements!");
 
     if (!found_node)
       libmesh_error_msg("ERROR: Could not find nodes!");
 
-
     // Don't close, just seek to the beginning
     in_stream.seekg(0, std::ios::beg);
 
-    if (!in_stream.good() )
+    if (!in_stream.good())
       libmesh_error_msg("ERROR: Cannot re-read input file.");
   }
 
@@ -227,18 +223,23 @@ void UNVIO::read_implementation (std::istream& in_stream)
   {
     // Read the datasets in the order that
     // we already know
-    libmesh_assert_equal_to (order_of_datasets.size(), 2);
+    libmesh_assert_greater_equal (order_of_datasets.size(), 2);
 
     for (unsigned int ds=0; ds < order_of_datasets.size(); ds++)
       {
         if (order_of_datasets[ds] == _label_dataset_nodes)
-          this->node_in    (in_stream);
+          this->node_in (in_stream);
 
         else if (order_of_datasets[ds] == _label_dataset_elements)
           this->element_in (in_stream);
 
+        else if (order_of_datasets[ds] == _label_dataset_groups)
+          // Reading the groups currently *requires* the nodes and
+          // elements to have already been read in.
+          this->groups_in(in_stream);
+
         else
-          libmesh_error_msg("Unsupported order_of_datasets[ds] value " << order_of_datasets[ds]);
+          libmesh_error_msg("Unrecognized dataset type " << order_of_datasets[ds]);
       }
 
     // Set the mesh dimension to the largest encountered for an element
@@ -258,6 +259,27 @@ void UNVIO::read_implementation (std::istream& in_stream)
     // tell the MeshData object that we are finished
     // reading data
     this->_mesh_data.close_foreign_id_maps ();
+
+    // Delete any lower-dimensional elements that might have been
+    // added to the mesh stricly for setting BCs.
+    {
+      // Grab reference to the Mesh, so we can add boundary info data to it
+      MeshBase& mesh = MeshInput<MeshBase>::mesh();
+
+      unsigned max_dim = this->max_elem_dimension_seen();
+
+      MeshBase::const_element_iterator       el     = mesh.elements_begin();
+      const MeshBase::const_element_iterator end_el = mesh.elements_end();
+
+      for (; el != end_el; ++el)
+        {
+          Elem* elem = *el;
+
+          if (elem->dim() < max_dim)
+            mesh.delete_elem(elem);
+        }
+    }
+
 
     if (this->verbose())
       libMesh::out << "  Finished." << std::endl << std::endl;
@@ -603,6 +625,279 @@ void UNVIO::node_in (std::istream& in_file)
 
 
 
+unsigned UNVIO::max_elem_dimension_seen ()
+{
+  unsigned max_dim = 0;
+
+  // The elems_of_dimension array is 1-based in the UNV reader
+  for (unsigned i=1; i<elems_of_dimension.size(); ++i)
+    if (elems_of_dimension[i])
+      max_dim = i;
+
+  // Debugging:
+  // libMesh::out << "max_dim=" << max_dim << std::endl;
+
+  return max_dim;
+}
+
+
+
+void UNVIO::groups_in (std::istream& in_file)
+{
+  // Grab reference to the Mesh, so we can add boundary info data to it
+  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+
+  // Read the "-1" strings that divide each section, and the dataset
+  // group identifier, so that we are ready to read the actual groups.
+  bool ok = this->beginning_of_dataset(in_file, _label_dataset_groups);
+
+  if (!ok)
+    libmesh_error_msg("ERROR: Could not find groups dataset!");
+
+  // Record the max and min element dimension seen while reading the file.
+  unsigned max_dim = this->max_elem_dimension_seen();
+
+  // map from (node ids) to elem of lower dimensional elements that can provide boundary conditions
+  typedef std::map<std::vector<dof_id_type>, Elem*> provide_bcs_t;
+  provide_bcs_t provide_bcs;
+
+  // Read groups until there aren't any more to read...
+  while (true)
+    {
+      // If we read a -1, it means there is nothing else to read in this section.
+      int group_number;
+      in_file >> group_number;
+
+      if (group_number == -1)
+        {
+          // Do we need to finish reading the rest of the line to the carriage return?
+          break;
+        }
+
+      // The first record consists of 8 entries:
+      // Field 1 -- group number (that we just read)
+      // Field 2 -- active constraint set no. for group
+      // Field 3 -- active restraint set no. for group
+      // Field 4 -- active load set no. for group
+      // Field 5 -- active dof set no. for group
+      // Field 6 -- active temperature set no. for group
+      // Field 7 -- active contact set no. for group
+      // Field 8 -- number of entities in group
+      // Only the first and last of these are relevant to us...
+      unsigned num_entities;
+      std::string group_name;
+      {
+        unsigned dummy;
+        in_file >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy
+                >> num_entities;
+
+        // Debugging:
+        // libMesh::out << "group_number=" << group_number << std::endl;
+        // libMesh::out << "num_entities=" << num_entities << std::endl;
+
+        // The second record has 1 field, the group name
+        in_file >> group_name;
+
+        // libMesh::out << "group_name=" << group_name << std::endl;
+      }
+
+      // The dimension of the elements in the group will determine
+      // whether this is a sideset group or a subdomain group.
+      bool
+        is_subdomain_group = false,
+        is_sideset_group = false;
+
+      // Each subsequent line has 8 entries, there are two entity type
+      // codes and two tags per line that we need to read.  In all my
+      // examples, the entity type code was always "8", which stands for
+      // "finite elements" but it's possible that we could eventually
+      // support other entity type codes...
+      // Field 1 -- entity type code
+      // Field 2 -- entity tag
+      // Field 3 -- entity node leaf id.
+      // Field 4 -- entity component/ ham id.
+      // Field 5 -- entity type code
+      // Field 6 -- entity tag
+      // Field 7 -- entity node leaf id.
+      // Field 8 -- entity component/ ham id.
+      {
+        unsigned entity_type_code, entity_tag, dummy;
+        for (unsigned entity=0; entity<num_entities; ++entity)
+          {
+            in_file >> entity_type_code >> entity_tag >> dummy >> dummy;
+
+            if (entity_type_code != 8)
+              libMesh::err << "Warning, unrecognized entity type code = "
+                           << entity_type_code
+                           << " in group "
+                           << group_name
+                           << std::endl;
+
+            // Try to find this ID in the map from UNV element ids to libmesh ids.
+            std::map<unsigned, unsigned>::iterator it =
+              _unv_elem_id_to_libmesh_elem_id.find(entity_tag);
+
+            if (it != _unv_elem_id_to_libmesh_elem_id.end())
+              {
+                unsigned libmesh_elem_id = it->second;
+
+                // Attempt to get a pointer to the elem listed in the group
+                Elem* group_elem = mesh.elem(libmesh_elem_id);
+                if (!group_elem)
+                  libmesh_error_msg("Group referred to non-existent element with ID " << libmesh_elem_id);
+
+                // dim < max_dim means the Elem defines a boundary condition
+                if (group_elem->dim() < max_dim)
+                  {
+                    is_sideset_group = true;
+
+                    // We can only handle elements that are *exactly*
+                    // one dimension lower than the max element
+                    // dimension.  Not sure if "edge" BCs in 3D
+                    // actually make sense/are required...
+                    if (group_elem->dim() != max_dim-1)
+                      libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << group_elem->dim());
+
+                    // libMesh::out << "UNV Element "
+                    //              << entity_tag
+                    //              << "(libmesh element "
+                    //              << libmesh_elem_id
+                    //              << ") dim=="
+                    //              << group_elem->dim()
+                    //              << " is in group "
+                    //              << group_name
+                    //              << std::endl;
+
+                    // To be pushed into the provide_bcs data container
+                    std::vector<dof_id_type> group_elem_node_ids(group_elem->n_nodes());
+
+                    // Save node IDs in a local vector which will be used as a key for the map.
+                    for (unsigned n=0; n<group_elem->n_nodes(); n++)
+                      group_elem_node_ids[n] = group_elem->node(n);
+
+                    // Set the current group number as the lower-dimensional element's subdomain ID.
+                    // We will use this later to set a boundary ID.
+                    group_elem->subdomain_id() = group_number;
+
+                    // Sort before putting into the map
+                    std::sort(group_elem_node_ids.begin(), group_elem_node_ids.end());
+
+                    // Unchecked insert:
+                    // provide_bcs[group_elem_node_ids] = group_elem;
+
+                    // Ensure that this key doesn't already exist when
+                    // inserting it.  We would need to use a multimap if
+                    // the same element appears in multiple group numbers!
+                    // This actually seems like it could be relatively
+                    // common, but I don't have a test for it at the
+                    // moment...
+                    std::pair<provide_bcs_t::iterator, bool> result =
+                      provide_bcs.insert(std::make_pair(group_elem_node_ids, group_elem));
+
+                    if (!result.second)
+                      libmesh_error_msg("Boundary element " << group_elem->id() << " was not inserted, it was already in the map!");
+                  }
+
+                // dim == max_dim means this group defines a subdomain ID
+                else if (group_elem->dim() == max_dim)
+                  {
+                    is_subdomain_group = true;
+                    group_elem->subdomain_id() = group_number;
+                  }
+
+                else
+                  libmesh_error_msg("ERROR: Found an elem with dim=" << group_elem->dim() << " > " << "max_dim=" << max_dim);
+              }
+            else
+              libMesh::err << "WARNING: UNV Element " << entity_tag << " not found while parsing groups." << std::endl;
+          } // end for (entity)
+      } // end scope
+
+      // Associate this group_number with the group_name in the BoundaryInfo object.
+      if (is_sideset_group)
+        mesh.boundary_info->sideset_name(group_number) = group_name;
+
+      if (is_subdomain_group)
+        mesh.subdomain_name(group_number) = group_name;
+
+    } // end while (true)
+
+  // Debugging: What did we put in the provide_bcs data structure?
+  // {
+  //   provide_bcs_t::iterator
+  //     provide_it = provide_bcs.begin(),
+  //     provide_end = provide_bcs.end();
+  //
+  //   for ( ; provide_it != provide_end; ++provide_it)
+  //     {
+  //       const std::vector<dof_id_type> & node_list = provide_it->first;
+  //       Elem* elem = provide_it->second;
+  //
+  //       libMesh::out << "Elem " << elem->id() << " provides BCs for the face with nodes: ";
+  //       for (unsigned i=0; i<node_list.size(); ++i)
+  //         libMesh::out << node_list[i] << " ";
+  //       libMesh::out << std::endl;
+  //     }
+  // }
+
+
+  // Loop over elements and try to assign boundary information
+  {
+    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::element_iterator end = mesh.active_elements_end();
+    for ( ; it != end; ++it)
+      {
+        Elem* elem = *it;
+
+        if (elem->dim() == max_dim)
+          {
+            // This is a max-dimension element that
+            // may require BCs.  For each of its
+            // sides, including internal sides, we'll
+            // see if a lower-dimensional element
+            // provides boundary information for it.
+            // Note that we have not yet called
+            // find_neighbors(), so we can't use
+            // elem->neighbor(sn) in this algorithm...
+
+            for (unsigned int sn=0; sn<elem->n_sides(); sn++)
+              {
+                AutoPtr<Elem> side (elem->build_side(sn));
+
+                // Build up a node_ids vector, which is the key
+                std::vector<dof_id_type> node_ids(side->n_nodes());
+                for (unsigned n=0; n<side->n_nodes(); n++)
+                  node_ids[n] = side->node(n);
+
+                // Sort the vector before using it as a key
+                std::sort(node_ids.begin(), node_ids.end());
+
+                // Look for this key in the provide_bcs map
+                provide_bcs_t::iterator iter = provide_bcs.find(node_ids);
+
+                if (iter != provide_bcs.end())
+                  {
+                    Elem* lower_dim_elem = iter->second;
+
+                    // Debugging
+                    // libMesh::out << "Elem "
+                    //              << lower_dim_elem->id()
+                    //              << " provides BCs for side "
+                    //              << sn
+                    //              << " of Elem "
+                    //              << elem->id()
+                    //              << std::endl;
+
+                    // Add boundary information based on the lower-dimensional element's subdomain id.
+                    mesh.boundary_info->add_side(elem, sn, lower_dim_elem->subdomain_id());
+                  }
+              }
+          }
+      }
+  }
+
+}
+
 
 
 void UNVIO::element_in (std::istream& in_file)
@@ -622,9 +917,12 @@ void UNVIO::element_in (std::istream& in_file)
     libmesh_error_msg("ERROR: Could not find element dataset!");
 
 
-  unsigned int      element_lab,       // element label (not supported yet)
-    n_nodes;           // number of nodes on element
-  unsigned long int fe_descriptor_id,  // FE descriptor id
+  unsigned int
+    element_lab, // element label
+    n_nodes;     // number of nodes on element
+
+  unsigned long int
+    fe_descriptor_id,  // FE descriptor id
     phys_prop_tab_num, // physical property table number (not supported yet)
     mat_prop_tab_num,  // material property table number (not supported yet)
     color;             // color (not supported yet)
@@ -900,10 +1198,17 @@ void UNVIO::element_in (std::istream& in_file)
 
       elems_of_dimension[elem->dim()] = true;
 
-      // add elem to the Mesh &
-      // tell the MeshData object the foreign elem id
-      // (note that mesh.add_elem() returns a pointer to the new element)
+      // Add elem to the Mesh
       elem->set_id(i);
+
+      // Maintain a map from the libmesh (0-based) numbering to the
+      // UNV numbering.  This probably duplicates what the MeshData
+      // object does, but hopefully the MeshData object will be going
+      // away at some point...
+      //_libmesh_elem_id_to_unv_elem_id[i] = element_lab;
+      _unv_elem_id_to_libmesh_elem_id[element_lab] = i;
+
+      // Tell the MeshData object the foreign elem id
       this->_mesh_data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
     }
 

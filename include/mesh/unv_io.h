@@ -145,6 +145,12 @@ private:
   void element_in (std::istream& in_file);
 
   /**
+   * Reads the "groups" section of the file. The format of the groups section is described here:
+   * http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2467.htm
+   */
+  void groups_in(std::istream& in_file);
+
+  /**
    * @returns \p false when error occured, \p true otherwise.
    * Adjusts the \p in_stream to the beginning of the
    * dataset \p ds_name.
@@ -179,6 +185,12 @@ private:
    */
   void element_out (std::ostream& out_file);
 
+  /**
+   * Returns the maximum geometric element dimension encountered while
+   * reading the Mesh.  Only valid after the elements have been read
+   * in and the elems_of_dimension array has been populated.
+   */
+  unsigned max_elem_dimension_seen ();
 
   //-------------------------------------------------------------
   // local data
@@ -222,6 +234,11 @@ private:
   static const std::string _label_dataset_elements;
 
   /**
+   * label for the groups dataset
+   */
+  static const std::string _label_dataset_groups;
+
+  /**
    * whether we need to convert notation of exponentials.
    * Used when reading.
    */
@@ -233,6 +250,15 @@ private:
    */
   MeshData& _mesh_data;
 
+  /**
+   * Map libmesh element IDs to UNV element IDs.
+   */
+  // std::vector<unsigned> _libmesh_elem_id_to_unv_elem_id;
+
+  /**
+   * Map UNV element IDs to libmesh element IDs.
+   */
+  std::map<unsigned, unsigned> _unv_elem_id_to_libmesh_elem_id;
 };
 
 
