@@ -1594,6 +1594,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   if (sys.use_fixed_solution)
     elem_fixed_solution.resize(n_dofs);
 
+  // This also resizes elem_solution
   sys.current_local_solution->get(dof_indices, elem_solution.get_values());
 
   // These resize calls also zero out the residual and jacobian
