@@ -216,6 +216,13 @@ public:
    */
   void numerical_side_jacobian (FEMContext &context) const;
 
+  /**
+   * Uses the results of multiple side_residual() calls
+   * to numerically differentiate the corresponding jacobian
+   * on nonlocal DoFs.
+   */
+  void numerical_nonlocal_jacobian (FEMContext &context) const;
+
 protected:
   /**
    * Initializes the member data fields associated with
