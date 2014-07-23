@@ -1407,6 +1407,13 @@ void FEMContext::elem_edge_reinit(Real theta)
 }
 
 
+void FEMContext::nonlocal_reinit(Real theta)
+{
+  // Update the "time" variable of this context object
+  this->_update_time_from_system(theta);
+}
+
+
 void FEMContext::elem_fe_reinit ()
 {
   // Initialize all the interior FE objects on elem.

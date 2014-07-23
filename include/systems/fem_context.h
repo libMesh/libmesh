@@ -504,6 +504,12 @@ public:
   virtual void elem_edge_reinit(Real theta);
 
   /**
+   * Gives derived classes the opportunity to reinitialize data needed
+   * for nonlocal calculations at a new point within a timestep
+   */
+  virtual void nonlocal_reinit(Real theta);
+
+  /**
    * Reinitializes local data vectors/matrices on the current geometric element
    */
   virtual void pre_fe_reinit(const System&, const Elem *e);
@@ -605,6 +611,12 @@ public:
    */
   void set_mesh_z_var(unsigned int z_var)
   { _mesh_z_var = z_var; }
+
+  /**
+   * Test for current Elem object
+   */
+  bool has_elem() const
+  { return (elem != NULL); }
 
   /**
    * Accessor for current Elem object
