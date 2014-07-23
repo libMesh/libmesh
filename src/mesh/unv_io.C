@@ -21,6 +21,7 @@
 #include <cstdio>   // for std::sprintf
 #include <algorithm> // for std::sort
 #include <fstream>
+#include <ctype.h> // isspace
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -61,6 +62,93 @@ const std::string UNVIO::_label_dataset_groups   = "2467";
 
 // ------------------------------------------------------------
 // UNVIO class members
+
+UNVIO::UNVIO (MeshBase& mesh, MeshData& mesh_data) :
+  MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase>(mesh),
+  _verbose (false),
+  _mesh_data (mesh_data)
+{
+}
+
+
+
+UNVIO::UNVIO (const MeshBase& mesh, MeshData& mesh_data) :
+  MeshOutput<MeshBase> (mesh),
+  _verbose (false),
+  _mesh_data (mesh_data)
+{
+}
+
+
+
+UNVIO::~UNVIO ()
+{
+  this->clear ();
+}
+
+
+
+bool & UNVIO::verbose ()
+{
+  return _verbose;
+}
+
+
+
+bool UNVIO::beginning_of_dataset (std::istream& in_file,
+                                  const std::string& ds_name) const
+{
+  libmesh_assert (in_file.good());
+  libmesh_assert (!ds_name.empty());
+
+  std::string olds, news;
+
+  while (true)
+    {
+      in_file >> olds >> news;
+
+      /*
+       * a "-1" followed by a number means the beginning of a dataset
+       * stop combing at the end of the file
+       */
+      while( ((olds != "-1") || (news == "-1") ) && !in_file.eof() )
+        {
+          olds = news;
+          in_file >> news;
+        }
+
+      if (in_file.eof())
+        return false;
+
+      if (news == ds_name)
+        return true;
+    }
+
+  // should never end up here
+  libmesh_error_msg("We'll never get here!");
+  return false;
+}
+
+
+
+inline
+Real UNVIO::D_to_e (std::string& number) const
+{
+  /* find "D" in string, start looking at
+   * 6th element, to improve speed.
+   * We dont expect a "D" earlier
+   */
+  const std::string::size_type position = number.find("D",6);
+
+  libmesh_assert (position != std::string::npos);
+  number.replace(position, 1, "e");
+
+  return std::atof (number.c_str());
+}
+
+
+
 void UNVIO::clear ()
 {
   /*
@@ -133,7 +221,6 @@ void UNVIO::read_implementation (std::istream& in_stream)
     if ( !in_stream.good() )
       libmesh_error_msg("ERROR: Input file not good.");
 
-
     // Count nodes and elements, then let
     // other methods read the element and
     // node data.  Also remember which
@@ -141,67 +228,97 @@ void UNVIO::read_implementation (std::istream& in_stream)
     if (this->verbose())
       libMesh::out << "  Counting nodes and elements" << std::endl;
 
-
-    // bool reached_eof = false;
     bool found_node  = false;
     bool found_elem  = false;
     bool found_group = false;
 
-    std::string olds, news;
+    std::string
+      old_line,
+      current_line;
 
-    while (in_stream.good())
+    while (true)
       {
-        in_stream >> olds >> news;
+        // Save off the old_line.  This will provide extra reliability
+        // for detecting the beginnings of the different sections.
+        old_line = current_line;
 
-        // a "-1" followed by a number means the beginning of a dataset
-        // stop combing at the end of the file
-        while ( ((olds != "-1") || (news == "-1") ) && !in_stream.eof() )
+        // Try to read something.  This may set EOF!
+        std::getline(in_stream, current_line);
+
+        // If the stream is still "valid", parse the line
+        if (in_stream)
           {
-            olds = news;
-            in_stream >> news;
+            // UNV files always have some amount of leading
+            // whitespace, let's not rely on exactly how much...  This
+            // command deletes it.
+            current_line.erase(std::remove_if(current_line.begin(), current_line.end(), isspace), current_line.end());
+
+            // Parse the nodes section
+            if (current_line == _label_dataset_nodes &&
+                old_line == "-1")
+              {
+                found_node = true;
+                order_of_datasets.push_back (_label_dataset_nodes);
+                this->count_nodes (in_stream);
+              }
+
+            // Parse the elements section
+            else if (current_line == _label_dataset_elements &&
+                     old_line == "-1")
+              {
+                found_elem = true;
+                order_of_datasets.push_back (_label_dataset_elements);
+                this->count_elements (in_stream);
+              }
+
+            // Parse the groups section
+            else if (current_line == _label_dataset_groups &&
+                     old_line == "-1")
+              {
+                found_group = true;
+                order_of_datasets.push_back (_label_dataset_groups);
+                // TODO: We can't currently read the groups until we've
+                // read the nodes and elements, unless we want to store
+                // the boundary info independently of the BoundaryInfo
+                // object.  When we evnetually switch over to not reading
+                // the input file twice, we can call groups_in() here.
+                // this->groups_in(in_stream);
+              }
+
+            // We can stop reading once we've found the nodes, elements,
+            // and group sections.
+            if (found_node && found_elem && found_group)
+              break;
+
+            // If we made it here, we're not done yet, so keep reading
+            continue;
           }
 
-        // if beginning of dataset, buffer it in
-        // temp_buffer, if desired
-        if (news == _label_dataset_nodes)
-          {
-            found_node = true;
-            order_of_datasets.push_back (_label_dataset_nodes);
-            this->count_nodes (in_stream);
-          }
-
-        else if (news == _label_dataset_elements)
-          {
-            found_elem = true;
-            order_of_datasets.push_back (_label_dataset_elements);
-            this->count_elements (in_stream);
-          }
-
-        else if (news == _label_dataset_groups)
-          {
-            found_group = true;
-            order_of_datasets.push_back (_label_dataset_groups);
-            // TODO: We can't currently read the groups until we've
-            // read the nodes and elements, unless we want to store
-            // the boundary info independently of the BoundaryInfo
-            // object.  When we evnetually switch over to not reading
-            // the input file twice, we can call groups_in() here.
-            // this->groups_in(in_stream);
-          }
-
-        // We can stop reading once we've found the nodes, elements,
-        // and group sections.
-        if (found_node && found_elem && found_group)
+        // if (!in_stream) check to see if EOF was set.  If so, break out of while loop.
+        if (in_stream.eof())
           break;
-      }
 
-    // Here, we better have found the datasets for nodes and elements,
+        // If !in_stream and !in_stream.eof(), stream is in a bad state!
+        libmesh_error_msg("Stream is bad! Perhaps the file does not exist?");
+      } // end while (true)
+
+    // By now we better have found the datasets for nodes and elements,
     // otherwise the unv file is bad!
     if (!found_elem)
       libmesh_error_msg("ERROR: Could not find elements!");
 
     if (!found_node)
       libmesh_error_msg("ERROR: Could not find nodes!");
+
+    // We only support reading the groups *after* the nodes and elements sections
+    std::vector<std::string>::iterator
+      nodes_pos  = std::find(order_of_datasets.begin(), order_of_datasets.end(), _label_dataset_nodes),
+      elems_pos  = std::find(order_of_datasets.begin(), order_of_datasets.end(), _label_dataset_elements),
+      groups_pos = std::find(order_of_datasets.begin(), order_of_datasets.end(), _label_dataset_groups);
+
+    if (groups_pos != order_of_datasets.end() &&
+        ((nodes_pos > groups_pos) || (elems_pos > groups_pos)))
+      libmesh_error_msg("ERROR: Group section must come *after* both nodes and elements sections.");
 
     // Don't close, just seek to the beginning
     in_stream.seekg(0, std::ios::beg);
@@ -242,10 +359,8 @@ void UNVIO::read_implementation (std::istream& in_stream)
           libmesh_error_msg("Unrecognized dataset type " << order_of_datasets[ds]);
       }
 
-    // Set the mesh dimension to the largest encountered for an element
-    for (unsigned int i=0; i!=4; ++i)
-      if (elems_of_dimension[i])
-        MeshInput<MeshBase>::mesh().set_mesh_dimension(i);
+    // Set the mesh dimension to the largest element dimension encountered
+    MeshInput<MeshBase>::mesh().set_mesh_dimension(max_elem_dimension_seen());
 
 #if LIBMESH_DIM < 3
     if (MeshInput<MeshBase>::mesh().mesh_dimension() > LIBMESH_DIM)
@@ -531,94 +646,68 @@ void UNVIO::node_in (std::istream& in_file)
     libMesh::out << "  Reading nodes" << std::endl;
 
   // adjust the \p istream to our position
-  const bool ok = this->beginning_of_dataset(in_file, _label_dataset_nodes);
+  bool ok = this->beginning_of_dataset(in_file, _label_dataset_nodes);
 
   if (!ok)
     libmesh_error_msg("ERROR: Could not find node dataset!");
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
-  unsigned int node_lab;           // label of the node
-  unsigned int exp_coord_sys_num,  // export coordinate system number       (not supported yet)
-    disp_coord_sys_num, // displacement coordinate system number (not supported yet)
-    color;              // color                                 (not supported yet)
+  // node label, we use an int here so we can read in a -1
+  int node_label;
 
-  // allocate the correct amount
-  // of memory for the node vector
-  this->_assign_nodes.reserve (this->_n_nodes);
-
+  unsigned int
+    exp_coord_sys_num,  // export coordinate system number       (not used yet)
+    disp_coord_sys_num, // displacement coordinate system number (not used yet)
+    color;              // color                                 (not used yet)
 
   // always 3 coordinates in the UNV file, no matter
   // which dimensionality libMesh is in
-  //std::vector<Real> xyz (3);
   Point xyz;
 
-  // depending on whether we have to convert each
-  // coordinate (float), we offer two versions.
-  // Note that \p count_nodes() already verified
-  // whether this file uses "D" of "e"
-  if (this->_need_D_to_e)
+  // Continue reading nodes until there are none left
+  unsigned ctr = 0;
+  while (true)
     {
-      // ok, convert...
-      std::string num_buf;
+      // Read the node label
+      in_file >> node_label;
 
-      for(dof_id_type i=0; i<this->_n_nodes; i++)
+      // Break out of the while loop when we hit -1
+      if (node_label == -1)
+        break;
+
+      // Read the rest of the node data
+      in_file >> exp_coord_sys_num       // (not used yet)
+              >> disp_coord_sys_num      // (not used yet)
+              >> color;                  // (not used yet)
+
+      // read the floating-point data
+      for (unsigned int d=0; d<3; d++)
         {
-          libmesh_assert (!in_file.eof());
-
-          in_file >> node_lab                // read the node label
-                  >> exp_coord_sys_num       // (not supported yet)
-                  >> disp_coord_sys_num      // (not supported yet)
-                  >> color;                  // (not supported yet)
-
-          // take care of the
-          // floating-point data
-          for (unsigned int d=0; d<3; d++)
+          if (this->_need_D_to_e)
             {
+              // Note that \p count_nodes() already determined
+              // whether this file uses "D" of "e".
+              std::string num_buf;
               in_file >> num_buf;
               xyz(d) = this->D_to_e (num_buf);
             }
-
-          // set up the id map
-          this->_assign_nodes.push_back (node_lab);
-
-          // add node to the Mesh &
-          // tell the MeshData object the foreign node id
-          // (note that mesh.add_point() returns a pointer to the new node)
-          this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz,i), node_lab);
+          else
+            in_file >> xyz(d);
         }
-    }
 
-  else
-    {
-      // very well, no need to convert anything,
-      // just plain import.
-      for (unsigned int i=0;i<this->_n_nodes;i++)
-        {
-          libmesh_assert (!in_file.eof());
+      // set up the id map
+      this->_assign_nodes.push_back (node_label);
 
-          in_file >> node_lab                // read the node label
-                  >> exp_coord_sys_num       // (not supported yet)
-                  >> disp_coord_sys_num      // (not supported yet)
-                  >> color                   // (not supported yet)
-                  >> xyz(0)                  // read x-coordinate
-                  >> xyz(1)                  // read y-coordinate
-                  >> xyz(2);                 // read z-coordinate
-
-          // set up the id map
-          this->_assign_nodes.push_back (node_lab);
-
-          // add node to the Mesh &
-          // tell the MeshData object the foreign node id
-          // (note that mesh.add_point() returns a pointer to the new node)
-          this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz,i), node_lab);
-        }
+      // add node to the Mesh &
+      // tell the MeshData object the foreign node id
+      // (note that mesh.add_point() returns a pointer to the new node)
+      this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz, ctr++), node_label);
     }
 
   // now we need to sort the _assign_nodes vector so we can
   // search it efficiently like a map
-  std::sort (this->_assign_nodes.begin(),
-             this->_assign_nodes.end());
+  std::sort (this->_assign_nodes.begin(), this->_assign_nodes.end());
 
   STOP_LOG("node_in()","UNVIO");
 }
@@ -916,21 +1005,18 @@ void UNVIO::element_in (std::istream& in_file)
   if (!ok)
     libmesh_error_msg("ERROR: Could not find element dataset!");
 
+  // node label, we use an int here so we can read in a -1
+  int element_label;
 
-  unsigned int
-    element_lab, // element label
-    n_nodes;     // number of nodes on element
-
-  unsigned long int
+  unsigned
+    n_nodes,           // number of nodes on element
     fe_descriptor_id,  // FE descriptor id
     phys_prop_tab_num, // physical property table number (not supported yet)
     mat_prop_tab_num,  // material property table number (not supported yet)
     color;             // color (not supported yet)
 
-
   // vector that temporarily holds the node labels defining element
   std::vector<unsigned int> node_labels (21);
-
 
   // vector that assigns element nodes to their correct position
   // for example:
@@ -948,19 +1034,21 @@ void UNVIO::element_in (std::istream& in_file)
 
   // Get the beginning and end of the _assign_nodes vector
   // to eliminate repeated function calls
-  const std::vector<dof_id_type>::const_iterator it_begin =
-    this->_assign_nodes.begin();
+  const std::vector<dof_id_type>::const_iterator
+    it_begin = this->_assign_nodes.begin(),
+    it_end = this->_assign_nodes.end();
 
-  const std::vector<dof_id_type>::const_iterator it_end   =
-    this->_assign_nodes.end();
-
-
-
-  // read from the virtual file
-  for (dof_id_type i=0; i<this->_n_elements; i++)
+  // Read elements until there are none left
+  unsigned ctr = 0;
+  while (true)
     {
-      in_file >> element_lab             // read element label
-              >> fe_descriptor_id        // read FE descriptor id
+      // read element label, break out when we read -1
+      in_file >> element_label;
+
+      if (element_label == -1)
+        break;
+
+      in_file >> fe_descriptor_id        // read FE descriptor id
               >> phys_prop_tab_num       // (not supported yet)
               >> mat_prop_tab_num        // (not supported yet)
               >> color                   // (not supported yet)
@@ -984,10 +1072,12 @@ void UNVIO::element_in (std::istream& in_file)
           in_file >> dummy >> dummy >> dummy;
         }
 
+       // read node labels (1-based)
       for (unsigned int j=1; j<=n_nodes; j++)
-        in_file >> node_labels[j];       // read node labels
+        in_file >> node_labels[j];
 
-      Elem* elem = NULL;                 // element pointer
+      // element pointer, to be allocated
+      Elem* elem = NULL;
 
       switch (fe_descriptor_id)
         {
@@ -1171,46 +1261,43 @@ void UNVIO::element_in (std::istream& in_file)
       for (dof_id_type j=1; j<=n_nodes; j++)
         {
           // Find the position of node_labels[j] in the _assign_nodes vector.
-          const std::pair<std::vector<dof_id_type>::const_iterator,
-            std::vector<dof_id_type>::const_iterator>
-            it = std::equal_range (it_begin,
-                                   it_end,
-                                   node_labels[j]);
+          const std::pair<std::vector<dof_id_type>::const_iterator, std::vector<dof_id_type>::const_iterator>
+            range = std::equal_range (it_begin, it_end, node_labels[j]);
 
           // it better be there, so libmesh_assert that it was found.
-          libmesh_assert (it.first != it.second);
-          libmesh_assert_equal_to (*(it.first), node_labels[j]);
+          libmesh_assert (range.first != range.second);
+          libmesh_assert_equal_to (*(range.first), node_labels[j]);
 
           // Now, the distance between this UNV id and the beginning of
           // the _assign_nodes vector will give us a unique id in the
           // range [0,n_nodes) that we can use for defining a contiguous
           // connectivity.
-          const dof_id_type assigned_node =
-            libmesh_cast_int<dof_id_type>
-            (std::distance (it_begin, it.first));
+          const dof_id_type assigned_node = libmesh_cast_int<dof_id_type>(std::distance (it_begin, range.first));
 
           // Make sure we didn't get an out-of-bounds id
           libmesh_assert_less (assigned_node, this->_n_nodes);
 
-          elem->set_node(assign_elem_nodes[j]) =
-            mesh.node_ptr(assigned_node);
+          elem->set_node(assign_elem_nodes[j]) = mesh.node_ptr(assigned_node);
         }
 
       elems_of_dimension[elem->dim()] = true;
 
-      // Add elem to the Mesh
-      elem->set_id(i);
+      // Set the element's ID
+      elem->set_id(ctr);
 
       // Maintain a map from the libmesh (0-based) numbering to the
       // UNV numbering.  This probably duplicates what the MeshData
       // object does, but hopefully the MeshData object will be going
       // away at some point...
-      //_libmesh_elem_id_to_unv_elem_id[i] = element_lab;
-      _unv_elem_id_to_libmesh_elem_id[element_lab] = i;
+      //_libmesh_elem_id_to_unv_elem_id[i] = element_label;
+      _unv_elem_id_to_libmesh_elem_id[element_label] = ctr;
 
       // Tell the MeshData object the foreign elem id
-      this->_mesh_data.add_foreign_elem_id (mesh.add_elem(elem), element_lab);
-    }
+      this->_mesh_data.add_foreign_elem_id (mesh.add_elem(elem), element_label);
+
+      // Increment the counter for the next iteration
+      ctr++;
+    } // end while(true)
 
   STOP_LOG("element_in()","UNVIO");
 }
