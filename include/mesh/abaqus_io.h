@@ -87,7 +87,7 @@ private:
    * *ELEMENT, TYPE=CPS3
    * so that it can determine the type of elements to read.
    */
-  void read_elements(std::string upper);
+  void read_elements(std::string upper, std::string elset_name);
 
   /**
    * This function parses a label of the form foo=bar from a
@@ -156,6 +156,13 @@ private:
    * trailing data intact.
    */
   void process_and_discard_comments();
+
+  /**
+   * Returns the maximum geometric element dimension encountered while
+   * reading the Mesh.  Only valid after the elements have been read
+   * in and the elems_of_dimension array has been populated.
+   */
+  unsigned max_elem_dimension_seen();
 
   /**
    * Abaqus writes nodesets and elemsets with labels.  As we read
