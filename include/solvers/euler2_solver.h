@@ -73,7 +73,7 @@ public:
   virtual Real error_order() const;
 
   /**
-   * This method uses the DifferentiableSystem's
+   * This method uses the DifferentiablePhysics'
    * element_time_derivative() and element_constraint()
    * to build a full residual on an element.  What combination
    * it uses will depend on theta.
@@ -82,7 +82,7 @@ public:
                                  DiffContext&);
 
   /**
-   * This method uses the DifferentiableSystem's
+   * This method uses the DifferentiablePhysics'
    * side_time_derivative() and side_constraint()
    * to build a full residual on an element's side.
    * What combination it uses will depend on theta.
@@ -91,11 +91,34 @@ public:
                               DiffContext&);
 
   /**
+   * This method uses the DifferentiablePhysics'
+   * nonlocal_time_derivative() and nonlocal_constraint()
+   * to build a full residual for non-local terms.
+   * What combination it uses will depend on theta.
+   */
+  virtual bool nonlocal_residual (bool request_jacobian,
+                                  DiffContext&);
+
+  /**
    * The value for the theta method to employ: 1.0 corresponds
    * to backwards Euler, 0.0 corresponds to forwards Euler,
    * 0.5 corresponds to a Crank-Nicolson-like scheme.
    */
   Real theta;
+
+protected:
+
+  /**
+   * This method is the underlying implementation of the public
+   * residual methods.
+   */
+  virtual bool _general_residual (bool request_jacobian,
+                                  DiffContext&,
+                                  ResFuncType mass,
+                                  ResFuncType time_deriv,
+                                  ResFuncType constraint,
+                                  ReinitFuncType reinit);
+
 };
 
 

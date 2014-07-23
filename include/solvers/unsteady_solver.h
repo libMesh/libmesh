@@ -31,9 +31,6 @@
 namespace libMesh
 {
 
-// Forward Declarations
-class UnsteadySolver;
-
 /**
  * This is a generic class that defines a solver to handle
  * time integration of DifferentiableSystems.
@@ -162,6 +159,7 @@ protected:
    */
   bool first_adjoint_step;
 };
+
 
 
 } // namespace libMesh

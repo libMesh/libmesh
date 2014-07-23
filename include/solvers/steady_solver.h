@@ -78,7 +78,7 @@ public:
   virtual Real error_order() const { return 0.; }
 
   /**
-   * This method uses the DifferentiableSystem's
+   * This method uses the DifferentiablePhysics'
    * element_time_derivative() and element_constraint()
    * to build a full residual/jacobian on an element.
    */
@@ -86,12 +86,20 @@ public:
                                  DiffContext &);
 
   /**
-   * This method uses the DifferentiableSystem's
+   * This method uses the DifferentiablePhysics'
    * side_time_derivative() and side_constraint()
    * to build a full residual/jacobian on an element's side.
    */
   virtual bool side_residual (bool request_jacobian,
                               DiffContext &);
+
+  /**
+   * This method uses the DifferentiablePhysics'
+   * nonlocal_time_derivative() and nonlocal_constraint()
+   * to build a full residual/jacobian for non-local terms.
+   */
+  virtual bool nonlocal_residual (bool request_jacobian,
+                                  DiffContext &);
 
   /**
    * Nominally computes the size of the difference between
@@ -104,6 +112,17 @@ public:
    * This is a steady-state solver.
    */
   virtual bool is_steady() const { return true; }
+
+protected:
+
+  /**
+   * This method is the underlying implementation of the public
+   * residual methods.
+   */
+  virtual bool _general_residual (bool request_jacobian,
+                                  DiffContext&,
+                                  ResFuncType time_deriv,
+                                  ResFuncType constraint);
 };
 
 

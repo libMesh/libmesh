@@ -34,33 +34,40 @@ SteadySolver::~SteadySolver ()
 bool SteadySolver::element_residual(bool request_jacobian,
                                     DiffContext& context)
 {
-  // If a fixed solution is requested, it will just be the current
-  // solution
-  if (_system.use_fixed_solution)
-    {
-      context.get_elem_fixed_solution() = context.get_elem_solution();
-      context.fixed_solution_derivative = 1.0;
-    }
-
-  bool jacobian_computed =
-    _system.element_time_derivative(request_jacobian, context);
-
-  // The user shouldn't compute a jacobian unless requested
-  libmesh_assert(request_jacobian || !jacobian_computed);
-
-  bool jacobian_computed2 =
-    _system.element_constraint(jacobian_computed, context);
-
-  // The user shouldn't compute a jacobian unless requested
-  libmesh_assert (jacobian_computed || !jacobian_computed2);
-
-  return jacobian_computed2;
+  return this->_general_residual(request_jacobian,
+                                 context,
+                                 &DifferentiablePhysics::element_time_derivative,
+                                 &DifferentiablePhysics::element_constraint);
 }
 
 
 
 bool SteadySolver::side_residual(bool request_jacobian,
                                  DiffContext& context)
+{
+  return this->_general_residual(request_jacobian,
+                                 context,
+                                 &DifferentiablePhysics::side_time_derivative,
+                                 &DifferentiablePhysics::side_constraint);
+}
+
+
+
+bool SteadySolver::nonlocal_residual(bool request_jacobian,
+                                     DiffContext& context)
+{
+  return this->_general_residual(request_jacobian,
+                                 context,
+                                 &DifferentiablePhysics::nonlocal_time_derivative,
+                                 &DifferentiablePhysics::nonlocal_constraint);
+}
+
+
+
+bool SteadySolver::_general_residual(bool request_jacobian,
+                                     DiffContext& context,
+                                     ResFuncType time_deriv,
+                                     ResFuncType constraint)
 {
   // If a fixed solution is requested, it will just be the current
   // solution
@@ -71,18 +78,19 @@ bool SteadySolver::side_residual(bool request_jacobian,
     }
 
   bool jacobian_computed =
-    _system.side_time_derivative(request_jacobian, context);
+    (_system.*time_deriv)(request_jacobian, context);
 
   // The user shouldn't compute a jacobian unless requested
   libmesh_assert (request_jacobian || !jacobian_computed);
 
   bool jacobian_computed2 =
-    _system.side_constraint(jacobian_computed, context);
+    (_system.*constraint)(jacobian_computed, context);
 
   // The user shouldn't compute a jacobian unless requested
   libmesh_assert (jacobian_computed || !jacobian_computed2);
 
   return jacobian_computed2;
 }
+
 
 } // namespace libMesh
