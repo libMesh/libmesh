@@ -1761,13 +1761,14 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 void DofMap::dof_indices (const Elem* const elem,
                           std::vector<dof_id_type>& di) const
 {
-  libmesh_assert(elem);
+  // We now allow elem==NULL to request just SCALAR dofs
+  // libmesh_assert(elem);
 
   // Clear the DOF indices vector
   di.clear();
 
   // Ghost subdivision elements have no real dofs
-  if (elem->type() == TRI3SUBDIVISION)
+  if (elem && elem->type() == TRI3SUBDIVISION)
     {
       const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
       if (sd_elem->is_ghost())
@@ -1790,18 +1791,21 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
-  if (elem->type() == TRI3SUBDIVISION)
+  if (elem)
     {
-      // Subdivision surface FE require the 1-ring around elem
-      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
-      MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
-    }
-  else
-    {
-      // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), NULL);
-      for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->get_node(i);
+      if (elem->type() == TRI3SUBDIVISION)
+        {
+          // Subdivision surface FE require the 1-ring around elem
+          const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+          MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+        }
+      else
+        {
+          // All other FE use only the nodes of elem itself
+          elem_nodes.resize(elem->n_nodes(), NULL);
+          for (unsigned int i=0; i<elem->n_nodes(); i++)
+            elem_nodes[i] = elem->get_node(i);
+        }
     }
 
   // Get the dof numbers
@@ -1818,7 +1822,7 @@ void DofMap::dof_indices (const Elem* const elem,
 #endif
 
         }
-      else
+      else if (elem)
         _dof_indices(elem, di, v, elem_nodes
 #ifdef DEBUG
                      , tot_size
@@ -1848,13 +1852,14 @@ void DofMap::dof_indices (const Elem* const elem,
                           std::vector<dof_id_type>& di,
                           const unsigned int vn) const
 {
-  libmesh_assert(elem);
+  // We now allow elem==NULL to request just SCALAR dofs
+  // libmesh_assert(elem);
 
   // Clear the DOF indices vector
   di.clear();
 
   // Ghost subdivision elements have no real dofs
-  if (elem->type() == TRI3SUBDIVISION)
+  if (elem && elem->type() == TRI3SUBDIVISION)
     {
       const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
       if (sd_elem->is_ghost())
@@ -1875,18 +1880,21 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
-  if (elem->type() == TRI3SUBDIVISION)
+  if (elem)
     {
-      // Subdivision surface FE require the 1-ring around elem
-      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
-      MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
-    }
-  else
-    {
-      // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), NULL);
-      for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->get_node(i);
+      if (elem->type() == TRI3SUBDIVISION)
+        {
+          // Subdivision surface FE require the 1-ring around elem
+          const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+          MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+        }
+      else
+        {
+          // All other FE use only the nodes of elem itself
+          elem_nodes.resize(elem->n_nodes(), NULL);
+          for (unsigned int i=0; i<elem->n_nodes(); i++)
+            elem_nodes[i] = elem->get_node(i);
+        }
     }
 
   // Get the dof numbers
@@ -1899,7 +1907,7 @@ void DofMap::dof_indices (const Elem* const elem,
                                       elem->type());
 #endif
     }
-  else
+  else if (elem)
     _dof_indices(elem, di, vn, elem_nodes
 #ifdef DEBUG
                  , tot_size
@@ -1933,6 +1941,9 @@ void DofMap::_dof_indices (const Elem* const elem,
 #endif
                            ) const
 {
+  // This internal function is only useful on valid elements
+  libmesh_assert(elem);
+
   const ElemType type        = elem->type();
   const unsigned int sys_num = this->sys_number();
   const unsigned int dim     = elem->dim();
