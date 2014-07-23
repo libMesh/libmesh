@@ -45,4 +45,59 @@ void DifferentiablePhysics::init_physics (const System& sys)
 
 
 
+bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
+                                                   DiffContext &c)
+{
+  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+
+  for (unsigned int var = 0; var != context.n_vars(); ++var)
+    {
+      if (!this->is_time_evolving(var))
+        continue;
+
+      if (c.get_system().variable(var).type().family != SCALAR)
+        continue;
+
+      const std::vector<dof_id_type>& dof_indices =
+              context.get_dof_indices(var);
+
+      const std::size_t n_dofs = dof_indices.size();
+
+      DenseSubVector<Number> &Fs = context.get_elem_residual(var);
+      DenseSubMatrix<Number> &Kss = context.get_elem_jacobian( var, var );
+
+      for (std::size_t i=0; i != n_dofs; ++i)
+        {
+          Number s = c.get_system().current_solution(dof_indices[i]);
+
+          Fs(i) += s;
+
+          if (request_jacobian && context.elem_solution_derivative)
+            {
+              libmesh_assert_equal_to (context.elem_solution_derivative, 1.0);
+
+              Kss(i,i) += 1;
+            }
+        }
+    }
+
+  return request_jacobian;
+}
+
+
+
+bool DifferentiablePhysics::_eulerian_time_deriv (bool request_jacobian,
+                                                  DiffContext &context)
+{
+  // For any problem we need time derivative terms
+  request_jacobian =
+    this->element_time_derivative(request_jacobian, context);
+
+  // For a moving mesh problem we may need the pseudoconvection term too
+  return this->eulerian_residual(request_jacobian, context) &&
+    request_jacobian;
+}
+
+
+
 } // namespace libMesh
