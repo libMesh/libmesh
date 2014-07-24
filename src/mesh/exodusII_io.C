@@ -891,6 +891,17 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
     }
 }
 
+const std::vector<std::string> & ExodusII_IO::get_nodal_var_names()
+{
+  exio_helper->read_var_names(ExodusII_IO_Helper::NODAL);
+  return exio_helper->nodal_var_names;
+}
+
+const std::vector<std::string> & ExodusII_IO::get_elem_var_names()
+{
+  exio_helper->read_var_names(ExodusII_IO_Helper::ELEMENTAL);
+  return exio_helper->elem_var_names;
+}
 
 
 // LIBMESH_HAVE_EXODUS_API is not defined, declare error() versions of functions...
@@ -1019,6 +1030,17 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string&, const std:
 void ExodusII_IO::write_nodal_data_common(std::string,
                                           const std::vector<std::string>&,
                                           bool)
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+
+const std::vector<std::string> & ExodusII_IO::elem_var_names()
+{
+  libmesh_error_msg("ERROR, ExodusII API is not defined.");
+}
+
+const std::vector<std::string> & ExodusII_IO::nodal_var_names()
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
