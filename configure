@@ -33318,9 +33318,9 @@ _ACEOF
 
          if (test $vtkmajor -gt 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor"
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor"
          else
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
          fi
 
 	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
@@ -33341,6 +33341,7 @@ _ACEOF
              #include "vtkPoints.h"
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
+             #include "vtkImageThreshold.h"
 
 int
 main ()
@@ -33351,6 +33352,7 @@ main ()
              vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+             vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
 
   ;
   return 0;
@@ -33372,7 +33374,7 @@ if ${ac_cv_lib_vtkIO_main+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkIO -lvtkCommon -lvtkFiltering $LIBS"
+LIBS="-lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 

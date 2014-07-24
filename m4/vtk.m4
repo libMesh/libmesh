@@ -129,9 +129,9 @@ AC_DEFUN([CONFIGURE_VTK],
 
          if (test $vtkmajor -gt 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor"
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor"
          else
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
          fi
 
 	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
@@ -155,6 +155,7 @@ AC_DEFUN([CONFIGURE_VTK],
              #include "vtkPoints.h"
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
+             #include "vtkImageThreshold.h"
                               ],
                              [
              vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
@@ -162,13 +163,14 @@ AC_DEFUN([CONFIGURE_VTK],
              vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+             vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
                              ])
            ],
            [enablevtk=yes], [enablevtk=no])
 
          dnl Check for VTK 5.x libraries
          else
-           AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering])
+           AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
 
            if (test $enablevtk = yes); then
              AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
