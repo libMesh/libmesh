@@ -155,7 +155,7 @@ AC_DEFUN([CONFIGURE_VTK],
              #include "vtkPoints.h"
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
-	     #include "vtkImageThreshold.h"
+             #include "vtkImageThreshold.h"
                               ],
                              [
              vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
@@ -163,7 +163,7 @@ AC_DEFUN([CONFIGURE_VTK],
              vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
-	     vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
                              ])
            ],
            [enablevtk=yes], [enablevtk=no])
