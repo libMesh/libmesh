@@ -111,29 +111,11 @@ private:
 
   //-------------------------------------------------------------
   // read support methods
-  /**
-   * When reading, counting the nodes first
-   * helps pre-allocation.  Also determine
-   * whether we need to convert from "D" to "e".
-   */
-  void count_nodes (std::istream& in_file);
 
   /**
-   * Method reads nodes from \p in_file and stores them in
-   * vector<Node*> \p nodes in the order they come in.
-   * The original node labels are being stored in
-   * \p _assign_nodes in order to assign the elements to
-   * the correct nodes later.  In addition, provided it is
-   * active, the \p MeshData gets to know the node id from
-   * the Universal file, too.
+   * Read nodes from file.
    */
-  void node_in (std::istream& in_file);
-
-  /**
-   * When reading, counting the elements first
-   * helps pre-allocation.
-   */
-  void count_elements (std::istream& in_file);
+  void nodes_in (std::istream& in_file);
 
   /**
    * Method reads elements and stores them in
@@ -142,7 +124,7 @@ private:
    * ignored, but \p MeshData takes care of such things
    * (if active).
    */
-  void element_in (std::istream& in_file);
+  void elements_in (std::istream& in_file);
 
   /**
    * Reads the "groups" section of the file. The format of the groups section is described here:
@@ -150,23 +132,16 @@ private:
    */
   void groups_in(std::istream& in_file);
 
-  /**
-   * @returns \p false when error occured, \p true otherwise.
-   * Adjusts the \p in_stream to the beginning of the
-   * dataset \p ds_name.
-   */
-  bool beginning_of_dataset (std::istream& in_file,
-                             const std::string& ds_name) const;
-
   //-------------------------------------------------------------
   // write support methods
+
   /**
    * Outputs nodes to the file \p out_file.
    * For this to work, the \p MeshData of the current
    * \p MeshBase has to be active.  Do not use this directly,
    * but through the proper write method.
    */
-  void node_out (std::ostream& out_file);
+  void nodes_out (std::ostream& out_file);
 
   /**
    * Outputs the element data to the file \p out_file.
@@ -174,7 +149,7 @@ private:
    * \p Mesh has to be active. Do not use this directly,
    * but through the proper write method.
    */
-  void element_out (std::ostream& out_file);
+  void elements_out (std::ostream& out_file);
 
   /**
    * Returns the maximum geometric element dimension encountered while
@@ -192,9 +167,9 @@ private:
   bool _verbose;
 
   /**
-   * maps node id's from UNV to internal.  Used when reading.
+   * maps node IDs from UNV to internal.  Used when reading.
    */
-  std::vector<dof_id_type> _assign_nodes;
+  std::map<unsigned, unsigned> _unv_node_id_to_libmesh_node_id;
 
   /**
    * stores positions of relevant datasets in the file, should
@@ -203,37 +178,19 @@ private:
   std::map<std::string,std::streampos> _ds_position;
 
   /**
-   * total number of nodes, determined through \p count_nodes().
-   * Primarily used when reading.
-   */
-  dof_id_type _n_nodes;
-
-  /**
-   * total number of elements, determined through
-   * \p count_elements().  Primarily used when reading.
-   */
-  dof_id_type _n_elements;
-
-  /**
    * label for the node dataset
    */
-  static const std::string _label_dataset_nodes;
+  static const std::string _nodes_dataset_label;
 
   /**
    * label for the element dataset
    */
-  static const std::string _label_dataset_elements;
+  static const std::string _elements_dataset_label;
 
   /**
    * label for the groups dataset
    */
-  static const std::string _label_dataset_groups;
-
-  /**
-   * whether we need to convert notation of exponentials.
-   * Used when reading.
-   */
-  bool _need_D_to_e;
+  static const std::string _groups_dataset_label;
 
   /**
    * A pointer to the MeshData object you would like to use.

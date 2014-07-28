@@ -54,9 +54,9 @@ namespace libMesh
 
 //-----------------------------------------------------------------------------
 // UNVIO class static members
-const std::string UNVIO::_label_dataset_nodes    = "2411";
-const std::string UNVIO::_label_dataset_elements = "2412";
-const std::string UNVIO::_label_dataset_groups   = "2467";
+const std::string UNVIO::_nodes_dataset_label    = "2411";
+const std::string UNVIO::_elements_dataset_label = "2412";
+const std::string UNVIO::_groups_dataset_label   = "2467";
 
 
 
@@ -96,52 +96,8 @@ bool & UNVIO::verbose ()
 
 
 
-bool UNVIO::beginning_of_dataset (std::istream& in_file,
-                                  const std::string& ds_name) const
-{
-  libmesh_assert (in_file.good());
-  libmesh_assert (!ds_name.empty());
-
-  std::string olds, news;
-
-  while (true)
-    {
-      in_file >> olds >> news;
-
-      /*
-       * a "-1" followed by a number means the beginning of a dataset
-       * stop combing at the end of the file
-       */
-      while( ((olds != "-1") || (news == "-1") ) && !in_file.eof() )
-        {
-          olds = news;
-          in_file >> news;
-        }
-
-      if (in_file.eof())
-        return false;
-
-      if (news == ds_name)
-        return true;
-    }
-
-  // should never end up here
-  libmesh_error_msg("We'll never get here!");
-  return false;
-}
-
-
-
 void UNVIO::clear ()
 {
-  /*
-   * Initialize these to dummy values
-   */
-  this->_n_nodes     = 0;
-  this->_n_elements  = 0;
-  this->_need_D_to_e = true;
-
-  this->_assign_nodes.clear();
   this->_ds_position.clear();
 }
 
@@ -185,19 +141,6 @@ void UNVIO::read_implementation (std::istream& in_stream)
   elems_of_dimension.clear();
   elems_of_dimension.resize(4, false);
 
-  // Note that we read this file
-  // @e twice.  First time to
-  // detect the number of nodes
-  // and elements (and possible
-  // conversion tasks like D_to_e)
-  // and the order of datasets
-  // (nodes first, then elements,
-  // or the other way around),
-  // and second to do the actual
-  // read.
-  std::vector<std::string> order_of_datasets;
-  order_of_datasets.reserve(2);
-
   {
     // the first time we read the file,
     // merely to obtain overall info
@@ -237,17 +180,15 @@ void UNVIO::read_implementation (std::istream& in_stream)
             current_line.erase(std::remove_if(current_line.begin(), current_line.end(), isspace), current_line.end());
 
             // Parse the nodes section
-            if (current_line == _label_dataset_nodes &&
+            if (current_line == _nodes_dataset_label &&
                 old_line == "-1")
               {
                 found_node = true;
-                order_of_datasets.push_back (_label_dataset_nodes);
-                // this->count_nodes (in_stream);
-                this->node_in(in_stream);
+                this->nodes_in(in_stream);
               }
 
             // Parse the elements section
-            else if (current_line == _label_dataset_elements &&
+            else if (current_line == _elements_dataset_label &&
                      old_line == "-1")
               {
                 // The current implementation requires the nodes to
@@ -257,13 +198,11 @@ void UNVIO::read_implementation (std::istream& in_stream)
                   libmesh_error_msg("ERROR: The Nodes section must come before the Elements section of the UNV file!");
 
                 found_elem = true;
-                order_of_datasets.push_back (_label_dataset_elements);
-                // this->count_elements (in_stream);
-                this->element_in(in_stream);
+                this->elements_in(in_stream);
               }
 
             // Parse the groups section
-            else if (current_line == _label_dataset_groups &&
+            else if (current_line == _groups_dataset_label &&
                      old_line == "-1")
               {
                 // The current implementation requires the nodes and
@@ -273,7 +212,6 @@ void UNVIO::read_implementation (std::istream& in_stream)
                   libmesh_error_msg("ERROR: The Nodes and Elements sections must come before the Groups section of the UNV file!");
 
                 found_group = true;
-                order_of_datasets.push_back (_label_dataset_groups);
                 this->groups_in(in_stream);
               }
 
@@ -348,7 +286,6 @@ void UNVIO::read_implementation (std::istream& in_stream)
   }
 
   // save memory
-  this->_assign_nodes.clear();
   this->_ds_position.clear();
 }
 
@@ -390,17 +327,6 @@ void UNVIO::write_implementation (std::ostream& out_file)
   if ( !out_file.good() )
     libmesh_error_msg("ERROR: Output file not good.");
 
-
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
-
-  // already know these data, so initialize
-  // them.  Does not hurt.
-  this->_n_nodes      = mesh.n_nodes();
-  this->_n_elements   = mesh.n_elem();
-  this->_need_D_to_e  = false;
-
-
-
   // we need the MeshData, otherwise we do not
   // know the foreign node id
   if (!this->_mesh_data.active())
@@ -416,187 +342,20 @@ void UNVIO::write_implementation (std::ostream& out_file)
         this->_mesh_data.enable_compatibility_mode();
       }
 
-
-
   // write the nodes,  then the elements
-  this->node_out    (out_file);
-  this->element_out (out_file);
+  this->nodes_out    (out_file);
+  this->elements_out (out_file);
 }
 
 
 
 
-
-void UNVIO::count_nodes (std::istream& in_file)
+void UNVIO::nodes_in (std::istream& in_file)
 {
-  START_LOG("count_nodes()","UNVIO");
-
-  // if this->_n_nodes is not 0 the dataset
-  // has already been scanned
-  if (this->_n_nodes != 0)
-    libmesh_error_msg("Error: Trying to scan nodes twice!");
-
-
-  // Read from file, count nodes,
-  // check if floats have to be converted
-  std::string data;
-
-  in_file >> data; // read the first node label
-
-
-  if (data == "-1")
-    libmesh_error_msg("ERROR: Bad, already reached end of dataset before even starting to read nodes!");
-
-
-  // ignore the misc data for this node
-  in_file.ignore(256,'\n');
-
-
-
-  // Now we are there to verify whether we need
-  // to convert from D to e or not
-  in_file >> data;
-
-  // When this "data" contains a "D", then
-  // we have to convert each and every float...
-  // But also assume when _this_ specific
-  // line does not contain a "D", then the
-  // other lines won't, too.
-  {
-    std::string::size_type position = data.find("D",6);
-
-    if (position!=std::string::npos) // npos means no position
-      {
-        this->_need_D_to_e = true;
-
-        if (this->verbose())
-          libMesh::out << "  Convert from \"D\" to \"e\"" << std::endl;
-      }
-    else
-      this->_need_D_to_e = false;
-  }
-
-  // read the remaining two coordinates
-  in_file >> data;
-  in_file >> data;
-
-
-  // this was our first node
-  this->_n_nodes++;
-
-
-
-  // proceed _counting_ the remaining
-  // nodes.
-  while (in_file.good())
-    {
-      // read the node label
-      in_file >> data;
-
-      if (data == "-1")
-        // end of dataset is reached
-        break;
-
-      // ignore the remaining data (coord_sys_label, color etc)
-      in_file.ignore (256, '\n');
-      // ignore the coordinates
-      in_file.ignore (256, '\n');
-
-      this->_n_nodes++;
-    }
-
-
-  if (in_file.eof())
-    libmesh_error_msg("ERROR: File ended before end of node dataset!");
-
-  if (this->verbose())
-    libMesh::out << "  Nodes   : " << this->_n_nodes << std::endl;
-
-  STOP_LOG("count_nodes()","UNVIO");
-}
-
-
-
-
-
-
-void UNVIO::count_elements (std::istream& in_file)
-{
-  START_LOG("count_elements()","UNVIO");
-
-  if (this->_n_elements != 0)
-    libmesh_error_msg("Error: Trying to scan elements twice!");
-
-
-  // Simply read the element
-  // dataset for the @e only
-  // purpose to count nodes!
-
-  std::string data;
-  unsigned int fe_id;
-
-  // A dummy string for ignoring lines
-  std::string dummy;
-
-  while (!in_file.eof())
-    {
-      // read element label
-      in_file >> data;
-
-      // end of dataset?
-      if (data == "-1")
-        break;
-
-      // read fe_id
-      in_file >> fe_id;
-
-      // Skip related data,
-      // and node number list
-      std::getline(in_file, dummy);
-      std::getline(in_file, dummy);
-
-      // For some elements the node numbers
-      // are given more than one record
-
-      // "beam" elements (fe_id < 25) have an extra line of IDs we need to ignore
-      // TET10 or QUAD9 - have so many nodes we need to skip an extra line
-      if (fe_id < 25 || fe_id == 118 || fe_id == 300)
-        std::getline(in_file, dummy);
-
-      // HEX20 - has so many nodes we have to skip two more lines
-      if (fe_id == 116)
-        {
-          std::getline(in_file, dummy);
-          std::getline(in_file, dummy);
-        }
-
-      this->_n_elements++;
-    }
-
-
-  if (in_file.eof())
-    libmesh_error_msg("ERROR: File ended before end of element dataset!");
-
-  if (this->verbose())
-    libMesh::out << "  Elements: " << this->_n_elements << std::endl;
-
-  STOP_LOG("count_elements()","UNVIO");
-}
-
-
-
-void UNVIO::node_in (std::istream& in_file)
-{
-  START_LOG("node_in()","UNVIO");
+  START_LOG("nodes_in()","UNVIO");
 
   if (this->verbose())
     libMesh::out << "  Reading nodes" << std::endl;
-
-  // adjust the \p istream to our position
-  // bool ok = this->beginning_of_dataset(in_file, _label_dataset_nodes);
-
-//  if (!ok)
-//    libmesh_error_msg("ERROR: Could not find node dataset!");
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
@@ -654,7 +413,7 @@ void UNVIO::node_in (std::istream& in_file)
       coords_stream >> xyz(0) >> xyz(1) >> xyz(2);
 
       // set up the id map
-      this->_assign_nodes.push_back (node_label);
+      _unv_node_id_to_libmesh_node_id[node_label] = ctr;
 
       // add node to the Mesh &
       // tell the MeshData object the foreign node id
@@ -662,11 +421,7 @@ void UNVIO::node_in (std::istream& in_file)
       this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz, ctr++), node_label);
     }
 
-  // now we need to sort the _assign_nodes vector so we can
-  // search it efficiently like a map
-  std::sort (this->_assign_nodes.begin(), this->_assign_nodes.end());
-
-  STOP_LOG("node_in()","UNVIO");
+  STOP_LOG("nodes_in()","UNVIO");
 }
 
 
@@ -692,13 +447,6 @@ void UNVIO::groups_in (std::istream& in_file)
 {
   // Grab reference to the Mesh, so we can add boundary info data to it
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
-
-  // Read the "-1" strings that divide each section, and the dataset
-  // group identifier, so that we are ready to read the actual groups.
-  // bool ok = this->beginning_of_dataset(in_file, _label_dataset_groups);
-
-//  if (!ok)
-//    libmesh_error_msg("ERROR: Could not find groups dataset!");
 
   // Record the max and min element dimension seen while reading the file.
   unsigned max_dim = this->max_elem_dimension_seen();
@@ -946,21 +694,14 @@ void UNVIO::groups_in (std::istream& in_file)
 
 
 
-void UNVIO::element_in (std::istream& in_file)
+void UNVIO::elements_in (std::istream& in_file)
 {
-  START_LOG("element_in()","UNVIO");
+  START_LOG("elements_in()","UNVIO");
 
   if (this->verbose())
     libMesh::out << "  Reading elements" << std::endl;
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
-
-  // adjust the \p istream to our
-  // position
-  // const bool ok = this->beginning_of_dataset(in_file, _label_dataset_elements);
-
-//  if (!ok)
-//    libmesh_error_msg("ERROR: Could not find element dataset!");
 
   // node label, we use an int here so we can read in a -1
   int element_label;
@@ -988,12 +729,6 @@ void UNVIO::element_in (std::istream& in_file)
   // UNV is 1-based, we leave the 0th element of the vectors unused in order
   // to prevent confusion, this way we can store elements with up to 20 nodes
   unsigned int assign_elem_nodes[21];
-
-  // Get the beginning and end of the _assign_nodes vector
-  // to eliminate repeated function calls
-  const std::vector<dof_id_type>::const_iterator
-    it_begin = this->_assign_nodes.begin(),
-    it_end = this->_assign_nodes.end();
 
   // Read elements until there are none left
   unsigned ctr = 0;
@@ -1217,24 +952,14 @@ void UNVIO::element_in (std::istream& in_file)
       // nodes are being stored in element
       for (dof_id_type j=1; j<=n_nodes; j++)
         {
-          // Find the position of node_labels[j] in the _assign_nodes vector.
-          const std::pair<std::vector<dof_id_type>::const_iterator, std::vector<dof_id_type>::const_iterator>
-            range = std::equal_range (it_begin, it_end, node_labels[j]);
+          // Map the UNV node ID to the libmesh node ID
+          std::map<unsigned, unsigned>::iterator it =
+            _unv_node_id_to_libmesh_node_id.find(node_labels[j]);
 
-          // it better be there, so libmesh_assert that it was found.
-          libmesh_assert (range.first != range.second);
-          libmesh_assert_equal_to (*(range.first), node_labels[j]);
-
-          // Now, the distance between this UNV id and the beginning of
-          // the _assign_nodes vector will give us a unique id in the
-          // range [0,n_nodes) that we can use for defining a contiguous
-          // connectivity.
-          const dof_id_type assigned_node = libmesh_cast_int<dof_id_type>(std::distance (it_begin, range.first));
-
-          // Make sure we didn't get an out-of-bounds id
-          libmesh_assert_less (assigned_node, this->_n_nodes);
-
-          elem->set_node(assign_elem_nodes[j]) = mesh.node_ptr(assigned_node);
+          if (it != _unv_node_id_to_libmesh_node_id.end())
+            elem->set_node(assign_elem_nodes[j]) = mesh.node_ptr(it->second);
+          else
+            libmesh_error_msg("ERROR: UNV node " << node_labels[j] << " not found!");
         }
 
       elems_of_dimension[elem->dim()] = true;
@@ -1256,7 +981,7 @@ void UNVIO::element_in (std::istream& in_file)
       ctr++;
     } // end while(true)
 
-  STOP_LOG("element_in()","UNVIO");
+  STOP_LOG("elements_in()","UNVIO");
 }
 
 
@@ -1264,7 +989,7 @@ void UNVIO::element_in (std::istream& in_file)
 
 
 
-void UNVIO::node_out (std::ostream& out_file)
+void UNVIO::nodes_out (std::ostream& out_file)
 {
 
   libmesh_assert (this->_mesh_data.active() ||
@@ -1272,12 +997,12 @@ void UNVIO::node_out (std::ostream& out_file)
 
 
   if (this->verbose())
-    libMesh::out << "  Writing " << this->_n_nodes << " nodes" << std::endl;
+    libMesh::out << "  Writing " << MeshOutput<MeshBase>::mesh().n_nodes() << " nodes" << std::endl;
 
   // Write beginning of dataset
   out_file << "    -1\n"
            << "  "
-           << _label_dataset_nodes
+           << _nodes_dataset_label
            << '\n';
 
 
@@ -1330,7 +1055,7 @@ void UNVIO::node_out (std::ostream& out_file)
 
 
 
-void UNVIO::element_out(std::ostream& out_file)
+void UNVIO::elements_out(std::ostream& out_file)
 {
   libmesh_assert (this->_mesh_data.active() ||
                   this->_mesh_data.compatibility_mode());
@@ -1341,7 +1066,7 @@ void UNVIO::element_out(std::ostream& out_file)
   // Write beginning of dataset
   out_file << "    -1\n"
            << "  "
-           << _label_dataset_elements
+           << _elements_dataset_label
            << "\n";
 
   unsigned long int fe_descriptor_id = 0;    // FE descriptor id
