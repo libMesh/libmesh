@@ -63,7 +63,7 @@ const std::string UNVIO::_groups_dataset_label   = "2467";
 // ------------------------------------------------------------
 // UNVIO class members
 
-UNVIO::UNVIO (MeshBase& mesh, MeshData& mesh_data) :
+UNVIO::UNVIO (MeshBase& mesh, MeshData* mesh_data) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
   _verbose (false),
@@ -73,7 +73,7 @@ UNVIO::UNVIO (MeshBase& mesh, MeshData& mesh_data) :
 
 
 
-UNVIO::UNVIO (const MeshBase& mesh, MeshData& mesh_data) :
+UNVIO::UNVIO (const MeshBase& mesh, MeshData* mesh_data) :
   MeshOutput<MeshBase> (mesh),
   _verbose (false),
   _mesh_data (mesh_data)
@@ -256,9 +256,10 @@ void UNVIO::read_implementation (std::istream& in_stream)
                         << "D support." );
 #endif
 
-    // tell the MeshData object that we are finished
-    // reading data
-    this->_mesh_data.close_foreign_id_maps ();
+    // Possibly tell the MeshData object that we are finished
+    // reading data.
+    if (_mesh_data)
+      _mesh_data->close_foreign_id_maps ();
 
     // Delete any lower-dimensional elements that might have been
     // added to the mesh stricly for setting BCs.
@@ -329,18 +330,17 @@ void UNVIO::write_implementation (std::ostream& out_file)
 
   // we need the MeshData, otherwise we do not
   // know the foreign node id
-  if (!this->_mesh_data.active())
-    if (!this->_mesh_data.compatibility_mode())
-      {
-        libMesh::err << std::endl
-                     << "*************************************************************************" << std::endl
-                     << "* WARNING: MeshData neither active nor in compatibility mode.           *" << std::endl
-                     << "*          Enable compatibility mode for MeshData.  Use this Universal  *" << std::endl
-                     << "*          file with caution: libMesh node and element ids are used.    *" << std::endl
-                     << "*************************************************************************" << std::endl
-                     << std::endl;
-        this->_mesh_data.enable_compatibility_mode();
-      }
+  if (_mesh_data && !(_mesh_data->active()) && !(_mesh_data->compatibility_mode()))
+    {
+      libMesh::err << std::endl
+                   << "*************************************************************************" << std::endl
+                   << "* WARNING: MeshData neither active nor in compatibility mode.           *" << std::endl
+                   << "*          Enable compatibility mode for MeshData.  Use this Universal  *" << std::endl
+                   << "*          file with caution: libMesh node and element ids are used.    *" << std::endl
+                   << "*************************************************************************" << std::endl
+                   << std::endl;
+      _mesh_data->enable_compatibility_mode();
+    }
 
   // write the nodes,  then the elements
   this->nodes_out    (out_file);
@@ -415,10 +415,12 @@ void UNVIO::nodes_in (std::istream& in_file)
       // set up the id map
       _unv_node_id_to_libmesh_node_id[node_label] = ctr;
 
-      // add node to the Mesh &
+      // add node to the Mesh
+      Node* added_node = mesh.add_point(xyz, ctr++);
+
       // tell the MeshData object the foreign node id
-      // (note that mesh.add_point() returns a pointer to the new node)
-      this->_mesh_data.add_foreign_node_id (mesh.add_point(xyz, ctr++), node_label);
+      if (_mesh_data)
+        _mesh_data->add_foreign_node_id (added_node, node_label);
     }
 
   STOP_LOG("nodes_in()","UNVIO");
@@ -974,8 +976,12 @@ void UNVIO::elements_in (std::istream& in_file)
       //_libmesh_elem_id_to_unv_elem_id[i] = element_label;
       _unv_elem_id_to_libmesh_elem_id[element_label] = ctr;
 
+      // Add the element to the Mesh
+      Elem* added_elem = mesh.add_elem(elem);
+
       // Tell the MeshData object the foreign elem id
-      this->_mesh_data.add_foreign_elem_id (mesh.add_elem(elem), element_label);
+      if (_mesh_data)
+        _mesh_data->add_foreign_elem_id (added_elem, element_label);
 
       // Increment the counter for the next iteration
       ctr++;
@@ -991,10 +997,9 @@ void UNVIO::elements_in (std::istream& in_file)
 
 void UNVIO::nodes_out (std::ostream& out_file)
 {
-
-  libmesh_assert (this->_mesh_data.active() ||
-                  this->_mesh_data.compatibility_mode());
-
+  if (_mesh_data)
+    libmesh_assert (_mesh_data->active() ||
+                    _mesh_data->compatibility_mode());
 
   if (this->verbose())
     libMesh::out << "  Writing " << MeshOutput<MeshBase>::mesh().n_nodes() << " nodes" << std::endl;
@@ -1020,9 +1025,15 @@ void UNVIO::nodes_out (std::ostream& out_file)
     {
       const Node* current_node = *nd;
 
+      dof_id_type node_id = current_node->id();
+
+      // If possible, use the MeshData object to get the right node ID.
+      if (_mesh_data)
+        node_id = _mesh_data->node_to_foreign_id(current_node);
+
       char buf[78];
       std::sprintf(buf, "%10d%10u%10u%10u\n",
-                   this->_mesh_data.node_to_foreign_id(current_node),
+                   node_id,
                    exp_coord_sys_dummy,
                    disp_coord_sys_dummy,
                    color_dummy);
@@ -1057,8 +1068,9 @@ void UNVIO::nodes_out (std::ostream& out_file)
 
 void UNVIO::elements_out(std::ostream& out_file)
 {
-  libmesh_assert (this->_mesh_data.active() ||
-                  this->_mesh_data.compatibility_mode());
+  if (_mesh_data)
+    libmesh_assert (_mesh_data->active() ||
+                    _mesh_data->compatibility_mode());
 
   if (this->verbose())
     libMesh::out << "  Writing elements" << std::endl;
@@ -1253,13 +1265,18 @@ void UNVIO::elements_out(std::ostream& out_file)
           libmesh_error_msg("ERROR: Element type = " << elem->type() << " not supported in " << "UNVIO!");
         }
 
+      dof_id_type elem_id = elem->id();
 
-      out_file << std::setw(10) << this->_mesh_data.elem_to_foreign_id(elem)  // element ID
-               << std::setw(10) << fe_descriptor_id                           // type of element
-               << std::setw(10) << phys_prop_tab_dummy                        // not supported
-               << std::setw(10) << mat_prop_tab_dummy                         // not supported
-               << std::setw(10) << color_dummy                                // not supported
-               << std::setw(10) << elem->n_nodes()                            // No. of nodes per element
+      // If possible, use the MeshData object to get the right node ID.
+      if (_mesh_data)
+        _mesh_data->elem_to_foreign_id(elem);
+
+      out_file << std::setw(10) << elem_id             // element ID
+               << std::setw(10) << fe_descriptor_id    // type of element
+               << std::setw(10) << phys_prop_tab_dummy // not supported
+               << std::setw(10) << mat_prop_tab_dummy  // not supported
+               << std::setw(10) << color_dummy         // not supported
+               << std::setw(10) << elem->n_nodes()     // No. of nodes per element
                << '\n';
 
       for (unsigned int j=0; j<elem->n_nodes(); j++)
@@ -1273,10 +1290,14 @@ void UNVIO::elements_out(std::ostream& out_file)
           if (j==8 || j==16)
             out_file << '\n';
 
-          // write foreign label for this node
-          out_file << std::setw(10) << this->_mesh_data.node_to_foreign_id(node_in_unv_order);
+          // Write foreign label for this node
+          dof_id_type node_id = node_in_unv_order->id();
 
+          // If possible, use the MeshData object to determine this
+          if (_mesh_data)
+            _mesh_data->node_to_foreign_id(node_in_unv_order);
 
+          out_file << std::setw(10) << node_id;
         }
 
       out_file << '\n';

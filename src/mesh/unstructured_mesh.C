@@ -681,12 +681,7 @@ void UnstructuredMesh::read (const std::string& name,
             LegacyXdrIO(*this,true).read_mgf (new_name);
 
           else if (new_name.rfind(".unv") < new_name.size())
-            {
-              if (mesh_data == NULL)
-                libmesh_error_msg("Error! You must pass a valid MeshData pointer to read UNV files!");
-
-              UNVIO(*this, *mesh_data).read (new_name);
-            }
+            UNVIO(*this, mesh_data).read (new_name);
 
           else if ((new_name.rfind(".node")  < new_name.size()) ||
                    (new_name.rfind(".ele")   < new_name.size()))
@@ -837,12 +832,7 @@ void UnstructuredMesh::write (const std::string& name,
           LegacyXdrIO(*this,true).write_mgf(new_name);
 
         else if (new_name.rfind(".unv") < new_name.size())
-          {
-            if (mesh_data == NULL)
-              libmesh_error_msg("Error! You must pass a valid MeshData pointer to write UNV files!");
-
-            UNVIO(*this, *mesh_data).write (new_name);
-          }
+          UNVIO(*this, mesh_data).write (new_name);
 
         else if (new_name.rfind(".mesh") < new_name.size())
           MEDITIO(*this).write (new_name);
