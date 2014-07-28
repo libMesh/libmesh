@@ -42,10 +42,13 @@ class MeshData;
  * The \p UNVIO class implements the Ideas \p UNV universal
  * file format.  This class enables both reading and writing
  * \p UNV files.
+ *
+ * Author history
+ * Original version: Tammo Kaschner, January 2003
+ * Optimization: Daniel Dreyer, September 2003
+ * Converted to MeshInput format: Benjamin Kirk, March 2004
+ * Read in "groups" section, general refactoring: John Peterson, July 2014
  */
-
-// ------------------------------------------------------------
-// UNVIO class definition
 class UNVIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>
 {
@@ -101,13 +104,6 @@ private:
    * type of stream to pass the implementation.
    */
   void write_implementation (std::ostream& out_stream);
-
-  /**
-   * Clears the data structures to a pristine
-   * state.
-   */
-  void clear();
-
 
   //-------------------------------------------------------------
   // read support methods
@@ -170,12 +166,6 @@ private:
    * maps node IDs from UNV to internal.  Used when reading.
    */
   std::map<unsigned, unsigned> _unv_node_id_to_libmesh_node_id;
-
-  /**
-   * stores positions of relevant datasets in the file, should
-   * help to re-read the data faster.  Used when reading.
-   */
-  std::map<std::string,std::streampos> _ds_position;
 
   /**
    * label for the node dataset

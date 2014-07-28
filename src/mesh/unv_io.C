@@ -18,7 +18,6 @@
 
 // C++ includes
 #include <iomanip>
-#include <cstdio>   // for std::sprintf
 #include <algorithm> // for std::sort
 #include <fstream>
 #include <ctype.h> // isspace
@@ -84,7 +83,6 @@ UNVIO::UNVIO (const MeshBase& mesh, MeshData* mesh_data) :
 
 UNVIO::~UNVIO ()
 {
-  this->clear ();
 }
 
 
@@ -93,15 +91,6 @@ bool & UNVIO::verbose ()
 {
   return _verbose;
 }
-
-
-
-void UNVIO::clear ()
-{
-  this->_ds_position.clear();
-}
-
-
 
 
 
@@ -133,31 +122,21 @@ void UNVIO::read (const std::string& file_name)
 
 void UNVIO::read_implementation (std::istream& in_stream)
 {
-  // clear everything, so that
-  // we can start from scratch
-  this->clear ();
-
   // Keep track of what kinds of elements this file contains
   elems_of_dimension.clear();
   elems_of_dimension.resize(4, false);
 
   {
-    // the first time we read the file,
-    // merely to obtain overall info
     if ( !in_stream.good() )
       libmesh_error_msg("ERROR: Input file not good.");
 
-    // Count nodes and elements, then let
-    // other methods read the element and
-    // node data.  Also remember which
-    // dataset comes first: nodes or elements
-    if (this->verbose())
-      libMesh::out << "  Counting nodes and elements" << std::endl;
+    // Flags to be set when certain sections are encountered
+    bool
+      found_node  = false,
+      found_elem  = false,
+      found_group = false;
 
-    bool found_node  = false;
-    bool found_elem  = false;
-    bool found_group = false;
-
+    // strings for reading the file line by line
     std::string
       old_line,
       current_line;
@@ -177,7 +156,8 @@ void UNVIO::read_implementation (std::istream& in_stream)
             // UNV files always have some amount of leading
             // whitespace, let's not rely on exactly how much...  This
             // command deletes it.
-            current_line.erase(std::remove_if(current_line.begin(), current_line.end(), isspace), current_line.end());
+            current_line.erase(std::remove_if(current_line.begin(), current_line.end(), isspace),
+                               current_line.end());
 
             // Parse the nodes section
             if (current_line == _nodes_dataset_label &&
@@ -281,13 +261,9 @@ void UNVIO::read_implementation (std::istream& in_stream)
         }
     }
 
-
     if (this->verbose())
       libMesh::out << "  Finished." << std::endl << std::endl;
   }
-
-  // save memory
-  this->_ds_position.clear();
 }
 
 
@@ -328,8 +304,7 @@ void UNVIO::write_implementation (std::ostream& out_file)
   if ( !out_file.good() )
     libmesh_error_msg("ERROR: Output file not good.");
 
-  // we need the MeshData, otherwise we do not
-  // know the foreign node id
+  // If we have a MeshData object, possibly set it to use "compatibility" mode.
   if (_mesh_data && !(_mesh_data->active()) && !(_mesh_data->compatibility_mode()))
     {
       libMesh::err << std::endl
@@ -342,7 +317,7 @@ void UNVIO::write_implementation (std::ostream& out_file)
       _mesh_data->enable_compatibility_mode();
     }
 
-  // write the nodes,  then the elements
+  // write the nodes, then the elements
   this->nodes_out    (out_file);
   this->elements_out (out_file);
 }
@@ -363,7 +338,7 @@ void UNVIO::nodes_in (std::istream& in_file)
   int node_label;
 
   // always 3 coordinates in the UNV file, no matter
-  // which dimensionality libMesh is in
+  // what LIBMESH_DIM is.
   Point xyz;
 
   // We'll just read the floating point values as strings even when
@@ -437,9 +412,6 @@ unsigned UNVIO::max_elem_dimension_seen ()
     if (elems_of_dimension[i])
       max_dim = i;
 
-  // Debugging:
-  // libMesh::out << "max_dim=" << max_dim << std::endl;
-
   return max_dim;
 }
 
@@ -465,10 +437,7 @@ void UNVIO::groups_in (std::istream& in_file)
       in_file >> group_number;
 
       if (group_number == -1)
-        {
-          // Do we need to finish reading the rest of the line to the carriage return?
-          break;
-        }
+        break;
 
       // The first record consists of 8 entries:
       // Field 1 -- group number (that we just read)
@@ -487,14 +456,8 @@ void UNVIO::groups_in (std::istream& in_file)
         in_file >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy
                 >> num_entities;
 
-        // Debugging:
-        // libMesh::out << "group_number=" << group_number << std::endl;
-        // libMesh::out << "num_entities=" << num_entities << std::endl;
-
         // The second record has 1 field, the group name
         in_file >> group_name;
-
-        // libMesh::out << "group_name=" << group_name << std::endl;
       }
 
       // The dimension of the elements in the group will determine
@@ -554,16 +517,6 @@ void UNVIO::groups_in (std::istream& in_file)
                     if (group_elem->dim() != max_dim-1)
                       libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << group_elem->dim());
 
-                    // libMesh::out << "UNV Element "
-                    //              << entity_tag
-                    //              << "(libmesh element "
-                    //              << libmesh_elem_id
-                    //              << ") dim=="
-                    //              << group_elem->dim()
-                    //              << " is in group "
-                    //              << group_name
-                    //              << std::endl;
-
                     // To be pushed into the provide_bcs data container
                     std::vector<dof_id_type> group_elem_node_ids(group_elem->n_nodes());
 
@@ -577,9 +530,6 @@ void UNVIO::groups_in (std::istream& in_file)
 
                     // Sort before putting into the map
                     std::sort(group_elem_node_ids.begin(), group_elem_node_ids.end());
-
-                    // Unchecked insert:
-                    // provide_bcs[group_elem_node_ids] = group_elem;
 
                     // Ensure that this key doesn't already exist when
                     // inserting it.  We would need to use a multimap if
@@ -618,25 +568,6 @@ void UNVIO::groups_in (std::istream& in_file)
 
     } // end while (true)
 
-  // Debugging: What did we put in the provide_bcs data structure?
-  // {
-  //   provide_bcs_t::iterator
-  //     provide_it = provide_bcs.begin(),
-  //     provide_end = provide_bcs.end();
-  //
-  //   for ( ; provide_it != provide_end; ++provide_it)
-  //     {
-  //       const std::vector<dof_id_type> & node_list = provide_it->first;
-  //       Elem* elem = provide_it->second;
-  //
-  //       libMesh::out << "Elem " << elem->id() << " provides BCs for the face with nodes: ";
-  //       for (unsigned i=0; i<node_list.size(); ++i)
-  //         libMesh::out << node_list[i] << " ";
-  //       libMesh::out << std::endl;
-  //     }
-  // }
-
-
   // Loop over elements and try to assign boundary information
   {
     MeshBase::element_iterator       it  = mesh.active_elements_begin();
@@ -647,15 +578,12 @@ void UNVIO::groups_in (std::istream& in_file)
 
         if (elem->dim() == max_dim)
           {
-            // This is a max-dimension element that
-            // may require BCs.  For each of its
-            // sides, including internal sides, we'll
-            // see if a lower-dimensional element
-            // provides boundary information for it.
-            // Note that we have not yet called
-            // find_neighbors(), so we can't use
-            // elem->neighbor(sn) in this algorithm...
-
+            // This is a max-dimension element that may require BCs.
+            // For each of its sides, including internal sides, we'll
+            // see if a lower-dimensional element provides boundary
+            // information for it.  Note that we have not yet called
+            // find_neighbors(), so we can't use elem->neighbor(sn) in
+            // this algorithm...
             for (unsigned int sn=0; sn<elem->n_sides(); sn++)
               {
                 AutoPtr<Elem> side (elem->build_side(sn));
@@ -675,15 +603,6 @@ void UNVIO::groups_in (std::istream& in_file)
                   {
                     Elem* lower_dim_elem = iter->second;
 
-                    // Debugging
-                    // libMesh::out << "Elem "
-                    //              << lower_dim_elem->id()
-                    //              << " provides BCs for side "
-                    //              << sn
-                    //              << " of Elem "
-                    //              << elem->id()
-                    //              << std::endl;
-
                     // Add boundary information based on the lower-dimensional element's subdomain id.
                     mesh.boundary_info->add_side(elem, sn, lower_dim_elem->subdomain_id());
                   }
@@ -691,7 +610,6 @@ void UNVIO::groups_in (std::istream& in_file)
           }
       }
   }
-
 }
 
 
@@ -1010,13 +928,16 @@ void UNVIO::nodes_out (std::ostream& out_file)
            << _nodes_dataset_label
            << '\n';
 
-
-  unsigned int exp_coord_sys_dummy  = 0; // export coordinate sys. (not supported yet)
-  unsigned int disp_coord_sys_dummy = 0; // displacement coordinate sys. (not supp. yet)
-  unsigned int color_dummy          = 0; // color(not supported yet)
+  unsigned int
+    exp_coord_sys_dummy  = 0, // export coordinate sys. (not supported yet)
+    disp_coord_sys_dummy = 0, // displacement coordinate sys. (not supp. yet)
+    color_dummy          = 0; // color(not supported yet)
 
   // A reference to the parent class's mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  // Use scientific notation with captial E and 16 digits for printing out the coordinates
+  out_file << std::scientific << std::setprecision(16) << std::uppercase;
 
   MeshBase::const_node_iterator       nd  = mesh.nodes_begin();
   const MeshBase::const_node_iterator end = mesh.nodes_end();
@@ -1031,31 +952,22 @@ void UNVIO::nodes_out (std::ostream& out_file)
       if (_mesh_data)
         node_id = _mesh_data->node_to_foreign_id(current_node);
 
-      char buf[78];
-      std::sprintf(buf, "%10d%10u%10u%10u\n",
-                   node_id,
-                   exp_coord_sys_dummy,
-                   disp_coord_sys_dummy,
-                   color_dummy);
-      out_file << buf;
+      out_file << std::setw(10) << node_id
+               << std::setw(10) << exp_coord_sys_dummy
+               << std::setw(10) << disp_coord_sys_dummy
+               << std::setw(10) << color_dummy
+               << '\n';
 
-      // the coordinates
-      if (mesh.spatial_dimension() == 3)
-        std::sprintf(buf, "%25.16E%25.16E%25.16E\n",
-                     static_cast<double>((*current_node)(0)),
-                     static_cast<double>((*current_node)(1)),
-                     static_cast<double>((*current_node)(2)));
-      else if (mesh.spatial_dimension() == 2)
-        std::sprintf(buf, "%25.16E%25.16E\n",
-                     static_cast<double>((*current_node)(0)),
-                     static_cast<double>((*current_node)(1)));
-      else
-        std::sprintf(buf, "%25.16E\n",
-                     static_cast<double>((*current_node)(0)));
+      // The coordinates - always write out three coords regardless of LIBMESH_DIM
+      Real x = (*current_node)(0);
+      Real y = mesh.spatial_dimension() > 1 ? (*current_node)(1) : 0.0;
+      Real z = mesh.spatial_dimension() > 2 ? (*current_node)(2) : 0.0;
 
-      out_file << buf;
+      out_file << std::setw(25) << x
+               << std::setw(25) << y
+               << std::setw(25) << z
+               << '\n';
     }
-
 
   // Write end of dataset
   out_file << "    -1\n";
@@ -1081,11 +993,11 @@ void UNVIO::elements_out(std::ostream& out_file)
            << _elements_dataset_label
            << "\n";
 
-  unsigned long int fe_descriptor_id = 0;    // FE descriptor id
-  unsigned long int phys_prop_tab_dummy = 2; // physical property (not supported yet)
-  unsigned long int mat_prop_tab_dummy = 1;  // material property (not supported yet)
-  unsigned long int color_dummy = 7;         // color (not supported yet)
-
+  unsigned
+    fe_descriptor_id = 0,    // FE descriptor id
+    phys_prop_tab_dummy = 2, // physical property (not supported yet)
+    mat_prop_tab_dummy = 1,  // material property (not supported yet)
+    color_dummy = 7;         // color (not supported yet)
 
   // vector that assigns element nodes to their correct position
   // currently only elements with up to 20 nodes
