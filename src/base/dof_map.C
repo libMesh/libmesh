@@ -1784,11 +1784,6 @@ void DofMap::dof_indices (const Elem* const elem,
   unsigned int tot_size = 0;
 #endif
 
-  // Create a vector to indicate which
-  // SCALAR variables have been requested
-  std::vector<unsigned int> SCALAR_var_numbers;
-  SCALAR_var_numbers.clear();
-
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
   if (elem)
@@ -1813,14 +1808,14 @@ void DofMap::dof_indices (const Elem* const elem,
     {
       if(this->variable(v).type().family == SCALAR)
         {
-          SCALAR_var_numbers.push_back(v);
-
 #ifdef DEBUG
           tot_size += FEInterface::n_dofs(elem->dim(),
                                           this->variable_type(v),
                                           elem->type());
 #endif
-
+          std::vector<dof_id_type> di_new;
+          this->SCALAR_dof_indices(di_new,v);
+          di.insert( di.end(), di_new.begin(), di_new.end());
         }
       else if (elem)
         _dof_indices(elem, di, v, elem_nodes
@@ -1828,16 +1823,6 @@ void DofMap::dof_indices (const Elem* const elem,
                      , tot_size
 #endif
                      );
-    }
-
-  // Finally append any SCALAR dofs that we asked for.
-  std::vector<dof_id_type> di_new;
-  std::vector<unsigned int>::iterator it           = SCALAR_var_numbers.begin();
-  std::vector<unsigned int>::const_iterator it_end = SCALAR_var_numbers.end();
-  for( ; it != it_end; ++it)
-    {
-      this->SCALAR_dof_indices(di_new,*it);
-      di.insert( di.end(), di_new.begin(), di_new.end());
     }
 
 #ifdef DEBUG
@@ -1873,11 +1858,6 @@ void DofMap::dof_indices (const Elem* const elem,
   unsigned int tot_size = 0;
 #endif
 
-  // Create a vector to indicate which
-  // SCALAR variables have been requested
-  std::vector<unsigned int> SCALAR_var_numbers;
-  SCALAR_var_numbers.clear();
-
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
   if (elem)
@@ -1900,12 +1880,14 @@ void DofMap::dof_indices (const Elem* const elem,
   // Get the dof numbers
   if(this->variable(vn).type().family == SCALAR)
     {
-      SCALAR_var_numbers.push_back(vn);
 #ifdef DEBUG
       tot_size += FEInterface::n_dofs(elem->dim(),
                                       this->variable_type(vn),
                                       elem->type());
 #endif
+      std::vector<dof_id_type> di_new;
+      this->SCALAR_dof_indices(di_new,vn);
+      di.insert( di.end(), di_new.begin(), di_new.end());
     }
   else if (elem)
     _dof_indices(elem, di, vn, elem_nodes
@@ -1913,16 +1895,6 @@ void DofMap::dof_indices (const Elem* const elem,
                  , tot_size
 #endif
                  );
-
-  // Finally append any SCALAR dofs that we asked for.
-  std::vector<dof_id_type> di_new;
-  std::vector<unsigned int>::iterator it           = SCALAR_var_numbers.begin();
-  std::vector<unsigned int>::const_iterator it_end = SCALAR_var_numbers.end();
-  for( ; it != it_end; ++it)
-    {
-      this->SCALAR_dof_indices(di_new,*it);
-      di.insert( di.end(), di_new.begin(), di_new.end());
-    }
 
 #ifdef DEBUG
   libmesh_assert_equal_to (tot_size, di.size());
