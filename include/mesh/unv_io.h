@@ -158,15 +158,6 @@ private:
   bool beginning_of_dataset (std::istream& in_file,
                              const std::string& ds_name) const;
 
-  /**
-   * Method for converting exponential notation
-   * from "D" to "e", for example
-   * \p 3.141592654D+00 \p --> \p 3.141592654e+00
-   * in order to make it readable for C++.
-   */
-  Real D_to_e (std::string& number) const;
-
-
   //-------------------------------------------------------------
   // write support methods
   /**

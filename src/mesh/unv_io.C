@@ -132,23 +132,6 @@ bool UNVIO::beginning_of_dataset (std::istream& in_file,
 
 
 
-inline
-Real UNVIO::D_to_e (std::string& number) const
-{
-  /* find "D" in string, start looking at
-   * 6th element, to improve speed.
-   * We dont expect a "D" earlier
-   */
-  const std::string::size_type position = number.find("D",6);
-
-  libmesh_assert (position != std::string::npos);
-  number.replace(position, 1, "e");
-
-  return std::atof (number.c_str());
-}
-
-
-
 void UNVIO::clear ()
 {
   /*
@@ -259,30 +242,39 @@ void UNVIO::read_implementation (std::istream& in_stream)
               {
                 found_node = true;
                 order_of_datasets.push_back (_label_dataset_nodes);
-                this->count_nodes (in_stream);
+                // this->count_nodes (in_stream);
+                this->node_in(in_stream);
               }
 
             // Parse the elements section
             else if (current_line == _label_dataset_elements &&
                      old_line == "-1")
               {
+                // The current implementation requires the nodes to
+                // have been read before reaching the elements
+                // section.
+                if (!found_node)
+                  libmesh_error_msg("ERROR: The Nodes section must come before the Elements section of the UNV file!");
+
                 found_elem = true;
                 order_of_datasets.push_back (_label_dataset_elements);
-                this->count_elements (in_stream);
+                // this->count_elements (in_stream);
+                this->element_in(in_stream);
               }
 
             // Parse the groups section
             else if (current_line == _label_dataset_groups &&
                      old_line == "-1")
               {
+                // The current implementation requires the nodes and
+                // elements to have already been read before reaching
+                // the groups section.
+                if (!found_node || !found_elem)
+                  libmesh_error_msg("ERROR: The Nodes and Elements sections must come before the Groups section of the UNV file!");
+
                 found_group = true;
                 order_of_datasets.push_back (_label_dataset_groups);
-                // TODO: We can't currently read the groups until we've
-                // read the nodes and elements, unless we want to store
-                // the boundary info independently of the BoundaryInfo
-                // object.  When we evnetually switch over to not reading
-                // the input file twice, we can call groups_in() here.
-                // this->groups_in(in_stream);
+                this->groups_in(in_stream);
               }
 
             // We can stop reading once we've found the nodes, elements,
@@ -304,61 +296,16 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
     // By now we better have found the datasets for nodes and elements,
     // otherwise the unv file is bad!
-    if (!found_elem)
-      libmesh_error_msg("ERROR: Could not find elements!");
-
     if (!found_node)
       libmesh_error_msg("ERROR: Could not find nodes!");
 
-    // We only support reading the groups *after* the nodes and elements sections
-    std::vector<std::string>::iterator
-      nodes_pos  = std::find(order_of_datasets.begin(), order_of_datasets.end(), _label_dataset_nodes),
-      elems_pos  = std::find(order_of_datasets.begin(), order_of_datasets.end(), _label_dataset_elements),
-      groups_pos = std::find(order_of_datasets.begin(), order_of_datasets.end(), _label_dataset_groups);
-
-    if (groups_pos != order_of_datasets.end() &&
-        ((nodes_pos > groups_pos) || (elems_pos > groups_pos)))
-      libmesh_error_msg("ERROR: Group section must come *after* both nodes and elements sections.");
-
-    // Don't close, just seek to the beginning
-    in_stream.seekg(0, std::ios::beg);
-
-    if (!in_stream.good())
-      libmesh_error_msg("ERROR: Cannot re-read input file.");
+    if (!found_elem)
+      libmesh_error_msg("ERROR: Could not find elements!");
   }
 
 
 
-
-
-  // We finished scanning the file,
-  // and our member data
-  // \p this->_n_nodes,
-  // \p this->_n_elements,
-  // \p this->_need_D_to_e
-  // should be properly initialized.
   {
-    // Read the datasets in the order that
-    // we already know
-    libmesh_assert_greater_equal (order_of_datasets.size(), 2);
-
-    for (unsigned int ds=0; ds < order_of_datasets.size(); ds++)
-      {
-        if (order_of_datasets[ds] == _label_dataset_nodes)
-          this->node_in (in_stream);
-
-        else if (order_of_datasets[ds] == _label_dataset_elements)
-          this->element_in (in_stream);
-
-        else if (order_of_datasets[ds] == _label_dataset_groups)
-          // Reading the groups currently *requires* the nodes and
-          // elements to have already been read in.
-          this->groups_in(in_stream);
-
-        else
-          libmesh_error_msg("Unrecognized dataset type " << order_of_datasets[ds]);
-      }
-
     // Set the mesh dimension to the largest element dimension encountered
     MeshInput<MeshBase>::mesh().set_mesh_dimension(max_elem_dimension_seen());
 
@@ -378,7 +325,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
     // Delete any lower-dimensional elements that might have been
     // added to the mesh stricly for setting BCs.
     {
-      // Grab reference to the Mesh, so we can add boundary info data to it
+      // Grab reference to the Mesh
       MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
       unsigned max_dim = this->max_elem_dimension_seen();
@@ -646,24 +593,26 @@ void UNVIO::node_in (std::istream& in_file)
     libMesh::out << "  Reading nodes" << std::endl;
 
   // adjust the \p istream to our position
-  bool ok = this->beginning_of_dataset(in_file, _label_dataset_nodes);
+  // bool ok = this->beginning_of_dataset(in_file, _label_dataset_nodes);
 
-  if (!ok)
-    libmesh_error_msg("ERROR: Could not find node dataset!");
+//  if (!ok)
+//    libmesh_error_msg("ERROR: Could not find node dataset!");
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   // node label, we use an int here so we can read in a -1
   int node_label;
 
-  unsigned int
-    exp_coord_sys_num,  // export coordinate system number       (not used yet)
-    disp_coord_sys_num, // displacement coordinate system number (not used yet)
-    color;              // color                                 (not used yet)
-
   // always 3 coordinates in the UNV file, no matter
   // which dimensionality libMesh is in
   Point xyz;
+
+  // We'll just read the floating point values as strings even when
+  // there are no "D" characters in the file.  This will make parsing
+  // the file a bit slower but the logic to do so will all be
+  // simplified and in one place...
+  std::string line;
+  std::istringstream coords_stream;
 
   // Continue reading nodes until there are none left
   unsigned ctr = 0;
@@ -676,25 +625,33 @@ void UNVIO::node_in (std::istream& in_file)
       if (node_label == -1)
         break;
 
-      // Read the rest of the node data
-      in_file >> exp_coord_sys_num       // (not used yet)
-              >> disp_coord_sys_num      // (not used yet)
-              >> color;                  // (not used yet)
+      // Read and discard the the rest of the node data on this line
+      // which we do not currently use:
+      // .) exp_coord_sys_num
+      // .) disp_coord_sys_num
+      // .) color
+      std::getline(in_file, line);
 
       // read the floating-point data
-      for (unsigned int d=0; d<3; d++)
+      std::getline(in_file, line);
+
+      // Replace any "D" characters used for exponents with "E"
+      size_t last_pos = 0;
+      while (true)
         {
-          if (this->_need_D_to_e)
-            {
-              // Note that \p count_nodes() already determined
-              // whether this file uses "D" of "e".
-              std::string num_buf;
-              in_file >> num_buf;
-              xyz(d) = this->D_to_e (num_buf);
-            }
+          last_pos = line.find("D", last_pos);
+
+          if (last_pos != std::string::npos)
+            line.replace(last_pos, 1, "E");
           else
-            in_file >> xyz(d);
+            break;
         }
+
+      // Construct a stream object from the current line and then
+      // stream in the xyz values.
+      coords_stream.str(line);
+      coords_stream.clear(); // clear iostate bits!  Important!
+      coords_stream >> xyz(0) >> xyz(1) >> xyz(2);
 
       // set up the id map
       this->_assign_nodes.push_back (node_label);
@@ -738,10 +695,10 @@ void UNVIO::groups_in (std::istream& in_file)
 
   // Read the "-1" strings that divide each section, and the dataset
   // group identifier, so that we are ready to read the actual groups.
-  bool ok = this->beginning_of_dataset(in_file, _label_dataset_groups);
+  // bool ok = this->beginning_of_dataset(in_file, _label_dataset_groups);
 
-  if (!ok)
-    libmesh_error_msg("ERROR: Could not find groups dataset!");
+//  if (!ok)
+//    libmesh_error_msg("ERROR: Could not find groups dataset!");
 
   // Record the max and min element dimension seen while reading the file.
   unsigned max_dim = this->max_elem_dimension_seen();
@@ -1000,10 +957,10 @@ void UNVIO::element_in (std::istream& in_file)
 
   // adjust the \p istream to our
   // position
-  const bool ok = this->beginning_of_dataset(in_file, _label_dataset_elements);
+  // const bool ok = this->beginning_of_dataset(in_file, _label_dataset_elements);
 
-  if (!ok)
-    libmesh_error_msg("ERROR: Could not find element dataset!");
+//  if (!ok)
+//    libmesh_error_msg("ERROR: Could not find element dataset!");
 
   // node label, we use an int here so we can read in a -1
   int element_label;
