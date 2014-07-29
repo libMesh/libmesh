@@ -66,11 +66,12 @@ bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
       DenseSubVector<Number> &Fs = context.get_elem_residual(var);
       DenseSubMatrix<Number> &Kss = context.get_elem_jacobian( var, var );
 
+      const libMesh::DenseSubVector<libMesh::Number> &Us =
+        context.get_elem_solution(var);
+
       for (std::size_t i=0; i != n_dofs; ++i)
         {
-          Number s = c.get_system().current_solution(dof_indices[i]);
-
-          Fs(i) += s;
+          Fs(i) += Us(i);
 
           if (request_jacobian && context.elem_solution_derivative)
             {
