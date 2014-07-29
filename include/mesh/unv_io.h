@@ -42,10 +42,13 @@ class MeshData;
  * The \p UNVIO class implements the Ideas \p UNV universal
  * file format.  This class enables both reading and writing
  * \p UNV files.
+ *
+ * Author history
+ * Original version: Tammo Kaschner, January 2003
+ * Optimization: Daniel Dreyer, September 2003
+ * Converted to MeshInput format: Benjamin Kirk, March 2004
+ * Read in "groups" section, general refactoring: John Peterson, July 2014
  */
-
-// ------------------------------------------------------------
-// UNVIO class definition
 class UNVIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>
 {
@@ -56,13 +59,13 @@ public:
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  UNVIO (MeshBase& mesh, MeshData& mesh_data);
+  UNVIO (MeshBase& mesh, MeshData* mesh_data = NULL);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  UNVIO (const MeshBase& mesh, MeshData& mesh_data);
+  UNVIO (const MeshBase& mesh, MeshData* mesh_data = NULL);
 
   /**
    * Destructor.
@@ -102,38 +105,13 @@ private:
    */
   void write_implementation (std::ostream& out_stream);
 
-  /**
-   * Clears the data structures to a pristine
-   * state.
-   */
-  void clear();
-
-
   //-------------------------------------------------------------
   // read support methods
-  /**
-   * When reading, counting the nodes first
-   * helps pre-allocation.  Also determine
-   * whether we need to convert from "D" to "e".
-   */
-  void count_nodes (std::istream& in_file);
 
   /**
-   * Method reads nodes from \p in_file and stores them in
-   * vector<Node*> \p nodes in the order they come in.
-   * The original node labels are being stored in
-   * \p _assign_nodes in order to assign the elements to
-   * the correct nodes later.  In addition, provided it is
-   * active, the \p MeshData gets to know the node id from
-   * the Universal file, too.
+   * Read nodes from file.
    */
-  void node_in (std::istream& in_file);
-
-  /**
-   * When reading, counting the elements first
-   * helps pre-allocation.
-   */
-  void count_elements (std::istream& in_file);
+  void nodes_in (std::istream& in_file);
 
   /**
    * Method reads elements and stores them in
@@ -142,34 +120,24 @@ private:
    * ignored, but \p MeshData takes care of such things
    * (if active).
    */
-  void element_in (std::istream& in_file);
+  void elements_in (std::istream& in_file);
 
   /**
-   * @returns \p false when error occured, \p true otherwise.
-   * Adjusts the \p in_stream to the beginning of the
-   * dataset \p ds_name.
+   * Reads the "groups" section of the file. The format of the groups section is described here:
+   * http://www.sdrl.uc.edu/universal-file-formats-for-modal-analysis-testing-1/file-format-storehouse/unv_2467.htm
    */
-  bool beginning_of_dataset (std::istream& in_file,
-                             const std::string& ds_name) const;
-
-  /**
-   * Method for converting exponential notation
-   * from "D" to "e", for example
-   * \p 3.141592654D+00 \p --> \p 3.141592654e+00
-   * in order to make it readable for C++.
-   */
-  Real D_to_e (std::string& number) const;
-
+  void groups_in(std::istream& in_file);
 
   //-------------------------------------------------------------
   // write support methods
+
   /**
    * Outputs nodes to the file \p out_file.
    * For this to work, the \p MeshData of the current
    * \p MeshBase has to be active.  Do not use this directly,
    * but through the proper write method.
    */
-  void node_out (std::ostream& out_file);
+  void nodes_out (std::ostream& out_file);
 
   /**
    * Outputs the element data to the file \p out_file.
@@ -177,8 +145,14 @@ private:
    * \p Mesh has to be active. Do not use this directly,
    * but through the proper write method.
    */
-  void element_out (std::ostream& out_file);
+  void elements_out (std::ostream& out_file);
 
+  /**
+   * Returns the maximum geometric element dimension encountered while
+   * reading the Mesh.  Only valid after the elements have been read
+   * in and the elems_of_dimension array has been populated.
+   */
+  unsigned max_elem_dimension_seen ();
 
   //-------------------------------------------------------------
   // local data
@@ -189,144 +163,42 @@ private:
   bool _verbose;
 
   /**
-   * maps node id's from UNV to internal.  Used when reading.
+   * maps node IDs from UNV to internal.  Used when reading.
    */
-  std::vector<dof_id_type> _assign_nodes;
-
-  /**
-   * stores positions of relevant datasets in the file, should
-   * help to re-read the data faster.  Used when reading.
-   */
-  std::map<std::string,std::streampos> _ds_position;
-
-  /**
-   * total number of nodes, determined through \p count_nodes().
-   * Primarily used when reading.
-   */
-  dof_id_type _n_nodes;
-
-  /**
-   * total number of elements, determined through
-   * \p count_elements().  Primarily used when reading.
-   */
-  dof_id_type _n_elements;
+  std::map<unsigned, unsigned> _unv_node_id_to_libmesh_node_id;
 
   /**
    * label for the node dataset
    */
-  static const std::string _label_dataset_nodes;
+  static const std::string _nodes_dataset_label;
 
   /**
    * label for the element dataset
    */
-  static const std::string _label_dataset_elements;
+  static const std::string _elements_dataset_label;
 
   /**
-   * whether we need to convert notation of exponentials.
-   * Used when reading.
+   * label for the groups dataset
    */
-  bool _need_D_to_e;
+  static const std::string _groups_dataset_label;
 
   /**
    * A pointer to the MeshData object you would like to use.
    * with this UNVIO object.  Can be NULL.
    */
-  MeshData& _mesh_data;
+  MeshData* _mesh_data;
 
+  /**
+   * Map libmesh element IDs to UNV element IDs.
+   */
+  // std::vector<unsigned> _libmesh_elem_id_to_unv_elem_id;
+
+  /**
+   * Map UNV element IDs to libmesh element IDs.
+   */
+  std::map<unsigned, unsigned> _unv_elem_id_to_libmesh_elem_id;
 };
 
-
-
-// ------------------------------------------------------------
-// MeshIO inline members
-inline
-UNVIO::UNVIO (MeshBase& mesh, MeshData& mesh_data) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
-  _verbose (false),
-  _mesh_data (mesh_data)
-{
-}
-
-
-
-inline
-UNVIO::UNVIO (const MeshBase& mesh, MeshData& mesh_data) :
-  MeshOutput<MeshBase> (mesh),
-  _verbose (false),
-  _mesh_data (mesh_data)
-{
-}
-
-
-
-inline
-UNVIO::~UNVIO ()
-{
-  this->clear ();
-}
-
-
-
-inline
-bool & UNVIO::verbose ()
-{
-  return _verbose;
-}
-
-
-
-inline
-bool UNVIO::beginning_of_dataset (std::istream& in_file,
-                                  const std::string& ds_name) const
-{
-  libmesh_assert (in_file.good());
-  libmesh_assert (!ds_name.empty());
-
-  std::string olds, news;
-
-  while (true)
-    {
-      in_file >> olds >> news;
-
-      /*
-       * a "-1" followed by a number means the beginning of a dataset
-       * stop combing at the end of the file
-       */
-      while( ((olds != "-1") || (news == "-1") ) && !in_file.eof() )
-        {
-          olds = news;
-          in_file >> news;
-        }
-
-      if (in_file.eof())
-        return false;
-
-      if (news == ds_name)
-        return true;
-    }
-
-  // should never end up here
-  libmesh_error_msg("We'll never get here!");
-  return false;
-}
-
-
-
-inline
-Real UNVIO::D_to_e (std::string& number) const
-{
-  /* find "D" in string, start looking at
-   * 6th element, to improve speed.
-   * We dont expect a "D" earlier
-   */
-  const std::string::size_type position = number.find("D",6);
-
-  libmesh_assert (position != std::string::npos);
-  number.replace(position, 1, "e");
-
-  return std::atof (number.c_str());
-}
 
 
 } // namespace libMesh
