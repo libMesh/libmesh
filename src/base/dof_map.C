@@ -1809,9 +1809,7 @@ void DofMap::dof_indices (const Elem* const elem,
       if(this->variable(v).type().family == SCALAR)
         {
 #ifdef DEBUG
-          tot_size += FEInterface::n_dofs(elem->dim(),
-                                          this->variable_type(v),
-                                          elem->type());
+          tot_size += this->variable(v).type().order;
 #endif
           std::vector<dof_id_type> di_new;
           this->SCALAR_dof_indices(di_new,v);
@@ -1881,9 +1879,7 @@ void DofMap::dof_indices (const Elem* const elem,
   if(this->variable(vn).type().family == SCALAR)
     {
 #ifdef DEBUG
-      tot_size += FEInterface::n_dofs(elem->dim(),
-                                      this->variable_type(vn),
-                                      elem->type());
+      tot_size += this->variable(vn).type().order;
 #endif
       std::vector<dof_id_type> di_new;
       this->SCALAR_dof_indices(di_new,vn);
