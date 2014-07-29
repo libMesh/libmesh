@@ -734,6 +734,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                 libmesh_error_msg("Relative error too large, exiting!");
               }
           }
+
+        add_element_system
+          (*this, get_residual, get_jacobian, _femcontext);
       }
   }
 
