@@ -398,6 +398,25 @@ void AbaqusIO::read (const std::string& fname)
   if (build_sidesets_from_nodesets)
     the_mesh.boundary_info->build_side_list_from_node_list();
 
+  // Delete lower-dimensional elements from the Mesh.  We assume these
+  // were only used for setting BCs, and aren't part of the actual
+  // Mesh.
+  {
+    unsigned max_dim = this->max_elem_dimension_seen();
+
+    MeshBase::element_iterator       el     = the_mesh.elements_begin();
+    const MeshBase::element_iterator end_el = the_mesh.elements_end();
+
+    for (; el != end_el; ++el)
+      {
+        Elem* elem = *el;
+
+        if (elem->dim() < max_dim)
+          the_mesh.delete_elem(elem);
+      }
+  }
+
+
 } // read()
 
 
@@ -829,6 +848,9 @@ void AbaqusIO::assign_subdomain_ids()
 
   // Loop over each Elemset and assign subdomain IDs to Mesh elements
   {
+    // The maximum element dimension seen while reading the Mesh
+    unsigned max_dim = this->max_elem_dimension_seen();
+
     // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
     container_t::iterator it = _elemset_ids.begin();
     for (unsigned elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
@@ -850,6 +872,15 @@ void AbaqusIO::assign_subdomain_ids()
 
             if (elem == NULL)
               libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
+
+            // We won't assign subdomain ids to lower-dimensional
+            // elements, as they are assumed to represent boundary
+            // conditions.  Since lower-dimensional elements can
+            // appear in multiple sidesets, it doesn't make sense to
+            // assign them a single subdomain id... only the last one
+            // assigned would actually "stick".
+            if (elem->dim() < max_dim)
+              break;
 
             // Compute the proper subdomain ID, based on the formula in the
             // documentation for this function.
@@ -981,6 +1012,11 @@ void AbaqusIO::assign_sideset_ids()
   {
     unsigned max_dim = this->max_elem_dimension_seen();
 
+    // multimap from "vector-of-lower-dimensional-element-node-ids" to subdomain ID which should be applied.
+    // We use a multimap because the lower-dimensional elements can belong to more than 1 sideset.
+    typedef std::multimap<std::vector<dof_id_type>, unsigned> provide_bcs_t;
+    provide_bcs_t provide_bcs;
+
     // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
     container_t::iterator it = _elemset_ids.begin();
     for (unsigned elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
@@ -1006,10 +1042,94 @@ void AbaqusIO::assign_sideset_ids()
             if (elem->dim() == max_dim)
               break;
 
+            // We can only handle elements that are *exactly*
+            // one dimension lower than the max element
+            // dimension.  Not sure if "edge" BCs in 3D
+            // actually make sense/are required...
+            if (elem->dim() != max_dim-1)
+              libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem->dim());
+
             // Debugging
-            libMesh::out << "Elset " << it->first << " defines sideset information!" << std::endl;
+            // libMesh::out << "Elset " << it->first << " defines sideset information!" << std::endl;
+
+            // To be pushed into the provide_bcs data container
+            std::vector<dof_id_type> elem_node_ids(elem->n_nodes());
+
+            // Save node IDs in a local vector which will be used as a key for the map.
+            for (unsigned n=0; n<elem->n_nodes(); n++)
+              elem_node_ids[n] = elem->node(n);
+
+            // Sort before putting into the map
+            std::sort(elem_node_ids.begin(), elem_node_ids.end());
+
+            // Insert the (key, id) pair into the multimap
+            provide_bcs.insert(std::make_pair(elem_node_ids, elemset_id));
+
+            // Associate the name of this sideset with the ID we've
+            // chosen.  It's not necessary to do this for every
+            // element in the set, but it's convenient to do it here
+            // since we have all the necessary information...
+            the_mesh.boundary_info->sideset_name(elemset_id) = it->first;
           }
       }
+
+    // Debugging: What did we put in the provide_bcs data structure?
+    {
+      provide_bcs_t::iterator
+        provide_it = provide_bcs.begin(),
+        provide_end = provide_bcs.end();
+
+      for ( ; provide_it != provide_end; ++provide_it)
+        {
+          const std::vector<dof_id_type> & node_list = provide_it->first;
+          unsigned set_id = provide_it->second;
+
+          libMesh::out << "Sideset " << set_id << " contains face with nodes: ";
+          for (unsigned i=0; i<node_list.size(); ++i)
+            libMesh::out << node_list[i] << " ";
+          libMesh::out << std::endl;
+        }
+    }
+
+    // Loop over elements and try to assign boundary information
+    {
+      MeshBase::element_iterator       it  = the_mesh.active_elements_begin();
+      const MeshBase::element_iterator end = the_mesh.active_elements_end();
+      for ( ; it != end; ++it)
+        {
+          Elem* elem = *it;
+
+          if (elem->dim() == max_dim)
+            {
+              // This is a max-dimension element that may require BCs.
+              // For each of its sides, including internal sides, we'll
+              // see if a lower-dimensional element provides boundary
+              // information for it.  Note that we have not yet called
+              // find_neighbors(), so we can't use elem->neighbor(sn) in
+              // this algorithm...
+              for (unsigned int sn=0; sn<elem->n_sides(); sn++)
+                {
+                  AutoPtr<Elem> side (elem->build_side(sn));
+
+                  // Build up a node_ids vector, which is the key
+                  std::vector<dof_id_type> node_ids(side->n_nodes());
+                  for (unsigned n=0; n<side->n_nodes(); n++)
+                    node_ids[n] = side->node(n);
+
+                  // Sort the vector before using it as a key
+                  std::sort(node_ids.begin(), node_ids.end());
+
+                  // Look for this key in the provide_bcs multimap
+                  std::pair<provide_bcs_t::const_iterator, provide_bcs_t::const_iterator>
+                    range = provide_bcs.equal_range (node_ids);
+
+                  // Add boundary information for this side for each side in the range.
+                  for (provide_bcs_t::const_iterator it = range.first; it != range.second; ++it)
+                    the_mesh.boundary_info->add_side(elem, sn, it->second);
+                }
+            }
+        }
+    }
   }
 
 } // assign_sideset_ids()
