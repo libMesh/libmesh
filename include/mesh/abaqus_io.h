@@ -75,10 +75,11 @@ private:
   typedef std::map<std::string, std::vector<std::pair<dof_id_type, unsigned> > > sideset_container_t;
 
   /**
-   * This function parses a block of nodes in the Abaqus file
-   * once such a block has been found.
+   * This function parses a block of nodes in the Abaqus file once
+   * such a block has been found.  If the *NODE section specifies an
+   * NSET name, also pass that to this function.
    */
-  void read_nodes();
+  void read_nodes(std::string nset_name);
 
   /**
    * This function parses a block of elements in the Abaqus file.

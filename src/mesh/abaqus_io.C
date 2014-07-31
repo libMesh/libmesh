@@ -245,11 +245,15 @@ void AbaqusIO::read (const std::string& fname)
           // 1.) Look for the "*Nodes" section
           if (upper.find("*NODE") == static_cast<std::string::size_type>(0))
             {
+              // Some *Node sections also specify an Nset name on the same line.
+              // Look for one here.
+              std::string nset_name = this->parse_label(s, "nset");
+
               // Process any lines of comments that may be present
               this->process_and_discard_comments();
 
               // Read a block of nodes
-              this->read_nodes();
+              this->read_nodes(nset_name);
             }
 
 
@@ -425,7 +429,7 @@ void AbaqusIO::read (const std::string& fname)
 
 
 
-void AbaqusIO::read_nodes()
+void AbaqusIO::read_nodes(std::string nset_name)
 {
   // Get a reference to the mesh we are reading
   MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
@@ -454,6 +458,13 @@ void AbaqusIO::read_nodes()
   // start our numbering with the number of nodes currently in the
   // Mesh.
   dof_id_type libmesh_node_id = the_mesh.n_nodes();
+
+  // We need to duplicate some of the read_ids code if this *NODE
+  // section also defines an NSET.  We'll set up the id_storage
+  // pointer and push back IDs into this vector in the loop below...
+  std::vector<dof_id_type>* id_storage = NULL;
+  if (nset_name != "")
+    id_storage = &(_nodeset_ids[nset_name]);
 
   // We will read nodes until the next line begins with *, since that will be the
   // next section.
@@ -484,6 +495,10 @@ void AbaqusIO::read_nodes()
       // This is required so that our 'peek()' at the beginning of this
       // loop doesn't read the newline character, for example.
       std::getline(_in, dummy);
+
+      // If this *NODE section defines an NSET, also store the abaqus ID in id_storage
+      if (id_storage)
+        id_storage->push_back(abaqus_node_id);
 
       // Set up the abaqus -> libmesh node mapping.  This is usually just the
       // "off-by-one" map.
