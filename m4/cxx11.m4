@@ -38,26 +38,67 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
 
 AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
   [
-    AC_MSG_CHECKING(for C++11 std::shared_ptr support)
-
     AC_LANG_PUSH([C++])
 
-    have_cxx11_shared_ptr=no
+    have_cxx11_shared_ptr=init
 
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-    @%:@include <memory>
-    ]], [[
-        std::shared_ptr<int> p1;
-        std::shared_ptr<int> p2 (new int);
-        std::shared_ptr<int> p3 (p2);
-        p3.reset(new int);
-    ]])],[
-        AC_MSG_RESULT(yes)
-        AC_DEFINE(HAVE_CXX11_SHARED_PTR, 1, [Flag indicating whether compiler supports std::shared_ptr])
-        have_cxx11_shared_ptr=yes
-    ],[
-        AC_MSG_RESULT(no)
-    ])
+    # Save any original value that CXXFLAGS had
+    saveCXXFLAGS="$CXXFLAGS"
+
+    # Try compiling the test code in all methods requested by the user
+    for method in ${METHODS}; do
+        case "${method}" in
+            optimized|opt)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPT $CPPFLAGS_OPT";;
+
+            debug|dbg)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DBG $CPPFLAGS_DBG";;
+
+            devel)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DEVEL $CPPFLAGS_DEVEL";;
+
+            profiling|pro|prof)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_PROF $CPPFLAGS_PROF";;
+
+            oprofile|oprof)
+              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPROF $CPPFLAGS_OPROF";;
+
+            *)
+            AC_MSG_ERROR([bad value ${method} for --with-methods])
+            ;;
+        esac
+
+        # If compilation fails for *any* of the methods, we'll disable
+        # shared_ptr support for *all* methods.
+        if test "x$have_cxx11_shared_ptr" != xno; then
+
+          AC_MSG_CHECKING([for C++11 std::shared_ptr support with ${method} flags])
+
+          AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+          @%:@include <memory>
+          ]], [[
+              std::shared_ptr<int> p1;
+              std::shared_ptr<int> p2 (new int);
+              std::shared_ptr<int> p3 (p2);
+              p3.reset(new int);
+          ]])],[
+              have_cxx11_shared_ptr=yes
+              AC_MSG_RESULT(yes)
+          ],[
+              have_cxx11_shared_ptr=no
+              AC_MSG_RESULT(no)
+          ])
+
+        fi
+    done
+
+    # Only set the header file variable if our flag was set to 'yes'.
+    if test "x$have_cxx11_shared_ptr" = xyes; then
+      AC_DEFINE(HAVE_CXX11_SHARED_PTR, 1, [Flag indicating whether compiler supports std::shared_ptr])
+    fi
+
+    # Restore the original flags, whatever they were.
+    CXXFLAGS="$saveCXXFLAGS"
 
     AC_LANG_POP([C++])
     AM_CONDITIONAL(HAVE_CXX11_SHARED_PTR, test x$have_cxx11_shared_ptr == xyes)
