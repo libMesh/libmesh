@@ -245,6 +245,14 @@ void AbaqusIO::read (const std::string& fname)
           // 1.) Look for the "*Nodes" section
           if (upper.find("*NODE") == static_cast<std::string::size_type>(0))
             {
+              // Some sections that begin with *NODE are actually
+              // "*NODE OUTPUT" sections which we want to skip.  I
+              // have only seen this with a single space, but it would
+              // probably be more robust to remove whitespace before
+              // making this check.
+              if (upper.find("*NODE OUTPUT") == static_cast<std::string::size_type>(0))
+                continue;
+
               // Some *Node sections also specify an Nset name on the same line.
               // Look for one here.
               std::string nset_name = this->parse_label(s, "nset");
@@ -261,6 +269,14 @@ void AbaqusIO::read (const std::string& fname)
           // 2.) Look for the "*Element" section
           else if (upper.find("*ELEMENT,") == static_cast<std::string::size_type>(0))
             {
+              // Some sections that begin with *ELEMENT are actually
+              // "*ELEMENT OUTPUT" sections which we want to skip.  I
+              // have only seen this with a single space, but it would
+              // probably be more robust to remove whitespace before
+              // making this check.
+              if (upper.find("*ELEMENT OUTPUT") == static_cast<std::string::size_type>(0))
+                continue;
+
               // Some *Element sections also specify an Elset name on the same line.
               // Look for one here.
               std::string elset_name = this->parse_label(s, "elset");
