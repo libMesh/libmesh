@@ -21,6 +21,7 @@
 #include <algorithm> // for std::sort
 #include <fstream>
 #include <ctype.h> // isspace
+#include <sstream> // std::istringstream
 
 // Local includes
 #include "libmesh/libmesh_config.h"
