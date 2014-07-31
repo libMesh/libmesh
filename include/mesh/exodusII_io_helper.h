@@ -522,6 +522,17 @@ public:
   // different ExodusII_IO object for each one.
   std::string current_filename;
 
+  /**
+   * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   * NODAL:     num_nodal_vars  nodal_var_names
+   * ELEMENTAL: num_elem_vars   elem_var_names
+   * GLOBAL:    num_global_vars global_var_names
+   */
+  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
+  void read_var_names(ExodusVarType type);
+
 protected:
   // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
   bool _run_only_on_proc0;
@@ -547,16 +558,6 @@ protected:
   bool _single_precision;
 
 private:
-  /**
-   * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
-   * The enumeration controls whether nodal, elemental, or global
-   * variable names are read and which class members are filled in.
-   * NODAL:     num_nodal_vars  nodal_var_names
-   * ELEMENTAL: num_elem_vars   elem_var_names
-   * GLOBAL:    num_global_vars global_var_names
-   */
-  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
-  void read_var_names(ExodusVarType type);
 
   /**
    * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
