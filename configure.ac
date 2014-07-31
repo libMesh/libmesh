@@ -119,7 +119,7 @@ if (test "x$enablecxx11" = "xyes"); then
   # flag for the current compiler.  Adds the result to CXXFLAGS if
   # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
   # --------------------------------------------------------------
-  AX_CXX_COMPILE_STDCXX_11([noext],[optional])
+  AX_CXX_COMPILE_STDCXX_11([],[optional])
 fi
 
 # --------------------------------------------------------------
