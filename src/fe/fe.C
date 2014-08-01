@@ -113,7 +113,7 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
-                       const std::vector<Point>* const pts,
+                       const std::vector<Point>* pts,
                        const std::vector<Real>* const weights)
 {
   // We can be called with no element if we're just evaluating SCALAR
@@ -236,15 +236,20 @@ void FE<Dim,T>::reinit(const Elem* elem,
         }
 
     }
-  else // SCALAR case with no defined elem, so no quadrature rule or
-       // mapping or caching to be done
+  else // SCALAR case with no defined elem, so mapping or caching to
+       // be done, and our "quadrature rule" is one point.
     {
-      libmesh_assert(pts);
-
       this->elem_type = INVALID_ELEM;
       this->_p_level = 0;
 
-      this->init_shape_functions (*pts, elem);
+      if (!pts)
+        {
+          const std::vector<Point> one_point(1,Point(0));
+
+          this->init_shape_functions (one_point, elem);
+        }
+      else
+        this->init_shape_functions (*pts, elem);
     }
 
   // Compute the shape functions and the derivatives at all of the
@@ -253,6 +258,11 @@ void FE<Dim,T>::reinit(const Elem* elem,
     {
       if (pts != NULL)
         this->compute_shape_functions (elem,*pts);
+      else if (T == SCALAR && !elem)
+        {
+          const std::vector<Point> one_point(1,Point(0));
+          this->compute_shape_functions (elem,one_point);
+        }
       else
         this->compute_shape_functions(elem,this->qrule->get_points());
     }
