@@ -36,10 +36,10 @@ cell_data = {
     {'''10', 24}
     {'''11', 36}
     {'''12', 49}
-    {'''13', 69}
-    {'''14', 19}
-    {'P', 10} % Preprints
-    {'T', 28} % Theses
+    {'''13', 71}
+    {'''14', 23}
+    {'P', 7} % Preprints
+    {'T', 29} % Theses
     };
 
 % Handle newer versions of Octave

@@ -171,6 +171,10 @@ data = {
     '2014-Jul-25', 27,  14
     '2014-Jul-26', 9,   8
     '2014-Jul-27', 27,  9
+    '2014-Jul-28', 73,  23
+    '2014-Jul-29', 136, 22
+    '2014-Jul-30', 25,  14
+    '2014-Jul-31', 113, 29
     };
 
 % length works like you would expect it to for cell arrays.
