@@ -119,7 +119,7 @@ if (test "x$enablecxx11" = "xyes"); then
   # flag for the current compiler.  Adds the result to CXXFLAGS if
   # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
   # --------------------------------------------------------------
-  AX_CXX_COMPILE_STDCXX_11([noext],[optional])
+  AX_CXX_COMPILE_STDCXX_11([],[optional])
 fi
 
 # --------------------------------------------------------------
@@ -129,6 +129,19 @@ fi
 # flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
 # --------------------------------------------------------------
 LIBMESH_SET_CXX_FLAGS
+
+#------------------------------------------------------
+# Checks for code coverage
+# this must be done after we look for our own compilers
+#------------------------------------------------------
+AX_CODE_COVERAGE
+libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
+libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
+
+#-----------------------------------------------------
+# Set compiler flags for devel, opt, etc. methods
+#-----------------------------------------------------
+LIBMESH_SET_METHODS
 
 # --------------------------------------------------------------
 # Test for specific C++11 features.  Note, we still run these
@@ -144,19 +157,6 @@ LIBMESH_TEST_CXX11_INITIALIZER_LIST
 LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES
 LIBMESH_TEST_CXX11_THREAD
 LIBMESH_TEST_CXX11_TYPE_TRAITS
-
-#------------------------------------------------------
-# Checks for code coverage
-# this must be done after we look for our own compilers
-#------------------------------------------------------
-AX_CODE_COVERAGE
-libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
-libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
-
-#-----------------------------------------------------
-# Set compiler flags for devel, opt, etc. methods
-#-----------------------------------------------------
-LIBMESH_SET_METHODS
 
 #-----------------------------------------------------
 # Initialize libtool.  By default, we will build
