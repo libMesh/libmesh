@@ -75,10 +75,11 @@ private:
   typedef std::map<std::string, std::vector<std::pair<dof_id_type, unsigned> > > sideset_container_t;
 
   /**
-   * This function parses a block of nodes in the Abaqus file
-   * once such a block has been found.
+   * This function parses a block of nodes in the Abaqus file once
+   * such a block has been found.  If the *NODE section specifies an
+   * NSET name, also pass that to this function.
    */
-  void read_nodes();
+  void read_nodes(std::string nset_name);
 
   /**
    * This function parses a block of elements in the Abaqus file.
@@ -87,7 +88,7 @@ private:
    * *ELEMENT, TYPE=CPS3
    * so that it can determine the type of elements to read.
    */
-  void read_elements(std::string upper);
+  void read_elements(std::string upper, std::string elset_name);
 
   /**
    * This function parses a label of the form foo=bar from a
@@ -156,6 +157,13 @@ private:
    * trailing data intact.
    */
   void process_and_discard_comments();
+
+  /**
+   * Returns the maximum geometric element dimension encountered while
+   * reading the Mesh.  Only valid after the elements have been read
+   * in and the elems_of_dimension array has been populated.
+   */
+  unsigned max_elem_dimension_seen();
 
   /**
    * Abaqus writes nodesets and elemsets with labels.  As we read

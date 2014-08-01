@@ -1612,21 +1612,25 @@ void BoundaryInfo::build_side_list_from_node_list()
               // For each nodeset that this node is a member of, increment the associated
               // nodeset ID count
               for (pos = range.first; pos != range.second; ++pos)
-                {
-                  nodesets_node_count[pos->second]++;
-                }
+                nodesets_node_count[pos->second]++;
             }
 
-          // Now check to see what nodeset_counts have the correct number of nodes in them
-          for (std::map<dof_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
-               nodesets != nodesets_node_count.end(); ++nodesets)
-            {
-              if (nodesets->second == side_elem->n_nodes())
-                {
-                  // Add this side to the sideset
-                  add_side(elem, side, nodesets->first);
-                }
-            }
+          // Now check to see what nodeset_counts have the correct
+          // number of nodes in them.  For any that do, add this side to
+          // the sideset, making sure the sideset inherits the
+          // nodeset's name, if there is one.
+          std::map<dof_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
+          for (; nodesets != nodesets_node_count.end(); ++nodesets)
+            if (nodesets->second == side_elem->n_nodes())
+              {
+                add_side(elem, side, nodesets->first);
+
+                // Let the sideset inherit any non-empty name from the nodeset
+                std::string& nset_name = nodeset_name(nodesets->first);
+
+                if (nset_name != "")
+                  sideset_name(nodesets->first) = nset_name;
+              }
         } // end for side
     } // end for el
 }
