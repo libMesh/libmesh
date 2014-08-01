@@ -116,112 +116,135 @@ void FE<Dim,T>::reinit(const Elem* elem,
                        const std::vector<Point>* const pts,
                        const std::vector<Real>* const weights)
 {
-  libmesh_assert(elem);
+  // We can be called with no element if we're just evaluating SCALAR
+  // dofs.
+  libmesh_assert(elem || T == SCALAR);
 
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
   bool cached_nodes_still_fit = false;
 
-  // Initialize the shape functions at the user-specified
-  // points
-  if (pts != NULL)
+  // Since non-SCALAR FE types are the default case, we'll write
+  // if(elem) tests in such a way as to allow them to be optimized
+  // away in the non-SCALAR case.
+  if (T != SCALAR || elem)
     {
-      // Set the type and p level for this element
-      this->elem_type = elem->type();
-      this->_p_level = elem->p_level();
 
-      // Initialize the shape functions
-      this->_fe_map->template init_reference_to_physical_map<Dim>(*pts, elem);
-      this->init_shape_functions (*pts, elem);
-
-      // The shape functions do not correspond to the qrule
-      this->shapes_on_quadrature = false;
-    }
-
-  // If there are no user specified points, we use the
-  // quadrature rule
-
-  // update the type in accordance to the current cell
-  // and reinit if the cell type has changed or (as in
-  // the case of the hierarchics) the shape functions need
-  // reinit, since they depend on the particular element shape
-  else
-    {
-      libmesh_assert(this->qrule);
-      this->qrule->init(elem->type(), elem->p_level());
-
-      if(this->qrule->shapes_need_reinit())
-        this->shapes_on_quadrature = false;
-
-      if (this->elem_type != elem->type() ||
-          this->_p_level != elem->p_level() ||
-          !this->shapes_on_quadrature)
+      // Initialize the shape functions at the user-specified
+      // points
+      if (pts != NULL && (T != SCALAR || elem))
         {
           // Set the type and p level for this element
           this->elem_type = elem->type();
           this->_p_level = elem->p_level();
-          // Initialize the shape functions
-          this->_fe_map->template init_reference_to_physical_map<Dim>(this->qrule->get_points(), elem);
-          this->init_shape_functions (this->qrule->get_points(), elem);
 
-          if (this->shapes_need_reinit())
+          // Initialize the shape functions
+          this->_fe_map->template init_reference_to_physical_map<Dim>
+            (*pts, elem);
+          this->init_shape_functions (*pts, elem);
+
+          // The shape functions do not correspond to the qrule
+          this->shapes_on_quadrature = false;
+        }
+
+      // If there are no user specified points, we use the
+      // quadrature rule
+
+      // update the type in accordance to the current cell
+      // and reinit if the cell type has changed or (as in
+      // the case of the hierarchics) the shape functions need
+      // reinit, since they depend on the particular element shape
+      else
+        {
+          libmesh_assert(this->qrule);
+          this->qrule->init(elem->type(), elem->p_level());
+
+          if(this->qrule->shapes_need_reinit())
+            this->shapes_on_quadrature = false;
+
+          if (this->elem_type != elem->type() ||
+              this->_p_level != elem->p_level() ||
+              !this->shapes_on_quadrature)
             {
-              cached_nodes.resize(elem->n_nodes());
-              for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+              // Set the type and p level for this element
+              this->elem_type = elem->type();
+              this->_p_level = elem->p_level();
+              // Initialize the shape functions
+              this->_fe_map->template init_reference_to_physical_map<Dim>
+                (this->qrule->get_points(), elem);
+              this->init_shape_functions (this->qrule->get_points(), elem);
+
+              if (this->shapes_need_reinit())
                 {
-                  cached_nodes[n] = elem->point(n);
+                  cached_nodes.resize(elem->n_nodes());
+                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                    {
+                      cached_nodes[n] = elem->point(n);
+                    }
                 }
             }
-        }
-      else
-        {
-          // libmesh_assert_greater (elem->n_nodes(), 1);
-
-          cached_nodes_still_fit = true;
-          if (cached_nodes.size() != elem->n_nodes())
-            cached_nodes_still_fit = false;
           else
-            for (unsigned int n = 1; n < elem->n_nodes(); ++n)
-              {
-                if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals(
-                                                                             (cached_nodes[n] - cached_nodes[0]), 1e-13))
-                  {
-                    cached_nodes_still_fit = false;
-                    break;
-                  }
-              }
-
-          if (this->shapes_need_reinit() && !cached_nodes_still_fit)
             {
-              this->_fe_map->template init_reference_to_physical_map<Dim>(this->qrule->get_points(), elem);
-              this->init_shape_functions (this->qrule->get_points(), elem);
-              cached_nodes.resize(elem->n_nodes());
-              for (unsigned int n = 0; n != elem->n_nodes(); ++n)
-                cached_nodes[n] = elem->point(n);
+              // libmesh_assert_greater (elem->n_nodes(), 1);
+
+              cached_nodes_still_fit = true;
+              if (cached_nodes.size() != elem->n_nodes())
+                cached_nodes_still_fit = false;
+              else
+                for (unsigned int n = 1; n < elem->n_nodes(); ++n)
+                  {
+                    if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals
+                        ((cached_nodes[n] - cached_nodes[0]), 1e-13))
+                      {
+                        cached_nodes_still_fit = false;
+                        break;
+                      }
+                  }
+
+              if (this->shapes_need_reinit() && !cached_nodes_still_fit)
+                {
+                  this->_fe_map->template init_reference_to_physical_map<Dim>
+                    (this->qrule->get_points(), elem);
+                  this->init_shape_functions (this->qrule->get_points(), elem);
+                  cached_nodes.resize(elem->n_nodes());
+                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                    cached_nodes[n] = elem->point(n);
+                }
+            }
+
+          // The shape functions correspond to the qrule
+          this->shapes_on_quadrature = true;
+        }
+
+      // Compute the map for this element.  In the future we can specify
+      // different types of maps
+      if (pts != NULL)
+        {
+          if (weights != NULL)
+            {
+              this->_fe_map->compute_map (this->dim,*weights, elem);
+            }
+          else
+            {
+              std::vector<Real> dummy_weights (pts->size(), 1.);
+              this->_fe_map->compute_map (this->dim,dummy_weights, elem);
             }
         }
-
-      // The shape functions correspond to the qrule
-      this->shapes_on_quadrature = true;
-    }
-
-  // Compute the map for this element.  In the future we can specify
-  // different types of maps
-  if (pts != NULL)
-    {
-      if (weights != NULL)
-        {
-          this->_fe_map->compute_map (this->dim,*weights, elem);
-        }
       else
         {
-          std::vector<Real> dummy_weights (pts->size(), 1.);
-          this->_fe_map->compute_map (this->dim,dummy_weights, elem);
+          this->_fe_map->compute_map (this->dim,this->qrule->get_weights(), elem);
         }
+
     }
-  else
+  else // SCALAR case with no defined elem, so no quadrature rule or
+       // mapping or caching to be done
     {
-      this->_fe_map->compute_map (this->dim,this->qrule->get_weights(), elem);
+      libmesh_assert(pts);
+
+      this->elem_type = INVALID_ELEM;
+      this->_p_level = 0;
+
+      this->init_shape_functions (*pts, elem);
     }
 
   // Compute the shape functions and the derivatives at all of the
@@ -241,7 +264,10 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
                                      const Elem* elem)
 {
-  libmesh_assert(elem);
+  // We can be called with no element if we're just evaluating SCALAR
+  // dofs.
+  libmesh_assert(elem || T == SCALAR);
+
   this->calculations_started = true;
 
   // If the user forgot to request anything, we'll be safe and

@@ -650,7 +650,7 @@ Real FEInterface::shape(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(elem->type()) )
+  if ( elem && is_InfFE_elem(elem->type()) )
     return ifem_shape(dim, fe_t, elem, i, p);
 
 #endif
@@ -709,7 +709,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(elem->type()) )
+  if ( elem && is_InfFE_elem(elem->type()) )
     phi = ifem_shape(dim, fe_t, elem, i, p);
 
 #endif
@@ -800,7 +800,7 @@ void FEInterface::compute_data(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(elem->type()) )
+  if ( elem && is_InfFE_elem(elem->type()) )
     {
       data.init();
       ifem_compute_data(dim, fe_t, elem, data);
