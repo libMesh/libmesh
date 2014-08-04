@@ -1411,6 +1411,9 @@ void FEMContext::nonlocal_reinit(Real theta)
 {
   // Update the "time" variable of this context object
   this->_update_time_from_system(theta);
+
+  // We can reuse the Elem FE safely here.
+  elem_fe_reinit();
 }
 
 
