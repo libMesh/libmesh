@@ -93,6 +93,9 @@ void clough_nodal_soln(const Elem* elem,
 
 unsigned int clough_n_dofs(const ElemType t, const Order o)
 {
+  if (t == INVALID_ELEM)
+    return 0;
+
   switch (o)
     {
       // Piecewise cubic shape functions with linear flux edges

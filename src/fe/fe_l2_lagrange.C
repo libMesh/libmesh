@@ -334,6 +334,9 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case PYRAMID14:
             return 5;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
@@ -375,6 +378,9 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
           case PRISM18:
             return 18;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
@@ -389,6 +395,9 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
 
           case EDGE4:
             return 4;
+
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");

@@ -135,6 +135,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case QUAD9:
             return 4;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -161,6 +164,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case QUAD9:
             return 9;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -185,6 +191,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUAD9:
             return 16;
+
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -211,6 +220,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case QUAD9:
             return 25;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -235,6 +247,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUAD9:
             return 36;
+
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -261,6 +276,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case QUAD9:
             return 49;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -284,6 +302,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUAD9:
             return 64;
+
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -384,6 +405,8 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 }
             }
 
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -467,6 +490,8 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 }
             }
 
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -550,6 +575,8 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 }
             }
 
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -633,6 +660,8 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 }
             }
 
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -716,6 +745,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 }
             }
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -798,6 +830,8 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 }
             }
 
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
@@ -880,6 +914,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                 }
             }
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -931,6 +968,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -966,6 +1006,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+            return 0;
+
+          case INVALID_ELEM:
             return 0;
 
           default:
@@ -1005,6 +1048,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -1040,6 +1086,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+            return 0;
+
+          case INVALID_ELEM:
             return 0;
 
           default:
@@ -1079,6 +1128,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -1115,6 +1167,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
@@ -1149,6 +1204,9 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+            return 0;
+
+          case INVALID_ELEM:
             return 0;
 
           default:

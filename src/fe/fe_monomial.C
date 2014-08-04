@@ -108,7 +108,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
       // constant shape functions
       // no matter what shape there is only one DOF.
     case CONSTANT:
-      return 1;
+      return (t != INVALID_ELEM) ? 1 : 0;
 
 
       // Discontinuous linear shape functions
@@ -144,6 +144,9 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID13:
           case PYRAMID14:
             return 4;
+
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
@@ -185,6 +188,9 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID14:
             return 10;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
@@ -225,6 +231,9 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID14:
             return 20;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
@@ -264,6 +273,9 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID14:
             return 35;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
@@ -301,6 +313,9 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID13:
           case PYRAMID14:
             return (order+1)*(order+2)*(order+3)/6;
+
+          case INVALID_ELEM:
+            return 0;
 
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");

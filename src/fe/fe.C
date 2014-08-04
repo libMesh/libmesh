@@ -116,23 +116,21 @@ void FE<Dim,T>::reinit(const Elem* elem,
                        const std::vector<Point>* pts,
                        const std::vector<Real>* const weights)
 {
-  // We can be called with no element if we're just evaluating SCALAR
-  // dofs.
-  libmesh_assert(elem || T == SCALAR);
+  // We can be called with no element.  If we're evaluating SCALAR
+  // dofs we'll still have work to do.
+  // libmesh_assert(elem);
 
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
   bool cached_nodes_still_fit = false;
 
-  // Since non-SCALAR FE types are the default case, we'll write
-  // if(elem) tests in such a way as to allow them to be optimized
-  // away in the non-SCALAR case.
-  if (T != SCALAR || elem)
+  // Most of the hard work happens when we have an actual element
+  if (elem)
     {
 
       // Initialize the shape functions at the user-specified
       // points
-      if (pts != NULL && (T != SCALAR || elem))
+      if (pts != NULL && elem)
         {
           // Set the type and p level for this element
           this->elem_type = elem->type();
@@ -236,17 +234,31 @@ void FE<Dim,T>::reinit(const Elem* elem,
         }
 
     }
-  else // SCALAR case with no defined elem, so mapping or caching to
-       // be done, and our "quadrature rule" is one point.
+  else // With no defined elem, so mapping or caching to
+       // be done, and our "quadrature rule" is one point for nonlocal
+       // (SCALAR) variables and zero points for local variables.
     {
       this->elem_type = INVALID_ELEM;
       this->_p_level = 0;
 
       if (!pts)
         {
-          const std::vector<Point> one_point(1,Point(0));
+          if (T == SCALAR)
+            {
+              this->qrule->get_points() =
+                std::vector<Point>(1,Point(0));
 
-          this->init_shape_functions (one_point, elem);
+              this->qrule->get_weights() =
+                std::vector<Real>(1,1);
+            }
+          else
+            {
+              this->qrule->get_points().clear();
+              this->qrule->get_weights().clear();
+            }
+
+           this->init_shape_functions
+             (this->qrule->get_points(), elem);
         }
       else
         this->init_shape_functions (*pts, elem);
@@ -258,11 +270,6 @@ void FE<Dim,T>::reinit(const Elem* elem,
     {
       if (pts != NULL)
         this->compute_shape_functions (elem,*pts);
-      else if (T == SCALAR && !elem)
-        {
-          const std::vector<Point> one_point(1,Point(0));
-          this->compute_shape_functions (elem,one_point);
-        }
       else
         this->compute_shape_functions(elem,this->qrule->get_points());
     }
@@ -274,9 +281,9 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
                                      const Elem* elem)
 {
-  // We can be called with no element if we're just evaluating SCALAR
-  // dofs.
-  libmesh_assert(elem || T == SCALAR);
+  // We can be called with no element.  If we're evaluating SCALAR
+  // dofs we'll still have work to do.
+  // libmesh_assert(elem);
 
   this->calculations_started = true;
 

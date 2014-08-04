@@ -123,6 +123,8 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
       return ((o+1)*(o+1)*(o+1));
     case TRI6:
       return ((o+1)*(o+2)/2);
+    case INVALID_ELEM:
+      return 0;
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for HIERARCHIC FE family!");
     }
@@ -246,6 +248,10 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX8/20/27!");
         }
+
+    case INVALID_ELEM:
+      return 0;
+
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
@@ -282,6 +288,8 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
       return 0;
     case HEX27:
       return ((o-1)*(o-1)*(o-1));
+    case INVALID_ELEM:
+      return 0;
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
