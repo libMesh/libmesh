@@ -907,7 +907,7 @@ template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&, DenseMatrix
 template void DenseMatrix<Number>::_svd_helper (char, char, std::vector<Number>&,
                                                 std::vector<Number>&,
                                                 std::vector<Number>& );
-template void DenseMatrix<Number>::_evd_lapack(DenseVector<Real>&, DenseVector<Real>&);
+template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number>&, DenseVector<Number>&);
 
 #endif
 
