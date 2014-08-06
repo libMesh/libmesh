@@ -668,6 +668,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                                          mesh.active_local_elements_end()),
                         AssemblyContributions(*this, get_residual, get_jacobian));
 
+  // SCALAR dofs are stored on the last processor, so we'll evaluate
+  // their equation terms there
   if ( this->processor_id() == (this->n_processors()-1) )
   {
     AutoPtr<DiffContext> con = this->build_context();
