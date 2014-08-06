@@ -113,7 +113,7 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
-                       const std::vector<Point>* pts,
+                       const std::vector<Point>* const pts,
                        const std::vector<Real>* const weights)
 {
   // We can be called with no element.  If we're evaluating SCALAR
