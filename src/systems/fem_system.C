@@ -668,6 +668,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                                          mesh.active_local_elements_end()),
                         AssemblyContributions(*this, get_residual, get_jacobian));
 
+  if ( this->processor_id() == (this->n_processors()-1) )
   {
     AutoPtr<DiffContext> con = this->build_context();
     FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
