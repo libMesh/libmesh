@@ -765,10 +765,71 @@ void FEMap::compute_affine_map( const unsigned int dim,
 
 
 
+void FEMap::compute_null_map( const unsigned int dim,
+                              const std::vector<Real>& qw)
+{
+  // Start logging the map computation.
+  START_LOG("compute_null_map()", "FEMap");
+
+  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
+
+  // Resize the vectors to hold data at the quadrature points
+  this->resize_quadrature_map_vectors(dim, n_qp);
+
+  // Compute "fake" xyz
+  for (unsigned int p=1; p<n_qp; p++)
+    {
+      xyz[p].zero();
+
+      dxyzdxi_map[p] = 0;
+      dxidx_map[p] = 0;
+      dxidy_map[p] = 0;
+      dxidz_map[p] = 0;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      d2xyzdxi2_map[p] = 0;
+#endif
+      if (dim > 1)
+        {
+          dxyzdeta_map[p] = 0;
+          detadx_map[p] = 0;
+          detady_map[p] = 0;
+          detadz_map[p] = 0;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+          d2xyzdxideta_map[p] = 0.;
+          d2xyzdeta2_map[p] = 0.;
+#endif
+          if (dim > 2)
+            {
+              dxyzdzeta_map[p] = 0;
+              dzetadx_map[p] = 0;
+              dzetady_map[p] = 0;
+              dzetadz_map[p] = 0;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+              d2xyzdxidzeta_map[p] = 0;
+              d2xyzdetadzeta_map[p] = 0;
+              d2xyzdzeta2_map[p] = 0;
+#endif
+            }
+        }
+      jac[p] = 1;
+      JxW[p] = qw[p];
+    }
+
+  STOP_LOG("compute_null_map()", "FEMap");
+}
+
+
+
 void FEMap::compute_map(const unsigned int dim,
                         const std::vector<Real>& qw,
                         const Elem* elem)
 {
+  if (!elem)
+    {
+      compute_null_map(dim, qw);
+      return;
+    }
+
   if (elem->has_affine_map())
     {
       compute_affine_map(dim, qw, elem);
