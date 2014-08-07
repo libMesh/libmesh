@@ -127,10 +127,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // Most of the hard work happens when we have an actual element
   if (elem)
     {
-
       // Initialize the shape functions at the user-specified
       // points
-      if (pts != NULL && elem)
+      if (pts != NULL)
         {
           // Set the type and p level for this element
           this->elem_type = elem->type();
