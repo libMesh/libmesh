@@ -117,6 +117,18 @@ public:
    */
   virtual void disable_out_of_mesh_mode ();
 
+  /**
+   * Set a tolerance to use when determining
+   * if a point is contained within the mesh.
+   */
+  virtual void set_close_to_point_tol(Real close_to_point_tol);
+
+  /**
+   * Specify that we do not want to use a user-specified tolerance to
+   * determine if a point is contained within the mesh.
+   */
+  virtual void unset_close_to_point_tol();
+
 protected:
   /**
    * Pointer to the list of element centroids.  Only the

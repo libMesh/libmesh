@@ -107,6 +107,19 @@ public:
   virtual const Elem* operator() (const Point& p) const;
 
   /**
+   * As a fallback option, it's helpful to be able to do a linear
+   * search over the entire mesh. This can be used if operator()
+   * fails to find an element that contains \p p, for example.
+   * Optionally specify a "close to point" tolerance to use in
+   * the linear search.
+   * Return NULL if no element is found.
+   */
+  const Elem* perform_linear_search(
+    const Point& p,
+    bool use_close_to_point,
+    Real close_to_point_tolerance=TOLERANCE) const;
+
+  /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
    * that is contained in no mesh at all, the point locator will
    * return a NULL pointer instead of crashing.  Per default, this

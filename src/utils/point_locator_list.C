@@ -202,4 +202,18 @@ void PointLocatorList::disable_out_of_mesh_mode ()
   libmesh_not_implemented();
 }
 
+
+void PointLocatorList::set_close_to_point_tol (Real close_to_point_tol)
+{
+  /* This functionality is not yet implemented for PointLocatorList.  */
+  libmesh_not_implemented();
+}
+
+
+void PointLocatorList::unset_close_to_point_tol ()
+{
+  /* This functionality is not yet implemented for PointLocatorList.  */
+  libmesh_not_implemented();
+}
+
 } // namespace libMesh
