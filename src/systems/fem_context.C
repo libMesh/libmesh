@@ -1407,6 +1407,16 @@ void FEMContext::elem_edge_reinit(Real theta)
 }
 
 
+void FEMContext::nonlocal_reinit(Real theta)
+{
+  // Update the "time" variable of this context object
+  this->_update_time_from_system(theta);
+
+  // We can reuse the Elem FE safely here.
+  elem_fe_reinit();
+}
+
+
 void FEMContext::elem_fe_reinit ()
 {
   // Initialize all the interior FE objects on elem.
@@ -1594,6 +1604,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   if (sys.use_fixed_solution)
     elem_fixed_solution.resize(n_dofs);
 
+  // This also resizes elem_solution
   sys.current_local_solution->get(dof_indices, elem_solution.get_values());
 
   // These resize calls also zero out the residual and jacobian
@@ -1699,11 +1710,24 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
                                                                const Point &p ) const
 {
   FEType fe_type = fe->get_fe_type();
-  AutoPtr<FEGenericBase<OutputShape> > fe_new(FEGenericBase<OutputShape>::build(elem->dim(), fe_type));
+
+  // If we don't have an Elem to evaluate on, then the only functions
+  // we can sensibly evaluate are the scalar dofs which are the same
+  // everywhere.
+  libmesh_assert(elem || fe_type.family == SCALAR);
+
+  unsigned int dim = elem ? elem->dim() : 0;
+
+  AutoPtr<FEGenericBase<OutputShape> >
+    fe_new(FEGenericBase<OutputShape>::build(dim, fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
-  std::vector<Point> coor(1, FEInterface::inverse_map(dim, fe_type, elem, p));
+  Point master_point = elem ?
+    FEInterface::inverse_map(dim, fe_type, elem, p) :
+    Point(0);
+
+  std::vector<Point> coor(1, master_point);
 
   // Reinitialize the element and compute the shape function values at coor
   fe_new->reinit (elem, &coor);

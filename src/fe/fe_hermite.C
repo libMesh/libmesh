@@ -99,6 +99,9 @@ unsigned int hermite_n_dofs(const ElemType t, const Order o)
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
 
+    case INVALID_ELEM:
+      return 0;
+
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
@@ -216,6 +219,9 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
           }
       }
 
+    case INVALID_ELEM:
+      return 0;
+
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
@@ -248,6 +254,9 @@ unsigned int hermite_n_dofs_per_elem(const ElemType t,
     case HEX20:
     case HEX27:
       return ((o-3)*(o-3)*(o-3));
+
+    case INVALID_ELEM:
+      return 0;
 
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");

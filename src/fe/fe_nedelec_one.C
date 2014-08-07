@@ -172,6 +172,9 @@ unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
           case HEX27:
             return 12;
 
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
@@ -345,6 +348,10 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                   libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
+
+          case INVALID_ELEM:
+            return 0;
+
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }

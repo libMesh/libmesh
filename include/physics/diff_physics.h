@@ -43,15 +43,11 @@ template <typename T> class NumericVector;
  * to generalize any system, linear or nonlinear, which
  * provides both a residual and a Jacobian.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
- *
  * @author Roy H. Stogner 2006
  */
 
 // ------------------------------------------------------------
-// DifferentiableSystem class definition
+// DifferentiablePhysics class definition
 
 class DifferentiablePhysics
 {
@@ -155,7 +151,7 @@ public:
   }
 
   /**
-   * Adds the time derivative contribution on \p side of \p elem to
+   * Adds the constraint contribution on \p side of \p elem to
    * elem_residual.
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If
@@ -173,6 +169,43 @@ public:
                                 DiffContext &) {
     return request_jacobian;
   }
+
+  /**
+   * Adds any nonlocal time derivative contributions (e.g. some
+   * components of time derivatives in scalar variable equations) to
+   * elem_residual
+   *
+   * If this method receives request_jacobian = true, then it
+   * should also modify elem_jacobian and return true if possible.  If
+   * the Jacobian changes have not been computed then the method
+   * should return false.
+   *
+   * Users may need to reimplement this for PDEs on systems to which
+   * SCALAR variables have been added.
+   */
+  virtual bool nonlocal_time_derivative (bool request_jacobian,
+                                         DiffContext &) {
+    return request_jacobian;
+  }
+
+  /**
+   * Adds any nonlocal constraint contributions (e.g. some
+   * components of constraints in scalar variable equations) to
+   * elem_residual
+   *
+   * If this method receives request_jacobian = true, then it
+   * should also modify elem_jacobian and return true if possible.  If
+   * the Jacobian changes have not been computed then the method
+   * should return false.
+   *
+   * Users may need to reimplement this for PDEs on systems to which
+   * SCALAR variables with non-tranient equations have been added.
+   */
+  virtual bool nonlocal_constraint (bool request_jacobian,
+                                    DiffContext &) {
+    return request_jacobian;
+  }
+
 
   /**
    * Tells the DiffSystem that variable var is evolving with
@@ -208,7 +241,7 @@ public:
    * moving mesh.
    *
    * The library provides a basic implementation in
-   * FEMSystem::eulerian_residual()
+   * FEMPhysics::eulerian_residual()
    */
   virtual bool eulerian_residual (bool request_jacobian,
                                   DiffContext &) {
@@ -223,7 +256,7 @@ public:
    * return false.
    *
    * Most problems can use the reimplementation in
-   * FEMSystem::mass_residual; few users will need to reimplement
+   * FEMPhysics::mass_residual; few users will need to reimplement
    * this themselves.
    */
   virtual bool mass_residual (bool request_jacobian,
@@ -247,6 +280,25 @@ public:
                                    DiffContext &) {
     return request_jacobian;
   }
+
+  /**
+   * Adds any nonlocal mass vector contributions (e.g. any time
+   * derivative coefficients in scalar variable equations) to
+   * elem_residual
+   *
+   * If this method receives request_jacobian = true, then it
+   * should also modify elem_jacobian and return true if possible.  If
+   * the Jacobian changes have not been computed then the method
+   * should return false.
+   *
+   * Many problems can use the implementation in
+   * DifferentiablePhysics::nonlocal_mass_residual, but users trying
+   * to solve SCALAR variable equations which have time derivative
+   * terms with mass coefficients != 1.0 will need to reimplement this
+   * themselves.
+   */
+  virtual bool nonlocal_mass_residual (bool request_jacobian,
+                                       DiffContext &c);
 
   /*
    * Prepares the result of a build_context() call for use.
@@ -339,6 +391,14 @@ public:
    * mesh z coordinate. Useful for ALE calculations.
    */
   unsigned int get_mesh_z_var() const;
+
+  /**
+   * This method simply combines element_time_derivative() and
+   * eulerian_residual(), which makes its address useful as a
+   * pointer-to-member-function when refactoring.
+   */
+  bool _eulerian_time_deriv (bool request_jacobian,
+                             DiffContext&);
 
 
 protected:

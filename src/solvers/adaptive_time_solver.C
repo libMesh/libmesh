@@ -128,6 +128,16 @@ bool AdaptiveTimeSolver::side_residual (bool request_jacobian,
 
 
 
+bool AdaptiveTimeSolver::nonlocal_residual (bool request_jacobian,
+                                            DiffContext &context)
+{
+  libmesh_assert(core_time_solver.get());
+
+  return core_time_solver->nonlocal_residual(request_jacobian, context);
+}
+
+
+
 AutoPtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 {
   return core_time_solver->diff_solver();

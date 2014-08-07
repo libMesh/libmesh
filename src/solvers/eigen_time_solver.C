@@ -205,6 +205,46 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
     libmesh_error_msg("Unrecognized value now_assembling = " << now_assembling);
 }
 
+
+
+bool EigenTimeSolver::nonlocal_residual(bool request_jacobian,
+                                        DiffContext &context)
+{
+  // The EigenTimeSolver always requests jacobians?
+  //libmesh_assert (request_jacobian);
+
+  // Assemble the operator for the spatial part.
+  if (now_assembling == Matrix_A)
+    {
+      bool jacobian_computed =
+        _system.nonlocal_time_derivative(request_jacobian, context);
+
+      // The user shouldn't compute a jacobian unless requested
+      libmesh_assert (request_jacobian || !jacobian_computed);
+
+      bool jacobian_computed2 =
+        _system.nonlocal_constraint(jacobian_computed, context);
+
+      // The user shouldn't compute a jacobian unless requested
+      libmesh_assert (jacobian_computed || !jacobian_computed2);
+
+      return jacobian_computed && jacobian_computed2;
+
+    }
+
+  // There is now a "side" equivalent for the mass matrix
+  else if (now_assembling == Matrix_B)
+    {
+      bool mass_jacobian_computed =
+        _system.nonlocal_mass_residual(request_jacobian, context);
+
+      return mass_jacobian_computed;
+    }
+
+  else
+    libmesh_error_msg("Unrecognized value now_assembling = " << now_assembling);
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC

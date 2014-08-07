@@ -132,6 +132,12 @@ public:
                               DiffContext&);
 
   /**
+   * Forms the jacobian of the nonlocal terms.
+   */
+  virtual bool nonlocal_residual (bool get_jacobian,
+                                  DiffContext&);
+
+  /**
    * Nominally computes the size of the difference between
    * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
    * but for this class just returns 0.

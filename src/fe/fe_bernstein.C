@@ -156,6 +156,8 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
         libmesh_assert_less (o, 3);
         return ((o+1)*(o+2)*(o+3)/6);
       }
+    case INVALID_ELEM:
+      return 0;
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
@@ -305,7 +307,8 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TET10!");
         }
-
+    case INVALID_ELEM:
+      return 0;
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
@@ -346,6 +349,8 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
       libmesh_assert_less (o, 2);
     case TET10:
       libmesh_assert_less (o, 3);
+      return 0;
+    case INVALID_ELEM:
       return 0;
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");

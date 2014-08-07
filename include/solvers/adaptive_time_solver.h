@@ -94,6 +94,12 @@ public:
                               DiffContext&);
 
   /**
+   * This method is passed on to the core_time_solver
+   */
+  virtual bool nonlocal_residual (bool get_jacobian,
+                                  DiffContext&);
+
+  /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
   virtual AutoPtr<DiffSolver> &diff_solver();

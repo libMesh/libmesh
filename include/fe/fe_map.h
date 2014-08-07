@@ -71,6 +71,15 @@ public:
                                   const Elem* elem);
 
   /**
+   * Assign a fake jacobian and some other additional data fields.
+   * Takes the integration weights as input.  For use on non-element
+   * evaluations.
+   */
+  virtual void compute_null_map(const unsigned int dim,
+                                const std::vector<Real>& qw);
+
+
+  /**
    * Compute the jacobian and some other additional
    * data fields. Takes the integration weights
    * as input, along with a pointer to the element.

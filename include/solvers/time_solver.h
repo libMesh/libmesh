@@ -36,6 +36,7 @@ namespace libMesh
 // Forward Declarations
 class DiffContext;
 class DiffSolver;
+class DifferentiablePhysics;
 class DifferentiableSystem;
 class ParameterVector;
 class SystemNorm;
@@ -126,9 +127,11 @@ public:
   virtual void retrieve_timestep();
 
   /**
-   * This method uses the DifferentiableSystem's
-   * element_time_derivative() and element_constraint()
-   * to build a full residual on an element.  What combination
+   * This method uses the DifferentiablePhysics
+   * element_time_derivative(), element_constraint(), and
+   * mass_residual() to build a full residual on an element.  What
+   * combination
+   *
    * it uses will depend on the type of solver.  See
    * the subclasses for more details.
    */
@@ -136,14 +139,28 @@ public:
                                  DiffContext &) = 0;
 
   /**
-   * This method uses the DifferentiableSystem's
-   * side_time_derivative() and side_constraint()
-   * to build a full residual on an element's side.
+   * This method uses the DifferentiablePhysics
+   * side_time_derivative(), side_constraint(), and
+   * side_mass_residual() to build a full residual on an element's
+   * side.
+   *
    * What combination it uses will depend on the type
    * of solver.  See the subclasses for more details.
    */
   virtual bool side_residual (bool request_jacobian,
                               DiffContext &) = 0;
+
+  /**
+   * This method uses the DifferentiablePhysics
+   * nonlocal_time_derivative(), nonlocal_constraint(), and
+   * nonlocal_mass_residual() to build a full residual of non-local
+   * terms.
+   *
+   * What combination it uses will depend on the type
+   * of solver.  See the subclasses for more details.
+   */
+  virtual bool nonlocal_residual (bool request_jacobian,
+                                  DiffContext &) = 0;
 
   /**
    * This method is for subclasses or users to override
@@ -258,6 +275,14 @@ protected:
    * different kind of SolutionHistory in the application
    */
   AutoPtr<SolutionHistory> solution_history;
+
+  /**
+   * Definitions of argument types for use in refactoring subclasses.
+   */
+
+  typedef bool (DifferentiablePhysics::*ResFuncType) (bool, DiffContext &);
+
+  typedef void (DiffContext::*ReinitFuncType) (Real);
 
 private:
 
