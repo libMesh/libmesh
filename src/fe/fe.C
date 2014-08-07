@@ -212,26 +212,6 @@ void FE<Dim,T>::reinit(const Elem* elem,
           // The shape functions correspond to the qrule
           this->shapes_on_quadrature = true;
         }
-
-      // Compute the map for this element.  In the future we can specify
-      // different types of maps
-      if (pts != NULL)
-        {
-          if (weights != NULL)
-            {
-              this->_fe_map->compute_map (this->dim,*weights, elem);
-            }
-          else
-            {
-              std::vector<Real> dummy_weights (pts->size(), 1.);
-              this->_fe_map->compute_map (this->dim,dummy_weights, elem);
-            }
-        }
-      else
-        {
-          this->_fe_map->compute_map (this->dim,this->qrule->get_weights(), elem);
-        }
-
     }
   else // With no defined elem, so mapping or caching to
        // be done, and our "quadrature rule" is one point for nonlocal
@@ -261,6 +241,24 @@ void FE<Dim,T>::reinit(const Elem* elem,
         }
       else
         this->init_shape_functions (*pts, elem);
+    }
+
+  // Compute the map for this element.
+  if (pts != NULL)
+    {
+      if (weights != NULL)
+        {
+          this->_fe_map->compute_map (this->dim,*weights, elem);
+        }
+      else
+        {
+          std::vector<Real> dummy_weights (pts->size(), 1.);
+          this->_fe_map->compute_map (this->dim,dummy_weights, elem);
+        }
+    }
+  else
+    {
+      this->_fe_map->compute_map (this->dim,this->qrule->get_weights(), elem);
     }
 
   // Compute the shape functions and the derivatives at all of the
