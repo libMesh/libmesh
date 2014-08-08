@@ -34694,9 +34694,14 @@ if test "${enable_nemesis+set}" = set; then :
  		             *) as_fn_error $? "bad value ${enableval} for --enable-nemesis" "$LINENO" 5 ;;
 		 esac
 else
-  enablenemesis=$enableexodus ; nemesisversion="v5.22"
+  enablenemesis=$enableexodus ; # if unspecified, depend on exodus
+                 if (test "x$exodusversion" = "xv5.22"); then
+                   nemesisversion="v5.22"
+                 else
+                   nemesisversion="v3.09"
+                 fi
 fi
- # if unspecified, depend on exodus
+
 
 
   # Trump --enable-nemesis with --disable-mpi
