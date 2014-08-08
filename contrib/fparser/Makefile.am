@@ -1,10 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects 
 
-AM_CPPFLAGS = $(CPPFLAGS_OPT)
-AM_CFLAGS   = $(CFLAGS_OPT)
-AM_CXXFLAGS = $(CXXFLAGS_OPT)
-
-AM_CPPFLAGS += -I$(srcdir)/fpoptimizer
+pkg_cppflags = -I$(srcdir)/fpoptimizer
 
 
 FEATURE_FLAGS =
@@ -110,9 +106,8 @@ EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptim
 
 
 
-noinst_LTLIBRARIES     = libfparser.la
-libfparser_la_SOURCES  = fparser.cc fparser_ad.cc
-libfparser_la_CPPFLAGS = $(AM_CPPFLAGS) $(FEATURE_FLAGS)
+pkg_sources = fparser.cc fparser_ad.cc
+pkg_cppflags = $(FEATURE_FLAGS)
 
 
 # util/tree_grammar_parser is a utility which is required to build 
@@ -201,7 +196,7 @@ fparser.cc: extrasrc/fp_opcode_add.inc
   BUILT_SOURCES += fpoptimizer/grammar_data.cc
 
 if FPARSER_SUPPORT_OPTIMIZER 
-    libfparser_la_SOURCES += $(FPOPTIMIZER_CC_FILES)
+    pkg_sources += $(FPOPTIMIZER_CC_FILES)
 endif
 
    # when doing 'make clean' we need to remove the generated sources
@@ -211,6 +206,8 @@ else !FPARSER_DEVEL
   SUBDIRS = extrasrc
 
 if FPARSER_SUPPORT_OPTIMIZER
-  libfparser_la_SOURCES += fpoptimizer.cc
+  pkg_sources += fpoptimizer.cc
 endif
 endif
+
+include $(top_srcdir)/contrib/Make.common
