@@ -204,6 +204,19 @@ public:
    */
   void disable_out_of_mesh_mode(void);
 
+  /**
+   * We may want to specify a tolerance for the PointLocator to use,
+   * since in some cases the point we want to evaluate at might be
+   * slightly outside the mesh (due to numerical rounding issues,
+   * for example).
+   */
+  void set_point_locator_tolerance(Real tol);
+
+  /**
+   * Turn off the user-specified PointLocator tolerance.
+   */
+  void unset_point_locator_tolerance();
+
 protected:
 
 

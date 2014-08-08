@@ -212,28 +212,32 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
           //     have generated a false negative.
           if (_out_of_mesh_mode == false)
             {
-              START_LOG("linear search", "PointLocatorTree");
+              this->_element = this->perform_linear_search(p, /*use_close_to_point*/ false);
 
-              // The type of iterator depends on the Trees::BuildType
-              // used for this PointLocator.  If it's
-              // TREE_LOCAL_ELEMENTS, we only want to double check
-              // local elements during this linear search.
-              MeshBase::const_element_iterator pos =
-                this->_build_type == Trees::LOCAL_ELEMENTS ? this->_mesh.active_local_elements_begin() : this->_mesh.active_elements_begin();
-
-              const MeshBase::const_element_iterator end_pos =
-                this->_build_type == Trees::LOCAL_ELEMENTS ? this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
-
-              for ( ; pos != end_pos; ++pos)
-                if ((*pos)->contains_point(p))
-                  {
-                    STOP_LOG("linear search", "PointLocatorTree");
-                    STOP_LOG("operator()", "PointLocatorTree");
-                    return this->_element = (*pos);
-                  }
-
-              STOP_LOG("linear search", "PointLocatorTree");
+              STOP_LOG("operator()", "PointLocatorTree");
+              return this->_element;
             }
+
+          // If we haven't found the element, we may want to do a linear
+          // search using a tolerance. We only do this if _out_of_mesh_mode == true,
+          // since we're looking for a point that may be outside of the mesh (within the
+          // specified tolerance).
+          if( _use_close_to_point_tol )
+            {
+              libMesh::out << "Performing linear search using close-to-point tolerance "
+                << _close_to_point_tol << std::endl;
+
+              this->_element =
+                this->perform_linear_search(
+                  p,
+                  /*use_close_to_point*/ true,
+                  _close_to_point_tol);
+
+              STOP_LOG("operator()", "PointLocatorTree");
+              return this->_element;
+            }
+
+   
         }
     }
 
@@ -246,6 +250,51 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
   return this->_element;
 }
 
+
+
+const Elem* PointLocatorTree::perform_linear_search(
+  const Point& p,
+  bool use_close_to_point,
+  Real close_to_point_tolerance) const
+{
+  START_LOG("perform_linear_search", "PointLocatorTree");
+
+  // The type of iterator depends on the Trees::BuildType
+  // used for this PointLocator.  If it's
+  // TREE_LOCAL_ELEMENTS, we only want to double check
+  // local elements during this linear search.
+  MeshBase::const_element_iterator pos =
+    this->_build_type == Trees::LOCAL_ELEMENTS ?
+      this->_mesh.active_local_elements_begin() : this->_mesh.active_elements_begin();
+
+  const MeshBase::const_element_iterator end_pos =
+    this->_build_type == Trees::LOCAL_ELEMENTS ?
+      this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
+
+  for ( ; pos != end_pos; ++pos)
+  {
+    if(!use_close_to_point)
+    {
+      if ((*pos)->contains_point(p))
+      {
+        STOP_LOG("perform_linear_search", "PointLocatorTree");
+        return (*pos);
+      }
+    }
+    else
+    {
+      if ((*pos)->close_to_point(p, close_to_point_tolerance))
+      {
+        STOP_LOG("perform_linear_search", "PointLocatorTree");
+        return (*pos);
+      }
+    }
+
+  }
+
+  STOP_LOG("perform_linear_search", "PointLocatorTree");
+  return NULL;
+}
 
 
 void PointLocatorTree::enable_out_of_mesh_mode ()
@@ -271,10 +320,10 @@ void PointLocatorTree::enable_out_of_mesh_mode ()
 }
 
 
-
 void PointLocatorTree::disable_out_of_mesh_mode ()
 {
   _out_of_mesh_mode = false;
 }
+
 
 } // namespace libMesh

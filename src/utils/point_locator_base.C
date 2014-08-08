@@ -37,7 +37,9 @@ PointLocatorBase::PointLocatorBase (const MeshBase& mesh,
                                     const PointLocatorBase* master) :
   _master                  (master),
   _mesh                    (mesh),
-  _initialized             (false)
+  _initialized             (false),
+  _use_close_to_point_tol  (false),
+  _close_to_point_tol      (TOLERANCE)
 {
 }
 
@@ -95,6 +97,19 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
   libmesh_error_msg("We'll never get here!");
   AutoPtr<PointLocatorBase> ap(NULL);
   return ap;
+}
+
+void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)
+{
+  _use_close_to_point_tol = true;
+  _close_to_point_tol = close_to_point_tol;
+}
+
+
+void PointLocatorBase::unset_close_to_point_tol ()
+{
+  _use_close_to_point_tol = false;
+  _close_to_point_tol = TOLERANCE;
 }
 
 } // namespace libMesh

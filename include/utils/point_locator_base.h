@@ -116,6 +116,18 @@ public:
    */
   virtual void disable_out_of_mesh_mode () = 0;
 
+  /**
+   * Set a tolerance to use when determining
+   * if a point is contained within the mesh.
+   */
+  virtual void set_close_to_point_tol(Real close_to_point_tol);
+
+  /**
+   * Specify that we do not want to use a user-specified tolerance to
+   * determine if a point is contained within the mesh.
+   */
+  virtual void unset_close_to_point_tol();
+
 protected:
   /**
    * Const pointer to our master, initialized to \p NULL if none
@@ -133,6 +145,17 @@ protected:
    * \p true when properly initialized, \p false otherwise.
    */
   bool _initialized;
+
+  /**
+   * \p true if we will use a user-specified tolerance for locating
+   * the element.
+   */
+  bool _use_close_to_point_tol;
+
+  /**
+   * The tolerance to use.
+   */
+  Real _close_to_point_tol;
 };
 
 } // namespace libMesh
