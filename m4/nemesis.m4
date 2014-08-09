@@ -12,7 +12,12 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 		            no) enablenemesis=no  ; nemesisversion=no ;;
  		             *) AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
 		 esac],
-		 [enablenemesis=$enableexodus ; nemesisversion="v5.22"]) # if unspecified, depend on exodus
+                [enablenemesis=$enableexodus ; # if unspecified, depend on exodus 
+                 if (test "x$exodusversion" = "xv5.22"); then
+                   nemesisversion="v5.22"
+                 else
+                   nemesisversion="v3.09"
+                 fi])
 
 
   # Trump --enable-nemesis with --disable-mpi
