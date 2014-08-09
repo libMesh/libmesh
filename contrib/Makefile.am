@@ -202,11 +202,11 @@ if LIBMESH_ENABLE_FPARSER
   # ATM always compile fparser with optimized flags,
   # and reuse in all methods
   SUBDIRS    += fparser
-  opt_libs   += fparser/libfparser.la
-  dbg_libs   += fparser/libfparser.la
-  devel_libs += fparser/libfparser.la
-  prof_libs  += fparser/libfparser.la
-  oprof_libs += fparser/libfparser.la
+  opt_libs   += fparser/libopt.la
+  dbg_libs   += fparser/libdbg.la
+  devel_libs += fparser/libdevel.la
+  prof_libs  += fparser/libprof.la
+  oprof_libs += fparser/liboprof.la
 endif
 
 if LIBMESH_ENABLE_NANOFLANN

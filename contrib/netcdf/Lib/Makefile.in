@@ -575,8 +575,8 @@ pkg_sources = attr.c ncx.c putget.c dim.c error.c libvers.c nc.c string.c v1hpg.
 # 
 AUTOMAKE_OPTIONS = subdir-objects 
 AM_CPPFLAGS = $(pkg_cppflags) # any defined package-specific include paths
-AM_CFLAGS = 
-AM_CXXFLAGS = 
+AM_CFLAGS = $(pkg_cflags)
+AM_CXXFLAGS = $(pkg_cxxflags)
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 
 ######################################################################
