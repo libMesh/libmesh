@@ -224,14 +224,14 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
         mu_max_in.set_value(param_name, max_val);
       }
     }
-  
+
   std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
 
   unsigned int n_discrete_parameters = infile.vector_variable_size("discrete_parameter_names");
   for(unsigned int i=0; i<n_discrete_parameters; i++)
     {
       std::string param_name = infile("discrete_parameter_names", "NONE", i);
-    
+
       unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
       std::vector<Real> vals_for_param(n_vals_for_param);
       for(unsigned int j=0; j<vals_for_param.size(); j++)
@@ -248,7 +248,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   for( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-    
+
       // For now, just set all entries to false.
       // TODO: Implement a decent way to specify log-scaling true/false
       // in the input text file

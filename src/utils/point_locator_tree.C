@@ -237,7 +237,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
               return this->_element;
             }
 
-   
+
         }
     }
 

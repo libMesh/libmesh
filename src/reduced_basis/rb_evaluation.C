@@ -468,7 +468,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       file_name.str("");
       file_name << directory_name << "/discrete_parameter_values" << suffix;
       std::string discrete_param_file_name = file_name.str();
-    
+
       write_parameter_data_to_files(continuous_param_file_name,
                                     discrete_param_file_name,
                                     write_binary_data);

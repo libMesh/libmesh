@@ -377,7 +377,7 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
           if ((libMesh::n_threads() > 1) &&
               (mpi_thread_provided < MPI_THREAD_FUNNELED))
             {
-              libmesh_warning("Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n" << 
+              libmesh_warning("Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n" <<
                               "for a threaded run.\n" <<
                               "Be sure your library is funneled-thread-safe..." <<
                                std::endl);

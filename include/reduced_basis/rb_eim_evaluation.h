@@ -173,7 +173,7 @@ public:
    * the interpolation points were identified.
    */
   std::vector<unsigned int> interpolation_points_var;
-  
+
   /**
    * The corresponding list of elements at which
    * the interpolation points were identified.

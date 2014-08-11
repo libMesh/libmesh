@@ -141,7 +141,7 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
         {
           vals_for_param[j] = infile(param_name, 0., j);
         }
-    
+
       discrete_parameter_values_in[param_name] = vals_for_param;
     }
 

@@ -88,7 +88,7 @@ public:
    * Get the number of discrete parameters.
    */
   unsigned int get_n_discrete_params() const;
-  
+
   /**
    * Get a set that stores the parameter names.
    */

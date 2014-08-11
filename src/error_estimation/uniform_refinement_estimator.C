@@ -519,7 +519,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   e_id = coarse->id();
                 }
 
-              Real L2normsq = 0., H1seminormsq = 0.; 
+              Real L2normsq = 0., H1seminormsq = 0.;
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               Real H2seminormsq = 0.;
 #endif

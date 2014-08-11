@@ -88,7 +88,7 @@ void PetscDMNonlinearSolver<T>::init(const char* name)
 
   // Attaching a DM with the function and Jacobian callbacks to SNES.
   ierr = DMCreateLibMesh(this->comm().get(), this->system(), &dm); LIBMESH_CHKERRABORT(ierr);
-    if (name) 
+    if (name)
       {
         ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
       }

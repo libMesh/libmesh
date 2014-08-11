@@ -36,7 +36,7 @@
 namespace libMesh
 {
 
-TransientRBEvaluation::TransientRBEvaluation 
+TransientRBEvaluation::TransientRBEvaluation
   (const Parallel::Communicator &comm_in) :
   RBEvaluation(comm_in)
 {
