@@ -129,7 +129,8 @@ AC_DEFUN([CONFIGURE_VTK],
 
          if (test $vtkmajor -gt 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor"
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
          else
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
          fi
