@@ -199,7 +199,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
           // Can do "fast" init since we're overwriting this in a sec
           coarse_adjoint->init(system.solution->size(), true);
 
-          coarse_adjoint = &system.get_adjoint_solution(j);
+          *coarse_adjoint = system.get_adjoint_solution(j);
 
           coarse_adjoints.push_back(coarse_adjoint);
         }
