@@ -819,6 +819,10 @@ void ExodusII_IO_Helper::read_var_names_impl(const char* var_type,
   ex_err = exII::ex_get_var_param(ex_id, var_type, &count);
   EX_CHECK_ERR(ex_err, "Error reading number of variables.");
 
+  // Do nothing if no variables are detected
+  if (count == 0)
+    return;
+
   // Second read the actual names and convert them into a format we can use
   NamesData names_table(count, MAX_STR_LENGTH);
 
