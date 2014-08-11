@@ -100,8 +100,6 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     system.solution->clone().release();
   NumericVector<Number> * coarse_local_solution =
     system.current_local_solution->clone().release();
-  // And make copies of the projected solution
-  NumericVector<Number> * projected_solution;
 
   // And we'll need to temporarily change solution projection settings
   bool old_projection_setting;
@@ -126,6 +124,18 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       newsol->swap(*system.solution);
       system.update();
     }
+
+  // Get coarse grid adjoint solutions.  This should be a relatively
+  // quick (especially with preconditioner reuse) way to get a good
+  // initial guess for the fine grid adjoint solutions.  More
+  // importantly, subtracting off a coarse adjoint approximation gives
+  // us better local error indication, and subtracting off *some* lift
+  // function is necessary for correctness if we have heterogeneous
+  // adjoint Dirichlet conditions.
+
+  // Solve the adjoint problem(s) on the coarse FE space
+  system.adjoint_solve(_qoi_set);
+
 
   // Loop over all the adjoint problems and, if any have heterogenous
   // Dirichlet conditions, get the corresponding coarse lift
@@ -178,10 +188,24 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
   // Copy the projected coarse grid solutions, which will be
   // overwritten by solve()
-  projected_solution = NumericVector<Number>::build(mesh.comm()).release();
-  projected_solution->init(system.solution->size(), true, SERIAL);
-  system.solution->localize(*projected_solution,
-                            system.get_dof_map().get_send_list());
+  std::vector<NumericVector<Number> *> coarse_adjoints;
+  for (unsigned int j=0; j != system.qoi.size(); j++)
+    {
+      if (_qoi_set.has_index(j))
+        {
+          NumericVector<Number> *coarse_adjoint =
+            NumericVector<Number>::build(mesh.comm()).release();
+
+          // Can do "fast" init since we're overwriting this in a sec
+          coarse_adjoint->init(system.solution->size(), true);
+
+          coarse_adjoint = &system.get_adjoint_solution(j);
+
+          coarse_adjoints.push_back(coarse_adjoint);
+        }
+      else
+        coarse_adjoints.push_back(NULL);
+    }
 
   // Rebuild the rhs with the projected primal solution
   (dynamic_cast<ImplicitSystem&>(system)).assembly(true, false);
@@ -199,7 +223,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
   // Loop over all the adjoint solutions and get the QoI error
   // contributions from all of them.  While we're looping anyway we'll
-  // handle heterogenous adjoint BCs
+  // pull off the coarse adjoints
   for (unsigned int j=0; j != system.qoi.size(); j++)
     {
       // Skip this QoI if not in the QoI Set
@@ -207,18 +231,11 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
         {
           // If the adjoint solution has heterogeneous dirichlet
           // values, then to get a proper error estimate here we need
-          // to subtract off a coarse grid lift function.  We won't
-          // need the lift function afterward.  We won't even need the
-          // fine adjoint solution afterward, so we'll modify it here.
-          if (system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-            {
-              std::ostringstream liftfunc_name;
-              liftfunc_name << "adjoint_lift_function" << j;
-              system.get_adjoint_solution(j) -=
-                system.get_vector(liftfunc_name.str());
-
-              system.remove_vector(liftfunc_name.str());
-            }
+          // to subtract off a coarse grid lift function.  In any case
+          // we can get a better error estimate by separating off a
+          // coarse representation of the adjoint solution, so we'll
+          // use that for our lift function.
+          system.get_adjoint_solution(j) -= *coarse_adjoints[j];
 
           computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
         }
@@ -439,7 +456,6 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   delete coarse_solution;
   *system.current_local_solution = *coarse_local_solution;
   delete coarse_local_solution;
-  delete projected_solution;
 
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
          system.vectors_end(); ++vec)
