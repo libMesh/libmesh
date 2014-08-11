@@ -1,5 +1,3 @@
-AUTOMAKE_OPTIONS = subdir-objects 
-
 pkg_cppflags = -I$(srcdir)/fpoptimizer
 
 
@@ -107,7 +105,7 @@ EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptim
 
 
 pkg_sources = fparser.cc fparser_ad.cc
-pkg_cppflags = $(FEATURE_FLAGS)
+pkg_cppflags += $(FEATURE_FLAGS)
 
 
 # util/tree_grammar_parser is a utility which is required to build 
