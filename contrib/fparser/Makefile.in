@@ -858,16 +858,7 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-
-######################################################################
-#
-# Common environment for all contribued packages
-# 
-# If we are careful, common rules can be defined here, 
-# once and for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
-pkg_cppflags = $(FEATURE_FLAGS)
+pkg_cppflags = -I$(srcdir)/fpoptimizer $(FEATURE_FLAGS)
 
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
@@ -979,6 +970,15 @@ util_bytecoderules_parser_SOURCES = util/bytecoderules_parser.cc
 util_cpp_compress_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
 util_cpp_compress_SOURCES = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 @FPARSER_DEVEL_FALSE@SUBDIRS = extrasrc
+
+######################################################################
+#
+# Common environment for all contribued packages
+# 
+# If we are careful, common rules can be defined here, 
+# once and for all.
+# 
+AUTOMAKE_OPTIONS = subdir-objects 
 AM_CPPFLAGS = $(pkg_cppflags) # any defined package-specific include paths
 AM_CFLAGS = $(pkg_cflags)
 AM_CXXFLAGS = $(pkg_cxxflags)
