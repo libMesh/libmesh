@@ -9,12 +9,12 @@ AC_DEFUN([CONFIGURE_VTK],
   AC_ARG_ENABLE(vtk,
                 AS_HELP_STRING([--disable-vtk],
                                [build without VTK file I/O support]),
-		[case "${enableval}" in
-		  yes)  enablevtk=yes ;;
-		   no)  enablevtk=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-vtk) ;;
-		 esac],
-		 [enablevtk=$enableoptional])
+               [case "${enableval}" in
+                 yes)  enablevtk=yes ;;
+                  no)  enablevtk=no ;;
+                   *)  AC_MSG_ERROR(bad value ${enableval} for --enable-vtk) ;;
+                esac],
+                [enablevtk=$enableoptional])
 
 
   if (test $enablevtk = yes); then
@@ -30,7 +30,7 @@ AC_DEFUN([CONFIGURE_VTK],
       if test "x$VTK_INCLUDE" != x; then
         if test -d $VTK_INCLUDE ; then
           VTK_INC=$VTK_INCLUDE
-	fi
+        fi
       elif (test -d $VTK_LS_CHECK); then
         VTK_INC=$VTK_LS_CHECK
       elif test "x$VTK_DIR" != x; then
@@ -129,14 +129,15 @@ AC_DEFUN([CONFIGURE_VTK],
 
          if (test $vtkmajor -gt 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
-                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor"
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
          else
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
          fi
 
-	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
-	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
-	 fi
+         if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
+           VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
+         fi
 
          LIBS="$old_LIBS $VTK_LIBRARY"
          CPPFLAGS="$CPPFLAGS -I$VTK_INC"
