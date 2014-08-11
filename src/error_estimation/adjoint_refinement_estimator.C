@@ -197,7 +197,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
             NumericVector<Number>::build(mesh.comm()).release();
 
           // Can do "fast" init since we're overwriting this in a sec
-          coarse_adjoint->init(system.solution->size(), true);
+          coarse_adjoint->init(system.solution->size(), true,
+                               system.get_adjoint_solution(j).type());
 
           *coarse_adjoint = system.get_adjoint_solution(j);
 
