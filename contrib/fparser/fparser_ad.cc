@@ -435,7 +435,11 @@ void FunctionParserADBase<Value_t>::Commit(const DiffProgramFragment & diff)
     int op = diff[i].first;
     int op_size = OpcodeSize(op);
     stack_size -= op_size > 0 ? op_size-1 : op_size;
-    if (stack_size > mData->mStackSize) mData->mStackSize = stack_size;
+    // mData->mStackSize is unsigned, stack_size should be an int
+    // since we subtract from it, so cast mStackSize to int for
+    // comparison to avoid compiler warnings.
+    if (stack_size > static_cast<int>(mData->mStackSize))
+      mData->mStackSize = stack_size;
 
     mData->mByteCode.push_back(op);
     if (diff[i].first == cImmed)
