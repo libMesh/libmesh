@@ -873,6 +873,41 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
         for (unsigned i=0; i<2; ++i)
           {
+            // First we deal with node boundary IDs.
+            // We only enter this loop if we have at least one
+            // nodeset.
+            if(mesh_array[i]->boundary_info->n_nodeset_conds() > 0)
+              {
+                // We need to find an element that contains boundary nodes in order
+                // to update hmin.
+                AutoPtr<PointLocatorBase> point_locator = mesh_array[i]->sub_point_locator();
+
+                std::vector<numeric_index_type> node_id_list;
+                std::vector<boundary_id_type> bc_id_list;
+
+                // Get the list of nodes with associated boundary IDs
+                mesh_array[i]->boundary_info->build_node_list(node_id_list, bc_id_list);
+
+                for(unsigned int node_index=0; node_index<bc_id_list.size(); node_index++)
+                  {
+                    boundary_id_type node_bc_id = bc_id_list[node_index];
+                    if(node_bc_id == id_array[i])
+                    {
+                      dof_id_type node_id = node_id_list[node_index];
+                      set_array[i]->insert( node_id );
+
+                      const Elem* elem = (*point_locator)( mesh_array[i]->node(node_id) );
+                      if(elem == NULL)
+                      {
+                        libmesh_error_msg("Error: PointLocator failed to find a valid element");
+                      }
+
+                      h_min = std::min(h_min, elem->hmin());
+                      h_min_updated = true;
+                    }
+                  }
+              }
+
             MeshBase::element_iterator elem_it  = mesh_array[i]->elements_begin();
             MeshBase::element_iterator elem_end = mesh_array[i]->elements_end();
             for ( ; elem_it != elem_end; ++elem_it)
@@ -883,8 +918,9 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                 for (unsigned int side_id=0; side_id<el->n_sides(); ++side_id)
                   if (el->neighbor(side_id) == NULL)
                     {
-                      // Get *all* boundary IDs, not just the first one!
-                      std::vector<boundary_id_type> bc_ids = mesh_array[i]->boundary_info->boundary_ids (el, side_id);
+                      // Get *all* boundary IDs on this side, not just the first one!
+                      std::vector<boundary_id_type> bc_ids =
+                        mesh_array[i]->boundary_info->boundary_ids (el, side_id);
 
                       if (std::count(bc_ids.begin(), bc_ids.end(), id_array[i]))
                         {
@@ -912,6 +948,29 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 #else
                               side_to_elem_map.insert (side_to_elem_map.begin(),kvp);
 #endif
+                            }
+                        }
+
+                      // Also, check the edges on this side. We don't have to worry about
+                      // updating neighbor info in this case since elements don't store
+                      // neighbor info on edges.
+                      for (unsigned int edge_id=0; edge_id<el->n_edges(); ++edge_id)
+                        {
+                          if(el->is_edge_on_side(edge_id, side_id))
+                            {
+                              // Get *all* boundary IDs on this edge, not just the first one!
+                              std::vector<boundary_id_type> edge_bc_ids =
+                                mesh_array[i]->boundary_info->edge_boundary_ids (el, edge_id);
+
+                              if (std::count(edge_bc_ids.begin(), edge_bc_ids.end(), id_array[i]))
+                                {
+                                  AutoPtr<Elem> edge (el->build_edge(edge_id));
+                                  for (unsigned int node_id=0; node_id<edge->n_nodes(); ++node_id)
+                                    set_array[i]->insert( edge->node(node_id) );
+
+                                  h_min = std::min(h_min, edge->hmin());
+                                  h_min_updated = true;
+                                }
                             }
                         }
                     }
