@@ -5,6 +5,7 @@
 #include <boost/current_function.hpp>
 #include <boost/memory_order.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/version.hpp>
 
@@ -32,9 +33,17 @@
 // Helper function for testing the pool allocator
 void test_pool();
 
+// Boost's unique_ptr requires a trivial "Deleter" object to be declared even for built-in types
+template<typename T>
+struct Deleter
+{
+  void operator()(T *p) { delete p; }
+};
+
 int main (int, char**)
 {
   boost::shared_ptr<int> p1( new int(1) );
+  boost::interprocess::unique_ptr<int, Deleter<int> > p2( new int(2) );
 
   BOOST_ASSERT(true);
 
