@@ -508,7 +508,7 @@ noinst_HEADERS = \
 # to a user.  Consider these the public interface of libMesh.
 # will get installed into '$(prefix)/include/libmesh'
 include_HEADERS = \
-        libmesh/libmesh_config.h \
+        libmesh_config.h \
         base/auto_ptr.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
