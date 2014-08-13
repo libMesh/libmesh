@@ -1299,7 +1299,14 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           // find the local node index that we want to update
           unsigned int local_node_index = el->local_node(other_node_id);
 
+          // We also need to copy over the nodeset info here,
+          // because the node will get deleted below
+          const std::vector<boundary_id_type>& ids =
+            this->boundary_info->boundary_ids(el->get_node(local_node_index));
+
           el->set_node(local_node_index) = &target_node;
+
+          this->boundary_info->add_node(&target_node, ids);
         }
     }
 
