@@ -22,7 +22,6 @@
 // Local Includes
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/petsc_nonlinear_solver.h"
-#include "libmesh/petsc_dm_nonlinear_solver.h"
 #include "libmesh/trilinos_nox_nonlinear_solver.h"
 #include "libmesh/auto_ptr.h"
 
@@ -45,18 +44,8 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-#if PETSC_VERSION_LESS_THAN(3,3,0)
       ap.reset(new PetscNonlinearSolver<T>(s));
       break;
-#else
-      if (libMesh::on_command_line ("--use-petsc-dm"))
-        ap.reset(new PetscDMNonlinearSolver<T>(s));
-
-      else
-        ap.reset(new PetscNonlinearSolver<T>(s));
-
-      break;
-#endif
 #endif // LIBMESH_HAVE_PETSC
 
 #ifdef LIBMESH_HAVE_NOX

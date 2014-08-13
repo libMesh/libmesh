@@ -185,13 +185,12 @@ protected:
    */
   bool _default_monitor;
 
-private:
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number>*>&, sys_type&),
                             MatNullSpace*);
 #endif
-
+private:
   friend PetscErrorCode __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void *ctx);
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
   friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
