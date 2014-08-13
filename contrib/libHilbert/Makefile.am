@@ -8,6 +8,7 @@ pkg_sources = \
 	include/Hilbert/SetBits.hpp \
 	include/Hilbert/Common.hpp \
 	include/Hilbert/BigBitVec.hpp \
+	include/Hilbert/BitVecType.hpp \
 	include/Hilbert/FixBitVec.hpp \
 	include/Hilbert/Algorithm.hpp \
 	include/Hilbert/GetBits.hpp \

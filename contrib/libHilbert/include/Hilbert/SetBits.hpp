@@ -22,7 +22,7 @@
 
 #include "Hilbert/Common.hpp"
 #include "Hilbert/BigBitVec.hpp"
-
+#include "Hilbert/BitVecType.hpp"
 
 namespace Hilbert
 {
@@ -70,6 +70,31 @@ namespace Hilbert
 		}
 		return;
 	}
+
+
+	// <CBigBitVec,CFixBitVec>
+	template<>
+	H_INLINE
+	void
+	setBits(
+		Hilbert::BitVecType &h,
+		int n,
+		int i,
+		const CFixBitVec &w
+		)
+	{
+		int ir, ib, t;
+		BBV_MODSPLIT(ir,ib,i);
+		h.racks()[ir] |= w.rack() << ib;
+		t = ib+n;
+		if ( t > FBV_BITS )
+		{
+			t -= FBV_BITS;
+			h.racks()[ir+1] |= w.rack() >> t;
+		}
+		return;
+	}
+
 
 
 	// <CFixBitVec,CFixBitVec>

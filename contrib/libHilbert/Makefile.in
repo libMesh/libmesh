@@ -111,8 +111,9 @@ am__libdbg_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
 	src/Hilbert.C src/hilbert_mpi_ops.C \
 	include/Hilbert/GetLocation.hpp include/Hilbert/SetBits.hpp \
 	include/Hilbert/Common.hpp include/Hilbert/BigBitVec.hpp \
-	include/Hilbert/FixBitVec.hpp include/Hilbert/Algorithm.hpp \
-	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
+	include/Hilbert/BitVecType.hpp include/Hilbert/FixBitVec.hpp \
+	include/Hilbert/Algorithm.hpp include/Hilbert/GetBits.hpp \
+	include/Hilbert/GrayCodeRank.hpp \
 	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
 	include/hilbert.h
 am__dirstamp = $(am__leading_dot)dirstamp
@@ -133,8 +134,9 @@ am__libdevel_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
 	src/Hilbert.C src/hilbert_mpi_ops.C \
 	include/Hilbert/GetLocation.hpp include/Hilbert/SetBits.hpp \
 	include/Hilbert/Common.hpp include/Hilbert/BigBitVec.hpp \
-	include/Hilbert/FixBitVec.hpp include/Hilbert/Algorithm.hpp \
-	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
+	include/Hilbert/BitVecType.hpp include/Hilbert/FixBitVec.hpp \
+	include/Hilbert/Algorithm.hpp include/Hilbert/GetBits.hpp \
+	include/Hilbert/GrayCodeRank.hpp \
 	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
 	include/hilbert.h
 am__objects_2 = src/libdevel_la-BigBitVec.lo \
@@ -151,8 +153,9 @@ am__liboprof_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
 	src/Hilbert.C src/hilbert_mpi_ops.C \
 	include/Hilbert/GetLocation.hpp include/Hilbert/SetBits.hpp \
 	include/Hilbert/Common.hpp include/Hilbert/BigBitVec.hpp \
-	include/Hilbert/FixBitVec.hpp include/Hilbert/Algorithm.hpp \
-	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
+	include/Hilbert/BitVecType.hpp include/Hilbert/FixBitVec.hpp \
+	include/Hilbert/Algorithm.hpp include/Hilbert/GetBits.hpp \
+	include/Hilbert/GrayCodeRank.hpp \
 	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
 	include/hilbert.h
 am__objects_3 = src/liboprof_la-BigBitVec.lo \
@@ -169,8 +172,9 @@ am__libopt_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
 	src/Hilbert.C src/hilbert_mpi_ops.C \
 	include/Hilbert/GetLocation.hpp include/Hilbert/SetBits.hpp \
 	include/Hilbert/Common.hpp include/Hilbert/BigBitVec.hpp \
-	include/Hilbert/FixBitVec.hpp include/Hilbert/Algorithm.hpp \
-	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
+	include/Hilbert/BitVecType.hpp include/Hilbert/FixBitVec.hpp \
+	include/Hilbert/Algorithm.hpp include/Hilbert/GetBits.hpp \
+	include/Hilbert/GrayCodeRank.hpp \
 	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
 	include/hilbert.h
 am__objects_4 = src/libopt_la-BigBitVec.lo src/libopt_la-FixBitVec.lo \
@@ -186,8 +190,9 @@ am__libprof_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
 	src/Hilbert.C src/hilbert_mpi_ops.C \
 	include/Hilbert/GetLocation.hpp include/Hilbert/SetBits.hpp \
 	include/Hilbert/Common.hpp include/Hilbert/BigBitVec.hpp \
-	include/Hilbert/FixBitVec.hpp include/Hilbert/Algorithm.hpp \
-	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
+	include/Hilbert/BitVecType.hpp include/Hilbert/FixBitVec.hpp \
+	include/Hilbert/Algorithm.hpp include/Hilbert/GetBits.hpp \
+	include/Hilbert/GrayCodeRank.hpp \
 	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
 	include/hilbert.h
 am__objects_5 = src/libprof_la-BigBitVec.lo \
@@ -565,6 +570,7 @@ pkg_sources = \
 	include/Hilbert/SetBits.hpp \
 	include/Hilbert/Common.hpp \
 	include/Hilbert/BigBitVec.hpp \
+	include/Hilbert/BitVecType.hpp \
 	include/Hilbert/FixBitVec.hpp \
 	include/Hilbert/Algorithm.hpp \
 	include/Hilbert/GetBits.hpp \
