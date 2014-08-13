@@ -664,21 +664,42 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 
 template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
-                                                         NumericVector<T> &solution_in)
+                                                         NumericVector<T> &eig_vec,
+                                                         NumericVector<T> *eig_vec_im)
 {
+  // make sure that for non-Hermitian problems with real matrices
+  // a vector is provided for imaginary part.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  libmesh_assert(eig_vec_im == NULL);
+#else
+  if (this->eigen_problem_type() == HEP ||
+      this->eigen_problem_type() == GHEP)
+    libmesh_assert(eig_vec_im == NULL);
+#endif
+
   PetscErrorCode ierr=0;
 
   PetscReal re, im;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* solution = libmesh_cast_ptr<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* v_re = libmesh_cast_ptr<PetscVector<T>*>(&eig_vec);
+  PetscVector<T>* v_im = NULL;
 
   // real and imaginary part of the ith eigenvalue.
   PetscScalar kr, ki;
 
-  solution->close();
+  eig_vec.close();
+  if (eig_vec_im)
+  {
+    eig_vec_im = libmesh_cast_ptr<PetscVector<T>*>(eig_vec_im);
+    eig_vec_im->close();
+    
+    // now get the eigenvector
+    ierr = EPSGetEigenpair(_eps, i, &kr, &ki, v_re->vec(), v_im->vec());
+  }
+  else
+    ierr = EPSGetEigenpair(_eps, i, &kr, &ki, v_re->vec(), PETSC_NULL);
 
-  ierr = EPSGetEigenpair(_eps, i, &kr, &ki, solution->vec(), PETSC_NULL);
   LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
@@ -692,6 +713,85 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
   return std::make_pair(re, im);
 }
 
+  
+  
+template <typename T>
+void SlepcEigenSolver<T>::get_right_eigenvector(unsigned int i,
+                                                NumericVector<T> &eig_vec,
+                                                NumericVector<T> *eig_vec_im)
+{
+  // make sure that for non-Hermitian problems with real matrices
+  // a vector is provided for imaginary part.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  libmesh_assert(eig_vec_im == NULL);
+#else
+  if (this->eigen_problem_type() == HEP ||
+      this->eigen_problem_type() == GHEP)
+    libmesh_assert(eig_vec_im == NULL);
+#endif
+
+  PetscErrorCode ierr=0;
+  
+  // Make sure the NumericVector passed in is really a PetscVector
+  PetscVector<T>* v_re = libmesh_cast_ptr<PetscVector<T>*>(&eig_vec);
+  PetscVector<T>* v_im = NULL;
+  
+  eig_vec.close();
+  if (eig_vec_im)
+  {
+    eig_vec_im = libmesh_cast_ptr<PetscVector<T>*>(eig_vec_im);
+    eig_vec_im->close();
+
+    // now get the eigenvector
+    ierr = EPSGetEigenvector(_eps, i, v_re->vec(), v_im->vec());
+  }
+  else
+    ierr = EPSGetEigenvector(_eps, i, v_re->vec(), PETSC_NULL);
+
+  
+  LIBMESH_CHKERRABORT(ierr);
+}
+
+  
+  
+template <typename T>
+void SlepcEigenSolver<T>::get_left_eigenvector(unsigned int i,
+                                               NumericVector<T> &eig_vec,
+                                               NumericVector<T> *eig_vec_im)
+{
+  // make sure that for non-Hermitian problems with real matrices
+  // a vector is provided for imaginary part.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  libmesh_assert(eig_vec_im == NULL);
+#else
+  if (this->eigen_problem_type() == HEP ||
+      this->eigen_problem_type() == GHEP)
+    libmesh_assert(eig_vec_im == NULL);
+#endif
+  
+  PetscErrorCode ierr=0;
+  
+  // Make sure the NumericVector passed in is really a PetscVector
+  PetscVector<T>* v_re = libmesh_cast_ptr<PetscVector<T>*>(&eig_vec);
+  PetscVector<T>* v_im = NULL;
+  
+  eig_vec.close();
+  if (eig_vec_im)
+  {
+    eig_vec_im = libmesh_cast_ptr<PetscVector<T>*>(eig_vec_im);
+    eig_vec_im->close();
+    
+    // now get the eigenvector
+    ierr = EPSGetEigenvectorLeft(_eps, i, v_re->vec(), v_im->vec());
+  }
+  else
+    ierr = EPSGetEigenvectorLeft(_eps, i, v_re->vec(), PETSC_NULL);
+  
+  
+  LIBMESH_CHKERRABORT(ierr);
+}
+
+  
 
 template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(unsigned int i)

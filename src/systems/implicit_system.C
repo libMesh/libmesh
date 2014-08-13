@@ -316,7 +316,12 @@ ImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
       this->matrix->close();
 
       // Reset and build the RHS from the residual derivatives
-      this->assemble_residual_derivatives(parameters);
+      for (unsigned int p=0; p<parameters.size(); p++)
+      {
+        NumericVector<Number> &sensitivity_rhs = this->add_sensitivity_rhs(p);
+        this->assemble_residual_derivative(parameters, p,
+                                           sensitivity_rhs);
+      }
     }
 
   // The sensitivity problem is linear
@@ -645,35 +650,38 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
 
 
 
-void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
-{
-  const unsigned int Np = libmesh_cast_int<unsigned int>
-    (parameters.size());
-  Real deltap = TOLERANCE;
-
-  for (unsigned int p=0; p != Np; ++p)
+void ImplicitSystem::assemble_residual_derivative(const ParameterVector& parameters,
+                                                  const unsigned int p,
+                                                  NumericVector<Number>& sensitivity_rhs)
+  {
+    Real deltap = TOLERANCE;
+    
+    // Call the user-provided sensitivity assembly function,
+    // if it was provided
+    if (!user_sensitivity_assembly(parameters, p, sensitivity_rhs))
     {
-      NumericVector<Number> &sensitivity_rhs = this->add_sensitivity_rhs(p);
-
+      // use the system provided finite difference routine if no
+      // user provided routine was available
+      
       // Approximate -(partial R / partial p) by
       // (R(p-dp) - R(p+dp)) / (2*dp)
-
+      
       Number old_parameter = *parameters[p];
       *parameters[p] -= deltap;
-
+      
       this->assembly(true, false);
       this->rhs->close();
       sensitivity_rhs = *this->rhs;
-
+      
       *parameters[p] = old_parameter + deltap;
-
+      
       this->assembly(true, false);
       this->rhs->close();
-
+      
       sensitivity_rhs -= *this->rhs;
       sensitivity_rhs /= (2*deltap);
       sensitivity_rhs.close();
-
+      
       *parameters[p] = old_parameter;
     }
 }
@@ -689,9 +697,6 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
     (parameters.size());
   const unsigned int Nq = libmesh_cast_int<unsigned int>
     (qoi.size());
-
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
 
   // An introduction to the problem:
   //
@@ -737,46 +742,21 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // to derive an equivalent equation:
   // dq/dp = (partial q / partial p) - (z+phi) * (partial R / partial p)
 
+  AutoPtr<NumericVector<Number> >
+  partialR_partialp(NumericVector<Number>::build(this->rhs->comm()).release());
+  partialR_partialp->init(*this->solution);
+    
   for (unsigned int j=0; j != Np; ++j)
     {
-      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
-      // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
-
-      Number old_parameter = *parameters[j];
-      // Number old_qoi = this->qoi;
-
-      *parameters[j] = old_parameter - delta_p;
-      this->assemble_qoi(qoi_indices);
-      std::vector<Number> qoi_minus = this->qoi;
-
-      this->assembly(true, false);
-      this->rhs->close();
-
-      // FIXME - this can and should be optimized to avoid the clone()
-      AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
-      *partialR_partialp *= -1;
-
-      *parameters[j] = old_parameter + delta_p;
-      this->assemble_qoi(qoi_indices);
-      std::vector<Number>& qoi_plus = this->qoi;
-
       std::vector<Number> partialq_partialp(Nq, 0);
+      this->assemble_residual_derivative(parameters, j,
+                                         *partialR_partialp);
+      this->assemble_qoi_parameter_partial_derivative(qoi_indices, parameters,
+                                                      j, partialq_partialp);
+      
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
-          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
-
-      this->assembly(true, false);
-      this->rhs->close();
-      *partialR_partialp += *this->rhs;
-      *partialR_partialp /= (2.*delta_p);
-
-      // Don't leave the parameter changed
-      *parameters[j] = old_parameter;
-
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          {
-
+        {
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
               {
                 AutoPtr<NumericVector<Number> > lift_func =
@@ -816,9 +796,6 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   const unsigned int Nq = libmesh_cast_int<unsigned int>
     (qoi.size());
 
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
-
   // An introduction to the problem:
   //
   // Residual R(u(p),p) = 0
@@ -855,25 +832,10 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
 
   for (unsigned int j=0; j != Np; ++j)
     {
-      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
-
-      Number old_parameter = *parameters[j];
-
-      *parameters[j] = old_parameter - delta_p;
-      this->assemble_qoi();
-      std::vector<Number> qoi_minus = this->qoi;
-
-      *parameters[j] = old_parameter + delta_p;
-      this->assemble_qoi();
-      std::vector<Number>& qoi_plus = this->qoi;
 
       std::vector<Number> partialq_partialp(Nq, 0);
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
-
-      // Don't leave the parameter changed
-      *parameters[j] = old_parameter;
+      this->assemble_qoi_parameter_partial_derivative(qoi_indices, parameters,
+                                                      j, partialq_partialp);
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
@@ -890,6 +852,50 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   this->matrix->close();
   this->assemble_qoi(qoi_indices);
 }
+
+  
+
+  
+void ImplicitSystem::assemble_qoi_parameter_partial_derivative(const QoISet&          qoi_indices,
+                                                               const ParameterVector& parameters,
+                                                               const unsigned int j,
+                                                               std::vector<Number>& partialq_partialp)
+{
+  // check if the user supplied routine are able to provide this data
+  if (!this->user_QOI_parameter_sensitivity(qoi_indices, parameters,
+                                            j, partialq_partialp))
+  {
+    
+    const unsigned int Nq = libmesh_cast_int<unsigned int>
+    (qoi.size());
+    
+    // We currently get partial derivatives via central differencing
+    const Real delta_p = TOLERANCE;
+    
+    // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
+    // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
+    
+    Number old_parameter = *parameters[j];
+    // Number old_qoi = this->qoi;
+    
+    *parameters[j] = old_parameter - delta_p;
+    this->assemble_qoi(qoi_indices);
+    std::vector<Number> qoi_minus = this->qoi;
+    
+    *parameters[j] = old_parameter + delta_p;
+    this->assemble_qoi(qoi_indices);
+    std::vector<Number>& qoi_plus = this->qoi;
+    
+    for (unsigned int i=0; i != Nq; ++i)
+      if (qoi_indices.has_index(i))
+        partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
+    
+    // Don't leave the parameter changed
+    *parameters[j] = old_parameter;
+  }
+}
+  
+  
 
 
 

@@ -96,9 +96,25 @@ public:
    * the condensed eigensolve. We only set the non-condensed
    * entries of the solution vector (the condensed
    * entries are set to zero by default).
+   *
+   * Returns real and imaginary part of the ith eigenvalue. If the vectors are
+   * provided in the function argument through \p vec_re and \p vec_im, this
+   * method copies the eigenvector in the given vector(s), else copies the
+   * vector to System::solution.
+   *
+   * Note that with Number = Complex, \p vec_im must be NULL, and for
+   * Number = Real and eigen problem type HEP or GHEP, \p vec_im must be NULL.
+   * For Number = Real and eigenproblem type NHEP or GNHEP, the real and imag.
+   * parts of the eigenvector are copied to \p vec_re and \p vec_im,
+   * respectively. If \p vec_im is not provided, then only the real part will be
+   * copied to either \p vec_re or System::solution depending on the second
+   * argument.
    */
-  virtual std::pair<Real, Real> get_eigenpair(unsigned int i);
+  virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
+                                               NumericVector<Number>* vec_re = NULL,
+                                               NumericVector<Number>* vec_im = NULL);
 
+  
   /**
    * The (condensed) system matrix for standard eigenvalue problems.
    */
