@@ -400,6 +400,13 @@ public:
                                std::vector<boundary_id_type>&   bc_id_list) const;
 
   /**
+   * Creates a list of element numbers, edges, and boundary ids for those edges.
+   */
+  void build_edge_list (std::vector<dof_id_type>&        element_id_list,
+                        std::vector<unsigned short int>& edge_list,
+                        std::vector<boundary_id_type>&   bc_id_list) const;
+
+  /**
    * @returns the user-specified boundary ids.
    */
   const std::set<boundary_id_type>& get_boundary_ids () const

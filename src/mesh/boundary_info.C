@@ -1693,6 +1693,30 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type>&        el,
     }
 }
 
+
+void BoundaryInfo::build_edge_list (std::vector<dof_id_type>&        el,
+                                    std::vector<unsigned short int>& sl,
+                                    std::vector<boundary_id_type>&   il) const
+{
+  // Reserve the size, then use push_back
+  el.reserve (_boundary_side_id.size());
+  sl.reserve (_boundary_side_id.size());
+  il.reserve (_boundary_side_id.size());
+
+  std::multimap<const Elem*,
+    std::pair<unsigned short int,
+    boundary_id_type> >::const_iterator pos;
+
+  for (pos=_boundary_edge_id.begin(); pos != _boundary_edge_id.end();
+       ++pos)
+    {
+      el.push_back (pos->first->id());
+      sl.push_back (pos->second.first);
+      il.push_back (pos->second.second);
+    }
+}
+
+
 void BoundaryInfo::print_info(std::ostream& out_stream) const
 {
   // Print out the nodal BCs
