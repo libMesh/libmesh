@@ -29,7 +29,7 @@ echo " " >> include_HEADERS
 
 
 headers=`find base enums error_estimation fe geom mesh numerics parallel partitioning physics quadrature reduced_basis solution_transfer solvers systems utils -name "*.h" -o -name "*specializations" -type f | LC_COLLATE=POSIX sort`
-headers="libmesh/libmesh_config.h $headers"
+headers="libmesh_config.h $headers"
 
 echo "# These are the headers we actually want to install and make available" >> include_HEADERS
 echo "# to a user.  Consider these the public interface of libMesh." >> include_HEADERS
