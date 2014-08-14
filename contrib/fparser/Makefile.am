@@ -184,11 +184,12 @@ extrasrc/fp_opcode_add.inc: \
 		>> $@
 
 BUILT_SOURCES += extrasrc/fp_opcode_add.inc
-BUILT_SOURCES += fpoptimizer/grammar_data.cc
 
 fparser.cc: extrasrc/fp_opcode_add.inc
 
 if FPARSER_DEVEL
+
+  BUILT_SOURCES += fpoptimizer/grammar_data.cc
 
   # Build up utility programs used to define parsing, not needed
   # for installation
