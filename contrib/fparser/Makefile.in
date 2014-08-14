@@ -62,20 +62,22 @@ target_triplet = @target@
 
 # Wrap code that uses std::move in fparser for compilers that don't support it
 @HAVE_CXX11_MOVE_TRUE@am__append_3 = -DFP_SUPPORT_CXX11_MOVE
-noinst_PROGRAMS = util/tree_grammar_parser$(EXEEXT) \
-	util/bytecoderules_parser$(EXEEXT) util/cpp_compress$(EXEEXT)
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_4 = $(FPOPTIMIZER_CC_FILES)
-@FPARSER_DEVEL_TRUE@am__append_5 = $(BUILT_SOURCES)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_6 = fpoptimizer.cc
+noinst_PROGRAMS = $(am__EXEEXT_1)
+@FPARSER_DEVEL_TRUE@am__append_4 = util/tree_grammar_parser \
+@FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
+@FPARSER_DEVEL_TRUE@	util/cpp_compress
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_5 = $(FPOPTIMIZER_CC_FILES)
+@FPARSER_DEVEL_TRUE@am__append_6 = $(BUILT_SOURCES)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_7 = fpoptimizer.cc
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/build-aux/ylwrap \
 	$(top_srcdir)/contrib/Make.common util/tree_grammar_parser.cc
-@LIBMESH_DBG_MODE_TRUE@am__append_7 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_8 = libdevel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_9 = libopt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_10 = libprof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_11 = liboprof.la
+@LIBMESH_DBG_MODE_TRUE@am__append_8 = libdbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_9 = libdevel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_10 = libopt.la
+@LIBMESH_PROF_MODE_TRUE@am__append_11 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_12 = liboprof.la
 subdir = contrib/fparser
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -377,6 +379,9 @@ libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libprof_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
+@FPARSER_DEVEL_TRUE@am__EXEEXT_1 = util/tree_grammar_parser$(EXEEXT) \
+@FPARSER_DEVEL_TRUE@	util/bytecoderules_parser$(EXEEXT) \
+@FPARSER_DEVEL_TRUE@	util/cpp_compress$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_util_bytecoderules_parser_OBJECTS =  \
 	util/util_bytecoderules_parser-bytecoderules_parser.$(OBJEXT)
@@ -873,7 +878,7 @@ EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 BUILT_SOURCES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc
 
 # when doing 'make clean' we need to remove the generated sources
-CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_5)
+CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_6)
 DISTCLEANFILES = util/tree_grammar_parser # in case it wasn't \
 	conditionally cleaned
 include_HEADERS = fparser.hh fparser_ad.hh
@@ -916,7 +921,7 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/cse.cc \
 	    fpoptimizer/optimize_main.cc
 
-pkg_sources = fparser.cc fparser_ad.cc $(am__append_4) $(am__append_6)
+pkg_sources = fparser.cc fparser_ad.cc $(am__append_5) $(am__append_7)
 
 # util/tree_grammar_parser is a utility which is required to build 
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
@@ -982,8 +987,8 @@ AM_LDFLAGS = $(libmesh_LDFLAGS)
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_7) $(am__append_8) $(am__append_9) \
-	$(am__append_10) $(am__append_11)
+noinst_LTLIBRARIES = $(am__append_8) $(am__append_9) $(am__append_10) \
+	$(am__append_11) $(am__append_12)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -2712,11 +2717,11 @@ extrasrc/fp_opcode_add.inc: \
 		| util/cpp_compress \
 		>> $@
 
-  # Build up utility programs used to define parsing, not needed
-  # for installation
-  # noinst_PROGRAMS           += util/make_function_name_parser
-
 fparser.cc: extrasrc/fp_opcode_add.inc
+
+@FPARSER_DEVEL_TRUE@  # Build up utility programs used to define parsing, not needed
+@FPARSER_DEVEL_TRUE@  # for installation
+@FPARSER_DEVEL_TRUE@  # noinst_PROGRAMS           += util/make_function_name_parser
 
 @FPARSER_DEVEL_TRUE@   # when doing 'make clean' we need to remove the generated sources
 
