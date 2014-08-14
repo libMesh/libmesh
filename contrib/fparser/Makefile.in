@@ -63,21 +63,22 @@ target_triplet = @target@
 # Wrap code that uses std::move in fparser for compilers that don't support it
 @HAVE_CXX11_MOVE_TRUE@am__append_3 = -DFP_SUPPORT_CXX11_MOVE
 noinst_PROGRAMS = $(am__EXEEXT_1)
-@FPARSER_DEVEL_TRUE@am__append_4 = util/tree_grammar_parser \
+@FPARSER_DEVEL_TRUE@am__append_4 = fpoptimizer/grammar_data.cc
+@FPARSER_DEVEL_TRUE@am__append_5 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
 @FPARSER_DEVEL_TRUE@	util/cpp_compress
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_5 = $(FPOPTIMIZER_CC_FILES)
-@FPARSER_DEVEL_TRUE@am__append_6 = $(BUILT_SOURCES)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_7 = fpoptimizer.cc
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_6 = $(FPOPTIMIZER_CC_FILES)
+@FPARSER_DEVEL_TRUE@am__append_7 = $(BUILT_SOURCES)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_8 = fpoptimizer.cc
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/build-aux/ylwrap \
 	$(top_srcdir)/contrib/Make.common util/tree_grammar_parser.cc
-@LIBMESH_DBG_MODE_TRUE@am__append_8 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_9 = libdevel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_10 = libopt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_11 = libprof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_12 = liboprof.la
+@LIBMESH_DBG_MODE_TRUE@am__append_9 = libdbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_10 = libdevel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_11 = libopt.la
+@LIBMESH_PROF_MODE_TRUE@am__append_12 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_13 = liboprof.la
 subdir = contrib/fparser
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -875,10 +876,10 @@ EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 	fpoptimizer/treerules.dat $(FPOPTIMIZER_CC_FILES) \
 	fpoptimizer/fpoptimizer_header.txt \
 	fpoptimizer/fpoptimizer_footer.txt
-BUILT_SOURCES = extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc
+BUILT_SOURCES = extrasrc/fp_opcode_add.inc $(am__append_4)
 
 # when doing 'make clean' we need to remove the generated sources
-CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_6)
+CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_7)
 # in case they weren't conditionally cleaned:
 DISTCLEANFILES = util/bytecoderules_parser util/cpp_compress \
 	util/tree_grammar_parser
@@ -922,7 +923,7 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/cse.cc \
 	    fpoptimizer/optimize_main.cc
 
-pkg_sources = fparser.cc fparser_ad.cc $(am__append_5) $(am__append_7)
+pkg_sources = fparser.cc fparser_ad.cc $(am__append_6) $(am__append_8)
 
 # util/tree_grammar_parser is a utility which is required to build 
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
@@ -988,8 +989,8 @@ AM_LDFLAGS = $(libmesh_LDFLAGS)
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_8) $(am__append_9) $(am__append_10) \
-	$(am__append_11) $(am__append_12)
+noinst_LTLIBRARIES = $(am__append_9) $(am__append_10) $(am__append_11) \
+	$(am__append_12) $(am__append_13)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
