@@ -418,7 +418,7 @@ extern OStreamProxy err;
         return 77;                                                      \
     } } while(0)
 
-// libmesh_cast_ref and libmesh_cast_ptr do a dynamic cast and assert
+// cast_ref and cast_ptr do a dynamic cast and assert
 // the result, if we have RTTI enabled and we're in debug or
 // development modes, but they just do a faster static cast if we're
 // in optimized mode.
@@ -426,7 +426,7 @@ extern OStreamProxy err;
 // Use these casts when you're certain that a cast will succeed in
 // correct code but you want to be able to double-check.
 template <typename Tnew, typename Told>
-inline Tnew libmesh_cast_ref(Told& oldvar)
+inline Tnew cast_ref(Told& oldvar);
 {
 #if !defined(NDEBUG) && defined(LIBMESH_HAVE_RTTI) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   try
@@ -449,10 +449,18 @@ inline Tnew libmesh_cast_ref(Told& oldvar)
 #endif
 }
 
+template <typename Tnew, typename Told>
+inline Tnew libmesh_cast_ref(Told& oldvar)
+{
+  // we use the less redundantly named libMesh::cast_ref now
+  libmesh_deprecated();
+  return cast_ref<Tnew>(oldvar);
+}
+
 // We use two different function names to avoid an odd overloading
 // ambiguity bug with icc 10.1.008
 template <typename Tnew, typename Told>
-inline Tnew libmesh_cast_ptr (Told* oldvar)
+inline Tnew cast_ptr (Told* oldvar)
 {
 #if !defined(NDEBUG) && defined(LIBMESH_HAVE_RTTI)
   Tnew newvar = dynamic_cast<Tnew>(oldvar);
@@ -473,7 +481,15 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 }
 
 
-// libmesh_cast_int asserts that the value of the castee is within the
+template <typename Tnew, typename Told>
+inline Tnew libmesh_cast_ptr (Told* oldvar)
+{
+  // we use the less redundantly named libMesh::cast_ptr now
+  return cast_ptr<Tnew>(oldvar);
+}
+
+
+// cast_int asserts that the value of the castee is within the
 // bounds which are exactly representable by the output type, if we're
 // in debug or development modes, but it just does a faster static
 // cast if we're in optimized mode.
@@ -481,12 +497,20 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 // Use these casts when you're certain that a cast will succeed in
 // correct code but you want to be able to double-check.
 template <typename Tnew, typename Told>
-inline Tnew libmesh_cast_int (Told oldvar)
+inline Tnew cast_int (Told oldvar)
 {
   libmesh_assert_equal_to
     (oldvar, static_cast<Told>(static_cast<Tnew>(oldvar)));
 
   return(static_cast<Tnew>(oldvar));
+}
+
+
+template <typename Tnew, typename Told>
+inline Tnew libmesh_cast_int (Told oldvar)
+{
+  // we use the less redundantly named libMesh::cast_int now
+  return cast_int<Tnew>(oldvar);
 }
 
 
