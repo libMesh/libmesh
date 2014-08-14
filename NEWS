@@ -30,7 +30,9 @@
     * libHilbert now under LGPL
   * clearer "configure --help" output
   * Assorted bug fixes, optimizations, new regression tests
-    * libHilbert shim - some old xda/xdr files may be corrupted!
+    * fixed libHilbert interface regression
+      * some xda/xdr files created with 0.9.3 MAY BE CORRUPTED when
+        read with older/newer libMesh versions, and vice-versa!
 
 0.9.2 -> 0.9.3
   * FEMContext public members now private, must use API pushed in 0.9.2.
