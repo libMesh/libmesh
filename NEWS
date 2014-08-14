@@ -9,6 +9,7 @@
   * allow appending to Tecplot ASCII files
   * improved Abaqus, Gmsh, UNV I/O support
   * VTK 6 support
+  * QHull now distributed in contrib/
   * Automatic differentiation of fparser parsed functions
   * Allow NaN in fparser parsed functions
   * Support NaN to locally disable DirichletBoundary functions
@@ -16,20 +17,27 @@
   * PointLocator option for local element searches
   * PointLocator/MeshFunction option for searches close to elements
   * Better solver convergence reporting
+  * Better 16-bit and 64-bit hash functions
   * Better QGrid behavior, documentation
   * DenseMatrix eigenvalue computations
   * DenseMatrix operations with mixed scalar types
   * Mesh stitching can now be done using node and edge boundary IDs
+  * Variational mesh smoother refactoring
   * MeshModification::transform() with arbitrary warping functions
   * Use MPI_THREAD_FUNNELED when available
   * libmesh_cast_ptr/ref/int deprecated, replaced by cast_ptr/ref/int
   * libMeshEnums namespace removed; enumerations in libMesh namespace
+  * Configure tests for more C++11 features
+  * Default complation with -std=c++11, easier for users to disable
   * Better configure autodetection of slepc, eigen compatibility
   * configure options for software licensing
     * non-LGPL-compatible options disabled by default
     * libHilbert now under LGPL
   * clearer "configure --help" output
+  * more verbose error messages using libmesh_error_msg()
+  * reformatted source code, no tabs should be in code from now on
   * Assorted bug fixes, optimizations, new regression tests
+    * all_first_order() and build_extrusion() bugs fixed
     * fixed libHilbert interface regression
       * some xda/xdr files created with 0.9.3 MAY BE CORRUPTED when
         read with older/newer libMesh versions, and vice-versa!
