@@ -567,7 +567,7 @@ check_SCRIPTS = run.sh
 #
 # how to make documentation
 #
-CLEANFILES = out_0.vtu out.pvtu $(example_name).php stdout.log
+CLEANFILES = out.pvtu $(example_name).php stdout.log
 
 ######################################################################
 #
@@ -1051,7 +1051,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
+clean-am: clean-checkPROGRAMS clean-generic clean-libtool clean-local \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -1121,8 +1121,8 @@ uninstall-am: uninstall-dataDATA
 .MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
-	clean-checkPROGRAMS clean-generic clean-libtool cscopelist \
-	ctags distclean distclean-compile distclean-generic \
+	clean-checkPROGRAMS clean-generic clean-libtool clean-local \
+	cscopelist ctags distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dataDATA install-dvi install-dvi-am \
@@ -1134,6 +1134,9 @@ uninstall-am: uninstall-dataDATA
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-dataDATA
 
+
+clean-local:
+	-rm -rf out_*.vtu
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
