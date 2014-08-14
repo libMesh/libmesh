@@ -180,19 +180,19 @@ extrasrc/fp_opcode_add.inc: \
 		| util/cpp_compress \
 		>> $@
 
-  # Build up utility programs used to define parsing, not needed
-  # for installation
-  noinst_PROGRAMS           += util/tree_grammar_parser
-  noinst_PROGRAMS           += util/bytecoderules_parser
-  noinst_PROGRAMS           += util/cpp_compress
-  # noinst_PROGRAMS           += util/make_function_name_parser
-
 BUILT_SOURCES += extrasrc/fp_opcode_add.inc
 BUILT_SOURCES += fpoptimizer/grammar_data.cc
 
 fparser.cc: extrasrc/fp_opcode_add.inc
 
 if FPARSER_DEVEL
+
+  # Build up utility programs used to define parsing, not needed
+  # for installation
+  noinst_PROGRAMS           += util/tree_grammar_parser
+  noinst_PROGRAMS           += util/bytecoderules_parser
+  noinst_PROGRAMS           += util/cpp_compress
+  # noinst_PROGRAMS           += util/make_function_name_parser
 
 if FPARSER_SUPPORT_OPTIMIZER 
     pkg_sources += $(FPOPTIMIZER_CC_FILES)
