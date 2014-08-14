@@ -4,7 +4,10 @@ data          = miscellaneous_ex4.C run.sh
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 
-CLEANFILES = out_0.vtu out.pvtu
+CLEANFILES = out.pvtu
+
+clean-local:
+	-rm -rf out_*.vtu
 
 ##############################################
 # include common example environment

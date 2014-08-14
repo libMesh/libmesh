@@ -146,6 +146,7 @@ util_tree_grammar_parser_SOURCES   = \
                                  lib/autoptr.hh \
                                  extrasrc/fpaux.hh \
                                  extrasrc/fptypes.hh \
+                                 extrasrc/fp_opcode_add.inc \
                                  fparser_gmpint.hh extrasrc/fp_identifier_parser.inc
 
   util_bytecoderules_parser_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
@@ -162,10 +163,11 @@ util_tree_grammar_parser_SOURCES   = \
 
 # when doing 'make clean' we need to remove the generated sources
 CLEANFILES += fpoptimizer/grammar_data.cc
-DISTCLEANFILES += util/tree_grammar_parser # in case it wasn't conditionally cleaned
+# in case they weren't conditionally cleaned:
+DISTCLEANFILES += util/bytecoderules_parser
+DISTCLEANFILES += util/cpp_compress
+DISTCLEANFILES += util/tree_grammar_parser
 
-
-if FPARSER_DEVEL
 
 # extrasrc/fp_opcode_add.inc is a generated source, and this rule specifies how we build it.
 extrasrc/fp_opcode_add.inc: \
@@ -181,17 +183,20 @@ extrasrc/fp_opcode_add.inc: \
 		| util/cpp_compress \
 		>> $@
 
+BUILT_SOURCES += extrasrc/fp_opcode_add.inc
+
+fparser.cc: extrasrc/fp_opcode_add.inc
+
+if FPARSER_DEVEL
+
+  BUILT_SOURCES += fpoptimizer/grammar_data.cc
+
   # Build up utility programs used to define parsing, not needed
   # for installation
   noinst_PROGRAMS           += util/tree_grammar_parser
   noinst_PROGRAMS           += util/bytecoderules_parser
   noinst_PROGRAMS           += util/cpp_compress
   # noinst_PROGRAMS           += util/make_function_name_parser
-
-fparser.cc: extrasrc/fp_opcode_add.inc
-
-  BUILT_SOURCES += extrasrc/fp_opcode_add.inc
-  BUILT_SOURCES += fpoptimizer/grammar_data.cc
 
 if FPARSER_SUPPORT_OPTIMIZER 
     pkg_sources += $(FPOPTIMIZER_CC_FILES)

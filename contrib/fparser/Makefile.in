@@ -63,11 +63,10 @@ target_triplet = @target@
 # Wrap code that uses std::move in fparser for compilers that don't support it
 @HAVE_CXX11_MOVE_TRUE@am__append_3 = -DFP_SUPPORT_CXX11_MOVE
 noinst_PROGRAMS = $(am__EXEEXT_1)
-@FPARSER_DEVEL_TRUE@am__append_4 = util/tree_grammar_parser \
+@FPARSER_DEVEL_TRUE@am__append_4 = fpoptimizer/grammar_data.cc
+@FPARSER_DEVEL_TRUE@am__append_5 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
 @FPARSER_DEVEL_TRUE@	util/cpp_compress
-@FPARSER_DEVEL_TRUE@am__append_5 = extrasrc/fp_opcode_add.inc \
-@FPARSER_DEVEL_TRUE@	fpoptimizer/grammar_data.cc
 @FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_6 = $(FPOPTIMIZER_CC_FILES)
 @FPARSER_DEVEL_TRUE@am__append_7 = $(BUILT_SOURCES)
 @FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_8 = fpoptimizer.cc
@@ -877,12 +876,13 @@ EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 	fpoptimizer/treerules.dat $(FPOPTIMIZER_CC_FILES) \
 	fpoptimizer/fpoptimizer_header.txt \
 	fpoptimizer/fpoptimizer_footer.txt
-BUILT_SOURCES = $(am__append_5)
+BUILT_SOURCES = extrasrc/fp_opcode_add.inc $(am__append_4)
 
 # when doing 'make clean' we need to remove the generated sources
 CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_7)
-DISTCLEANFILES = util/tree_grammar_parser # in case it wasn't \
-	conditionally cleaned
+# in case they weren't conditionally cleaned:
+DISTCLEANFILES = util/bytecoderules_parser util/cpp_compress \
+	util/tree_grammar_parser
 include_HEADERS = fparser.hh fparser_ad.hh
 FPOPTIMIZER_CC_FILES = \
 	    lib/crc32.hh \
@@ -963,6 +963,7 @@ util_tree_grammar_parser_SOURCES = \
                                  lib/autoptr.hh \
                                  extrasrc/fpaux.hh \
                                  extrasrc/fptypes.hh \
+                                 extrasrc/fp_opcode_add.inc \
                                  fparser_gmpint.hh extrasrc/fp_identifier_parser.inc
 
 util_bytecoderules_parser_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
@@ -2705,24 +2706,24 @@ fpoptimizer/grammar_data.cc: \
   # util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc 
 
 # extrasrc/fp_opcode_add.inc is a generated source, and this rule specifies how we build it.
-@FPARSER_DEVEL_TRUE@extrasrc/fp_opcode_add.inc: \
-@FPARSER_DEVEL_TRUE@		util/bytecoderules_parser \
-@FPARSER_DEVEL_TRUE@		util/bytecoderules.dat \
-@FPARSER_DEVEL_TRUE@		util/bytecoderules_header.txt \
-@FPARSER_DEVEL_TRUE@		util/cpp_compress
-@FPARSER_DEVEL_TRUE@	@echo "Creating system-specific Bytecode in "$@" ..."
-@FPARSER_DEVEL_TRUE@	@$(MKDIR_P) extrasrc
-@FPARSER_DEVEL_TRUE@	@cat $(srcdir)/util/bytecoderules_header.txt > $@
-@FPARSER_DEVEL_TRUE@	@util/bytecoderules_parser \
-@FPARSER_DEVEL_TRUE@		< $(srcdir)/util/bytecoderules.dat \
-@FPARSER_DEVEL_TRUE@		| util/cpp_compress \
-@FPARSER_DEVEL_TRUE@		>> $@
+extrasrc/fp_opcode_add.inc: \
+		util/bytecoderules_parser \
+		util/bytecoderules.dat \
+		util/bytecoderules_header.txt \
+		util/cpp_compress
+	@echo "Creating system-specific Bytecode in "$@" ..."
+	@$(MKDIR_P) extrasrc
+	@cat $(srcdir)/util/bytecoderules_header.txt > $@
+	@util/bytecoderules_parser \
+		< $(srcdir)/util/bytecoderules.dat \
+		| util/cpp_compress \
+		>> $@
+
+fparser.cc: extrasrc/fp_opcode_add.inc
 
 @FPARSER_DEVEL_TRUE@  # Build up utility programs used to define parsing, not needed
 @FPARSER_DEVEL_TRUE@  # for installation
 @FPARSER_DEVEL_TRUE@  # noinst_PROGRAMS           += util/make_function_name_parser
-
-@FPARSER_DEVEL_TRUE@fparser.cc: extrasrc/fp_opcode_add.inc
 
 @FPARSER_DEVEL_TRUE@   # when doing 'make clean' we need to remove the generated sources
 
