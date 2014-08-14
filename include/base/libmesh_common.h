@@ -466,7 +466,7 @@ template<class T> inline void libmesh_ignore( const T& ) { }
 // Use these casts when you're certain that a cast will succeed in
 // correct code but you want to be able to double-check.
 template <typename Tnew, typename Told>
-inline Tnew cast_ref(Told& oldvar);
+inline Tnew cast_ref(Told& oldvar)
 {
 #if !defined(NDEBUG) && defined(LIBMESH_HAVE_RTTI) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   try
