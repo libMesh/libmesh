@@ -17,7 +17,7 @@ using namespace libMesh;
 void LaplaceSystem::side_qoi_derivative (DiffContext &context,
                                          const QoISet & /* qois */)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.

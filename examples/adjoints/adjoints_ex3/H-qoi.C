@@ -18,7 +18,7 @@ void CoupledSystemQoI::init_qoi( std::vector<Number>& sys_qoi)
 void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
                                             const QoISet & /* qois */)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* side_fe = NULL;
   c.get_side_fe( 0, side_fe );
@@ -79,7 +79,7 @@ void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
 void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
 {
 
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.

@@ -31,7 +31,7 @@ void LaplaceSystem::init_data ()
 
 void LaplaceSystem::init_context(DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // Now make sure we have requested all the data
   // we need to build the linear system.
@@ -58,7 +58,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   // Are the jacobians specified analytically ?
   bool compute_jacobian = request_jacobian && _analytic_jacobians;
 
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -111,7 +111,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
   // Are the jacobians specified analytically ?
   bool compute_jacobian = request_jacobian && _analytic_jacobians;
 
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.

@@ -15,7 +15,7 @@ void LaplaceQoI::element_qoi (DiffContext &context,
                               const QoISet & /* qois */ )
 
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* elem_fe = NULL;
   c.get_element_fe( 0, elem_fe );
@@ -60,7 +60,7 @@ void LaplaceQoI::element_qoi (DiffContext &context,
 void LaplaceQoI::element_qoi_derivative (DiffContext &context,
                                          const QoISet & /* qois */)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.

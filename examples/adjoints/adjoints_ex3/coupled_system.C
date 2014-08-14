@@ -172,7 +172,7 @@ void CoupledSystem::init_data ()
 
 void CoupledSystem::init_context(DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // We should prerequest all the data
   // we will need to build the linear system.
@@ -201,7 +201,7 @@ void CoupledSystem::init_context(DiffContext &context)
 bool CoupledSystem::element_time_derivative (bool request_jacobian,
                                              DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -328,7 +328,7 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 bool CoupledSystem::element_constraint (bool request_jacobian,
                                         DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.

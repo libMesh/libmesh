@@ -147,7 +147,7 @@ void SolidSystem::update() {
 }
 
 void SolidSystem::init_context(DiffContext &context) {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // Pre-request all the data needed
   FEBase* elem_fe = NULL;
@@ -172,7 +172,7 @@ void SolidSystem::init_context(DiffContext &context) {
  */
 bool SolidSystem::element_time_derivative(bool request_jacobian,
                                           DiffContext &context) {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -270,7 +270,7 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
 
 bool SolidSystem::side_time_derivative(bool request_jacobian,
                                        DiffContext &context) {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // Apply displacement boundary conditions with penalty method
 

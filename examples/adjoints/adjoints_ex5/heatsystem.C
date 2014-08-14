@@ -73,7 +73,7 @@ void HeatSystem::init_data ()
 
 void HeatSystem::init_context(DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* elem_fe = NULL;
   c.get_element_fe( 0, elem_fe );
@@ -109,7 +109,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 {
   bool compute_jacobian = request_jacobian && _analytic_jacobians;
 
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
