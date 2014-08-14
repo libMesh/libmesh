@@ -163,7 +163,10 @@ util_tree_grammar_parser_SOURCES   = \
 
 # when doing 'make clean' we need to remove the generated sources
 CLEANFILES += fpoptimizer/grammar_data.cc
-DISTCLEANFILES += util/tree_grammar_parser # in case it wasn't conditionally cleaned
+# in case they weren't conditionally cleaned:
+DISTCLEANFILES += util/bytecoderules_parser
+DISTCLEANFILES += util/cpp_compress
+DISTCLEANFILES += util/tree_grammar_parser
 
 
 # extrasrc/fp_opcode_add.inc is a generated source, and this rule specifies how we build it.
