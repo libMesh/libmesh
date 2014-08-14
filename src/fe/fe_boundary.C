@@ -352,7 +352,7 @@ void FE<Dim,T>::side_map (const Elem* elem,
     }
 
   const unsigned int n_points =
-    libmesh_cast_int<unsigned int>(reference_side_points.size());
+    cast_int<unsigned int>(reference_side_points.size());
   reference_points.resize(n_points);
   for (unsigned int i = 0; i < n_points; i++)
     reference_points[i].zero();
@@ -393,7 +393,7 @@ void FEMap::init_face_shape_functions(const std::vector<Point>& qp,
   const ElemType mapping_elem_type (side->type());
 
   // The number of quadrature points.
-  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qp.size());
+  const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
@@ -482,7 +482,7 @@ void FEMap::init_edge_shape_functions(const std::vector<Point>& qp,
   const ElemType mapping_elem_type (edge->type());
 
   // The number of quadrature points.
-  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qp.size());
+  const unsigned int n_qp = cast_int<unsigned int>(qp.size());
 
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
@@ -529,7 +529,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
   START_LOG("compute_face_map()", "FEMap");
 
   // The number of quadrature points.
-  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
+  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
   switch (dim)
     {
@@ -817,7 +817,7 @@ void FEMap::compute_edge_map(int dim,
   START_LOG("compute_edge_map()", "FEMap");
 
   // The number of quadrature points.
-  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
+  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
   // Resize the vectors to hold data at the quadrature points
   this->xyz.resize(n_qp);

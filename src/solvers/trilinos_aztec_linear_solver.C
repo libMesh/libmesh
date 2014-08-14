@@ -110,10 +110,10 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
   START_LOG("solve()", "AztecLinearSolver");
 
   // Make sure the data passed in are really of Epetra types
-  EpetraMatrix<T>* matrix   = libmesh_cast_ptr<EpetraMatrix<T>*>(&matrix_in);
-  EpetraMatrix<T>* precond  = libmesh_cast_ptr<EpetraMatrix<T>*>(&precond_in);
-  EpetraVector<T>* solution = libmesh_cast_ptr<EpetraVector<T>*>(&solution_in);
-  EpetraVector<T>* rhs      = libmesh_cast_ptr<EpetraVector<T>*>(&rhs_in);
+  EpetraMatrix<T>* matrix   = cast_ptr<EpetraMatrix<T>*>(&matrix_in);
+  EpetraMatrix<T>* precond  = cast_ptr<EpetraMatrix<T>*>(&precond_in);
+  EpetraVector<T>* solution = cast_ptr<EpetraVector<T>*>(&solution_in);
+  EpetraVector<T>* rhs      = cast_ptr<EpetraVector<T>*>(&rhs_in);
 
   this->init();
 

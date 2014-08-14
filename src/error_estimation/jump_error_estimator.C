@@ -232,7 +232,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
                               dof_map.dof_indices (fine_elem, dof_indices_fine, var);
                               const unsigned int n_dofs_fine =
-                                libmesh_cast_int<unsigned int>(dof_indices_fine.size());
+                                cast_int<unsigned int>(dof_indices_fine.size());
                               Ufine.resize(n_dofs_fine);
 
                               for (unsigned int i=0; i<n_dofs_fine; i++)
@@ -297,9 +297,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
                       // The number of DOFS on each element
                       const unsigned int n_dofs_fine =
-                        libmesh_cast_int<unsigned int>(dof_indices_fine.size());
+                        cast_int<unsigned int>(dof_indices_fine.size());
                       const unsigned int n_dofs_coarse =
-                        libmesh_cast_int<unsigned int>(dof_indices_coarse.size());
+                        cast_int<unsigned int>(dof_indices_coarse.size());
                       Ufine.resize(n_dofs_fine);
                       Ucoarse.resize(n_dofs_coarse);
 
@@ -344,7 +344,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
                       // The number of DOFS on each element
                       const unsigned int n_dofs_fine =
-                        libmesh_cast_int<unsigned int>(dof_indices_fine.size());
+                        cast_int<unsigned int>(dof_indices_fine.size());
                       Ufine.resize(n_dofs_fine);
 
                       for (unsigned int i=0; i<n_dofs_fine; i++)

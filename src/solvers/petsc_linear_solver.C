@@ -459,10 +459,10 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* matrix   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_in);
-  PetscMatrix<T>* precond  = libmesh_cast_ptr<PetscMatrix<T>*>(&precond_in);
-  PetscVector<T>* solution = libmesh_cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = libmesh_cast_ptr<PetscVector<T>*>(&rhs_in);
+  PetscMatrix<T>* matrix   = cast_ptr<PetscMatrix<T>*>(&matrix_in);
+  PetscMatrix<T>* precond  = cast_ptr<PetscMatrix<T>*>(&precond_in);
+  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
 
   this->init (matrix);
 
@@ -802,11 +802,11 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* matrix   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_in);
+  PetscMatrix<T>* matrix   = cast_ptr<PetscMatrix<T>*>(&matrix_in);
   // Note that the matrix and precond matrix are the same
-  PetscMatrix<T>* precond  = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_in);
-  PetscVector<T>* solution = libmesh_cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = libmesh_cast_ptr<PetscVector<T>*>(&rhs_in);
+  PetscMatrix<T>* precond  = cast_ptr<PetscMatrix<T>*>(&matrix_in);
+  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
 
   this->init (matrix);
 
@@ -1167,8 +1167,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  PetscVector<T>* solution = libmesh_cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = libmesh_cast_ptr<PetscVector<T>*>(&rhs_in);
+  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
 
   this->init ();
 
@@ -1444,9 +1444,9 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   START_LOG("solve()", "PetscLinearSolver");
 
   // Make sure the data passed in are really of Petsc types
-  const PetscMatrix<T>* precond  = libmesh_cast_ptr<const PetscMatrix<T>*>(&precond_matrix);
-  PetscVector<T>* solution = libmesh_cast_ptr<PetscVector<T>*>(&solution_in);
-  PetscVector<T>* rhs      = libmesh_cast_ptr<PetscVector<T>*>(&rhs_in);
+  const PetscMatrix<T>* precond  = cast_ptr<const PetscMatrix<T>*>(&precond_matrix);
+  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* rhs      = cast_ptr<PetscVector<T>*>(&rhs_in);
 
   this->init ();
 

@@ -385,7 +385,7 @@ public:
    * Stokes (u,v,p), etc...
    */
   unsigned int n_variable_groups() const
-  { return libmesh_cast_int<unsigned int>(_variable_groups.size()); }
+  { return cast_int<unsigned int>(_variable_groups.size()); }
 
   /**
    * @returns the number of variables in the global solution vector. Defaults
@@ -393,7 +393,7 @@ public:
    * Stokes (u,v,p), etc...
    */
   unsigned int n_variables() const
-  { return libmesh_cast_int<unsigned int>(_variables.size()); }
+  { return cast_int<unsigned int>(_variables.size()); }
 
   /**
    * @returns true if the variables are capable of being stored in a blocked
@@ -443,7 +443,7 @@ public:
    */
   dof_id_type n_dofs_on_processor(const processor_id_type proc) const {
     libmesh_assert_less (proc, _first_df.size());
-    return libmesh_cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
+    return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
   }
 
   /**
@@ -475,7 +475,7 @@ public:
   dof_id_type last_dof(const processor_id_type proc) const {
     libmesh_deprecated();
     libmesh_assert_less (proc, _end_df.size());
-    return libmesh_cast_int<dof_id_type>(_end_df[proc] - 1);
+    return cast_int<dof_id_type>(_end_df[proc] - 1);
   }
 
   dof_id_type last_dof() const
@@ -598,7 +598,7 @@ public:
    * in the mesh.
    */
   dof_id_type n_constrained_nodes() const
-  { return libmesh_cast_int<dof_id_type>(_node_constraints.size()); }
+  { return cast_int<dof_id_type>(_node_constraints.size()); }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**

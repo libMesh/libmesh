@@ -775,7 +775,7 @@ template <typename T>
 inline
 void EigenSparseVector<T>::swap (NumericVector<T> &other)
 {
-  EigenSparseVector<T>& v = libmesh_cast_ref<EigenSparseVector<T>&>(other);
+  EigenSparseVector<T>& v = cast_ref<EigenSparseVector<T>&>(other);
 
   _vec.swap(v._vec);
 

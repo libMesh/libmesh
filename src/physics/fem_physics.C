@@ -46,7 +46,7 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
   libmesh_not_implemented();
 
 #if 0
-  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+  FEMContext &context = cast_ref<FEMContext&>(c);
 
   // This function only supports fully coupled mesh motion for now
   libmesh_assert_equal_to (_mesh_sys, this);
@@ -104,7 +104,7 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
       if (this->time_solver->is_steady())
         return request_jacobian;
       else
-        unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
+        unsteady = cast_ptr<UnsteadySolver*>(this->time_solver.get());
 
       const std::vector<Real> &JxW =
         context.element_fe_var[var]->get_JxW();
@@ -201,7 +201,7 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
 bool FEMPhysics::mass_residual (bool request_jacobian,
                                 DiffContext &c)
 {
-  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+  FEMContext &context = cast_ref<FEMContext&>(c);
 
   unsigned int n_qpoints = context.get_element_qrule().n_points();
 
@@ -217,7 +217,7 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
 
       const std::vector<std::vector<Real> > &phi = elem_fe->get_phi();
 
-      const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+      const unsigned int n_dofs = cast_int<unsigned int>
         (context.get_dof_indices(var).size());
 
       DenseSubVector<Number> &Fu = context.get_elem_residual(var);

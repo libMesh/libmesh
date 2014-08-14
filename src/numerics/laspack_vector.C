@@ -180,7 +180,7 @@ template <typename T>
 void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 {
   // Make sure the vector passed in is really a LaspackVector
-  const LaspackVector* v = libmesh_cast_ptr<const LaspackVector*>(&v_in);
+  const LaspackVector* v = cast_ptr<const LaspackVector*>(&v_in);
 
 #ifndef NDEBUG
   const bool was_closed = this->_is_closed;
@@ -290,8 +290,8 @@ void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
                                    const SparseMatrix<T> &mat_in)
 {
   // Make sure the data passed in are really in Laspack types
-  const LaspackVector<T>* vec = libmesh_cast_ptr<const LaspackVector<T>*>(&vec_in);
-  const LaspackMatrix<T>* mat = libmesh_cast_ptr<const LaspackMatrix<T>*>(&mat_in);
+  const LaspackVector<T>* vec = cast_ptr<const LaspackVector<T>*>(&vec_in);
+  const LaspackMatrix<T>* mat = cast_ptr<const LaspackMatrix<T>*>(&mat_in);
 
   libmesh_assert(vec);
   libmesh_assert(mat);
@@ -336,7 +336,7 @@ T LaspackVector<T>::dot (const NumericVector<T>& V) const
   libmesh_assert (this->initialized());
 
   // Make sure the NumericVector passed in is really a LaspackVector
-  const LaspackVector<T>* v = libmesh_cast_ptr<const LaspackVector<T>*>(&V);
+  const LaspackVector<T>* v = cast_ptr<const LaspackVector<T>*>(&V);
   libmesh_assert(v);
 
   return Mul_VV (const_cast<QVector*>(&(this->_vec)),
@@ -365,7 +365,7 @@ LaspackVector<T>::operator = (const NumericVector<T>& v_in)
 {
   // Make sure the NumericVector passed in is really a LaspackVector
   const LaspackVector<T>* v =
-    libmesh_cast_ptr<const LaspackVector<T>*>(&v_in);
+    cast_ptr<const LaspackVector<T>*>(&v_in);
 
   libmesh_assert(v);
 
@@ -422,7 +422,7 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
 {
   // Make sure the NumericVector passed in is really a LaspackVector
   LaspackVector<T>* v_local =
-    libmesh_cast_ptr<LaspackVector<T>*>(&v_local_in);
+    cast_ptr<LaspackVector<T>*>(&v_local_in);
 
   libmesh_assert(v_local);
 
@@ -437,7 +437,7 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
 {
   // Make sure the NumericVector passed in is really a LaspackVector
   LaspackVector<T>* v_local =
-    libmesh_cast_ptr<LaspackVector<T>*>(&v_local_in);
+    cast_ptr<LaspackVector<T>*>(&v_local_in);
 
   libmesh_assert(v_local);
   libmesh_assert_less_equal (send_list.size(), v_local->size());

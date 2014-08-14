@@ -1043,7 +1043,7 @@ void EpetraVector<T>::swap (NumericVector<T> &other)
 {
   NumericVector<T>::swap(other);
 
-  EpetraVector<T>& v = libmesh_cast_ref<EpetraVector<T>&>(other);
+  EpetraVector<T>& v = cast_ref<EpetraVector<T>&>(other);
 
   std::swap(_vec, v._vec);
   std::swap(_map, v._map);

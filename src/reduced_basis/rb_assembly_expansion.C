@@ -102,19 +102,19 @@ void RBAssemblyExpansion::perform_output_boundary_assembly(unsigned int output_i
 
 unsigned int RBAssemblyExpansion::get_n_A_terms() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_A_assembly_vector.size());
 }
 
 unsigned int RBAssemblyExpansion::get_n_F_terms() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_F_assembly_vector.size());
 }
 
 unsigned int RBAssemblyExpansion::get_n_outputs() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_output_assembly_vector.size());
 }
 
@@ -123,7 +123,7 @@ unsigned int RBAssemblyExpansion::get_n_output_terms(unsigned int index) const
   if(index >= get_n_outputs())
     libmesh_error_msg("Error: We must have index < n_outputs in get_Q_l.");
 
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_output_assembly_vector[index].size());
 }
 

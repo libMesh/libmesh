@@ -97,7 +97,7 @@ void RBEIMEvaluation::attach_parametrized_function(RBParametrizedFunction* pf)
 
 unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_parametrized_functions.size());
 }
 

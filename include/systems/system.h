@@ -2003,7 +2003,7 @@ void System::set_basic_system_only ()
 inline
 unsigned int System::n_vars() const
 {
-  return libmesh_cast_int<unsigned int>(_variables.size());
+  return cast_int<unsigned int>(_variables.size());
 }
 
 
@@ -2011,7 +2011,7 @@ unsigned int System::n_vars() const
 inline
 unsigned int System::n_variable_groups() const
 {
-  return libmesh_cast_int<unsigned int>(_variable_groups.size());
+  return cast_int<unsigned int>(_variable_groups.size());
 }
 
 
@@ -2131,7 +2131,7 @@ bool System::have_vector (const std::string& vec_name) const
 inline
 unsigned int System::n_vectors () const
 {
-  return libmesh_cast_int<unsigned int>(_vectors.size());
+  return cast_int<unsigned int>(_vectors.size());
 }
 
 inline

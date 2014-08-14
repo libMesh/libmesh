@@ -74,8 +74,8 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
   // that each bin is roughly equal size
   {
     // Find the total size of the data set
-    IdxType local_data_size = libmesh_cast_int<IdxType>(data.size());
-    IdxType global_data_size = libmesh_cast_int<IdxType>(local_data_size);
+    IdxType local_data_size = cast_int<IdxType>(data.size());
+    IdxType global_data_size = cast_int<IdxType>(local_data_size);
 
     this->comm().sum(global_data_size);
 

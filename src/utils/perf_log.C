@@ -176,13 +176,13 @@ std::string PerfLog::get_info_header() const
       unsigned int max_length = 0;
       for (unsigned int i=0; i<v.size(); ++i)
         if (v[i]->str().size() > max_length)
-          max_length = libmesh_cast_int<unsigned int>
+          max_length = cast_int<unsigned int>
             (v[i]->str().size());
 
       // Find the longest string in the parsed_libmesh_configure_info
       for (unsigned i=0; i<parsed_libmesh_configure_info.size(); ++i)
         if (parsed_libmesh_configure_info[i].size() > max_length)
-          max_length = libmesh_cast_int<unsigned int>
+          max_length = cast_int<unsigned int>
             (parsed_libmesh_configure_info[i].size());
 
       // Print dashed line for the header
@@ -265,7 +265,7 @@ std::string PerfLog::get_perf_info() const
       // a possible 2-character indentation, plus a space.
       for (pos = log.begin(); pos != log.end(); ++pos)
         if (pos->first.second.size()+3 > event_col_width)
-          event_col_width = libmesh_cast_int<unsigned int>
+          event_col_width = cast_int<unsigned int>
             (pos->first.second.size()+3);
 
       // Set the total width of the column
@@ -291,7 +291,7 @@ std::string PerfLog::get_perf_info() const
              << ", Active time=" << total_time;
 
         // Get the size of the temporary string
-        const unsigned int temp_size = libmesh_cast_int<unsigned int>
+        const unsigned int temp_size = cast_int<unsigned int>
           (temp.str().size());
 
         // Send the temporary message to the output

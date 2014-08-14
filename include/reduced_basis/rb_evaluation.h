@@ -146,7 +146,7 @@ public:
    * Get the current number of basis functions.
    */
   virtual unsigned int get_n_basis_functions() const
-  { return libmesh_cast_int<unsigned int>(basis_functions.size()); }
+  { return cast_int<unsigned int>(basis_functions.size()); }
 
   /**
    * Set the number of basis functions. Useful when reading in

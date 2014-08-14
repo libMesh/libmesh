@@ -93,8 +93,8 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   NonlinearImplicitSystem &sys = _solver->system();
 
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm()), R(r, sys.comm());
-  EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
-  EpetraVector<Number>& R_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.rhs);
+  EpetraVector<Number>& X_sys = *cast_ptr<EpetraVector<Number>*>(sys.solution.get());
+  EpetraVector<Number>& R_sys = *cast_ptr<EpetraVector<Number>*>(sys.rhs);
 
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
@@ -141,7 +141,7 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
   NonlinearImplicitSystem &sys = _solver->system();
 
   EpetraMatrix<Number> Jac(&dynamic_cast<Epetra_FECrsMatrix &>(jac), sys.comm());
-  EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
+  EpetraVector<Number>& X_sys = *cast_ptr<EpetraVector<Number>*>(sys.solution.get());
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm());
 
   // Set the dof maps
@@ -195,7 +195,7 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
   TrilinosPreconditioner<Number> & tpc = dynamic_cast<TrilinosPreconditioner<Number> &>(prec);
 
   EpetraMatrix<Number> Jac(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()),sys.comm());
-  EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
+  EpetraVector<Number>& X_sys = *cast_ptr<EpetraVector<Number>*>(sys.solution.get());
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm());
 
   // Set the dof maps
@@ -263,7 +263,7 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  /* jac_in */,  // System Jacobia
   if (this->user_presolve)
     this->user_presolve(this->system());
 
-  EpetraVector<T> * x_epetra = libmesh_cast_ptr<EpetraVector<T>*>(&x_in);
+  EpetraVector<T> * x_epetra = cast_ptr<EpetraVector<T>*>(&x_in);
   // Creating a Teuchos::RCP as they do in NOX examples does not work here - we get some invalid memory references
   // thus we make a local copy
   NOX::Epetra::Vector x(*x_epetra->vec());
@@ -309,7 +309,9 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  /* jac_in */,  // System Jacobia
           // PJNFK
           lsParams.set("Preconditioner", "User Defined");
 
-          TrilinosPreconditioner<Number> * trilinos_pc = libmesh_cast_ptr<TrilinosPreconditioner<Number> *>(this->_preconditioner);
+          TrilinosPreconditioner<Number> * trilinos_pc =
+            cast_ptr<TrilinosPreconditioner<Number> *>
+              (this->_preconditioner);
           pc = Teuchos::rcp(trilinos_pc);
 
           Teuchos::RCP<NOX::Epetra::Interface::Preconditioner> iPrec(_interface);
@@ -323,7 +325,7 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  /* jac_in */,  // System Jacobia
 
           // full jacobian
           NonlinearImplicitSystem & sys = _interface->_solver->system();
-          EpetraMatrix<Number> & jacSys = *libmesh_cast_ptr<EpetraMatrix<Number>*>(sys.matrix);
+          EpetraMatrix<Number> & jacSys = *cast_ptr<EpetraMatrix<Number>*>(sys.matrix);
           Teuchos::RCP<Epetra_RowMatrix> jacMat = Teuchos::rcp(jacSys.mat());
 
           Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac(_interface);

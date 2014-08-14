@@ -115,7 +115,7 @@ IdxType Histogram<KeyType,IdxType>::n_bins () const
   if (bin_iters.empty())
     return 0;
 
-  return libmesh_cast_int<IdxType>(bin_iters.size()-1);
+  return cast_int<IdxType>(bin_iters.size()-1);
 }
 
 
@@ -127,7 +127,7 @@ IdxType Histogram<KeyType,IdxType>::local_bin_size (const IdxType bin) const
   libmesh_assert_less ((bin+1), bin_iters.size());
 
   // The number of entries in the bin (locally)
-  return libmesh_cast_int<IdxType>
+  return cast_int<IdxType>
     (std::distance (bin_iters[bin], bin_iters[bin+1]));
 }
 

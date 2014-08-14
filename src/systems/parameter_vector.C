@@ -32,7 +32,7 @@ namespace libMesh
 
 void ParameterVector::deep_copy(ParameterVector &target) const
 {
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());
   target._params.resize(Np);
   target._my_data.resize(Np);
@@ -55,7 +55,7 @@ void ParameterVector::shallow_copy(ParameterVector &target) const
 
 void ParameterVector::value_copy(const ParameterVector &target) const
 {
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());
   libmesh_assert_equal_to (target._params.size(), Np);
 
@@ -77,7 +77,7 @@ void ParameterVector::deep_resize(unsigned int s)
 
 ParameterVector& ParameterVector::operator *= (const Number a)
 {
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());
   for (unsigned int i=0; i != Np; ++i)
     *(this->_params[i]) *= a;
@@ -88,7 +88,7 @@ ParameterVector& ParameterVector::operator *= (const Number a)
 
 const ParameterVector& ParameterVector::operator += (const ParameterVector& a) const
 {
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (this->_params.size());
   libmesh_assert_equal_to (a._params.size(), Np);
   for (unsigned int i=0; i != Np; ++i)

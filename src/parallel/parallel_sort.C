@@ -63,7 +63,7 @@ void Sort<KeyType,IdxType>::sort()
   // Find the global data size.  The sorting
   // algorithms assume they have a range to
   // work with, so catch the degenerate cases here
-  IdxType global_data_size = libmesh_cast_int<IdxType>(_data.size());
+  IdxType global_data_size = cast_int<IdxType>(_data.size());
 
   this->comm().sum (global_data_size);
 

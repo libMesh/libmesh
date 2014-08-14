@@ -170,7 +170,7 @@ void FEMContext::interior_value(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -204,7 +204,7 @@ void FEMContext::interior_values (unsigned int var,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -253,7 +253,7 @@ void FEMContext::interior_gradient(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -291,7 +291,7 @@ void FEMContext::interior_gradients
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -341,7 +341,7 @@ void FEMContext::interior_hessian(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -380,7 +380,7 @@ void FEMContext::interior_hessians
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -420,7 +420,7 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -455,7 +455,7 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -498,7 +498,7 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -533,7 +533,7 @@ void FEMContext::side_values
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -581,7 +581,7 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -619,7 +619,7 @@ void FEMContext::side_gradients
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -669,7 +669,7 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -708,7 +708,7 @@ void FEMContext::side_hessians
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -759,7 +759,7 @@ void FEMContext::point_value(unsigned int var, const Point &p,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -808,7 +808,7 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -860,7 +860,7 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -897,7 +897,7 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -944,7 +944,7 @@ void FEMContext::fixed_interior_value(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -990,7 +990,7 @@ void FEMContext::FEMContext::fixed_interior_gradient(unsigned int var, unsigned 
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1039,7 +1039,7 @@ void FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1084,7 +1084,7 @@ void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1130,7 +1130,7 @@ void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1178,7 +1178,7 @@ void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1222,7 +1222,7 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1271,7 +1271,7 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1323,7 +1323,7 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
   // Get current local coefficients
@@ -1597,7 +1597,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
 
   // Initialize the per-element data for elem.
   sys.get_dof_map().dof_indices (elem, dof_indices);
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices.size());
   const std::size_t n_qoi = sys.qoi.size();
 
@@ -1623,7 +1623,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
       {
         sys.get_dof_map().dof_indices (elem, dof_indices_var[i], i);
 
-        const unsigned int n_dofs_var = libmesh_cast_int<unsigned int>
+        const unsigned int n_dofs_var = cast_int<unsigned int>
           (dof_indices_var[i].size());
 
         elem_subsolutions[i]->reposition
@@ -1643,7 +1643,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
         for (unsigned int j=0; j != i; ++j)
           {
             const unsigned int n_dofs_var_j =
-              libmesh_cast_int<unsigned int>
+              cast_int<unsigned int>
               (dof_indices_var[j].size());
 
             elem_subjacobians[i][j]->reposition
@@ -1677,7 +1677,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
       unsigned int sub_dofs = 0;
       for (unsigned int i=0; i != sys.n_vars(); ++i)
         {
-          const unsigned int n_dofs_var = libmesh_cast_int<unsigned int>
+          const unsigned int n_dofs_var = cast_int<unsigned int>
             (dof_indices_var[i].size());
           sys.get_dof_map().dof_indices (elem, dof_indices_var[i], i);
 

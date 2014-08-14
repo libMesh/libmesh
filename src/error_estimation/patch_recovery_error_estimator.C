@@ -415,7 +415,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
               libmesh_assert_equal_to (dof_indices.size(), phi->size());
 
               const unsigned int n_dofs =
-                libmesh_cast_int<unsigned int>(dof_indices.size());
+                cast_int<unsigned int>(dof_indices.size());
               const unsigned int n_qp   = qrule->n_points();
 
               // Compute the projection components from this cell.
@@ -663,7 +663,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
               // The number of dofs for this variable on this element
               const unsigned int n_dofs =
-                libmesh_cast_int<unsigned int>(dof_indices.size());
+                cast_int<unsigned int>(dof_indices.size());
 
               // Variable to hold the error on the current element
               Real element_error = 0;
@@ -680,7 +680,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
               // The number of points we will sample over
               const unsigned int n_sp =
-                libmesh_cast_int<unsigned int>(JxW.size());
+                cast_int<unsigned int>(JxW.size());
 
               // Loop over every sample point for the current element
               for (unsigned int sp=0; sp<n_sp; sp++)

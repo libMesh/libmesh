@@ -131,7 +131,7 @@ EpetraVector<T>::operator /= (NumericVector<T> & v)
   libmesh_assert(this->closed());
   libmesh_assert_equal_to(size(), v.size());
 
-  EpetraVector<T> & v_vec = libmesh_cast_ref<EpetraVector<T>&>(v);
+  EpetraVector<T> & v_vec = cast_ref<EpetraVector<T>&>(v);
 
   _vec->ReciprocalMultiply(1.0, *v_vec._vec, *_vec, 0.0);
 }
@@ -236,12 +236,12 @@ template <typename T>
 void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
                                   const SparseMatrix<T>& A_in)
 {
-  const EpetraVector<T>* V = libmesh_cast_ptr<const EpetraVector<T>*>(&V_in);
-  const EpetraMatrix<T>* A = libmesh_cast_ptr<const EpetraMatrix<T>*>(&A_in);
+  const EpetraVector<T>* V = cast_ptr<const EpetraVector<T>*>(&V_in);
+  const EpetraMatrix<T>* A = cast_ptr<const EpetraMatrix<T>*>(&A_in);
 
   // FIXME - does Trilinos let us do this *without* memory allocation?
   AutoPtr<NumericVector<T> > temp = V->zero_clone();
-  EpetraVector<T>* tempV = libmesh_cast_ptr<EpetraVector<T>*>(temp.get());
+  EpetraVector<T>* tempV = cast_ptr<EpetraVector<T>*>(temp.get());
   A->mat()->Multiply(false, *V->_vec, *tempV->_vec);
   *this += *temp;
 }
@@ -295,7 +295,7 @@ void EpetraVector<T>::add (const NumericVector<T>& v)
 template <typename T>
 void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 {
-  const EpetraVector<T>* v = libmesh_cast_ptr<const EpetraVector<T>*>(&v_in);
+  const EpetraVector<T>* v = cast_ptr<const EpetraVector<T>*>(&v_in);
 
   libmesh_assert_equal_to (this->size(), v->size());
 
@@ -375,7 +375,7 @@ void EpetraVector<T>::abs()
 template <typename T>
 T EpetraVector<T>::dot (const NumericVector<T>& V_in) const
 {
-  const EpetraVector<T>* V = libmesh_cast_ptr<const EpetraVector<T>*>(&V_in);
+  const EpetraVector<T>* V = cast_ptr<const EpetraVector<T>*>(&V_in);
 
   T result=0.0;
 
@@ -389,8 +389,8 @@ template <typename T>
 void EpetraVector<T>::pointwise_mult (const NumericVector<T>& vec1,
                                       const NumericVector<T>& vec2)
 {
-  const EpetraVector<T>* V1 = libmesh_cast_ptr<const EpetraVector<T>*>(&vec1);
-  const EpetraVector<T>* V2 = libmesh_cast_ptr<const EpetraVector<T>*>(&vec2);
+  const EpetraVector<T>* V1 = cast_ptr<const EpetraVector<T>*>(&vec1);
+  const EpetraVector<T>* V2 = cast_ptr<const EpetraVector<T>*>(&vec2);
 
   _vec->Multiply(1.0, *V1->_vec, *V2->_vec, 0.0);
 }
@@ -411,7 +411,7 @@ template <typename T>
 NumericVector<T>&
 EpetraVector<T>::operator = (const NumericVector<T>& v_in)
 {
-  const EpetraVector<T>* v = libmesh_cast_ptr<const EpetraVector<T>*>(&v_in);
+  const EpetraVector<T>* v = cast_ptr<const EpetraVector<T>*>(&v_in);
 
   *this = *v;
 
@@ -474,7 +474,7 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
 template <typename T>
 void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 {
-  EpetraVector<T>* v_local = libmesh_cast_ptr<EpetraVector<T>*>(&v_local_in);
+  EpetraVector<T>* v_local = cast_ptr<EpetraVector<T>*>(&v_local_in);
 
   Epetra_Map rootMap = Epetra_Util::Create_Root_Map( *_map, -1);
   v_local->_vec->ReplaceMap(rootMap);
@@ -493,7 +493,7 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
   this->localize(v_local_in);
 
   //   EpetraVector<T>* v_local =
-  //   libmesh_cast_ptr<EpetraVector<T>*>(&v_local_in);
+  //   cast_ptr<EpetraVector<T>*>(&v_local_in);
 
   //   libmesh_assert(this->_map.get());
   //   libmesh_assert(v_local->_map.get());

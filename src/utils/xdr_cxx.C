@@ -432,7 +432,7 @@ bool xdr_translate(XDR* x, std::complex<T>& a) {
 
 template <typename T>
 bool xdr_translate(XDR* x, std::vector<T>& a) {
-  unsigned int length = libmesh_cast_int<unsigned int>(a.size());
+  unsigned int length = cast_int<unsigned int>(a.size());
   xdr_u_int(x, &length);
   if (length > 0)
     {
@@ -446,7 +446,7 @@ bool xdr_translate(XDR* x, std::vector<T>& a) {
 
 template <typename T>
 bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
-  unsigned int length = libmesh_cast_int<unsigned int>(a.size());
+  unsigned int length = cast_int<unsigned int>(a.size());
   bool b = xdr_u_int(x, &length);
   a.resize(length);
   typename std::vector<std::complex<T> >::iterator iter = a.begin();
@@ -458,7 +458,7 @@ bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
 
 template <>
 bool xdr_translate(XDR* x, std::vector<std::string>& s) {
-  unsigned int length = libmesh_cast_int<unsigned int>(s.size());
+  unsigned int length = cast_int<unsigned int>(s.size());
   bool b = xdr_u_int(x, &length);
   s.resize(length);
   std::vector<std::string>::iterator iter = s.begin();

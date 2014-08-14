@@ -261,7 +261,7 @@ void RBEIMConstruction::enrich_RB_space()
   // this allows us to compute EIM_rhs appropriately
   solution->localize(*_ghosted_meshfunction_vector, this->get_dof_map().get_send_list());
 
-  RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+  RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
 
   // If we have at least one basis function we need to use
   // rb_solve to find the EIM interpolation error, otherwise just use solution as is
@@ -304,7 +304,7 @@ void RBEIMConstruction::enrich_RB_space()
   MeshBase& mesh = this->get_mesh();
 
   AutoPtr<DGFEMContext> c = this->build_context();
-  DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
+  DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
 
   this->init_context(context);
 
@@ -497,14 +497,14 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   // Otherwise, we have to compute the projection
   else
     {
-      RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+      RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
       eim_eval.set_parameters( get_parameters() );
 
       // Compute truth representation via projection
       const MeshBase& mesh = this->get_mesh();
 
       AutoPtr<DGFEMContext> c = this->build_context();
-      DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
+      DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
 
       this->init_context(context);
 
@@ -538,7 +538,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
               DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
 
-              unsigned int n_var_dofs = libmesh_cast_int<unsigned int>
+              unsigned int n_var_dofs = cast_int<unsigned int>
                 (context.get_dof_indices( var ).size());
 
               Number eval_result = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
@@ -607,7 +607,7 @@ void RBEIMConstruction::update_RB_system_matrices()
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+  RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
 
   // update the EIM interpolation matrix
   for(unsigned int j=0; j<RB_size; j++)

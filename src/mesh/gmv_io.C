@@ -1110,7 +1110,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       (v != NULL))
     {
       const unsigned int n_vars =
-        libmesh_cast_int<unsigned int>(solution_names->size());
+        cast_int<unsigned int>(solution_names->size());
 
       if (!(v->size() == mesh.n_nodes()*n_vars))
         libMesh::err << "ERROR: v->size()=" << v->size()

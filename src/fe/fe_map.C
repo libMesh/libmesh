@@ -701,7 +701,7 @@ void FEMap::compute_affine_map( const unsigned int dim,
 
   libmesh_assert(elem);
 
-  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
+  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
   // Resize the vectors to hold data at the quadrature points
   this->resize_quadrature_map_vectors(dim, n_qp);
@@ -771,7 +771,7 @@ void FEMap::compute_null_map( const unsigned int dim,
   // Start logging the map computation.
   START_LOG("compute_null_map()", "FEMap");
 
-  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
+  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
   // Resize the vectors to hold data at the quadrature points
   this->resize_quadrature_map_vectors(dim, n_qp);
@@ -841,7 +841,7 @@ void FEMap::compute_map(const unsigned int dim,
 
   libmesh_assert(elem);
 
-  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
+  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
   // Resize the vectors to hold data at the quadrature points
   this->resize_quadrature_map_vectors(dim, n_qp);

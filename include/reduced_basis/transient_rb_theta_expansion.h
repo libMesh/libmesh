@@ -67,7 +67,7 @@ public:
    * expansion for the mass operator.
    */
   virtual unsigned int get_n_M_terms()
-  { return libmesh_cast_int<unsigned int>(_M_theta_vector.size()); }
+  { return cast_int<unsigned int>(_M_theta_vector.size()); }
 
   /**
    * Attach a pointer to a functor object that defines one

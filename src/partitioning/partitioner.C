@@ -244,7 +244,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
       libmesh_assert_less (global_index, n_unpartitioned_elements);
 
       const processor_id_type subdomain_id =
-        libmesh_cast_int<processor_id_type>
+        cast_int<processor_id_type>
         (std::distance(subdomain_bounds.begin(),
                        std::upper_bound(subdomain_bounds.begin(),
                                         subdomain_bounds.end(),

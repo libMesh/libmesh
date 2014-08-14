@@ -373,7 +373,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
 
   const processor_id_type n_adjacent_processors =
-    libmesh_cast_int<processor_id_type>(adjacent_processors.size());
+    cast_int<processor_id_type>(adjacent_processors.size());
 
   //-------------------------------------------------------------------------
   // Let's build a list of all nodes which live on NULL-neighbor sides.

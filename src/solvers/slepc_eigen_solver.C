@@ -107,7 +107,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T>* matrix_A   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+  PetscMatrix<T>* matrix_A   = cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
@@ -294,8 +294,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* matrix_A   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
-  PetscMatrix<T>* matrix_B   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
+  PetscMatrix<T>* matrix_A   = cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+  PetscMatrix<T>* matrix_B   = cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
@@ -329,7 +329,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
                         &mat_A);
   LIBMESH_CHKERRABORT(ierr);
 
-  PetscMatrix<T>* matrix_B   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
+  PetscMatrix<T>* matrix_B   = cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_B->close ();
@@ -360,7 +360,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 
   PetscErrorCode ierr=0;
 
-  PetscMatrix<T>* matrix_A = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
+  PetscMatrix<T>* matrix_A = cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
@@ -671,7 +671,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
   PetscReal re, im;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* solution = libmesh_cast_ptr<PetscVector<T>*>(&solution_in);
+  PetscVector<T>* solution = cast_ptr<PetscVector<T>*>(&solution_in);
 
   // real and imaginary part of the ith eigenvalue.
   PetscScalar kr, ki;
@@ -737,7 +737,7 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T>& deflation_vec
   this->init();
 
   PetscErrorCode ierr = 0;
-  Vec deflation_vector = (libmesh_cast_ptr<PetscVector<T>*>(&deflation_vector_in))->vec();
+  Vec deflation_vector = (cast_ptr<PetscVector<T>*>(&deflation_vector_in))->vec();
   Vec* deflation_space = &deflation_vector;
 #if SLEPC_VERSION_LESS_THAN(3,1,0)
   ierr = EPSAttachDeflationSpace(_eps, 1, deflation_space, PETSC_FALSE);

@@ -738,7 +738,7 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   this->close();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T>* petsc_submatrix = libmesh_cast_ptr<PetscMatrix<T>*>(&submatrix);
+  PetscMatrix<T>* petsc_submatrix = cast_ptr<PetscMatrix<T>*>(&submatrix);
 
   // If we're not reusing submatrix and submatrix is already initialized
   // then we need to clear it, otherwise we get a memory leak.
@@ -786,7 +786,7 @@ template <typename T>
 void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 {
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>& petsc_dest = libmesh_cast_ref<PetscVector<T>&>(dest);
+  PetscVector<T>& petsc_dest = cast_ref<PetscVector<T>&>(dest);
 
   // Call PETSc function.
 
@@ -813,7 +813,7 @@ template <typename T>
 void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 {
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T>& petsc_dest = libmesh_cast_ref<PetscMatrix<T>&>(dest);
+  PetscMatrix<T>& petsc_dest = cast_ref<PetscMatrix<T>&>(dest);
 
   // If we aren't reusing the matrix then need to clear dest,
   // otherwise we get a memory leak
@@ -991,7 +991,7 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   libmesh_assert_equal_to (this->n(), X_in.n());
 
   PetscScalar     a = static_cast<PetscScalar>      (a_in);
-  PetscMatrix<T>* X = libmesh_cast_ptr<PetscMatrix<T>*> (&X_in);
+  PetscMatrix<T>* X = cast_ptr<PetscMatrix<T>*> (&X_in);
 
   libmesh_assert (X);
 

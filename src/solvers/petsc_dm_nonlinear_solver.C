@@ -131,11 +131,11 @@ PetscDMNonlinearSolver<T>::solve (SparseMatrix<T>& jac_in,  // System Jacobian M
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  libmesh_cast_ptr<PetscMatrix<T>*>(&jac_in);
-  libmesh_cast_ptr<PetscVector<T>*>(&r_in);
+  cast_ptr<PetscMatrix<T>*>(&jac_in);
+  cast_ptr<PetscVector<T>*>(&r_in);
 
   // Extract solution vector
-  PetscVector<T>* x = libmesh_cast_ptr<PetscVector<T>*>(&x_in);
+  PetscVector<T>* x = cast_ptr<PetscVector<T>*>(&x_in);
 
   PetscErrorCode ierr=0;
   PetscInt n_iterations =0;

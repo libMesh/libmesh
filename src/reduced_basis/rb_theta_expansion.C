@@ -34,19 +34,19 @@ RBThetaExpansion::RBThetaExpansion()
 
 unsigned int RBThetaExpansion::get_n_A_terms() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_A_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_F_terms() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_F_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_outputs() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_output_theta_vector.size());
 }
 
@@ -55,7 +55,7 @@ unsigned int RBThetaExpansion::get_n_output_terms(unsigned int index) const
   if(index >= get_n_outputs())
     libmesh_error_msg("Error: We must have index < n_outputs in get_Q_l.");
 
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (_output_theta_vector[index].size());
 }
 

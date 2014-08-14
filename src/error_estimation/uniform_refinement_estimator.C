@@ -536,7 +536,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
               // The number of shape functions
               const unsigned int n_sf =
-                libmesh_cast_int<unsigned int>(dof_indices.size());
+                cast_int<unsigned int>(dof_indices.size());
 
               //
               // Begin the loop over the Quadrature points.

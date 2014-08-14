@@ -159,7 +159,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
   // the number of quadrature points
   const unsigned int n_radial_qp =
-    libmesh_cast_int<unsigned int>(som.size());
+    cast_int<unsigned int>(som.size());
   const unsigned int n_base_qp   = base_qrule->n_points();
   const unsigned int n_total_qp  = n_radial_qp * n_base_qp;
 
@@ -176,7 +176,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
     // the number of mapping shape functions
     // (Lagrange shape functions are used for mapping in the base)
     const unsigned int n_radial_mapping_sf =
-      libmesh_cast_int<unsigned int>(radial_map.size());
+      cast_int<unsigned int>(radial_map.size());
     const unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
                                                                                 base_mapping_order);
 

@@ -385,11 +385,11 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   // -----------------------------------------------------------------
   // fast access to some const int's for the radial data
   const unsigned int n_radial_mapping_sf =
-    libmesh_cast_int<unsigned int>(radial_map.size());
+    cast_int<unsigned int>(radial_map.size());
   const unsigned int n_radial_approx_sf  =
-    libmesh_cast_int<unsigned int>(mode.size());
+    cast_int<unsigned int>(mode.size());
   const unsigned int n_radial_qp         =
-    libmesh_cast_int<unsigned int>(som.size());
+    cast_int<unsigned int>(som.size());
 
 
   // -----------------------------------------------------------------
@@ -746,7 +746,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 
 
   const unsigned int n_base_mapping_sf =
-    libmesh_cast_int<unsigned int>(dist.size());
+    cast_int<unsigned int>(dist.size());
   const Point origin = inf_elem->origin();
 
   // for each new infinite element, compute the radial distances
@@ -793,7 +793,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
         const unsigned int n_base_qp           = base_qrule->  n_points();
 
         const unsigned int n_total_mapping_sf  =
-          libmesh_cast_int<unsigned int>(radial_map.size()) * n_base_mapping_sf;
+          cast_int<unsigned int>(radial_map.size()) * n_base_mapping_sf;
 
         const unsigned int n_total_approx_sf   = Radial::n_dofs(fe_type.radial_order) *  base_fe->n_shape_functions();
 

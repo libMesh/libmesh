@@ -1825,7 +1825,7 @@ Elem::RefinementState Elem::refinement_flag () const
 inline
 void Elem::set_refinement_flag(RefinementState rflag)
 {
-  _rflag = libmesh_cast_int<RefinementState>(rflag);
+  _rflag = cast_int<RefinementState>(rflag);
 }
 
 
@@ -1841,7 +1841,7 @@ Elem::RefinementState Elem::p_refinement_flag () const
 inline
 void Elem::set_p_refinement_flag(RefinementState pflag)
 {
-  _pflag = libmesh_cast_int<unsigned char>(pflag);
+  _pflag = cast_int<unsigned char>(pflag);
 }
 
 
@@ -1881,8 +1881,8 @@ void Elem::set_p_level(unsigned int p)
       // our parent's, but we have to check every other child to see
       else if (parent_p_level == _p_level && _p_level < p)
         {
-          _p_level = libmesh_cast_int<unsigned char>(p);
-          parent_p_level = libmesh_cast_int<unsigned char>(p);
+          _p_level = cast_int<unsigned char>(p);
+          parent_p_level = cast_int<unsigned char>(p);
           for (unsigned int c=0; c != this->parent()->n_children(); c++)
             parent_p_level = std::min(parent_p_level,
                                       this->parent()->child(c)->p_level());
@@ -1894,7 +1894,7 @@ void Elem::set_p_level(unsigned int p)
         }
     }
 
-  _p_level = libmesh_cast_int<unsigned char>(p);
+  _p_level = cast_int<unsigned char>(p);
 }
 
 
@@ -1902,7 +1902,7 @@ void Elem::set_p_level(unsigned int p)
 inline
 void Elem::hack_p_level(unsigned int p)
 {
-  _p_level = libmesh_cast_int<unsigned char>(p);
+  _p_level = cast_int<unsigned char>(p);
 }
 
 

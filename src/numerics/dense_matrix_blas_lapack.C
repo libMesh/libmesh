@@ -79,7 +79,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
     }
 
   // For this to work, the passed arg. must actually be a DenseMatrix<T>
-  const DenseMatrix<T>* const_that = libmesh_cast_ptr< const DenseMatrix<T>* >(&other);
+  const DenseMatrix<T>* const_that = cast_ptr< const DenseMatrix<T>* >(&other);
 
   // Also, although 'that' is logically const in this BLAS routine,
   // the PETSc BLAS interface does not specify that any of the inputs are
@@ -313,7 +313,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
 
   // Load the singular values into sigma, ignore U_val and VT_val
   const unsigned int n_sigma_vals =
-    libmesh_cast_int<unsigned int>(sigma_val.size());
+    cast_int<unsigned int>(sigma_val.size());
   sigma.resize(n_sigma_vals);
   for(unsigned int i=0; i<n_sigma_vals; i++)
     sigma(i) = sigma_val[i];
@@ -358,7 +358,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
 
   // Load the singular values into sigma, ignore U_val and VT_val
   const unsigned int n_sigma_vals =
-    libmesh_cast_int<unsigned int>(sigma_val.size());
+    cast_int<unsigned int>(sigma_val.size());
   sigma.resize(n_sigma_vals);
   for(unsigned int i=0; i<n_sigma_vals; i++)
     sigma(i) = sigma_val[i];

@@ -115,7 +115,7 @@ public:
    */
   unsigned int n_points() const
   { libmesh_assert (!_points.empty());
-    return libmesh_cast_int<unsigned int>(_points.size()); }
+    return cast_int<unsigned int>(_points.size()); }
 
   /**
    * @returns the dimension of the quadrature rule.

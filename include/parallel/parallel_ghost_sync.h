@@ -178,10 +178,10 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
     {
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
-        libmesh_cast_int<processor_id_type>
+        cast_int<processor_id_type>
         ((communicator.rank() + p) % communicator.size());
       const processor_id_type procdown =
-        libmesh_cast_int<processor_id_type>
+        cast_int<processor_id_type>
         ((communicator.size() + communicator.rank() - p) %
          communicator.size());
       std::vector<Real> request_to_fill_x,
@@ -281,10 +281,10 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
     {
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
-        libmesh_cast_int<processor_id_type>
+        cast_int<processor_id_type>
         (communicator.rank() + p) % communicator.size();
       const processor_id_type procdown =
-        libmesh_cast_int<processor_id_type>
+        cast_int<processor_id_type>
         ((communicator.size() + communicator.rank() - p) %
          communicator.size());
       std::vector<dof_id_type> request_to_fill_id;
@@ -367,7 +367,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       requested_objs_id[obj_procid].push_back(elem->id());
       requested_objs_parent_id[obj_procid].push_back(parent->id());
       requested_objs_child_num[obj_procid].push_back
-        (libmesh_cast_int<unsigned char>
+        (cast_int<unsigned char>
          (parent->which_child_am_i(elem)));
     }
 
@@ -376,10 +376,10 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
     {
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
-        libmesh_cast_int<processor_id_type>
+        cast_int<processor_id_type>
         (communicator.rank() + p) % communicator.size();
       const processor_id_type procdown =
-        libmesh_cast_int<processor_id_type>
+        cast_int<processor_id_type>
         ((communicator.size() + communicator.rank() - p) %
          communicator.size());
       std::vector<dof_id_type>   request_to_fill_parent_id;

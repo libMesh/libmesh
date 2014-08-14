@@ -721,8 +721,8 @@ void Nemesis_IO_Helper::create(std::string filename)
     }
   else
     {
-      comp_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
-      io_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
+      comp_ws = cast_int<int>(std::min(sizeof(Real), sizeof(double)));
+      io_ws = cast_int<int>(std::min(sizeof(Real), sizeof(double)));
     }
 
   this->ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
@@ -745,7 +745,7 @@ void Nemesis_IO_Helper::create(std::string filename)
 void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, bool /*use_discontinuous*/)
 {
   // Make sure that the reference passed in is really a ParallelMesh
-  // const ParallelMesh& pmesh = libmesh_cast_ref<const ParallelMesh&>(mesh);
+  // const ParallelMesh& pmesh = cast_ref<const ParallelMesh&>(mesh);
   const MeshBase& pmesh = mesh;
 
   // According to Nemesis documentation, first call when writing should be to
@@ -924,9 +924,9 @@ void Nemesis_IO_Helper::write_exodus_initialization_info(const MeshBase& pmesh,
   // Exodus will also use *global* number of side and node sets,
   // though it will not write out entries for all of them...
   this->num_side_sets =
-    libmesh_cast_int<int>(this->global_sideset_ids.size());
+    cast_int<int>(this->global_sideset_ids.size());
   this->num_node_sets =
-    libmesh_cast_int<int>(this->global_nodeset_ids.size());
+    cast_int<int>(this->global_nodeset_ids.size());
 
   // We need to write the global number of blocks, even though this processor might not have
   // elements in some of them!
@@ -2286,7 +2286,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*use_discontinuous*/)
 {
   // Make sure that the reference passed in is really a ParallelMesh
-  // const ParallelMesh& pmesh = libmesh_cast_ref<const ParallelMesh&>(mesh);
+  // const ParallelMesh& pmesh = cast_ref<const ParallelMesh&>(mesh);
 
   unsigned local_num_nodes = this->exodus_node_num_to_libmesh.size();
 

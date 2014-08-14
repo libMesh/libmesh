@@ -48,7 +48,7 @@ void DifferentiablePhysics::init_physics (const System& sys)
 bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
                                                    DiffContext &c)
 {
-  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+  FEMContext &context = cast_ref<FEMContext&>(c);
 
   for (unsigned int var = 0; var != context.n_vars(); ++var)
     {

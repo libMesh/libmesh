@@ -807,7 +807,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
   const unsigned int
     sys_num    = this->number(),
-    num_vecs   = libmesh_cast_int<unsigned int>(vecs.size());
+    num_vecs   = cast_int<unsigned int>(vecs.size());
   const std::size_t
     io_blksize = std::min(max_io_blksize,
                           static_cast<std::size_t>(n_objs)),
@@ -1835,7 +1835,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
   const unsigned int
     sys_num    = this->number(),
-    num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
+    num_vecs   = cast_int<unsigned int>(vecs.size()),
     num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 
   // libMesh::out << "io_blksize = "    << io_blksize
@@ -2103,7 +2103,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
       const DofMap& dof_map = this->get_dof_map();
       std::vector<dof_id_type> SCALAR_dofs;
       dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
-      const unsigned int n_scalar_dofs = libmesh_cast_int<unsigned int>
+      const unsigned int n_scalar_dofs = cast_int<unsigned int>
         (SCALAR_dofs.size());
 
       for(unsigned int i=0; i<n_scalar_dofs; i++)
@@ -2136,7 +2136,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
   if (this->processor_id() == 0)
     {
       io.data_stream (&vals[0], vals.size());
-      written_length += libmesh_cast_int<unsigned int>(vals.size());
+      written_length += cast_int<unsigned int>(vals.size());
     }
 
   return written_length;
@@ -2301,7 +2301,7 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
   if (this->processor_id() == 0)
     {
       unsigned int
-        n_vec    = libmesh_cast_int<unsigned int>(vectors.size());
+        n_vec    = cast_int<unsigned int>(vectors.size());
       dof_id_type
         vec_size = vectors.empty() ? 0 : vectors[0]->size();
       // Set the number of vectors
