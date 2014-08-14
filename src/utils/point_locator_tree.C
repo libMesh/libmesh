@@ -164,7 +164,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
           // the master in a state for which we are friends.
           // And make sure the master @e has a tree!
           const PointLocatorTree* my_master =
-            libmesh_cast_ptr<const PointLocatorTree*>(this->_master);
+            cast_ptr<const PointLocatorTree*>(this->_master);
 
           if (my_master->initialized())
             this->_tree = my_master->_tree;

@@ -24,7 +24,7 @@
 // type of iterator you will be using.
 
 // libMesh includes
-#include "libmesh/libmesh_common.h" // libmesh_cast_int
+#include "libmesh/libmesh_common.h" // cast_int
 #include "libmesh/parallel_object.h"
 
 // C++ includes
@@ -81,7 +81,7 @@ IdxType BinSorter<KeyType,IdxType>::sizeof_bin (const IdxType bin) const
 
   // The size of the bin is defined by the distance between
   // its bounding iterators
-  return libmesh_cast_int<IdxType>
+  return cast_int<IdxType>
     (std::distance (bin_iters[bin], bin_iters[bin+1]));
 }
 

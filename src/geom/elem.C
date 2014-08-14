@@ -531,7 +531,7 @@ bool Elem::operator == (const Elem& rhs) const
       iterator new_end = std::unique (common_nodes.begin(),
                                       common_nodes.end());
 
-      const int new_size = libmesh_cast_int<int>
+      const int new_size = cast_int<int>
         (std::distance (common_nodes.begin(), new_end));
 
       // If this passes the elements are connected

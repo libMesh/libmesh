@@ -79,7 +79,7 @@ public:
    * @returns the size of the vector.
    */
   virtual unsigned int size() const {
-    return libmesh_cast_int<unsigned int>(_val.size());
+    return cast_int<unsigned int>(_val.size());
   }
 
   /**

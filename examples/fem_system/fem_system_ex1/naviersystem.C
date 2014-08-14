@@ -177,7 +177,7 @@ void NavierSystem::init_data ()
 
 void NavierSystem::init_context(DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* u_elem_fe;
   FEBase* p_elem_fe;
@@ -205,7 +205,7 @@ void NavierSystem::init_context(DiffContext &context)
 bool NavierSystem::element_time_derivative (bool request_jacobian,
                                             DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* u_elem_fe;
   FEBase* p_elem_fe;
@@ -385,7 +385,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
 bool NavierSystem::element_constraint (bool request_jacobian,
                                        DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* u_elem_fe;
   FEBase* p_elem_fe;
@@ -461,7 +461,7 @@ bool NavierSystem::element_constraint (bool request_jacobian,
 bool NavierSystem::side_constraint (bool request_jacobian,
                                     DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* p_elem_fe;
 
@@ -519,7 +519,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
 bool NavierSystem::mass_residual (bool request_jacobian,
                                   DiffContext &context)
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* u_elem_fe;
 

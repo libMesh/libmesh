@@ -99,7 +99,7 @@ public:
    * Number of variables in solution.
    */
   unsigned int n_vars() const
-  { return libmesh_cast_int<unsigned int>(dof_indices_var.size()); }
+  { return cast_int<unsigned int>(dof_indices_var.size()); }
 
   /**
    * Accessor for associated system.

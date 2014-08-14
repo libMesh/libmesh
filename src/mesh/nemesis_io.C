@@ -1130,7 +1130,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     return;
 
   // Gather neighboring elements so that the mesh has the proper "ghost" neighbor information.
-  MeshCommunication().gather_neighboring_elements(libmesh_cast_ref<ParallelMesh&>(mesh));
+  MeshCommunication().gather_neighboring_elements(cast_ref<ParallelMesh&>(mesh));
 }
 
 #else

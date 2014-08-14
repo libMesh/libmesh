@@ -1313,24 +1313,24 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
           if (read_unique_id)
             {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              unique_id  = libmesh_cast_int<unique_id_type>(*it);
+              unique_id  = cast_int<unique_id_type>(*it);
 #endif
               ++it;
             }
           const dof_id_type parent_id =
             (*it == static_cast<T>(-1)) ?
             DofObject::invalid_id :
-            libmesh_cast_int<dof_id_type>(*it);
+            cast_int<dof_id_type>(*it);
           ++it;
           const processor_id_type proc_id =
-            libmesh_cast_int<processor_id_type>(*it);
+            cast_int<processor_id_type>(*it);
           ++it;
           const subdomain_id_type subdomain_id =
-            libmesh_cast_int<subdomain_id_type>(*it);
+            cast_int<subdomain_id_type>(*it);
           ++it;
 #ifdef LIBMESH_ENABLE_AMR
           const unsigned int p_level =
-            libmesh_cast_int<unsigned int>(*it);
+            cast_int<unsigned int>(*it);
 #endif
           ++it;
 

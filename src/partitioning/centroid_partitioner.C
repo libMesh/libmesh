@@ -110,8 +110,8 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
       Elem* elem = _elem_centroids[i].second;
 
       elem->processor_id() =
-        std::min (libmesh_cast_int<processor_id_type>(i / target_size),
-                  libmesh_cast_int<processor_id_type>(n-1));
+        std::min (cast_int<processor_id_type>(i / target_size),
+                  cast_int<processor_id_type>(n-1));
     }
 }
 

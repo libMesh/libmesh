@@ -30,7 +30,7 @@
 #endif
 
 // Local includes
-#include "libmesh/libmesh_common.h" // for libmesh_cast_ptr()
+#include "libmesh/libmesh_common.h" // for cast_ptr()
 
 /**
  * Original Authors: Corwin Joy          * Michael Gradman
@@ -201,10 +201,10 @@ public:
     {
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
-        libMesh::libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>*>(other);
+        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType>*>(other);
 #else
       const Iter<IterType>* p =
-        libMesh::libmesh_cast_ptr<const Iter<IterType>*>(other);
+        libMesh::cast_ptr<const Iter<IterType>*>(other);
 #endif
 
       return (iter_data == p->iter_data);
@@ -287,10 +287,10 @@ public:
       // Attempt downcast
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
-        libMesh::libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>* >(in);
+        libMesh::cast_ptr<const variant_filter_iterator::Iter<IterType>* >(in);
 #else
       const Iter<IterType>* p =
-        libMesh::libmesh_cast_ptr<const Iter<IterType>* >(in);
+        libMesh::cast_ptr<const Iter<IterType>* >(in);
 #endif
 
       // Return result of op() for the user's predicate.

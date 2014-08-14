@@ -165,7 +165,7 @@ NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
 {
   libmesh_assert_equal_to(size(), v.size());
 
-  DistributedVector<T> & v_vec = libmesh_cast_ref<DistributedVector<T>&>(v);
+  DistributedVector<T> & v_vec = cast_ref<DistributedVector<T>&>(v);
 
   std::size_t local_size = _values.size();
 
@@ -384,7 +384,7 @@ T DistributedVector<T>::dot (const NumericVector<T>& V) const
   parallel_object_only();
 
   // Make sure the NumericVector passed in is really a DistributedVector
-  const DistributedVector<T>* v = libmesh_cast_ptr<const DistributedVector<T>*>(&V);
+  const DistributedVector<T>* v = cast_ptr<const DistributedVector<T>*>(&V);
 
   // Make sure that the two vectors are distributed in the same way.
   libmesh_assert_equal_to ( this->first_local_index(), v->first_local_index() );
@@ -425,7 +425,7 @@ NumericVector<T>&
 DistributedVector<T>::operator = (const NumericVector<T>& v_in)
 {
   // Make sure the NumericVector passed in is really a DistributedVector
-  const DistributedVector<T>* v = libmesh_cast_ptr<const DistributedVector<T>*>(&v_in);
+  const DistributedVector<T>* v = cast_ptr<const DistributedVector<T>*>(&v_in);
 
   *this = *v;
 
@@ -488,7 +488,7 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  DistributedVector<T>* v_local = libmesh_cast_ptr<DistributedVector<T>*>(&v_local_in);
+  DistributedVector<T>* v_local = cast_ptr<DistributedVector<T>*>(&v_local_in);
 
   v_local->_first_local_index = 0;
 

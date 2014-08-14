@@ -237,8 +237,8 @@ void PetscVector<T>::add_vector (const NumericVector<T>& V_in,
 {
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
-  const PetscVector<T>* V = libmesh_cast_ptr<const PetscVector<T>*>(&V_in);
-  const PetscMatrix<T>* A = libmesh_cast_ptr<const PetscMatrix<T>*>(&A_in);
+  const PetscVector<T>* V = cast_ptr<const PetscVector<T>*>(&V_in);
+  const PetscMatrix<T>* A = cast_ptr<const PetscMatrix<T>*>(&A_in);
 
   PetscErrorCode ierr=0;
 
@@ -269,8 +269,8 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T>& V_in,
 {
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
-  const PetscVector<T>* V = libmesh_cast_ptr<const PetscVector<T>*>(&V_in);
-  const PetscMatrix<T>* A = libmesh_cast_ptr<const PetscMatrix<T>*>(&A_in);
+  const PetscVector<T>* V = cast_ptr<const PetscVector<T>*>(&V_in);
+  const PetscMatrix<T>* A = cast_ptr<const PetscMatrix<T>*>(&A_in);
 
   PetscErrorCode ierr=0;
 
@@ -301,8 +301,8 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>& V_i
 {
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
-  const PetscVector<T>* V = libmesh_cast_ptr<const PetscVector<T>*>(&V_in);
-  const PetscMatrix<T>* A = libmesh_cast_ptr<const PetscMatrix<T>*>(&A_in);
+  const PetscVector<T>* V = cast_ptr<const PetscVector<T>*>(&V_in);
+  const PetscMatrix<T>* A = cast_ptr<const PetscMatrix<T>*>(&A_in);
 
   A->close();
 
@@ -403,7 +403,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   PetscScalar a = static_cast<PetscScalar>(a_in);
 
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&v_in);
+  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&v_in);
   v->_restore_array();
 
   libmesh_assert_equal_to (this->size(), v->size());
@@ -542,7 +542,7 @@ NumericVector<T> & PetscVector<T>::operator /= (NumericVector<T> & v)
 {
   PetscErrorCode ierr = 0;
 
-  const PetscVector<T>* v_vec = libmesh_cast_ptr<const PetscVector<T>*>(&v);
+  const PetscVector<T>* v_vec = cast_ptr<const PetscVector<T>*>(&v);
 
   ierr = VecPointwiseDivide(_vec, _vec, v_vec->_vec);
   LIBMESH_CHKERRABORT(ierr);
@@ -588,7 +588,7 @@ T PetscVector<T>::dot (const NumericVector<T>& V) const
   PetscScalar value=0.;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&V);
+  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&V);
 
   // 2.3.x (at least) style.  Untested for previous versions.
   ierr = VecDot(this->_vec, v->_vec, &value);
@@ -609,7 +609,7 @@ T PetscVector<T>::indefinite_dot (const NumericVector<T>& V) const
   PetscScalar value=0.;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&V);
+  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&V);
 
   // 2.3.x (at least) style.  Untested for previous versions.
   ierr = VecTDot(this->_vec, v->_vec, &value);
@@ -674,7 +674,7 @@ NumericVector<T>&
 PetscVector<T>::operator = (const NumericVector<T>& v_in)
 {
   // Make sure the NumericVector passed in is really a PetscVector
-  const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&v_in);
+  const PetscVector<T>* v = cast_ptr<const PetscVector<T>*>(&v_in);
 
   *this = *v;
 
@@ -807,7 +807,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   this->_restore_array();
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
+  PetscVector<T>* v_local = cast_ptr<PetscVector<T>*>(&v_local_in);
 
   libmesh_assert(v_local);
   libmesh_assert_equal_to (v_local->size(), this->size());
@@ -884,7 +884,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   this->_restore_array();
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
+  PetscVector<T>* v_local = cast_ptr<PetscVector<T>*>(&v_local_in);
 
   libmesh_assert(v_local);
   libmesh_assert_equal_to (v_local->size(), this->size());
@@ -1266,8 +1266,8 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
   PetscErrorCode ierr = 0;
 
   // Convert arguments to PetscVector*.
-  const PetscVector<T>* vec1_petsc = libmesh_cast_ptr<const PetscVector<T>*>(&vec1);
-  const PetscVector<T>* vec2_petsc = libmesh_cast_ptr<const PetscVector<T>*>(&vec2);
+  const PetscVector<T>* vec1_petsc = cast_ptr<const PetscVector<T>*>(&vec1);
+  const PetscVector<T>* vec2_petsc = cast_ptr<const PetscVector<T>*>(&vec2);
 
   // Call PETSc function.
 
@@ -1386,7 +1386,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
   PetscErrorCode ierr = 0;
 
   // Make sure the passed in subvector is really a PetscVector
-  PetscVector<T>* petsc_subvector = libmesh_cast_ptr<PetscVector<T>*>(&subvector);
+  PetscVector<T>* petsc_subvector = cast_ptr<PetscVector<T>*>(&subvector);
 
   // If the petsc_subvector is already initialized, we assume that the
   // user has already allocated the *correct* amount of space for it.

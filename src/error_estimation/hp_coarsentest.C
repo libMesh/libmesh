@@ -69,7 +69,7 @@ void HPCoarsenTest::add_projection(const System &system,
   dof_map.dof_indices(elem, dof_indices, var);
 
   const unsigned int n_dofs =
-    libmesh_cast_int<unsigned int>(dof_indices.size());
+    cast_int<unsigned int>(dof_indices.size());
 
   FEInterface::inverse_map (system.get_mesh().mesh_dimension(),
                             fe_type, coarse, *xyz_values, coarse_qpoints);
@@ -77,7 +77,7 @@ void HPCoarsenTest::add_projection(const System &system,
   fe_coarse->reinit(coarse, &coarse_qpoints);
 
   const unsigned int n_coarse_dofs =
-    libmesh_cast_int<unsigned int>(phi_coarse->size());
+    cast_int<unsigned int>(phi_coarse->size());
 
   if (Uc.size() == 0)
     {
@@ -288,7 +288,7 @@ void HPCoarsenTest::select_refinement (System &system)
 
           // The number of DOFS on the fine element
           const unsigned int n_dofs =
-            libmesh_cast_int<unsigned int>(dof_indices.size());
+            cast_int<unsigned int>(dof_indices.size());
 
           // The number of nodes on the fine element
           const unsigned int n_nodes = elem->n_nodes();
@@ -322,7 +322,7 @@ void HPCoarsenTest::select_refinement (System &system)
               fe_coarse->reinit(elem, &(qrule->get_points()));
 
               const unsigned int n_coarse_dofs =
-                libmesh_cast_int<unsigned int>(phi_coarse->size());
+                cast_int<unsigned int>(phi_coarse->size());
 
               (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
 
@@ -458,7 +458,7 @@ void HPCoarsenTest::select_refinement (System &system)
 
               // The number of DOFS on the coarse element
               unsigned int n_coarse_dofs =
-                libmesh_cast_int<unsigned int>(phi_coarse->size());
+                cast_int<unsigned int>(phi_coarse->size());
 
               // Loop over the quadrature points
               for (unsigned int qp=0; qp<n_qp; qp++)

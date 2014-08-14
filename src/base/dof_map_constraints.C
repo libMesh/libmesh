@@ -488,7 +488,7 @@ private:
 
         // The number of DOFs on the element
         const unsigned int n_dofs =
-          libmesh_cast_int<unsigned int>(dof_indices.size());
+          cast_int<unsigned int>(dof_indices.size());
 
         // Fixed vs. free DoFs on edge/face projections
         std::vector<char> dof_is_fixed(n_dofs, false); // bools
@@ -2261,7 +2261,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       !called_recursively) // case 2: constrained in terms of our own DOFs
     {
       const unsigned int old_size =
-        libmesh_cast_int<unsigned int>(elem_dofs.size());
+        cast_int<unsigned int>(elem_dofs.size());
 
       // Add new dependency dofs to the end of the current dof set
       elem_dofs.insert(elem_dofs.end(),
@@ -2270,7 +2270,7 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       // Now we can build the constraint matrix.
       // Note that resize also zeros for a DenseMatrix<Number>.
       C.resize (old_size,
-                libmesh_cast_int<unsigned int>(elem_dofs.size()));
+                cast_int<unsigned int>(elem_dofs.size()));
 
       // Create the C constraint matrix.
       for (unsigned int i=0; i != old_size; i++)
@@ -2393,7 +2393,7 @@ void DofMap::build_constraint_matrix_and_vector
         }
 
       const unsigned int old_size =
-        libmesh_cast_int<unsigned int>(elem_dofs.size());
+        cast_int<unsigned int>(elem_dofs.size());
 
       // Add new dependency dofs to the end of the current dof set
       elem_dofs.insert(elem_dofs.end(),
@@ -2402,7 +2402,7 @@ void DofMap::build_constraint_matrix_and_vector
       // Now we can build the constraint matrix and vector.
       // Note that resize also zeros for a DenseMatrix and DenseVector
       C.resize (old_size,
-                libmesh_cast_int<unsigned int>(elem_dofs.size()));
+                cast_int<unsigned int>(elem_dofs.size()));
       H.resize (old_size);
 
       // Create the C constraint matrix.

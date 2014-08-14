@@ -97,7 +97,7 @@ public:
    * The number of field variables.
    */
   unsigned int n_field_variables () const
-  { return libmesh_cast_int<unsigned int>(_names.size()); }
+  { return cast_int<unsigned int>(_names.size()); }
 
   /**
    * Defines the field variable(s) we are responsible for,

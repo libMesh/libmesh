@@ -396,7 +396,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
           for (unsigned int vg=0; vg != n_var_groups; ++vg)
             {
               unsigned int n_comp_g =
-                libmesh_cast_int<unsigned int>(filled_request[i*2*n_var_groups+vg]);
+                cast_int<unsigned int>(filled_request[i*2*n_var_groups+vg]);
               requested->set_n_comp_group(sys_num, vg, n_comp_g);
               if (n_comp_g)
                 {
@@ -676,7 +676,7 @@ void DofMap::reinit(MeshBase& mesh)
                 node->n_comp_group(sys_num, vg);
 
               const unsigned int vertex_dofs = old_node_dofs?
-                libmesh_cast_int<unsigned int>(node->vg_dof_base (sys_num,vg)):0;
+                cast_int<unsigned int>(node->vg_dof_base (sys_num,vg)):0;
 
               const unsigned int new_node_dofs =
                 FEInterface::n_dofs_at_node(dim, fe_type, type, n);
@@ -1683,7 +1683,7 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
   bool has_constrained_dofs = false;
 
   for (unsigned int il=0;
-       il != libmesh_cast_int<unsigned int>(dof_indices_in.size()); il++)
+       il != cast_int<unsigned int>(dof_indices_in.size()); il++)
     {
       const dof_id_type ig = dof_indices_in[il];
 
@@ -1715,13 +1715,13 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 
       // compute Ue = C Ug, with proper mapping.
       const unsigned int n_original_dofs =
-        libmesh_cast_int<unsigned int>(dof_indices_in.size());
+        cast_int<unsigned int>(dof_indices_in.size());
       for (unsigned int i=0; i != n_original_dofs; i++)
         {
           Ue.el(i) = H(i);
 
           const unsigned int n_constrained =
-            libmesh_cast_int<unsigned int>(constrained_dof_indices.size());
+            cast_int<unsigned int>(constrained_dof_indices.size());
           for (unsigned int j=0; j<n_constrained; j++)
             {
               const dof_id_type jg = constrained_dof_indices[j];
@@ -1742,7 +1742,7 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
   // Trivial mapping
 
   const unsigned int n_original_dofs =
-    libmesh_cast_int<unsigned int>(dof_indices_in.size());
+    cast_int<unsigned int>(dof_indices_in.size());
 
   libmesh_assert_equal_to (n_original_dofs, Ue.size());
 
@@ -2458,7 +2458,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
           std::sort(element_dofs.begin(), element_dofs.end());
 
           const unsigned int n_dofs_on_element =
-            libmesh_cast_int<unsigned int>(element_dofs.size());
+            cast_int<unsigned int>(element_dofs.size());
 
           for (unsigned int i=0; i<n_dofs_on_element; i++)
             {
@@ -2615,7 +2615,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
             // into increasing order
             std::sort(element_dofs_i.begin(), element_dofs_i.end());
             const unsigned int n_dofs_on_element_i =
-              libmesh_cast_int<unsigned int>(element_dofs_i.size());
+              cast_int<unsigned int>(element_dofs_i.size());
 
             for (unsigned int vj=0; vj<n_var; vj++)
               if ((*dof_coupling)(vi,vj)) // If vi couples to vj
@@ -2637,7 +2637,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
                     element_dofs_j = element_dofs_i;
 
                   const unsigned int n_dofs_on_element_j =
-                    libmesh_cast_int<unsigned int>(element_dofs_j.size());
+                    cast_int<unsigned int>(element_dofs_j.size());
 
                   // there might be 0 dofs for the other variable on the same element (when subdomain variables do not overlap) and that's when we do not do anything
                   if (n_dofs_on_element_j > 0)
@@ -2747,7 +2747,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
                                       dof_map.find_connected_dofs (neighbor_dofs);
 #endif
                                       const unsigned int n_dofs_on_neighbor =
-                                        libmesh_cast_int<unsigned int>(neighbor_dofs.size());
+                                        cast_int<unsigned int>(neighbor_dofs.size());
 
                                       for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
                                         {

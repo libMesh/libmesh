@@ -300,7 +300,7 @@ inline
 void DGFEMContext::get_neighbor_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
 {
   libmesh_assert_less ( var, _neighbor_side_fe_var.size() );
-  fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _neighbor_side_fe_var[var] );
+  fe = cast_ptr<FEGenericBase<OutputShape>*>( _neighbor_side_fe_var[var] );
 }
 
 } // namespace libMesh

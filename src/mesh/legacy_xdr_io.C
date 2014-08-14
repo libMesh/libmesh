@@ -745,7 +745,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
 
   // Store a variable for the number of element types
   const unsigned int n_el_types =
-    libmesh_cast_int<unsigned int>(etypes.size());
+    cast_int<unsigned int>(etypes.size());
 
   m.set_num_levels(n_levels);
 

@@ -774,7 +774,7 @@ template <typename T>
 inline
 void LaspackVector<T>::swap (NumericVector<T> &other)
 {
-  LaspackVector<T>& v = libmesh_cast_ref<LaspackVector<T>&>(other);
+  LaspackVector<T>& v = cast_ref<LaspackVector<T>&>(other);
 
   // This is all grossly dependent on Laspack version...
 

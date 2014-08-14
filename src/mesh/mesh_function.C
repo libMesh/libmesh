@@ -116,7 +116,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
     {
       // we aren't the master
       const MeshFunction* master =
-        libmesh_cast_ptr<const MeshFunction*>(this->_master);
+        cast_ptr<const MeshFunction*>(this->_master);
 
       if (master->_point_locator == NULL)
         libmesh_error_msg("ERROR: When the master-servant concept is used, the master has to be initialized first!");
@@ -225,7 +225,7 @@ void MeshFunction::operator() (const Point& p,
   if (this->_master != NULL)
     {
       const MeshFunction* master =
-        libmesh_cast_ptr<const MeshFunction*>(this->_master);
+        cast_ptr<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
         libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
                           << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
@@ -267,7 +267,7 @@ void MeshFunction::operator() (const Point& p,
     {
       // resize the output vector to the number of output values
       // that the user told us
-      output.resize (libmesh_cast_int<unsigned int>
+      output.resize (cast_int<unsigned int>
                      (this->_system_vars.size()));
 
 
@@ -346,7 +346,7 @@ void MeshFunction::gradient (const Point& p,
   if (this->_master != NULL)
     {
       const MeshFunction* master =
-        libmesh_cast_ptr<const MeshFunction*>(this->_master);
+        cast_ptr<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
         libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
                           << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
@@ -457,7 +457,7 @@ void MeshFunction::hessian (const Point& p,
   if (this->_master != NULL)
     {
       const MeshFunction* master =
-        libmesh_cast_ptr<const MeshFunction*>(this->_master);
+        cast_ptr<const MeshFunction*>(this->_master);
       if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
         libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
                           << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");

@@ -943,7 +943,7 @@ void PetscVector<T>::init (const NumericVector<T>& other,
   if (this->initialized())
     this->clear();
 
-  const PetscVector<T>& v = libmesh_cast_ref<const PetscVector<T>&>(other);
+  const PetscVector<T>& v = cast_ref<const PetscVector<T>&>(other);
 
   // Other vector should restore array.
   if(v.initialized())
@@ -1333,7 +1333,7 @@ void PetscVector<T>::swap (NumericVector<T> &other)
 {
   NumericVector<T>::swap(other);
 
-  PetscVector<T>& v = libmesh_cast_ref<PetscVector<T>&>(other);
+  PetscVector<T>& v = cast_ref<PetscVector<T>&>(other);
 
   std::swap(_vec, v._vec);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);

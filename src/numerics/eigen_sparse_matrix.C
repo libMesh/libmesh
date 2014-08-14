@@ -124,8 +124,8 @@ void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 {
   libmesh_assert (this->initialized());
-  unsigned int n_rows = libmesh_cast_int<unsigned int>(rows.size());
-  unsigned int n_cols = libmesh_cast_int<unsigned int>(cols.size());
+  unsigned int n_rows = cast_int<unsigned int>(rows.size());
+  unsigned int n_cols = cast_int<unsigned int>(cols.size());
   libmesh_assert_equal_to (dm.m(), n_rows);
   libmesh_assert_equal_to (dm.n(), n_cols);
 
@@ -140,7 +140,7 @@ void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 template <typename T>
 void EigenSparseMatrix<T>::get_diagonal (NumericVector<T>& dest_in) const
 {
-  EigenSparseVector<T>& dest = libmesh_cast_ref<EigenSparseVector<T>&>(dest_in);
+  EigenSparseVector<T>& dest = cast_ref<EigenSparseVector<T>&>(dest_in);
 
   dest._vec = _mat.diagonal();
 }
@@ -150,7 +150,7 @@ void EigenSparseMatrix<T>::get_diagonal (NumericVector<T>& dest_in) const
 template <typename T>
 void EigenSparseMatrix<T>::get_transpose (SparseMatrix<T>& dest_in) const
 {
-  EigenSparseMatrix<T>& dest = libmesh_cast_ref<EigenSparseMatrix<T>&>(dest_in);
+  EigenSparseMatrix<T>& dest = cast_ref<EigenSparseMatrix<T>&>(dest_in);
 
   dest._mat = _mat.transpose();
 }
@@ -273,7 +273,7 @@ void EigenSparseMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  EigenSparseMatrix<T> &X = libmesh_cast_ref<EigenSparseMatrix<T>&> (X_in);
+  EigenSparseMatrix<T> &X = cast_ref<EigenSparseMatrix<T>&> (X_in);
 
   _mat += X._mat*a_in;
 }

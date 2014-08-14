@@ -90,13 +90,13 @@ public:
    * @returns the number of processors in the group.
    */
   processor_id_type n_processors () const
-  { return libmesh_cast_int<processor_id_type>(_communicator.size()); }
+  { return cast_int<processor_id_type>(_communicator.size()); }
 
   /**
    * @returns the rank of this processor in the group.
    */
   processor_id_type processor_id () const
-  { return libmesh_cast_int<processor_id_type>(_communicator.rank()); }
+  { return cast_int<processor_id_type>(_communicator.rank()); }
 
 
 protected:

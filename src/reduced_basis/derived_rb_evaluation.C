@@ -49,7 +49,7 @@ void DerivedRBEvaluation<Base>::clear()
 template <class Base>
 unsigned int DerivedRBEvaluation<Base>::get_n_basis_functions() const
 {
-  return libmesh_cast_int<unsigned int>
+  return cast_int<unsigned int>
     (derived_basis_functions.size());
 }
 

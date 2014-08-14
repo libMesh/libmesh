@@ -705,7 +705,7 @@ inline
 unsigned int DofObject::n_systems () const
 {
   return _idx_buf.empty() ?
-    0 : libmesh_cast_int<unsigned int>(_idx_buf[0]);
+    0 : cast_int<unsigned int>(_idx_buf[0]);
 }
 
 
@@ -731,7 +731,7 @@ unsigned int DofObject::n_vars(const unsigned int s,
 
   libmesh_assert_less ((start_idx_sys + 2*vg), _idx_buf.size());
 
-  return (libmesh_cast_int<unsigned int>
+  return (cast_int<unsigned int>
           (_idx_buf[start_idx_sys + 2*vg]) / ncv_magic);
 }
 
@@ -824,7 +824,7 @@ dof_id_type DofObject::dof_number(const unsigned int s,
       // << ncg << " "
       // << comp << '\n';
 
-      return libmesh_cast_int<dof_id_type>(base_idx + vig*ncg + comp);
+      return cast_int<dof_id_type>(base_idx + vig*ncg + comp);
     }
 }
 
@@ -859,7 +859,7 @@ unsigned int DofObject::start_idx (const unsigned int s) const
   libmesh_assert_less (s, this->n_systems());
   libmesh_assert_less (s, _idx_buf.size());
 
-  return libmesh_cast_int<unsigned int>(_idx_buf[s]);
+  return cast_int<unsigned int>(_idx_buf[s]);
 }
 
 
@@ -871,8 +871,8 @@ unsigned int DofObject::end_idx (const unsigned int s) const
   libmesh_assert_less (s, _idx_buf.size());
 
   return ((s+1) == this->n_systems()) ?
-    libmesh_cast_int<unsigned int>(_idx_buf.size()) :
-    libmesh_cast_int<unsigned int>(_idx_buf[s+1]);
+    cast_int<unsigned int>(_idx_buf.size()) :
+    cast_int<unsigned int>(_idx_buf[s+1]);
 }
 
 

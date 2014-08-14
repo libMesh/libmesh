@@ -144,7 +144,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices);
 
   const unsigned int n_dofs = dof_indices.size();
-  const unsigned int n_neighbor_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int n_neighbor_dofs = cast_int<unsigned int>
     (_neighbor_dof_indices.size());
 
   // These resize calls also zero out the residual and jacobian
@@ -161,7 +161,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
       {
         get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices_var[i], i);
 
-        const unsigned int n_dofs_var = libmesh_cast_int<unsigned int>
+        const unsigned int n_dofs_var = cast_int<unsigned int>
           (_neighbor_dof_indices_var[i].size());
 
         _neighbor_subresiduals[i]->reposition
@@ -170,7 +170,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
         for (unsigned int j=0; j != i; ++j)
           {
             const unsigned int n_dofs_var_j =
-              libmesh_cast_int<unsigned int>
+              cast_int<unsigned int>
               (dof_indices_var[j].size());
 
             _elem_elem_subjacobians[i][j]->reposition

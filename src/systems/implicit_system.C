@@ -647,7 +647,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
 
 void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
 {
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
   Real deltap = TOLERANCE;
 
@@ -685,9 +685,9 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
  const ParameterVector& parameters,
  SensitivityData&       sensitivities)
 {
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = libmesh_cast_int<unsigned int>
+  const unsigned int Nq = cast_int<unsigned int>
     (qoi.size());
 
   // We currently get partial derivatives via central differencing
@@ -811,9 +811,9 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
  const ParameterVector& parameters,
  SensitivityData&       sensitivities)
 {
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = libmesh_cast_int<unsigned int>
+  const unsigned int Nq = cast_int<unsigned int>
     (qoi.size());
 
   // We currently get partial derivatives via central differencing
@@ -905,9 +905,9 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
   // We'll use a single temporary vector for matrix-vector-vector products
   AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
 
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = libmesh_cast_int<unsigned int>
+  const unsigned int Nq = cast_int<unsigned int>
     (qoi.size());
 
   // For each quantity of interest q, the parameter sensitivity
@@ -1108,9 +1108,9 @@ void ImplicitSystem::qoi_parameter_hessian
   // so we can safely perturb this->solution.
   AutoPtr<NumericVector<Number> > oldsolution = this->solution->clone();
 
-  const unsigned int Np = libmesh_cast_int<unsigned int>
+  const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  const unsigned int Nq = libmesh_cast_int<unsigned int>
+  const unsigned int Nq = cast_int<unsigned int>
     (qoi.size());
 
   // For each quantity of interest q, the parameter sensitivity

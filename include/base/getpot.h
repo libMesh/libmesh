@@ -75,7 +75,7 @@ extern "C" {
 #define getpot_cerr libMesh::err
 #define getpot_error() libmesh_error()
 #define getpot_file_error(filename) libmesh_file_error(filename)
-#define getpot_cast_int libMesh::libmesh_cast_int
+#define getpot_cast_int libMesh::cast_int
 
 #else // USE_LIBMESH
 

@@ -667,7 +667,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
   }
 
   AutoPtr<DGFEMContext> c = this->build_context();
-  DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
+  DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
 
   this->init_context(context);
 

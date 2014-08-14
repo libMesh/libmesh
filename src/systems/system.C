@@ -1540,7 +1540,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
           const unsigned int n_qp = qrule->n_points();
 
-          const unsigned int n_sf = libmesh_cast_int<unsigned int>
+          const unsigned int n_sf = cast_int<unsigned int>
             (dof_indices.size());
 
           // Begin the loop over the Quadrature points.
@@ -2030,7 +2030,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
   dof_map.dof_indices (&e, dof_indices, var);
 
   // Get the no of dofs assciated with this point
-  const unsigned int num_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int num_dofs = cast_int<unsigned int>
     (dof_indices.size());
 
   FEType fe_type = dof_map.variable_type(var);
@@ -2128,7 +2128,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
   dof_map.dof_indices (&e, dof_indices, var);
 
   // Get the no of dofs assciated with this point
-  const unsigned int num_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int num_dofs = cast_int<unsigned int>
     (dof_indices.size());
 
   FEType fe_type = dof_map.variable_type(var);
@@ -2226,7 +2226,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
   dof_map.dof_indices (&e, dof_indices, var);
 
   // Get the no of dofs assciated with this point
-  const unsigned int num_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int num_dofs = cast_int<unsigned int>
     (dof_indices.size());
 
   FEType fe_type = dof_map.variable_type(var);

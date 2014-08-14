@@ -281,7 +281,7 @@ public:
   void operator()(const ConstElemRange &range) const
   {
     AutoPtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _sys.init_context(_femcontext);
 
     for (ConstElemRange::const_iterator elem_it = range.begin();
@@ -322,7 +322,7 @@ public:
   void operator()(const ConstElemRange &range) const
   {
     AutoPtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _sys.init_context(_femcontext);
 
     for (ConstElemRange::const_iterator elem_it = range.begin();
@@ -385,7 +385,7 @@ public:
   void operator()(const ConstElemRange &range)
   {
     AutoPtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _diff_qoi.init_context(_femcontext);
 
     for (ConstElemRange::const_iterator elem_it = range.begin();
@@ -453,7 +453,7 @@ public:
   void operator()(const ConstElemRange &range) const
   {
     AutoPtr<DiffContext> con = _sys.build_context();
-    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _qoi.init_context(_femcontext);
 
     for (ConstElemRange::const_iterator elem_it = range.begin();
@@ -673,7 +673,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   if ( this->processor_id() == (this->n_processors()-1) )
   {
     AutoPtr<DiffContext> con = this->build_context();
-    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     this->init_context(_femcontext);
     _femcontext.pre_fe_reinit(*this, NULL);
 
@@ -801,7 +801,7 @@ void FEMSystem::mesh_position_set()
   MeshBase& mesh = this->get_mesh();
 
   AutoPtr<DiffContext> con = this->build_context();
-  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
   this->init_context(_femcontext);
 
   // Move every mesh element we can
@@ -867,7 +867,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   this->update();
 
-  const unsigned int Nq = libmesh_cast_int<unsigned int>(qoi.size());
+  const unsigned int Nq = cast_int<unsigned int>(qoi.size());
 
   // the quantity of interest is assumed to be a sum of element and
   // side terms
@@ -1086,7 +1086,7 @@ void FEMSystem::init_context(DiffContext &c)
   // overloads.
   c.set_deltat_pointer ( &deltat );
 
-  FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
+  FEMContext &context = cast_ref<FEMContext&>(c);
 
   // Make sure we're prepared to do mass integration
   for (unsigned int var = 0; var != this->n_vars(); ++var)
@@ -1139,7 +1139,7 @@ void FEMSystem::mesh_position_get()
     mesh.active_local_elements_end();
 
   AutoPtr<DiffContext> con = this->build_context();
-  FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+  FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
   this->init_context(_femcontext);
 
   // Get the solution's mesh variables from every element

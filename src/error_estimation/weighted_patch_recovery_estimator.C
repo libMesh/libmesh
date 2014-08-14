@@ -329,7 +329,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
               libmesh_assert (dof_indices.size() == phi->size());
 
               const unsigned int n_dofs =
-                libmesh_cast_int<unsigned int>(dof_indices.size());
+                cast_int<unsigned int>(dof_indices.size());
               const unsigned int n_qp   = qrule->n_points();
 
               // Compute the weighted projection components from this cell.
@@ -599,7 +599,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
               // The number of dofs for this variable on this element
               const unsigned int n_dofs =
-                libmesh_cast_int<unsigned int>(dof_indices.size());
+                cast_int<unsigned int>(dof_indices.size());
 
               // Variable to hold the error on the current element
               Real element_error = 0;
@@ -616,7 +616,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
               // The number of points we will sample over
               const unsigned int n_sp =
-                libmesh_cast_int<unsigned int>(JxW.size());
+                cast_int<unsigned int>(JxW.size());
 
               // Loop over every sample point for the current element
               for (unsigned int sp=0; sp<n_sp; sp++)

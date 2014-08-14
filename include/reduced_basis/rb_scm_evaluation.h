@@ -116,7 +116,7 @@ public:
    * Get size of the set C_J.
    */
   unsigned int get_C_J_size()
-  { return libmesh_cast_int<unsigned int>(C_J.size()); }
+  { return cast_int<unsigned int>(C_J.size()); }
 
   /**
    * Get entry of C_J.

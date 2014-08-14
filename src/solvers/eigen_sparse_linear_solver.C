@@ -71,9 +71,9 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   this->init ();
 
   // Make sure the data passed in are really Eigen types
-  EigenSparseMatrix<T>& matrix   = libmesh_cast_ref<EigenSparseMatrix<T>&>(matrix_in);
-  EigenSparseVector<T>& solution = libmesh_cast_ref<EigenSparseVector<T>&>(solution_in);
-  EigenSparseVector<T>& rhs      = libmesh_cast_ref<EigenSparseVector<T>&>(rhs_in);
+  EigenSparseMatrix<T>& matrix   = cast_ref<EigenSparseMatrix<T>&>(matrix_in);
+  EigenSparseVector<T>& solution = cast_ref<EigenSparseVector<T>&>(solution_in);
+  EigenSparseVector<T>& rhs      = cast_ref<EigenSparseVector<T>&>(rhs_in);
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix.close();

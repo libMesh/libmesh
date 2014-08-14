@@ -570,7 +570,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  int num_vars = libmesh_cast_int<int>(names.size());
+  int num_vars = cast_int<int>(names.size());
   dof_id_type num_nodes = mesh.n_nodes();
 
   // The names of the variables to be output
@@ -610,7 +610,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
         continue;
 
       unsigned int variable_name_position =
-        libmesh_cast_int<unsigned int>(pos - output_names.begin());
+        cast_int<unsigned int>(pos - output_names.begin());
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
       std::vector<Real> real_parts(num_nodes);
@@ -774,7 +774,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  int num_vars = libmesh_cast_int<int>(names.size());
+  int num_vars = cast_int<int>(names.size());
   int num_nodes = 0;
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();

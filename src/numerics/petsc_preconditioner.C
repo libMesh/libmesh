@@ -43,8 +43,8 @@ namespace libMesh
 template <typename T>
 void PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
 {
-  PetscVector<T> & x_pvec = libmesh_cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(x));
-  PetscVector<T> & y_pvec = libmesh_cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(y));
+  PetscVector<T> & x_pvec = cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(x));
+  PetscVector<T> & y_pvec = cast_ref<PetscVector<T>&>(const_cast<NumericVector<T>&>(y));
 
   Vec x_vec = x_pvec.vec();
   Vec y_vec = y_pvec.vec();
@@ -75,7 +75,7 @@ void PetscPreconditioner<T>::init ()
       int ierr = PCCreate(this->comm().get(),&_pc);
       LIBMESH_CHKERRABORT(ierr);
 
-      PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
+      PetscMatrix<T> * pmatrix = cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
 
       _mat = pmatrix->mat();
     }

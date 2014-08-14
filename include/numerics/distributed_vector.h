@@ -888,7 +888,7 @@ template <typename T>
 inline
 void DistributedVector<T>::swap (NumericVector<T> &other)
 {
-  DistributedVector<T>& v = libmesh_cast_ref<DistributedVector<T>&>(other);
+  DistributedVector<T>& v = cast_ref<DistributedVector<T>&>(other);
 
   std::swap(_global_size, v._global_size);
   std::swap(_local_size, v._local_size);

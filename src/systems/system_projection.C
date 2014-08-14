@@ -383,7 +383,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
             dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
             dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
             const unsigned int new_n_dofs =
-              libmesh_cast_int<unsigned int>(new_SCALAR_indices.size());
+              cast_int<unsigned int>(new_SCALAR_indices.size());
 
             for (unsigned int i=0; i<new_n_dofs; i++)
               {
@@ -554,7 +554,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
             std::vector<dof_id_type> SCALAR_indices;
             dof_map.SCALAR_dof_indices (SCALAR_indices, var);
             const unsigned int n_SCALAR_dofs =
-              libmesh_cast_int<unsigned int>(SCALAR_indices.size());
+              cast_int<unsigned int>(SCALAR_indices.size());
 
             for (unsigned int i=0; i<n_SCALAR_dofs; i++)
               {
@@ -618,7 +618,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
             std::vector<dof_id_type> SCALAR_indices;
             dof_map.SCALAR_dof_indices (SCALAR_indices, var);
             const unsigned int n_SCALAR_dofs =
-              libmesh_cast_int<unsigned int>(SCALAR_indices.size());
+              cast_int<unsigned int>(SCALAR_indices.size());
 
             for (unsigned int i=0; i<n_SCALAR_dofs; i++)
               {
@@ -869,7 +869,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 
           // The number of DOFs on the new element
           const unsigned int new_n_dofs =
-            libmesh_cast_int<unsigned int>(new_dof_indices.size());
+            cast_int<unsigned int>(new_dof_indices.size());
 
           // Fixed vs. free DoFs on edge/face projections
           std::vector<char> dof_is_fixed(new_n_dofs, false); // bools
@@ -928,7 +928,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
             }
 
           unsigned int old_n_dofs =
-            libmesh_cast_int<unsigned int>(old_dof_indices.size());
+            cast_int<unsigned int>(old_dof_indices.size());
 
           if (fe_type.family != LAGRANGE) {
 
@@ -1368,7 +1368,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
 
           // The number of DOFs on the element
           const unsigned int n_dofs =
-            libmesh_cast_int<unsigned int>(dof_indices.size());
+            cast_int<unsigned int>(dof_indices.size());
 
           // Fixed vs. free DoFs on edge/face projections
           std::vector<char> dof_is_fixed(n_dofs, false); // bools
@@ -1954,7 +1954,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 
           // The number of DOFs on the element
           const unsigned int n_dofs =
-            libmesh_cast_int<unsigned int>(dof_indices.size());
+            cast_int<unsigned int>(dof_indices.size());
 
           // Fixed vs. free DoFs on edge/face projections
           std::vector<char> dof_is_fixed(n_dofs, false); // bools
@@ -2615,7 +2615,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
 
           // The number of DOFs on the element
           const unsigned int n_dofs =
-            libmesh_cast_int<unsigned int>(dof_indices.size());
+            cast_int<unsigned int>(dof_indices.size());
 
           // Fixed vs. free DoFs on edge/face projections
           std::vector<char> dof_is_fixed(n_dofs, false); // bools

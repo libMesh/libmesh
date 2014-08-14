@@ -63,7 +63,7 @@ char* XdrHEAD::cpyString(const char* src, int len)
   if(src)
     {
       if (myLen == -1)
-        myLen = libmesh_cast_int<int>(std::strlen(src))+1;
+        myLen = cast_int<int>(std::strlen(src))+1;
       temp = new char[myLen];
       temp = (char *) std::memcpy(temp, src, (myLen)*sizeof(char));
     }

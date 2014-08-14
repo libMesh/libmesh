@@ -420,7 +420,7 @@ bool Parameters::have_parameter (const std::string& name) const
 #ifdef LIBMESH_HAVE_RTTI
     if (dynamic_cast<const Parameter<T>*>(it->second) != NULL)
 #else // LIBMESH_HAVE_RTTI
-      if (libmesh_cast_ptr<const Parameter<T>*>(it->second) != NULL)
+      if (cast_ptr<const Parameter<T>*>(it->second) != NULL)
 #endif // LIBMESH_HAVE_RTTI
         return true;
 
@@ -453,7 +453,7 @@ const T& Parameters::get (const std::string& name) const
   libmesh_assert(it != _values.end());
   libmesh_assert(it->second);
 
-  return libmesh_cast_ptr<Parameter<T>*>(it->second)->get();
+  return cast_ptr<Parameter<T>*>(it->second)->get();
 }
 
 template <typename T>
@@ -476,7 +476,7 @@ T& Parameters::set (const std::string& name)
 
   set_attributes(name, false);
 
-  return libmesh_cast_ptr<Parameter<T>*>(_values[name])->set();
+  return cast_ptr<Parameter<T>*>(_values[name])->set();
 }
 
 inline

@@ -100,8 +100,8 @@ extern "C"
 
     NonlinearImplicitSystem &sys = solver->system();
 
-    PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
-    PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
+    PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
+    PetscVector<Number>& R_sys = *cast_ptr<PetscVector<Number>*>(sys.rhs);
     PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
 
     // Use the systems update() to get a good local version of the parallel solution
@@ -190,8 +190,8 @@ extern "C"
     PetscMatrix<Number> PC(pc, sys.comm());
     PetscMatrix<Number> Jac(jac, sys.comm());
 #endif
-    PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
-    PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
+    PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
+    PetscMatrix<Number>& Jac_sys = *cast_ptr<PetscMatrix<Number>*>(sys.matrix);
     PetscVector<Number> X_global(x, sys.comm());
 
     // Set the dof maps
@@ -397,7 +397,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 
       for (PetscInt i=0; i<nmodes; ++i)
         {
-          PetscVector<T>* pv = libmesh_cast_ptr<PetscVector<T>*>(sp[i]);
+          PetscVector<T>* pv = cast_ptr<PetscVector<T>*>(sp[i]);
           Vec v = pv->vec();
 
           ierr = VecDuplicate(v, modes+i);
@@ -454,9 +454,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* jac = libmesh_cast_ptr<PetscMatrix<T>*>(&jac_in);
-  PetscVector<T>* x   = libmesh_cast_ptr<PetscVector<T>*>(&x_in);
-  PetscVector<T>* r   = libmesh_cast_ptr<PetscVector<T>*>(&r_in);
+  PetscMatrix<T>* jac = cast_ptr<PetscMatrix<T>*>(&jac_in);
+  PetscVector<T>* x   = cast_ptr<PetscVector<T>*>(&x_in);
+  PetscVector<T>* r   = cast_ptr<PetscVector<T>*>(&r_in);
 
   PetscErrorCode ierr=0;
   PetscInt n_iterations =0;

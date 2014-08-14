@@ -20,7 +20,7 @@ using namespace libMesh;
 void LaplaceSystem::element_postprocess (DiffContext &context)
 
 {
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
+  FEMContext &c = cast_ref<FEMContext&>(context);
 
   FEBase* elem_fe = NULL;
   c.get_element_fe( 0, elem_fe );

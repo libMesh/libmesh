@@ -263,7 +263,7 @@ template <typename T>
 void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 {
   // Convert vector to EpetraVector.
-  EpetraVector<T>* epetra_dest = libmesh_cast_ptr<EpetraVector<T>*>(&dest);
+  EpetraVector<T>* epetra_dest = cast_ptr<EpetraVector<T>*>(&dest);
 
   // Call Epetra function.
   _mat->ExtractDiagonalCopy(*(epetra_dest->vec()));
@@ -275,7 +275,7 @@ template <typename T>
 void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 {
   // Make sure the SparseMatrix passed in is really a EpetraMatrix
-  EpetraMatrix<T>& epetra_dest = libmesh_cast_ref<EpetraMatrix<T>&>(dest);
+  EpetraMatrix<T>& epetra_dest = cast_ref<EpetraMatrix<T>&>(dest);
 
   if(&epetra_dest != this)
     epetra_dest = *this;
@@ -428,7 +428,7 @@ void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   libmesh_assert_equal_to (this->m(), X_in.m());
   libmesh_assert_equal_to (this->n(), X_in.n());
 
-  EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
+  EpetraMatrix<T>* X = cast_ptr<EpetraMatrix<T>*> (&X_in);
 
   EpetraExt::MatrixMatrix::Add (*X->_mat, false, a_in, *_mat, 1.);
 }

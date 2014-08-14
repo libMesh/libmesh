@@ -103,9 +103,9 @@ extern "C"
       libMesh::out << "Assembling the residual" << std::endl;
 
     PetscVector<Number>& X_system =
-      *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
+      *cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscVector<Number>& R_system =
-      *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
+      *cast_ptr<PetscVector<Number>*>(sys.rhs);
     PetscVector<Number> X_input(x, sys.comm()), R_input(r, sys.comm());
 
     // DiffSystem assembles from the solution and into the rhs, so swap
@@ -157,7 +157,7 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat libmesh_dbg_var(j), Mat p
       libMesh::out << "Assembling the Jacobian" << std::endl;
 
     PetscVector<Number>& X_system =
-      *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
+      *cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscVector<Number> X_input(x, sys.comm());
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
@@ -166,7 +166,7 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat libmesh_dbg_var(j), Mat p
   PetscMatrix<Number> J_input(pc, sys.comm());
 #endif
   PetscMatrix<Number>& J_system =
-    *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
+    *cast_ptr<PetscMatrix<Number>*>(sys.matrix);
 
     // DiffSystem assembles from the solution and into the jacobian, so
     // swap those with our input vectors before assembling.  They'll
@@ -352,11 +352,11 @@ unsigned int PetscDiffSolver::solve()
   START_LOG("solve()", "PetscDiffSolver");
 
   PetscVector<Number> &x =
-    *(libmesh_cast_ptr<PetscVector<Number>*>(_system.solution.get()));
+    *(cast_ptr<PetscVector<Number>*>(_system.solution.get()));
   PetscMatrix<Number> &jac =
-    *(libmesh_cast_ptr<PetscMatrix<Number>*>(_system.matrix));
+    *(cast_ptr<PetscMatrix<Number>*>(_system.matrix));
   PetscVector<Number> &r =
-    *(libmesh_cast_ptr<PetscVector<Number>*>(_system.rhs));
+    *(cast_ptr<PetscVector<Number>*>(_system.rhs));
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   _system.get_dof_map().enforce_constraints_exactly(_system);
