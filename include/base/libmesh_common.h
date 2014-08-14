@@ -418,6 +418,46 @@ extern OStreamProxy err;
         return 77;                                                      \
     } } while(0)
 
+// The libmesh_do_once macro helps us avoid redundant repeated
+// repetitions of the same warning messages
+#undef libmesh_do_once
+#define libmesh_do_once(do_this)                \
+  do {                                          \
+    static bool did_this_already = false;       \
+    if (!did_this_already) {                    \
+      did_this_already = true;                  \
+      do_this;                                  \
+    } } while (0)
+
+
+// The libmesh_warning macro outputs a file/line/time stamped warning
+// message, if warnings are enabled.
+#ifdef LIBMESH_ENABLE_WARNINGS
+#define libmesh_warning(message) \
+  libmesh_do_once(libMesh::out << message \
+                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+#else
+#define libmesh_warning(message)  ((void) 0)
+#endif
+
+// The libmesh_experimental macro warns that you are using
+// bleeding-edge code
+#undef libmesh_experimental
+#define libmesh_experimental() \
+  libmesh_warning("*** Warning, This code is untested, experimental, or likely to see future API changes: ");
+
+
+// The libmesh_deprecated macro warns that you are using obsoleted code
+#undef libmesh_deprecated
+#define libmesh_deprecated() \
+  libmesh_warning("*** Warning, This code is deprecated, and likely to be removed in future library versions! ");
+
+// A function template for ignoring unused variables.  This is a way
+// to shut up unused variable compiler warnings on a case by case
+// basis.
+template<class T> inline void libmesh_ignore( const T& ) { }
+
+
 // cast_ref and cast_ptr do a dynamic cast and assert
 // the result, if we have RTTI enabled and we're in debug or
 // development modes, but they just do a faster static cast if we're
@@ -512,46 +552,6 @@ inline Tnew libmesh_cast_int (Told oldvar)
   // we use the less redundantly named libMesh::cast_int now
   return cast_int<Tnew>(oldvar);
 }
-
-
-// The libmesh_do_once macro helps us avoid redundant repeated
-// repetitions of the same warning messages
-#undef libmesh_do_once
-#define libmesh_do_once(do_this)                \
-  do {                                          \
-    static bool did_this_already = false;       \
-    if (!did_this_already) {                    \
-      did_this_already = true;                  \
-      do_this;                                  \
-    } } while (0)
-
-
-// The libmesh_warning macro outputs a file/line/time stamped warning
-// message, if warnings are enabled.
-#ifdef LIBMESH_ENABLE_WARNINGS
-#define libmesh_warning(message) \
-  libmesh_do_once(libMesh::out << message \
-                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
-#else
-#define libmesh_warning(message)  ((void) 0)
-#endif
-
-// The libmesh_experimental macro warns that you are using
-// bleeding-edge code
-#undef libmesh_experimental
-#define libmesh_experimental() \
-  libmesh_warning("*** Warning, This code is untested, experimental, or likely to see future API changes: ");
-
-
-// The libmesh_deprecated macro warns that you are using obsoleted code
-#undef libmesh_deprecated
-#define libmesh_deprecated() \
-  libmesh_warning("*** Warning, This code is deprecated, and likely to be removed in future library versions! ");
-
-// A function template for ignoring unused variables.  This is a way
-// to shut up unused variable compiler warnings on a case by case
-// basis.
-template<class T> inline void libmesh_ignore( const T& ) { }
 
 
 // build a integer representation of version
