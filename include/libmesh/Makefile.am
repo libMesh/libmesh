@@ -80,6 +80,12 @@ netcdf.h: $(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
 
 endif
 
+unique_ptr.hpp: $(top_srcdir)/contrib/unique_ptr/unique_ptr.hpp
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+  BUILT_SOURCES  += unique_ptr.hpp
+  DISTCLEANFILES += unique_ptr.hpp
+
 #
 # libmesh_config.h rule
 libmesh_config.h: $(top_builddir)/include/libmesh_config.h
