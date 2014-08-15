@@ -158,12 +158,6 @@ private:
   const MeshBase& mesh;
 
   /**
-   * The maximum number of things we should store before
-   * refining ourself.
-   */
-  const unsigned int tgt_bin_size;
-
-  /**
    * Pointer to this node's parent.
    */
   const TreeNode<N> *parent;
@@ -192,6 +186,12 @@ private:
   std::vector<const Node*> nodes;
 
   /**
+   * The maximum number of things we should store before
+   * refining ourself.
+   */
+  const unsigned int tgt_bin_size;
+
+  /**
    * Does this node contain any infinite elements.
    */
   bool contains_ifems;
@@ -209,8 +209,8 @@ TreeNode<N>::TreeNode (const MeshBase& m,
                        unsigned int tbs,
                        const TreeNode<N>* p) :
   mesh           (m),
-  tgt_bin_size   (tbs),
   parent         (p),
+  tgt_bin_size   (tbs),
   contains_ifems (false)
 {
   // libmesh_assert our children are empty, thus we are active.
