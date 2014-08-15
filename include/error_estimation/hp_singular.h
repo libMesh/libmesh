@@ -52,7 +52,8 @@ public:
   /**
    * Constructor.
    */
-  HPSingularity()
+  HPSingularity() :
+    singular_points()
   {
     libmesh_experimental();
   }

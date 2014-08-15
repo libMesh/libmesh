@@ -62,7 +62,8 @@ public:
     _mesh_sys              (NULL),
     _mesh_x_var            (libMesh::invalid_uint),
     _mesh_y_var            (libMesh::invalid_uint),
-    _mesh_z_var            (libMesh::invalid_uint)
+    _mesh_z_var            (libMesh::invalid_uint),
+    _time_evolving         ()
   {}
 
   /**

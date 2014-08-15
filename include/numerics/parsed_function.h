@@ -49,8 +49,17 @@ public:
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
                   const std::vector<Output>* initial_vals=NULL) :
     _expression (expression),
+    parsers(),
     _spacetime (LIBMESH_DIM+1 + (additional_vars ?
                                  additional_vars->size() : 0)),
+    dx_parsers(),
+#if LIBMESH_DIM > 1
+    dy_parsers(),
+#endif
+#if LIBMESH_DIM > 2
+    dz_parsers(),
+#endif
+    dt_parsers(),
     _valid_derivatives (true),
     _additional_vars (additional_vars ? *additional_vars :
                       std::vector<std::string>()),

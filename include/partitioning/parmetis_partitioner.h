@@ -48,7 +48,27 @@ public:
   /**
    * Constructor.
    */
-  ParmetisPartitioner () {}
+  ParmetisPartitioner ()
+#ifdef LIBMESH_HAVE_PARMETIS
+    :
+    _n_active_elem_on_proc(),
+    _global_index_by_pid_map(),
+    _vtxdist(),
+    _xadj(),
+    _adjncy(),
+    _part(),
+    _tpwgts(),
+    _ubvec(),
+    _options(),
+    _vwgt(),
+    _wgtflag(0),
+    _ncon(0),
+    _numflag(0),
+    _nparts(0),
+    _edgecut(0)
+#endif
+  {}
+
 
   /**
    * Creates a new partitioner of this type and returns it in

@@ -51,7 +51,7 @@ public:
   /**
    * Constructor.
    */
-  HPSelector() {}
+  HPSelector() : component_scale() {}
 
   /**
    * Destructor.

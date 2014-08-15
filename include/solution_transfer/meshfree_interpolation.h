@@ -72,7 +72,10 @@ public:
   MeshfreeInterpolation (const libMesh::Parallel::Communicator &comm_in
                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
     ParallelObject(comm_in),
-    _parallelization_strategy (SYNC_SOURCES)
+    _parallelization_strategy (SYNC_SOURCES),
+    _names(),
+    _src_pts(),
+    _src_vals()
   {}
 
   /**
@@ -325,9 +328,11 @@ public:
     MeshfreeInterpolation(comm_in),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),
+    _kd_tree(NULL),
 #endif
     _half_power(power/2.0),
-    _n_interp_pts(n_interp_pts)
+    _n_interp_pts(n_interp_pts),
+    _vals()
   {}
 
   /**

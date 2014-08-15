@@ -54,6 +54,7 @@ public:
     ErrorEstimator(),
     number_h_refinements(1),
     number_p_refinements(0),
+    computed_global_QoI_errors(),
     _qoi_set(QoISet())
   {
     // We're not actually going to use error_norm; our norms are

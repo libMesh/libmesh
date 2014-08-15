@@ -85,10 +85,11 @@ struct abstract_multi_predicate : multi_predicate
 
 protected:
   // Do not instantiate the base class.
-  abstract_multi_predicate() {}
+  abstract_multi_predicate() : _predicates() {}
 
   // Copy constructor.
   abstract_multi_predicate(const abstract_multi_predicate& rhs)
+    : _predicates()
   {
     this->deep_copy(rhs);
   }

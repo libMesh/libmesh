@@ -42,7 +42,7 @@ public:
   /**
    * Default constructor: "no parameters"
    */
-  ParameterVector() : _is_shallow_copy(false) {}
+  ParameterVector() : _params(), _my_data(), _is_shallow_copy(false) {}
 
   /**
    * Constructor-from-vector-of-Number*: each points to a parameter

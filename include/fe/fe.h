@@ -1042,6 +1042,7 @@ template <unsigned int Dim, FEFamily T>
 inline
 FE<Dim,T>::FE (const FEType& fet) :
   FEGenericBase<typename FEOutputType<T>::type> (Dim,fet),
+  cached_nodes(),
   last_side(INVALID_ELEM),
   last_edge(libMesh::invalid_uint)
 {

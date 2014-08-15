@@ -361,7 +361,9 @@ QBase::QBase(const unsigned int d,
   _dim(d),
   _order(o),
   _type(INVALID_ELEM),
-  _p_level(0)
+  _p_level(0),
+  _points(),
+  _weights()
 {
 }
 

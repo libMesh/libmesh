@@ -67,7 +67,7 @@ public:
   /**
    * Default constructor.  Does nothing.
    */
-  Parameters () {}
+  Parameters () : _values() {}
 
   /**
    * Copy constructor.

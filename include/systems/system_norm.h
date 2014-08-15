@@ -170,21 +170,30 @@ private:
 
 inline
 SystemNorm::SystemNorm() :
-  _norms(1, DISCRETE_L2), _weights(1, 1.0), _weights_sq(1, 1.0)
+  _norms(1, DISCRETE_L2),
+  _weights(1, 1.0),
+  _weights_sq(1, 1.0),
+  _off_diagonal_weights()
 {
 }
 
 
 inline
 SystemNorm::SystemNorm(const FEMNormType &t) :
-  _norms(1, t), _weights(1, 1.0), _weights_sq(1, 1.0)
+  _norms(1, t),
+  _weights(1, 1.0),
+  _weights_sq(1, 1.0),
+  _off_diagonal_weights()
 {
 }
 
 
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
-  _norms(norms), _weights(1, 1.0), _weights_sq(1, 1.0)
+  _norms(norms),
+  _weights(1, 1.0),
+  _weights_sq(1, 1.0),
+  _off_diagonal_weights()
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
@@ -194,7 +203,10 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
                        std::vector<Real> &weights) :
-  _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
+  _norms(norms),
+  _weights(weights),
+  _weights_sq(_weights.size(), 0.0),
+  _off_diagonal_weights()
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
@@ -246,7 +258,10 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 
 inline
 SystemNorm::SystemNorm(const SystemNorm &s) :
-  _norms(s._norms), _weights(s._weights), _weights_sq(s._weights_sq)
+  _norms(s._norms),
+  _weights(s._weights),
+  _weights_sq(s._weights_sq),
+  _off_diagonal_weights()
 {
 }
 

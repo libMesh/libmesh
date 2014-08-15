@@ -446,9 +446,20 @@ private:
 inline
 PltLoader::PltLoader (const bool v) :
   _verbose      (v),
+  _version      (),
   _is_foreign   (false),
+  _title        (),
   _n_vars       (0),
-  _n_zones      (0)
+  _var_names    (),
+  _n_zones      (0),
+  _zone_types   (),
+  _zone_names   (),
+  _zone_pack    (),
+  _imax         (),
+  _jmax         (),
+  _kmax         (),
+  _data         (),
+  _conn         ()
 {
 }
 

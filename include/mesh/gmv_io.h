@@ -277,7 +277,9 @@ GMVIO::GMVIO (const MeshBase& mesh) :
   _write_subdomain_id_as_material (false),
   _subdivide_second_order (true),
   _p_levels               (true),
-  _next_elem_id           (0)
+  _cell_centered_data     (),
+  _next_elem_id           (0),
+  _nodal_data             ()
 {
 }
 
@@ -291,7 +293,9 @@ GMVIO::GMVIO (MeshBase& mesh) :
   _write_subdomain_id_as_material (false),
   _subdivide_second_order (true),
   _p_levels               (true),
-  _next_elem_id           (0)
+  _cell_centered_data     (),
+  _next_elem_id           (0),
+  _nodal_data             ()
 {
 }
 

@@ -76,6 +76,9 @@ public:
     _exact_value(NULL),
     _exact_deriv(NULL),
     _exact_hessian(NULL),
+    _exact_values(),
+    _exact_derivs(),
+    _exact_hessians(),
     _equation_systems_fine(NULL),
     _extra_order(0)
   { error_norm = H1; }

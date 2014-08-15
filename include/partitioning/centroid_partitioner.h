@@ -70,7 +70,9 @@ public:
    * defaults to \p X ordering.
    */
   explicit
-  CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
+  CentroidPartitioner (const CentroidSortMethod sm=X) :
+    _sort_method(sm),
+    _elem_centroids() {}
 
   /**
    * Creates a new partitioner of this type and returns it in

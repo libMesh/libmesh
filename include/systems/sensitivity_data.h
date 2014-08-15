@@ -156,6 +156,9 @@ inline
 SensitivityData::SensitivityData(const QoISet &qoi_indices,
                                  const System& sys,
                                  const ParameterVector& parameter_vector)
+  :
+  _grad_data(),
+  _hess_data()
 {
   this->allocate_data(qoi_indices, sys, parameter_vector);
 }
