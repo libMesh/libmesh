@@ -98,7 +98,7 @@ install-data-hook:
             cd $(DESTDIR)$(prefix) && mv $$genfile.replaced $$genfile ; \
           done ; \
         fi
-	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) etc/libmesh/Make.common Make.common
+	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) -f etc/libmesh/Make.common Make.common
 	cat $(DESTDIR)$(libmesh_configdir)/libmesh-config | $(SED) "s/has_been_installed=no/has_been_installed=yes/g" > $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed
 	mv $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config && chmod +x $(DESTDIR)$(libmesh_configdir)/libmesh-config
 	cat $(DESTDIR)$(prefix)/contrib/bin/libtool | $(SED) "s/-l //g" > $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed

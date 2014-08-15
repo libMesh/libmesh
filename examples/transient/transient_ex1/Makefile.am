@@ -1,7 +1,7 @@
 BUILT_SOURCES = mesh.xda
 
 mesh.xda: $(top_srcdir)/examples/adaptivity/adaptivity_ex2/mesh.xda
-	$(AM_V_GEN)$(LN_S) $< $@
+	$(AM_V_GEN)$(LN_S) -f $< $@
 
 DISTCLEANFILES = $(BUILT_SOURCES)
 

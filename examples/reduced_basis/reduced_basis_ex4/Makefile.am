@@ -13,9 +13,9 @@ clean-local:
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f reduced_basis_ex4.in && $(LN_S) $(srcdir)/reduced_basis_ex4.in .
-	-rm -f eim.in               && $(LN_S) $(srcdir)/eim.in .
-	-rm -f rb.in                && $(LN_S) $(srcdir)/rb.in .
+	-rm -f reduced_basis_ex4.in && $(LN_S) -f $(srcdir)/reduced_basis_ex4.in .
+	-rm -f eim.in               && $(LN_S) -f $(srcdir)/eim.in .
+	-rm -f rb.in                && $(LN_S) -f $(srcdir)/rb.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += reduced_basis_ex4.in eim.in rb.in .linkstamp

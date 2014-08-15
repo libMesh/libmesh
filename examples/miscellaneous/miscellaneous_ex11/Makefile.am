@@ -10,7 +10,7 @@ CLEANFILES = without_ghosts.pvtu without_ghosts_*.vtu without_ghosts.e with_ghos
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f square_mesh.off && $(LN_S) $(srcdir)/square_mesh.off .
+	-rm -f square_mesh.off && $(LN_S) -f $(srcdir)/square_mesh.off .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += square_mesh.off .linkstamp

@@ -10,9 +10,9 @@ CLEANFILES = primal_error.gmv primal.out.* dual_error.gmv adjoint_?.out.*
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
-	-rm -f l-shaped.in && $(LN_S) $(srcdir)/l-shaped.in .
-	-rm -f lshaped.xda && $(LN_S) $(srcdir)/lshaped.xda .
+	-rm -f general.in  && $(LN_S) -f $(srcdir)/general.in .
+	-rm -f l-shaped.in && $(LN_S) -f $(srcdir)/l-shaped.in .
+	-rm -f lshaped.xda && $(LN_S) -f $(srcdir)/lshaped.xda .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += general.in l-shaped.in lshaped.xda .linkstamp

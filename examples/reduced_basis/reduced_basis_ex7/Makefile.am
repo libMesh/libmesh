@@ -13,8 +13,8 @@ clean-local:
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f reduced_basis_ex7.in && $(LN_S) $(srcdir)/reduced_basis_ex7.in .
-	-rm -f horn.msh             && $(LN_S) $(srcdir)/horn.msh .
+	-rm -f reduced_basis_ex7.in && $(LN_S) -f $(srcdir)/reduced_basis_ex7.in .
+	-rm -f horn.msh             && $(LN_S) -f $(srcdir)/horn.msh .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += reduced_basis_ex7.in horn.in .linkstamp

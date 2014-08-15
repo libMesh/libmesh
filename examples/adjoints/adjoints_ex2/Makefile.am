@@ -1,7 +1,7 @@
 # need to link lshaped.xda
 BUILT_SOURCES = lshaped.xda
 lshaped.xda:
-	$(AM_V_GEN)$(LN_S) $(top_srcdir)/examples/adjoints/adjoints_ex1/lshaped.xda .
+	$(AM_V_GEN)$(LN_S) -f $(top_srcdir)/examples/adjoints/adjoints_ex1/lshaped.xda .
 
 CLEANFILES = lshaped.xda
 
@@ -17,8 +17,8 @@ CLEANFILES += primal.out.* adjoint_0.out.*
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES += .linkstamp
 .linkstamp:
-	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
-	-rm -f l-shaped.in && $(LN_S) $(srcdir)/l-shaped.in .
+	-rm -f general.in  && $(LN_S) -f $(srcdir)/general.in .
+	-rm -f l-shaped.in && $(LN_S) -f $(srcdir)/l-shaped.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += general.in l-shaped.in .linkstamp

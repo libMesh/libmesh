@@ -10,8 +10,8 @@ CLEANFILES = out_*.e
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f navier.in && $(LN_S) $(srcdir)/navier.in .
-	-rm -f fem_system_ex1.in && $(LN_S) $(srcdir)/fem_system_ex1.in .
+	-rm -f navier.in && $(LN_S) -f $(srcdir)/navier.in .
+	-rm -f fem_system_ex1.in && $(LN_S) -f $(srcdir)/fem_system_ex1.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += navier.in fem_system_ex1.in .linkstamp

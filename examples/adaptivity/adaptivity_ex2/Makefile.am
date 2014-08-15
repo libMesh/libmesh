@@ -1,6 +1,6 @@
 BUILT_SOURCES = exact_solution.C
 exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.C
-	$(AM_V_GEN)$(LN_S) $< $@
+	$(AM_V_GEN)$(LN_S) -f $< $@
 
 DISTCLEANFILES = $(BUILT_SOURCES)
 
@@ -16,7 +16,7 @@ CLEANFILES = solution_read_in.gmv saved_solution.xda saved_solution.gmv saved_me
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES += .linkstamp
 .linkstamp:
-	-rm -f mesh.xda && $(LN_S) $(srcdir)/mesh.xda .
+	-rm -f mesh.xda && $(LN_S) -f $(srcdir)/mesh.xda .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += mesh.xda .linkstamp

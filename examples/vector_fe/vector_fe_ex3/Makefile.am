@@ -10,7 +10,7 @@ CLEANFILES = out.e
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f vector_fe_ex3.in && $(LN_S) $(srcdir)/vector_fe_ex3.in .
+	-rm -f vector_fe_ex3.in && $(LN_S) -f $(srcdir)/vector_fe_ex3.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += vector_fe_ex3.in .linkstamp

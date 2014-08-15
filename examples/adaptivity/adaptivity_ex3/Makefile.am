@@ -10,9 +10,9 @@ CLEANFILES = lshaped.e biquadratic_h_adaptive.m error_*.e
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f lshaped.xda       && $(LN_S) $(srcdir)/lshaped.xda .
-	-rm -f lshaped3D.xda     && $(LN_S) $(srcdir)/lshaped3D.xda .
-	-rm -f adaptivity_ex3.in && $(LN_S) $(srcdir)/adaptivity_ex3.in .
+	-rm -f lshaped.xda       && $(LN_S) -f $(srcdir)/lshaped.xda .
+	-rm -f lshaped3D.xda     && $(LN_S) -f $(srcdir)/lshaped3D.xda .
+	-rm -f adaptivity_ex3.in && $(LN_S) -f $(srcdir)/adaptivity_ex3.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += lshaped.xda lshaped3D.xda adaptivity_ex3.in .linkstamp
