@@ -1233,9 +1233,9 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.C
-	$(AM_V_GEN)$(LN_S) $< $@
+	$(AM_V_GEN)$(LN_S) -f $< $@
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f mesh.xda && $(LN_S) $(srcdir)/mesh.xda .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f mesh.xda && $(LN_S) -f $(srcdir)/mesh.xda .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

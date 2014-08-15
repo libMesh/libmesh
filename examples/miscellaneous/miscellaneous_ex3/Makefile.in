@@ -1147,7 +1147,7 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 lshaped.xda:
-	$(AM_V_GEN)$(LN_S) $(top_srcdir)/examples/adjoints/adjoints_ex1/lshaped.xda .
+	$(AM_V_GEN)$(LN_S) -f $(top_srcdir)/examples/adjoints/adjoints_ex1/lshaped.xda .
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)

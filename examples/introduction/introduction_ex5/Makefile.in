@@ -1227,7 +1227,7 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 exact_solution.C: $(top_srcdir)/examples/introduction/introduction_ex3/exact_solution.C
-	$(AM_V_GEN)$(LN_S) $< $@
+	$(AM_V_GEN)$(LN_S) -f $< $@
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)

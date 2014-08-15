@@ -614,7 +614,7 @@ uninstall-am:
 
 @FPARSER_RELEASE_TRUE@fp_opcode_add.inc: $(srcdir)/fp_opcode_add.inc.release
 @FPARSER_RELEASE_TRUE@	$(AM_V_at)$(RM) $@
-@FPARSER_RELEASE_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
+@FPARSER_RELEASE_TRUE@	$(AM_V_GEN)$(LN_S) -f $< $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

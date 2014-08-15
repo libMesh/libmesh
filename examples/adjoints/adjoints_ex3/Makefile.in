@@ -1683,9 +1683,9 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f general.in          && $(LN_S) $(srcdir)/general.in .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f coupled_system.in   && $(LN_S) $(srcdir)/coupled_system.in .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f H_channel_quads.xda && $(LN_S) $(srcdir)/H_channel_quads.xda .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f general.in          && $(LN_S) -f $(srcdir)/general.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f coupled_system.in   && $(LN_S) -f $(srcdir)/coupled_system.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f H_channel_quads.xda && $(LN_S) -f $(srcdir)/H_channel_quads.xda .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

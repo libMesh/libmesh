@@ -1246,8 +1246,8 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f navier.in && $(LN_S) $(srcdir)/navier.in .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f fem_system_ex1.in && $(LN_S) $(srcdir)/fem_system_ex1.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f navier.in && $(LN_S) -f $(srcdir)/navier.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f fem_system_ex1.in && $(LN_S) -f $(srcdir)/fem_system_ex1.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

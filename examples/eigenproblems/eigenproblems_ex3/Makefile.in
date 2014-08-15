@@ -1151,8 +1151,8 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f drum1_mesh.e && $(LN_S) $(srcdir)/drum1_mesh.e .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f drum2_mesh.e && $(LN_S) $(srcdir)/drum2_mesh.e .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f drum1_mesh.e && $(LN_S) -f $(srcdir)/drum1_mesh.e .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f drum2_mesh.e && $(LN_S) -f $(srcdir)/drum2_mesh.e .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
