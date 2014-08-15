@@ -119,15 +119,6 @@ public:
                            const Point& p,
                            Real time=0.);
 
-
-protected:
-
-  /**
-   * Variable index to decide which overloaded function should
-   * be accessed
-   */
-  unsigned int var_index ;
-
 };
 
 template <typename Output>
