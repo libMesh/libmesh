@@ -75,41 +75,31 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
       {
         edge->set_node(0) = this->get_node(0);
         edge->set_node(1) = this->get_node(1);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     case 1:
       {
         edge->set_node(0) = this->get_node(1);
         edge->set_node(1) = this->get_node(2);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     case 2:
       {
         edge->set_node(0) = this->get_node(2);
         edge->set_node(1) = this->get_node(3);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     case 3:
       {
         edge->set_node(0) = this->get_node(3);
         edge->set_node(1) = this->get_node(0);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap_edge(edge);
-  return ap_edge;
+  return AutoPtr<Elem>(edge);
 }
 
 

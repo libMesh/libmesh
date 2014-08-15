@@ -109,8 +109,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   system.project_solution_on_reinit() = true;
 
   // And it'll be best to avoid any repartitioning
-  AutoPtr<Partitioner> old_partitioner = mesh.partitioner();
-  mesh.partitioner().reset(NULL);
+  AutoPtr<Partitioner> old_partitioner(mesh.partitioner().release());
 
   // And we can't allow any renumbering
   const bool old_renumbering_setting = mesh.allow_renumbering();
@@ -489,7 +488,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     }
 
   // Restore old partitioner and renumbering settings
-  mesh.partitioner() = old_partitioner;
+  mesh.partitioner().reset(old_partitioner.release());
   mesh.allow_renumbering(old_renumbering_setting);
 
   // Fiinally sum the vector of estimated error values.

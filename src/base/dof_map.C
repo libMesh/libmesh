@@ -120,7 +120,7 @@ AutoPtr<SparsityPattern::Build> DofMap::build_sparsity
     _augment_sparsity_pattern->augment_sparsity_pattern
       (sp->sparsity_pattern, sp->n_nz, sp->n_oz);
 
-  return sp;
+  return AutoPtr<SparsityPattern::Build>(sp.release());
 }
 
 

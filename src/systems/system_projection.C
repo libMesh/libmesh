@@ -124,8 +124,8 @@ public:
                    const Parameters &parameters_in,
                    NumericVector<Number> &new_v_in) :
     system(system_in),
-    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
-    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >()),
+    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >()),
     parameters(parameters_in),
     new_vector(new_v_in)
   {
@@ -137,8 +137,8 @@ public:
 
   ProjectSolution (const ProjectSolution &in) :
     system(in.system),
-    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
-    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >()),
+    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >()),
     parameters(in.parameters),
     new_vector(in.new_vector)
   {
@@ -172,8 +172,8 @@ public:
                       FEMFunctionBase<Gradient>* g_in,
                       NumericVector<Number> &new_v_in) :
     system(system_in),
-    f(f_in ? f_in->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
-    g(g_in ? g_in->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f(f_in ? f_in->clone() : AutoPtr<FEMFunctionBase<Number> >()),
+    g(g_in ? g_in->clone() : AutoPtr<FEMFunctionBase<Gradient> >()),
     new_vector(new_v_in)
   {
     libmesh_assert(f.get());
@@ -181,8 +181,8 @@ public:
 
   ProjectFEMSolution (const ProjectFEMSolution &in) :
     system(in.system),
-    f(in.f.get() ? in.f->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
-    g(in.g.get() ? in.g->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f(in.f.get() ? in.f->clone() : AutoPtr<FEMFunctionBase<Number> >()),
+    g(in.g.get() ? in.g->clone() : AutoPtr<FEMFunctionBase<Gradient> >()),
     new_vector(in.new_vector)
   {
     libmesh_assert(f.get());
@@ -219,8 +219,8 @@ public:
     b(b_in),
     variables(variables_in),
     system(system_in),
-    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
-    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >()),
+    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >()),
     parameters(parameters_in),
     new_vector(new_v_in)
   {
@@ -234,8 +234,8 @@ public:
     b(in.b),
     variables(in.variables),
     system(in.system),
-    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
-    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >()),
+    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >()),
     parameters(in.parameters),
     new_vector(in.new_vector)
   {

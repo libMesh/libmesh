@@ -72,49 +72,43 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
+  // To be returned wrapped in an AutoPtr
+  Elem* edge = NULL;
 
   switch (i)
     {
     case 0:
       {
         // base face
-        Edge2* edge = new Edge2;
-
+        edge = new Edge2;
         edge->set_node(0) = this->get_node(0);
         edge->set_node(1) = this->get_node(1);
-
-        AutoPtr<Elem> ap(edge);  return ap;
+        break;
       }
 
     case 1:
       {
         // adjacent to another infinite element
-        InfEdge2* edge = new InfEdge2;
-
+        edge = new InfEdge2;
         edge->set_node(0) = this->get_node(1);
         edge->set_node(1) = this->get_node(3);
-
-        AutoPtr<Elem> ap(edge);  return ap;
+        break;
       }
 
     case 2:
       {
         // adjacent to another infinite element
-        InfEdge2* edge = new InfEdge2;
-
+        edge = new InfEdge2;
         edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
         edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
-
-        AutoPtr<Elem> ap(edge);  return ap;
+        break;
       }
 
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>(edge);
 }
 
 

@@ -115,19 +115,15 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
         {
           // base
         case 0:
-          {
-            AutoPtr<Elem> ap(new Side<Quad8,InfHex16>(this,i));
-            return ap;
-          }
+          return AutoPtr<Elem>(new Side<Quad8,InfHex16>(this,i));
+
           // ifem sides
         case 1:
         case 2:
         case 3:
         case 4:
-          {
-            AutoPtr<Elem> ap(new Side<InfQuad6,InfHex16>(this,i));
-            return ap;
-          }
+          return AutoPtr<Elem>(new Side<InfQuad6,InfHex16>(this,i));
+
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
@@ -136,14 +132,14 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      AutoPtr<Elem> face(NULL);
+      Elem* face = NULL;
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
         {
         case 0: // the base face
           {
-            face.reset(new Quad8);
+            face = new Quad8;
 
             // Only here, the face element's normal points inward
             face->set_node(0) = this->get_node(0);
@@ -160,7 +156,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 
         case 1:  // connecting to another infinite element
           {
-            face.reset(new InfQuad6);
+            face = new InfQuad6;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(1);
@@ -174,7 +170,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 
         case 2:  // connecting to another infinite element
           {
-            face.reset(new InfQuad6);
+            face = new InfQuad6;
 
             face->set_node(0) = this->get_node(1);
             face->set_node(1) = this->get_node(2);
@@ -188,7 +184,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 
         case 3:  // connecting to another infinite element
           {
-            face.reset(new InfQuad6);
+            face = new InfQuad6;
 
             face->set_node(0) = this->get_node(2);
             face->set_node(1) = this->get_node(3);
@@ -202,7 +198,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 
         case 4:  // connecting to another infinite element
           {
-            face.reset(new InfQuad6);
+            face = new InfQuad6;
 
             face->set_node(0) = this->get_node(3);
             face->set_node(1) = this->get_node(0);
@@ -219,12 +215,11 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
-      return face;
+      return AutoPtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 AutoPtr<Elem> InfHex16::build_edge (const unsigned int i) const

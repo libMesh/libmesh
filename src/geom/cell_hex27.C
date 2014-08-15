@@ -208,14 +208,11 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    {
-      AutoPtr<Elem> ap(new Side<Quad9,Hex27>(this,i));
-      return ap;
-    }
+    return AutoPtr<Elem>(new Side<Quad9,Hex27>(this,i));
 
   else
     {
-      AutoPtr<Elem> face(new Quad9);
+      Elem* face = new Quad9;
       face->subdomain_id() = this->subdomain_id();
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
@@ -232,8 +229,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
             face->set_node(6) = this->get_node(9);
             face->set_node(7) = this->get_node(8);
             face->set_node(8) = this->get_node(20);
-
-            return face;
+            break;
           }
         case 1:  // the face at y = 0
           {
@@ -246,8 +242,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
             face->set_node(6) = this->get_node(16);
             face->set_node(7) = this->get_node(12);
             face->set_node(8) = this->get_node(21);
-
-            return face;
+            break;
           }
         case 2:  // the face at x=1
           {
@@ -260,8 +255,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
             face->set_node(6) = this->get_node(17);
             face->set_node(7) = this->get_node(13);
             face->set_node(8) = this->get_node(22);
-
-            return face;
+            break;
           }
         case 3: // the face at y=1
           {
@@ -274,8 +268,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
             face->set_node(6) = this->get_node(18);
             face->set_node(7) = this->get_node(14);
             face->set_node(8) = this->get_node(23);
-
-            return face;
+            break;
           }
         case 4: // the face at x=0
           {
@@ -288,8 +281,7 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
             face->set_node(6) = this->get_node(19);
             face->set_node(7) = this->get_node(15);
             face->set_node(8) = this->get_node(24);
-
-            return face;
+            break;
           }
         case 5: // the face at z=1
           {
@@ -302,17 +294,17 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
             face->set_node(6) = this->get_node(18);
             face->set_node(7) = this->get_node(19);
             face->set_node(8) = this->get_node(25);
-
-            return face;
+            break;
           }
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+
+      return AutoPtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 

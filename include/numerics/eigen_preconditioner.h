@@ -41,7 +41,6 @@ namespace libMesh
 {
 
 // forward declarations
-template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;

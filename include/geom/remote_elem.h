@@ -152,14 +152,14 @@ public:
   { libmesh_not_implemented(); return 0; }
 
   virtual AutoPtr<Elem> side (const unsigned int) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
+  { libmesh_not_implemented(); return AutoPtr<Elem>(); }
 
   virtual AutoPtr<Elem> build_side (const unsigned int,
                                     bool) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
+  { libmesh_not_implemented(); return AutoPtr<Elem>(); }
 
   virtual AutoPtr<Elem> build_edge (const unsigned int) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
+  { libmesh_not_implemented(); return AutoPtr<Elem>(); }
 
   virtual Order default_order () const
   { libmesh_not_implemented(); return FIRST; }

@@ -38,7 +38,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
 
   Parent                    (es, name_in, number_in),
   nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
-  diff_solver               (NULL),
+  diff_solver               (),
   _n_nonlinear_iterations   (0),
   _final_nonlinear_residual (1.e20)
 {

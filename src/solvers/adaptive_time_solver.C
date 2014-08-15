@@ -26,8 +26,9 @@ namespace libMesh
 
 AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
   : UnsteadySolver(s),
-    core_time_solver(NULL),
-    target_tolerance(1.e-3), upper_tolerance(0.0),
+    core_time_solver(),
+    target_tolerance(1.e-3),
+    upper_tolerance(0.0),
     max_deltat(0.),
     min_deltat(0.),
     max_growth(0.),

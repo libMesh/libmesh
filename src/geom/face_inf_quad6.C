@@ -118,16 +118,12 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
       switch (i)
         {
         case 0:
-          {
-            AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
-            return ap;
-          }
+          return AutoPtr<Elem>(new Side<Edge3,InfQuad6>(this,i));
+
         case 1:
         case 2:
-          {
-            AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad6>(this,i));
-            return ap;
-          }
+          return AutoPtr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
+
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
@@ -136,13 +132,13 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      AutoPtr<Elem> edge(NULL);
+      Elem* edge = NULL;
 
       switch (i)
         {
         case 0:
           {
-            edge.reset(new Edge3);
+            edge = new Edge3;
 
             edge->set_node(0) = this->get_node(0);
             edge->set_node(1) = this->get_node(1);
@@ -154,7 +150,7 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
         case 1:
           {
             // adjacent to another infinite element
-            edge.reset(new InfEdge2);
+            edge = new InfEdge2;
 
             edge->set_node(0) = this->get_node(1);
             edge->set_node(1) = this->get_node(3);
@@ -165,7 +161,7 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
         case 2:
           {
             // adjacent to another infinite element
-            edge.reset(new InfEdge2);
+            edge = new InfEdge2;
 
             edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
             edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
@@ -177,12 +173,11 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
         }
 
       edge->subdomain_id() = this->subdomain_id();
-      return edge;
+      return AutoPtr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 

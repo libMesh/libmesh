@@ -184,9 +184,6 @@ AutoPtr<FEGenericBase<Real> >
 FEGenericBase<Real>::build (const unsigned int dim,
                             const FEType& fet)
 {
-  // The stupid AutoPtr<FEBase> ap(); return ap;
-  // construct is required to satisfy IBM's xlC
-
   switch (dim)
     {
       // 0D
@@ -195,72 +192,39 @@ FEGenericBase<Real>::build (const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            {
-              AutoPtr<FEBase> ap(new FE<0,CLOUGH>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,CLOUGH>(fet));
 
           case HERMITE:
-            {
-              AutoPtr<FEBase> ap(new FE<0,HERMITE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,HERMITE>(fet));
 
           case LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<0,LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,LAGRANGE>(fet));
 
           case L2_LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<0,L2_LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<0,HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<0,L2_HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            {
-              AutoPtr<FEBase> ap(new FE<0,MONOMIAL>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            {
-              AutoPtr<FEBase> ap(new FE<0,SZABAB>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,SZABAB>(fet));
 
           case BERNSTEIN:
-            {
-              AutoPtr<FEBase> ap(new FE<0,BERNSTEIN>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<0,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            {
-              AutoPtr<FEBase> ap(new FEXYZ<0>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEXYZ<0>(fet));
 
           case SCALAR:
-            {
-              AutoPtr<FEBase> ap(new FEScalar<0>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEScalar<0>(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -272,72 +236,39 @@ FEGenericBase<Real>::build (const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            {
-              AutoPtr<FEBase> ap(new FE<1,CLOUGH>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,CLOUGH>(fet));
 
           case HERMITE:
-            {
-              AutoPtr<FEBase> ap(new FE<1,HERMITE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,HERMITE>(fet));
 
           case LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,LAGRANGE>(fet));
 
           case L2_LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<1,L2_LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<1,L2_HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            {
-              AutoPtr<FEBase> ap(new FE<1,MONOMIAL>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            {
-              AutoPtr<FEBase> ap(new FE<1,SZABAB>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,SZABAB>(fet));
 
           case BERNSTEIN:
-            {
-              AutoPtr<FEBase> ap(new FE<1,BERNSTEIN>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<1,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            {
-              AutoPtr<FEBase> ap(new FEXYZ<1>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEXYZ<1>(fet));
 
           case SCALAR:
-            {
-              AutoPtr<FEBase> ap(new FEScalar<1>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEScalar<1>(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -351,78 +282,42 @@ FEGenericBase<Real>::build (const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            {
-              AutoPtr<FEBase> ap(new FE<2,CLOUGH>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,CLOUGH>(fet));
 
           case HERMITE:
-            {
-              AutoPtr<FEBase> ap(new FE<2,HERMITE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,HERMITE>(fet));
 
           case LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,LAGRANGE>(fet));
 
           case L2_LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<2,L2_LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<2,L2_HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            {
-              AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            {
-              AutoPtr<FEBase> ap(new FE<2,SZABAB>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,SZABAB>(fet));
 
           case BERNSTEIN:
-            {
-              AutoPtr<FEBase> ap(new FE<2,BERNSTEIN>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<2,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            {
-              AutoPtr<FEBase> ap(new FEXYZ<2>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEXYZ<2>(fet));
 
           case SCALAR:
-            {
-              AutoPtr<FEBase> ap(new FEScalar<2>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEScalar<2>(fet));
 
           case SUBDIVISION:
-            {
-              AutoPtr<FEBase> ap(new FESubdivision(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FESubdivision(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -439,66 +334,36 @@ FEGenericBase<Real>::build (const unsigned int dim,
             libmesh_error_msg("ERROR: Clough-Tocher elements currently only support 1D and 2D");
 
           case HERMITE:
-            {
-              AutoPtr<FEBase> ap(new FE<3,HERMITE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,HERMITE>(fet));
 
           case LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,LAGRANGE>(fet));
 
           case L2_LAGRANGE:
-            {
-              AutoPtr<FEBase> ap(new FE<3,L2_LAGRANGE>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            {
-              AutoPtr<FEBase> ap(new FE<3,L2_HIERARCHIC>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            {
-              AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            {
-              AutoPtr<FEBase> ap(new FE<3,SZABAB>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,SZABAB>(fet));
 
           case BERNSTEIN:
-            {
-              AutoPtr<FEBase> ap(new FE<3,BERNSTEIN>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FE<3,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            {
-              AutoPtr<FEBase> ap(new FEXYZ<3>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEXYZ<3>(fet));
 
           case SCALAR:
-            {
-              AutoPtr<FEBase> ap(new FEScalar<3>(fet));
-              return ap;
-            }
+            return AutoPtr<FEBase>(new FEScalar<3>(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -510,8 +375,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<FEBase> ap(NULL);
-  return ap;
+  return AutoPtr<FEBase>();
 }
 
 
@@ -521,9 +385,6 @@ AutoPtr<FEGenericBase<RealGradient> >
 FEGenericBase<RealGradient>::build (const unsigned int dim,
                                     const FEType& fet)
 {
-  // The stupid AutoPtr<FEBase> ap(); return ap;
-  // construct is required to satisfy IBM's xlC
-
   switch (dim)
     {
       // 0D
@@ -532,10 +393,8 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            {
-              AutoPtr<FEVectorBase> ap( new FELagrangeVec<0>(fet) );
-              return ap;
-            }
+            return AutoPtr<FEVectorBase>(new FELagrangeVec<0>(fet));
+
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
@@ -545,10 +404,8 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            {
-              AutoPtr<FEVectorBase> ap( new FELagrangeVec<1>(fet) );
-              return ap;
-            }
+            return AutoPtr<FEVectorBase>(new FELagrangeVec<1>(fet));
+
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
@@ -558,15 +415,11 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            {
-              AutoPtr<FEVectorBase> ap( new FELagrangeVec<2>(fet) );
-              return ap;
-            }
+            return AutoPtr<FEVectorBase>(new FELagrangeVec<2>(fet));
+
           case NEDELEC_ONE:
-            {
-              AutoPtr<FEVectorBase> ap( new FENedelecOne<2>(fet) );
-              return ap;
-            }
+            return AutoPtr<FEVectorBase>(new FENedelecOne<2>(fet));
+
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
@@ -576,15 +429,11 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
         switch (fet.family)
           {
           case LAGRANGE_VEC:
-            {
-              AutoPtr<FEVectorBase> ap( new FELagrangeVec<3>(fet) );
-              return ap;
-            }
+            return AutoPtr<FEVectorBase>(new FELagrangeVec<3>(fet));
+
           case NEDELEC_ONE:
-            {
-              AutoPtr<FEVectorBase> ap( new FENedelecOne<3>(fet) );
-              return ap;
-            }
+            return AutoPtr<FEVectorBase>(new FENedelecOne<3>(fet));
+
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
@@ -595,8 +444,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
     } // switch(dim)
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<FEVectorBase> ap(NULL);
-  return ap;
+  return AutoPtr<FEVectorBase>();
 }
 
 
@@ -613,9 +461,6 @@ AutoPtr<FEGenericBase<Real> >
 FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                                   const FEType& fet)
 {
-  // The stupid AutoPtr<FEBase> ap(); return ap;
-  // construct is required to satisfy IBM's xlC
-
   switch (dim)
     {
 
@@ -632,10 +477,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<1,JACOBI_20_00,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<1,JACOBI_20_00,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -646,10 +489,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<1,JACOBI_30_00,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<1,JACOBI_30_00,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -660,10 +501,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<1,LEGENDRE,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<1,LEGENDRE,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -674,10 +513,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<1,LAGRANGE,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<1,LAGRANGE,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -704,10 +541,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<2,JACOBI_20_00,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<2,JACOBI_20_00,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -718,10 +553,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<2,JACOBI_30_00,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<2,JACOBI_30_00,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -732,10 +565,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<2,LEGENDRE,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<2,LEGENDRE,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -746,10 +577,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<2,LAGRANGE,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<2,LAGRANGE,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -776,10 +605,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -790,10 +617,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -804,10 +629,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -818,10 +641,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
               switch (fet.inf_map)
                 {
                 case CARTESIAN:
-                  {
-                    AutoPtr<FEBase> ap(new InfFE<3,LAGRANGE,CARTESIAN>(fet));
-                    return ap;
-                  }
+                  return AutoPtr<FEBase>(new InfFE<3,LAGRANGE,CARTESIAN>(fet));
+
                 default:
                   libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
@@ -837,8 +658,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<FEBase> ap(NULL);
-  return ap;
+  return AutoPtr<FEBase>();
 }
 
 
@@ -850,8 +670,7 @@ FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
 {
   // No vector types defined... YET.
   libmesh_not_implemented();
-  AutoPtr<FEVectorBase> ap(NULL);
-  return ap;
+  return AutoPtr<FEVectorBase>();
 }
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

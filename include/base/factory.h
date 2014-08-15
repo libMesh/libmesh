@@ -139,16 +139,11 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
       libmesh_error_msg("Exiting...");
 
       // We'll never get here
-      AutoPtr<Base> ret_val (NULL);
-      return ret_val;
+      return AutoPtr<Base>();
     }
 
-  // Do this the stoopid way for IBM xlC
   Factory<Base> *f = factory_map()[name];
-
-  AutoPtr<Base> ret_val (f->create());
-
-  return ret_val;
+  return AutoPtr<Base>(f->create());
 }
 
 
@@ -168,10 +163,7 @@ template <class Derived, class Base>
 inline
 AutoPtr<Base> FactoryImp<Derived,Base>::create ()
 {
-  // Do this the stoopid way for IBM xlC
-  AutoPtr<Base> ret_val (new Derived);
-
-  return ret_val;
+  return AutoPtr<Base>(new Derived);
 }
 
 

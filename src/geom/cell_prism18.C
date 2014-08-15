@@ -185,18 +185,12 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
         {
         case 0:
         case 4:
-          {
-            AutoPtr<Elem> face(new Side<Tri6,Prism18>(this,i));
-            return face;
-          }
+          return AutoPtr<Elem>(new Side<Tri6,Prism18>(this,i));
 
         case 1:
         case 2:
         case 3:
-          {
-            AutoPtr<Elem> face(new Side<Quad9,Prism18>(this,i));
-            return face;
-          }
+          return AutoPtr<Elem>(new Side<Quad9,Prism18>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -206,13 +200,13 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      AutoPtr<Elem> face(NULL);
+      Elem* face = NULL;
 
       switch (i)
         {
         case 0:  // the triangular face at z=-1
           {
-            face.reset(new Tri6);
+            face = new Tri6;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(2);
@@ -225,7 +219,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
           }
         case 1:  // the quad face at y=0
           {
-            face.reset(new Quad9);
+            face = new Quad9;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(1);
@@ -241,7 +235,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
           }
         case 2:  // the other quad face
           {
-            face.reset(new Quad9);
+            face = new Quad9;
 
             face->set_node(0) = this->get_node(1);
             face->set_node(1) = this->get_node(2);
@@ -257,7 +251,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
           }
         case 3: // the quad face at x=0
           {
-            face.reset(new Quad9);
+            face = new Quad9;
 
             face->set_node(0) = this->get_node(2);
             face->set_node(1) = this->get_node(0);
@@ -273,7 +267,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
           }
         case 4: // the triangular face at z=1
           {
-            face.reset(new Tri6);
+            face = new Tri6;
 
             face->set_node(0) = this->get_node(3);
             face->set_node(1) = this->get_node(4);
@@ -289,12 +283,11 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
-      return face;
+      return AutoPtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 

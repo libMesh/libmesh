@@ -49,51 +49,32 @@ NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage 
   switch (solver_package)
     {
 
-
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      {
-        AutoPtr<NumericVector<T> > ap(new LaspackVector<T>(comm, AUTOMATIC));
-        return ap;
-      }
+      return AutoPtr<NumericVector<T> >(new LaspackVector<T>(comm, AUTOMATIC));
 #endif
-
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      {
-        AutoPtr<NumericVector<T> > ap(new PetscVector<T>(comm, AUTOMATIC));
-        return ap;
-      }
+      return AutoPtr<NumericVector<T> >(new PetscVector<T>(comm, AUTOMATIC));
 #endif
-
 
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
-      {
-        AutoPtr<NumericVector<T> > ap(new EpetraVector<T>(comm, AUTOMATIC));
-        return ap;
-      }
+      return AutoPtr<NumericVector<T> >(new EpetraVector<T>(comm, AUTOMATIC));
 #endif
-
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      {
-        AutoPtr<NumericVector<T> > ap(new EigenSparseVector<T>(comm, AUTOMATIC));
-        return ap;
-      }
+      return AutoPtr<NumericVector<T> >(new EigenSparseVector<T>(comm, AUTOMATIC));
 #endif
 
-
     default:
-      AutoPtr<NumericVector<T> > ap(new DistributedVector<T>(comm, AUTOMATIC));
-      return ap;
-
+      return AutoPtr<NumericVector<T> >(new DistributedVector<T>(comm, AUTOMATIC));
     }
 
-  AutoPtr<NumericVector<T> > ap(NULL);
-  return ap;
+  libmesh_error_msg("We'll never get here!");
+  return AutoPtr<NumericVector<T> >();
 }
 
 

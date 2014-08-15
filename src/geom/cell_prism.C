@@ -87,74 +87,68 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
+  Elem* face = NULL;
+
   switch (i)
     {
     case 0:  // the triangular face at z=0
       {
-        Elem* facet = new Tri3;
-        AutoPtr<Elem> ap_facet(facet);
+        face = new Tri3;
 
-        facet->set_node(0) = this->get_node(0);
-        facet->set_node(1) = this->get_node(2);
-        facet->set_node(2) = this->get_node(1);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(2);
+        face->set_node(2) = this->get_node(1);
 
-        return ap_facet;
+        break;
       }
     case 1:  // the quad face at y=0
       {
-        Elem* faceq = new Quad4;
-        AutoPtr<Elem> ap_faceq(faceq);
+        face = new Quad4;
 
-        faceq->set_node(0) = this->get_node(0);
-        faceq->set_node(1) = this->get_node(1);
-        faceq->set_node(2) = this->get_node(4);
-        faceq->set_node(3) = this->get_node(3);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(1);
+        face->set_node(2) = this->get_node(4);
+        face->set_node(3) = this->get_node(3);
 
-        return ap_faceq;
+        break;
       }
     case 2:  // the other quad face
       {
-        Elem* faceq = new Quad4;
-        AutoPtr<Elem> ap_faceq(faceq);
+        face = new Quad4;
 
-        faceq->set_node(0) = this->get_node(1);
-        faceq->set_node(1) = this->get_node(2);
-        faceq->set_node(2) = this->get_node(5);
-        faceq->set_node(3) = this->get_node(4);
+        face->set_node(0) = this->get_node(1);
+        face->set_node(1) = this->get_node(2);
+        face->set_node(2) = this->get_node(5);
+        face->set_node(3) = this->get_node(4);
 
-        return ap_faceq;
+        break;
       }
     case 3: // the quad face at x=0
       {
-        Elem* faceq = new Quad4;
-        AutoPtr<Elem> ap_faceq(faceq);
+        face = new Quad4;
 
-        faceq->set_node(0) = this->get_node(2);
-        faceq->set_node(1) = this->get_node(0);
-        faceq->set_node(2) = this->get_node(3);
-        faceq->set_node(3) = this->get_node(5);
+        face->set_node(0) = this->get_node(2);
+        face->set_node(1) = this->get_node(0);
+        face->set_node(2) = this->get_node(3);
+        face->set_node(3) = this->get_node(5);
 
-        return ap_faceq;
+        break;
       }
     case 4: // the triangular face at z=1
       {
-        Elem* facet = new Tri3;
-        AutoPtr<Elem> ap_facet(facet);
+        face = new Tri3;
 
-        facet->set_node(0) = this->get_node(3);
-        facet->set_node(1) = this->get_node(4);
-        facet->set_node(2) = this->get_node(5);
+        face->set_node(0) = this->get_node(3);
+        face->set_node(1) = this->get_node(4);
+        face->set_node(2) = this->get_node(5);
 
-        return ap_facet;
+        break;
       }
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  Elem* facet = new Tri3;
-  AutoPtr<Elem> ap_facet(facet);
-  return ap_facet;
+  return AutoPtr<Elem>(face);
 }
 
 

@@ -123,17 +123,14 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    {
-      AutoPtr<Elem> ap(new Side<Quad4,Hex8>(this,i));
-      return ap;
-    }
+    return AutoPtr<Elem>(new Side<Quad4,Hex8>(this,i));
 
   else
     {
-      AutoPtr<Elem> face(new Quad4);
+      Elem* face = new Quad4;
       face->subdomain_id() = this->subdomain_id();
 
-      // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
+      // Think of a unit cube: (-1,1) x (-1,1) x (-1,1)
       switch (i)
         {
         case 0:  // the face at z = -1
@@ -142,8 +139,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
             face->set_node(1) = this->get_node(3);
             face->set_node(2) = this->get_node(2);
             face->set_node(3) = this->get_node(1);
-
-            return face;
+            break;
           }
         case 1:  // the face at y = -1
           {
@@ -151,8 +147,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
             face->set_node(1) = this->get_node(1);
             face->set_node(2) = this->get_node(5);
             face->set_node(3) = this->get_node(4);
-
-            return face;
+            break;
           }
         case 2:  // the face at x = 1
           {
@@ -160,8 +155,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
             face->set_node(1) = this->get_node(2);
             face->set_node(2) = this->get_node(6);
             face->set_node(3) = this->get_node(5);
-
-            return face;
+            break;
           }
         case 3: // the face at y = 1
           {
@@ -169,8 +163,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
             face->set_node(1) = this->get_node(3);
             face->set_node(2) = this->get_node(7);
             face->set_node(3) = this->get_node(6);
-
-            return face;
+            break;
           }
         case 4: // the face at x = -1
           {
@@ -178,8 +171,7 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
             face->set_node(1) = this->get_node(0);
             face->set_node(2) = this->get_node(4);
             face->set_node(3) = this->get_node(7);
-
-            return face;
+            break;
           }
         case 5: // the face at z = 1
           {
@@ -187,17 +179,17 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
             face->set_node(1) = this->get_node(5);
             face->set_node(2) = this->get_node(6);
             face->set_node(3) = this->get_node(7);
-
-            return face;
+            break;
           }
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+
+      return AutoPtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 
@@ -206,8 +198,7 @@ AutoPtr<Elem> Hex8::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
-  AutoPtr<Elem> ap(new SideEdge<Edge2,Hex8>(this,i));
-  return ap;
+  return AutoPtr<Elem>(new SideEdge<Edge2,Hex8>(this,i));
 }
 
 
