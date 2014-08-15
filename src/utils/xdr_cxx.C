@@ -144,8 +144,8 @@ Xdr::Xdr (const std::string& name, const XdrMODE m) :
   xdrs(NULL),
   fp(NULL),
 #endif
-  in(NULL),
-  out(NULL),
+  in(),
+  out(),
   comm_len(xdr_MAX_STRING_LENGTH),
   gzipped_file(false),
   bzipped_file(false),

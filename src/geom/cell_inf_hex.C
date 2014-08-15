@@ -99,102 +99,86 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  /*
-   *Think of a unit cube: (-1,1) x (-1,1)x (-1,1),
-   * with (in general) the normals pointing outwards
-   */
+  // To be returned wrapped in an AutoPtr
+  Elem* face = NULL;
+
+  // Think of a unit cube: (-1,1) x (-1,1) x (-1,1),
+  // with (in general) the normals pointing outwards
   switch (i)
     {
-    case 0:  // the face at z = -1
+      // the face at z = -1
       // the base, where the infinite element couples to conventional
       // elements
+    case 0:
       {
-        Elem* face = new Quad4;
-        AutoPtr<Elem> ap_face(face);
-
-        /*
-         * Oops, here we are, claiming the normal of the face
-         * elements point outwards -- and this is the exception:
-         * For the side built from the base face,
-         * the normal is pointing _into_ the element!
-         * Why is that? - In agreement with build_side(),
-         * which in turn _has_ to build the face in this
-         * way as to enable the cool way \p InfFE re-uses \p FE.
-         */
+        // Oops, here we are, claiming the normal of the face
+        // elements point outwards -- and this is the exception:
+        // For the side built from the base face,
+        // the normal is pointing _into_ the element!
+        // Why is that? - In agreement with build_side(),
+        // which in turn _has_ to build the face in this
+        // way as to enable the cool way \p InfFE re-uses \p FE.
+        face = new Quad4;
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(1);
         face->set_node(2) = this->get_node(2);
         face->set_node(3) = this->get_node(3);
-
-        return ap_face;
+        break;
       }
 
-    case 1:  // the face at y = -1
+      // the face at y = -1
       // this face connects to another infinite element
+    case 1:
       {
-        Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
-
+        face = new InfQuad4;
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(1);
         face->set_node(2) = this->get_node(4);
         face->set_node(3) = this->get_node(5);
-
-        return ap_face;
+        break;
       }
 
-    case 2:  // the face at x = 1
+      // the face at x = 1
       // this face connects to another infinite element
+    case 2:
       {
-        Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
-        //AutoPtr<Elem> face(new InfQuad4);
-
+        face = new InfQuad4;
         face->set_node(0) = this->get_node(1);
         face->set_node(1) = this->get_node(2);
         face->set_node(2) = this->get_node(5);
         face->set_node(3) = this->get_node(6);
-
-        return ap_face;
+        break;
       }
 
-    case 3: // the face at y = 1
+      // the face at y = 1
       // this face connects to another infinite element
+    case 3:
       {
-        Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
-        //AutoPtr<Elem> face(new InfQuad4);
-
+        face = new InfQuad4;
         face->set_node(0) = this->get_node(2);
         face->set_node(1) = this->get_node(3);
         face->set_node(2) = this->get_node(6);
         face->set_node(3) = this->get_node(7);
-
-        return ap_face;
+        break;
       }
 
-    case 4: // the face at x = -1
+      // the face at x = -1
       // this face connects to another infinite element
+    case 4:
       {
-        Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
-        //AutoPtr<Elem> face(new InfQuad4);
-
+        face = new InfQuad4;
         face->set_node(0) = this->get_node(3);
         face->set_node(1) = this->get_node(0);
         face->set_node(2) = this->get_node(7);
         face->set_node(3) = this->get_node(4);
-
-        return ap_face;
+        break;
       }
 
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>(face);
 }
 
 

@@ -52,10 +52,9 @@ public:
    * Creates a new partitioner of this type and returns it in
    * an \p AutoPtr.
    */
-  virtual AutoPtr<Partitioner> clone () const {
-    AutoPtr<Partitioner> cloned_partitioner
-      (new LinearPartitioner());
-    return cloned_partitioner;
+  virtual AutoPtr<Partitioner> clone () const
+  {
+    return AutoPtr<Partitioner>(new LinearPartitioner());
   }
 
 protected:

@@ -29,8 +29,8 @@ namespace libMesh
 TimeSolver::TimeSolver (sys_type& s)
   : quiet (true),
     reduce_deltat_on_diffsolver_failure (0),
-    _diff_solver (NULL),
-    _linear_solver (NULL),
+    _diff_solver (),
+    _linear_solver (),
     _system (s),
     solution_history(new NoSolutionHistory()), // Default setting for solution_history
     _is_adjoint (false)

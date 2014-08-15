@@ -77,17 +77,15 @@ EXTERN_C_FOR_PETSC_END
 // Local anonymous namespace to hold miscelaneous bits
 namespace {
 
-using libMesh::AutoPtr;
-
-AutoPtr<GetPot> command_line (NULL);
-AutoPtr<std::ofstream> _ofstream (NULL);
+AutoPtr<GetPot> command_line;
+AutoPtr<std::ofstream> _ofstream;
 // If std::cout and std::cerr are redirected, we need to
 // be a little careful and save the original streambuf objects,
 // replacing them in the destructor before program termination.
 std::streambuf* out_buf (NULL);
 std::streambuf* err_buf (NULL);
 
-AutoPtr<libMesh::Threads::task_scheduler_init> task_scheduler (NULL);
+AutoPtr<libMesh::Threads::task_scheduler_init> task_scheduler;
 #if defined(LIBMESH_HAVE_MPI)
 bool libmesh_initialized_mpi = false;
 #endif

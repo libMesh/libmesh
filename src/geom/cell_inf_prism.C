@@ -88,71 +88,63 @@ AutoPtr<Elem> InfPrism::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
+  Elem* face = NULL;
+
   switch (i)
     {
     case 0:  // the triangular face at z=-1, base face
       {
-        Elem* face = new Tri3;
-        AutoPtr<Elem> ap_face(face);
-        //AutoPtr<Elem> face(new Tri3);
+        face = new Tri3;
 
         // Note that for this face element, the normal points inward
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(1);
         face->set_node(2) = this->get_node(2);
 
-        return ap_face;
+        break;
       }
 
     case 1:  // the quad face at y=0
       {
-        Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
-        //AutoPtr<Elem> face(new InfQuad4);
+        face = new InfQuad4;
 
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(1);
         face->set_node(2) = this->get_node(3);
         face->set_node(3) = this->get_node(4);
 
-        return ap_face;
+        break;
       }
 
     case 2:  // the other quad face
       {
-        Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
-        //AutoPtr<Elem> face(new InfQuad4);
+        face = new InfQuad4;
 
         face->set_node(0) = this->get_node(1);
         face->set_node(1) = this->get_node(2);
         face->set_node(2) = this->get_node(4);
         face->set_node(3) = this->get_node(5);
 
-        return ap_face;
+        break;
       }
 
     case 3: // the quad face at x=0
       {
-        Elem* face = new InfQuad4;
-        AutoPtr<Elem> ap_face(face);
-        //AutoPtr<Elem> face(new InfQuad4);
+        face = new InfQuad4;
 
         face->set_node(0) = this->get_node(2);
         face->set_node(1) = this->get_node(0);
         face->set_node(2) = this->get_node(5);
         face->set_node(3) = this->get_node(3);
 
-        return ap_face;
+        break;
       }
 
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>(face);
 }
 
 

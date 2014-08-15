@@ -132,14 +132,11 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    {
-      AutoPtr<Elem> ap(new Side<Tri3,Tet4>(this,i));
-      return ap;
-    }
+    return AutoPtr<Elem>(new Side<Tri3,Tet4>(this,i));
 
   else
     {
-      AutoPtr<Elem> face(new Tri3);
+      Elem* face = new Tri3;
       face->subdomain_id() = this->subdomain_id();
 
       switch (i)
@@ -149,41 +146,38 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(2);
             face->set_node(2) = this->get_node(1);
-
-            return face;
+            break;
           }
         case 1:
           {
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(1);
             face->set_node(2) = this->get_node(3);
-
-            return face;
+            break;
           }
         case 2:
           {
             face->set_node(0) = this->get_node(1);
             face->set_node(1) = this->get_node(2);
             face->set_node(2) = this->get_node(3);
-
-            return face;
+            break;
           }
         case 3:
           {
             face->set_node(0) = this->get_node(2);
             face->set_node(1) = this->get_node(0);
             face->set_node(2) = this->get_node(3);
-
-            return face;
+            break;
           }
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+
+      return AutoPtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 

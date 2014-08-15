@@ -42,16 +42,6 @@ Preconditioner<T>::build(const libMesh::Parallel::Communicator &comm,
   switch (solver_package)
     {
 
-      /*
-        #ifdef LIBMESH_HAVE_LASPACK
-        case LASPACK_SOLVERS:
-        {
-        AutoPtr<Preconditioner<T> > ap(new LaspackPreconditioner<T>(comm));
-        return ap;
-        }
-        #endif
-      */
-
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {

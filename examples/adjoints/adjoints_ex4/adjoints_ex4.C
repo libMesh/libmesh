@@ -163,7 +163,7 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
                                               FEMParameters &param)
 {
-  AutoPtr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));
+  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -171,7 +171,7 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return mesh_refinement;
+  return AutoPtr<MeshRefinement>(mesh_refinement);
 }
 
 // This is where declare the adjoint refined error estimator. This estimator builds an error bound
@@ -179,20 +179,16 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 // see the description of the Adjoint Refinement Error Estimator in adjoint_refinement_error_estimator.C
 AutoPtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet &qois)
 {
-  AutoPtr<AdjointRefinementEstimator> error_estimator;
-
   std::cout<<"Computing the error estimate using the Adjoint Refinement Error Estimator"<<std::endl<<std::endl;
 
   AdjointRefinementEstimator *adjoint_refinement_estimator = new AdjointRefinementEstimator;
-
-  error_estimator.reset (adjoint_refinement_estimator);
 
   adjoint_refinement_estimator->qoi_set() = qois;
 
   // We enrich the FE space for the dual problem by doing 2 uniform h refinements
   adjoint_refinement_estimator->number_h_refinements = 2;
 
-  return error_estimator;
+  return AutoPtr<AdjointRefinementEstimator>(adjoint_refinement_estimator);
 }
 
 #endif // LIBMESH_ENABLE_AMR

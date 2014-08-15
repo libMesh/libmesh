@@ -539,7 +539,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
 AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
                                               FEMParameters &param)
 {
-  AutoPtr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));
+  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -547,7 +547,7 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return mesh_refinement;
+  return AutoPtr<MeshRefinement>(mesh_refinement);
 }
 
 #endif // LIBMESH_ENABLE_AMR
@@ -556,11 +556,7 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 // for comparisons of adjoint and non-adjoint based error indicators
 AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters& /* param */)
 {
-  AutoPtr<ErrorEstimator> error_estimator;
-
-  error_estimator.reset(new KellyErrorEstimator);
-
-  return error_estimator;
+  return AutoPtr<ErrorEstimator>(new KellyErrorEstimator);
 }
 
 // Functions to build the adjoint based error indicators
@@ -573,11 +569,7 @@ build_error_estimator_component_wise
  std::vector<FEMNormType> &primal_error_norm_type,
  std::vector<FEMNormType> &dual_error_norm_type)
 {
-  AutoPtr<ErrorEstimator> error_estimator;
-
   AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
-
-  error_estimator.reset (adjoint_residual_estimator);
 
   // Both the primal and dual weights are going to be estimated using the patch recovery error estimator
   PatchRecoveryErrorEstimator *p1 =
@@ -616,7 +608,7 @@ build_error_estimator_component_wise
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
 
-  return error_estimator;
+  return AutoPtr<ErrorEstimator>(adjoint_residual_estimator);
 }
 
 // The error_convection_diffusion_x and error_convection_diffusion_y are the nonlinear contributions which
@@ -629,11 +621,7 @@ build_weighted_error_estimator_component_wise
  std::vector<FEMNormType> &dual_error_norm_type,
  std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
 {
-  AutoPtr<ErrorEstimator> error_estimator;
-
   AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
-
-  error_estimator.reset (adjoint_residual_estimator);
 
   // Using the user filled error norm type vector, we pass the type of norm to be used for
   // the error in each variable, we can have different types of norms for the primal and
@@ -679,7 +667,7 @@ build_weighted_error_estimator_component_wise
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
 
-  return error_estimator;
+  return AutoPtr<ErrorEstimator>(adjoint_residual_estimator);
 }
 
 // The main program.

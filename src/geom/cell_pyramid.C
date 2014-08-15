@@ -86,77 +86,67 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-
+  // To be returned wrapped in an AutoPtr
+  Elem* face = NULL;
 
   switch (i)
     {
     case 0:  // triangular face 1
       {
-        Elem* face = new Tri3;
+        face = new Tri3;
 
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(1);
         face->set_node(2) = this->get_node(4);
 
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 1:  // triangular face 2
       {
-        Elem* face = new Tri3;
+        face = new Tri3;
 
         face->set_node(0) = this->get_node(1);
         face->set_node(1) = this->get_node(2);
         face->set_node(2) = this->get_node(4);
 
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 2:  // triangular face 3
       {
-        Elem* face = new Tri3;
+        face = new Tri3;
 
         face->set_node(0) = this->get_node(2);
         face->set_node(1) = this->get_node(3);
         face->set_node(2) = this->get_node(4);
 
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 3:  // triangular face 4
       {
-        Elem* face = new Tri3;
+        face = new Tri3;
 
         face->set_node(0) = this->get_node(3);
         face->set_node(1) = this->get_node(0);
         face->set_node(2) = this->get_node(4);
 
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 4:  // the quad face at z=0
       {
-        Elem* face = new Quad4;
+        face = new Quad4;
 
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(3);
         face->set_node(2) = this->get_node(2);
         face->set_node(3) = this->get_node(1);
 
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     default:
-      {
-        libmesh_error_msg("Invalid side i = " << i);
-        AutoPtr<Elem> ap_face(NULL);
-        return ap_face;
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap_face(NULL);
-  return ap_face;
+  return AutoPtr<Elem>(face);
 }
 
 

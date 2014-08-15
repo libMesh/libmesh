@@ -30,7 +30,7 @@ DifferentiableSystem::DifferentiableSystem
  const std::string& name_in,
  const unsigned int number_in) :
   Parent      (es, name_in, number_in),
-  time_solver (NULL),
+  time_solver (),
   deltat(1.),
   print_solution_norms(false),
   print_solutions(false),
@@ -114,11 +114,9 @@ void DifferentiableSystem::init_data ()
 
 AutoPtr<DiffContext> DifferentiableSystem::build_context ()
 {
-  AutoPtr<DiffContext> ap(new DiffContext(*this));
-
-  ap->set_deltat_pointer( &this->deltat );
-
-  return ap;
+  DiffContext* context = new DiffContext(*this);
+  context->set_deltat_pointer( &this->deltat );
+  return AutoPtr<DiffContext>(context);
 }
 
 

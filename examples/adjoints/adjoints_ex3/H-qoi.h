@@ -25,10 +25,11 @@ public:
 
   virtual void side_qoi(DiffContext &context, const QoISet & qois);
 
-  virtual AutoPtr<DifferentiableQoI> clone( )
-  { AutoPtr<DifferentiableQoI> my_clone( new CoupledSystemQoI );
+  virtual AutoPtr<DifferentiableQoI> clone()
+  {
+    DifferentiableQoI* my_clone = new CoupledSystemQoI;
     *my_clone = *this;
-    return my_clone;
+    return AutoPtr<DifferentiableQoI>(my_clone);
   }
 
 };

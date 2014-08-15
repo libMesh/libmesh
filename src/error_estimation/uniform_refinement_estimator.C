@@ -200,8 +200,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   std::vector<bool> old_projection_settings(system_list.size());
 
   // And it'll be best to avoid any repartitioning
-  AutoPtr<Partitioner> old_partitioner = mesh.partitioner();
-  mesh.partitioner().reset(NULL);
+  AutoPtr<Partitioner> old_partitioner(mesh.partitioner().release());
 
   for (unsigned int i=0; i != system_list.size(); ++i)
     {
@@ -717,7 +716,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     }
 
   // Restore old partitioner settings
-  mesh.partitioner() = old_partitioner;
+  mesh.partitioner().reset(old_partitioner.release());
 }
 
 } // namespace libMesh
