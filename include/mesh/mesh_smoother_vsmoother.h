@@ -222,10 +222,8 @@ private:
   template <typename T>
   struct Array2D
   {
-    Array2D(unsigned nx, unsigned ny)
-    {
-      _data.resize(nx, std::vector<T>(ny));
-    }
+    Array2D(unsigned nx, unsigned ny) :
+      _data(nx, std::vector<T>(ny)) {}
 
     // Accessors
     std::vector<T>& operator[](unsigned i) {return _data[i];}

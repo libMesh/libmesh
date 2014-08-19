@@ -59,6 +59,10 @@ public:
     : ErrorEstimator(),
       scale_by_n_flux_faces(false),
       integrate_boundary_sides(false),
+      fine_elem(NULL), coarse_elem(NULL),
+      fine_error(0), coarse_error(0),
+      fine_side(libMesh::invalid_uint),
+      var(libMesh::invalid_uint),
       fe_fine(NULL), fe_coarse(NULL) {}
 
   /**

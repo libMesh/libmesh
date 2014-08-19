@@ -243,6 +243,10 @@ inline
 Node::Node (const Point& p,
             const dof_id_type dofid) :
   Point(p)
+#ifdef LIBMESH_ENABLE_NODE_VALENCE
+  ,
+  _valence
+#endif
 {
   // optionally assign the id.  We have
   // to do it like this otherwise

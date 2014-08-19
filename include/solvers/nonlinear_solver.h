@@ -336,6 +336,7 @@ NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
   max_linear_iterations(0),
   initial_linear_tolerance(0),
   minimum_linear_tolerance(0),
+  converged(false),
   _system(s),
   _is_initialized (false),
   _preconditioner (NULL)

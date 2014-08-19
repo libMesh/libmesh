@@ -30,7 +30,7 @@ template <typename Output=Number>
 class ConstFEMFunction : public FEMFunctionBase<Output>
 {
 public:
-  ConstFEMFunction (const Output c) {_c = c;}
+  ConstFEMFunction (const Output c) : _c(c) {}
 
   ~ConstFEMFunction() {}
 

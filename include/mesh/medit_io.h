@@ -110,7 +110,8 @@ private:
 inline
 MEDITIO::MEDITIO (const MeshBase& mesh_in) :
   MeshOutput<MeshBase> (mesh_in),
-  _binary (false)
+  _binary (false),
+  scalar_idx (0)
 {
 }
 
