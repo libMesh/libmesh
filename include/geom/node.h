@@ -245,7 +245,7 @@ Node::Node (const Point& p,
   Point(p)
 #ifdef LIBMESH_ENABLE_NODE_VALENCE
   ,
-  _valence
+  _valence(0)
 #endif
 {
   // optionally assign the id.  We have
