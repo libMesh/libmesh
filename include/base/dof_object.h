@@ -395,17 +395,16 @@ private:
                                      const unsigned int var) const;
 
   /**
-   * The \p id of the \p DofObject
-   */
-  dof_id_type _id;
-
-
-  /**
    * A globally unique id, guarenteed not to change as the mesh is repartioned or adapted
    */
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   unique_id_type _unique_id;
 #endif
+
+  /**
+   * The \p id of the \p DofObject
+   */
+  dof_id_type _id;
 
   /**
    * The \p processor_id of the \p DofObject.
