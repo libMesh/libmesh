@@ -58,7 +58,114 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petrou_Thesis">1</a>]
+[<a name="Gamble_2014">1</a>]
+</td>
+<td class="bibtexitem">
+K.&nbsp;A.&nbsp;L. Gamble.
+ Modeling three-dimensional deformation mechanisms in CANDU reactor
+  fuel elements.
+ Master's thesis, Royal Military College of Canada, May 2014.
+
+  <a href="https://espace.rmc.ca/bitstream/11264/102/1/Gamble,%20Kyle%20-%20Thesis%20Final.pdf">https://espace.rmc.ca/bitstream/11264/102/1/Gamble,%20Kyle%20-%20Thesis%20Final.pdf</a>.
+<a name="Gamble_2014"></a><pre>
+@mastersthesis{Gamble_2014,
+  author = {K.~A.~L.~Gamble},
+  school = {Royal Military College of Canada},
+  title = {{Modeling three-dimensional deformation mechanisms in CANDU reactor fuel elements}},
+  note = {\url{https://espace.rmc.ca/bitstream/11264/102/1/Gamble,%20Kyle%20-%20Thesis%20Final.pdf}},
+  month = may,
+  year = {2014}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Steih_2014">2</a>]
+</td>
+<td class="bibtexitem">
+K.&nbsp;Steih.
+ <em>Reduced basis methods for time-periodic parametric partial
+  differential equations</em>.
+ PhD thesis, Universit&auml;t Ulm, April 2014.
+ <a href="http://vts.uni-ulm.de/docs/2014/9093/vts_9093_13686.pdf">http://vts.uni-ulm.de/docs/2014/9093/vts_9093_13686.pdf</a>.
+<a name="Steih_2014"></a><pre>
+@phdthesis{Steih_2014,
+  author = {K.~Steih},
+  school = {Universit\"{a}t Ulm},
+  title = {{Reduced basis methods for time-periodic parametric partial differential equations}},
+  note = {\url{http://vts.uni-ulm.de/docs/2014/9093/vts_9093_13686.pdf}},
+  month = apr,
+  year = {2014}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Ryser_Thesis">3</a>]
+</td>
+<td class="bibtexitem">
+C.&nbsp;Ryser.
+ <em>Cold ice in an alpine glacier and ice dynamics at the margin of
+  the Greenland ice sheet</em>.
+ PhD thesis, ETH-Z&uuml;rich, 2014.
+ <a href="http://dx.doi.org/10.3929/ethz-a-010129038">http://dx.doi.org/10.3929/ethz-a-010129038</a>.
+<a name="Ryser_Thesis"></a><pre>
+@phdthesis{Ryser_Thesis,
+  author = {C.~Ryser},
+  school = {ETH-Z\"{u}rich},
+  title = {{Cold ice in an alpine glacier and ice dynamics at the margin of the Greenland ice sheet}},
+  note = {\url{http://dx.doi.org/10.3929/ethz-a-010129038}},
+  year = {2014}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vasconselos_Thesis">4</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;F.&nbsp;M. Vasconcelos.
+ Modelo de campo de fases Allen-Cahn baseado em res&iacute;duo para a
+  simula&ccedil;&atilde;o paralela e adaptativa de escoamentos incompress&iacute;veis.
+ Master's Thesis, COPPE Universidade Federal do Rio de Janeiro,
+  August 2013.
+
+  <a href="http://www.coc.ufrj.br/index.php/dissertacoes-de-mestrado/378-2013/4280-daniel-francisco-maia-vasconcelos">http://www.coc.ufrj.br/index.php/dissertacoes-de-mestrado/378-2013/4280-daniel-francisco-maia-vasconcelos</a>.
+<a name="Vasconselos_Thesis"></a><pre>
+@mastersthesis{Vasconselos_Thesis,
+  author = {D.~F.~M.~Vasconcelos},
+  type = {{Master's Thesis}},
+  school = {COPPE Universidade Federal do Rio de Janeiro},
+  title = {{Modelo de campo de fases Allen-Cahn baseado em res\'{i}duo para a simula\c{c}\~{a}o paralela e adaptativa de escoamentos incompress\'{i}veis}},
+  note = {\url{http://www.coc.ufrj.br/index.php/dissertacoes-de-mestrado/378-2013/4280-daniel-francisco-maia-vasconcelos}},
+  month = aug,
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Petrou_Thesis">5</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Petrou.
@@ -85,7 +192,7 @@ Z.&nbsp;Petrou.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Trepanier_2013">2</a>]
+[<a name="Trepanier_2013">6</a>]
 </td>
 <td class="bibtexitem">
 P.-Y. Tr&eacute;panier.
@@ -114,7 +221,7 @@ P.-Y. Tr&eacute;panier.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Butterfield_2013">3</a>]
+[<a name="Butterfield_2013">7</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;S. Butterfield.
@@ -122,7 +229,7 @@ A.&nbsp;S. Butterfield.
   anisotropic grain boundaries with molecular dynamics</em>.
  Senior thesis (Bachelor of Science), Brigham Young
   University-Idaho, July 2013.
-
+ <a href="http://dx.doi.org/10.2172/1093887">http://dx.doi.org/10.2172/1093887</a>,
   <a href="http://www.byui.edu/Documents/physics/Theses/Aaron_ButterfieldS13.pdf">http://www.byui.edu/Documents/physics/Theses/Aaron_ButterfieldS13.pdf</a>.
 <a name="Butterfield_2013"></a><pre>
 @phdthesis{Butterfield_2013,
@@ -130,7 +237,7 @@ A.&nbsp;S. Butterfield.
   school = {Brigham Young University-Idaho},
   title = {{Exploration of the phase field framework MARMOT to include
              anisotropic grain boundaries with molecular dynamics}},
-  note = {\url{http://www.byui.edu/Documents/physics/Theses/Aaron_ButterfieldS13.pdf}},
+  note = {\url{http://dx.doi.org/10.2172/1093887}, \url{http://www.byui.edu/Documents/physics/Theses/Aaron_ButterfieldS13.pdf}},
   month = jul,
   type = {{Senior thesis (Bachelor of Science)}},
   year = {2013}
@@ -144,7 +251,7 @@ A.&nbsp;S. Butterfield.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Teague_2013">4</a>]
+[<a name="Teague_2013">8</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;C. Teague.
@@ -170,7 +277,7 @@ M.&nbsp;C. Teague.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huber_2013">5</a>]
+[<a name="Huber_2013">9</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Huber.
@@ -195,7 +302,7 @@ J.&nbsp;Huber.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Garg_thesis">6</a>]
+[<a name="Garg_thesis">10</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;V. Garg.
@@ -223,7 +330,7 @@ V.&nbsp;V. Garg.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_thesis">7</a>]
+[<a name="Rossa_thesis">11</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa.
@@ -250,7 +357,7 @@ A.&nbsp;L. Rossa.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bornia_thesis">8</a>]
+[<a name="Bornia_thesis">12</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;Bornia.
@@ -276,7 +383,7 @@ G.&nbsp;Bornia.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lee_dissertation">9</a>]
+[<a name="Lee_dissertation">13</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Lee.
@@ -301,7 +408,7 @@ K.&nbsp;Lee.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2011">10</a>]
+[<a name="Camata_2011">14</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Camata.
@@ -327,7 +434,7 @@ J.&nbsp;J. Camata.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="HawkinsDaarud_thesis">11</a>]
+[<a name="HawkinsDaarud_thesis">15</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;J. Hawkins-Daarud.
@@ -354,7 +461,7 @@ A.&nbsp;J. Hawkins-Daarud.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_dissertation">12</a>]
+[<a name="Nagler_dissertation">16</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler.
@@ -382,17 +489,17 @@ L.&nbsp;Nagler.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brown_thesis">13</a>]
+[<a name="Brown_thesis">17</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;A. Kallen-Brown.
  <em>Computational methods for ice flow simulation</em>.
- PhD thesis, ETH Z&uuml;rich, 2011.
+ PhD thesis, ETH-Z&uuml;rich, 2011.
  <a href="http://dx.doi.org/10.3929/ethz-a-007316245">http://dx.doi.org/10.3929/ethz-a-007316245</a>.
 <a name="Brown_thesis"></a><pre>
 @phdthesis{Brown_thesis,
   author = {J.~A.~Kallen-Brown},
-  school = {ETH Z\"{u}rich},
+  school = {ETH-Z\"{u}rich},
   title = {{Computational methods for ice flow simulation}},
   note = {\url{http://dx.doi.org/10.3929/ethz-a-007316245}},
   year = {2011}
@@ -406,7 +513,7 @@ J.&nbsp;A. Kallen-Brown.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2010">14</a>]
+[<a name="Mahadevan_2010">18</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan.
@@ -433,7 +540,7 @@ V.&nbsp;S. Mahadevan.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nenning_Dissertation">15</a>]
+[<a name="Nenning_Dissertation">19</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Nenning.
@@ -460,7 +567,7 @@ M.&nbsp;Nenning.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Dec_2010">16</a>]
+[<a name="Dec_2010">20</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;A. Dec.
@@ -486,7 +593,7 @@ J.&nbsp;A. Dec.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petrolati_Dissertation">17</a>]
+[<a name="Petrolati_Dissertation">21</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;Petrolati.
@@ -512,7 +619,7 @@ E.&nbsp;Petrolati.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nam_2008">18</a>]
+[<a name="Nam_2008">22</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Nam.
@@ -539,7 +646,7 @@ K.&nbsp;Nam.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_Dissertation">19</a>]
+[<a name="Stogner_Dissertation">23</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner.
@@ -567,7 +674,7 @@ R.&nbsp;H. Stogner.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rammerstorfer_2008">20</a>]
+[<a name="Rammerstorfer_2008">24</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;Rammerstorfer.
@@ -594,7 +701,7 @@ F.&nbsp;Rammerstorfer.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Wang_Dissertation">21</a>]
+[<a name="Wang_Dissertation">25</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Wang.
@@ -620,7 +727,7 @@ S.&nbsp;Wang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Dissertation">22</a>]
+[<a name="Peterson_Dissertation">26</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -647,7 +754,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_Dissertation">23</a>]
+[<a name="Knezevic_Dissertation">27</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -674,7 +781,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_Dissertation">24</a>]
+[<a name="Kirk_Dissertation">28</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -701,7 +808,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Thesis">25</a>]
+[<a name="Peterson_Thesis">29</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -738,22 +845,133 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Prudencio_2014">1</a>]
+[<a name="Corsini_2014">1</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Corsini, F.&nbsp;Rispoli, A.&nbsp;G. Sheard, K.&nbsp;Takizawa, T.&nbsp;E. Tezduyar, and
+  P.&nbsp;Venturini.
+ A variational multiscale method for particle-cloud tracking in
+  turbomachinery flows.
+ <em>Computational Mechanics</em>, July 2014.
+ <a href="http://dx.doi.org/10.1007/s00466-014-1050-0">http://dx.doi.org/10.1007/s00466-014-1050-0</a>.
+<a name="Corsini_2014"></a><pre>
+@article{Corsini_2014,
+  author = {A.~Corsini and F.~Rispoli and A.~G.~Sheard and K.~Takizawa and T.~E.~Tezduyar and P.~Venturini},
+  title = {{A variational multiscale method for particle-cloud tracking in turbomachinery flows}},
+  journal = {Computational Mechanics},
+  month = jul,
+  year = 2014,
+  note = {\url{http://dx.doi.org/10.1007/s00466-014-1050-0}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Cournoyer_2014">2</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;E. Cournoyer.
+ Fire modeling of an emerging fire suppression system.
+ <em>Journal of Chemical Health and Safety</em>, July/August 2014.
+ <a href="http://dx.doi.org/10.1016/j.jchas.2014.05.011">http://dx.doi.org/10.1016/j.jchas.2014.05.011</a>.
+<a name="Cournoyer_2014"></a><pre>
+@article{Cournoyer_2014,
+  author = {M.~E.~Cournoyer},
+  title = {{Fire modeling of an emerging fire suppression system}},
+  journal = {Journal of Chemical Health and Safety},
+  month = jul # {/} # aug,
+  year = 2014,
+  note = {\url{http://dx.doi.org/10.1016/j.jchas.2014.05.011}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Ballarin_2014">3</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;Ballarin, A.&nbsp;Manzoni, A.&nbsp;Quarteroni, and G.&nbsp;Rozza.
+ Supremizer stabilization of POD-Galerkin approximation of
+  parametrized Navier-Stokes equations.
+ Technical Report MOX:13/2014, MATHICSE:23.2014, MOX, Dipartimento di
+  Matematica, &ldquo;F.&nbsp;Brioschi&rdquo; Politecnico di Milano and MATHICSE, &Eacute;cole
+  Polytechnique F&eacute;d&eacute;rale de Lausanne, April 2014.
+
+  <a href="http://mox.polimi.it/it/progetti/pubblicazioni/quaderni/13-2014.pdf">http://mox.polimi.it/it/progetti/pubblicazioni/quaderni/13-2014.pdf</a>,
+  <a href="http://mathicse.epfl.ch/page-68906-en.html">http://mathicse.epfl.ch/page-68906-en.html</a>.
+<a name="Ballarin_2014"></a><pre>
+@techreport{Ballarin_2014,
+  author = {F.~Ballarin and A.~Manzoni and A.~Quarteroni and G.~Rozza},
+  title = {{Supremizer stabilization of POD-Galerkin approximation of parametrized Navier-Stokes equations}},
+  institution = {MOX, Dipartimento di Matematica, ``F.~Brioschi'' Politecnico di Milano and
+                 MATHICSE, \'{E}cole Polytechnique F\'{e}d\'{e}rale de Lausanne},
+  month = apr,
+  year = {2014},
+  number = {MOX:13/2014, MATHICSE:23.2014},
+  note = {\url{http://mox.polimi.it/it/progetti/pubblicazioni/quaderni/13-2014.pdf},
+                 \url{http://mathicse.epfl.ch/page-68906-en.html}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gao_2014">4</a>]
+</td>
+<td class="bibtexitem">
+H.&nbsp;Gao, H.&nbsp;Wang, C.&nbsp;Berry, X.&nbsp;Luo, and B.&nbsp;E. Griffith.
+ Quasi-static image-based immersed boundary-finite element model of
+  left ventricle under diastolic loading.
+ <em>International Journal for Numerical Methods in Biomedical
+  Engineering</em>, 2014.
+ <a href="http://dx.doi.org/10.1002/cnm.2652">http://dx.doi.org/10.1002/cnm.2652</a>.
+<a name="Gao_2014"></a><pre>
+@article{Gao_2014,
+  author = {H.~Gao and H.~Wang and C.~Berry and X.~Luo and B.~E.~Griffith},
+  title = {{Quasi-static image-based immersed boundary-finite element model of left ventricle under diastolic loading}},
+  journal = {International Journal for Numerical Methods in Biomedical Engineering},
+  year = 2014,
+  note = {\url{http://dx.doi.org/10.1002/cnm.2652}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Prudencio_2014">5</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;E. Prudencio, P.&nbsp;T. Bauman, D.&nbsp;Faghihi, K.&nbsp;Ravi-Chandar, and J.&nbsp;T. Oden.
  A computational framework for dynamic data driven material damage
   control, based on Bayesian inference and model selection.
- <em>Submitted to IJNME</em>, 2014.
-
-  <a href="https://www.ices.utexas.edu/sites/oden/wp-content/uploads/2013/06/2014-Oden-Prudencio-Bauman-Faghihi-Chandar_-Material-Damage_-IJNME.pdf">https://www.ices.utexas.edu/sites/oden/wp-content/uploads/2013/06/2014-Oden-Prudencio-Bauman-Faghihi-Chandar_-Material-Damage_-IJNME.pdf</a>.
+ <em>International Journal for Numerical Methods in Engineering</em>,
+  2014.
+ <a href="http://dx.doi.org/10.1002/nme.4669">http://dx.doi.org/10.1002/nme.4669</a>.
 <a name="Prudencio_2014"></a><pre>
 @article{Prudencio_2014,
   author = {E.~E.~Prudencio and P.~T.~Bauman and D.~Faghihi and K.~Ravi-Chandar and J.~T.~Oden},
   title = {{A computational framework for dynamic data driven material damage control, based on Bayesian inference and model selection}},
-  journal = {Submitted to IJNME},
+  journal = {International Journal for Numerical Methods in Engineering},
   year = 2014,
-  note = {\url{https://www.ices.utexas.edu/sites/oden/wp-content/uploads/2013/06/2014-Oden-Prudencio-Bauman-Faghihi-Chandar_-Material-Damage_-IJNME.pdf}}
+  note = {\url{http://dx.doi.org/10.1002/nme.4669}}
 }
 </pre>
 
@@ -764,35 +982,7 @@ E.&nbsp;E. Prudencio, P.&nbsp;T. Bauman, D.&nbsp;Faghihi, K.&nbsp;Ravi-Chandar, 
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Grote_2013">2</a>]
-</td>
-<td class="bibtexitem">
-M.&nbsp;J. Grote, J.&nbsp;Huber, D.&nbsp;Kourounis, and O.&nbsp;Schenk.
- Inexact interior-point method for PDE-constrained nonlinear
-  optimization.
- In <em>Institute of Mathematics, University of Basel, Preprint No.
-  2013-15</em>, May 2013.
-
-  <a href="http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf">http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf</a>.
-<a name="Grote_2013"></a><pre>
-@inproceedings{Grote_2013,
-  author = {M.~J.~Grote and J.~Huber and D.~Kourounis and O.~Schenk},
-  title = {{Inexact interior-point method for PDE-constrained nonlinear optimization}},
-  booktitle = {Institute of Mathematics, University of Basel, Preprint No. 2013-15},
-  month = may,
-  year = 2013,
-  note = {\url{http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Zhu_2013b">3</a>]
+[<a name="Zhu_2013b">6</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;Gao, C.&nbsp;Mccomb, and C.&nbsp;Berry.
@@ -806,86 +996,6 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;Gao, C.&nbsp;Mccomb, and C.&nbsp;Berry.
   journal = {International Journal of Computer Mathematics},
   year = 2013,
   note = {\url{http://dx.doi.org/10.1080/00207160.2013.854337}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Yeniaras_2013">4</a>]
-</td>
-<td class="bibtexitem">
-E.&nbsp;Yeniaras, D.&nbsp;T. Fuentes, S.&nbsp;J. Fahrenholtz, J.&nbsp;S. Weinberg, F.&nbsp;Maier, J.&nbsp;D.
-  Hazle, and R.&nbsp;J. Stafford.
- Design and initial evaluation of a treatment planning software
-  system for MRI-guided laser ablation in the brain.
- <em>International Journal of Computer Assisted Radiology and
-  Surgery</em>, 2013.
- <a href="http://dx.doi.org/10.1007/s11548-013-0948-x">http://dx.doi.org/10.1007/s11548-013-0948-x</a>.
-<a name="Yeniaras_2013"></a><pre>
-@article{Yeniaras_2013,
-  author = {E.~Yeniaras and D.~T.~Fuentes and S.~J.~Fahrenholtz and J.~S.~Weinberg and F.~Maier and J.~D.~Hazle and R.~J.~Stafford},
-  title = {{Design and initial evaluation of a treatment planning software system for MRI-guided laser ablation in the brain}},
-  journal = {International Journal of Computer Assisted Radiology and Surgery},
-  year = 2013,
-  note = {\url{http://dx.doi.org/10.1007/s11548-013-0948-x}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Toader_2013">5</a>]
-</td>
-<td class="bibtexitem">
-A.-M. Toader and C.&nbsp;Barbarosie.
- Optimization of bodies with locally periodic microstructure by
-  varying the periodicity pattern.
- In <em>Centro de Matem&aacute;tica e Aplica&ccedil;&otilde;es Fundamentais
-  (CMAF) Preprint Pre-010</em>, 2013.
-
-  <a href="http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf">http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf</a>.
-<a name="Toader_2013"></a><pre>
-@inproceedings{Toader_2013,
-  author = {A.-M.~Toader and C.~Barbarosie},
-  title = {{Optimization of bodies with locally periodic microstructure by varying the periodicity pattern}},
-  booktitle = {{Centro de Matem\'{a}tica e Aplica\c{c}\~{o}es Fundamentais (CMAF) Preprint Pre-010}},
-  year = {2013},
-  note = {\url{http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Vallaghe_2013">6</a>]
-</td>
-<td class="bibtexitem">
-S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
- The static condensation reduced basis element method for a
-  mixed-mean conjugate heat exchanger model.
- <em>PREPRINT, submitted to SISC</em>, 2013.
-
-  <a href="http://augustine.mit.edu/methodology/papers/VP_SISC_revised_May2013.pdf">http://augustine.mit.edu/methodology/papers/VP_SISC_revised_May2013.pdf</a>.
-<a name="Vallaghe_2013"></a><pre>
-@article{Vallaghe_2013,
-  author = {S.~Vallagh\'{e} and A.~T.~Patera},
-  title = {{The static condensation reduced basis element method for a mixed-mean conjugate heat exchanger model}},
-  journal = {PREPRINT, submitted to SISC},
-  year = 2013,
-  note = {\url{http://augustine.mit.edu/methodology/papers/VP_SISC_revised_May2013.pdf}}
 }
 </pre>
 
@@ -918,7 +1028,46 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 </td>
 </tr>
 </table><a name="Articles"></a>
-<h2>2014</h2>
+<h2>2015</h2>
+
+<!-- This document was automatically generated with bibtex2html 1.96
+     (see http://www.lri.fr/~filliatr/bibtex2html/),
+     with the following command:
+     bibtex2html -d -r --nodoc --single -nofooter fifteen.bib  -->
+
+
+<table>
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Krol_2015">1</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Kr&oacute;l, J.&nbsp;Harris, and D.&nbsp;Zydek.
+ Hybrid GPU/CPU approach to multiphysics simulation.
+ In H.&nbsp;Selvaraj, D.&nbsp;Zydek, and G.&nbsp;Chmaj, editors, <em>Progress in
+  Systems Engineering</em>, volume 1089 of <em>Advances in Intelligent Systems
+  and Computing</em>, pages 893-899. Springer International, 2015.
+ <a href="http://dx.doi.org/10.1007/978-3-319-08422-0_130">http://dx.doi.org/10.1007/978-3-319-08422-0_130</a>.
+<a name="Krol_2015"></a><pre>
+@inproceedings{Krol_2015,
+  author = {D.~Kr\'{o}l and J.~Harris and D.~Zydek},
+  title = {{Hybrid GPU/CPU approach to multiphysics simulation}},
+  booktitle = {{Progress in Systems Engineering}},
+  series = {Advances in Intelligent Systems and Computing},
+  volume = 1089,
+  editor = {H.~Selvaraj and D.~Zydek and G.~Chmaj},
+  pages = {893--899},
+  publisher = {Springer International},
+  year = {2015},
+  note = {\url{http://dx.doi.org/10.1007/978-3-319-08422-0_130}}
+}
+</pre>
+
+
+</td>
+</tr>
+</table><h2>2014</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
@@ -930,7 +1079,415 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_2014">1</a>]
+[<a name="Prudencio_2014b">1</a>]
+</td>
+<td class="bibtexitem">
+E.&nbsp;E. Prudencio, P.&nbsp;T. Bauman, S.&nbsp;V. Williams, D.&nbsp;Faghihi, K.&nbsp;Ravi-Chandar, and
+  J.&nbsp;T. Oden.
+ Real-time inference of stochastic damage in composite materials.
+ <em>Composites Part B: Engineering</em>, 67:209-219, November 2014.
+ <a href="http://dx.doi.org/10.1016/j.compositesb.2014.07.004">http://dx.doi.org/10.1016/j.compositesb.2014.07.004</a>.
+<a name="Prudencio_2014b"></a><pre>
+@article{Prudencio_2014b,
+  author = {E.~E.~Prudencio and P.~T.~Bauman and S.~V.~Williams and D.~Faghihi and K.~Ravi-Chandar and J.~T.~Oden},
+  title = {{Real-time inference of stochastic damage in composite materials}},
+  journal = {Composites Part B: Engineering},
+  year = 2014,
+  volume = 67,
+  month = nov,
+  pages = {209--219},
+  note = {\url{http://dx.doi.org/10.1016/j.compositesb.2014.07.004}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Courty_2014">2</a>]
+</td>
+<td class="bibtexitem">
+O.&nbsp;Courty, A.&nbsp;T. Motta, and J.&nbsp;D. Hales.
+ Modeling and simulation of hydrogen behavior in Zircaloy-4 fuel
+  cladding.
+ <em>Journal of Nuclear Materials</em>, 452(1-3):311-320, September
+  2014.
+ <a href="http://dx.doi.org/10.1016/j.jnucmat.2014.05.013">http://dx.doi.org/10.1016/j.jnucmat.2014.05.013</a>.
+<a name="Courty_2014"></a><pre>
+@article{Courty_2014,
+  author = {O.~Courty and A.~T.~Motta and J.~D.~Hales},
+  title = {{Modeling and simulation of hydrogen behavior in Zircaloy-4 fuel cladding}},
+  journal = {Journal of Nuclear Materials},
+  year = 2014,
+  volume = {452},
+  number = {1--3},
+  pages = {311--320},
+  month = sep,
+  note = {\url{http://dx.doi.org/10.1016/j.jnucmat.2014.05.013}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hales_2014">3</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;D. Hales, S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, R.&nbsp;L. Williamson, G.&nbsp;Pastore, and
+  D.&nbsp;M. Perez.
+ Verification of the BISON fuel performance code.
+ <em>Annals of Nuclear Energy</em>, 71:81-90, September 2014.
+ <a href="http://dx.doi.org/10.1016/j.anucene.2014.03.027">http://dx.doi.org/10.1016/j.anucene.2014.03.027</a>.
+<a name="Hales_2014"></a><pre>
+@article{Hales_2014,
+  author = {J.~D.~Hales and S.~R.~Novascone and B.~W.~Spencer and R.~L.~Williamson and G.~Pastore and D.~M.~Perez},
+  title = {{Verification of the BISON fuel performance code}},
+  journal = {Annals of Nuclear Energy},
+  year = 2014,
+  volume = 71,
+  month = sep,
+  pages = {81--90},
+  note = {\url{http://dx.doi.org/10.1016/j.anucene.2014.03.027}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kalashnikova_2014b">4</a>]
+</td>
+<td class="bibtexitem">
+I.&nbsp;Kalashnikova, M.&nbsp;F. Barone, J.&nbsp;A. Fike, S.&nbsp;Arunajatesan, and B.&nbsp;G. van
+  Bloemen&nbsp;Waanders.
+ Approaches for building stable projection-based reduced order
+  models.
+ In <em>Reduced-Order Modeling (ROM) Workshop, Livermore, CA</em>.
+  Sandia National Laboratories, SAND2014-16583PE, August&nbsp;7, 2014.
+
+  <a href="http://www.sandia.gov/~ikalash/kalash_rom_day_aug7_2014_final.pdf">http://www.sandia.gov/~ikalash/kalash_rom_day_aug7_2014_final.pdf</a>.
+<a name="Kalashnikova_2014b"></a><pre>
+@inproceedings{Kalashnikova_2014b,
+  author = {I.~Kalashnikova and M.~F.~Barone and J.~A.~Fike and S.~Arunajatesan and B.~G.~van Bloemen Waanders},
+  title = {{Approaches for building stable projection-based reduced order models}},
+  booktitle = {{Reduced-Order Modeling (ROM) Workshop, Livermore, CA}},
+  publisher = {Sandia National Laboratories, SAND2014-16583PE},
+  month = aug # {~7,},
+  year = {2014},
+  note = {\url{http://www.sandia.gov/~ikalash/kalash_rom_day_aug7_2014_final.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Schillinger_2014">5</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Schillinger, S.&nbsp;J. Hossain, and T.&nbsp;J.&nbsp;R. Hughes.
+ Reduced B&eacute;zier element quadrature rules for quadratic and cubic
+  splines in isogeometric analysis.
+ <em>Computer Methods in Applied Mechanics and Engineering</em>,
+  277:1-45, August 2014.
+ <a href="http://dx.doi.org/10.1016/j.cma.2014.04.008">http://dx.doi.org/10.1016/j.cma.2014.04.008</a>.
+<a name="Schillinger_2014"></a><pre>
+@article{Schillinger_2014,
+  author = {D.~Schillinger and S.~J.~Hossain and T.~J.~R.~Hughes},
+  title = {{Reduced B\'{e}zier element quadrature rules for quadratic and cubic splines in isogeometric analysis}},
+  journal = {Computer Methods in Applied Mechanics and Engineering},
+  year = 2014,
+  volume = 277,
+  pages = {1--45},
+  month = aug,
+  note = {\url{http://dx.doi.org/10.1016/j.cma.2014.04.008}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Andersson_2014">6</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;A. Andersson, P.&nbsp;Garcia, X.-Y. Liu, G.&nbsp;Pastore, M.&nbsp;Tonks, P.&nbsp;Millett,
+  B.&nbsp;Dorado, D.&nbsp;R. Gaston, D.&nbsp;Andrs, R.&nbsp;L. Williamson, R.&nbsp;C. Martineau, B.&nbsp;P.
+  Uberuaga, and C.&nbsp;R. Stanek.
+ Atomistic modeling of intrinsic and radiation-enhanced fission gas
+  (Xe) diffusion in UO<sub>2x</sub>: Implications for nuclear fuel performance
+  modeling.
+ <em>Journal of Nuclear Materials</em>, 451(1-3):225-242, August 2014.
+ <a href="http://dx.doi.org/10.1016/j.jnucmat.2014.03.041">http://dx.doi.org/10.1016/j.jnucmat.2014.03.041</a>.
+<a name="Andersson_2014"></a><pre>
+@article{Andersson_2014,
+  author = {D.~A.~Andersson and P.~Garcia and X.-Y.~Liu and G.~Pastore and M.~Tonks and P.~Millett and B.~Dorado and
+             D.~R.~Gaston and D.~Andrs and R.~L.~Williamson and R.~C.~Martineau and B.~P.~Uberuaga and C.~R.~Stanek},
+  title = {{Atomistic modeling of intrinsic and radiation-enhanced fission gas (Xe) diffusion
+              in UO$_{2\pm x}$: Implications for nuclear fuel performance modeling}},
+  journal = {Journal of Nuclear Materials},
+  year = 2014,
+  volume = 451,
+  number = {1--3},
+  pages = {225--242},
+  month = aug,
+  note = {\url{http://dx.doi.org/10.1016/j.jnucmat.2014.03.041}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Williamson_2014">7</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;L. Williamson, J.&nbsp;D. Hales, D.&nbsp;M. Perez, S.&nbsp;R. Novascone, and G.&nbsp;Pastore.
+ BISON Software V&amp;V Plan.
+ Technical Report INL/EXT-14-31671, Idaho National Laboratory, July
+  2014.
+ <a href="http://www.osti.gov/scitech/biblio/1149007">http://www.osti.gov/scitech/biblio/1149007</a>.
+<a name="Williamson_2014"></a><pre>
+@techreport{Williamson_2014,
+  author = {R.~L.~Williamson and J.~D.~Hales and D.~M.~Perez and S.~R.~Novascone and G.~Pastore},
+  title = {{BISON Software V\&V Plan}},
+  institution = {Idaho National Laboratory},
+  day = {1},
+  month = jul,
+  year = {2014},
+  number = {INL/EXT-14-31671},
+  note = {\url{http://www.osti.gov/scitech/biblio/1149007}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Yeniaras_2014">8</a>]
+</td>
+<td class="bibtexitem">
+E.&nbsp;Yeniaras, D.&nbsp;T. Fuentes, S.&nbsp;J. Fahrenholtz, J.&nbsp;S. Weinberg, F.&nbsp;Maier, J.&nbsp;D.
+  Hazle, and R.&nbsp;J. Stafford.
+ Design and initial evaluation of a treatment planning software
+  system for MRI-guided laser ablation in the brain.
+ <em>International Journal of Computer Assisted Radiology and
+  Surgery</em>, 9(4):659-667, July 2014.
+ <a href="http://dx.doi.org/10.1007/s11548-013-0948-x">http://dx.doi.org/10.1007/s11548-013-0948-x</a>.
+<a name="Yeniaras_2014"></a><pre>
+@article{Yeniaras_2014,
+  author = {E.~Yeniaras and D.~T.~Fuentes and S.~J.~Fahrenholtz and J.~S.~Weinberg and F.~Maier and J.~D.~Hazle and R.~J.~Stafford},
+  title = {{Design and initial evaluation of a treatment planning software system for MRI-guided laser ablation in the brain}},
+  journal = {International Journal of Computer Assisted Radiology and Surgery},
+  month = jul,
+  year = 2014,
+  volume = 9,
+  number = 4,
+  pages = {659--667},
+  note = {\url{http://dx.doi.org/10.1007/s11548-013-0948-x}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vasconcelos_2014">9</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;F.&nbsp;M. Vasconcelos, A.&nbsp;L. Rossa, and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
+ A residual-based Allen-Cahn phase field model for the mixture of
+  incompressible fluid flows.
+ <em>International Journal for Numerical Methods in Fluids</em>,
+  75(9):645-667, July 2014.
+ <a href="http://dx.doi.org/10.1002/fld.3910">http://dx.doi.org/10.1002/fld.3910</a>.
+<a name="Vasconcelos_2014"></a><pre>
+@article{Vasconcelos_2014,
+  author = {D.~F.~M.~Vasconcelos and A.~L.~Rossa and A.~L.~G.~A.~Coutinho},
+  title = {A residual-based {A}llen-{C}ahn phase field model for the mixture of incompressible fluid flows},
+  journal = {International Journal for Numerical Methods in Fluids},
+  month = jul,
+  year = 2014,
+  volume = 75,
+  number = 9,
+  pages = {645--667},
+  note = {\url{http://dx.doi.org/10.1002/fld.3910}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Muppidi_2014">10</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Muppidi, M.&nbsp;Barnhardt, G.&nbsp;E. Palmer, N.&nbsp;N. Mansour, M.&nbsp;Wright, and
+  J.&nbsp;Lachaud.
+ Toward ablative material response coupling in DPLR.
+ In <em>11th AIAA/ASME Joint Thermophysics and Heat Transfer
+  Conference</em>, June&nbsp;16-20, 2014.
+ <a href="http://arc.aiaa.org/doi/abs/10.2514/6.2014-2120">http://arc.aiaa.org/doi/abs/10.2514/6.2014-2120</a>.
+<a name="Muppidi_2014"></a><pre>
+@inproceedings{Muppidi_2014,
+  author = {S.~Muppidi and M.~Barnhardt and G.~E.~Palmer and N.~N.~Mansour and M.~Wright and J.~Lachaud},
+  title = {{Toward ablative material response coupling in DPLR}},
+  booktitle = {{11th AIAA/ASME Joint Thermophysics and Heat Transfer Conference}},
+  month = jun # {~16--20,},
+  year = {2014},
+  note = {\url{http://arc.aiaa.org/doi/abs/10.2514/6.2014-2120}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Palmer_2014">11</a>]
+</td>
+<td class="bibtexitem">
+G.&nbsp;E. Palmer, M.&nbsp;Barnhardt, B.&nbsp;Kirk, A.&nbsp;J. Amar, Y.-K. Chen, and N.&nbsp;N. Mansour.
+ Coupled CFD-ablation response model simulations using the libMesh
+  framework.
+ In <em>11th AIAA/ASME Joint Thermophysics and Heat Transfer
+  Conference</em>, June&nbsp;16-20, 2014.
+ <a href="http://arc.aiaa.org/doi/abs/10.2514/6.2014-2123">http://arc.aiaa.org/doi/abs/10.2514/6.2014-2123</a>.
+<a name="Palmer_2014"></a><pre>
+@inproceedings{Palmer_2014,
+  author = {G.~E.~Palmer and M.~Barnhardt and B.~Kirk and A.~J.~Amar and Y.-K.~Chen and N.~N.~Mansour},
+  title = {{Coupled CFD-ablation response model simulations using the libMesh framework}},
+  booktitle = {{11th AIAA/ASME Joint Thermophysics and Heat Transfer Conference}},
+  month = jun # {~16--20,},
+  year = {2014},
+  note = {\url{http://arc.aiaa.org/doi/abs/10.2514/6.2014-2123}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Delchini_2014">12</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;O. Delchini, R.&nbsp;A. Berry, and J.&nbsp;Ragusa.
+ RELAP-7 Numerical Stabilization: Entropy Viscosity Method.
+ Technical Report INL/EXT-14-32352, Idaho National Laboratory, June
+  2014.
+ <a href="http://www.osti.gov/scitech/biblio/1149027">http://www.osti.gov/scitech/biblio/1149027</a>.
+<a name="Delchini_2014"></a><pre>
+@techreport{Delchini_2014,
+  author = {M.~O.~Delchini and R.~A.~Berry and J.~Ragusa},
+  title = {{RELAP-7 Numerical Stabilization: Entropy Viscosity Method}},
+  institution = {Idaho National Laboratory},
+  day = {1},
+  month = jun,
+  year = {2014},
+  number = {INL/EXT-14-32352},
+  note = {\url{http://www.osti.gov/scitech/biblio/1149027}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kalashnikova_2014">13</a>]
+</td>
+<td class="bibtexitem">
+I.&nbsp;Kalashnikova, S.&nbsp;Arunajatesan, M.&nbsp;F. Barone, B.&nbsp;G. van Bloemen&nbsp;Waanders, and
+  J.&nbsp;A. Fike.
+ Reduced order modeling for prediction and control of large-scale
+  systems.
+ Technical Report SAND2014-4693, Sandia National Laboratories, May
+  2014.
+ <a href="http://www.sandia.gov/~ikalash/ROM_Final_SAND_report.pdf">http://www.sandia.gov/~ikalash/ROM_Final_SAND_report.pdf</a>.
+<a name="Kalashnikova_2014"></a><pre>
+@techreport{Kalashnikova_2014,
+  author = {I.~Kalashnikova and S.~Arunajatesan and M.~F.~Barone and B.~G.~van Bloemen Waanders and J.~A.~Fike},
+  title = {{Reduced order modeling for prediction and control of large-scale systems}},
+  institution = {Sandia National Laboratories},
+  month = may,
+  year = {2014},
+  number = {SAND2014-4693},
+  note = {\url{http://www.sandia.gov/~ikalash/ROM_Final_SAND_report.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gimenez_2014">14</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;M. Gimenez, N.&nbsp;M. Nigro, and S.&nbsp;R. Idelsohn.
+ Evaluating the performance of the particle finite element method in
+  parallel architectures.
+ <em>Computational Particle Mechanics</em>, 1(1):103-116, May 2014.
+ <a href="http://dx.doi.org/10.1007/s40571-014-0009-4">http://dx.doi.org/10.1007/s40571-014-0009-4</a>.
+<a name="Gimenez_2014"></a><pre>
+@article{Gimenez_2014,
+  author = {J.~M.~Gimenez and N.~M.~Nigro and S.~R.~Idelsohn},
+  title = {{Evaluating the performance of the particle finite element method in parallel architectures}},
+  journal = {Computational Particle Mechanics},
+  year = 2014,
+  month = may,
+  volume = 1,
+  number = 1,
+  pages = {103--116},
+  note = {\url{http://dx.doi.org/10.1007/s40571-014-0009-4}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Nagler_2014">15</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler, P.&nbsp;Rong, M.&nbsp;Schanz, and O.&nbsp;von Estorff.
@@ -958,7 +1515,7 @@ L.&nbsp;Nagler, P.&nbsp;Rong, M.&nbsp;Schanz, and O.&nbsp;von Estorff.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2014">2</a>]
+[<a name="Kirk_2014">16</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, P.&nbsp;T. Bauman, and T.&nbsp;A. Oliver.
@@ -986,7 +1543,120 @@ B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, P.&nbsp;T. Bauman, and T.&nbsp;A. Oliver.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2014">3</a>]
+[<a name="Ryser_2014">17</a>]
+</td>
+<td class="bibtexitem">
+C.&nbsp;Ryser, M.&nbsp;P. L&uuml;thi, L.&nbsp;C. Andrews, M.&nbsp;J. Hoffman, G.&nbsp;A. Catania, R.&nbsp;L.
+  Hawley, T.&nbsp;A. Neumann, and S.&nbsp;S. Kristensen.
+ Sustained high basal motion of the Greenland ice sheet revealed by
+  borehole deformation.
+ <em>Journal of Glaciology</em>, 60(222):647-660, 2014.
+ <a href="http://dx.doi.org/10.3189/2014JoG13J196">http://dx.doi.org/10.3189/2014JoG13J196</a>.
+<a name="Ryser_2014"></a><pre>
+@article{Ryser_2014,
+  author = {C.~Ryser and M.~P.~L\"{u}thi and L.~C.~Andrews and M.~J.~Hoffman and G.~A.~Catania
+             and R.~L.~Hawley and T.~A.~Neumann and S.~S.~Kristensen},
+  title = {{Sustained high basal motion of the Greenland ice sheet revealed by borehole deformation}},
+  journal = {Journal of Glaciology},
+  year = 2014,
+  volume = 60,
+  number = 222,
+  pages = {647--660},
+  note = {\url{http://dx.doi.org/10.3189/2014JoG13J196}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vallaghe_2014">18</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
+ The static condensation reduced basis element method for a
+  mixed-mean conjugate heat exchanger model.
+ <em>SIAM Journal on Scientific Computing</em>, 36(3):B294-B320, 2014.
+ <a href="http://dx.doi.org/10.1137/120887709">http://dx.doi.org/10.1137/120887709</a>.
+<a name="Vallaghe_2014"></a><pre>
+@article{Vallaghe_2014,
+  author = {S.~Vallagh\'{e} and A.~T.~Patera},
+  title = {{The static condensation reduced basis element method for a mixed-mean conjugate heat exchanger model}},
+  journal = {SIAM Journal on Scientific Computing},
+  year = 2014,
+  volume = 36,
+  number = 3,
+  pages = {B294--B320},
+  note = {\url{http://dx.doi.org/10.1137/120887709}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Ellis_2014">19</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Ellis, J.&nbsp;Ortensi, Y.&nbsp;Wang, K.&nbsp;Smith, and R.&nbsp;C. Martineau.
+ Initial RattleSnake Calculations of the Hot Zero Power BEAVRS.
+ Technical Report INL/EXT-13-30903, Idaho National Laboratory, January
+  2014.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5974389.pdf">http://www.inl.gov/technicalpublications/Documents/5974389.pdf</a>.
+<a name="Ellis_2014"></a><pre>
+@techreport{Ellis_2014,
+  author = {M.~Ellis and J.~Ortensi and Y.~Wang and K.~Smith and R.~C.~Martineau},
+  title = {{Initial RattleSnake Calculations of the Hot Zero Power BEAVRS}},
+  institution = {Idaho National Laboratory},
+  month = jan,
+  year = {2014},
+  number = {INL/EXT-13-30903},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5974389.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Schmidt_2014">20</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;G. Schmidt, R.&nbsp;A. Sauer, and A.&nbsp;E. Ismail.
+ Multiscale treatment of mechanical contact problems involving thin
+  polymeric layers.
+ <em>Modelling and Simulation in Materials Science and Engineering</em>,
+  22:045012 (30pp), 2014.
+ <a href="http://dx.doi.org/10.1088/0965-0393/22/4/045012">http://dx.doi.org/10.1088/0965-0393/22/4/045012</a>.
+<a name="Schmidt_2014"></a><pre>
+@article{Schmidt_2014,
+  author = {M.~G.~Schmidt and R.~A.~Sauer and A.~E.~Ismail},
+  title = {{Multiscale treatment of mechanical contact problems involving thin polymeric layers}},
+  journal = {Modelling and Simulation in Materials Science and Engineering},
+  year = 2014,
+  volume = 22,
+  pages = {045012 (30pp)},
+  note = {\url{http://dx.doi.org/10.1088/0965-0393/22/4/045012}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vavourakis_2014">21</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
@@ -1015,7 +1685,7 @@ V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekater
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Short_2014">4</a>]
+[<a name="Short_2014">22</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;P. Short, D.&nbsp;Gaston, C.&nbsp;R. Stanek, and S.&nbsp;Yip.
@@ -1045,7 +1715,7 @@ M.&nbsp;P. Short, D.&nbsp;Gaston, C.&nbsp;R. Stanek, and S.&nbsp;Yip.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2014">5</a>]
+[<a name="Eftang_2014">23</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang and A.&nbsp;T. Patera.
@@ -1075,7 +1745,7 @@ J.&nbsp;L. Eftang and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Neveln_2014">6</a>]
+[<a name="Neveln_2014">24</a>]
 </td>
 <td class="bibtexitem">
 I.&nbsp;D. Neveln, R.&nbsp;Bale, A.&nbsp;P.&nbsp;S. Bhalla, O.&nbsp;M. Curet, N.&nbsp;A. Patankar, and M.&nbsp;A.
@@ -1103,7 +1773,7 @@ I.&nbsp;D. Neveln, R.&nbsp;Bale, A.&nbsp;P.&nbsp;S. Bhalla, O.&nbsp;M. Curet, N.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2014">7</a>]
+[<a name="Tonks_2014">25</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;R. Tonks, Y.&nbsp;Zhang, X.&nbsp;Bai, and P.&nbsp;C. Millett.
@@ -1131,7 +1801,7 @@ M.&nbsp;R. Tonks, Y.&nbsp;Zhang, X.&nbsp;Bai, and P.&nbsp;C. Millett.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Teague_2014">8</a>]
+[<a name="Teague_2014">26</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Teague, M.&nbsp;Tonks, S.&nbsp;Novascone, and S.&nbsp;Hayes.
@@ -1167,7 +1837,94 @@ M.&nbsp;Teague, M.&nbsp;Tonks, S.&nbsp;Novascone, and S.&nbsp;Hayes.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rong_2013">1</a>]
+[<a name="Ma_2013">1</a>]
+</td>
+<td class="bibtexitem">
+X.&nbsp;S. Ma, H.&nbsp;Gao, N.&nbsp;Qi, C.&nbsp;Berry, B.&nbsp;E. Griffith, and X.&nbsp;Y. Luo.
+ Image-based immersed boundary/finite element model of the human
+  mitral valve.
+ In P.&nbsp;Nithiarasu, R.&nbsp;L&ouml;hner, and K.&nbsp;M. Liew, editors, <em>
+  Proceedings of the Third International Conference on Computational &amp;
+  Mathematical Biomedical Engineering (CMBE13)</em>, December&nbsp;16-18, 2013.
+ <a href="http://www.compbiomed.net/2013">http://www.compbiomed.net/2013</a>.
+<a name="Ma_2013"></a><pre>
+@inproceedings{Ma_2013,
+  author = {X.~S.~Ma and H.~Gao and N.~Qi and C.~Berry and B.~E.~Griffith and X.~Y.~Luo},
+  title = {{Image-based immersed boundary/finite element model of the human mitral valve}},
+  booktitle = {{Proceedings of the Third International Conference on Computational \& Mathematical Biomedical Engineering (CMBE13)}},
+  editor = {P.~Nithiarasu and R.~L\"{o}hner and K.~M.~Liew},
+  month = dec # {~16--18,},
+  year = {2013},
+  note = {\url{http://www.compbiomed.net/2013}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Flamini_2013">2</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;Flamini, A.&nbsp;DeAnda, and B.&nbsp;E. Griffith.
+ Simulating the effects of intersubject variability in aortic root
+  compliance by the immersed boundary method.
+ In P.&nbsp;Nithiarasu, R.&nbsp;L&ouml;hner, and K.&nbsp;M. Liew, editors, <em>
+  Proceedings of the Third International Conference on Computational &amp;
+  Mathematical Biomedical Engineering (CMBE13)</em>, December&nbsp;16-18, 2013.
+ <a href="http://www.compbiomed.net/2013">http://www.compbiomed.net/2013</a>.
+<a name="Flamini_2013"></a><pre>
+@inproceedings{Flamini_2013,
+  author = {V.~Flamini and A.~DeAnda and B.~E.~Griffith},
+  title = {{Simulating the effects of intersubject variability in aortic root compliance by the immersed boundary method}},
+  booktitle = {{Proceedings of the Third International Conference on Computational \& Mathematical Biomedical Engineering (CMBE13)}},
+  editor = {P.~Nithiarasu and R.~L\"{o}hner and K.~M.~Liew},
+  month = dec # {~16--18,},
+  year = {2013},
+  note = {\url{http://www.compbiomed.net/2013}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Griffith_2013">3</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;E. Griffith, V.&nbsp;Flamini, A.&nbsp;DeAnda, and L.&nbsp;Scotten.
+ Simulating the dynamics of an aortic valve prosthesis in a pulse
+  duplicator: Numerical methods and initial experience.
+ <em>Journal of Medical Devices</em>, 7(4):040912, December 2013.
+ <a href="http://dx.doi.org/10.1115/1.4025768">http://dx.doi.org/10.1115/1.4025768</a>.
+<a name="Griffith_2013"></a><pre>
+@article{Griffith_2013,
+  author = {B.~E.~Griffith and V.~Flamini and A.~DeAnda and L.~Scotten},
+  title = {{Simulating the dynamics of an aortic valve prosthesis in a pulse duplicator: Numerical methods and initial experience}},
+  journal = {Journal of Medical Devices},
+  month = dec,
+  year = 2013,
+  volume = 7,
+  number = 4,
+  pages = {040912},
+  note = {\url{http://dx.doi.org/10.1115/1.4025768}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Rong_2013">4</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;Rong, O.&nbsp;von Estorff, L.&nbsp;Nagler, and M.&nbsp;Schanz.
@@ -1197,7 +1954,7 @@ P.&nbsp;Rong, O.&nbsp;von Estorff, L.&nbsp;Nagler, and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2013b">2</a>]
+[<a name="Fuentes_2013b">5</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, J.&nbsp;T. Oden, K.&nbsp;R. Diller, J.&nbsp;Yung, Y.&nbsp;Feng, J.&nbsp;D. Hazle, A.&nbsp;Shetty,
@@ -1226,7 +1983,7 @@ D.&nbsp;Fuentes, J.&nbsp;T. Oden, K.&nbsp;R. Diller, J.&nbsp;Yung, Y.&nbsp;Feng,
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_2013">3</a>]
+[<a name="Rossa_2013">6</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
@@ -1254,7 +2011,7 @@ A.&nbsp;L. Rossa and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rong_2013b">4</a>]
+[<a name="Rong_2013b">7</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;Rong, M.&nbsp;Abele, and O.&nbsp;von Estorff.
@@ -1284,7 +2041,7 @@ P.&nbsp;Rong, M.&nbsp;Abele, and O.&nbsp;von Estorff.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2013">5</a>]
+[<a name="Botti_2013">8</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, K.&nbsp;Canneyt, R.&nbsp;Kaminsky, T.&nbsp;Claessens, R.&nbsp;N. Planken, P.&nbsp;Verdonck,
@@ -1315,7 +2072,7 @@ L.&nbsp;Botti, K.&nbsp;Canneyt, R.&nbsp;Kaminsky, T.&nbsp;Claessens, R.&nbsp;N. 
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2013b">6</a>]
+[<a name="Vavourakis_2013b">9</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
@@ -1344,7 +2101,7 @@ V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanasta
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Perez_2013b">7</a>]
+[<a name="Perez_2013b">10</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;M. Perez, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, G.&nbsp;Pastore, J.&nbsp;D. Hales, and
@@ -1373,7 +2130,7 @@ D.&nbsp;M. Perez, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, G.&nbsp;Pastore, 
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2013b">8</a>]
+[<a name="Gaston_2013b">11</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;R. Gaston, J.&nbsp;W. Peterson, C.&nbsp;J. Permann, D.&nbsp;Andrs, A.&nbsp;E. Slaughter, and
@@ -1402,7 +2159,7 @@ D.&nbsp;R. Gaston, J.&nbsp;W. Peterson, C.&nbsp;J. Permann, D.&nbsp;Andrs, A.&nb
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Widmer_2013b">9</a>]
+[<a name="Widmer_2013b">12</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;P.&nbsp;Widmer Soyka, A.&nbsp;L&oacute;pez, C.&nbsp;Persson, L.&nbsp;Cristofolini, and S.&nbsp;J.
@@ -1432,7 +2189,7 @@ R.&nbsp;P.&nbsp;Widmer Soyka, A.&nbsp;L&oacute;pez, C.&nbsp;Persson, L.&nbsp;Cri
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2013b">10</a>]
+[<a name="Hales_2013b">13</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Hales, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, D.&nbsp;M. Perez, B.&nbsp;W. Spencer, and
@@ -1462,7 +2219,7 @@ J.&nbsp;D. Hales, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, D.&nbsp;M. Perez,
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gunther_2013">11</a>]
+[<a name="Gunther_2013">14</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
@@ -1491,7 +2248,150 @@ A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Novascone_2013b">12</a>]
+[<a name="Hales_2013c">15</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;D. Hales, S.&nbsp;R. Novascone, G.&nbsp;Pastore, D.&nbsp;M. Perez, B.&nbsp;W. Spencer, and R.&nbsp;L.
+  Williamson.
+ BISON Theory Manual: The Equations Behind Nuclear Fuel Analysis.
+ Technical Report INL/EXT-13-29930, Idaho National Laboratory, October
+  2013.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5842314.pdf">http://www.inl.gov/technicalpublications/Documents/5842314.pdf</a>.
+<a name="Hales_2013c"></a><pre>
+@techreport{Hales_2013c,
+  author = {J.~D.~Hales and S.~R.~Novascone and G.~Pastore and D.~M.~Perez and B.~W.~Spencer and R.~L.~Williamson},
+  title = {{BISON Theory Manual: The Equations Behind Nuclear Fuel Analysis}},
+  institution = {Idaho National Laboratory},
+  month = oct,
+  year = {2013},
+  number = {INL/EXT-13-29930},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5842314.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Li_2013">16</a>]
+</td>
+<td class="bibtexitem">
+Y.&nbsp;Li, S.&nbsp;Hu, and X.&nbsp;Sun.
+ Report on the Implementation of the Homogeneous Nucleation Scheme in
+  MARMOT-based Phase Field Simulations.
+ Technical Report PNNL-22829, Pacific Northwest National Laboratory,
+  September 2013.
+
+  <a href="http://www.pnnl.gov/main/publications/external/technical_reports/PNNL-22829.pdf">http://www.pnnl.gov/main/publications/external/technical_reports/PNNL-22829.pdf</a>.
+<a name="Li_2013"></a><pre>
+@techreport{Li_2013,
+  author = {Y.~Li and S.~Hu and X.~Sun},
+  title = {{Report on the Implementation of the Homogeneous Nucleation Scheme in MARMOT-based Phase Field Simulations}},
+  institution = {Pacific Northwest National Laboratory},
+  month = sep,
+  year = {2013},
+  number = {PNNL-22829},
+  note = {\url{http://www.pnnl.gov/main/publications/external/technical_reports/PNNL-22829.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Swiler_2013c">17</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;P. Swiler, D.&nbsp;Mandelli, C.&nbsp;Rabiti, and A.&nbsp;Alfonsi.
+ DAKOTA Reliability Methods applied to RAVEN/RELAP-7.
+ Technical Report SAND2013-8439, Sandia National Laboratory, September
+  2013.
+
+  <a href="http://prod.sandia.gov/techlib/access-control.cgi/2013/138439.pdf">http://prod.sandia.gov/techlib/access-control.cgi/2013/138439.pdf</a>.
+<a name="Swiler_2013c"></a><pre>
+@techreport{Swiler_2013c,
+  author = {L.~P.~Swiler and D.~Mandelli and C.~Rabiti and A.~Alfonsi},
+  title = {{DAKOTA Reliability Methods applied to RAVEN/RELAP-7}},
+  institution = {Sandia National Laboratory},
+  month = sep,
+  year = {2013},
+  number = {SAND2013-8439},
+  note = {\url{http://prod.sandia.gov/techlib/access-control.cgi/2013/138439.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Medvedev_2013">18</a>]
+</td>
+<td class="bibtexitem">
+P.&nbsp;Medvedev.
+ Summary Report on the Fuel Performance Modeling of the AFC-2A, 2B
+  Irradiation Experiments.
+ Technical Report INL/EXT-13-30006, Idaho National Laboratory,
+  September 2013.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5864449.pdf">http://www.inl.gov/technicalpublications/Documents/5864449.pdf</a>.
+<a name="Medvedev_2013"></a><pre>
+@techreport{Medvedev_2013,
+  author = {P.~Medvedev},
+  title = {{Summary Report on the Fuel Performance Modeling of the AFC-2A, 2B Irradiation Experiments}},
+  institution = {Idaho National Laboratory},
+  month = sep,
+  year = {2013},
+  number = {INL/EXT-13-30006},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5864449.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hu_2013b">19</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Hu, J.&nbsp;W. Thomas, E.&nbsp;Munkhzul, T.&nbsp;H. Fanning, H.&nbsp;Zhang, and R.&nbsp;Martineau.
+ Development of SFR Primary System Simulation Capability for Advanced
+  System Codes.
+ Technical Report ANL/NE-13/11, Argonne National Laboratory, September
+  2013.
+ <a href="http://www.ipd.anl.gov/anlpubs/2014/01/77535.pdf">http://www.ipd.anl.gov/anlpubs/2014/01/77535.pdf</a>,
+  <a href="http://dx.doi.org/10.2172/1121040">http://dx.doi.org/10.2172/1121040</a>.
+<a name="Hu_2013b"></a><pre>
+@techreport{Hu_2013b,
+  author = {R.~Hu and J.~W.~Thomas and E.~Munkhzul and T.~H.~Fanning and H.~Zhang and R.~Martineau},
+  title = {{Development of SFR Primary System Simulation Capability for Advanced System Codes}},
+  institution = {Argonne National Laboratory},
+  day = {30},
+  month = sep,
+  year = {2013},
+  number = {ANL/NE-13/11},
+  note = {\url{http://www.ipd.anl.gov/anlpubs/2014/01/77535.pdf}, \url{http://dx.doi.org/10.2172/1121040}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Novascone_2013b">20</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, and J.&nbsp;D. Hales.
@@ -1519,7 +2419,39 @@ S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, and J.&nbsp;D. Hales.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Novascone_2013c">13</a>]
+[<a name="Hales_2013d">21</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;D. Hales, M.&nbsp;R. Tonks, K.&nbsp;Chockalingam, D.&nbsp;M. Perez, S.&nbsp;R. Novascone, B.&nbsp;W.
+  Spencer, and R.&nbsp;L. Williamson.
+ Multiscale Nuclear Fuel Analysis via Asymptotic Expansion
+  Homogenization.
+ Technical Report INL/CON-12-27165, Idaho National Laboratory, August
+  2013.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5842301.pdf">http://www.inl.gov/technicalpublications/Documents/5842301.pdf</a>,
+  also appeared in: Transactions, SMiRT-22, San Francisco, CA, USA, August
+  18-23, 2013, Division III.
+<a name="Hales_2013d"></a><pre>
+@techreport{Hales_2013d,
+  author = {J.~D.~Hales and M.~R.~Tonks and K.~Chockalingam and D.~M.~Perez and S.~R.~Novascone and B.~W.~Spencer and R.~L.~Williamson},
+  title = {{Multiscale Nuclear Fuel Analysis via Asymptotic Expansion Homogenization}},
+  institution = {Idaho National Laboratory},
+  month = aug,
+  year = {2013},
+  number = {INL/CON-12-27165},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5842301.pdf},
+                 also appeared in: Transactions, SMiRT-22, San Francisco, CA, USA, August 18-23, 2013, Division III}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Novascone_2013c">22</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, R.&nbsp;L. Williamson, D.&nbsp;Andrs, J.&nbsp;D. Hales, and
@@ -1551,7 +2483,7 @@ S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, R.&nbsp;L. Williamson, D.&nbsp;Andrs, 
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fike_2013">14</a>]
+[<a name="Fike_2013">23</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;A. Fike.
@@ -1582,7 +2514,7 @@ J.&nbsp;A. Fike.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carlson_2013">15</a>]
+[<a name="Carlson_2013">24</a>]
 </td>
 <td class="bibtexitem">
 N.&nbsp;N. Carlson, C.&nbsp;Unal, and J.&nbsp;D. Galloway.
@@ -1614,7 +2546,7 @@ N.&nbsp;N. Carlson, C.&nbsp;Unal, and J.&nbsp;D. Galloway.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tahir_2013">16</a>]
+[<a name="Tahir_2013">25</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;M. Tahir, G.&nbsp;Amberg, and M.&nbsp;Do-Quang.
@@ -1642,7 +2574,7 @@ A.&nbsp;M. Tahir, G.&nbsp;Amberg, and M.&nbsp;Do-Quang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Millett_2013">17</a>]
+[<a name="Millett_2013">26</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;C. Millett, M.&nbsp;R. Tonks, K.&nbsp;Chockalingam, Y.&nbsp;Zhang, and S.&nbsp;B. Biner.
@@ -1671,7 +2603,7 @@ P.&nbsp;C. Millett, M.&nbsp;R. Tonks, K.&nbsp;Chockalingam, Y.&nbsp;Zhang, and S
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gimenez_2013">18</a>]
+[<a name="Gimenez_2013">27</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;M. Gimenez and N.&nbsp;M. Nigro.
@@ -1701,7 +2633,7 @@ J.&nbsp;M. Gimenez and N.&nbsp;M. Nigro.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2013b">19</a>]
+[<a name="Kirk_2013b">28</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, T.&nbsp;A. Oliver, and P.&nbsp;T. Bauman.
@@ -1728,7 +2660,7 @@ B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, T.&nbsp;A. Oliver, and P.&nbsp;T. Bauman.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2013">20</a>]
+[<a name="Corsini_2013">29</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, F.&nbsp;Rispoli, A.&nbsp;G. Sheard, and P.&nbsp;Venturini.
@@ -1758,7 +2690,7 @@ A.&nbsp;Corsini, F.&nbsp;Rispoli, A.&nbsp;G. Sheard, and P.&nbsp;Venturini.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Dickson_2013">21</a>]
+[<a name="Dickson_2013">30</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;L. Dickson, P.&nbsp;T. Williams, S.&nbsp;Yin, H.&nbsp;B. Klasky, S.&nbsp;K. Tadinada, and B.&nbsp;R.
@@ -1787,7 +2719,7 @@ T.&nbsp;L. Dickson, P.&nbsp;T. Williams, S.&nbsp;Yin, H.&nbsp;B. Klasky, S.&nbsp
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fahrenholtz_2013">22</a>]
+[<a name="Fahrenholtz_2013">31</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;J. Fahrenholtz, R.&nbsp;J. Stafford, F.&nbsp;Maier, J.&nbsp;D. Hazle, and D.&nbsp;Fuentes.
@@ -1816,7 +2748,7 @@ S.&nbsp;J. Fahrenholtz, R.&nbsp;J. Stafford, F.&nbsp;Maier, J.&nbsp;D. Hazle, an
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Oden_2013">23</a>]
+[<a name="Oden_2013">32</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
@@ -1846,7 +2778,7 @@ J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Delchini_2013">24</a>]
+[<a name="Delchini_2013">33</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;O. Delchini, J.&nbsp;C. Ragusa, and R.&nbsp;A. Berry.
@@ -1871,7 +2803,7 @@ M.&nbsp;O. Delchini, J.&nbsp;C. Ragusa, and R.&nbsp;A. Berry.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Alfonsi_2013">25</a>]
+[<a name="Alfonsi_2013">34</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Alfonsi, C.&nbsp;Rabiti, D.&nbsp;Mandelli, J.&nbsp;J. Cogliati, and R.&nbsp;A. Kinoshita.
@@ -1897,7 +2829,7 @@ A.&nbsp;Alfonsi, C.&nbsp;Rabiti, D.&nbsp;Mandelli, J.&nbsp;J. Cogliati, and R.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rabiti_2013">26</a>]
+[<a name="Rabiti_2013">35</a>]
 </td>
 <td class="bibtexitem">
 C.&nbsp;Rabiti, D.&nbsp;Mandelli, A.&nbsp;Alfonsi, J.&nbsp;J. Cogliati, and R.&nbsp;A. Kinoshita.
@@ -1923,7 +2855,7 @@ C.&nbsp;Rabiti, D.&nbsp;Mandelli, A.&nbsp;Alfonsi, J.&nbsp;J. Cogliati, and R.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Wang_2013">27</a>]
+[<a name="Wang_2013">36</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Wang.
@@ -1951,7 +2883,7 @@ Y.&nbsp;Wang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Johnson_2013">28</a>]
+[<a name="Johnson_2013">37</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Johnson and H.&nbsp;Zhao.
@@ -1979,7 +2911,7 @@ M.&nbsp;Johnson and H.&nbsp;Zhao.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gleicher_2013">29</a>]
+[<a name="Gleicher_2013">38</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;N. Gleicher, B.&nbsp;W. Spencer, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, R.&nbsp;C.
@@ -2006,7 +2938,7 @@ F.&nbsp;N. Gleicher, B.&nbsp;W. Spencer, S.&nbsp;R. Novascone, R.&nbsp;L. Willia
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="HZhang_2013">30</a>]
+[<a name="HZhang_2013">39</a>]
 </td>
 <td class="bibtexitem">
 H.&nbsp;Zhang, L.&nbsp;Zou, D.&nbsp;Andrs, H.&nbsp;Zhao, and R.&nbsp;C. Martineau.
@@ -2032,7 +2964,7 @@ H.&nbsp;Zhang, L.&nbsp;Zou, D.&nbsp;Andrs, H.&nbsp;Zhao, and R.&nbsp;C. Martinea
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2013">31</a>]
+[<a name="Tonks_2013">40</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;R. Tonks, S.&nbsp;B. Biner, P.&nbsp;C. Millett, and D.&nbsp;A. Andersson.
@@ -2058,7 +2990,7 @@ M.&nbsp;R. Tonks, S.&nbsp;B. Biner, P.&nbsp;C. Millett, and D.&nbsp;A. Andersson
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zou_2013">32</a>]
+[<a name="Zou_2013">41</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Zou, J.&nbsp;W. Peterson, H.&nbsp;Zhao, H.&nbsp;Zhang, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
@@ -2086,7 +3018,7 @@ L.&nbsp;Zou, J.&nbsp;W. Peterson, H.&nbsp;Zhao, H.&nbsp;Zhang, D.&nbsp;Andrs, an
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Novascone_2013">33</a>]
+[<a name="Novascone_2013">42</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, D.&nbsp;Andrs, R.&nbsp;L. Williamson, J.&nbsp;D. Hales, and
@@ -2112,7 +3044,7 @@ S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, D.&nbsp;Andrs, R.&nbsp;L. Williamson, 
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Perez_2013">34</a>]
+[<a name="Perez_2013">43</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;M. Perez, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, T.&nbsp;K. Larson, J.&nbsp;D. Hales,
@@ -2138,7 +3070,7 @@ D.&nbsp;M. Perez, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, T.&nbsp;K. Larson
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2013">35</a>]
+[<a name="Hales_2013">44</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Hales, D.&nbsp;R. Gaston, and D.&nbsp;Andrs.
@@ -2164,7 +3096,7 @@ J.&nbsp;D. Hales, D.&nbsp;R. Gaston, and D.&nbsp;Andrs.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2013">36</a>]
+[<a name="Gaston_2013">45</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, and J.&nbsp;W. Peterson.
@@ -2189,7 +3121,7 @@ D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Swiler_2013">37</a>]
+[<a name="Swiler_2013">46</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;P. Swiler, R.&nbsp;L. Williamson, and D.&nbsp;M. Perez.
@@ -2216,7 +3148,36 @@ L.&nbsp;P. Swiler, R.&nbsp;L. Williamson, and D.&nbsp;M. Perez.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2013c">38</a>]
+[<a name="Grote_2013">47</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;J. Grote, J.&nbsp;Huber, D.&nbsp;Kourounis, and O.&nbsp;Schenk.
+ Inexact interior-point method for PDE-constrained nonlinear
+  optimization.
+ Technical Report 2013-15, Institute of Mathematics, University of
+  Basel, Preprint No. 2013-15, May 2013.
+
+  <a href="http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf">http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf</a>.
+<a name="Grote_2013"></a><pre>
+@techreport{Grote_2013,
+  author = {M.~J.~Grote and J.~Huber and D.~Kourounis and O.~Schenk},
+  title = {{Inexact interior-point method for PDE-constrained nonlinear optimization}},
+  institution = {Institute of Mathematics, University of Basel, Preprint No. 2013-15},
+  month = may,
+  year = {2013},
+  number = {2013-15},
+  note = {\url{http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Tonks_2013c">48</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;R. Tonks, S.&nbsp;B. Biner, P.&nbsp;C. Millett, and D.&nbsp;A. Andersson.
@@ -2244,7 +3205,7 @@ M.&nbsp;R. Tonks, S.&nbsp;B. Biner, P.&nbsp;C. Millett, and D.&nbsp;A. Andersson
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Swiler_2013b">39</a>]
+[<a name="Swiler_2013b">49</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;P. Swiler, G.&nbsp;Pastore, R.&nbsp;L. Williamson, and D.&nbsp;M. Perez.
@@ -2272,7 +3233,7 @@ L.&nbsp;P. Swiler, G.&nbsp;Pastore, R.&nbsp;L. Williamson, and D.&nbsp;M. Perez.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bittl_2012">40</a>]
+[<a name="Bittl_2012">50</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bittl and D.&nbsp;Kuzmin.
@@ -2301,7 +3262,7 @@ M.&nbsp;Bittl and D.&nbsp;Kuzmin.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Chockalingam_2013">41</a>]
+[<a name="Chockalingam_2013">51</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Chockalingam, M.&nbsp;R. Tonks, J.&nbsp;D. Hales, D.&nbsp;R. Gaston, P.&nbsp;C. Millett, and
@@ -2330,7 +3291,7 @@ K.&nbsp;Chockalingam, M.&nbsp;R. Tonks, J.&nbsp;D. Hales, D.&nbsp;R. Gaston, P.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lee_2013">42</a>]
+[<a name="Lee_2013">52</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Lee and K.&nbsp;Willcox.
@@ -2357,7 +3318,7 @@ K.&nbsp;Lee and K.&nbsp;Willcox.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bhatia_2013">43</a>]
+[<a name="Bhatia_2013">53</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bhatia and P.&nbsp;Beran.
@@ -2384,7 +3345,7 @@ M.&nbsp;Bhatia and P.&nbsp;Beran.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Opstal_2013">44</a>]
+[<a name="Opstal_2013">54</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;M. van Opstal, P.&nbsp;T. Bauman, S.&nbsp;Prudhomme, and E.&nbsp;H. Brummelen.
@@ -2412,7 +3373,7 @@ T.&nbsp;M. van Opstal, P.&nbsp;T. Bauman, S.&nbsp;Prudhomme, and E.&nbsp;H. Brum
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hu_2013">45</a>]
+[<a name="Hu_2013">55</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Hu, J.&nbsp;W. Thomas, and T.&nbsp;H. Fanning.
@@ -2440,7 +3401,7 @@ R.&nbsp;Hu, J.&nbsp;W. Thomas, and T.&nbsp;H. Fanning.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Guo_2013">46</a>]
+[<a name="Guo_2013">56</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Guo, H.&nbsp;Huang, D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, G.&nbsp;D. Redden, C.&nbsp;Lu,
@@ -2470,7 +3431,7 @@ L.&nbsp;Guo, H.&nbsp;Huang, D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhang_2013">47</a>]
+[<a name="Zhang_2013">57</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;Andrs, P.&nbsp;C. Millett, and
@@ -2499,7 +3460,7 @@ L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;An
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Satou_2013">48</a>]
+[<a name="Satou_2013">58</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Satou, V.&nbsp;Ryzhii, F.&nbsp;T. Vasko, V.&nbsp;V. Mitin, and T.&nbsp;Otsuji.
@@ -2530,7 +3491,7 @@ A.&nbsp;Satou, V.&nbsp;Ryzhii, F.&nbsp;T. Vasko, V.&nbsp;V. Mitin, and T.&nbsp;O
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2013">49</a>]
+[<a name="Kirk_2013">59</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and T.&nbsp;A. Oliver.
@@ -2556,7 +3517,34 @@ B.&nbsp;S. Kirk and T.&nbsp;A. Oliver.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2013d">50</a>]
+[<a name="Toader_2013">60</a>]
+</td>
+<td class="bibtexitem">
+A.-M. Toader and C.&nbsp;Barbarosie.
+ Optimization of bodies with locally periodic microstructure by
+  varying the periodicity pattern.
+ In <em>Centro de Matem&aacute;tica e Aplica&ccedil;&otilde;es Fundamentais
+  (CMAF) Preprint Pre-010</em>, 2013.
+
+  <a href="http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf">http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf</a>.
+<a name="Toader_2013"></a><pre>
+@inproceedings{Toader_2013,
+  author = {A.-M.~Toader and C.~Barbarosie},
+  title = {{Optimization of bodies with locally periodic microstructure by varying the periodicity pattern}},
+  booktitle = {{Centro de Matem\'{a}tica e Aplica\c{c}\~{o}es Fundamentais (CMAF) Preprint Pre-010}},
+  year = {2013},
+  note = {\url{http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Tonks_2013d">61</a>]
 </td>
 <td class="bibtexitem">
 Michael&nbsp;R. Tonks, Yongfeng Zhang, S.B. Biner, Paul&nbsp;C. Millett, and Xianming
@@ -2585,7 +3573,7 @@ Michael&nbsp;R. Tonks, Yongfeng Zhang, S.B. Biner, Paul&nbsp;C. Millett, and Xia
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2013b">51</a>]
+[<a name="Tonks_2013b">62</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;R. Tonks, P.&nbsp;C. Millett, P.&nbsp;Nerikar, S.&nbsp;Du, D.&nbsp;Andersson, C.&nbsp;R. Stanek,
@@ -2614,7 +3602,7 @@ M.&nbsp;R. Tonks, P.&nbsp;C. Millett, P.&nbsp;Nerikar, S.&nbsp;Du, D.&nbsp;Ander
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2013b">52</a>]
+[<a name="Corsini_2013b">63</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini and A.&nbsp;G. Sheard.
@@ -2642,7 +3630,7 @@ A.&nbsp;Corsini and A.&nbsp;G. Sheard.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Krol_2013">53</a>]
+[<a name="Krol_2013">64</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Kr&oacute;l, D.&nbsp;Zydek, and H.&nbsp;Selvaraj.
@@ -2670,7 +3658,7 @@ D.&nbsp;Kr&oacute;l, D.&nbsp;Zydek, and H.&nbsp;Selvaraj.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rutledge_2013">54</a>]
+[<a name="Rutledge_2013">65</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;J. Rutledge.
@@ -2697,7 +3685,7 @@ V.&nbsp;J. Rutledge.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Widmer_2013">55</a>]
+[<a name="Widmer_2013">66</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
@@ -2726,7 +3714,7 @@ R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2013">56</a>]
+[<a name="Fuentes_2013">67</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J.
@@ -2758,7 +3746,7 @@ D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2013">57</a>]
+[<a name="Huynh_2013">68</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -2788,7 +3776,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2013">58</a>]
+[<a name="Vavourakis_2013">69</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
@@ -2816,7 +3804,7 @@ V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanasta
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2013">59</a>]
+[<a name="Zhu_2013">70</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -2844,7 +3832,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berr
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2013">60</a>]
+[<a name="Vetter_2013">71</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
