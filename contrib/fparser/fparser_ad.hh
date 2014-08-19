@@ -2,7 +2,6 @@
 #define ONCE_FPARSERAD_H_
 
 #include "fparser.hh"
-//#include "libmesh_common.h"
 #include <exception>
 
 template<typename Value_t>
@@ -39,8 +38,23 @@ protected:
   /**
    * A list of opcodes and immediate values
    */
-  typedef std::pair<unsigned, Value_t> OpcodeDataPair;
-  typedef std::vector<OpcodeDataPair> DiffProgramFragment;
+  struct OpcodePacket {
+    unsigned first, index;
+    Value_t second;
+    OpcodePacket() : first(0), second(Value_t()), index(0) {}
+    OpcodePacket(unsigned _first, Value_t _second, unsigned _index) : first(_first), second(_second), index(_index) {}
+  };
+  struct OpcodePlain : OpcodePacket {
+    OpcodePlain(unsigned _first) : OpcodePacket(_first, Value_t(), 0) {}
+  };
+  struct OpcodeImmediate : OpcodePacket {
+    OpcodeImmediate(Value_t _second);
+  };
+  struct OpcodeFCall : OpcodePacket {
+    OpcodeFCall(unsigned _index);
+  };
+
+  typedef std::vector<OpcodePacket> DiffProgramFragment;
   typedef std::pair<typename DiffProgramFragment::const_iterator,
                     typename DiffProgramFragment::const_iterator> Interval;
 
@@ -53,7 +67,7 @@ protected:
   /**
    * how much does the current opcode move the stack pointer
    */
-  int OpcodeSize(unsigned op);
+  int OpcodeSize(const OpcodePacket & p);
 
 private:
   typename FunctionParserBase<Value_t>::Data * mData;
@@ -73,11 +87,17 @@ private:
   /// write the DiffProgramFragement into the internal bytecode storage
   void Commit(const DiffProgramFragment & code);
 
+  /// the function index of the plog function
+  unsigned mFPlog;
+
   /**
    * In certain applications derivatives are built proactively and may never be used.
    * We silence all AutoDiff exceptions in that case to avoid confusing the user.
    */
   bool mSilenceErrors;
+
+  // user function plog
+  static Value_t fp_plog(const Value_t * params);
 
   // Exceptions
   class UnsupportedOpcode : public std::exception {
