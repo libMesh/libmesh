@@ -128,7 +128,7 @@ public:
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
     TensorValue&>::type
-  operator = (const Scalar& p)
+  operator = (const Scalar& libmesh_dbg_var(p) )
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 
 

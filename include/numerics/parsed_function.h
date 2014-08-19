@@ -271,14 +271,19 @@ private:
   }
 
   // Evaluate the ith FunctionParser and check the result
-  inline Output eval(FunctionParserADBase<Output> & parser, const std::string & function_name, unsigned int component)
+  inline Output eval(FunctionParserADBase<Output> & parser,
+                     const std::string & libmesh_dbg_var(function_name),
+                     unsigned int libmesh_dbg_var(component_idx))
   {
 #ifndef NDEBUG
     Output result = parser.Eval(&_spacetime[0]);
     int error_code = parser.EvalError();
     if (error_code)
     {
-      libMesh::err << "ERROR: FunctionParser is unable to evaluate component " << component << " of expression  '" << function_name << "' with arguments:\n";
+      libMesh::err <<
+        "ERROR: FunctionParser is unable to evaluate component " <<
+        component_idx << " of expression '" << function_name <<
+        "' with arguments:\n";
       for (unsigned int j=0; j<_spacetime.size(); ++j)
         libMesh::err << '\t' << _spacetime[j] << '\n';
       libMesh::err << '\n';
