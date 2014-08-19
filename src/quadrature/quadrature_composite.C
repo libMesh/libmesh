@@ -16,6 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "libmesh/libmesh_config.h"
+#if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
+
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_trap.h"
@@ -157,3 +160,5 @@ template class QComposite<QTrap>;
 template class QComposite<QSimpson>;
 
 } // namespace libMesh
+
+#endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_HAVE_TETGEN

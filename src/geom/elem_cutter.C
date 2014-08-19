@@ -16,6 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "libmesh/libmesh_config.h"
+#if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
+
 // Local includes
 #include "libmesh/elem_cutter.h"
 #include "libmesh/elem.h"
@@ -399,3 +402,5 @@ namespace libMesh
 
 
 } // namespace libMesh
+
+#endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_HAVE_TETGEN

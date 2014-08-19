@@ -20,6 +20,10 @@
 #ifndef LIBMESH_QUADRATURE_COMPOSITE_H
 #define LIBMESH_QUADRATURE_COMPOSITE_H
 
+#include "libmesh/libmesh_config.h"
+
+#if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
+
 // Local includes
 #include "libmesh/quadrature.h"
 #include "libmesh/elem_cutter.h"
@@ -34,7 +38,9 @@ namespace libMesh
  * This class implements generic composite quadrature rules.
  * Composite quadrature rules are constructed from any of the
  * supported rules by breaking an element into subelements and
- * applying the base rule on each subelement.
+ * applying the base rule on each subelement.  This class uses the
+ * ElemCutter, which is only available if libmesh is configured with
+ * --disable-strict-lgpl.
  */
 
 // ------------------------------------------------------------
@@ -108,4 +114,5 @@ class QComposite : public QSubCell
 
 
 
+#endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_HAVE_TETGEN
 #endif // LIBMESH_QUADRATURE_COMPOSITE_H

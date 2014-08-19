@@ -65,9 +65,11 @@ int main (int argc, char** argv)
 
   // This example requires Adaptive Mesh Refinement support - although
   // it only refines uniformly, the refinement code used is the same
-  // underneath
-#ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  // underneath.  It also requires libmesh support for Triangle and
+  // Tetgen, which means that libmesh must be configured with
+  // --disable-strict-lgpl for this example to run.
+#if !defined(LIBMESH_HAVE_TRIANGLE) || !defined(LIBMESH_HAVE_TETGEN) || !defined(LIBMESH_ENABLE_AMR)
+  libmesh_example_requires(false, "--disable-strict-lgpl --enable-amr");
 #else
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
@@ -115,6 +117,7 @@ int main (int argc, char** argv)
 
 void integrate_function (const MeshBase &mesh)
 {
+#if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
@@ -161,4 +164,7 @@ void integrate_function (const MeshBase &mesh)
 	     << " exact_val = " <<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
 	     << "\n***********************************\n"
 	     << std::endl;
+#else
+  libmesh_ignore(mesh);
+#endif
 }

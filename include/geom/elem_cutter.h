@@ -20,6 +20,10 @@
 #ifndef LIBMESH_ELEM_CUTTER_H
 #define LIBMESH_ELEM_CUTTER_H
 
+#include "libmesh/libmesh_config.h"
+
+#if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
+
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
@@ -42,7 +46,9 @@ class TetGenMeshInterface;
 
 /**
  * This class implements cutting a single element into a collection
- * of subelements.
+ * of subelements.  This class depends on libmesh's Triangle and Tetgen
+ * interfaces, the former of which is only defined if libmesh is configured
+ * with --disable-strict-lgpl.
  *
  * \author Benjamin S. Kirk, 2013
  */
@@ -164,5 +170,5 @@ protected:
 
 } // namespace libMesh
 
-
+#endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_HAVE_TETGEN
 #endif // LIBMESH_ELEM_CUTTER_H
