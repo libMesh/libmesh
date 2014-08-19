@@ -1314,6 +1314,13 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
   std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
   for( ; node_map_it != node_map_it_end; ++node_map_it)
     {
+      // In the case that this==other_mesh, the two nodes might be the same (e.g. if
+      // we're stitching a "sliver"), hence we need to skip node deletion in that case.
+      if( (this == other_mesh) && (node_map_it->second == node_map_it->first) )
+      {
+        continue;
+      }
+
       dof_id_type node_id = node_map_it->second;
       this->delete_node( this->node_ptr(node_id) );
     }
