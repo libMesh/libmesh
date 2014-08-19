@@ -41,6 +41,8 @@ DiffSolver::DiffSolver (sys_type& s)
     minimum_linear_tolerance(TOLERANCE*TOLERANCE),
     max_solution_norm(0.),
     max_residual_norm(0.),
+    _outer_iterations(0),
+    _inner_iterations(0),
     _system (s),
     _solve_result(INVALID_SOLVE_RESULT)
 {
