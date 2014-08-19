@@ -1196,12 +1196,18 @@ protected:
   Elem** _elemlinks;
 
 #ifdef LIBMESH_ENABLE_AMR
-
   /**
    * Pointers to this element's children.
    */
   Elem** _children;
+#endif
 
+  /**
+   * The subdomain to which this element belongs.
+   */
+  subdomain_id_type _sbd_id;
+
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * h refinement flag. This is stored as an unsigned char
    * to save space.
@@ -1225,13 +1231,7 @@ protected:
    * been padding anyway.
    */
   unsigned char _p_level;
-
 #endif
-
-  /**
-   * The subdomain to which this element belongs.
-   */
-  subdomain_id_type _sbd_id;
 };
 
 // ------------------------------------------------------------
