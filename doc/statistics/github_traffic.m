@@ -190,6 +190,10 @@ data = {
     '2014-Aug-13', 173, 25
     '2014-Aug-14', 109, 28
     '2014-Aug-15', 46,  17
+    '2014-Aug-16', 33,  11
+    '2014-Aug-17', 109, 15
+    '2014-Aug-18', 154, 20
+    '2014-Aug-19', 143, 23
     };
 
 % Github now tracks the total number of clones and unique cloners
@@ -207,6 +211,10 @@ clone_data = {
     '2014-Aug-13', 19, 11
     '2014-Aug-14', 9,  7
     '2014-Aug-15', 5,  5
+    '2014-Aug-16', 5,  2
+    '2014-Aug-17', 5,  5
+    '2014-Aug-18', 10, 8
+    '2014-Aug-19', 9,  8
     };
 
 % length works like you would expect it to for cell arrays.
