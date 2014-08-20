@@ -211,6 +211,9 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 
         break;
       }
+
+    default:
+      libmesh_error_msg("Invalid dim = " << Dim);
     }
 
   /**

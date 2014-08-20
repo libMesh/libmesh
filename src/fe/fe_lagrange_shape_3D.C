@@ -715,6 +715,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
                         libmesh_error_msg("Invalid i = " << i);
                       }
                   }
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
             }
 
@@ -751,6 +754,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
                 case 2:
                   return (FE<2,LAGRANGE>::shape(TRI3,  FIRST, i1[i], p2d)*
                           FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, p1d));
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
             }
 
@@ -1110,6 +1116,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
                     default:
                       libmesh_error_msg("Invalid i = " << i);
                     }
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
             }
 
@@ -1478,6 +1487,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
                 case 2:
                   return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
                           FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
             }
 
@@ -2801,6 +2813,9 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
                 case 5:
                   return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
                           FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
             }
 

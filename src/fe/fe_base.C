@@ -75,7 +75,7 @@ const Elem* primary_boundary_point_neighbor
       // one of its sides is on a relevant boundary and that side
       // contains this vertex
       bool vertex_on_periodic_side = false;
-      for (unsigned int ns = 0;
+      for (unsigned short int ns = 0;
            ns != pt_neighbor->n_sides(); ++ns)
         {
           const std::vector<boundary_id_type> bc_ids =
@@ -138,7 +138,7 @@ const Elem* primary_boundary_edge_neighbor
       // one of its sides is on this periodic boundary and that
       // side contains this edge
       bool vertex_on_periodic_side = false;
-      for (unsigned int ns = 0;
+      for (unsigned short int ns = 0;
            ns != e_neighbor->n_sides(); ++ns)
         {
           const std::vector<boundary_id_type>& bc_ids =
@@ -1882,7 +1882,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
-  for (unsigned int s=0; s<elem->n_sides(); s++)
+  for (unsigned short int s=0; s<elem->n_sides(); s++)
     {
       if (elem->neighbor(s))
         continue;

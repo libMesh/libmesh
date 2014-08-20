@@ -623,6 +623,9 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
             return val;
           }
       }
+
+    default:
+      libmesh_error_msg("Invalid shape function derivative j = " << j);
     }
 
 #endif

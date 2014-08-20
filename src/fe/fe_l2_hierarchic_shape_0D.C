@@ -31,7 +31,7 @@ namespace libMesh
 template <>
 Real FE<0,L2_HIERARCHIC>::shape(const ElemType,
                                 const Order,
-                                const unsigned int i,
+                                const unsigned int libmesh_dbg_var(i),
                                 const Point&)
 {
   libmesh_assert_less (i, 1);
@@ -43,7 +43,7 @@ Real FE<0,L2_HIERARCHIC>::shape(const ElemType,
 template <>
 Real FE<0,L2_HIERARCHIC>::shape(const Elem*,
                                 const Order,
-                                const unsigned int i,
+                                const unsigned int libmesh_dbg_var(i),
                                 const Point&)
 {
   libmesh_assert_less (i, 1);

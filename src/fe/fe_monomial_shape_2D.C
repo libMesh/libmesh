@@ -289,6 +289,9 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
             return val;
           }
       }
+
+    default:
+      libmesh_error_msg("Invalid shape function derivative j = " << j);
     }
 
   libmesh_error_msg("We'll never get here!");
@@ -521,6 +524,9 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
             return val;
           }
       }
+
+    default:
+      libmesh_error_msg("Invalid shape function derivative j = " << j);
     }
 
   libmesh_error_msg("We'll never get here!");

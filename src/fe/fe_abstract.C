@@ -1107,7 +1107,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
-  for (unsigned int s=0; s<elem->n_sides(); s++)
+  for (unsigned short int s=0; s<elem->n_sides(); s++)
     {
       if (elem->neighbor(s))
         continue;

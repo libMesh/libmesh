@@ -219,6 +219,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
                 case 11: // edge 3 points
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -317,6 +320,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
                 case 14: // edge 3 points
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -428,6 +434,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
                 case 19:
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -549,6 +558,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
                 case 22:
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -686,6 +698,9 @@ Real FE<2,SZABAB>::shape(const Elem* elem,
                 case 27:
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -899,6 +914,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
                 case 11: // edge 3 points
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
 
@@ -1002,6 +1020,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
                 case 14: // edge 3 points
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
 
@@ -1108,6 +1129,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
                 case 19:
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
 
@@ -1212,6 +1236,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
                 case 22:
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
 
@@ -1320,6 +1347,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
                 case 27:
                   if (elem->point(0) > elem->point(3))f = -1.;
                   break;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
 
 

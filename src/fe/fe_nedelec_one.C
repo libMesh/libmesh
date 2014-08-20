@@ -371,7 +371,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
 void nedelec_one_compute_constraints (DofConstraints &/*constraints*/,
                                       DofMap &/*dof_map*/,
                                       const unsigned int /*variable_number*/,
-                                      const Elem* elem,
+                                      const Elem* libmesh_dbg_var(elem),
                                       const unsigned Dim)
 {
   // Only constrain elements in 2,3D.
