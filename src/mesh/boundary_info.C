@@ -1619,7 +1619,7 @@ void BoundaryInfo::build_side_list_from_node_list()
           // number of nodes in them.  For any that do, add this side to
           // the sideset, making sure the sideset inherits the
           // nodeset's name, if there is one.
-          std::map<dof_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
+          std::map<boundary_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
           for (; nodesets != nodesets_node_count.end(); ++nodesets)
             if (nodesets->second == side_elem->n_nodes())
               {
