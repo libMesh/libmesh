@@ -1783,7 +1783,7 @@ void DofMap::dof_indices (const Elem* const elem,
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
-  unsigned int tot_size = 0;
+  std::size_t tot_size = 0;
 #endif
 
   // Determine the nodes contributing to element elem
