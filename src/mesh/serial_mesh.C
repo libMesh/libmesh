@@ -898,7 +898,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                       set_array[i]->insert( node_id );
 
                       const Elem* near_elem = (*my_locator)( mesh_array[i]->node(node_id) );
-                      if(elem == NULL)
+                      if(near_elem == NULL)
                       {
                         libmesh_error_msg("Error: PointLocator failed to find a valid element");
                       }
