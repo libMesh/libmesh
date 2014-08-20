@@ -525,8 +525,7 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[2],p(2));
                   break;
                 default:
-                  libmesh_error_msg("Invalid shape function derivative j = " <<
-                                    deriv_type);
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
 
             }
@@ -627,8 +626,7 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
                     FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[2],p(2));
                   break;
                 default:
-                  libmesh_error_msg("Invalid shape function derivative j = " <<
-                                    deriv_type);
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
 
             }
