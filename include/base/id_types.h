@@ -43,6 +43,10 @@ public:
 typedef TestClass subdomain_id_type;
 #endif
 
+
+// How many bytes do we need to specify subsets of the boundary?  By
+// default we'll allow for tens of thousands of different boundary
+// ids.
 #if LIBMESH_BOUNDARY_ID_BYTES == 1
 typedef int8_t boundary_id_type;
 #elif LIBMESH_BOUNDARY_ID_BYTES == 4
@@ -54,6 +58,8 @@ typedef int16_t boundary_id_type;
 #endif
 
 
+// How many bytes do we need to specify DoFObjects?  By default we'll
+// allow for a few billion (each) nodes & elements.
 #if LIBMESH_DOF_ID_BYTES == 1
 typedef uint8_t dof_id_type;
 #elif LIBMESH_DOF_ID_BYTES == 2
@@ -65,6 +71,10 @@ typedef uint32_t dof_id_type;
 #endif
 
 
+
+// How many bytes do we need to specify DoFObjects without ever
+// renumbering?  By default we'll allow for quintillions of
+// one-time-use ids.
 #if LIBMESH_UNIQUE_ID_BYTES == 1
 typedef uint8_t unique_id_type;
 #elif LIBMESH_UNIQUE_ID_BYTES == 2
@@ -96,6 +106,9 @@ typedef uint16_t processor_id_type;
 #endif
 
 
+// How many bytes do we need to specify subsets of the interior?  By
+// default we'll allow for tens of thousands of different subdomain
+// ids.
 #if LIBMESH_SUBDOMAIN_ID_BYTES == 1
 typedef uint8_t subdomain_id_type;
 #elif LIBMESH_SUBDOMAIN_ID_BYTES == 4
@@ -115,6 +128,10 @@ typedef int64_t subdomain_id_type;
 typedef uint16_t subdomain_id_type;
 #endif
 
+
+// For serialization purposes we often like to pack the different
+// kinds of ids together; how large a data type do we need to hold an
+// arbitrary id?
 #if (LIBMESH_BOUNDARY_ID_BYTES > 4) || (LIBMESH_DOF_ID_BYTES > 4) ||    \
   (LIBMESH_UNIQUE_ID_BYTES > 4) || (LIBMESH_PROCESSOR_ID_BYTES > 4) ||  \
   (LIBMESH_SUBDOMAIN_ID_BYTES > 4)
