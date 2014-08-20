@@ -232,7 +232,7 @@ subdomain_id_type MeshBase::n_subdomains() const
 
   this->subdomain_ids (ids);
 
-  return ids.size();
+  return cast_int<subdomain_id_type>(ids.size());
 }
 
 

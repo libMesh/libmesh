@@ -394,11 +394,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       for (processor_id_type pid=0; pid<communicator.size(); pid++)
         {
           // Trade my requests with processor procup and procdown
-          const processor_id_type procup = (communicator.rank() + pid) %
-            communicator.size();
-          const processor_id_type procdown = (communicator.size() +
-                                              communicator.rank() - pid) %
-            communicator.size();
+          const processor_id_type procup = cast_int<processor_id_type>
+            ((communicator.rank() + pid) % communicator.size());
+          const processor_id_type procdown = cast_int<processor_id_type>
+            ((communicator.size() + communicator.rank() - pid) %
+             communicator.size());
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
           communicator.send_receive(procup, requested_ids[procup],
@@ -419,7 +419,9 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
               // Finally, assign the global index based off the position of the index
               // in my array, properly offset.
-              global_ids.push_back (std::distance(my_node_bin.begin(), pos) + my_offset);
+              global_ids.push_back 
+                (cast_int<dof_id_type>
+                   (std::distance(my_node_bin.begin(), pos) + my_offset));
             }
 
           // and trade back
@@ -511,11 +513,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       for (processor_id_type pid=0; pid<communicator.size(); pid++)
         {
           // Trade my requests with processor procup and procdown
-          const processor_id_type procup = (communicator.rank() + pid) %
-            communicator.size();
-          const processor_id_type procdown = (communicator.size() +
-                                              communicator.rank() - pid) %
-            communicator.size();
+          const processor_id_type procup = cast_int<processor_id_type>
+            ((communicator.rank() + pid) % communicator.size());
+          const processor_id_type procdown = cast_int<processor_id_type>
+            ((communicator.size() + communicator.rank() - pid) %
+             communicator.size());
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
           communicator.send_receive(procup, requested_ids[procup],
@@ -536,7 +538,9 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
               // Finally, assign the global index based off the position of the index
               // in my array, properly offset.
-              global_ids.push_back (std::distance(my_elem_bin.begin(), pos) + my_offset);
+              global_ids.push_back
+                (cast_int<dof_id_type>
+                   (std::distance(my_elem_bin.begin(), pos) + my_offset));
             }
 
           // and trade back
@@ -689,7 +693,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
     std::vector<std::vector<Hilbert::HilbertIndices> >
       requested_ids (communicator.size());
     // Results to gather from each processor
-    std::vector<std::vector<unsigned int> >
+    std::vector<std::vector<dof_id_type> >
       filled_request (communicator.size());
 
     // build up list of requests
@@ -718,15 +722,15 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
 
     // start with pid=0, so that we will trade with ourself
     std::vector<Hilbert::HilbertIndices> request_to_fill;
-    std::vector<unsigned int> global_ids;
-    for (unsigned int pid=0; pid<communicator.size(); pid++)
+    std::vector<dof_id_type> global_ids;
+    for (processor_id_type pid=0; pid<communicator.size(); pid++)
       {
         // Trade my requests with processor procup and procdown
-        const unsigned int procup = (communicator.rank() + pid) %
-          communicator.size();
-        const unsigned int procdown = (communicator.size() +
-                                       communicator.rank() - pid) %
-          communicator.size();
+        const processor_id_type procup = cast_int<processor_id_type>
+          ((communicator.rank() + pid) % communicator.size());
+        const processor_id_type procdown = cast_int<processor_id_type>
+          ((communicator.size() + communicator.rank() - pid) %
+           communicator.size());
 
         communicator.send_receive(procup, requested_ids[procup],
                                   procdown, request_to_fill);
@@ -746,7 +750,9 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
 
             // Finally, assign the global index based off the position of the index
             // in my array, properly offset.
-            global_ids.push_back (std::distance(my_bin.begin(), pos) + my_offset);
+            global_ids.push_back 
+              (cast_int<dof_id_type>
+                 (std::distance(my_bin.begin(), pos) + my_offset));
           }
 
         // and trade back
@@ -757,7 +763,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
     // We now have all the filled requests, so we can loop through our
     // nodes once and assign the global index to each one.
     {
-      std::vector<std::vector<unsigned int>::const_iterator>
+      std::vector<std::vector<dof_id_type>::const_iterator>
         next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
       for (unsigned int pid=0; pid<communicator.size(); pid++)
         next_obj_on_proc.push_back(filled_request[pid].begin());
@@ -765,12 +771,13 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
       unsigned int cnt=0;
       for (ForwardIterator it = begin; it != end; ++it, cnt++)
         {
-          const unsigned int pid = index_map[cnt];
+          const processor_id_type pid = cast_int<processor_id_type>
+            (index_map[cnt]);
 
           libmesh_assert_less (pid, communicator.size());
           libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
-          const unsigned int global_index = *next_obj_on_proc[pid];
+          const dof_id_type global_index = *next_obj_on_proc[pid];
           index_map[cnt] = global_index;
 
           ++next_obj_on_proc[pid];

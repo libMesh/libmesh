@@ -589,7 +589,8 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
             {
               // FIXME: factor out this strtol stuff into a utility function.
               char* endptr;
-              long abaqus_global_node_id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
+              dof_id_type abaqus_global_node_id = cast_int<dof_id_type>
+                (std::strtol(cell.c_str(), &endptr, /*base=*/10));
 
               if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
                 {
@@ -710,7 +711,8 @@ void AbaqusIO::read_ids(std::string set_name, container_t& container)
           char* endptr;
 
           // FIXME - this needs to be updated for 64-bit inputs
-          long id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
+          dof_id_type id = cast_int<dof_id_type>
+            (std::strtol(cell.c_str(), &endptr, /*base=*/10));
 
           // Note that lists of comma-separated values in abaqus also
           // *end* with a comma, so the last call to getline on a given
@@ -812,7 +814,8 @@ void AbaqusIO::assign_subdomain_ids()
 
             // Compute the proper subdomain ID, based on the formula in the
             // documentation for this function.
-            subdomain_id_type computed_id = elemset_id + (elem_types_map[elem->type()] * n_elemsets);
+            subdomain_id_type computed_id = cast_int<subdomain_id_type>
+              (elemset_id + (elem_types_map[elem->type()] * n_elemsets));
 
             // Assign this ID to the element in question
             elem->subdomain_id() = computed_id;
@@ -838,7 +841,7 @@ void AbaqusIO::assign_boundary_node_ids()
 
   // Iterate over the container of nodesets
   container_t::iterator it = _nodeset_ids.begin();
-  for (unsigned current_id=0; it != _nodeset_ids.end(); ++it, ++current_id)
+  for (unsigned short current_id=0; it != _nodeset_ids.end(); ++it, ++current_id)
     {
       // Associate current_id with the name we determined earlier
       the_mesh.boundary_info->nodeset_name(current_id) = it->first;
@@ -877,7 +880,7 @@ void AbaqusIO::assign_sideset_ids()
 
   // Iterate over the container of sidesets
   sideset_container_t::iterator it = _sideset_ids.begin();
-  for (unsigned current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
+  for (unsigned short current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
     {
       // Associate current_id with the name we determined earlier
       the_mesh.boundary_info->sideset_name(current_id) = it->first;
@@ -989,11 +992,11 @@ void AbaqusIO::assign_sideset_ids()
 
     // Loop over elements and try to assign boundary information
     {
-      MeshBase::element_iterator       it  = the_mesh.active_elements_begin();
+      MeshBase::element_iterator       e_it  = the_mesh.active_elements_begin();
       const MeshBase::element_iterator end = the_mesh.active_elements_end();
-      for ( ; it != end; ++it)
+      for ( ; e_it != end; ++e_it)
         {
-          Elem* elem = *it;
+          Elem* elem = *e_it;
 
           if (elem->dim() == max_dim)
             {
@@ -1020,8 +1023,10 @@ void AbaqusIO::assign_sideset_ids()
                     range = provide_bcs.equal_range (node_ids);
 
                   // Add boundary information for each side in the range.
-                  for (provide_bcs_t::const_iterator it = range.first; it != range.second; ++it)
-                    the_mesh.boundary_info->add_side(elem, sn, it->second);
+                  for (provide_bcs_t::const_iterator s_it = range.first;
+                       s_it != range.second; ++s_it)
+                    the_mesh.boundary_info->add_side
+                      (elem, sn, cast_int<unsigned short>(s_it->second));
                 }
             }
         }

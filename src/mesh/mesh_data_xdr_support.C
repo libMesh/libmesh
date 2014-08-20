@@ -159,7 +159,7 @@ void MeshData::read_xdr (const std::string& name,
   io.data (n_elem);
 
 #ifdef DEBUG
-  unsigned int previous_values_size = 0;
+  std::size_t previous_values_size = 0;
 #endif
 
   for (unsigned int n_cnt=0; n_cnt < n_node; n_cnt++)
@@ -373,7 +373,8 @@ void MeshData::write_xdr (const std::string& name,
    * Write the number of nodes for which data is there
    */
   {
-    unsigned int n_node = this->_node_data.size();
+    unsigned int n_node =
+      cast_int<unsigned int>(this->_node_data.size());
     io.data (n_node, "# No. of nodes for which data is stored");
   }
 
@@ -384,7 +385,8 @@ void MeshData::write_xdr (const std::string& name,
    * Write the number of elements for which data is there
    */
   {
-    unsigned int n_elem = this->_elem_data.size();
+    unsigned int n_elem =
+      cast_int<unsigned int>(this->_elem_data.size());
     io.data (n_elem, "# No. of elements for which data is stored");
   }
 

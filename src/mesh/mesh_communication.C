@@ -188,7 +188,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
         }
 
         // the number of nodes we will ship to pid
-        send_n_nodes_and_elem_per_proc[2*pid+0] = connected_nodes.size();
+        send_n_nodes_and_elem_per_proc[2*pid+0] =
+          cast_int<dof_id_tye>(connected_nodes.size());
 
         // send any nodes off to the destination processor
         if (!connected_nodes.empty())
@@ -204,7 +205,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
           }
 
         // the number of elements we will send to this processor
-        send_n_nodes_and_elem_per_proc[2*pid+1] = elements_to_send.size();
+        send_n_nodes_and_elem_per_proc[2*pid+1] =
+          cast_int<dof_id_type>(elements_to_send.size());
 
         if (!elements_to_send.empty())
           {
@@ -470,7 +472,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
         status(mesh.comm().probe (Parallel::any_source,
                                   element_neighbors_tag));
       const processor_id_type
-        source_pid_idx = status.source(),
+        source_pid_idx = cast_int<processor_id_type>(status.source()),
         dest_pid_idx   = source_pid_idx;
 
       //------------------------------------------------------------------

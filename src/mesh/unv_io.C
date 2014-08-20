@@ -527,7 +527,8 @@ void UNVIO::groups_in (std::istream& in_file)
 
                     // Set the current group number as the lower-dimensional element's subdomain ID.
                     // We will use this later to set a boundary ID.
-                    group_elem->subdomain_id() = group_number;
+                    group_elem->subdomain_id() =
+                      cast_int<subdomain_id_type>(group_number);
 
                     // Sort before putting into the map
                     std::sort(group_elem_node_ids.begin(), group_elem_node_ids.end());
@@ -549,7 +550,8 @@ void UNVIO::groups_in (std::istream& in_file)
                 else if (group_elem->dim() == max_dim)
                   {
                     is_subdomain_group = true;
-                    group_elem->subdomain_id() = group_number;
+                    group_elem->subdomain_id() =
+                      cast_int<subdomain_id_type>(group_number);
                   }
 
                 else
@@ -562,10 +564,12 @@ void UNVIO::groups_in (std::istream& in_file)
 
       // Associate this group_number with the group_name in the BoundaryInfo object.
       if (is_sideset_group)
-        mesh.boundary_info->sideset_name(group_number) = group_name;
+        mesh.boundary_info->sideset_name
+          (cast_int<boundary_id_type>(group_number)) = group_name;
 
       if (is_subdomain_group)
-        mesh.subdomain_name(group_number) = group_name;
+        mesh.subdomain_name
+          (cast_int<subdomain_id_type>(group_number)) = group_name;
 
     } // end while (true)
 
@@ -585,7 +589,7 @@ void UNVIO::groups_in (std::istream& in_file)
             // information for it.  Note that we have not yet called
             // find_neighbors(), so we can't use elem->neighbor(sn) in
             // this algorithm...
-            for (unsigned int sn=0; sn<elem->n_sides(); sn++)
+            for (unsigned short sn=0; sn<elem->n_sides(); sn++)
               {
                 AutoPtr<Elem> side (elem->build_side(sn));
 

@@ -939,11 +939,11 @@ dof_id_type ParallelMesh::renumber_dof_objects
       for (processor_id_type p=1; p != this->n_processors(); ++p)
         {
           // Trade my requests with processor procup and procdown
-          processor_id_type procup = (this->processor_id() + p) %
-            this->n_processors();
-          processor_id_type procdown = (this->n_processors() +
-                                        this->processor_id() - p) %
-            this->n_processors();
+          processor_id_type procup = cast_int<processor_id_type>
+            ((this->processor_id() + p) % this->n_processors());
+          processor_id_type procdown = cast_int<processor_id_type>
+            ((this->n_processors() + this->processor_id() - p) %
+             this->n_processors());
           std::vector<dof_id_type> request_to_fill;
           this->comm().send_receive(procup, requested_ids[procup],
                                     procdown, request_to_fill);

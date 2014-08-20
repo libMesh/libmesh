@@ -23,7 +23,8 @@
 #include <iomanip>
 
 // C includes
-#include <unistd.h>  // for unlink()
+#include <sys/types.h> // for pid_t
+#include <unistd.h>    // for getpid(), unlink()
 
 // Local includes
 #include "libmesh/boundary_info.h"
@@ -294,7 +295,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       {
         Elem* element = *el;
 
-        for (unsigned int ms=0; ms<element->n_neighbors(); ms++)
+        for (unsigned char ms=0; ms<element->n_neighbors(); ms++)
           {
           next_side:
             // If we haven't yet found a neighbor on this side, try.
@@ -528,7 +529,7 @@ void UnstructuredMesh::read (const std::string& name,
 
       // Find the length of a string which represents the highest processor ID
       full_name << (this->n_processors());
-      unsigned field_width = full_name.str().size();
+      std::size_t field_width = full_name.str().size();
 
       // reset the string stream
       full_name.str("");
@@ -783,7 +784,7 @@ void UnstructuredMesh::write (const std::string& name,
 
       // Nasty hack for reading/writing zipped files
       std::string new_name = name;
-      processor_id_type pid_0 = 0;
+      pid_t pid_0 = 0;
       if (this->processor_id() == 0)
         pid_0 = getpid();
       this->comm().broadcast(pid_0);
@@ -1069,7 +1070,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       new_elem->processor_id() = old_elem->processor_id();
 
       // Maybe add boundary conditions for this element
-      for (unsigned int s=0; s<old_elem->n_sides(); s++)
+      for (unsigned short s=0; s<old_elem->n_sides(); s++)
         // We're supporting boundary ids on internal sides now
         //if (old_elem->neighbor(s) == NULL)
         {

@@ -230,7 +230,7 @@ public:
    * @returns the number of nodes for which this
    * \p MeshData has data stored.
    */
-  unsigned int n_node_data () const;
+  dof_id_type n_node_data () const;
 
   /**
    * Returns the \p MeshData::const_node_data_iterator which points
@@ -308,7 +308,7 @@ public:
    * @returns the number of elements for which this
    * \p MeshData has data stored.
    */
-  unsigned int n_elem_data () const;
+  dof_id_type n_elem_data () const;
 
   /**
    * Returns a \p MeshData::const_elem_data_iterators which points

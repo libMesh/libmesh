@@ -73,13 +73,13 @@ int XdrSOLN::header(XdrSHEAD *hd)
         if (m_type == XdrMGF::DECODE)
           {
             xdr_string(mp_xdr_handle, &tempTitle, hd->m_strSize*m_wrtVar);
-            int olen= std::strlen(tempTitle);
+            std::size_t olen= std::strlen(tempTitle);
             char *top = tempTitle;
             for (int ivar = 0; ivar < m_wrtVar; ++ivar)
               {
                 char *p = strchr(tempTitle,' ');
                 *p = '\0';
-                int tempSize = std::strlen(tempTitle) ;
+                std::size_t tempSize = std::strlen(tempTitle) ;
                 tempTitle+=tempSize+1;
               }
             tempTitle = top;
@@ -92,7 +92,7 @@ int XdrSOLN::header(XdrSHEAD *hd)
             char *top = tempTitle;
             for (int ivar = 0; ivar < m_wrtVar; ++ivar)
               {
-                int tempSize = std::strlen(p) + 1;
+                std::size_t tempSize = std::strlen(p) + 1;
                 std::memcpy(tempTitle,p,tempSize*sizeof(char));
                 tempSize = std::strlen(tempTitle);
                 tempTitle[tempSize] = ' ';

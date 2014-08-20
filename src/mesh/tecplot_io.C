@@ -472,9 +472,9 @@ void TecplotIO::write_binary (const std::string& fname,
       if ((vec != NULL) &&
           (solution_names != NULL))
         {
-          const unsigned int n_vars = solution_names->size();
+          const std::size_t n_vars = solution_names->size();
 
-          for (unsigned int c=0; c<n_vars; c++)
+          for (std::size_t c=0; c<n_vars; c++)
             {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
@@ -608,7 +608,7 @@ void TecplotIO::write_binary (const std::string& fname,
         // Write *all* the data for the first zone, then share it with the others
         if (firstzone)
           {
-            int total =
+            int total = cast_int<int>
 #ifdef LIBMESH_USE_REAL_NUMBERS
               ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #else
@@ -695,13 +695,15 @@ void TecplotIO::write_binary (const std::string& fname,
   // face should be 4, in 3D it's 8.
 
 
-  TecplotMacros tm(the_mesh.n_nodes(),
+  TecplotMacros tm(cast_int<unsigned int>(the_mesh.n_nodes()),
+                   cast_int<unsigned int>
 #ifdef LIBMESH_USE_REAL_NUMBERS
                    (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
 #else
                    (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
 #endif
-                   the_mesh.n_active_sub_elem(),
+                   cast_int<unsigned int>
+                   (the_mesh.n_active_sub_elem()),
                    ((the_mesh.mesh_dimension() == 2) ? 4 : 8)
                    );
 

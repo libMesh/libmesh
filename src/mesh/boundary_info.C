@@ -1603,7 +1603,7 @@ void BoundaryInfo::build_side_list_from_node_list()
           AutoPtr<Elem> side_elem = elem->build_side(side);
 
           // map from nodeset_id to count for that ID
-          std::map<dof_id_type, unsigned> nodesets_node_count;
+          std::map<boundary_id_type, unsigned> nodesets_node_count;
           for (unsigned node_num=0; node_num < side_elem->n_nodes(); ++node_num)
             {
               Node* node = side_elem->get_node(node_num);

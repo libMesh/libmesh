@@ -181,7 +181,8 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   int facet_num = this->_mesh.n_elem();
 
   // allocate memory in "tetgenio" structure:
-  tetgen_wrapper.allocate_facetlist(facet_num, holes.size());
+  tetgen_wrapper.allocate_facetlist
+    (facet_num, cast_int<int>(holes.size()));
 
 
   // Set up tetgen data structures with existing facet information
@@ -215,8 +216,9 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
             if (node_iter == _sequential_to_libmesh_node_map.end())
               libmesh_error_msg("Global node " << libmesh_node_id << " not found in sequential node map!");
 
-            std::vector<unsigned>::difference_type
-              sequential_index = std::distance(_sequential_to_libmesh_node_map.begin(), node_iter);
+            int sequential_index = cast_int<int>
+              (std::distance(_sequential_to_libmesh_node_map.begin(),
+                             node_iter));
 
             // Debugging:
             //    libMesh::out << "libmesh_node_id=" << libmesh_node_id

@@ -303,7 +303,7 @@ void LaplaceMeshSmoother::allgather_graph()
   // where:
   // * NA is the number of graph connections for node A
   // * A_0, A_1, etc. are the IDs connected to node A
-  std::vector<std::size_t> flat_graph;
+  std::vector<dof_id_type> flat_graph;
 
   // Reserve at least enough space for each node to have zero entries
   flat_graph.reserve(_graph.size());
@@ -311,7 +311,7 @@ void LaplaceMeshSmoother::allgather_graph()
   for (std::size_t i=0; i<_graph.size(); ++i)
     {
       // First push back the number of entries for this node
-      flat_graph.push_back (_graph[i].size());
+      flat_graph.push_back (cast_int<dof_id_type>(_graph[i].size()));
 
       // Then push back all the IDs
       for (std::size_t j=0; j<_graph[i].size(); ++j)

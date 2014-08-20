@@ -334,7 +334,8 @@ void UCDIO::write_nodal_data(const std::string& fname,
   libmesh_assert (mesh.mesh_dimension() != 1);
 
   // Write header
-  this->write_header(out_stream,mesh,n_elem,names.size());
+  this->write_header(out_stream,mesh,n_elem,
+                     cast_int<unsigned int>(names.size()));
 
   // Write the node coordinates
   this->write_nodes(out_stream,mesh);
