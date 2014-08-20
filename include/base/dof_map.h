@@ -1077,7 +1077,8 @@ private:
                      const unsigned int v,
                      const std::vector<Node*>& elem_nodes
 #ifdef DEBUG
-                     ,unsigned int & tot_size
+                     ,
+                     std::size_t & tot_size
 #endif
                      ) const;
 
