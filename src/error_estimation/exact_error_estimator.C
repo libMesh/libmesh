@@ -270,7 +270,9 @@ void ExactErrorEstimator::estimate_error (const System& system,
           // used even when a different vector is used for the coarse
           // system
           fine_system.update_global_solution(global_soln);
-          fine_soln->init (global_soln.size(), true, SERIAL);
+          fine_soln->init
+            (cast_int<numeric_index_type>(global_soln.size()), true,
+             SERIAL);
           (*fine_soln) = global_soln;
 
           fine_values = AutoPtr<MeshFunction>
