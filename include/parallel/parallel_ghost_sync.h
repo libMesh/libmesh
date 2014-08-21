@@ -282,7 +282,7 @@ void sync_dofobject_data_by_id(const Communicator& comm,
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         cast_int<processor_id_type>
-        (comm.rank() + p) % comm.size();
+        ((comm.rank() + p) % comm.size());
       const processor_id_type procdown =
         cast_int<processor_id_type>
         ((comm.size() + comm.rank() - p) %
@@ -377,7 +377,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         cast_int<processor_id_type>
-        (comm.rank() + p) % comm.size();
+        ((comm.rank() + p) % comm.size());
       const processor_id_type procdown =
         cast_int<processor_id_type>
         ((comm.size() + comm.rank() - p) %
