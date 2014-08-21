@@ -501,10 +501,10 @@ DofObject::DofObject () :
 #ifdef LIBMESH_ENABLE_AMR
   old_dof_object(NULL),
 #endif
-  _id (invalid_id),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id (invalid_unique_id),
 #endif
+  _id (invalid_id),
   _processor_id (invalid_processor_id)
 {
   this->invalidate();

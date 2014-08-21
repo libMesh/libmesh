@@ -44,10 +44,10 @@ DofObject::DofObject (const DofObject& dof_obj) :
 #ifdef LIBMESH_ENABLE_AMR
   old_dof_object (NULL),
 #endif
-  _id            (dof_obj._id),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id     (dof_obj._unique_id),
 #endif
+  _id            (dof_obj._id),
   _processor_id  (dof_obj._processor_id),
   _idx_buf       (dof_obj._idx_buf)
 {
