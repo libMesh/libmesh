@@ -472,7 +472,7 @@ private:
 
         // We can also impose Dirichlet boundary conditions on edges, so we should
         // also independently check whether the edges have been requested
-        for (unsigned int e=0; e != elem->n_edges(); ++e)
+        for (unsigned short e=0; e != elem->n_edges(); ++e)
           {
             const std::vector<boundary_id_type>& bc_ids =
               boundary_info.edge_boundary_ids (elem, e);
@@ -1021,7 +1021,7 @@ dof_id_type DofMap::n_local_constrained_dofs() const
     upper =
     _dof_constraints.upper_bound(this->end_dof()-1);
 
-  return std::distance(lower, upper);
+  return cast_int<dof_id_type>(std::distance(lower, upper));
 }
 
 
