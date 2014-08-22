@@ -167,9 +167,9 @@ NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
 
   DistributedVector<T> & v_vec = cast_ref<DistributedVector<T>&>(v);
 
-  std::size_t local_size = _values.size();
+  std::size_t val_size = _values.size();
 
-  for(std::size_t i=0; i<local_size; i++)
+  for(std::size_t i=0; i<val_size; i++)
     _values[i] = _values[i] / v_vec._values[i];
 
   return *this;
@@ -203,7 +203,7 @@ void DistributedVector<T>::add_vector (const NumericVector<T>& V,
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<V.size(); i++)
+  for (numeric_index_type i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
 }
 
@@ -316,7 +316,7 @@ void DistributedVector<T>::insert (const NumericVector<T>& V,
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<V.size(); i++)
+  for (numeric_index_type i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
 }
 
@@ -369,7 +369,7 @@ void DistributedVector<T>::abs()
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<local_size(); i++)
+  for (numeric_index_type i=0; i<local_size(); i++)
     this->set(i,std::abs(_values[i]));
 }
 

@@ -582,11 +582,11 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   for (processor_id_type p=1; p != mesh.n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      processor_id_type procup = (mesh.processor_id() + p) %
-        mesh.n_processors();
-      processor_id_type procdown = (mesh.n_processors() +
-                                    mesh.processor_id() - p) %
-        mesh.n_processors();
+      processor_id_type procup = cast_int<processor_id_type>
+        ((mesh.processor_id() + p) % mesh.n_processors());
+      processor_id_type procdown = cast_int<processor_id_type>
+        ((mesh.n_processors() + mesh.processor_id() - p) %
+         mesh.n_processors());
       std::vector<dof_id_type> request_to_fill;
       mesh.comm().send_receive(procup, requested_node_ids[procup],
                                procdown, request_to_fill);
@@ -613,9 +613,13 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
         {
           Node *node = mesh.node_ptr(requested_node_ids[procup][i]);
           libmesh_assert(node);
-          libmesh_assert_less (filled_request[i], mesh.n_partitions()); // this is the correct test --
-          node->processor_id(filled_request[i]);           //  the number of partitions may
-        }                                                  //  not equal the number of processors
+
+          // this is the correct test -- the number of partitions may
+          // not equal the number of processors
+          libmesh_assert_less (filled_request[i], mesh.n_partitions());
+
+          node->processor_id(cast_int<processor_id_type>(filled_request[i]));
+        }
     }
 
 #ifdef DEBUG

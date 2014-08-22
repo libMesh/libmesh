@@ -308,7 +308,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
 
       tot_weight += weight;
 
-      const unsigned int src_idx = *src_idx_it;
+      const std::size_t src_idx = *src_idx_it;
 
       // loop over field variables
       for (unsigned int v=0; v<n_fv; v++)

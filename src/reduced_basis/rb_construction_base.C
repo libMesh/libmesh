@@ -285,7 +285,8 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
     }
 
   // Get the number of local and global training parameters
-  numeric_index_type n_local_training_samples  = new_training_set.begin()->second.size();
+  numeric_index_type n_local_training_samples  =
+    cast_int<numeric_index_type>(new_training_set.begin()->second.size());
   numeric_index_type n_global_training_samples = n_local_training_samples;
   this->comm().sum(n_global_training_samples);
 

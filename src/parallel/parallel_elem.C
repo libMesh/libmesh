@@ -62,14 +62,14 @@ unsigned int packed_size (const Elem*,
 
   // int 0: level
   const unsigned int level =
-    static_cast<unsigned int>(*in);
+    cast_int<unsigned int>(*in);
 
   // int 4: element type
   const int typeint = *(in+4);
   libmesh_assert_greater_equal (typeint, 0);
   libmesh_assert_less (typeint, INVALID_ELEM);
   const ElemType type =
-    static_cast<ElemType>(typeint);
+    cast_int<ElemType>(typeint);
 
   const unsigned int n_nodes =
     Elem::type_to_n_nodes_map[type];
@@ -296,26 +296,26 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 
   // int 0: level
   const unsigned int level =
-    static_cast<unsigned int>(*in++);
+    cast_int<unsigned int>(*in++);
 
 #ifdef LIBMESH_ENABLE_AMR
   // int 1: p level
   const unsigned int p_level =
-    static_cast<unsigned int>(*in++);
+    cast_int<unsigned int>(*in++);
 
   // int 2: refinement flag
   const int rflag = *in++;
   libmesh_assert_greater_equal (rflag, 0);
   libmesh_assert_less (rflag, Elem::INVALID_REFINEMENTSTATE);
   const Elem::RefinementState refinement_flag =
-    static_cast<Elem::RefinementState>(rflag);
+    cast_int<Elem::RefinementState>(rflag);
 
   // int 3: p refinement flag
   const int pflag = *in++;
   libmesh_assert_greater_equal (pflag, 0);
   libmesh_assert_less (pflag, Elem::INVALID_REFINEMENTSTATE);
   const Elem::RefinementState p_refinement_flag =
-    static_cast<Elem::RefinementState>(pflag);
+    cast_int<Elem::RefinementState>(pflag);
 #else
   in += 3;
 #endif // LIBMESH_ENABLE_AMR
@@ -325,42 +325,42 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
   libmesh_assert_greater_equal (typeint, 0);
   libmesh_assert_less (typeint, INVALID_ELEM);
   const ElemType type =
-    static_cast<ElemType>(typeint);
+    cast_int<ElemType>(typeint);
 
   const unsigned int n_nodes =
     Elem::type_to_n_nodes_map[type];
 
   // int 5: processor id
   const processor_id_type processor_id =
-    static_cast<processor_id_type>(*in++);
+    cast_int<processor_id_type>(*in++);
   libmesh_assert (processor_id < mesh->n_processors() ||
                   processor_id == DofObject::invalid_processor_id);
 
   // int 6: subdomain id
   const subdomain_id_type subdomain_id =
-    static_cast<subdomain_id_type>(*in++);
+    cast_int<subdomain_id_type>(*in++);
 
   // int 7: dof object id
   const dof_id_type id =
-    static_cast<dof_id_type>(*in++);
+    cast_int<dof_id_type>(*in++);
   libmesh_assert_not_equal_to (id, DofObject::invalid_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   // int 8: dof object unique id
   const unique_id_type unique_id =
-    static_cast<unique_id_type>(*in++);
+    cast_int<unique_id_type>(*in++);
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
   // int 9: parent dof object id
   const dof_id_type parent_id =
-    static_cast<dof_id_type>(*in++);
+    cast_int<dof_id_type>(*in++);
   libmesh_assert (level == 0 || parent_id != DofObject::invalid_id);
   libmesh_assert (level != 0 || parent_id == DofObject::invalid_id);
 
   // int 10: local child id
   const unsigned int which_child_am_i =
-    static_cast<unsigned int>(*in++);
+    cast_int<unsigned int>(*in++);
 #else
   in += 2;
 #endif // LIBMESH_ENABLE_AMR
@@ -390,7 +390,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       // All our nodes should be correct
       for (unsigned int i=0; i != n_nodes; ++i)
         libmesh_assert(elem->node(i) ==
-                       static_cast<dof_id_type>(*in++));
+                       cast_int<dof_id_type>(*in++));
 #else
       in += n_nodes;
 #endif
@@ -410,7 +410,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
         {
           const dof_id_type neighbor_id =
-            static_cast<dof_id_type>(*in++);
+            cast_int<dof_id_type>(*in++);
 
           // If the sending processor sees a domain boundary here,
           // we'd better agree.
@@ -528,12 +528,12 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       for (unsigned int n=0; n != n_nodes; n++)
         elem->set_node(n) =
           mesh->node_ptr
-          (static_cast<dof_id_type>(*in++));
+          (cast_int<dof_id_type>(*in++));
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
           const dof_id_type neighbor_id =
-            static_cast<dof_id_type>(*in++);
+            cast_int<dof_id_type>(*in++);
 
           if (neighbor_id == DofObject::invalid_id)
             continue;
@@ -575,7 +575,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
   // add any element side or edge boundary condition ids
   if (level == 0)
     {
-      for (unsigned int s = 0; s != elem->n_sides(); ++s)
+      for (unsigned short s = 0; s != elem->n_sides(); ++s)
         {
           const int num_bcs = *in++;
           libmesh_assert_greater_equal (num_bcs, 0);
@@ -584,7 +584,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
             mesh->boundary_info->add_side (elem, s, *in++);
         }
 
-      for (unsigned int e = 0; e != elem->n_edges(); ++e)
+      for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
           const int num_bcs = *in++;
           libmesh_assert_greater_equal (num_bcs, 0);

@@ -2008,14 +2008,14 @@ void RBConstruction::get_all_vectors(std::map<std::string, NumericVector<Number>
 
   for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
   {
-    std::stringstream vector_name;
-    vector_name << "F" << q_f;
-    all_vectors[vector_name.str()] = get_Fq(q_f);
+    std::stringstream F_vector_name;
+    F_vector_name << "F" << q_f;
+    all_vectors[F_vector_name.str()] = get_Fq(q_f);
 
     if(store_non_dirichlet_operators)
     {
-      vector_name << "_non_dirichlet";
-      all_vectors[vector_name.str()] = get_non_dirichlet_Fq(q_f);
+      F_vector_name << "_non_dirichlet";
+      all_vectors[F_vector_name.str()] = get_non_dirichlet_Fq(q_f);
     }
   }
 }

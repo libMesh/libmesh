@@ -59,7 +59,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
   // Construct a bounding box for our source points
   _src_bbox.invalidate();
 
-  const unsigned int n_src_pts = this->_src_pts.size();
+  const std::size_t  n_src_pts = this->_src_pts.size();
   const unsigned int n_vars    = this->n_field_variables();
   libmesh_assert_equal_to (this->_src_vals.size(), n_src_pts*this->n_field_variables());
 
@@ -68,7 +68,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
       &p_min(_src_bbox.min()),
       &p_max(_src_bbox.max());
 
-    for (unsigned int p=0; p<n_src_pts; p++)
+    for (std::size_t p=0; p<n_src_pts; p++)
       {
         const Point &p_src(_src_pts[p]);
 
@@ -106,14 +106,14 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
 
   DynamicMatrix A(n_src_pts, n_src_pts), x(n_src_pts,n_vars), b(n_src_pts,n_vars);
 
-  for (unsigned int i=0; i<n_src_pts; i++)
+  for (std::size_t i=0; i<n_src_pts; i++)
     {
       const Point &x_i (_src_pts[i]);
 
       // Diagonal
       A(i,i) = rbf(0.);
 
-      for (unsigned int j=i+1; j<n_src_pts; j++)
+      for (std::size_t j=i+1; j<n_src_pts; j++)
         {
           const Point &x_j (_src_pts[j]);
 
@@ -135,7 +135,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
   // save  the weights for each variable
   _weights.resize (this->_src_vals.size());
 
-  for (unsigned int i=0; i<n_src_pts; i++)
+  for (std::size_t i=0; i<n_src_pts; i++)
     for (unsigned int var=0; var<n_vars; var++)
       _weights[i*n_vars + var] = x(i,var);
 
@@ -157,7 +157,9 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
   libmesh_experimental();
 
   const unsigned int
-    n_vars    = this->n_field_variables(),
+    n_vars    = this->n_field_variables();
+
+  const std::size_t
     n_src_pts = this->_src_pts.size(),
     n_tgt_pts = tgt_pts.size();
 
@@ -178,11 +180,11 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
 
   tgt_vals.resize (n_tgt_pts*n_vars); /**/ std::fill (tgt_vals.begin(), tgt_vals.end(), Number(0.));
 
-  for (unsigned int tgt=0; tgt<n_tgt_pts; tgt++)
+  for (std::size_t tgt=0; tgt<n_tgt_pts; tgt++)
     {
       const Point &p (tgt_pts[tgt]);
 
-      for (unsigned int i=0; i<n_src_pts; i++)
+      for (std::size_t i=0; i<n_src_pts; i++)
         {
           const Point &x_i(_src_pts[i]);
           const Real
