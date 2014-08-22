@@ -547,6 +547,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -30 + 42*xi + 42*eta;
             case 2:
               return -6 + 18*xi - 6*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 1:
           switch (subtriangle_lookup(p))
@@ -557,6 +561,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 18 - 27*xi - 21*eta;
             case 2:
               return 6 - 15*xi + 3*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 2:
           switch (subtriangle_lookup(p))
@@ -567,6 +575,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 12 - 15*xi - 21*eta;
             case 2:
               return -3*xi + 3*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 3:
           switch (subtriangle_lookup(p))
@@ -577,6 +589,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -9 + 13*xi + 8*eta;
             case 2:
               return -1 - 7*xi + 4*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 4:
           switch (subtriangle_lookup(p))
@@ -587,6 +603,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 1 - 2*xi + 3*eta;
             case 2:
               return -3 + 14*xi - eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 5:
           switch (subtriangle_lookup(p))
@@ -597,6 +617,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -4 + 17./2.*xi + 7./2.*eta;
             case 2:
               return -2 + 13./2.*xi - 1./2.*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 6:
           switch (subtriangle_lookup(p))
@@ -607,6 +631,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 9 - 23./2.*xi - 23./2.*eta;
             case 2:
               return -1 + 5./2.*xi + 9./2.*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 7:
           switch (subtriangle_lookup(p))
@@ -617,6 +645,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 7 - 17./2.*xi - 25./2.*eta;
             case 2:
               return 1 - 13./2.*xi + 7./2.*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 8:
           switch (subtriangle_lookup(p))
@@ -627,6 +659,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -2 + 5./2.*xi + 7./2.*eta;
             case 2:
               return 1./2.*xi - 1./2.*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 9:
           switch (subtriangle_lookup(p))
@@ -637,6 +673,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return std::sqrt(2.) * (8 - 10*xi - 14*eta);
             case 2:
               return std::sqrt(2.) * (-2*xi + 2*eta);
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 10:
           switch (subtriangle_lookup(p))
@@ -647,6 +687,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -4 + 4*xi + 8*eta;
             case 2:
               return -4 + 20*xi - 8*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 11:
           switch (subtriangle_lookup(p))
@@ -657,7 +701,15 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -12 + 16*xi + 12*eta;
             case 2:
               return 4 - 16*xi - 4*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
+
+        default:
+          libmesh_error_msg("Invalid shape function index i = " <<
+                            basis_num);
         }
 
       // second derivative in xi-eta direction
@@ -674,6 +726,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                 + 42*eta;
             case 2:
               return -6*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 1:
           switch (subtriangle_lookup(p))
@@ -684,6 +740,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 15 - 21*xi - 21*eta;
             case 2:
               return 3*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 2:
           switch (subtriangle_lookup(p))
@@ -694,6 +754,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 15 - 21*xi - 21*eta;
             case 2:
               return 3*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 3:
           switch (subtriangle_lookup(p))
@@ -704,6 +768,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -4 + 8*xi + 3*eta;
             case 2:
               return -3 + 4*xi + 4*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 4:
           switch (subtriangle_lookup(p))
@@ -714,6 +782,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return - 4 + 3*xi + 8*eta;
             case 2:
               return -xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 5:
           switch (subtriangle_lookup(p))
@@ -724,6 +796,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -5./2. + 7./2.*xi + 7./2.*eta;
             case 2:
               return - 1./2.*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 6:
           switch (subtriangle_lookup(p))
@@ -734,6 +810,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 19./2. - 23./2.*xi - 25./2.*eta;
             case 2:
               return 9./2.*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 7:
           switch (subtriangle_lookup(p))
@@ -744,6 +824,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 19./2. - 25./2.*xi - 23./2.*eta;
             case 2:
               return -1 + 7./2.*xi + 4*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 8:
           switch (subtriangle_lookup(p))
@@ -754,6 +838,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -5./2. + 7./2.*xi + 7./2.*eta;
             case 2:
               return -1./2.*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 9:
           switch (subtriangle_lookup(p))
@@ -764,6 +852,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return std::sqrt(2.) * (10 - 14*xi - 14*eta);
             case 2:
               return std::sqrt(2.) * (2*xi);
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 10:
           switch (subtriangle_lookup(p))
@@ -774,6 +866,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return - 8 + 8*xi + 12*eta;
             case 2:
               return 4 - 8*xi - 8*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 11:
           switch (subtriangle_lookup(p))
@@ -784,7 +880,15 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -8 + 12*xi + 8*eta;
             case 2:
               return -4*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
+
+        default:
+          libmesh_error_msg("Invalid shape function index i = " <<
+                            basis_num);
         }
 
       // second derivative in eta-eta direction
@@ -800,6 +904,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -30 + 42*xi + 42*eta;
             case 2:
               return -6 + 12*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 1:
           switch (subtriangle_lookup(p))
@@ -810,6 +918,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 12 - 21*xi - 15*eta;
             case 2:
               return 0;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 2:
           switch (subtriangle_lookup(p))
@@ -820,6 +932,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 18 - 21.*xi - 27*eta;
             case 2:
               return 6 - 12*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 3:
           switch (subtriangle_lookup(p))
@@ -830,6 +946,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 1 + 3*xi - 2*eta;
             case 2:
               return 4*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 4:
           switch (subtriangle_lookup(p))
@@ -840,6 +960,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -9 + 8*xi + 13*eta;
             case 2:
               return -4 + 6*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 5:
           switch (subtriangle_lookup(p))
@@ -850,6 +974,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -2 + 7./2.*xi + 5./2.*eta;
             case 2:
               return 0;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 6:
           switch (subtriangle_lookup(p))
@@ -860,6 +988,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 7 - 25./2.*xi - 17./2.*eta;
             case 2:
               return 0;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 7:
           switch (subtriangle_lookup(p))
@@ -870,6 +1002,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return 9 - 23./2.*xi - 23./2.*eta;
             case 2:
               return 4*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 8:
           switch (subtriangle_lookup(p))
@@ -880,6 +1016,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -4 + 7./2.*xi + 17./2.*eta;
             case 2:
               return -2 + 6*eta;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 9:
           switch (subtriangle_lookup(p))
@@ -890,6 +1030,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return std::sqrt(2.) * (8 - 14*xi - 10*eta);
             case 2:
               return 0;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 10:
           switch (subtriangle_lookup(p))
@@ -900,6 +1044,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -12 + 12*xi + 16*eta;
             case 2:
               return -8*xi;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
         case 11:
           switch (subtriangle_lookup(p))
@@ -910,7 +1058,15 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
               return -4 + 8*xi + 4*eta;
             case 2:
               return 0;
+
+            default:
+              libmesh_error_msg("Invalid subtriangle lookup = " <<
+                                subtriangle_lookup(p));
             }
+
+        default:
+          libmesh_error_msg("Invalid shape function index i = " <<
+                            basis_num);
         }
     }
 
