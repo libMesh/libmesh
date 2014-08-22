@@ -476,9 +476,10 @@ unsigned int DofObject::unpackable_indexing_size
 
   const largest_id_type this_indexing_size = *begin++;
 
-  return dof_header_size + this_indexing_size +
-    (has_old_dof_object ?
-     unpackable_indexing_size(begin+this_indexing_size) : 0);
+  return cast_int<unsigned int>
+    (dof_header_size + this_indexing_size +
+     (has_old_dof_object ?
+      unpackable_indexing_size(begin+this_indexing_size) : 0));
 }
 
 

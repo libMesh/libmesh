@@ -145,8 +145,8 @@ int main(int argc, char** argv)
   for (; el != end_el; ++el)
     {
       Elem *elem = *el;
-      unsigned int n_sides = elem->n_sides();
-      for (unsigned int s=0; s != n_sides; ++s)
+      unsigned short n_sides = elem->n_sides();
+      for (unsigned short s=0; s != n_sides; ++s)
         {
           if (elem->neighbor(s))
             continue;

@@ -3677,11 +3677,13 @@ void DofMap::add_adjoint_dirichlet_boundary
 (const DirichletBoundary& dirichlet_boundary,
  unsigned int qoi_index)
 {
-  std::size_t old_size = _adjoint_dirichlet_boundaries.size();
-  for (std::size_t i = old_size; i <= qoi_index; ++i)
+  unsigned int old_size = cast_int<unsigned int>
+    (_adjoint_dirichlet_boundaries.size());
+  for (unsigned int i = old_size; i <= qoi_index; ++i)
     _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
 
-  _adjoint_dirichlet_boundaries[qoi_index]->push_back(new DirichletBoundary(dirichlet_boundary));
+  _adjoint_dirichlet_boundaries[qoi_index]->push_back
+    (new DirichletBoundary(dirichlet_boundary));
 }
 
 
@@ -3705,8 +3707,9 @@ DofMap::get_adjoint_dirichlet_boundaries(unsigned int q) const
 DirichletBoundaries *
 DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
 {
-  std::size_t old_size = _adjoint_dirichlet_boundaries.size();
-  for (std::size_t i = old_size; i <= q; ++i)
+  unsigned int old_size = cast_int<unsigned int>
+    (_adjoint_dirichlet_boundaries.size());
+  for (unsigned int i = old_size; i <= q; ++i)
     _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
 
   return _adjoint_dirichlet_boundaries[q];

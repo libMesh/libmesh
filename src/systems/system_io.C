@@ -2066,7 +2066,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
           // output_vals buffer is now filled for this block.
           // write it to disk
           async_io.reset(new Threads::Thread(threaded_io));
-          written_length += output_vals.size();
+          written_length += cast_int<dof_id_type>(output_vals.size());
         }
 
       // wait on any previous asynchronous IO - this *must* complete before
@@ -2135,8 +2135,10 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
   // Write the output on processor 0.
   if (this->processor_id() == 0)
     {
-      io.data_stream (&vals[0], vals.size());
-      written_length += cast_int<unsigned int>(vals.size());
+      const unsigned int vals_size =
+        cast_int<unsigned int>(vals.size());
+      io.data_stream (&vals[0], vals_size);
+      written_length += vals_size;
     }
 
   return written_length;

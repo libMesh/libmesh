@@ -139,7 +139,7 @@ init (const SubdomainSelection& subdomain_selection)
               for(size_t i=0; i<dof_indices.size(); i++)
                 {
                   const dof_id_type dof = dof_indices[i];
-                  for(unsigned int proc=0; proc<this->n_processors(); proc++)
+                  for(processor_id_type proc=0; proc<this->n_processors(); proc++)
                     {
                       if((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
                         {

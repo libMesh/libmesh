@@ -36,7 +36,8 @@ template <typename T>
 Real StatisticsVector<T>::l2_norm() const
 {
   Real normsq = 0.;
-  for (dof_id_type i = 0; i != this->size(); ++i)
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  for (dof_id_type i = 0; i != n; ++i)
     normsq += ((*this)[i] * (*this)[i]);
 
   return std::sqrt(normsq);
@@ -78,7 +79,7 @@ Real StatisticsVector<T>::mean() const
 {
   START_LOG ("mean()", "StatisticsVector");
 
-  const dof_id_type n = this->size();
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
 
   Real the_mean = 0;
 
@@ -99,7 +100,7 @@ Real StatisticsVector<T>::mean() const
 template <typename T>
 Real StatisticsVector<T>::median()
 {
-  const dof_id_type n   = this->size();
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
 
   if (n == 0)
     return 0.;
@@ -147,7 +148,7 @@ Real StatisticsVector<T>::median() const
 template <typename T>
 Real StatisticsVector<T>::variance(const Real mean_in) const
 {
-  const dof_id_type n   = this->size();
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
 
   START_LOG ("variance()", "StatisticsVector");
 
@@ -172,7 +173,7 @@ Real StatisticsVector<T>::variance(const Real mean_in) const
 template <typename T>
 void StatisticsVector<T>::normalize()
 {
-  const dof_id_type n   = this->size();
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
   const Real max = this->maximum();
 
   for (dof_id_type i=0; i<n; i++)
@@ -192,7 +193,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
   // Must have at least 1 bin
   libmesh_assert (n_bins>0);
 
-  const dof_id_type n   = this->size();
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
 
   std::sort(this->begin(), this->end());
 
@@ -340,7 +341,7 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
 {
   START_LOG ("cut_below()", "StatisticsVector");
 
-  const dof_id_type n   = this->size();
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
 
   std::vector<dof_id_type> cut_indices;
   cut_indices.reserve(n/2);  // Arbitrary
@@ -366,7 +367,7 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
 {
   START_LOG ("cut_above()", "StatisticsVector");
 
-  const dof_id_type n   = this->size();
+  const dof_id_type n = cast_int<dof_id_type>(this->size());
 
   std::vector<dof_id_type> cut_indices;
   cut_indices.reserve(n/2);  // Arbitrary
