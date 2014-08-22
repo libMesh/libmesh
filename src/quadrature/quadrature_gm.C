@@ -97,9 +97,9 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
       // This for loop needs to run for dim, degree, or dim+degree-i iterations,
       // whichever is largest.
       const unsigned int weight_loop_index =
-        std::max(dim, std::max(degree, degree+dim-i));
+        std::max(dim, std::max(degree, degree+dim-i))+1;
 
-      for (unsigned int j=1; j<=weight_loop_index; ++j)
+      for (unsigned int j=1; j<weight_loop_index; ++j)
         {
           if (j <= degree) // Accumulate (d+n-2i)^d term
             weight *= static_cast<Real>(degree+dim-2*i);
