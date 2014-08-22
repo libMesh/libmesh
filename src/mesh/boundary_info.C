@@ -1598,7 +1598,7 @@ void BoundaryInfo::build_side_list_from_node_list()
     {
       const Elem* elem = *el;
 
-      for (unsigned side=0; side<elem->n_sides(); ++side)
+      for (unsigned short side=0; side<elem->n_sides(); ++side)
         {
           AutoPtr<Elem> side_elem = elem->build_side(side);
 

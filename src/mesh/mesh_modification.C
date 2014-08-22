@@ -1460,9 +1460,11 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
       {
 #ifndef NDEBUG
         dof_id_type orig_id = (*it)->id();
-#endif
 
-        Elem* added_elem = mesh.add_elem(*it);
+        // ugly mid-statement endif to avoid unused variable warnings
+        Elem* added_elem =
+#endif
+          mesh.add_elem(*it);
 
 #ifndef NDEBUG
         dof_id_type added_id = added_elem->id();

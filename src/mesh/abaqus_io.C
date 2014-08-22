@@ -44,7 +44,7 @@ struct ElementDefinition
   std::vector<unsigned> abaqus_zero_based_node_id_to_libmesh_node_id;
 
   // Maps (zero-based!) Abaqus side numbers to libmesh side numbers
-  std::vector<unsigned> abaqus_zero_based_side_id_to_libmesh_side_id;
+  std::vector<unsigned short> abaqus_zero_based_side_id_to_libmesh_side_id;
 };
 
 /**
@@ -58,7 +58,7 @@ std::map<ElemType, ElementDefinition> eletypes;
 void add_eletype_entry(ElemType libmesh_elem_type,
                        const unsigned* node_map,
                        unsigned node_map_size,
-                       const unsigned* side_map,
+                       const short* side_map,
                        unsigned side_map_size)
 {
   // If map entry does not exist, this will create it
@@ -68,11 +68,13 @@ void add_eletype_entry(ElemType libmesh_elem_type,
   // Use the "swap trick" from Scott Meyer's "Effective STL" to swap
   // an unnamed temporary vector into the map_entry's vector.  Note:
   // the vector(iter, iter) constructor is used.
-  std::vector<unsigned>(node_map,
-                        node_map+node_map_size).swap(map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
+  std::vector<unsigned>
+    (node_map, node_map+node_map_size).swap
+      (map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
 
-  std::vector<unsigned>(side_map,
-                        side_map+side_map_size).swap(map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
+  std::vector<unsigned short>
+    (side_map, side_map+side_map_size).swap
+      (map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
 }
 
 
@@ -89,78 +91,86 @@ void init_eletypes ()
     {
       {
         // EDGE2
-        const unsigned int node_map[] = {0,1}; // identity
-        const unsigned int side_map[] = {0,1}; // identity
+        const unsigned int   node_map[] = {0,1}; // identity
+        const unsigned short side_map[] = {0,1}; // identity
         add_eletype_entry(EDGE2, node_map, 2, side_map, 2);
       }
 
       {
         // TRI3
-        const unsigned int node_map[] = {0,1,2}; // identity
-        const unsigned int side_map[] = {0,1,2}; // identity
+        const unsigned int   node_map[] = {0,1,2}; // identity
+        const unsigned short side_map[] = {0,1,2}; // identity
         add_eletype_entry(TRI3, node_map, 3, side_map, 3);
       }
 
       {
         // QUAD4
-        const unsigned int node_map[] = {0,1,2,3}; // identity
-        const unsigned int side_map[] = {0,1,2,3}; // identity
+        const unsigned int   node_map[] = {0,1,2,3}; // identity
+        const unsigned short side_map[] = {0,1,2,3}; // identity
         add_eletype_entry(QUAD4, node_map, 4, side_map, 4);
       }
 
       {
         // TET4
-        const unsigned int node_map[] = {0,1,2,3}; // identity
-        const unsigned int side_map[] = {0,1,2,3}; // identity
+        const unsigned int   node_map[] = {0,1,2,3}; // identity
+        const unsigned short side_map[] = {0,1,2,3}; // identity
         add_eletype_entry(TET4, node_map, 4, side_map, 4);
       }
 
       {
         // TET10
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9}; // identity
-        const unsigned int side_map[] = {0,1,2,3};             // identity
+        const unsigned int   node_map[] = {0,1,2,3,4,5,6,7,8,9}; // identity
+        const unsigned short side_map[] = {0,1,2,3};             // identity
         add_eletype_entry(TET10, node_map, 10, side_map, 4);
       }
 
       {
         // HEX8
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7}; // identity
-        const unsigned int side_map[] = {0,5,1,2,3,4};     // inverse = 0,2,3,4,5,1
+        const unsigned int   node_map[] = {0,1,2,3,4,5,6,7}; // identity
+        const unsigned short side_map[] = {0,5,1,2,3,4};     // inverse = 0,2,3,4,5,1
         add_eletype_entry(HEX8, node_map, 8, side_map, 6);
       }
 
       {
         // HEX20
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15}; // map is its own inverse
-        const unsigned int side_map[] = {0,5,1,2,3,4};                                       // inverse = 0,2,3,4,5,1
+        const unsigned int   node_map[] = // map is its own inverse
+          {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,5,1
+          {0,5,1,2,3,4};
         add_eletype_entry(HEX20, node_map, 20, side_map, 6);
       }
 
       {
         // HEX27
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,26,20,25,21,22,23,24}; // inverse = ...,21,23,24,25,26,22,20
-        const unsigned int side_map[] = {0,5,1,2,3,4};                                                            // inverse = 0,2,3,4,5,1
+        const unsigned int   node_map[] = // inverse = ...,21,23,24,25,26,22,20
+          {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,26,20,25,21,22,23,24};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,5,1
+          {0,5,1,2,3,4};
         add_eletype_entry(HEX27, node_map, 27, side_map, 6);
       }
 
       {
         // PRISM6
-        const unsigned int node_map[] = {0,1,2,3,4,5}; // identity
-        const unsigned int side_map[] = {0,4,1,2,3};   // inverse = 0,2,3,4,1
+        const unsigned int   node_map[] = {0,1,2,3,4,5}; // identity
+        const unsigned short side_map[] = {0,4,1,2,3};   // inverse = 0,2,3,4,1
         add_eletype_entry(PRISM6, node_map, 6, side_map, 5);
       }
 
       {
         // PRISM15
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11}; // map is its own inverse
-        const unsigned int side_map[] = {0,4,1,2,3};                          // inverse = 0,2,3,4,1
+        const unsigned int   node_map[] = // map is its own inverse
+          {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,1
+          {0,4,1,2,3};
         add_eletype_entry(PRISM15, node_map, 15, side_map, 5);
       }
 
       {
         // PRISM18
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11,15,16,17}; // map is its own inverse
-        const unsigned int side_map[] = {0,4,1,2,3};                                   // inverse = 0,2,3,4,1
+        const unsigned int   node_map[] = // map is its own inverse
+          {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11,15,16,17};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,1
+          {0,4,1,2,3};
         add_eletype_entry(PRISM18, node_map, 18, side_map, 5);
       }
     } // if (eletypes.empty())
@@ -879,6 +889,7 @@ void AbaqusIO::assign_sideset_ids()
   init_eletypes();
 
   // Iterate over the container of sidesets
+  {
   sideset_container_t::iterator it = _sideset_ids.begin();
   for (unsigned short current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
     {
@@ -924,6 +935,7 @@ void AbaqusIO::assign_sideset_ids()
                                            current_id);
         }
     }
+  }
 
 
   // Some elsets (if they contain lower-dimensional elements) also
@@ -939,7 +951,7 @@ void AbaqusIO::assign_sideset_ids()
 
     // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
     container_t::iterator it = _elemset_ids.begin();
-    for (unsigned elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
+    for (unsigned short elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
       {
         // Grab a reference to the vector of IDs
         std::vector<dof_id_type>& id_vector = it->second;
@@ -1006,7 +1018,7 @@ void AbaqusIO::assign_sideset_ids()
               // information for it.  Note that we have not yet called
               // find_neighbors(), so we can't use elem->neighbor(sn) in
               // this algorithm...
-              for (unsigned int sn=0; sn<elem->n_sides(); sn++)
+              for (unsigned short sn=0; sn<elem->n_sides(); sn++)
                 {
                   AutoPtr<Elem> side (elem->build_side(sn));
 

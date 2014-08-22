@@ -529,7 +529,7 @@ void UnstructuredMesh::read (const std::string& name,
 
       // Find the length of a string which represents the highest processor ID
       full_name << (this->n_processors());
-      std::size_t field_width = full_name.str().size();
+      int field_width = cast_int<int>(full_name.str().size());
 
       // reset the string stream
       full_name.str("");

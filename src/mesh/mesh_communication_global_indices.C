@@ -142,7 +142,7 @@ public:
   // computes the hilbert index for a node
   void operator() (const ConstNodeRange &range) const
   {
-    dof_id_type pos = range.first_idx();
+    std::size_t pos = range.first_idx();
     for (ConstNodeRange::const_iterator it = range.begin(); it!=range.end(); ++it)
       {
         const Node* node = (*it);
@@ -155,7 +155,7 @@ public:
   // computes the hilbert index for an element
   void operator() (const ConstElemRange &range) const
   {
-    dof_id_type pos = range.first_idx();
+    std::size_t pos = range.first_idx();
     for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
       {
         const Elem* elem = (*it);
