@@ -78,7 +78,7 @@ Real FE<1,L2_HIERARCHIC>::shape(const ElemType,
       break;
     default:
       Real denominator = 1.;
-      for (int n=1; n <= i; ++n)
+      for (unsigned int n=1; n <= i; ++n)
         {
           returnval *= xi;
           denominator *= n;

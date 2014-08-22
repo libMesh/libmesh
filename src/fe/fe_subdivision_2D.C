@@ -104,7 +104,7 @@ void FESubdivision::init_subdivision_matrix(DenseMatrix<Real> &A,
   // Last, set the S11 part: first row
   std::vector<Real> weights;
   loop_subdivision_mask(weights, valence);
-  for (int i = 0; i <= valence; ++i)
+  for (unsigned int i = 0; i <= valence; ++i)
     A(0,i) = weights[i];
 
   // second row

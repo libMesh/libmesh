@@ -371,9 +371,9 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
             for (; i >= (o+1)*(o+2)/2; o++) { }
             unsigned int i2 = i - (o*(o+1)/2);
             Real val = i2;
-            for (int index=i2; index != o; index++)
+            for (unsigned int index=i2; index != o; index++)
               val *= dx;
-            for (int index=1; index <= i2; index++)
+            for (unsigned int index=1; index <= i2; index++)
               val *= dy;
             return val/disty;
           }
