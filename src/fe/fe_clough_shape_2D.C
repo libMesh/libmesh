@@ -1068,6 +1068,10 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
           libmesh_error_msg("Invalid shape function index i = " <<
                             basis_num);
         }
+
+    default:
+      libmesh_error_msg("Invalid shape function derivative j = " <<
+                        deriv_type);
     }
 
   libmesh_error_msg("We'll never get here!");
