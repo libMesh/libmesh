@@ -65,7 +65,7 @@ unsigned int packed_size (const Elem*,
     cast_int<unsigned int>(*in);
 
   // int 4: element type
-  const int typeint = *(in+4);
+  const int typeint = cast_int<int>(*(in+4));
   libmesh_assert_greater_equal (typeint, 0);
   libmesh_assert_less (typeint, INVALID_ELEM);
   const ElemType type =
@@ -91,18 +91,18 @@ unsigned int packed_size (const Elem*,
     {
       for (unsigned int s = 0; s != n_sides; ++s)
         {
-          const int n_bcs =
-            *(in + pre_indexing_size + indexing_size +
-              total_packed_bc_data++);
+          const int n_bcs = cast_int<int>
+            (*(in + pre_indexing_size + indexing_size +
+              total_packed_bc_data++));
           libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
 
       for (unsigned int e = 0; e != n_edges; ++e)
         {
-          const int n_bcs =
-            *(in + pre_indexing_size + indexing_size +
-              total_packed_bc_data++);
+          const int n_bcs = cast_int<int>
+            (*(in + pre_indexing_size + indexing_size +
+              total_packed_bc_data++));
           libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }

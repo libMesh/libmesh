@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 
   GetPot cl(argc, argv);
 
-  int dim = -1;
+  unsigned char dim = -1;
   if (!cl.search("--dim"))
     {
       libMesh::err << "No --dim argument found!" << std::endl;
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
   for (; el != end_el; ++el)
     {
       Elem *elem = *el;
-      unsigned short n_sides = elem->n_sides();
+      unsigned int n_sides = elem->n_sides();
       for (unsigned short s=0; s != n_sides; ++s)
         {
           if (elem->neighbor(s))
