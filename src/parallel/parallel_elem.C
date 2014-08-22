@@ -577,22 +577,22 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
     {
       for (unsigned short s = 0; s != elem->n_sides(); ++s)
         {
-          const largest_id_type num_bcs = *in++;
-          libmesh_assert_greater_equal (num_bcs, 0);
+          const boundary_id_type num_bcs =
+            cast_int<boundary_id_type>(*in++);
 
-          for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
             mesh->boundary_info->add_side
-              (elem, s, cast_int<unsigned short>(*in++));
+              (elem, s, cast_int<boundary_id_type>(*in++));
         }
 
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
-          const largest_id_type num_bcs = *in++;
-          libmesh_assert_greater_equal (num_bcs, 0);
+          const boundary_id_type num_bcs =
+            cast_int<boundary_id_type>(*in++);
 
-          for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
             mesh->boundary_info->add_edge
-              (elem, e, cast_int<unsigned short>(*in++));
+              (elem, e, cast_int<boundary_id_type>(*in++));
         }
     }
 
