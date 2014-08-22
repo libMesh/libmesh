@@ -40,7 +40,7 @@ template <typename T>
 void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
                                  const numeric_index_type n_in,
                                  const numeric_index_type libmesh_dbg_var(m_l),
-                                 const numeric_index_type libmesh_Dbg_var(n_l),
+                                 const numeric_index_type libmesh_dbg_var(n_l),
                                  const numeric_index_type nnz,
                                  const numeric_index_type,
                                  const numeric_index_type)
