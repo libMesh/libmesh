@@ -706,7 +706,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
                                        mesh_inserter_iterator<Elem>(mesh));
 
   // Make sure mesh dimension is consistent
-  unsigned int mesh_dimension = mesh.mesh_dimension();
+  unsigned char mesh_dimension = mesh.mesh_dimension();
   mesh.comm().broadcast(mesh_dimension);
   mesh.set_mesh_dimension(mesh_dimension);
 

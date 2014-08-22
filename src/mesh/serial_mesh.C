@@ -118,7 +118,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // SerialMesh class member functions
 SerialMesh::SerialMesh (const Parallel::Communicator &comm_in,
-                        unsigned int d) :
+                        unsigned char d) :
   UnstructuredMesh (comm_in,d)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -132,7 +132,7 @@ SerialMesh::SerialMesh (const Parallel::Communicator &comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
-SerialMesh::SerialMesh (unsigned int d) :
+SerialMesh::SerialMesh (unsigned char d) :
   UnstructuredMesh (d)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID

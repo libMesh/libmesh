@@ -32,7 +32,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (const Parallel::Communicator &comm_in,
-                            unsigned int d) :
+                            unsigned char d) :
   UnstructuredMesh (comm_in,d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -52,7 +52,7 @@ ParallelMesh::ParallelMesh (const Parallel::Communicator &comm_in,
 #ifndef LIBMESH_DISABLE_COMMWORLD
 // ------------------------------------------------------------
 // ParallelMesh class member functions
-ParallelMesh::ParallelMesh (unsigned int d) :
+ParallelMesh::ParallelMesh (unsigned char d) :
   UnstructuredMesh (d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),

@@ -43,7 +43,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // MeshBase class member functions
 MeshBase::MeshBase (const Parallel::Communicator &comm_in,
-                    unsigned int d) :
+                    unsigned char d) :
   ParallelObject (comm_in),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
@@ -129,7 +129,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   if (!this->is_serial())
     {
-      unsigned int dim = this->mesh_dimension();
+      unsigned char dim = this->mesh_dimension();
       this->comm().max(dim);
       this->set_mesh_dimension(dim);
     }

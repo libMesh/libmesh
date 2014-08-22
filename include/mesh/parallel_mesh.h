@@ -57,7 +57,7 @@ public:
    */
   explicit
   ParallelMesh (const Parallel::Communicator &comm_in,
-                unsigned int dim=1);
+                unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -66,7 +66,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  ParallelMesh (unsigned int dim=1);
+  ParallelMesh (unsigned char dim=1);
 #endif
 
 

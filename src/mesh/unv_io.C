@@ -248,7 +248,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
       // Grab reference to the Mesh
       MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
-      unsigned max_dim = this->max_elem_dimension_seen();
+      unsigned char max_dim = this->max_elem_dimension_seen();
 
       MeshBase::const_element_iterator       el     = mesh.elements_begin();
       const MeshBase::const_element_iterator end_el = mesh.elements_end();
@@ -404,12 +404,14 @@ void UNVIO::nodes_in (std::istream& in_file)
 
 
 
-unsigned UNVIO::max_elem_dimension_seen ()
+unsigned char UNVIO::max_elem_dimension_seen ()
 {
-  unsigned max_dim = 0;
+  unsigned char max_dim = 0;
 
+  unsigned char elem_dimensions_size = cast_int<unsigned char>
+    (elems_of_dimension.size());
   // The elems_of_dimension array is 1-based in the UNV reader
-  for (unsigned i=1; i<elems_of_dimension.size(); ++i)
+  for (unsigned char i=1; i<elem_dimensions_size; ++i)
     if (elems_of_dimension[i])
       max_dim = i;
 
@@ -424,7 +426,7 @@ void UNVIO::groups_in (std::istream& in_file)
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   // Record the max and min element dimension seen while reading the file.
-  unsigned max_dim = this->max_elem_dimension_seen();
+  unsigned char max_dim = this->max_elem_dimension_seen();
 
   // map from (node ids) to elem of lower dimensional elements that can provide boundary conditions
   typedef std::map<std::vector<dof_id_type>, Elem*> provide_bcs_t;

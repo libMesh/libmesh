@@ -133,11 +133,11 @@ unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
   if (elem->level() == 0)
     {
       total_packed_bcs += elem->n_sides();
-      for (unsigned int s = 0; s != elem->n_sides(); ++s)
+      for (unsigned short s = 0; s != elem->n_sides(); ++s)
         total_packed_bcs += mesh->boundary_info->n_boundary_ids(elem,s);
 
       total_packed_bcs += elem->n_edges();
-      for (unsigned int e = 0; e != elem->n_edges(); ++e)
+      for (unsigned short e = 0; e != elem->n_edges(); ++e)
         total_packed_bcs += mesh->boundary_info->n_edge_boundary_ids(elem,e);
     }
 
@@ -245,7 +245,7 @@ void pack (const Elem* elem,
   // Add any element side boundary condition ids
   if (elem->level() == 0)
     {
-      for (unsigned int s = 0; s != elem->n_sides(); ++s)
+      for (unsigned short s = 0; s != elem->n_sides(); ++s)
         {
           std::vector<boundary_id_type> bcs =
             mesh->boundary_info->boundary_ids(elem, s);
@@ -256,7 +256,7 @@ void pack (const Elem* elem,
             data.push_back(bcs[bc_it]);
         }
 
-      for (unsigned int e = 0; e != elem->n_edges(); ++e)
+      for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
           std::vector<boundary_id_type> bcs =
             mesh->boundary_info->edge_boundary_ids(elem, e);
@@ -304,14 +304,14 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
     cast_int<unsigned int>(*in++);
 
   // int 2: refinement flag
-  const int rflag = *in++;
+  const int rflag = cast_int<int>(*in++);
   libmesh_assert_greater_equal (rflag, 0);
   libmesh_assert_less (rflag, Elem::INVALID_REFINEMENTSTATE);
   const Elem::RefinementState refinement_flag =
     cast_int<Elem::RefinementState>(rflag);
 
   // int 3: p refinement flag
-  const int pflag = *in++;
+  const int pflag = cast_int<int>(*in++);
   libmesh_assert_greater_equal (pflag, 0);
   libmesh_assert_less (pflag, Elem::INVALID_REFINEMENTSTATE);
   const Elem::RefinementState p_refinement_flag =
@@ -321,7 +321,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 #endif // LIBMESH_ENABLE_AMR
 
   // int 4: element type
-  const int typeint = *in++;
+  const int typeint = cast_int<int>(*in++);
   libmesh_assert_greater_equal (typeint, 0);
   libmesh_assert_less (typeint, INVALID_ELEM);
   const ElemType type =
@@ -577,20 +577,22 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
     {
       for (unsigned short s = 0; s != elem->n_sides(); ++s)
         {
-          const int num_bcs = *in++;
+          const largest_id_type num_bcs = *in++;
           libmesh_assert_greater_equal (num_bcs, 0);
 
-          for(int bc_it=0; bc_it < num_bcs; bc_it++)
-            mesh->boundary_info->add_side (elem, s, *in++);
+          for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+            mesh->boundary_info->add_side
+              (elem, s, cast_int<unsigned short>(*in++));
         }
 
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
-          const int num_bcs = *in++;
+          const largest_id_type num_bcs = *in++;
           libmesh_assert_greater_equal (num_bcs, 0);
 
-          for(int bc_it=0; bc_it < num_bcs; bc_it++)
-            mesh->boundary_info->add_edge (elem, e, *in++);
+          for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+            mesh->boundary_info->add_edge
+              (elem, e, cast_int<unsigned short>(*in++));
         }
     }
 

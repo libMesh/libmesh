@@ -172,9 +172,12 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
 
   /**
    * The boundary mesh elements will be one lower dimension than the
-   * interior mesh elements
+   * interior mesh elements.
+   *
+   * cast_int will scream if the interior is a 0-D mesh
    */
-  boundary_mesh.set_mesh_dimension(_mesh.mesh_dimension() - 1);
+  boundary_mesh.set_mesh_dimension
+    (cast_int<unsigned char>(_mesh.mesh_dimension() - 1));
 
   /**
    * Re-create the boundary mesh.

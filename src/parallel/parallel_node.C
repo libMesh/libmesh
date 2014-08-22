@@ -81,8 +81,8 @@ unsigned int packed_size (const Node*,
   const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
 
-  const int n_bcs =
-    *(in + pre_indexing_size + indexing_size);
+  const int n_bcs = cast_int<int>
+    (*(in + pre_indexing_size + indexing_size));
   libmesh_assert_greater_equal (n_bcs, 0);
 
   return pre_indexing_size + indexing_size + 1 + n_bcs;
@@ -272,7 +272,8 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
   // libmesh_assert_greater_equal (num_bcs, 0);
 
   for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
-    mesh->boundary_info->add_node (node, *in++);
+    mesh->boundary_info->add_node
+      (node, cast_int<boundary_id_type>(*in++));
 
   *out = node;
 

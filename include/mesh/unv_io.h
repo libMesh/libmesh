@@ -152,7 +152,7 @@ private:
    * reading the Mesh.  Only valid after the elements have been read
    * in and the elems_of_dimension array has been populated.
    */
-  unsigned max_elem_dimension_seen ();
+  unsigned char max_elem_dimension_seen ();
 
   //-------------------------------------------------------------
   // local data

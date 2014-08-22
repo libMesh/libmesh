@@ -570,17 +570,19 @@ void GmshIO::read_mesh(std::istream& in)
               std::getline(in, s);
 
               // Record the max and min element dimension seen while reading the file.
-              unsigned
+              unsigned char
                 max_elem_dimension_seen=1,
                 min_elem_dimension_seen=3;
 
-              for (unsigned i=0; i<elem_dimensions_seen.size(); ++i)
+              for (unsigned char i=0; i<elem_dimensions_seen.size(); ++i)
                 if (elem_dimensions_seen[i])
                   {
                     // Debugging
                     // libMesh::out << "Seen elements of dimension " << i+1 << std::endl;
-                    max_elem_dimension_seen = std::max(max_elem_dimension_seen, i+1);
-                    min_elem_dimension_seen = std::min(min_elem_dimension_seen, i+1);
+                    max_elem_dimension_seen =
+                      std::max(max_elem_dimension_seen, cast_int<unsigned char>(i+1));
+                    min_elem_dimension_seen =
+                      std::min(min_elem_dimension_seen, cast_int<unsigned char>(i+1));
                   }
 
               // Debugging:

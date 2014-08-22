@@ -386,7 +386,7 @@ void AbaqusIO::read (const std::string& fname)
   // were only used for setting BCs, and aren't part of the actual
   // Mesh.
   {
-    unsigned max_dim = this->max_elem_dimension_seen();
+    unsigned char max_dim = this->max_elem_dimension_seen();
 
     MeshBase::element_iterator       el     = the_mesh.elements_begin();
     const MeshBase::element_iterator end_el = the_mesh.elements_end();
@@ -792,7 +792,7 @@ void AbaqusIO::assign_subdomain_ids()
   // Loop over each Elemset and assign subdomain IDs to Mesh elements
   {
     // The maximum element dimension seen while reading the Mesh
-    unsigned max_dim = this->max_elem_dimension_seen();
+    unsigned char max_dim = this->max_elem_dimension_seen();
 
     // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
     container_t::iterator it = _elemset_ids.begin();
@@ -942,7 +942,7 @@ void AbaqusIO::assign_sideset_ids()
   // define sidesets.  So loop over them and build a searchable data
   // structure we can use to assign sidesets.
   {
-    unsigned max_dim = this->max_elem_dimension_seen();
+    unsigned char max_dim = this->max_elem_dimension_seen();
 
     // multimap from "vector-of-lower-dimensional-element-node-ids" to subdomain ID which should be applied.
     // We use a multimap because the lower-dimensional elements can belong to more than 1 sideset.
@@ -1091,12 +1091,14 @@ void AbaqusIO::process_and_discard_comments()
 
 
 
-unsigned AbaqusIO::max_elem_dimension_seen ()
+unsigned char AbaqusIO::max_elem_dimension_seen ()
 {
-  unsigned max_dim = 0;
+  unsigned char max_dim = 0;
 
+  unsigned char elem_dimensions_size = cast_int<unsigned char>
+    (elems_of_dimension.size());
   // The elems_of_dimension array is 1-based in the UNV reader
-  for (unsigned i=1; i<elems_of_dimension.size(); ++i)
+  for (unsigned char i=1; i<elem_dimensions_size; ++i)
     if (elems_of_dimension[i])
       max_dim = i;
 
