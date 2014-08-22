@@ -1145,7 +1145,8 @@ unsigned int System::add_variable (const std::string& var,
       // were violated
       if (should_be_in_vg)
         {
-          const unsigned short curr_n_vars = this->n_vars();
+          const unsigned short curr_n_vars = cast_int<unsigned short>
+            (this->n_vars());
 
           vg.append (var);
 
@@ -1191,7 +1192,8 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
           libmesh_error_msg("ERROR: incompatible variable " << vars[ov] << " has already been added for this system!");
         }
 
-  const unsigned short curr_n_vars = this->n_vars();
+  const unsigned short curr_n_vars = cast_int<unsigned short>
+    (this->n_vars());
 
   const unsigned int next_first_component = this->n_components();
 
@@ -1208,7 +1210,8 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
   for (unsigned short v=0; v<vars.size(); v++)
     {
       _variables.push_back (vg(v));
-      _variable_numbers[vars[v]] = curr_n_vars+v;
+      _variable_numbers[vars[v]] = cast_int<unsigned short>
+        (curr_n_vars+v);
     }
 
   libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());

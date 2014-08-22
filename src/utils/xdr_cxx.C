@@ -413,7 +413,7 @@ bool xdr_translate(XDR* x, std::string& s) {
   bool b = xdr_string(x, &sptr, length);
 
   // This is necessary when reading, but inefficient when writing...
-  length = std::strlen(sptr);
+  length = cast_int<unsigned int>(std::strlen(sptr));
   s.resize(length);
   std::copy(sptr, sptr+length, s.begin());
 
