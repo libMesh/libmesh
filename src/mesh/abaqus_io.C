@@ -58,7 +58,7 @@ std::map<ElemType, ElementDefinition> eletypes;
 void add_eletype_entry(ElemType libmesh_elem_type,
                        const unsigned* node_map,
                        unsigned node_map_size,
-                       const short* side_map,
+                       const unsigned short* side_map,
                        unsigned side_map_size)
 {
   // If map entry does not exist, this will create it
