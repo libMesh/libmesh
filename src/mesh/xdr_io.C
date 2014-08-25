@@ -181,10 +181,10 @@ void XdrIO::write (const std::string& name)
   libmesh_assert(n_elem == mesh.n_elem());
   libmesh_assert(n_nodes == mesh.n_nodes());
 
-  std::size_t
-    n_bcs      = mesh.boundary_info->n_boundary_conds();
-  std::size_t
-    n_nodesets = mesh.boundary_info->n_nodeset_conds();
+  header_id_type n_bcs =
+    cast_int<header_id_type>(mesh.boundary_info->n_boundary_conds());
+  header_id_type n_nodesets =
+    cast_int<header_id_type>(mesh.boundary_info->n_nodeset_conds());
   unsigned int
     n_p_levels = MeshTools::n_p_levels (mesh);
 
@@ -1249,8 +1249,9 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
   for (dof_id_type blk=0, first_elem=0, last_elem=0;
        last_elem<n_elem; blk++)
     {
-      first_elem = blk*io_blksize;
-      last_elem  = std::min((blk+1)*io_blksize, std::size_t(n_elem));
+      first_elem = cast_int<dof_id_type>(blk*io_blksize);
+      last_elem  = std::min(cast_int<dof_id_type>((blk+1)*io_blksize),
+                            n_elem);
 
       conn.clear();
 
@@ -1381,7 +1382,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
     }
 
   // Set the mesh dimension to the largest encountered for an element
-  for (unsigned int i=0; i!=4; ++i)
+  for (unsigned char i=0; i!=4; ++i)
     if (elems_of_dimension[i])
       mesh.set_mesh_dimension(i);
 
@@ -1514,7 +1515,7 @@ void XdrIO::read_serialized_bcs (Xdr &io, T)
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
         dof_bc_data.push_back
           (DofBCData(cast_int<dof_id_type>(input_buffer[idx+0]),
-                     input_buffer[idx+1],
+                     cast_int<unsigned short>(input_buffer[idx+1]),
                      cast_int<boundary_id_type>(input_buffer[idx+2])));
       input_buffer.clear();
       // note that while the files *we* write should already be sorted by
