@@ -312,7 +312,7 @@ private:
    * Internal method that returns the local size of \p
    * _restrict_solve_to_is.
    */
-  size_t _restrict_solve_to_is_local_size(void)const;
+  PetscInt _restrict_solve_to_is_local_size(void)const;
 
   /**
    * Creates \p _restrict_solve_to_is_complement to contain all
@@ -358,7 +358,7 @@ PetscLinearSolver<T>::~PetscLinearSolver ()
 
 
 template <typename T>
-inline size_t
+inline PetscInt
 PetscLinearSolver<T>::
 _restrict_solve_to_is_local_size(void)const
 {
@@ -368,7 +368,7 @@ _restrict_solve_to_is_local_size(void)const
   int ierr = ISGetLocalSize(_restrict_solve_to_is,&s);
   LIBMESH_CHKERRABORT(ierr);
 
-  return static_cast<size_t>(s);
+  return s;
 }
 
 
