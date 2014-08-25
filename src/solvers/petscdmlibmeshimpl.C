@@ -41,7 +41,25 @@ struct DM_libMesh
   std::vector<std::set<unsigned int> > *decomposition;
   unsigned int                          embedding_type;
   IS                                    embedding;
+  unsigned int                          vec_count;
 };
+
+struct DMVec_libMesh {
+  std::string label;
+};
+
+#undef  __FUNCT__
+#define __FUNCT__ "DMlibMeshGetVec_Private"
+PetscErrorCode DMlibMeshGetVec_Private(DM dm, const char* name, Vec*)
+{
+  PetscErrorCode ierr;
+
+  PetscFunctionBegin;
+
+  PetscFunctionReturn(0);
+}
+
+
 
 PetscErrorCode DMlibMeshSetUpName_Private(DM dm);
 
