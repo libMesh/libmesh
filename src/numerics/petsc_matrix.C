@@ -259,24 +259,31 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
                                       n_nz, n_oz,
                                       b_n_nz, b_n_oz);
 
-      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, 0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]));
+      ierr = MatSeqBAIJSetPreallocation
+               (_mat, blocksize, 0,
+                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
-                                        0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]),
-                                        0, (PetscInt*)(b_n_oz.empty()?NULL:&b_n_oz[0]));
+      ierr = MatMPIBAIJSetPreallocation
+               (_mat, blocksize, 0,
+                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]), 0,
+                numeric_petsc_cast(b_n_oz.empty()?NULL:&b_n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
   else
 #endif
     {
+
       ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
       LIBMESH_CHKERRABORT(ierr);
-      ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
+      ierr = MatSeqAIJSetPreallocation
+               (_mat, 0,
+                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
-      ierr = MatMPIAIJSetPreallocation(_mat,
-                                       0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
-                                       0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
+      ierr = MatMPIAIJSetPreallocation
+               (_mat, 0,
+                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]), 0,
+                numeric_petsc_cast(n_oz.empty()?NULL:&n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
 
@@ -350,12 +357,15 @@ void PetscMatrix<T>::init ()
                                       n_nz, n_oz,
                                       b_n_nz, b_n_oz);
 
-      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, 0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]));
+      ierr = MatSeqBAIJSetPreallocation
+               (_mat, blocksize, 0,
+                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
-                                        0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]),
-                                        0, (PetscInt*)(b_n_oz.empty()?NULL:&b_n_oz[0]));
+      ierr = MatMPIBAIJSetPreallocation
+               (_mat, blocksize, 0,
+                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]), 0,
+                numeric_petsc_cast(b_n_oz.empty()?NULL:&b_n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
   else
@@ -365,11 +375,14 @@ void PetscMatrix<T>::init ()
       ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
+      ierr = MatSeqAIJSetPreallocation
+               (_mat, 0,
+                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
-      ierr = MatMPIAIJSetPreallocation(_mat,
-                                       0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
-                                       0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
+      ierr = MatMPIAIJSetPreallocation
+               (_mat, 0,
+                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]), 0,
+                numeric_petsc_cast(n_oz.empty()?NULL:&n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
 
@@ -416,7 +429,8 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 
 #if PETSC_RELEASE_LESS_THAN(3,1,1)
   if(!rows.empty())
-    ierr = MatZeroRows(_mat, rows.size(), (PetscInt*)&rows[0], diag_value);
+    ierr = MatZeroRows(_mat, rows.size(),
+                       numeric_petsc_cast(&rows[0]), diag_value);
   else
     ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value);
 #else
@@ -425,9 +439,12 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
   // solutions for the zeroed rows (x) and right hand side (b) to update.
   // Could be useful for setting boundary conditions...
   if(!rows.empty())
-    ierr = MatZeroRows(_mat, rows.size(), (PetscInt*)&rows[0], diag_value, PETSC_NULL, PETSC_NULL);
+    ierr = MatZeroRows(_mat, cast_int<PetscInt>(rows.size()),
+                       numeric_petsc_cast(&rows[0]), diag_value,
+                       PETSC_NULL, PETSC_NULL);
   else
-    ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value, PETSC_NULL, PETSC_NULL);
+    ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value, PETSC_NULL,
+                       PETSC_NULL);
 #endif
 
   LIBMESH_CHKERRABORT(ierr);
@@ -677,9 +694,9 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
   // These casts are required for PETSc <= 2.1.5
   ierr = MatSetValues(_mat,
-                      n_rows, (PetscInt*) &rows[0],
-                      n_cols, (PetscInt*) &cols[0],
-                      (PetscScalar*) &dm.get_values()[0],
+                      n_rows, numeric_petsc_cast(&rows[0]),
+                      n_cols, numeric_petsc_cast(&cols[0]),
+                      const_cast<PetscScalar*>(&dm.get_values()[0]),
                       ADD_VALUES);
   LIBMESH_CHKERRABORT(ierr);
 }
@@ -696,19 +713,24 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T>& dm,
 {
   libmesh_assert (this->initialized());
 
-  const numeric_index_type n_rows    = dm.m();
-  const numeric_index_type n_cols    = dm.n();
-  const numeric_index_type n_brows   = brows.size();
-  const numeric_index_type n_bcols   = bcols.size();
+  const numeric_index_type n_brows =
+    cast_int<numeric_index_type>(brows.size());
+  const numeric_index_type n_bcols =
+    cast_int<numeric_index_type>(bcols.size());
+
+  PetscErrorCode ierr=0;
+
+#ifndef NDEBUG
+  const numeric_index_type n_rows  =
+    cast_int<numeric_index_type>(dm.m());
+  const numeric_index_type n_cols  =
+    cast_int<numeric_index_type>(dm.n());
   const numeric_index_type blocksize = n_rows / n_brows;
 
   libmesh_assert_equal_to (n_cols / n_bcols, blocksize);
   libmesh_assert_equal_to (blocksize*n_brows, n_rows);
   libmesh_assert_equal_to (blocksize*n_bcols, n_cols);
 
-  PetscErrorCode ierr=0;
-
-#ifndef NDEBUG
   PetscInt petsc_blocksize;
   ierr = MatGetBlockSize(_mat, &petsc_blocksize);
   LIBMESH_CHKERRABORT(ierr);
@@ -717,9 +739,9 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T>& dm,
 
   // These casts are required for PETSc <= 2.1.5
   ierr = MatSetValuesBlocked(_mat,
-                             n_brows, (PetscInt*) &brows[0],
-                             n_bcols, (PetscInt*) &bcols[0],
-                             (PetscScalar*) &dm.get_values()[0],
+                             n_brows, numeric_petsc_cast(&brows[0]),
+                             n_bcols, numeric_petsc_cast(&bcols[0]),
+                             const_cast<PetscScalar*>(&dm.get_values()[0]),
                              ADD_VALUES);
   LIBMESH_CHKERRABORT(ierr);
 }
@@ -751,13 +773,13 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 
   ierr = ISCreateLibMesh(this->comm().get(),
                          rows.size(),
-                         (PetscInt*) &rows[0],
+                         numeric_petsc_cast(&rows[0]),
                          PETSC_USE_POINTER,
                          &isrow); LIBMESH_CHKERRABORT(ierr);
 
   ierr = ISCreateLibMesh(this->comm().get(),
                          cols.size(),
-                         (PetscInt*) &cols[0],
+                         numeric_petsc_cast(&cols[0]),
                          PETSC_USE_POINTER,
                          &iscol); LIBMESH_CHKERRABORT(ierr);
 

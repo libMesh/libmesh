@@ -211,7 +211,8 @@ void PetscVector<T>::add_vector (const std::vector<T>& v,
   const PetscInt * i_val = reinterpret_cast<const PetscInt*>(&dof_indices[0]);
   const PetscScalar * petsc_value = static_cast<const PetscScalar*>(&v[0]);
 
-  ierr = VecSetValues (_vec, v.size(), i_val, petsc_value, ADD_VALUES);
+  ierr = VecSetValues (_vec, cast_int<PetscInt>(v.size()), i_val,
+                       petsc_value, ADD_VALUES);
   LIBMESH_CHKERRABORT(ierr);
 
   this->_is_closed = false;
@@ -891,7 +892,8 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   libmesh_assert_less_equal (send_list.size(), v_local->size());
 
   PetscErrorCode ierr=0;
-  const numeric_index_type n_sl = send_list.size();
+  const numeric_index_type n_sl =
+    cast_int<numeric_index_type>(send_list.size());
 
   IS is;
   VecScatter scatter;
@@ -1400,11 +1402,13 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
       // class.  Should we differentiate here between sequential and
       // parallel vector creation based on this->n_processors() ?
       ierr = VecCreateMPI(this->comm().get(),
-                          PETSC_DECIDE,          // n_local
-                          rows.size(),           // n_global
-                          &(petsc_subvector->_vec)); LIBMESH_CHKERRABORT(ierr);
+                          PETSC_DECIDE,                    // n_local
+                          cast_int<PetscInt>(rows.size()), // n_global
+                          &(petsc_subvector->_vec));
+      LIBMESH_CHKERRABORT(ierr);
 
-      ierr = VecSetFromOptions (petsc_subvector->_vec); LIBMESH_CHKERRABORT(ierr);
+      ierr = VecSetFromOptions (petsc_subvector->_vec);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Mark the subvector as initialized
       petsc_subvector->_is_initialized = true;
@@ -1421,15 +1425,17 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
   // Construct index sets
   ierr = ISCreateLibMesh(this->comm().get(),
                          rows.size(),
-                         (PetscInt*) &rows[0],
+                         numeric_petsc_cast(&rows[0]),
                          PETSC_USE_POINTER,
-                         &parent_is); LIBMESH_CHKERRABORT(ierr);
+                         &parent_is);
+  LIBMESH_CHKERRABORT(ierr);
 
   ierr = ISCreateLibMesh(this->comm().get(),
                          rows.size(),
-                         (PetscInt*) &idx[0],
+                         &idx[0],
                          PETSC_USE_POINTER,
-                         &subvector_is); LIBMESH_CHKERRABORT(ierr);
+                         &subvector_is);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Construct the scatter object
   ierr = VecScatterCreate(this->_vec,
