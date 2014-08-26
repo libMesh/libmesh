@@ -185,7 +185,8 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase& mesh, bool ghost
       Node* node = *nd;
       std::vector<const Node*> neighbors;
       MeshTools::find_nodal_neighbors(mesh, *node, nodes_to_elem_map, neighbors);
-      const unsigned int valence = neighbors.size();
+      const unsigned int valence =
+        cast_int<unsigned int>(neighbors.size());
       libmesh_assert_greater(valence, 1);
       node->set_valence(valence);
     }

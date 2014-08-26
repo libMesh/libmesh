@@ -1438,10 +1438,10 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
   // Get the count for each global sideset ID
   for (unsigned i=0; i<global_sideset_ids.size(); ++i)
     {
-      this->num_global_side_counts[i] =
-        std::count(bndry_id_list.begin(),
-                   bndry_id_list.end(),
-                   cast_int<boundary_id_type>(this->global_sideset_ids[i]));
+      this->num_global_side_counts[i] = cast_int<int>
+        (std::count(bndry_id_list.begin(),
+                    bndry_id_list.end(),
+                    cast_int<boundary_id_type>(this->global_sideset_ids[i])));
     }
 
   if (verbose)
@@ -1570,10 +1570,10 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
   // Now we can do the local count for each ID...
   for (unsigned i=0; i<global_nodeset_ids.size(); ++i)
     {
-      this->num_global_node_counts[i] =
-        std::count(boundary_node_boundary_id_list.begin(),
-                   boundary_node_boundary_id_list.end(),
-                   cast_int<boundary_id_type>(this->global_nodeset_ids[i]));
+      this->num_global_node_counts[i] = cast_int<int>
+        (std::count(boundary_node_boundary_id_list.begin(),
+                    boundary_node_boundary_id_list.end(),
+                    cast_int<boundary_id_type>(this->global_nodeset_ids[i])));
     }
 
   // And finally we can sum them up
@@ -1760,7 +1760,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
         this->nodes_attached_to_local_elems.insert( elem->node(n) );
 
-      unsigned int cur_subdomain = elem->subdomain_id();
+      subdomain_id_type cur_subdomain = elem->subdomain_id();
 
       /*
       // We can't have a zero subdomain ID in Exodus (for some reason?)
