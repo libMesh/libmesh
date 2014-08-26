@@ -157,7 +157,8 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   // Initialize the _n_hanging_edges member variable
   MeshTools::find_hanging_nodes_and_parents(_mesh, _hanging_nodes);
-  this->_n_hanging_edges = _hanging_nodes.size();
+  this->_n_hanging_edges =
+    cast_int<dof_id_type>(_hanging_nodes.size());
 
   std::vector<int>
     mask(_n_nodes),
@@ -504,7 +505,7 @@ int VariationalMeshSmoother::readmetr(std::string name,
   std::ifstream infile(name.c_str());
   std::string dummy;
 
-  for (unsigned i=0; i<_n_cells; i++)
+  for (dof_id_type i=0; i<_n_cells; i++)
     for (unsigned j=0; j<_dim; j++)
       {
         for (unsigned k=0; k<_dim; k++)
@@ -588,10 +589,10 @@ int VariationalMeshSmoother::read_adp(std::vector<double>& afun)
   if (_area_of_interest)
     adjust_adapt_data();
 
-  int m = adapt_data.size();
+  std::size_t m = adapt_data.size();
 
-  int j =0 ;
-  for (int i=0; i<m; i++)
+  std::size_t j =0 ;
+  for (std::size_t i=0; i<m; i++)
     if (adapt_data[i] != 0)
       {
         afun[j] = adapt_data[i];
@@ -845,7 +846,7 @@ void VariationalMeshSmoother::adp_renew(const Array2D<double>& R,
   // evaluates given adaptive function on the provided mesh
   if (adp < 0)
     {
-      for (unsigned i=0; i<_n_cells; i++)
+      for (dof_id_type i=0; i<_n_cells; i++)
         {
           double
             x = 0.,
@@ -869,7 +870,7 @@ void VariationalMeshSmoother::adp_renew(const Array2D<double>& R,
 
   else if (adp > 0)
     {
-      for (unsigned i=0; i<_n_nodes; i++)
+      for (dof_id_type i=0; i<_n_nodes; i++)
         {
           double z = 0;
           for (unsigned j=0; j<_dim; j++)
@@ -900,7 +901,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
   // Control the amount of print statements in this funcion
   int msglev = 1;
 
-  int afun_size = 0;
+  dof_id_type afun_size = 0;
 
   // Adaptive function is on cells
   if (adp < 0)
@@ -923,7 +924,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
 
   // Boundary node counting
   int NBN=0;
-  for (unsigned i=0; i<_n_nodes; i++)
+  for (dof_id_type i=0; i<_n_nodes; i++)
     if (mask[i] == 2 || mask[i] == 1)
       NBN++;
 
@@ -933,7 +934,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
         _logfile << "# of Boundary Nodes=" << NBN << std::endl;
 
       NBN=0;
-      for (unsigned i=0; i<_n_nodes; i++)
+      for (dof_id_type i=0; i<_n_nodes; i++)
         if (mask[i] == 2)
           NBN++;
 
@@ -941,7 +942,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
         _logfile << "# of moving Boundary Nodes=" << NBN << std::endl;
     }
 
-  for (unsigned i=0; i<_n_nodes; i++)
+  for (dof_id_type i=0; i<_n_nodes; i++)
     {
       if ((mask[i]==1) || (mask[i]==2))
         maskf[i] = 1;
@@ -1103,7 +1104,7 @@ double VariationalMeshSmoother::maxE(Array2D<double>& R,
     gemax = -1.e32,
     vmin = 1.e32;
 
-  for (unsigned ii=0; ii<_n_cells; ii++)
+  for (dof_id_type ii=0; ii<_n_cells; ii++)
     if (mcells[ii] >= 0)
       {
         // Final value of E will be saved in Gamma at the end of this loop
@@ -1501,7 +1502,7 @@ double VariationalMeshSmoother::minq(const Array2D<double>& R,
   double vmin = 1.e32;
   double gqmin = 1.e32;
 
-  for (unsigned ii=0; ii<_n_cells; ii++)
+  for (dof_id_type ii=0; ii<_n_cells; ii++)
     if (mcells[ii] >= 0)
       {
         if (_dim == 2)
@@ -1939,7 +1940,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
   double Jpr = 0.;
 
   // find minimization direction P
-  for (unsigned i=0; i<_n_cells; i++)
+  for (dof_id_type i=0; i<_n_cells; i++)
     {
       int nvert = 0;
       while (cells[i][nvert] >= 0)
@@ -2032,7 +2033,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 
   // tolerance for HN being the mid-edge node for its parents
   double Tau_hn = pow(vol, 1./static_cast<double>(_dim))*1e-10;
-  for (unsigned i=0; i<_n_hanging_edges; i++)
+  for (dof_id_type i=0; i<_n_hanging_edges; i++)
     {
       int ind_i = hnodes[i];
       int ind_j = edges[2*i];
@@ -2121,11 +2122,11 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
     }
 
   // ||\grad J||_2
-  for (unsigned i=0; i<_dim*_n_nodes; i++)
+  for (dof_id_type i=0; i<_dim*_n_nodes; i++)
     nonzero += b[i]*b[i];
 
   // sort matrix A
-  for (unsigned i=0; i<_dim*_n_nodes; i++)
+  for (dof_id_type i=0; i<_dim*_n_nodes; i++)
     {
       for (int j=columns-1; j>1; j--)
         {
@@ -2150,7 +2151,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
   ia[0] = 0;
   {
     int j = 0;
-    for (unsigned i=0; i<_dim*_n_nodes; i++)
+    for (dof_id_type i=0; i<_dim*_n_nodes; i++)
       {
         u[i] = 0;
         int nz = 0;
@@ -2168,13 +2169,13 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
       }
   }
 
-  int m = _dim*_n_nodes;
+  dof_id_type m = _dim*_n_nodes;
   int sch = (msglev >= 3) ? 1 : 0;
 
   solver(m, ia, ja, a, u, b, eps, 100, sch);
   // sol_pcg_pj(m, ia, ja, a, u, b, eps, 100, sch);
 
-  for (unsigned i=0; i<_n_nodes; i++)
+  for (dof_id_type i=0; i<_n_nodes; i++)
     {
       //ensure fixed nodes are not moved
       for (unsigned index=0; index<_dim; index++)
@@ -2187,7 +2188,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
   // P is determined
   if (msglev >= 4)
     {
-    for (unsigned i=0; i<_n_nodes; i++)
+    for (dof_id_type i=0; i<_n_nodes; i++)
       {
       for (unsigned j=0; j<_dim; j++)
         if (P[i][j] != 0)
@@ -2214,7 +2215,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
 
       // search through finite # of values for tau
       tau = pow(2., j);
-      for (unsigned i=0; i<_n_nodes; i++)
+      for (dof_id_type i=0; i<_n_nodes; i++)
         for (unsigned k=0; k<_dim; k++)
           Rpr[i][k] = R[i][k] + tau*P[i][k];
 
@@ -2222,7 +2223,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
       gVmin = 1e32;
       gemax = -1e32;
       gqmin = 1e32;
-      for (unsigned i=0; i<_n_cells; i++)
+      for (dof_id_type i=0; i<_n_cells; i++)
         {
           if (mcells[i] >= 0)
             {
@@ -2244,7 +2245,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
                 gqmin = lqmin;
 
               // HN correction
-              for (unsigned ii=0; ii<_n_hanging_edges; ii++)
+              for (dof_id_type ii=0; ii<_n_hanging_edges; ii++)
                 {
                   int ind_i = hnodes[ii];
                   int ind_j = edges[2*ii];
@@ -2279,7 +2280,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
       gtmin0 = 1e32;
       gtmax0 = -1e32;
       gqmin0 = 1e32;
-      for (unsigned i=0; i<_n_cells; i++)
+      for (dof_id_type i=0; i<_n_cells; i++)
         {
           if (mcells[i] >= 0)
             {
@@ -2301,7 +2302,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
                 gqmin0 = lqmin;
 
               // HN correction
-              for (unsigned ii=0; ii<_n_hanging_edges; ii++)
+              for (dof_id_type ii=0; ii<_n_hanging_edges; ii++)
                 {
                   int ind_i = hnodes[ii];
                   int ind_j = edges[2*ii];
@@ -2336,7 +2337,7 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
     }
 
   nonzero = 0;
-  for (unsigned j=0; j<_n_nodes; j++)
+  for (dof_id_type j=0; j<_n_nodes; j++)
     for (unsigned k=0; k<_dim; k++)
       {
         R[j][k] = R[j][k] + T*P[j][k];
@@ -2401,7 +2402,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
 
   {
     int I = 0;
-    for (unsigned i=0; i<_n_nodes; i++)
+    for (dof_id_type i=0; i<_n_nodes; i++)
       if (mask[i] == 2)
         {
           Bind[I] = i;
@@ -2423,7 +2424,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         ind = 0;
 
       // boundary connectivity
-      for (unsigned l=0; l<_n_cells; l++)
+      for (dof_id_type l=0; l<_n_cells; l++)
         {
           int nvert = 0;
 
@@ -2703,13 +2704,13 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
       // find H and -grad J
       nonzero = 0.;
       Jpr = 0;
-      for (unsigned i=0; i<2*_n_nodes; i++)
+      for (dof_id_type i=0; i<2*_n_nodes; i++)
         {
           b[i] = 0;
           hm[i] = 0;
         }
 
-      for (unsigned i=0; i<_n_cells; i++)
+      for (dof_id_type i=0; i<_n_cells; i++)
         {
           int nvert = 0;
 
@@ -2753,7 +2754,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         }
 
       // ||grad J||_2
-      for (unsigned i=0; i<2*_n_nodes; i++)
+      for (dof_id_type i=0; i<2*_n_nodes; i++)
         nonzero += b[i]*b[i];
 
       // solve for Plam
@@ -2797,14 +2798,14 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         }
 
       // solve for P
-      for (unsigned i=0; i<_n_nodes; i++)
+      for (dof_id_type i=0; i<_n_nodes; i++)
         {
           P[i][0] = b[i]/hm[i];
           P[i][1] = b[i+_n_nodes]/hm[i+_n_nodes];
         }
 
       // correct solution
-      for (unsigned i=0; i<_n_nodes; i++)
+      for (dof_id_type i=0; i<_n_nodes; i++)
         for (unsigned j=0; j<2; j++)
           if ((std::abs(P[i][j]) < eps) || (mask[i] == 1))
             P[i][j] = 0;
@@ -2812,7 +2813,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
       // P is determined
       if (msglev >= 3)
         {
-          for (unsigned i=0; i<_n_nodes; i++)
+          for (dof_id_type i=0; i<_n_nodes; i++)
             for (unsigned j=0; j<2; j++)
               if (P[i][j] != 0)
                 _logfile << "P[" << i << "][" << j << "]=" << P[i][j] << "  ";
@@ -2829,7 +2830,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         {
           j = j-1;
           tau = pow(2.,j);
-          for (unsigned i=0; i<_n_nodes; i++)
+          for (dof_id_type i=0; i<_n_nodes; i++)
             for (unsigned k=0; k<2; k++)
               Rpr[i][k] = R[i][k] + tau*P[i][k];
 
@@ -2837,7 +2838,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
           gVmin = 1.e32;
           gemax = -1.e32;
           gqmin = 1.e32;
-          for (unsigned i=0; i<_n_cells; i++)
+          for (dof_id_type i=0; i<_n_cells; i++)
             if (mcells[i] >= 0)
               {
                 int nvert = 0;
@@ -2887,7 +2888,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
         {
           Jpr = L;
           qq = J;
-          for (unsigned i=0; i<_n_nodes; i++)
+          for (dof_id_type i=0; i<_n_nodes; i++)
             for (unsigned k=0; k<2; k++)
               Rpr[i][k] = R[i][k] + tau*0.5*P[i][k];
 
@@ -2896,7 +2897,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
           gemax0 = -1.e32;
           gqmin0 = 1.e32;
 
-          for (unsigned i=0; i<_n_cells; i++)
+          for (dof_id_type i=0; i<_n_cells; i++)
             if (mcells[i] >= 0)
               {
                 int nvert = 0;
@@ -2956,7 +2957,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
           qmin = gqmin;
         }
 
-      for (unsigned i=0; i<_n_nodes; i++)
+      for (dof_id_type i=0; i<_n_nodes; i++)
         for (unsigned k=0; k<2; k++)
           R[i][k] += T*P[i][k];
 
@@ -4310,7 +4311,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
   // Use scientific notation with 6 digits
   grid_file << std::scientific << std::setprecision(6);
 
-  for (unsigned i=0; i<_n_nodes; i++)
+  for (dof_id_type i=0; i<_n_nodes; i++)
     {
       // node coordinates
       for (unsigned j=0; j<_dim; j++)
@@ -4319,7 +4320,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
       grid_file << mask[i] << std::endl;
     }
 
-  for (unsigned i=0; i<_n_cells; i++)
+  for (dof_id_type i=0; i<_n_cells; i++)
     if (mcells[i] >= 0)
       {
         // cell connectivity
