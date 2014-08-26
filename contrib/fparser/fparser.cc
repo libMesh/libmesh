@@ -1648,7 +1648,18 @@ inline void FunctionParserBase<Value_t>::AddFunctionOpcode(unsigned opcode)
 {
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 0
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+
 #include "extrasrc/fp_opcode_add.inc"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
 }
@@ -1660,7 +1671,18 @@ inline void FunctionParserBase<long>::AddFunctionOpcode(unsigned opcode)
     typedef long Value_t;
 #define FP_FLOAT_VERSION 0
 #define FP_COMPLEX_VERSION 0
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+
 #include "extrasrc/fp_opcode_add.inc"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
 }
@@ -1673,7 +1695,18 @@ inline void FunctionParserBase<GmpInt>::AddFunctionOpcode(unsigned opcode)
     typedef GmpInt Value_t;
 #define FP_FLOAT_VERSION 0
 #define FP_COMPLEX_VERSION 0
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+
 #include "extrasrc/fp_opcode_add.inc"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
 }
@@ -1686,7 +1719,18 @@ inline void FunctionParserBase<std::complex<double> >::AddFunctionOpcode(unsigne
     typedef std::complex<double> Value_t;
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 1
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+
 #include "extrasrc/fp_opcode_add.inc"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
 }
@@ -1699,7 +1743,18 @@ inline void FunctionParserBase<std::complex<float> >::AddFunctionOpcode(unsigned
     typedef std::complex<float> Value_t;
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 1
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+
 #include "extrasrc/fp_opcode_add.inc"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
 }
@@ -1712,7 +1767,18 @@ inline void FunctionParserBase<std::complex<long double> >::AddFunctionOpcode(un
     typedef std::complex<long double> Value_t;
 #define FP_FLOAT_VERSION 1
 #define FP_COMPLEX_VERSION 1
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc99-extensions"
+#endif
+
 #include "extrasrc/fp_opcode_add.inc"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #undef FP_COMPLEX_VERSION
 #undef FP_FLOAT_VERSION
 }
