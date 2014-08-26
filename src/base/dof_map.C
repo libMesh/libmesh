@@ -1764,6 +1764,11 @@ void DofMap::dof_indices (const Elem* const elem,
   // We now allow elem==NULL to request just SCALAR dofs
   // libmesh_assert(elem);
 
+  // If we are asking for current indices on an element, it ought to
+  // be an active element (or a Side proxy, which also thinks it's
+  // active)
+  libmesh_assert(!elem || elem->active());
+
   // Clear the DOF indices vector
   di.clear();
 
