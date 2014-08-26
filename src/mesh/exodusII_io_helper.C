@@ -1733,7 +1733,7 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
       return;
     }
 
-  int num_records = records.size();
+  int num_records = cast_int<int>(records.size());
 
   if (num_records > 0)
     {
