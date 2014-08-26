@@ -62,7 +62,7 @@ public:
   //float* nodalData;
   //int*   connData;
 
-  void set_n_cells (const unsigned int nc);
+  void set_n_cells (const dof_id_type nc);
 
   const dof_id_type n_nodes;
   const unsigned int n_vars;
