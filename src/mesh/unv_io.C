@@ -559,7 +559,9 @@ void UNVIO::groups_in (std::istream& in_file)
                   }
 
                 else
-                  libmesh_error_msg("ERROR: Found an elem with dim=" << group_elem->dim() << " > " << "max_dim=" << max_dim);
+                  libmesh_error_msg("ERROR: Found an elem with dim="
+                                    << group_elem->dim() << " > " <<
+                                    "max_dim=" << +max_dim);
               }
             else
               libMesh::err << "WARNING: UNV Element " << entity_tag << " not found while parsing groups." << std::endl;

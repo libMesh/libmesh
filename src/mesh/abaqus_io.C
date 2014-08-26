@@ -978,7 +978,7 @@ void AbaqusIO::assign_sideset_ids()
             // one dimension lower than the max element
             // dimension.  Not sure if "edge" BCs in 3D
             // actually make sense/are required...
-            if (elem->dim() != max_dim-1)
+            if (elem->dim()+1 != max_dim)
               libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem->dim());
 
             // To be pushed into the provide_bcs data container

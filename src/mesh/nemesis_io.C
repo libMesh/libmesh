@@ -266,9 +266,9 @@ void Nemesis_IO::read (const std::string& base_filename)
   // we own all the nodes on this processor.  We will then interrogate the
   // node cmaps and see if a lower-rank processor is associated with any of
   // our nodes.  If so, then that processor owns the node, not us...
-  std::vector<unsigned short int> node_ownership (nemhelper->num_internal_nodes +
-                                                  nemhelper->num_border_nodes,
-                                                  this->processor_id());
+  std::vector<processor_id_type> node_ownership (nemhelper->num_internal_nodes +
+                                                 nemhelper->num_border_nodes,
+                                                 this->processor_id());
 
   // a map from processor id to cmap number, to be used later
   std::map<unsigned int, unsigned int> pid_to_cmap_map;
@@ -285,7 +285,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
       // In all the samples I have seen, node_cmap_ids[cmap] is the processor
       // rank of the remote processor...
-      const unsigned short int adjcnt_pid_idx = nemhelper->node_cmap_ids[cmap];
+      const int adjcnt_pid_idx = nemhelper->node_cmap_ids[cmap];
 
       libmesh_assert_less (adjcnt_pid_idx, this->n_processors());
       libmesh_assert_not_equal_to (adjcnt_pid_idx, this->processor_id());
@@ -309,7 +309,8 @@ void Nemesis_IO::read (const std::string& base_filename)
           // if the adjacent processor is lower rank than the current
           // owner for this node, then it will get the node...
           node_ownership[local_node_idx] =
-            std::min(node_ownership[local_node_idx], adjcnt_pid_idx);
+            std::min(node_ownership[local_node_idx],
+                     cast_int<processor_id_type>(adjcnt_pid_idx));
         }
     } // We now should have established proper node ownership.
 
@@ -635,8 +636,8 @@ void Nemesis_IO::read (const std::string& base_filename)
                     mesh.add_point (Point(nemhelper->x[local_node_idx],
                                           nemhelper->y[local_node_idx],
                                           nemhelper->z[local_node_idx]),
-                                    global_node_idx,
-                                    source_pid_idx);
+                                    cast_int<dof_id_type>(global_node_idx),
+                                    cast_int<processor_id_type>(source_pid_idx));
 
                   // Make sure the node we added has the ID we thought it would
                   if (added_node->id() != global_node_idx)
@@ -801,7 +802,8 @@ void Nemesis_IO::read (const std::string& base_filename)
       if (!nemhelper->num_elem_this_blk) continue;
 
       // Set subdomain ID based on the block ID.
-      int subdomain_id = nemhelper->block_ids[i];
+      subdomain_id_type subdomain_id =
+        cast_int<subdomain_id_type>(nemhelper->block_ids[i]);
 
       // Create a type string (this uses the null-terminated string ctor).
       const std::string type_str ( &(nemhelper->elem_type[0]) );
@@ -874,8 +876,8 @@ void Nemesis_IO::read (const std::string& base_filename)
     }
 
   // Get the max dimension seen on the current processor
-  unsigned int max_dim_seen = 0;
-  for (unsigned int i=1; i<elems_of_dimension.size(); ++i)
+  unsigned char max_dim_seen = 0;
+  for (unsigned char i=1; i<elems_of_dimension.size(); ++i)
     if (elems_of_dimension[i])
       max_dim_seen = i;
 
@@ -888,7 +890,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     {
       // Print the max element dimension from all processors
       libMesh::out << "[" << this->processor_id() << "] "
-                   << "max_dim_seen=" << max_dim_seen << std::endl;
+                   << "max_dim_seen=" << +max_dim_seen << std::endl;
     }
 
   // Set the mesh dimension to the largest encountered for an element
@@ -1024,9 +1026,11 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Finally, we are ready to add the element and its side to the BoundaryInfo object.
       // Call the version of add_side which takes a pointer, since we have already gone to
       // the trouble of getting said pointer...
-      mesh.boundary_info->add_side (elem,
-                                    conv.get_side_map(nemhelper->side_list[e]-1/*Exodus numbering is 1-based*/),
-                                    nemhelper->id_list[e]);
+      mesh.boundary_info->add_side 
+        (elem,
+         cast_int<unsigned short>
+           (conv.get_side_map(nemhelper->side_list[e]-1/*Exodus numbering is 1-based*/)),
+         cast_int<boundary_id_type>(nemhelper->id_list[e]));
     }
 
   // Debugging: make sure there are as many boundary conditions in the
@@ -1101,7 +1105,9 @@ void Nemesis_IO::read (const std::string& base_filename)
             }
 
           // Add the node to the BoundaryInfo object with the proper nodeset_id
-          mesh.boundary_info->add_node(global_node_id, nodeset_id);
+          mesh.boundary_info->add_node
+            (cast_int<dof_id_type>(global_node_id),
+             cast_int<boundary_id_type>(nodeset_id));
         }
     }
 
