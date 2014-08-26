@@ -48,7 +48,6 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   std::vector<unsigned char> max_level_at_node (_mesh.n_nodes(), 0);
   std::vector<unsigned char> max_p_level_at_node (_mesh.n_nodes(), 0);
 
-
   // Loop over all the active elements & fill the vector
   {
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
@@ -81,7 +80,9 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
 
   // Now loop over the active elements and flag the elements
-  // who violate the requested level mismatch
+  // who violate the requested level mismatch. Alternatively, if
+  // _enforce_mismatch_limit_prior_to_refinement is true, swap refinement flags
+  // accordingly.
   {
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
@@ -93,8 +94,11 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
         const unsigned int elem_p_level = elem->p_level();
 
         // Skip the element if it is already fully flagged
+        // unless we are enforcing mismatch prior to refienemnt and may need to
+        // remove the refinement flag(s)
         if (elem->refinement_flag() == Elem::REFINE &&
-            elem->p_refinement_flag() == Elem::REFINE)
+            elem->p_refinement_flag() == Elem::REFINE
+            && !_enforce_mismatch_limit_prior_to_refinement)
           continue;
 
         // Loop over the nodes, check for possible mismatch
@@ -116,6 +120,42 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
                 elem->set_p_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
+
+            // if we are enforcing the limit prior to refinement then we
+            // need to remove flags from any elements marked for refinement that
+            // would cause a mismatch
+            if(_enforce_mismatch_limit_prior_to_refinement
+                && elem->refinement_flag() == Elem::REFINE )
+              {
+                // get all the POINT neighbors since we may have to refine
+                // elements off the corner as well
+                std::set< const Elem* > n_set ;
+                elem->find_point_neighbors(n_set);
+                std::set< const Elem* >::iterator n_it = n_set.begin();
+                std::set< const Elem* >::iterator n_end = n_set.end();
+
+                // Loop over the neighbors of element e
+                for (; n_it != n_end; ++n_it)
+                  {
+                    Elem* n = const_cast<Elem*>(*n_it) ;
+
+                    // get neighbors current level
+                    unsigned int n_level = n->level();
+                    unsigned int n_p_level = n->p_level();
+
+                    if ( (elem_level + 1 - max_mismatch ) > n_level )
+                      {
+                        elem->set_refinement_flag( Elem::DO_NOTHING );
+                        flags_changed = true;
+                      }
+
+                    if ( (elem_p_level + 1 - max_mismatch ) > n_p_level )
+                      {
+                        elem->set_p_refinement_flag( Elem::DO_NOTHING );
+                        flags_changed = true;
+                      }
+                  } // loop over neighbors
+              } // if _enforce_mismatch_limit_prior_to_refinement
           }
       }
   }
@@ -225,7 +265,8 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
         // Skip the element if it is already fully flagged
         if (elem->refinement_flag() == Elem::REFINE &&
-            elem->p_refinement_flag() == Elem::REFINE)
+            elem->p_refinement_flag() == Elem::REFINE
+            && !_enforce_mismatch_limit_prior_to_refinement)
           continue;
 
         // Loop over the nodes, check for possible mismatch
@@ -248,14 +289,47 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
+
             if ( (elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
                  && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
-          }
-      }
+
+            // if we are enforcing the limit prior to refinement then we
+            // need to remove flags from any elements marked for refinement that
+            // would cause a mismatch
+            if( _enforce_mismatch_limit_prior_to_refinement
+                && (elem->refinement_flag() == Elem::REFINE) )
+              {
+                // get all the POINT neighbors since we may have to refine
+                // elements off the corner as well
+                std::set< const Elem* > n_set ;
+                elem->find_edge_neighbors(n_set);
+                std::set< const Elem* >::iterator n_it = n_set.begin();
+                std::set< const Elem* >::iterator n_end = n_set.end();
+
+                // Loop over the neighbors of element e
+                for (; n_it != n_end; ++n_it)
+                  {
+                    Elem* n = const_cast<Elem*>(*n_it) ;
+
+                    if ( (elem_level + 1 - max_mismatch ) > n->level() )
+                      {
+                        elem->set_refinement_flag( Elem::DO_NOTHING );
+                        flags_changed = true;
+                      }
+                    if ( (elem_p_level + 1 - max_mismatch ) > n->p_level() )
+                      {
+                        elem->set_p_refinement_flag( Elem::DO_NOTHING );
+                        flags_changed = true;
+                      }
+
+                  } // loop over edge neighbors
+              } // if _enforce_mismatch_limit_prior_to_refinement
+          } // loop over edges
+      } // loop over active elements
   }
 
   // If flags changed on any processor then they changed globally
