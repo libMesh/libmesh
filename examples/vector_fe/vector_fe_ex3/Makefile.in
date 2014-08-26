@@ -1251,7 +1251,7 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f vector_fe_ex3.in && $(LN_S) $(srcdir)/vector_fe_ex3.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f vector_fe_ex3.in && $(LN_S) -f $(srcdir)/vector_fe_ex3.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

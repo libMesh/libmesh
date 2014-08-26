@@ -1149,7 +1149,7 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f adaptivity_ex4.in && $(LN_S) $(srcdir)/adaptivity_ex4.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f adaptivity_ex4.in && $(LN_S) -f $(srcdir)/adaptivity_ex4.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

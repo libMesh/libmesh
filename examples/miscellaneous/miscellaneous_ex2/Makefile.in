@@ -1150,8 +1150,8 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshape.unv && $(LN_S) $(srcdir)/lshape.unv .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshape_data.unv && $(LN_S) $(srcdir)/lshape_data.unv .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshape.unv && $(LN_S) -f $(srcdir)/lshape.unv .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshape_data.unv && $(LN_S) -f $(srcdir)/lshape_data.unv .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

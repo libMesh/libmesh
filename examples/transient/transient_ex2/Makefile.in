@@ -1142,7 +1142,7 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f pipe-mesh.unv && $(LN_S) $(srcdir)/pipe-mesh.unv .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f pipe-mesh.unv && $(LN_S) -f $(srcdir)/pipe-mesh.unv .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

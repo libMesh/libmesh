@@ -1149,9 +1149,9 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshaped.xda       && $(LN_S) $(srcdir)/lshaped.xda .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshaped3D.xda     && $(LN_S) $(srcdir)/lshaped3D.xda .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f adaptivity_ex3.in && $(LN_S) $(srcdir)/adaptivity_ex3.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshaped.xda       && $(LN_S) -f $(srcdir)/lshaped.xda .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshaped3D.xda     && $(LN_S) -f $(srcdir)/lshaped3D.xda .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f adaptivity_ex3.in && $(LN_S) -f $(srcdir)/adaptivity_ex3.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

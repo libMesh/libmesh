@@ -14,10 +14,10 @@ DISTCLEANFILES = $(BUILT_SOURCES)
 if LIBMESH_ENABLE_FPARSER
 
 fparser.hh: $(top_srcdir)/contrib/fparser/fparser.hh
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fparser_ad.hh: $(top_srcdir)/contrib/fparser/fparser_ad.hh
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += fparser.hh fparser_ad.hh
   DISTCLEANFILES += fparser.hh fparser_ad.hh
@@ -27,7 +27,7 @@ endif
 if LIBMESH_ENABLE_NANOFLANN
 
 nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += nanoflann.hpp
   DISTCLEANFILES += nanoflann.hpp
@@ -37,13 +37,13 @@ endif
 if LIBMESH_ENABLE_EXODUS_V509
 
 exodusII.h: $(top_srcdir)/contrib/exodusii/v5.09/include/exodusII.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += exodusII.h
   DISTCLEANFILES += exodusII.h
 
 exodusII_ext.h: $(top_srcdir)/contrib/exodusii/v5.09/include/exodusII_ext.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += exodusII_ext.h
   DISTCLEANFILES += exodusII_ext.h
@@ -53,7 +53,7 @@ endif
 if LIBMESH_ENABLE_EXODUS_V522
 
 exodusII.h: $(top_srcdir)/contrib/exodusii/v5.22/exodus/cbind/include/exodusII.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += exodusII.h
   DISTCLEANFILES += exodusII.h
@@ -63,7 +63,7 @@ endif
 if LIBMESH_ENABLE_NETCDF_V3
 
 netcdf.h: $(top_srcdir)/contrib/netcdf/v3/netcdf.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += netcdf.h
   DISTCLEANFILES += netcdf.h
@@ -73,7 +73,7 @@ endif
 if LIBMESH_ENABLE_NETCDF_V4
 
 netcdf.h: $(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += netcdf.h
   DISTCLEANFILES += netcdf.h
@@ -83,7 +83,7 @@ endif
 #
 # libmesh_config.h rule
 libmesh_config.h: $(top_builddir)/include/libmesh_config.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
   BUILT_SOURCES  += libmesh_config.h
   DISTCLEANFILES += libmesh_config.h
@@ -91,1166 +91,1166 @@ libmesh_config.h: $(top_builddir)/include/libmesh_config.h
 #
 # libMesh header rules
 auto_ptr.h: $(top_srcdir)/include/base/auto_ptr.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_map.h: $(top_srcdir)/include/base/dof_map.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_object.h: $(top_srcdir)/include/base/dof_object.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 factory.h: $(top_srcdir)/include/base/factory.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 getpot.h: $(top_srcdir)/include/base/getpot.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 id_types.h: $(top_srcdir)/include/base/id_types.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh.h: $(top_srcdir)/include/base/libmesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_C_isnan.h: $(top_srcdir)/include/base/libmesh_C_isnan.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_augment_std_namespace.h: $(top_srcdir)/include/base/libmesh_augment_std_namespace.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_base.h: $(top_srcdir)/include/base/libmesh_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_common.h: $(top_srcdir)/include/base/libmesh_common.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_documentation.h: $(top_srcdir)/include/base/libmesh_documentation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_exceptions.h: $(top_srcdir)/include/base/libmesh_exceptions.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_logging.h: $(top_srcdir)/include/base/libmesh_logging.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_singleton.h: $(top_srcdir)/include/base/libmesh_singleton.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_version.h: $(top_srcdir)/include/base/libmesh_version.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 multi_predicates.h: $(top_srcdir)/include/base/multi_predicates.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 periodic_boundaries.h: $(top_srcdir)/include/base/periodic_boundaries.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 periodic_boundary.h: $(top_srcdir)/include/base/periodic_boundary.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 periodic_boundary_base.h: $(top_srcdir)/include/base/periodic_boundary_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counter.h: $(top_srcdir)/include/base/reference_counter.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 single_predicates.h: $(top_srcdir)/include/base/single_predicates.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sparsity_pattern.h: $(top_srcdir)/include/base/sparsity_pattern.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 variable.h: $(top_srcdir)/include/base/variable.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 variant_filter_iterator.h: $(top_srcdir)/include/base/variant_filter_iterator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_convergence_flags.h: $(top_srcdir)/include/enums/enum_convergence_flags.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_eigen_solver_type.h: $(top_srcdir)/include/enums/enum_eigen_solver_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_elem_quality.h: $(top_srcdir)/include/enums/enum_elem_quality.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_elem_type.h: $(top_srcdir)/include/enums/enum_elem_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_fe_family.h: $(top_srcdir)/include/enums/enum_fe_family.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_inf_map_type.h: $(top_srcdir)/include/enums/enum_inf_map_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_io_package.h: $(top_srcdir)/include/enums/enum_io_package.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_norm_type.h: $(top_srcdir)/include/enums/enum_norm_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_order.h: $(top_srcdir)/include/enums/enum_order.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_parallel_type.h: $(top_srcdir)/include/enums/enum_parallel_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_point_locator_type.h: $(top_srcdir)/include/enums/enum_point_locator_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_preconditioner_type.h: $(top_srcdir)/include/enums/enum_preconditioner_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_quadrature_type.h: $(top_srcdir)/include/enums/enum_quadrature_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_solver_package.h: $(top_srcdir)/include/enums/enum_solver_package.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_solver_type.h: $(top_srcdir)/include/enums/enum_solver_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_subset_solve_mode.h: $(top_srcdir)/include/enums/enum_subset_solve_mode.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_xdr_mode.h: $(top_srcdir)/include/enums/enum_xdr_mode.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 adjoint_refinement_estimator.h: $(top_srcdir)/include/error_estimation/adjoint_refinement_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 adjoint_residual_error_estimator.h: $(top_srcdir)/include/error_estimation/adjoint_residual_error_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 discontinuity_measure.h: $(top_srcdir)/include/error_estimation/discontinuity_measure.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 error_estimator.h: $(top_srcdir)/include/error_estimation/error_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exact_error_estimator.h: $(top_srcdir)/include/error_estimation/exact_error_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exact_solution.h: $(top_srcdir)/include/error_estimation/exact_solution.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fourth_error_estimators.h: $(top_srcdir)/include/error_estimation/fourth_error_estimators.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hp_coarsentest.h: $(top_srcdir)/include/error_estimation/hp_coarsentest.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hp_selector.h: $(top_srcdir)/include/error_estimation/hp_selector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hp_singular.h: $(top_srcdir)/include/error_estimation/hp_singular.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 jump_error_estimator.h: $(top_srcdir)/include/error_estimation/jump_error_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 kelly_error_estimator.h: $(top_srcdir)/include/error_estimation/kelly_error_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 patch_recovery_error_estimator.h: $(top_srcdir)/include/error_estimation/patch_recovery_error_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 uniform_refinement_estimator.h: $(top_srcdir)/include/error_estimation/uniform_refinement_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 weighted_patch_recovery_error_estimator.h: $(top_srcdir)/include/error_estimation/weighted_patch_recovery_error_estimator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe.h: $(top_srcdir)/include/fe/fe.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_abstract.h: $(top_srcdir)/include/fe/fe_abstract.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_base.h: $(top_srcdir)/include/fe/fe_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_compute_data.h: $(top_srcdir)/include/fe/fe_compute_data.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_interface.h: $(top_srcdir)/include/fe/fe_interface.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_macro.h: $(top_srcdir)/include/fe/fe_macro.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_map.h: $(top_srcdir)/include/fe/fe_map.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_transformation_base.h: $(top_srcdir)/include/fe/fe_transformation_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_type.h: $(top_srcdir)/include/fe/fe_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_xyz_map.h: $(top_srcdir)/include/fe/fe_xyz_map.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 h1_fe_transformation.h: $(top_srcdir)/include/fe/h1_fe_transformation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hcurl_fe_transformation.h: $(top_srcdir)/include/fe/hcurl_fe_transformation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe.h: $(top_srcdir)/include/fe/inf_fe.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe_instantiate_1D.h: $(top_srcdir)/include/fe/inf_fe_instantiate_1D.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe_instantiate_2D.h: $(top_srcdir)/include/fe/inf_fe_instantiate_2D.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe_instantiate_3D.h: $(top_srcdir)/include/fe/inf_fe_instantiate_3D.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe_macro.h: $(top_srcdir)/include/fe/inf_fe_macro.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell.h: $(top_srcdir)/include/geom/cell.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_hex.h: $(top_srcdir)/include/geom/cell_hex.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_hex20.h: $(top_srcdir)/include/geom/cell_hex20.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_hex27.h: $(top_srcdir)/include/geom/cell_hex27.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_hex8.h: $(top_srcdir)/include/geom/cell_hex8.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf.h: $(top_srcdir)/include/geom/cell_inf.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_hex.h: $(top_srcdir)/include/geom/cell_inf_hex.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_hex16.h: $(top_srcdir)/include/geom/cell_inf_hex16.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_hex18.h: $(top_srcdir)/include/geom/cell_inf_hex18.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_hex8.h: $(top_srcdir)/include/geom/cell_inf_hex8.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_prism.h: $(top_srcdir)/include/geom/cell_inf_prism.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_prism12.h: $(top_srcdir)/include/geom/cell_inf_prism12.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_prism6.h: $(top_srcdir)/include/geom/cell_inf_prism6.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism.h: $(top_srcdir)/include/geom/cell_prism.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism15.h: $(top_srcdir)/include/geom/cell_prism15.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism18.h: $(top_srcdir)/include/geom/cell_prism18.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism6.h: $(top_srcdir)/include/geom/cell_prism6.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid.h: $(top_srcdir)/include/geom/cell_pyramid.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid13.h: $(top_srcdir)/include/geom/cell_pyramid13.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid14.h: $(top_srcdir)/include/geom/cell_pyramid14.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_pyramid5.h: $(top_srcdir)/include/geom/cell_pyramid5.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_tet.h: $(top_srcdir)/include/geom/cell_tet.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_tet10.h: $(top_srcdir)/include/geom/cell_tet10.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_tet4.h: $(top_srcdir)/include/geom/cell_tet4.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 edge.h: $(top_srcdir)/include/geom/edge.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 edge_edge2.h: $(top_srcdir)/include/geom/edge_edge2.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 edge_edge3.h: $(top_srcdir)/include/geom/edge_edge3.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 edge_edge4.h: $(top_srcdir)/include/geom/edge_edge4.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 edge_inf_edge2.h: $(top_srcdir)/include/geom/edge_inf_edge2.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem.h: $(top_srcdir)/include/geom/elem.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_quality.h: $(top_srcdir)/include/geom/elem_quality.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_range.h: $(top_srcdir)/include/geom/elem_range.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_type.h: $(top_srcdir)/include/geom/elem_type.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face.h: $(top_srcdir)/include/geom/face.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_inf_quad.h: $(top_srcdir)/include/geom/face_inf_quad.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_inf_quad4.h: $(top_srcdir)/include/geom/face_inf_quad4.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_inf_quad6.h: $(top_srcdir)/include/geom/face_inf_quad6.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad.h: $(top_srcdir)/include/geom/face_quad.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad4.h: $(top_srcdir)/include/geom/face_quad4.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad8.h: $(top_srcdir)/include/geom/face_quad8.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad9.h: $(top_srcdir)/include/geom/face_quad9.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri.h: $(top_srcdir)/include/geom/face_tri.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3.h: $(top_srcdir)/include/geom/face_tri3.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri3_subdivision.h: $(top_srcdir)/include/geom/face_tri3_subdivision.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_tri6.h: $(top_srcdir)/include/geom/face_tri6.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 node.h: $(top_srcdir)/include/geom/node.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 node_elem.h: $(top_srcdir)/include/geom/node_elem.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 node_range.h: $(top_srcdir)/include/geom/node_range.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 plane.h: $(top_srcdir)/include/geom/plane.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point.h: $(top_srcdir)/include/geom/point.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_elem.h: $(top_srcdir)/include/geom/reference_elem.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 remote_elem.h: $(top_srcdir)/include/geom/remote_elem.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 side.h: $(top_srcdir)/include/geom/side.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sphere.h: $(top_srcdir)/include/geom/sphere.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 stored_range.h: $(top_srcdir)/include/geom/stored_range.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 surface.h: $(top_srcdir)/include/geom/surface.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 abaqus_io.h: $(top_srcdir)/include/mesh/abaqus_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 boundary_info.h: $(top_srcdir)/include/mesh/boundary_info.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 boundary_mesh.h: $(top_srcdir)/include/mesh/boundary_mesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 checkpoint_io.h: $(top_srcdir)/include/mesh/checkpoint_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diva_io.h: $(top_srcdir)/include/mesh/diva_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ensight_io.h: $(top_srcdir)/include/mesh/ensight_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exodusII_io.h: $(top_srcdir)/include/mesh/exodusII_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 exodusII_io_helper.h: $(top_srcdir)/include/mesh/exodusII_io_helper.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fro_io.h: $(top_srcdir)/include/mesh/fro_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 gmsh_io.h: $(top_srcdir)/include/mesh/gmsh_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 gmv_io.h: $(top_srcdir)/include/mesh/gmv_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 gnuplot_io.h: $(top_srcdir)/include/mesh/gnuplot_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_elem_builder.h: $(top_srcdir)/include/mesh/inf_elem_builder.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 legacy_xdr_io.h: $(top_srcdir)/include/mesh/legacy_xdr_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 matlab_io.h: $(top_srcdir)/include/mesh/matlab_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 medit_io.h: $(top_srcdir)/include/mesh/medit_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh.h: $(top_srcdir)/include/mesh/mesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_base.h: $(top_srcdir)/include/mesh/mesh_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_communication.h: $(top_srcdir)/include/mesh/mesh_communication.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_data.h: $(top_srcdir)/include/mesh/mesh_data.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_function.h: $(top_srcdir)/include/mesh/mesh_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_generation.h: $(top_srcdir)/include/mesh/mesh_generation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_input.h: $(top_srcdir)/include/mesh/mesh_input.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_inserter_iterator.h: $(top_srcdir)/include/mesh/mesh_inserter_iterator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_modification.h: $(top_srcdir)/include/mesh/mesh_modification.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_output.h: $(top_srcdir)/include/mesh/mesh_output.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_refinement.h: $(top_srcdir)/include/mesh/mesh_refinement.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_serializer.h: $(top_srcdir)/include/mesh/mesh_serializer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_smoother.h: $(top_srcdir)/include/mesh/mesh_smoother.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_smoother_laplace.h: $(top_srcdir)/include/mesh/mesh_smoother_laplace.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_smoother_vsmoother.h: $(top_srcdir)/include/mesh/mesh_smoother_vsmoother.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_subdivision_support.h: $(top_srcdir)/include/mesh/mesh_subdivision_support.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_tetgen_interface.h: $(top_srcdir)/include/mesh/mesh_tetgen_interface.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_tetgen_wrapper.h: $(top_srcdir)/include/mesh/mesh_tetgen_wrapper.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_tools.h: $(top_srcdir)/include/mesh/mesh_tools.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_triangle_holes.h: $(top_srcdir)/include/mesh/mesh_triangle_holes.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_triangle_interface.h: $(top_srcdir)/include/mesh/mesh_triangle_interface.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_triangle_wrapper.h: $(top_srcdir)/include/mesh/mesh_triangle_wrapper.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nemesis_io.h: $(top_srcdir)/include/mesh/nemesis_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nemesis_io_helper.h: $(top_srcdir)/include/mesh/nemesis_io_helper.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 off_io.h: $(top_srcdir)/include/mesh/off_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_mesh.h: $(top_srcdir)/include/mesh/parallel_mesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 patch.h: $(top_srcdir)/include/mesh/patch.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 postscript_io.h: $(top_srcdir)/include/mesh/postscript_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tecplot_io.h: $(top_srcdir)/include/mesh/tecplot_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tetgen_io.h: $(top_srcdir)/include/mesh/tetgen_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ucd_io.h: $(top_srcdir)/include/mesh/ucd_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 unstructured_mesh.h: $(top_srcdir)/include/mesh/unstructured_mesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 unv_io.h: $(top_srcdir)/include/mesh/unv_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 vtk_io.h: $(top_srcdir)/include/mesh/vtk_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_head.h: $(top_srcdir)/include/mesh/xdr_head.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_io.h: $(top_srcdir)/include/mesh/xdr_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_mesh.h: $(top_srcdir)/include/mesh/xdr_mesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_mgf.h: $(top_srcdir)/include/mesh/xdr_mgf.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_mhead.h: $(top_srcdir)/include/mesh/xdr_mhead.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_shead.h: $(top_srcdir)/include/mesh/xdr_shead.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_soln.h: $(top_srcdir)/include/mesh/xdr_soln.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 analytic_function.h: $(top_srcdir)/include/numerics/analytic_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 const_fem_function.h: $(top_srcdir)/include/numerics/const_fem_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 const_function.h: $(top_srcdir)/include/numerics/const_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 coupling_matrix.h: $(top_srcdir)/include/numerics/coupling_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_matrix.h: $(top_srcdir)/include/numerics/dense_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_matrix_base.h: $(top_srcdir)/include/numerics/dense_matrix_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_submatrix.h: $(top_srcdir)/include/numerics/dense_submatrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_subvector.h: $(top_srcdir)/include/numerics/dense_subvector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_vector.h: $(top_srcdir)/include/numerics/dense_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_vector_base.h: $(top_srcdir)/include/numerics/dense_vector_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 distributed_vector.h: $(top_srcdir)/include/numerics/distributed_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_core_support.h: $(top_srcdir)/include/numerics/eigen_core_support.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_preconditioner.h: $(top_srcdir)/include/numerics/eigen_preconditioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_sparse_matrix.h: $(top_srcdir)/include/numerics/eigen_sparse_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_sparse_vector.h: $(top_srcdir)/include/numerics/eigen_sparse_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fem_function_base.h: $(top_srcdir)/include/numerics/fem_function_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 function_base.h: $(top_srcdir)/include/numerics/function_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 laspack_matrix.h: $(top_srcdir)/include/numerics/laspack_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 laspack_vector.h: $(top_srcdir)/include/numerics/laspack_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 numeric_vector.h: $(top_srcdir)/include/numerics/numeric_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parsed_fem_function.h: $(top_srcdir)/include/numerics/parsed_fem_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parsed_function.h: $(top_srcdir)/include/numerics/parsed_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_macro.h: $(top_srcdir)/include/numerics/petsc_macro.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_matrix.h: $(top_srcdir)/include/numerics/petsc_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_preconditioner.h: $(top_srcdir)/include/numerics/petsc_preconditioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_vector.h: $(top_srcdir)/include/numerics/petsc_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 preconditioner.h: $(top_srcdir)/include/numerics/preconditioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 raw_accessor.h: $(top_srcdir)/include/numerics/raw_accessor.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 refinement_selector.h: $(top_srcdir)/include/numerics/refinement_selector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 shell_matrix.h: $(top_srcdir)/include/numerics/shell_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sparse_matrix.h: $(top_srcdir)/include/numerics/sparse_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sparse_shell_matrix.h: $(top_srcdir)/include/numerics/sparse_shell_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sum_shell_matrix.h: $(top_srcdir)/include/numerics/sum_shell_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tensor_shell_matrix.h: $(top_srcdir)/include/numerics/tensor_shell_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tensor_tools.h: $(top_srcdir)/include/numerics/tensor_tools.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tensor_value.h: $(top_srcdir)/include/numerics/tensor_value.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 trilinos_epetra_matrix.h: $(top_srcdir)/include/numerics/trilinos_epetra_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 trilinos_epetra_vector.h: $(top_srcdir)/include/numerics/trilinos_epetra_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 trilinos_preconditioner.h: $(top_srcdir)/include/numerics/trilinos_preconditioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 type_n_tensor.h: $(top_srcdir)/include/numerics/type_n_tensor.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 type_tensor.h: $(top_srcdir)/include/numerics/type_tensor.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 type_vector.h: $(top_srcdir)/include/numerics/type_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 vector_value.h: $(top_srcdir)/include/numerics/vector_value.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 wrapped_function.h: $(top_srcdir)/include/numerics/wrapped_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel.h: $(top_srcdir)/include/parallel/parallel.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_algebra.h: $(top_srcdir)/include/parallel/parallel_algebra.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_bin_sorter.h: $(top_srcdir)/include/parallel/parallel_bin_sorter.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_conversion_utils.h: $(top_srcdir)/include/parallel/parallel_conversion_utils.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_elem.h: $(top_srcdir)/include/parallel/parallel_elem.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_ghost_sync.h: $(top_srcdir)/include/parallel/parallel_ghost_sync.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_hilbert.h: $(top_srcdir)/include/parallel/parallel_hilbert.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_histogram.h: $(top_srcdir)/include/parallel/parallel_histogram.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_implementation.h: $(top_srcdir)/include/parallel/parallel_implementation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_node.h: $(top_srcdir)/include/parallel/parallel_node.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_object.h: $(top_srcdir)/include/parallel/parallel_object.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads.h: $(top_srcdir)/include/parallel/threads.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_allocators.h: $(top_srcdir)/include/parallel/threads_allocators.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 centroid_partitioner.h: $(top_srcdir)/include/partitioning/centroid_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hilbert_sfc_partitioner.h: $(top_srcdir)/include/partitioning/hilbert_sfc_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 linear_partitioner.h: $(top_srcdir)/include/partitioning/linear_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 metis_csr_graph.h: $(top_srcdir)/include/partitioning/metis_csr_graph.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 metis_partitioner.h: $(top_srcdir)/include/partitioning/metis_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 morton_sfc_partitioner.h: $(top_srcdir)/include/partitioning/morton_sfc_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parmetis_partitioner.h: $(top_srcdir)/include/partitioning/parmetis_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 partitioner.h: $(top_srcdir)/include/partitioning/partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sfc_partitioner.h: $(top_srcdir)/include/partitioning/sfc_partitioner.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_physics.h: $(top_srcdir)/include/physics/diff_physics.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_qoi.h: $(top_srcdir)/include/physics/diff_qoi.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fem_physics.h: $(top_srcdir)/include/physics/fem_physics.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature.h: $(top_srcdir)/include/quadrature/quadrature.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_clough.h: $(top_srcdir)/include/quadrature/quadrature_clough.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_conical.h: $(top_srcdir)/include/quadrature/quadrature_conical.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_gauss.h: $(top_srcdir)/include/quadrature/quadrature_gauss.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_gm.h: $(top_srcdir)/include/quadrature/quadrature_gm.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_grid.h: $(top_srcdir)/include/quadrature/quadrature_grid.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_jacobi.h: $(top_srcdir)/include/quadrature/quadrature_jacobi.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_monomial.h: $(top_srcdir)/include/quadrature/quadrature_monomial.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_rules.h: $(top_srcdir)/include/quadrature/quadrature_rules.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_simpson.h: $(top_srcdir)/include/quadrature/quadrature_simpson.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_trap.h: $(top_srcdir)/include/quadrature/quadrature_trap.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 derived_rb_construction.h: $(top_srcdir)/include/reduced_basis/derived_rb_construction.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 derived_rb_evaluation.h: $(top_srcdir)/include/reduced_basis/derived_rb_evaluation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_assembly_expansion.h: $(top_srcdir)/include/reduced_basis/rb_assembly_expansion.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_construction.h: $(top_srcdir)/include/reduced_basis/rb_construction.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_construction_base.h: $(top_srcdir)/include/reduced_basis/rb_construction_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_eim_assembly.h: $(top_srcdir)/include/reduced_basis/rb_eim_assembly.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_eim_construction.h: $(top_srcdir)/include/reduced_basis/rb_eim_construction.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_eim_evaluation.h: $(top_srcdir)/include/reduced_basis/rb_eim_evaluation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_eim_theta.h: $(top_srcdir)/include/reduced_basis/rb_eim_theta.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_evaluation.h: $(top_srcdir)/include/reduced_basis/rb_evaluation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_parameters.h: $(top_srcdir)/include/reduced_basis/rb_parameters.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_parametrized.h: $(top_srcdir)/include/reduced_basis/rb_parametrized.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_parametrized_function.h: $(top_srcdir)/include/reduced_basis/rb_parametrized_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_scm_construction.h: $(top_srcdir)/include/reduced_basis/rb_scm_construction.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_scm_evaluation.h: $(top_srcdir)/include/reduced_basis/rb_scm_evaluation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_temporal_discretization.h: $(top_srcdir)/include/reduced_basis/rb_temporal_discretization.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_theta.h: $(top_srcdir)/include/reduced_basis/rb_theta.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_theta_expansion.h: $(top_srcdir)/include/reduced_basis/rb_theta_expansion.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_rb_assembly_expansion.h: $(top_srcdir)/include/reduced_basis/transient_rb_assembly_expansion.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_rb_construction.h: $(top_srcdir)/include/reduced_basis/transient_rb_construction.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_rb_evaluation.h: $(top_srcdir)/include/reduced_basis/transient_rb_evaluation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_rb_theta_expansion.h: $(top_srcdir)/include/reduced_basis/transient_rb_theta_expansion.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 direct_solution_transfer.h: $(top_srcdir)/include/solution_transfer/direct_solution_transfer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dtk_adapter.h: $(top_srcdir)/include/solution_transfer/dtk_adapter.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dtk_evaluator.h: $(top_srcdir)/include/solution_transfer/dtk_evaluator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dtk_solution_transfer.h: $(top_srcdir)/include/solution_transfer/dtk_solution_transfer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 meshfree_interpolation.h: $(top_srcdir)/include/solution_transfer/meshfree_interpolation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 meshfree_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfree_solution_transfer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 meshfunction_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfunction_solution_transfer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 radial_basis_functions.h: $(top_srcdir)/include/solution_transfer/radial_basis_functions.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 radial_basis_interpolation.h: $(top_srcdir)/include/solution_transfer/radial_basis_interpolation.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solution_transfer.h: $(top_srcdir)/include/solution_transfer/solution_transfer.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 adaptive_time_solver.h: $(top_srcdir)/include/solvers/adaptive_time_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_solver.h: $(top_srcdir)/include/solvers/diff_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_solver.h: $(top_srcdir)/include/solvers/eigen_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_sparse_linear_solver.h: $(top_srcdir)/include/solvers/eigen_sparse_linear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_time_solver.h: $(top_srcdir)/include/solvers/eigen_time_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 euler2_solver.h: $(top_srcdir)/include/solvers/euler2_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 euler_solver.h: $(top_srcdir)/include/solvers/euler_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 laspack_linear_solver.h: $(top_srcdir)/include/solvers/laspack_linear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 linear.h: $(top_srcdir)/include/solvers/linear.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 linear_solver.h: $(top_srcdir)/include/solvers/linear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 memory_solution_history.h: $(top_srcdir)/include/solvers/memory_solution_history.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 newton_solver.h: $(top_srcdir)/include/solvers/newton_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 no_solution_history.h: $(top_srcdir)/include/solvers/no_solution_history.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nonlinear_solver.h: $(top_srcdir)/include/solvers/nonlinear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_auto_fieldsplit.h: $(top_srcdir)/include/solvers/petsc_auto_fieldsplit.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_diff_solver.h: $(top_srcdir)/include/solvers/petsc_diff_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_dm_nonlinear_solver.h: $(top_srcdir)/include/solvers/petsc_dm_nonlinear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_linear_solver.h: $(top_srcdir)/include/solvers/petsc_linear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_nonlinear_solver.h: $(top_srcdir)/include/solvers/petsc_nonlinear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petscdmlibmesh.h: $(top_srcdir)/include/solvers/petscdmlibmesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 slepc_eigen_solver.h: $(top_srcdir)/include/solvers/slepc_eigen_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 slepc_macro.h: $(top_srcdir)/include/solvers/slepc_macro.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solution_history.h: $(top_srcdir)/include/solvers/solution_history.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 solver.h: $(top_srcdir)/include/solvers/solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 steady_solver.h: $(top_srcdir)/include/solvers/steady_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 time_solver.h: $(top_srcdir)/include/solvers/time_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 trilinos_aztec_linear_solver.h: $(top_srcdir)/include/solvers/trilinos_aztec_linear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 trilinos_nox_nonlinear_solver.h: $(top_srcdir)/include/solvers/trilinos_nox_nonlinear_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 twostep_time_solver.h: $(top_srcdir)/include/solvers/twostep_time_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 unsteady_solver.h: $(top_srcdir)/include/solvers/unsteady_solver.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 condensed_eigen_system.h: $(top_srcdir)/include/systems/condensed_eigen_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 continuation_system.h: $(top_srcdir)/include/systems/continuation_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dg_fem_context.h: $(top_srcdir)/include/systems/dg_fem_context.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_context.h: $(top_srcdir)/include/systems/diff_context.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_system.h: $(top_srcdir)/include/systems/diff_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_system.h: $(top_srcdir)/include/systems/eigen_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 elem_assembly.h: $(top_srcdir)/include/systems/elem_assembly.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 equation_systems.h: $(top_srcdir)/include/systems/equation_systems.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 explicit_system.h: $(top_srcdir)/include/systems/explicit_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fem_context.h: $(top_srcdir)/include/systems/fem_context.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fem_system.h: $(top_srcdir)/include/systems/fem_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 frequency_system.h: $(top_srcdir)/include/systems/frequency_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 implicit_system.h: $(top_srcdir)/include/systems/implicit_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 linear_implicit_system.h: $(top_srcdir)/include/systems/linear_implicit_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 newmark_system.h: $(top_srcdir)/include/systems/newmark_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nonlinear_implicit_system.h: $(top_srcdir)/include/systems/nonlinear_implicit_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_vector.h: $(top_srcdir)/include/systems/parameter_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 qoi_set.h: $(top_srcdir)/include/systems/qoi_set.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sensitivity_data.h: $(top_srcdir)/include/systems/sensitivity_data.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 steady_system.h: $(top_srcdir)/include/systems/steady_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 system.h: $(top_srcdir)/include/systems/system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 system_norm.h: $(top_srcdir)/include/systems/system_norm.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 system_subset.h: $(top_srcdir)/include/systems/system_subset.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 system_subset_by_subdomain.h: $(top_srcdir)/include/systems/system_subset_by_subdomain.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_system.h: $(top_srcdir)/include/systems/transient_system.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 compare_types.h: $(top_srcdir)/include/utils/compare_types.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 error_vector.h: $(top_srcdir)/include/utils/error_vector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hashword.h: $(top_srcdir)/include/utils/hashword.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ignore_warnings.h: $(top_srcdir)/include/utils/ignore_warnings.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 location_maps.h: $(top_srcdir)/include/utils/location_maps.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mapvector.h: $(top_srcdir)/include/utils/mapvector.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 null_output_iterator.h: $(top_srcdir)/include/utils/null_output_iterator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 number_lookups.h: $(top_srcdir)/include/utils/number_lookups.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ostream_proxy.h: $(top_srcdir)/include/utils/ostream_proxy.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameters.h: $(top_srcdir)/include/utils/parameters.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 perf_log.h: $(top_srcdir)/include/utils/perf_log.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 perfmon.h: $(top_srcdir)/include/utils/perfmon.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 plt_loader.h: $(top_srcdir)/include/utils/plt_loader.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_locator_base.h: $(top_srcdir)/include/utils/point_locator_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_locator_list.h: $(top_srcdir)/include/utils/point_locator_list.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_locator_tree.h: $(top_srcdir)/include/utils/point_locator_tree.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 statistics.h: $(top_srcdir)/include/utils/statistics.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 string_to_enum.h: $(top_srcdir)/include/utils/string_to_enum.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 timestamp.h: $(top_srcdir)/include/utils/timestamp.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tree.h: $(top_srcdir)/include/utils/tree.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tree_base.h: $(top_srcdir)/include/utils/tree_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tree_node.h: $(top_srcdir)/include/utils/tree_node.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 utility.h: $(top_srcdir)/include/utils/utility.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 vectormap.h: $(top_srcdir)/include/utils/vectormap.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_communicator_specializations: $(top_srcdir)/include/parallel/parallel_communicator_specializations
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 

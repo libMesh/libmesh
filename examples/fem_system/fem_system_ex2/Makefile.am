@@ -10,7 +10,7 @@ CLEANFILES = *vtu
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f solid.in && $(LN_S) $(srcdir)/solid.in .
+	-rm -f solid.in && $(LN_S) -f $(srcdir)/solid.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += solid.in .linkstamp

@@ -9,7 +9,7 @@ CLEANFILES = pressure_node.res out.*.gmv out_*.vtu  out_*.pvtu
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f pipe-mesh.unv && $(LN_S) $(srcdir)/pipe-mesh.unv .
+	-rm -f pipe-mesh.unv && $(LN_S) -f $(srcdir)/pipe-mesh.unv .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += pipe-mesh.unv .linkstamp

@@ -1172,7 +1172,7 @@ uninstall-am: uninstall-dataDATA
 clean-local:
 	-rm -rf rb_data scm_data
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f reduced_basis_ex2.in && $(LN_S) $(srcdir)/reduced_basis_ex2.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f reduced_basis_ex2.in && $(LN_S) -f $(srcdir)/reduced_basis_ex2.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

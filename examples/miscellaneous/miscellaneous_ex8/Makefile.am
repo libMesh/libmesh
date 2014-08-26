@@ -14,8 +14,8 @@ CLEANFILES = src.dat dest*.dat
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f struct.ucd.gz   && $(LN_S) $(srcdir)/struct.ucd.gz
-	-rm -f unstruct.ucd.gz && $(LN_S) $(srcdir)/unstruct.ucd.gz
+	-rm -f struct.ucd.gz   && $(LN_S) -f $(srcdir)/struct.ucd.gz
+	-rm -f unstruct.ucd.gz && $(LN_S) -f $(srcdir)/unstruct.ucd.gz
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += struct.ucd.gz unstruct.ucd.gz .linkstamp

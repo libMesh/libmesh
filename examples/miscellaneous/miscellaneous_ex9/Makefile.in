@@ -1252,7 +1252,7 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f miscellaneous_ex9.exo && $(LN_S) $(srcdir)/miscellaneous_ex9.exo
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f miscellaneous_ex9.exo && $(LN_S) -f $(srcdir)/miscellaneous_ex9.exo
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

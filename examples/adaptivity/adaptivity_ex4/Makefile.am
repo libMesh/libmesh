@@ -10,7 +10,7 @@ CLEANFILES = 2D_hermite_adaptive.m 2D_hermite_adaptive.e
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f adaptivity_ex4.in && $(LN_S) $(srcdir)/adaptivity_ex4.in .
+	-rm -f adaptivity_ex4.in && $(LN_S) -f $(srcdir)/adaptivity_ex4.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += adaptivity_ex4.in .linkstamp

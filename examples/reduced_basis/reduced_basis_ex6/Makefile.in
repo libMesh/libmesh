@@ -1193,9 +1193,9 @@ uninstall-am: uninstall-dataDATA
 clean-local:
 	-rm -rf rb_data eim_data
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f reduced_basis_ex6.in && $(LN_S) $(srcdir)/reduced_basis_ex6.in .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f eim.in               && $(LN_S) $(srcdir)/eim.in .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f rb.in                && $(LN_S) $(srcdir)/rb.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f reduced_basis_ex6.in && $(LN_S) -f $(srcdir)/reduced_basis_ex6.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f eim.in               && $(LN_S) -f $(srcdir)/eim.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f rb.in                && $(LN_S) -f $(srcdir)/rb.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

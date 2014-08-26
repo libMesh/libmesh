@@ -10,7 +10,7 @@ CLEANFILES = solution.exo
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f miscellaneous_ex9.exo && $(LN_S) $(srcdir)/miscellaneous_ex9.exo
+	-rm -f miscellaneous_ex9.exo && $(LN_S) -f $(srcdir)/miscellaneous_ex9.exo
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += miscellaneous_ex9.exo .linkstamp

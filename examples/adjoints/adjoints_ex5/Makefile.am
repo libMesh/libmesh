@@ -10,8 +10,8 @@ CLEANFILES = *.gmv.*
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
-	-rm -f heat.in && $(LN_S) $(srcdir)/heat.in .
+	-rm -f general.in  && $(LN_S) -f $(srcdir)/general.in .
+	-rm -f heat.in && $(LN_S) -f $(srcdir)/heat.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += general.in heat.in .linkstamp

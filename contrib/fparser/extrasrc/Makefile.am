@@ -12,6 +12,6 @@ if FPARSER_RELEASE
 
 fp_opcode_add.inc: $(srcdir)/fp_opcode_add.inc.release
 	$(AM_V_at)$(RM) $@
-	$(AM_V_GEN)$(LN_S) $< $@
+	$(AM_V_GEN)$(LN_S) -f $< $@
 
 endif

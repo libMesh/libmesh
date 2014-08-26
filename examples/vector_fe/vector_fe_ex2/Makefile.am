@@ -10,8 +10,8 @@ CLEANFILES = out.e out.inp
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f vector_fe_ex2.in && $(LN_S) $(srcdir)/vector_fe_ex2.in .
-	-rm -f laplace.in && $(LN_S) $(srcdir)/laplace.in .
+	-rm -f vector_fe_ex2.in && $(LN_S) -f $(srcdir)/vector_fe_ex2.in .
+	-rm -f laplace.in && $(LN_S) -f $(srcdir)/laplace.in .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += vector_fe_ex2.in laplace.in .linkstamp

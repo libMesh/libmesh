@@ -14,8 +14,8 @@ endif
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f drum1_mesh.e && $(LN_S) $(srcdir)/drum1_mesh.e .
-	-rm -f drum2_mesh.e && $(LN_S) $(srcdir)/drum2_mesh.e .
+	-rm -f drum1_mesh.e && $(LN_S) -f $(srcdir)/drum1_mesh.e .
+	-rm -f drum2_mesh.e && $(LN_S) -f $(srcdir)/drum2_mesh.e .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += drum*_mesh.xda .linkstamp

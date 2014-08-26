@@ -14,8 +14,8 @@ endif
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f lshape.unv && $(LN_S) $(srcdir)/lshape.unv .
-	-rm -f lshape_data.unv && $(LN_S) $(srcdir)/lshape_data.unv .
+	-rm -f lshape.unv && $(LN_S) -f $(srcdir)/lshape.unv .
+	-rm -f lshape_data.unv && $(LN_S) -f $(srcdir)/lshape_data.unv .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += lshape.unv lshape_data.unv .linkstamp
