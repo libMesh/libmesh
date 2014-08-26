@@ -13,8 +13,9 @@ oprof_libs =
 # it in case someone includes this Makefile?
 AM_LDFLAGS   = $(libmesh_LDFLAGS)
 
-# FIXME: Add a configure test for this?
-SUBDIRS += unique_ptr
+if LIBMESH_INSTALL_HINNANT_UNIQUE_PTR
+  SUBDIRS += unique_ptr
+endif
 
 if LIBMESH_INSTALL_INTERNAL_BOOST
    SUBDIRS += boost/include

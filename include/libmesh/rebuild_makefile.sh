@@ -111,11 +111,15 @@ netcdf.h: \$(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
 
 endif
 
+if LIBMESH_INSTALL_HINNANT_UNIQUE_PTR
+
 unique_ptr.hpp: \$(top_srcdir)/contrib/unique_ptr/unique_ptr.hpp
 	\$(AM_V_GEN)rm -f \$@ && \$(LN_S) \$< \$@
 
   BUILT_SOURCES  += unique_ptr.hpp
   DISTCLEANFILES += unique_ptr.hpp
+
+endif
 
 EOF
 
