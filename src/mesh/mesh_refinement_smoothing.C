@@ -79,7 +79,9 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
 
   // Now loop over the active elements and flag the elements
-  // who violate the requested level mismatch
+  // who violate the requested level mismatch. Alternatively, if
+  // _enforce_mismatch_limit_prior_to_refinement is true, swap refinement flags
+  // accordingly. 
   {
     MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
@@ -107,6 +109,12 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
               {
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
+
+                // if we are enforcing the limit prior to refinement then we
+                // need to remove any neighbor flags
+                if (_enforce_mismatch_limit_prior_to_refinement)
+                  {
+                  }
               }
             if ( (elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
                  && elem->p_refinement_flag() != Elem::REFINE)
