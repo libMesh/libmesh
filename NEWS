@@ -41,6 +41,11 @@
     * fixed libHilbert interface regression
       * some xda/xdr files created with 0.9.3 MAY BE CORRUPTED when
         read with older/newer libMesh versions, and vice-versa!
+    * fixed bug with stitching "slivers"
+    * fixed std::memset bug which pops up for newer GCCs on OSX
+    * fixed misc. distcheck bugs
+  * Many fixes to silence paranoid compiler warnings (see doc/notes/compiler_warnings.txt)
+  * Use -f when symbolic linking files during build/install stage
 
 0.9.2 -> 0.9.3
   * FEMContext public members now private, must use API pushed in 0.9.2.
