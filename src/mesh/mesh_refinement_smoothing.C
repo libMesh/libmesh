@@ -47,6 +47,15 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   // Vector holding the maximum element level that touches a node.
   std::vector<unsigned char> max_level_at_node (_mesh.n_nodes(), 0);
   std::vector<unsigned char> max_p_level_at_node (_mesh.n_nodes(), 0);
+  std::vector<unsigned char> min_level_at_node ;
+  std::vector<unsigned char> min_p_level_at_node ;
+
+  // Vector holding the minimum element level that touches a node.
+  if(_enforce_mismatch_limit_prior_to_refinement)
+  {
+    min_level_at_node.resize (_mesh.n_nodes(),9999);
+    min_p_level_at_node.resize (_mesh.n_nodes(),9999);
+  }
 
 
   // Loop over all the active elements & fill the vector
@@ -57,10 +66,12 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
     for (; elem_it != elem_end; ++elem_it)
       {
         const Elem* elem = *elem_it;
+        const unsigned char elem_current_level = elem->level() ;
+        const unsigned char elem_current_p_level = elem->p_level() ;
         const unsigned char elem_level =
-          elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+          elem_current_level + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
         const unsigned char elem_p_level =
-          elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
+          elem_current_p_level + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
 
         // Set the max_level at each node
         for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -73,6 +84,16 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
               std::max (max_level_at_node[node_number], elem_level);
             max_p_level_at_node[node_number] =
               std::max (max_p_level_at_node[node_number], elem_p_level);
+
+            // need min_level if enforcing prior to refinement
+            if( _enforce_mismatch_limit_prior_to_refinement )
+              {
+                // we want the minimum without refinement flags
+                min_level_at_node[node_number] =
+                  std::min (min_level_at_node[node_number], elem_current_level);
+                min_p_level_at_node[node_number] =
+                  std::min (min_p_level_at_node[node_number], elem_current_p_level);
+              }
           }
       }
   }
@@ -93,8 +114,11 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
         const unsigned int elem_p_level = elem->p_level();
 
         // Skip the element if it is already fully flagged
+        // unless we are enforcing mismatch prior to refienemnt and may need to
+        // remove the refinement flag(s)
         if (elem->refinement_flag() == Elem::REFINE &&
-            elem->p_refinement_flag() == Elem::REFINE)
+            elem->p_refinement_flag() == Elem::REFINE
+            && !_enforce_mismatch_limit_prior_to_refinement)
           continue;
 
         // Loop over the nodes, check for possible mismatch
@@ -109,17 +133,29 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
               {
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
-
-                // if we are enforcing the limit prior to refinement then we
-                // need to remove any neighbor flags
-                if (_enforce_mismatch_limit_prior_to_refinement)
-                  {
-                  }
               }
+            // if we are enforcing the limit prior to refinement then we
+            // need to remove flags from any elements marked for refinement that
+            // would cause a mismatch
+            else if (_enforce_mismatch_limit_prior_to_refinement
+                && elem->refinement_flag() == Elem::REFINE
+                && (elem_level + 1 - max_mismatch ) > min_level_at_node[node_number] )
+              {
+                elem->set_refinement_flag( Elem::DO_NOTHING );
+                flags_changed = true;
+              }
+
             if ( (elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
                  && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
+                flags_changed = true;
+              }
+            else if (_enforce_mismatch_limit_prior_to_refinement
+                && (elem->p_refinement_flag() == Elem::REFINE)
+                && (elem_p_level + 1 - max_mismatch ) > min_p_level_at_node[node_number] )
+              {
+                elem->set_p_refinement_flag( Elem::DO_NOTHING );
                 flags_changed = true;
               }
           }
