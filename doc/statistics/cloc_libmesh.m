@@ -187,7 +187,11 @@ data = {
     '2014-05-04', 806, 173772
     '2014-06-04', 807, 171098
     '2014-07-04', 807, 171220
+    '2014-08-04', 808, 172534
        };
+
+% Try and support multiple versions of Octave
+is_380 = strcmp(version(), '3.8.0');
 
 % length works like you would expect it to for cell arrays.
 N=length(data);
@@ -210,8 +214,13 @@ lines_fit = polyfit(x, n_lines, 1);
 files_per_month = files_fit(1);
 lines_per_month = lines_fit(1);
 
-text(50, 50, ['Approx. ', num2str(files_per_month, '%.1f'), ' files added/month']);
-text(50, 35, ['Approx. ', num2str(lines_per_month, '%.1f'), ' lines added/month']);
+if (is_380)
+  text(50, 100, ['Approx. ', num2str(files_per_month, '%.1f'), ' files added/month']);
+  text(50, 35, ['Approx. ', num2str(lines_per_month, '%.1f'), ' lines added/month']);
+else
+  text(50, 50, ['Approx. ', num2str(files_per_month, '%.1f'), ' files added/month']);
+  text(50, 35, ['Approx. ', num2str(lines_per_month, '%.1f'), ' lines added/month']);
+end
 
 % Label the axes
 ylabel (haxis(1), 'Files');
@@ -240,13 +249,16 @@ for i=1:length(xticksat)
 end
 set(haxis, 'xticklabel', xtlabels);
 
-% Set some "paper" variables.  None of these seem to have any effect?
-% set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
-% set (gcf, "papersize", [11, 8.5]);
-% set (gcf, "paperorientation", 'landscape');
+if (is_380)
+  set (gcf, "papersize", [11, 8.5]);
+  set (gcf, "paperorientation", 'landscape');
+  set (gcf, "paperposition", [0.25, 0.25, 8.0, 10.5]);
+  print('-dpdf', 'cloc_libmesh.pdf', '-FHelvetica:20');
+else
+  % Make a PDF of this plot.  I had to mess with setting the size
+  % manually through the print command, otherwise the right-hand axis
+  % was cut off.  I just picked 1920x1080 at random and it seemed to
+  % work...
+  print('-dpdf', '-S1920,1080', 'cloc_libmesh.pdf', '-FHelvetica:20');
+end
 
-% Make a PDF of this plot.  I had to mess with setting the size
-% manually through the print command, otherwise the right-hand axis
-% was cut off.  I just picked 1920x1080 at random and it seemed to
-% work...
-print('-dpdf', '-S1920,1080', 'cloc_libmesh.pdf', '-FHelvetica:20');
