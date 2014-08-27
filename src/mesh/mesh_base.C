@@ -64,7 +64,7 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
-MeshBase::MeshBase (unsigned int d) :
+MeshBase::MeshBase (unsigned char d) :
   ParallelObject (CommWorld),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
