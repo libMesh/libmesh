@@ -384,7 +384,7 @@ void UnstructuredMesh::all_first_order ()
        */
       libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
-      for (unsigned int s=0; s<so_elem->n_sides(); s++)
+      for (unsigned short s=0; s<so_elem->n_sides(); s++)
         {
           const std::vector<boundary_id_type> boundary_ids =
             this->boundary_info->raw_boundary_ids (so_elem, s);
@@ -672,7 +672,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        */
       libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
-      for (unsigned int s=0; s<lo_elem->n_sides(); s++)
+      for (unsigned short s=0; s<lo_elem->n_sides(); s++)
         {
           const std::vector<boundary_id_type> boundary_ids =
             this->boundary_info->raw_boundary_ids (lo_elem, s);
@@ -937,7 +937,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
             if (mesh_has_boundary_data)
               {
-                for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
+                for (unsigned short sn=0; sn<elem->n_sides(); ++sn)
                   {
                     const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(*el, sn);
                     for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
@@ -1408,7 +1408,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
         // This element could have boundary info or ParallelMesh
         // remote_elem links as well.  We need to save the (elem,
         // side, bc_id) triples and those links
-        for (unsigned int s=0; s<elem->n_sides(); s++)
+        for (unsigned short s=0; s<elem->n_sides(); s++)
           {
             if (elem->neighbor(s) == remote_elem)
               copy->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
@@ -1458,11 +1458,17 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
          it != new_elements.end();
          ++it)
       {
+#ifndef NDEBUG
         dof_id_type orig_id = (*it)->id();
 
-        Elem* added_elem = mesh.add_elem(*it);
+        // ugly mid-statement endif to avoid unused variable warnings
+        Elem* added_elem =
+#endif
+          mesh.add_elem(*it);
 
+#ifndef NDEBUG
         dof_id_type added_id = added_elem->id();
+#endif
 
         // If the Elem, as it was re-added to the mesh, now has a
         // different ID (this is unlikely, so it's just an assert)
@@ -1509,7 +1515,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
         }
 
       unsigned int n_edges = elem->n_edges();
-      for (unsigned int edge=0; edge != n_edges; ++edge)
+      for (unsigned short edge=0; edge != n_edges; ++edge)
         {
           const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->edge_boundary_ids(elem, edge);
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
@@ -1522,7 +1528,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
         }
 
       unsigned int n_sides = elem->n_sides();
-      for (unsigned int s=0; s != n_sides; ++s)
+      for (unsigned short s=0; s != n_sides; ++s)
         {
           const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->boundary_ids(elem, s);
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())

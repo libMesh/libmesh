@@ -249,14 +249,6 @@ extern OStreamProxy err;
 #define libmesh_dbg_var(var)
 #endif
 
-// The libmesh_dbg_var() macro indicates that an argument to a function
-// is used only in debug mode (i.e., when NDEBUG is not defined).
-#ifndef NDEBUG
-#define libmesh_dbg_var(var) var
-#else
-#define libmesh_dbg_var(var)
-#endif
-
 // The libmesh_assert() macro acts like C's assert(), but throws a
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG

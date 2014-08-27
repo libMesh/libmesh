@@ -874,7 +874,7 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
 void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names)
 {
   // Update the count variable so that it's available to other parts of the class.
-  count = names.size();
+  count = cast_int<int>(names.size());
 
   // Write that number of variables to the file.
   ex_err = exII::ex_put_var_param(ex_id, var_type, count);
@@ -897,7 +897,7 @@ void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, int& count, 
 
       ex_err = exII::ex_put_var_names(ex_id,
                                       var_type,
-                                      names.size(),
+                                      cast_int<int>(names.size()),
                                       names_table.get_char_star_star()
                                       );
 
@@ -994,15 +994,17 @@ void ExodusII_IO_Helper::create(std::string filename)
 
       if(_single_precision)
         {
-          comp_ws = sizeof(float);
-          io_ws = sizeof(float);
+          comp_ws = cast_int<int>(sizeof(float));
+          io_ws = cast_int<int>(sizeof(float));
         }
       // Fall back on double precision when necessary since ExodusII
       // doesn't seem to support long double
       else
         {
-          comp_ws = std::min(sizeof(Real), sizeof(double));
-          io_ws = std::min(sizeof(Real), sizeof(double));
+          comp_ws = cast_int<int>
+            (std::min(sizeof(Real), sizeof(double)));
+          io_ws = cast_int<int>
+            (std::min(sizeof(Real), sizeof(double)));
         }
 
       ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
@@ -1052,8 +1054,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   mesh.boundary_info->build_side_boundary_ids(unique_side_boundaries);
   mesh.boundary_info->build_node_boundary_ids(unique_node_boundaries);
 
-  num_side_sets = unique_side_boundaries.size();
-  num_node_sets = unique_node_boundaries.size();
+  num_side_sets = cast_int<int>(unique_side_boundaries.size());
+  num_node_sets = cast_int<int>(unique_node_boundaries.size());
 
   //loop through element and map between block and element vector
   std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
@@ -1067,7 +1069,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
       subdomain_map[cur_subdomain].push_back(elem->id());
     }
-  num_elem_blk = subdomain_map.size();
+  num_elem_blk = cast_int<int>(subdomain_map.size());
 
   if (str_title.size() > MAX_LINE_LENGTH)
     {
@@ -1222,7 +1224,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
     }
 
   // element map vector
-  num_elem_blk = subdomain_map.size();
+  num_elem_blk = cast_int<int>(subdomain_map.size());
   block_ids.resize(num_elem_blk);
   elem_num_map.resize(n_active_elem);
   std::vector<int>::iterator curr_elem_map_end = elem_num_map.begin();
@@ -1404,7 +1406,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
       for (unsigned int i=0; i<side_boundary_ids.size(); i++)
         {
-          int ss_id = side_boundary_ids[i];
+          boundary_id_type ss_id = side_boundary_ids[i];
 
           int actual_id = ss_id;
 
@@ -1451,7 +1453,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
       for (unsigned int i=0; i<node_boundary_ids.size(); i++)
         {
-          int nodeset_id = node_boundary_ids[i];
+          boundary_id_type nodeset_id = node_boundary_ids[i];
 
           int actual_id = nodeset_id;
 
@@ -1654,7 +1656,8 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
       for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
         {
           const std::vector<unsigned int> & elem_nums = (*it).second;
-          const unsigned int num_elems_this_block = elem_nums.size();
+          const unsigned int num_elems_this_block =
+            cast_int<unsigned int>(elem_nums.size());
           std::vector<Real> data(num_elems_this_block);
 
           for (unsigned int k=0; k<num_elems_this_block; ++k)
@@ -1730,7 +1733,7 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
       return;
     }
 
-  int num_records = records.size();
+  int num_records = cast_int<int>(records.size());
 
   if (num_records > 0)
     {

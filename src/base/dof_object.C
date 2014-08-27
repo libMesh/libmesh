@@ -44,10 +44,10 @@ DofObject::DofObject (const DofObject& dof_obj) :
 #ifdef LIBMESH_ENABLE_AMR
   old_dof_object (NULL),
 #endif
-  _id            (dof_obj._id),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _unique_id     (dof_obj._unique_id),
 #endif
+  _id            (dof_obj._id),
   _processor_id  (dof_obj._processor_id),
   _idx_buf       (dof_obj._idx_buf)
 {
@@ -199,7 +199,7 @@ void DofObject::add_system()
 
   // this inserts the current vector size at the position for the new system - creating the
   // entry we need for the new system indicating there are 0 variables.
-  _idx_buf.insert(it, _idx_buf.size());
+  _idx_buf.insert(it, cast_int<dof_id_type>(_idx_buf.size()));
 
   // cache this value before we screw it up!
   const unsigned int ns_orig = this->n_systems();
@@ -450,12 +450,13 @@ void DofObject::set_dof_number(const unsigned int s,
 unsigned int DofObject::packed_indexing_size() const
 {
   return
+    cast_int<unsigned int> (
 #ifdef LIBMESH_ENABLE_AMR
     ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) + 2 +
 #else
     1 +
 #endif
-    _idx_buf.size();
+    _idx_buf.size());
 }
 
 
@@ -465,21 +466,20 @@ unsigned int DofObject::unpackable_indexing_size
 (std::vector<largest_id_type>::const_iterator begin)
 {
 #ifdef LIBMESH_ENABLE_AMR
-  const int has_old_dof_object = *begin++;
+  const bool has_old_dof_object = cast_int<bool>(*begin++);
 
-  // Either we have an old_dof_object or we don't
-  libmesh_assert(has_old_dof_object == 1 || has_old_dof_object == 0);
   static const int dof_header_size = 2;
 #else
   static const bool has_old_dof_object = false;
   static const int dof_header_size = 1;
 #endif
 
-  const int this_indexing_size = *begin++;
+  const largest_id_type this_indexing_size = *begin++;
 
-  return dof_header_size + this_indexing_size +
-    (has_old_dof_object ?
-     unpackable_indexing_size(begin+this_indexing_size) : 0);
+  return cast_int<unsigned int>
+    (dof_header_size + this_indexing_size +
+     (has_old_dof_object ?
+      unpackable_indexing_size(begin+this_indexing_size) : 0));
 }
 
 
@@ -490,12 +490,10 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
 
 #ifdef LIBMESH_ENABLE_AMR
   this->clear_old_dof_object();
-  const int has_old_dof_object = *begin++;
-  libmesh_assert(has_old_dof_object == 1 ||
-                 has_old_dof_object == 0);
+  const bool has_old_dof_object = cast_int<bool>(*begin++);
 #endif
 
-  const int size = *begin++;
+  const largest_id_type size = *begin++;
   _idx_buf.reserve(size);
   std::copy(begin, begin+size, back_inserter(_idx_buf));
 

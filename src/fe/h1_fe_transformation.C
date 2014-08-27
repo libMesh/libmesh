@@ -70,6 +70,7 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
           }
         break;
       }
+
     default:
       libmesh_error_msg("Invalid dim = " << dim);
     }
@@ -673,6 +674,9 @@ void H1FETransformation<RealGradient>::map_div
 
         break;
       }
+
+    default:                                                  \
+      libmesh_error_msg("Invalid dim = " << dim);             \
     } // switch(dim)
 
   return;

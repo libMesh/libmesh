@@ -91,7 +91,7 @@ bool EulerSolver::_general_residual (bool request_jacobian,
                                      ResFuncType mass,
                                      ResFuncType time_deriv,
                                      ResFuncType constraint,
-                                     ReinitFuncType reinit)
+                                     ReinitFuncType reinit_func)
 {
   unsigned int n_dofs = context.get_elem_solution().size();
 
@@ -124,7 +124,7 @@ bool EulerSolver::_general_residual (bool request_jacobian,
   context.get_elem_solution().swap(theta_solution);
 
   // Move the mesh into place first if necessary
-  (context.*reinit)(theta);
+  (context.*reinit_func)(theta);
 
   // We're going to compute just the change in elem_residual
   // (and possibly elem_jacobian), then add back the old values
@@ -173,7 +173,7 @@ bool EulerSolver::_general_residual (bool request_jacobian,
   context.get_elem_solution().swap(theta_solution);
 
   // Restore the elem position if necessary
-  (context.*reinit)(1.);
+  (context.*reinit_func)(1.);
 
   // Add the constraint term
   jacobian_computed = (_system.*constraint)(jacobian_computed, context) &&

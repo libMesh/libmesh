@@ -57,7 +57,7 @@ namespace Parallel {
 template <typename Iterator,
           typename DofObjType,
           typename SyncFunctor>
-void sync_dofobject_data_by_xyz(const Communicator&      communicator,
+void sync_dofobject_data_by_xyz(const Communicator&      comm,
                                 const Iterator&          range_begin,
                                 const Iterator&          range_end,
                                 LocationMap<DofObjType>* location_map,
@@ -78,7 +78,7 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
  */
 template <typename Iterator,
           typename SyncFunctor>
-void sync_dofobject_data_by_id(const Communicator& communicator,
+void sync_dofobject_data_by_id(const Communicator& comm,
                                const Iterator&     range_begin,
                                const Iterator&     range_end,
                                SyncFunctor&        sync);
@@ -110,25 +110,25 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
 template <typename Iterator,
           typename DofObjType,
           typename SyncFunctor>
-void sync_dofobject_data_by_xyz(const Communicator&      communicator,
+void sync_dofobject_data_by_xyz(const Communicator&      comm,
                                 const Iterator&          range_begin,
                                 const Iterator&          range_end,
                                 LocationMap<DofObjType>& location_map,
                                 SyncFunctor&             sync)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(communicator);
+  libmesh_parallel_only(comm);
 
   // We need a valid location_map
 #ifdef DEBUG
   bool need_map_update = (range_begin != range_end && location_map.empty());
-  communicator.max(need_map_update);
+  comm.max(need_map_update);
   libmesh_assert(!need_map_update);
 #endif
 
   // Count the objectss to ask each processor about
   std::vector<dof_id_type>
-    ghost_objects_from_proc(communicator.size(), 0);
+    ghost_objects_from_proc(comm.size(), 0);
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -141,17 +141,17 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
 
   // Request sets to send to each processor
   std::vector<std::vector<Real> >
-    requested_objs_x(communicator.size()),
-    requested_objs_y(communicator.size()),
-    requested_objs_z(communicator.size());
+    requested_objs_x(comm.size()),
+    requested_objs_y(comm.size()),
+    requested_objs_z(comm.size());
   // Corresponding ids to keep track of
   std::vector<std::vector<dof_id_type> >
-    requested_objs_id(communicator.size());
+    requested_objs_id(comm.size());
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type p=0; p != communicator.size(); ++p)
-    if (p != communicator.rank())
+  for (processor_id_type p=0; p != comm.size(); ++p)
+    if (p != comm.rank())
       {
         requested_objs_x[p].reserve(ghost_objects_from_proc[p]);
         requested_objs_y[p].reserve(ghost_objects_from_proc[p]);
@@ -162,7 +162,7 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
     {
       DofObjType *obj = *it;
       processor_id_type obj_procid = obj->processor_id();
-      if (obj_procid == communicator.rank() ||
+      if (obj_procid == comm.rank() ||
           obj_procid == DofObject::invalid_processor_id)
         continue;
 
@@ -174,25 +174,25 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
     }
 
   // Trade requests with other processors
-  for (processor_id_type p=1; p != communicator.size(); ++p)
+  for (processor_id_type p=1; p != comm.size(); ++p)
     {
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         cast_int<processor_id_type>
-        ((communicator.rank() + p) % communicator.size());
+        ((comm.rank() + p) % comm.size());
       const processor_id_type procdown =
         cast_int<processor_id_type>
-        ((communicator.size() + communicator.rank() - p) %
-         communicator.size());
+        ((comm.size() + comm.rank() - p) %
+         comm.size());
       std::vector<Real> request_to_fill_x,
         request_to_fill_y,
         request_to_fill_z;
-      communicator.send_receive(procup, requested_objs_x[procup],
-                                procdown, request_to_fill_x);
-      communicator.send_receive(procup, requested_objs_y[procup],
-                                procdown, request_to_fill_y);
-      communicator.send_receive(procup, requested_objs_z[procup],
-                                procdown, request_to_fill_z);
+      comm.send_receive(procup, requested_objs_x[procup],
+                        procdown, request_to_fill_x);
+      comm.send_receive(procup, requested_objs_y[procup],
+                        procdown, request_to_fill_y);
+      comm.send_receive(procup, requested_objs_z[procup],
+                        procdown, request_to_fill_z);
 
       // Find the local id of each requested object
       std::vector<dof_id_type> request_to_fill_id(request_to_fill_x.size());
@@ -219,8 +219,8 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
 
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
-      communicator.send_receive(procdown, data,
-                                procup, received_data);
+      comm.send_receive(procdown, data,
+                        procup, received_data);
       libmesh_assert_equal_to (requested_objs_x[procup].size(),
                                received_data.size());
 
@@ -233,17 +233,17 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
 
 template <typename Iterator,
           typename SyncFunctor>
-void sync_dofobject_data_by_id(const Communicator& communicator,
+void sync_dofobject_data_by_id(const Communicator& comm,
                                const Iterator& range_begin,
                                const Iterator& range_end,
                                SyncFunctor&    sync)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(communicator);
+  libmesh_parallel_only(comm);
 
   // Count the objects to ask each processor about
   std::vector<dof_id_type>
-    ghost_objects_from_proc(communicator.size(), 0);
+    ghost_objects_from_proc(comm.size(), 0);
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -256,12 +256,12 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
 
   // Request sets to send to each processor
   std::vector<std::vector<dof_id_type> >
-    requested_objs_id(communicator.size());
+    requested_objs_id(comm.size());
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type p=0; p != communicator.size(); ++p)
-    if (p != communicator.rank())
+  for (processor_id_type p=0; p != comm.size(); ++p)
+    if (p != comm.rank())
       {
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
       }
@@ -269,7 +269,7 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
     {
       DofObject *obj = *it;
       processor_id_type obj_procid = obj->processor_id();
-      if (obj_procid == communicator.rank() ||
+      if (obj_procid == comm.rank() ||
           obj_procid == DofObject::invalid_processor_id)
         continue;
 
@@ -277,19 +277,19 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
     }
 
   // Trade requests with other processors
-  for (processor_id_type p=1; p != communicator.size(); ++p)
+  for (processor_id_type p=1; p != comm.size(); ++p)
     {
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         cast_int<processor_id_type>
-        (communicator.rank() + p) % communicator.size();
+        ((comm.rank() + p) % comm.size());
       const processor_id_type procdown =
         cast_int<processor_id_type>
-        ((communicator.size() + communicator.rank() - p) %
-         communicator.size());
+        ((comm.size() + comm.rank() - p) %
+         comm.size());
       std::vector<dof_id_type> request_to_fill_id;
-      communicator.send_receive(procup, requested_objs_id[procup],
-                                procdown, request_to_fill_id);
+      comm.send_receive(procup, requested_objs_id[procup],
+                        procdown, request_to_fill_id);
 
       // Gather whatever data the user wants
       std::vector<typename SyncFunctor::datum> data;
@@ -297,8 +297,8 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
 
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
-      communicator.send_receive(procdown, data,
-                                procup, received_data);
+      comm.send_receive(procdown, data,
+                        procup, received_data);
       libmesh_assert_equal_to (requested_objs_id[procup].size(),
                                received_data.size());
 
@@ -318,14 +318,14 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
                                     const Iterator& range_end,
                                     SyncFunctor&    sync)
 {
-  const Communicator &communicator (mesh.comm());
+  const Communicator &comm (mesh.comm());
 
   // This function must be run on all processors at once
-  libmesh_parallel_only(communicator);
+  libmesh_parallel_only(comm);
 
   // Count the objects to ask each processor about
   std::vector<dof_id_type>
-    ghost_objects_from_proc(communicator.size(), 0);
+    ghost_objects_from_proc(comm.size(), 0);
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
@@ -338,15 +338,15 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
 
   // Request sets to send to each processor
   std::vector<std::vector<dof_id_type> >
-    requested_objs_id(communicator.size()),
-    requested_objs_parent_id(communicator.size());
+    requested_objs_id(comm.size()),
+    requested_objs_parent_id(comm.size());
   std::vector<std::vector<unsigned char> >
-    requested_objs_child_num(communicator.size());
+    requested_objs_child_num(comm.size());
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (processor_id_type p=0; p != communicator.size(); ++p)
-    if (p != communicator.rank())
+  for (processor_id_type p=0; p != comm.size(); ++p)
+    if (p != comm.rank())
       {
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
         requested_objs_parent_id[p].reserve(ghost_objects_from_proc[p]);
@@ -357,7 +357,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
     {
       Elem *elem = *it;
       processor_id_type obj_procid = elem->processor_id();
-      if (obj_procid == communicator.rank() ||
+      if (obj_procid == comm.rank() ||
           obj_procid == DofObject::invalid_processor_id)
         continue;
       const Elem *parent = elem->parent();
@@ -372,21 +372,21 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
     }
 
   // Trade requests with other processors
-  for (processor_id_type p=1; p != communicator.size(); ++p)
+  for (processor_id_type p=1; p != comm.size(); ++p)
     {
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         cast_int<processor_id_type>
-        (communicator.rank() + p) % communicator.size();
+        ((comm.rank() + p) % comm.size());
       const processor_id_type procdown =
         cast_int<processor_id_type>
-        ((communicator.size() + communicator.rank() - p) %
-         communicator.size());
+        ((comm.size() + comm.rank() - p) %
+         comm.size());
       std::vector<dof_id_type>   request_to_fill_parent_id;
       std::vector<unsigned char> request_to_fill_child_num;
-      communicator.send_receive(procup, requested_objs_parent_id[procup],
+      comm.send_receive(procup, requested_objs_parent_id[procup],
                                 procdown, request_to_fill_parent_id);
-      communicator.send_receive(procup, requested_objs_child_num[procup],
+      comm.send_receive(procup, requested_objs_child_num[procup],
                                 procdown, request_to_fill_child_num);
 
       // Find the id of each requested element
@@ -409,8 +409,8 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
 
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
-      communicator.send_receive(procdown, data,
-                                procup, received_data);
+      comm.send_receive(procdown, data,
+                        procup, received_data);
       libmesh_assert_equal_to (requested_objs_id[procup].size(),
                                received_data.size());
 

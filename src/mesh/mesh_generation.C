@@ -1309,7 +1309,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   // Get a pointer to the node located at the HEX27 centroid
                   Node* apex_node = base_hex->get_node(26);
 
-                  for (unsigned int s=0; s<base_hex->n_sides(); ++s)
+                  for (unsigned short s=0; s<base_hex->n_sides(); ++s)
                     {
                       // Get the boundary ID for this side
                       boundary_id_type b_id = mesh.boundary_info->boundary_id(*el, s);
@@ -1930,7 +1930,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
     for (; it != end; ++it)
       {
         Elem* elem = *it;
-        for (unsigned int s=0; s != elem->n_sides(); ++s)
+        for (unsigned short s=0; s != elem->n_sides(); ++s)
           if (!elem->neighbor(s))
             mesh.boundary_info->add_side(elem, s, 0);
       }
@@ -2000,7 +2000,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   const std::set<boundary_id_type> &side_ids =
     cross_section.boundary_info->get_side_boundary_ids();
   const boundary_id_type next_side_id = side_ids.empty() ?
-    0 : *side_ids.rbegin() + 1;
+    0 : cast_int<boundary_id_type>(*side_ids.rbegin() + 1);
 
   MeshBase::const_element_iterator       el  = cross_section.elements_begin();
   const MeshBase::const_element_iterator end = cross_section.elements_end();
@@ -2135,7 +2135,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           new_elem = mesh.add_elem(new_elem);
 
           // Copy any old boundary ids on all sides
-          for (unsigned int s = 0; s != elem->n_sides(); ++s)
+          for (unsigned short s = 0; s != elem->n_sides(); ++s)
             {
               const std::vector<boundary_id_type> ids_to_copy =
                 cross_section.boundary_info->boundary_ids(elem, s);
@@ -2146,7 +2146,9 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                   // for side s on the old element to side s+1 on the
                   // new element.  This is just a happy coincidence as
                   // far as I can tell...
-                  mesh.boundary_info->add_side(new_elem, s+1, ids_to_copy);
+                  mesh.boundary_info->add_side
+                    (new_elem, cast_int<unsigned short>(s+1),
+                     ids_to_copy);
                 }
               else
                 {
@@ -2168,8 +2170,11 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
               // For 2D->3D extrusion, the "top" ID is 1+the original
               // element's number of sides.  For 1D->2D extrusion, the
               // "top" ID is side 2.
-              const unsigned short top_id = new_elem->dim() == 3 ? elem->n_sides()+1 : 2;
-              mesh.boundary_info->add_side(new_elem, top_id, next_side_id+1);
+              const unsigned short top_id = new_elem->dim() == 3 ?
+                cast_int<unsigned short>(elem->n_sides()+1) : 2;
+              mesh.boundary_info->add_side
+                (new_elem, top_id,
+                 cast_int<boundary_id_type>(next_side_id+1));
             }
         }
     }

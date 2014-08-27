@@ -409,11 +409,11 @@ bool xdr_translate(XDR* x, std::string& s) {
   char* sptr = new char[xdr_MAX_STRING_LENGTH+1];
   std::copy(s.begin(), s.end(), sptr);
   sptr[s.size()] = 0;
-  std::size_t length = xdr_MAX_STRING_LENGTH;
+  unsigned int length = xdr_MAX_STRING_LENGTH;
   bool b = xdr_string(x, &sptr, length);
 
   // This is necessary when reading, but inefficient when writing...
-  length = std::strlen(sptr);
+  length = cast_int<unsigned int>(std::strlen(sptr));
   s.resize(length);
   std::copy(sptr, sptr+length, s.begin());
 
@@ -672,7 +672,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
         libmesh_assert (this->is_open());
 
-        size_t size_of_type = sizeof(T);
+        unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
 
         if (size_of_type <= 4) // 32-bit types
           {
@@ -707,7 +707,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
         libmesh_assert (this->is_open());
 
-        size_t size_of_type = sizeof(T);
+        unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
 
         if (size_of_type <= 4) // 32-bit types
           {

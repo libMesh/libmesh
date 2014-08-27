@@ -1196,12 +1196,18 @@ protected:
   Elem** _elemlinks;
 
 #ifdef LIBMESH_ENABLE_AMR
-
   /**
    * Pointers to this element's children.
    */
   Elem** _children;
+#endif
 
+  /**
+   * The subdomain to which this element belongs.
+   */
+  subdomain_id_type _sbd_id;
+
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * h refinement flag. This is stored as an unsigned char
    * to save space.
@@ -1225,13 +1231,7 @@ protected:
    * been padding anyway.
    */
   unsigned char _p_level;
-
 #endif
-
-  /**
-   * The subdomain to which this element belongs.
-   */
-  subdomain_id_type _sbd_id;
 };
 
 // ------------------------------------------------------------
@@ -1257,11 +1257,14 @@ Elem::Elem(const unsigned int nn,
   _elemlinks(elemlinkdata),
 #ifdef LIBMESH_ENABLE_AMR
   _children(NULL),
-  _rflag(Elem::DO_NOTHING),
-  _pflag(Elem::DO_NOTHING),
-  _p_level(0),
 #endif
   _sbd_id(0)
+#ifdef LIBMESH_ENABLE_AMR
+  ,
+  _rflag(Elem::DO_NOTHING),
+  _pflag(Elem::DO_NOTHING),
+  _p_level(0)
+#endif
 {
   this->processor_id() = DofObject::invalid_processor_id;
 

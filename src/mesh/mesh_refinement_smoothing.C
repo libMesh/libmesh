@@ -58,9 +58,11 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
       {
         const Elem* elem = *elem_it;
         const unsigned char elem_level =
-          elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+          cast_int<unsigned char>(elem->level() +
+            ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
         const unsigned char elem_p_level =
-          elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
+          cast_int<unsigned char>(elem->p_level() +
+            ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
         // Set the max_level at each node
         for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -151,9 +153,11 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
       {
         const Elem* elem = *elem_it;
         const unsigned char elem_level =
-          elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+          cast_int<unsigned char>(elem->level() +
+            ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
         const unsigned char elem_p_level =
-          elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
+          cast_int<unsigned char>(elem->p_level() +
+            ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
         // Set the max_level at each edge
         for (unsigned int n=0; n<elem->n_edges(); n++)

@@ -93,8 +93,8 @@ void MeshTools::Subdivision::all_subdivision(MeshBase& mesh)
   const bool mesh_has_boundary_data = (mesh.boundary_info->n_boundary_ids() > 0);
 
   std::vector<Elem*> new_boundary_elements;
-  std::vector<unsigned int> new_boundary_sides;
-  std::vector<short int> new_boundary_ids;
+  std::vector<short int> new_boundary_sides;
+  std::vector<boundary_id_type> new_boundary_ids;
 
   MeshBase::const_element_iterator       el     = mesh.elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.elements_end();
@@ -111,9 +111,10 @@ void MeshTools::Subdivision::all_subdivision(MeshBase& mesh)
 
       if (mesh_has_boundary_data)
         {
-          for (unsigned int side = 0; side < elem->n_sides(); ++side)
+          for (unsigned short side = 0; side < elem->n_sides(); ++side)
             {
-              const short int boundary_id = mesh.boundary_info->boundary_id(elem, side);
+              const boundary_id_type boundary_id =
+                mesh.boundary_info->boundary_id(elem, side);
               if (boundary_id != BoundaryInfo::invalid_id)
                 {
                   // add the boundary id to the list of new boundary ids
@@ -184,7 +185,8 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase& mesh, bool ghost
       Node* node = *nd;
       std::vector<const Node*> neighbors;
       MeshTools::find_nodal_neighbors(mesh, *node, nodes_to_elem_map, neighbors);
-      const unsigned int valence = neighbors.size();
+      const unsigned int valence =
+        cast_int<unsigned int>(neighbors.size());
       libmesh_assert_greater(valence, 1);
       node->set_valence(valence);
     }

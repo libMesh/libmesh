@@ -149,7 +149,7 @@ int XdrMESH::header(XdrMHEAD *hd)
           {
             xdr_vector(mp_xdr_handle,
                        (char *) &et[0],
-                       et.size(),
+                       cast_int<unsigned int>(et.size()),
                        sizeof(unsigned int),
                        (xdrproc_t) xdr_u_int);
             break;
@@ -214,7 +214,7 @@ int XdrMESH::header(XdrMHEAD *hd)
           {
             xdr_vector(mp_xdr_handle,
                        (char *) &neeb[0],
-                       neeb.size(),
+                       cast_int<unsigned int>(neeb.size()),
                        sizeof(unsigned int),
                        (xdrproc_t) xdr_u_int);
           }
@@ -304,13 +304,19 @@ int XdrMESH::header(XdrMHEAD *hd)
     case (XdrMGF::DECODE):
       {
         char* temp = hd->cpyString(hd->getId());
-        xdr_string(mp_xdr_handle,&temp, ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
+        xdr_string(mp_xdr_handle, &temp,
+                   ((m_type == XdrMGF::ENCODE) ?
+                    cast_int<unsigned int>(std::strlen(temp)) :
+                    hd->m_strSize));
         hd->setId(temp);
         delete [] temp;
 
         temp = hd->cpyString(hd->getTitle());
 
-        xdr_string(mp_xdr_handle,&temp, ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
+        xdr_string(mp_xdr_handle, &temp,
+                   ((m_type == XdrMGF::ENCODE) ?
+                    cast_int<unsigned int>(std::strlen(temp)) :
+                    hd->m_strSize));
         hd->setTitle(temp);
         delete [] temp;
         break;

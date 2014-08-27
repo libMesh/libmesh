@@ -345,11 +345,13 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
   for (processor_id_type p=1; p != this->n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      processor_id_type procup = (this->processor_id() + p) %
-        this->n_processors();
-      processor_id_type procdown = (this->n_processors() +
-                                    this->processor_id() - p) %
-        this->n_processors();
+      processor_id_type procup =
+        cast_int<processor_id_type>((this->processor_id() + p) %
+                                    this->n_processors());
+      processor_id_type procdown = 
+        cast_int<processor_id_type>((this->n_processors() +
+                                     this->processor_id() - p) %
+                                    this->n_processors());
       std::vector<dof_id_type> request_to_fill;
       this->comm().send_receive(procup, requested_ids[procup],
                                 procdown, request_to_fill);
@@ -1786,7 +1788,7 @@ void DofMap::dof_indices (const Elem* const elem,
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
-  unsigned int tot_size = 0;
+  std::size_t tot_size = 0;
 #endif
 
   // Determine the nodes contributing to element elem
@@ -1858,7 +1860,7 @@ void DofMap::dof_indices (const Elem* const elem,
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
-  unsigned int tot_size = 0;
+  std::size_t tot_size = 0;
 #endif
 
   // Determine the nodes contributing to element elem
@@ -1910,7 +1912,8 @@ void DofMap::_dof_indices (const Elem* const elem,
                            const unsigned int v,
                            const std::vector<Node*>& elem_nodes
 #ifdef DEBUG
-                           ,unsigned int & tot_size
+                           ,
+                           std::size_t & tot_size
 #endif
                            ) const
 {
@@ -2873,9 +2876,9 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
   NonlocalGraph::const_iterator it = other.nonlocal_pattern.begin();
   for (; it != other.nonlocal_pattern.end(); ++it)
     {
+#ifndef NDEBUG
       const dof_id_type dof_id = it->first;
 
-#ifndef NDEBUG
       processor_id_type dbg_proc_id = 0;
       while (dof_id >= dof_map.end_dof(dbg_proc_id))
         dbg_proc_id++;
@@ -2927,11 +2930,12 @@ void SparsityPattern::Build::parallel_sync ()
   for (processor_id_type p=1; p != this->n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
-      processor_id_type procup = (this->processor_id() + p) %
-        this->n_processors();
-      processor_id_type procdown = (this->n_processors() +
-                                    this->processor_id() - p) %
-        this->n_processors();
+      processor_id_type procup =
+        cast_int<processor_id_type>((this->processor_id() + p) %
+                                    this->n_processors());
+      processor_id_type procdown =
+        cast_int<processor_id_type>((this->n_processors() + this->processor_id() - p) %
+                                    this->n_processors());
 
       // Pack the sparsity pattern rows to push to procup
       std::vector<dof_id_type> pushed_row_ids,

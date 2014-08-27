@@ -86,6 +86,9 @@ dof_id_type Hex::key (const unsigned int s) const
                            this->node(5),
                            this->node(6),
                            this->node(7));
+
+    default:
+      libmesh_error_msg("Invalid s = " << s);
     }
 
   libmesh_error_msg("We'll never get here!");

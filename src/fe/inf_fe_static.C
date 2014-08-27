@@ -294,10 +294,9 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
             * FE<2,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
         break;
       }
-#ifdef DEBUG
+
     default:
       libmesh_error_msg("Unknown Dim = " << Dim);
-#endif
     }
 
 

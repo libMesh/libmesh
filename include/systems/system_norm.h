@@ -212,7 +212,10 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
                        std::vector<std::vector<Real> > &weights):
-  _norms(norms), _weights(weights.size()), _off_diagonal_weights(weights)
+  _norms(norms),
+  _weights(weights.size()),
+  _weights_sq(weights.size()),
+  _off_diagonal_weights(weights)
 {
   if(_norms.empty())
     _norms.push_back(DISCRETE_L2);

@@ -725,7 +725,9 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
   const MeshBase::element_iterator e_end = _mesh.active_local_elements_end();
 
   // Get the number of local nodes
-  dof_id_type n_local_nodes = std::distance(_mesh.local_nodes_begin(), _mesh.local_nodes_end());
+  dof_id_type n_local_nodes = cast_int<dof_id_type>
+    (std::distance(_mesh.local_nodes_begin(),
+                   _mesh.local_nodes_end()));
 
   // Create a NumericVector to hold the parallel solution
   AutoPtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build(_communicator);
@@ -885,7 +887,9 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
   libmesh_assert_equal_to (ne, _mesh.max_elem_id());
 
   // Get the number of local elements
-  dof_id_type n_local_elems = std::distance(_mesh.local_elements_begin(), _mesh.local_elements_end());
+  dof_id_type n_local_elems = cast_int<dof_id_type>
+    (std::distance(_mesh.local_elements_begin(),
+                   _mesh.local_elements_end()));
 
   // If the names vector has entries, we will only populate the soln vector
   // with names included in that list.  Note: The names vector may be

@@ -1497,7 +1497,8 @@ void GMVIO::write_binary (const std::string& fname,
     {
       float *temp = new float[mesh.n_nodes()];
 
-      const unsigned int n_vars = solution_names->size();
+      const unsigned int n_vars =
+        cast_int<unsigned int>(solution_names->size());
 
       for (unsigned int c=0; c<n_vars; c++)
         {
@@ -1860,7 +1861,8 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
 
   // write the data
   {
-    const unsigned int n_vars = solution_names.size();
+    const unsigned int n_vars =
+      cast_int<unsigned int>(solution_names.size());
 
     //    libmesh_assert_equal_to (v.size(), tw*n_vars);
 
@@ -2088,7 +2090,7 @@ void GMVIO::read (const std::string& name)
     } // end while
 
   // Set the mesh dimension to the largest encountered for an element
-  for (unsigned int i=0; i!=4; ++i)
+  for (unsigned char i=0; i!=4; ++i)
     if (elems_of_dimension[i])
       mesh.set_mesh_dimension(i);
 
@@ -2158,7 +2160,7 @@ void GMVIO::_read_materials()
       // << std::endl;
 
       MeshInput<MeshBase>::mesh().elem(i)->processor_id() =
-        GMVLib::gmv_data.longdata1[i]-1;
+        cast_int<processor_id_type>(GMVLib::gmv_data.longdata1[i]-1);
     }
 
 #endif
@@ -2260,7 +2262,8 @@ void GMVIO::_read_one_cell()
           unsigned mapped_i = eledef.node_map[i];
 
           // Note: Node numbers (as stored in libmesh) are 1-based
-          elem->set_node(i) = mesh.node_ptr(GMVLib::gmv_data.longdata1[mapped_i]-1);
+          elem->set_node(i) = mesh.node_ptr
+            (cast_int<dof_id_type>(GMVLib::gmv_data.longdata1[mapped_i]-1));
         }
 
       elems_of_dimension[elem->dim()] = true;

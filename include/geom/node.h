@@ -243,6 +243,10 @@ inline
 Node::Node (const Point& p,
             const dof_id_type dofid) :
   Point(p)
+#ifdef LIBMESH_ENABLE_NODE_VALENCE
+  ,
+  _valence(0)
+#endif
 {
   // optionally assign the id.  We have
   // to do it like this otherwise
@@ -322,12 +326,7 @@ bool Node::active () const
 inline
 void Node::set_valence (unsigned int val)
 {
-#ifndef NDEBUG
-  if (val != static_cast<valence_idx_t>(val))
-    libmesh_error_msg("ERROR: Node::valence_idx_t too small to hold val=" << val);
-#endif // #ifndef NDEBUG
-
-  _valence = val;
+  _valence = cast_int<valence_idx_t>(val);
 }
 
 #else

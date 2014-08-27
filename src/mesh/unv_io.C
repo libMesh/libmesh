@@ -248,7 +248,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
       // Grab reference to the Mesh
       MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
-      unsigned max_dim = this->max_elem_dimension_seen();
+      unsigned char max_dim = this->max_elem_dimension_seen();
 
       MeshBase::const_element_iterator       el     = mesh.elements_begin();
       const MeshBase::const_element_iterator end_el = mesh.elements_end();
@@ -404,12 +404,14 @@ void UNVIO::nodes_in (std::istream& in_file)
 
 
 
-unsigned UNVIO::max_elem_dimension_seen ()
+unsigned char UNVIO::max_elem_dimension_seen ()
 {
-  unsigned max_dim = 0;
+  unsigned char max_dim = 0;
 
+  unsigned char elem_dimensions_size = cast_int<unsigned char>
+    (elems_of_dimension.size());
   // The elems_of_dimension array is 1-based in the UNV reader
-  for (unsigned i=1; i<elems_of_dimension.size(); ++i)
+  for (unsigned char i=1; i<elem_dimensions_size; ++i)
     if (elems_of_dimension[i])
       max_dim = i;
 
@@ -424,7 +426,7 @@ void UNVIO::groups_in (std::istream& in_file)
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
   // Record the max and min element dimension seen while reading the file.
-  unsigned max_dim = this->max_elem_dimension_seen();
+  unsigned char max_dim = this->max_elem_dimension_seen();
 
   // map from (node ids) to elem of lower dimensional elements that can provide boundary conditions
   typedef std::map<std::vector<dof_id_type>, Elem*> provide_bcs_t;
@@ -515,8 +517,10 @@ void UNVIO::groups_in (std::istream& in_file)
                     // one dimension lower than the max element
                     // dimension.  Not sure if "edge" BCs in 3D
                     // actually make sense/are required...
-                    if (group_elem->dim() != max_dim-1)
-                      libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << group_elem->dim());
+                    if (group_elem->dim()+1 != max_dim)
+                      libmesh_error_msg
+                        ("ERROR: Expected boundary element of dimension " <<
+                         max_dim-1 << " but got " << group_elem->dim());
 
                     // To be pushed into the provide_bcs data container
                     std::vector<dof_id_type> group_elem_node_ids(group_elem->n_nodes());
@@ -527,7 +531,8 @@ void UNVIO::groups_in (std::istream& in_file)
 
                     // Set the current group number as the lower-dimensional element's subdomain ID.
                     // We will use this later to set a boundary ID.
-                    group_elem->subdomain_id() = group_number;
+                    group_elem->subdomain_id() =
+                      cast_int<subdomain_id_type>(group_number);
 
                     // Sort before putting into the map
                     std::sort(group_elem_node_ids.begin(), group_elem_node_ids.end());
@@ -549,11 +554,14 @@ void UNVIO::groups_in (std::istream& in_file)
                 else if (group_elem->dim() == max_dim)
                   {
                     is_subdomain_group = true;
-                    group_elem->subdomain_id() = group_number;
+                    group_elem->subdomain_id() =
+                      cast_int<subdomain_id_type>(group_number);
                   }
 
                 else
-                  libmesh_error_msg("ERROR: Found an elem with dim=" << group_elem->dim() << " > " << "max_dim=" << max_dim);
+                  libmesh_error_msg("ERROR: Found an elem with dim="
+                                    << group_elem->dim() << " > " <<
+                                    "max_dim=" << +max_dim);
               }
             else
               libMesh::err << "WARNING: UNV Element " << entity_tag << " not found while parsing groups." << std::endl;
@@ -562,10 +570,12 @@ void UNVIO::groups_in (std::istream& in_file)
 
       // Associate this group_number with the group_name in the BoundaryInfo object.
       if (is_sideset_group)
-        mesh.boundary_info->sideset_name(group_number) = group_name;
+        mesh.boundary_info->sideset_name
+          (cast_int<boundary_id_type>(group_number)) = group_name;
 
       if (is_subdomain_group)
-        mesh.subdomain_name(group_number) = group_name;
+        mesh.subdomain_name
+          (cast_int<subdomain_id_type>(group_number)) = group_name;
 
     } // end while (true)
 
@@ -585,7 +595,7 @@ void UNVIO::groups_in (std::istream& in_file)
             // information for it.  Note that we have not yet called
             // find_neighbors(), so we can't use elem->neighbor(sn) in
             // this algorithm...
-            for (unsigned int sn=0; sn<elem->n_sides(); sn++)
+            for (unsigned short sn=0; sn<elem->n_sides(); sn++)
               {
                 AutoPtr<Elem> side (elem->build_side(sn));
 

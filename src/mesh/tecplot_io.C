@@ -51,22 +51,22 @@ namespace
 class TecplotMacros
 {
 public:
-  TecplotMacros(const unsigned int n_nodes,
+  TecplotMacros(const dof_id_type n_nodes,
                 const unsigned int n_vars,
-                const unsigned int n_cells,
+                const dof_id_type n_cells,
                 const unsigned int n_vert);
-  float & nd(const unsigned int i, const unsigned int j);
-  int   & cd(const unsigned int i, const unsigned int j);
+  float & nd(const std::size_t i, const std::size_t j);
+  int   & cd(const std::size_t i, const std::size_t j);
   std::vector<float> nodalData;
   std::vector<int>   connData;
   //float* nodalData;
   //int*   connData;
 
-  void set_n_cells (const unsigned int nc);
+  void set_n_cells (const dof_id_type nc);
 
-  const unsigned int n_nodes;
+  const dof_id_type n_nodes;
   const unsigned int n_vars;
-  unsigned int n_cells;
+  dof_id_type n_cells;
   const unsigned int n_vert;
 };
 }
@@ -74,9 +74,9 @@ public:
 
 
 inline
-TecplotMacros::TecplotMacros(const unsigned int nn,
+TecplotMacros::TecplotMacros(const dof_id_type nn,
                              const unsigned int nvar,
-                             const unsigned int nc,
+                             const dof_id_type nc,
                              const unsigned int nvrt) :
   n_nodes(nn),
   n_vars(nvar),
@@ -90,7 +90,7 @@ TecplotMacros::TecplotMacros(const unsigned int nn,
 
 
 inline
-float & TecplotMacros::nd(const unsigned int i, const unsigned int j)
+float & TecplotMacros::nd(const std::size_t i, const std::size_t j)
 {
   return nodalData[(i)*(n_nodes) + (j)];
 }
@@ -98,14 +98,14 @@ float & TecplotMacros::nd(const unsigned int i, const unsigned int j)
 
 
 inline
-int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
+int & TecplotMacros::cd(const std::size_t i, const std::size_t j)
 {
   return connData[(i) + (j)*(n_vert)];
 }
 
 
 inline
-void TecplotMacros::set_n_cells (const unsigned int nc)
+void TecplotMacros::set_n_cells (const dof_id_type nc)
 {
   n_cells = nc;
   connData.resize(n_cells*n_vert);
@@ -451,9 +451,11 @@ void TecplotIO::write_binary (const std::string& fname,
 
   TecplotMacros tm(the_mesh.n_nodes(),
 #ifdef LIBMESH_USE_REAL_NUMBERS
-                   (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
+                   (3 + ((solution_names == NULL) ? 0 :
+                    cast_int<unsigned int>(solution_names->size()))),
 #else
-                   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
+                   (3 + 3*((solution_names == NULL) ? 0 :
+                    cast_int<unsigned int>(solution_names->size()))),
 #endif
                    the_mesh.n_active_sub_elem(),
                    nn_per_elem
@@ -472,9 +474,9 @@ void TecplotIO::write_binary (const std::string& fname,
       if ((vec != NULL) &&
           (solution_names != NULL))
         {
-          const unsigned int n_vars = solution_names->size();
+          const std::size_t n_vars = solution_names->size();
 
-          for (unsigned int c=0; c<n_vars; c++)
+          for (std::size_t c=0; c<n_vars; c++)
             {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
@@ -491,14 +493,15 @@ void TecplotIO::write_binary (const std::string& fname,
 
   // Initialize the file
   ierr = TECINI112 (NULL,
-                    (char*) tecplot_variable_names.c_str(),
-                    (char*) fname.c_str(),
-                    (char*) ".",
+                    const_cast<char*>(tecplot_variable_names.c_str()),
+                    const_cast<char*>(fname.c_str()),
+                    const_cast<char*>("."),
                     &file_type,
                     &tec_debug,
                     &is_double);
 
-  libmesh_assert_equal_to (ierr, 0);
+  if (ierr)
+    libmesh_file_error(fname);
 
   // A zone for each subdomain
   bool firstzone=true;
@@ -581,7 +584,7 @@ void TecplotIO::write_binary (const std::string& fname,
             zone_name << *sbd_it;
           }
 
-        ierr = TECZNE112 ((char*) zone_name.str().c_str(),
+        ierr = TECZNE112 (const_cast<char*>(zone_name.str().c_str()),
                           &cell_type,
                           &num_nodes,
                           &num_cells,
@@ -603,12 +606,13 @@ void TecplotIO::write_binary (const std::string& fname,
                           (firstzone) ? NULL : &share_var_from_zone[0],
                           &share_connect_from_zone);
 
-        libmesh_assert_equal_to (ierr, 0);
+        if (ierr)
+          libmesh_file_error(fname);
 
         // Write *all* the data for the first zone, then share it with the others
         if (firstzone)
           {
-            int total =
+            int total = cast_int<int>
 #ifdef LIBMESH_USE_REAL_NUMBERS
               ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #else
@@ -620,13 +624,15 @@ void TecplotIO::write_binary (const std::string& fname,
                               &tm.nodalData[0],
                               &is_double);
 
-            libmesh_assert_equal_to (ierr, 0);
+            if (ierr)
+              libmesh_file_error(fname);
           }
 
         // Write the connectivity
         ierr = TECNOD112 (&tm.connData[0]);
 
-        libmesh_assert_equal_to (ierr, 0);
+        if (ierr)
+          libmesh_file_error(fname);
       }
 
       firstzone = false;
@@ -635,7 +641,8 @@ void TecplotIO::write_binary (const std::string& fname,
   // Done, close the file.
   ierr = TECEND112 ();
 
-  libmesh_assert_equal_to (ierr, 0);
+  if (ierr)
+    libmesh_file_error(fname);
 
 
 
@@ -695,13 +702,15 @@ void TecplotIO::write_binary (const std::string& fname,
   // face should be 4, in 3D it's 8.
 
 
-  TecplotMacros tm(the_mesh.n_nodes(),
+  TecplotMacros tm(cast_int<unsigned int>(the_mesh.n_nodes()),
+                   cast_int<unsigned int>
 #ifdef LIBMESH_USE_REAL_NUMBERS
                    (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
 #else
                    (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
 #endif
-                   the_mesh.n_active_sub_elem(),
+                   cast_int<unsigned int>
+                   (the_mesh.n_active_sub_elem()),
                    ((the_mesh.mesh_dimension() == 2) ? 4 : 8)
                    );
 
@@ -772,7 +781,9 @@ void TecplotIO::write_binary (const std::string& fname,
                    &tec_debug,
                    &is_double);
 
-    libmesh_assert_equal_to (ierr, 0);
+    if (ierr)
+      libmesh_file_error(fname);
+
 
     ierr = TECZNE (NULL,
                    &num_nodes,
@@ -781,7 +792,8 @@ void TecplotIO::write_binary (const std::string& fname,
                    (char*) "FEBLOCK",
                    NULL);
 
-    libmesh_assert_equal_to (ierr, 0);
+    if (ierr)
+      libmesh_file_error(fname);
 
 
     int total =
@@ -796,15 +808,18 @@ void TecplotIO::write_binary (const std::string& fname,
                    &tm.nodalData[0],
                    &is_double);
 
-    libmesh_assert_equal_to (ierr, 0);
+    if (ierr)
+      libmesh_file_error(fname);
 
     ierr = TECNOD (&tm.connData[0]);
 
-    libmesh_assert_equal_to (ierr, 0);
+    if (ierr)
+      libmesh_file_error(fname);
 
     ierr = TECEND ();
 
-    libmesh_assert_equal_to (ierr, 0);
+    if (ierr)
+      libmesh_file_error(fname);
   }
 
 #endif

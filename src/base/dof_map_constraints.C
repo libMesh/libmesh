@@ -472,7 +472,7 @@ private:
 
         // We can also impose Dirichlet boundary conditions on edges, so we should
         // also independently check whether the edges have been requested
-        for (unsigned int e=0; e != elem->n_edges(); ++e)
+        for (unsigned short e=0; e != elem->n_edges(); ++e)
           {
             const std::vector<boundary_id_type>& bc_ids =
               boundary_info.edge_boundary_ids (elem, e);
@@ -1021,7 +1021,7 @@ dof_id_type DofMap::n_local_constrained_dofs() const
     upper =
     _dof_constraints.upper_bound(this->end_dof()-1);
 
-  return std::distance(lower, upper);
+  return cast_int<dof_id_type>(std::distance(lower, upper));
 }
 
 
@@ -2561,11 +2561,13 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
     for (processor_id_type p = 0; p != this->n_processors(); ++p)
       {
         // Push to processor procup while receiving from procdown
-        processor_id_type procup = (this->processor_id() + p) %
-          this->n_processors();
-        processor_id_type procdown = (this->n_processors() +
-                                      this->processor_id() - p) %
-          this->n_processors();
+        processor_id_type procup =
+          cast_int<processor_id_type>((this->processor_id() + p) %
+                                      this->n_processors());
+        processor_id_type procdown =
+          cast_int<processor_id_type>((this->n_processors() +
+                                       this->processor_id() - p) %
+                                      this->n_processors());
 
         // Pack the dof constraint rows and rhs's to push to procup
         const std::size_t pushed_ids_size = pushed_ids[procup].size();
@@ -2854,11 +2856,13 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
       for (processor_id_type p=1; p != this->n_processors(); ++p)
         {
           // Trade my requests with processor procup and procdown
-          processor_id_type procup = (this->processor_id() + p) %
-            this->n_processors();
-          processor_id_type procdown = (this->n_processors() +
-                                        this->processor_id() - p) %
-            this->n_processors();
+          processor_id_type procup =
+            cast_int<processor_id_type>((this->processor_id() + p) %
+                                        this->n_processors());
+          processor_id_type procdown =
+            cast_int<processor_id_type>((this->n_processors() +
+                                         this->processor_id() - p) %
+                                        this->n_processors());
           std::vector<dof_id_type> dof_request_to_fill,
             node_request_to_fill;
           this->comm().send_receive(procup, requested_dof_ids[procup],
@@ -3222,11 +3226,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
   for (processor_id_type p = 0; p != this->n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
-      processor_id_type procup = (this->processor_id() + p) %
-        this->n_processors();
-      processor_id_type procdown = (this->n_processors() +
-                                    this->processor_id() - p) %
-        this->n_processors();
+      processor_id_type procup =
+        cast_int<processor_id_type>((this->processor_id() + p) %
+                                    this->n_processors());
+      processor_id_type procdown =
+        cast_int<processor_id_type>((this->n_processors() +
+                                     this->processor_id() - p) %
+                                    this->n_processors());
 
       // Pack the dof constraint rows and rhs's to push to procup
       const std::size_t pushed_ids_size = pushed_ids[procup].size();
@@ -3463,11 +3469,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
   for (processor_id_type p = 0; p != this->n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
-      processor_id_type procup = (this->processor_id() + p) %
-        this->n_processors();
-      processor_id_type procdown = (this->n_processors() +
-                                    this->processor_id() - p) %
-        this->n_processors();
+      processor_id_type procup =
+        cast_int<processor_id_type>((this->processor_id() + p) %
+                                    this->n_processors());
+      processor_id_type procdown =
+        cast_int<processor_id_type>((this->n_processors() +
+                                     this->processor_id() - p) %
+                                    this->n_processors());
 
       // Pack the dof constraint rows and rhs's to push to procup
       const std::size_t pushed_ids_size = pushed_ids[procup].size();
@@ -3669,11 +3677,13 @@ void DofMap::add_adjoint_dirichlet_boundary
 (const DirichletBoundary& dirichlet_boundary,
  unsigned int qoi_index)
 {
-  std::size_t old_size = _adjoint_dirichlet_boundaries.size();
-  for (std::size_t i = old_size; i <= qoi_index; ++i)
+  unsigned int old_size = cast_int<unsigned int>
+    (_adjoint_dirichlet_boundaries.size());
+  for (unsigned int i = old_size; i <= qoi_index; ++i)
     _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
 
-  _adjoint_dirichlet_boundaries[qoi_index]->push_back(new DirichletBoundary(dirichlet_boundary));
+  _adjoint_dirichlet_boundaries[qoi_index]->push_back
+    (new DirichletBoundary(dirichlet_boundary));
 }
 
 
@@ -3697,8 +3707,9 @@ DofMap::get_adjoint_dirichlet_boundaries(unsigned int q) const
 DirichletBoundaries *
 DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
 {
-  std::size_t old_size = _adjoint_dirichlet_boundaries.size();
-  for (std::size_t i = old_size; i <= q; ++i)
+  unsigned int old_size = cast_int<unsigned int>
+    (_adjoint_dirichlet_boundaries.size());
+  for (unsigned int i = old_size; i <= q; ++i)
     _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
 
   return _adjoint_dirichlet_boundaries[q];

@@ -344,8 +344,8 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
 template <>
 RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                                                    const Order order,
-                                                   const unsigned int i,
-                                                   const unsigned int j,
+                                                   const unsigned int libmesh_dbg_var(i),
+                                                   const unsigned int libmesh_dbg_var(j),
                                                    const Point&)
 {
 #if LIBMESH_DIM > 1

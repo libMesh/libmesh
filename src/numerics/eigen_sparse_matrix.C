@@ -39,8 +39,8 @@ namespace libMesh
 template <typename T>
 void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
                                  const numeric_index_type n_in,
-                                 const numeric_index_type m_l,
-                                 const numeric_index_type n_l,
+                                 const numeric_index_type libmesh_dbg_var(m_l),
+                                 const numeric_index_type libmesh_dbg_var(n_l),
                                  const numeric_index_type nnz,
                                  const numeric_index_type,
                                  const numeric_index_type)
@@ -158,8 +158,9 @@ void EigenSparseMatrix<T>::get_transpose (SparseMatrix<T>& dest_in) const
 
 
 template <typename T>
-EigenSparseMatrix<T>::EigenSparseMatrix (const Parallel::Communicator &comm) :
-  SparseMatrix<T>(comm),
+EigenSparseMatrix<T>::EigenSparseMatrix
+  (const Parallel::Communicator &comm_in) :
+  SparseMatrix<T>(comm_in),
   _closed (false)
 {
 }

@@ -64,7 +64,8 @@ void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
 {
   libmesh_assert_equal_to (dm.m() / brows.size(), dm.n() / bcols.size());
 
-  const numeric_index_type blocksize = dm.m() / brows.size();
+  const numeric_index_type blocksize = cast_int<numeric_index_type>
+    (dm.m() / brows.size());
 
   libmesh_assert_equal_to (dm.m()%blocksize, 0);
   libmesh_assert_equal_to (dm.n()%blocksize, 0);

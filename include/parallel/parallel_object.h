@@ -68,7 +68,7 @@ public:
    * are identical because this is the only thing that makes
    * sense
    */
-  ParallelObject & operator= (const ParallelObject &other)
+  ParallelObject & operator= (const ParallelObject & libmesh_dbg_var(other))
   {
     libmesh_assert_equal_to (&_communicator, &other._communicator);
     return *this;

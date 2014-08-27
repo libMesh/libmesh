@@ -469,6 +469,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
             return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0,    xi)*
                     FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 
+          default:
+            libmesh_error_msg("Invalid shape function derivative j = " << j);
           }
       }
 

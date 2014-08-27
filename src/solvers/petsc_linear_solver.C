@@ -576,7 +576,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   // subdomain if neccessary.
   if(_restrict_solve_to_is!=NULL)
     {
-      size_t is_local_size = this->_restrict_solve_to_is_local_size();
+      PetscInt is_local_size = this->_restrict_solve_to_is_local_size();
 
       ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
@@ -632,7 +632,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
       if(_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
-          size_t is_complement_local_size = rhs_in.local_size()-is_local_size;
+          PetscInt is_complement_local_size =
+            cast_int<PetscInt>(rhs_in.local_size()-is_local_size);
 
           Vec subvec1 = NULL;
           Mat submat1 = NULL;
@@ -755,6 +756,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
           /* Nothing to do here.  */
           break;
 
+        default:
+          libmesh_error();
         }
       ierr = VecScatterBegin(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERRABORT(ierr);
@@ -921,7 +924,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
   // subdomain if neccessary.
   if(_restrict_solve_to_is!=NULL)
     {
-      size_t is_local_size = this->_restrict_solve_to_is_local_size();
+      PetscInt is_local_size = this->_restrict_solve_to_is_local_size();
 
       ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
@@ -977,7 +980,8 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
       if(_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
-          size_t is_complement_local_size = rhs_in.local_size()-is_local_size;
+          PetscInt is_complement_local_size = 
+            cast_int<PetscInt>(rhs_in.local_size()-is_local_size);
 
           Vec subvec1 = NULL;
           Mat submat1 = NULL;
@@ -1100,6 +1104,8 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
           /* Nothing to do here.  */
           break;
 
+        default:
+          libmesh_error();
         }
       ierr = VecScatterBegin(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERRABORT(ierr);
@@ -1211,7 +1217,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   // matrix works as the preconditioning matrix.
   if(_restrict_solve_to_is!=NULL)
     {
-      size_t is_local_size = this->_restrict_solve_to_is_local_size();
+      PetscInt is_local_size = this->_restrict_solve_to_is_local_size();
 
       ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
@@ -1257,7 +1263,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
       if(_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
-          size_t is_complement_local_size = rhs_in.local_size()-is_local_size;
+          PetscInt is_complement_local_size =
+            cast_int<PetscInt>(rhs_in.local_size()-is_local_size);
 
           Vec subvec1 = NULL;
           Mat submat1 = NULL;
@@ -1382,6 +1389,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
           /* Nothing to do here.  */
           break;
 
+        default:
+          libmesh_error();
         }
       ierr = VecScatterBegin(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERRABORT(ierr);
@@ -1491,7 +1500,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
   // matrix works as the preconditioning matrix.
   if(_restrict_solve_to_is!=NULL)
     {
-      size_t is_local_size = this->_restrict_solve_to_is_local_size();
+      PetscInt is_local_size = this->_restrict_solve_to_is_local_size();
 
       ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
@@ -1541,7 +1550,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
       if(_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
-          size_t is_complement_local_size = rhs_in.local_size()-is_local_size;
+          PetscInt is_complement_local_size = rhs_in.local_size()-is_local_size;
 
           Vec subvec1 = NULL;
           Mat submat1 = NULL;
@@ -1682,6 +1691,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
           /* Nothing to do here.  */
           break;
 
+        default:
+          libmesh_error();
         }
       ierr = VecScatterBegin(scatter,subsolution,solution->vec(),INSERT_VALUES,SCATTER_REVERSE);
       LIBMESH_CHKERRABORT(ierr);
@@ -1797,43 +1808,69 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
     {
 
     case CG:
-      ierr = KSPSetType (_ksp, (char*) KSPCG);         LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCG));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case CR:
-      ierr = KSPSetType (_ksp, (char*) KSPCR);         LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCR));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case CGS:
-      ierr = KSPSetType (_ksp, (char*) KSPCGS);        LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCGS));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case BICG:
-      ierr = KSPSetType (_ksp, (char*) KSPBICG);       LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPBICG));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case TCQMR:
-      ierr = KSPSetType (_ksp, (char*) KSPTCQMR);      LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPTCQMR));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case TFQMR:
-      ierr = KSPSetType (_ksp, (char*) KSPTFQMR);      LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPTFQMR));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case LSQR:
-      ierr = KSPSetType (_ksp, (char*) KSPLSQR);       LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPLSQR));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case BICGSTAB:
-      ierr = KSPSetType (_ksp, (char*) KSPBCGS);       LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPBCGS));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case MINRES:
-      ierr = KSPSetType (_ksp, (char*) KSPMINRES);     LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPMINRES));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case GMRES:
-      ierr = KSPSetType (_ksp, (char*) KSPGMRES);      LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPGMRES));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case RICHARDSON:
-      ierr = KSPSetType (_ksp, (char*) KSPRICHARDSON); LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPRICHARDSON));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 
     case CHEBYSHEV:
 #if defined(LIBMESH_HAVE_PETSC) && PETSC_VERSION_LESS_THAN(3,3,0)
-      ierr = KSPSetType (_ksp, (char*) KSPCHEBYCHEV);  LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCHEBYCHEV));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 #else
-      ierr = KSPSetType (_ksp, (char*) KSPCHEBYSHEV);  LIBMESH_CHKERRABORT(ierr); return;
+      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCHEBYSHEV));
+      LIBMESH_CHKERRABORT(ierr);
+      return;
 #endif
 
 

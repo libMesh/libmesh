@@ -1416,6 +1416,20 @@ void PetscVector<T>::_restore_array(void) const
     }
 }
 
+
+#ifdef LIBMESH_HAVE_CXX11
+      static_assert
+        (sizeof(PetscInt) == sizeof(numeric_index_type),
+         "PETSc and libMesh integer sizes must match!");
+#endif
+
+
+inline
+PetscInt* numeric_petsc_cast(const numeric_index_type* p)
+{
+  return reinterpret_cast<PetscInt*>(const_cast<numeric_index_type*>(p));
+}
+
 } // namespace libMesh
 
 

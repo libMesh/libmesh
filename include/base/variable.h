@@ -57,10 +57,10 @@ public:
             const FEType &var_type) :
     _sys(sys),
     _name(var_name),
+    _active_subdomains(),
     _number(var_number),
     _first_scalar_number(first_scalar_num),
-    _type(var_type),
-    _active_subdomains()
+    _type(var_type)
   {}
 
   /**
@@ -75,10 +75,10 @@ public:
             const std::set<subdomain_id_type> &var_active_subdomains) :
     _sys(sys),
     _name(var_name),
+    _active_subdomains(var_active_subdomains),
     _number(var_number),
     _first_scalar_number(first_scalar_num),
-    _type(var_type),
-    _active_subdomains(var_active_subdomains)
+    _type(var_type)
   {}
 
   /**
@@ -146,10 +146,10 @@ public:
 protected:
   System *                _sys;
   std::string             _name;
+  std::set<subdomain_id_type> _active_subdomains;
   unsigned int            _number;
   unsigned int            _first_scalar_number;
   FEType                  _type;
-  std::set<subdomain_id_type> _active_subdomains;
 };
 
 

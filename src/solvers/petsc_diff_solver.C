@@ -339,6 +339,8 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
       // SNES_CONVERGED_ITERATING is invalid.
     case SNES_CONVERGED_ITERATING:
       return DiffSolver::INVALID_SOLVE_RESULT;
+    default:
+      break;
     }
   return DiffSolver::INVALID_SOLVE_RESULT;
 }

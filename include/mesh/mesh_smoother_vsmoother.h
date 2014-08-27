@@ -187,21 +187,21 @@ private:
    * Not set until smooth() is actually called to mimic the
    * original code's behavior.
    */
-  unsigned _n_nodes;
+  dof_id_type _n_nodes;
 
   /**
    * The number of active elements in the Mesh at the time of smoothing.
    * Not set until smooth() is actually called to mimic the
    * original code's behavior.
    */
-  unsigned _n_cells;
+  dof_id_type _n_cells;
 
   /**
    * The number of hanging node edges in the Mesh at the time of smoothing.
    * Not set until smooth() is actually called to mimic the
    * original code's behavior.
    */
-  unsigned _n_hanging_edges;
+  dof_id_type _n_hanging_edges;
 
   /**
    * All output (including debugging) is sent to the _logfile.
@@ -222,10 +222,8 @@ private:
   template <typename T>
   struct Array2D
   {
-    Array2D(unsigned nx, unsigned ny)
-    {
-      _data.resize(nx, std::vector<T>(ny));
-    }
+    Array2D(unsigned nx, unsigned ny) :
+      _data(nx, std::vector<T>(ny)) {}
 
     // Accessors
     std::vector<T>& operator[](unsigned i) {return _data[i];}

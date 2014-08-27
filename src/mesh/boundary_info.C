@@ -172,9 +172,12 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
 
   /**
    * The boundary mesh elements will be one lower dimension than the
-   * interior mesh elements
+   * interior mesh elements.
+   *
+   * cast_int will scream if the interior is a 0-D mesh
    */
-  boundary_mesh.set_mesh_dimension(_mesh.mesh_dimension() - 1);
+  boundary_mesh.set_mesh_dimension
+    (cast_int<unsigned char>(_mesh.mesh_dimension() - 1));
 
   /**
    * Re-create the boundary mesh.
@@ -1598,12 +1601,12 @@ void BoundaryInfo::build_side_list_from_node_list()
     {
       const Elem* elem = *el;
 
-      for (unsigned side=0; side<elem->n_sides(); ++side)
+      for (unsigned short side=0; side<elem->n_sides(); ++side)
         {
           AutoPtr<Elem> side_elem = elem->build_side(side);
 
           // map from nodeset_id to count for that ID
-          std::map<dof_id_type, unsigned> nodesets_node_count;
+          std::map<boundary_id_type, unsigned> nodesets_node_count;
           for (unsigned node_num=0; node_num < side_elem->n_nodes(); ++node_num)
             {
               Node* node = side_elem->get_node(node_num);
@@ -1619,7 +1622,7 @@ void BoundaryInfo::build_side_list_from_node_list()
           // number of nodes in them.  For any that do, add this side to
           // the sideset, making sure the sideset inherits the
           // nodeset's name, if there is one.
-          std::map<dof_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
+          std::map<boundary_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
           for (; nodesets != nodesets_node_count.end(); ++nodesets)
             if (nodesets->second == side_elem->n_nodes())
               {

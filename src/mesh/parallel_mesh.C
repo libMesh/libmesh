@@ -32,7 +32,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (const Parallel::Communicator &comm_in,
-                            unsigned int d) :
+                            unsigned char d) :
   UnstructuredMesh (comm_in,d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -52,7 +52,7 @@ ParallelMesh::ParallelMesh (const Parallel::Communicator &comm_in,
 #ifndef LIBMESH_DISABLE_COMMWORLD
 // ------------------------------------------------------------
 // ParallelMesh class member functions
-ParallelMesh::ParallelMesh (unsigned int d) :
+ParallelMesh::ParallelMesh (unsigned char d) :
   UnstructuredMesh (d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -939,11 +939,11 @@ dof_id_type ParallelMesh::renumber_dof_objects
       for (processor_id_type p=1; p != this->n_processors(); ++p)
         {
           // Trade my requests with processor procup and procdown
-          processor_id_type procup = (this->processor_id() + p) %
-            this->n_processors();
-          processor_id_type procdown = (this->n_processors() +
-                                        this->processor_id() - p) %
-            this->n_processors();
+          processor_id_type procup = cast_int<processor_id_type>
+            ((this->processor_id() + p) % this->n_processors());
+          processor_id_type procdown = cast_int<processor_id_type>
+            ((this->n_processors() + this->processor_id() - p) %
+             this->n_processors());
           std::vector<dof_id_type> request_to_fill;
           this->comm().send_receive(procup, requested_ids[procup],
                                     procdown, request_to_fill);

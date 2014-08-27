@@ -524,7 +524,7 @@ void MeshData::insert_node_data (std::map<const Node*,
   // entry as reference length, and compare this
   // with the length of the 1st, 2nd...
   libmesh_assert (nd_pos != nd_end);
-  const unsigned int reference_length = (*nd_pos).second.size();
+  const std::size_t reference_length = (*nd_pos).second.size();
 
   // advance, so that we compare with the 1st
   ++nd_pos;
@@ -576,7 +576,7 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 
   // Compare entity-by-entity that the
   // sizes of the std::vector's are identical.
-  const unsigned int reference_length = (*ed_pos).second.size();
+  const std::size_t reference_length = (*ed_pos).second.size();
   ++ed_pos;
 
   for (; ed_pos != ed_end; ++ed_pos)
@@ -615,7 +615,7 @@ unsigned int MeshData::n_val_per_node () const
       std::map<const Node*,
         std::vector<Number> >::const_iterator pos = _node_data.begin();
       libmesh_assert (pos != _node_data.end());
-      return (pos->second.size());
+      return cast_int<unsigned int>(pos->second.size());
     }
   else
     return 0;
@@ -624,12 +624,12 @@ unsigned int MeshData::n_val_per_node () const
 
 
 
-unsigned int MeshData::n_node_data () const
+dof_id_type MeshData::n_node_data () const
 {
   libmesh_assert (this->_active || this->_compatibility_mode);
   libmesh_assert (this->_node_data_closed);
 
-  return this->_node_data.size();
+  return cast_int<dof_id_type>(this->_node_data.size());
 }
 
 
@@ -645,7 +645,7 @@ unsigned int MeshData::n_val_per_elem () const
       std::map<const Elem*,
         std::vector<Number> >::const_iterator pos = _elem_data.begin();
       libmesh_assert (pos != _elem_data.end());
-      return (pos->second.size());
+      return cast_int<unsigned int>(pos->second.size());
     }
   else
     return 0;
@@ -654,12 +654,12 @@ unsigned int MeshData::n_val_per_elem () const
 
 
 
-unsigned int MeshData::n_elem_data () const
+dof_id_type MeshData::n_elem_data () const
 {
   libmesh_assert (this->_active || this->_compatibility_mode);
   libmesh_assert (this->_elem_data_closed);
 
-  return _elem_data.size();
+  return cast_int<dof_id_type>(_elem_data.size());
 }
 
 

@@ -127,20 +127,26 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
   switch (preconditioner_type)
     {
     case IDENTITY_PRECOND:
-      ierr = PCSetType (pc, (char*) PCNONE);      CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCNONE));
+      CHKERRABORT(comm,ierr);
+      break;
 
     case CHOLESKY_PRECOND:
-      ierr = PCSetType (pc, (char*) PCCHOLESKY);  CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCCHOLESKY));
+      CHKERRABORT(comm,ierr);
+      break;
 
     case ICC_PRECOND:
-      ierr = PCSetType (pc, (char*) PCICC);       CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCICC));
+      CHKERRABORT(comm,ierr);
+      break;
 
     case ILU_PRECOND:
       {
         // In serial, just set the ILU preconditioner type
         if (communicator.size())
           {
-            ierr = PCSetType (pc, (char*) PCILU);
+            ierr = PCSetType (pc, const_cast<KSPType>(PCILU));
             CHKERRABORT(comm,ierr);
           }
         else
@@ -148,7 +154,7 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
             // But PETSc has no truly parallel ILU, instead you have to set
             // an actual parallel preconditioner (e.g. block Jacobi) and then
             // assign ILU sub-preconditioners.
-            ierr = PCSetType (pc, (char*) PCBJACOBI);
+            ierr = PCSetType (pc, const_cast<KSPType>(PCBJACOBI));
             CHKERRABORT(comm,ierr);
 
             // Set ILU as the sub preconditioner type
@@ -162,7 +168,7 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
         // In serial, just set the LU preconditioner type
         if (communicator.size())
           {
-            ierr = PCSetType (pc, (char*) PCLU);
+            ierr = PCSetType (pc, const_cast<KSPType>(PCLU));
             CHKERRABORT(comm,ierr);
           }
         else
@@ -170,7 +176,7 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
             // But PETSc has no truly parallel LU, instead you have to set
             // an actual parallel preconditioner (e.g. block Jacobi) and then
             // assign LU sub-preconditioners.
-            ierr = PCSetType (pc, (char*) PCBJACOBI);
+            ierr = PCSetType (pc, const_cast<KSPType>(PCBJACOBI));
             CHKERRABORT(comm,ierr);
 
             // Set ILU as the sub preconditioner type
@@ -184,34 +190,48 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
         // In parallel, I think ASM uses ILU by default as the sub-preconditioner...
         // I tried setting a different sub-preconditioner here, but apparently the matrix
         // is not in the correct state (at this point) to call PCSetUp().
-        ierr = PCSetType (pc, (char*) PCASM);
+        ierr = PCSetType (pc, const_cast<KSPType>(PCASM));
         CHKERRABORT(comm,ierr);
         break;
       }
 
     case JACOBI_PRECOND:
-      ierr = PCSetType (pc, (char*) PCJACOBI);    CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCJACOBI));
+      CHKERRABORT(comm,ierr);
+      break;
 
     case BLOCK_JACOBI_PRECOND:
-      ierr = PCSetType (pc, (char*) PCBJACOBI);   CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCBJACOBI));
+      CHKERRABORT(comm,ierr);
+      break;
 
     case SOR_PRECOND:
-      ierr = PCSetType (pc, (char*) PCSOR);       CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCSOR));
+      CHKERRABORT(comm,ierr);
+      break;
 
     case EISENSTAT_PRECOND:
-      ierr = PCSetType (pc, (char*) PCEISENSTAT); CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCEISENSTAT));
+      CHKERRABORT(comm,ierr);
+      break;
 
     case AMG_PRECOND:
-      ierr = PCSetType (pc, (char*) PCHYPRE);     CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCHYPRE));
+      CHKERRABORT(comm,ierr);
+      break;
 
 #if !(PETSC_VERSION_LESS_THAN(2,1,2))
       // Only available for PETSC >= 2.1.2
     case USER_PRECOND:
-      ierr = PCSetType (pc, (char*) PCMAT);       CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCMAT));
+      CHKERRABORT(comm,ierr);
+      break;
 #endif
 
     case SHELL_PRECOND:
-      ierr = PCSetType (pc, (char*) PCSHELL);     CHKERRABORT(comm,ierr); break;
+      ierr = PCSetType (pc, const_cast<KSPType>(PCSHELL));
+      CHKERRABORT(comm,ierr);
+      break;
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Preconditioner: "

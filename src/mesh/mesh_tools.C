@@ -662,7 +662,7 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
 dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
                                const MeshBase::const_element_iterator &end)
 {
-  return std::distance(begin, end);
+  return cast_int<dof_id_type>(std::distance(begin, end));
 }
 
 
@@ -670,7 +670,7 @@ dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
 dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
                                 const MeshBase::const_node_iterator &end)
 {
-  return std::distance(begin, end);
+  return cast_int<dof_id_type>(std::distance(begin, end));
 }
 
 

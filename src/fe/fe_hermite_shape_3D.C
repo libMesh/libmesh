@@ -146,6 +146,8 @@ Real hermite_bases_3D
           bases1D[1] = 1;
           bases1D[2] = 1;
           break;
+        default:
+          libmesh_error_msg("Invalid basis node = " << i/8);
         }
 
       unsigned int basisnum = i%8;
@@ -175,6 +177,8 @@ Real hermite_bases_3D
         case 7: // DoF = xyz derivative at node
           coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
           bases1D[0] += 2; bases1D[1] += 2; bases1D[2] += 2; break;
+        default:
+          libmesh_error_msg("Invalid basisnum = " << basisnum);
         }
     }
   // Edges
@@ -291,6 +295,8 @@ Real hermite_bases_3D
           if (basisnum % 2)
             coef *= dxdxi[2][1];
           break;
+        default:
+          libmesh_error_msg("Invalid basis node = " << (i - 64) / (4*e));
         }
     }
   // Faces
@@ -341,6 +347,8 @@ Real hermite_bases_3D
           if (basisnum % 2)
             coef *= dxdxi[2][1];
           break;
+        default:
+          libmesh_error_msg("Invalid basis node = " << (i - 64 - 12*4*e) / (2*e*e));
         }
     }
   // Interior
@@ -516,6 +524,8 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[2],p(2));
                   break;
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
 
             }
@@ -615,6 +625,8 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[2],p(2));
                   break;
+                default:
+                  libmesh_error_msg("Invalid shape function derivative j = " << j);
                 }
 
             }

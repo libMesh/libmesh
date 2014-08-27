@@ -85,6 +85,7 @@ extern "C"
     libmesh_assert(r);
     libmesh_assert(ctx);
 
+    // No way to safety-check this cast, since we got a void*...
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
 
@@ -95,7 +96,7 @@ extern "C"
       PetscInt n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
       CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = static_cast<unsigned>(n_iterations);
+      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
     }
 
     NonlinearImplicitSystem &sys = solver->system();
@@ -169,6 +170,7 @@ extern "C"
 
     libmesh_assert(ctx);
 
+    // No way to safety-check this cast, since we got a void*...
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
 
@@ -179,7 +181,7 @@ extern "C"
       PetscInt n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
       CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = static_cast<unsigned>(n_iterations);
+      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
     }
 
     NonlinearImplicitSystem &sys = solver->system();
@@ -386,7 +388,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
     {
       Vec *modes;
       PetscScalar *dots;
-      PetscInt nmodes = sp.size();
+      PetscInt nmodes = cast_int<PetscInt>(sp.size());
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = PetscMalloc2(nmodes,Vec,&modes,nmodes,PetscScalar,&dots);

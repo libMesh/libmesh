@@ -694,6 +694,8 @@ void FEInterface::shape<Real>(const unsigned int dim,
     case 3:
       fe_scalar_vec_error_switch(3, shape(t,o,i,p), phi = , ; break;);
       break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
     }
 
   return;
@@ -730,6 +732,8 @@ void FEInterface::shape<Real>(const unsigned int dim,
     case 3:
       fe_scalar_vec_error_switch(3, shape(elem,o,i,p), phi = , ; break;);
       break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
     }
 
   return;
@@ -759,6 +763,8 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
     case 3:
       fe_vector_scalar_error_switch(3, shape(t,o,i,p), phi = , ; break;);
       break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
     }
 
   return;
@@ -788,6 +794,8 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
     case 3:
       fe_vector_scalar_error_switch(3, shape(elem,o,i,p), phi = , ; break;);
       break;
+    default:
+      libmesh_error_msg("Invalid dimension = " << dim);
     }
 
   return;

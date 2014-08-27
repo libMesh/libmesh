@@ -507,7 +507,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                                                    const Order order,
                                                    const unsigned int i,
                                                    const unsigned int j,
-                                                   const Point& p)
+                                                   const Point& libmesh_dbg_var(p))
 {
 #if LIBMESH_DIM == 3
 

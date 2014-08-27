@@ -2156,7 +2156,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
               if (cont == C_ONE)
                 dphi = &(edge_fe->get_dphi());
 
-              for (unsigned int e=0; e != elem->n_edges(); ++e)
+              for (unsigned char e=0; e != elem->n_edges(); ++e)
                 {
                   context.edge = e;
                   context.edge_fe_reinit();
@@ -2264,7 +2264,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
               if (cont == C_ONE)
                 dphi = &(side_fe->get_dphi());
 
-              for (unsigned int s=0; s != elem->n_sides(); ++s)
+              for (unsigned char s=0; s != elem->n_sides(); ++s)
                 {
                   FEInterface::dofs_on_side(elem, dim, fe_type, s,
                                             side_dofs);

@@ -46,12 +46,12 @@ namespace libMesh
 namespace {
 struct DofBCData
 {
-  unsigned int       dof_id;
+  dof_id_type        dof_id;
   unsigned short int side;
   boundary_id_type   bc_id;
 
   // Default constructor
-  DofBCData (unsigned int       dof_id_in=0,
+  DofBCData (dof_id_type        dof_id_in=0,
              unsigned short int side_in=0,
              boundary_id_type   bc_id_in=0) :
     dof_id(dof_id_in),
@@ -181,10 +181,10 @@ void XdrIO::write (const std::string& name)
   libmesh_assert(n_elem == mesh.n_elem());
   libmesh_assert(n_nodes == mesh.n_nodes());
 
-  std::size_t
-    n_bcs      = mesh.boundary_info->n_boundary_conds();
-  std::size_t
-    n_nodesets = mesh.boundary_info->n_nodeset_conds();
+  header_id_type n_bcs =
+    cast_int<header_id_type>(mesh.boundary_info->n_boundary_conds());
+  header_id_type n_nodesets =
+    cast_int<header_id_type>(mesh.boundary_info->n_nodeset_conds());
   unsigned int
     n_p_levels = MeshTools::n_p_levels (mesh);
 
@@ -360,21 +360,20 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 
   // We will only write active elements and their parents.
   const unsigned int n_active_levels = MeshTools::n_active_levels (mesh);
-  std::vector<xdr_id_type>
-    n_global_elem_at_level(n_active_levels), n_local_elem_at_level(n_active_levels);
+  std::vector<xdr_id_type> n_global_elem_at_level(n_active_levels);
 
   MeshBase::const_element_iterator it  = mesh.local_elements_end(), end=it;
 
   // Find the number of local and global elements at each level
 #ifndef NDEBUG
-  dof_id_type tot_n_elem = 0;
+  xdr_id_type tot_n_elem = 0;
 #endif
   for (unsigned int level=0; level<n_active_levels; level++)
     {
       it  = mesh.local_level_elements_begin(level);
       end = mesh.local_level_elements_end(level);
 
-      n_local_elem_at_level[level] = n_global_elem_at_level[level] = MeshTools::n_elem(it, end);
+      n_global_elem_at_level[level] = MeshTools::n_elem(it, end);
 
       this->comm().sum(n_global_elem_at_level[level]);
 #ifndef NDEBUG
@@ -479,7 +478,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
                 for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
                   output_buffer.push_back(*recv_conn_iter);
 
-                io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
+                io.data_stream 
+                  (&output_buffer[0],
+                   cast_int<unsigned int>(output_buffer.size()),
+                   cast_int<unsigned int>(output_buffer.size()));
               }
           }
         }
@@ -590,7 +592,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
                     for (xdr_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
                       output_buffer.push_back(*recv_conn_iter);
 
-                    io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
+                    io.data_stream
+                      (&output_buffer[0],
+                       cast_int<unsigned int>(output_buffer.size()),
+                       cast_int<unsigned int>(output_buffer.size()));
                   }
               }
             }
@@ -817,7 +822,8 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
                 n_written++;
               }
 
-          io.data_stream (coords.empty() ? NULL : &coords[0], coords.size(), 3);
+          io.data_stream (coords.empty() ? NULL : &coords[0],
+                          cast_int<unsigned int>(coords.size()), 3);
         }
     }
   if (this->processor_id() == 0)
@@ -826,7 +832,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
 
 
 
-void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
+void XdrIO::write_serialized_bcs (Xdr &io, const header_id_type n_bcs) const
 {
   libmesh_assert (io.writing());
 
@@ -859,7 +865,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
     {
       const Elem *elem = *it;
 
-      for (unsigned int s=0; s<elem->n_sides(); s++)
+      for (unsigned short s=0; s<elem->n_sides(); s++)
         // We're supporting boundary ids on internal sides now
         //if (elem->neighbor(s) == NULL)
         {
@@ -896,12 +902,14 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
             this->comm().receive (pid, recv_bcs);
 
           const dof_id_type my_n_local_level_0_elem
-            = recv_bcs.back(); recv_bcs.pop_back();
+            = cast_int<dof_id_type>(recv_bcs.back());
+          recv_bcs.pop_back();
 
           for (std::size_t idx=0; idx<recv_bcs.size(); idx += 3, n_bcs_out++)
             recv_bcs[idx+0] += elem_offset;
 
-          io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0], recv_bcs.size(), 3);
+          io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0],
+                          cast_int<unsigned int>(recv_bcs.size()), 3);
           elem_offset += my_n_local_level_0_elem;
         }
       libmesh_assert_equal_to (n_bcs, n_bcs_out);
@@ -912,7 +920,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
 
 
 
-void XdrIO::write_serialized_nodesets (Xdr &io, const std::size_t n_nodesets) const
+void XdrIO::write_serialized_nodesets (Xdr &io, const header_id_type n_nodesets) const
 {
   libmesh_assert (io.writing());
 
@@ -973,13 +981,15 @@ void XdrIO::write_serialized_nodesets (Xdr &io, const std::size_t n_nodesets) co
           else
             this->comm().receive (pid, recv_bcs);
 
-          const dof_id_type my_n_node
-            = recv_bcs.back(); recv_bcs.pop_back();
+          const dof_id_type my_n_node =
+            cast_int<dof_id_type>(recv_bcs.back());
+          recv_bcs.pop_back();
 
           for (std::size_t idx=0; idx<recv_bcs.size(); idx += 2, n_nodesets_out++)
             recv_bcs[idx+0] += node_offset;
 
-          io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0], recv_bcs.size(), 2);
+          io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0],
+                          cast_int<unsigned int>(recv_bcs.size()), 2);
           node_offset += my_n_node;
         }
       libmesh_assert_equal_to (n_nodesets, n_nodesets_out);
@@ -1236,11 +1246,12 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
     sizes[unique_id_size_index] ? true : false;
 
   T n_elem_at_level=0, n_processed_at_level=0;
-  for (std::size_t blk=0, first_elem=0, last_elem=0;
+  for (dof_id_type blk=0, first_elem=0, last_elem=0;
        last_elem<n_elem; blk++)
     {
-      first_elem = blk*io_blksize;
-      last_elem  = std::min((blk+1)*io_blksize, std::size_t(n_elem));
+      first_elem = cast_int<dof_id_type>(blk*io_blksize);
+      last_elem  = std::min(cast_int<dof_id_type>((blk+1)*io_blksize),
+                            n_elem);
 
       conn.clear();
 
@@ -1358,7 +1369,8 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
 
           for (unsigned int n=0; n<elem->n_nodes(); n++, ++it)
             {
-              const dof_id_type global_node_number = *it;
+              const dof_id_type global_node_number =
+                cast_int<dof_id_type>(*it);
 
               elem->set_node(n) =
                 mesh.add_point (Point(), global_node_number);
@@ -1370,7 +1382,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
     }
 
   // Set the mesh dimension to the largest encountered for an element
-  for (unsigned int i=0; i!=4; ++i)
+  for (unsigned char i=0; i!=4; ++i)
     if (elems_of_dimension[i])
       mesh.set_mesh_dimension(i);
 
@@ -1431,7 +1443,8 @@ void XdrIO::read_serialized_nodes (Xdr &io, const dof_id_type n_nodes)
       coords.resize(3*(last_node - first_node));
 
       if (this->processor_id() == 0)
-        io.data_stream (coords.empty() ? NULL : &coords[0], coords.size());
+        io.data_stream (coords.empty() ? NULL : &coords[0],
+                        cast_int<unsigned int>(coords.size()));
 
       // For large numbers of processors the majority of processors at any given
       // block may not actually need these data.  It may be worth profiling this,
@@ -1448,7 +1461,7 @@ void XdrIO::read_serialized_nodes (Xdr &io, const dof_id_type n_nodes)
           if (pos.first != pos.second) // we need this node.
             {
               libmesh_assert_equal_to (*pos.first, n);
-              mesh.node(n) =
+              mesh.node(cast_int<dof_id_type>(n)) =
                 Point (coords[idx+0],
                        coords[idx+1],
                        coords[idx+2]);
@@ -1492,16 +1505,18 @@ void XdrIO::read_serialized_bcs (Xdr &io, T)
       input_buffer.resize (3*(last_bc - first_bc));
 
       if (this->processor_id() == 0)
-        io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0], input_buffer.size());
+        io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0],
+                        cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
       dof_bc_data.clear(); /**/ dof_bc_data.reserve (input_buffer.size()/3);
 
       // convert the input_buffer to DofBCData to facilitate searching
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
-        dof_bc_data.push_back (DofBCData(input_buffer[idx+0],
-                                         input_buffer[idx+1],
-                                         input_buffer[idx+2]));
+        dof_bc_data.push_back
+          (DofBCData(cast_int<dof_id_type>(input_buffer[idx+0]),
+                     cast_int<unsigned short>(input_buffer[idx+1]),
+                     cast_int<boundary_id_type>(input_buffer[idx+2])));
       input_buffer.clear();
       // note that while the files *we* write should already be sorted by
       // element id this is not necessarily guaranteed.
@@ -1569,16 +1584,18 @@ void XdrIO::read_serialized_nodesets (Xdr &io, T)
       input_buffer.resize (2*(last_bc - first_bc));
 
       if (this->processor_id() == 0)
-        io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0], input_buffer.size());
+        io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0],
+                        cast_int<unsigned int>(input_buffer.size()));
 
       this->comm().broadcast (input_buffer);
       node_bc_data.clear(); /**/ node_bc_data.reserve (input_buffer.size()/2);
 
       // convert the input_buffer to DofBCData to facilitate searching
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=2)
-        node_bc_data.push_back (DofBCData(input_buffer[idx+0],
-                                          0,
-                                          input_buffer[idx+1]));
+        node_bc_data.push_back
+          (DofBCData(cast_int<dof_id_type>(input_buffer[idx+0]),
+                     0,
+                     cast_int<boundary_id_type>(input_buffer[idx+1])));
       input_buffer.clear();
       // note that while the files *we* write should already be sorted by
       // node id this is not necessarily guaranteed.

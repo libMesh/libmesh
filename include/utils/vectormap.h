@@ -63,10 +63,11 @@ class vectormap : public std::vector<std::pair<Key, Tp> >
 
 public:
 
-  typedef Key                     key_type;
-  typedef Tp                      mapped_type;
-  typedef std::pair<Key, Tp>      value_type;
-  typedef std::vector<value_type> vector_type;
+  typedef Key                                   key_type;
+  typedef Tp                                    mapped_type;
+  typedef std::pair<Key, Tp>                    value_type;
+  typedef std::vector<value_type>               vector_type;
+  typedef typename vector_type::difference_type difference_type;
 
 private:
 
@@ -159,7 +160,8 @@ public:
    * *returns the number of occurances of \p key.  For a map-like object, this should
    * be 1 or 0.
    */
-  unsigned int count (const key_type &key) const
+  difference_type
+  count (const key_type &key) const
   {
     if (!_sorted)
       const_cast<vectormap<Key, Tp>*>(this)->sort();

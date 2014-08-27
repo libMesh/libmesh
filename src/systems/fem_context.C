@@ -1716,15 +1716,15 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   // everywhere.
   libmesh_assert(elem || fe_type.family == SCALAR);
 
-  unsigned int dim = elem ? elem->dim() : 0;
+  unsigned int elem_dim = elem ? elem->dim() : 0;
 
   AutoPtr<FEGenericBase<OutputShape> >
-    fe_new(FEGenericBase<OutputShape>::build(dim, fe_type));
+    fe_new(FEGenericBase<OutputShape>::build(elem_dim, fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
   Point master_point = elem ?
-    FEInterface::inverse_map(dim, fe_type, elem, p) :
+    FEInterface::inverse_map(elem_dim, fe_type, elem, p) :
     Point(0);
 
   std::vector<Point> coor(1, master_point);

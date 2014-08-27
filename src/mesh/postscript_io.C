@@ -285,7 +285,8 @@ void PostscriptIO::_compute_edge_bezier_coeffs(const Elem* elem)
         // by their postscript-scaled values.
         for (unsigned int j=0; j<3; ++j)
           {
-            phys_coords[j] = (elem->point(j)(i) - _offset(i)) * _scale;
+            phys_coords[j] = static_cast<float>
+              ((elem->point(j)(i) - _offset(i)) * _scale);
             bez_coords[j] = 0.; // zero out result vector
           }
 

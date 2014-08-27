@@ -113,7 +113,15 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
           return -4 + 6*xi;
         case 3:
           return -2 + 6*xi;
+
+        default:
+          libmesh_error_msg("Invalid shape function index i = " <<
+                            basis_num);
         }
+
+    default:
+      libmesh_error_msg("Invalid shape function derivative j = " <<
+                        deriv_type);
     }
 
   libmesh_error_msg("We'll never get here!");
@@ -141,7 +149,15 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
           return 1 - 4*xi + 3*xi*xi;
         case 3:
           return -2*xi + 3*xi*xi;
+
+        default:
+          libmesh_error_msg("Invalid shape function index i = " <<
+                            basis_num);
         }
+
+    default:
+      libmesh_error_msg("Invalid shape function derivative j = " <<
+                        deriv_type);
     }
 
   libmesh_error_msg("We'll never get here!");
@@ -163,6 +179,10 @@ Real clough_raw_shape(const unsigned int basis_num,
       return xi - 2*xi*xi + xi*xi*xi;
     case 3:
       return -xi*xi + xi*xi*xi;
+
+    default:
+      libmesh_error_msg("Invalid shape function index i = " <<
+                        basis_num);
     }
 
   libmesh_error_msg("We'll never get here!");

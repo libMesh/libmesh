@@ -267,7 +267,7 @@ void ExodusII_IO::read (const std::string& fname)
   // libmesh_assert_equal_to (static_cast<unsigned>(nelem_last_block), mesh.n_elem());
 
   // Set the mesh dimension to the largest encountered for an element
-  for (unsigned int i=0; i!=4; ++i)
+  for (unsigned char i=0; i!=4; ++i)
     if (elems_of_dimension[i])
       mesh.set_mesh_dimension(i);
 
@@ -284,7 +284,9 @@ void ExodusII_IO::read (const std::string& fname)
 
         std::string sideset_name = exio_helper->get_side_set_name(i);
         if (!sideset_name.empty())
-          mesh.boundary_info->sideset_name(exio_helper->get_side_set_id(i)) = sideset_name;
+          mesh.boundary_info->sideset_name
+            (cast_int<boundary_id_type>
+              (exio_helper->get_side_set_id(i))) = sideset_name;
       }
 
     for (unsigned int e=0; e<exio_helper->elem_list.size(); e++)
@@ -296,7 +298,9 @@ void ExodusII_IO::read (const std::string& fname)
         // 2.) Pass it through elem_num_map (to get the corresponding Exodus ID)
         // 3.) Subtract 1 from that, since libmesh is "zero"-based,
         //     even when the Exodus numbering doesn't start with 1.
-        int libmesh_elem_id = exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1;
+        dof_id_type libmesh_elem_id =
+          cast_int<dof_id_type>
+            (exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1);
 
         // Set any relevant node/edge maps for this element
         Elem * elem = mesh.elem(libmesh_elem_id);
@@ -304,9 +308,10 @@ void ExodusII_IO::read (const std::string& fname)
         const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(elem->type());
 
         // Add this (elem,side,id) triplet to the BoundaryInfo object.
-        mesh.boundary_info->add_side (libmesh_elem_id,
-                                      conv.get_side_map(exio_helper->side_list[e]-1),
-                                      exio_helper->id_list[e]);
+        mesh.boundary_info->add_side
+          (libmesh_elem_id,
+           cast_int<unsigned short>(conv.get_side_map(exio_helper->side_list[e]-1)),
+           cast_int<boundary_id_type>(exio_helper->id_list[e]));
       }
   }
 
@@ -316,7 +321,8 @@ void ExodusII_IO::read (const std::string& fname)
 
     for (int nodeset=0; nodeset<exio_helper->num_node_sets; nodeset++)
       {
-        int nodeset_id = exio_helper->nodeset_ids[nodeset];
+        boundary_id_type nodeset_id =
+          cast_int<boundary_id_type>(exio_helper->nodeset_ids[nodeset]);
 
         std::string nodeset_name = exio_helper->get_node_set_name(nodeset);
         if (!nodeset_name.empty())
@@ -330,7 +336,8 @@ void ExodusII_IO::read (const std::string& fname)
             // indcies into the node_num_map array, so we have to map
             // them.  See comment above.
             int libmesh_node_id = exio_helper->node_num_map[exio_helper->node_list[node] - 1] - 1;
-            mesh.boundary_info->add_node(libmesh_node_id, nodeset_id);
+            mesh.boundary_info->add_node(cast_int<dof_id_type>(libmesh_node_id),
+                                         nodeset_id);
           }
       }
   }

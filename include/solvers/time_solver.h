@@ -259,12 +259,6 @@ protected:
   sys_type& _system;
 
   /**
-   * A bool that will be true the first time solve() is called,
-   * and false thereafter
-   */
-  bool first_solve;
-
-  /**
    * Serial vector of _system.get_vector("_old_nonlinear_solution")
    */
   AutoPtr<NumericVector<Number> > old_local_nonlinear_solution;

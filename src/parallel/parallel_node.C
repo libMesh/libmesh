@@ -81,8 +81,8 @@ unsigned int packed_size (const Node*,
   const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
 
-  const int n_bcs =
-    *(in + pre_indexing_size + indexing_size);
+  const int n_bcs = cast_int<int>
+    (*(in + pre_indexing_size + indexing_size));
   libmesh_assert_greater_equal (n_bcs, 0);
 
   return pre_indexing_size + indexing_size + 1 + n_bcs;
@@ -194,14 +194,14 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
   libmesh_assert_equal_to (incoming_header, node_magic_header);
 #endif
 
-  const processor_id_type processor_id = static_cast<processor_id_type>(*in++);
+  const processor_id_type processor_id = cast_int<processor_id_type>(*in++);
   libmesh_assert(processor_id == DofObject::invalid_processor_id ||
                  processor_id < mesh->n_processors());
 
-  const dof_id_type id = static_cast<dof_id_type>(*in++);
+  const dof_id_type id = cast_int<dof_id_type>(*in++);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  const unique_id_type unique_id = static_cast<unique_id_type>(*in++);
+  const unique_id_type unique_id = cast_int<unique_id_type>(*in++);
 #endif
 
   Node *node = mesh->query_node_ptr(id);
@@ -272,13 +272,14 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
   // libmesh_assert_greater_equal (num_bcs, 0);
 
   for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
-    mesh->boundary_info->add_node (node, *in++);
+    mesh->boundary_info->add_node
+      (node, cast_int<boundary_id_type>(*in++));
 
   *out = node;
 
 #ifndef NDEBUG
   libmesh_assert (in - original_in ==
-                  static_cast<int>
+                  cast_int<int>
                   (Parallel::packed_size(node, original_in)));
 #endif
 }

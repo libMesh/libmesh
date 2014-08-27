@@ -197,7 +197,7 @@ uint64_t hashword2(const uint64_t first, const uint64_t second)
 inline
 uint16_t hashword2(const uint16_t first, const uint16_t second)
 {
-  return (first%65449 + (second<<5)%65449);
+  return static_cast<uint16_t>(first%65449 + (second<<5)%65449);
 }
 
 // Call the 64-bit FNV hash function.

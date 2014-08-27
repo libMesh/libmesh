@@ -673,7 +673,7 @@ public:
    * Requires communication with all other processors.
    */
   void update_global_solution (std::vector<Number>& global_soln,
-                               const unsigned int dest_proc) const;
+                               const processor_id_type dest_proc) const;
 
   /**
    * @returns a constant reference to this systems's \p _mesh.

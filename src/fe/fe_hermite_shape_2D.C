@@ -109,6 +109,8 @@ Real hermite_bases_2D
         case 3:
           bases1D[1] = 1;
           break;
+        default:
+          libmesh_error_msg("Invalid basis node = " << i/4);
         }
 
       unsigned int basisnum = i%4;

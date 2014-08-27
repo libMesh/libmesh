@@ -147,7 +147,8 @@ unsigned int RBParametrized::get_n_discrete_params() const
   if(!parameters_initialized)
     libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_n_discrete_params");
 
-  return get_discrete_parameter_values().size();
+  return cast_int<unsigned int>
+    (get_discrete_parameter_values().size());
 }
 
 std::set<std::string> RBParametrized::get_parameter_names() const
@@ -286,7 +287,8 @@ void RBParametrized::write_discrete_parameter_values_to_file(const std::string& 
       for( ; discrete_it != discrete_it_end; ++discrete_it)
         {
           std::string param_name = discrete_it->first;
-          unsigned int n_discrete_values = discrete_it->second.size();
+          unsigned int n_discrete_values = cast_int<unsigned int>
+            (discrete_it->second.size());
           discrete_parameters_out << param_name << n_discrete_values;
 
           for(unsigned int i=0; i<n_discrete_values; i++)

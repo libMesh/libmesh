@@ -3094,7 +3094,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T> > &data,
     {
       for (unsigned int i=0; i<data.size(); ++i)
         {
-          temp.push_back(data[i].size());
+          temp.push_back(cast_int<unsigned int>(data[i].size()));
           for (std::size_t j=0; j != data[i].size(); ++j)
             /**
              * The strings will be packed in one long array with the size of each

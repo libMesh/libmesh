@@ -44,7 +44,7 @@ struct ElementDefinition
   std::vector<unsigned> abaqus_zero_based_node_id_to_libmesh_node_id;
 
   // Maps (zero-based!) Abaqus side numbers to libmesh side numbers
-  std::vector<unsigned> abaqus_zero_based_side_id_to_libmesh_side_id;
+  std::vector<unsigned short> abaqus_zero_based_side_id_to_libmesh_side_id;
 };
 
 /**
@@ -58,7 +58,7 @@ std::map<ElemType, ElementDefinition> eletypes;
 void add_eletype_entry(ElemType libmesh_elem_type,
                        const unsigned* node_map,
                        unsigned node_map_size,
-                       const unsigned* side_map,
+                       const unsigned short* side_map,
                        unsigned side_map_size)
 {
   // If map entry does not exist, this will create it
@@ -68,11 +68,13 @@ void add_eletype_entry(ElemType libmesh_elem_type,
   // Use the "swap trick" from Scott Meyer's "Effective STL" to swap
   // an unnamed temporary vector into the map_entry's vector.  Note:
   // the vector(iter, iter) constructor is used.
-  std::vector<unsigned>(node_map,
-                        node_map+node_map_size).swap(map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
+  std::vector<unsigned>
+    (node_map, node_map+node_map_size).swap
+      (map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
 
-  std::vector<unsigned>(side_map,
-                        side_map+side_map_size).swap(map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
+  std::vector<unsigned short>
+    (side_map, side_map+side_map_size).swap
+      (map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
 }
 
 
@@ -89,78 +91,86 @@ void init_eletypes ()
     {
       {
         // EDGE2
-        const unsigned int node_map[] = {0,1}; // identity
-        const unsigned int side_map[] = {0,1}; // identity
+        const unsigned int   node_map[] = {0,1}; // identity
+        const unsigned short side_map[] = {0,1}; // identity
         add_eletype_entry(EDGE2, node_map, 2, side_map, 2);
       }
 
       {
         // TRI3
-        const unsigned int node_map[] = {0,1,2}; // identity
-        const unsigned int side_map[] = {0,1,2}; // identity
+        const unsigned int   node_map[] = {0,1,2}; // identity
+        const unsigned short side_map[] = {0,1,2}; // identity
         add_eletype_entry(TRI3, node_map, 3, side_map, 3);
       }
 
       {
         // QUAD4
-        const unsigned int node_map[] = {0,1,2,3}; // identity
-        const unsigned int side_map[] = {0,1,2,3}; // identity
+        const unsigned int   node_map[] = {0,1,2,3}; // identity
+        const unsigned short side_map[] = {0,1,2,3}; // identity
         add_eletype_entry(QUAD4, node_map, 4, side_map, 4);
       }
 
       {
         // TET4
-        const unsigned int node_map[] = {0,1,2,3}; // identity
-        const unsigned int side_map[] = {0,1,2,3}; // identity
+        const unsigned int   node_map[] = {0,1,2,3}; // identity
+        const unsigned short side_map[] = {0,1,2,3}; // identity
         add_eletype_entry(TET4, node_map, 4, side_map, 4);
       }
 
       {
         // TET10
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9}; // identity
-        const unsigned int side_map[] = {0,1,2,3};             // identity
+        const unsigned int   node_map[] = {0,1,2,3,4,5,6,7,8,9}; // identity
+        const unsigned short side_map[] = {0,1,2,3};             // identity
         add_eletype_entry(TET10, node_map, 10, side_map, 4);
       }
 
       {
         // HEX8
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7}; // identity
-        const unsigned int side_map[] = {0,5,1,2,3,4};     // inverse = 0,2,3,4,5,1
+        const unsigned int   node_map[] = {0,1,2,3,4,5,6,7}; // identity
+        const unsigned short side_map[] = {0,5,1,2,3,4};     // inverse = 0,2,3,4,5,1
         add_eletype_entry(HEX8, node_map, 8, side_map, 6);
       }
 
       {
         // HEX20
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15}; // map is its own inverse
-        const unsigned int side_map[] = {0,5,1,2,3,4};                                       // inverse = 0,2,3,4,5,1
+        const unsigned int   node_map[] = // map is its own inverse
+          {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,5,1
+          {0,5,1,2,3,4};
         add_eletype_entry(HEX20, node_map, 20, side_map, 6);
       }
 
       {
         // HEX27
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,26,20,25,21,22,23,24}; // inverse = ...,21,23,24,25,26,22,20
-        const unsigned int side_map[] = {0,5,1,2,3,4};                                                            // inverse = 0,2,3,4,5,1
+        const unsigned int   node_map[] = // inverse = ...,21,23,24,25,26,22,20
+          {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,26,20,25,21,22,23,24};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,5,1
+          {0,5,1,2,3,4};
         add_eletype_entry(HEX27, node_map, 27, side_map, 6);
       }
 
       {
         // PRISM6
-        const unsigned int node_map[] = {0,1,2,3,4,5}; // identity
-        const unsigned int side_map[] = {0,4,1,2,3};   // inverse = 0,2,3,4,1
+        const unsigned int   node_map[] = {0,1,2,3,4,5}; // identity
+        const unsigned short side_map[] = {0,4,1,2,3};   // inverse = 0,2,3,4,1
         add_eletype_entry(PRISM6, node_map, 6, side_map, 5);
       }
 
       {
         // PRISM15
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11}; // map is its own inverse
-        const unsigned int side_map[] = {0,4,1,2,3};                          // inverse = 0,2,3,4,1
+        const unsigned int   node_map[] = // map is its own inverse
+          {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,1
+          {0,4,1,2,3};
         add_eletype_entry(PRISM15, node_map, 15, side_map, 5);
       }
 
       {
         // PRISM18
-        const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11,15,16,17}; // map is its own inverse
-        const unsigned int side_map[] = {0,4,1,2,3};                                   // inverse = 0,2,3,4,1
+        const unsigned int   node_map[] = // map is its own inverse
+          {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11,15,16,17};
+        const unsigned short side_map[] = // inverse = 0,2,3,4,1
+          {0,4,1,2,3};
         add_eletype_entry(PRISM18, node_map, 18, side_map, 5);
       }
     } // if (eletypes.empty())
@@ -376,7 +386,7 @@ void AbaqusIO::read (const std::string& fname)
   // were only used for setting BCs, and aren't part of the actual
   // Mesh.
   {
-    unsigned max_dim = this->max_elem_dimension_seen();
+    unsigned char max_dim = this->max_elem_dimension_seen();
 
     MeshBase::element_iterator       el     = the_mesh.elements_begin();
     const MeshBase::element_iterator end_el = the_mesh.elements_end();
@@ -589,7 +599,8 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
             {
               // FIXME: factor out this strtol stuff into a utility function.
               char* endptr;
-              long abaqus_global_node_id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
+              dof_id_type abaqus_global_node_id = cast_int<dof_id_type>
+                (std::strtol(cell.c_str(), &endptr, /*base=*/10));
 
               if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
                 {
@@ -710,7 +721,8 @@ void AbaqusIO::read_ids(std::string set_name, container_t& container)
           char* endptr;
 
           // FIXME - this needs to be updated for 64-bit inputs
-          long id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
+          dof_id_type id = cast_int<dof_id_type>
+            (std::strtol(cell.c_str(), &endptr, /*base=*/10));
 
           // Note that lists of comma-separated values in abaqus also
           // *end* with a comma, so the last call to getline on a given
@@ -780,7 +792,7 @@ void AbaqusIO::assign_subdomain_ids()
   // Loop over each Elemset and assign subdomain IDs to Mesh elements
   {
     // The maximum element dimension seen while reading the Mesh
-    unsigned max_dim = this->max_elem_dimension_seen();
+    unsigned char max_dim = this->max_elem_dimension_seen();
 
     // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
     container_t::iterator it = _elemset_ids.begin();
@@ -812,7 +824,8 @@ void AbaqusIO::assign_subdomain_ids()
 
             // Compute the proper subdomain ID, based on the formula in the
             // documentation for this function.
-            subdomain_id_type computed_id = elemset_id + (elem_types_map[elem->type()] * n_elemsets);
+            subdomain_id_type computed_id = cast_int<subdomain_id_type>
+              (elemset_id + (elem_types_map[elem->type()] * n_elemsets));
 
             // Assign this ID to the element in question
             elem->subdomain_id() = computed_id;
@@ -838,7 +851,7 @@ void AbaqusIO::assign_boundary_node_ids()
 
   // Iterate over the container of nodesets
   container_t::iterator it = _nodeset_ids.begin();
-  for (unsigned current_id=0; it != _nodeset_ids.end(); ++it, ++current_id)
+  for (unsigned short current_id=0; it != _nodeset_ids.end(); ++it, ++current_id)
     {
       // Associate current_id with the name we determined earlier
       the_mesh.boundary_info->nodeset_name(current_id) = it->first;
@@ -876,8 +889,9 @@ void AbaqusIO::assign_sideset_ids()
   init_eletypes();
 
   // Iterate over the container of sidesets
+  {
   sideset_container_t::iterator it = _sideset_ids.begin();
-  for (unsigned current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
+  for (unsigned short current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
     {
       // Associate current_id with the name we determined earlier
       the_mesh.boundary_info->sideset_name(current_id) = it->first;
@@ -921,13 +935,14 @@ void AbaqusIO::assign_sideset_ids()
                                            current_id);
         }
     }
+  }
 
 
   // Some elsets (if they contain lower-dimensional elements) also
   // define sidesets.  So loop over them and build a searchable data
   // structure we can use to assign sidesets.
   {
-    unsigned max_dim = this->max_elem_dimension_seen();
+    unsigned char max_dim = this->max_elem_dimension_seen();
 
     // multimap from "vector-of-lower-dimensional-element-node-ids" to subdomain ID which should be applied.
     // We use a multimap because the lower-dimensional elements can belong to more than 1 sideset.
@@ -936,7 +951,7 @@ void AbaqusIO::assign_sideset_ids()
 
     // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
     container_t::iterator it = _elemset_ids.begin();
-    for (unsigned elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
+    for (unsigned short elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
       {
         // Grab a reference to the vector of IDs
         std::vector<dof_id_type>& id_vector = it->second;
@@ -963,7 +978,7 @@ void AbaqusIO::assign_sideset_ids()
             // one dimension lower than the max element
             // dimension.  Not sure if "edge" BCs in 3D
             // actually make sense/are required...
-            if (elem->dim() != max_dim-1)
+            if (elem->dim()+1 != max_dim)
               libmesh_error_msg("ERROR: Expected boundary element of dimension " << max_dim-1 << " but got " << elem->dim());
 
             // To be pushed into the provide_bcs data container
@@ -989,11 +1004,11 @@ void AbaqusIO::assign_sideset_ids()
 
     // Loop over elements and try to assign boundary information
     {
-      MeshBase::element_iterator       it  = the_mesh.active_elements_begin();
+      MeshBase::element_iterator       e_it  = the_mesh.active_elements_begin();
       const MeshBase::element_iterator end = the_mesh.active_elements_end();
-      for ( ; it != end; ++it)
+      for ( ; e_it != end; ++e_it)
         {
-          Elem* elem = *it;
+          Elem* elem = *e_it;
 
           if (elem->dim() == max_dim)
             {
@@ -1003,7 +1018,7 @@ void AbaqusIO::assign_sideset_ids()
               // information for it.  Note that we have not yet called
               // find_neighbors(), so we can't use elem->neighbor(sn) in
               // this algorithm...
-              for (unsigned int sn=0; sn<elem->n_sides(); sn++)
+              for (unsigned short sn=0; sn<elem->n_sides(); sn++)
                 {
                   AutoPtr<Elem> side (elem->build_side(sn));
 
@@ -1020,8 +1035,10 @@ void AbaqusIO::assign_sideset_ids()
                     range = provide_bcs.equal_range (node_ids);
 
                   // Add boundary information for each side in the range.
-                  for (provide_bcs_t::const_iterator it = range.first; it != range.second; ++it)
-                    the_mesh.boundary_info->add_side(elem, sn, it->second);
+                  for (provide_bcs_t::const_iterator s_it = range.first;
+                       s_it != range.second; ++s_it)
+                    the_mesh.boundary_info->add_side
+                      (elem, sn, cast_int<unsigned short>(s_it->second));
                 }
             }
         }
@@ -1074,12 +1091,14 @@ void AbaqusIO::process_and_discard_comments()
 
 
 
-unsigned AbaqusIO::max_elem_dimension_seen ()
+unsigned char AbaqusIO::max_elem_dimension_seen ()
 {
-  unsigned max_dim = 0;
+  unsigned char max_dim = 0;
 
+  unsigned char elem_dimensions_size = cast_int<unsigned char>
+    (elems_of_dimension.size());
   // The elems_of_dimension array is 1-based in the UNV reader
-  for (unsigned i=1; i<elems_of_dimension.size(); ++i)
+  for (unsigned char i=1; i<elem_dimensions_size; ++i)
     if (elems_of_dimension[i])
       max_dim = i;
 

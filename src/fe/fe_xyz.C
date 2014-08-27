@@ -568,7 +568,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
 
 template <unsigned int Dim>
 void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
-                                      const Elem* elem)
+                                      const Elem* libmesh_dbg_var(elem))
 {
   libmesh_assert(elem);
   this->calculations_started = true;

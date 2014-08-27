@@ -204,7 +204,7 @@ void UCDIO::read_implementation (std::istream& in)
       }
 
     // Set the mesh dimension to the largest encountered for an element
-    for (unsigned int i=0; i!=4; ++i)
+    for (unsigned char i=0; i!=4; ++i)
       if (elems_of_dimension[i])
         mesh.set_mesh_dimension(i);
 
@@ -334,7 +334,8 @@ void UCDIO::write_nodal_data(const std::string& fname,
   libmesh_assert (mesh.mesh_dimension() != 1);
 
   // Write header
-  this->write_header(out_stream,mesh,n_elem,names.size());
+  this->write_header(out_stream,mesh,n_elem,
+                     cast_int<unsigned int>(names.size()));
 
   // Write the node coordinates
   this->write_nodes(out_stream,mesh);

@@ -560,7 +560,9 @@ void GmshIO::read_mesh(std::istream& in)
                       // line.  At least it was in the example gmsh
                       // file I had...
                       in >> node_id;
-                      mesh.boundary_info->add_node(nodetrans[node_id], physical);
+                      mesh.boundary_info->add_node
+                        (nodetrans[node_id],
+                         static_cast<boundary_id_type>(physical));
                     }
                 } // element loop
 
@@ -568,17 +570,19 @@ void GmshIO::read_mesh(std::istream& in)
               std::getline(in, s);
 
               // Record the max and min element dimension seen while reading the file.
-              unsigned
+              unsigned char
                 max_elem_dimension_seen=1,
                 min_elem_dimension_seen=3;
 
-              for (unsigned i=0; i<elem_dimensions_seen.size(); ++i)
+              for (unsigned char i=0; i<elem_dimensions_seen.size(); ++i)
                 if (elem_dimensions_seen[i])
                   {
                     // Debugging
                     // libMesh::out << "Seen elements of dimension " << i+1 << std::endl;
-                    max_elem_dimension_seen = std::max(max_elem_dimension_seen, i+1);
-                    min_elem_dimension_seen = std::min(min_elem_dimension_seen, i+1);
+                    max_elem_dimension_seen =
+                      std::max(max_elem_dimension_seen, cast_int<unsigned char>(i+1));
+                    min_elem_dimension_seen =
+                      std::min(min_elem_dimension_seen, cast_int<unsigned char>(i+1));
                   }
 
               // Debugging:
@@ -678,7 +682,7 @@ void GmshIO::read_mesh(std::istream& in)
                             // find_neighbors(), so we can't use
                             // elem->neighbor(sn) in this algorithm...
 
-                            for (unsigned int sn=0;
+                            for (unsigned short sn=0;
                                  sn<elem->n_sides(); sn++)
                               {
                                 AutoPtr<Elem> side (elem->build_side(sn));
@@ -707,7 +711,10 @@ void GmshIO::read_mesh(std::istream& in)
                                     //              << std::endl;
 
                                     // Add boundary information based on the lower-dimensional element's subdomain id.
-                                    mesh.boundary_info->add_side(elem, sn, lower_dim_elem->subdomain_id());
+                                    mesh.boundary_info->add_side
+                                      (elem, sn,
+                                       cast_int<boundary_id_type>
+                                         (lower_dim_elem->subdomain_id()));
                                   }
                               }
                           }

@@ -91,7 +91,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
                                       ResFuncType mass,
                                       ResFuncType time_deriv,
                                       ResFuncType constraint,
-                                      ReinitFuncType reinit)
+                                      ReinitFuncType reinit_func)
 {
   unsigned int n_dofs = context.get_elem_solution().size();
 
@@ -180,7 +180,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   context.get_elem_solution().swap(old_elem_solution);
 
   // Move the mesh into place first if necessary
-  (context.*reinit)(0.);
+  (context.*reinit_func)(0.);
 
   if (_system.use_fixed_solution)
     {
@@ -236,7 +236,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   context.get_elem_solution().swap(delta_elem_solution);
 
   // Restore the elem position if necessary
-  (context.*reinit)(1.);
+  (context.*reinit_func)(1.);
 
   // Add the constraint term
   jacobian_computed = (_system.*constraint)(jacobian_computed, context) &&

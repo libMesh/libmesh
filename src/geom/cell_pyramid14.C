@@ -346,7 +346,7 @@ unsigned short int Pyramid14::second_order_adjacent_vertex (const unsigned int n
 
         // The vertex nodes surrounding node 13 are 0, 1, 2, and 3.
         // Thus, the v'th node is simply = v.
-        return v;
+        return cast_int<unsigned short>(v);
       }
 
     default:

@@ -47,8 +47,15 @@ class ParsedFunction : public FunctionBase<Output>
 public:
   explicit
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
-                  const std::vector<Output>* initial_vals=NULL)
-    : _expression(expression), _valid_derivatives(true)
+                  const std::vector<Output>* initial_vals=NULL) :
+    _expression (expression),
+    _spacetime (LIBMESH_DIM+1 + (additional_vars ?
+                                 additional_vars->size() : 0)),
+    _valid_derivatives (true),
+    _additional_vars (additional_vars ? *additional_vars :
+                      std::vector<std::string>()),
+    _initial_vals (initial_vals ? *initial_vals :
+                   std::vector<Output>())
       // Size the spacetime vector to account for space, time, and any additional
       // variables passed
       //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
@@ -62,18 +69,11 @@ public:
 #endif
     variables += ",t";
 
-    _spacetime.resize(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0));
-
     // If additional vars were passed, append them to the string
     // that we send to the function parser. Also add them to the
     // end of our spacetime vector
     if (additional_vars)
       {
-        if (initial_vals)
-          std::copy(initial_vals->begin(), initial_vals->end(), std::back_inserter(_initial_vals));
-
-        std::copy(additional_vars->begin(), additional_vars->end(), std::back_inserter(_additional_vars));
-
         for (unsigned int i=0; i < additional_vars->size(); ++i)
           {
             variables += "," + (*additional_vars)[i];
@@ -271,14 +271,19 @@ private:
   }
 
   // Evaluate the ith FunctionParser and check the result
-  inline Output eval(FunctionParserADBase<Output> & parser, const std::string & function_name, unsigned int component)
+  inline Output eval(FunctionParserADBase<Output> & parser,
+                     const std::string & libmesh_dbg_var(function_name),
+                     unsigned int libmesh_dbg_var(component_idx))
   {
 #ifndef NDEBUG
     Output result = parser.Eval(&_spacetime[0]);
     int error_code = parser.EvalError();
     if (error_code)
     {
-      libMesh::err << "ERROR: FunctionParser is unable to evaluate component " << component << " of expression  '" << function_name << "' with arguments:\n";
+      libMesh::err <<
+        "ERROR: FunctionParser is unable to evaluate component " <<
+        component_idx << " of expression '" << function_name <<
+        "' with arguments:\n";
       for (unsigned int j=0; j<_spacetime.size(); ++j)
         libMesh::err << '\t' << _spacetime[j] << '\n';
       libMesh::err << '\n';

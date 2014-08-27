@@ -259,7 +259,8 @@ void VTKIO::cells_to_vtk()
               vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
 
               // Update the _local_node_map with the ID returned by VTK
-              _local_node_map[global_node_id] = local;
+              _local_node_map[global_node_id] =
+                cast_int<dof_id_type>(local);
             }
 
           // Otherwise, the node ID was found in the _local_node_map, so
@@ -268,7 +269,8 @@ void VTKIO::cells_to_vtk()
         }
 
       vtkIdType vtkcellid = cells->InsertNextCell(pts);
-      types[active_element_counter] = this->get_elem_type(elem->type());
+      types[active_element_counter] =
+        cast_int<int>(this->get_elem_type(elem->type()));
       elem_id->InsertTuple1(vtkcellid, elem->id());
       subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
     } // end loop over active elements
@@ -513,7 +515,8 @@ void VTKIO::read (const std::string& name)
 
       // get the straightforward numbering from the VTK cells
       for (unsigned int j=0; j<elem->n_nodes(); ++j)
-        elem->set_node(j) = mesh.node_ptr(cell->GetPointId(j));
+        elem->set_node(j) =
+          mesh.node_ptr(cast_int<dof_id_type>(cell->GetPointId(j)));
 
       // then get the connectivity
       std::vector<dof_id_type> conn;
@@ -532,7 +535,7 @@ void VTKIO::read (const std::string& name)
     } // end loop over VTK cells
 
   // Set the mesh dimension to the largest encountered for an element
-  for (unsigned int i=0; i!=4; ++i)
+  for (unsigned char i=0; i!=4; ++i)
     if (elems_of_dimension[i])
       mesh.set_mesh_dimension(i);
 

@@ -431,7 +431,7 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
 #endif
 
   const unsigned int valence = sd_elem->get_ordered_valence(0);
-  const unsigned int n_qp = qp.size();
+  const unsigned int n_qp = cast_int<unsigned int>(qp.size());
   const unsigned int n_approx_shape_functions = valence + 6;
 
   // resize the vectors to hold current data
@@ -678,12 +678,14 @@ void FESubdivision::attach_quadrature_rule(QBase *q)
 
 
 void FESubdivision::reinit(const Elem* elem,
-                           const std::vector<Point>* const pts,
+                           const std::vector<Point>* const libmesh_dbg_var(pts),
                            const std::vector<Real>* const)
 {
   libmesh_assert(elem);
   libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
+#ifndef NDEBUG
   const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+#endif
 
   START_LOG("reinit()", "FESubdivision");
 

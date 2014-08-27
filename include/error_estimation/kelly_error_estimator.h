@@ -69,6 +69,7 @@ public:
    */
   KellyErrorEstimator() :
     JumpErrorEstimator(),
+    my_system(NULL),
     _bc_function(NULL)
   { error_norm = H1_SEMINORM; }
 

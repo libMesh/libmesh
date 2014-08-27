@@ -114,7 +114,7 @@ private:
 // Specialize for specific cases
 template<>
 inline
-Number& RawAccessor<Number>::operator()( unsigned int i )
+Number& RawAccessor<Number>::operator()( unsigned int libmesh_dbg_var(i) )
 {
   libmesh_assert_equal_to (i, 0);
   return this->_data;

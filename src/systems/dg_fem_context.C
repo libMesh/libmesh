@@ -143,7 +143,8 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   // Initialize the per-element data for elem.
   get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices);
 
-  const unsigned int n_dofs = dof_indices.size();
+  const unsigned int n_dofs = cast_int<unsigned int>
+    (dof_indices.size());
   const unsigned int n_neighbor_dofs = cast_int<unsigned int>
     (_neighbor_dof_indices.size());
 

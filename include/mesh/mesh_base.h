@@ -76,7 +76,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   MeshBase (const Parallel::Communicator &comm_in,
-            unsigned int dim=1);
+            unsigned char dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -84,7 +84,7 @@ public:
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
-  MeshBase (unsigned int dim=1);
+  MeshBase (unsigned char dim=1);
 #endif
 
   /**
@@ -152,21 +152,21 @@ public:
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
    */
-  unsigned int mesh_dimension () const
-  { return static_cast<unsigned int>(_dim); }
+  unsigned char mesh_dimension () const
+  { return _dim; }
 
   /**
    * Resets the logical dimension of the mesh.
    */
-  void set_mesh_dimension (unsigned int d)
+  void set_mesh_dimension (unsigned char d)
   { _dim = d; }
 
   /**
    * Returns the spatial dimension of the mesh.  Note that this is
    * defined at compile time in the header \p libmesh_common.h.
    */
-  unsigned int spatial_dimension () const
-  { return static_cast<unsigned int>(LIBMESH_DIM); }
+  unsigned char spatial_dimension () const
+  { return LIBMESH_DIM; }
 
   /**
    * Returns the number of nodes in the mesh. This function and others must
@@ -873,7 +873,7 @@ protected:
   /**
    * The logical dimension of the mesh.
    */
-  unsigned int _dim;
+  unsigned char _dim;
 
   /**
    * Flag indicating if the mesh has been prepared for use.

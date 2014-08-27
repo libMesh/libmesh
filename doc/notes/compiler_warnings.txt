@@ -1,0 +1,19 @@
+Although not currently enabled by any libMesh METHOD options, we do
+occasionally build libMesh in a "paranoid" mode with as many compiler
+flags as sensible turned on.  With gcc 4.9, this means:
+
+CXXFLAGS="-Wall -pedantic -pedantic-errors -Wextra  -Wall -Wcast-align -Wcast-qual  -Wchar-subscripts  -Wcomment -Wconversion -Wdisabled-optimization -Wfloat-conversion -Wformat  -Wformat=2 -Wformat-security -Wformat-y2k -Wimport  -Winit-self  -Winvalid-pch -Wmissing-braces -Wmissing-field-initializers -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wparentheses -Wpointer-arith -Wredundant-decls -Wreturn-type -Wsequence-point -Wshadow -Wsign-compare  -Wstrict-aliasing -Wstrict-aliasing=2 -Wswitch  -Wswitch-default -Wtrigraphs  -Wuninitialized -Wunknown-pragmas  -Wunreachable-code -Wunused -Wunused-function -Wunused-label  -Wunused-parameter -Wunused-value  -Wunused-variable -Wvariadic-macros -Wvolatile-register-var  -Wwrite-strings -Wno-suggest-attribute=noreturn"
+
+-Wfloat-conversion may need to be omitted, either because older gcc versions
+don't support it or because we have a lot of quadrature code that assigns long
+doubles to less precise types without (yet) casting.
+
+Because third party software is not typically so paranoid, we sort
+through results with e.g.:
+
+grep warning: paranoid.txt | grep -v contrib | grep -v extrasrc | grep -v examples | grep -v LIBRARIES | grep -v "/usr/include" | sort | uniq | less
+
+
+A few libMesh files do not yet compile cleanly with all these warnings even in
+the default configuration.  Many warnings still exist in non-default (e.g. 8
+byte dof_id_type) configurations which we need to attend to.
