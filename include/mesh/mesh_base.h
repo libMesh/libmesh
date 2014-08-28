@@ -152,8 +152,8 @@ public:
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
    */
-  unsigned char mesh_dimension () const
-  { return _dim; }
+  unsigned int mesh_dimension () const
+  { return cast_int<unsigned int>(_dim); }
 
   /**
    * Resets the logical dimension of the mesh.
@@ -165,8 +165,8 @@ public:
    * Returns the spatial dimension of the mesh.  Note that this is
    * defined at compile time in the header \p libmesh_common.h.
    */
-  unsigned char spatial_dimension () const
-  { return LIBMESH_DIM; }
+  unsigned int spatial_dimension () const
+  { return cast_int<unsigned int>(LIBMESH_DIM); }
 
   /**
    * Returns the number of nodes in the mesh. This function and others must
