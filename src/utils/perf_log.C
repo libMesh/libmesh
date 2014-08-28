@@ -195,7 +195,7 @@ std::string PerfLog::get_info_header() const
         {
           if (v[i]->str().size())
             oss << v[i]->str()
-                << std::setw (cast_int<unsigned int>
+                << std::setw (cast_int<int>
                               (max_length + 4 - v[i]->str().size()))
                 << std::right
                 << "|\n";
@@ -206,7 +206,7 @@ std::string PerfLog::get_info_header() const
       // 'Configuration'.
       oss << "| Configuration:  "
           << parsed_libmesh_configure_info[0]
-          << std::setw (cast_int<unsigned int>
+          << std::setw (cast_int<int>
                         (max_length + 4 -
                          parsed_libmesh_configure_info[0].size() - 18))
           << std::right
@@ -218,7 +218,7 @@ std::string PerfLog::get_info_header() const
         {
           oss << "|  "
               << parsed_libmesh_configure_info[i]
-              << std::setw (cast_int<unsigned int>
+              << std::setw (cast_int<int>
                             (max_length + 4 -
                              parsed_libmesh_configure_info[i].size() - 3))
               << std::right
