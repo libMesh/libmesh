@@ -1002,9 +1002,41 @@ void RBEvaluation::read_in_vectors(System& sys,
                                    const std::string& data_name,
                                    const bool read_binary_vectors)
 {
-  START_LOG("read_in_vectors()", "RBEvaluation");
+  std::vector< std::vector<NumericVector<Number>*>* > vectors_vec;
+  vectors_vec.push_back(&vectors);
 
-  //libMesh::out << "Reading in the basis functions..." << std::endl;
+  std::vector<std::string> directory_name_vec;
+  directory_name_vec.push_back(directory_name);
+
+  std::vector<std::string> data_name_vec;
+  data_name_vec.push_back(data_name);
+
+  read_in_vectors_from_multiple_files(
+    sys,
+    vectors_vec,
+    directory_name_vec,
+    data_name_vec,
+    read_binary_vectors);
+}
+
+void RBEvaluation::read_in_vectors_from_multiple_files(
+  System& sys,
+  std::vector< std::vector<NumericVector<Number>*>* > multiple_vectors,
+  const std::vector<std::string>& multiple_directory_names,
+  const std::vector<std::string>& multiple_data_names,
+  const bool read_binary_vectors)
+{
+  START_LOG("read_in_vectors_from_multiple_files()", "RBEvaluation");
+
+  unsigned int n_files = multiple_vectors.size();
+  unsigned int n_directories = multiple_directory_names.size();
+  unsigned int n_data_names = multiple_data_names.size();
+  libmesh_assert( (n_files == n_directories) && (n_files == n_data_names) );
+
+  if(n_files == 0)
+  {
+    return;
+  }
 
   // Make sure processors are synced up before we begin
   this->comm().barrier();
@@ -1013,7 +1045,9 @@ void RBEvaluation::read_in_vectors(System& sys,
   const std::string basis_function_suffix = (read_binary_vectors ? ".xdr" : ".dat");
   struct stat stat_info;
 
-  file_name << directory_name << "/" << data_name << "_header" << basis_function_suffix;
+  // Assume that all the headers are the same, hence we can just use the first one.
+  file_name << multiple_directory_names[0] << "/"
+    << multiple_data_names[0] << "_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   read_binary_vectors ? DECODE : READ);
 
@@ -1029,89 +1063,60 @@ void RBEvaluation::read_in_vectors(System& sys,
 
   // We need to call sys.read_header (e.g. to set _written_var_indices properly),
   // but by setting the read_header argument to false, it doesn't reinitialize the system
-  sys.read_header(header_data, io_version_string, /*read_header=*/false, /*read_additional_data=*/false);
+  sys.read_header(
+    header_data, io_version_string, /*read_header=*/false, /*read_additional_data=*/false);
 
   // Following EquationSystemsIO::read, we use a temporary numbering (node major)
   // before writing out the data
-  MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
+  MeshTools::Private::globally_renumber_nodes_and_elements(
+    sys.get_mesh());
 
+  for(unsigned int data_index=0; data_index<n_directories; data_index++)
+  {
+    std::vector<NumericVector<Number>*>& vectors = *multiple_vectors[data_index];
 
-  const bool read_legacy_format = false;
-  if (read_legacy_format)
+    // Allocate storage for each vector
+    for(unsigned int i=0; i<vectors.size(); i++)
     {
-      // Use System::read_serialized_data to read in the basis functions
-      // into this->solution and then swap with the appropriate
-      // of basis function.
-      for(unsigned int i=0; i<vectors.size(); i++)
-        {
-          file_name.str(""); // reset the string
-          file_name << directory_name << "/" << data_name << i << basis_function_suffix;
+      vectors[i] = NumericVector<Number>::build(
+        sys.comm()).release();
 
-          // On processor zero check to be sure the file exists
-          if (this->processor_id() == 0)
-            {
-              int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-              if (stat_result != 0)
-                libmesh_error_msg("File does not exist: " << file_name.str());
-            }
-
-          Xdr vector_data(file_name.str(),
-                          read_binary_vectors ? DECODE : READ);
-
-          // The bf_data needs to know which version to read.
-          vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
-
-          sys.read_serialized_data(vector_data, false);
-
-          vectors[i] = NumericVector<Number>::build(sys.comm()).release();
-          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, PARALLEL);
-
-          // No need to copy, just swap
-          // *vectors[i] = *solution;
-          vectors[i]->swap(*sys.solution);
-        }
+      vectors[i]->init (
+        sys.n_dofs(),
+        sys.n_local_dofs(),
+        false,
+        PARALLEL);
     }
 
-  //------------------------------------------------------
-  // new implementation
-  else
+    file_name.str("");
+    file_name << multiple_directory_names[data_index]
+      << "/" << multiple_data_names[data_index]
+      << "_data" << basis_function_suffix;
+
+    // On processor zero check to be sure the file exists
+    if (this->processor_id() == 0)
     {
-      // Allocate storage for each vector
-      for(unsigned int i=0; i<vectors.size(); i++)
-        {
-          vectors[i] = NumericVector<Number>::build(sys.comm()).release();
-          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, PARALLEL);
-        }
+      int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-      file_name.str("");
-      file_name << directory_name << "/" << data_name << "_data" << basis_function_suffix;
-
-      // On processor zero check to be sure the file exists
-      if (this->processor_id() == 0)
-        {
-          int stat_result = stat(file_name.str().c_str(), &stat_info);
-
-          if (stat_result != 0)
-            libmesh_error_msg("File does not exist: " << file_name.str());
-        }
-
-      Xdr vector_data(file_name.str(),
-                      read_binary_vectors ? DECODE : READ);
-
-      // The vector_data needs to know which version to read.
-      vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
-
-      sys.read_serialized_vectors (vector_data, vectors);
+      if (stat_result != 0)
+      {
+        libmesh_error_msg("File does not exist: " << file_name.str());
+      }
     }
-  //------------------------------------------------------
+
+    Xdr vector_data(file_name.str(),
+                    read_binary_vectors ? DECODE : READ);
+
+    // The vector_data needs to know which version to read.
+    vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+
+    sys.read_serialized_vectors (vector_data, vectors);
+  }
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
 
-  //libMesh::out << "Finished reading in the basis functions..." << std::endl;
-
-  STOP_LOG("read_in_vectors()", "RBEvaluation");
+  STOP_LOG("read_in_vectors_from_multiple_files()", "RBEvaluation");
 }
 
 std::string RBEvaluation::get_io_version_string()
