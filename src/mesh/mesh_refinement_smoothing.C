@@ -47,16 +47,6 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   // Vector holding the maximum element level that touches a node.
   std::vector<unsigned char> max_level_at_node (_mesh.n_nodes(), 0);
   std::vector<unsigned char> max_p_level_at_node (_mesh.n_nodes(), 0);
-  std::vector<unsigned char> min_level_at_node ;
-  std::vector<unsigned char> min_p_level_at_node ;
-
-  // Vector holding the minimum element level that touches a node.
-  if(_enforce_mismatch_limit_prior_to_refinement)
-  {
-    min_level_at_node.resize (_mesh.n_nodes(),9999);
-    min_p_level_at_node.resize (_mesh.n_nodes(),9999);
-  }
-
 
   // Loop over all the active elements & fill the vector
   {
@@ -66,12 +56,10 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
     for (; elem_it != elem_end; ++elem_it)
       {
         const Elem* elem = *elem_it;
-        const unsigned char elem_current_level = elem->level() ;
-        const unsigned char elem_current_p_level = elem->p_level() ;
         const unsigned char elem_level =
-          elem_current_level + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+          elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
         const unsigned char elem_p_level =
-          elem_current_p_level + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
+          elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
 
         // Set the max_level at each node
         for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -84,16 +72,6 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
               std::max (max_level_at_node[node_number], elem_level);
             max_p_level_at_node[node_number] =
               std::max (max_p_level_at_node[node_number], elem_p_level);
-
-            // need min_level if enforcing prior to refinement
-            if( _enforce_mismatch_limit_prior_to_refinement )
-              {
-                // we want the minimum without refinement flags
-                min_level_at_node[node_number] =
-                  std::min (min_level_at_node[node_number], elem_current_level);
-                min_p_level_at_node[node_number] =
-                  std::min (min_p_level_at_node[node_number], elem_current_p_level);
-              }
           }
       }
   }
@@ -134,31 +112,49 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
-            // if we are enforcing the limit prior to refinement then we
-            // need to remove flags from any elements marked for refinement that
-            // would cause a mismatch
-            else if (_enforce_mismatch_limit_prior_to_refinement
-                && elem->refinement_flag() == Elem::REFINE
-                && (elem_level + 1 - max_mismatch ) > min_level_at_node[node_number] )
-              {
-                elem->set_refinement_flag( Elem::DO_NOTHING );
-                flags_changed = true;
-              }
-
             if ( (elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
                  && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
-            else if (_enforce_mismatch_limit_prior_to_refinement
-                && (elem->p_refinement_flag() == Elem::REFINE)
-                && (elem_p_level + 1 - max_mismatch ) > min_p_level_at_node[node_number] )
+
+            // if we are enforcing the limit prior to refinement then we
+            // need to remove flags from any elements marked for refinement that
+            // would cause a mismatch
+            if(_enforce_mismatch_limit_prior_to_refinement 
+                && elem->refinement_flag() == Elem::REFINE )
               {
-                elem->set_p_refinement_flag( Elem::DO_NOTHING );
-                flags_changed = true;
-              }
-          }
+                // get all the POINT neighbors since we may have to refine
+                // elements off the corner as well
+                std::set< const Elem* > n_set ;
+                elem->find_point_neighbors(n_set);
+                std::set< const Elem* >::iterator n_it = n_set.begin();
+                std::set< const Elem* >::iterator n_end = n_set.end();
+
+                // Loop over the neighbors of element e
+                for (; n_it != n_end; ++n_it)
+                  {
+                    Elem* n = const_cast<Elem*>(*n_it) ;
+
+                    // get neighbors current level
+                    unsigned int n_level = n->level();
+                    unsigned int n_p_level = n->p_level();
+
+                    if ( (elem_level + 1 - max_mismatch ) > n_level )
+                      {
+                        elem->set_refinement_flag( Elem::DO_NOTHING );
+                        flags_changed = true;
+                      }
+
+                    if ( (elem_p_level + 1 - max_mismatch ) > n_p_level )
+                      {
+                        elem->set_p_refinement_flag( Elem::DO_NOTHING );
+                        flags_changed = true;
+                      }
+                  } // loop over neighbors
+              } // if _enforce_mismatch_limit_prior_to_refinement
+          } 
       }
   }
 
@@ -265,7 +261,8 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
         // Skip the element if it is already fully flagged
         if (elem->refinement_flag() == Elem::REFINE &&
-            elem->p_refinement_flag() == Elem::REFINE)
+            elem->p_refinement_flag() == Elem::REFINE
+            && !_enforce_mismatch_limit_prior_to_refinement)
           continue;
 
         // Loop over the nodes, check for possible mismatch
@@ -288,14 +285,51 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
+
             if ( (elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
                  && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
-          }
-      }
+
+            // if we are enforcing the limit prior to refinement then we
+            // need to remove flags from any elements marked for refinement that
+            // would cause a mismatch
+            if( _enforce_mismatch_limit_prior_to_refinement 
+                && (elem->refinement_flag() == Elem::REFINE) )
+              {
+                // get all the POINT neighbors since we may have to refine
+                // elements off the corner as well
+                std::set< const Elem* > n_set ;
+                elem->find_edge_neighbors(n_set);
+                std::set< const Elem* >::iterator n_it = n_set.begin();
+                std::set< const Elem* >::iterator n_end = n_set.end();
+
+                // Loop over the neighbors of element e
+                for (; n_it != n_end; ++n_it)
+                  {
+                    Elem* n = const_cast<Elem*>(*n_it) ;
+
+                    // get neighbors current level
+                    unsigned int n_level = n->level();
+                    unsigned int n_p_level = n->p_level();
+
+                    if ( (elem_level + 1 - max_mismatch ) > n->level() )
+                      {
+                          elem->set_refinement_flag( Elem::DO_NOTHING );
+                          flags_changed = true;
+                      }
+                    if ( (elem_p_level + 1 - max_mismatch ) > n_p_level )
+                      {
+                        elem->set_p_refinement_flag( Elem::DO_NOTHING );
+                        flags_changed = true;
+                      }
+
+                  } // loop over edge neighbors
+              } // if _enforce_mismatch_limit_prior_to_refinement
+          } // loop over edges
+      } // loop over active elements
   }
 
   // If flags changed on any processor then they changed globally
