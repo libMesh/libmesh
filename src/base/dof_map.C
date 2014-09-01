@@ -2159,7 +2159,9 @@ void DofMap::old_dof_indices (const Elem* const elem,
         if(this->variable(v).type().family == SCALAR)
           {
             // We asked for this variable, so add it to the vector.
-            SCALAR_var_numbers.push_back(v);
+            std::vector<dof_id_type> di_new;
+            this->SCALAR_dof_indices(di_new,*it,true);
+            di.insert( di.end(), di_new.begin(), di_new.end());
           }
         else
           if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
@@ -2273,16 +2275,6 @@ void DofMap::old_dof_indices (const Elem* const elem,
                 }
             }
       } // end loop over variables
-
-  // Finally append any SCALAR dofs that we asked for.
-  std::vector<dof_id_type> di_new;
-  std::vector<unsigned int>::iterator it           = SCALAR_var_numbers.begin();
-  std::vector<unsigned int>::const_iterator it_end = SCALAR_var_numbers.end();
-  for( ; it != it_end; ++it)
-    {
-      this->SCALAR_dof_indices(di_new,*it,true);
-      di.insert( di.end(), di_new.begin(), di_new.end());
-    }
 
   STOP_LOG("old_dof_indices()", "DofMap");
 }
