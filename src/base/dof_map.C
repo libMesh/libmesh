@@ -2160,7 +2160,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
           {
             // We asked for this variable, so add it to the vector.
             std::vector<dof_id_type> di_new;
-            this->SCALAR_dof_indices(di_new,*it,true);
+            this->SCALAR_dof_indices(di_new,v,true);
             di.insert( di.end(), di_new.begin(), di_new.end());
           }
         else
