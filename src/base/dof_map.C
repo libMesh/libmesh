@@ -1413,7 +1413,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
           {
             // We asked for this variable, so add it to the vector.
             std::vector<dof_id_type> di_new;
-            this->SCALAR_dof_indices(di_new,elem,true);
+            this->SCALAR_dof_indices(di_new,v,true);
             for (unsigned int i=0; i != di_new.size(); ++i)
               {
                 const dof_id_type dof_index = di_new[i];
@@ -2188,7 +2188,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
           {
             // We asked for this variable, so add it to the vector.
             std::vector<dof_id_type> di_new;
-            this->SCALAR_dof_indices(di_new,*it,true);
+            this->SCALAR_dof_indices(di_new,v,true);
             di.insert( di.end(), di_new.begin(), di_new.end());
           }
         else
