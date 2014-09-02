@@ -1407,7 +1407,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
       // Normally we'd catch those on neighboring elements, but it's
       // possible that the neighbors are of different subdomains and
       // the SCALAR isn't supported on them.
-      for (unsigned int v=0; v<n_vars; v++)
+      for (unsigned int v=0; v<this->n_variables(); v++)
         if(this->variable(v).type().family == SCALAR &&
            this->variable(v).active_on_subdomain(elem->subdomain_id()))
           {
