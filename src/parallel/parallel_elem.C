@@ -352,15 +352,25 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-  // int 9: parent dof object id
+  // int 9: parent dof object id.
+  // Note: If level==0, then (*in) == (unsigned long long)(-1).  In
+  // this case, the equality check in cast_int<unsigned>(*in) will
+  // never succeed.  Therefore, we should only attempt the more
+  // rigorous cast verification in cases where level != 0.
   const dof_id_type parent_id =
-    cast_int<dof_id_type>(*in++);
+    (level == 0)
+    ? static_cast<dof_id_type>(*in++)
+    : cast_int<dof_id_type>(*in++);
   libmesh_assert (level == 0 || parent_id != DofObject::invalid_id);
   libmesh_assert (level != 0 || parent_id == DofObject::invalid_id);
 
   // int 10: local child id
+  // Note: If level==0, then which_child_am_i is not valid, so don't
+  // do the more rigorous cast verification.
   const unsigned int which_child_am_i =
-    cast_int<unsigned int>(*in++);
+    (level == 0)
+    ? static_cast<unsigned int>(*in++)
+    : cast_int<unsigned int>(*in++);
 #else
   in += 2;
 #endif // LIBMESH_ENABLE_AMR
@@ -409,8 +419,11 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       // to update them, but we can check for some inconsistencies.
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
         {
+          // We can't cast_int here, since NULL neighbors have an ID
+          // of (unsigned long long)(-1) which doesn't fit in an
+          // unsigned.
           const dof_id_type neighbor_id =
-            cast_int<dof_id_type>(*in++);
+            static_cast<dof_id_type>(*in++);
 
           // If the sending processor sees a domain boundary here,
           // we'd better agree.
@@ -532,8 +545,11 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
+          // We can't cast_int here, since NULL neighbors have an ID
+          // of (unsigned long long)(-1) which doesn't fit in an
+          // unsigned.
           const dof_id_type neighbor_id =
-            cast_int<dof_id_type>(*in++);
+            static_cast<dof_id_type>(*in++);
 
           if (neighbor_id == DofObject::invalid_id)
             continue;
