@@ -65,7 +65,8 @@ MeshRefinement::MeshRefinement (MeshBase& m) :
   _absolute_global_tolerance(0.0),
   _face_level_mismatch_limit(1),
   _edge_level_mismatch_limit(0),
-  _node_level_mismatch_limit(0)
+  _node_level_mismatch_limit(0),
+  _enforce_mismatch_limit_prior_to_refinement(false)
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(NULL)
 #endif

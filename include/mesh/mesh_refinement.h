@@ -430,6 +430,18 @@ public:
    */
   bool make_flags_parallel_consistent ();
 
+  /**
+   * Returns the state of the _enforce_mismatch_limit_prior_to_refinement flag.
+   * Defaults to false.
+   * */
+  bool get_enforce_mismatch_limit_prior_to_refinement();
+
+  /**
+   * Set _enforce_mismatch_limit_prior_to_refinement option.
+   * Defaults to false.
+   * */
+  void set_enforce_mismatch_limit_prior_to_refinement(bool enforce);
+
 private:
 
   /**
@@ -675,6 +687,89 @@ private:
   unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
     _node_level_mismatch_limit;
 
+  /**
+   * This option enforces the mismatch level prior to refinement by checking
+   * if refining any element marked for refinement \b would cause a mismatch
+   * greater than the limit. Applies to all mismatch methods.
+   *
+   * Calling this with \p node_level_mismatch_limit() = 1
+   * would transform this mesh:
+   * \verbatim
+   * o-------o-------o-------o-------o
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * o-------o---o---o-------o-------o
+   * |       |   :   |       |       |
+   * |       |   :   |       |       |
+   * |       o...o...o       |       |
+   * |       |   :   |       |       |
+   * |       |   :   |       |       |
+   * o-------o---o---o-------o-------o
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * o-------o-------o               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * o-------o-------o---------------o
+   * \endverbatim
+   *
+   * into this:
+   *
+   * \verbatim
+   * o-------o-------o-------o-------o
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * o-------o-------o-------o-------o
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * o-------o-------o-------o-------o
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * o-------o-------o.......o.......o
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * o-------o-------o-------o-------o
+   * \endverbatim
+   * by moving the refinement flag to the indicated element.
+   *
+   * Default value is false.
+   */
+  bool _enforce_mismatch_limit_prior_to_refinement;
+
+  /**
+   * This helper function enforces the desired mismatch limits prior
+   * to refinement.  It is called from the
+   * MeshRefinement::limit_level_mismatch_at_edge() and
+   * MeshRefinement::limit_level_mismatch_at_node() functions.
+   * Returns true if this enforcement caused the refinement flags for
+   * elem to change, false otherwise.
+   */
+  enum NeighborType {POINT, EDGE};
+  bool enforce_mismatch_limit_prior_to_refinement(Elem* elem,
+                                                  NeighborType nt,
+                                                  unsigned max_mismatch);
+
 #ifdef LIBMESH_ENABLE_PERIODIC
   PeriodicBoundaries * _periodic_boundaries;
 #endif
@@ -742,6 +837,15 @@ inline unsigned char& MeshRefinement::node_level_mismatch_limit()
   return _node_level_mismatch_limit;
 }
 
+inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()
+{
+  return _enforce_mismatch_limit_prior_to_refinement;
+}
+
+inline void MeshRefinement::set_enforce_mismatch_limit_prior_to_refinement(bool enforce)
+{
+  _enforce_mismatch_limit_prior_to_refinement = enforce;
+}
 
 } // namespace libMesh
 
