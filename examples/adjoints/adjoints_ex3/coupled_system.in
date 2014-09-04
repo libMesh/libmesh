@@ -4,7 +4,6 @@
 Reynolds = 1.0
 
 verify_analytic_jacobians = 0.
-print_jacobians = false
 print_element_jacobians = false
 
 # The polynomial order and finite element type to use for the pressure
