@@ -231,9 +231,9 @@ void UNVIO::read_implementation (std::istream& in_stream)
 #if LIBMESH_DIM < 3
     if (MeshInput<MeshBase>::mesh().mesh_dimension() > LIBMESH_DIM)
       libmesh_error_msg("Cannot open dimension "                        \
-                        << MeshInput<MeshBase>::mesh().mesh_dimension() \
+                        << +MeshInput<MeshBase>::mesh().mesh_dimension() \
                         << " mesh file when configured without "        \
-                        << MeshInput<MeshBase>::mesh().mesh_dimension() \
+                        << +MeshInput<MeshBase>::mesh().mesh_dimension() \
                         << "D support." );
 #endif
 

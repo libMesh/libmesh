@@ -586,8 +586,8 @@ void GmshIO::read_mesh(std::istream& in)
                   }
 
               // Debugging:
-              // libMesh::out << "max_elem_dimension_seen=" << max_elem_dimension_seen << std::endl;
-              // libMesh::out << "min_elem_dimension_seen=" << min_elem_dimension_seen << std::endl;
+              // libMesh::out << "max_elem_dimension_seen=" << +max_elem_dimension_seen << std::endl;
+              // libMesh::out << "min_elem_dimension_seen=" << +min_elem_dimension_seen << std::endl;
 
               // If the difference between the max and min element dimension seen is larger than
               // 1, (e.g. the file has 1D and 3D elements only) we don't handle this case.

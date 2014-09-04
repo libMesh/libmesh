@@ -308,8 +308,8 @@ std::string MeshBase::get_info() const
   std::ostringstream oss;
 
   oss << " Mesh Information:"                                  << '\n'
-      << "  mesh_dimension()="    << this->mesh_dimension()    << '\n'
-      << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
+      << "  mesh_dimension()="    << +this->mesh_dimension()   << '\n'
+      << "  spatial_dimension()=" << +this->spatial_dimension()<< '\n'
       << "  n_nodes()="           << this->n_nodes()           << '\n'
       << "    n_local_nodes()="   << this->n_local_nodes()     << '\n'
       << "  n_elem()="            << this->n_elem()            << '\n'

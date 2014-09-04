@@ -254,7 +254,8 @@ void LaplaceMeshSmoother::init()
       } // case 3
 
     default:
-      libmesh_error_msg("At this time it is not possible to smooth a dimension " << _mesh.mesh_dimension() << "mesh.  Aborting...");
+      libmesh_error_msg("At this time it is not possible to smooth a dimension " <<
+                        +_mesh.mesh_dimension() << "mesh.  Aborting...");
     }
 
   // Done building graph from local elements.  Let's now allgather the

@@ -931,7 +931,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
         }
 
       default:
-        libmesh_error_msg("Unsupported mesh dimension: " << mesh.mesh_dimension());
+        libmesh_error_msg("Unsupported mesh dimension: " << +mesh.mesh_dimension());
       }
 
     out_stream << '\n';
@@ -1333,7 +1333,7 @@ void GMVIO::write_binary (const std::string& fname,
           }
         break;
       default:
-        libmesh_error_msg("Unsupported mesh dimension: " << mesh.mesh_dimension());
+        libmesh_error_msg("Unsupported mesh dimension: " << +mesh.mesh_dimension());
 
       }
   }
@@ -1817,7 +1817,7 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
         }
 
       default:
-        libmesh_error_msg("Unsupported mesh dimension: " << mesh.mesh_dimension());
+        libmesh_error_msg("Unsupported mesh dimension: " << +mesh.mesh_dimension());
       }
 
     out_stream << std::endl;
@@ -2097,9 +2097,9 @@ void GMVIO::read (const std::string& name)
 #if LIBMESH_DIM < 3
   if (mesh.mesh_dimension() > LIBMESH_DIM)
     libmesh_error_msg("Cannot open dimension " \
-                      << mesh.mesh_dimension()            \
+                      << +mesh.mesh_dimension()            \
                       << " mesh file when configured without "        \
-                      << mesh.mesh_dimension()                        \
+                      << +mesh.mesh_dimension()                        \
                       << "D support.");
 #endif
 

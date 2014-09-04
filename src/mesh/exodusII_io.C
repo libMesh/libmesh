@@ -345,9 +345,9 @@ void ExodusII_IO::read (const std::string& fname)
 #if LIBMESH_DIM < 3
   if (mesh.mesh_dimension() > LIBMESH_DIM)
     libmesh_error_msg("Cannot open dimension "        \
-                      << mesh.mesh_dimension()            \
+                      << +mesh.mesh_dimension()            \
                       << " mesh file when configured without "        \
-                      << mesh.mesh_dimension()                        \
+                      << +mesh.mesh_dimension()                        \
                       << "D support.");
 #endif
 }
