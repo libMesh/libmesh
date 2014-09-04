@@ -37,26 +37,33 @@
 #include <cstdlib> // std::system
 #include <sys/types.h> // pid_t
 
-#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE) && defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
-
+#if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 #include <execinfo.h>
-#include <cxxabi.h>
+#endif
 
-namespace libMesh
+#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE)
+#include <cxxabi.h>
+#endif
+
+// Anonymous namespace for print_trace() helper functions
+namespace
 {
 
+// process_trace() is a helper function used by
+// libMesh::print_trace().  It is only available if configure
+// determined your compiler supports backtrace(), which is a GLIBC
+// extension.
+#if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 std::string process_trace(const char *name)
 {
   std::string fullname = name;
   std::string saved_begin, saved_end;
   size_t namestart, nameend;
 
-  /**
-   * The Apple backtrace function returns more information than the Linux version.
-   * We need to pass only the function name to the demangler or it won't decode it for us.
-   *
-   * lineno: stackframeno                 address functionname + offset
-   */
+  // The Apple backtrace function returns more information than the Linux version.
+  // We need to pass only the function name to the demangler or it won't decode it for us.
+  //
+  // lineno: stackframeno address functionname + offset
 
 #ifdef __APPLE__
   namestart = fullname.find("0x");
@@ -91,31 +98,16 @@ std::string process_trace(const char *name)
   std::string type_name = fullname.substr(namestart, nameend - namestart);
 
   // Try to demangle now
-  return saved_begin + demangle(type_name.c_str()) + saved_end;
+  return saved_begin + libMesh::demangle(type_name.c_str()) + saved_end;
 }
-
-
-std::string demangle(const char *name)
-{
-  int status = 0;
-  std::string ret = name;
-
-  // Actually do the demangling
-  char *demangled_name = abi::__cxa_demangle(name, 0, 0, &status);
-
-  // If demangling returns non-NULL, save the result in a string.
-  if (demangled_name)
-    ret = demangled_name;
-
-  // According to cxxabi.h docs, the caller is responsible for
-  // deallocating memory.
-  std::free(demangled_name);
-
-  return ret;
-}
+#endif
 
 
 
+// gdb_backtrace() is used by libMesh::print_trace() to try and get a
+// "better" backtrace than what the backtrace() function provides.
+// GDB backtraces are a bit slower, but they provide line numbers in
+// source code, a really helpful feature when debugging something...
 bool gdb_backtrace(std::ostream &out_stream)
 {
   // Eventual return value, true if gdb succeeds, false otherwise.
@@ -157,7 +149,11 @@ bool gdb_backtrace(std::ostream &out_stream)
   return success;
 }
 
+} // end anonymous namespace
 
+
+namespace libMesh
+{
 
 void print_trace(std::ostream &out_stream)
 {
@@ -168,6 +164,10 @@ void print_trace(std::ostream &out_stream)
   // calling backtrace().
   bool gdb_worked = gdb_backtrace(out_stream);
 
+  // This part requires that your compiler at least supports
+  // backtraces.  Demangling is also nice, but it will still run
+  // without it.
+#if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
   if (!gdb_worked)
     {
       void *addresses[40];
@@ -180,24 +180,12 @@ void print_trace(std::ostream &out_stream)
         out_stream << i << ": " << process_trace(strings[i]) << std::endl;
       std::free(strings);
     }
-}
-
-} // namespace libMesh
-
-#else
-
-namespace libMesh
-{
-void print_trace(std::ostream &) {}
-
-std::string demangle(const char *name) { return std::string(name); }
-}
-
 #endif
+}
 
 
-namespace libMesh
-{
+  // If tracefiles are enabled, calls print_trace() and sends the
+  // result to file.  Otherwise, does nothing.
 void write_traceout()
 {
 #ifdef LIBMESH_ENABLE_TRACEFILES
@@ -207,4 +195,34 @@ void write_traceout()
   libMesh::print_trace(traceout);
 #endif
 }
+
+
+
+// demangle() is used by the process_trace() helper function.  It is
+// also used by the Parameters class for demangling typeid's.  If
+// configure determined that your compiler does not support
+// demangling, it simply returns the input string.
+#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE)
+std::string demangle(const char *name)
+{
+  int status = 0;
+  std::string ret = name;
+
+  // Actually do the demangling
+  char *demangled_name = abi::__cxa_demangle(name, 0, 0, &status);
+
+  // If demangling returns non-NULL, save the result in a string.
+  if (demangled_name)
+    ret = demangled_name;
+
+  // According to cxxabi.h docs, the caller is responsible for
+  // deallocating memory.
+  std::free(demangled_name);
+
+  return ret;
 }
+#else
+std::string demangle(const char *name) { return std::string(name); }
+#endif
+
+} // namespace libMesh
