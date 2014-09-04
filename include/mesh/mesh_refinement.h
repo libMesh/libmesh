@@ -757,6 +757,19 @@ private:
    */
   bool _enforce_mismatch_limit_prior_to_refinement;
 
+  /**
+   * This helper function enforces the desired mismatch limits prior
+   * to refinement.  It is called from the
+   * MeshRefinement::limit_level_mismatch_at_edge() and
+   * MeshRefinement::limit_level_mismatch_at_node() functions.
+   * Returns true if this enforcement caused the refinement flags for
+   * elem to change, false otherwise.
+   */
+  enum NeighborType {POINT, EDGE};
+  bool enforce_mismatch_limit_prior_to_refinement(Elem* elem,
+                                                  NeighborType nt,
+                                                  unsigned max_mismatch);
+
 #ifdef LIBMESH_ENABLE_PERIODIC
   PeriodicBoundaries * _periodic_boundaries;
 #endif
