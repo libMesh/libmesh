@@ -108,8 +108,6 @@ void CoupledSystem::init_data ()
 
   // Useful debugging options
   this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
-  this->print_jacobians = infile("print_jacobians", false);
-  this->print_element_jacobians = infile("print_element_jacobians", false);
 
   // Set Dirichlet boundary conditions
   const boundary_id_type left_inlet_id = 0;
