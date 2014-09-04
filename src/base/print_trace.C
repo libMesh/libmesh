@@ -137,14 +137,15 @@ bool gdb_backtrace(std::ostream &out_stream)
       pid_t this_pid = getpid();
       std::ostringstream command;
       command << "gdb -p " << this_pid << " -batch -ex bt 2>/dev/null 1>" << temp_file;
-      std::system(command.str().c_str());
+      int exit_status = std::system(command.str().c_str());
 
-      // If we can open the temp_file and it is not empty, we'll
-      // assume that gdb worked, so copy the file's contents to the
-      // user's requested stream.  This rdbuf() thing is apparently
-      // how you do this... otherwise, report failure.
+      // If we can open the temp_file, the file is not empty, and the
+      // exit status from the system call is 0, we'll assume that gdb
+      // worked, and copy the file's contents to the user's requested
+      // stream.  This rdbuf() thing is apparently how you do
+      // this... Otherwise, report failure.
       std::ifstream fin(temp_file);
-      if (fin && (fin.peek() != std::ifstream::traits_type::eof()))
+      if (fin && (fin.peek() != std::ifstream::traits_type::eof()) && (exit_status == 0))
         out_stream << fin.rdbuf();
       else
         success = false;
