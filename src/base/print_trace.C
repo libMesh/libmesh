@@ -32,14 +32,15 @@
 #include <unistd.h>  // needed for getpid()
 #include <fstream>
 #include <sstream>
+#include <string>
+#include <cstdio> // std::remove
+#include <cstdlib> // std::system
+#include <sys/types.h> // pid_t
 
 #if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE) && defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 
-#include <iostream>
-#include <string>
 #include <execinfo.h>
 #include <cxxabi.h>
-#include <cstdlib>
 
 namespace libMesh
 {
@@ -113,17 +114,71 @@ std::string demangle(const char *name)
   return ret;
 }
 
+
+
+bool gdb_backtrace(std::ostream &out_stream)
+{
+  // Eventual return value, true if gdb succeeds, false otherwise.
+  bool success = true;
+
+  // The system() call does not allow us to redirect the output to a
+  // C++ ostream, so we redirect gdb's output to a (known) temporary
+  // file, and then send output that to the user's stream.
+  char temp_file[] = "temp_print_trace.XXXXXX";
+  int fd = mkstemp(temp_file);
+
+  // If mkstemp fails, we failed.
+  if (fd == -1)
+    success = false;
+  else
+    {
+      // Run gdb using a system() call, redirecting the output to our
+      // temporary file.
+      pid_t this_pid = getpid();
+      std::ostringstream command;
+      command << "gdb -p " << this_pid << " -batch -ex bt 2>/dev/null 1>" << temp_file;
+      std::system(command.str().c_str());
+
+      // If we can open the temp_file and it is not empty, we'll
+      // assume that gdb worked, so copy the file's contents to the
+      // user's requested stream.  This rdbuf() thing is apparently
+      // how you do this... otherwise, report failure.
+      std::ifstream fin(temp_file);
+      if (fin && (fin.peek() != std::ifstream::traits_type::eof()))
+        out_stream << fin.rdbuf();
+      else
+        success = false;
+    }
+
+  // Clean up the temporary file, regardless of whether it was opened successfully.
+  std::remove(temp_file);
+
+  return success;
+}
+
+
+
 void print_trace(std::ostream &out_stream)
 {
-  void *addresses[40];
-  char **strings;
+  // First try a GDB backtrace.  They are better than what you get
+  // from calling backtrace() because you don't have to do any
+  // demangling, and they include line numbers!  If the GDB backtrace
+  // fails, for example if your system does not have GDB, fall back to
+  // calling backtrace().
+  bool gdb_worked = gdb_backtrace(out_stream);
 
-  int size = backtrace(addresses, 40);
-  strings = backtrace_symbols(addresses, size);
-  out_stream << "Stack frames: " << size << std::endl;
-  for(int i = 0; i < size; i++)
-    out_stream << i << ": " << process_trace(strings[i]) << std::endl;
-  std::free(strings);
+  if (!gdb_worked)
+    {
+      void *addresses[40];
+      char **strings;
+
+      int size = backtrace(addresses, 40);
+      strings = backtrace_symbols(addresses, size);
+      out_stream << "Stack frames: " << size << std::endl;
+      for(int i = 0; i < size; i++)
+        out_stream << i << ": " << process_trace(strings[i]) << std::endl;
+      std::free(strings);
+    }
 }
 
 } // namespace libMesh
