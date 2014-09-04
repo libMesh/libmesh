@@ -517,7 +517,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
     default:
       // Hm?
-      libmesh_error_msg("Unknown mesh dimension " << this->mesh_dimension());
+      libmesh_error_msg("Unknown mesh dimension " << +this->mesh_dimension());
     }
 
 

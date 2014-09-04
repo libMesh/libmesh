@@ -1411,7 +1411,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       } // end case dim==3
 
     default:
-      libmesh_error_msg("Unknown dimension " << mesh.mesh_dimension());
+      libmesh_error_msg("Unknown dimension " << +mesh.mesh_dimension());
     }
 
   STOP_LOG("build_cube()", "MeshTools::Generation");
@@ -1834,7 +1834,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
       } // end case 3
 
     default:
-      libmesh_error_msg("Unknown dimension " << mesh.mesh_dimension());
+      libmesh_error_msg("Unknown dimension " << +mesh.mesh_dimension());
 
 
 
