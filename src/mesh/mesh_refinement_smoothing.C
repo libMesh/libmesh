@@ -108,13 +108,13 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
             // Flag the element for refinement if it violates
             // the requested level mismatch
-            if ( (elem_level + max_mismatch) < max_level_at_node[node_number]
+            if ((elem_level + max_mismatch) < max_level_at_node[node_number]
                  && elem->refinement_flag() != Elem::REFINE)
               {
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
-            if ( (elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
+            if ((elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
                  && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
@@ -124,34 +124,29 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
             // if we are enforcing the limit prior to refinement then we
             // need to remove flags from any elements marked for refinement that
             // would cause a mismatch
-            if(_enforce_mismatch_limit_prior_to_refinement
-                && elem->refinement_flag() == Elem::REFINE )
+            if (_enforce_mismatch_limit_prior_to_refinement
+                && elem->refinement_flag() == Elem::REFINE)
               {
                 // get all the POINT neighbors since we may have to refine
                 // elements off the corner as well
-                std::set< const Elem* > n_set ;
+                std::set<const Elem*> n_set;
                 elem->find_point_neighbors(n_set);
-                std::set< const Elem* >::iterator n_it = n_set.begin();
-                std::set< const Elem* >::iterator n_end = n_set.end();
 
                 // Loop over the neighbors of element e
-                for (; n_it != n_end; ++n_it)
+                std::set<const Elem*>::iterator n_it = n_set.begin();
+                for (; n_it != n_set.end(); ++n_it)
                   {
-                    Elem* n = const_cast<Elem*>(*n_it) ;
+                    const Elem* n = *n_it;
 
-                    // get neighbors current level
-                    unsigned int n_level = n->level();
-                    unsigned int n_p_level = n->p_level();
-
-                    if ( (elem_level + 1 - max_mismatch ) > n_level )
+                    if ((elem_level + 1 - max_mismatch) > n->level())
                       {
-                        elem->set_refinement_flag( Elem::DO_NOTHING );
+                        elem->set_refinement_flag(Elem::DO_NOTHING);
                         flags_changed = true;
                       }
 
-                    if ( (elem_p_level + 1 - max_mismatch ) > n_p_level )
+                    if ((elem_p_level + 1 - max_mismatch) > n->p_level())
                       {
-                        elem->set_p_refinement_flag( Elem::DO_NOTHING );
+                        elem->set_p_refinement_flag(Elem::DO_NOTHING);
                         flags_changed = true;
                       }
                   } // loop over neighbors
@@ -283,14 +278,14 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
             // Flag the element for refinement if it violates
             // the requested level mismatch
-            if ( (elem_level + max_mismatch) < max_level_at_edge[edge_key]
+            if ((elem_level + max_mismatch) < max_level_at_edge[edge_key]
                  && elem->refinement_flag() != Elem::REFINE)
               {
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
 
-            if ( (elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
+            if ((elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
                  && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
@@ -300,29 +295,28 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
             // if we are enforcing the limit prior to refinement then we
             // need to remove flags from any elements marked for refinement that
             // would cause a mismatch
-            if( _enforce_mismatch_limit_prior_to_refinement
-                && (elem->refinement_flag() == Elem::REFINE) )
+            if (_enforce_mismatch_limit_prior_to_refinement
+                && elem->refinement_flag() == Elem::REFINE)
               {
                 // get all the POINT neighbors since we may have to refine
                 // elements off the corner as well
-                std::set< const Elem* > n_set ;
+                std::set<const Elem*> n_set;
                 elem->find_edge_neighbors(n_set);
-                std::set< const Elem* >::iterator n_it = n_set.begin();
-                std::set< const Elem* >::iterator n_end = n_set.end();
 
                 // Loop over the neighbors of element e
-                for (; n_it != n_end; ++n_it)
+                std::set<const Elem*>::iterator n_it = n_set.begin();
+                for (; n_it != n_set.end(); ++n_it)
                   {
-                    Elem* n = const_cast<Elem*>(*n_it) ;
+                    const Elem* n = *n_it;
 
-                    if ( (elem_level + 1 - max_mismatch ) > n->level() )
+                    if ((elem_level + 1 - max_mismatch) > n->level())
                       {
-                        elem->set_refinement_flag( Elem::DO_NOTHING );
+                        elem->set_refinement_flag(Elem::DO_NOTHING);
                         flags_changed = true;
                       }
-                    if ( (elem_p_level + 1 - max_mismatch ) > n->p_level() )
+                    if ((elem_p_level + 1 - max_mismatch) > n->p_level())
                       {
-                        elem->set_p_refinement_flag( Elem::DO_NOTHING );
+                        elem->set_p_refinement_flag(Elem::DO_NOTHING);
                         flags_changed = true;
                       }
 

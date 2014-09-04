@@ -434,14 +434,13 @@ public:
    * Returns the state of the _enforce_mismatch_limit_prior_to_refinement flag.
    * Defaults to false.
    * */
-  bool get_enforce_mismatch_limit_prior_to_refinement() ;
+  bool get_enforce_mismatch_limit_prior_to_refinement();
 
   /**
    * Set _enforce_mismatch_limit_prior_to_refinement option.
    * Defaults to false.
    * */
-  void set_enforce_mismatch_limit_prior_to_refinement(
-      bool enforce ) ;
+  void set_enforce_mismatch_limit_prior_to_refinement(bool enforce);
 
 private:
 
@@ -695,68 +694,67 @@ private:
    *
    * Calling this with \p node_level_mismatch_limit() = 1
    * would transform this mesh:
-   \verbatim
-   o-------o-------o-------o-------o
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   o-------o---o---o-------o-------o
-   |       |   :   |       |       |
-   |       |   :   |       |       |
-   |       o...o...o       |       |
-   |       |   :   |       |       |
-   |       |   :   |       |       |
-   o-------o---o---o-------o-------o
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   o-------o-------o               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   o-------o-------o---------------o
-   \endverbatim
-
+   * \verbatim
+   * o-------o-------o-------o-------o
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * o-------o---o---o-------o-------o
+   * |       |   :   |       |       |
+   * |       |   :   |       |       |
+   * |       o...o...o       |       |
+   * |       |   :   |       |       |
+   * |       |   :   |       |       |
+   * o-------o---o---o-------o-------o
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * o-------o-------o               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * o-------o-------o---------------o
+   * \endverbatim
+   *
    * into this:
-
-   \verbatim
-   o-------o-------o-------o-------o
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   o-------o-------o-------o-------o
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   |       |       |       |       |
-   o-------o-------o-------o-------o
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   o-------o-------o.......o.......o
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   o-------o-------o-------o-------o
-   \endverbatim
-   by moving the refinement flag to the indicated element.
-
-   Default value is false.
-
-  */
+   *
+   * \verbatim
+   * o-------o-------o-------o-------o
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * o-------o-------o-------o-------o
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * |       |       |       |       |
+   * o-------o-------o-------o-------o
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * o-------o-------o.......o.......o
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * o-------o-------o-------o-------o
+   * \endverbatim
+   * by moving the refinement flag to the indicated element.
+   *
+   * Default value is false.
+   */
   bool _enforce_mismatch_limit_prior_to_refinement;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -831,8 +829,7 @@ inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()
   return _enforce_mismatch_limit_prior_to_refinement;
 }
 
-inline void MeshRefinement::set_enforce_mismatch_limit_prior_to_refinement(
-    bool enforce )
+inline void MeshRefinement::set_enforce_mismatch_limit_prior_to_refinement(bool enforce)
 {
   _enforce_mismatch_limit_prior_to_refinement = enforce;
 }
