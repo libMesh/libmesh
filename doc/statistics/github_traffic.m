@@ -383,31 +383,92 @@ print('-dpdf', 'weekly_github_traffic.pdf', '-FHelvetica:20');
 
 
 
-% 3.) Make monthly plot - not enough data to be interesting yet...
+% 3.) Make monthly plot
 
-%% month_intervals = {'2014-Feb-17', '2014-Mar-17', '2014-Apr-17'};
-%%
-%% % Numerical indexes of the month intervals
-%% month_indexes = [];
-%%
-%% for i=1:length(month_intervals)
-%%   % Calling 'strcmp' on a cell array of strings returns an array of 0s
-%%   % and 1s, then 'find' returns the non-zero index.  The 'end' keyword
-%%   % is used to append to the array.
-%%   month_indexes(end+1) = find(strcmp(month_intervals{i}, dates));
-%% end
-%%
-%% % Get total views and average unique viewers for each month
-%% month_views = [];
-%% month_visitors = [];
-%%   for i=1:length(month_indexes)-1
-%%   start = month_indexes(i);
-%%   stop = month_indexes(i+1) - 1;
-%%   month_views(end+1) = sum(views(start:stop));
-%%   month_visitors(end+1) = mean(visitors(start:stop));
-%% end
-%%
-%% clf;
-%% hold on;
-%% x=linspace(1, length(month_views), length(month_views));
-%% [haxis, h1, h2] = plotyy(x, month_views, x, month_visitors);
+month_intervals = {'2014-Feb-17', '2014-Mar-17', '2014-Apr-17', '2014-May-17', '2014-Jun-17', '2014-Jul-17', '2014-Aug-17'};
+
+% Numerical indexes of the month intervals
+month_indexes = [];
+
+for i=1:length(month_intervals)
+  % Calling 'strcmp' on a cell array of strings returns an array of 0s
+  % and 1s, then 'find' returns the non-zero index.  The 'end' keyword
+  % is used to append to the array.
+  month_indexes(end+1) = find(strcmp(month_intervals{i}, dates));
+end
+
+% Get total views and average unique viewers for each month
+month_views = [];
+month_visitors = [];
+  for i=1:length(month_indexes)-1
+  start = month_indexes(i);
+  stop = month_indexes(i+1) - 1;
+  month_views(end+1) = sum(views(start:stop));
+  month_visitors(end+1) = mean(visitors(start:stop));
+end
+
+clf;
+hold on;
+x=linspace(1, length(month_views), length(month_views));
+[haxis, h1, h2] = plotyy(x, month_views, x, month_visitors);
+
+% Label the axes
+ylabel (haxis(1), 'Monthly Page Views');
+ylabel (haxis(2), 'Avg. Daily Unique Visitors');
+
+% Add title
+title (['Total Pageviews: ', num2str(sum(views)), ', Avg. Daily Unique Visitors: ', num2str(mean(visitors))]);
+
+% Make thick lines - this looks better in PDF
+set([h1, h2], 'linewidth', 6);
+
+% Turn on markers
+set(h1, 'marker', 'o');
+set(h2, 'marker', 's');
+
+% Set marker size
+set([h1, h2], 'markersize', 6);
+
+% Make dashed line?  Aquaterm doesn't seem to properly display this, but it
+% does work in the PDF!
+set(h1, 'linestyle', '--');
+
+% Set the xticks and labels.
+n_months = length(x);
+
+% Label every month
+xticksat = 1:n_months;
+
+% Label a subset of the months.  For an odd number of months, label
+% the center tick, otherwise label the first and last month only.
+% if (mod(n_months,2) == 0)
+%   xticksat = [1 n_months];
+% else
+%   xticksat = [1 ceil(n_months/2) n_months];
+% end
+% set(haxis, 'xtick', xticksat);
+
+% Label the ticks with months
+for i=1:length(xticksat)
+  date_string = data{month_indexes(xticksat(i)), 1};
+  % Extract month and year from date string
+  month = date_string(6:end-3);
+  year = date_string(1:4);
+  xtlabels{i} = [month, '\n', year];
+end
+set(haxis, 'xticklabel', xtlabels);
+
+% Set up the paper orientation and size
+set (gcf, "papersize", [11, 8.5]);
+set (gcf, "paperorientation", 'landscape');
+
+if (!is_380)
+  set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
+else
+  % In Octave 3.8.0, the default paperposition is [0.25000, 2.50000, 8.00000, 6.00000],
+  % the third number makes the plot taller instead of wider!
+  set (gcf, "paperposition", [0.25, 0.25, 8.0, 10.5]);
+end
+
+% Make a PDF of the monthly data.
+print('-dpdf', 'monthly_github_traffic.pdf', '-FHelvetica:20');
