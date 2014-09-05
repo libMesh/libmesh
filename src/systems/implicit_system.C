@@ -737,6 +737,17 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // to derive an equivalent equation:
   // dq/dp = (partial q / partial p) - (z+phi) * (partial R / partial p)
 
+
+  // If we have non-zero adjoint dofs on Dirichlet constrained
+  // boundary dofs, then we need the residual components
+  // corresponding to those dofs when using r*z to compute R(u,z), so
+  // we can't apply constraints.
+  //
+  // If we aren't in that situation we could apply constraints but
+  // it will be faster not to.
+
+  this->get_dof_map().stash_dof_constraints();
+
   for (unsigned int j=0; j != Np; ++j)
     {
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
@@ -798,6 +809,8 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // We didn't cache the original rhs or matrix for memory reasons,
   // but we can restore them to a state consistent solution -
   // principle of least surprise.
+
+  this->get_dof_map().unstash_dof_constraints();
   this->assembly(true, true);
   this->rhs->close();
   this->matrix->close();
