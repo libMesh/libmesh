@@ -674,6 +674,18 @@ public:
   DofConstraints::const_iterator constraint_rows_end() const
   { return _dof_constraints.end(); }
 
+  void stash_dof_constraints()
+  {
+    libmesh_assert(_stashed_dof_constraints.empty());
+    _dof_constraints.swap(_stashed_dof_constraints);
+  }
+
+  void unstash_dof_constraints()
+  {
+    libmesh_assert(_dof_constraints.empty());
+    _dof_constraints.swap(_stashed_dof_constraints);
+  }
+
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * Returns an iterator pointing to the first Node constraint row
@@ -1338,7 +1350,8 @@ private:
    * Data structure containing DOF constraints.  The ith
    * entry is the constraint matrix row for DOF i.
    */
-  DofConstraints             _dof_constraints;
+  DofConstraints             _dof_constraints,
+                             _stashed_dof_constraints;
 
   DofConstraintValueMap      _primal_constraint_values;
 

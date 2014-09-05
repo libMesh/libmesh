@@ -154,6 +154,7 @@ DofMap::DofMap(const unsigned int number,
 #endif
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   , _dof_constraints()
+  , _stashed_dof_constraints()
   , _primal_constraint_values()
   , _adjoint_constraint_values()
 #endif
@@ -821,6 +822,7 @@ void DofMap::clear()
 #ifdef LIBMESH_ENABLE_AMR
 
   _dof_constraints.clear();
+  _stashed_dof_constraints.clear();
   _primal_constraint_values.clear();
   _adjoint_constraint_values.clear();
   _n_old_dfs = 0;
