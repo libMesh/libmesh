@@ -795,7 +795,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
                 AutoPtr<NumericVector<Number> > lift_func =
                   this->get_adjoint_solution(i).zero_clone();
                 this->get_dof_map().enforce_adjoint_constraints_exactly
-                  (lift_func.get(), i);
+                  (*lift_func.get(), i);
                 sensitivities[i][j] += partialR_partialp->dot(*lift_func);
               }
           }
