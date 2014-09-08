@@ -32,30 +32,38 @@
 #include <unistd.h>  // needed for getpid()
 #include <fstream>
 #include <sstream>
-
-#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE) && defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
-
-#include <iostream>
 #include <string>
-#include <execinfo.h>
-#include <cxxabi.h>
-#include <cstdlib>
+#include <cstdio> // std::remove
+#include <cstdlib> // std::system
+#include <sys/types.h> // pid_t
 
-namespace libMesh
+#if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
+#include <execinfo.h>
+#endif
+
+#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE)
+#include <cxxabi.h>
+#endif
+
+// Anonymous namespace for print_trace() helper functions
+namespace
 {
 
+// process_trace() is a helper function used by
+// libMesh::print_trace().  It is only available if configure
+// determined your compiler supports backtrace(), which is a GLIBC
+// extension.
+#if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 std::string process_trace(const char *name)
 {
   std::string fullname = name;
   std::string saved_begin, saved_end;
   size_t namestart, nameend;
 
-  /**
-   * The Apple backtrace function returns more information than the Linux version.
-   * We need to pass only the function name to the demangler or it won't decode it for us.
-   *
-   * lineno: stackframeno                 address functionname + offset
-   */
+  // The Apple backtrace function returns more information than the Linux version.
+  // We need to pass only the function name to the demangler or it won't decode it for us.
+  //
+  // lineno: stackframeno address functionname + offset
 
 #ifdef __APPLE__
   namestart = fullname.find("0x");
@@ -90,10 +98,111 @@ std::string process_trace(const char *name)
   std::string type_name = fullname.substr(namestart, nameend - namestart);
 
   // Try to demangle now
-  return saved_begin + demangle(type_name.c_str()) + saved_end;
+  return saved_begin + libMesh::demangle(type_name.c_str()) + saved_end;
+}
+#endif
+
+
+
+// gdb_backtrace() is used by libMesh::print_trace() to try and get a
+// "better" backtrace than what the backtrace() function provides.
+// GDB backtraces are a bit slower, but they provide line numbers in
+// source code, a really helpful feature when debugging something...
+bool gdb_backtrace(std::ostream &out_stream)
+{
+  // Eventual return value, true if gdb succeeds, false otherwise.
+  bool success = true;
+
+  // The system() call does not allow us to redirect the output to a
+  // C++ ostream, so we redirect gdb's output to a (known) temporary
+  // file, and then send output that to the user's stream.
+  char temp_file[] = "temp_print_trace.XXXXXX";
+  int fd = mkstemp(temp_file);
+
+  // If mkstemp fails, we failed.
+  if (fd == -1)
+    success = false;
+  else
+    {
+      // Run gdb using a system() call, redirecting the output to our
+      // temporary file.
+      pid_t this_pid = getpid();
+      std::ostringstream command;
+      command << "gdb -p " << this_pid << " -batch -ex bt 2>/dev/null 1>" << temp_file;
+      int exit_status = std::system(command.str().c_str());
+
+      // If we can open the temp_file, the file is not empty, and the
+      // exit status from the system call is 0, we'll assume that gdb
+      // worked, and copy the file's contents to the user's requested
+      // stream.  This rdbuf() thing is apparently how you do
+      // this... Otherwise, report failure.
+      std::ifstream fin(temp_file);
+      if (fin && (fin.peek() != std::ifstream::traits_type::eof()) && (exit_status == 0))
+        out_stream << fin.rdbuf();
+      else
+        success = false;
+    }
+
+  // Clean up the temporary file, regardless of whether it was opened successfully.
+  std::remove(temp_file);
+
+  return success;
+}
+
+} // end anonymous namespace
+
+
+namespace libMesh
+{
+
+void print_trace(std::ostream &out_stream)
+{
+  // First try a GDB backtrace.  They are better than what you get
+  // from calling backtrace() because you don't have to do any
+  // demangling, and they include line numbers!  If the GDB backtrace
+  // fails, for example if your system does not have GDB, fall back to
+  // calling backtrace().
+  bool gdb_worked = gdb_backtrace(out_stream);
+
+  // This part requires that your compiler at least supports
+  // backtraces.  Demangling is also nice, but it will still run
+  // without it.
+#if defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
+  if (!gdb_worked)
+    {
+      void *addresses[40];
+      char **strings;
+
+      int size = backtrace(addresses, 40);
+      strings = backtrace_symbols(addresses, size);
+      out_stream << "Stack frames: " << size << std::endl;
+      for(int i = 0; i < size; i++)
+        out_stream << i << ": " << process_trace(strings[i]) << std::endl;
+      std::free(strings);
+    }
+#endif
 }
 
 
+  // If tracefiles are enabled, calls print_trace() and sends the
+  // result to file.  Otherwise, does nothing.
+void write_traceout()
+{
+#ifdef LIBMESH_ENABLE_TRACEFILES
+  std::stringstream outname;
+  outname << "traceout_" << static_cast<std::size_t>(libMesh::global_processor_id()) << '_' << getpid() << ".txt";
+  std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
+  libMesh::print_trace(traceout);
+#endif
+}
+
+
+
+// demangle() is used by the process_trace() helper function.  It is
+// also used by the Parameters class for demangling typeid's.  If
+// configure determined that your compiler does not support
+// demangling, it simply returns the input string.
+#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE)
 std::string demangle(const char *name)
 {
   int status = 0;
@@ -112,43 +221,8 @@ std::string demangle(const char *name)
 
   return ret;
 }
-
-void print_trace(std::ostream &out_stream)
-{
-  void *addresses[40];
-  char **strings;
-
-  int size = backtrace(addresses, 40);
-  strings = backtrace_symbols(addresses, size);
-  out_stream << "Stack frames: " << size << std::endl;
-  for(int i = 0; i < size; i++)
-    out_stream << i << ": " << process_trace(strings[i]) << std::endl;
-  std::free(strings);
-}
+#else
+std::string demangle(const char *name) { return std::string(name); }
+#endif
 
 } // namespace libMesh
-
-#else
-
-namespace libMesh
-{
-void print_trace(std::ostream &) {}
-
-std::string demangle(const char *name) { return std::string(name); }
-}
-
-#endif
-
-
-namespace libMesh
-{
-void write_traceout()
-{
-#ifdef LIBMESH_ENABLE_TRACEFILES
-  std::stringstream outname;
-  outname << "traceout_" << static_cast<std::size_t>(libMesh::global_processor_id()) << '_' << getpid() << ".txt";
-  std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
-  libMesh::print_trace(traceout);
-#endif
-}
-}
