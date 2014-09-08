@@ -2074,6 +2074,11 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type>& di,
   // First we need to find out the first dof
   // index for each SCALAR.
 #ifdef LIBMESH_ENABLE_AMR
+
+  // If we're asking for old dofs then we'd better have some
+  if (old_dofs)
+    libmesh_assert_greater_equal(n_old_dofs(), n_SCALAR_dofs());
+
   dof_id_type first_SCALAR_dof_index = (old_dofs ? n_old_dofs() : n_dofs()) - n_SCALAR_dofs();
 #else
   dof_id_type first_SCALAR_dof_index = n_dofs() - n_SCALAR_dofs();
