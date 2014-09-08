@@ -787,21 +787,17 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
+            sensitivities[i][j] = partialq_partialp[i] -
+              partialR_partialp->dot(this->get_adjoint_solution(i));
 
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
               {
                 AutoPtr<NumericVector<Number> > lift_func =
                   this->get_adjoint_solution(i).zero_clone();
-                this->get_dof_map().enforce_constraints_exactly
-                  (*this, lift_func.get(),
-                   /* homogeneous = */ false);
-                sensitivities[i][j] = partialq_partialp[i] -
-                  partialR_partialp->dot(*lift_func) -
-                  partialR_partialp->dot(this->get_adjoint_solution(i));
+                this->get_dof_map().enforce_adjoint_constraints_exactly
+                  (lift_func.get(), i);
+                sensitivities[i][j] += partialR_partialp->dot(*lift_func);
               }
-            else
-              sensitivities[i][j] = partialq_partialp[i] -
-                partialR_partialp->dot(this->get_adjoint_solution(i));
           }
     }
 
