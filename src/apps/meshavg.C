@@ -95,6 +95,8 @@ int main(int argc, char** argv)
       (*summed_solutions[s]) /= n_solutions;
       es1.get_system(s).solution->swap(*summed_solutions[s]);
       es1.get_system(s).solution->close();
+
+      delete summed_solutions[s];
     }
 
   std::string outputname(argv[1]);
