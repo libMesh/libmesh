@@ -49,10 +49,16 @@ int main(int argc, char** argv)
                << " outputsolution mesh firstsolution [secondsolution ...]" << std::endl;
 
   mesh1.read(argv[2]);
-  libMesh::out << "Loaded mesh " << argv[1] << std::endl;
+  libMesh::out << "Loaded mesh " << argv[2] << std::endl;
 
-  es1.read(argv[3]);
+  mesh1.print_info();
+
+  es1.read(argv[3], EquationSystems::READ_HEADER |
+                    EquationSystems::READ_DATA |
+                    EquationSystems::READ_BASIC_ONLY);
   libMesh::out << "Loaded first solution " << argv[3] << std::endl;
+
+  es1.print_info();
 
   std::vector<std::string> sysnames;
   std::vector<NumericVector<libMesh::Number>*> summed_solutions;
@@ -68,7 +74,9 @@ int main(int argc, char** argv)
       Mesh mesh2(init.comm(), dim);
       EquationSystems es2(mesh2);
       mesh2.read(argv[2]);
-      es2.read(argv[i]);
+      es2.read(argv[i], EquationSystems::READ_HEADER |
+                        EquationSystems::READ_DATA |
+                        EquationSystems::READ_BASIC_ONLY);
       libMesh::out << "Loaded next solution " << argv[i] << std::endl;
 
       for (unsigned int s = 0; s != sysnames.size(); ++s)
@@ -89,7 +97,7 @@ int main(int argc, char** argv)
       es1.get_system(s).solution->close();
     }
 
-  std::string outputname(argv[2]);
+  std::string outputname(argv[1]);
 
   if (outputname.find(".xda") != std::string::npos ||
       outputname.find(".xdr") != std::string::npos)
