@@ -3646,22 +3646,25 @@ libmesh_prof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @LIBMESH_PROF_MODE_TRUE@am_libmesh_prof_la_rpath = -rpath $(libdir)
 am__EXEEXT_1 = getpot_parse-opt$(EXEEXT) meshtool-opt$(EXEEXT) \
 	compare-opt$(EXEEXT) meshbcid-opt$(EXEEXT) meshid-opt$(EXEEXT) \
-	meshdiff-opt$(EXEEXT) meshnorm-opt$(EXEEXT) \
-	projection-opt$(EXEEXT) output_libmesh_version-opt$(EXEEXT) \
-	meshplot-opt$(EXEEXT) solution_components-opt$(EXEEXT)
+	meshavg-opt$(EXEEXT) meshdiff-opt$(EXEEXT) \
+	meshnorm-opt$(EXEEXT) projection-opt$(EXEEXT) \
+	output_libmesh_version-opt$(EXEEXT) meshplot-opt$(EXEEXT) \
+	solution_components-opt$(EXEEXT)
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_2 = $(am__EXEEXT_1)
 am__EXEEXT_3 = getpot_parse-devel$(EXEEXT) meshtool-devel$(EXEEXT) \
 	compare-devel$(EXEEXT) meshbcid-devel$(EXEEXT) \
-	meshid-devel$(EXEEXT) meshdiff-devel$(EXEEXT) \
-	meshnorm-devel$(EXEEXT) projection-devel$(EXEEXT) \
+	meshid-devel$(EXEEXT) meshavg-devel$(EXEEXT) \
+	meshdiff-devel$(EXEEXT) meshnorm-devel$(EXEEXT) \
+	projection-devel$(EXEEXT) \
 	output_libmesh_version-devel$(EXEEXT) meshplot-devel$(EXEEXT) \
 	solution_components-devel$(EXEEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_4 = $(am__EXEEXT_3)
 am__EXEEXT_5 = getpot_parse-dbg$(EXEEXT) meshtool-dbg$(EXEEXT) \
 	compare-dbg$(EXEEXT) meshbcid-dbg$(EXEEXT) meshid-dbg$(EXEEXT) \
-	meshdiff-dbg$(EXEEXT) meshnorm-dbg$(EXEEXT) \
-	projection-dbg$(EXEEXT) output_libmesh_version-dbg$(EXEEXT) \
-	meshplot-dbg$(EXEEXT) solution_components-dbg$(EXEEXT)
+	meshavg-dbg$(EXEEXT) meshdiff-dbg$(EXEEXT) \
+	meshnorm-dbg$(EXEEXT) projection-dbg$(EXEEXT) \
+	output_libmesh_version-dbg$(EXEEXT) meshplot-dbg$(EXEEXT) \
+	solution_components-dbg$(EXEEXT)
 @LIBMESH_DBG_MODE_TRUE@am__EXEEXT_6 = $(am__EXEEXT_5)
 PROGRAMS = $(bin_PROGRAMS)
 am_compare_dbg_OBJECTS = src/apps/compare_dbg-compare.$(OBJEXT)
@@ -3707,6 +3710,25 @@ getpot_parse_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(getpot_parse_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_meshavg_dbg_OBJECTS = src/apps/meshavg_dbg-meshavg.$(OBJEXT)
+meshavg_dbg_OBJECTS = $(am_meshavg_dbg_OBJECTS)
+meshavg_dbg_DEPENDENCIES = libmesh_dbg.la
+meshavg_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(meshavg_dbg_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_meshavg_devel_OBJECTS = src/apps/meshavg_devel-meshavg.$(OBJEXT)
+meshavg_devel_OBJECTS = $(am_meshavg_devel_OBJECTS)
+meshavg_devel_DEPENDENCIES = libmesh_devel.la
+meshavg_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(meshavg_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+	-o $@
+am_meshavg_opt_OBJECTS = src/apps/meshavg_opt-meshavg.$(OBJEXT)
+meshavg_opt_OBJECTS = $(am_meshavg_opt_OBJECTS)
+meshavg_opt_DEPENDENCIES = libmesh_opt.la
+meshavg_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(meshavg_opt_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_meshbcid_dbg_OBJECTS = src/apps/meshbcid_dbg-meshbcid.$(OBJEXT)
 meshbcid_dbg_OBJECTS = $(am_meshbcid_dbg_OBJECTS)
 meshbcid_dbg_DEPENDENCIES = libmesh_dbg.la
@@ -3956,16 +3978,18 @@ SOURCES = $(libmesh_dbg_la_SOURCES) $(libmesh_devel_la_SOURCES) \
 	$(libmesh_prof_la_SOURCES) $(compare_dbg_SOURCES) \
 	$(compare_devel_SOURCES) $(compare_opt_SOURCES) \
 	$(getpot_parse_dbg_SOURCES) $(getpot_parse_devel_SOURCES) \
-	$(getpot_parse_opt_SOURCES) $(meshbcid_dbg_SOURCES) \
-	$(meshbcid_devel_SOURCES) $(meshbcid_opt_SOURCES) \
-	$(meshdiff_dbg_SOURCES) $(meshdiff_devel_SOURCES) \
-	$(meshdiff_opt_SOURCES) $(meshid_dbg_SOURCES) \
-	$(meshid_devel_SOURCES) $(meshid_opt_SOURCES) \
-	$(meshnorm_dbg_SOURCES) $(meshnorm_devel_SOURCES) \
-	$(meshnorm_opt_SOURCES) $(meshplot_dbg_SOURCES) \
-	$(meshplot_devel_SOURCES) $(meshplot_opt_SOURCES) \
-	$(meshtool_dbg_SOURCES) $(meshtool_devel_SOURCES) \
-	$(meshtool_opt_SOURCES) $(output_libmesh_version_dbg_SOURCES) \
+	$(getpot_parse_opt_SOURCES) $(meshavg_dbg_SOURCES) \
+	$(meshavg_devel_SOURCES) $(meshavg_opt_SOURCES) \
+	$(meshbcid_dbg_SOURCES) $(meshbcid_devel_SOURCES) \
+	$(meshbcid_opt_SOURCES) $(meshdiff_dbg_SOURCES) \
+	$(meshdiff_devel_SOURCES) $(meshdiff_opt_SOURCES) \
+	$(meshid_dbg_SOURCES) $(meshid_devel_SOURCES) \
+	$(meshid_opt_SOURCES) $(meshnorm_dbg_SOURCES) \
+	$(meshnorm_devel_SOURCES) $(meshnorm_opt_SOURCES) \
+	$(meshplot_dbg_SOURCES) $(meshplot_devel_SOURCES) \
+	$(meshplot_opt_SOURCES) $(meshtool_dbg_SOURCES) \
+	$(meshtool_devel_SOURCES) $(meshtool_opt_SOURCES) \
+	$(output_libmesh_version_dbg_SOURCES) \
 	$(output_libmesh_version_devel_SOURCES) \
 	$(output_libmesh_version_opt_SOURCES) \
 	$(projection_dbg_SOURCES) $(projection_devel_SOURCES) \
@@ -3979,16 +4003,18 @@ DIST_SOURCES = $(am__libmesh_dbg_la_SOURCES_DIST) \
 	$(am__libmesh_prof_la_SOURCES_DIST) $(compare_dbg_SOURCES) \
 	$(compare_devel_SOURCES) $(compare_opt_SOURCES) \
 	$(getpot_parse_dbg_SOURCES) $(getpot_parse_devel_SOURCES) \
-	$(getpot_parse_opt_SOURCES) $(meshbcid_dbg_SOURCES) \
-	$(meshbcid_devel_SOURCES) $(meshbcid_opt_SOURCES) \
-	$(meshdiff_dbg_SOURCES) $(meshdiff_devel_SOURCES) \
-	$(meshdiff_opt_SOURCES) $(meshid_dbg_SOURCES) \
-	$(meshid_devel_SOURCES) $(meshid_opt_SOURCES) \
-	$(meshnorm_dbg_SOURCES) $(meshnorm_devel_SOURCES) \
-	$(meshnorm_opt_SOURCES) $(meshplot_dbg_SOURCES) \
-	$(meshplot_devel_SOURCES) $(meshplot_opt_SOURCES) \
-	$(meshtool_dbg_SOURCES) $(meshtool_devel_SOURCES) \
-	$(meshtool_opt_SOURCES) $(output_libmesh_version_dbg_SOURCES) \
+	$(getpot_parse_opt_SOURCES) $(meshavg_dbg_SOURCES) \
+	$(meshavg_devel_SOURCES) $(meshavg_opt_SOURCES) \
+	$(meshbcid_dbg_SOURCES) $(meshbcid_devel_SOURCES) \
+	$(meshbcid_opt_SOURCES) $(meshdiff_dbg_SOURCES) \
+	$(meshdiff_devel_SOURCES) $(meshdiff_opt_SOURCES) \
+	$(meshid_dbg_SOURCES) $(meshid_devel_SOURCES) \
+	$(meshid_opt_SOURCES) $(meshnorm_dbg_SOURCES) \
+	$(meshnorm_devel_SOURCES) $(meshnorm_opt_SOURCES) \
+	$(meshplot_dbg_SOURCES) $(meshplot_devel_SOURCES) \
+	$(meshplot_opt_SOURCES) $(meshtool_dbg_SOURCES) \
+	$(meshtool_devel_SOURCES) $(meshtool_opt_SOURCES) \
+	$(output_libmesh_version_dbg_SOURCES) \
 	$(output_libmesh_version_devel_SOURCES) \
 	$(output_libmesh_version_opt_SOURCES) \
 	$(projection_dbg_SOURCES) $(projection_devel_SOURCES) \
@@ -4909,6 +4935,8 @@ CLEANFILES = $(am__append_11)
 
 # meshid
 
+# meshavg
+
 # meshdiff
 
 # meshnorm
@@ -4921,16 +4949,16 @@ CLEANFILES = $(am__append_11)
 
 # solution_components
 opt_programs = getpot_parse-opt meshtool-opt compare-opt meshbcid-opt \
-	meshid-opt meshdiff-opt meshnorm-opt projection-opt \
-	output_libmesh_version-opt meshplot-opt \
+	meshid-opt meshavg-opt meshdiff-opt meshnorm-opt \
+	projection-opt output_libmesh_version-opt meshplot-opt \
 	solution_components-opt
 devel_programs = getpot_parse-devel meshtool-devel compare-devel \
-	meshbcid-devel meshid-devel meshdiff-devel meshnorm-devel \
-	projection-devel output_libmesh_version-devel meshplot-devel \
-	solution_components-devel
+	meshbcid-devel meshid-devel meshavg-devel meshdiff-devel \
+	meshnorm-devel projection-devel output_libmesh_version-devel \
+	meshplot-devel solution_components-devel
 dbg_programs = getpot_parse-dbg meshtool-dbg compare-dbg meshbcid-dbg \
-	meshid-dbg meshdiff-dbg meshnorm-dbg projection-dbg \
-	output_libmesh_version-dbg meshplot-dbg \
+	meshid-dbg meshavg-dbg meshdiff-dbg meshnorm-dbg \
+	projection-dbg output_libmesh_version-dbg meshplot-dbg \
 	solution_components-dbg
 prof_programs = # empty, append below
 oprof_programs = # empty, append below
@@ -4994,6 +5022,18 @@ meshid_dbg_SOURCES = src/apps/meshid.C
 meshid_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 meshid_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 meshid_dbg_LDADD = libmesh_dbg.la
+meshavg_opt_SOURCES = src/apps/meshavg.C
+meshavg_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+meshavg_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+meshavg_opt_LDADD = libmesh_opt.la
+meshavg_devel_SOURCES = src/apps/meshavg.C
+meshavg_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+meshavg_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+meshavg_devel_LDADD = libmesh_devel.la
+meshavg_dbg_SOURCES = src/apps/meshavg.C
+meshavg_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+meshavg_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+meshavg_dbg_LDADD = libmesh_dbg.la
 meshdiff_opt_SOURCES = src/apps/meshdiff.C
 meshdiff_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 meshdiff_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -10310,6 +10350,21 @@ src/apps/getpot_parse_opt-getpot_parse.$(OBJEXT):  \
 getpot_parse-opt$(EXEEXT): $(getpot_parse_opt_OBJECTS) $(getpot_parse_opt_DEPENDENCIES) $(EXTRA_getpot_parse_opt_DEPENDENCIES) 
 	@rm -f getpot_parse-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(getpot_parse_opt_LINK) $(getpot_parse_opt_OBJECTS) $(getpot_parse_opt_LDADD) $(LIBS)
+src/apps/meshavg_dbg-meshavg.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+meshavg-dbg$(EXEEXT): $(meshavg_dbg_OBJECTS) $(meshavg_dbg_DEPENDENCIES) $(EXTRA_meshavg_dbg_DEPENDENCIES)
+	@rm -f meshavg-dbg$(EXEEXT)
+	$(AM_V_CXXLD)$(meshavg_dbg_LINK) $(meshavg_dbg_OBJECTS) $(meshavg_dbg_LDADD) $(LIBS)
+src/apps/meshavg_devel-meshavg.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+meshavg-devel$(EXEEXT): $(meshavg_devel_OBJECTS) $(meshavg_devel_DEPENDENCIES) $(EXTRA_meshavg_devel_DEPENDENCIES)
+	@rm -f meshavg-devel$(EXEEXT)
+	$(AM_V_CXXLD)$(meshavg_devel_LINK) $(meshavg_devel_OBJECTS) $(meshavg_devel_LDADD) $(LIBS)
+src/apps/meshavg_opt-meshavg.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+meshavg-opt$(EXEEXT): $(meshavg_opt_OBJECTS) $(meshavg_opt_DEPENDENCIES) $(EXTRA_meshavg_opt_DEPENDENCIES)
+	@rm -f meshavg-opt$(EXEEXT)
+	$(AM_V_CXXLD)$(meshavg_opt_LINK) $(meshavg_opt_OBJECTS) $(meshavg_opt_LDADD) $(LIBS)
 src/apps/meshbcid_dbg-meshbcid.$(OBJEXT): src/apps/$(am__dirstamp) \
 	src/apps/$(DEPDIR)/$(am__dirstamp)
 meshbcid-dbg$(EXEEXT): $(meshbcid_dbg_OBJECTS) $(meshbcid_dbg_DEPENDENCIES) $(EXTRA_meshbcid_dbg_DEPENDENCIES) 
@@ -10594,6 +10649,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/getpot_parse_dbg-getpot_parse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/getpot_parse_devel-getpot_parse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/getpot_parse_opt-getpot_parse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshavg_dbg-meshavg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshavg_devel-meshavg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshavg_opt-meshavg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshbcid_dbg-meshbcid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshbcid_devel-meshbcid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshbcid_opt-meshbcid.Po@am__quote@
@@ -27054,6 +27112,48 @@ src/apps/getpot_parse_opt-getpot_parse.obj: src/apps/getpot_parse.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/getpot_parse.C' object='src/apps/getpot_parse_opt-getpot_parse.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(getpot_parse_opt_CPPFLAGS) $(CPPFLAGS) $(getpot_parse_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/getpot_parse_opt-getpot_parse.obj `if test -f 'src/apps/getpot_parse.C'; then $(CYGPATH_W) 'src/apps/getpot_parse.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/getpot_parse.C'; fi`
+
+src/apps/meshavg_dbg-meshavg.o: src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_dbg_CPPFLAGS) $(CPPFLAGS) $(meshavg_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshavg_dbg-meshavg.o -MD -MP -MF src/apps/$(DEPDIR)/meshavg_dbg-meshavg.Tpo -c -o src/apps/meshavg_dbg-meshavg.o `test -f 'src/apps/meshavg.C' || echo '$(srcdir)/'`src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshavg_dbg-meshavg.Tpo src/apps/$(DEPDIR)/meshavg_dbg-meshavg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshavg.C' object='src/apps/meshavg_dbg-meshavg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_dbg_CPPFLAGS) $(CPPFLAGS) $(meshavg_dbg_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshavg_dbg-meshavg.o `test -f 'src/apps/meshavg.C' || echo '$(srcdir)/'`src/apps/meshavg.C
+
+src/apps/meshavg_dbg-meshavg.obj: src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_dbg_CPPFLAGS) $(CPPFLAGS) $(meshavg_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshavg_dbg-meshavg.obj -MD -MP -MF src/apps/$(DEPDIR)/meshavg_dbg-meshavg.Tpo -c -o src/apps/meshavg_dbg-meshavg.obj `if test -f 'src/apps/meshavg.C'; then $(CYGPATH_W) 'src/apps/meshavg.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshavg.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshavg_dbg-meshavg.Tpo src/apps/$(DEPDIR)/meshavg_dbg-meshavg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshavg.C' object='src/apps/meshavg_dbg-meshavg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_dbg_CPPFLAGS) $(CPPFLAGS) $(meshavg_dbg_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshavg_dbg-meshavg.obj `if test -f 'src/apps/meshavg.C'; then $(CYGPATH_W) 'src/apps/meshavg.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshavg.C'; fi`
+
+src/apps/meshavg_devel-meshavg.o: src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_devel_CPPFLAGS) $(CPPFLAGS) $(meshavg_devel_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshavg_devel-meshavg.o -MD -MP -MF src/apps/$(DEPDIR)/meshavg_devel-meshavg.Tpo -c -o src/apps/meshavg_devel-meshavg.o `test -f 'src/apps/meshavg.C' || echo '$(srcdir)/'`src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshavg_devel-meshavg.Tpo src/apps/$(DEPDIR)/meshavg_devel-meshavg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshavg.C' object='src/apps/meshavg_devel-meshavg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_devel_CPPFLAGS) $(CPPFLAGS) $(meshavg_devel_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshavg_devel-meshavg.o `test -f 'src/apps/meshavg.C' || echo '$(srcdir)/'`src/apps/meshavg.C
+
+src/apps/meshavg_devel-meshavg.obj: src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_devel_CPPFLAGS) $(CPPFLAGS) $(meshavg_devel_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshavg_devel-meshavg.obj -MD -MP -MF src/apps/$(DEPDIR)/meshavg_devel-meshavg.Tpo -c -o src/apps/meshavg_devel-meshavg.obj `if test -f 'src/apps/meshavg.C'; then $(CYGPATH_W) 'src/apps/meshavg.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshavg.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshavg_devel-meshavg.Tpo src/apps/$(DEPDIR)/meshavg_devel-meshavg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshavg.C' object='src/apps/meshavg_devel-meshavg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_devel_CPPFLAGS) $(CPPFLAGS) $(meshavg_devel_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshavg_devel-meshavg.obj `if test -f 'src/apps/meshavg.C'; then $(CYGPATH_W) 'src/apps/meshavg.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshavg.C'; fi`
+
+src/apps/meshavg_opt-meshavg.o: src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_opt_CPPFLAGS) $(CPPFLAGS) $(meshavg_opt_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshavg_opt-meshavg.o -MD -MP -MF src/apps/$(DEPDIR)/meshavg_opt-meshavg.Tpo -c -o src/apps/meshavg_opt-meshavg.o `test -f 'src/apps/meshavg.C' || echo '$(srcdir)/'`src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshavg_opt-meshavg.Tpo src/apps/$(DEPDIR)/meshavg_opt-meshavg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshavg.C' object='src/apps/meshavg_opt-meshavg.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_opt_CPPFLAGS) $(CPPFLAGS) $(meshavg_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshavg_opt-meshavg.o `test -f 'src/apps/meshavg.C' || echo '$(srcdir)/'`src/apps/meshavg.C
+
+src/apps/meshavg_opt-meshavg.obj: src/apps/meshavg.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_opt_CPPFLAGS) $(CPPFLAGS) $(meshavg_opt_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshavg_opt-meshavg.obj -MD -MP -MF src/apps/$(DEPDIR)/meshavg_opt-meshavg.Tpo -c -o src/apps/meshavg_opt-meshavg.obj `if test -f 'src/apps/meshavg.C'; then $(CYGPATH_W) 'src/apps/meshavg.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshavg.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshavg_opt-meshavg.Tpo src/apps/$(DEPDIR)/meshavg_opt-meshavg.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshavg.C' object='src/apps/meshavg_opt-meshavg.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshavg_opt_CPPFLAGS) $(CPPFLAGS) $(meshavg_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshavg_opt-meshavg.obj `if test -f 'src/apps/meshavg.C'; then $(CYGPATH_W) 'src/apps/meshavg.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshavg.C'; fi`
 
 src/apps/meshbcid_dbg-meshbcid.o: src/apps/meshbcid.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshbcid_dbg_CPPFLAGS) $(CPPFLAGS) $(meshbcid_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshbcid_dbg-meshbcid.o -MD -MP -MF src/apps/$(DEPDIR)/meshbcid_dbg-meshbcid.Tpo -c -o src/apps/meshbcid_dbg-meshbcid.o `test -f 'src/apps/meshbcid.C' || echo '$(srcdir)/'`src/apps/meshbcid.C
