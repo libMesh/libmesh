@@ -311,6 +311,25 @@ meshid_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 meshid_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 meshid_dbg_LDADD      = libmesh_dbg.la
 
+# meshavg
+opt_programs           += meshavg-opt
+meshavg_opt_SOURCES    = src/apps/meshavg.C
+meshavg_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+meshavg_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
+meshavg_opt_LDADD      = libmesh_opt.la
+
+devel_programs         += meshavg-devel
+meshavg_devel_SOURCES  = src/apps/meshavg.C
+meshavg_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+meshavg_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+meshavg_devel_LDADD    = libmesh_devel.la
+
+dbg_programs           += meshavg-dbg
+meshavg_dbg_SOURCES    = src/apps/meshavg.C
+meshavg_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+meshavg_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
+meshavg_dbg_LDADD      = libmesh_dbg.la
+
 # meshdiff
 opt_programs           += meshdiff-opt
 meshdiff_opt_SOURCES    = src/apps/meshdiff.C
