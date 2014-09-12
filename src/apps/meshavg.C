@@ -69,7 +69,7 @@ int main(int argc, char** argv)
       summed_solutions.push_back(es1.get_system(s).solution->clone().release());
     }
 
-  for (unsigned int i=4; i < argc; ++i)
+  for (int i=4; i < argc; ++i)
     {
       Mesh mesh2(init.comm(), dim);
       EquationSystems es2(mesh2);
