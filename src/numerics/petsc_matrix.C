@@ -596,7 +596,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
   PetscErrorCode ierr=0;
 
   // Print to screen if ostream is stdout
-  if (os == std::cout)
+  if (os.rdbuf() == std::cout.rdbuf())
     {
       ierr = MatView(_mat, PETSC_VIEWER_STDOUT_SELF);
       LIBMESH_CHKERRABORT(ierr);
