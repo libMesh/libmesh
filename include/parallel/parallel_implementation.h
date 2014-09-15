@@ -26,12 +26,11 @@
 // C++ includes
 #include <iterator> // iterator_traits
 
+namespace libMesh {
+namespace Parallel {
 
 // First declare StandardType specializations so we can use them in anonymous
 // helper functions later
-
-namespace libMesh {
-namespace Parallel {
 
 #ifdef LIBMESH_HAVE_MPI
 
@@ -363,13 +362,11 @@ extern Communicator& Communicator_World;
 /**
  * Helper function for range packing
  */
-template <typename Context, typename buffertype, typename Iter>
-inline void pack_range (const Context *context,
-                        Iter range_begin,
-                        const Iter range_end,
-                        std::vector<buffertype>& buffer)
+template <typename Context, typename Iter>
+inline std::size_t packed_range_size (const Context *context,
+                                      Iter range_begin,
+                                      const Iter range_end)
 {
-  // Count the total size of and preallocate buffer for efficiency
   std::size_t buffer_size = 0;
   for (Iter range_count = range_begin;
        range_count != range_end;
@@ -377,10 +374,44 @@ inline void pack_range (const Context *context,
     {
       buffer_size += Parallel::packable_size(*range_count, context);
     }
+  return buffer_size;
+}
+
+
+/**
+ * Helper function for range packing
+ */
+template <typename Context, typename buffertype, typename Iter>
+inline Iter pack_range (const Context *context,
+                        Iter range_begin,
+                        const Iter range_end,
+                        std::vector<buffertype>& buffer)
+{
+  // When we serialize into buffers, we need to use large buffers to optimize MPI
+  // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
+  // is measured in number of buffer type entries; number of bytes may be 4 or 8
+  // times larger depending on configuration.
+
+  static const std::size_t max_buffer_size = 1000000;
+  // static const std::size_t max_buffer_size = std::size_t(-1);
+
+  // Count the total size of and preallocate buffer for efficiency.
+  // Prepare to stop early if the buffer would be too large.
+  std::size_t buffer_size = 0;
+  Iter range_stop = range_begin;
+  for (; range_stop != range_end; ++range_stop)
+    {
+      std::size_t next_buffer_size =
+        Parallel::packable_size(*range_stop, context);
+      if (buffer_size + next_buffer_size >= max_buffer_size)
+        break;
+      else
+        buffer_size += next_buffer_size;
+    }
   buffer.reserve(buffer.size() + buffer_size);
 
   // Pack the objects into the buffer
-  for (; range_begin != range_end; ++range_begin)
+  for (; range_begin != range_stop; ++range_begin)
     {
 #ifndef NDEBUG
       std::size_t old_size = buffer.size();
@@ -398,6 +429,8 @@ inline void pack_range (const Context *context,
       libmesh_assert_equal_to (buffer.size(), old_size + my_packable_size);
 #endif
     }
+
+  return range_stop;
 }
 
 
@@ -637,6 +670,10 @@ inline Request::Request (const Request &other) :
   _request(other._request),
   post_wait_work(other.post_wait_work)
 {
+  if (other._prior_request.get())
+    _prior_request = AutoPtr<Request>
+      (new Request(*other._prior_request.get()));
+
   // operator= should behave like a shared pointer
   if (post_wait_work)
     post_wait_work->second++;
@@ -671,6 +708,10 @@ inline Request& Request::operator = (const Request &other)
   _request = other._request;
   post_wait_work = other.post_wait_work;
 
+  if (other._prior_request.get())
+    _prior_request = AutoPtr<Request>
+      (new Request(*other._prior_request.get()));
+
   // operator= should behave like a shared pointer
   if (post_wait_work)
     post_wait_work->second++;
@@ -693,6 +734,9 @@ inline Request::~Request () {
 inline Status Request::wait ()
 {
   START_LOG("wait()", "Parallel::Request");
+
+  if (_prior_request.get())
+    _prior_request->wait();
 
   Status stat;
 #ifdef LIBMESH_HAVE_MPI
@@ -752,6 +796,16 @@ inline bool Request::test (status &)
   return true;
 }
 #endif
+
+inline void Request::add_prior_request(const Request& req)
+{
+  // We're making a chain of prior requests, not a tree
+  libmesh_assert(!req._prior_request.get());
+
+  Request *new_prior_req = new Request(req);
+  new_prior_req->_prior_request = this->_prior_request;
+  this->_prior_request = AutoPtr<Request>(new_prior_req);
+}
 
 inline void Request::add_post_wait_work(PostWaitWork* work)
 {
@@ -2148,12 +2202,33 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
   // We will serialize variable size objects from *range_begin to
   // *range_end as a sequence of plain data (e.g. ints) in this buffer
   typedef typename std::iterator_traits<Iter>::value_type T;
-  std::vector<typename Parallel::BufferType<T>::type> buffer;
 
-  Parallel::pack_range(context, range_begin, range_end, buffer);
+  std::size_t total_buffer_size =
+    Parallel::packed_range_size(context, range_begin, range_end);
 
-  // Blocking send of the buffer
-  this->send(dest_processor_id, buffer, tag);
+  this->send(dest_processor_id, total_buffer_size, tag);
+
+#ifdef DEBUG
+  std::size_t used_buffer_size = 0;
+#endif
+
+  while (range_begin != range_end)
+    {
+      std::vector<typename Parallel::BufferType<T>::type> buffer;
+
+      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
+
+#ifdef DEBUG
+      used_buffer_size += buffer.size();
+#endif
+
+      // Blocking send of the buffer
+      this->send(dest_processor_id, buffer, tag);
+    }
+
+#ifdef DEBUG
+  libmesh_assert_equal_to(used_buffer_size, total_buffer_size);
+#endif
 }
 
 
@@ -2169,17 +2244,44 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
   // after the Request::wait()
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
-  std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
 
-  Parallel::pack_range(context, range_begin, range_end, *buffer);
+  std::size_t total_buffer_size =
+    Parallel::packed_range_size(context, range_begin, range_end);
 
-  // Make the Request::wait() handle deleting the buffer
-  req.add_post_wait_work
-    (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >
-     (buffer));
+  Request intermediate_req = request();
+  this->send(dest_processor_id, total_buffer_size, intermediate_req, tag);
 
-  // Non-blocking send of the buffer
-  this->send(dest_processor_id, *buffer, req, tag);
+  req.add_prior_request(intermediate_req);
+
+#ifdef DEBUG
+  std::size_t used_buffer_size = 0;
+#endif
+
+  while (range_begin != range_end)
+    {
+      std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
+
+      range_begin = Parallel::pack_range(context, range_begin, range_end, *buffer);
+
+#ifdef DEBUG
+      used_buffer_size += buffer->size();
+#endif
+
+      Request intermediate_req;
+
+      Request *my_req = (range_begin == range_end) ? &req : &intermediate_req;
+
+      // Make the Request::wait() handle deleting the buffer
+      my_req->add_post_wait_work
+        (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >
+         (buffer));
+
+      // Non-blocking send of the buffer
+      this->send(dest_processor_id, *buffer, *my_req, tag);
+
+      if (range_begin != range_end)
+        req.add_prior_request(*my_req);
+    }
 }
 
 
@@ -2455,14 +2557,23 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
   typedef typename std::iterator_traits<OutputIter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
 
-  // Receive serialized variable size objects as a sequence of ints
-  std::vector<buffer_t> buffer;
-  this->receive(src_processor_id, buffer, tag);
-  Parallel::unpack_range(buffer, context, out);
+  // Receive serialized variable size objects as sequences of buffer_t
+  std::size_t total_buffer_size = 0;
+  this->receive(src_processor_id, total_buffer_size, tag);
+
+  std::size_t received_buffer_size = 0;
+  while (received_buffer_size < total_buffer_size)
+    {
+      std::vector<buffer_t> buffer;
+      this->receive(src_processor_id, buffer, tag);
+      received_buffer_size += buffer.size();
+      Parallel::unpack_range(buffer, context, out);
+    }
 }
 
 
 
+/*
 template <typename Context, typename OutputIter>
 inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
                                                 Context *context,
@@ -2489,6 +2600,7 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
   req.add_post_wait_work
     (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >(buffer));
 }
+*/
 
 
 
@@ -2890,15 +3002,24 @@ inline void Communicator::gather_packed_range
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
 
-  // We will serialize variable size objects from *range_begin to
-  // *range_end as a sequence of ints in this buffer
-  std::vector<buffer_t> buffer;
+  bool nonempty_range = (range_begin != range_end);
+  this->max(nonempty_range);
 
-  Parallel::pack_range(context, range_begin, range_end, buffer);
+  while (nonempty_range)
+    {
+      // We will serialize variable size objects from *range_begin to
+      // *range_end as a sequence of ints in this buffer
+      std::vector<buffer_t> buffer;
 
-  this->gather(root_id, buffer);
+      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
 
-  Parallel::unpack_range(buffer, context, out);
+      this->gather(root_id, buffer);
+
+      Parallel::unpack_range(buffer, context, out);
+
+      nonempty_range = (range_begin != range_end);
+      this->max(nonempty_range);
+    }
 }
 
 
@@ -2912,15 +3033,26 @@ inline void Communicator::allgather_packed_range
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
 
-  // We will serialize variable size objects from *range_begin to
-  // *range_end as a sequence of ints in this buffer
-  std::vector<buffer_t> buffer;
+  bool nonempty_range = (range_begin != range_end);
+  this->max(nonempty_range);
 
-  Parallel::pack_range(context, range_begin, range_end, buffer);
+  while (nonempty_range)
+    {
+      // We will serialize variable size objects from *range_begin to
+      // *range_end as a sequence of ints in this buffer
+      std::vector<buffer_t> buffer;
 
-  this->allgather(buffer, false);
+      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
 
-  Parallel::unpack_range(buffer, context, out);
+      this->allgather(buffer, false);
+
+      libmesh_assert(buffer.size());
+
+      Parallel::unpack_range(buffer, context, out);
+
+      nonempty_range = (range_begin != range_end);
+      this->max(nonempty_range);
+    }
 }
 
 
@@ -3229,24 +3361,32 @@ inline void Communicator::broadcast_packed_range
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
 
-  // We will serialize variable size objects from *range_begin to
-  // *range_end as a sequence of ints in this buffer
-  std::vector<buffer_t> buffer;
+  do
+    {
+      // We will serialize variable size objects from *range_begin to
+      // *range_end as a sequence of ints in this buffer
+      std::vector<buffer_t> buffer;
 
-  if (this->rank() == root_id)
-    Parallel::pack_range(context1, range_begin, range_end, buffer);
+      if (this->rank() == root_id)
+        range_begin = Parallel::pack_range(context1, range_begin, range_end, buffer);
 
-  // this->broadcast(vector) requires the receiving vectors to
-  // already be the appropriate size
-  std::size_t buffer_size = buffer.size();
-  this->broadcast (buffer_size);
-  buffer.resize(buffer_size);
+      // this->broadcast(vector) requires the receiving vectors to
+      // already be the appropriate size
+      std::size_t buffer_size = buffer.size();
+      this->broadcast (buffer_size, root_id);
 
-  // Broadcast the packed data
-  this->broadcast (buffer, root_id);
+      // We continue until there's nothing left to broadcast
+      if (!buffer_size)
+        break;
 
-  if (this->rank() != root_id)
-    Parallel::unpack_range(buffer, context2, out);
+      buffer.resize(buffer_size);
+
+      // Broadcast the packed data
+      this->broadcast (buffer, root_id);
+
+      if (this->rank() != root_id)
+        Parallel::unpack_range(buffer, context2, out);
+    } while (true);  // break above when we reach buffer_size==0
 }
 
 
