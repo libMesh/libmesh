@@ -33,6 +33,9 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 
+/* DMlibMesh include. */
+#include "libmesh/petscdmlibmesh.h"
+
 namespace libMesh
 {
 
@@ -327,6 +330,24 @@ void PetscNonlinearSolver<T>::init (const char* name)
           ierr = SNESSetOptionsPrefix(_snes, name);
           LIBMESH_CHKERRABORT(ierr);
         }
+
+#if !PETSC_RELEASE_LESS_THAN(3,3,0)
+      // Attaching a DM to SNES.
+      DM dm;
+      ierr = DMCreate(this->comm().get(), &dm);LIBMESH_CHKERRABORT(ierr);
+      ierr = DMSetType(dm,DMLIBMESH);LIBMESH_CHKERRABORT(ierr);
+      ierr = DMlibMeshSetSystem(dm,this->system());LIBMESH_CHKERRABORT(ierr);
+      if (name)
+	{
+	  ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
+	}
+      ierr = DMSetFromOptions(dm);               LIBMESH_CHKERRABORT(ierr);
+      ierr = DMSetUp(dm);                        LIBMESH_CHKERRABORT(ierr);
+      ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERRABORT(ierr);
+      // SNES now owns the reference to dm.
+      ierr = DMDestroy(&dm);                     LIBMESH_CHKERRABORT(ierr);
+
+#endif
 
       if (_default_monitor)
         {
