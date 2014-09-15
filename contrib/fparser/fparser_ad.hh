@@ -35,6 +35,19 @@ public:
    */
   void silenceAutoDiffErrors(bool _silence = true) { mSilenceErrors = _silence; }
 
+  /**
+   * compile the current function, or load a previously compiled copy
+   */
+  bool JITCompile(bool cacheFunction = true);
+
+#ifdef LIBMESH_HAVE_FPARSER_JIT
+  /**
+   * Overwrite the Exec function with one that tests for a JIT compiled version
+   * and uses that if it exists
+   */
+  Value_t Eval(const Value_t* Vars);
+#endif
+
 protected:
   /**
    * A list of opcodes and immediate values
@@ -70,8 +83,14 @@ private:
   /// variable to diff for
   unsigned mVarOp;
 
+  /// expand
+  DiffProgramFragment Expand();
+
   /// write the DiffProgramFragement into the internal bytecode storage
   void Commit(const DiffProgramFragment & code);
+
+  /// JIT function pointer
+  Value_t (*compiledFunction)(const Value_t *, const Value_t *);
 
   /**
    * In certain applications derivatives are built proactively and may never be used.

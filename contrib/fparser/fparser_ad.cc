@@ -6,10 +6,19 @@ using namespace FUNCTIONPARSERTYPES;
 
 #include <iostream>
 
+#ifdef LIBMESH_HAVE_FPARSER_JIT
+#  include <fstream>
+#  include <cstdio>
+#  include <cstdlib>
+#  include <dlfcn.h>
+#  include "lib/sha1.h"
+#endif
+
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
     mData(this->getParserData()),
+    compiledFunction(NULL),
     mSilenceErrors(false)
 {
 }
@@ -18,6 +27,7 @@ template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& cpy) :
     FunctionParserBase<Value_t>(cpy),
     mData(this->getParserData()),
+    compiledFunction(cpy.compiledFunction),
     mSilenceErrors(cpy.mSilenceErrors)
 {
 }
@@ -473,6 +483,68 @@ void FunctionParserADBase<Value_t>::setZero()
 }
 
 template<typename Value_t>
+typename FunctionParserADBase<Value_t>::DiffProgramFragment
+FunctionParserADBase<Value_t>::Expand()
+{
+  // get a reference to the stored bytecode
+  const std::vector<unsigned>& ByteCode = mData->mByteCode;
+
+  // get a reference to the immediate values
+  const std::vector<Value_t>& Immed = mData->mImmed;
+
+  DiffProgramFragment orig;
+  unsigned op;
+  unsigned int nImmed = 0;
+
+  for (unsigned int i = 0; i < ByteCode.size(); ++i)
+  {
+    op = ByteCode[i];
+    if (op == cImmed)
+      orig.push_back(OpcodeDataPair(op, Immed[nImmed++]));
+    else if (op == cDup)
+    {
+      // substitute full code for cDup opcodes
+      Interval arg = GetArgument(orig);
+      orig.insert(orig.end(), arg.first, arg.second);
+    }
+    else if (op == cJump)
+      throw UnsupportedOpcodeException;
+    else if (op == cSinCos)
+    {
+      // this instruction puts two values on the stack!
+      Interval arg = GetArgument(orig);
+      DiffProgramFragment sub(arg.first, arg.second);
+      orig.push_back(OpcodeDataPair(cSin, 0.0));
+      orig.insert(orig.end(), sub.begin(), sub.end());
+      orig.push_back(OpcodeDataPair(cCos, 0.0));
+    }
+    else if (op == cCsc)
+    {
+      orig.push_back(OpcodeDataPair(cSin, 0.0));
+      orig.push_back(OpcodeDataPair(cInv, 0.0));
+    }
+    else if (op == cSec)
+    {
+      orig.push_back(OpcodeDataPair(cSin, 0.0));
+      orig.push_back(OpcodeDataPair(cInv, 0.0));
+    }
+    else if (op == cCot)
+    {
+      orig.push_back(OpcodeDataPair(cTan, 0.0));
+      orig.push_back(OpcodeDataPair(cInv, 0.0));
+    }
+#ifdef FP_SUPPORT_OPTIMIZER
+    else if (op == cNop)
+      continue;
+#endif
+    else
+      orig.push_back(OpcodeDataPair(op, 0.0));
+  }
+
+  return orig;
+}
+
+template<typename Value_t>
 int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
 {
   this->ForceDeepCopy();
@@ -500,74 +572,15 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
   // invalid var argument, variable not found
   if (mVarOp == 0) return 1;
 
-  // get a reference to the stored bytecode
-  const std::vector<unsigned>& ByteCode = mData->mByteCode;
-
-  // get a reference to the immediate values
-  const std::vector<Value_t>& Immed = mData->mImmed;
-
   // uncompressed immediate data representation
   // we also expand a few multiopcodes into elementary opcodes
   // to keep the diff rules above simple (cDup must be expanded in this step)
   DiffProgramFragment orig, diff;
-  unsigned op;
-  unsigned int nImmed = 0;
 
   try
   {
-    for (unsigned int i = 0; i < ByteCode.size(); ++i)
-    {
-      op = ByteCode[i];
-      if (op == cImmed)
-        orig.push_back(OpcodeDataPair(op, Immed[nImmed++]));
-      else if (op == cDup)
-      {
-        // substitute full code for cDup opcodes
-        Interval arg = GetArgument(orig);
-        orig.insert(orig.end(), arg.first, arg.second);
-      }
-      else if (op == cJump)
-        throw UnsupportedOpcodeException;
-      else if (op == cFetch)
-      {
-        // get index and advance instruction counter
-        throw UnsupportedOpcodeException; // for now
-
-        unsigned index = ByteCode[++i];
-        Interval arg = GetArgument(orig, index); // maybe off by one
-        orig.insert(orig.end(), arg.first, arg.second);
-      }
-      else if (op == cSinCos)
-      {
-        // this instruction puts two values on the stack!
-        Interval arg = GetArgument(orig);
-        DiffProgramFragment sub(arg.first, arg.second);
-        orig.push_back(OpcodeDataPair(cSin, 0.0));
-        orig.insert(orig.end(), sub.begin(), sub.end());
-        orig.push_back(OpcodeDataPair(cCos, 0.0));
-      }
-      else if (op == cCsc)
-      {
-        orig.push_back(OpcodeDataPair(cSin, 0.0));
-        orig.push_back(OpcodeDataPair(cInv, 0.0));
-      }
-      else if (op == cSec)
-      {
-        orig.push_back(OpcodeDataPair(cSin, 0.0));
-        orig.push_back(OpcodeDataPair(cInv, 0.0));
-      }
-      else if (op == cCot)
-      {
-        orig.push_back(OpcodeDataPair(cTan, 0.0));
-        orig.push_back(OpcodeDataPair(cInv, 0.0));
-      }
-  #ifdef FP_SUPPORT_OPTIMIZER
-      else if (op == cNop)
-        continue;
-  #endif
-      else
-        orig.push_back(OpcodeDataPair(op, 0.0));
-    }
+    // expand the internal byte code into a more convenient form
+    orig = Expand();
 
     diff  = DiffFunction(orig);
 
@@ -588,6 +601,224 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
 
   return -1;
 }
+
+template<typename Value_t>
+bool FunctionParserADBase<Value_t>::JITCompile(bool)
+{
+  // JIT compile attempted for an unsupported value type
+  return false;
+}
+
+#ifdef LIBMESH_HAVE_FPARSER_JIT
+template<typename Value_t>
+Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
+{
+  return FunctionParserBase<Value_t>::Eval(Vars);
+}
+
+template<>
+double FunctionParserADBase<double>::Eval(const double* Vars)
+{
+  if (compiledFunction == NULL)
+    return FunctionParserBase<double>::Eval(Vars);
+  else
+    return (*compiledFunction)(Vars, &(mData->mImmed[0]));
+}
+
+// currently JIT is just implemented for double types (this could easily be extended)
+template<>
+bool FunctionParserADBase<double>::JITCompile(bool cacheFunction)
+{
+  DiffProgramFragment code = Expand();
+
+  // generate a sha1 hash of the current program
+  SHA1 *sha1 = new SHA1();
+  char result[41];
+  sha1->addBytes((char*) &(mData->mByteCode[0]), mData->mByteCode.size() * sizeof(unsigned));
+  unsigned char* digest = sha1->getDigest();
+  for (unsigned int i = 0; i<20; ++i)
+    sprintf(&(result[i*2]), "%02x", digest[i]);
+  delete sha1;
+
+  // function name
+  std::string fnname = "f_";
+  fnname += result;
+
+  // cache file name
+  std::string jitprefix = "./.jit";
+  std::string libname = jitprefix + result + ".so";
+
+  // attempt to open the cache file
+  void * lib;
+  if (cacheFunction)
+  {
+    lib = dlopen(libname.c_str(), RTLD_NOW);
+    if (lib != NULL) {
+      // fetch function pointer
+      *(void **) (&compiledFunction) = dlsym(lib, fnname.c_str());
+      if (dlerror() == NULL)  {
+        // success
+        return true;
+      }
+    }
+  }
+
+  // opening the cached file did nbot work. (re)build it.
+
+  // tmp filenames
+  char ccname[] = "tmp_jit_XXXXXX.cc";
+  if (mkstemps(ccname, 3) == -1)
+  {
+    std::cerr << "Error creating JIT tmp file " << ccname << ".\n";
+    return false;
+  }
+  char object[] = "tmp_jit_XXXXXX.so";
+  if (mkstemps(object, 3) == -1)
+  {
+    std::cerr << "Error creating JIT tmp file " << object << ".\n";
+    std::remove(ccname);
+    return false;
+  }
+
+  int status;
+
+  // save source
+  std::ofstream ccfile;
+  ccfile.open(ccname);
+  ccfile << "#include <cmath>\n";
+  ccfile << "extern \"C\" double " << fnname << "(double *params, double *immed) {\ndouble r, s[" << mData->mStackSize << "] ;\n";
+  int nImmed = 0, sp = 0;
+  for (unsigned int i = 0; i < code.size(); ++i)
+  {
+    int op = code[i].first;
+    int op_size = OpcodeSize(op);
+    if ( op>= VarBegin)
+    {
+      ccfile << "s[" << sp << "] = params[" << (op-VarBegin) << "];\n";
+    }
+    else
+      switch (op)
+      {
+        case cImmed:
+          ccfile << "s[" << sp << "] = immed[" << nImmed << "]; // " << code[i].second << ',' << mData->mImmed[nImmed] << '\n';
+          nImmed++;
+          break;
+        case cAdd:
+          ccfile << "s[" << (sp-2) << "] += s[" << (sp-1) << "];\n";
+          break;
+        case cSub: // Check if this is the right way around
+          ccfile << "s[" << (sp-2) << "] -= s[" << (sp-1) << "];\n";
+          break;
+        case cRSub: // Check if this is the right way around
+          ccfile << "s[" << (sp-2) << "] = s[" << (sp-1) << "] - s[" << (sp-2) << "];\n";
+          break;
+        case cMul:
+          ccfile << "s[" << (sp-2) << "] *= s[" << (sp-1) << "];\n";
+          break;
+        case cDiv: // Check if this is the right way around
+          ccfile << "s[" << (sp-1) << "] /= s[" << sp << "];\n";
+          break;
+        case cRDiv: // Check if this is the right way around
+          ccfile << "s[" << (sp-1) << "] = s[" << sp << "] / s[" << (sp-1) << "];\n";
+          break;
+
+        case cSin:
+          ccfile << "s[" << (sp-1) << "] = std::sin(s[" << (sp-1) << "]);\n";
+          break;
+        case cCos:
+          ccfile << "s[" << (sp-1) << "] = std::cos(s[" << (sp-1) << "]);\n";
+          break;
+        case cTan:
+          ccfile << "s[" << (sp-1) << "] = std::tan(s[" << (sp-1) << "]);\n";
+          break;
+
+        case cAbs:
+          ccfile << "s[" << (sp-1) << "] = std::abs(s[" << (sp-1) << "]);\n";
+          break;
+
+        case cLog:
+          ccfile << "s[" << (sp-1) << "] = std::log(s[" << (sp-1) << "]);\n";
+          break;
+        case cLog2:
+          //ccfile << "s[" << (sp-1) << "] = std::log2(s[" << (sp-1) << "]);\n"; // C++11
+          ccfile << "s[" << (sp-1) << "] = std::log(s[" << (sp-1) << "])/log(2.0);\n"; // C++11
+          break;
+        case cLog10:
+          ccfile << "s[" << (sp-1) << "] = std::log10(s[" << (sp-1) << "]);\n";
+          break;
+
+        case cSqr:
+          ccfile << "s[" << (sp-1) << "] *= s[" << (sp-1) << "];\n";
+          break;
+        case cSqrt:
+          ccfile << "s[" << (sp-1) << "] = std::pow(s[" << (sp-1) << "], 0.5);\n";
+          break;
+        case cRSqrt:
+          ccfile << "s[" << (sp-1) << "] = std::pow(s[" << (sp-1) << "], -0.5);\n";
+          break;
+        case cPow:
+          ccfile << "s[" << (sp-2) << "] = std::pow(s[" << (sp-2) << "], s[" << (sp-1) << "]);\n";
+          break;
+        case cExp:
+          ccfile << "s[" << (sp-1) << "] = std::exp(s[" << (sp-1) << "]);\n";
+          break;
+        case cExp2:
+          ccfile << "s[" << (sp-1) << "] = std::pow(2.0, s[" << (sp-1) << "]);\n";
+          break;
+
+        default:
+          std::cerr << "Opcode not supported by JIT.\n";
+          ccfile.close();
+          return false;
+      }
+    sp -= op_size > 0 ? op_size-1 : op_size;
+  }
+  ccfile << "return s[0]; }\n";
+  ccfile.close();
+
+  // run compiler
+  std::string command = FPARSER_JIT_COMPILER" -O2 -shared -rdynamic -fPIC ";
+  command += ccname;
+  command += " -o ";
+  command += object;
+  status = system(command.c_str());
+  std::remove(ccname);
+  if (status != 0) {
+    std::cerr << "JIT compile failed.\n";
+    return false;
+  }
+
+  // load compiled object
+  lib = dlopen(object, RTLD_NOW);
+  if (lib == NULL) {
+    std::cerr << "JIT object load failed.\n";
+    std::remove(object);
+    return false;
+  }
+
+  // fetch function pointer
+  *(void **) (&compiledFunction) = dlsym(lib, fnname.c_str());
+  char * error;
+  if ((error = dlerror()) != NULL)  {
+    std::cerr << "Error binding JIT compiled function\n" << error << '\n';
+    compiledFunction = NULL;
+    std::remove(object);
+    return false;
+  }
+
+  // rename successfully compiled obj to cache file
+  if (cacheFunction)
+  {
+    status = std::rename(object, libname.c_str());
+    if (status != 0)
+      std::remove(object);
+  }
+  else
+    std::remove(object);
+
+  return true;
+}
+#endif
 
 
 #define FUNCTIONPARSERAD_INSTANTIATE_CLASS(type) \

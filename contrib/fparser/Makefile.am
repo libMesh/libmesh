@@ -104,7 +104,11 @@ EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptim
 
 
 
-pkg_sources = fparser.cc fparser_ad.cc
+pkg_sources = fparser.cc fparser_ad.cc sha1-0.2/sha1.cpp
+if FPARSER_NO_SUPPORT_JIT
+  pkg_sources += sha1-0.2/sha1.cpp
+endif
+
 pkg_cppflags += $(FEATURE_FLAGS)
 
 
