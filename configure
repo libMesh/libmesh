@@ -661,6 +661,8 @@ CPPUNIT_CFLAGS
 CPPUNIT_CONFIG
 LIBMESH_ENABLE_FPARSER_FALSE
 LIBMESH_ENABLE_FPARSER_TRUE
+FPARSER_SUPPORT_JIT_FALSE
+FPARSER_SUPPORT_JIT_TRUE
 FPARSER_SUPPORT_DEBUGGING_FALSE
 FPARSER_SUPPORT_DEBUGGING_TRUE
 FPARSER_SUPPORT_OPTIMIZER_FALSE
@@ -1164,6 +1166,7 @@ enable_libHilbert
 enable_fparser
 with_fparser
 enable_fparser_debugging
+enable_fparser_jit
 enable_fparser_optimizer
 enable_cppunit
 with_cppunit_prefix
@@ -1930,6 +1933,8 @@ Optional Features:
   --disable-fparser       build without C++ function parser support
   --enable-fparser-debugging
                           Build fparser with bytecode debugging functions
+  --enable-fparser-jit    Build fparser with experimental JIT compile
+                          functions
   --disable-fparser-optimizer
                           do not optimize parsed functions
   --disable-cppunit       Build without cppunit C++ unit testing support
@@ -34877,6 +34882,18 @@ else
 fi
 
 
+    # Check whether --enable-fparser-jit was given.
+if test "${enable_fparser_jit+set}" = set; then :
+  enableval=$enable_fparser_jit; case "${enableval}" in
+		  yes)  enablefparserjit=yes ;;
+		   no)  enablefparserjit=no ;;
+		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-jit" "$LINENO" 5 ;;
+		 esac
+else
+  enablefparserjit=no
+fi
+
+
     # Check whether --enable-fparser-optimizer was given.
 if test "${enable_fparser_optimizer+set}" = set; then :
   enableval=$enable_fparser_optimizer; case "${enableval}" in
@@ -35036,6 +35053,14 @@ $as_echo "#define HAVE_FPARSER_DEVEL 0" >>confdefs.h
 $as_echo "<<< Configuring library with fparser support (release version) >>>" >&6; }
       fi
 
+      if (test $enablefparserjit = yes); then
+
+$as_echo "#define HAVE_FPARSER_JIT 1" >>confdefs.h
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with fparser JIT compilation support (experimental) >>>" >&5
+$as_echo "<<< Configuring library with fparser JIT compilation support (experimental) >>>" >&6; }
+      fi
+
       # This define in libmesh_config.h is used internally in fparser.hh and various source files
       if (test $enablefparserdebugging = yes); then
 
@@ -35092,6 +35117,14 @@ fi
 else
   FPARSER_SUPPORT_DEBUGGING_TRUE='#'
   FPARSER_SUPPORT_DEBUGGING_FALSE=
+fi
+
+   if test x$enablefparserjit = xyes; then
+  FPARSER_SUPPORT_JIT_TRUE=
+  FPARSER_SUPPORT_JIT_FALSE='#'
+else
+  FPARSER_SUPPORT_JIT_TRUE='#'
+  FPARSER_SUPPORT_JIT_FALSE=
 fi
 
 
@@ -35871,6 +35904,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${FPARSER_SUPPORT_DEBUGGING_TRUE}" && test -z "${FPARSER_SUPPORT_DEBUGGING_FALSE}"; then
   as_fn_error $? "conditional \"FPARSER_SUPPORT_DEBUGGING\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${FPARSER_SUPPORT_JIT_TRUE}" && test -z "${FPARSER_SUPPORT_JIT_FALSE}"; then
+  as_fn_error $? "conditional \"FPARSER_SUPPORT_JIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_FPARSER_TRUE}" && test -z "${LIBMESH_ENABLE_FPARSER_FALSE}"; then
