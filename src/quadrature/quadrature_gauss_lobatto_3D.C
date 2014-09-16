@@ -17,32 +17,36 @@
 
 
 
-#ifndef LIBMESH_ENUM_QUADRATURE_TYPE_H
-#define LIBMESH_ENUM_QUADRATURE_TYPE_H
+// Local includes
+#include "libmesh/quadrature_gauss_lobatto.h"
 
-// ------------------------------------------------------------
-// enum QuadratureType definition
-namespace libMesh {
+namespace libMesh
+{
 
-/**
- * Defines an \p enum for currently available quadrature rules.
- */
-enum QuadratureType {QGAUSS            = 0,
+void QGaussLobatto::init_3D(const ElemType type_in,
+                            unsigned int p)
+{
+  switch (type_in)
+    {
+    case HEX8:
+    case HEX20:
+    case HEX27:
+      {
+        // We compute the 3D quadrature rule as a tensor
+        // product of the 1D quadrature rule.
+        QGaussLobatto q1D(1, _order);
+        q1D.init(EDGE2, p);
+        tensor_product_hex(q1D);
+        return;
+      }
 
-                     QJACOBI_1_0       = 1,
-                     QJACOBI_2_0       = 2,
-
-                     QSIMPSON          = 3,
-                     QTRAP             = 4,
-                     QGRID             = 5,
-                     QGRUNDMANN_MOLLER = 6,
-                     QMONOMIAL         = 7,
-                     QCONICAL          = 8,
-                     QGAUSS_LOBATTO    = 9,
-
-                     QCLOUGH           = 21,
-
-                     INVALID_Q_RULE    = 127};
+      // We *could* fall back to a Gauss type rule for other types
+      // elements, but the assumption here is that the user has asked
+      // for a Gauss-Lobatto rule, i.e. a rule with integration points
+      // on the element boundary, for a reason.
+    default:
+      libmesh_error_msg("ERROR: Unsupported type: " << type_in);
+    }
 }
 
-#endif // LIBMESH_ENUM_QUADRATURE_TYPE_H
+} // namespace libMesh
