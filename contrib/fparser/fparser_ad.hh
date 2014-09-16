@@ -36,7 +36,10 @@ public:
   void silenceAutoDiffErrors(bool _silence = true) { mSilenceErrors = _silence; }
 
   /**
-   * compile the current function, or load a previously compiled copy
+   * compile the current function, or load a previously compiled copy.
+   * Warning: When re-using an FParser function object by parsing a new expression
+   *          the previously JIT compiled function will continue to be Evaled until the
+   *          JITCompile method is called again.
    */
   bool JITCompile(bool cacheFunction = true);
 
@@ -89,8 +92,11 @@ private:
   /// write the DiffProgramFragement into the internal bytecode storage
   void Commit(const DiffProgramFragment & code);
 
+  /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
+  bool JITCompileHelper(const std::string &, bool);
+
   /// JIT function pointer
-  Value_t (*compiledFunction)(const Value_t *, const Value_t *);
+  Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
 
   /**
    * In certain applications derivatives are built proactively and may never be used.
