@@ -289,6 +289,10 @@ libmesh_SOURCES =  \
         src/quadrature/quadrature_gauss_1D.C \
         src/quadrature/quadrature_gauss_2D.C \
         src/quadrature/quadrature_gauss_3D.C \
+        src/quadrature/quadrature_gauss_lobatto.C \
+        src/quadrature/quadrature_gauss_lobatto_1D.C \
+        src/quadrature/quadrature_gauss_lobatto_2D.C \
+        src/quadrature/quadrature_gauss_lobatto_3D.C \
         src/quadrature/quadrature_gm.C \
         src/quadrature/quadrature_gm_3D.C \
         src/quadrature/quadrature_grid.C \
