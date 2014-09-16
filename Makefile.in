@@ -360,6 +360,10 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_gauss_1D.C \
 	src/quadrature/quadrature_gauss_2D.C \
 	src/quadrature/quadrature_gauss_3D.C \
+	src/quadrature/quadrature_gauss_lobatto.C \
+	src/quadrature/quadrature_gauss_lobatto_1D.C \
+	src/quadrature/quadrature_gauss_lobatto_2D.C \
+	src/quadrature/quadrature_gauss_lobatto_3D.C \
 	src/quadrature/quadrature_gm.C \
 	src/quadrature/quadrature_gm_3D.C \
 	src/quadrature/quadrature_grid.C \
@@ -746,6 +750,10 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_gauss_1D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_gauss_2D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_gauss_3D.lo \
+	src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto.lo \
+	src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_1D.lo \
+	src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_2D.lo \
+	src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_3D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_gm.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_gm_3D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_grid.lo \
@@ -1056,6 +1064,10 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_gauss_1D.C \
 	src/quadrature/quadrature_gauss_2D.C \
 	src/quadrature/quadrature_gauss_3D.C \
+	src/quadrature/quadrature_gauss_lobatto.C \
+	src/quadrature/quadrature_gauss_lobatto_1D.C \
+	src/quadrature/quadrature_gauss_lobatto_2D.C \
+	src/quadrature/quadrature_gauss_lobatto_3D.C \
 	src/quadrature/quadrature_gm.C \
 	src/quadrature/quadrature_gm_3D.C \
 	src/quadrature/quadrature_grid.C \
@@ -1441,6 +1453,10 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/quadrature/libmesh_devel_la-quadrature_gauss_1D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_gauss_2D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_gauss_3D.lo \
+	src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto.lo \
+	src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_1D.lo \
+	src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_2D.lo \
+	src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_3D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_gm.lo \
 	src/quadrature/libmesh_devel_la-quadrature_gm_3D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_grid.lo \
@@ -1748,6 +1764,10 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_gauss_1D.C \
 	src/quadrature/quadrature_gauss_2D.C \
 	src/quadrature/quadrature_gauss_3D.C \
+	src/quadrature/quadrature_gauss_lobatto.C \
+	src/quadrature/quadrature_gauss_lobatto_1D.C \
+	src/quadrature/quadrature_gauss_lobatto_2D.C \
+	src/quadrature/quadrature_gauss_lobatto_3D.C \
 	src/quadrature/quadrature_gm.C \
 	src/quadrature/quadrature_gm_3D.C \
 	src/quadrature/quadrature_grid.C \
@@ -2133,6 +2153,10 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_gauss_1D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_gauss_2D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_gauss_3D.lo \
+	src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto.lo \
+	src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_1D.lo \
+	src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_2D.lo \
+	src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_3D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_gm.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_gm_3D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_grid.lo \
@@ -2440,6 +2464,10 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_gauss_1D.C \
 	src/quadrature/quadrature_gauss_2D.C \
 	src/quadrature/quadrature_gauss_3D.C \
+	src/quadrature/quadrature_gauss_lobatto.C \
+	src/quadrature/quadrature_gauss_lobatto_1D.C \
+	src/quadrature/quadrature_gauss_lobatto_2D.C \
+	src/quadrature/quadrature_gauss_lobatto_3D.C \
 	src/quadrature/quadrature_gm.C \
 	src/quadrature/quadrature_gm_3D.C \
 	src/quadrature/quadrature_grid.C \
@@ -2825,6 +2853,10 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/quadrature/libmesh_opt_la-quadrature_gauss_1D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_gauss_2D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_gauss_3D.lo \
+	src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto.lo \
+	src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_1D.lo \
+	src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_2D.lo \
+	src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_3D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_gm.lo \
 	src/quadrature/libmesh_opt_la-quadrature_gm_3D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_grid.lo \
@@ -3131,6 +3163,10 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_gauss_1D.C \
 	src/quadrature/quadrature_gauss_2D.C \
 	src/quadrature/quadrature_gauss_3D.C \
+	src/quadrature/quadrature_gauss_lobatto.C \
+	src/quadrature/quadrature_gauss_lobatto_1D.C \
+	src/quadrature/quadrature_gauss_lobatto_2D.C \
+	src/quadrature/quadrature_gauss_lobatto_3D.C \
 	src/quadrature/quadrature_gm.C \
 	src/quadrature/quadrature_gm_3D.C \
 	src/quadrature/quadrature_grid.C \
@@ -3516,6 +3552,10 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/quadrature/libmesh_prof_la-quadrature_gauss_1D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_gauss_2D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_gauss_3D.lo \
+	src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto.lo \
+	src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_1D.lo \
+	src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_2D.lo \
+	src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_3D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_gm.lo \
 	src/quadrature/libmesh_prof_la-quadrature_gm_3D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_grid.lo \
@@ -4766,6 +4806,10 @@ libmesh_SOURCES = \
         src/quadrature/quadrature_gauss_1D.C \
         src/quadrature/quadrature_gauss_2D.C \
         src/quadrature/quadrature_gauss_3D.C \
+        src/quadrature/quadrature_gauss_lobatto.C \
+        src/quadrature/quadrature_gauss_lobatto_1D.C \
+        src/quadrature/quadrature_gauss_lobatto_2D.C \
+        src/quadrature/quadrature_gauss_lobatto_3D.C \
         src/quadrature/quadrature_gm.C \
         src/quadrature/quadrature_gm_3D.C \
         src/quadrature/quadrature_grid.C \
@@ -5921,6 +5965,18 @@ src/quadrature/libmesh_dbg_la-quadrature_gauss_2D.lo:  \
 src/quadrature/libmesh_dbg_la-quadrature_gauss_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_1D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_2D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_3D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_dbg_la-quadrature_gm.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -6944,6 +7000,18 @@ src/quadrature/libmesh_devel_la-quadrature_gauss_2D.lo:  \
 src/quadrature/libmesh_devel_la-quadrature_gauss_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_1D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_2D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_3D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_devel_la-quadrature_gm.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -7937,6 +8005,18 @@ src/quadrature/libmesh_oprof_la-quadrature_gauss_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_oprof_la-quadrature_gauss_3D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_1D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_2D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_oprof_la-quadrature_gm.lo:  \
@@ -8933,6 +9013,18 @@ src/quadrature/libmesh_opt_la-quadrature_gauss_2D.lo:  \
 src/quadrature/libmesh_opt_la-quadrature_gauss_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_1D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_2D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_3D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_opt_la-quadrature_gm.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -9923,6 +10015,18 @@ src/quadrature/libmesh_prof_la-quadrature_gauss_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_prof_la-quadrature_gauss_3D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_1D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_2D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_prof_la-quadrature_gm.lo:  \
@@ -12067,6 +12171,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_1D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_2D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gm_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_grid.Plo@am__quote@
@@ -12101,6 +12209,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_1D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_2D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gm_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_grid.Plo@am__quote@
@@ -12135,6 +12247,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_1D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_2D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gm_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_grid.Plo@am__quote@
@@ -12169,6 +12285,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_1D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_2D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gm_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_grid.Plo@am__quote@
@@ -12203,6 +12323,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_1D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_2D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gm_3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_grid.Plo@am__quote@
@@ -14757,6 +14881,34 @@ src/quadrature/libmesh_dbg_la-quadrature_gauss_3D.lo: src/quadrature/quadrature_
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_3D.C' object='src/quadrature/libmesh_dbg_la-quadrature_gauss_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_3D.lo `test -f 'src/quadrature/quadrature_gauss_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_3D.C
+
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto.lo: src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto.Tpo src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto.C' object='src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_1D.lo: src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_1D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_1D.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_1D.Tpo src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_1D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_1D.C' object='src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_1D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_2D.lo: src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_2D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_2D.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_2D.Tpo src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_2D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_2D.C' object='src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_2D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+
+src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_3D.lo: src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_3D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_3D.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_3D.Tpo src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gauss_lobatto_3D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_3D.C' object='src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_3D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
 
 src/quadrature/libmesh_dbg_la-quadrature_gm.lo: src/quadrature/quadrature_gm.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_gm.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_gm.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_gm.lo `test -f 'src/quadrature/quadrature_gm.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gm.C
@@ -17614,6 +17766,34 @@ src/quadrature/libmesh_devel_la-quadrature_gauss_3D.lo: src/quadrature/quadratur
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_3D.lo `test -f 'src/quadrature/quadrature_gauss_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_3D.C
 
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto.lo: src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto.C' object='src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_1D.lo: src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_1D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_1D.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_1D.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_1D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_1D.C' object='src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_1D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_2D.lo: src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_2D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_2D.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_2D.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_2D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_2D.C' object='src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_2D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+
+src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_3D.lo: src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_3D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_3D.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_3D.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gauss_lobatto_3D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_3D.C' object='src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_3D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
+
 src/quadrature/libmesh_devel_la-quadrature_gm.lo: src/quadrature/quadrature_gm.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_gm.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gm.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_gm.lo `test -f 'src/quadrature/quadrature_gm.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gm.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gm.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_gm.Plo
@@ -20469,6 +20649,34 @@ src/quadrature/libmesh_oprof_la-quadrature_gauss_3D.lo: src/quadrature/quadratur
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_3D.C' object='src/quadrature/libmesh_oprof_la-quadrature_gauss_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_3D.lo `test -f 'src/quadrature/quadrature_gauss_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_3D.C
+
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto.lo: src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto.Tpo src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto.C' object='src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_1D.lo: src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_1D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_1D.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_1D.Tpo src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_1D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_1D.C' object='src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_1D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_2D.lo: src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_2D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_2D.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_2D.Tpo src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_2D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_2D.C' object='src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_2D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+
+src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_3D.lo: src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_3D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_3D.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_3D.Tpo src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gauss_lobatto_3D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_3D.C' object='src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_3D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
 
 src/quadrature/libmesh_oprof_la-quadrature_gm.lo: src/quadrature/quadrature_gm.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_gm.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_gm.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_gm.lo `test -f 'src/quadrature/quadrature_gm.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gm.C
@@ -23326,6 +23534,34 @@ src/quadrature/libmesh_opt_la-quadrature_gauss_3D.lo: src/quadrature/quadrature_
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_3D.lo `test -f 'src/quadrature/quadrature_gauss_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_3D.C
 
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto.lo: src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto.C' object='src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_1D.lo: src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_1D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_1D.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_1D.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_1D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_1D.C' object='src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_1D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_2D.lo: src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_2D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_2D.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_2D.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_2D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_2D.C' object='src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_2D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+
+src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_3D.lo: src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_3D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_3D.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_3D.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gauss_lobatto_3D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_3D.C' object='src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_3D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
+
 src/quadrature/libmesh_opt_la-quadrature_gm.lo: src/quadrature/quadrature_gm.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_gm.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gm.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_gm.lo `test -f 'src/quadrature/quadrature_gm.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gm.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gm.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_gm.Plo
@@ -26181,6 +26417,34 @@ src/quadrature/libmesh_prof_la-quadrature_gauss_3D.lo: src/quadrature/quadrature
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_3D.C' object='src/quadrature/libmesh_prof_la-quadrature_gauss_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_3D.lo `test -f 'src/quadrature/quadrature_gauss_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_3D.C
+
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto.lo: src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto.Tpo src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto.C' object='src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto.lo `test -f 'src/quadrature/quadrature_gauss_lobatto.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto.C
+
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_1D.lo: src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_1D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_1D.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_1D.Tpo src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_1D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_1D.C' object='src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_1D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_1D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_1D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_1D.C
+
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_2D.lo: src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_2D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_2D.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_2D.Tpo src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_2D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_2D.C' object='src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_2D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_2D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_2D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_2D.C
+
+src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_3D.lo: src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_3D.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_3D.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_3D.Tpo src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gauss_lobatto_3D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_gauss_lobatto_3D.C' object='src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_3D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_gauss_lobatto_3D.lo `test -f 'src/quadrature/quadrature_gauss_lobatto_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gauss_lobatto_3D.C
 
 src/quadrature/libmesh_prof_la-quadrature_gm.lo: src/quadrature/quadrature_gm.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_gm.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_gm.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_gm.lo `test -f 'src/quadrature/quadrature_gm.C' || echo '$(srcdir)/'`src/quadrature/quadrature_gm.C
