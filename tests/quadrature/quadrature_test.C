@@ -5,6 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/quadrature.h>
+#include <libmesh/string_to_enum.h>
 
 using namespace libMesh;
 
@@ -85,6 +86,10 @@ public:
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(1) , qrule1D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(2) , qrule2D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(3) , qrule3D->get_dim() );
+
+    // Test the enum-to-string conversion for this qtype is
+    // implemented, but not what the actual value is.
+    Utility::enum_to_string(qtype);
   }
 
 
