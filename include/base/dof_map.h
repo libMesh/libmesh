@@ -707,11 +707,18 @@ public:
   bool is_constrained_dof (const dof_id_type dof) const;
 
   /**
-   * @returns true if the degree of freedom \p dof has a heterogenous
-   * constraint for adjoint solution \p qoi_num, false otherwise.
+   * @returns true if the system has any heterogenous constraints for
+   * adjoint solution \p qoi_num, false otherwise.
    */
-  bool has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
-                                            const dof_id_type dof) const;
+  bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const;
+
+  /**
+   * @returns the heterogeneous constraint value if the degree of
+   * freedom \p dof has a heterogenous constraint for adjoint solution
+   * \p qoi_num, zero otherwise.
+   */
+  Number has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
+                                              const dof_id_type dof) const;
 
   /**
    * @returns true if the Node is constrained,
@@ -1495,17 +1502,38 @@ bool DofMap::is_constrained_dof (const dof_id_type dof) const
   return false;
 }
 
+
 inline
-bool DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
-                                                  const dof_id_type dof) const
+bool DofMap::has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const
 {
   AdjointDofConstraintValues::const_iterator it =
     _adjoint_constraint_values.find(qoi_num);
-  if (it != _adjoint_constraint_values.end() &&
-      it->second.count(dof))
-    return true;
+  if (it == _adjoint_constraint_values.end())
+    return false;
+  if (it->second.empty())
+    return false;
 
-  return false;
+  return true;
+}
+
+
+inline
+Number DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
+                                                    const dof_id_type dof) const
+{
+  AdjointDofConstraintValues::const_iterator it =
+    _adjoint_constraint_values.find(qoi_num);
+  if (it != _adjoint_constraint_values.end())
+    {
+      DofConstraintValueMap::const_iterator rhsit =
+        it->second.find(dof);
+      if (rhsit == it->second.end())
+        return 0;
+      else
+        return rhsit->second;
+    }
+
+  return 0;
 }
 
 
@@ -1543,7 +1571,7 @@ inline void DofMap::enforce_constraints_exactly (const System &,
                                                  NumericVector<Number> *,
                                                  bool = false) const {}
 
-inline void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> *,
+inline void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> &,
                                                          unsigned int) const {}
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
