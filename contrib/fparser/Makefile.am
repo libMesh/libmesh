@@ -104,9 +104,10 @@ EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptim
 
 
 
-pkg_sources = fparser.cc fparser_ad.cc sha1-0.2/sha1.cpp
-if FPARSER_NO_SUPPORT_JIT
-  pkg_sources += sha1-0.2/sha1.cpp
+pkg_sources = fparser.cc fparser_ad.cc 
+if FPARSER_SUPPORT_JIT
+  pkg_sources += lib/sha1.cpp
+  pkg_cppflags += -DFPARSER_JIT_COMPILER="\"$(CXX)\""
 endif
 
 pkg_cppflags += $(FEATURE_FLAGS)
@@ -148,6 +149,7 @@ util_tree_grammar_parser_SOURCES   = \
                                  lib/functional.hh \
                                  lib/crc32.hh \
                                  lib/autoptr.hh \
+                                 lib/sha1.hh \
                                  extrasrc/fpaux.hh \
                                  extrasrc/fptypes.hh \
                                  extrasrc/fp_opcode_add.inc \
