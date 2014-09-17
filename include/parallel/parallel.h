@@ -22,6 +22,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h" // libmesh_assert, cast_int
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>
@@ -442,10 +443,16 @@ public:
 
   bool test (status &status);
 
+  void add_prior_request(const Request& req);
+
   void add_post_wait_work(PostWaitWork* work);
 
 private:
   request _request;
+
+  // Breaking non-blocking sends into multiple requests can require chaining
+  // multiple requests into a single Request
+  AutoPtr<Request> _prior_request;
 
   // post_wait_work->first is a vector of work to do after a wait
   // finishes; post_wait_work->second is a reference count so that
@@ -547,10 +554,19 @@ inline void unpack_range (const typename std::vector<buffertype>& buffer,
  * array.
  */
 template <typename Context, typename buffertype, typename Iter>
-inline void pack_range (const Context *context,
+inline Iter pack_range (const Context *context,
                         Iter range_begin,
                         const Iter range_end,
                         typename std::vector<buffertype>& buffer);
+
+/**
+ * Return the total buffer size needed to encode a range of
+ * potentially-variable-size objects to a data array.
+ */
+template <typename Context, typename Iter>
+inline std::size_t packed_range_size (const Context *context,
+                                      Iter range_begin,
+                                      const Iter range_end);
 
 //-------------------------------------------------------------------
 /**
@@ -915,37 +931,17 @@ public:
                              const MessageTag &tag=any_tag) const;
 
   /**
-   * Nonblocking-receive range-of-pointers from one processor.  This
-   * function does not receive raw pointers, but rather constructs new
-   * objects whose contents match the objects pointed to by the
-   * sender.
-   *
-   * The objects will be of type
-   * T = iterator_traits<OutputIter>::value_type.
-   *
-   * Using std::back_inserter as the output iterator allows receive to
-   * fill any container type.  Using libMesh::null_output_iterator
-   * allows the receive to be dealt with solely by Parallel::unpack(),
-   * for objects whose unpack() is written so as to not leak memory
-   * when used in this fashion.
-   *
-   * A future version of this method should be created to preallocate
-   * memory when receiving vectors...
-   *
-   * void Parallel::unpack(vector<int>::iterator in, T** out, Context*)
-   * is used to unserialize type T, typically into a new
-   * heap-allocated object whose pointer is returned as *out.
-   *
-   * unsigned int Parallel::packed_size(const T*,
-   *                                    vector<int>::const_iterator)
-   * is used to advance to the beginning of the next object's data.
+   * Nonblocking-receive range-of-pointers from one processor.
+   * Not yet implemented.
    */
+/*
   template <typename Context, typename OutputIter>
   void receive_packed_range (const unsigned int dest_processor_id,
                              Context *context,
                              OutputIter out,
                              Request &req,
                              const MessageTag &tag=any_tag) const;
+*/
 
   /**
    * Send data \p send to one processor while simultaneously receiving
