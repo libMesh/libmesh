@@ -281,6 +281,7 @@ void init_quadrature_type_to_enum ()
       quadrature_type_to_enum["QTRAP"      ]=QTRAP;
       quadrature_type_to_enum["QGRID"      ]=QGRID;
       quadrature_type_to_enum["QCLOUGH"    ]=QCLOUGH;
+      quadrature_type_to_enum["QGAUSS_LOBATTO"    ]=QGAUSS_LOBATTO;
     }
 }
 

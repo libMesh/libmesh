@@ -16,33 +16,37 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "libmesh/quadrature_gauss_lobatto.h"
 
-#ifndef LIBMESH_ENUM_QUADRATURE_TYPE_H
-#define LIBMESH_ENUM_QUADRATURE_TYPE_H
+namespace libMesh
+{
 
-// ------------------------------------------------------------
-// enum QuadratureType definition
-namespace libMesh {
+// See the files:
 
-/**
- * Defines an \p enum for currently available quadrature rules.
- */
-enum QuadratureType {QGAUSS            = 0,
+// quadrature_gauss_lobatto_1D.C
+// quadrature_gauss_lobatto_2D.C
+// quadrature_gauss_lobatto_3D.C
 
-                     QJACOBI_1_0       = 1,
-                     QJACOBI_2_0       = 2,
+// for implementation of specific element types.
 
-                     QSIMPSON          = 3,
-                     QTRAP             = 4,
-                     QGRID             = 5,
-                     QGRUNDMANN_MOLLER = 6,
-                     QMONOMIAL         = 7,
-                     QCONICAL          = 8,
-                     QGAUSS_LOBATTO    = 9,
 
-                     QCLOUGH           = 21,
-
-                     INVALID_Q_RULE    = 127};
+QGaussLobatto::QGaussLobatto(const unsigned int d,
+                             const Order o) : QBase(d,o)
+{
+  // explicitly call the init function in 1D since the
+  // other tensor-product rules require this one.
+  // note that EDGE will not be used internally, however
+  // if we called the function with INVALID_ELEM it would try to
+  // be smart and return, thinking it had already done the work.
+  if (_dim == 1)
+    init(EDGE2);
 }
 
-#endif // LIBMESH_ENUM_QUADRATURE_TYPE_H
+
+
+QGaussLobatto::~QGaussLobatto()
+{
+}
+
+
+} // namespace libMesh

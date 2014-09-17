@@ -5,6 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/quadrature.h>
+#include <libmesh/string_to_enum.h>
 
 using namespace libMesh;
 
@@ -42,6 +43,30 @@ public:
   TEST_ONE_ORDER(QTRAP, FIRST, 1);
   TEST_ALL_ORDERS(QGRID, 1);
 
+  // The TEST_ALL_ORDERS macro only goes up to 9th-order
+  TEST_ALL_ORDERS(QGAUSS_LOBATTO, 9);
+
+  // The Gauss-Lobatto quadrature rules passed all these tests during
+  // development, but we don't run them with every 'make check'
+  // because it takes too long.
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, ELEVENTH,    11);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTEENTH,  13);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, FIFTEENTH,   15);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, SEVENTEENTH, 17);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, NINTEENTH,   19);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYFIRST, 21);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYTHIRD, 23);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYFIFTH, 25);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYSEVENTH, 27);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, TWENTYNINTH, 29);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYFIRST, 31);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYTHIRD, 33);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYFIFTH, 35);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYSEVENTH, 37);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, THIRTYNINTH, 39);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYFIRST, 41);
+  // TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYTHIRD, 43);
+
 // Edges/Tris only
 //  TEST_ALL_ORDERS(QCLOUGH, 9999);
 
@@ -78,6 +103,10 @@ public:
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(1) , qrule1D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(2) , qrule2D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(3) , qrule3D->get_dim() );
+
+    // Test the enum-to-string conversion for this qtype is
+    // implemented, but not what the actual value is.
+    Utility::enum_to_string(qtype);
   }
 
 
@@ -144,14 +173,18 @@ if (std::abs(exact - sum) >= TOLERANCE*TOLERANCE)
           CPPUNIT_ASSERT_DOUBLES_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
         }
 
-    qrule->init (TRI6);
+    // We may eventually support Gauss-Lobatto type quadrature on triangles...
+    if (qtype != QGAUSS_LOBATTO)
+      {
+        qrule->init (TRI6);
 
-    Real sum = 0;
+        Real sum = 0;
 
-    for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-      sum += qrule->w(qp);
+        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+          sum += qrule->w(qp);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.5 , sum , TOLERANCE*TOLERANCE );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.5 , sum , TOLERANCE*TOLERANCE );
+      }
   }
 
 
@@ -189,23 +222,27 @@ if (std::abs(exact - sum) >= TOLERANCE*TOLERANCE)
             CPPUNIT_ASSERT_DOUBLES_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
           }
 
-    qrule->init (TET10);
+    // We may eventually support Gauss-Lobatto type quadrature on tets and prisms...
+    if (qtype != QGAUSS_LOBATTO)
+      {
+        qrule->init (TET10);
 
-    Real sum = 0;
+        Real sum = 0;
 
-    for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-      sum += qrule->w(qp);
+        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+          sum += qrule->w(qp);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1./6., sum , TOLERANCE*TOLERANCE );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 1./6., sum , TOLERANCE*TOLERANCE );
 
-    qrule->init (PRISM15);
+        qrule->init (PRISM15);
 
-    sum = 0;
+        sum = 0;
 
-    for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-      sum += qrule->w(qp);
+        for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+          sum += qrule->w(qp);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1., sum , TOLERANCE*TOLERANCE );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 1., sum , TOLERANCE*TOLERANCE );
+      }
   }
 };
 
