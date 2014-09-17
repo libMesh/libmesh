@@ -215,7 +215,7 @@ void QGauss::init_1D(const ElemType,
         return;
       }
     case EIGHTTEENTH:
-    case NINTEENTH:
+    case NINETEENTH:
       {
         _points.resize (10);
         _weights.resize(10);

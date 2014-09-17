@@ -254,7 +254,7 @@ void QGaussLobatto::init_1D(const ElemType,
 
       // 2*11-3 = 19
     case EIGHTTEENTH:
-    case NINTEENTH:
+    case NINETEENTH:
       {
         _points.resize (11);
         _weights.resize(11);

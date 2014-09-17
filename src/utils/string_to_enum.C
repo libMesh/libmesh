@@ -189,7 +189,8 @@ void init_order_to_enum ()
       order_to_enum["SIXTEENTH"    ]=SIXTEENTH;
       order_to_enum["SEVENTEENTH"  ]=SEVENTEENTH;
       order_to_enum["EIGHTTEENTH"  ]=EIGHTTEENTH;
-      order_to_enum["NINTEENTH"    ]=NINTEENTH;
+      order_to_enum["NINTEENTH"    ]=NINTEENTH; // deprecated
+      order_to_enum["NINETEENTH"   ]=NINETEENTH;
       order_to_enum["TWENTIETH"    ]=TWENTIETH;
 
       order_to_enum["TWENTYFIRST"  ]=TWENTYFIRST;

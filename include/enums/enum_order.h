@@ -49,7 +49,8 @@ enum Order {CONSTANT     =  0,
             SIXTEENTH    = 16,
             SEVENTEENTH  = 17,
             EIGHTTEENTH  = 18,
-            NINTEENTH    = 19,
+            NINTEENTH    = 19, // deprecated
+            NINETEENTH   = 19,
             TWENTIETH    = 20,
 
             TWENTYFIRST   = 21,

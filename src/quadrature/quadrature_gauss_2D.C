@@ -1047,7 +1047,7 @@ void QGauss::init_2D(const ElemType type_in,
             // It was copied 23rd June 2008 from:
             // http://people.scs.fsu.edu/~burkardt/f_src/dunavant/dunavant.f90
           case EIGHTTEENTH:
-          case NINTEENTH:
+          case NINETEENTH:
             {
               _points.resize (73);
               _weights.resize(73);
