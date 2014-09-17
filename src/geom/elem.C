@@ -380,8 +380,7 @@ AutoPtr<Elem> Elem::build(const ElemType type,
       libmesh_error_msg("ERROR: Undefined element type!");
     }
 
-  AutoPtr<Elem> ap(elem);
-  return ap;
+  return AutoPtr<Elem>(elem);
 }
 
 

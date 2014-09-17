@@ -118,16 +118,10 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
         case 1:
         case 2:
         case 3:
-          {
-            AutoPtr<Elem> face(new Side<Tri3,Pyramid5>(this,i));
-            return face;
-          }
+          return AutoPtr<Elem>(new Side<Tri3,Pyramid5>(this,i));
 
         case 4:
-          {
-            AutoPtr<Elem> face(new Side<Quad4,Pyramid5>(this,i));
-            return face;
-          }
+          return AutoPtr<Elem>(new Side<Quad4,Pyramid5>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -137,13 +131,13 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      AutoPtr<Elem> face(NULL);
+      Elem* face = NULL;
 
       switch (i)
         {
         case 0:  // triangular face 1
           {
-            face.reset(new Tri3);
+            face = new Tri3;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(1);
@@ -153,7 +147,7 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
           }
         case 1:  // triangular face 2
           {
-            face.reset(new Tri3);
+            face = new Tri3;
 
             face->set_node(0) = this->get_node(1);
             face->set_node(1) = this->get_node(2);
@@ -163,7 +157,7 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
           }
         case 2:  // triangular face 3
           {
-            face.reset(new Tri3);
+            face = new Tri3;
 
             face->set_node(0) = this->get_node(2);
             face->set_node(1) = this->get_node(3);
@@ -173,7 +167,7 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
           }
         case 3:  // triangular face 4
           {
-            face.reset(new Tri3);
+            face = new Tri3;
 
             face->set_node(0) = this->get_node(3);
             face->set_node(1) = this->get_node(0);
@@ -183,7 +177,7 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
           }
         case 4:  // the quad face at z=0
           {
-            face.reset(new Quad4);
+            face = new Quad4;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(3);
@@ -197,12 +191,11 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
-      return face;
+      return AutoPtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 

@@ -177,7 +177,7 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
                                               FEMParameters &param)
 {
-  AutoPtr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));
+  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -185,7 +185,7 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return mesh_refinement;
+  return AutoPtr<MeshRefinement>(mesh_refinement);
 }
 
 #endif // LIBMESH_ENABLE_AMR
@@ -199,21 +199,17 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 
 AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
 {
-  AutoPtr<ErrorEstimator> error_estimator;
-
   if (param.indicator_type == "kelly")
     {
       std::cout<<"Using Kelly Error Estimator"<<std::endl;
 
-      error_estimator.reset(new KellyErrorEstimator);
+      return AutoPtr<ErrorEstimator>(new KellyErrorEstimator);
     }
   else if (param.indicator_type == "adjoint_residual")
     {
       std::cout<<"Using Adjoint Residual Error Estimator with Patch Recovery Weights"<<std::endl<<std::endl;
 
       AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
-
-      error_estimator.reset (adjoint_residual_estimator);
 
       adjoint_residual_estimator->error_plot_suffix = "error.gmv";
 
@@ -228,11 +224,11 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
 
       adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
+
+      return AutoPtr<ErrorEstimator>(adjoint_residual_estimator);
     }
   else
     libmesh_error_msg("Unknown indicator_type = " << param.indicator_type);
-
-  return error_estimator;
 }
 
 // The main program.

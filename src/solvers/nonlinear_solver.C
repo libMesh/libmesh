@@ -37,8 +37,6 @@ template <typename T>
 AutoPtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 {
-  AutoPtr<NonlinearSolver<T> > ap;
-
   // Build the appropriate solver
   switch (solver_package)
     {
@@ -46,39 +44,37 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
 #if PETSC_VERSION_LESS_THAN(3,3,0)
-      ap.reset(new PetscNonlinearSolver<T>(s));
-      break;
+      return AutoPtr<NonlinearSolver<T> >(new PetscNonlinearSolver<T>(s));
 #else
       if (libMesh::on_command_line ("--use-petsc-dm"))
-        ap.reset(new PetscDMNonlinearSolver<T>(s));
+        return AutoPtr<NonlinearSolver<T> >(new PetscDMNonlinearSolver<T>(s));
 
       else
-        ap.reset(new PetscNonlinearSolver<T>(s));
+        return AutoPtr<NonlinearSolver<T> >(new PetscNonlinearSolver<T>(s));
 
-      break;
 #endif
 #endif // LIBMESH_HAVE_PETSC
 
 #ifdef LIBMESH_HAVE_NOX
     case TRILINOS_SOLVERS:
-      ap.reset(new NoxNonlinearSolver<T>(s));
-      break;
+      return AutoPtr<NonlinearSolver<T> >(new NoxNonlinearSolver<T>(s));
 #endif
 
     default:
       libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
     }
 
-  return ap;
+  libmesh_error_msg("We'll never get here!");
+  return AutoPtr<NonlinearSolver<T> >();
 }
+
 #else // LIBMESH_HAVE_PETSC || LIBMESH_HAVE_NOX
+
 template <typename T>
 AutoPtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type&, const SolverPackage)
 {
-  libMesh::err << "ERROR: libMesh was compiled without nonlinear solver support"
-               << std::endl;
-  libmesh_not_implemented();
+  libmesh_not_implemented_msg("ERROR: libMesh was compiled without nonlinear solver support");
 }
 #endif
 

@@ -25,52 +25,43 @@ namespace libMesh
 template< typename OutputShape >
 AutoPtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::build( const FEType& fe_type )
 {
-  switch( fe_type.family )
+  switch (fe_type.family)
     {
-      /* H1 Conforming Elements */
+      // H1 Conforming Elements
     case LAGRANGE:
     case HIERARCHIC:
     case BERNSTEIN:
     case SZABAB:
-    case CLOUGH: /* PB: Really H2 */
-    case HERMITE: /* PB: Really H2 */
+    case CLOUGH: // PB: Really H2
+    case HERMITE: // PB: Really H2
     case SUBDIVISION:
     case LAGRANGE_VEC:
-    case MONOMIAL: /* PB: Shouldn't this be L2 conforming? */
-    case XYZ: /* PB: Shouldn't this be L2 conforming? */
-    case L2_HIERARCHIC: /* PB: Shouldn't this be L2 conforming? */
-    case L2_LAGRANGE: /* PB: Shouldn't this be L2 conforming? */
-    case JACOBI_20_00: /* PB: For infinite elements... */
-    case JACOBI_30_00: /* PB: For infinite elements... */
-      {
-        AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
-        return ap;
-      }
-      /* HCurl Conforming Elements */
+    case MONOMIAL: // PB: Shouldn't this be L2 conforming?
+    case XYZ: // PB: Shouldn't this be L2 conforming?
+    case L2_HIERARCHIC: // PB: Shouldn't this be L2 conforming?
+    case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
+    case JACOBI_20_00: // PB: For infinite elements...
+    case JACOBI_30_00: // PB: For infinite elements...
+      return AutoPtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
+
+      // HCurl Conforming Elements
     case NEDELEC_ONE:
-      {
-        AutoPtr<FETransformationBase<OutputShape> > ap( new HCurlFETransformation<OutputShape> );
-        return ap;
-      }
+      return AutoPtr<FETransformationBase<OutputShape> >(new HCurlFETransformation<OutputShape>);
 
-      /* HDiv Conforming Elements */
-      /* L2 Conforming Elements */
+      // HDiv Conforming Elements
+      // L2 Conforming Elements
 
-      /* Other... */
+      // Other...
     case SCALAR:
-      {
-        // Should never need this for SCALARs
-        AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
-        return ap;
-      }
+      // Should never need this for SCALARs
+      return AutoPtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
 
     default:
       libmesh_error_msg("Unknown family = " << fe_type.family);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<FETransformationBase<OutputShape> > ap( NULL );
-  return ap;
+  return AutoPtr<FETransformationBase<OutputShape> >();
 }
 
 template class FETransformationBase<Real>;

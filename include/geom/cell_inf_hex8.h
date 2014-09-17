@@ -121,15 +121,6 @@ public:
    */
   AutoPtr<Elem> build_side (const unsigned int i,
                             bool proxy) const;
-  /*   {  */
-  /*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
-  /*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
-  /*     Elem* side = cast_ptr<Elem*>(ap_dof_object.release()); */
-  /*     libmesh_assert(side); // libmesh_assert that the cast was successful */
-
-  /*     AutoPtr<Elem> ap(side); */
-  /*     return ap; */
-  /*   } */
 
   /**
    * Returns an \p EDGE2 built coincident with edges 0 to 3, an \p INFEDGE2

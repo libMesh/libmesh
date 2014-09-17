@@ -282,6 +282,10 @@
 /* Define if HDF5 is available */
 #undef HAVE_HDF5
 
+/* Flag indicating whether the library will be compiled with Howard Hinnant's
+   C++03 unique_ptr implementation */
+#undef HAVE_HINNANT_UNIQUE_PTR
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

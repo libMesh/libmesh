@@ -112,14 +112,11 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    {
-      AutoPtr<Elem> ap(new Side<Edge2,Tri3>(this,i));
-      return ap;
-    }
+    return AutoPtr<Elem>(new Side<Edge2,Tri3>(this,i));
 
   else
     {
-      AutoPtr<Elem> edge(new Edge2);
+      Elem* edge = new Edge2;
       edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
@@ -128,31 +125,29 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
           {
             edge->set_node(0) = this->get_node(0);
             edge->set_node(1) = this->get_node(1);
-
-            return edge;
+            break;
           }
         case 1:
           {
             edge->set_node(0) = this->get_node(1);
             edge->set_node(1) = this->get_node(2);
-
-            return edge;
+            break;
           }
         case 2:
           {
             edge->set_node(0) = this->get_node(2);
             edge->set_node(1) = this->get_node(0);
-
-            return edge;
+            break;
           }
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+
+      return AutoPtr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return AutoPtr<Elem>();
 }
 
 

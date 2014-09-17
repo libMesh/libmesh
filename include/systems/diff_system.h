@@ -211,10 +211,13 @@ public:
 
   /**
    * Sets the time_solver
+   * FIXME: This code is a little dangerous as it transfers ownership
+   * from the TimeSolver creator to this class.  The user must no longer
+   * access his original TimeSolver object after calling this function.
    */
   void set_time_solver(AutoPtr<TimeSolver> _time_solver)
   {
-    time_solver = _time_solver;
+    time_solver.reset(_time_solver.release());
   }
 
   /**

@@ -74,8 +74,6 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-
-
   Elem* face = new Tri3;
 
   switch (i)
@@ -85,44 +83,34 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(2);
         face->set_node(2) = this->get_node(1);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 1:
       {
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(1);
         face->set_node(2) = this->get_node(3);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 2:
       {
         face->set_node(0) = this->get_node(1);
         face->set_node(1) = this->get_node(2);
         face->set_node(2) = this->get_node(3);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 3:
       {
         face->set_node(0) = this->get_node(2);
         face->set_node(1) = this->get_node(0);
         face->set_node(2) = this->get_node(3);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap_face(face);
-  return ap_face;
+  return AutoPtr<Elem>(face);
 }
 
 

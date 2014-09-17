@@ -8,7 +8,7 @@
 # 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
+AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include $(libmesh_contrib_INCLUDES)
 AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_LDFLAGS   = $(libmesh_LDFLAGS)

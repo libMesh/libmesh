@@ -80,6 +80,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/feexcept.m4 $(top_srcdir)/m4/fparser.m4 \
 	$(top_srcdir)/m4/glpk.m4 $(top_srcdir)/m4/gmv.m4 \
 	$(top_srcdir)/m4/gz.m4 $(top_srcdir)/m4/hdf5.m4 \
+	$(top_srcdir)/m4/hinnant_unique_ptr.m4 \
 	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
@@ -645,7 +646,7 @@ CLEANFILES = *.gmv.* $(am__append_1) $(example_name).php stdout.log
 # for all.
 # 
 AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
+AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include $(libmesh_contrib_INCLUDES)
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 AM_LDFLAGS = $(libmesh_LDFLAGS)

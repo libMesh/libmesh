@@ -716,12 +716,9 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > DistributedVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector
-    (new DistributedVector<T>(this->comm()));
-
+  NumericVector<T>* cloned_vector = new DistributedVector<T>(this->comm());
   cloned_vector->init(*this);
-
-  return cloned_vector;
+  return AutoPtr<NumericVector<T> >(cloned_vector);
 }
 
 
@@ -730,14 +727,10 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > DistributedVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector
-    (new DistributedVector<T>(this->comm()));
-
+  NumericVector<T>* cloned_vector = new DistributedVector<T>(this->comm());
   cloned_vector->init(*this, true);
-
   *cloned_vector = *this;
-
-  return cloned_vector;
+  return AutoPtr<NumericVector<T> >(cloned_vector);
 }
 
 

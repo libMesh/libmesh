@@ -27,6 +27,7 @@
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>
@@ -35,13 +36,9 @@ namespace libMesh
 {
 
 // forward declarations
-template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class Preconditioner;
-
-
-
 
 /**
  * This class provides a uniform interface for nonlinear solvers.  This base
@@ -50,7 +47,6 @@ template <typename T> class Preconditioner;
  *
  * @author Benjamin Kirk, 2005
  */
-
 template <typename T>
 class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >,
   public ParallelObject

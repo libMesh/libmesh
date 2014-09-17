@@ -63,7 +63,7 @@ public:
       fine_error(0), coarse_error(0),
       fine_side(libMesh::invalid_uint),
       var(libMesh::invalid_uint),
-      fe_fine(NULL), fe_coarse(NULL) {}
+      fe_fine(), fe_coarse() {}
 
   /**
    * Destructor.

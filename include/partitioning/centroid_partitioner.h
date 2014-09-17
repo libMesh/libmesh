@@ -76,10 +76,9 @@ public:
    * Creates a new partitioner of this type and returns it in
    * an \p AutoPtr.
    */
-  virtual AutoPtr<Partitioner> clone () const {
-    AutoPtr<Partitioner> cloned_partitioner
-      (new CentroidPartitioner(sort_method()));
-    return cloned_partitioner;
+  virtual AutoPtr<Partitioner> clone () const
+  {
+    return AutoPtr<Partitioner>(new CentroidPartitioner(sort_method()));
   }
 
   /**

@@ -1050,8 +1050,6 @@ AutoPtr<DiffContext> FEMSystem::build_context ()
 {
   FEMContext* fc = new FEMContext(*this);
 
-  AutoPtr<DiffContext> ap(fc);
-
   DifferentiablePhysics* phys = this->get_physics();
 
   libmesh_assert (phys);
@@ -1062,12 +1060,12 @@ AutoPtr<DiffContext> FEMSystem::build_context ()
   fc->set_mesh_y_var(phys->get_mesh_y_var());
   fc->set_mesh_z_var(phys->get_mesh_z_var());
 
-  ap->set_deltat_pointer( &deltat );
+  fc->set_deltat_pointer( &deltat );
 
   // If we are solving the adjoint problem, tell that to the Context
-  ap->is_adjoint() = this->get_time_solver().is_adjoint();
+  fc->is_adjoint() = this->get_time_solver().is_adjoint();
 
-  return ap;
+  return AutoPtr<DiffContext>(fc);
 }
 
 

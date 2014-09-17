@@ -828,6 +828,8 @@ petscversion
 PETSCARCH
 PETSC_ARCH
 PETSC_DIR
+LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE
+LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE
 LIBMESH_INSTALL_INTERNAL_BOOST_FALSE
 LIBMESH_INSTALL_INTERNAL_BOOST_TRUE
 BOOST_LDFLAGS
@@ -1116,6 +1118,7 @@ enable_nested
 enable_boost
 with_boost
 with_boost_libdir
+enable_hinnant_unique_ptr
 enable_petsc
 with_mpi
 with_gm
@@ -1893,6 +1896,9 @@ Optional Features:
   --disable-nested        Do not use nested autoconf subpackages
   --disable-boost         build without either external or built-in BOOST
                           support
+  --disable-hinnant-unique-ptr
+                          build without Howard Hinnant's unique_ptr
+                          implementation
   --disable-petsc         build without PETSc iterative solver suppport
   --disable-slepc         build without SLEPc eigen solver support
   --disable-trilinos      build without Trilinos support
@@ -28498,6 +28504,7 @@ fi
 
 
   install_internal_boost=no
+  BOOST_INCLUDE=""
   if (test "$enableboost" !=  no) ; then
     # --------------------------------------------------------------
     # Look for a user or system-provided boost.  If there is not
@@ -28548,7 +28555,7 @@ fi
 
 
 if test "x$want_boost" = "xyes"; then
-    boost_lib_version_req=1.20.0
+    boost_lib_version_req=1.55.0
     boost_lib_version_req_shorten=`expr $boost_lib_version_req : '\([0-9]*\.[0-9]*\)'`
     boost_lib_version_req_major=`expr $boost_lib_version_req : '\([0-9]*\)'`
     boost_lib_version_req_minor=`expr $boost_lib_version_req : '[0-9]*\.\([0-9]*\)'`
@@ -28786,9 +28793,9 @@ $as_echo "<<< External boost installation *not* found... will try to configure f
       # Note: 4th argument is libmesh's builtin boost.
       internal_boost_found=yes
 
-          if test "x$srcdir/contrib/boost" != "x"; then
+          if test "x$top_srcdir/contrib/boost" != "x"; then
     want_boost="yes"
-    ac_boost_path="$srcdir/contrib/boost"
+    ac_boost_path="$top_srcdir/contrib/boost"
   else
 
 # Check whether --with-boost was given.
@@ -28829,7 +28836,7 @@ fi
 
 
 if test "x$want_boost" = "xyes"; then
-    boost_lib_version_req=1.20.0
+    boost_lib_version_req=1.55.0
     boost_lib_version_req_shorten=`expr $boost_lib_version_req : '\([0-9]*\.[0-9]*\)'`
     boost_lib_version_req_major=`expr $boost_lib_version_req : '\([0-9]*\)'`
     boost_lib_version_req_minor=`expr $boost_lib_version_req : '[0-9]*\.\([0-9]*\)'`
@@ -29065,13 +29072,24 @@ $as_echo "<<< Libmesh boost installation *not* found >>>" >&6; }
 	enableboost=no
       else
         install_internal_boost=yes
+        BOOST_INCLUDE="-I\$(top_srcdir)/contrib/boost/include"
       fi
     fi
-
-    # currently only using boost headers
-    libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
-    #libmesh_optional_LIBS="$BOOST_LDFLAGS $libmesh_optional_LIBS"
   fi
+
+
+  # if we are installing our own Boost, add it to the contrib search path
+  # which is not exported during install.  If we are using an external boost,
+  # add its (absolute) path, as determined by AX_BOOST_BASE to the
+  # libmesh_optional_INCLUDES variable.
+  if (test x$enableboost = xyes); then
+    if (test x$install_internal_boost = xyes); then
+      libmesh_contrib_INCLUDES="$BOOST_INCLUDE $libmesh_contrib_INCLUDES"
+    else
+      libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
+    fi
+  fi
+
    if test x$install_internal_boost = xyes; then
   LIBMESH_INSTALL_INTERNAL_BOOST_TRUE=
   LIBMESH_INSTALL_INTERNAL_BOOST_FALSE='#'
@@ -29080,12 +29098,143 @@ else
   LIBMESH_INSTALL_INTERNAL_BOOST_FALSE=
 fi
 
-  # --------------------------------------------------------------
 
 ac_config_files="$ac_config_files contrib/boost/include/Makefile"
 
 # --------------------------------------------------------------
 
+
+# --------------------------------------------------------------
+# Howard Hinnant's unique_ptr implementation.  Must be tested after
+# Boost and requires a working Boost installation.
+
+  # Howard Hinnant's unique_ptr is enabled by default, but we allow it to be explicitly disabled.
+  # Check whether --enable-hinnant-unique-ptr was given.
+if test "${enable_hinnant_unique_ptr+set}" = set; then :
+  enableval=$enable_hinnant_unique_ptr; case "${enableval}" in
+                  yes)  enablehinnant=yes ;;
+                   no)  enablehinnant=no ;;
+                    *)  as_fn_error $? "bad value ${enableval} for --enable-boost" "$LINENO" 5 ;;
+                esac
+else
+  enablehinnant=yes
+fi
+
+
+  # Shell variable that will eventually be used to set the AM_CONDITIONAL
+  install_hinnant_unique_ptr=no
+
+  # If the user did not explicitly disable it, do some more testing
+  if (test x$enablehinnant = xyes); then
+
+    # We require boost to be enabled for Hinnant's unique pointer to be installed.
+    if (test x$enableboost = xyes); then
+
+      # Try to compile a test program that uses the unique_ptr.hpp header file
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+      # Save any original value that CXXFLAGS had
+      saveCXXFLAGS="$CXXFLAGS"
+
+      # Add location of contrib header file to CXXFLAGS
+      CXXFLAGS="$saveCXXFLAGS -I$top_srcdir/contrib/unique_ptr";
+
+      # Depending on whether the boost installation found is external
+      # or internal, also add that path (see also boost.m4)
+      if (test x$install_internal_boost = xyes); then
+        CXXFLAGS="$CXXFLAGS -I$top_srcdir/contrib/boost/include"
+      else
+        CXXFLAGS="$CXXFLAGS $BOOST_CPPFLAGS"
+      fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking if Howard Hinnant's C++03 unique_ptr implementation can be compiled" >&5
+$as_echo_n "checking if Howard Hinnant's C++03 unique_ptr implementation can be compiled... " >&6; }
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      #include <iostream>
+      #include "unique_ptr.hpp"
+      struct Foo
+      {
+        Foo()      { std::cout << "Foo::Foo\n";  }
+        ~Foo()     { std::cout << "Foo::~Foo\n"; }
+      };
+
+int
+main ()
+{
+
+      {
+        // up now owns a Foo
+        boost::unique_ptr<Foo> up(new Foo);
+      } // Foo deleted when up goes out of scope
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        install_hinnant_unique_ptr=yes
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      # Restore the original flags, whatever they were.
+      CXXFLAGS="$saveCXXFLAGS"
+
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+      # Set the header file define and print a message on compilation success
+      if (test x$install_hinnant_unique_ptr = xyes); then
+
+$as_echo "#define HAVE_HINNANT_UNIQUE_PTR 1" >>confdefs.h
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Installing Howard Hinnant's unique_ptr implementation >>>" >&5
+$as_echo "<<< Installing Howard Hinnant's unique_ptr implementation >>>" >&6; }
+      fi
+
+    else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< No boost, Howard Hinnant's unique_ptr implementation not available >>>" >&5
+$as_echo "<<< No boost, Howard Hinnant's unique_ptr implementation not available >>>" >&6; }
+    fi
+
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Howard Hinnant's unique_ptr implementation explicitly disabled >>>" >&5
+$as_echo "<<< Howard Hinnant's unique_ptr implementation explicitly disabled >>>" >&6; }
+  fi
+
+  # Set Makefile.am conditional variable.  This call must be outside of all if-statements
+   if test x$install_hinnant_unique_ptr = xyes; then
+  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE=
+  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE='#'
+else
+  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE='#'
+  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE=
+fi
+
+
+ac_config_files="$ac_config_files contrib/unique_ptr/Makefile"
+
+# --------------------------------------------------------------
 
 
 # -------------------------------------------------------------
@@ -35733,6 +35882,10 @@ if test -z "${LIBMESH_INSTALL_INTERNAL_BOOST_TRUE}" && test -z "${LIBMESH_INSTAL
   as_fn_error $? "conditional \"LIBMESH_INSTALL_INTERNAL_BOOST\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE}" && test -z "${LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_INSTALL_HINNANT_UNIQUE_PTR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_PETSC_TRUE}" && test -z "${LIBMESH_ENABLE_PETSC_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_PETSC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -37053,6 +37206,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "contrib/boost/include/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/boost/include/Makefile" ;;
+    "contrib/unique_ptr/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/unique_ptr/Makefile" ;;
     "contrib/laspack/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/laspack/Makefile" ;;
     "contrib/sfcurves/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/sfcurves/Makefile" ;;
     "contrib/gzstream/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gzstream/Makefile" ;;
