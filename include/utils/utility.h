@@ -310,8 +310,8 @@ T ReverseBytes::operator() (T& data) const
     {
       unsigned char* b = (unsigned char*) &data;
 
-      register int i=0;
-      register int j=(sizeof(T) - 1);
+      int i=0;
+      int j=(sizeof(T) - 1);
 
       while (i < j)
         {
