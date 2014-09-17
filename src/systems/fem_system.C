@@ -445,7 +445,7 @@ public:
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
         if (have_some_heterogenous_qoi_bc)
           {
-            _sys.time_solver->element_residual(true, _femcontext);
+            _sys.time_solver->element_residual(false, _femcontext);
 
             for (unsigned int q=0; q != _sys.qoi.size(); ++q)
               {
@@ -517,6 +517,18 @@ public:
     FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _qoi.init_context(_femcontext);
 
+    std::vector<bool> have_heterogenous_qoi_bc(_sys.qoi.size(), false);
+    bool have_some_heterogenous_qoi_bc = false;
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+    for (unsigned int q=0; q != _sys.qoi.size(); ++q)
+      if (_qoi_indices.has_index(q) &&
+          _sys.get_dof_map().has_heterogenous_adjoint_constraints(q))
+        {
+          have_heterogenous_qoi_bc[q] = true;
+          have_some_heterogenous_qoi_bc = true;
+        }
+#endif
+
     for (ConstElemRange::const_iterator elem_it = range.begin();
          elem_it != range.end(); ++elem_it)
       {
@@ -524,12 +536,71 @@ public:
 
         _femcontext.pre_fe_reinit(_sys, el);
 
-        if (_qoi.assemble_qoi_elements)
+        // We might have some heterogenous dofs here; let's see for
+        // certain
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+        if (have_some_heterogenous_qoi_bc)
           {
-            _femcontext.elem_fe_reinit();
-
-            _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
+            have_some_heterogenous_qoi_bc = false;
+            for (unsigned int q=0; q != _sys.qoi.size(); ++q)
+              {
+                if (have_heterogenous_qoi_bc[q])
+                  {
+                    have_heterogenous_qoi_bc[q] = false;
+                    for (unsigned int d=0;
+                         d != _femcontext.get_dof_indices().size(); ++d)
+                      if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
+                          (q, _femcontext.get_dof_indices()[d]))
+                        {
+                          have_some_heterogenous_qoi_bc = true;
+                          have_heterogenous_qoi_bc[q] = true;
+                          break;
+                        }
+                  }
+              }
           }
+#endif
+
+        if (_qoi.assemble_qoi_elements ||
+            have_some_heterogenous_qoi_bc)
+          _femcontext.elem_fe_reinit();
+
+        if (_qoi.assemble_qoi_elements)
+          _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
+
+        // If we have some heterogenous dofs here, those are
+        // themselves part of a regularized flux QoI which the library
+        // handles integrating
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+        if (have_some_heterogenous_qoi_bc)
+          {
+            _sys.time_solver->element_residual(true, _femcontext);
+
+            for (unsigned int q=0; q != _sys.qoi.size(); ++q)
+              {
+                if (have_heterogenous_qoi_bc[q])
+                  {
+                    for (unsigned int i=0;
+                         i != _femcontext.get_dof_indices().size(); ++i)
+                      {
+                        Number liftfunc_val =
+                          _sys.get_dof_map().has_heterogenous_adjoint_constraint
+                            (q, _femcontext.get_dof_indices()[i]);
+
+                        if (liftfunc_val)
+                          {
+                            for (unsigned int j=0;
+                                 j != _femcontext.get_dof_indices().size(); ++j)
+                              _femcontext.get_qoi_derivatives()[q](j) -=
+                                _femcontext.get_elem_jacobian()(i,j) *
+                                liftfunc_val;
+                          }
+                      }
+                  }
+              }
+          }
+#endif
+
 
         for (_femcontext.side = 0;
              _femcontext.side != _femcontext.get_elem().n_sides();
@@ -568,6 +639,7 @@ public:
             if (_qoi_indices.has_index(i))
               {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
+#ifndef NDEBUG
                 bool has_heterogenous_constraint = false;
                 for (unsigned int d=0;
                      d != _femcontext.get_dof_indices().size(); ++d)
@@ -575,19 +647,21 @@ public:
                       (i, _femcontext.get_dof_indices()[d]))
                     {
                       has_heterogenous_constraint = true;
+                      libmesh_assert(have_heterogenous_qoi_bc[i]);
+                      libmesh_assert(have_some_heterogenous_qoi_bc);
                       break;
                     }
+#else
+                bool has_heterogenous_constraint =
+                  have_heterogenous_qoi_bc[i];
+#endif
 
                 _femcontext.get_dof_indices() = original_dofs;
 
                 // If we're going to need K to impose a heterogenous
-                // constraint then we either already have it or we
-                // need to compute it
+                // constraint, we already computed it above.
                 if (has_heterogenous_constraint)
                   {
-                    assemble_unconstrained_element_system
-                      (_sys, true, _femcontext);
-
                     _sys.get_dof_map().heterogenously_constrain_element_vector
                       (_femcontext.get_elem_jacobian(),
                        _femcontext.get_qoi_derivatives()[i],
