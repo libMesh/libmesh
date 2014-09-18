@@ -743,7 +743,7 @@ void enableFPE(bool on)
       _MM_SET_EXCEPTION_MASK(flags);
 #  endif
 #endif
-      signal(SIGFPE, 0);
+      signal(SIGFPE, SIG_DFL);
     }
 }
 
