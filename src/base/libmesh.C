@@ -126,6 +126,25 @@ void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
                     << "  run ...\n"                                    \
                     << "  bt");
 }
+
+
+void libmesh_handleSEGV(int /*signo*/, siginfo_t *info, void * /*context*/)
+{
+  libMesh::err << std::endl;
+  libMesh::err << "Segmentation fault exception signaled (";
+  switch (info->si_code)
+    {
+    case SEGV_MAPERR: libMesh::err << "Address not mapped"; break;
+    case SEGV_ACCERR: libMesh::err << "Invalid permissions"; break;
+    default:         libMesh::err << "unrecognized"; break;
+    }
+  libMesh::err << ")!" << std::endl;
+
+  libmesh_error_msg("\nTo track this down, compile in debug mode, then in gdb do:\n" \
+                    << "  break libmesh_handleSEGV\n"                    \
+                    << "  run ...\n"                                    \
+                    << "  bt");
+}
 }
 
 
@@ -569,6 +588,9 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
   if (libMesh::on_command_line("--enable-fpe"))
     libMesh::enableFPE(true);
 
+  if (libMesh::on_command_line("--enable-segv"))
+    libMesh::enableSEGV(true);
+
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
 
@@ -744,6 +766,33 @@ void enableFPE(bool on)
 #  endif
 #endif
       signal(SIGFPE, SIG_DFL);
+    }
+}
+
+
+// Enable handling of SIGSEGV by libMesh 
+// (potentially instead of PETSc)
+void enableSEGV(bool on)
+{
+  static struct sigaction old_action;
+  static bool was_on = false;
+
+  if (on)
+    {
+      struct sigaction new_action;
+      was_on = true;
+
+      // Set up the structure to specify the new action.
+      new_action.sa_sigaction = libmesh_handleSEGV;
+      sigemptyset (&new_action.sa_mask);
+      new_action.sa_flags = SA_SIGINFO;
+
+      sigaction (SIGSEGV, &new_action, &old_action);
+    }
+  else if (was_on)
+    {
+      was_on = false;
+      sigaction (SIGSEGV, &old_action, NULL);
     }
 }
 

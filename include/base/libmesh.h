@@ -101,6 +101,11 @@ bool closed ();
 void enableFPE(bool on);
 
 /**
+ * Toggle libMesh reporting of segmentation faults
+ */
+void enableSEGV(bool on);
+
+/**
  * @returns true if the argument \p arg was specified on the command line,
  * \p false otherwise.
  */
