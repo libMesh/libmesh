@@ -1004,14 +1004,14 @@ inline void receive_packed_range (const unsigned int src_processor_id,
                                   const Communicator &comm = Communicator_World)
 { comm.receive_packed_range (src_processor_id, context, out, tag); }
 
-template <typename Context, typename OutputIter>
-inline void receive_packed_range (const unsigned int src_processor_id,
-                                  Context *context,
-                                  OutputIter out,
-                                  Request &req,
-                                  const MessageTag &tag=any_tag,
-                                  const Communicator &comm = Communicator_World)
-{ comm.receive_packed_range (src_processor_id, context, out, req, tag); }
+// template <typename Context, typename OutputIter>
+// inline void receive_packed_range (const unsigned int src_processor_id,
+//                                   Context *context,
+//                                   OutputIter out,
+//                                   Request &req,
+//                                   const MessageTag &tag=any_tag,
+//                                   const Communicator &comm = Communicator_World)
+// { comm.receive_packed_range (src_processor_id, context, out, req, tag); }
 
 template <typename T>
 inline void nonblocking_receive (const unsigned int src_processor_id,
@@ -3497,10 +3497,10 @@ inline void Communicator::receive_packed_range
 (const unsigned int, Context*, OutputIter, const MessageTag&) const
 { libmesh_not_implemented(); }
 
-template <typename Context, typename OutputIter>
-inline void Communicator::receive_packed_range
-(const unsigned int, Context*, OutputIter, Request&, const MessageTag&) const
-{ libmesh_not_implemented(); }
+// template <typename Context, typename OutputIter>
+// inline void Communicator::receive_packed_range
+// (const unsigned int, Context*, OutputIter, Request&, const MessageTag&) const
+// { libmesh_not_implemented(); }
 
 /**
  * Send-receive data from one processor.
