@@ -27,7 +27,7 @@ int main()
     "cos(x+3)+sin(x+3)+4*cot(x)+8*sec(x)"
   };
 
-  for (unsigned int i = 0; i < nfunc; ++i) 
+  for (unsigned int i = 0; i < nfunc; ++i)
   {
     FunctionParserAD fparser, fparser2, fparser3;
 
@@ -41,7 +41,7 @@ int main()
     fparser2.Optimize();
     fparser3.Parse(func[i], "x");
 
-    if (!fparser.JITCompile()) 
+    if (!fparser.JITCompile())
     {
       std::cout << "JIT compile failed for " << func[i] << '\n';
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
@@ -49,7 +49,7 @@ int main()
 #endif
       exit(1);
     }
-    if (!fparser2.JITCompile()) 
+    if (!fparser2.JITCompile())
     {
       std::cout << "JIT compile failed for optimized " << func[i] << '\n';
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
@@ -61,9 +61,9 @@ int main()
     const double eps = 1e-12;
     double p[1], a, b, c;
 
-    for (p[0]=-2.7; p[0]<2.7; p[0]+=0.1) 
+    for (p[0]=-2.7; p[0]<2.7; p[0]+=0.1)
     {
-      a = fparser.Eval(p); 
+      a = fparser.Eval(p);
       b = fparser2.Eval(p);
       c = fparser3.Eval(p);
 

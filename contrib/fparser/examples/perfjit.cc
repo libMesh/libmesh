@@ -19,7 +19,7 @@ double evalTime(FunctionParserAD & fparser)
   std::clock_t start= std::clock();
 
   for (int i=0; i<100000; ++i)
-    for (p[0]=-2.7; p[0]<2.7; p[0]+=0.1) 
+    for (p[0]=-2.7; p[0]<2.7; p[0]+=0.1)
       fparser.Eval(p);
 
   return std::clock() - start;
@@ -27,10 +27,10 @@ double evalTime(FunctionParserAD & fparser)
 
 void testFParser(const char *func[], int nfunc, bool ad)
 {
-  double t=0, to=0, tj=0, toj=0, tcms = 0.0; 
+  double t=0, to=0, tj=0, toj=0, tcms = 0.0;
   struct timeval tc0, tc1;
 
-  for (unsigned int i = 0; i < nfunc; ++i) 
+  for (unsigned int i = 0; i < nfunc; ++i)
   {
     FunctionParserAD fparser, fparser_o, fparser_j, fparser_oj;
 
@@ -121,4 +121,3 @@ int main()
 
   return 0;
 }
-

@@ -67,16 +67,16 @@ int main()
   std::cout << "Copy of the original:\n";
   fparser2.PrintByteCode(std::cout);
   std::cout << std::endl;
-  
+
   double p[1];
-  
-  for (p[0]=0.0; p[0]<3.141; p[0]+=0.1) 
+
+  for (p[0]=0.0; p[0]<3.141; p[0]+=0.1)
     std::cout << fparser2.Eval(p) << '\n';
 
   fparser2.JITCompile();
   std::cout << "\nJIT\n\n";
 
-  for (p[0]=0.0; p[0]<3.141; p[0]+=0.1) 
+  for (p[0]=0.0; p[0]<3.141; p[0]+=0.1)
     std::cout << fparser2.Eval(p) << '\n';
 
   return 0;
