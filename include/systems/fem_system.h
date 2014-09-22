@@ -158,7 +158,9 @@ public:
    * interest that are not expressible as a sum of element qois.
    */
   virtual void assemble_qoi_derivative
-  (const QoISet& indices = QoISet());
+  (const QoISet &qoi_indices = QoISet(),
+   bool include_liftfunc = true,
+   bool apply_constraints = true);
 
   /**
    * If fe_reinit_during_postprocess is true (it is true by default), FE

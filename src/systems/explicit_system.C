@@ -99,7 +99,10 @@ void ExplicitSystem::assemble_qoi (const QoISet& qoi_indices)
 
 
 
-void ExplicitSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
+void ExplicitSystem::assemble_qoi_derivative
+  (const QoISet& qoi_indices,
+   bool include_liftfunc,
+   bool apply_constraints)
 {
   // The user quantity of interest derivative assembly gets to expect
   // to accumulate on initially zero vectors
@@ -107,7 +110,8 @@ void ExplicitSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
     if (qoi_indices.has_index(i))
       this->add_adjoint_rhs(i).zero();
 
-  Parent::assemble_qoi_derivative (qoi_indices);
+  Parent::assemble_qoi_derivative (qoi_indices, include_liftfunc,
+                                   apply_constraints);
 }
 
 

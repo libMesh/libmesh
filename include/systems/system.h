@@ -204,7 +204,10 @@ public:
      * be called to compute derivatived of quantities of interest and
      * must be provided by the user in a derived class.
      */
-    virtual void qoi_derivative (const QoISet& qoi_indices) = 0;
+    virtual void qoi_derivative 
+      (const QoISet& qoi_indices,
+       bool include_liftfunc,
+       bool apply_constraints) = 0;
   };
 
 
@@ -270,7 +273,9 @@ public:
    * @e Can be overloaded in derived classes.
    */
   virtual void assemble_qoi_derivative
-  (const QoISet &qoi_indices = QoISet());
+  (const QoISet &qoi_indices = QoISet(),
+   bool include_liftfunc = true,
+   bool apply_constraints = true);
 
   /**
    * Calls residual parameter derivative function.
@@ -1371,7 +1376,9 @@ public:
    */
   void attach_QOI_derivative (void fptr(EquationSystems& es,
                                         const std::string& name,
-                                        const QoISet& qoi_indices));
+                                        const QoISet& qoi_indices,
+                                        bool include_liftfunc,
+                                        bool apply_constraints));
 
   /**
    * Register a user object for evaluating derivatives of a quantity
@@ -1408,7 +1415,10 @@ public:
    * Calls user's attached quantity of interest derivative function,
    * or is overloaded by the user in derived classes.
    */
-  virtual void user_QOI_derivative (const QoISet& qoi_indices);
+  virtual void user_QOI_derivative
+  (const QoISet &qoi_indices = QoISet(),
+   bool include_liftfunc = true,
+   bool apply_constraints = true);
 
   /**
    * Re-update the local values when the mesh has changed.
@@ -1783,7 +1793,9 @@ private:
    */
   void (* _qoi_evaluate_derivative_function) (EquationSystems& es,
                                               const std::string& name,
-                                              const QoISet& qoi_indices);
+                                              const QoISet& qoi_indices,
+                                              bool include_liftfunc,
+                                              bool apply_constraints);
 
   /**
    * Object to compute derivatives of quantities of interest.
