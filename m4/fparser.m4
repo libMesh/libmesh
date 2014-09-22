@@ -6,23 +6,23 @@ AC_DEFUN([CONFIGURE_FPARSER],
   AC_ARG_ENABLE([fparser],
                 AS_HELP_STRING([--disable-fparser],
                                [build without C++ function parser support]),
-		[case "${enableval}" in
-		  yes)  enablefparser=yes ;;
-		   no)  enablefparser=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser) ;;
-		 esac],
-		 [enablefparser=$enableoptional])
+                [case "${enableval}" in
+                  yes)  enablefparser=yes ;;
+                   no)  enablefparser=no ;;
+                    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser) ;;
+                 esac],
+                [enablefparser=$enableoptional])
 
   AC_ARG_WITH([fparser],
-	       AS_HELP_STRING([--with-fparser=<release|none|devel>],
+               AS_HELP_STRING([--with-fparser=<release|none|devel>],
                               [Determine which version of the C++ function parser to use]),
-	      [case "${withval}" in
-		  release)  enablefparserdevel=no  ;;
-		    devel)  enablefparserdevel=yes ;;
-		     none)  enablefparser=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${withval} for --with-fparser) ;;
-		 esac],
-	      [enablefparserdevel=no])
+               [case "${withval}" in
+                   release)  enablefparserdevel=no  ;;
+                     devel)  enablefparserdevel=yes ;;
+                      none)  enablefparser=no ;;
+                         *)  AC_MSG_ERROR(bad value ${withval} for --with-fparser) ;;
+                esac],
+               [enablefparserdevel=no])
 
 
   if (test x$enablefparser = xyes); then
@@ -31,32 +31,32 @@ AC_DEFUN([CONFIGURE_FPARSER],
     AC_ARG_ENABLE(fparser-debugging,
                   AS_HELP_STRING([--enable-fparser-debugging],
                                  [Build fparser with bytecode debugging functions]),
-		[case "${enableval}" in
-		  yes)  enablefparserdebugging=yes ;;
-		   no)  enablefparserdebugging=no ;;
-		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-debugging) ;;
-		 esac],
-                 [enablefparserdebugging=no])
+                  [case "${enableval}" in
+                    yes)  enablefparserdebugging=yes ;;
+                     no)  enablefparserdebugging=no ;;
+                      *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-debugging) ;;
+                   esac],
+                  [enablefparserdebugging=no])
 
     AC_ARG_ENABLE(fparser-jit,
                   AS_HELP_STRING([--enable-fparser-jit],
                                  [Build fparser with experimental JIT compile functions]),
-		[case "${enableval}" in
-		  yes)  enablefparserjit=yes ;;
-		   no)  enablefparserjit=no ;;
-		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-jit) ;;
-		 esac],
-                 [enablefparserjit=no])
+                  [case "${enableval}" in
+                    yes)  enablefparserjit=yes ;;
+                     no)  enablefparserjit=no ;;
+                      *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-jit) ;;
+                   esac],
+                  [enablefparserjit=no])
 
     AC_ARG_ENABLE(fparser-optimizer,
                   AS_HELP_STRING([--disable-fparser-optimizer],
                                  [do not optimize parsed functions]),
-		[case "${enableval}" in
-		  yes)  enablefparseroptimizer=yes ;;
-		   no)  enablefparseroptimizer=no ;;
-		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
-		 esac],
-		 [enablefparseroptimizer=yes])
+                  [case "${enableval}" in
+                    yes)  enablefparseroptimizer=yes ;;
+                     no)  enablefparseroptimizer=no ;;
+                      *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
+                   esac],
+                  [enablefparseroptimizer=yes])
 
     # note - fparser optimization may fail on cygwin (please test), so disable it regardless
     case "${host_os}" in
