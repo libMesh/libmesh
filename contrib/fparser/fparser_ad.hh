@@ -35,6 +35,22 @@ public:
    */
   void silenceAutoDiffErrors(bool _silence = true) { mSilenceErrors = _silence; }
 
+  /**
+   * compile the current function, or load a previously compiled copy.
+   * Warning: When re-using an FParser function object by parsing a new expression
+   *          the previously JIT compiled function will continue to be Evaled until the
+   *          JITCompile method is called again.
+   */
+  bool JITCompile(bool cacheFunction = true);
+
+#ifdef LIBMESH_HAVE_FPARSER_JIT
+  /**
+   * Overwrite the Exec function with one that tests for a JIT compiled version
+   * and uses that if it exists
+   */
+  Value_t Eval(const Value_t* Vars);
+#endif
+
 protected:
   /**
    * A list of opcodes and immediate values
@@ -70,8 +86,17 @@ private:
   /// variable to diff for
   unsigned mVarOp;
 
+  /// expand
+  DiffProgramFragment Expand();
+
   /// write the DiffProgramFragement into the internal bytecode storage
   void Commit(const DiffProgramFragment & code);
+
+  /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
+  bool JITCompileHelper(const std::string &, bool);
+
+  /// JIT function pointer
+  Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
 
   /**
    * In certain applications derivatives are built proactively and may never be used.
