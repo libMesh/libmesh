@@ -939,7 +939,7 @@ FPOPTIMIZER_CC_FILES = \
 pkg_sources = fparser.cc fparser_ad.cc $(am__append_4) $(am__append_8) \
 	$(am__append_10)
 
-# util/tree_grammar_parser is a utility which is required to build 
+# util/tree_grammar_parser is a utility which is required to build
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
 # when we are compiling with optimization support enabled.
 #
@@ -975,7 +975,7 @@ util_tree_grammar_parser_SOURCES = \
                                  lib/functional.hh \
                                  lib/crc32.hh \
                                  lib/autoptr.hh \
-                                 lib/sha1.hh \
+                                 lib/sha1.h \
                                  extrasrc/fpaux.hh \
                                  extrasrc/fptypes.hh \
                                  extrasrc/fp_opcode_add.inc \
@@ -2803,7 +2803,7 @@ fpoptimizer/grammar_data.cc: \
   # 'util/make_function_name_parser' is used to create extrasrc/fp_identifier_parser.inc,
   # but it seems to only define a snippet.  So for now we use the distributed version
   # of that file rather than treating it as a built source.
-  # util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc 
+  # util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc
 
 # extrasrc/fp_opcode_add.inc is a generated source, and this rule specifies how we build it.
 extrasrc/fp_opcode_add.inc: \

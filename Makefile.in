@@ -10456,17 +10456,17 @@ getpot_parse-opt$(EXEEXT): $(getpot_parse_opt_OBJECTS) $(getpot_parse_opt_DEPEND
 	$(AM_V_CXXLD)$(getpot_parse_opt_LINK) $(getpot_parse_opt_OBJECTS) $(getpot_parse_opt_LDADD) $(LIBS)
 src/apps/meshavg_dbg-meshavg.$(OBJEXT): src/apps/$(am__dirstamp) \
 	src/apps/$(DEPDIR)/$(am__dirstamp)
-meshavg-dbg$(EXEEXT): $(meshavg_dbg_OBJECTS) $(meshavg_dbg_DEPENDENCIES) $(EXTRA_meshavg_dbg_DEPENDENCIES)
+meshavg-dbg$(EXEEXT): $(meshavg_dbg_OBJECTS) $(meshavg_dbg_DEPENDENCIES) $(EXTRA_meshavg_dbg_DEPENDENCIES) 
 	@rm -f meshavg-dbg$(EXEEXT)
 	$(AM_V_CXXLD)$(meshavg_dbg_LINK) $(meshavg_dbg_OBJECTS) $(meshavg_dbg_LDADD) $(LIBS)
 src/apps/meshavg_devel-meshavg.$(OBJEXT): src/apps/$(am__dirstamp) \
 	src/apps/$(DEPDIR)/$(am__dirstamp)
-meshavg-devel$(EXEEXT): $(meshavg_devel_OBJECTS) $(meshavg_devel_DEPENDENCIES) $(EXTRA_meshavg_devel_DEPENDENCIES)
+meshavg-devel$(EXEEXT): $(meshavg_devel_OBJECTS) $(meshavg_devel_DEPENDENCIES) $(EXTRA_meshavg_devel_DEPENDENCIES) 
 	@rm -f meshavg-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(meshavg_devel_LINK) $(meshavg_devel_OBJECTS) $(meshavg_devel_LDADD) $(LIBS)
 src/apps/meshavg_opt-meshavg.$(OBJEXT): src/apps/$(am__dirstamp) \
 	src/apps/$(DEPDIR)/$(am__dirstamp)
-meshavg-opt$(EXEEXT): $(meshavg_opt_OBJECTS) $(meshavg_opt_DEPENDENCIES) $(EXTRA_meshavg_opt_DEPENDENCIES)
+meshavg-opt$(EXEEXT): $(meshavg_opt_OBJECTS) $(meshavg_opt_DEPENDENCIES) $(EXTRA_meshavg_opt_DEPENDENCIES) 
 	@rm -f meshavg-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(meshavg_opt_LINK) $(meshavg_opt_OBJECTS) $(meshavg_opt_LDADD) $(LIBS)
 src/apps/meshbcid_dbg-meshbcid.$(OBJEXT): src/apps/$(am__dirstamp) \

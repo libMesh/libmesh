@@ -34843,10 +34843,10 @@ ac_config_files="$ac_config_files contrib/libHilbert/Makefile"
   # Check whether --enable-fparser was given.
 if test "${enable_fparser+set}" = set; then :
   enableval=$enable_fparser; case "${enableval}" in
-		  yes)  enablefparser=yes ;;
-		   no)  enablefparser=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser" "$LINENO" 5 ;;
-		 esac
+                  yes)  enablefparser=yes ;;
+                   no)  enablefparser=no ;;
+                    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser" "$LINENO" 5 ;;
+                 esac
 else
   enablefparser=$enableoptional
 fi
@@ -34856,11 +34856,11 @@ fi
 # Check whether --with-fparser was given.
 if test "${with_fparser+set}" = set; then :
   withval=$with_fparser; case "${withval}" in
-		  release)  enablefparserdevel=no  ;;
-		    devel)  enablefparserdevel=yes ;;
-		     none)  enablefparser=no ;;
- 		    *)  as_fn_error $? "bad value ${withval} for --with-fparser" "$LINENO" 5 ;;
-		 esac
+                   release)  enablefparserdevel=no  ;;
+                     devel)  enablefparserdevel=yes ;;
+                      none)  enablefparser=no ;;
+                         *)  as_fn_error $? "bad value ${withval} for --with-fparser" "$LINENO" 5 ;;
+                esac
 else
   enablefparserdevel=no
 fi
@@ -34873,10 +34873,10 @@ fi
     # Check whether --enable-fparser-debugging was given.
 if test "${enable_fparser_debugging+set}" = set; then :
   enableval=$enable_fparser_debugging; case "${enableval}" in
-		  yes)  enablefparserdebugging=yes ;;
-		   no)  enablefparserdebugging=no ;;
-		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-debugging" "$LINENO" 5 ;;
-		 esac
+                    yes)  enablefparserdebugging=yes ;;
+                     no)  enablefparserdebugging=no ;;
+                      *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-debugging" "$LINENO" 5 ;;
+                   esac
 else
   enablefparserdebugging=no
 fi
@@ -34885,10 +34885,10 @@ fi
     # Check whether --enable-fparser-jit was given.
 if test "${enable_fparser_jit+set}" = set; then :
   enableval=$enable_fparser_jit; case "${enableval}" in
-		  yes)  enablefparserjit=yes ;;
-		   no)  enablefparserjit=no ;;
-		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-jit" "$LINENO" 5 ;;
-		 esac
+                    yes)  enablefparserjit=yes ;;
+                     no)  enablefparserjit=no ;;
+                      *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-jit" "$LINENO" 5 ;;
+                   esac
 else
   enablefparserjit=no
 fi
@@ -34897,10 +34897,10 @@ fi
     # Check whether --enable-fparser-optimizer was given.
 if test "${enable_fparser_optimizer+set}" = set; then :
   enableval=$enable_fparser_optimizer; case "${enableval}" in
-		  yes)  enablefparseroptimizer=yes ;;
-		   no)  enablefparseroptimizer=no ;;
-		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-optimizer" "$LINENO" 5 ;;
-		 esac
+                    yes)  enablefparseroptimizer=yes ;;
+                     no)  enablefparseroptimizer=no ;;
+                      *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-optimizer" "$LINENO" 5 ;;
+                   esac
 else
   enablefparseroptimizer=yes
 fi
