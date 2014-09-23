@@ -98,9 +98,10 @@ public:
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located.  Overloaded from base class.
+   * \p p is located, optionally restricted to a set of allowed subdomains.
+   * Overloaded from base class.
    */
-  virtual const Elem* operator() (const Point& p) const;
+  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point

@@ -100,11 +100,12 @@ public:
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located.  The mutable _element member is used to cache
+   * \p p is located, optionally restricted to a set of allowed subdomains.
+   * The mutable _element member is used to cache
    * the result and allow it to be used during the next call to
    * operator().
    */
-  virtual const Elem* operator() (const Point& p) const;
+  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
 
   /**
    * As a fallback option, it's helpful to be able to do a linear
@@ -116,6 +117,7 @@ public:
    */
   const Elem* perform_linear_search(
     const Point& p,
+    const std::set<subdomain_id_type> *allowed_subdomains,
     bool use_close_to_point,
     Real close_to_point_tolerance=TOLERANCE) const;
 

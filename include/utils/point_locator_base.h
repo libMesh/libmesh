@@ -91,9 +91,10 @@ public:
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located.  Pure virtual.
+   * \p p is located.  Pure virtual. Optionally allows the user to restrict
+   * the subdomains searched.
    */
-  virtual const Elem* operator() (const Point& p) const = 0;
+  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const = 0;
 
   /**
    * @returns \p true when this object is properly initialized

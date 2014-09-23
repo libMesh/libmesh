@@ -453,7 +453,7 @@ unsigned int TreeNode<N>::n_active_bins() const
 
 
 template <unsigned int N>
-const Elem* TreeNode<N>::find_element(const Point& p) const
+const Elem* TreeNode<N>::find_element(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
 {
   if (this->active())
     {
@@ -463,14 +463,15 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
         // Search the active elements in the active TreeNode.
         for (std::vector<const Elem*>::const_iterator pos=elements.begin();
              pos != elements.end(); ++pos)
-          if ((*pos)->active() && (*pos)->contains_point(p))
-            return *pos;
+          if (!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id()))
+            if ((*pos)->active() && (*pos)->contains_point(p))
+              return *pos;
 
       // The point was not found in any element
       return NULL;
     }
   else
-    return this->find_element_in_children(p);
+    return this->find_element_in_children(p,allowed_subdomains);
 
   libmesh_error_msg("We'll never get here!");
   return NULL;
@@ -480,7 +481,7 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
 
 
 template <unsigned int N>
-const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
+const Elem* TreeNode<N>::find_element_in_children(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
 {
   libmesh_assert (!this->active());
 
@@ -495,14 +496,14 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
       {
         if (children[c]->active())
           {
-            const Elem* e = children[c]->find_element(p);
+            const Elem* e = children[c]->find_element(p,allowed_subdomains);
 
             if (e != NULL)
               return e;
           }
         else
           {
-            const Elem* e = children[c]->find_element_in_children(p);
+            const Elem* e = children[c]->find_element_in_children(p,allowed_subdomains);
 
             if (e != NULL)
               return e;
@@ -526,14 +527,14 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
       {
         if (children[c]->active())
           {
-            const Elem* e = children[c]->find_element(p);
+            const Elem* e = children[c]->find_element(p,allowed_subdomains);
 
             if (e != NULL)
               return e;
           }
         else
           {
-            const Elem* e = children[c]->find_element_in_children(p);
+            const Elem* e = children[c]->find_element_in_children(p,allowed_subdomains);
 
             if (e != NULL)
               return e;

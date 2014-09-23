@@ -187,17 +187,20 @@ void PointLocatorTree::init (Trees::BuildType build_type)
 
 
 
-const Elem* PointLocatorTree::operator() (const Point& p) const
+const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
 {
   libmesh_assert (this->_initialized);
 
   START_LOG("operator()", "PointLocatorTree");
 
+  // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
+  if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = NULL;
+
   // First check the element from last time before asking the tree
   if (this->_element==NULL || !(this->_element->contains_point(p)))
     {
       // ask the tree
-      this->_element = this->_tree->find_element (p);
+      this->_element = this->_tree->find_element (p,allowed_subdomains);
 
       if (this->_element == NULL)
         {
@@ -212,7 +215,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
           //     have generated a false negative.
           if (_out_of_mesh_mode == false)
             {
-              this->_element = this->perform_linear_search(p, /*use_close_to_point*/ false);
+              this->_element = this->perform_linear_search(p, allowed_subdomains, /*use_close_to_point*/ false);
 
               STOP_LOG("operator()", "PointLocatorTree");
               return this->_element;
@@ -230,19 +233,21 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
               this->_element =
                 this->perform_linear_search(
                   p,
+                  allowed_subdomains,
                   /*use_close_to_point*/ true,
                   _close_to_point_tol);
 
               STOP_LOG("operator()", "PointLocatorTree");
               return this->_element;
             }
-
-
         }
     }
 
   // If we found an element, it should be active
   libmesh_assert (!this->_element || this->_element->active());
+
+  // If we found an element and have a restriction list, they better match
+  libmesh_assert (!this->_element || !allowed_subdomains || allowed_subdomains->count(this->_element->subdomain_id()));
 
   STOP_LOG("operator()", "PointLocatorTree");
 
@@ -254,6 +259,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 
 const Elem* PointLocatorTree::perform_linear_search(
   const Point& p,
+  const std::set<subdomain_id_type> *allowed_subdomains,
   bool use_close_to_point,
   Real close_to_point_tolerance) const
 {
@@ -272,25 +278,28 @@ const Elem* PointLocatorTree::perform_linear_search(
       this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
 
   for ( ; pos != end_pos; ++pos)
-  {
-    if(!use_close_to_point)
     {
-      if ((*pos)->contains_point(p))
-      {
-        STOP_LOG("perform_linear_search", "PointLocatorTree");
-        return (*pos);
-      }
+      if (!allowed_subdomains ||
+          allowed_subdomains->count((*pos)->subdomain_id()))
+        {
+          if(!use_close_to_point)
+            {
+              if ((*pos)->contains_point(p))
+                {
+                  STOP_LOG("perform_linear_search", "PointLocatorTree");
+                  return (*pos);
+                }
+            }
+          else
+            {
+              if ((*pos)->close_to_point(p, close_to_point_tolerance))
+                {
+                  STOP_LOG("perform_linear_search", "PointLocatorTree");
+                  return (*pos);
+                }
+            }
+        }
     }
-    else
-    {
-      if ((*pos)->close_to_point(p, close_to_point_tolerance))
-      {
-        STOP_LOG("perform_linear_search", "PointLocatorTree");
-        return (*pos);
-      }
-    }
-
-  }
 
   STOP_LOG("perform_linear_search", "PointLocatorTree");
   return NULL;
