@@ -507,6 +507,7 @@ dvidir = @dvidir@
 enabledefaultcommworld = @enabledefaultcommworld@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
+enableuniqueptr = @enableuniqueptr@
 enablewarnings = @enablewarnings@
 exec_prefix = @exec_prefix@
 gitquery = @gitquery@
@@ -578,8 +579,8 @@ CLEANFILES = output.xda output.xdr $(example_name).html stdout.log
 # This file is included by *every* example.  If we are careful, common
 # rules like 'make doc' or 'make run' can be defined here, once and
 # for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
+#
+AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include $(libmesh_contrib_INCLUDES)
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)

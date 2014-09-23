@@ -841,6 +841,7 @@ LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE
 enablelegacyincludepaths
 enabledefaultcommworld
 enablewarnings
+enableuniqueptr
 PWD
 MPCXX
 METHOD
@@ -1082,6 +1083,7 @@ enable_timestamps
 enable_unordered_containers
 enable_openmp
 with_gdb_command
+enable_unique_ptr
 enable_warnings
 enable_blocked_storage
 enable_default_comm_world
@@ -1860,6 +1862,8 @@ Optional Features:
   --disable-unordered-containers
                           Use map/set instead of unordered_map/unordered_set
   --disable-openmp        Build without OpenMP Support
+  --enable-unique-ptr     Use a true unique_ptr implementation instead of
+                          libMesh AutoPtr
   --disable-warnings      Do not warn about deprecated, experimental, or
                           questionable code
   --enable-blocked-storage
@@ -27770,6 +27774,38 @@ _ACEOF
 $as_echo "configuring gdb command... \"$gdb_command\"" >&6; }
 # -------------------------------------------------------------
 
+
+
+# --------------------------------------------------------------
+# Use a true unique_ptr implementation - disabled by default.
+#
+# When enabled, the 'UniquePtr' type in libMesh is a C++03/11
+# compatible (non-deprecated) unique_ptr type.  Otherwise, it is
+# libMesh's (deprecated) AutoPtr type, allowing for backwards
+# compatibility.
+#
+# At some point in the future, this option will become enabled by
+# default, forcing applications to either upgrade or explicitly
+# configure with --disable-unique-ptr.
+# --------------------------------------------------------------
+# Check whether --enable-unique-ptr was given.
+if test "${enable_unique_ptr+set}" = set; then :
+  enableval=$enable_unique_ptr; enableuniqueptr=$enableval
+else
+  enableuniqueptr=no
+fi
+
+
+
+
+if test "$enableuniqueptr" = yes ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with a non-deprecated UniquePtr implementation >>>" >&5
+$as_echo "<<< Configuring library with a non-deprecated UniquePtr implementation >>>" >&6; }
+
+$as_echo "#define ENABLE_UNIQUE_PTR 1" >>confdefs.h
+
+fi
+# --------------------------------------------------------------
 
 
 # --------------------------------------------------------------

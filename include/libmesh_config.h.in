@@ -155,6 +155,10 @@
 /* Flag indicating if the library should be built with unique id support */
 #undef ENABLE_UNIQUE_ID
 
+/* Flag indicating if the library should use a non-deprecated UniquePtr
+   implementation */
+#undef ENABLE_UNIQUE_PTR
+
 /* Flag indicating if the library should be built with variational smoother
    support */
 #undef ENABLE_VSMOOTHER

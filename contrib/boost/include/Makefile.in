@@ -125,10 +125,9 @@ am__nobase_include_HEADERS_DIST = boost/aligned_storage.hpp \
 	boost/assert.hpp boost/checked_delete.hpp \
 	boost/config/compiler/clang.hpp \
 	boost/config/compiler/common_edg.hpp \
-	boost/config/stdlib/libcpp.hpp \
 	boost/config/compiler/gcc.hpp boost/config/compiler/intel.hpp \
 	boost/config/no_tr1/memory.hpp boost/config/no_tr1/utility.hpp \
-	boost/config/platform/linux.hpp \
+	boost/config/stdlib/libcpp.hpp boost/config/platform/linux.hpp \
 	boost/config/platform/macos.hpp \
 	boost/config/posix_features.hpp \
 	boost/config/select_compiler_config.hpp \
@@ -661,6 +660,7 @@ dvidir = @dvidir@
 enabledefaultcommworld = @enabledefaultcommworld@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
+enableuniqueptr = @enableuniqueptr@
 enablewarnings = @enablewarnings@
 exec_prefix = @exec_prefix@
 gitquery = @gitquery@
