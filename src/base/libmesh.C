@@ -208,6 +208,7 @@ Parallel::Communicator& Parallel::Communicator_World = CommWorld;
 OStreamProxy out(std::cout);
 OStreamProxy err(std::cerr);
 
+bool warned_about_auto_ptr(false);
 
 PerfLog            perflog ("libMesh",
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING

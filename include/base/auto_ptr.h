@@ -19,20 +19,29 @@
 #define LIBMESH_AUTO_PTR_H
 
 #include "libmesh/libmesh_config.h"
+#include "libmesh_common.h" // for libmesh_deprecated()
 
-// LibMesh's AutoPtr was once equivalent to the (currently deprecated)
-// std::auto_ptr, it is now either std::unique_ptr or Howard Hinnant's
-// C++03 compatible boost::unique_ptr, depending on your compiler's
-// capabilities.
-
+// LibMesh's AutoPtr is now libmesh_deprecated(), just like the
+// std::auto_ptr it is based on.
+//
+// New library code should use the UniquePtr typedef (which will
+// eventually be a C++11 alias declaration).  LibMesh's UniquePtr is
+// one of:
+// 1.) std::unique_ptr
+// 2.) Howard Hinnant's C++03 compatible boost::unique_ptr
+// 3.) The deprecated libMesh AutoPtr
+// in that order, depending on what your compiler supports.  If you
+// are using a compiler that cannot compile Howard Hinnant's
+// unique_ptr implementation, you should probably think about
+// upgrading.
 #ifdef LIBMESH_HAVE_CXX11_UNIQUE_PTR
 #  include <memory>
-#  define AutoPtr std::unique_ptr
+#  define UniquePtr std::unique_ptr
 #elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
 #  include "libmesh/unique_ptr.hpp"
-#  define AutoPtr boost::unique_ptr
+#  define UniquePtr boost::unique_ptr
 #else
-#  define AutoPtr libMesh::DeprecatedAutoPtr
+#  define UniquePtr libMesh::AutoPtr
 #endif
 
 
@@ -40,14 +49,14 @@ namespace libMesh
 {
 
 /**
- *  A wrapper class to provide DeprecatedAutoPtr with reference semantics.  For
- *  example, an DeprecatedAutoPtr can be assigned (or constructed from) the result of
- *  a function which returns an DeprecatedAutoPtr by value.
+ *  A wrapper class to provide AutoPtr with reference semantics.  For
+ *  example, an AutoPtr can be assigned (or constructed from) the result of
+ *  a function which returns an AutoPtr by value.
  *
- *  All the DeprecatedAutoPtrRef stuff should happen behind the scenes.
+ *  All the AutoPtrRef stuff should happen behind the scenes.
  */
 template<typename Tp1>
-struct DeprecatedAutoPtrRef
+struct AutoPtrRef
 {
   /**
    * The actual pointer.
@@ -58,7 +67,7 @@ struct DeprecatedAutoPtrRef
    * Constructor.
    */
   explicit
-  DeprecatedAutoPtrRef(Tp1* p)
+  AutoPtrRef(Tp1* p)
     : _ptr(p) {}
 };
 
@@ -68,18 +77,18 @@ struct DeprecatedAutoPtrRef
  *
  *  The Standard says:
  *  <pre>
- *  An @c DeprecatedAutoPtr owns the object it holds a pointer to.  Copying an
- *  @c DeprecatedAutoPtr copies the pointer and transfers ownership to the destination.
- *  If more than one @c DeprecatedAutoPtr owns the same object at the same time the
+ *  An @c AutoPtr owns the object it holds a pointer to.  Copying an
+ *  @c AutoPtr copies the pointer and transfers ownership to the destination.
+ *  If more than one @c AutoPtr owns the same object at the same time the
  *  behavior of the program is undefined.
  *
- *  The uses of @c DeprecatedAutoPtr include providing temporary exception-safety for
+ *  The uses of @c AutoPtr include providing temporary exception-safety for
  *  dynamically allocated memory, passing ownership of dynamically allocated
  *  memory to a function, and returning dynamically allocated memory from a
- *  function.  @c DeprecatedAutoPtr does not meet the CopyConstructible and Assignable
+ *  function.  @c AutoPtr does not meet the CopyConstructible and Assignable
  *  requirements for Standard Library <a href="tables.html#65">container</a>
  *  elements and thus instantiating a Standard Library container with an
- *  @c DeprecatedAutoPtr results in undefined behavior.
+ *  @c AutoPtr results in undefined behavior.
  *  </pre>
  *  Quoted from [20.4.5]/3.
  *
@@ -87,7 +96,7 @@ struct DeprecatedAutoPtrRef
  * function as a replacement for \p std::auto_ptr<>.  Unfortunately
  * the \p std::auto_ptr<> is not particularly portable since various
  * compilers implement various revisions of the standard.  Using
- * \p DeprecatedAutoPtr<> instead of \p std::auto_ptr<> allows for easy
+ * \p AutoPtr<> instead of \p std::auto_ptr<> allows for easy
  * portability.
  *
  * The following are the original copyright declarations distributed with this class:
@@ -131,7 +140,7 @@ struct DeprecatedAutoPtrRef
  * purpose.  It is provided "as is" without express or implied warranty.
  */
 template<typename Tp>
-class DeprecatedAutoPtr
+class AutoPtr
 {
 private:
 
@@ -147,28 +156,35 @@ public:
   typedef Tp element_type;
 
   /**
-   *  @brief  An %DeprecatedAutoPtr is usually constructed from a raw pointer.
+   *  @brief  An %AutoPtr is usually constructed from a raw pointer.
    *  @param  p  A pointer (defaults to NULL).
    *
    *  This object now @e owns the object pointed to by @a p.
    */
   explicit
-  DeprecatedAutoPtr(element_type* p = 0)
-    : _ptr(p) {}
+  AutoPtr(element_type* p = 0)
+    : _ptr(p)
+  {
+    // Note: we can't call libmesh_deprecated() here, since global
+    // AutoPtr variables are sometimes created before the libMesh::out
+    // stream is ready.
+  }
 
   /**
-   *  @brief  An %DeprecatedAutoPtr can be constructed from another %DeprecatedAutoPtr.
-   *  @param  a  Another %DeprecatedAutoPtr of the same type.
+   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
+   *  @param  a  Another %AutoPtr of the same type.
    *
    *  This object now @e owns the object previously owned by @a a, which has
    *  given up ownsership.
    */
-  DeprecatedAutoPtr(DeprecatedAutoPtr& a)
-    : _ptr(a.release()) {}
+  AutoPtr(AutoPtr& a)
+    : _ptr(a.release())
+  {
+  }
 
   /**
-   *  @brief  An %DeprecatedAutoPtr can be constructed from another %DeprecatedAutoPtr.
-   *  @param  a  Another %DeprecatedAutoPtr of a different but related type.
+   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
+   *  @param  a  Another %AutoPtr of a different but related type.
    *
    *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
@@ -176,27 +192,29 @@ public:
    *  given up ownsership.
    */
   template<typename Tp1>
-  DeprecatedAutoPtr(DeprecatedAutoPtr<Tp1>& a)
-    : _ptr(a.release()) {}
+  AutoPtr(AutoPtr<Tp1>& a)
+    : _ptr(a.release())
+  {
+  }
 
   /**
-   *  @brief  %DeprecatedAutoPtr assignment operator.
-   *  @param  a  Another %DeprecatedAutoPtr of the same type.
+   *  @brief  %AutoPtr assignment operator.
+   *  @param  a  Another %AutoPtr of the same type.
    *
    *  This object now @e owns the object previously owned by @a a, which has
    *  given up ownsership.  The object that this one @e used to own and
    *  track has been deleted.
    */
-  DeprecatedAutoPtr&
-  operator=(DeprecatedAutoPtr& a)
+  AutoPtr&
+  operator=(AutoPtr& a)
   {
     reset(a.release());
     return *this;
   }
 
   /**
-   *  @brief  %DeprecatedAutoPtr assignment operator.
-   *  @param  a  Another %DeprecatedAutoPtr of a different but related type.
+   *  @brief  %AutoPtr assignment operator.
+   *  @param  a  Another %AutoPtr of a different but related type.
    *
    *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
@@ -205,15 +223,15 @@ public:
    *  track has been deleted.
    */
   template <typename Tp1>
-  DeprecatedAutoPtr&
-  operator=(DeprecatedAutoPtr<Tp1>& a)
+  AutoPtr&
+  operator=(AutoPtr<Tp1>& a)
   {
     reset(a.release());
     return *this;
   }
 
   /**
-   *  When the %DeprecatedAutoPtr goes out of scope, the object it owns is deleted.
+   *  When the %AutoPtr goes out of scope, the object it owns is deleted.
    *  If it no longer owns anything (i.e., @c get() is @c NULL), then this
    *  has no effect.
    *
@@ -224,12 +242,21 @@ public:
    *  prohibited.  [17.4.3.6]/2
    *  @endif maint
    */
-  ~DeprecatedAutoPtr() { delete _ptr; }
+  ~AutoPtr()
+  {
+    if (!libMesh::warned_about_auto_ptr)
+      {
+        libMesh::warned_about_auto_ptr = true;
+        libMesh::out << "*** Warning, AutoPtr is deprecated and will be removed in a future library version! "
+                     << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;
+      }
+    delete _ptr;
+  }
 
   /**
    *  @brief  Smart pointer dereferencing.
    *
-   *  If this %DeprecatedAutoPtr no longer owns anything, then this operation will
+   *  If this %AutoPtr no longer owns anything, then this operation will
    *  crash.  (For a smart pointer, "no longer owns anything" is the same as
    *  being a null pointer, and you know what happens when you dereference
    *  one of those...)
@@ -254,7 +281,7 @@ public:
    *  situations such as passing to a function which only accepts a raw
    *  pointer.
    *
-   *  @note  This %DeprecatedAutoPtr still owns the memory.
+   *  @note  This %AutoPtr still owns the memory.
    */
   element_type*
   get() const  { return _ptr; }
@@ -267,7 +294,7 @@ public:
    *  situations such as passing to a function which only accepts a raw
    *  pointer.
    *
-   *  @note  This %DeprecatedAutoPtr no longer owns the memory.  When this object
+   *  @note  This %AutoPtr no longer owns the memory.  When this object
    *  goes out of scope, nothing will happen.
    */
   element_type*
@@ -298,25 +325,25 @@ public:
   /** @{
    *  @brief  Automatic conversions
    *
-   *  These operations convert an %DeprecatedAutoPtr into and from an DeprecatedAutoPtrRef
+   *  These operations convert an %AutoPtr into and from an AutoPtrRef
    *  automatically as needed.  This allows constructs such as
    *  @code
-   *    DeprecatedAutoPtr<Derived>  func_returning_DeprecatedAutoPtr(.....);
+   *    AutoPtr<Derived>  func_returning_AutoPtr(.....);
    *    ...
-   *    DeprecatedAutoPtr<Base> ptr = func_returning_DeprecatedAutoPtr(.....);
+   *    AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
    *  @endcode
    */
-  DeprecatedAutoPtr(DeprecatedAutoPtrRef<element_type> ref)
+  AutoPtr(AutoPtrRef<element_type> ref)
     : _ptr(ref._ptr) {}
 
   /**
-   * op= for DeprecatedAutoPtr.  Allows you to write:
+   * op= for AutoPtr.  Allows you to write:
    * @code
-   * DeprecatedAutoPtr<Base> ptr = func_returning_DeprecatedAutoPtr(.....);
+   * AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
    * @endcode
    */
-  DeprecatedAutoPtr&
-  operator=(DeprecatedAutoPtrRef<element_type> ref)
+  AutoPtr&
+  operator=(AutoPtrRef<element_type> ref)
   {
     if (ref._ptr != this->get())
       {
@@ -327,18 +354,18 @@ public:
   }
 
   /**
-   * op() for DeprecatedAutoPtrRef<Tp1>.  Calls the release member.
+   * op() for AutoPtrRef<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
-  operator DeprecatedAutoPtrRef<Tp1>()
-  { return DeprecatedAutoPtrRef<Tp1>(this->release()); }
+  operator AutoPtrRef<Tp1>()
+  { return AutoPtrRef<Tp1>(this->release()); }
 
   /**
-   * op() for DeprecatedAutoPtr<Tp1>.  Calls the release member.
+   * op() for AutoPtr<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
-  operator DeprecatedAutoPtr<Tp1>()
-  { return DeprecatedAutoPtr<Tp1>(this->release()); }
+  operator AutoPtr<Tp1>()
+  { return AutoPtr<Tp1>(this->release()); }
 };
 
 

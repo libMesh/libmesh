@@ -231,6 +231,11 @@ extern int GLOBAL_COMM_WORLD;
 extern OStreamProxy out;
 extern OStreamProxy err;
 
+// This global variable is to help us deprecate AutoPtr.  We can't
+// just use libmesh_deprecated() because then you get one print out
+// per template instantiation, instead of one total print out.
+extern bool warned_about_auto_ptr;
+
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
 // stick a libmesh_here(); in it, for example
