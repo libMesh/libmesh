@@ -112,8 +112,8 @@ class ProjectSolution
 private:
   const System                &system;
 
-  AutoPtr<FunctionBase<Number> > f;
-  AutoPtr<FunctionBase<Gradient> > g;
+  UniquePtr<FunctionBase<Number> > f;
+  UniquePtr<FunctionBase<Gradient> > g;
   const Parameters &parameters;
   NumericVector<Number>       &new_vector;
 
@@ -124,8 +124,8 @@ public:
                    const Parameters &parameters_in,
                    NumericVector<Number> &new_v_in) :
     system(system_in),
-    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >()),
-    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >()),
+    f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number> >()),
+    g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient> >()),
     parameters(parameters_in),
     new_vector(new_v_in)
   {
@@ -137,8 +137,8 @@ public:
 
   ProjectSolution (const ProjectSolution &in) :
     system(in.system),
-    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >()),
-    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >()),
+    f(in.f.get() ? in.f->clone() : UniquePtr<FunctionBase<Number> >()),
+    g(in.g.get() ? in.g->clone() : UniquePtr<FunctionBase<Gradient> >()),
     parameters(in.parameters),
     new_vector(in.new_vector)
   {
@@ -162,8 +162,8 @@ class ProjectFEMSolution
 private:
   const System                &system;
 
-  AutoPtr<FEMFunctionBase<Number> > f;
-  AutoPtr<FEMFunctionBase<Gradient> > g;
+  UniquePtr<FEMFunctionBase<Number> > f;
+  UniquePtr<FEMFunctionBase<Gradient> > g;
   NumericVector<Number>       &new_vector;
 
 public:
@@ -172,8 +172,8 @@ public:
                       FEMFunctionBase<Gradient>* g_in,
                       NumericVector<Number> &new_v_in) :
     system(system_in),
-    f(f_in ? f_in->clone() : AutoPtr<FEMFunctionBase<Number> >()),
-    g(g_in ? g_in->clone() : AutoPtr<FEMFunctionBase<Gradient> >()),
+    f(f_in ? f_in->clone() : UniquePtr<FEMFunctionBase<Number> >()),
+    g(g_in ? g_in->clone() : UniquePtr<FEMFunctionBase<Gradient> >()),
     new_vector(new_v_in)
   {
     libmesh_assert(f.get());
@@ -181,8 +181,8 @@ public:
 
   ProjectFEMSolution (const ProjectFEMSolution &in) :
     system(in.system),
-    f(in.f.get() ? in.f->clone() : AutoPtr<FEMFunctionBase<Number> >()),
-    g(in.g.get() ? in.g->clone() : AutoPtr<FEMFunctionBase<Gradient> >()),
+    f(in.f.get() ? in.f->clone() : UniquePtr<FEMFunctionBase<Number> >()),
+    g(in.g.get() ? in.g->clone() : UniquePtr<FEMFunctionBase<Gradient> >()),
     new_vector(in.new_vector)
   {
     libmesh_assert(f.get());
@@ -203,8 +203,8 @@ private:
   const std::set<boundary_id_type> &b;
   const std::vector<unsigned int>  &variables;
   const System                     &system;
-  AutoPtr<FunctionBase<Number> >    f;
-  AutoPtr<FunctionBase<Gradient> >  g;
+  UniquePtr<FunctionBase<Number> >    f;
+  UniquePtr<FunctionBase<Gradient> >  g;
   const Parameters                 &parameters;
   NumericVector<Number>            &new_vector;
 
@@ -219,8 +219,8 @@ public:
     b(b_in),
     variables(variables_in),
     system(system_in),
-    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >()),
-    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >()),
+    f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number> >()),
+    g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient> >()),
     parameters(parameters_in),
     new_vector(new_v_in)
   {
@@ -234,8 +234,8 @@ public:
     b(in.b),
     variables(in.variables),
     system(in.system),
-    f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >()),
-    g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >()),
+    f(in.f.get() ? in.f->clone() : UniquePtr<FunctionBase<Number> >()),
+    g(in.g.get() ? in.g->clone() : UniquePtr<FunctionBase<Gradient> >()),
     parameters(in.parameters),
     new_vector(in.new_vector)
   {
@@ -257,7 +257,7 @@ void System::project_vector (NumericVector<Number>& vector,
 {
   // Create a copy of the vector, which currently
   // contains the old data.
-  AutoPtr<NumericVector<Number> >
+  UniquePtr<NumericVector<Number> >
     old_vector (vector.clone());
 
   // Project the old vector to the new vector
@@ -288,9 +288,9 @@ void System::project_vector (const NumericVector<Number>& old_v,
 
   // Resize the new vector and get a serial version.
   NumericVector<Number> *new_vector_ptr = NULL;
-  AutoPtr<NumericVector<Number> > new_vector_built;
+  UniquePtr<NumericVector<Number> > new_vector_built;
   NumericVector<Number> *local_old_vector;
-  AutoPtr<NumericVector<Number> > local_old_vector_built;
+  UniquePtr<NumericVector<Number> > local_old_vector_built;
   const NumericVector<Number> *old_vector_ptr = NULL;
 
   ConstElemRange active_local_elem_range
@@ -401,7 +401,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // creating a temporary parallel vector to use localize! - RHS
   if (old_v.type() == SERIAL)
     {
-      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build(this->comm());
+      UniquePtr<NumericVector<Number> > dist_v = NumericVector<Number>::build(this->comm());
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
@@ -803,16 +803,16 @@ void ProjectVector::operator()(const ConstElemRange &range) const
         continue;
 
       // Get FE objects of the appropriate type
-      AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));
-      AutoPtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));
+      UniquePtr<FEBase> fe (FEBase::build(dim, base_fe_type));
+      UniquePtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));
 
       // Create FE objects with potentially different p_level
       FEType fe_type, temp_fe_type;
 
       // Prepare variables for non-Lagrange projection
-      AutoPtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
-      AutoPtr<QBase> qedgerule (base_fe_type.default_quadrature_rule(1));
-      AutoPtr<QBase> qsiderule (base_fe_type.default_quadrature_rule(dim-1));
+      UniquePtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
+      UniquePtr<QBase> qedgerule (base_fe_type.default_quadrature_rule(1));
+      UniquePtr<QBase> qsiderule (base_fe_type.default_quadrature_rule(dim-1));
       std::vector<Point> coarse_qpoints;
 
       // The values of the shape functions at the quadrature
@@ -1312,12 +1312,12 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
         system.variable_scalar_number(var, 0);
 
       // Get FE objects of the appropriate type
-      AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+      UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
       // Prepare variables for projection
-      AutoPtr<QBase> qrule     (fe_type.default_quadrature_rule(dim));
-      AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
-      AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+      UniquePtr<QBase> qrule     (fe_type.default_quadrature_rule(dim));
+      UniquePtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
+      UniquePtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
 
       // The values of the shape functions at the quadrature
       // points
@@ -2530,11 +2530,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
         system.variable_scalar_number(var, 0);
 
       // Get FE objects of the appropriate type
-      AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+      UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
       // Prepare variables for projection
-      AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
-      AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+      UniquePtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
+      UniquePtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
 
       // The values of the shape functions at the quadrature
       // points

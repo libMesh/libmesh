@@ -60,7 +60,7 @@ dof_id_type Tri::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Tri::side (const unsigned int i) const
+UniquePtr<Elem> Tri::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -90,7 +90,7 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  return AutoPtr<Elem>(edge);
+  return UniquePtr<Elem>(edge);
 }
 
 

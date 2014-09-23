@@ -491,7 +491,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
 
       /*
        * write this default header, then let
-       * the AutoPtr go out of scope.  This
+       * the UniquePtr go out of scope.  This
        * will take care of memory management.
        */
       my_header.write (out_file);

@@ -82,11 +82,11 @@ dof_id_type Pyramid::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Pyramid::side (const unsigned int i) const
+UniquePtr<Elem> Pyramid::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in an AutoPtr
+  // To be returned wrapped in an UniquePtr
   Elem* face = NULL;
 
   switch (i)
@@ -146,7 +146,7 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  return AutoPtr<Elem>(face);
+  return UniquePtr<Elem>(face);
 }
 
 

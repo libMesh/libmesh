@@ -115,11 +115,11 @@ public:
 
   /**
    * Builds a specific finite element type.  A \p
-   * AutoPtr<FEAbstract> is returned to prevent a memory leak. This
+   * UniquePtr<FEAbstract> is returned to prevent a memory leak. This
    * way the user need not remember to delete the object.
    */
-  static AutoPtr<FEAbstract> build (const unsigned int dim,
-                                    const FEType& type);
+  static UniquePtr<FEAbstract> build (const unsigned int dim,
+                                      const FEType& type);
 
   /**
    * This is at the core of this class. Use this for each
@@ -506,7 +506,7 @@ protected:
    */
   virtual void compute_shape_functions(const Elem*, const std::vector<Point>& ) =0;
 
-  AutoPtr<FEMap> _fe_map;
+  UniquePtr<FEMap> _fe_map;
 
 
   /**

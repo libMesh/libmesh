@@ -37,7 +37,7 @@ namespace libMesh
 //------------------------------------------------------------------
 // LinearSolver members
 template <typename T>
-AutoPtr<LinearSolver<T> >
+UniquePtr<LinearSolver<T> >
 LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
                        const SolverPackage solver_package)
 {
@@ -48,32 +48,32 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return AutoPtr<LinearSolver<T> >(new LaspackLinearSolver<T>(comm));
+      return UniquePtr<LinearSolver<T> >(new LaspackLinearSolver<T>(comm));
 #endif
 
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return AutoPtr<LinearSolver<T> >(new PetscLinearSolver<T>(comm));
+      return UniquePtr<LinearSolver<T> >(new PetscLinearSolver<T>(comm));
 #endif
 
 
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
-      return AutoPtr<LinearSolver<T> >(new AztecLinearSolver<T>(comm));
+      return UniquePtr<LinearSolver<T> >(new AztecLinearSolver<T>(comm));
 #endif
 
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return AutoPtr<LinearSolver<T> >(new EigenSparseLinearSolver<T>(comm));
+      return UniquePtr<LinearSolver<T> >(new EigenSparseLinearSolver<T>(comm));
 #endif
 
     default:
       libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
     }
 
-  return AutoPtr<LinearSolver<T> >();
+  return UniquePtr<LinearSolver<T> >();
 }
 
 template <typename T>

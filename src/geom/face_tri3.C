@@ -106,13 +106,13 @@ bool Tri3::is_node_on_side(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> Tri3::build_side (const unsigned int i,
-                                bool proxy) const
+UniquePtr<Elem> Tri3::build_side (const unsigned int i,
+                                  bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return AutoPtr<Elem>(new Side<Edge2,Tri3>(this,i));
+    return UniquePtr<Elem>(new Side<Edge2,Tri3>(this,i));
 
   else
     {
@@ -143,11 +143,11 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      return AutoPtr<Elem>(edge);
+      return UniquePtr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<Elem>();
+  return UniquePtr<Elem>();
 }
 
 

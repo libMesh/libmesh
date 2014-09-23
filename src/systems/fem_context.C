@@ -136,7 +136,7 @@ FEMContext::FEMContext (const System &sys)
 
 FEMContext::~FEMContext()
 {
-  // We don't want to store AutoPtrs in STL containers, but we don't
+  // We don't want to store UniquePtrs in STL containers, but we don't
   // want to leak memory either
   for (std::vector<std::map<FEType, FEAbstract *> >::iterator d = _element_fe.begin();
        d != _element_fe.end(); ++d)
@@ -857,7 +857,7 @@ void FEMContext::point_value(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe );
 
   // Build a FE for calculating u(p)
-  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<OutputShape> >&  phi = fe_new->get_phi();
@@ -906,7 +906,7 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe );
 
   // Build a FE for calculating u(p)
-  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&  dphi = fe_new->get_dphi();
@@ -958,7 +958,7 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe );
 
   // Build a FE for calculating u(p)
-  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&  d2phi = fe_new->get_d2phi();
@@ -995,7 +995,7 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe );
 
   // Build a FE for calculating u(p)
-  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> >&  curl_phi = fe_new->get_curl_phi();
@@ -1242,7 +1242,7 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe );
 
   // Build a FE for calculating u(p)
-  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<OutputShape> >&  phi = fe_new->get_phi();
@@ -1291,7 +1291,7 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe );
 
   // Build a FE for calculating u(p)
-  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&  dphi = fe_new->get_dphi();
@@ -1343,7 +1343,7 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
   this->get_element_fe<OutputShape>( var, fe );
 
   // Build a FE for calculating u(p)
-  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+  UniquePtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
 
   // Get the values of the shape function derivatives
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&  d2phi = fe_new->get_d2phi();
@@ -1762,8 +1762,8 @@ void FEMContext::_update_time_from_system(Real theta)
 
 
 template<typename OutputShape>
-AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
-                                                               const Point &p ) const
+UniquePtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
+                                                                 const Point &p ) const
 {
   FEType fe_type = fe->get_fe_type();
 
@@ -1792,7 +1792,7 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
     // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
     fe_new->reinit (NULL, &coor);
 
-  return AutoPtr<FEGenericBase<OutputShape> >(fe_new);
+  return UniquePtr<FEGenericBase<OutputShape> >(fe_new);
 }
 
 
@@ -1907,8 +1907,8 @@ template void FEMContext::fixed_point_hessian<Tensor>(unsigned int, const Point&
 template void FEMContext::interior_rate<Number>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::interior_rate<Gradient>(unsigned int, unsigned int, Gradient&) const;
 
-template AutoPtr<FEGenericBase<Real> > FEMContext::build_new_fe( const FEGenericBase<Real>*, const Point & ) const;
-template AutoPtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe( const FEGenericBase<RealGradient>*, const Point & ) const;
+template UniquePtr<FEGenericBase<Real> > FEMContext::build_new_fe( const FEGenericBase<Real>*, const Point & ) const;
+template UniquePtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe( const FEGenericBase<RealGradient>*, const Point & ) const;
 
 
 } // namespace libMesh

@@ -424,7 +424,7 @@ const PointLocatorBase& MeshBase::point_locator () const
 }
 
 
-AutoPtr<PointLocatorBase> MeshBase::sub_point_locator () const
+UniquePtr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
   // If there's no master point locator, then we need one.
   if (_point_locator.get() == NULL)

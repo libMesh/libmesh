@@ -139,11 +139,11 @@ int main (int argc, char** argv)
   // Solve this as a time-dependent or steady system
   if (transient)
     system.time_solver =
-      AutoPtr<TimeSolver>(new EulerSolver(system));
+      UniquePtr<TimeSolver>(new EulerSolver(system));
   else
     {
       system.time_solver =
-        AutoPtr<TimeSolver>(new SteadySolver(system));
+        UniquePtr<TimeSolver>(new SteadySolver(system));
       libmesh_assert_equal_to (n_timesteps, 1);
     }
 
@@ -193,7 +193,7 @@ int main (int argc, char** argv)
 
           ErrorVector error;
 
-          AutoPtr<ErrorEstimator> error_estimator;
+          UniquePtr<ErrorEstimator> error_estimator;
 
           // To solve to a tolerance in this problem we
           // need a better estimator than Kelly

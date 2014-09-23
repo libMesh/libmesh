@@ -557,7 +557,7 @@ int main (int argc, char** argv)
 
                    x_sym, y_sym, z_sym);
 
-  AutoPtr<Mesh> mesh_ptr;
+  UniquePtr<Mesh> mesh_ptr;
   if (dim == static_cast<unsigned char>(-1))
     {
       mesh_ptr.reset(new Mesh(init.comm()));

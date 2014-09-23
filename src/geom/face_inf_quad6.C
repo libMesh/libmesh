@@ -108,8 +108,8 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 
 
 
-AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
-                                    bool proxy) const
+UniquePtr<Elem> InfQuad6::build_side (const unsigned int i,
+                                      bool proxy) const
 {
   // libmesh_assert_less (i, this->n_sides());
 
@@ -118,11 +118,11 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
       switch (i)
         {
         case 0:
-          return AutoPtr<Elem>(new Side<Edge3,InfQuad6>(this,i));
+          return UniquePtr<Elem>(new Side<Edge3,InfQuad6>(this,i));
 
         case 1:
         case 2:
-          return AutoPtr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
+          return UniquePtr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -173,11 +173,11 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
         }
 
       edge->subdomain_id() = this->subdomain_id();
-      return AutoPtr<Elem>(edge);
+      return UniquePtr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<Elem>();
+  return UniquePtr<Elem>();
 }
 
 

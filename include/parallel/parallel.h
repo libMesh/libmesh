@@ -452,7 +452,7 @@ private:
 
   // Breaking non-blocking sends into multiple requests can require chaining
   // multiple requests into a single Request
-  AutoPtr<Request> _prior_request;
+  UniquePtr<Request> _prior_request;
 
   // post_wait_work->first is a vector of work to do after a wait
   // finishes; post_wait_work->second is a reference count so that

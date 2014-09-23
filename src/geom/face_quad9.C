@@ -201,13 +201,13 @@ dof_id_type Quad9::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Quad9::build_side (const unsigned int i,
-                                 bool proxy) const
+UniquePtr<Elem> Quad9::build_side (const unsigned int i,
+                                   bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return AutoPtr<Elem>(new Side<Edge3,Quad9>(this,i));
+    return UniquePtr<Elem>(new Side<Edge3,Quad9>(this,i));
 
   else
     {
@@ -248,11 +248,11 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      return AutoPtr<Elem>(edge);
+      return UniquePtr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<Elem>();
+  return UniquePtr<Elem>();
 }
 
 

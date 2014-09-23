@@ -608,7 +608,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters_in
   this->assembly(true, false, true);
   this->rhs->close();
 
-  AutoPtr<NumericVector<Number> > temprhs = this->rhs->clone();
+  UniquePtr<NumericVector<Number> > temprhs = this->rhs->clone();
 
   oldparameters.value_copy(parameters);
   parameterperturbation *= -1.0;
@@ -783,7 +783,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       this->rhs->close();
 
       // FIXME - this can and should be optimized to avoid the clone()
-      AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
+      UniquePtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
       *parameters[j] = old_parameter + delta_p;
@@ -811,7 +811,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
               {
-                AutoPtr<NumericVector<Number> > lift_func =
+                UniquePtr<NumericVector<Number> > lift_func =
                   this->get_adjoint_solution(i).zero_clone();
                 this->get_dof_map().enforce_adjoint_constraints_exactly
                   (*lift_func.get(), i);
@@ -939,7 +939,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
     const_cast<ParameterVector&>(parameters_in);
 
   // We'll use a single temporary vector for matrix-vector-vector products
-  AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
+  UniquePtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
@@ -1145,11 +1145,11 @@ void ImplicitSystem::qoi_parameter_hessian
     const_cast<ParameterVector&>(parameters_in);
 
   // We'll use one temporary vector for matrix-vector-vector products
-  AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
+  UniquePtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
 
   // And another temporary vector to hold a copy of the true solution
   // so we can safely perturb this->solution.
-  AutoPtr<NumericVector<Number> > oldsolution = this->solution->clone();
+  UniquePtr<NumericVector<Number> > oldsolution = this->solution->clone();
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());

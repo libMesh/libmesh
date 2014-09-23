@@ -130,18 +130,18 @@ public:
 
   /**
    * Returns a \p QUAD9 built coincident with face 0, an \p INFQUAD6
-   * built coincident with faces 1 to 4. Note that the \p AutoPtr<Elem>
+   * built coincident with faces 1 to 4. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  AutoPtr<Elem> build_side (const unsigned int i,
-                            bool proxy) const;
+  UniquePtr<Elem> build_side (const unsigned int i,
+                              bool proxy) const;
 
   /**
    * Returns a \p EDGE3 built coincident with edges 0-3, an \p INFEDGE2
-   * built coincident with edges 4 to 11. Note that the \p AutoPtr<Elem>
+   * built coincident with edges 4 to 11. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  AutoPtr<Elem> build_edge (const unsigned int i) const;
+  UniquePtr<Elem> build_edge (const unsigned int i) const;
 
   /**
    * @returns an id associated with the \p s side of this element.

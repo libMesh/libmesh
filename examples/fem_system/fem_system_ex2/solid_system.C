@@ -48,7 +48,7 @@ SolidSystem::SolidSystem(EquationSystems& es, const std::string& name_in,
   FEMSystem(es, name_in, number_in) {
 
   // Add a time solver. We are just looking at a steady state problem here.
-  this->time_solver = AutoPtr<TimeSolver>(new SteadySolver(*this));
+  this->time_solver = UniquePtr<TimeSolver>(new SteadySolver(*this));
 }
 
 void SolidSystem::save_initial_mesh() {

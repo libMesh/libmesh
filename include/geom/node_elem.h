@@ -93,20 +93,20 @@ public:
   /**
    * The \p Elem::side() member makes no sense for nodes.
    */
-  AutoPtr<Elem> side (const unsigned int) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(); }
+  UniquePtr<Elem> side (const unsigned int) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
    * The \p Elem::build_side() member makes no sense for nodes.
    */
-  AutoPtr<Elem> build_side (const unsigned int, bool) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(); }
+  UniquePtr<Elem> build_side (const unsigned int, bool) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
    * The \p Elem::build_edge() member makes no sense for nodes.
    */
-  AutoPtr<Elem> build_edge (const unsigned int) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(); }
+  UniquePtr<Elem> build_edge (const unsigned int) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
    * @returns 1

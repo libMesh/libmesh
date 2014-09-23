@@ -72,7 +72,7 @@ public:
    * store them in the underlying map, this class must be clone'able,
    * i.e. have a kind of virtual construction mechanism.
    */
-  virtual AutoPtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const;
+  virtual UniquePtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const;
 
 protected:
   // One of these days we'll support rotated boundaries

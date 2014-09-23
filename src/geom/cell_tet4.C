@@ -126,13 +126,13 @@ bool Tet4::is_node_on_side(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> Tet4::build_side (const unsigned int i,
-                                bool proxy) const
+UniquePtr<Elem> Tet4::build_side (const unsigned int i,
+                                  bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return AutoPtr<Elem>(new Side<Tri3,Tet4>(this,i));
+    return UniquePtr<Elem>(new Side<Tri3,Tet4>(this,i));
 
   else
     {
@@ -173,19 +173,19 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
           libmesh_error_msg("Invalid side i = " << i);
         }
 
-      return AutoPtr<Elem>(face);
+      return UniquePtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<Elem>();
+  return UniquePtr<Elem>();
 }
 
 
-AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
+UniquePtr<Elem> Tet4::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return AutoPtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
+  return UniquePtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
 }
 
 

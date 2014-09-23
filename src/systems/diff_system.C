@@ -114,11 +114,11 @@ void DifferentiableSystem::init_data ()
 
 
 
-AutoPtr<DiffContext> DifferentiableSystem::build_context ()
+UniquePtr<DiffContext> DifferentiableSystem::build_context ()
 {
   DiffContext* context = new DiffContext(*this);
   context->set_deltat_pointer( &this->deltat );
-  return AutoPtr<DiffContext>(context);
+  return UniquePtr<DiffContext>(context);
 }
 
 

@@ -584,27 +584,27 @@ void assemble_biharmonic(EquationSystems& es,
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // store the object as an \p UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // Quadrature rule for numerical integration.
   // With 2D triangles, the Clough quadrature rule puts a Gaussian
   // quadrature rule on each of the 3 subelements
-  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim));
+  UniquePtr<QBase> qrule(fe_type.default_quadrature_rule(dim));
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (qrule.get());
 
   // Declare a special finite element object for
   // boundary integration.
-  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
   // Boundary integration requires another quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   // In 1D, the Clough and Gauss quadrature rules are identical.
-  AutoPtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
+  UniquePtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
 
   // Tell the finte element object to use our
   // quadrature rule.

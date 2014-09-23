@@ -157,8 +157,8 @@ dof_id_type InfHex18::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
-                                    bool proxy) const
+UniquePtr<Elem> InfHex18::build_side (const unsigned int i,
+                                      bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -168,14 +168,14 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
         {
           // base
         case 0:
-          return AutoPtr<Elem>(new Side<Quad9,InfHex18>(this,i));
+          return UniquePtr<Elem>(new Side<Quad9,InfHex18>(this,i));
 
           // ifem sides
         case 1:
         case 2:
         case 3:
         case 4:
-          return AutoPtr<Elem>(new Side<InfQuad6,InfHex18>(this,i));
+          return UniquePtr<Elem>(new Side<InfQuad6,InfHex18>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -270,23 +270,23 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
-      return AutoPtr<Elem>(face);
+      return UniquePtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<Elem>();
+  return UniquePtr<Elem>();
 }
 
 
 
-AutoPtr<Elem> InfHex18::build_edge (const unsigned int i) const
+UniquePtr<Elem> InfHex18::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
   if (i < 4) // base edges
-    return AutoPtr<Elem>(new SideEdge<Edge3,InfHex18>(this,i));
+    return UniquePtr<Elem>(new SideEdge<Edge3,InfHex18>(this,i));
   // infinite edges
-  return AutoPtr<Elem>(new SideEdge<InfEdge2,InfHex18>(this,i));
+  return UniquePtr<Elem>(new SideEdge<InfEdge2,InfHex18>(this,i));
 }
 
 

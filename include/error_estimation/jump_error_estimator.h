@@ -159,7 +159,7 @@ protected:
   /**
    * The finite element objects for fine and coarse elements
    */
-  AutoPtr<FEBase> fe_fine, fe_coarse;
+  UniquePtr<FEBase> fe_fine, fe_coarse;
 };
 
 

@@ -42,7 +42,7 @@ namespace libMesh
 
 // Full specialization for Real datatypes
 template <typename T>
-AutoPtr<NumericVector<T> >
+UniquePtr<NumericVector<T> >
 NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage solver_package)
 {
   // Build the appropriate vector
@@ -51,36 +51,36 @@ NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage 
 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return AutoPtr<NumericVector<T> >(new LaspackVector<T>(comm, AUTOMATIC));
+      return UniquePtr<NumericVector<T> >(new LaspackVector<T>(comm, AUTOMATIC));
 #endif
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return AutoPtr<NumericVector<T> >(new PetscVector<T>(comm, AUTOMATIC));
+      return UniquePtr<NumericVector<T> >(new PetscVector<T>(comm, AUTOMATIC));
 #endif
 
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
-      return AutoPtr<NumericVector<T> >(new EpetraVector<T>(comm, AUTOMATIC));
+      return UniquePtr<NumericVector<T> >(new EpetraVector<T>(comm, AUTOMATIC));
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return AutoPtr<NumericVector<T> >(new EigenSparseVector<T>(comm, AUTOMATIC));
+      return UniquePtr<NumericVector<T> >(new EigenSparseVector<T>(comm, AUTOMATIC));
 #endif
 
     default:
-      return AutoPtr<NumericVector<T> >(new DistributedVector<T>(comm, AUTOMATIC));
+      return UniquePtr<NumericVector<T> >(new DistributedVector<T>(comm, AUTOMATIC));
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<NumericVector<T> >();
+  return UniquePtr<NumericVector<T> >();
 }
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
 template <typename T>
-AutoPtr<NumericVector<T> >
+UniquePtr<NumericVector<T> >
 NumericVector<T>::build(const SolverPackage solver_package)
 {
   libmesh_deprecated();

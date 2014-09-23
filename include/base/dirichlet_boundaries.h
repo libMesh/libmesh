@@ -70,10 +70,10 @@ public:
                     const FunctionBase<Gradient> *g_in = NULL) :
     b(b_in),
     variables(variables_in),
-    f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >()),
-    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >()),
-    f_fem(AutoPtr<FEMFunctionBase<Number> >()),
-    g_fem(AutoPtr<FEMFunctionBase<Gradient> >()),
+    f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number> >()),
+    g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient> >()),
+    f_fem(UniquePtr<FEMFunctionBase<Number> >()),
+    g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
     f_system(NULL)
   {
     libmesh_assert(f.get());
@@ -88,9 +88,9 @@ public:
     b(b_in),
     variables(variables_in),
     f(f_in.clone()),
-    g(AutoPtr<FunctionBase<Gradient> >()),
-    f_fem(AutoPtr<FEMFunctionBase<Number> >()),
-    g_fem(AutoPtr<FEMFunctionBase<Gradient> >()),
+    g(UniquePtr<FunctionBase<Gradient> >()),
+    f_fem(UniquePtr<FEMFunctionBase<Number> >()),
+    g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
     f_system(NULL)
   {
     f->init();
@@ -105,8 +105,8 @@ public:
     variables(variables_in),
     f(f_in.clone()),
     g(g_in.clone()),
-    f_fem(AutoPtr<FEMFunctionBase<Number> >()),
-    g_fem(AutoPtr<FEMFunctionBase<Gradient> >()),
+    f_fem(UniquePtr<FEMFunctionBase<Number> >()),
+    g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
     f_system(NULL)
   {
     f->init();
@@ -121,10 +121,10 @@ public:
                     const FEMFunctionBase<Gradient> *g_in = NULL) :
     b(b_in),
     variables(variables_in),
-    f(AutoPtr<FunctionBase<Number> >()),
-    g(AutoPtr<FunctionBase<Gradient> >()),
-    f_fem(f_in ? f_in->clone() : AutoPtr<FEMFunctionBase<Number> >()),
-    g_fem(g_in ? g_in->clone() : AutoPtr<FEMFunctionBase<Gradient> >()),
+    f(UniquePtr<FunctionBase<Number> >()),
+    g(UniquePtr<FunctionBase<Gradient> >()),
+    f_fem(f_in ? f_in->clone() : UniquePtr<FEMFunctionBase<Number> >()),
+    g_fem(g_in ? g_in->clone() : UniquePtr<FEMFunctionBase<Gradient> >()),
     f_system(&f_sys_in)
   {
     libmesh_assert(f_fem.get());
@@ -136,10 +136,10 @@ public:
                     const FEMFunctionBase<Number> &f_in) :
     b(b_in),
     variables(variables_in),
-    f(AutoPtr<FunctionBase<Number> >()),
-    g(AutoPtr<FunctionBase<Gradient> >()),
+    f(UniquePtr<FunctionBase<Number> >()),
+    g(UniquePtr<FunctionBase<Gradient> >()),
     f_fem(f_in.clone()),
-    g_fem(AutoPtr<FEMFunctionBase<Gradient> >()),
+    g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
     f_system(&f_sys_in)
   {
   }
@@ -152,8 +152,8 @@ public:
                     const FEMFunctionBase<Gradient> &g_in) :
     b(b_in),
     variables(variables_in),
-    f(AutoPtr<FunctionBase<Number> >()),
-    g(AutoPtr<FunctionBase<Gradient> >()),
+    f(UniquePtr<FunctionBase<Number> >()),
+    g(UniquePtr<FunctionBase<Gradient> >()),
     f_fem(f_in.clone()),
     g_fem(g_in.clone()),
     f_system(&f_sys_in)
@@ -167,13 +167,13 @@ public:
     b(dirichlet_in.b),
     variables(dirichlet_in.variables),
     f(dirichlet_in.f.get() ?
-      dirichlet_in.f->clone() : AutoPtr<FunctionBase<Number> >()),
+      dirichlet_in.f->clone() : UniquePtr<FunctionBase<Number> >()),
     g(dirichlet_in.g.get() ?
-      dirichlet_in.g->clone() : AutoPtr<FunctionBase<Gradient> >()),
+      dirichlet_in.g->clone() : UniquePtr<FunctionBase<Gradient> >()),
     f_fem(dirichlet_in.f_fem.get() ?
-      dirichlet_in.f_fem->clone() : AutoPtr<FEMFunctionBase<Number> >()),
+      dirichlet_in.f_fem->clone() : UniquePtr<FEMFunctionBase<Number> >()),
     g_fem(dirichlet_in.g_fem.get() ?
-      dirichlet_in.g_fem->clone() : AutoPtr<FEMFunctionBase<Gradient> >()),
+      dirichlet_in.g_fem->clone() : UniquePtr<FEMFunctionBase<Gradient> >()),
     f_system(dirichlet_in.f_system)
   {
     libmesh_assert(f.get() || f_fem.get());
@@ -190,11 +190,11 @@ public:
   std::set<boundary_id_type> b;
   std::vector<unsigned int> variables;
 
-  AutoPtr<FunctionBase<Number> > f;
-  AutoPtr<FunctionBase<Gradient> > g;
+  UniquePtr<FunctionBase<Number> > f;
+  UniquePtr<FunctionBase<Gradient> > g;
 
-  AutoPtr<FEMFunctionBase<Number> > f_fem;
-  AutoPtr<FEMFunctionBase<Gradient> > g_fem;
+  UniquePtr<FEMFunctionBase<Number> > f_fem;
+  UniquePtr<FEMFunctionBase<Gradient> > g_fem;
 
   const System *f_system;
 };

@@ -600,14 +600,14 @@ void assemble_laplace(EquationSystems& es,
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // store the object as an \p UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe      (FEBase::build(mesh_dim, fe_type));
-  AutoPtr<FEBase> fe_face (FEBase::build(mesh_dim, fe_type));
+  UniquePtr<FEBase> fe      (FEBase::build(mesh_dim, fe_type));
+  UniquePtr<FEBase> fe_face (FEBase::build(mesh_dim, fe_type));
 
   // Quadrature rules for numerical integration.
-  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(mesh_dim));
-  AutoPtr<QBase> qface(fe_type.default_quadrature_rule(mesh_dim-1));
+  UniquePtr<QBase> qrule(fe_type.default_quadrature_rule(mesh_dim));
+  UniquePtr<QBase> qface(fe_type.default_quadrature_rule(mesh_dim-1));
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule      (qrule.get());

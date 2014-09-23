@@ -153,7 +153,7 @@ public:
    * The EigenSolver object.  This is what actually
    * makes the calls to SLEPc.
    */
-  AutoPtr<EigenSolver<Number> > eigen_solver;
+  UniquePtr<EigenSolver<Number> > eigen_solver;
 
   /**
    * The linear solver tolerance to be used when solving the

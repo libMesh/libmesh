@@ -354,7 +354,7 @@ public:
    */
   void operator()(const ConstElemRange &range) const
   {
-    AutoPtr<DiffContext> con = _sys.build_context();
+    UniquePtr<DiffContext> con = _sys.build_context();
     FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _sys.init_context(_femcontext);
 
@@ -397,7 +397,7 @@ public:
    */
   void operator()(const ConstElemRange &range) const
   {
-    AutoPtr<DiffContext> con = _sys.build_context();
+    UniquePtr<DiffContext> con = _sys.build_context();
     FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _sys.init_context(_femcontext);
 
@@ -460,7 +460,7 @@ public:
    */
   void operator()(const ConstElemRange &range)
   {
-    AutoPtr<DiffContext> con = _sys.build_context();
+    UniquePtr<DiffContext> con = _sys.build_context();
     FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _diff_qoi.init_context(_femcontext);
 
@@ -593,7 +593,7 @@ public:
    */
   void operator()(const ConstElemRange &range) const
   {
-    AutoPtr<DiffContext> con = _sys.build_context();
+    UniquePtr<DiffContext> con = _sys.build_context();
     FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
     _qoi.init_context(_femcontext);
 
@@ -917,7 +917,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
   // their equation terms there and only if we have a SCALAR variable
   if ( this->processor_id() == (this->n_processors()-1) && have_scalar )
     {
-      AutoPtr<DiffContext> con = this->build_context();
+      UniquePtr<DiffContext> con = this->build_context();
       FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
       this->init_context(_femcontext);
       _femcontext.pre_fe_reinit(*this, NULL);
@@ -1046,7 +1046,7 @@ void FEMSystem::mesh_position_set()
 
   MeshBase& mesh = this->get_mesh();
 
-  AutoPtr<DiffContext> con = this->build_context();
+  UniquePtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
   this->init_context(_femcontext);
 
@@ -1296,7 +1296,7 @@ void FEMSystem::numerical_nonlocal_jacobian (FEMContext &context) const
 
 
 
-AutoPtr<DiffContext> FEMSystem::build_context ()
+UniquePtr<DiffContext> FEMSystem::build_context ()
 {
   FEMContext* fc = new FEMContext(*this);
 
@@ -1315,7 +1315,7 @@ AutoPtr<DiffContext> FEMSystem::build_context ()
   // If we are solving the adjoint problem, tell that to the Context
   fc->is_adjoint() = this->get_time_solver().is_adjoint();
 
-  return AutoPtr<DiffContext>(fc);
+  return UniquePtr<DiffContext>(fc);
 }
 
 
@@ -1386,7 +1386,7 @@ void FEMSystem::mesh_position_get()
   const MeshBase::const_element_iterator end_el =
     mesh.active_local_elements_end();
 
-  AutoPtr<DiffContext> con = this->build_context();
+  UniquePtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
   this->init_context(_femcontext);
 

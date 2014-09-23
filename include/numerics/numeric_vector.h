@@ -110,7 +110,7 @@ public:
    * \p comm using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<NumericVector<T> >
+  static UniquePtr<NumericVector<T> >
   build(const Parallel::Communicator &comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 
@@ -120,7 +120,7 @@ public:
    * CommWorld using the linear solver package specified by \p
    * solver_package.  Deprecated.
    */
-  static AutoPtr<NumericVector<T> >
+  static UniquePtr<NumericVector<T> >
   build(const SolverPackage solver_package = libMesh::default_solver_package());
 #endif
 
@@ -165,16 +165,16 @@ public:
   /**
    * Creates a vector which has the same type, size and partitioning
    * as this vector, but whose data is all zero.  Returns it in an \p
-   * AutoPtr.
+   * UniquePtr.
    * This must be overloaded in the derived classes.
    */
-  virtual AutoPtr<NumericVector<T> > zero_clone () const = 0;
+  virtual UniquePtr<NumericVector<T> > zero_clone () const = 0;
 
   /**
-   * Creates a copy of this vector and returns it in an \p AutoPtr.
+   * Creates a copy of this vector and returns it in an \p UniquePtr.
    * This must be overloaded in the derived classes.
    */
-  virtual AutoPtr<NumericVector<T> > clone () const = 0;
+  virtual UniquePtr<NumericVector<T> > clone () const = 0;
 
   /**
    * Change the dimension of the vector to \p N. The reserved memory for

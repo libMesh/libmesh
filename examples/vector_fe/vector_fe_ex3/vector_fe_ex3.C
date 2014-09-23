@@ -90,7 +90,7 @@ int main (int argc, char** argv)
 
   // This example only implements the steady-state problem
   system.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system));
+    UniquePtr<TimeSolver>(new SteadySolver(system));
 
   // Initialize the system
   equation_systems.init();

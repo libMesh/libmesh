@@ -61,11 +61,11 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p AutoPtr.
+   * an \p UniquePtr.
    * This is used when copying meshes, and must be overloaded in the
    * derived classes.
    */
-  virtual AutoPtr<Partitioner> clone () const = 0;
+  virtual UniquePtr<Partitioner> clone () const = 0;
 
 
   /**

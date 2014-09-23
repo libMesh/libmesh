@@ -401,7 +401,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
             for (unsigned int s=0; s<elem->n_sides(); s++)
               if (elem->neighbor(s) == NULL)
                 {
-                  AutoPtr<Elem> side(elem->build_side(s));
+                  UniquePtr<Elem> side(elem->build_side(s));
 
                   for (unsigned int n=0; n<side->n_vertices(); n++)
                     my_interface_node_set.insert (side->node(n));

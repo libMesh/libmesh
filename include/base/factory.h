@@ -58,13 +58,13 @@ public:
   /**
    * Builds an object of type Base identified by name.
    */
-  static AutoPtr<Base> build (const std::string& name);
+  static UniquePtr<Base> build (const std::string& name);
 
   /**
    * Create a Base class.  Force this to be implemented
    * later.
    */
-  virtual AutoPtr<Base> create () = 0;
+  virtual UniquePtr<Base> create () = 0;
 
 
 protected:
@@ -100,7 +100,7 @@ private:
   /**
    * @returns a new object of type Derived.
    */
-  AutoPtr<Base> create ();
+  UniquePtr<Base> create ();
 
 };
 
@@ -123,7 +123,7 @@ Factory<Base>::Factory (const std::string& name)
 
 template <class Base>
 inline
-AutoPtr<Base> Factory<Base>::build (const std::string& name)
+UniquePtr<Base> Factory<Base>::build (const std::string& name)
 {
   // name not found in the map
   if (!factory_map().count(name))
@@ -139,11 +139,11 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
       libmesh_error_msg("Exiting...");
 
       // We'll never get here
-      return AutoPtr<Base>();
+      return UniquePtr<Base>();
     }
 
   Factory<Base> *f = factory_map()[name];
-  return AutoPtr<Base>(f->create());
+  return UniquePtr<Base>(f->create());
 }
 
 
@@ -161,9 +161,9 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
 
 template <class Derived, class Base>
 inline
-AutoPtr<Base> FactoryImp<Derived,Base>::create ()
+UniquePtr<Base> FactoryImp<Derived,Base>::create ()
 {
-  return AutoPtr<Base>(new Derived);
+  return UniquePtr<Base>(new Derived);
 }
 
 

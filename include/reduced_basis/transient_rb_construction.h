@@ -258,13 +258,13 @@ public:
   /**
    * The L2 matrix.
    */
-  AutoPtr< SparseMatrix<Number> > L2_matrix;
+  UniquePtr< SparseMatrix<Number> > L2_matrix;
 
   /**
    * The L2 matrix without Dirichlet conditions enforced.
    * (This is only computed if store_non_dirichlet_operators == true.)
    */
-  AutoPtr< SparseMatrix<Number> > non_dirichlet_L2_matrix;
+  UniquePtr< SparseMatrix<Number> > non_dirichlet_L2_matrix;
 
   /**
    * Vector storing the Q_m matrices from the mass operator

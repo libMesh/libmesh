@@ -140,12 +140,12 @@ void assemble(EquationSystems& es,
   // about the geometry of the problem and the quadrature rule
   FEType fe_type (FIRST);
 
-  AutoPtr<FEBase> fe(FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe(FEBase::build(dim, fe_type));
   QGauss qrule(dim, FIFTH);
 
   fe->attach_quadrature_rule (&qrule);
 
-  AutoPtr<FEBase> fe_face(FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_type));
   QGauss qface(dim-1, FIFTH);
 
   fe_face->attach_quadrature_rule(&qface);

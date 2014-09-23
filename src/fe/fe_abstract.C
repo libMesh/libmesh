@@ -41,8 +41,8 @@
 namespace libMesh
 {
 
-AutoPtr<FEAbstract> FEAbstract::build(const unsigned int dim,
-                                      const FEType& fet)
+UniquePtr<FEAbstract> FEAbstract::build(const unsigned int dim,
+                                        const FEType& fet)
 {
   switch (dim)
     {
@@ -52,42 +52,42 @@ AutoPtr<FEAbstract> FEAbstract::build(const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return AutoPtr<FEAbstract>(new FE<0,CLOUGH>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,CLOUGH>(fet));
 
           case HERMITE:
-            return AutoPtr<FEAbstract>(new FE<0,HERMITE>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,HERMITE>(fet));
 
           case LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<0,LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,LAGRANGE>(fet));
 
           case LAGRANGE_VEC:
-            return AutoPtr<FEAbstract>(new FE<0,LAGRANGE_VEC>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,LAGRANGE_VEC>(fet));
 
           case L2_LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<0,L2_LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<0,HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<0,L2_HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            return AutoPtr<FEAbstract>(new FE<0,MONOMIAL>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return AutoPtr<FEAbstract>(new FE<0,SZABAB>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,SZABAB>(fet));
 
           case BERNSTEIN:
-            return AutoPtr<FEAbstract>(new FE<0,BERNSTEIN>(fet));
+            return UniquePtr<FEAbstract>(new FE<0,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            return AutoPtr<FEAbstract>(new FEXYZ<0>(fet));
+            return UniquePtr<FEAbstract>(new FEXYZ<0>(fet));
 
           case SCALAR:
-            return AutoPtr<FEAbstract>(new FEScalar<0>(fet));
+            return UniquePtr<FEAbstract>(new FEScalar<0>(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -99,42 +99,42 @@ AutoPtr<FEAbstract> FEAbstract::build(const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return AutoPtr<FEAbstract>(new FE<1,CLOUGH>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,CLOUGH>(fet));
 
           case HERMITE:
-            return AutoPtr<FEAbstract>(new FE<1,HERMITE>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,HERMITE>(fet));
 
           case LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<1,LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,LAGRANGE>(fet));
 
           case LAGRANGE_VEC:
-            return AutoPtr<FEAbstract>(new FE<1,LAGRANGE_VEC>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,LAGRANGE_VEC>(fet));
 
           case L2_LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<1,L2_LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<1,HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<1,L2_HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            return AutoPtr<FEAbstract>(new FE<1,MONOMIAL>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return AutoPtr<FEAbstract>(new FE<1,SZABAB>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,SZABAB>(fet));
 
           case BERNSTEIN:
-            return AutoPtr<FEAbstract>(new FE<1,BERNSTEIN>(fet));
+            return UniquePtr<FEAbstract>(new FE<1,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            return AutoPtr<FEAbstract>(new FEXYZ<1>(fet));
+            return UniquePtr<FEAbstract>(new FEXYZ<1>(fet));
 
           case SCALAR:
-            return AutoPtr<FEAbstract>(new FEScalar<1>(fet));
+            return UniquePtr<FEAbstract>(new FEScalar<1>(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -148,48 +148,48 @@ AutoPtr<FEAbstract> FEAbstract::build(const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            return AutoPtr<FEAbstract>(new FE<2,CLOUGH>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,CLOUGH>(fet));
 
           case HERMITE:
-            return AutoPtr<FEAbstract>(new FE<2,HERMITE>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,HERMITE>(fet));
 
           case LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<2,LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,LAGRANGE>(fet));
 
           case LAGRANGE_VEC:
-            return AutoPtr<FEAbstract>(new FE<2,LAGRANGE_VEC>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,LAGRANGE_VEC>(fet));
 
           case L2_LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<2,L2_LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<2,HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<2,L2_HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            return AutoPtr<FEAbstract>(new FE<2,MONOMIAL>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return AutoPtr<FEAbstract>(new FE<2,SZABAB>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,SZABAB>(fet));
 
           case BERNSTEIN:
-            return AutoPtr<FEAbstract>(new FE<2,BERNSTEIN>(fet));
+            return UniquePtr<FEAbstract>(new FE<2,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            return AutoPtr<FEAbstract>(new FEXYZ<2>(fet));
+            return UniquePtr<FEAbstract>(new FEXYZ<2>(fet));
 
           case SCALAR:
-            return AutoPtr<FEAbstract>(new FEScalar<2>(fet));
+            return UniquePtr<FEAbstract>(new FEScalar<2>(fet));
 
           case NEDELEC_ONE:
-            return AutoPtr<FEAbstract>(new FENedelecOne<2>(fet));
+            return UniquePtr<FEAbstract>(new FENedelecOne<2>(fet));
 
           case SUBDIVISION:
-            return AutoPtr<FEAbstract>(new FESubdivision(fet));
+            return UniquePtr<FEAbstract>(new FESubdivision(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -206,42 +206,42 @@ AutoPtr<FEAbstract> FEAbstract::build(const unsigned int dim,
             libmesh_error_msg("ERROR: Clough-Tocher elements currently only support 1D and 2D");
 
           case HERMITE:
-            return AutoPtr<FEAbstract>(new FE<3,HERMITE>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,HERMITE>(fet));
 
           case LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<3,LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,LAGRANGE>(fet));
 
           case LAGRANGE_VEC:
-            return AutoPtr<FEAbstract>(new FE<3,LAGRANGE_VEC>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,LAGRANGE_VEC>(fet));
 
           case L2_LAGRANGE:
-            return AutoPtr<FEAbstract>(new FE<3,L2_LAGRANGE>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,L2_LAGRANGE>(fet));
 
           case HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<3,HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,HIERARCHIC>(fet));
 
           case L2_HIERARCHIC:
-            return AutoPtr<FEAbstract>(new FE<3,L2_HIERARCHIC>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,L2_HIERARCHIC>(fet));
 
           case MONOMIAL:
-            return AutoPtr<FEAbstract>(new FE<3,MONOMIAL>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,MONOMIAL>(fet));
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
-            return AutoPtr<FEAbstract>(new FE<3,SZABAB>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,SZABAB>(fet));
 
           case BERNSTEIN:
-            return AutoPtr<FEAbstract>(new FE<3,BERNSTEIN>(fet));
+            return UniquePtr<FEAbstract>(new FE<3,BERNSTEIN>(fet));
 #endif
 
           case XYZ:
-            return AutoPtr<FEAbstract>(new FEXYZ<3>(fet));
+            return UniquePtr<FEAbstract>(new FEXYZ<3>(fet));
 
           case SCALAR:
-            return AutoPtr<FEAbstract>(new FEScalar<3>(fet));
+            return UniquePtr<FEAbstract>(new FEScalar<3>(fet));
 
           case NEDELEC_ONE:
-            return AutoPtr<FEAbstract>(new FENedelecOne<3>(fet));
+            return UniquePtr<FEAbstract>(new FENedelecOne<3>(fet));
 
           default:
             libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
@@ -253,7 +253,7 @@ AutoPtr<FEAbstract> FEAbstract::build(const unsigned int dim,
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<FEAbstract>();
+  return UniquePtr<FEAbstract>();
 }
 
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nodes)
@@ -821,8 +821,8 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
           // level than their neighbors!
           libmesh_assert(parent);
 
-          const AutoPtr<Elem> my_side     (elem->build_side(s));
-          const AutoPtr<Elem> parent_side (parent->build_side(s));
+          const UniquePtr<Elem> my_side     (elem->build_side(s));
+          const UniquePtr<Elem> parent_side (parent->build_side(s));
 
           const unsigned int n_side_nodes = my_side->n_nodes();
 
@@ -985,8 +985,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                   libmesh_assert(neigh->active());
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-                  const AutoPtr<Elem> my_side    (elem->build_side(s));
-                  const AutoPtr<Elem> neigh_side (neigh->build_side(s_neigh));
+                  const UniquePtr<Elem> my_side    (elem->build_side(s));
+                  const UniquePtr<Elem> neigh_side (neigh->build_side(s_neigh));
 
                   const unsigned int n_side_nodes = my_side->n_nodes();
 

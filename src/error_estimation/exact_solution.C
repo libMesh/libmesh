@@ -131,8 +131,8 @@ void ExactSolution::attach_exact_values (std::vector<FunctionBase<Number> *> f)
   _exact_values.resize(f.size(), NULL);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we can't put the resulting AutoPtrs into an STL
-  // container.
+  // subclasses, but we don't currently put the resulting UniquePtrs
+  // into an STL container.
   for (unsigned int i=0; i != f.size(); ++i)
     if (f[i])
       _exact_values[i] = f[i]->clone().release();
@@ -185,8 +185,8 @@ void ExactSolution::attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g
   _exact_derivs.resize(g.size(), NULL);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we can't put the resulting AutoPtrs into an STL
-  // container.
+  // subclasses, but we don't currently put the resulting UniquePtrs
+  // into an STL container.
   for (unsigned int i=0; i != g.size(); ++i)
     if (g[i])
       _exact_derivs[i] = g[i]->clone().release();
@@ -239,8 +239,8 @@ void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h
   _exact_hessians.resize(h.size(), NULL);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we can't put the resulting AutoPtrs into an STL
-  // container.
+  // subclasses, but we don't currently put the resulting UniquePtrs
+  // into an STL container.
   for (unsigned int i=0; i != h.size(); ++i)
     if (h[i])
       _exact_hessians[i] = h[i]->clone().release();
@@ -533,8 +533,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
     computed_system.variable_scalar_number(var, 0);
 
   // Prepare a global solution and a MeshFunction of the coarse system if we need one
-  AutoPtr<MeshFunction> coarse_values;
-  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
+  UniquePtr<MeshFunction> coarse_values;
+  UniquePtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
   if (_equation_systems_fine)
     {
       const System& comparison_system
@@ -545,7 +545,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       comparison_soln->init(comparison_system.solution->size(), true, SERIAL);
       (*comparison_soln) = global_soln;
 
-      coarse_values = AutoPtr<MeshFunction>
+      coarse_values = UniquePtr<MeshFunction>
         (new MeshFunction(_equation_systems,
                           *comparison_soln,
                           comparison_system.get_dof_map(),

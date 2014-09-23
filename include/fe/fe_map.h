@@ -41,7 +41,7 @@ public:
   FEMap();
   virtual ~FEMap(){}
 
-  static AutoPtr<FEMap> build(FEType fe_type);
+  static UniquePtr<FEMap> build(FEType fe_type);
 
   template<unsigned int Dim>
   void init_reference_to_physical_map(const std::vector<Point>& qp,

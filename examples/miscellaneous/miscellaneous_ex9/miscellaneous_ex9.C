@@ -176,9 +176,9 @@ void assemble_poisson(EquationSystems& es,
 
   FEType fe_type = dof_map.variable_type(0);
 
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  AutoPtr<FEBase> fe_elem_face (FEBase::build(dim, fe_type));
-  AutoPtr<FEBase> fe_neighbor_face (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe_elem_face (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe_neighbor_face (FEBase::build(dim, fe_type));
 
   QGauss qrule (dim, fe_type.default_quadrature_order());
   QGauss qface(dim-1, fe_type.default_quadrature_order());

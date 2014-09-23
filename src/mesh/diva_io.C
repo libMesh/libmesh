@@ -150,7 +150,7 @@ void DivaIO::write_stream (std::ostream& out_file)
         for (unsigned int s=0; s<the_mesh.elem(e)->n_sides(); s++)
           if (the_mesh.elem(e)->neighbor(s) == NULL)
             {
-              const AutoPtr<Elem> side(the_mesh.elem(e)->build_side(s));
+              const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 
               if (side->type() == TRI3)
                 {
@@ -187,7 +187,7 @@ void DivaIO::write_stream (std::ostream& out_file)
         for (unsigned int s=0; s<the_mesh.elem(e)->n_sides(); s++)
           if (the_mesh.elem(e)->neighbor(s) == NULL)
             {
-              const AutoPtr<Elem> side(the_mesh.elem(e)->build_side(s));
+              const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 
               if ((side->type() == QUAD4) ||
                   (side->type() == QUAD8)  )
@@ -236,7 +236,7 @@ void DivaIO::write_stream (std::ostream& out_file)
         for (unsigned short s=0; s<the_mesh.elem(e)->n_sides(); s++)
           if (the_mesh.elem(e)->neighbor(s) == NULL)
             {
-              const AutoPtr<Elem> side(the_mesh.elem(e)->build_side(s));
+              const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 
               if ((side->type() == TRI3) ||
                   (side->type() == TRI6)  )
@@ -254,7 +254,7 @@ void DivaIO::write_stream (std::ostream& out_file)
         for (unsigned short s=0; s<the_mesh.elem(e)->n_sides(); s++)
           if (the_mesh.elem(e)->neighbor(s) == NULL)
             {
-              const AutoPtr<Elem> side(the_mesh.elem(e)->build_side(s));
+              const UniquePtr<Elem> side(the_mesh.elem(e)->build_side(s));
 
               if ((side->type() == QUAD4) ||
                   (side->type() == QUAD8) ||

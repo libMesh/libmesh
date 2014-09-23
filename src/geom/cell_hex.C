@@ -97,7 +97,7 @@ dof_id_type Hex::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Hex::side (const unsigned int i) const
+UniquePtr<Elem> Hex::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -158,7 +158,7 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
       libmesh_error_msg("Unsupported side i = " << i);
     }
 
-  return AutoPtr<Elem>(face);
+  return UniquePtr<Elem>(face);
 }
 
 

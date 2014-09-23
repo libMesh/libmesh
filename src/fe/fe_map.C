@@ -39,19 +39,19 @@ FEMap::FEMap() {}
 
 
 
-AutoPtr<FEMap> FEMap::build( FEType fe_type )
+UniquePtr<FEMap> FEMap::build( FEType fe_type )
 {
   switch( fe_type.family )
     {
     case XYZ:
-      return AutoPtr<FEMap>(new FEXYZMap);
+      return UniquePtr<FEMap>(new FEXYZMap);
 
     default:
-      return AutoPtr<FEMap>(new FEMap);
+      return UniquePtr<FEMap>(new FEMap);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<FEMap>();
+  return UniquePtr<FEMap>();
 }
 
 

@@ -83,7 +83,7 @@ dof_id_type Prism::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Prism::side (const unsigned int i) const
+UniquePtr<Elem> Prism::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -148,7 +148,7 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  return AutoPtr<Elem>(face);
+  return UniquePtr<Elem>(face);
 }
 
 

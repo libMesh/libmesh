@@ -68,11 +68,11 @@ dof_id_type InfQuad::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> InfQuad::side (const unsigned int i) const
+UniquePtr<Elem> InfQuad::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in an AutoPtr
+  // To be returned wrapped in an UniquePtr
   Elem* edge = NULL;
 
   switch (i)
@@ -108,7 +108,7 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  return AutoPtr<Elem>(edge);
+  return UniquePtr<Elem>(edge);
 }
 
 

@@ -105,8 +105,8 @@ bool Pyramid5::has_affine_map() const
 
 
 
-AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
-                                    bool proxy) const
+UniquePtr<Elem> Pyramid5::build_side (const unsigned int i,
+                                      bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -118,10 +118,10 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
         case 1:
         case 2:
         case 3:
-          return AutoPtr<Elem>(new Side<Tri3,Pyramid5>(this,i));
+          return UniquePtr<Elem>(new Side<Tri3,Pyramid5>(this,i));
 
         case 4:
-          return AutoPtr<Elem>(new Side<Quad4,Pyramid5>(this,i));
+          return UniquePtr<Elem>(new Side<Quad4,Pyramid5>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -191,20 +191,20 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
-      return AutoPtr<Elem>(face);
+      return UniquePtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return AutoPtr<Elem>();
+  return UniquePtr<Elem>();
 }
 
 
 
-AutoPtr<Elem> Pyramid5::build_edge (const unsigned int i) const
+UniquePtr<Elem> Pyramid5::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return AutoPtr<Elem>(new SideEdge<Edge2,Pyramid5>(this,i));
+  return UniquePtr<Elem>(new SideEdge<Edge2,Pyramid5>(this,i));
 }
 
 

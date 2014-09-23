@@ -70,8 +70,8 @@ void ExactErrorEstimator::attach_exact_values (std::vector<FunctionBase<Number> 
   _exact_values.resize(f.size(), NULL);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we can't put the resulting AutoPtrs into an STL
-  // container.
+  // subclasses, but we don't currently put the resulting UniquePtrs
+  // into an STL container.
   for (unsigned int i=0; i != f.size(); ++i)
     if (f[i])
       _exact_values[i] = f[i]->clone().release();
@@ -116,8 +116,8 @@ void ExactErrorEstimator::attach_exact_derivs (std::vector<FunctionBase<Gradient
   _exact_derivs.resize(g.size(), NULL);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we can't put the resulting AutoPtrs into an STL
-  // container.
+  // subclasses, but we don't currently put the resulting UniquePtrs
+  // into an STL container.
   for (unsigned int i=0; i != g.size(); ++i)
     if (g[i])
       _exact_derivs[i] = g[i]->clone().release();
@@ -164,8 +164,8 @@ void ExactErrorEstimator::attach_exact_hessians (std::vector<FunctionBase<Tensor
   _exact_hessians.resize(h.size(), NULL);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we can't put the resulting AutoPtrs into an STL
-  // container.
+  // subclasses, but we don't currently put the resulting UniquePtrs
+  // into an STL container.
   for (unsigned int i=0; i != h.size(); ++i)
     if (h[i])
       _exact_hessians[i] = h[i]->clone().release();
@@ -249,18 +249,18 @@ void ExactErrorEstimator::estimate_error (const System& system,
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
 
-      AutoPtr<FEBase> fe (FEBase::build (dim, fe_type));
+      UniquePtr<FEBase> fe (FEBase::build (dim, fe_type));
 
       // Build an appropriate Gaussian quadrature rule
-      AutoPtr<QBase> qrule =
+      UniquePtr<QBase> qrule =
         fe_type.default_quadrature_rule (dim,
                                          _extra_order);
 
       fe->attach_quadrature_rule (qrule.get());
 
       // Prepare a global solution and a MeshFunction of the fine system if we need one
-      AutoPtr<MeshFunction> fine_values;
-      AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(system.comm());
+      UniquePtr<MeshFunction> fine_values;
+      UniquePtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(system.comm());
       if (_equation_systems_fine)
         {
           const System& fine_system = _equation_systems_fine->get_system(system.name());
@@ -275,7 +275,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
              SERIAL);
           (*fine_soln) = global_soln;
 
-          fine_values = AutoPtr<MeshFunction>
+          fine_values = UniquePtr<MeshFunction>
             (new MeshFunction(*_equation_systems_fine,
                               *fine_soln,
                               fine_system.get_dof_map(),

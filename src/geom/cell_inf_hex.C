@@ -95,11 +95,11 @@ dof_id_type InfHex::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> InfHex::side (const unsigned int i) const
+UniquePtr<Elem> InfHex::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in an AutoPtr
+  // To be returned wrapped in an UniquePtr
   Elem* face = NULL;
 
   // Think of a unit cube: (-1,1) x (-1,1) x (-1,1),
@@ -178,7 +178,7 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  return AutoPtr<Elem>(face);
+  return UniquePtr<Elem>(face);
 }
 
 

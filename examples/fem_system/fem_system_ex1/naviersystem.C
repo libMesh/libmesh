@@ -58,8 +58,8 @@ public:
     output(_w_var) = (_Re+1)*(x*x + y*y);
   }
 
-  virtual AutoPtr<FunctionBase<Number> > clone() const
-  { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
+  virtual UniquePtr<FunctionBase<Number> > clone() const
+  { return UniquePtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
 
 private:
   const unsigned int _u_var, _v_var, _w_var;

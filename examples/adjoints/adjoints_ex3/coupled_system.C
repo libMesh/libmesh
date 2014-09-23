@@ -56,8 +56,8 @@ public:
     output(_v_var) = 0;
   }
 
-  virtual AutoPtr<FunctionBase<Number> > clone() const
-  { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _sign)); }
+  virtual UniquePtr<FunctionBase<Number> > clone() const
+  { return UniquePtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _sign)); }
 
 private:
   const unsigned int _u_var, _v_var;

@@ -84,7 +84,7 @@ dof_id_type InfPrism::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> InfPrism::side (const unsigned int i) const
+UniquePtr<Elem> InfPrism::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -144,7 +144,7 @@ AutoPtr<Elem> InfPrism::side (const unsigned int i) const
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  return AutoPtr<Elem>(face);
+  return UniquePtr<Elem>(face);
 }
 
 

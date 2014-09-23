@@ -544,7 +544,7 @@ public:
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual AutoPtr<Elem> side (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> side (const unsigned int i) const = 0;
 
   /**
    * Creates an element coincident with side \p i. The element returned is
@@ -552,7 +552,7 @@ public:
    * build_side(0) on a 20-noded hex will build a 8-noded quadrilateral
    * coincident with face 0 and pass back the pointer.
    *
-   * A \p AutoPtr<Elem> is returned to prevent a memory leak.
+   * A \p UniquePtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    *
    * The second argument, which is true by default, specifies that a
@@ -562,18 +562,18 @@ public:
    * If you really need a full-ordered, non-proxy side object, call
    * this function with proxy=false.
    */
-  virtual AutoPtr<Elem> build_side (const unsigned int i,
-                                    bool proxy=true) const = 0;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy=true) const = 0;
 
   /**
    * Creates an element coincident with edge \p i. The element returned is
    * full-ordered.  For example, calling build_edge(0) on a 20-noded hex will
    * build a 3-noded edge coincident with edge 0 and pass back the pointer.
    *
-   * A \p AutoPtr<Elem> is returned to prevent a memory leak.
+   * A \p UniquePtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    */
-  virtual AutoPtr<Elem> build_edge (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const = 0;
 
   /**
    * @returns the default approximation order for this element type.
@@ -1141,10 +1141,10 @@ public:
   /**
    * Build an element of type \p type.  Since this method
    * allocates memory the new \p Elem is returned in a
-   * \p AutoPtr<>
+   * \p UniquePtr<>
    */
-  static AutoPtr<Elem> build (const ElemType type,
-                              Elem* p=NULL);
+  static UniquePtr<Elem> build (const ElemType type,
+                                Elem* p=NULL);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -2071,7 +2071,7 @@ public:
   // unary op*
   Elem*& operator*() const
   {
-    // Set the AutoPtr
+    // Set the UniquePtr
     this->_update_side_ptr();
 
     // Return a reference to _side_ptr
@@ -2108,22 +2108,22 @@ private:
   // This has to be called before dereferencing.
   void _update_side_ptr() const
   {
-    // Construct new side, store in AutoPtr
+    // Construct new side, store in UniquePtr
     this->_side = this->_parent->build_side(this->_side_number);
 
     // Also set our internal naked pointer.  Memory is still owned
-    // by the AutoPtr.
+    // by the UniquePtr.
     this->_side_ptr = _side.get();
   }
 
-  // AutoPtr to the actual side, handles memory management for
+  // UniquePtr to the actual side, handles memory management for
   // the sides which are created during the course of iteration.
-  mutable AutoPtr<Elem> _side;
+  mutable UniquePtr<Elem> _side;
 
   // Raw pointer needed to facilitate passing back to the user a
   // reference to a non-temporary raw pointer in order to conform to
   // the variant_filter_iterator interface.  It points to the same
-  // thing the AutoPtr "_side" above holds.  What happens if the user
+  // thing the UniquePtr "_side" above holds.  What happens if the user
   // calls delete on the pointer passed back?  Well, this is an issue
   // which is not addressed by the iterators in libMesh.  Basically it
   // is a bad idea to ever call delete on an iterator from the library.

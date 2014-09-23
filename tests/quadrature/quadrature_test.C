@@ -384,9 +384,9 @@ public:
   template <QuadratureType qtype, Order order>
   void testBuild ()
   {
-    AutoPtr<QBase> qrule1D = QBase::build (qtype, 1, order);
-    AutoPtr<QBase> qrule2D = QBase::build (qtype, 2, order);
-    AutoPtr<QBase> qrule3D = QBase::build (qtype, 3, order);
+    UniquePtr<QBase> qrule1D = QBase::build (qtype, 1, order);
+    UniquePtr<QBase> qrule2D = QBase::build (qtype, 2, order);
+    UniquePtr<QBase> qrule3D = QBase::build (qtype, 3, order);
 
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(1) , qrule1D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(2) , qrule2D->get_dim() );
@@ -404,7 +404,7 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test1DWeights ()
   {
-    AutoPtr<QBase> qrule = QBase::build(qtype , 1, order);
+    UniquePtr<QBase> qrule = QBase::build(qtype , 1, order);
     qrule->init (EDGE3);
 
     for (unsigned int mode=0; mode <= exactorder; ++mode)
@@ -438,7 +438,7 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test2DWeights ()
   {
-    AutoPtr<QBase> qrule = QBase::build(qtype, 2, order);
+    UniquePtr<QBase> qrule = QBase::build(qtype, 2, order);
     qrule->init (QUAD8);
 
     for (unsigned int modex=0; modex <= exactorder; ++modex)
@@ -482,7 +482,7 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test3DWeights ()
   {
-    AutoPtr<QBase> qrule = QBase::build(qtype, 3, order);
+    UniquePtr<QBase> qrule = QBase::build(qtype, 3, order);
     qrule->init (HEX20);
 
     for (unsigned int modex=0; modex <= exactorder; ++modex)

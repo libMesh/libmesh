@@ -105,7 +105,7 @@ private:
    * empirical interpolation approximation. This will be a GHOSTED
    * vector to facilitate interpolation in the case of multiple processors.
    */
-  AutoPtr< NumericVector<Number> > _ghosted_basis_function;
+  UniquePtr< NumericVector<Number> > _ghosted_basis_function;
 
   /**
    * We store an FE object for each variable in _rb_eim_con. This is used

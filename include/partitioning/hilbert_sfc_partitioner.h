@@ -51,11 +51,11 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p AutoPtr.
+   * an \p UniquePtr.
    */
-  virtual AutoPtr<Partitioner> clone () const
+  virtual UniquePtr<Partitioner> clone () const
   {
-    return AutoPtr<Partitioner>(new HilbertSFCPartitioner());
+    return UniquePtr<Partitioner>(new HilbertSFCPartitioner());
   }
 
 protected:

@@ -31,6 +31,7 @@
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/auto_ptr.h"
 
 // Trilinos includes
 #include "Epetra_Operator.h"
@@ -44,7 +45,6 @@ namespace libMesh
 {
 
 // forward declarations
-template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;

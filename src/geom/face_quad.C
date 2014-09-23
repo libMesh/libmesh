@@ -63,7 +63,7 @@ dof_id_type Quad::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Quad::side (const unsigned int i) const
+UniquePtr<Elem> Quad::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -99,7 +99,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  return AutoPtr<Elem>(edge);
+  return UniquePtr<Elem>(edge);
 }
 
 
