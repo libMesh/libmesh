@@ -2946,9 +2946,10 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 
           // Constraining nodes might not even exist on our subset of
           // a distributed mesh, so let's make them exist.
-          this->comm().send_receive_packed_range
-            (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
-             procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
+          if (!mesh.is_serial())
+            this->comm().send_receive_packed_range
+              (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
+               procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
 
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
           libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
@@ -3312,9 +3313,10 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 
       // Constraining nodes might not even exist on our subset of
       // a distributed mesh, so let's make them exist.
-      this->comm().send_receive_packed_range
-        (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
-         procdown, &mesh, mesh_inserter_iterator<Node>(mesh));
+      if (!mesh.is_serial())
+        this->comm().send_receive_packed_range
+          (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
+           procdown, &mesh, mesh_inserter_iterator<Node>(mesh));
 
       libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_keys_to_me.size());
       libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_vals_to_me.size());
