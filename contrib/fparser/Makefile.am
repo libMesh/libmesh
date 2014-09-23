@@ -113,7 +113,7 @@ endif
 pkg_cppflags += $(FEATURE_FLAGS)
 
 
-# util/tree_grammar_parser is a utility which is required to build 
+# util/tree_grammar_parser is a utility which is required to build
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
 # when we are compiling with optimization support enabled.
 #
@@ -149,7 +149,7 @@ util_tree_grammar_parser_SOURCES   = \
                                  lib/functional.hh \
                                  lib/crc32.hh \
                                  lib/autoptr.hh \
-                                 lib/sha1.hh \
+                                 lib/sha1.h \
                                  extrasrc/fpaux.hh \
                                  extrasrc/fptypes.hh \
                                  extrasrc/fp_opcode_add.inc \
@@ -161,7 +161,7 @@ util_tree_grammar_parser_SOURCES   = \
   # 'util/make_function_name_parser' is used to create extrasrc/fp_identifier_parser.inc,
   # but it seems to only define a snippet.  So for now we use the distributed version
   # of that file rather than treating it as a built source.
-  # util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc 
+  # util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc
 
   util_cpp_compress_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
   util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
@@ -204,7 +204,7 @@ if FPARSER_DEVEL
   noinst_PROGRAMS           += util/cpp_compress
   # noinst_PROGRAMS           += util/make_function_name_parser
 
-if FPARSER_SUPPORT_OPTIMIZER 
+if FPARSER_SUPPORT_OPTIMIZER
     pkg_sources += $(FPOPTIMIZER_CC_FILES)
 endif
 
