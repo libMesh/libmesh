@@ -34,16 +34,21 @@
 // are using a compiler that cannot compile Howard Hinnant's
 // unique_ptr implementation, you should probably think about
 // upgrading.
-#ifdef LIBMESH_HAVE_CXX11_UNIQUE_PTR
-#  include <memory>
-#  define UniquePtr std::unique_ptr
-#elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
-#  include "libmesh/unique_ptr.hpp"
-#  define UniquePtr boost::unique_ptr
+#ifdef LIBMESH_ENABLE_UNIQUE_PTR
+  #ifdef LIBMESH_HAVE_CXX11_UNIQUE_PTR
+  #  include <memory>
+  #  define UniquePtr std::unique_ptr
+  #elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
+  #  include "libmesh/unique_ptr.hpp"
+  #  define UniquePtr boost::unique_ptr
+  #else
+  #  define UniquePtr libMesh::AutoPtr
+  #endif
 #else
-#  define UniquePtr libMesh::AutoPtr
+  // libMesh was configured with --disable-unique-ptr, so we'll use
+  // libMesh's AutoPtr class instead.
+  #define UniquePtr libMesh::AutoPtr
 #endif
-
 
 namespace libMesh
 {
