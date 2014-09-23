@@ -501,6 +501,11 @@ Node* SerialMesh::insert_node(Node* n)
   if (n->id() < _nodes.size())
     {
       // Don't allow inserting on top of an existing Node.
+
+      // Doing so doesn't have to be *error*, in the case where a
+      // redundant insert is done, but when that happens we ought to
+      // always be able to make the code more efficient by avoiding
+      // the redundant insert, so let's keep screaming "Error" here.
       if (_nodes[ n->id() ] != NULL)
         libmesh_error_msg("Error, cannot insert node on top of existing node.");
     }
