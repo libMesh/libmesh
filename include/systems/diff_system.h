@@ -299,6 +299,16 @@ public:
   bool print_jacobians;
 
   /**
+   * Set print_element_solutions to true to print each U_elem input.
+   */
+  bool print_element_solutions;
+
+  /**
+   * Set print_element_residuals to true to print each R_elem contribution.
+   */
+  bool print_element_residuals;
+
+  /**
    * Set print_element_jacobians to true to print each J_elem contribution.
    */
   bool print_element_jacobians;

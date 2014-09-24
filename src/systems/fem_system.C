@@ -51,6 +51,28 @@ void assemble_unconstrained_element_system
  const bool _get_jacobian,
  FEMContext &_femcontext)
 {
+  if (_sys.print_element_solutions)
+    {
+      std::streamsize old_precision = libMesh::out.precision();
+      libMesh::out.precision(16);
+      if (_femcontext.has_elem())
+        libMesh::out << "U_elem " << _femcontext.get_elem().id();
+      else
+        libMesh::out << "U_scalar ";
+      libMesh::out << " = " << _femcontext.get_elem_solution() << std::endl;
+
+      if (_sys.use_fixed_solution)
+        {
+          if (_femcontext.has_elem())
+            libMesh::out << "Ufixed_elem " << _femcontext.get_elem().id();
+          else
+            libMesh::out << "Ufixed_scalar ";
+          libMesh::out << " = " << _femcontext.get_elem_fixed_solution() << std::endl;
+          libMesh::out.precision(old_precision);
+        }
+    }
+
+
   bool jacobian_computed =
     _sys.time_solver->element_residual(_get_jacobian, _femcontext);
 
@@ -222,6 +244,18 @@ void add_element_system
  FEMContext &_femcontext)
 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
+  if (_get_residual && _sys.print_element_residuals)
+    {
+      std::streamsize old_precision = libMesh::out.precision();
+      libMesh::out.precision(16);
+      if (_femcontext.has_elem())
+        libMesh::out << "Rraw_elem " << _femcontext.get_elem().id();
+      else
+        libMesh::out << "Rraw_scalar ";
+      libMesh::out << " = " << _femcontext.get_elem_residual() << std::endl;
+      libMesh::out.precision(old_precision);
+    }
+
   // We turn off the asymmetric constraint application;
   // enforce_constraints_exactly() should be called in the solver
   if (_get_residual && _get_jacobian)
@@ -235,6 +269,18 @@ void add_element_system
     _sys.get_dof_map().constrain_element_matrix
       (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
+
+  if (_get_residual && _sys.print_element_residuals)
+    {
+      std::streamsize old_precision = libMesh::out.precision();
+      libMesh::out.precision(16);
+      if (_femcontext.has_elem())
+        libMesh::out << "R_elem " << _femcontext.get_elem().id();
+      else
+        libMesh::out << "R_scalar ";
+      libMesh::out << " = " << _femcontext.get_elem_residual() << std::endl;
+      libMesh::out.precision(old_precision);
+    }
 
   if (_get_jacobian && _sys.print_element_jacobians)
     {

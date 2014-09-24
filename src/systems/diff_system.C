@@ -38,6 +38,8 @@ DifferentiableSystem::DifferentiableSystem
   print_residuals(false),
   print_jacobian_norms(false),
   print_jacobians(false),
+  print_element_solutions(false),
+  print_element_residuals(false),
   print_element_jacobians(false),
   _diff_physics(this),
   diff_qoi(this)
