@@ -325,7 +325,9 @@ void System::restrict_vectors ()
       NumericVector<Number>* v = pos->second;
 
       if (_vector_projections[pos->first])
-        this->project_vector (*v, _vector_is_adjoint[pos->first]);
+        {
+          this->project_vector (*v, this->vector_is_adjoint(pos->first));
+        }
       else
         {
           ParallelType type = _vector_types[pos->first];
@@ -687,6 +689,9 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 
   _vector_types.insert (std::make_pair (vec_name, type));
 
+  // Vectors are primal by default
+  _vector_is_adjoint.insert (std::make_pair (vec_name, -1));
+
   // Initialize it if necessary
   if (!_can_add_vectors)
     {
@@ -903,7 +908,7 @@ void System::set_vector_as_adjoint (const std::string &vec_name,
 
 
 
-int System::vector_as_adjoint (const std::string &vec_name) const
+int System::vector_is_adjoint (const std::string &vec_name) const
 {
   libmesh_assert(_vector_is_adjoint.find(vec_name) !=
                  _vector_is_adjoint.end());

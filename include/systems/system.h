@@ -871,7 +871,7 @@ public:
    * vec_name represents a solution from an adjoint (non-negative) or
    * the primal (-1) space.
    */
-  int vector_as_adjoint (const std::string &vec_name) const;
+  int vector_is_adjoint (const std::string &vec_name) const;
 
  /**
    * Allows one to set the boolean controlling whether the vector
