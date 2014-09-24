@@ -159,7 +159,7 @@ class NodeConstraints : public std::map<const Node *,
  * This class handles the numbering of degrees of freedom on a mesh.
  * For systems of equations the class supports a fixed number of variables.
  * The degrees of freedom are numbered such that sequential, contiguous blocks
- * correspond to distinct subdomains.  This is so that the resulting data
+ * belong to distinct processors.  This is so that the resulting data
  * structures will work well with parallel linear algebra packages.
  *
  * @author Benjamin S. Kirk, 2002-2007
@@ -482,7 +482,8 @@ public:
   { return this->last_dof(this->processor_id()); }
 
   /**
-   * Returns the first dof index that is after all indices local to subdomain \p proc.
+   * Returns the first dof index that is after all indices local to
+   * processor \p proc.
    * Analogous to the end() member function of STL containers.
    */
   dof_id_type end_dof(const processor_id_type proc) const
@@ -493,7 +494,8 @@ public:
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
-   * Returns the first old dof index that is after all indices local to subdomain \p proc.
+   * Returns the first old dof index that is after all indices local
+   * to processor \p proc.
    * Analogous to the end() member function of STL containers.
    */
   dof_id_type end_old_dof(const processor_id_type proc) const
@@ -1240,8 +1242,8 @@ private:
   std::vector<dof_id_type> _end_df;
 
   /**
-   * A list containing all the global DOF indicies that affect the
-   * solution on my subdomain.
+   * A list containing all the global DOF indices that affect the
+   * solution on my processor.
    */
   std::vector<dof_id_type> _send_list;
 
