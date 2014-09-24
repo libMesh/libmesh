@@ -19,6 +19,7 @@
 // C++ includes
 
 // Local includes
+#include "libmesh/elem.h"
 #include "libmesh/quadrature.h"
 
 namespace libMesh
@@ -64,6 +65,16 @@ void QBase::init(const ElemType t,
     default:
       libmesh_error_msg("Invalid dimension _dim = " << _dim);
     }
+}
+
+
+
+void QBase::init (const Elem &elem,
+		  const std::vector<Real> & /* vertex_distance_func */,
+		  unsigned int p_level)
+{
+  // dispatch generic implementation
+  this->init(elem.type(), p_level);
 }
 
 

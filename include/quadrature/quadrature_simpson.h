@@ -50,7 +50,8 @@ public:
    * Constructor.  Declares the order of the quadrature rule.
    */
   explicit
-  QSimpson (const unsigned int _dim);
+  QSimpson (const unsigned int _dim,
+	    const Order o=THIRD);
 
   /**
    * Destructor. Empty.
@@ -79,7 +80,8 @@ private:
 // ------------------------------------------------------------
 // QSimpson class members
 inline
-QSimpson::QSimpson(const unsigned int d) : QBase(d,THIRD)
+QSimpson::QSimpson(const unsigned int d,
+		   const Order) : QBase(d,THIRD)
 {
   // explicitly call the init function in 1D since the
   // other tensor-product rules require this one.

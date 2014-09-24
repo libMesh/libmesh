@@ -42,6 +42,8 @@ enum QuadratureType {QGAUSS            = 0,
 
                      QCLOUGH           = 21,
 
+                     QCOMPOSITE        = 31,
+
                      INVALID_Q_RULE    = 127};
 }
 

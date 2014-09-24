@@ -350,6 +350,7 @@ if (test "x$enableexamples" = "xyes"); then
                 examples/miscellaneous/miscellaneous_ex11/Makefile
                 examples/subdomains/subdomains_ex1/Makefile
                 examples/subdomains/subdomains_ex2/Makefile
+                examples/subdomains/subdomains_ex3/Makefile
                 examples/systems_of_equations/systems_of_equations_ex1/Makefile
                 examples/systems_of_equations/systems_of_equations_ex2/Makefile
                 examples/systems_of_equations/systems_of_equations_ex3/Makefile
