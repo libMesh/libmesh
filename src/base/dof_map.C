@@ -1403,6 +1403,28 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
     {
       const Elem* elem = *local_elem_it;
 
+      // We may have non-local SCALAR dofs on a local element.
+      // Normally we'd catch those on neighboring elements, but it's
+      // possible that the neighbors are of different subdomains and
+      // the SCALAR isn't supported on them.
+      for (unsigned int v=0; v<this->n_variables(); v++)
+        if(this->variable(v).type().family == SCALAR &&
+           this->variable(v).active_on_subdomain(elem->subdomain_id()))
+          {
+            // We asked for this variable, so add it to the vector.
+            std::vector<dof_id_type> di_new;
+            this->SCALAR_dof_indices(di_new,v);
+            for (unsigned int i=0; i != di_new.size(); ++i)
+              {
+                const dof_id_type dof_index = di_new[i];
+
+                if (dof_index < this->first_dof() ||
+                    dof_index >= this->end_dof())
+                  _send_list.push_back(dof_index);
+              }
+          }
+
+      // We may have non-local nodes on a local element.
       for (unsigned int n=0; n!=elem->n_nodes(); n++)
         {
           // Flag all the nodes of active local elements as seen, so
@@ -1813,7 +1835,9 @@ void DofMap::dof_indices (const Elem* const elem,
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
     {
-      if(this->variable(v).type().family == SCALAR)
+      if(this->variable(v).type().family == SCALAR &&
+         (!elem ||
+          this->variable(v).active_on_subdomain(elem->subdomain_id())))
         {
 #ifdef DEBUG
           tot_size += this->variable(v).type().order;
@@ -1883,7 +1907,9 @@ void DofMap::dof_indices (const Elem* const elem,
     }
 
   // Get the dof numbers
-  if(this->variable(vn).type().family == SCALAR)
+  if(this->variable(vn).type().family == SCALAR &&
+     (!elem ||
+      this->variable(vn).active_on_subdomain(elem->subdomain_id())))
     {
 #ifdef DEBUG
       tot_size += this->variable(vn).type().order;
@@ -2156,7 +2182,9 @@ void DofMap::old_dof_indices (const Elem* const elem,
   for (unsigned int v=0; v<n_vars; v++)
     if ((v == vn) || (vn == libMesh::invalid_uint))
       {
-        if(this->variable(v).type().family == SCALAR)
+        if(this->variable(v).type().family == SCALAR &&
+           (!elem ||
+            this->variable(v).active_on_subdomain(elem->subdomain_id())))
           {
             // We asked for this variable, so add it to the vector.
             std::vector<dof_id_type> di_new;
