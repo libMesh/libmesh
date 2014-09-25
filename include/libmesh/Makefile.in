@@ -509,10 +509,11 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	linear_partitioner.h metis_csr_graph.h metis_partitioner.h \
 	morton_sfc_partitioner.h parmetis_partitioner.h partitioner.h \
 	sfc_partitioner.h diff_physics.h diff_qoi.h fem_physics.h \
-	quadrature.h quadrature_clough.h quadrature_composite.h quadrature_conical.h \
-	quadrature_gauss.h quadrature_gauss_lobatto.h quadrature_gm.h \
-	quadrature_grid.h quadrature_jacobi.h quadrature_monomial.h \
-	quadrature_rules.h quadrature_simpson.h quadrature_trap.h \
+	quadrature.h quadrature_clough.h quadrature_composite.h \
+	quadrature_conical.h quadrature_gauss.h \
+	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
+	quadrature_jacobi.h quadrature_monomial.h quadrature_rules.h \
+	quadrature_simpson.h quadrature_trap.h \
 	derived_rb_construction.h derived_rb_evaluation.h \
 	rb_assembly_expansion.h rb_construction.h \
 	rb_construction_base.h rb_eim_assembly.h rb_eim_construction.h \
