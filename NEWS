@@ -46,6 +46,12 @@
     * fixed misc. distcheck bugs
   * Many fixes to silence paranoid compiler warnings (see doc/notes/compiler_warnings.txt)
   * Use -f when symbolic linking files during build/install stage
+  * 1D Gauss-Lobatto quadrature rules, additional quadrature unit testing
+  * Cut-cell quadrature (ElemCutter, QComposite classes) for XFEM
+  * Per-subdomain scalar variable support
+  * Added 'meshavg' application for averaging solutions
+  * Fparser JIT support
+  * GDB backtraces and backtraces from the segfault handler
 
 0.9.2 -> 0.9.3
   * FEMContext public members now private, must use API pushed in 0.9.2.
