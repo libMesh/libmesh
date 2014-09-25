@@ -42,7 +42,7 @@
 
 namespace
 {
-  bool split_first_diagonal(const Elem* elem,
+  bool split_first_diagonal(const libMesh::Elem * elem,
                             unsigned int diag_1_node_1,
                             unsigned int diag_1_node_2,
                             unsigned int diag_2_node_1,
