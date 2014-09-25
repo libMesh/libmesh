@@ -581,14 +581,19 @@ public:
         if (_qoi.assemble_qoi_elements)
           _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
 
-        // If we have some heterogenous dofs here, those are
-        // themselves part of a regularized flux QoI which the library
-        // handles integrating
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-        if (_include_liftfunc && elem_has_some_heterogenous_qoi_bc)
-          {
+        // If we need to use heterogenous dofs here, we need the
+        // Jacobian either for the regularized flux QoI integration
+        // and/or for constraint application.
+        if ((_include_liftfunc || _apply_constraints) &&
+            elem_has_some_heterogenous_qoi_bc)
             _sys.time_solver->element_residual(true, _femcontext);
 
+        // If we have some heterogenous dofs here, those are
+        // themselves part of a regularized flux QoI which the library
+        // may handle integrating
+        if (_include_liftfunc && elem_has_some_heterogenous_qoi_bc)
+          {
             for (unsigned int q=0; q != _sys.qoi.size(); ++q)
               {
                 if (elem_has_heterogenous_qoi_bc[q])
