@@ -47,7 +47,7 @@ namespace libMesh
  * There is not much sense in using this class directly,
  * since it only provides 1D rules, weighted, as described before.
  * Still, this class is particularly helpful: check \p QGauss
- * for triangles and tetrahedra, with orders beyond \p FIFTH.
+ * for triangles and tetrahedra, with orders beyond \p THIRTIETH.
  */
 class QJacobi : public QBase
 {
@@ -55,13 +55,11 @@ public:
 
   /**
    * Constructor.  Currently, only one-dimensional rules provided.
-   * Check \p QGauss for versions of Jacobi quadrature rule for
-   * higher dimensions.
    */
   QJacobi (const unsigned int _dim,
            const Order _order=INVALID_ORDER,
-           const unsigned int _alpha=1,
-           const unsigned int _beta=0);
+           const unsigned int a=1,
+           const unsigned int b=0);
 
   /**
    * Destructor. Empty.
@@ -95,11 +93,6 @@ QJacobi::QJacobi(const unsigned int d,
                  const unsigned int a,
                  const unsigned int b) : QBase(d,o), _alpha(a), _beta(b)
 {
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
   if (_dim == 1)
     init(EDGE2);
 }
