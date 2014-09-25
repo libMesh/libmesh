@@ -10,7 +10,7 @@ using namespace FUNCTIONPARSERTYPES;
 #ifdef LIBMESH_HAVE_FPARSER_JIT
 #  include <fstream>
 #  include <cstdio>
-#  include <cstdlib>
+#  include <unistd.h>
 #  include <dlfcn.h>
 #  include "lib/sha1.h"
 #  include <errno.h>
@@ -673,14 +673,14 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   // opening the cached file did nbot work. (re)build it.
 
   // tmp filenames
-  char ccname[] = "./tmp_jit_XXXXXX.cc";
-  if (mkstemps(ccname, 3) == -1)
+  char ccname[] = "./tmp_jit_XXXXXX";
+  if (mkstemp(ccname) == -1)
   {
     std::cerr << "Error creating JIT tmp file " << ccname << ".\n";
     return false;
   }
-  char object[] = "./tmp_jit_XXXXXX.so";
-  if (mkstemps(object, 3) == -1)
+  char object[] = "./tmp_jit_XXXXXX";
+  if (mkstemp(object) == -1)
   {
     std::cerr << "Error creating JIT tmp file " << object << ".\n";
     std::remove(ccname);
@@ -947,23 +947,43 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   ccfile << "return s[" << sp << "]; }\n";
   ccfile.close();
 
+  // add a .cc extension to the source (needed by the compiler)
+  std::string ccname_cc = ccname;
+  ccname_cc += ".cc";
+  status = std::rename(ccname, ccname_cc.c_str());
+  if (status != 0)
+  {
+    std::cerr << "Unable to rename JIT source code file\n";
+    std::remove(ccname);
+    return false;
+  }
+
   // run compiler
   std::string command = FPARSER_JIT_COMPILER" -O2 -shared -rdynamic -fPIC ";
-  command += ccname;
-  command += " -o ";
-  command += object;
+  command += ccname_cc + " -o " + object;
   status = system(command.c_str());
-  std::remove(ccname);
+  std::remove(ccname_cc.c_str());
   if (status != 0) {
     std::cerr << "JIT compile failed.\n";
     return false;
   }
 
+  // add a .so extension to the object (needed by dlopen on mac)
+  std::string object_so = object;
+  object_so += ".so";
+  status = std::rename(object, object_so.c_str());
+  if (status != 0)
+  {
+    std::cerr << "Unable to rename JIT compiled function object\n";
+    std::remove(object);
+    return false;
+  }
+
   // load compiled object
-  lib = dlopen(object, RTLD_NOW);
+  lib = dlopen(object_so.c_str(), RTLD_NOW);
   if (lib == NULL) {
     std::cerr << "JIT object load failed.\n";
-    std::remove(object);
+    std::remove(object_so.c_str());
     return false;
   }
 
@@ -973,20 +993,18 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   if ((error = dlerror()) != NULL)  {
     std::cerr << "Error binding JIT compiled function\n" << error << '\n';
     compiledFunction = NULL;
-    std::remove(object);
+    std::remove(object_so.c_str());
     return false;
   }
 
   // rename successfully compiled obj to cache file
   if (cacheFunction && (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)) {
     // the directory was either successfuly created, or it already exists
-    status = std::rename(object, libname.c_str());
-    if (status != 0)
-      std::remove(object);
+    status = std::rename(object_so.c_str(), libname.c_str());
+    if (status == 0) return true;
   }
-  else
-    std::remove(object);
 
+  std::remove(object_so.c_str());
   return true;
 }
 #endif
