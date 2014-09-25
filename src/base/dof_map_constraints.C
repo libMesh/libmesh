@@ -402,6 +402,16 @@ private:
       {
         const Elem* elem = *elem_it;
 
+        // We only calculate Dirichlet constraints on active
+        // elements
+        if (!elem->active())
+          continue;
+
+        // Per-subdomain variables don't need to be projected on
+        // elements where they're not active
+        if (!variable.active_on_subdomain(elem->subdomain_id()))
+          continue;
+
         // There's a chicken-and-egg problem with FEMFunction-based
         // Dirichlet constraints: we can't evaluate the FEMFunction
         // until we have an initialized local solution vector, we
@@ -416,16 +426,6 @@ private:
         // setting initial conditions anyway.
         if (f_system && context.get())
           context->pre_fe_reinit(*f_system, elem);
-
-        // We only calculate Dirichlet constraints on active
-        // elements
-        if (!elem->active())
-          continue;
-
-        // Per-subdomain variables don't need to be projected on
-        // elements where they're not active
-        if (!variable.active_on_subdomain(elem->subdomain_id()))
-          continue;
 
         // Find out which nodes, edges and sides are on a requested
         // boundary:
@@ -1053,8 +1053,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 #if defined(LIBMESH_ENABLE_PERIODIC) || defined(LIBMESH_ENABLE_DIRICHLET) || defined(LIBMESH_ENABLE_AMR)
   libmesh_assert(this->comm().verify(mesh.is_serial()));
 
-  if (!mesh.is_serial())
-    this->comm().max(possible_global_constraints);
+  this->comm().max(possible_global_constraints);
 #endif
 
   if (!possible_global_constraints)
@@ -1080,29 +1079,9 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // u_a = u_b is collocated at the nodes of side a, which gives
   // one row of the constraint matrix.
 
-  // define the range of elements of interest
-  ConstElemRange range;
-  if (possible_local_constraints)
-    {
-      // With SerialMesh or a serial ParallelMesh, every processor
-      // computes every constraint
-      MeshBase::const_element_iterator
-        elem_begin = mesh.elements_begin(),
-        elem_end   = mesh.elements_end();
-
-      // With a parallel ParallelMesh, processors compute only
-      // their local constraints
-      if (!mesh.is_serial())
-        {
-          elem_begin = mesh.local_elements_begin();
-          elem_end   = mesh.local_elements_end();
-        }
-
-      // set the range to contain the specified elements
-      range.reset (elem_begin, elem_end);
-    }
-  else
-    range.reset (mesh.elements_end(), mesh.elements_end());
+  // Processors only compute their local constraints
+  ConstElemRange range (mesh.local_elements_begin(),
+                        mesh.local_elements_end());
 
   // compute_periodic_constraints requires a point_locator() from our
   // Mesh, that point_locator() construction is threaded.  Rather than
@@ -2967,9 +2946,10 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 
           // Constraining nodes might not even exist on our subset of
           // a distributed mesh, so let's make them exist.
-          this->comm().send_receive_packed_range
-            (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
-             procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
+          if (!mesh.is_serial())
+            this->comm().send_receive_packed_range
+              (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
+               procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
 
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
           libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
@@ -3037,11 +3017,9 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 
 void DofMap::process_constraints (MeshBase& mesh)
 {
-  // With a parallelized Mesh, we've computed our local constraints,
-  // but they may depend on non-local constraints that we'll need to
-  // take into account.
-  if (!mesh.is_serial())
-    this->allgather_recursive_constraints(mesh);
+  // We've computed our local constraints, but they may depend on
+  // non-local constraints that we'll need to take into account.
+  this->allgather_recursive_constraints(mesh);
 
   // Create a set containing the DOFs we already depend on
   typedef std::set<dof_id_type> RCSet;
@@ -3132,8 +3110,7 @@ void DofMap::process_constraints (MeshBase& mesh)
   // others are on processors which are aware of that constraint, yet
   // we need such awareness for sparsity pattern generation.  So send
   // other processors any constraints they might need to know about.
-  if (!mesh.is_serial())
-    this->scatter_constraints(mesh);
+  this->scatter_constraints(mesh);
 
   // Now that we have our root constraint dependencies sorted out, add
   // them to the send_list
@@ -3336,9 +3313,10 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 
       // Constraining nodes might not even exist on our subset of
       // a distributed mesh, so let's make them exist.
-      this->comm().send_receive_packed_range
-        (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
-         procdown, &mesh, mesh_inserter_iterator<Node>(mesh));
+      if (!mesh.is_serial())
+        this->comm().send_receive_packed_range
+          (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
+           procdown, &mesh, mesh_inserter_iterator<Node>(mesh));
 
       libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_keys_to_me.size());
       libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_vals_to_me.size());
