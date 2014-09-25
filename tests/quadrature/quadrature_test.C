@@ -7,6 +7,8 @@
 #include <libmesh/quadrature.h>
 #include <libmesh/string_to_enum.h>
 
+#include <iomanip>
+
 using namespace libMesh;
 
 #define MACROCOMMA ,
@@ -79,6 +81,9 @@ public:
 // Tris+Tets only
 //  TEST_ALL_ORDERS(QCONICAL, 9999);
 
+// Test Jacobi quadrature rules with special weighting function
+  CPPUNIT_TEST( testJacobi );
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -90,6 +95,93 @@ public:
 
   void tearDown ()
   {}
+
+  void testJacobi ()
+  {
+    // LibMesh supports two different types of Jacobi quadrature
+    QuadratureType qtype[2] = {QJACOBI_1_0, QJACOBI_2_0};
+
+    // The weights of the Jacobi quadrature rules in libmesh have been
+    // scaled based on their intended use:
+    // (alpha=1, beta=0) rule weights sum to 1/2.
+    // (alpha=2, beta=0) rule weights sum to 1/3.
+    Real initial_sum_weights[2] = {.5, 1./3.};
+
+    // The points of the Jacobi rules in LibMesh are also defined on
+    // [0,1]... this has to be taken into account when computing the
+    // exact integral values in Maple!  Also note: if you scale the
+    // points to a different interval, you need to also compute what
+    // the sum of the weights should be for that interval, it will not
+    // simply be the element length for weighted quadrature rules like
+    // Jacobi.  For general alpha and beta=0, the sum of the weights
+    // on the interval [-1,1] is 2^(alpha+1) / (alpha+1).
+    std::vector<std::vector<Real> > true_integrals(2);
+
+    // alpha=1 integral values
+    true_integrals[0].push_back(1./2.);   // Maple: int((1-x),     x=0..1);
+    true_integrals[0].push_back(1./6.);   // Maple: int((1-x)*x,   x=0..1);
+    true_integrals[0].push_back(1./12.);  // Maple: int((1-x)*x^2, x=0..1);
+    true_integrals[0].push_back(1./20.);  // Maple: int((1-x)*x^3, x=0..1);
+    true_integrals[0].push_back(1./30.);  // Maple: int((1-x)*x^4, x=0..1);
+    true_integrals[0].push_back(1./42.);  // Maple: int((1-x)*x^5, x=0..1);
+    true_integrals[0].push_back(1./56.);  // Maple: int((1-x)*x^6, x=0..1);
+    true_integrals[0].push_back(1./72.);  // Maple: int((1-x)*x^7, x=0..1);
+    true_integrals[0].push_back(1./90.);  // Maple: int((1-x)*x^8, x=0..1);
+    true_integrals[0].push_back(1./110.); // Maple: int((1-x)*x^9, x=0..1);
+
+    // alpha=2 integral values
+    true_integrals[1].push_back(1./3.);   // Maple: int((1-x)^2,     x=0..1);
+    true_integrals[1].push_back(1./12.);  // Maple: int((1-x)^2*x,   x=0..1);
+    true_integrals[1].push_back(1./30.);  // Maple: int((1-x)^2*x^2, x=0..1);
+    true_integrals[1].push_back(1./60.);  // Maple: int((1-x)^2*x^3, x=0..1);
+    true_integrals[1].push_back(1./105.); // Maple: int((1-x)^2*x^4, x=0..1);
+    true_integrals[1].push_back(1./168.); // Maple: int((1-x)^2*x^5, x=0..1);
+    true_integrals[1].push_back(1./252.); // Maple: int((1-x)^2*x^6, x=0..1);
+    true_integrals[1].push_back(1./360.); // Maple: int((1-x)^2*x^7, x=0..1);
+    true_integrals[1].push_back(1./495.); // Maple: int((1-x)^2*x^8, x=0..1);
+    true_integrals[1].push_back(1./660.); // Maple: int((1-x)^2*x^9, x=0..1);
+
+    // Test both types of Jacobi quadrature rules
+    for (int qt=0; qt<2; ++qt)
+      {
+        for (int order=0; order<10; ++order)
+          {
+            AutoPtr<QBase> qrule = QBase::build(qtype[qt],
+                                                /*dim=*/1,
+                                                static_cast<Order>(order));
+
+            // Initialize on a 1D element, EDGE2/3/4 should not matter...
+            qrule->init (EDGE2);
+
+            // Test the sum of the weights for this order
+            Real sumw = 0.;
+            for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+              sumw += qrule->w(qp);
+
+            // Make sure that the weights add up to the value we expect
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(initial_sum_weights[qt], sumw, TOLERANCE*TOLERANCE);
+
+            // Test integrating different polynomial powers
+            for (int testpower=0; testpower<=order; ++testpower)
+              {
+                // Don't try testpowers larger than the order of the method
+                if (testpower > order)
+                  continue;
+
+                // Note that the weighting function, (1-x)^alpha *
+                // (1+x)^beta, is built into these quadrature rules;
+                // the polynomials we actually integrate are just the
+                // usual monomials.
+                Real sumq = 0.;
+                for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+                  sumq += qrule->w(qp) * std::pow(qrule->qp(qp)(0), testpower);
+
+                // Make sure that the computed integral agrees with the "true" value
+                CPPUNIT_ASSERT_DOUBLES_EQUAL(true_integrals[qt][testpower], sumq, TOLERANCE*TOLERANCE);
+              } // end for(testpower)
+          } // end for(order)
+      } // end for(qt)
+  } // testJacobi
 
 
 

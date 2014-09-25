@@ -89,10 +89,10 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
       {
 
 #ifdef DEBUG
-        if (_order > TWENTYTHIRD)
+        if (_order > FORTYTHIRD)
           {
             libMesh::out << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
-                         << " up to TWENTYTHIRD order." << std::endl;
+                         << " up to FORTYTHIRD order." << std::endl;
           }
 
         if (_dim > 1)
@@ -110,10 +110,10 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
       {
 
 #ifdef DEBUG
-        if (_order > TWENTYTHIRD)
+        if (_order > FORTYTHIRD)
           {
             libMesh::out << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
-                         << " up to TWENTYTHIRD order." << std::endl;
+                         << " up to FORTYTHIRD order." << std::endl;
           }
 
         if (_dim > 1)
