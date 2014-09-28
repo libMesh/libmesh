@@ -227,6 +227,12 @@ data = {
     '2014-Sep-19', 84,  25
     '2014-Sep-20', 45,  15
     '2014-Sep-21', 34,  11
+    '2014-Sep-22', 57,  21
+    '2014-Sep-23', 130, 19
+    '2014-Sep-24', 169, 30
+    '2014-Sep-25', 195, 29
+    '2014-Sep-26', 82,  17
+    '2014-Sep-27', 32,  10
     };
 
 % Github now tracks the total number of clones and unique cloners
@@ -281,6 +287,12 @@ clone_data = {
     '2014-Sep-19', 16, 8
     '2014-Sep-20', 0,  0
     '2014-Sep-21', 4,  4
+    '2014-Sep-22', 4,  3
+    '2014-Sep-23', 19, 14
+    '2014-Sep-24', 13, 11
+    '2014-Sep-25', 26, 15
+    '2014-Sep-26', 10, 9
+    '2014-Sep-27', 1,  1
     };
 
 % length works like you would expect it to for cell arrays.
@@ -419,7 +431,7 @@ print('-dpdf', 'weekly_github_traffic.pdf', '-FHelvetica:20');
 
 % 3.) Make monthly plot
 
-month_intervals = {'2014-Feb-17', '2014-Mar-17', '2014-Apr-17', '2014-May-17', '2014-Jun-17', '2014-Jul-17', '2014-Aug-17'};
+month_intervals = {'2014-Feb-17', '2014-Mar-17', '2014-Apr-17', '2014-May-17', '2014-Jun-17', '2014-Jul-17', '2014-Aug-17', '2014-Sep-17'};
 
 % Numerical indexes of the month intervals
 month_indexes = [];
