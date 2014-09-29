@@ -112,6 +112,16 @@ ParallelMesh::local_elements_begin ()
 
 
 
+// local elements begin() accessor
+ParallelMesh::element_iterator
+ParallelMesh::semilocal_elements_begin ()
+{
+  Predicates::SemiLocal<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
 // not_local elements begin() accessor
 ParallelMesh::element_iterator
 ParallelMesh::not_local_elements_begin ()
@@ -331,6 +341,16 @@ ParallelMesh::const_element_iterator
 ParallelMesh::local_elements_begin () const
 {
   Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// const local begin() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::semilocal_elements_begin () const
+{
+  Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -559,6 +579,16 @@ ParallelMesh::local_elements_end ()
 
 
 
+// semilocal end() accessor
+ParallelMesh::element_iterator
+ParallelMesh::semilocal_elements_end ()
+{
+  Predicates::SemiLocal<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
 // not_local end() accessor
 ParallelMesh::element_iterator
 ParallelMesh::not_local_elements_end ()
@@ -779,6 +809,16 @@ ParallelMesh::const_element_iterator
 ParallelMesh::local_elements_end () const
 {
   Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// semilocal const end() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::semilocal_elements_end () const
+{
+  Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 

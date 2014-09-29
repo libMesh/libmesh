@@ -112,6 +112,16 @@ SerialMesh::local_elements_begin ()
 
 
 
+// semilocal elements begin() accessor
+SerialMesh::element_iterator
+SerialMesh::semilocal_elements_begin ()
+{
+  Predicates::SemiLocal<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
 // not_local elements begin() accessor
 SerialMesh::element_iterator
 SerialMesh::not_local_elements_begin ()
@@ -330,6 +340,16 @@ SerialMesh::const_element_iterator
 SerialMesh::local_elements_begin () const
 {
   Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// const semilocal begin() accessor
+SerialMesh::const_element_iterator
+SerialMesh::semilocal_elements_begin () const
+{
+  Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -558,6 +578,16 @@ SerialMesh::local_elements_end ()
 
 
 
+// semilocal end() accessor
+SerialMesh::element_iterator
+SerialMesh::semilocal_elements_end ()
+{
+  Predicates::SemiLocal<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
 // not_local end() accessor
 SerialMesh::element_iterator
 SerialMesh::not_local_elements_end ()
@@ -780,6 +810,16 @@ SerialMesh::const_element_iterator
 SerialMesh::local_elements_end () const
 {
   Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// semilocal const end() accessor
+SerialMesh::const_element_iterator
+SerialMesh::semilocal_elements_end () const
+{
+  Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
