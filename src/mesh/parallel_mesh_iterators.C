@@ -112,11 +112,21 @@ ParallelMesh::local_elements_begin ()
 
 
 
-// local elements begin() accessor
+// semilocal elements begin() accessor
 ParallelMesh::element_iterator
 ParallelMesh::semilocal_elements_begin ()
 {
   Predicates::SemiLocal<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// face-local elements begin() accessor
+ParallelMesh::element_iterator
+ParallelMesh::facelocal_elements_begin ()
+{
+  Predicates::FaceLocal<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -346,11 +356,21 @@ ParallelMesh::local_elements_begin () const
 
 
 
-// const local begin() accessor
+// const semilocal begin() accessor
 ParallelMesh::const_element_iterator
 ParallelMesh::semilocal_elements_begin () const
 {
   Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// const face-local begin() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::facelocal_elements_begin () const
+{
+  Predicates::FaceLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -589,6 +609,16 @@ ParallelMesh::semilocal_elements_end ()
 
 
 
+// face-local end() accessor
+ParallelMesh::element_iterator
+ParallelMesh::facelocal_elements_end ()
+{
+  Predicates::FaceLocal<elem_iterator_imp> p(this->processor_id());
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
 // not_local end() accessor
 ParallelMesh::element_iterator
 ParallelMesh::not_local_elements_end ()
@@ -819,6 +849,16 @@ ParallelMesh::const_element_iterator
 ParallelMesh::semilocal_elements_end () const
 {
   Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// face-local const end() accessor
+ParallelMesh::const_element_iterator
+ParallelMesh::facelocal_elements_end () const
+{
+  Predicates::FaceLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
