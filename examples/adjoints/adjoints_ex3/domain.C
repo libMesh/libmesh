@@ -13,7 +13,7 @@ using namespace libMesh;
 
 
 //Mesh construction
-void build_domain (Mesh &mesh, FEMParameters &param)
+void build_domain (MeshBase &mesh, FEMParameters &param)
 {
   mesh.read(param.domainfile);
 
