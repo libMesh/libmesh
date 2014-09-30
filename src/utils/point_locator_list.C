@@ -134,7 +134,7 @@ void PointLocatorList::init ()
 
 
 
-const Elem* PointLocatorList::operator() (const Point& p) const
+const Elem* PointLocatorList::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
 {
   libmesh_assert (this->_initialized);
 
@@ -167,17 +167,25 @@ const Elem* PointLocatorList::operator() (const Point& p) const
 
     for (std::size_t n=1; n<max_index; n++)
       {
-        const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
-
-        if (current_distance_sq < last_distance_sq)
+        // Only consider elements in the allowed_subdomains list, if it exists
+        if (!allowed_subdomains ||
+            allowed_subdomains->count(my_list[n].second->subdomain_id()))
           {
-            last_distance_sq = current_distance_sq;
-            last_elem        = my_list[n].second;
+            const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
+
+            if (current_distance_sq < last_distance_sq)
+              {
+                last_distance_sq = current_distance_sq;
+                last_elem        = my_list[n].second;
+              }
           }
       }
 
     // If we found an element, it should be active
     libmesh_assert (!last_elem || last_elem->active());
+
+    // If we found an element and have a restriction list, they better match
+    libmesh_assert (!last_elem || !allowed_subdomains || allowed_subdomains->count(last_elem->subdomain_id()));
 
     STOP_LOG("operator()", "PointLocatorList");
 

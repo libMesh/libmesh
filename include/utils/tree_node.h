@@ -27,6 +27,7 @@
 // C++ includes
 #include <cstddef>
 #include <vector>
+#include <set>
 
 namespace libMesh
 {
@@ -136,16 +137,18 @@ public:
   unsigned int n_active_bins() const;
 
   /**
-   * @returns an element containing point p.
+   * @returns an element containing point p,
+   * optionally restricted to a set of allowed subdomains.
    */
-  const Elem* find_element (const Point& p) const;
+  const Elem* find_element (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
 
 
 private:
   /**
-   * Look for point \p p in our children.
+   * Look for point \p p in our children,
+   * optionally restricted to a set of allowed subdomains.
    */
-  const Elem* find_element_in_children (const Point& p) const;
+  const Elem* find_element_in_children (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const;
 
   /**
    * Constructs the bounding box for child \p c.

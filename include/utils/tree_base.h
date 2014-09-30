@@ -24,6 +24,7 @@
 #include "libmesh/reference_counted_object.h"
 
 // C++ includes
+#include <set>
 
 namespace libMesh
 {
@@ -88,9 +89,10 @@ public:
   virtual unsigned int n_active_bins() const = 0;
 
   /**
-   * @returns a pointer to the element containing point p.
+   * @returns a pointer to the element containing point p,
+   * optionally restricted to a set of allowed subdomains.
    */
-  virtual const Elem* find_element(const Point& p) const = 0;
+  virtual const Elem* find_element(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const = 0;
 
 protected:
 
