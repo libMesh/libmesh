@@ -918,7 +918,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
           ccfile << "if (s[" << sp-- << "] < 0.5) ";
 
         if (ip >= ByteCode.size())
-          ccfile << "return s[" << sp << "]; }\n";
+          ccfile << "return s[" << sp << "];\n";
         else
         {
           ccfile << "goto l" << ip << ";\n";
