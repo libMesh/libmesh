@@ -796,7 +796,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
       case cAtanh:
         ccfile << "s[" << sp << "] = std::atanh(s[" << sp << "]);\n"; break;
       case cAtan2:
-        --sp; ccfile << "s[" << sp << "] = std::atan(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
+        --sp; ccfile << "s[" << sp << "] = std::atan2(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
       case cHypot:
         --sp; ccfile << "s[" << sp << "] = std::sqrt(s[" << sp << "]*s[" << sp << "] + s[" << (sp+1) << "]*s[" << (sp+1) << "]);\n"; break;
 
