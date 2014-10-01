@@ -150,6 +150,7 @@ util_tree_grammar_parser_SOURCES   = \
                                  lib/crc32.hh \
                                  lib/autoptr.hh \
                                  lib/sha1.h \
+                                 lib/sha1.cpp \
                                  extrasrc/fpaux.hh \
                                  extrasrc/fptypes.hh \
                                  extrasrc/fp_opcode_add.inc \
