@@ -91,7 +91,7 @@ namespace
                             break;
 
                         Value_t new_base_immed = fp_pow(base_immed, imm);
-                        if(fp_equal(new_base_immed, Value_t(0)))
+                        if(fp_equal(new_base_immed, Value_t(0)) || fp_equal(new_base_immed, Value_t(1)))
                             break;
 
                         if(!changes)
