@@ -216,6 +216,25 @@ dbg_programs   = # empty, append below
 prof_programs  = # empty, append below
 oprof_programs = # empty, append below
 
+# fparser_parse
+opt_programs               += fparser_parse-opt
+fparser_parse_opt_SOURCES    = src/apps/fparser_parse.C
+fparser_parse_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+fparser_parse_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
+fparser_parse_opt_LDADD      = libmesh_opt.la
+
+devel_programs             += fparser_parse-devel
+fparser_parse_devel_SOURCES  = src/apps/fparser_parse.C
+fparser_parse_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+fparser_parse_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+fparser_parse_devel_LDADD    = libmesh_devel.la
+
+dbg_programs               += fparser_parse-dbg
+fparser_parse_dbg_SOURCES    = src/apps/fparser_parse.C
+fparser_parse_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+fparser_parse_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
+fparser_parse_dbg_LDADD      = libmesh_dbg.la
+
 # getpot_parse
 opt_programs               += getpot_parse-opt
 getpot_parse_opt_SOURCES    = src/apps/getpot_parse.C
