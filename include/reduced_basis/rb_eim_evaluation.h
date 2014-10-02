@@ -98,7 +98,7 @@ public:
    * Get a writable reference to the interpolation points mesh.
    */
   SerialMesh& get_interpolation_points_mesh();
-  
+
   /**
    * @return the value of the parametrized function that is being
    * approximated at the point \p p.

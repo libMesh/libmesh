@@ -478,7 +478,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
                 for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
                   output_buffer.push_back(*recv_conn_iter);
 
-                io.data_stream 
+                io.data_stream
                   (&output_buffer[0],
                    cast_int<unsigned int>(output_buffer.size()),
                    cast_int<unsigned int>(output_buffer.size()));

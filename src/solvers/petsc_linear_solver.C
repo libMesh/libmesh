@@ -980,7 +980,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
       if(_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
-          PetscInt is_complement_local_size = 
+          PetscInt is_complement_local_size =
             cast_int<PetscInt>(rhs_in.local_size()-is_local_size);
 
           Vec subvec1 = NULL;

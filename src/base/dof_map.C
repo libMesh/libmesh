@@ -348,7 +348,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
       processor_id_type procup =
         cast_int<processor_id_type>((this->processor_id() + p) %
                                     this->n_processors());
-      processor_id_type procdown = 
+      processor_id_type procdown =
         cast_int<processor_id_type>((this->n_processors() +
                                      this->processor_id() - p) %
                                     this->n_processors());

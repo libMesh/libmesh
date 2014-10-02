@@ -770,7 +770,7 @@ void enableFPE(bool on)
 }
 
 
-// Enable handling of SIGSEGV by libMesh 
+// Enable handling of SIGSEGV by libMesh
 // (potentially instead of PETSc)
 void enableSEGV(bool on)
 {
