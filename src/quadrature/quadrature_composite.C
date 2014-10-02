@@ -129,14 +129,17 @@ void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const*> &s
       // tetgen seems to create 0-volume cells on occasion, but we *should*
       // be catching that appropriately now inside the ElemCutter class.
       // Just in case trap here, describe the error, and abort.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
       try
         {
+#endif
           _lagrange_fe->reinit(*it);
           _weights.insert(_weights.end(),
                           subelem_weights.begin(), subelem_weights.end());
 
           _points.insert(_points.end(),
                          subelem_points.begin(), subelem_points.end());
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
         }
       catch (...)
         {
@@ -147,6 +150,7 @@ void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const*> &s
 
           libmesh_error_msg("Tetgen may have created a 0-volume cell during Cutcell integration.");
         }
+#endif
     }
 }
 
