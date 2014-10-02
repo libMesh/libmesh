@@ -39,7 +39,7 @@ namespace FPoptimizer_CodeTree
         return tmp;
     }
     template<typename Value_t>
-    range<Value_t> CodeTree<Value_t>::CalculateResultBoundaries_do(const CodeTree<Value_t>& tree)
+    range<Value_t> CalculateResultBoundaries_do(const CodeTree<Value_t>& tree)
 #endif
     {
         static const range<Value_t> pihalf_limits
@@ -645,6 +645,10 @@ namespace FPoptimizer_CodeTree
                         {
                             min = fp_pow(p0.min.val, p1.min.val);
                             if(p0.min.val < Value_t(0) && (!p1.max.known || p1.max.val >= Value_t(0)) && min >= Value_t(0))
+                                min = Value_t(0);
+
+                            // we've already determined the result to be positive, but these boundaries would result in a min = inf
+                            if(p0.min.val == Value_t(0) || p1.min.val < Value_t(0))
                                 min = Value_t(0);
                         }
                         if(p0.min.known && p0.min.val >= Value_t(0) && p0.max.known && p1.max.known)
