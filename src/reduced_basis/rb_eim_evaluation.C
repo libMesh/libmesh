@@ -101,6 +101,11 @@ unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
     (_parametrized_functions.size());
 }
 
+SerialMesh& RBEIMEvaluation::get_interpolation_points_mesh()
+{
+  return _interpolation_points_mesh;
+}
+
 Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index,
                                                        const Point& p,
                                                        const Elem& elem)
