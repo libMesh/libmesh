@@ -151,7 +151,7 @@ namespace libMesh
       case 1: this->cut_1D(elem, vertex_distance_func); break;
       case 2: this->cut_2D(elem, vertex_distance_func); break;
       case 3: this->cut_3D(elem, vertex_distance_func); break;
-      default: libmesh_error();
+      default: libmesh_error_msg("Invalid element dimension: " << elem.dim());
       }
   }
 

@@ -141,12 +141,11 @@ void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const*> &s
       catch (...)
         {
           libMesh::err << "ERROR: found a bad cut cell!\n";
-          libmesh_here();
 
           for (unsigned int n=0; n<(*it)->n_nodes(); n++)
             libMesh::err << (*it)->point(n) << std::endl;
 
-          libmesh_error();
+          libmesh_error_msg("Tetgen may have created a 0-volume cell during Cutcell integration.");
         }
     }
 }

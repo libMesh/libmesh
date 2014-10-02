@@ -82,7 +82,7 @@ int main(int argc, char** argv)
       for (unsigned int s = 0; s != sysnames.size(); ++s)
         {
           if (!es2.has_system(sysnames[s]))
-            libmesh_error();
+            libmesh_error_msg("EquationSystems object does not have " << sysnames[s]);
 
           (*summed_solutions[s]) += *es2.get_system(s).solution;
         }
