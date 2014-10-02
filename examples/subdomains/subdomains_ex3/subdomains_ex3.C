@@ -86,8 +86,8 @@ int main (int argc, char** argv)
 
     if (argc == 3 && std::atoi(argv[2]) == 3)
       {
-	libmesh_here();
-	dim=3;
+        libmesh_here();
+        dim=3;
       }
 
     mesh.read ((dim==2) ? "mesh.xda" : "hybrid_3d.xda");
@@ -140,13 +140,13 @@ void integrate_function (const MeshBase &mesh)
       vertex_distance.clear();
 
       for (unsigned int v=0; v<elem->n_vertices(); v++)
-	vertex_distance.push_back (distance(elem->point(v)));
+        vertex_distance.push_back (distance(elem->point(v)));
 
       qrule.init (*elem, vertex_distance);
 
       fe->reinit (elem,
-		  &(qrule.get_points()),
-		  &(qrule.get_weights()));
+                  &(qrule.get_points()),
+                  &(qrule.get_weights()));
 
 
       // TODO:  would it be valuable to have the composite quadrature rule sort
@@ -154,16 +154,16 @@ void integrate_function (const MeshBase &mesh)
       // ... large + small + large + large + small ...
       // type truncation errors?
       for (unsigned int qp=0; qp<q_points.size(); qp++)
-	int_val += JxW[qp] * integrand(q_points[qp]);
+        int_val += JxW[qp] * integrand(q_points[qp]);
     }
 
   mesh.comm().sum (int_val);
 
   std::cout  << "\n***********************************\n"
-	     << " int_val   = " << int_val << std::endl
-	     << " exact_val = " <<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
-	     << "\n***********************************\n"
-	     << std::endl;
+             << " int_val   = " << int_val << std::endl
+             << " exact_val = " <<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
+             << "\n***********************************\n"
+             << std::endl;
 #else
   libmesh_ignore(mesh);
 #endif

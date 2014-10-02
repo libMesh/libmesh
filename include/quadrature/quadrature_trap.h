@@ -47,7 +47,7 @@ public:
    */
   explicit
   QTrap (const unsigned int _dim,
-	 const Order o=FIRST);
+         const Order o=FIRST);
 
   /**
    * Destructor. Empty.
@@ -74,7 +74,7 @@ private:
 // QTrap class members
 inline
 QTrap::QTrap(const unsigned int d,
-	     const Order) : QBase(d,FIRST)
+             const Order) : QBase(d,FIRST)
 {
   // explicitly call the init function in 1D since the
   // other tensor-product rules require this one.

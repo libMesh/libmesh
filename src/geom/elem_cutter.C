@@ -61,12 +61,12 @@ namespace libMesh
 
 
   bool ElemCutter::is_inside (const Elem &elem,
-			      const std::vector<Real> &vertex_distance_func) const
+                              const std::vector<Real> &vertex_distance_func) const
   {
     libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
 
     for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
-	 it!=vertex_distance_func.end(); ++it)
+         it!=vertex_distance_func.end(); ++it)
       if (*it > 0.) return false;
 
     // if the distance function is nonpositive, we are outside
@@ -76,12 +76,12 @@ namespace libMesh
 
 
   bool ElemCutter::is_outside (const Elem &elem,
-			       const std::vector<Real> &vertex_distance_func) const
+                               const std::vector<Real> &vertex_distance_func) const
   {
     libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
 
     for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
-	 it!=vertex_distance_func.end(); ++it)
+         it!=vertex_distance_func.end(); ++it)
       if (*it < 0.) return false;
 
     // if the distance function is nonnegative, we are outside
@@ -91,7 +91,7 @@ namespace libMesh
 
 
   bool ElemCutter::is_cut (const Elem &elem,
-			   const std::vector<Real> &vertex_distance_func) const
+                           const std::vector<Real> &vertex_distance_func) const
   {
     libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
 
@@ -100,10 +100,10 @@ namespace libMesh
       vmax = vmin;
 
     for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
-	 it!=vertex_distance_func.end(); ++it)
+         it!=vertex_distance_func.end(); ++it)
       {
-	vmin = std::min (vmin, *it);
-	vmax = std::max (vmax, *it);
+        vmin = std::min (vmin, *it);
+        vmax = std::max (vmax, *it);
       }
 
     // if the distance function changes sign, we're cut.
@@ -113,7 +113,7 @@ namespace libMesh
 
 
   void ElemCutter::operator()(const Elem &elem,
-			      const std::vector<Real> &vertex_distance_func)
+                              const std::vector<Real> &vertex_distance_func)
 
   {
     libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
@@ -125,19 +125,19 @@ namespace libMesh
     {
       // completely outside?
       if (this->is_outside(elem, vertex_distance_func))
-	{
-	  //std::cout << "element completely outside\n";
-	  _outside_elem.push_back(&elem);
-	  return;
-	}
+        {
+          //std::cout << "element completely outside\n";
+          _outside_elem.push_back(&elem);
+          return;
+        }
 
       // completely inside?
       else if (this->is_inside(elem, vertex_distance_func))
-	{
-	  //std::cout << "element completely inside\n";
-	_inside_elem.push_back(&elem);
-	return;
-	}
+        {
+          //std::cout << "element completely inside\n";
+          _inside_elem.push_back(&elem);
+          return;
+        }
 
       libmesh_assert (this->is_cut (elem, vertex_distance_func));
     }
@@ -158,54 +158,54 @@ namespace libMesh
 
 
   void ElemCutter::find_intersection_points(const Elem &elem,
-					    const std::vector<Real> &vertex_distance_func)
+                                            const std::vector<Real> &vertex_distance_func)
   {
     _intersection_pts.clear();
 
     for (unsigned int e=0; e<elem.n_edges(); e++)
       {
-	AutoPtr<Elem> edge (elem.build_edge(e));
+        AutoPtr<Elem> edge (elem.build_edge(e));
 
-	// find the element nodes el0, el1 that map
-	unsigned int
-	  el0 = elem.get_node_index(edge->get_node(0)),
-	  el1 = elem.get_node_index(edge->get_node(1));
+        // find the element nodes el0, el1 that map
+        unsigned int
+          el0 = elem.get_node_index(edge->get_node(0)),
+          el1 = elem.get_node_index(edge->get_node(1));
 
-	libmesh_assert (elem.is_vertex(el0));
-	libmesh_assert (elem.is_vertex(el1));
-	libmesh_assert_less (el0, vertex_distance_func.size());
-	libmesh_assert_less (el1, vertex_distance_func.size());
+        libmesh_assert (elem.is_vertex(el0));
+        libmesh_assert (elem.is_vertex(el1));
+        libmesh_assert_less (el0, vertex_distance_func.size());
+        libmesh_assert_less (el1, vertex_distance_func.size());
 
-	const Real
-	  d0 = vertex_distance_func[el0],
-	  d1 = vertex_distance_func[el1];
+        const Real
+          d0 = vertex_distance_func[el0],
+          d1 = vertex_distance_func[el1];
 
-	// if this egde has a 0 crossing
-	if (d0*d1 < 0.)
-	  {
-	    libmesh_assert_not_equal_to (d0, d1);
+        // if this egde has a 0 crossing
+        if (d0*d1 < 0.)
+          {
+            libmesh_assert_not_equal_to (d0, d1);
 
-	    // then find d_star in [0,1], the
-	    // distance from el0 to el1 where the 0 lives.
-	    const Real d_star = d0 / (d0 - d1);
+            // then find d_star in [0,1], the
+            // distance from el0 to el1 where the 0 lives.
+            const Real d_star = d0 / (d0 - d1);
 
 
-	    // Prevent adding nodes trivially close to existing
-	    // nodes.
-	    const Real endpoint_tol = 0.01;
+            // Prevent adding nodes trivially close to existing
+            // nodes.
+            const Real endpoint_tol = 0.01;
 
-	    if ( (d_star > endpoint_tol) &&
-		 (d_star < (1.-endpoint_tol)) )
-	      {
-		const Point x_star = (edge->point(0)*(1.-d_star) +
-				      edge->point(1)*d_star);
+            if ( (d_star > endpoint_tol) &&
+                 (d_star < (1.-endpoint_tol)) )
+              {
+                const Point x_star = (edge->point(0)*(1.-d_star) +
+                                      edge->point(1)*d_star);
 
-		std::cout << "adding cut point (d_star, x_star) = "
-			  << d_star << " , " << x_star << std::endl;
+                std::cout << "adding cut point (d_star, x_star) = "
+                          << d_star << " , " << x_star << std::endl;
 
-		_intersection_pts.push_back (x_star);
-	      }
-	  }
+                _intersection_pts.push_back (x_star);
+              }
+          }
       }
   }
 
@@ -213,7 +213,7 @@ namespace libMesh
 
 
   void ElemCutter::cut_1D (const Elem & /*elem*/,
-			   const std::vector<Real> &/*vertex_distance_func*/)
+                           const std::vector<Real> &/*vertex_distance_func*/)
   {
     libmesh_not_implemented();
   }
@@ -221,14 +221,14 @@ namespace libMesh
 
 
   void ElemCutter::cut_2D (const Elem &elem,
-			   const std::vector<Real> &vertex_distance_func)
+                           const std::vector<Real> &vertex_distance_func)
   {
 #ifndef LIBMESH_HAVE_TRIANGLE
 
     // current implementation requires triangle!
     libMesh::err << "ERROR: current libMesh ElemCutter 2D implementation requires\n"
-		 << "       the \"triangle\" library!\n"
-		 << std::endl;
+                 << "       the \"triangle\" library!\n"
+                 << std::endl;
     libmesh_not_implemented();
 
 #else // OK, LIBMESH_HAVE_TRIANGLE
@@ -243,18 +243,18 @@ namespace libMesh
 
     for (unsigned int v=0; v<elem.n_vertices(); v++)
       {
-	if (vertex_distance_func[v] >= 0.)
-	  _outside_mesh_2D->add_point (elem.point(v));
+        if (vertex_distance_func[v] >= 0.)
+          _outside_mesh_2D->add_point (elem.point(v));
 
-	if (vertex_distance_func[v] <= 0.)
-	  _inside_mesh_2D->add_point (elem.point(v));
+        if (vertex_distance_func[v] <= 0.)
+          _inside_mesh_2D->add_point (elem.point(v));
       }
 
     for (std::vector<Point>::const_iterator it=_intersection_pts.begin();
-	 it != _intersection_pts.end(); ++it)
+         it != _intersection_pts.end(); ++it)
       {
-	_inside_mesh_2D->add_point(*it);
-	_outside_mesh_2D->add_point(*it);
+        _inside_mesh_2D->add_point(*it);
+        _outside_mesh_2D->add_point(*it);
       }
 
 
@@ -281,8 +281,8 @@ namespace libMesh
     // std::ostringstream name;
 
     // name << "cut_face_"
-    // 	 << cut_cntr++
-    // 	 << ".dat";
+    //  << cut_cntr++
+    //  << ".dat";
     // _inside_mesh_2D->write  ("in_"  + name.str());
     // _outside_mesh_2D->write ("out_" + name.str());
 
@@ -291,17 +291,17 @@ namespace libMesh
       _inside_elem.clear(); /**/ _outside_elem.clear();
 
       MeshBase::const_element_iterator
-	it  = _inside_mesh_2D->elements_begin(),
-	end = _inside_mesh_2D->elements_end();
+        it  = _inside_mesh_2D->elements_begin(),
+        end = _inside_mesh_2D->elements_end();
 
       for (; it!=end; ++it)
-	_inside_elem.push_back (*it);
+        _inside_elem.push_back (*it);
 
       it  = _outside_mesh_2D->elements_begin();
       end = _outside_mesh_2D->elements_end();
 
       for (; it!=end; ++it)
-	_outside_elem.push_back (*it);
+        _outside_elem.push_back (*it);
     }
 
 #endif
@@ -310,14 +310,14 @@ namespace libMesh
 
 
   void ElemCutter::cut_3D (const Elem &elem,
-			   const std::vector<Real> &vertex_distance_func)
+                           const std::vector<Real> &vertex_distance_func)
   {
 #ifndef LIBMESH_HAVE_TETGEN
 
     // current implementation requires tetgen!
     libMesh::err << "ERROR: current libMesh ElemCutter 3D implementation requires\n"
-		 << "       the \"tetgen\" library!\n"
-		 << std::endl;
+                 << "       the \"tetgen\" library!\n"
+                 << std::endl;
     libmesh_not_implemented();
 
 #else // OK, LIBMESH_HAVE_TETGEN
@@ -332,18 +332,18 @@ namespace libMesh
 
     for (unsigned int v=0; v<elem.n_vertices(); v++)
       {
-	if (vertex_distance_func[v] >= 0.)
-	  _outside_mesh_3D->add_point (elem.point(v));
+        if (vertex_distance_func[v] >= 0.)
+          _outside_mesh_3D->add_point (elem.point(v));
 
-	if (vertex_distance_func[v] <= 0.)
-	  _inside_mesh_3D->add_point (elem.point(v));
+        if (vertex_distance_func[v] <= 0.)
+          _inside_mesh_3D->add_point (elem.point(v));
       }
 
     for (std::vector<Point>::const_iterator it=_intersection_pts.begin();
-	 it != _intersection_pts.end(); ++it)
+         it != _intersection_pts.end(); ++it)
       {
-	_inside_mesh_3D->add_point(*it);
-	_outside_mesh_3D->add_point(*it);
+        _inside_mesh_3D->add_point(*it);
+        _outside_mesh_3D->add_point(*it);
       }
 
 
@@ -371,8 +371,8 @@ namespace libMesh
     std::ostringstream name;
 
     name << "cut_cell_"
-    	 << cut_cntr++
-    	 << ".dat";
+         << cut_cntr++
+         << ".dat";
     _inside_mesh_3D->write  ("in_"  + name.str());
     _outside_mesh_3D->write ("out_" + name.str());
 
@@ -381,19 +381,19 @@ namespace libMesh
       _inside_elem.clear(); /**/ _outside_elem.clear();
 
       MeshBase::const_element_iterator
-	it  = _inside_mesh_3D->elements_begin(),
-	end = _inside_mesh_3D->elements_end();
+        it  = _inside_mesh_3D->elements_begin(),
+        end = _inside_mesh_3D->elements_end();
 
       for (; it!=end; ++it)
-	if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
-	  _inside_elem.push_back (*it);
+        if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
+          _inside_elem.push_back (*it);
 
       it  = _outside_mesh_3D->elements_begin();
       end = _outside_mesh_3D->elements_end();
 
       for (; it!=end; ++it)
-	if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
-	  _outside_elem.push_back (*it);
+        if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
+          _outside_elem.push_back (*it);
     }
 
 #endif

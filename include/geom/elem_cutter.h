@@ -76,7 +76,7 @@ public:
    * \p vertex_distance_func.
    */
   bool is_inside (const Elem &elem,
-		  const std::vector<Real> &vertex_distance_func) const;
+                  const std::vector<Real> &vertex_distance_func) const;
 
   /**
    * @returns \p true if the element is completely outside the
@@ -84,7 +84,7 @@ public:
    * \p vertex_distance_func.
    */
   bool is_outside (const Elem &elem,
-		   const std::vector<Real> &vertex_distance_func) const;
+                   const std::vector<Real> &vertex_distance_func) const;
 
   /**
    * @returns \p true if the element is cut by the interface defined
@@ -92,7 +92,7 @@ public:
    * \p vertex_distance_func.
    */
   bool is_cut (const Elem &elem,
-	       const std::vector<Real> &vertex_distance_func) const;
+               const std::vector<Real> &vertex_distance_func) const;
 
   /**
    * This function implements cutting an element by a signed distance
@@ -104,7 +104,7 @@ public:
    * cutting surface and is not cut.
    */
   void operator()(const Elem &elem_in,
-		  const std::vector<Real> &vertex_distance_func);
+                  const std::vector<Real> &vertex_distance_func);
 
   /**
    * Returns a list of in general element pieces considered inside the
@@ -129,25 +129,25 @@ protected:
    * intersects the element edges.
    */
   void find_intersection_points(const Elem &elem,
-				const std::vector<Real> &vertex_distance_func);
+                                const std::vector<Real> &vertex_distance_func);
 
   /**
    * cutting algoritm in 1D.
    */
   void cut_1D(const Elem &elem,
-	      const std::vector<Real> &vertex_distance_func);
+              const std::vector<Real> &vertex_distance_func);
 
   /**
    * cutting algoritm in 2D.
    */
   void cut_2D(const Elem &elem,
-	      const std::vector<Real> &vertex_distance_func);
+              const std::vector<Real> &vertex_distance_func);
 
   /**
    * cutting algoritm in 3D.
    */
   void cut_3D(const Elem &elem,
-	      const std::vector<Real> &vertex_distance_func);
+              const std::vector<Real> &vertex_distance_func);
 
   std::vector<Elem const*> _inside_elem;
   std::vector<Elem const*> _outside_elem;

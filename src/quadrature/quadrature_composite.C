@@ -34,7 +34,7 @@ namespace libMesh
 
 template <class QSubCell>
 QComposite<QSubCell>::QComposite(const unsigned int d,
-				 const Order o) :
+                                 const Order o) :
   QSubCell(d,o), // explicitly call base class constructor
   _q_subcell(d,o),
   _lagrange_fe(FEBase::build (d, FEType (FIRST, LAGRANGE)))
@@ -62,8 +62,8 @@ QComposite<QSubCell>::~QComposite()
 
 template <class QSubCell>
 void QComposite<QSubCell>::init (const Elem &elem,
-				 const std::vector<Real> &vertex_distance_func,
-				 unsigned int p_level)
+                                 const std::vector<Real> &vertex_distance_func,
+                                 unsigned int p_level)
 {
   libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
   libmesh_assert_equal_to (_dim, elem.dim());
@@ -130,24 +130,24 @@ void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const*> &s
       // be catching that appropriately now inside the ElemCutter class.
       // Just in case trap here, describe the error, and abort.
       try
-	{
-	  _lagrange_fe->reinit(*it);
-	  _weights.insert(_weights.end(),
-			  subelem_weights.begin(), subelem_weights.end());
+        {
+          _lagrange_fe->reinit(*it);
+          _weights.insert(_weights.end(),
+                          subelem_weights.begin(), subelem_weights.end());
 
-	  _points.insert(_points.end(),
-			 subelem_points.begin(), subelem_points.end());
-	}
+          _points.insert(_points.end(),
+                         subelem_points.begin(), subelem_points.end());
+        }
       catch (...)
-	{
-	  libMesh::err << "ERROR: found a bad cut cell!\n";
-	  libmesh_here();
+        {
+          libMesh::err << "ERROR: found a bad cut cell!\n";
+          libmesh_here();
 
-	  for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-	    libMesh::err << (*it)->point(n) << std::endl;
+          for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+            libMesh::err << (*it)->point(n) << std::endl;
 
-	  libmesh_error();
-	}
+          libmesh_error();
+        }
     }
 }
 

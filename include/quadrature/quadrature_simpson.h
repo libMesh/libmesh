@@ -51,7 +51,7 @@ public:
    */
   explicit
   QSimpson (const unsigned int _dim,
-	    const Order o=THIRD);
+            const Order o=THIRD);
 
   /**
    * Destructor. Empty.
@@ -81,7 +81,7 @@ private:
 // QSimpson class members
 inline
 QSimpson::QSimpson(const unsigned int d,
-		   const Order) : QBase(d,THIRD)
+                   const Order) : QBase(d,THIRD)
 {
   // explicitly call the init function in 1D since the
   // other tensor-product rules require this one.

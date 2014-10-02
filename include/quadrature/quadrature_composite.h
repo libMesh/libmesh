@@ -62,7 +62,7 @@ class QComposite : public QSubCell
    * Constructor.  Declares the order of the quadrature rule.
    */
   QComposite (const unsigned int _dim,
-	      const Order _order=INVALID_ORDER);
+              const Order _order=INVALID_ORDER);
 
   /**
    * Destructor.
@@ -83,8 +83,8 @@ class QComposite : public QSubCell
    * composite quadrature rule for the cut element.
    */
   virtual void init (const Elem &elem,
-		     const std::vector<Real> &vertex_distance_func,
-		     unsigned int p_level=0);
+                     const std::vector<Real> &vertex_distance_func,
+                     unsigned int p_level=0);
 
  private:
 
