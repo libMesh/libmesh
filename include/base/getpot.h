@@ -839,9 +839,9 @@ GetPot::GetPot(const GetPot& Other) :
   _comment_start(Other._comment_start),
   _comment_end(Other._comment_end),
   _field_separator(Other._field_separator),
-#if !defined(GETPOT_DISABLE_MUTEX)
-  _getpot_mtx(Other._getpot_mtx),
-#endif
+// #if !defined(GETPOT_DISABLE_MUTEX)
+//   _getpot_mtx(Other._getpot_mtx),
+// #endif
   _internal_string_container(),
   _requested_arguments(Other._requested_arguments),
   _requested_variables(Other._requested_variables),
@@ -897,9 +897,9 @@ GetPot::operator=(const GetPot& Other)
   _comment_start       = Other._comment_start;
   _comment_end         = Other._comment_end;
   _field_separator     = Other._field_separator;
-#if !defined(GETPOT_DISABLE_MUTEX)
-  _getpot_mtx          = Other._getpot_mtx;
-#endif
+// #if !defined(GETPOT_DISABLE_MUTEX)
+//   _getpot_mtx          = Other._getpot_mtx;
+// #endif
   _requested_arguments = Other._requested_arguments;
   _requested_variables = Other._requested_variables;
   _requested_sections  = Other._requested_sections;
