@@ -351,7 +351,7 @@ private:
 namespace libMesh {
 
 
-template <typename Output>
+  template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:

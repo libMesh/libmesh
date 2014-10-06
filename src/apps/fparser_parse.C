@@ -3,6 +3,7 @@
 
 #include "libmesh/libmesh_config.h"
 #include "libmesh/parsed_function.h"
+#include "libmesh/point.h"
 
 #include <cstdlib>
 
