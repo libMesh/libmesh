@@ -1407,7 +1407,7 @@ GetPot::_process_section_label(const std::string& Section,
           if (sname[i] == '/')
             {
               section_stack.push_back(sname.substr(0,i));
-              if (i+1 < sname.length()-1)
+              if (i+1 < sname.length())
                 sname = sname.substr(i+1);
               i = 0;
             }
