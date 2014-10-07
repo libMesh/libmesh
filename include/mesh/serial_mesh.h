@@ -245,6 +245,12 @@ public:
   element_iterator local_elements_begin ();
   element_iterator local_elements_end   ();
 
+  element_iterator semilocal_elements_begin ();
+  element_iterator semilocal_elements_end   ();
+
+  element_iterator facelocal_elements_begin ();
+  element_iterator facelocal_elements_end   ();
+
   element_iterator not_local_elements_begin ();
   element_iterator not_local_elements_end   ();
 
@@ -313,6 +319,12 @@ public:
 
   const_element_iterator local_elements_begin () const;
   const_element_iterator local_elements_end   () const;
+
+  const_element_iterator semilocal_elements_begin () const;
+  const_element_iterator semilocal_elements_end   () const;
+
+  const_element_iterator facelocal_elements_begin () const;
+  const_element_iterator facelocal_elements_end   () const;
 
   const_element_iterator not_local_elements_begin () const;
   const_element_iterator not_local_elements_end   () const;

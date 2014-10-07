@@ -171,6 +171,54 @@ protected:
 
 
 
+// The semilocal_pid predicate returns true if the element
+// pointed to is semilocal to (has nodes shared with an element of) a
+// given processor id.
+template <typename T>
+struct semilocal_pid : predicate<T>
+{
+  // Constructor
+  semilocal_pid(const processor_id_type p) : _pid(p) {}
+  virtual ~semilocal_pid() {}
+
+  // op()
+  virtual bool operator()(const T& it) const { return (*it)->is_semilocal(_pid); }
+
+protected:
+  virtual predicate<T>* clone() const { return new semilocal_pid<T>(*this); }
+  const processor_id_type _pid;
+};
+
+
+
+// The facelocal_pid predicate returns true if the element
+// pointed to is face-local to (is on or has a neighbor on the
+// partition of) a given processor id.
+template <typename T>
+struct facelocal_pid : predicate<T>
+{
+  // Constructor
+  facelocal_pid(const processor_id_type p) : _pid(p) {}
+  virtual ~facelocal_pid() {}
+
+  // op()
+  virtual bool operator()(const T& it) const {
+    if ((*it)->processor_id() == _pid)
+      return true;
+    for (unsigned int n = 0; n != (*it)->n_neighbors(); ++n)
+      if ((*it)->neighbor(n) &&
+          (*it)->neighbor(n)->processor_id() == _pid)
+        return true;
+    return false;
+  }
+
+protected:
+  virtual predicate<T>* clone() const { return new facelocal_pid<T>(*this); }
+  const processor_id_type _pid;
+};
+
+
+
 // The not_pid predicate returns ture if the pointers
 // processor id does _not_ match p.
 template <typename T>

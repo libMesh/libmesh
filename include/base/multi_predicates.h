@@ -242,6 +242,36 @@ struct Local : abstract_multi_predicate<T>
 };
 
 
+// Instantiation for the Local abstract_multi_predicate
+template <typename T>
+struct SemiLocal : abstract_multi_predicate<T>
+{
+  // Constructor, pushes back two single predicates
+  SemiLocal(const processor_id_type my_pid)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new not_subactive<T>);
+    this->_predicates.push_back(new semilocal_pid<T>(my_pid));
+  }
+
+};
+
+
+// Instantiation for the Local abstract_multi_predicate
+template <typename T>
+struct FaceLocal : abstract_multi_predicate<T>
+{
+  // Constructor, pushes back two single predicates
+  FaceLocal(const processor_id_type my_pid)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new not_subactive<T>);
+    this->_predicates.push_back(new facelocal_pid<T>(my_pid));
+  }
+
+};
+
+
 // Instantiation for the NotLocal abstract_multi_predicate
 template <typename T>
 struct NotLocal : abstract_multi_predicate<T>
