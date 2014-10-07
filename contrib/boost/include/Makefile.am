@@ -15,6 +15,7 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/config/select_stdlib_config.hpp \
         boost/config/no_tr1/utility.hpp \
         boost/config/stdlib/libstdcpp3.hpp \
+        boost/config/stdlib/libcpp.hpp \
         boost/config/select_platform_config.hpp \
         boost/config/platform/macos.hpp \
         boost/config/platform/linux.hpp \
