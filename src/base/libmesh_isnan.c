@@ -27,8 +27,8 @@ int libmesh_C_isnan_double(double a) { return isnan(a); }
 int libmesh_C_isnan_longdouble(long double a) { return isnan(a); }
 
 #else
-int libmesh_C_isnan_float(float a) { return 0; }
-int libmesh_C_isnan_double(double a) { return 0; }
-int libmesh_C_isnan_longdouble(long double a) { return 0; }
+int libmesh_C_isnan_float(float a) { return (a != a); }
+int libmesh_C_isnan_double(double a) { return (a != a); }
+int libmesh_C_isnan_longdouble(long double a) { return (a != a); }
 
 #endif
