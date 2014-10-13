@@ -30,6 +30,7 @@
 #include "libmesh/quadrature_simpson.h"
 #include "libmesh/quadrature_trap.h"
 #include "libmesh/quadrature_gauss_lobatto.h"
+#include "libmesh/quadrature_conical.h"
 #include "libmesh/string_to_enum.h"
 
 namespace libMesh
@@ -178,6 +179,12 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
     case QGAUSS_LOBATTO:
       {
         AutoPtr<QBase> ap(new QGaussLobatto(_dim, _order));
+        return ap;
+      }
+
+    case QCONICAL:
+      {
+        AutoPtr<QBase> ap(new QConical(_dim, _order));
         return ap;
       }
 
