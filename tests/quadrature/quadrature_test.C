@@ -6,6 +6,7 @@
 
 #include <libmesh/quadrature.h>
 #include <libmesh/string_to_enum.h>
+#include <libmesh/utility.h>
 
 #include <iomanip>
 
@@ -78,8 +79,11 @@ public:
 // Tets only
 //  TEST_ALL_ORDERS(QGRUNDMANN_MOLLER, 9999);
 
-// Tris+Tets only
-//  TEST_ALL_ORDERS(QCONICAL, 9999);
+  // Test quadrature rules on Triangles
+  CPPUNIT_TEST( testTriQuadrature );
+
+  // Test quadrature rules on Tetrahedra
+  CPPUNIT_TEST( testTetQuadrature );
 
 // Test Jacobi quadrature rules with special weighting function
   CPPUNIT_TEST( testJacobi );
@@ -95,6 +99,160 @@ public:
 
   void tearDown ()
   {}
+
+  void testTetQuadrature ()
+  {
+    // There are 3 different families of quadrature rules for tetrahedra
+    QuadratureType qtype[3] = {QCONICAL, QGRUNDMANN_MOLLER, QGAUSS};
+
+    for (int qt=0; qt<3; ++qt)
+      for (int order=0; order<7; ++order)
+        {
+          AutoPtr<QBase> qrule = QBase::build(qtype[qt],
+                                              /*dim=*/3,
+                                              static_cast<Order>(order));
+
+          // Initialize on a TET element
+          qrule->init (TET4);
+
+          // Test the sum of the weights for this order
+          Real sumw = 0.;
+          for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+            sumw += qrule->w(qp);
+
+          // Make sure that the weights add up to the value we expect
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(1./6., sumw, TOLERANCE*TOLERANCE);
+
+          // Test integrating different polynomial powers
+          for (int x_power=0; x_power<=order; ++x_power)
+            for (int y_power=0; y_power<=order; ++y_power)
+              for (int z_power=0; z_power<=order; ++z_power)
+                {
+                  // Only try to integrate polynomials we can integrate exactly
+                  if (x_power + y_power + z_power > order)
+                    continue;
+
+                  // Compute the integral via quadrature
+                  Real sumq = 0.;
+                  for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+                    sumq += qrule->w(qp)
+                      * std::pow(qrule->qp(qp)(0), x_power)
+                      * std::pow(qrule->qp(qp)(1), y_power)
+                      * std::pow(qrule->qp(qp)(2), z_power);
+
+                  // std::cout << "sumq = " << sumq << std::endl;
+
+                  // Compute the true integral, a! b! c! / (a + b + c + 3)!
+                  Real analytical = 1.0;
+                  {
+                    // Sort the a, b, c values
+                    int sorted_powers[3] = {x_power, y_power, z_power};
+                    std::sort(sorted_powers, sorted_powers+3);
+
+                    // Cancel the largest power with the denominator, fill in the
+                    // entries for the remaining numerator terms and the denominator.
+                    std::vector<int>
+                      numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
+                      numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
+                      denominator(3 + sorted_powers[0] + sorted_powers[1]);
+
+                    // Fill up the vectors with sequences starting at the right values.
+                    Utility::iota(numerator_1.begin(), numerator_1.end(), 2);
+                    Utility::iota(numerator_2.begin(), numerator_2.end(), 2);
+                    Utility::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
+
+                    // The denominator is guaranteed to have the most terms...
+                    for (unsigned i=0; i<denominator.size(); ++i)
+                      {
+                        if (i < numerator_1.size())
+                          analytical *= numerator_1[i];
+
+                        if (i < numerator_2.size())
+                          analytical *= numerator_2[i];
+
+                        analytical /= denominator[i];
+                      }
+                  }
+
+                  // std::cout << "analytical = " << analytical << std::endl;
+
+                  // Make sure that the computed integral agrees with the "true" value
+                  CPPUNIT_ASSERT_DOUBLES_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
+                } // end for(testpower)
+        } // end for(order)
+  }
+
+  void testTriQuadrature ()
+  {
+    // There are 2 main families of quadrature rules for triangles
+    QuadratureType qtype[3] = {QCONICAL, QGAUSS};
+
+    for (int qt=0; qt<2; ++qt)
+      for (int order=0; order<10; ++order)
+        {
+          AutoPtr<QBase> qrule = QBase::build(qtype[qt],
+                                              /*dim=*/2,
+                                              static_cast<Order>(order));
+
+          // Initialize on a TRI element
+          qrule->init (TRI3);
+
+          // Test the sum of the weights for this order
+          Real sumw = 0.;
+          for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+            sumw += qrule->w(qp);
+
+          // Make sure that the weights add up to the value we expect
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5, sumw, TOLERANCE*TOLERANCE);
+
+          // Test integrating different polynomial powers
+          for (int x_power=0; x_power<=order; ++x_power)
+            for (int y_power=0; y_power<=order; ++y_power)
+              {
+                // Only try to integrate polynomials we can integrate exactly
+                if (x_power + y_power > order)
+                  continue;
+
+                // Compute the integral via quadrature
+                Real sumq = 0.;
+                for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+                  sumq += qrule->w(qp) * std::pow(qrule->qp(qp)(0), x_power) * std::pow(qrule->qp(qp)(1), y_power);
+
+                // std::cout << "sumq = " << sumq << std::endl;
+
+                // Compute the true integral, a! b! / (a + b + 2)!
+                Real analytical = 1.0;
+                {
+                  unsigned
+                    larger_power = std::max(x_power, y_power),
+                    smaller_power = std::min(x_power, y_power);
+
+                  // Cancel the larger of the two numerator terms with the
+                  // denominator, and fill in the remaining entries.
+                  std::vector<unsigned>
+                    numerator(smaller_power > 1 ? smaller_power-1 : 0),
+                    denominator(2+smaller_power);
+
+                  // Fill up the vectors with sequences starting at the right values.
+                  Utility::iota(numerator.begin(), numerator.end(), 2);
+                  Utility::iota(denominator.begin(), denominator.end(), larger_power+1);
+
+                  // The denominator is guaranteed to have more terms...
+                  for (unsigned i=0; i<denominator.size(); ++i)
+                    {
+                      if (i < numerator.size())
+                        analytical *= numerator[i];
+                      analytical /= denominator[i];
+                    }
+                }
+
+                // std::cout << "analytical = " << analytical << std::endl;
+
+                // Make sure that the computed integral agrees with the "true" value
+                CPPUNIT_ASSERT_DOUBLES_EQUAL(analytical, sumq, TOLERANCE*TOLERANCE);
+              } // end for(testpower)
+        } // end for(order)
+  }
 
   void testJacobi ()
   {
