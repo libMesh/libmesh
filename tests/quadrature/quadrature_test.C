@@ -118,28 +118,16 @@ public:
     std::vector<std::vector<Real> > true_integrals(2);
 
     // alpha=1 integral values
-    true_integrals[0].push_back(1./2.);   // Maple: int((1-x),     x=0..1);
-    true_integrals[0].push_back(1./6.);   // Maple: int((1-x)*x,   x=0..1);
-    true_integrals[0].push_back(1./12.);  // Maple: int((1-x)*x^2, x=0..1);
-    true_integrals[0].push_back(1./20.);  // Maple: int((1-x)*x^3, x=0..1);
-    true_integrals[0].push_back(1./30.);  // Maple: int((1-x)*x^4, x=0..1);
-    true_integrals[0].push_back(1./42.);  // Maple: int((1-x)*x^5, x=0..1);
-    true_integrals[0].push_back(1./56.);  // Maple: int((1-x)*x^6, x=0..1);
-    true_integrals[0].push_back(1./72.);  // Maple: int((1-x)*x^7, x=0..1);
-    true_integrals[0].push_back(1./90.);  // Maple: int((1-x)*x^8, x=0..1);
-    true_integrals[0].push_back(1./110.); // Maple: int((1-x)*x^9, x=0..1);
+    // int((1-x)*x^p, x=0..1) = 1 / (p^2 + 3p + 2)
+    true_integrals[0].resize(10);
+    for (unsigned p=0; p<true_integrals[0].size(); ++p)
+      true_integrals[0][p] = 1. / (p*p + 3.*p + 2.);
 
     // alpha=2 integral values
-    true_integrals[1].push_back(1./3.);   // Maple: int((1-x)^2,     x=0..1);
-    true_integrals[1].push_back(1./12.);  // Maple: int((1-x)^2*x,   x=0..1);
-    true_integrals[1].push_back(1./30.);  // Maple: int((1-x)^2*x^2, x=0..1);
-    true_integrals[1].push_back(1./60.);  // Maple: int((1-x)^2*x^3, x=0..1);
-    true_integrals[1].push_back(1./105.); // Maple: int((1-x)^2*x^4, x=0..1);
-    true_integrals[1].push_back(1./168.); // Maple: int((1-x)^2*x^5, x=0..1);
-    true_integrals[1].push_back(1./252.); // Maple: int((1-x)^2*x^6, x=0..1);
-    true_integrals[1].push_back(1./360.); // Maple: int((1-x)^2*x^7, x=0..1);
-    true_integrals[1].push_back(1./495.); // Maple: int((1-x)^2*x^8, x=0..1);
-    true_integrals[1].push_back(1./660.); // Maple: int((1-x)^2*x^9, x=0..1);
+    // int((1-x)^2*x^p, x=0..1) = 2 / (p^3 + 6*p^2 + 11*p + 6)
+    true_integrals[1].resize(10);
+    for (unsigned p=0; p<true_integrals[1].size(); ++p)
+      true_integrals[1][p] = 2. / (p*p*p + 6.*p*p + 11.*p + 6.);
 
     // Test both types of Jacobi quadrature rules
     for (int qt=0; qt<2; ++qt)
