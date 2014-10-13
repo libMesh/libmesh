@@ -152,10 +152,6 @@ public:
             // Test integrating different polynomial powers
             for (int testpower=0; testpower<=order; ++testpower)
               {
-                // Don't try testpowers larger than the order of the method
-                if (testpower > order)
-                  continue;
-
                 // Note that the weighting function, (1-x)^alpha *
                 // (1+x)^beta, is built into these quadrature rules;
                 // the polynomials we actually integrate are just the
