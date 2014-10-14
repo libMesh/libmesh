@@ -407,7 +407,7 @@ extern OStreamProxy err;
   do {                                                                  \
     if (!(condition)) {                                                 \
       libMesh::out << "Configuring libMesh with " #option " is required to run this example." << std::endl; \
-        return 77;                                                      \
+      return 77;                                                        \
     } } while(0)
 
 // The libmesh_do_once macro helps us avoid redundant repeated
@@ -425,8 +425,8 @@ extern OStreamProxy err;
 // The libmesh_warning macro outputs a file/line/time stamped warning
 // message, if warnings are enabled.
 #ifdef LIBMESH_ENABLE_WARNINGS
-#define libmesh_warning(message) \
-  libmesh_do_once(libMesh::out << message \
+#define libmesh_warning(message)                                        \
+  libmesh_do_once(libMesh::out << message                               \
                   << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
 #else
 #define libmesh_warning(message)  ((void) 0)
@@ -435,13 +435,13 @@ extern OStreamProxy err;
 // The libmesh_experimental macro warns that you are using
 // bleeding-edge code
 #undef libmesh_experimental
-#define libmesh_experimental() \
+#define libmesh_experimental()                                          \
   libmesh_warning("*** Warning, This code is untested, experimental, or likely to see future API changes: ");
 
 
 // The libmesh_deprecated macro warns that you are using obsoleted code
 #undef libmesh_deprecated
-#define libmesh_deprecated() \
+#define libmesh_deprecated()                                            \
   libmesh_warning("*** Warning, This code is deprecated, and likely to be removed in future library versions! ");
 
 // A function template for ignoring unused variables.  This is a way

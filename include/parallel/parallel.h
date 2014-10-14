@@ -934,14 +934,12 @@ public:
    * Nonblocking-receive range-of-pointers from one processor.
    * Not yet implemented.
    */
-/*
-  template <typename Context, typename OutputIter>
-  void receive_packed_range (const unsigned int dest_processor_id,
-                             Context *context,
-                             OutputIter out,
-                             Request &req,
-                             const MessageTag &tag=any_tag) const;
-*/
+  // template <typename Context, typename OutputIter>
+  // void receive_packed_range (const unsigned int dest_processor_id,
+  //                            Context *context,
+  //                            OutputIter out,
+  //                            Request &req,
+  //                            const MessageTag &tag=any_tag) const;
 
   /**
    * Send data \p send to one processor while simultaneously receiving

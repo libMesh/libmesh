@@ -1418,9 +1418,8 @@ void PetscVector<T>::_restore_array(void) const
 
 
 #ifdef LIBMESH_HAVE_CXX11
-      static_assert
-        (sizeof(PetscInt) == sizeof(numeric_index_type),
-         "PETSc and libMesh integer sizes must match!");
+static_assert(sizeof(PetscInt) == sizeof(numeric_index_type),
+              "PETSc and libMesh integer sizes must match!");
 #endif
 
 

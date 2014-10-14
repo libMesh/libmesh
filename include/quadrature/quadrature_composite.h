@@ -48,7 +48,7 @@ namespace libMesh
 template <class QSubCell>
 class QComposite : public QSubCell
 {
- public:
+public:
 
   /**
    * Import base class data into namespace scope.
@@ -86,7 +86,7 @@ class QComposite : public QSubCell
                      const std::vector<Real> &vertex_distance_func,
                      unsigned int p_level=0);
 
- private:
+private:
 
   /**
    *

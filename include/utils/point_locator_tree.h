@@ -115,11 +115,10 @@ public:
    * the linear search.
    * Return NULL if no element is found.
    */
-  const Elem* perform_linear_search(
-    const Point& p,
-    const std::set<subdomain_id_type> *allowed_subdomains,
-    bool use_close_to_point,
-    Real close_to_point_tolerance=TOLERANCE) const;
+  const Elem* perform_linear_search(const Point& p,
+                                    const std::set<subdomain_id_type> *allowed_subdomains,
+                                    bool use_close_to_point,
+                                    Real close_to_point_tolerance=TOLERANCE) const;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point

@@ -854,7 +854,7 @@ public:
    */
   const std::string & vector_name (const NumericVector<Number> & vec_reference) const;
 
-   /**
+  /**
    * Allows one to set the QoI index controlling whether the vector
    * identified by vec_name represents a solution from the adjoint
    * (qoi_num >= 0) or primal (qoi_num == -1) space.  This becomes
@@ -873,7 +873,7 @@ public:
    */
   int vector_is_adjoint (const std::string &vec_name) const;
 
- /**
+  /**
    * Allows one to set the boolean controlling whether the vector
    * identified by vec_name should be "preserved": projected to new
    * meshes, saved, etc.

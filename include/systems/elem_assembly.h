@@ -64,10 +64,9 @@ public:
    * This allows one to impose point loads, for example.
    */
   virtual void
-    get_nodal_rhs_values(
-      std::map<numeric_index_type, Number>& values,
-      const System& ,
-      const Node& )
+  get_nodal_rhs_values(std::map<numeric_index_type, Number>& values,
+                       const System& ,
+                       const Node& )
   {
     // By default, just clear the values map
     values.clear();

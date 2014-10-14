@@ -38,8 +38,8 @@ namespace libMesh
 {
 
 
-  // forward declarations
-  class Elem;
+// forward declarations
+class Elem;
 
 /**
  * This is the \p QBase class.  It provides the basic functionality

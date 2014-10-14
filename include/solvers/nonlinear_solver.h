@@ -53,7 +53,7 @@ template <typename T> class Preconditioner;
 
 template <typename T>
 class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >,
-  public ParallelObject
+                        public ParallelObject
 {
 public:
   /**

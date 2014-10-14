@@ -171,9 +171,9 @@ public:
     g(dirichlet_in.g.get() ?
       dirichlet_in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
     f_fem(dirichlet_in.f_fem.get() ?
-      dirichlet_in.f_fem->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
+          dirichlet_in.f_fem->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
     g_fem(dirichlet_in.g_fem.get() ?
-      dirichlet_in.g_fem->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+          dirichlet_in.g_fem->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
     f_system(dirichlet_in.f_system)
   {
     libmesh_assert(f.get() || f_fem.get());

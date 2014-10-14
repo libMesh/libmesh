@@ -94,8 +94,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-EigenPreconditioner<T>::EigenPreconditioner
-  (const libMesh::Parallel::Communicator &comm_in) :
+EigenPreconditioner<T>::EigenPreconditioner(const libMesh::Parallel::Communicator &comm_in) :
   Preconditioner<T>(comm_in)
 {
 }

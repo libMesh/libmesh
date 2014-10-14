@@ -28,8 +28,8 @@
 #include "libmesh/system.h"
 
 #ifdef LIBMESH_HAVE_FPARSER
-  // FParser includes
-  #include "libmesh/fparser.hh"
+// FParser includes
+#include "libmesh/fparser.hh"
 #endif
 
 // C++ includes
@@ -167,7 +167,7 @@ public:
   virtual AutoPtr<FEMFunctionBase<Output> > clone () const {
     return AutoPtr<FEMFunctionBase<Output> >
       (new ParsedFEMFunction
-         (_sys, _expression, &_additional_vars, &_initial_vals));
+       (_sys, _expression, &_additional_vars, &_initial_vals));
   }
 
   // ------------------------------------------------------

@@ -385,9 +385,9 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       std::vector<dof_id_type>   request_to_fill_parent_id;
       std::vector<unsigned char> request_to_fill_child_num;
       comm.send_receive(procup, requested_objs_parent_id[procup],
-                                procdown, request_to_fill_parent_id);
+                        procdown, request_to_fill_parent_id);
       comm.send_receive(procup, requested_objs_child_num[procup],
-                                procdown, request_to_fill_child_num);
+                        procdown, request_to_fill_child_num);
 
       // Find the id of each requested element
       std::size_t request_size = request_to_fill_parent_id.size();

@@ -333,8 +333,7 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-PetscLinearSolver<T>::PetscLinearSolver
-  (const libMesh::Parallel::Communicator &comm_in):
+PetscLinearSolver<T>::PetscLinearSolver(const libMesh::Parallel::Communicator &comm_in) :
   LinearSolver<T>(comm_in),
   _restrict_solve_to_is(NULL),
   _restrict_solve_to_is_complement(NULL),

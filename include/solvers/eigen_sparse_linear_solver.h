@@ -149,8 +149,7 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-EigenSparseLinearSolver<T>::EigenSparseLinearSolver
-  (const libMesh::Parallel::Communicator &comm_in) :
+EigenSparseLinearSolver<T>::EigenSparseLinearSolver(const libMesh::Parallel::Communicator &comm_in) :
   LinearSolver<T>(comm_in)
 {
   // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead

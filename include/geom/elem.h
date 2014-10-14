@@ -1173,7 +1173,7 @@ protected:
 
 
 
- public:
+public:
 
   /**
    * Replaces this element with \p NULL for all of
@@ -1182,7 +1182,7 @@ protected:
    */
   void nullify_neighbors ();
 
- protected:
+protected:
 
   /**
    * Pointers to the nodes we are connected to.

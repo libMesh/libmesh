@@ -123,8 +123,8 @@ public:
    * Performs the matrix-vector multiplication,
    * \p dest := (*this) * \p arg.
    */
-  void vector_mult(DenseVector<T>& dest,
-                   const DenseVector<T>& arg) const;
+  void vector_mult (DenseVector<T>& dest,
+                    const DenseVector<T>& arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
@@ -132,16 +132,15 @@ public:
    * on mixed types
    */
   template <typename T2>
-  void vector_mult(DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-                   const DenseVector<T2>& arg) const;
+  void vector_mult (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+                    const DenseVector<T2>& arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
    * \p dest := (*this)^T * \p arg.
    */
-  void vector_mult_transpose
-    (DenseVector<T>& dest,
-     const DenseVector<T>& arg) const;
+  void vector_mult_transpose (DenseVector<T>& dest,
+                              const DenseVector<T>& arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
@@ -149,18 +148,16 @@ public:
    * on mixed types
    */
   template <typename T2>
-  void vector_mult_transpose
-    (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-     const DenseVector<T2>& arg) const;
+  void vector_mult_transpose (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+                              const DenseVector<T2>& arg) const;
 
   /**
    * Performs the scaled matrix-vector multiplication,
    * \p dest += \p factor * (*this) * \p arg.
    */
-  void vector_mult_add
-    (DenseVector<T>& dest,
-     const T factor,
-     const DenseVector<T>& arg) const;
+  void vector_mult_add (DenseVector<T>& dest,
+                        const T factor,
+                        const DenseVector<T>& arg) const;
 
   /**
    * Performs the scaled matrix-vector multiplication,
@@ -168,12 +165,9 @@ public:
    * on mixed types
    */
   template <typename T2, typename T3>
-  void vector_mult_add
-    (DenseVector<
-       typename CompareTypes<T,
-         typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
-     const T2 factor,
-     const DenseVector<T3>& arg) const;
+  void vector_mult_add (DenseVector<typename CompareTypes<T, typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
+                        const T2 factor,
+                        const DenseVector<T3>& arg) const;
 
   /**
    * Put the \p sub_m x \p sub_n principal submatrix into \p dest.
