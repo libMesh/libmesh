@@ -119,7 +119,7 @@ private:
   bool mSilenceErrors;
 
   /// the function index of the plog function
-  const unsigned mFPlog;
+  unsigned mFPlog;
 
   // user function plog
   static Value_t fp_plog(const Value_t * params);
