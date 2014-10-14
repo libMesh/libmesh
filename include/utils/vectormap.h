@@ -39,14 +39,14 @@ namespace libMesh
  *
  * This class is limited in its applicability.  The typical use case is:
  *
- \verbatim
- vectormap<KeyType,ValType> vmap;
- for ( ; ;)
- vmap.insert (std::make_pair(key,val));
-
- val1 = vmap[key1];
- val2 = vmap[key2];
- \endverbatim
+ * \verbatim
+ * vectormap<KeyType,ValType> vmap;
+ * for ( ; ;)
+ * vmap.insert (std::make_pair(key,val));
+ *
+ * val1 = vmap[key1];
+ * val2 = vmap[key2];
+ * \endverbatim
  *
  * Note in particular the two-phase usage.  It is not advised to do
  * intermediate insert/lookups, as each time an insertion is done the

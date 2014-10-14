@@ -479,66 +479,65 @@ private:
    * This algorithm restricts the maximum level mismatch
    * at any node in the mesh.  Calling this with \p max_mismatch
    * equal to 1 would transform this mesh:
-   \verbatim
-   o---o---o---o---o-------o-------o
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o       |       |
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o-------o-------o
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o       |       |
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o-------o-------o
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   o-------o-------o               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   |       |       |               |
-   o-------o-------o---------------o
-   \endverbatim
-
+   * \verbatim
+   * o---o---o---o---o-------o-------o
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o       |       |
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o-------o-------o
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o       |       |
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o-------o-------o
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * o-------o-------o               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * |       |       |               |
+   * o-------o-------o---------------o
+   * \endverbatim
+   *
    * into this:
-
-   \verbatim
-   o---o---o---o---o-------o-------o
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o       |       |
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o-------o-------o
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o       |       |
-   |   |   |   |   |       |       |
-   |   |   |   |   |       |       |
-   o---o---o---o---o-------o-------o
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   o-------o-------o.......o.......o
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   |       |       |       :       |
-   o-------o-------o-------o-------o
-   \endverbatim
-   by refining the indicated element
-
-  */
+   *
+   * \verbatim
+   * o---o---o---o---o-------o-------o
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o       |       |
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o-------o-------o
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o       |       |
+   * |   |   |   |   |       |       |
+   * |   |   |   |   |       |       |
+   * o---o---o---o---o-------o-------o
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * o-------o-------o.......o.......o
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * |       |       |       :       |
+   * o-------o-------o-------o-------o
+   * \endverbatim
+   * by refining the indicated element
+   */
   bool limit_level_mismatch_at_node (const unsigned int max_mismatch);
 
   /*
@@ -552,54 +551,53 @@ private:
    * This algorithm selects an element for refinement
    * if all of its neighbors are (or will be) refined.
    * This algorithm will transform this mesh:
-   \verbatim
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   |   |   |       |   |   |
-   |   |   |       |   |   |
-   o---o---o       o---o---o
-   |   |   |       |   |   |
-   |   |   |       |   |   |
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   \endverbatim
-
-   into this:
-   \verbatim
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   |   |   |   :   |   |   |
-   |   |   |   :   |   |   |
-   o---o---o...o...o---o---o
-   |   |   |   :   |   |   |
-   |   |   |   :   |   |   |
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   |   |   |   |   |   |   |
-   |   |   |   |   |   |   |
-   o---o---o---o---o---o---o
-   \endverbatim
-
-   by refining the indicated element
-
-  */
+   * \verbatim
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |       |   |   |
+   * |   |   |       |   |   |
+   * o---o---o       o---o---o
+   * |   |   |       |   |   |
+   * |   |   |       |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * \endverbatim
+   *
+   * into this:
+   * \verbatim
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |   :   |   |   |
+   * |   |   |   :   |   |   |
+   * o---o---o...o...o---o---o
+   * |   |   |   :   |   |   |
+   * |   |   |   :   |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * |   |   |   |   |   |   |
+   * |   |   |   |   |   |   |
+   * o---o---o---o---o---o---o
+   * \endverbatim
+   *
+   * by refining the indicated element
+   */
   bool eliminate_unrefined_patches ();
 
 

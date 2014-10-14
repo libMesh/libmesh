@@ -123,17 +123,17 @@ public:
   void set_auto_parallel ();
 
   /**
-   * Get/Set the version string.  Vailid version strings:
-   \verbatim
-
-   "libMesh-0.7.0+"
-   "libMesh-0.7.0+ parallel"
-
-   \endverbatim
-   If "libMesh" is not detected in the version string the
-   \p LegacyXdrIO class will be used to read older
-   (pre version 0.7.0) mesh files.
-  */
+   * Get/Set the version string.  Valid version strings:
+   *
+   * \verbatim
+   * "libMesh-0.7.0+"
+   * "libMesh-0.7.0+ parallel"
+   * \endverbatim
+   *
+   * If "libMesh" is not detected in the version string the
+   * \p LegacyXdrIO class will be used to read older
+   * (pre version 0.7.0) mesh files.
+   */
   const std::string & version () const { return _version; }
   std::string &       version ()       { return _version; }
 

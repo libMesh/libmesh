@@ -1030,22 +1030,20 @@ public:
    * Take a vector of local variables and expand it on processor root_id
    * to include values from all processors
    *
-   *
-   * This handles the
-   * case where the lengths of the vectors may vary.
+   * This handles the case where the lengths of the vectors may vary.
    * Specifically, this function transforms this:
-   \verbatim
-   Processor 0: [ ... N_0 ]
-   Processor 1: [ ....... N_1 ]
-   ...
-   Processor M: [ .. N_M]
-   \endverbatim
+   * \verbatim
+   * Processor 0: [ ... N_0 ]
+   * Processor 1: [ ....... N_1 ]
+   * ...
+   * Processor M: [ .. N_M]
+   * \endverbatim
    *
    * into this:
    *
-   \verbatim
-   [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
-   \endverbatim
+   * \verbatim
+   * [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
+   * \endverbatim
    *
    * on processor root_id. This function is collective and therefore
    * must be called by all processors in the Communicator.
@@ -1071,18 +1069,18 @@ public:
    * additional communication can be avoided.
    *
    * Specifically, this function transforms this:
-   \verbatim
-   Processor 0: [ ... N_0 ]
-   Processor 1: [ ....... N_1 ]
-   ...
-   Processor M: [ .. N_M]
-   \endverbatim
+   * \verbatim
+   * Processor 0: [ ... N_0 ]
+   * Processor 1: [ ....... N_1 ]
+   * ...
+   * Processor M: [ .. N_M]
+   * \endverbatim
    *
    * into this:
    *
-   \verbatim
-   [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
-   \endverbatim
+   * \verbatim
+   * [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
+   * \endverbatim
    *
    * on each processor. This function is collective and therefore
    * must be called by all processors in the Communicator.

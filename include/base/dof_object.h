@@ -420,26 +420,34 @@ private:
   /**
    * DoF index information.  This is packed into a contiguous buffer of the following format:
    *
-   * [ns end_0 end_1 ... end_{ns-1} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0 (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1 ... (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_ns ]
+   * \verbatim
+   * [ns end_0 end_1 ... end_{ns-1} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0
+   *                                (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1
+   *                                ...
+   *                                (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_ns ]
+   * \endverbatim
    *
    * where 'end_s' is the index past the end of the variable group storage for system \p s.
    * Note that we specifically do not store the end for the last system - this always _idx_buf.size().
    *
    * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 variable groups, respectively.  The _idx_buf then looks like:
-   \verbatim
-   [4 10 10 12 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1)]
-   [0  1  2  3         4     5     6     7     8     9         10    11      12    13    14    15]
-
-   \endverbatim
-   * The ending index is then given by
-   \verbatim
-   end_s = _idx_buf.size(), s == (ns-1),
-   = _idx_buf[s+1]    otherwise.
-   \endverbatim
+   *
+   * \verbatim
+   * [4 10 10 12 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1)]
+   * [0  1  2  3         4     5     6     7     8     9         10    11      12    13    14    15]
+   * \endverbatim
+   *
+   * The ending index is then given by:
+   *
+   * \verbatim
+   * end_s = _idx_buf.size(), s == (ns-1),
+   *       = _idx_buf[s+1]    otherwise.
+   * \endverbatim
+   *
    * The starting indices are not specifically stored, but rather inferred as follows:
    *
    * start_s = _idx_buf[s];
-
+   *
    * Now, the defining characteristic of the \p VariableGroup is that it supports
    * an arbitrary number of variables of the same type.  At the \p DofObject level, what
    * that means is that each \p Variable in the \p VariableGroup will have the same number
@@ -451,7 +459,7 @@ private:
    *
    * the DoF index for a particular component c of variable v within that group is then given by
    *
-   *  idx_var = idx_# + n_comp*v + c
+   * idx_var = idx_# + n_comp*v + c
    *
    * note there is a subtlety here - "variable v within that group" usually means nothing to the
    * user. This class is either indexed with variable group numbers, or variable numbers counted
