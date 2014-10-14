@@ -482,14 +482,10 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
       {
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == NULL);
-        if(!use_current_system)
-          {
-            use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
-          }
-        if(!use_current_system)
-          {
-            continue;
-          }
+        if (!use_current_system)
+          use_current_system = system_names->count(pos->first);
+        if (!use_current_system)
+          continue;
 
         for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
           {
@@ -522,14 +518,10 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
     {
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == NULL);
-      if(!use_current_system)
-        {
-          use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
-        }
-      if(!use_current_system)
-        {
-          continue;
-        }
+      if (!use_current_system)
+        use_current_system = system_names->count(pos->first);
+      if (!use_current_system)
+        continue;
 
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
         {
@@ -695,14 +687,10 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       {
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == NULL);
-        if(!use_current_system)
-          {
-            use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
-          }
-        if(!use_current_system)
-          {
-            continue;
-          }
+        if (!use_current_system)
+          use_current_system = system_names->count(pos->first);
+        if (!use_current_system)
+          continue;
 
         for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
           {
@@ -756,14 +744,10 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
     {
       // Check current system is listed in system_names, and skip pos if not
       bool use_current_system = (system_names == NULL);
-      if(!use_current_system)
-        {
-          use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
-        }
-      if(!use_current_system)
-        {
-          continue;
-        }
+      if (!use_current_system)
+        use_current_system = system_names->count(pos->first);
+      if (!use_current_system)
+        continue;
 
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
@@ -1020,11 +1004,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == NULL);
         if (!use_current_system)
-          {
-            use_current_system =
-              (std::find( system_names->begin(), system_names->end(), pos->first )
-               != system_names->end());
-          }
+          use_current_system = system_names->count(pos->first);
         if (!use_current_system)
           continue;
 
@@ -1069,11 +1049,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
         // Check current system is listed in system_names, and skip pos if not
         bool use_current_system = (system_names == NULL);
         if (!use_current_system)
-          {
-            use_current_system =
-              (std::find( system_names->begin(), system_names->end(), pos->first )
-               != system_names->end());
-          }
+          use_current_system = system_names->count(pos->first);
         if (!use_current_system)
           continue;
 
