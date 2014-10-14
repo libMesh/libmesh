@@ -129,9 +129,9 @@ void QGrid::init_3D(const ElemType type_in,
                 for (int j = 0; j != _order + 1 - k; ++j)
                   {
                     _points[pt](0) = (i+0.5)*dx-1.0 +
-                       (k+0.5)*dz;
+                      (k+0.5)*dz;
                     _points[pt](1) = (j+0.5)*dx-1.0 +
-                       (k+0.5)*dz;
+                      (k+0.5)*dz;
                     _points[pt](2) = (k+0.5)*dz;
                     _weights[pt] = weight;
                     pt++;

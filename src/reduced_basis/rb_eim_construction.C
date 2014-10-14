@@ -528,26 +528,23 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
           // Loop over qp before var because parametrized functions often use
           // some caching based on qp.
-          for(unsigned int qp=0; qp<n_qpoints; qp++)
-          {
-            for(unsigned int var=0; var<n_vars(); var++)
+          for (unsigned int qp=0; qp<n_qpoints; qp++)
             {
-              FEBase* elem_fe = NULL;
-              context.get_element_fe( var, elem_fe );
-              const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+              for (unsigned int var=0; var<n_vars(); var++)
+                {
+                  FEBase* elem_fe = NULL;
+                  context.get_element_fe( var, elem_fe );
+                  const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
 
-              DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
+                  DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
 
-              unsigned int n_var_dofs = cast_int<unsigned int>
-                (context.get_dof_indices( var ).size());
+                  unsigned int n_var_dofs = cast_int<unsigned int>(context.get_dof_indices( var ).size());
 
-              Number eval_result = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
-              for(unsigned int i=0; i != n_var_dofs; i++)
-              {
-                subresidual_var(i) += JxW[qp] * eval_result * phi[i][qp];
-              }
+                  Number eval_result = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
+                  for (unsigned int i=0; i != n_var_dofs; i++)
+                    subresidual_var(i) += JxW[qp] * eval_result * phi[i][qp];
+                }
             }
-          }
 
           // Apply constraints, e.g. periodic constraints
           this->get_dof_map().constrain_element_vector(context.get_elem_residual(), context.get_dof_indices() );
@@ -559,10 +556,8 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       // Solve to find the best fit, then solution stores the truth representation
       // of the function to be approximated
       solve();
-      if(assert_convergence)
-      {
+      if (assert_convergence)
         check_convergence();
-      }
 
       if(reuse_preconditioner)
         {

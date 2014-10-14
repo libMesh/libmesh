@@ -88,10 +88,8 @@ void PetscDMNonlinearSolver<T>::init(const char* name)
 
   // Attaching a DM with the function and Jacobian callbacks to SNES.
   ierr = DMCreateLibMesh(this->comm().get(), this->system(), &dm); LIBMESH_CHKERRABORT(ierr);
-    if (name)
-      {
-        ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
-      }
+  if (name)
+    ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
   ierr = DMSetFromOptions(dm);               LIBMESH_CHKERRABORT(ierr);
   ierr = DMSetUp(dm);                        LIBMESH_CHKERRABORT(ierr);
   ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERRABORT(ierr);
@@ -165,8 +163,8 @@ PetscDMNonlinearSolver<T>::solve (SparseMatrix<T>& jac_in,  // System Jacobian M
   LIBMESH_CHKERRABORT(ierr);
 #else
   {
-    /* PB: Not sure where r_in is coming from and it's not used here, so we'll
-           just get the residual from PETSc */
+    // PB: Not sure where r_in is coming from and it's not used here, so we'll
+    // just get the residual from PETSc
     Vec r;
     ierr = SNESGetFunction(this->_snes,&r,NULL,NULL);LIBMESH_CHKERRABORT(ierr);
     ierr = VecNorm(r,NORM_2,&final_residual_norm);LIBMESH_CHKERRABORT(ierr);

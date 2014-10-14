@@ -813,8 +813,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
     sys_num    = this->number(),
     num_vecs   = cast_int<unsigned int>(vecs.size());
   const dof_id_type
-    io_blksize = cast_int<dof_id_type>
-      (std::min(max_io_blksize, static_cast<std::size_t>(n_objs))),
+    io_blksize = cast_int<dof_id_type>(std::min(max_io_blksize, static_cast<std::size_t>(n_objs))),
     num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 
   libmesh_assert_less_equal (_written_var_indices.size(), this->n_vars());
@@ -869,8 +868,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       // local objects in [first_object,last_object).
       const dof_id_type
         first_object = blk*io_blksize,
-        last_object  =
-          std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs);
+        last_object  = std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs);
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -928,8 +926,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       // local objects in [first_object,last_object).
       const dof_id_type
         first_object  = blk*io_blksize,
-        last_object   =
-          std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs),
+        last_object   = std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs),
         n_objects_blk = last_object - first_object;
 
       // Processor 0 has a special job.  It needs to gather the requested indices
@@ -1891,8 +1888,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
       // local objects in [first_object,last_object).
       const dof_id_type
         first_object = blk*io_blksize,
-        last_object  =
-          std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs);
+        last_object  = std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs);
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -1969,8 +1965,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
           // local objects in [first_object,last_object).
           const dof_id_type
             first_object  = cast_int<dof_id_type>(blk*io_blksize),
-            last_object   =
-              std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs),
+            last_object   = std::min(cast_int<dof_id_type>((blk+1)*io_blksize), n_objs),
             n_objects_blk = last_object - first_object;
 
           // offset array. this will define where each object's values

@@ -53,9 +53,10 @@ int main(int argc, char** argv)
 
   mesh1.print_info();
 
-  es1.read(argv[3], EquationSystems::READ_HEADER |
-                    EquationSystems::READ_DATA |
-                    EquationSystems::READ_BASIC_ONLY);
+  es1.read(argv[3],
+           EquationSystems::READ_HEADER |
+           EquationSystems::READ_DATA |
+           EquationSystems::READ_BASIC_ONLY);
   libMesh::out << "Loaded first solution " << argv[3] << std::endl;
 
   es1.print_info();
@@ -74,9 +75,10 @@ int main(int argc, char** argv)
       Mesh mesh2(init.comm(), dim);
       EquationSystems es2(mesh2);
       mesh2.read(argv[2]);
-      es2.read(argv[i], EquationSystems::READ_HEADER |
-                        EquationSystems::READ_DATA |
-                        EquationSystems::READ_BASIC_ONLY);
+      es2.read(argv[i],
+               EquationSystems::READ_HEADER |
+               EquationSystems::READ_DATA |
+               EquationSystems::READ_BASIC_ONLY);
       libMesh::out << "Loaded next solution " << argv[i] << std::endl;
 
       for (unsigned int s = 0; s != sysnames.size(); ++s)

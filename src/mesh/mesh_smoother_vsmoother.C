@@ -352,11 +352,11 @@ int VariationalMeshSmoother::readgr(Array2D<double>& R,
                         // it must also be on the boundary
                         if (on_boundary[neighbors[a]->id()] &&
                             on_boundary[neighbors[b]->id()] &&
-                           (
-                            (std::abs(thetas[a] - (thetas[b] + (libMesh::pi))) < .001) ||
-                            (std::abs(thetas[a] - (thetas[b] - (libMesh::pi))) < .001)
+                            (
+                             (std::abs(thetas[a] - (thetas[b] + (libMesh::pi))) < .001) ||
+                             (std::abs(thetas[a] - (thetas[b] - (libMesh::pi))) < .001)
+                             )
                             )
-                           )
                           {
                             // if ((*(*it))(1) > 0.25 || (*(*it))(0) > .7 || (*(*it))(0) < .01)
                             mask[i] = 2;
@@ -1988,40 +1988,40 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
             {
               for (int m=0; m<nvert; m++)
                 {
-                if ((W[index][l][m] != 0) &&
-                    (cells[i][m] >= cells[i][l]))
-                  {
-                    int sch = 0;
-                    int ind = 1;
-                    while (ind != 0)
-                      {
-                        if (A[cells[i][l] + index*_n_nodes][sch] != 0)
-                          {
-                            if (JA[cells[i][l] + index*_n_nodes][sch] == static_cast<int>(cells[i][m] + index*_n_nodes))
-                              {
-                                A[cells[i][l] + index*_n_nodes][sch] = A[cells[i][l] + index*_n_nodes][sch] + W[index][l][m];
-                                ind=0;
-                              }
-                            else
-                              sch++;
-                          }
-                        else
-                          {
-                            A[cells[i][l] + index*_n_nodes][sch] = W[index][l][m];
-                            JA[cells[i][l] + index*_n_nodes][sch] = cells[i][m] + index*_n_nodes;
-                            ind = 0;
-                          }
+                  if ((W[index][l][m] != 0) &&
+                      (cells[i][m] >= cells[i][l]))
+                    {
+                      int sch = 0;
+                      int ind = 1;
+                      while (ind != 0)
+                        {
+                          if (A[cells[i][l] + index*_n_nodes][sch] != 0)
+                            {
+                              if (JA[cells[i][l] + index*_n_nodes][sch] == static_cast<int>(cells[i][m] + index*_n_nodes))
+                                {
+                                  A[cells[i][l] + index*_n_nodes][sch] = A[cells[i][l] + index*_n_nodes][sch] + W[index][l][m];
+                                  ind=0;
+                                }
+                              else
+                                sch++;
+                            }
+                          else
+                            {
+                              A[cells[i][l] + index*_n_nodes][sch] = W[index][l][m];
+                              JA[cells[i][l] + index*_n_nodes][sch] = cells[i][m] + index*_n_nodes;
+                              ind = 0;
+                            }
 
-                        if (sch > columns-1)
-                          _logfile << "error: # of nonzero entries in the "
-                                   << cells[i][l]
-                                   << " row of Hessian ="
-                                   << sch
-                                   << ">= columns="
-                                   << columns
-                                   << std::endl;
-                      }
-                  }
+                          if (sch > columns-1)
+                            _logfile << "error: # of nonzero entries in the "
+                                     << cells[i][l]
+                                     << " row of Hessian ="
+                                     << sch
+                                     << ">= columns="
+                                     << columns
+                                     << std::endl;
+                        }
+                    }
                 }
               b[cells[i][l] + index*_n_nodes] = b[cells[i][l] + index*_n_nodes] - F[index][l];
             }
@@ -2188,12 +2188,12 @@ double VariationalMeshSmoother::minJ(Array2D<double>& R,
   // P is determined
   if (msglev >= 4)
     {
-    for (dof_id_type i=0; i<_n_nodes; i++)
-      {
-      for (unsigned j=0; j<_dim; j++)
-        if (P[i][j] != 0)
-          _logfile << "P[" << i << "][" << j << "]=" << P[i][j];
-      }
+      for (dof_id_type i=0; i<_n_nodes; i++)
+        {
+          for (unsigned j=0; j<_dim; j++)
+            if (P[i][j] != 0)
+              _logfile << "P[" << i << "][" << j << "]=" << P[i][j];
+        }
     }
 
   // local minimization problem, determination of tau
@@ -2872,7 +2872,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
 
               else
                 g = (Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I]) +
-                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1]) - constr[4*I+2];
+                  (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1]) - constr[4*I+2];
 
               L += (lam[I] + tau*Plam[I])*g;
             }
@@ -2931,7 +2931,7 @@ double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
 
               else
                 g = (Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I]) +
-                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1]) - constr[4*I+2];
+                  (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1]) - constr[4*I+2];
 
               L += (lam[I] + tau*0.5*Plam[I])*g;
             }
@@ -4138,117 +4138,24 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
               } // end QUAD case
           } // end _dim==2
 
-      if (_dim == 3)
-        {
-          // 3D - tetr and hex
-
-          if (nvert == 4)
-            {
-              // tetr
-              basisA(Q, 4, K, Q, 1);
-
-              Point a1, a2, a3;
-
-              for (int k=0; k<3; k++)
-                for (int l=0; l<4; l++)
-                  {
-                    a1(k) += Q[k][l]*R[cells[i][l]][0];
-                    a2(k) += Q[k][l]*R[cells[i][l]][1];
-                    a3(k) += Q[k][l]*R[cells[i][l]][2];
-                  }
-
-              det = jac3(a1(0), a1(1), a1(2),
-                         a2(0), a2(1), a2(2),
-                         a3(0), a3(1), a3(2));
-              g1 = std::sqrt(a1(0)*a1(0) + a2(0)*a2(0) + a3(0)*a3(0));
-              g2 = std::sqrt(a1(1)*a1(1) + a2(1)*a2(1) + a3(1)*a3(1));
-              g3 = std::sqrt(a1(2)*a1(2) + a2(2)*a2(2) + a3(2)*a3(2));
-
-              // need to keep data from previous cell
-              if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
-                det = det_o;
-
-              if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
-                g1 = g1_o;
-
-              if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
-                g2 = g2_o;
-
-              if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
-                g3 = g3_o;
-
-              // write to file
-              if (me == 2)
-                metric_file << 1./pow(det, 1./3.)
-                            << " 0.000000e+00  0.000000e+00\n0.000000e+00 "
-                            << 1./pow(det, 1./3.)
-                            << " 0.000000e+00\n0.000000e+00 0.000000e+00 "
-                            << 1./pow(det, 1./3.)
-                            << std::endl;
-
-              if (me == 3)
-                metric_file << 1./g1
-                            << " 0.000000e+00  0.000000e+00\n0.000000e+00 "
-                            << 1./g2
-                            << " 0.000000e+00\n0.000000e+00 0.000000e+00 "
-                            << 1./g3
-                            << std::endl;
-
-              det_o = det;
-              g1_o = g1;
-              g2_o = g2;
-              g3_o = g3;
-              Ncells++;
-            }
-
-        if (nvert == 8)
+        if (_dim == 3)
           {
-            // hex
+            // 3D - tetr and hex
 
-            // Set up the node edge neighbor indices
-            const unsigned node_indices[8] = {0, 1, 3, 2, 4, 5, 7, 6};
-            const unsigned first_neighbor_indices[8] = {1, 3, 2, 0, 6, 4, 5, 7};
-            const unsigned second_neighbor_indices[8] = {2, 0, 1, 3, 5, 7, 6, 4};
-            const unsigned third_neighbor_indices[8] = {4, 5, 7, 6, 0, 1, 3, 2};
-
-            // Loop over each node, compute some quantities associated
-            // with its edge neighbors, and write them to file.
-            for (unsigned ni=0; ni<8; ++ni)
+            if (nvert == 4)
               {
-                unsigned
-                  node_index = node_indices[ni],
-                  first_neighbor_index = first_neighbor_indices[ni],
-                  second_neighbor_index = second_neighbor_indices[ni],
-                  third_neighbor_index = third_neighbor_indices[ni];
+                // tetr
+                basisA(Q, 4, K, Q, 1);
 
-                Real
-                  node_x = R[cells[i][node_index]][0],
-                  node_y = R[cells[i][node_index]][1],
-                  node_z = R[cells[i][node_index]][2],
-                  first_neighbor_x = R[cells[i][first_neighbor_index]][0],
-                  first_neighbor_y = R[cells[i][first_neighbor_index]][1],
-                  first_neighbor_z = R[cells[i][first_neighbor_index]][2],
-                  second_neighbor_x = R[cells[i][second_neighbor_index]][0],
-                  second_neighbor_y = R[cells[i][second_neighbor_index]][1],
-                  second_neighbor_z = R[cells[i][second_neighbor_index]][2],
-                  third_neighbor_x = R[cells[i][third_neighbor_index]][0],
-                  third_neighbor_y = R[cells[i][third_neighbor_index]][1],
-                  third_neighbor_z = R[cells[i][third_neighbor_index]][2];
+                Point a1, a2, a3;
 
-                // "dx"
-                Point a1(first_neighbor_x - node_x,
-                         second_neighbor_x - node_x,
-                         third_neighbor_x - node_x);
-
-                // "dy"
-                Point a2(first_neighbor_y - node_y,
-                         second_neighbor_y - node_y,
-                         third_neighbor_y - node_y);
-
-                // "dz"
-                Point a3(first_neighbor_z - node_z,
-                         second_neighbor_z - node_z,
-                         third_neighbor_z - node_z);
+                for (int k=0; k<3; k++)
+                  for (int l=0; l<4; l++)
+                    {
+                      a1(k) += Q[k][l]*R[cells[i][l]][0];
+                      a2(k) += Q[k][l]*R[cells[i][l]][1];
+                      a3(k) += Q[k][l]*R[cells[i][l]][2];
+                    }
 
                 det = jac3(a1(0), a1(1), a1(2),
                            a2(0), a2(1), a2(2),
@@ -4272,21 +4179,19 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
                 // write to file
                 if (me == 2)
-                  metric_file << 1./pow(det, 1./3.) << " "
-                              << 0.5/pow(det, 1./3.) << " "
-                              << 0.5/pow(det, 1./3.) << "\n0.000000e+00 "
-                              << 0.5*std::sqrt(3.)/pow(det, 1./3.) << " "
-                              << 0.5/(std::sqrt(3.)*pow(det, 1./3.)) << "\n0.000000e+00 0.000000e+00 "
-                              << std::sqrt(2/3.)/pow(det, 1./3.)
+                  metric_file << 1./pow(det, 1./3.)
+                              << " 0.000000e+00  0.000000e+00\n0.000000e+00 "
+                              << 1./pow(det, 1./3.)
+                              << " 0.000000e+00\n0.000000e+00 0.000000e+00 "
+                              << 1./pow(det, 1./3.)
                               << std::endl;
 
                 if (me == 3)
-                  metric_file << 1./g1 << " "
-                              << 0.5/g2 << " "
-                              << 0.5/g3 << "\n0.000000e+00 "
-                              << 0.5*std::sqrt(3.)/g2 << " "
-                              << 0.5/(std::sqrt(3.)*g3) << "\n0.000000e+00 0.000000e+00 "
-                              << std::sqrt(2./3.)/g3
+                  metric_file << 1./g1
+                              << " 0.000000e+00  0.000000e+00\n0.000000e+00 "
+                              << 1./g2
+                              << " 0.000000e+00\n0.000000e+00 0.000000e+00 "
+                              << 1./g3
                               << std::endl;
 
                 det_o = det;
@@ -4294,9 +4199,104 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
                 g2_o = g2;
                 g3_o = g3;
                 Ncells++;
-              } // end for ni
-          } // end hex
-        } // end dim==3
+              }
+
+            if (nvert == 8)
+              {
+                // hex
+
+                // Set up the node edge neighbor indices
+                const unsigned node_indices[8] = {0, 1, 3, 2, 4, 5, 7, 6};
+                const unsigned first_neighbor_indices[8] = {1, 3, 2, 0, 6, 4, 5, 7};
+                const unsigned second_neighbor_indices[8] = {2, 0, 1, 3, 5, 7, 6, 4};
+                const unsigned third_neighbor_indices[8] = {4, 5, 7, 6, 0, 1, 3, 2};
+
+                // Loop over each node, compute some quantities associated
+                // with its edge neighbors, and write them to file.
+                for (unsigned ni=0; ni<8; ++ni)
+                  {
+                    unsigned
+                      node_index = node_indices[ni],
+                      first_neighbor_index = first_neighbor_indices[ni],
+                      second_neighbor_index = second_neighbor_indices[ni],
+                      third_neighbor_index = third_neighbor_indices[ni];
+
+                    Real
+                      node_x = R[cells[i][node_index]][0],
+                      node_y = R[cells[i][node_index]][1],
+                      node_z = R[cells[i][node_index]][2],
+                      first_neighbor_x = R[cells[i][first_neighbor_index]][0],
+                      first_neighbor_y = R[cells[i][first_neighbor_index]][1],
+                      first_neighbor_z = R[cells[i][first_neighbor_index]][2],
+                      second_neighbor_x = R[cells[i][second_neighbor_index]][0],
+                      second_neighbor_y = R[cells[i][second_neighbor_index]][1],
+                      second_neighbor_z = R[cells[i][second_neighbor_index]][2],
+                      third_neighbor_x = R[cells[i][third_neighbor_index]][0],
+                      third_neighbor_y = R[cells[i][third_neighbor_index]][1],
+                      third_neighbor_z = R[cells[i][third_neighbor_index]][2];
+
+                    // "dx"
+                    Point a1(first_neighbor_x - node_x,
+                             second_neighbor_x - node_x,
+                             third_neighbor_x - node_x);
+
+                    // "dy"
+                    Point a2(first_neighbor_y - node_y,
+                             second_neighbor_y - node_y,
+                             third_neighbor_y - node_y);
+
+                    // "dz"
+                    Point a3(first_neighbor_z - node_z,
+                             second_neighbor_z - node_z,
+                             third_neighbor_z - node_z);
+
+                    det = jac3(a1(0), a1(1), a1(2),
+                               a2(0), a2(1), a2(2),
+                               a3(0), a3(1), a3(2));
+                    g1 = std::sqrt(a1(0)*a1(0) + a2(0)*a2(0) + a3(0)*a3(0));
+                    g2 = std::sqrt(a1(1)*a1(1) + a2(1)*a2(1) + a3(1)*a3(1));
+                    g3 = std::sqrt(a1(2)*a1(2) + a2(2)*a2(2) + a3(2)*a3(2));
+
+                    // need to keep data from previous cell
+                    if ((std::abs(det) < eps*eps*eps*det_o) || (det < 0))
+                      det = det_o;
+
+                    if ((std::abs(g1) < eps*g1_o) || (g1 < 0))
+                      g1 = g1_o;
+
+                    if ((std::abs(g2) < eps*g2_o) || (g2 < 0))
+                      g2 = g2_o;
+
+                    if ((std::abs(g3) < eps*g3_o) || (g3 < 0))
+                      g3 = g3_o;
+
+                    // write to file
+                    if (me == 2)
+                      metric_file << 1./pow(det, 1./3.) << " "
+                                  << 0.5/pow(det, 1./3.) << " "
+                                  << 0.5/pow(det, 1./3.) << "\n0.000000e+00 "
+                                  << 0.5*std::sqrt(3.)/pow(det, 1./3.) << " "
+                                  << 0.5/(std::sqrt(3.)*pow(det, 1./3.)) << "\n0.000000e+00 0.000000e+00 "
+                                  << std::sqrt(2/3.)/pow(det, 1./3.)
+                                  << std::endl;
+
+                    if (me == 3)
+                      metric_file << 1./g1 << " "
+                                  << 0.5/g2 << " "
+                                  << 0.5/g3 << "\n0.000000e+00 "
+                                  << 0.5*std::sqrt(3.)/g2 << " "
+                                  << 0.5/(std::sqrt(3.)*g3) << "\n0.000000e+00 0.000000e+00 "
+                                  << std::sqrt(2./3.)/g3
+                                  << std::endl;
+
+                    det_o = det;
+                    g1_o = g1;
+                    g2_o = g2;
+                    g3_o = g3;
+                    Ncells++;
+                  } // end for ni
+              } // end hex
+          } // end dim==3
       }
 
   // Done with the metric file

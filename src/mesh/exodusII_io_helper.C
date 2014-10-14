@@ -1036,17 +1036,15 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
   num_elem = mesh.n_elem();
 
-  if(!use_discontinuous)
-  {
+  if (!use_discontinuous)
     num_nodes = mesh.n_nodes();
-  }
   else
-  {
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-    for (; it!=end; ++it)
-      num_nodes += (*it)->n_nodes();
-  }
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end();
+      for (; it!=end; ++it)
+        num_nodes += (*it)->n_nodes();
+    }
 
   std::vector<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
@@ -1112,61 +1110,61 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
   // map just to be on the safe side.
   node_num_map.resize(num_nodes);
 
-  if(!use_discontinuous)
-  {
-    MeshBase::const_node_iterator it = mesh.nodes_begin();
-    const MeshBase::const_node_iterator end = mesh.nodes_end();
-    for (unsigned i = 0; it != end; ++it, ++i)
-      {
-        const Node* node = *it;
-
-        x[i] = (*node)(0) + _coordinate_offset(0);
-
-#if LIBMESH_DIM > 1
-        y[i]=(*node)(1) + _coordinate_offset(1);
-#else
-        y[i]=0.;
-#endif
-#if LIBMESH_DIM > 2
-        z[i]=(*node)(2) + _coordinate_offset(2);
-#else
-        z[i]=0.;
-#endif
-
-        // Fill in node_num_map entry with the proper (1-based) node id
-        node_num_map[i] = node->id() + 1;
-      }
-  }
-  else
-  {
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-    unsigned int i = 0;
-    for (; it!=end; ++it)
-      for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+  if (!use_discontinuous)
+    {
+      MeshBase::const_node_iterator it = mesh.nodes_begin();
+      const MeshBase::const_node_iterator end = mesh.nodes_end();
+      for (unsigned i = 0; it != end; ++it, ++i)
         {
-          x[i]=(*it)->point(n)(0);
+          const Node* node = *it;
+
+          x[i] = (*node)(0) + _coordinate_offset(0);
+
 #if LIBMESH_DIM > 1
-          y[i]=(*it)->point(n)(1);
+          y[i]=(*node)(1) + _coordinate_offset(1);
 #else
           y[i]=0.;
 #endif
 #if LIBMESH_DIM > 2
-          z[i]=(*it)->point(n)(2);
+          z[i]=(*node)(2) + _coordinate_offset(2);
 #else
           z[i]=0.;
 #endif
 
-          // Let's skip the node_num_map in the discontinuous case,
-          // since we're effectively duplicating nodes for the
-          // sake of discontinuous visualization, so it isn't clear
-          // how to deal with node_num_map here. It's only optional
-          // anyway, so no big deal.
+          // Fill in node_num_map entry with the proper (1-based) node id
+          node_num_map[i] = node->id() + 1;
+        }
+    }
+  else
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
-          i++;
-      }
-  }
+      unsigned int i = 0;
+      for (; it!=end; ++it)
+        for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+          {
+            x[i]=(*it)->point(n)(0);
+#if LIBMESH_DIM > 1
+            y[i]=(*it)->point(n)(1);
+#else
+            y[i]=0.;
+#endif
+#if LIBMESH_DIM > 2
+            z[i]=(*it)->point(n)(2);
+#else
+            z[i]=0.;
+#endif
+
+            // Let's skip the node_num_map in the discontinuous case,
+            // since we're effectively duplicating nodes for the
+            // sake of discontinuous visualization, so it isn't clear
+            // how to deal with node_num_map here. It's only optional
+            // anyway, so no big deal.
+
+            i++;
+          }
+    }
 
   if (_single_precision)
     {
@@ -1191,12 +1189,12 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 
   EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
 
-  if(!use_discontinuous)
-  {
-    // Also write the (1-based) node_num_map to the file.
-    ex_err = exII::ex_put_node_num_map(ex_id, &node_num_map[0]);
-    EX_CHECK_ERR(ex_err, "Error writing node_num_map");
-  }
+  if (!use_discontinuous)
+    {
+      // Also write the (1-based) node_num_map to the file.
+      ex_err = exII::ex_put_node_num_map(ex_id, &node_num_map[0]);
+      EX_CHECK_ERR(ex_err, "Error writing node_num_map");
+    }
 }
 
 
@@ -1308,14 +1306,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                 }
 
               // FIXME: We are hard-coding the 1-based node numbering assumption here.
-              if(!use_discontinuous)
-              {
+              if (!use_discontinuous)
                 connect[connect_index] = elem->node(elem_node_index)+1;
-              }
               else
-              {
                 connect[connect_index] = node_counter*num_nodes_per_elem+elem_node_index+1;
-              }
             }
 
           node_counter++;

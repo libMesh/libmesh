@@ -249,13 +249,12 @@ private:
 
   const AddConstraint     &add_fn;
 
-  static Number f_component
-    (FunctionBase<Number> *f,
-     FEMFunctionBase<Number> *f_fem,
-     const FEMContext* c,
-     unsigned int i,
-     const Point& p,
-     Real time)
+  static Number f_component (FunctionBase<Number> *f,
+                             FEMFunctionBase<Number> *f_fem,
+                             const FEMContext* c,
+                             unsigned int i,
+                             const Point& p,
+                             Real time)
   {
     if (f_fem)
       {
@@ -267,13 +266,12 @@ private:
     return f->component(i, p, time);
   }
 
-  static Gradient g_component
-    (FunctionBase<Gradient> *g,
-     FEMFunctionBase<Gradient> *g_fem,
-     const FEMContext* c,
-     unsigned int i,
-     const Point& p,
-     Real time)
+  static Gradient g_component (FunctionBase<Gradient> *g,
+                               FEMFunctionBase<Gradient> *g_fem,
+                               const FEMContext* c,
+                               unsigned int i,
+                               const Point& p,
+                               Real time)
   {
     if (g_fem)
       {
@@ -1083,10 +1081,10 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   ConstElemRange range (mesh.local_elements_begin(),
                         mesh.local_elements_end());
 
-// Global computation fails if we're using a FEMFunctionBase BC on a
-// SerialMesh in parallel
-//  ConstElemRange range (mesh.elements_begin(),
-//                        mesh.elements_end());
+  // Global computation fails if we're using a FEMFunctionBase BC on a
+  // SerialMesh in parallel
+  // ConstElemRange range (mesh.elements_begin(),
+  //                       mesh.elements_end());
 
   // compute_periodic_constraints requires a point_locator() from our
   // Mesh, that point_locator() construction is threaded.  Rather than

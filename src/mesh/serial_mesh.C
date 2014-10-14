@@ -897,20 +897,18 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                 for(unsigned int node_index=0; node_index<bc_id_list.size(); node_index++)
                   {
                     boundary_id_type node_bc_id = bc_id_list[node_index];
-                    if(node_bc_id == id_array[i])
-                    {
-                      dof_id_type node_id = node_id_list[node_index];
-                      set_array[i]->insert( node_id );
-
-                      const Elem* near_elem = (*my_locator)( mesh_array[i]->node(node_id) );
-                      if(near_elem == NULL)
+                    if (node_bc_id == id_array[i])
                       {
-                        libmesh_error_msg("Error: PointLocator failed to find a valid element");
-                      }
+                        dof_id_type node_id = node_id_list[node_index];
+                        set_array[i]->insert( node_id );
 
-                      h_min = std::min(h_min, near_elem->hmin());
-                      h_min_updated = true;
-                    }
+                        const Elem* near_elem = (*my_locator)( mesh_array[i]->node(node_id) );
+                        if (near_elem == NULL)
+                          libmesh_error_msg("Error: PointLocator failed to find a valid element");
+
+                        h_min = std::min(h_min, near_elem->hmin());
+                        h_min_updated = true;
+                      }
                   }
               }
 
@@ -1322,10 +1320,8 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
     {
       // In the case that this==other_mesh, the two nodes might be the same (e.g. if
       // we're stitching a "sliver"), hence we need to skip node deletion in that case.
-      if( (this == other_mesh) && (node_map_it->second == node_map_it->first) )
-      {
+      if ((this == other_mesh) && (node_map_it->second == node_map_it->first))
         continue;
-      }
 
       dof_id_type node_id = node_map_it->second;
       this->delete_node( this->node_ptr(node_id) );

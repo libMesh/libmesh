@@ -1688,11 +1688,11 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type>&        el,
 
       // Populate the list items
       for (std::vector<const Elem *>::iterator elem_it = family.begin(); elem_it != family.end(); elem_it++)
-      {
-        el.push_back ((*elem_it)->id());
-        sl.push_back (pos->second.first);
-        il.push_back (pos->second.second);
-      }
+        {
+          el.push_back ((*elem_it)->id());
+          sl.push_back (pos->second.first);
+          il.push_back (pos->second.second);
+        }
     }
 }
 

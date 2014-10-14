@@ -472,19 +472,19 @@ void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
 void RBConstruction::assemble_affine_expansion(bool skip_matrix_assembly,
                                                bool skip_vector_assembly)
 {
-  if(!skip_matrix_assembly)
-  {
-    // Assemble and store all of the matrices
-    this->assemble_misc_matrices();
-    this->assemble_all_affine_operators();
-  }
+  if (!skip_matrix_assembly)
+    {
+      // Assemble and store all of the matrices
+      this->assemble_misc_matrices();
+      this->assemble_all_affine_operators();
+    }
 
-  if(!skip_vector_assembly)
-  {
-    // Assemble and store all of the vectors
-    this->assemble_all_affine_vectors();
-    this->assemble_all_output_vectors();
-  }
+  if (!skip_vector_assembly)
+    {
+      // Assemble and store all of the vectors
+      this->assemble_all_affine_vectors();
+      this->assemble_all_output_vectors();
+    }
 }
 
 void RBConstruction::allocate_data_structures()
@@ -631,40 +631,40 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
   // We only enter this loop if we have at least one
   // nodeset, since we use nodesets to indicate
   // where to impose the node-based terms.
-  if(mesh.boundary_info->n_nodeset_conds() > 0)
-  {
-    std::vector<numeric_index_type> node_id_list;
-    std::vector<boundary_id_type> bc_id_list;
-
-    // Get the list of nodes with boundary IDs
-    mesh.boundary_info->build_node_list(node_id_list, bc_id_list);
-
-    for(unsigned int i=0; i<node_id_list.size(); i++)
+  if (mesh.boundary_info->n_nodeset_conds() > 0)
     {
-      const Node& node = mesh.node(node_id_list[i]);
+      std::vector<numeric_index_type> node_id_list;
+      std::vector<boundary_id_type> bc_id_list;
 
-      // If node is on this processor, then all dofs on node are too
-      // so we can do the add below safely
-      if(node.processor_id() == this->comm().rank())
-      {
-        // Get the values to add to the rhs vector
-        std::map<numeric_index_type, Number> rhs_values;
-        elem_assembly->get_nodal_rhs_values(rhs_values, *this, node);
+      // Get the list of nodes with boundary IDs
+      mesh.boundary_info->build_node_list(node_id_list, bc_id_list);
 
-        std::map<numeric_index_type, Number>::const_iterator it =
-          rhs_values.begin();
-        const std::map<numeric_index_type, Number>::const_iterator it_end =
-          rhs_values.end();
-        for( ; it != it_end; ++it)
+      for (unsigned int i=0; i<node_id_list.size(); i++)
         {
-          numeric_index_type dof_index = it->first;
-          Number value = it->second;
+          const Node& node = mesh.node(node_id_list[i]);
 
-          input_vector->add( dof_index, value);
+          // If node is on this processor, then all dofs on node are too
+          // so we can do the add below safely
+          if (node.processor_id() == this->comm().rank())
+            {
+              // Get the values to add to the rhs vector
+              std::map<numeric_index_type, Number> rhs_values;
+              elem_assembly->get_nodal_rhs_values(rhs_values, *this, node);
+
+              std::map<numeric_index_type, Number>::const_iterator it =
+                rhs_values.begin();
+              const std::map<numeric_index_type, Number>::const_iterator it_end =
+                rhs_values.end();
+              for ( ; it != it_end; ++it)
+                {
+                  numeric_index_type dof_index = it->first;
+                  Number value = it->second;
+
+                  input_vector->add( dof_index, value);
+                }
+            }
         }
-      }
     }
-  }
 
   AutoPtr<DGFEMContext> c = this->build_context();
   DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
@@ -1155,10 +1155,8 @@ Real RBConstruction::truth_solve(int plot_solution)
   // Safer to zero the solution first, especially when using iterative solvers
   solution->zero();
   solve();
-  if(assert_convergence)
-  {
+  if (assert_convergence)
     check_convergence();
-  }
 
   const RBParameters& mu = get_parameters();
 
@@ -1497,10 +1495,8 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
             }
 
           solve();
-          if(assert_convergence)
-          {
+          if (assert_convergence)
             check_convergence();
-          }
 
           if (!is_quiet())
             {
@@ -1654,10 +1650,8 @@ void RBConstruction::compute_output_dual_innerprods()
                              << Utility::get_timestamp() << std::endl;
 
               solve();
-              if(assert_convergence)
-              {
+              if (assert_convergence)
                 check_convergence();
-              }
 
               if (!is_quiet())
                 {
@@ -1774,10 +1768,8 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
                          << Utility::get_timestamp() << std::endl;
 
           solve();
-          if(assert_convergence)
-          {
+          if (assert_convergence)
             check_convergence();
-          }
 
           if (!is_quiet())
             {
@@ -1980,24 +1972,24 @@ void RBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number>
 
   all_matrices["inner_product"] = get_inner_product_matrix();
 
-  if(store_non_dirichlet_operators)
-  {
-    all_matrices["inner_product_non_dirichlet"] =
-      get_non_dirichlet_inner_product_matrix();
-  }
+  if (store_non_dirichlet_operators)
+    {
+      all_matrices["inner_product_non_dirichlet"] =
+        get_non_dirichlet_inner_product_matrix();
+    }
 
   for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
-  {
-    std::stringstream matrix_name;
-    matrix_name << "A" << q_a;
-    all_matrices[matrix_name.str()] = get_Aq(q_a);
-
-    if(store_non_dirichlet_operators)
     {
-      matrix_name << "_non_dirichlet";
-      all_matrices[matrix_name.str()] = get_non_dirichlet_Aq(q_a);
+      std::stringstream matrix_name;
+      matrix_name << "A" << q_a;
+      all_matrices[matrix_name.str()] = get_Aq(q_a);
+
+      if (store_non_dirichlet_operators)
+        {
+          matrix_name << "_non_dirichlet";
+          all_matrices[matrix_name.str()] = get_non_dirichlet_Aq(q_a);
+        }
     }
-  }
 }
 
 void RBConstruction::get_all_vectors(std::map<std::string, NumericVector<Number>*>& all_vectors)
@@ -2007,36 +1999,36 @@ void RBConstruction::get_all_vectors(std::map<std::string, NumericVector<Number>
   get_output_vectors(all_vectors);
 
   for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
-  {
-    std::stringstream F_vector_name;
-    F_vector_name << "F" << q_f;
-    all_vectors[F_vector_name.str()] = get_Fq(q_f);
-
-    if(store_non_dirichlet_operators)
     {
-      F_vector_name << "_non_dirichlet";
-      all_vectors[F_vector_name.str()] = get_non_dirichlet_Fq(q_f);
+      std::stringstream F_vector_name;
+      F_vector_name << "F" << q_f;
+      all_vectors[F_vector_name.str()] = get_Fq(q_f);
+
+      if (store_non_dirichlet_operators)
+        {
+          F_vector_name << "_non_dirichlet";
+          all_vectors[F_vector_name.str()] = get_non_dirichlet_Fq(q_f);
+        }
     }
-  }
 }
 
 void RBConstruction::get_output_vectors(std::map<std::string, NumericVector<Number>*>& output_vectors)
 {
   output_vectors.clear();
 
-  for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
-    {
-      std::stringstream output_name;
-      output_name << "output_" << n << "_"<< q_l;
-      output_vectors[output_name.str()] = get_output_vector(n,q_l);
-
-      if(store_non_dirichlet_operators)
+  for (unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
+    for (unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
-        output_name << "_non_dirichlet";
-        output_vectors[output_name.str()] = get_non_dirichlet_output_vector(n,q_l);
+        std::stringstream output_name;
+        output_name << "output_" << n << "_"<< q_l;
+        output_vectors[output_name.str()] = get_output_vector(n,q_l);
+
+        if (store_non_dirichlet_operators)
+          {
+            output_name << "_non_dirichlet";
+            output_vectors[output_name.str()] = get_non_dirichlet_output_vector(n,q_l);
+          }
       }
-    }
 }
 
 AutoPtr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
@@ -2258,10 +2250,10 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 
 void RBConstruction::check_convergence()
 {
-    libMesh::LinearConvergenceReason conv_flag;
-    conv_flag = get_linear_solver()->get_converged_reason();
-    if(conv_flag < 0)
-      libmesh_error_msg("Error, conv_flag < 0!");
+  libMesh::LinearConvergenceReason conv_flag;
+  conv_flag = get_linear_solver()->get_converged_reason();
+  if (conv_flag < 0)
+    libmesh_error_msg("Error, conv_flag < 0!");
 }
 
 bool RBConstruction::get_convergence_assertion_flag() const

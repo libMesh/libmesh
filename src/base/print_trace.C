@@ -184,8 +184,8 @@ void print_trace(std::ostream &out_stream)
 }
 
 
-  // If tracefiles are enabled, calls print_trace() and sends the
-  // result to file.  Otherwise, does nothing.
+// If tracefiles are enabled, calls print_trace() and sends the
+// result to file.  Otherwise, does nothing.
 void write_traceout()
 {
 #ifdef LIBMESH_ENABLE_TRACEFILES

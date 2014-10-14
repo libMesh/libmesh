@@ -387,8 +387,8 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 #if MPI_VERSION > 1
           int mpi_thread_provided;
           const int mpi_thread_requested = libMesh::n_threads() > 1 ?
-                                           MPI_THREAD_FUNNELED :
-                                           MPI_THREAD_SINGLE;
+            MPI_THREAD_FUNNELED :
+            MPI_THREAD_SINGLE;
 
           MPI_Init_thread (&argc, const_cast<char***>(&argv),
                            mpi_thread_requested, &mpi_thread_provided);
@@ -396,10 +396,10 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
           if ((libMesh::n_threads() > 1) &&
               (mpi_thread_provided < MPI_THREAD_FUNNELED))
             {
-              libmesh_warning("Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n" <<
-                              "for a threaded run.\n" <<
-                              "Be sure your library is funneled-thread-safe..." <<
-                               std::endl);
+              libmesh_warning("Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n"
+                              << "for a threaded run.\n"
+                              << "Be sure your library is funneled-thread-safe..."
+                              << std::endl);
 
               // Ideally, if an MPI stack tells us it's unsafe for us
               // to use threads, we shouldn't use threads.

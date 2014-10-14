@@ -236,8 +236,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
               this->qrule->get_weights().clear();
             }
 
-           this->init_shape_functions
-             (this->qrule->get_points(), elem);
+          this->init_shape_functions (this->qrule->get_points(), elem);
         }
       else
         this->init_shape_functions (*pts, elem);

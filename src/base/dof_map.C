@@ -1032,7 +1032,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type>& idx,
             {
               const dof_id_type index = elem->dof_number(sys_num,var_num,i);
               if (idx.empty() || index > idx.back())
-                    idx.push_back(index);
+                idx.push_back(index);
             }
         } // done looping over elements
 
@@ -1607,16 +1607,14 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
   // Possibly override the commandline option, if set_implicit_neighbor_dofs
   // has been called.
   if(_implicit_neighbor_dofs_initialized)
-  {
-    implicit_neighbor_dofs = _implicit_neighbor_dofs;
-
-    // Again, if the user explicitly says implicit_neighbor_dofs = false,
-    // then we return here.
-    if(!implicit_neighbor_dofs)
     {
-      return false;
+      implicit_neighbor_dofs = _implicit_neighbor_dofs;
+
+      // Again, if the user explicitly says implicit_neighbor_dofs = false,
+      // then we return here.
+      if (!implicit_neighbor_dofs)
+        return false;
     }
-  }
 
   // Look at all the variables in this system.  If every one is
   // discontinuous then the user must be doing DG/FVM, so be nice

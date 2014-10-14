@@ -697,7 +697,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
     }
   else
     {
- #if PETSC_RELEASE_LESS_THAN(3,5,0)
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
                              this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
 #else

@@ -695,7 +695,7 @@ void UNVIO::elements_in (std::istream& in_file)
           in_file >> dummy >> dummy >> dummy;
         }
 
-       // read node labels (1-based)
+      // read node labels (1-based)
       for (unsigned int j=1; j<=n_nodes; j++)
         in_file >> node_labels[j];
 

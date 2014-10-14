@@ -135,19 +135,19 @@ extern "C"
 
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-PetscErrorCode
-__libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat *pc,
-                                      MatStructure *msflag, void *ctx)
+  PetscErrorCode
+  __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat *pc,
+                                        MatStructure *msflag, void *ctx)
 #else
-PetscErrorCode
-__libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat libmesh_dbg_var(j), Mat pc,
-                                      void *ctx)
+    PetscErrorCode
+    __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat libmesh_dbg_var(j), Mat pc,
+                                          void *ctx)
 #endif
-{
-  libmesh_assert(x);
-  libmesh_assert(j);
-//  libmesh_assert_equal_to (pc, j);  // We don't use separate preconditioners yet
-  libmesh_assert(ctx);
+  {
+    libmesh_assert(x);
+    libmesh_assert(j);
+    //  libmesh_assert_equal_to (pc, j);  // We don't use separate preconditioners yet
+    libmesh_assert(ctx);
 
     PetscDiffSolver& solver =
       *(static_cast<PetscDiffSolver*> (ctx));
@@ -161,12 +161,12 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat libmesh_dbg_var(j), Mat p
     PetscVector<Number> X_input(x, sys.comm());
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-  PetscMatrix<Number> J_input(*pc, sys.comm());
+    PetscMatrix<Number> J_input(*pc, sys.comm());
 #else
-  PetscMatrix<Number> J_input(pc, sys.comm());
+    PetscMatrix<Number> J_input(pc, sys.comm());
 #endif
-  PetscMatrix<Number>& J_system =
-    *cast_ptr<PetscMatrix<Number>*>(sys.matrix);
+    PetscMatrix<Number>& J_system =
+      *cast_ptr<PetscMatrix<Number>*>(sys.matrix);
 
     // DiffSystem assembles from the solution and into the jacobian, so
     // swap those with our input vectors before assembling.  They'll
@@ -190,11 +190,11 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat libmesh_dbg_var(j), Mat p
     J_input.swap(J_system);
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-  *msflag = SAME_NONZERO_PATTERN;
+    *msflag = SAME_NONZERO_PATTERN;
 #endif
-  // No errors, we hope
-  return 0;
-}
+    // No errors, we hope
+    return 0;
+  }
 
 } // extern "C"
 

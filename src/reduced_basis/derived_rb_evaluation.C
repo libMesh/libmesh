@@ -30,9 +30,7 @@ namespace libMesh
 {
 
 template <class Base>
-DerivedRBEvaluation<Base>::DerivedRBEvaluation
-  (const Parallel::Communicator &comm_in)
-  :
+DerivedRBEvaluation<Base>::DerivedRBEvaluation (const Parallel::Communicator &comm_in) :
   Base(comm_in),
   residual_type_flag(RESIDUAL_WRT_UBER)
 {}

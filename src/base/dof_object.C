@@ -452,11 +452,11 @@ unsigned int DofObject::packed_indexing_size() const
   return
     cast_int<unsigned int> (
 #ifdef LIBMESH_ENABLE_AMR
-    ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) + 2 +
+                            ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) + 2 +
 #else
-    1 +
+                            1 +
 #endif
-    _idx_buf.size());
+                            _idx_buf.size());
 }
 
 

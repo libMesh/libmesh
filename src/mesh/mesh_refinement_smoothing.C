@@ -58,10 +58,10 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
         const Elem* elem = *elem_it;
         const unsigned char elem_level =
           cast_int<unsigned char>(elem->level() +
-            ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
+                                  ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
         const unsigned char elem_p_level =
           cast_int<unsigned char>(elem->p_level() +
-            ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+                                  ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
         // Set the max_level at each node
         for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -109,13 +109,13 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
             // Flag the element for refinement if it violates
             // the requested level mismatch
             if ((elem_level + max_mismatch) < max_level_at_node[node_number]
-                 && elem->refinement_flag() != Elem::REFINE)
+                && elem->refinement_flag() != Elem::REFINE)
               {
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
             if ((elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
-                 && elem->p_refinement_flag() != Elem::REFINE)
+                && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
                 flags_changed = true;
@@ -161,10 +161,10 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         const Elem* elem = *elem_it;
         const unsigned char elem_level =
           cast_int<unsigned char>(elem->level() +
-            ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
+                                  ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
         const unsigned char elem_p_level =
           cast_int<unsigned char>(elem->p_level() +
-            ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+                                  ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
         // Set the max_level at each edge
         for (unsigned int n=0; n<elem->n_edges(); n++)
@@ -251,14 +251,14 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
             // Flag the element for refinement if it violates
             // the requested level mismatch
             if ((elem_level + max_mismatch) < max_level_at_edge[edge_key]
-                 && elem->refinement_flag() != Elem::REFINE)
+                && elem->refinement_flag() != Elem::REFINE)
               {
                 elem->set_refinement_flag (Elem::REFINE);
                 flags_changed = true;
               }
 
             if ((elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
-                 && elem->p_refinement_flag() != Elem::REFINE)
+                && elem->p_refinement_flag() != Elem::REFINE)
               {
                 elem->set_p_refinement_flag (Elem::REFINE);
                 flags_changed = true;

@@ -56,7 +56,7 @@ void TimeSolver::reinit ()
   if (libMesh::on_command_line("--solver_system_names"))
     _linear_solver->init((_system.name()+"_").c_str());
   else
-  _linear_solver->init();
+    _linear_solver->init();
 }
 
 
@@ -81,7 +81,7 @@ void TimeSolver::init_data ()
   if (libMesh::on_command_line("--solver_system_names"))
     _linear_solver->init((_system.name()+"_").c_str());
   else
-  _linear_solver->init();
+    _linear_solver->init();
 }
 
 

@@ -452,10 +452,10 @@ void TecplotIO::write_binary (const std::string& fname,
   TecplotMacros tm(the_mesh.n_nodes(),
 #ifdef LIBMESH_USE_REAL_NUMBERS
                    (3 + ((solution_names == NULL) ? 0 :
-                    cast_int<unsigned int>(solution_names->size()))),
+                         cast_int<unsigned int>(solution_names->size()))),
 #else
                    (3 + 3*((solution_names == NULL) ? 0 :
-                    cast_int<unsigned int>(solution_names->size()))),
+                           cast_int<unsigned int>(solution_names->size()))),
 #endif
                    the_mesh.n_active_sub_elem(),
                    nn_per_elem

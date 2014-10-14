@@ -36,38 +36,38 @@ FEInterface::FEInterface()
 
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-#define fe_family_switch(dim, func_and_args, prefix, suffix)    \
-  do {                                                          \
-    switch (fe_t.family)                                        \
-      {                                                         \
-      case CLOUGH:                                              \
-        prefix FE<dim,CLOUGH>::func_and_args suffix             \
-      case HERMITE:                                             \
-        prefix FE<dim,HERMITE>::func_and_args suffix            \
-      case HIERARCHIC:                                          \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix         \
-      case L2_HIERARCHIC:                                       \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix      \
-      case LAGRANGE:                                            \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix           \
-      case L2_LAGRANGE:                                         \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix        \
-      case MONOMIAL:                                            \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix           \
-      case SCALAR:                                              \
-        prefix FE<dim,SCALAR>::func_and_args suffix             \
-      case BERNSTEIN:                                           \
-        prefix FE<dim,BERNSTEIN>::func_and_args suffix          \
-      case SZABAB:                                              \
-        prefix FE<dim,SZABAB>::func_and_args suffix             \
-      case XYZ:                                                 \
-        prefix FEXYZ<dim>::func_and_args suffix                 \
-      case SUBDIVISION:                                         \
-        libmesh_assert_equal_to (dim, 2);                       \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix          \
-      default:                                                  \
-        libmesh_error_msg("Unsupported family = " << fe_t.family); \
-      }                                                         \
+#define fe_family_switch(dim, func_and_args, prefix, suffix)            \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
+      {                                                                 \
+      case CLOUGH:                                                      \
+        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
+      case HERMITE:                                                     \
+        prefix FE<dim,HERMITE>::func_and_args suffix                    \
+      case HIERARCHIC:                                                  \
+        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
+      case L2_HIERARCHIC:                                               \
+        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case LAGRANGE:                                                    \
+        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
+      case L2_LAGRANGE:                                                 \
+        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
+      case MONOMIAL:                                                    \
+        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
+      case SCALAR:                                                      \
+        prefix FE<dim,SCALAR>::func_and_args suffix                     \
+      case BERNSTEIN:                                                   \
+        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
+      case SZABAB:                                                      \
+        prefix FE<dim,SZABAB>::func_and_args suffix                     \
+      case XYZ:                                                         \
+        prefix FEXYZ<dim>::func_and_args suffix                         \
+      case SUBDIVISION:                                                 \
+        libmesh_assert_equal_to (dim, 2);                               \
+        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
+      default:                                                          \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      }                                                                 \
   } while (0)
 
 #define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix)   \
@@ -172,34 +172,34 @@ FEInterface::FEInterface()
   } while(0)
 
 #else
-#define fe_family_switch(dim, func_and_args, prefix, suffix)    \
-  do {                                                          \
-    switch (fe_t.family)                                        \
-      {                                                         \
-      case CLOUGH:                                              \
-        prefix FE<dim,CLOUGH>::func_and_args suffix             \
-      case HERMITE:                                             \
-        prefix FE<dim,HERMITE>::func_and_args suffix            \
-      case HIERARCHIC:                                          \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix         \
-      case L2_HIERARCHIC:                                       \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix      \
-      case LAGRANGE:                                            \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix           \
-      case L2_LAGRANGE:                                         \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix        \
-      case MONOMIAL:                                            \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix           \
-      case SCALAR:                                              \
-        prefix FE<dim,SCALAR>::func_and_args suffix             \
-      case XYZ:                                                 \
-        prefix FEXYZ<dim>::func_and_args suffix                 \
-      case SUBDIVISION:                                         \
-        libmesh_assert_equal_to (dim, 2);                       \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix          \
-      default:                                                  \
-        libmesh_error_msg("Unsupported family = " << fe_t.family); \
-      }                                                         \
+#define fe_family_switch(dim, func_and_args, prefix, suffix)            \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
+      {                                                                 \
+      case CLOUGH:                                                      \
+        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
+      case HERMITE:                                                     \
+        prefix FE<dim,HERMITE>::func_and_args suffix                    \
+      case HIERARCHIC:                                                  \
+        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
+      case L2_HIERARCHIC:                                               \
+        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case LAGRANGE:                                                    \
+        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
+      case L2_LAGRANGE:                                                 \
+        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
+      case MONOMIAL:                                                    \
+        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
+      case SCALAR:                                                      \
+        prefix FE<dim,SCALAR>::func_and_args suffix                     \
+      case XYZ:                                                         \
+        prefix FEXYZ<dim>::func_and_args suffix                         \
+      case SUBDIVISION:                                                 \
+        libmesh_assert_equal_to (dim, 2);                               \
+        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
+      default:                                                          \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      }                                                                 \
   } while (0)
 
 #define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix)   \

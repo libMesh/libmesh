@@ -343,28 +343,25 @@ void TransientRBConstruction::get_all_matrices(std::map<std::string, SparseMatri
 
   all_matrices["L2_matrix"] = L2_matrix.get();
 
-  if(store_non_dirichlet_operators)
-  {
-    all_matrices["L2_matrix_non_dirichlet"] =
-      non_dirichlet_L2_matrix.get();
-  }
+  if (store_non_dirichlet_operators)
+    all_matrices["L2_matrix_non_dirichlet"] = non_dirichlet_L2_matrix.get();
 
   TransientRBThetaExpansion& trans_theta_expansion =
     cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
 
   for(unsigned int q_m=0; q_m<Q_m; q_m++)
-  {
-    std::stringstream matrix_name;
-    matrix_name << "M" << q_m;
-    all_matrices[matrix_name.str()] = get_M_q(q_m);
-
-    if(store_non_dirichlet_operators)
     {
-      matrix_name << "_non_dirichlet";
-      all_matrices[matrix_name.str()] = get_non_dirichlet_M_q(q_m);
+      std::stringstream matrix_name;
+      matrix_name << "M" << q_m;
+      all_matrices[matrix_name.str()] = get_M_q(q_m);
+
+      if (store_non_dirichlet_operators)
+        {
+          matrix_name << "_non_dirichlet";
+          all_matrices[matrix_name.str()] = get_non_dirichlet_M_q(q_m);
+        }
     }
-  }
 }
 
 void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)
@@ -592,10 +589,8 @@ Real TransientRBConstruction::truth_solve(int write_interval)
       // We assume that the truth assembly has been attached to the system
       truth_assembly();
       solve();
-      if(assert_convergence)
-      {
+      if (assert_convergence)
         check_convergence();
-      }
 
       if(reuse_preconditioner)
         {
@@ -1135,10 +1130,8 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                          << i << " in TransientRBConstruction::update_residual_terms() at "
                          << Utility::get_timestamp() << std::endl;
           solve();
-          if(assert_convergence)
-          {
+          if (assert_convergence)
             check_convergence();
-          }
 
           if (!is_quiet())
             {

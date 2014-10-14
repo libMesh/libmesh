@@ -55,7 +55,7 @@ std::string QuadratureRules::name (const QuadratureType q)
       its_name = "Trapezoidal Rule";
       break;
 
-   default:
+    default:
       libmesh_error_msg("ERROR: Bad qt=" << q);
     }
 

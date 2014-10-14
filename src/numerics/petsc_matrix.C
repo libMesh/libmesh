@@ -259,15 +259,18 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
                                       n_nz, n_oz,
                                       b_n_nz, b_n_oz);
 
-      ierr = MatSeqBAIJSetPreallocation
-               (_mat, blocksize, 0,
-                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]));
+      ierr = MatSeqBAIJSetPreallocation (_mat,
+                                         blocksize,
+                                         0,
+                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = MatMPIBAIJSetPreallocation
-               (_mat, blocksize, 0,
-                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]), 0,
-                numeric_petsc_cast(b_n_oz.empty()?NULL:&b_n_oz[0]));
+      ierr = MatMPIBAIJSetPreallocation (_mat,
+                                         blocksize,
+                                         0,
+                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]),
+                                         0,
+                                         numeric_petsc_cast(b_n_oz.empty() ? NULL : &b_n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
   else
@@ -276,14 +279,15 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
       ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
       LIBMESH_CHKERRABORT(ierr);
-      ierr = MatSeqAIJSetPreallocation
-               (_mat, 0,
-                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]));
+      ierr = MatSeqAIJSetPreallocation (_mat,
+                                        0,
+                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
-      ierr = MatMPIAIJSetPreallocation
-               (_mat, 0,
-                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]), 0,
-                numeric_petsc_cast(n_oz.empty()?NULL:&n_oz[0]));
+      ierr = MatMPIAIJSetPreallocation (_mat,
+                                        0,
+                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]),
+                                        0,
+                                        numeric_petsc_cast(n_oz.empty() ? NULL : &n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
 
@@ -357,15 +361,18 @@ void PetscMatrix<T>::init ()
                                       n_nz, n_oz,
                                       b_n_nz, b_n_oz);
 
-      ierr = MatSeqBAIJSetPreallocation
-               (_mat, blocksize, 0,
-                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]));
+      ierr = MatSeqBAIJSetPreallocation (_mat,
+                                         blocksize,
+                                         0,
+                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = MatMPIBAIJSetPreallocation
-               (_mat, blocksize, 0,
-                numeric_petsc_cast(b_n_nz.empty()?NULL:&b_n_nz[0]), 0,
-                numeric_petsc_cast(b_n_oz.empty()?NULL:&b_n_oz[0]));
+      ierr = MatMPIBAIJSetPreallocation (_mat,
+                                         blocksize,
+                                         0,
+                                         numeric_petsc_cast(b_n_nz.empty() ? NULL : &b_n_nz[0]),
+                                         0,
+                                         numeric_petsc_cast(b_n_oz.empty() ? NULL : &b_n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
   else
@@ -375,14 +382,15 @@ void PetscMatrix<T>::init ()
       ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = MatSeqAIJSetPreallocation
-               (_mat, 0,
-                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]));
+      ierr = MatSeqAIJSetPreallocation (_mat,
+                                        0,
+                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
-      ierr = MatMPIAIJSetPreallocation
-               (_mat, 0,
-                numeric_petsc_cast(n_nz.empty()?NULL:&n_nz[0]), 0,
-                numeric_petsc_cast(n_oz.empty()?NULL:&n_oz[0]));
+      ierr = MatMPIAIJSetPreallocation (_mat,
+                                        0,
+                                        numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]),
+                                        0,
+                                        numeric_petsc_cast(n_oz.empty() ? NULL : &n_oz[0]));
       LIBMESH_CHKERRABORT(ierr);
     }
 

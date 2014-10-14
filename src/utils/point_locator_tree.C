@@ -228,14 +228,14 @@ const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdoma
           if( _use_close_to_point_tol )
             {
               libMesh::out << "Performing linear search using close-to-point tolerance "
-                << _close_to_point_tol << std::endl;
+                           << _close_to_point_tol
+                           << std::endl;
 
               this->_element =
-                this->perform_linear_search(
-                  p,
-                  allowed_subdomains,
-                  /*use_close_to_point*/ true,
-                  _close_to_point_tol);
+                this->perform_linear_search(p,
+                                            allowed_subdomains,
+                                            /*use_close_to_point*/ true,
+                                            _close_to_point_tol);
 
               STOP_LOG("operator()", "PointLocatorTree");
               return this->_element;
@@ -257,11 +257,10 @@ const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdoma
 
 
 
-const Elem* PointLocatorTree::perform_linear_search(
-  const Point& p,
-  const std::set<subdomain_id_type> *allowed_subdomains,
-  bool use_close_to_point,
-  Real close_to_point_tolerance) const
+const Elem* PointLocatorTree::perform_linear_search(const Point& p,
+                                                    const std::set<subdomain_id_type> *allowed_subdomains,
+                                                    bool use_close_to_point,
+                                                    Real close_to_point_tolerance) const
 {
   START_LOG("perform_linear_search", "PointLocatorTree");
 
@@ -271,11 +270,11 @@ const Elem* PointLocatorTree::perform_linear_search(
   // local elements during this linear search.
   MeshBase::const_element_iterator pos =
     this->_build_type == Trees::LOCAL_ELEMENTS ?
-      this->_mesh.active_local_elements_begin() : this->_mesh.active_elements_begin();
+    this->_mesh.active_local_elements_begin() : this->_mesh.active_elements_begin();
 
   const MeshBase::const_element_iterator end_pos =
     this->_build_type == Trees::LOCAL_ELEMENTS ?
-      this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
+    this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
 
   for ( ; pos != end_pos; ++pos)
     {

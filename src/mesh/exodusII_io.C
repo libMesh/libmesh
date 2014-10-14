@@ -284,9 +284,7 @@ void ExodusII_IO::read (const std::string& fname)
 
         std::string sideset_name = exio_helper->get_side_set_name(i);
         if (!sideset_name.empty())
-          mesh.boundary_info->sideset_name
-            (cast_int<boundary_id_type>
-              (exio_helper->get_side_set_id(i))) = sideset_name;
+          mesh.boundary_info->sideset_name(cast_int<boundary_id_type>(exio_helper->get_side_set_id(i))) = sideset_name;
       }
 
     for (unsigned int e=0; e<exio_helper->elem_list.size(); e++)
@@ -299,8 +297,7 @@ void ExodusII_IO::read (const std::string& fname)
         // 3.) Subtract 1 from that, since libmesh is "zero"-based,
         //     even when the Exodus numbering doesn't start with 1.
         dof_id_type libmesh_elem_id =
-          cast_int<dof_id_type>
-            (exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1);
+          cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1);
 
         // Set any relevant node/edge maps for this element
         Elem * elem = mesh.elem(libmesh_elem_id);

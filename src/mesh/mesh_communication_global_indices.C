@@ -419,9 +419,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
               // Finally, assign the global index based off the position of the index
               // in my array, properly offset.
-              global_ids.push_back
-                (cast_int<dof_id_type>
-                   (std::distance(my_node_bin.begin(), pos) + my_offset));
+              global_ids.push_back(cast_int<dof_id_type>(std::distance(my_node_bin.begin(), pos) + my_offset));
             }
 
           // and trade back
@@ -538,9 +536,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
               // Finally, assign the global index based off the position of the index
               // in my array, properly offset.
-              global_ids.push_back
-                (cast_int<dof_id_type>
-                   (std::distance(my_elem_bin.begin(), pos) + my_offset));
+              global_ids.push_back (cast_int<dof_id_type>(std::distance(my_elem_bin.begin(), pos) + my_offset));
             }
 
           // and trade back
@@ -750,9 +746,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
 
             // Finally, assign the global index based off the position of the index
             // in my array, properly offset.
-            global_ids.push_back
-              (cast_int<dof_id_type>
-                 (std::distance(my_bin.begin(), pos) + my_offset));
+            global_ids.push_back (cast_int<dof_id_type>(std::distance(my_bin.begin(), pos) + my_offset));
           }
 
         // and trade back

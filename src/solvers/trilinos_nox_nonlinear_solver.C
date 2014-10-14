@@ -310,8 +310,7 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  /* jac_in */,  // System Jacobia
           lsParams.set("Preconditioner", "User Defined");
 
           TrilinosPreconditioner<Number> * trilinos_pc =
-            cast_ptr<TrilinosPreconditioner<Number> *>
-              (this->_preconditioner);
+            cast_ptr<TrilinosPreconditioner<Number> *>(this->_preconditioner);
           pc = Teuchos::rcp(trilinos_pc);
 
           Teuchos::RCP<NOX::Epetra::Interface::Preconditioner> iPrec(_interface);

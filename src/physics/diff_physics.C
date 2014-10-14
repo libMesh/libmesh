@@ -59,7 +59,7 @@ bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
         continue;
 
       const std::vector<dof_id_type>& dof_indices =
-              context.get_dof_indices(var);
+        context.get_dof_indices(var);
 
       const unsigned int n_dofs = cast_int<unsigned int>
         (dof_indices.size());

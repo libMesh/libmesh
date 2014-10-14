@@ -717,77 +717,77 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   // SCALAR dofs are stored on the last processor, so we'll evaluate
   // their equation terms there
   if ( this->processor_id() == (this->n_processors()-1) )
-  {
-    AutoPtr<DiffContext> con = this->build_context();
-    FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
-    this->init_context(_femcontext);
-    _femcontext.pre_fe_reinit(*this, NULL);
+    {
+      AutoPtr<DiffContext> con = this->build_context();
+      FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
+      this->init_context(_femcontext);
+      _femcontext.pre_fe_reinit(*this, NULL);
 
-    bool jacobian_computed =
-      this->time_solver->nonlocal_residual(get_jacobian, _femcontext);
+      bool jacobian_computed =
+        this->time_solver->nonlocal_residual(get_jacobian, _femcontext);
 
-    // Nonlocal residuals are likely to be length 0, in which case we
-    // don't need to do any more.  And we shouldn't try to do any
-    // more; lots of DenseVector/DenseMatrix code assumes rank>0.
-    if (_femcontext.get_elem_residual().size())
-      {
-        // Compute a numeric jacobian if we have to
-        if (get_jacobian && !jacobian_computed)
-          {
-            // Make sure we didn't compute a jacobian and lie about it
-            libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
-            // Logging of numerical jacobians is done separately
-            this->numerical_nonlocal_jacobian(_femcontext);
-          }
+      // Nonlocal residuals are likely to be length 0, in which case we
+      // don't need to do any more.  And we shouldn't try to do any
+      // more; lots of DenseVector/DenseMatrix code assumes rank>0.
+      if (_femcontext.get_elem_residual().size())
+        {
+          // Compute a numeric jacobian if we have to
+          if (get_jacobian && !jacobian_computed)
+            {
+              // Make sure we didn't compute a jacobian and lie about it
+              libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+              // Logging of numerical jacobians is done separately
+              this->numerical_nonlocal_jacobian(_femcontext);
+            }
 
-        // Compute a numeric jacobian if we're asked to verify the
-        // analytic jacobian we got
-        if (get_jacobian && jacobian_computed &&
-            this->verify_analytic_jacobians != 0.0)
-          {
-            DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
+          // Compute a numeric jacobian if we're asked to verify the
+          // analytic jacobian we got
+          if (get_jacobian && jacobian_computed &&
+              this->verify_analytic_jacobians != 0.0)
+            {
+              DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
 
-            _femcontext.get_elem_jacobian().zero();
-            // Logging of numerical jacobians is done separately
-            this->numerical_nonlocal_jacobian(_femcontext);
+              _femcontext.get_elem_jacobian().zero();
+              // Logging of numerical jacobians is done separately
+              this->numerical_nonlocal_jacobian(_femcontext);
 
-            Real analytic_norm = analytic_jacobian.l1_norm();
-            Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
+              Real analytic_norm = analytic_jacobian.l1_norm();
+              Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
 
-            // If we can continue, we'll probably prefer the analytic jacobian
-            analytic_jacobian.swap(_femcontext.get_elem_jacobian());
+              // If we can continue, we'll probably prefer the analytic jacobian
+              analytic_jacobian.swap(_femcontext.get_elem_jacobian());
 
-            // The matrix "analytic_jacobian" will now hold the error matrix
-            analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
-            Real error_norm = analytic_jacobian.l1_norm();
+              // The matrix "analytic_jacobian" will now hold the error matrix
+              analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
+              Real error_norm = analytic_jacobian.l1_norm();
 
-            Real relative_error = error_norm /
-              std::max(analytic_norm, numerical_norm);
+              Real relative_error = error_norm /
+                std::max(analytic_norm, numerical_norm);
 
-            if (relative_error > this->verify_analytic_jacobians)
-              {
-                libMesh::err << "Relative error " << relative_error
-                             << " detected in analytic jacobian on nonlocal dofs!"
-                             << std::endl;
+              if (relative_error > this->verify_analytic_jacobians)
+                {
+                  libMesh::err << "Relative error " << relative_error
+                               << " detected in analytic jacobian on nonlocal dofs!"
+                               << std::endl;
 
-                std::streamsize old_precision = libMesh::out.precision();
-                libMesh::out.precision(16);
-                libMesh::out << "J_analytic nonlocal = "
-                             << _femcontext.get_elem_jacobian() << std::endl;
-                analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
-                libMesh::out << "J_numeric nonlocal = "
-                             << analytic_jacobian << std::endl;
+                  std::streamsize old_precision = libMesh::out.precision();
+                  libMesh::out.precision(16);
+                  libMesh::out << "J_analytic nonlocal = "
+                               << _femcontext.get_elem_jacobian() << std::endl;
+                  analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
+                  libMesh::out << "J_numeric nonlocal = "
+                               << analytic_jacobian << std::endl;
 
-                libMesh::out.precision(old_precision);
+                  libMesh::out.precision(old_precision);
 
-                libmesh_error_msg("Relative error too large, exiting!");
-              }
-          }
+                  libmesh_error_msg("Relative error too large, exiting!");
+                }
+            }
 
-        add_element_system
-          (*this, get_residual, get_jacobian, _femcontext);
-      }
-  }
+          add_element_system
+            (*this, get_residual, get_jacobian, _femcontext);
+        }
+    }
 
   if (get_residual && (print_residual_norms || print_residuals))
     this->rhs->close();

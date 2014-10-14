@@ -2108,8 +2108,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 
       // Try to find this boundary ID in the local list we created
       local_node_boundary_id_lists_iterator it =
-        local_node_boundary_id_lists.find
-          (cast_int<boundary_id_type>(this->global_nodeset_ids[i]));
+        local_node_boundary_id_lists.find (cast_int<boundary_id_type>(this->global_nodeset_ids[i]));
 
       // No nodes found for this boundary ID on this processor
       if (it == local_node_boundary_id_lists.end())
@@ -2247,8 +2246,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 
       // Try to find this boundary ID in the local list we created
       local_elem_boundary_id_lists_iterator it =
-        local_elem_boundary_id_lists.find
-          (cast_int<boundary_id_type>(this->global_sideset_ids[i]));
+        local_elem_boundary_id_lists.find (cast_int<boundary_id_type>(this->global_sideset_ids[i]));
 
       // No sides found for this boundary ID on this processor
       if (it == local_elem_boundary_id_lists.end())
@@ -2270,8 +2268,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
         {
           // Get iterator to sides vector as well
           local_elem_boundary_id_lists_iterator it_sides =
-            local_elem_boundary_id_side_lists.find
-              (cast_int<boundary_id_type>(this->global_sideset_ids[i]));
+            local_elem_boundary_id_side_lists.find (cast_int<boundary_id_type>(this->global_sideset_ids[i]));
 
           libmesh_assert (it_sides != local_elem_boundary_id_side_lists.end());
 

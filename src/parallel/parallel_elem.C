@@ -93,7 +93,7 @@ unsigned int packed_size (const Elem*,
         {
           const int n_bcs = cast_int<int>
             (*(in + pre_indexing_size + indexing_size +
-              total_packed_bc_data++));
+               total_packed_bc_data++));
           libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
@@ -102,7 +102,7 @@ unsigned int packed_size (const Elem*,
         {
           const int n_bcs = cast_int<int>
             (*(in + pre_indexing_size + indexing_size +
-              total_packed_bc_data++));
+               total_packed_bc_data++));
           libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }

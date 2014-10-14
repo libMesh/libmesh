@@ -70,11 +70,11 @@ void add_eletype_entry(ElemType libmesh_elem_type,
   // the vector(iter, iter) constructor is used.
   std::vector<unsigned>
     (node_map, node_map+node_map_size).swap
-      (map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
+    (map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
 
   std::vector<unsigned short>
     (side_map, side_map+side_map_size).swap
-      (map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
+    (map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
 }
 
 
@@ -890,51 +890,51 @@ void AbaqusIO::assign_sideset_ids()
 
   // Iterate over the container of sidesets
   {
-  sideset_container_t::iterator it = _sideset_ids.begin();
-  for (unsigned short current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
-    {
-      // Associate current_id with the name we determined earlier
-      the_mesh.boundary_info->sideset_name(current_id) = it->first;
+    sideset_container_t::iterator it = _sideset_ids.begin();
+    for (unsigned short current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
+      {
+        // Associate current_id with the name we determined earlier
+        the_mesh.boundary_info->sideset_name(current_id) = it->first;
 
-      // Get a reference to the current vector of nodeset ID values
-      std::vector<std::pair<dof_id_type,unsigned> >& sideset_ids = it->second;
+        // Get a reference to the current vector of nodeset ID values
+        std::vector<std::pair<dof_id_type,unsigned> >& sideset_ids = it->second;
 
-      for (std::size_t i=0; i<sideset_ids.size(); ++i)
-        {
-          // sideset_ids is a vector of pairs (elem id, side id).  Pull them out
-          // now to make the code below more readable.
-          dof_id_type  abaqus_elem_id = sideset_ids[i].first;
-          unsigned abaqus_side_number = sideset_ids[i].second;
+        for (std::size_t i=0; i<sideset_ids.size(); ++i)
+          {
+            // sideset_ids is a vector of pairs (elem id, side id).  Pull them out
+            // now to make the code below more readable.
+            dof_id_type  abaqus_elem_id = sideset_ids[i].first;
+            unsigned abaqus_side_number = sideset_ids[i].second;
 
-          // Map the Abaqus element ID to LibMesh numbering
-          dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
+            // Map the Abaqus element ID to LibMesh numbering
+            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
 
-          // Get pointer to that element
-          Elem* elem = the_mesh.elem(libmesh_elem_id);
+            // Get pointer to that element
+            Elem* elem = the_mesh.elem(libmesh_elem_id);
 
-          // Check that the pointer returned from the Mesh is non-NULL
-          if (elem == NULL)
-            libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
+            // Check that the pointer returned from the Mesh is non-NULL
+            if (elem == NULL)
+              libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
 
-          // Grab a reference to the element definition for this element type
-          const ElementDefinition& eledef = eletypes[elem->type()];
+            // Grab a reference to the element definition for this element type
+            const ElementDefinition& eledef = eletypes[elem->type()];
 
-          // If the element definition was not found, the call above would have
-          // created one with an uninitialized struct.  Check for that here...
-          if (eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0)
-            libmesh_error_msg("No Abaqus->LibMesh mapping information for ElemType " \
-                              << Utility::enum_to_string(elem->type())  \
-                              << "!");
+            // If the element definition was not found, the call above would have
+            // created one with an uninitialized struct.  Check for that here...
+            if (eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0)
+              libmesh_error_msg("No Abaqus->LibMesh mapping information for ElemType " \
+                                << Utility::enum_to_string(elem->type())  \
+                                << "!");
 
-          // Add this node with the current_id (which is determined by the
-          // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
-          // so we subtract 1 here before passing the abaqus side number to the
-          // mapping array
-          the_mesh.boundary_info->add_side(elem,
-                                           eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
-                                           current_id);
-        }
-    }
+            // Add this node with the current_id (which is determined by the
+            // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
+            // so we subtract 1 here before passing the abaqus side number to the
+            // mapping array
+            the_mesh.boundary_info->add_side(elem,
+                                             eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
+                                             current_id);
+          }
+      }
   }
 
 

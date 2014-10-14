@@ -1012,27 +1012,25 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   unsigned int nv = 0;
 
   {
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+    const_system_iterator       pos = _systems.begin();
+    const const_system_iterator end = _systems.end();
 
-  for (; pos != end; ++pos)
-    {
-      // Check current system is listed in system_names, and skip pos if not
-      bool use_current_system = (system_names == NULL);
-      if(!use_current_system)
-        {
-          use_current_system =
-            (std::find( system_names->begin(), system_names->end(), pos->first )
+    for (; pos != end; ++pos)
+      {
+        // Check current system is listed in system_names, and skip pos if not
+        bool use_current_system = (system_names == NULL);
+        if (!use_current_system)
+          {
+            use_current_system =
+              (std::find( system_names->begin(), system_names->end(), pos->first )
                != system_names->end());
-        }
-      if(!use_current_system)
-        {
+          }
+        if (!use_current_system)
           continue;
-        }
 
-      const System& system  = *(pos->second);
-      nv += system.n_vars();
-    }
+        const System& system  = *(pos->second);
+        nv += system.n_vars();
+      }
   }
 
   unsigned int tw=0;
@@ -1063,79 +1061,77 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
   {
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+    const_system_iterator       pos = _systems.begin();
+    const const_system_iterator end = _systems.end();
 
-  for (; pos != end; ++pos)
-    {
-      // Check current system is listed in system_names, and skip pos if not
-      bool use_current_system = (system_names == NULL);
-      if(!use_current_system)
-        {
-          use_current_system =
-            (std::find( system_names->begin(), system_names->end(), pos->first )
+    for (; pos != end; ++pos)
+      {
+        // Check current system is listed in system_names, and skip pos if not
+        bool use_current_system = (system_names == NULL);
+        if (!use_current_system)
+          {
+            use_current_system =
+              (std::find( system_names->begin(), system_names->end(), pos->first )
                != system_names->end());
-        }
-      if(!use_current_system)
-        {
+          }
+        if (!use_current_system)
           continue;
-        }
 
-      const System& system  = *(pos->second);
-      const unsigned int nv_sys = system.n_vars();
+        const System& system  = *(pos->second);
+        const unsigned int nv_sys = system.n_vars();
 
-      system.update_global_solution (sys_soln, 0);
+        system.update_global_solution (sys_soln, 0);
 
-      if (_mesh.processor_id() == 0)
-        {
-          std::vector<Number>       elem_soln;   // The finite element solution
-          std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
-          std::vector<dof_id_type>  dof_indices; // The DOF indices for the finite element
+        if (_mesh.processor_id() == 0)
+          {
+            std::vector<Number>       elem_soln;   // The finite element solution
+            std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
+            std::vector<dof_id_type>  dof_indices; // The DOF indices for the finite element
 
-          for (unsigned int var=0; var<nv_sys; var++)
-            {
-              const FEType& fe_type    = system.variable_type(var);
+            for (unsigned int var=0; var<nv_sys; var++)
+              {
+                const FEType& fe_type    = system.variable_type(var);
 
-              MeshBase::element_iterator       it       = _mesh.active_elements_begin();
-              const MeshBase::element_iterator end_elem = _mesh.active_elements_end();
+                MeshBase::element_iterator       it       = _mesh.active_elements_begin();
+                const MeshBase::element_iterator end_elem = _mesh.active_elements_end();
 
-              unsigned int nn=0;
+                unsigned int nn=0;
 
-              for ( ; it != end_elem; ++it)
-                {
-                  const Elem* elem = *it;
-                  system.get_dof_map().dof_indices (elem, dof_indices, var);
+                for ( ; it != end_elem; ++it)
+                  {
+                    const Elem* elem = *it;
+                    system.get_dof_map().dof_indices (elem, dof_indices, var);
 
-                  elem_soln.resize(dof_indices.size());
+                    elem_soln.resize(dof_indices.size());
 
-                  for (unsigned int i=0; i<dof_indices.size(); i++)
-                    elem_soln[i] = sys_soln[dof_indices[i]];
+                    for (unsigned int i=0; i<dof_indices.size(); i++)
+                      elem_soln[i] = sys_soln[dof_indices[i]];
 
-                  FEInterface::nodal_soln (dim,
-                                           fe_type,
-                                           elem,
-                                           elem_soln,
-                                           nodal_soln);
+                    FEInterface::nodal_soln (dim,
+                                             fe_type,
+                                             elem,
+                                             elem_soln,
+                                             nodal_soln);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                  // infinite elements should be skipped...
-                  if (!elem->infinite())
+                    // infinite elements should be skipped...
+                    if (!elem->infinite())
 #endif
-                    {
-                      libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
+                      {
+                        libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
-                      for (unsigned int n=0; n<elem->n_nodes(); n++)
-                        {
-                          soln[nv*(nn++) + (var + var_num)] +=
-                            nodal_soln[n];
-                        }
-                    }
-                }
-            }
-        }
+                        for (unsigned int n=0; n<elem->n_nodes(); n++)
+                          {
+                            soln[nv*(nn++) + (var + var_num)] +=
+                              nodal_soln[n];
+                          }
+                      }
+                  }
+              }
+          }
 
-      var_num += nv_sys;
-    }
+        var_num += nv_sys;
+      }
   }
 
   STOP_LOG("build_discontinuous_solution_vector()", "EquationSystems");

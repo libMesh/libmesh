@@ -379,9 +379,8 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T2>& B)
 
 
 template<typename T>
-void DenseMatrix<T>::vector_mult
-  (DenseVector<T>& dest,
-   const DenseVector<T>& arg) const
+void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
+                                  const DenseVector<T>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->n(), arg.size());
@@ -411,9 +410,8 @@ void DenseMatrix<T>::vector_mult
 
 template<typename T>
 template<typename T2>
-void DenseMatrix<T>::vector_mult
-  (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-   const DenseVector<T2>& arg) const
+void DenseMatrix<T>::vector_mult (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+                                  const DenseVector<T2>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->n(), arg.size());
@@ -437,9 +435,8 @@ void DenseMatrix<T>::vector_mult
 
 
 template<typename T>
-void DenseMatrix<T>::vector_mult_transpose
-  (DenseVector<T>& dest,
-   const DenseVector<T>& arg) const
+void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
+                                            const DenseVector<T>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->m(), arg.size());
@@ -477,9 +474,8 @@ void DenseMatrix<T>::vector_mult_transpose
 
 template<typename T>
 template<typename T2>
-void DenseMatrix<T>::vector_mult_transpose
-  (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-   const DenseVector<T2>& arg) const
+void DenseMatrix<T>::vector_mult_transpose (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+                                            const DenseVector<T2>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->m(), arg.size());
@@ -509,10 +505,9 @@ void DenseMatrix<T>::vector_mult_transpose
 
 
 template<typename T>
-void DenseMatrix<T>::vector_mult_add
-  (DenseVector<T>& dest,
-   const T factor,
-   const DenseVector<T>& arg) const
+void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
+                                      const T factor,
+                                      const DenseVector<T>& arg) const
 {
   // Short-circuit if the matrix is empty
   if(this->m() == 0)
@@ -535,19 +530,16 @@ void DenseMatrix<T>::vector_mult_add
 
 template<typename T>
 template<typename T2, typename T3>
-void DenseMatrix<T>::vector_mult_add
-  (DenseVector<
-     typename CompareTypes<T,
-       typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
-   const T2 factor,
-   const DenseVector<T3>& arg) const
+void DenseMatrix<T>::vector_mult_add (DenseVector<typename CompareTypes<T, typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
+                                      const T2 factor,
+                                      const DenseVector<T3>& arg) const
 {
   // Short-circuit if the matrix is empty
-  if(this->m() == 0)
-  {
-    dest.resize(0);
-    return;
-  }
+  if (this->m() == 0)
+    {
+      dest.resize(0);
+      return;
+    }
 
   DenseVector<typename CompareTypes<T,T3>::supertype>
     temp(arg.size());
@@ -1038,13 +1030,13 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-#define LIBMESH_VMA_INSTANTIATE(T1,T2,T3) \
-template void DenseMatrix<T1>::vector_mult_add \
-  (DenseVector< \
-     CompareTypes<T1, \
-       CompareTypes<T2,T3>::supertype>::supertype>& dest, \
-   const T2 factor, \
-   const DenseVector<T3>& arg) const \
+#define LIBMESH_VMA_INSTANTIATE(T1,T2,T3)               \
+  template void DenseMatrix<T1>::vector_mult_add        \
+  (DenseVector<                                         \
+   CompareTypes<T1,                                     \
+   CompareTypes<T2,T3>::supertype>::supertype>& dest,   \
+   const T2 factor,                                     \
+   const DenseVector<T3>& arg) const
 
 template class DenseMatrix<Real>;
 template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Real>&, DenseVector<Real>&);
@@ -1063,12 +1055,10 @@ LIBMESH_VMA_INSTANTIATE(Real,double,Real);
 template class DenseMatrix<Complex>;
 template void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex>&,DenseVector<Complex>&);
 template void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
-template void DenseMatrix<Real>::vector_mult
-  (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
-   const DenseVector<Complex>& arg) const;
-template void DenseMatrix<Real>::vector_mult_transpose
-  (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
-   const DenseVector<Complex>& arg) const;
+template void DenseMatrix<Real>::vector_mult (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
+                                              const DenseVector<Complex>& arg) const;
+template void DenseMatrix<Real>::vector_mult_transpose (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
+                                                        const DenseVector<Complex>& arg) const;
 LIBMESH_VMA_INSTANTIATE(Real,int,Complex);
 LIBMESH_VMA_INSTANTIATE(Complex,int,Complex);
 LIBMESH_VMA_INSTANTIATE(Complex,int,Real);
