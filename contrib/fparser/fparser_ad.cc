@@ -23,9 +23,9 @@ FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
     mData(this->getParserData()),
     compiledFunction(NULL),
-    mSilenceErrors(false)
+    mSilenceErrors(false),
+    mFPlog(mData->mFuncPtrs.size())
 {
-  mFPlog  = mData->mFuncPtrs.size();
   this->AddFunction("plog", fp_plog, 2);
 }
 
@@ -34,9 +34,9 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     FunctionParserBase<Value_t>(cpy),
     mData(this->getParserData()),
     compiledFunction(cpy.compiledFunction),
-    mSilenceErrors(cpy.mSilenceErrors)
+    mSilenceErrors(cpy.mSilenceErrors),
+    mFPlog(cpy.mFPlog)
 {
-  mFPlog  = cpy.mFPlog;
 }
 
 template<typename Value_t>
@@ -926,6 +926,23 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
         ++sp; ccfile << "s[" << sp << "] = s[" << ByteCode[++i] << "];\n"; break;
       case cDup:
         ++sp; ccfile << "s[" << sp << "] = s[" << (sp-1) << "];\n"; break;
+
+      case cFCall:
+      {
+        unsigned function = ByteCode[++i];
+        if (function == mFPlog)
+        {
+          --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
+        }
+        else
+        {
+          std::cerr << "Function call not supported by JIT.\n";
+          ccfile.close();
+          std::remove(ccname);
+          return false;
+        }
+        break;
+      }
 
 #ifdef FP_SUPPORT_OPTIMIZER
       case cPopNMov:

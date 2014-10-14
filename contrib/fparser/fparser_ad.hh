@@ -112,14 +112,14 @@ private:
   /// JIT function pointer
   Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
 
-  /// the function index of the plog function
-  unsigned mFPlog;
-
   /**
    * In certain applications derivatives are built proactively and may never be used.
    * We silence all AutoDiff exceptions in that case to avoid confusing the user.
    */
   bool mSilenceErrors;
+
+  /// the function index of the plog function
+  const unsigned mFPlog;
 
   // user function plog
   static Value_t fp_plog(const Value_t * params);
