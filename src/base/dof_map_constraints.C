@@ -2712,7 +2712,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                       _adjoint_constraint_values.find(q);
 
                     if ((adjoint_map_it == _adjoint_constraint_values.end()) &&
-                        !pushed_adj_rhss_to_me[q][constrained])
+                        pushed_adj_rhss_to_me[q][constrained] == Number(0))
                       continue;
 
                     if (adjoint_map_it == _adjoint_constraint_values.end())
@@ -2722,7 +2722,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                     DofConstraintValueMap &constraint_map =
                       adjoint_map_it->second;
 
-                    if (pushed_adj_rhss_to_me[q][i])
+                    if (pushed_adj_rhss_to_me[q][i] != Number(0))
                       constraint_map[constrained] =
                         pushed_adj_rhss_to_me[q][i];
                     else
@@ -3071,7 +3071,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                         _adjoint_constraint_values.find(q);
 
                       if ((adjoint_map_it == _adjoint_constraint_values.end()) &&
-                          !adj_filled_rhss[q][constrained])
+                          adj_filled_rhss[q][constrained] == Number(0))
                         continue;
 
                       if (adjoint_map_it == _adjoint_constraint_values.end())
@@ -3081,7 +3081,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                       DofConstraintValueMap &constraint_map =
                         adjoint_map_it->second;
 
-                      if (adj_filled_rhss[q][i])
+                      if (adj_filled_rhss[q][i] != Number(0))
                         constraint_map[constrained] =
                           adj_filled_rhss[q][i];
                       else

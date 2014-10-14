@@ -2267,9 +2267,9 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
       used_buffer_size += buffer->size();
 #endif
 
-      Request intermediate_req;
+      Request next_intermediate_req;
 
-      Request *my_req = (range_begin == range_end) ? &req : &intermediate_req;
+      Request *my_req = (range_begin == range_end) ? &req : &next_intermediate_req;
 
       // Make the Request::wait() handle deleting the buffer
       my_req->add_post_wait_work
