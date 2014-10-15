@@ -450,11 +450,12 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       if (findex == mFPlog)
       {
         // we assume that the second argument to plog is constant for now (TODO?).
-        // da/a
         prog_da = DiffFunction(prog_a);
+        // da (inner derivative)
         outer = prog_da;
+        // 1/a
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.push_back(OpcodePlain(cDiv));
+        outer.push_back(OpcodePlain(cInv));
         // a>b
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
@@ -470,8 +471,10 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         outer.push_back(OpcodePlain(cLessOrEq));
         // *
         outer.push_back(OpcodePlain(cMul));
-        // *
+        // +
         outer.push_back(OpcodePlain(cAdd));
+        // multiply by inner derivative da
+        outer.push_back(OpcodePlain(cMul));
         return outer;
       }
       break;
