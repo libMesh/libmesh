@@ -329,6 +329,16 @@ unsigned int NewtonSolver::solve()
           if (verbose)
             libMesh::out << "Linear solve unnecessary; residual = 0"
                          << std::endl;
+
+          if (absolute_residual_tolerance > 0)
+            _solve_result |= CONVERGED_ABSOLUTE_RESIDUAL;
+          if (relative_residual_tolerance > 0)
+            _solve_result |= CONVERGED_RELATIVE_RESIDUAL;
+          if (absolute_step_tolerance > 0)
+            _solve_result |= CONVERGED_ABSOLUTE_STEP;
+          if (relative_step_tolerance > 0)
+            _solve_result |= CONVERGED_RELATIVE_STEP;
+
           break;
         }
 
