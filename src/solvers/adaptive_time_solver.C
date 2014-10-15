@@ -145,6 +145,13 @@ AutoPtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 
 
 
+AutoPtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
+{
+  return core_time_solver->linear_solver();
+}
+
+
+
 Real AdaptiveTimeSolver::calculate_norm(System &s,
                                         NumericVector<Number> &v)
 {
