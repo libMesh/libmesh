@@ -42,8 +42,11 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
 template<typename Value_t>
 Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
 {
-  // return params[0] < params[1] ? fp_log(params[1]) + (params[0] - params[1]) / params[1] : fp_log(params[0]);
-  return params[0] < params[1] ? fp_log(params[1]) - Value_t(1.5) + Value_t(2.0)/params[1] * params[0] - Value_t(0.5)/(params[1]*params[1]) * params[0] * params[0] : fp_log(params[0]);
+  const Value_t x = params[0];
+  const Value_t a = params[1];
+  // return x < a ? fp_log(a) + (params[0] - a) / a : fp_log(params[0]);
+  // return x < a ? fp_log(a) - Value_t(1.5) + Value_t(2.0)/a * x - Value_t(0.5)/(a*a) * x*x : fp_log(x);
+  return x < a ? fp_log(a) + (x-a)/a - (x-a)*(x-a)/(Value_t(2)*a*a) + (x-a)*(x-a)*(x-a)/(Value_t(3)*a*a*a) : fp_log(x);
 }
 
 template<typename Value_t>
@@ -467,7 +470,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         // 1/b
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
         outer.push_back(OpcodePlain(cInv));
-        // a<=
+        // a<=b
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
         outer.push_back(OpcodePlain(cLessOrEq));
@@ -479,6 +482,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         outer.push_back(OpcodePlain(cMul));
         */
 
+        /*
         // x<e ? (2/e - 1/(e*e)*x) : 1/x
         prog_da = DiffFunction(prog_a);
         // da (inner derivative)
@@ -505,7 +509,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         outer.push_back(OpcodePlain(cMul));
         // -
         outer.push_back(OpcodePlain(cSub));
-        // a<=
+        // a<=b
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
         outer.push_back(OpcodePlain(cLessOrEq));
@@ -515,6 +519,59 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         outer.push_back(OpcodePlain(cAdd));
         // multiply by inner derivative da
         outer.push_back(OpcodePlain(cMul));
+        */
+
+        // x<e ? (1/e - 1/(e*e)*(x-e) + 1/e^3*(x-e)^2) : 1/x
+        prog_da = DiffFunction(prog_a);
+        // da (inner derivative)
+        outer = prog_da;
+        // 1/a
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.push_back(OpcodePlain(cInv));
+        // a>b
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cGreater));
+        // *
+        outer.push_back(OpcodePlain(cMul));
+        // 1/b
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cInv));
+        /// 1/(b*b) = b^-2
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodeImmediate(Value_t(-2)));
+        outer.push_back(OpcodePlain(cPow));
+        // * (a-b)
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cSub));
+        outer.push_back(OpcodePlain(cMul));
+        // -
+        outer.push_back(OpcodePlain(cSub));
+        // 1/(e*e*e) = e^-3
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodeImmediate(Value_t(-3)));
+        outer.push_back(OpcodePlain(cPow));
+        // * (x-e)^2
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cSub));
+        outer.push_back(OpcodeImmediate(Value_t(2)));
+        outer.push_back(OpcodePlain(cPow));
+        outer.push_back(OpcodePlain(cMul));
+        // +
+        outer.push_back(OpcodePlain(cAdd));
+        // a<=b
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cLessOrEq));
+        // *
+        outer.push_back(OpcodePlain(cMul));
+        // +
+        outer.push_back(OpcodePlain(cAdd));
+        // multiply by inner derivative da
+        outer.push_back(OpcodePlain(cMul));
+
         return outer;
       }
       break;
@@ -976,7 +1033,8 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
         if (function == mFPlog)
         {
           // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
-          --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) - 1.5 + 2.0/s[" << (sp+1) << "] * s[" << sp << "] - 0.5/(s[" << (sp+1) << "]*s[" << (sp+1) << "]) * s[" << sp << "]*s[" << sp << "] : std::log(s[" << sp << "]);\n";
+          // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) - 1.5 + 2.0/s[" << (sp+1) << "] * s[" << sp << "] - 0.5/(s[" << (sp+1) << "]*s[" << (sp+1) << "]) * s[" << sp << "]*s[" << sp << "] : std::log(s[" << sp << "]);\n";
+          --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "])  +  (s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "]  -  std::pow(s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],2.0)/2.0  +  std::pow(s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],3.0)/3.0 : std::log(s[" << sp << "]);\n";
         }
         else
         {
