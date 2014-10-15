@@ -47,9 +47,9 @@ TimeSolver::~TimeSolver ()
 
 void TimeSolver::reinit ()
 {
-  libmesh_assert(_diff_solver.get());
-  libmesh_assert_equal_to (&(_diff_solver->system()), &(this->system()));
-  _diff_solver->reinit();
+  libmesh_assert(this->diff_solver().get());
+  libmesh_assert_equal_to (&(this->diff_solver()->system()), &(this->system()));
+  this->diff_solver()->reinit();
 
   libmesh_assert(_linear_solver.get());
   _linear_solver->clear();
@@ -65,8 +65,8 @@ void TimeSolver::init ()
 {
   // If the user hasn't given us a solver to use,
   // just build a default solver
-  if (_diff_solver.get() == NULL)
-    _diff_solver = DiffSolver::build(_system);
+  if (this->diff_solver().get() == NULL)
+    this->diff_solver() = DiffSolver::build(_system);
 
   if (_linear_solver.get() == NULL)
     _linear_solver = LinearSolver<Number>::build(_system.comm());
@@ -76,7 +76,7 @@ void TimeSolver::init ()
 
 void TimeSolver::init_data ()
 {
-  _diff_solver->init();
+  this->diff_solver()->init();
 
   if (libMesh::on_command_line("--solver_system_names"))
     _linear_solver->init((_system.name()+"_").c_str());
@@ -88,9 +88,9 @@ void TimeSolver::init_data ()
 
 void TimeSolver::solve ()
 {
-  libmesh_assert(_diff_solver.get());
-  libmesh_assert_equal_to (&(_diff_solver->system()), &(this->system()));
-  _diff_solver->solve();
+  libmesh_assert(this->diff_solver().get());
+  libmesh_assert_equal_to (&(this->diff_solver()->system()), &(this->system()));
+  this->diff_solver()->solve();
 }
 
 
