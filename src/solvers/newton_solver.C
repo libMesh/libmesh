@@ -314,9 +314,6 @@ unsigned int NewtonSolver::solve()
       rhs.close();
       Real current_residual = rhs.l2_norm();
 
-      // Prepare to take incomplete steps
-      Real last_residual = current_residual;
-
       if (libmesh_isnan(current_residual))
         {
           libMesh::out << "  Nonlinear solver DIVERGED at step "
@@ -326,6 +323,17 @@ unsigned int NewtonSolver::solve()
           libmesh_convergence_failure();
           continue;
         }
+
+      if (current_residual == 0)
+        {
+          if (verbose)
+            libMesh::out << "Linear solve unnecessary; residual = 0"
+                         << std::endl;
+          break;
+        }
+
+      // Prepare to take incomplete steps
+      Real last_residual = current_residual;
 
       max_residual_norm = std::max (current_residual,
                                     max_residual_norm);
