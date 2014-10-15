@@ -330,6 +330,10 @@ unsigned int NewtonSolver::solve()
             libMesh::out << "Linear solve unnecessary; residual = 0"
                          << std::endl;
 
+          // We're not doing a solve, but other code may reuse this
+          // matrix.
+          matrix.close();
+
           if (absolute_residual_tolerance > 0)
             _solve_result |= CONVERGED_ABSOLUTE_RESIDUAL;
           if (relative_residual_tolerance > 0)
