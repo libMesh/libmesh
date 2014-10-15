@@ -42,7 +42,8 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
 template<typename Value_t>
 Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
 {
-  return params[0] < params[1] ? fp_log(params[1]) + (params[0] - params[1]) / params[1] : fp_log(params[0]);
+  // return params[0] < params[1] ? fp_log(params[1]) + (params[0] - params[1]) / params[1] : fp_log(params[0]);
+  return params[0] < params[1] ? fp_log(params[1]) - Value_t(1.5) + Value_t(2.0)/params[1] * params[0] - Value_t(0.5)/(params[1]*params[1]) * params[0] * params[0] : fp_log(params[0]);
 }
 
 template<typename Value_t>
@@ -450,6 +451,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       if (findex == mFPlog)
       {
         // we assume that the second argument to plog is constant for now (TODO?).
+        /*
         prog_da = DiffFunction(prog_a);
         // da (inner derivative)
         outer = prog_da;
@@ -465,6 +467,44 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         // 1/b
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
         outer.push_back(OpcodePlain(cInv));
+        // a<=
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cLessOrEq));
+        // *
+        outer.push_back(OpcodePlain(cMul));
+        // +
+        outer.push_back(OpcodePlain(cAdd));
+        // multiply by inner derivative da
+        outer.push_back(OpcodePlain(cMul));
+        */
+
+        // x<e ? (2/e - 1/(e*e)*x) : 1/x
+        prog_da = DiffFunction(prog_a);
+        // da (inner derivative)
+        outer = prog_da;
+        // 1/a
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.push_back(OpcodePlain(cInv));
+        // a>b
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cGreater));
+        // *
+        outer.push_back(OpcodePlain(cMul));
+        // 2/b
+        outer.push_back(OpcodeImmediate(Value_t(2)));
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodePlain(cDiv));
+        /// 1/(e*e) = e^-2
+        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+        outer.push_back(OpcodeImmediate(Value_t(-2)));
+        outer.push_back(OpcodePlain(cPow));
+        // * x
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.push_back(OpcodePlain(cMul));
+        // -
+        outer.push_back(OpcodePlain(cSub));
         // a<=
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
         outer.insert(outer.end(), prog_b.begin(), prog_b.end());
@@ -935,7 +975,8 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
         unsigned function = ByteCode[++i];
         if (function == mFPlog)
         {
-          --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
+          // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
+          --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) - 1.5 + 2.0/s[" << (sp+1) << "] * s[" << sp << "] - 0.5/(s[" << (sp+1) << "]*s[" << (sp+1) << "]) * s[" << sp << "]*s[" << sp << "] : std::log(s[" << sp << "]);\n";
         }
         else
         {
