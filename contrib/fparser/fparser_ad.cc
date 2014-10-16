@@ -76,6 +76,7 @@ int FunctionParserADBase<Value_t>::OpcodeSize(const OpcodePacket & p)
       case cAdd: case cSub: case cRSub:
       case cMul: case cDiv: case cRDiv:
       case cPow: case cHypot:
+      case cEqual: case cNEqual:
       case cLess: case cLessOrEq: case cGreater: case cGreaterOrEq:
         return 2;
 
@@ -444,12 +445,21 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
     case cFloor:
     case cCeil:
     case cTrunc:
+      outer.push_back(OpcodeImmediate(Value_t(0)));
+      return outer;
+
+    // we return those undiffed to keep conditionals intact (for piecewise functions like:  (x<0) * 1 + (x>=0) * (1+x^2) )
+    case cEqual:
+    case cNEqual:
     case cLess:
     case cLessOrEq:
     case cGreater:
     case cGreaterOrEq:
-      outer.push_back(OpcodeImmediate(Value_t(0)));
+      outer = prog_a;
+      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+      outer.push_back(OpcodePlain(op));
       return outer;
+
     case cFCall:
       if (findex == mFPlog)
       {
@@ -527,6 +537,12 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
         outer = prog_da;
         // 1/a
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        // actually do 1/(a + (a==0)). This avoids a 1/0 and a=0 should always make this the false-branch!
+        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+        outer.push_back(OpcodeImmediate(Value_t(0)));
+        outer.push_back(OpcodePlain(cEqual));
+        outer.push_back(OpcodePlain(cAdd));
+
         outer.push_back(OpcodePlain(cInv));
         // a>b
         outer.insert(outer.end(), prog_a.begin(), prog_a.end());
@@ -1034,7 +1050,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
         {
           // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
           // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) - 1.5 + 2.0/s[" << (sp+1) << "] * s[" << sp << "] - 0.5/(s[" << (sp+1) << "]*s[" << (sp+1) << "]) * s[" << sp << "]*s[" << sp << "] : std::log(s[" << sp << "]);\n";
-          --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "])  +  (s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "]  -  std::pow(s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],2.0)/2.0  +  std::pow(s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],3.0)/3.0 : std::log(s[" << sp << "]);\n";
+          --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "])  +  (s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "]  -  std::pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],2.0)/2.0  +  std::pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],3.0)/3.0 : std::log(s[" << sp << "]);\n";
         }
         else
         {
