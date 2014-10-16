@@ -124,11 +124,11 @@ public:
       component(reverse_index_map[i].second,p,time);
   }
 
-  virtual AutoPtr<FunctionBase<Output> > clone() const {
+  virtual UniquePtr<FunctionBase<Output> > clone() const {
     CompositeFunction* returnval = new CompositeFunction();
     for (unsigned int i=0; i != subfunctions.size(); ++i)
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
-    return AutoPtr<FunctionBase<Output> > (returnval);
+    return UniquePtr<FunctionBase<Output> > (returnval);
   }
 
   unsigned int n_subfunctions () const {

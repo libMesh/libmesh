@@ -105,9 +105,9 @@ public:
 
         for (int order=0; order<7; ++order)
           {
-            AutoPtr<QBase> qrule = QBase::build(QMONOMIAL,
-                                                dims[i],
-                                                static_cast<Order>(order));
+            UniquePtr<QBase> qrule = QBase::build(QMONOMIAL,
+                                                  dims[i],
+                                                  static_cast<Order>(order));
             qrule->init(elem_type[i]);
 
             // In 3D, max(z_power)==order, in 2D max(z_power)==0
@@ -163,9 +163,9 @@ public:
     for (int qt=0; qt<3; ++qt)
       for (int order=0; order<7; ++order)
         {
-          AutoPtr<QBase> qrule = QBase::build(qtype[qt],
-                                              /*dim=*/3,
-                                              static_cast<Order>(order));
+          UniquePtr<QBase> qrule = QBase::build(qtype[qt],
+                                                /*dim=*/3,
+                                                static_cast<Order>(order));
 
           // Initialize on a TET element
           qrule->init (TET4);
@@ -244,9 +244,9 @@ public:
     for (int qt=0; qt<4; ++qt)
       for (int order=0; order<10; ++order)
         {
-          AutoPtr<QBase> qrule = QBase::build(qtype[qt],
-                                              /*dim=*/2,
-                                              static_cast<Order>(order));
+          UniquePtr<QBase> qrule = QBase::build(qtype[qt],
+                                                /*dim=*/2,
+                                                static_cast<Order>(order));
 
           // Initialize on a TRI element
           qrule->init (TRI3);
@@ -346,7 +346,7 @@ public:
       {
         for (int order=0; order<10; ++order)
           {
-            AutoPtr<QBase> qrule = QBase::build(qtype[qt],
+            UniquePtr<QBase> qrule = QBase::build(qtype[qt],
                                                 /*dim=*/1,
                                                 static_cast<Order>(order));
 

@@ -108,7 +108,7 @@ public:
    * An implicit linear solver to use for adjoint and sensitivity
    * problems.
    */
-  virtual AutoPtr<LinearSolver<Number> > &linear_solver();
+  virtual UniquePtr<LinearSolver<Number> > &linear_solver();
 
   /**
    * This object is used to take timesteps

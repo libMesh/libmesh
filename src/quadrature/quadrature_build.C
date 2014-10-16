@@ -165,10 +165,7 @@ UniquePtr<QBase> QBase::build(const QuadratureType _qt,
       return UniquePtr<QBase>(new QGaussLobatto(_dim, _order));
 
     case QCONICAL:
-      {
-        AutoPtr<QBase> ap(new QConical(_dim, _order));
-        return ap;
-      }
+      return UniquePtr<QBase>(new QConical(_dim, _order));
 
     default:
       libmesh_error_msg("ERROR: Bad qt=" << _qt);

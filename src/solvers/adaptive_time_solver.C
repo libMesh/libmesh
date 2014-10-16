@@ -146,7 +146,7 @@ UniquePtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 
 
 
-AutoPtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
+UniquePtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
 {
   return core_time_solver->linear_solver();
 }

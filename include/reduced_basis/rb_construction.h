@@ -452,7 +452,7 @@ public:
    * use for solving all systems in which the system matrix is set
    * to inner_product_matrix.
    */
-  AutoPtr< LinearSolver<Number> > inner_product_solver;
+  UniquePtr< LinearSolver<Number> > inner_product_solver;
 
   /**
    * We also need a pointer to store the original linear solver in

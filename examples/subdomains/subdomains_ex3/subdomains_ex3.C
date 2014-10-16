@@ -126,7 +126,7 @@ void integrate_function (const MeshBase &mesh)
   QComposite<QGauss> qrule (mesh.mesh_dimension(), FIRST);
   //QGauss qrule (mesh.mesh_dimension(), FIRST);
 
-  AutoPtr<FEBase> fe (FEBase::build (mesh.mesh_dimension(), FEType (FIRST, LAGRANGE)));
+  UniquePtr<FEBase> fe (FEBase::build (mesh.mesh_dimension(), FEType (FIRST, LAGRANGE)));
 
   Real int_val=0.;
 

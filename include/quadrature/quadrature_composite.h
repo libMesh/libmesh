@@ -106,7 +106,7 @@ private:
   /**
    * Lagrange FE to use for subcell mapping.
    */
-  AutoPtr<FEBase> _lagrange_fe;
+  UniquePtr<FEBase> _lagrange_fe;
 };
 
 

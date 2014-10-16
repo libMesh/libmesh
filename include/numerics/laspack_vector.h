@@ -602,12 +602,11 @@ template <typename T>
 inline
 UniquePtr<NumericVector<T> > LaspackVector<T>::zero_clone () const
 {
-  UniquePtr<NumericVector<T> > cloned_vector
-    (new LaspackVector<T>(this->comm()));
+  NumericVector<T> * cloned_vector = new LaspackVector<T>(this->comm());
 
   cloned_vector->init(*this);
 
-  return cloned_vector;
+  return UniquePtr<NumericVector<T> >(cloned_vector);
 }
 
 
@@ -616,14 +615,13 @@ template <typename T>
 inline
 UniquePtr<NumericVector<T> > LaspackVector<T>::clone () const
 {
-  UniquePtr<NumericVector<T> > cloned_vector
-    (new LaspackVector<T>(this->comm()));
+  NumericVector<T> * cloned_vector = new LaspackVector<T>(this->comm());
 
   cloned_vector->init(*this, true);
 
   *cloned_vector = *this;
 
-  return cloned_vector;
+  return UniquePtr<NumericVector<T> >(cloned_vector);
 }
 
 
