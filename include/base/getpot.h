@@ -2770,6 +2770,13 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::log10(arg));
             }
+          else if (funcname == "exp")
+            {
+              STRING_VECTOR A =
+                _DBE_get_expr_list(expr.substr(funcnameend), 1);
+              double arg = _convert_to_type(A[0], 0.0);
+              return _convert_from_type(std::exp(arg));
+            }
           else if (funcname == "sin")
             {
               STRING_VECTOR A =
@@ -2840,6 +2847,27 @@ GetPot::_DBE_expand(const std::string& expr)
                 _DBE_get_expr_list(expr.substr(funcnameend), 1);
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::tanh(arg));
+            }
+          else if (funcname == "asinh")
+            {
+              STRING_VECTOR A =
+                _DBE_get_expr_list(expr.substr(funcnameend), 1);
+              double arg = _convert_to_type(A[0], 0.0);
+              return _convert_from_type(std::asinh(arg));
+            }
+          else if (funcname == "acosh")
+            {
+              STRING_VECTOR A =
+                _DBE_get_expr_list(expr.substr(funcnameend), 1);
+              double arg = _convert_to_type(A[0], 0.0);
+              return _convert_from_type(std::acosh(arg));
+            }
+          else if (funcname == "atanh")
+            {
+              STRING_VECTOR A =
+                _DBE_get_expr_list(expr.substr(funcnameend), 1);
+              double arg = _convert_to_type(A[0], 0.0);
+              return _convert_from_type(std::atanh(arg));
             }
           else if (funcname == "sqrt")
             {
@@ -2926,9 +2954,14 @@ GetPot::_DBE_expand(const std::string& expr)
                 } while (returnval >= y);
               return _convert_from_type(returnval / x);
             }
-
           else if (funcname == "time")
             return _convert_from_type(std::time(NULL));
+          else
+            {
+              getpot_cerr << "ERROR: unrecognized function " <<
+                             funcname << std::endl;
+              getpot_error();
+            }
         }
     }
 
