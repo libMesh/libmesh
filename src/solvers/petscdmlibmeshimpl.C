@@ -50,10 +50,8 @@ struct DMVec_libMesh {
 
 #undef  __FUNCT__
 #define __FUNCT__ "DMlibMeshGetVec_Private"
-PetscErrorCode DMlibMeshGetVec_Private(DM dm, const char* name, Vec*)
+PetscErrorCode DMlibMeshGetVec_Private(DM /*dm*/, const char* /*name*/, Vec*)
 {
-  PetscErrorCode ierr;
-
   PetscFunctionBegin;
 
   PetscFunctionReturn(0);
