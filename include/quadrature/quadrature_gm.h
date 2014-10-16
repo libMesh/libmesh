@@ -45,39 +45,42 @@ namespace libMesh
  * equivalent order.  The GM rules are defined to be exact for
  * polynomials of degree d=2*s+1, s=0,1,2,3,... The table also gives
  * the percentage of each GM rule's weights which are negative.
- * Although the percentage of negative weights does not grow
- * particularly quickly, the amplification factor (a measure of the
- * effect of round-off) defined as
+ * The percentage of negative weights appears to approach 50, and the
+ * amplification factor (a measure of the effect of round-off) defined
+ * as
  *
  * amp. factor = \f$ \frac{1}{V} \sum \|w_i\|, \f$
  *
- * where V is the volume of the reference element, does grow quickly.
- * (A rule with all positive has has an amplification factor of 1.0 by
- * definition.)
+ * where V is the volume of the reference element, grows like exp(C*s).
+ * (A rule with all positive weights has an amplification factor of
+ * 1.0 by definition.)
  *
  * \verbatim
- *  s  | d     | N. CP        | N. GM   | % neg wts | amp. factor
- * -----------------------------------------------------------------
- *  0  | 1     |              | 1       |           |
- *  1  | 2-3   |              | 5       |           |
- *  2  | 4-5   |              | 15      |           |
- *  3  | 6-7   |              | 35      | 31.43     |   11.94
- *  4  | 8-9   |  5^3=125     | 70      | 34.29     |   25.35
- *  5  | 10-11 |  6^3=216     | 126     | 36.51     |   54.14
- *  6  | 12-13 |  7^3=343     | 210     | 38.10     |  116.30
- *  7  | 14-15 |  8^3=512     | 330     | 39.39     |  251.10
- *  8  | 16-17 |  9^3=729     | 495     | 40.40     |  544.68
- *  9  | 18-19 | 10^3=1,000   | 715     | 41.26     | 1186.16
- * 10  | 20-21 | 11^3=1,331   | 1,001   | 41.96     | 2591.97
- * 11  | 22-23 | 12^3=1,728   | 1,365   | 42.56     | 5680.75
- * ...
- * 16  | 32-33 | 17^3=4,913   | 4,845   |
- * 17  | 34-35 | 18^3=5,832   | 5,985   | <= Cross-over point, CP has fewer points for d >= 34
- * 18  | 36-37 | 19^3=6,859   | 7,315   |
- * ...
- * 21  | 42-43 | 22^3=10,648  | 12,650  |
+ * s	degree	n_pts(conical)	n_pts(GM)	% neg wts	amp. factor
+ * ------------------------------------------------------------------------
+ * 0	1	1		1		 0.00		1.00e+00
+ * 1	3	8		5		20.00		2.60e+00
+ * 2	5	27		15		26.67		5.63e+00
+ * 3	7	64		35		31.43		1.19e+01
+ * 4	9	125		70		34.29		2.54e+01
+ * 5	11	216		126		36.51		5.41e+01
+ * 6	13	343		210		38.10		1.16e+02
+ * 7	15	512		330		39.39		2.51e+02
+ * 8	17	729		495		40.40		5.45e+02
+ * 9	19	1000		715		41.26		1.19e+03
+ * 10	21	1331		1001		41.96		2.59e+03
+ * 11	23	1728		1365		42.56		5.68e+03
+ * 12	25	2197		1820		43.08		1.25e+04
+ * 13	27	2744		2380		43.53		2.75e+04
+ * 14	29	3375		3060		43.92		6.07e+04
+ * 15	31	4096		3876		44.27		1.34e+05
+ * 16	33	4913		4845		44.58		2.97e+05
+ * 17	35	5832		5985		44.86		6.59e+05 <= Conical rule has fewer points for degree >= 34
+ * 18	37	6859		7315		45.11		1.46e+06
+ * 19	39	8000		8855		45.34		3.25e+06
+ * 20	41	9261		10626		45.55		7.23e+06
+ * 21	43	10648		12650		45.74		1.61e+07
  * \endverbatim
- *
  *
  * Reference:
  *    Axel Grundmann and Michael M\"{o}ller,
