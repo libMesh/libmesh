@@ -997,6 +997,9 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
     return false;
   }
 
+  // clear evalerror (this will not get set again by the JIT code)
+  mData->mEvalErrorType = 0;
+
   // rename successfully compiled obj to cache file
   if (cacheFunction && (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)) {
     // the directory was either successfuly created, or it already exists
