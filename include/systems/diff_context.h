@@ -124,7 +124,36 @@ public:
    * to the variable index argument.
    */
   const DenseSubVector<Number>& get_elem_solution( unsigned int var ) const
-  { return *(elem_subsolutions[var]); }
+  { 
+    libmesh_assert_greater(elem_subsolutions.size(), var);
+    libmesh_assert(elem_subsolutions[var]);
+    return *(elem_subsolutions[var]);
+  }
+
+  /**
+   * Accessor for element solution rate of change w.r.t. time.
+   */
+  const DenseVector<Number>& get_elem_solution_rate() const
+  { return elem_solution_rate; }
+
+  /**
+   * Non-const accessor for element solution rate of change w.r.t.
+   * time.
+   */
+  DenseVector<Number>& get_elem_solution_rate()
+  { return elem_solution_rate; }
+
+  /**
+   * Accessor for element solution rate for a particular variable
+   * corresponding to the variable index argument.
+   */
+  const DenseSubVector<Number>& get_elem_solution_rate( unsigned int var ) const
+  { 
+    libmesh_assert_greater(elem_subsolution_rates.size(), var);
+    libmesh_assert(elem_subsolution_rates[var]);
+    return *(elem_subsolution_rates[var]);
+  }
+
 
   /**
    * Accessor for element fixed solution.
@@ -143,7 +172,11 @@ public:
    * to the variable index argument.
    */
   const DenseSubVector<Number>& get_elem_fixed_solution( unsigned int var ) const
-  { return *(elem_fixed_subsolutions[var]); }
+  { 
+    libmesh_assert_greater(elem_fixed_subsolutions.size(), var);
+    libmesh_assert(elem_fixed_subsolutions[var]);
+    return *(elem_fixed_subsolutions[var]);
+  }
 
   /**
    * Const accessor for element residual.
@@ -162,14 +195,22 @@ public:
    * to the variable index argument.
    */
   const DenseSubVector<Number>& get_elem_residual( unsigned int var ) const
-  { return *(elem_subresiduals[var]); }
+  {
+    libmesh_assert_greater(elem_subresiduals.size(), var);
+    libmesh_assert(elem_subresiduals[var]);
+    return *(elem_subresiduals[var]);
+  }
 
   /**
    * Non-const accessor for element residual of a particular variable corresponding
    * to the variable index argument.
    */
   DenseSubVector<Number>& get_elem_residual( unsigned int var )
-  { return *(elem_subresiduals[var]); }
+  {
+    libmesh_assert_greater(elem_subresiduals.size(), var);
+    libmesh_assert(elem_subresiduals[var]);
+    return *(elem_subresiduals[var]);
+  }
 
   /**
    * Const accessor for element Jacobian.
@@ -188,14 +229,24 @@ public:
    * to the variable index arguments.
    */
   const DenseSubMatrix<Number>& get_elem_jacobian( unsigned int var1, unsigned int var2 ) const
-  { return *(elem_subjacobians[var1][var2]); }
+  {
+    libmesh_assert_greater(elem_subjacobians.size(), var1);
+    libmesh_assert_greater(elem_subjacobians[var1].size(), var2);
+    libmesh_assert(elem_subjacobians[var1][var2]);
+    return *(elem_subjacobians[var1][var2]);
+  }
 
   /**
    * Non-const accessor for element Jacobian of particular variables corresponding
    * to the variable index arguments.
    */
   DenseSubMatrix<Number>& get_elem_jacobian( unsigned int var1, unsigned int var2 )
-  { return *(elem_subjacobians[var1][var2]); }
+  {
+    libmesh_assert_greater(elem_subjacobians.size(), var1);
+    libmesh_assert_greater(elem_subjacobians[var1].size(), var2);
+    libmesh_assert(elem_subjacobians[var1][var2]);
+    return *(elem_subjacobians[var1][var2]);
+  }
 
   /**
    * Const accessor for QoI vector.
@@ -226,14 +277,24 @@ public:
    * to the index arguments.
    */
   const DenseSubVector<Number>& get_qoi_derivatives( unsigned int qoi, unsigned int var ) const
-  { return *(elem_qoi_subderivatives[qoi][var]); }
+  {
+    libmesh_assert_greater(elem_qoi_subderivatives.size(), qoi);
+    libmesh_assert_greater(elem_qoi_subderivatives[qoi].size(), var);
+    libmesh_assert(elem_qoi_subderivatives[qoi][var]);
+    return *(elem_qoi_subderivatives[qoi][var]);
+  }
 
   /**
    * Non-const accessor for QoI derivative of a particular qoi and variable corresponding
    * to the index arguments.
    */
   DenseSubVector<Number>& get_qoi_derivatives( unsigned int qoi, unsigned int var )
-  { return *(elem_qoi_subderivatives[qoi][var]); }
+  {
+    libmesh_assert_greater(elem_qoi_subderivatives.size(), qoi);
+    libmesh_assert_greater(elem_qoi_subderivatives[qoi].size(), var);
+    libmesh_assert(elem_qoi_subderivatives[qoi][var]);
+    return *(elem_qoi_subderivatives[qoi][var]);
+  }
 
   /**
    * Accessor for element dof indices
@@ -252,7 +313,10 @@ public:
    * to the index argument.
    */
   const std::vector<dof_id_type>& get_dof_indices( unsigned int var ) const
-  { return dof_indices_var[var]; }
+  {
+    libmesh_assert_greater(dof_indices_var.size(), var);
+    return dof_indices_var[var];
+  }
 
   /**
    * Accessor for the time variable stored in the system class.
@@ -272,9 +336,30 @@ public:
   void set_time( Real time_in )
   { time = time_in; }
 
+  /**
+   * The derivative of the current elem_solution w.r.t. the unknown
+   * solution.  Corresponding Jacobian contributions should be
+   * multiplied by this amount, or may be skipped if
+   * get_elem_solution_derivative() is 0.
+   */
   Real get_elem_solution_derivative() const
   { return elem_solution_derivative; }
 
+  /**
+   * The derivative of the current elem_solution_rate w.r.t. the
+   * unknown solution.  Corresponding Jacobian contributions should be
+   * multiplied by this amount, or may be skipped if
+   * get_elem_solution_rate_derivative() is 0.
+   */
+  Real get_elem_solution_rate_derivative() const
+  { return elem_solution_rate_derivative; }
+
+  /**
+   * The derivative of the current fixed_elem_solution w.r.t. the
+   * unknown solution.  Corresponding Jacobian contributions should be
+   * multiplied by this amount, or may be skipped if
+   * get_fixed_elem_solution_derivative() is 0.
+   */
   Real get_fixed_solution_derivative() const
   { return fixed_solution_derivative; }
 
@@ -309,11 +394,17 @@ public:
   const Real system_time;
 
   /**
-   * The derivative of elem_solution with respect to the nonlinear solution,
-   * for use by systems constructing jacobians with elem_fixed_solution
-   * based methods
+   * The derivative of elem_solution with respect to the current
+   * nonlinear solution.
    */
   Real elem_solution_derivative;
+
+  /**
+   * The derivative of elem_solution_rate with respect to the current
+   * nonlinear solution, for use by systems with non default
+   * mass_residual terms.
+   */
+  Real elem_solution_rate_derivative;
 
   /**
    * The derivative of elem_fixed_solution with respect to the nonlinear
@@ -382,6 +473,13 @@ protected:
    */
   DenseVector<Number> elem_solution;
   std::vector<DenseSubVector<Number> *> elem_subsolutions;
+
+  /**
+   * Element by element components of du/dt
+   * as adjusted by a time_solver
+   */
+  DenseVector<Number> elem_solution_rate;
+  std::vector<DenseSubVector<Number> *> elem_subsolution_rates;
 
   /**
    * Element by element components of nonlinear_solution
