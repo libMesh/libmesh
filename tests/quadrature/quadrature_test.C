@@ -418,15 +418,15 @@ public:
         const Real exact = (mode % 2) ?
           0 : (Real(2.0) / (mode+1));
 
-if (std::abs(exact - sum) >= TOLERANCE*TOLERANCE)
-{
-    std::cout << "qtype = " << qtype << std::endl;
-    std::cout << "order = " << order << std::endl;
-    std::cout << "exactorder = " << exactorder << std::endl;
-    std::cout << "mode = " << mode << std::endl;
-    std::cout << "exact = " << exact << std::endl;
-    std::cout << "sum = " << sum << std::endl << std::endl;
-}
+        if (std::abs(exact - sum) >= TOLERANCE*TOLERANCE)
+          {
+            std::cout << "qtype = " << qtype << std::endl;
+            std::cout << "order = " << order << std::endl;
+            std::cout << "exactorder = " << exactorder << std::endl;
+            std::cout << "mode = " << mode << std::endl;
+            std::cout << "exact = " << exact << std::endl;
+            std::cout << "sum = " << sum << std::endl << std::endl;
+          }
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL( exact , sum , TOLERANCE*TOLERANCE );
       }
