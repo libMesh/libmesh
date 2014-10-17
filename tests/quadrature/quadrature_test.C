@@ -70,14 +70,8 @@ public:
   // TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYFIRST, 41);
   // TEST_ONE_ORDER(QGAUSS_LOBATTO, FORTYTHIRD, 43);
 
-// Edges/Tris only
-//  TEST_ALL_ORDERS(QCLOUGH, 9999);
-
-// Quads/Hexes only
-//  TEST_ALL_ORDERS(QMONOMIAL, 1); // need "non-tensor" option?
-
-// Tets only
-//  TEST_ALL_ORDERS(QGRUNDMANN_MOLLER, 9999);
+  // Test monomial quadrature rules on quads and hexes
+  CPPUNIT_TEST( testMonomialQuadrature );
 
   // Test quadrature rules on Triangles
   CPPUNIT_TEST( testTriQuadrature );
@@ -85,7 +79,7 @@ public:
   // Test quadrature rules on Tetrahedra
   CPPUNIT_TEST( testTetQuadrature );
 
-// Test Jacobi quadrature rules with special weighting function
+  // Test Jacobi quadrature rules with special weighting function
   CPPUNIT_TEST( testJacobi );
 
   CPPUNIT_TEST_SUITE_END();
@@ -99,6 +93,67 @@ public:
 
   void tearDown ()
   {}
+
+  void testMonomialQuadrature ()
+  {
+    ElemType elem_type[2] = {QUAD4, HEX8};
+    int dims[2]           = {2, 3};
+
+    for (int i=0; i<2; ++i)
+      {
+        // std::cout << "\nChecking monomial quadrature on element type " << elem_type[i] << std::endl;
+
+        for (int order=0; order<7; ++order)
+          {
+            AutoPtr<QBase> qrule = QBase::build(QMONOMIAL,
+                                                dims[i],
+                                                static_cast<Order>(order));
+            qrule->init(elem_type[i]);
+
+            // In 3D, max(z_power)==order, in 2D max(z_power)==0
+            int max_z_power = dims[i]==2 ? 0 : order;
+
+            for (int x_power=0; x_power<=order; ++x_power)
+              for (int y_power=0; y_power<=order; ++y_power)
+                for (int z_power=0; z_power<=max_z_power; ++z_power)
+                  {
+                    // Only try to integrate polynomials we can integrate exactly
+                    if (x_power + y_power + z_power > order)
+                      continue;
+
+                    // Compute the integral via quadrature.  Note that
+                    // std::pow(0,0) returns 1 in the 2D case.
+                    Real sumq = 0.;
+                    for (unsigned int qp=0; qp<qrule->n_points(); qp++)
+                      sumq += qrule->w(qp)
+                        * std::pow(qrule->qp(qp)(0), x_power)
+                        * std::pow(qrule->qp(qp)(1), y_power)
+                        * std::pow(qrule->qp(qp)(2), z_power);
+
+                    // std::cout << "Quadrature of x^" << x_power
+                    //           << " y^" << y_power
+                    //           << " z^" << z_power
+                    //           << " = " << sumq << std::endl;
+
+                    // Copy-pasted code from test3DWeights()
+                    Real exact_x = (x_power % 2) ? 0 : (Real(2.0) / (x_power+1));
+                    Real exact_y = (y_power % 2) ? 0 : (Real(2.0) / (y_power+1));
+                    Real exact_z = (z_power % 2) ? 0 : (Real(2.0) / (z_power+1));
+
+                    // Handle 2D
+                    if (dims[i]==2)
+                      exact_z = 1.0;
+
+                    Real exact = exact_x*exact_y*exact_z;
+
+                    // std::cout << "Exact solution is " << exact << std::endl;
+
+                    // Make sure that the quadrature solution matches the exact solution
+                    CPPUNIT_ASSERT_DOUBLES_EQUAL(exact, sumq, TOLERANCE*TOLERANCE);
+                  }
+          } // end for (order)
+      } // end for (i)
+  }
 
   void testTetQuadrature ()
   {
