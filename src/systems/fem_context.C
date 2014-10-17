@@ -1589,11 +1589,12 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
     (dof_indices.size());
   const std::size_t n_qoi = sys.qoi.size();
 
-  if (sys.use_fixed_solution)
-    elem_fixed_solution.resize(n_dofs);
-
   // This also resizes elem_solution
   sys.current_local_solution->get(dof_indices, elem_solution.get_values());
+
+  if (sys.use_fixed_solution)
+    elem_fixed_solution.resize(n_dofs);
+  elem_solution_rate.resize(n_dofs);
 
   // These resize calls also zero out the residual and jacobian
   elem_residual.resize(n_dofs);
@@ -1615,6 +1616,9 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
           (dof_indices_var[i].size());
 
         elem_subsolutions[i]->reposition
+          (sub_dofs, n_dofs_var);
+
+        elem_subsolution_rates[i]->reposition
           (sub_dofs, n_dofs_var);
 
         if (sys.use_fixed_solution)
@@ -1831,6 +1835,9 @@ template void FEMContext::fixed_point_hessian<Tensor>(unsigned int, const Point&
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::fixed_point_hessian<??>(unsigned int, const Point&, ??&) const;
 #endif
+
+template void FEMContext::interior_rate<Number>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::interior_rate<Gradient>(unsigned int, unsigned int, Gradient&) const;
 
 template AutoPtr<FEGenericBase<Real> > FEMContext::build_new_fe( const FEGenericBase<Real>*, const Point & ) const;
 template AutoPtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe( const FEGenericBase<RealGradient>*, const Point & ) const;
