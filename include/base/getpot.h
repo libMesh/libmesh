@@ -2848,6 +2848,7 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::tanh(arg));
             }
+#if __cplusplus > 199711L  // C++11 or better
           else if (funcname == "asinh")
             {
               STRING_VECTOR A =
@@ -2869,6 +2870,7 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::atanh(arg));
             }
+#endif // __cplusplus > 199711L
           else if (funcname == "sqrt")
             {
               STRING_VECTOR A =
