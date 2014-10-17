@@ -130,6 +130,9 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
   // The EigenTimeSolver always computes jacobians!
   libmesh_assert (request_jacobian);
 
+  context.elem_solution_rate_derivative = 1;
+  context.elem_solution_derivative = 1;
+
   // Assemble the operator for the spatial part.
   if (now_assembling == Matrix_A)
     {
@@ -172,6 +175,9 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
 {
   // The EigenTimeSolver always requests jacobians?
   //libmesh_assert (request_jacobian);
+
+  context.elem_solution_rate_derivative = 1;
+  context.elem_solution_derivative = 1;
 
   // Assemble the operator for the spatial part.
   if (now_assembling == Matrix_A)
