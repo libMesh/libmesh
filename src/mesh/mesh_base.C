@@ -196,7 +196,7 @@ void MeshBase::clear ()
   _is_prepared = false;
 
   // Clear boundary information
-  this->boundary_info->clear();
+  this->get_boundary_info().clear();
 
   // Clear our point locator.
   this->clear_point_locator();

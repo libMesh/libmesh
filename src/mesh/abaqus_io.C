@@ -380,7 +380,7 @@ void AbaqusIO::read (const std::string& fname)
   // sidesets.  So we can call the new BoundaryInfo function which
   // generates sidesets from nodesets.
   if (build_sidesets_from_nodesets)
-    the_mesh.boundary_info->build_side_list_from_node_list();
+    the_mesh.get_boundary_info().build_side_list_from_node_list();
 
   // Delete lower-dimensional elements from the Mesh.  We assume these
   // were only used for setting BCs, and aren't part of the actual
@@ -854,7 +854,7 @@ void AbaqusIO::assign_boundary_node_ids()
   for (unsigned short current_id=0; it != _nodeset_ids.end(); ++it, ++current_id)
     {
       // Associate current_id with the name we determined earlier
-      the_mesh.boundary_info->nodeset_name(current_id) = it->first;
+      the_mesh.get_boundary_info().nodeset_name(current_id) = it->first;
 
       // Get a reference to the current vector of nodeset ID values
       std::vector<dof_id_type>& nodeset_ids = it->second;
@@ -872,7 +872,7 @@ void AbaqusIO::assign_boundary_node_ids()
 
           // Add this node with the current_id (which is determined by the
           // alphabetical ordering of the map) to the BoundaryInfo object
-          the_mesh.boundary_info->add_node(node, current_id);
+          the_mesh.get_boundary_info().add_node(node, current_id);
         }
     }
 }
@@ -894,7 +894,7 @@ void AbaqusIO::assign_sideset_ids()
     for (unsigned short current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
       {
         // Associate current_id with the name we determined earlier
-        the_mesh.boundary_info->sideset_name(current_id) = it->first;
+        the_mesh.get_boundary_info().sideset_name(current_id) = it->first;
 
         // Get a reference to the current vector of nodeset ID values
         std::vector<std::pair<dof_id_type,unsigned> >& sideset_ids = it->second;
@@ -930,9 +930,10 @@ void AbaqusIO::assign_sideset_ids()
             // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
             // so we subtract 1 here before passing the abaqus side number to the
             // mapping array
-            the_mesh.boundary_info->add_side(elem,
-                                             eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
-                                             current_id);
+            the_mesh.get_boundary_info().add_side
+              (elem,
+               eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
+               current_id);
           }
       }
   }
@@ -998,7 +999,7 @@ void AbaqusIO::assign_sideset_ids()
             // chosen.  It's not necessary to do this for every
             // element in the set, but it's convenient to do it here
             // since we have all the necessary information...
-            the_mesh.boundary_info->sideset_name(elemset_id) = it->first;
+            the_mesh.get_boundary_info().sideset_name(elemset_id) = it->first;
           }
       }
 
@@ -1037,7 +1038,7 @@ void AbaqusIO::assign_sideset_ids()
                   // Add boundary information for each side in the range.
                   for (provide_bcs_t::const_iterator s_it = range.first;
                        s_it != range.second; ++s_it)
-                    the_mesh.boundary_info->add_side
+                    the_mesh.get_boundary_info().add_side
                       (elem, sn, cast_int<unsigned short>(s_it->second));
                 }
             }

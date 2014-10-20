@@ -182,9 +182,9 @@ void XdrIO::write (const std::string& name)
   libmesh_assert(n_nodes == mesh.n_nodes());
 
   header_id_type n_bcs =
-    cast_int<header_id_type>(mesh.boundary_info->n_boundary_conds());
+    cast_int<header_id_type>(mesh.get_boundary_info().n_boundary_conds());
   header_id_type n_nodesets =
-    cast_int<header_id_type>(mesh.boundary_info->n_nodeset_conds());
+    cast_int<header_id_type>(mesh.get_boundary_info().n_nodeset_conds());
   unsigned int
     n_p_levels = MeshTools::n_p_levels (mesh);
 
@@ -288,7 +288,7 @@ void XdrIO::write (const std::string& name)
       this->write_serialized_nodesets (io, n_nodesets);
     }
 
-  if(mesh.boundary_info->n_edge_conds() > 0)
+  if(mesh.get_boundary_info().n_edge_conds() > 0)
     {
       libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
                    << "are not supported by the XDR format."
@@ -840,7 +840,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const header_id_type n_bcs) const
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
   // and our boundary info object
-  const BoundaryInfo &boundary_info = *mesh.boundary_info;
+  const BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces entity names
   write_serialized_bc_names(io, boundary_info, true);  // sideset names
@@ -928,7 +928,7 @@ void XdrIO::write_serialized_nodesets (Xdr &io, const header_id_type n_nodesets)
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
   // and our boundary info object
-  const BoundaryInfo &boundary_info = *mesh.boundary_info;
+  const BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces entity names
   write_serialized_bc_names(io, boundary_info, false);  // nodeset names
@@ -1484,7 +1484,7 @@ void XdrIO::read_serialized_bcs (Xdr &io, T)
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
   // and our boundary info object
-  BoundaryInfo &boundary_info = *mesh.boundary_info;
+  BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces unique ids
   read_serialized_bc_names(io, boundary_info, true);  // sideset names
@@ -1562,7 +1562,7 @@ void XdrIO::read_serialized_nodesets (Xdr &io, T)
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
   // and our boundary info object
-  BoundaryInfo &boundary_info = *mesh.boundary_info;
+  BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces unique ids
   read_serialized_bc_names(io, boundary_info, false); // nodeset names

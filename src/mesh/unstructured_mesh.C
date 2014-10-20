@@ -1074,14 +1074,14 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
         // We're supporting boundary ids on internal sides now
         //if (old_elem->neighbor(s) == NULL)
         {
-          const std::vector<boundary_id_type>& bc_ids = this->boundary_info->boundary_ids(old_elem, s);
+          const std::vector<boundary_id_type>& bc_ids =
+            this->get_boundary_info().boundary_ids(old_elem, s);
           for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
             {
               const boundary_id_type bc_id = *id_it;
-              if (bc_id != this->boundary_info->invalid_id)
-                new_mesh.boundary_info->add_side (new_elem,
-                                                  s,
-                                                  bc_id);
+              if (bc_id != this->get_boundary_info().invalid_id)
+                new_mesh.get_boundary_info().add_side (new_elem, s,
+                                                       bc_id);
             }
         }
     } // end loop over elements

@@ -560,7 +560,7 @@ void GmshIO::read_mesh(std::istream& in)
                       // line.  At least it was in the example gmsh
                       // file I had...
                       in >> node_id;
-                      mesh.boundary_info->add_node
+                      mesh.get_boundary_info().add_node
                         (nodetrans[node_id],
                          static_cast<boundary_id_type>(physical));
                     }
@@ -634,7 +634,8 @@ void GmshIO::read_mesh(std::istream& in)
                             // the Mesh's BoundaryInfo object with the lower-dimensional element's subdomain ID.
                             for (unsigned n=0; n<elem->n_nodes(); n++)
                               {
-                                mesh.boundary_info->add_node(elem->node(n), elem->subdomain_id());
+                                mesh.get_boundary_info().add_node
+                                  (elem->node(n), elem->subdomain_id());
 
                                 // And save for our local data structure
                                 node_ids[n] = elem->node(n);
@@ -711,9 +712,10 @@ void GmshIO::read_mesh(std::istream& in)
                                     //              << std::endl;
 
                                     // Add boundary information based on the lower-dimensional element's subdomain id.
-                                    mesh.boundary_info->add_side(elem,
-                                                                 sn,
-                                                                 cast_int<boundary_id_type>(lower_dim_elem->subdomain_id()));
+                                    mesh.get_boundary_info().add_side
+                                      (elem, sn,
+                                       cast_int<boundary_id_type>
+                                         (lower_dim_elem->subdomain_id()));
                                   }
                               }
                           }

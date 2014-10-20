@@ -1049,8 +1049,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   std::vector<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
 
-  mesh.boundary_info->build_side_boundary_ids(unique_side_boundaries);
-  mesh.boundary_info->build_node_boundary_ids(unique_node_boundaries);
+  mesh.get_boundary_info().build_side_boundary_ids(unique_side_boundaries);
+  mesh.get_boundary_info().build_node_boundary_ids(unique_node_boundaries);
 
   num_side_sets = cast_int<int>(unique_side_boundaries.size());
   num_node_sets = cast_int<int>(unique_node_boundaries.size());
@@ -1359,7 +1359,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   std::vector< unsigned short int > sl;
   std::vector< boundary_id_type > il;
 
-  mesh.boundary_info->build_side_list(el, sl, il);
+  mesh.get_boundary_info().build_side_list(el, sl, il);
 
   // Maps from sideset id to the element and sides
   std::map<int, std::vector<int> > elem;
@@ -1391,7 +1391,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     }
 
   std::vector<boundary_id_type> side_boundary_ids;
-  mesh.boundary_info->build_side_boundary_ids(side_boundary_ids);
+  mesh.get_boundary_info().build_side_boundary_ids(side_boundary_ids);
 
   // Write out the sideset names, but only if there is something to write
   if (side_boundary_ids.size() > 0)
@@ -1404,7 +1404,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
           int actual_id = ss_id;
 
-          names_table.push_back_entry(mesh.boundary_info->sideset_name(ss_id));
+          names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
 
           ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 0);
           EX_CHECK_ERR(ex_err, "Error writing sideset parameters");
@@ -1428,7 +1428,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   std::vector< dof_id_type > nl;
   std::vector< boundary_id_type > il;
 
-  mesh.boundary_info->build_node_list(nl, il);
+  mesh.get_boundary_info().build_node_list(nl, il);
 
   // Maps from nodeset id to the nodes
   std::map<boundary_id_type, std::vector<int> > node;
@@ -1438,7 +1438,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
     node[il[i]].push_back(nl[i]+1);
 
   std::vector<boundary_id_type> node_boundary_ids;
-  mesh.boundary_info->build_node_boundary_ids(node_boundary_ids);
+  mesh.get_boundary_info().build_node_boundary_ids(node_boundary_ids);
 
   // Write out the nodeset names, but only if there is something to write
   if (node_boundary_ids.size() > 0)
@@ -1451,7 +1451,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
           int actual_id = nodeset_id;
 
-          names_table.push_back_entry(mesh.boundary_info->nodeset_name(nodeset_id));
+          names_table.push_back_entry(mesh.get_boundary_info().get_nodeset_name(nodeset_id));
 
           ex_err = exII::ex_put_node_set_param(ex_id, actual_id, node[nodeset_id].size(), 0);
           EX_CHECK_ERR(ex_err, "Error writing nodeset parameters");

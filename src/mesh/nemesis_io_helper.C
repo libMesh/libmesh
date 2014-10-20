@@ -1364,8 +1364,8 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
 {
   // 1.) Get reference to the set of side boundary IDs
   std::set<boundary_id_type> global_side_boundary_ids
-    (pmesh.boundary_info->get_side_boundary_ids().begin(),
-     pmesh.boundary_info->get_side_boundary_ids().end());
+    (pmesh.get_boundary_info().get_side_boundary_ids().begin(),
+     pmesh.get_boundary_info().get_side_boundary_ids().end());
 
   // 2.) Gather boundary side IDs from other processors
   this->comm().set_union(global_side_boundary_ids);
@@ -1393,7 +1393,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
   std::vector<dof_id_type> bndry_elem_list;
   std::vector<unsigned short int> bndry_side_list;
   std::vector<boundary_id_type> bndry_id_list;
-  pmesh.boundary_info->build_side_list(bndry_elem_list, bndry_side_list, bndry_id_list);
+  pmesh.get_boundary_info().build_side_list(bndry_elem_list, bndry_side_list, bndry_id_list);
 
   // Similarly to the nodes, we can't count any sides for elements which aren't local
   std::vector<dof_id_type>::iterator it_elem=bndry_elem_list.begin();
@@ -1475,8 +1475,8 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
 
   // 1.) Get reference to the set of node boundary IDs *for this processor*
   std::set<boundary_id_type> global_node_boundary_ids
-    (pmesh.boundary_info->get_node_boundary_ids().begin(),
-     pmesh.boundary_info->get_node_boundary_ids().end());
+    (pmesh.get_boundary_info().get_node_boundary_ids().begin(),
+     pmesh.get_boundary_info().get_node_boundary_ids().end());
 
   // Save a copy of the local_node_boundary_ids...
   local_node_boundary_ids = global_node_boundary_ids;
@@ -1513,7 +1513,8 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
   // There is probably a better way to do this...
   std::vector<dof_id_type> boundary_node_list;
   std::vector<boundary_id_type> boundary_node_boundary_id_list;
-  pmesh.boundary_info->build_node_list(boundary_node_list, boundary_node_boundary_id_list);
+  pmesh.get_boundary_info().build_node_list
+    (boundary_node_list, boundary_node_boundary_id_list);
 
   if (verbose)
     {
@@ -2031,7 +2032,8 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
   // build it here again, hopefully it's small relative to the size of the entire mesh.
   std::vector<dof_id_type> boundary_node_list;
   std::vector<boundary_id_type> boundary_node_boundary_id_list;
-  mesh.boundary_info->build_node_list(boundary_node_list, boundary_node_boundary_id_list);
+  mesh.get_boundary_info().build_node_list
+    (boundary_node_list, boundary_node_boundary_id_list);
 
   if (verbose)
     {
@@ -2174,7 +2176,8 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
   std::vector< unsigned short int > bndry_side_list;
   std::vector< boundary_id_type > bndry_id_list;
 
-  mesh.boundary_info->build_side_list(bndry_elem_list, bndry_side_list, bndry_id_list);
+  mesh.get_boundary_info().build_side_list
+    (bndry_elem_list, bndry_side_list, bndry_id_list);
 
   // Integer looping, skipping non-local elements
   for (unsigned i=0; i<bndry_elem_list.size(); ++i)

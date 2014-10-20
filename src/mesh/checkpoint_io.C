@@ -322,7 +322,7 @@ void CheckpointIO::write_bcs (Xdr &io) const
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
   // and our boundary info object
-  const BoundaryInfo &boundary_info = *mesh.boundary_info;
+  const BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces entity names
   write_bc_names(io, boundary_info, true);  // sideset names
@@ -349,7 +349,7 @@ void CheckpointIO::write_nodesets (Xdr &io) const
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
   // and our boundary info object
-  const BoundaryInfo &boundary_info = *mesh.boundary_info;
+  const BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   std::vector<dof_id_type> node_id_list;
   std::vector<boundary_id_type> bc_id_list;
@@ -661,7 +661,7 @@ void CheckpointIO::read_bcs (Xdr &io)
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
   // and our boundary info object
-  BoundaryInfo &boundary_info = *mesh.boundary_info;
+  BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   // Version 0.9.2+ introduces entity names
   read_bc_names(io, boundary_info, true);  // sideset names
@@ -687,7 +687,7 @@ void CheckpointIO::read_nodesets (Xdr &io)
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
   // and our boundary info object
-  BoundaryInfo &boundary_info = *mesh.boundary_info;
+  BoundaryInfo &boundary_info = mesh.get_boundary_info();
 
   std::vector<dof_id_type> node_id_list;
   std::vector<boundary_id_type> bc_id_list;

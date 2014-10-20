@@ -570,7 +570,7 @@ void UNVIO::groups_in (std::istream& in_file)
 
       // Associate this group_number with the group_name in the BoundaryInfo object.
       if (is_sideset_group)
-        mesh.boundary_info->sideset_name
+        mesh.get_boundary_info().sideset_name
           (cast_int<boundary_id_type>(group_number)) = group_name;
 
       if (is_subdomain_group)
@@ -615,7 +615,8 @@ void UNVIO::groups_in (std::istream& in_file)
                     Elem* lower_dim_elem = iter->second;
 
                     // Add boundary information based on the lower-dimensional element's subdomain id.
-                    mesh.boundary_info->add_side(elem, sn, lower_dim_elem->subdomain_id());
+                    mesh.get_boundary_info().add_side
+                      (elem, sn, lower_dim_elem->subdomain_id());
                   }
               }
           }

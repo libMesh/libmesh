@@ -1539,7 +1539,7 @@ bool MeshRefinement::_coarsen_elements ()
 
           // Remove any boundary information associated
           // with this element
-          _mesh.boundary_info->remove (elem);
+          _mesh.get_boundary_info().remove (elem);
 
           // Add this iterator to the _unused_elements
           // data structure so we might fill it.

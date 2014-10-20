@@ -387,9 +387,9 @@ void UnstructuredMesh::all_first_order ()
       for (unsigned short s=0; s<so_elem->n_sides(); s++)
         {
           const std::vector<boundary_id_type> boundary_ids =
-            this->boundary_info->raw_boundary_ids (so_elem, s);
+            this->get_boundary_info().raw_boundary_ids (so_elem, s);
 
-          this->boundary_info->add_side (lo_elem, s, boundary_ids);
+          this->get_boundary_info().add_side (lo_elem, s, boundary_ids);
         }
 
       /*
@@ -675,9 +675,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       for (unsigned short s=0; s<lo_elem->n_sides(); s++)
         {
           const std::vector<boundary_id_type> boundary_ids =
-            this->boundary_info->raw_boundary_ids (lo_elem, s);
+            this->get_boundary_info().raw_boundary_ids (lo_elem, s);
 
-          this->boundary_info->add_side (so_elem, s, boundary_ids);
+          this->get_boundary_info().add_side (so_elem, s, boundary_ids);
 
           if (lo_elem->neighbor(s) == remote_elem)
             so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
@@ -734,7 +734,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
   // If the original mesh has boundary data, we carry that over
   // to the new mesh with triangular elements.
-  const bool mesh_has_boundary_data = (mesh.boundary_info->n_boundary_ids() > 0);
+  const bool mesh_has_boundary_data = (mesh.get_boundary_info().n_boundary_ids() > 0);
 
   // Temporary vectors to store the new boundary element pointers, side numbers, and boundary ids
   std::vector<Elem*> new_bndry_elements;
@@ -939,7 +939,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
               {
                 for (unsigned short sn=0; sn<elem->n_sides(); ++sn)
                   {
-                    const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(*el, sn);
+                    const std::vector<boundary_id_type>& bc_ids =
+                      mesh.get_boundary_info().boundary_ids(*el, sn);
                     for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                       {
                         const boundary_id_type b_id = *id_it;
@@ -1031,7 +1032,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                   } // end for loop over sides
 
                 // Remove the original element from the BoundaryInfo structure.
-                mesh.boundary_info->remove(elem);
+                mesh.get_boundary_info().remove(elem);
 
               } // end if (mesh_has_boundary_data)
 
@@ -1148,10 +1149,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
     {
       // By this time, we should have removed all of the original boundary sides
       // - except on a hybrid mesh, where we can't "start from a blank slate"! - RHS
-      // libmesh_assert_equal_to (mesh.boundary_info->n_boundary_conds(), 0);
+      // libmesh_assert_equal_to (mesh.get_boundary_info().n_boundary_conds(), 0);
 
       // Clear the boundary info, to be sure and start from a blank slate.
-      // mesh.boundary_info->clear();
+      // mesh.get_boundary_info().clear();
 
       // If the old mesh had boundary data, the new mesh better have some.
       libmesh_assert_greater (new_bndry_elements.size(), 0);
@@ -1163,9 +1164,9 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
       // Add the new boundary info to the mesh
       for (unsigned int s=0; s<new_bndry_elements.size(); ++s)
-        mesh.boundary_info->add_side(new_bndry_elements[s],
-                                     new_bndry_sides[s],
-                                     new_bndry_ids[s]);
+        mesh.get_boundary_info().add_side(new_bndry_elements[s],
+                                          new_bndry_sides[s],
+                                          new_bndry_ids[s]);
     }
 
 
@@ -1379,9 +1380,9 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
   // Reserve a reasonable amt. of space for each
   new_elements.reserve(mesh.n_active_elem());
-  saved_boundary_elements.reserve(mesh.boundary_info->n_boundary_conds());
-  saved_bc_ids.reserve(mesh.boundary_info->n_boundary_conds());
-  saved_bc_sides.reserve(mesh.boundary_info->n_boundary_conds());
+  saved_boundary_elements.reserve(mesh.get_boundary_info().n_boundary_conds());
+  saved_bc_ids.reserve(mesh.get_boundary_info().n_boundary_conds());
+  saved_bc_sides.reserve(mesh.get_boundary_info().n_boundary_conds());
   {
     MeshBase::element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::element_iterator end = mesh.active_elements_end();
@@ -1413,7 +1414,8 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
             if (elem->neighbor(s) == remote_elem)
               copy->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
 
-            const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
+            const std::vector<boundary_id_type>& bc_ids =
+              mesh.get_boundary_info().boundary_ids(elem,s);
             for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
               {
                 const boundary_id_type bc_id = *id_it;
@@ -1479,9 +1481,9 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
   // Finally, also add back the saved boundary information
   for (unsigned int e=0; e<saved_boundary_elements.size(); ++e)
-    mesh.boundary_info->add_side(saved_boundary_elements[e],
-                                 saved_bc_sides[e],
-                                 saved_bc_ids[e]);
+    mesh.get_boundary_info().add_side(saved_boundary_elements[e],
+                                      saved_bc_sides[e],
+                                      saved_bc_ids[e]);
 
   // Trim unused and renumber nodes and elements
   mesh.prepare_for_use(/*skip_renumber =*/ false);
@@ -1504,39 +1506,42 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
       unsigned int n_nodes = elem->n_nodes();
       for (unsigned int n=0; n != n_nodes; ++n)
         {
-          const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->boundary_ids(elem->get_node(n));
+          const std::vector<boundary_id_type>& old_ids =
+            mesh.get_boundary_info().boundary_ids(elem->get_node(n));
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
             {
               std::vector<boundary_id_type> new_ids(old_ids);
               std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
-              mesh.boundary_info->remove(elem->get_node(n));
-              mesh.boundary_info->add_node(elem->get_node(n), new_ids);
+              mesh.get_boundary_info().remove(elem->get_node(n));
+              mesh.get_boundary_info().add_node(elem->get_node(n), new_ids);
             }
         }
 
       unsigned int n_edges = elem->n_edges();
       for (unsigned short edge=0; edge != n_edges; ++edge)
         {
-          const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->edge_boundary_ids(elem, edge);
+          const std::vector<boundary_id_type>& old_ids =
+            mesh.get_boundary_info().edge_boundary_ids(elem, edge);
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
             {
               std::vector<boundary_id_type> new_ids(old_ids);
               std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
-              mesh.boundary_info->remove_edge(elem, edge);
-              mesh.boundary_info->add_edge(elem, edge, new_ids);
+              mesh.get_boundary_info().remove_edge(elem, edge);
+              mesh.get_boundary_info().add_edge(elem, edge, new_ids);
             }
         }
 
       unsigned int n_sides = elem->n_sides();
       for (unsigned short s=0; s != n_sides; ++s)
         {
-          const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->boundary_ids(elem, s);
+          const std::vector<boundary_id_type>& old_ids =
+            mesh.get_boundary_info().boundary_ids(elem, s);
           if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
             {
               std::vector<boundary_id_type> new_ids(old_ids);
               std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
-              mesh.boundary_info->remove_side(elem, s);
-              mesh.boundary_info->add_side(elem, s, new_ids);
+              mesh.get_boundary_info().remove_side(elem, s);
+              mesh.get_boundary_info().add_side(elem, s, new_ids);
             }
         }
     }

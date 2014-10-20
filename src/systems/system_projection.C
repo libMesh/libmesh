@@ -2501,7 +2501,8 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
   const DofMap& dof_map = system.get_dof_map();
 
   // Boundary info for the current mesh
-  const BoundaryInfo& boundary_info = *system.get_mesh().boundary_info;
+  const BoundaryInfo& boundary_info =
+    system.get_mesh().get_boundary_info();
 
   // The element matrix and RHS for projections.
   // Note that Ke is always real-valued, whereas
