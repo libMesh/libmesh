@@ -89,7 +89,15 @@ extern "C" {
 
 #endif
 
-
+// Only support hyperbolic inverse trig functions in C++11
+#if __cplusplus > 199711L
+// For non-clang compilers, we assume their C++11 mode supports
+// hyperbolic inverse trig functions.  Otherwise, we require a clang compiler
+// from Apple with major version >= 6.
+#if !defined(__clang__) || (defined(__apple_build_version__) && (__clang_major__ >= 6))
+#define HAVE_HYPERBOLIC_INVERSE_TRIG_FUNCTIONS
+#endif
+#endif
 
 typedef  std::vector<std::string>  STRING_VECTOR;
 
@@ -2848,7 +2856,7 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::tanh(arg));
             }
-#if __cplusplus > 199711L  // C++11 or better
+#ifdef HAVE_HYPERBOLIC_INVERSE_TRIG_FUNCTIONS
           else if (funcname == "asinh")
             {
               STRING_VECTOR A =
@@ -2870,7 +2878,7 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::atanh(arg));
             }
-#endif // __cplusplus > 199711L
+#endif // HAVE_HYPERBOLIC_INVERSE_TRIG_FUNCTIONS
           else if (funcname == "sqrt")
             {
               STRING_VECTOR A =
