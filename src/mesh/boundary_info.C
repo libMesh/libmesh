@@ -1410,7 +1410,9 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
   return libMesh::invalid_uint;
 }
 
-void BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> &b_ids)
+void
+BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> &b_ids)
+const
 {
   b_ids.clear();
 
@@ -1426,7 +1428,9 @@ void BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> &b_ids)
     }
 }
 
-void BoundaryInfo::build_side_boundary_ids(std::vector<boundary_id_type> &b_ids)
+void
+BoundaryInfo::build_side_boundary_ids(std::vector<boundary_id_type> &b_ids)
+const
 {
   b_ids.clear();
 
@@ -1874,12 +1878,12 @@ void BoundaryInfo::print_summary(std::ostream& out_stream) const
     }
 }
 
-std::string& BoundaryInfo::sideset_name(boundary_id_type id)
+std::string& BoundaryInfo::sideset_name(boundary_id_type id) const
 {
   return _ss_id_to_name[id];
 }
 
-std::string& BoundaryInfo::nodeset_name(boundary_id_type id)
+std::string& BoundaryInfo::nodeset_name(boundary_id_type id) const
 {
   return _ns_id_to_name[id];
 }
