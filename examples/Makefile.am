@@ -102,7 +102,7 @@ doc:
 	for dir in $(SUBDIRS) ; do \
 	  cd $$dir ; \
 	  $(MAKE) doc ; \
-	  cp *.php $(abs_top_srcdir)/doc/html ; \
+	  cp *.html $(abs_top_srcdir)/doc/html/examples ; \
 	  cd - ; \
 	done
 

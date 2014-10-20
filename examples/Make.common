@@ -1,12 +1,12 @@
 ######################################################################
 #
 # Common environment for all examples
-# 
+#
 # This file is included by *every* example.  If we are careful, common
-# rules like 'make doc' or 'make run' can be defined here, once and 
+# rules like 'make doc' or 'make run' can be defined here, once and
 # for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
+#
+AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
 AM_CFLAGS    = $(libmesh_CFLAGS)
@@ -114,10 +114,10 @@ run: $(check_PROGRAMS)
 #
 # how to make documentation
 #
-CLEANFILES += $(example_name).php stdout.log
-doc: $(example_name).php
-html: $(example_name).php
-$(example_name).php: $(DOC_PROGRAM) \
+CLEANFILES += $(example_name).html stdout.log
+doc: $(example_name).html
+html: $(example_name).html
+$(example_name).html: $(DOC_PROGRAM) \
                         $(top_srcdir)/contrib/bin/ex2html.sh \
                        Makefile
 	$(MAKE) METHODS=$(DOC_METHOD) -s run > stdout.log
