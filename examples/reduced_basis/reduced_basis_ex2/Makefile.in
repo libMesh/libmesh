@@ -591,7 +591,7 @@ sources = $(data) run.sh
 # how to make documentation
 #
 CLEANFILES = bf0.e RB_sol.e rb_data/* scm_data/* $(am__append_1) \
-	$(example_name).php stdout.log
+	$(example_name).html stdout.log
 
 # conditionally enable this test
 @LIBMESH_ENABLE_GLPK_TRUE@@LIBMESH_ENABLE_SLEPC_TRUE@check_SCRIPTS = run.sh
@@ -602,12 +602,12 @@ CLEANFILES = bf0.e RB_sol.e rb_data/* scm_data/* $(am__append_1) \
 ######################################################################
 #
 # Common environment for all examples
-# 
+#
 # This file is included by *every* example.  If we are careful, common
-# rules like 'make doc' or 'make run' can be defined here, once and 
+# rules like 'make doc' or 'make run' can be defined here, once and
 # for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
+#
+AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
@@ -1178,9 +1178,9 @@ clean-local:
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)" $(srcdir)/$(check_SCRIPTS)
-doc: $(example_name).php
-html: $(example_name).php
-$(example_name).php: $(DOC_PROGRAM) \
+doc: $(example_name).html
+html: $(example_name).html
+$(example_name).html: $(DOC_PROGRAM) \
                         $(top_srcdir)/contrib/bin/ex2html.sh \
                        Makefile
 	$(MAKE) METHODS=$(DOC_METHOD) -s run > stdout.log

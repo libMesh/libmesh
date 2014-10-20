@@ -567,18 +567,18 @@ check_SCRIPTS = run.sh
 #
 # how to make documentation
 #
-CLEANFILES = hole_3D.e delaunay_l_shaped_hole.e $(example_name).php \
+CLEANFILES = hole_3D.e delaunay_l_shaped_hole.e $(example_name).html \
 	stdout.log
 
 ######################################################################
 #
 # Common environment for all examples
-# 
+#
 # This file is included by *every* example.  If we are careful, common
-# rules like 'make doc' or 'make run' can be defined here, once and 
+# rules like 'make doc' or 'make run' can be defined here, once and
 # for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
+#
+AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
@@ -1139,9 +1139,9 @@ uninstall-am: uninstall-dataDATA
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)" $(srcdir)/$(check_SCRIPTS)
-doc: $(example_name).php
-html: $(example_name).php
-$(example_name).php: $(DOC_PROGRAM) \
+doc: $(example_name).html
+html: $(example_name).html
+$(example_name).html: $(DOC_PROGRAM) \
                         $(top_srcdir)/contrib/bin/ex2html.sh \
                        Makefile
 	$(MAKE) METHODS=$(DOC_METHOD) -s run > stdout.log

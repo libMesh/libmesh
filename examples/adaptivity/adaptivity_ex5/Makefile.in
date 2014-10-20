@@ -581,18 +581,18 @@ sources = $(data) run.sh
 #
 CLEANFILES = solution_read_in.gmv solution_read_in.e \
 	saved_solution.xdr saved_solution.gmv saved_solution.e \
-	saved_mesh.xdr out_*.e out.gmv.* $(example_name).php \
+	saved_mesh.xdr out_*.e out.gmv.* $(example_name).html \
 	stdout.log
 
 ######################################################################
 #
 # Common environment for all examples
-# 
+#
 # This file is included by *every* example.  If we are careful, common
-# rules like 'make doc' or 'make run' can be defined here, once and 
+# rules like 'make doc' or 'make run' can be defined here, once and
 # for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
+#
+AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
@@ -1235,9 +1235,9 @@ exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)" $(srcdir)/$(check_SCRIPTS)
-doc: $(example_name).php
-html: $(example_name).php
-$(example_name).php: $(DOC_PROGRAM) \
+doc: $(example_name).html
+html: $(example_name).html
+$(example_name).html: $(DOC_PROGRAM) \
                         $(top_srcdir)/contrib/bin/ex2html.sh \
                        Makefile
 	$(MAKE) METHODS=$(DOC_METHOD) -s run > stdout.log
