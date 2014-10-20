@@ -607,7 +607,9 @@ void assemble_stokes (EquationSystems& es,
                   // 3=left
 
                   // Set u = 1 on the top boundary, 0 everywhere else
-                  const Real u_value = (mesh.boundary_info->has_boundary_id(elem,s,2)) ? 1. : 0.;
+                  const Real u_value =
+                    (mesh.get_boundary_info().has_boundary_id(elem,s,2))
+                      ? 1. : 0.;
 
                   // Set v = 0 everywhere
                   const Real v_value = 0.;

@@ -242,7 +242,8 @@ void AssemblyA2::interior_assembly(FEMContext &c)
 
 void AssemblyF0::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+  if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+       (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
     {
       const unsigned int u_var = 0;
 
@@ -270,7 +271,8 @@ void AssemblyF0::boundary_assembly(FEMContext &c)
 
 void AssemblyF1::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+  if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+       (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
     {
       const unsigned int u_var = 0;
       const unsigned int v_var = 1;
@@ -299,7 +301,8 @@ void AssemblyF1::boundary_assembly(FEMContext &c)
 
 void AssemblyF2::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+  if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+       (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
     {
       const unsigned int u_var = 0;
       const unsigned int w_var = 2;
@@ -334,7 +337,8 @@ void AssemblyPointLoadX::get_nodal_rhs_values(
   // First clear the values map
   values.clear();
 
-  if(sys.get_mesh().boundary_info->has_boundary_id(&node, NODE_BOUNDARY_ID))
+  if(sys.get_mesh().get_boundary_info().has_boundary_id
+       (&node, NODE_BOUNDARY_ID))
   {
     numeric_index_type dof_index =
       node.dof_number(sys.number(), sys.variable_number("u"), 0);
@@ -350,7 +354,8 @@ void AssemblyPointLoadY::get_nodal_rhs_values(
   // First clear the values map
   values.clear();
 
-  if(sys.get_mesh().boundary_info->has_boundary_id(&node, NODE_BOUNDARY_ID))
+  if(sys.get_mesh().get_boundary_info().has_boundary_id
+       (&node, NODE_BOUNDARY_ID))
   {
     numeric_index_type dof_index =
       node.dof_number(sys.number(), sys.variable_number("v"), 0);
@@ -366,7 +371,8 @@ void AssemblyPointLoadZ::get_nodal_rhs_values(
   // First clear the values map
   values.clear();
 
-  if(sys.get_mesh().boundary_info->has_boundary_id(&node, NODE_BOUNDARY_ID))
+  if(sys.get_mesh().get_boundary_info().has_boundary_id
+       (&node, NODE_BOUNDARY_ID))
   {
     numeric_index_type dof_index =
       node.dof_number(sys.number(), sys.variable_number("w"), 0);
