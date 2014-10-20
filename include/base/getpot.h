@@ -89,14 +89,25 @@ extern "C" {
 
 #endif
 
-// Only support hyperbolic inverse trig functions in C++11
-#if __cplusplus > 199711L
-// For non-clang compilers, we assume their C++11 mode supports
-// hyperbolic inverse trig functions.  Otherwise, we require a clang compiler
-// from Apple with major version >= 6.
-#if !defined(__clang__) || (defined(__apple_build_version__) && (__clang_major__ >= 6))
-#define HAVE_HYPERBOLIC_INVERSE_TRIG_FUNCTIONS
+// Clang provides the __has_builtin macro, we define it for compilers
+// that don't...
+#ifndef __has_builtin
+  #define __has_builtin(x) 0
 #endif
+
+// Fine-grained ifdefs for all three inverse hyperbolic trig
+// functions.  This works for the two clang compilers I tried it
+// on... a hand-built one and one from Apple.
+#if __cplusplus > 199711L && (!defined(__clang__) || __has_builtin(asinh))
+#define HAVE_INVERSE_HYPERBOLIC_SINE
+#endif
+
+#if __cplusplus > 199711L && (!defined(__clang__) || __has_builtin(acosh))
+#define HAVE_INVERSE_HYPERBOLIC_COSINE
+#endif
+
+#if __cplusplus > 199711L && (!defined(__clang__) || __has_builtin(atanh))
+#define HAVE_INVERSE_HYPERBOLIC_TANGENT
 #endif
 
 typedef  std::vector<std::string>  STRING_VECTOR;
@@ -2856,7 +2867,7 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::tanh(arg));
             }
-#ifdef HAVE_HYPERBOLIC_INVERSE_TRIG_FUNCTIONS
+#ifdef HAVE_INVERSE_HYPERBOLIC_SINE
           else if (funcname == "asinh")
             {
               STRING_VECTOR A =
@@ -2864,6 +2875,8 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::asinh(arg));
             }
+#endif
+#ifdef HAVE_INVERSE_HYPERBOLIC_COSINE
           else if (funcname == "acosh")
             {
               STRING_VECTOR A =
@@ -2871,6 +2884,8 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::acosh(arg));
             }
+#endif
+#ifdef HAVE_INVERSE_HYPERBOLIC_TANGENT
           else if (funcname == "atanh")
             {
               STRING_VECTOR A =
@@ -2878,7 +2893,7 @@ GetPot::_DBE_expand(const std::string& expr)
               double arg = _convert_to_type(A[0], 0.0);
               return _convert_from_type(std::atanh(arg));
             }
-#endif // HAVE_HYPERBOLIC_INVERSE_TRIG_FUNCTIONS
+#endif
           else if (funcname == "sqrt")
             {
               STRING_VECTOR A =
