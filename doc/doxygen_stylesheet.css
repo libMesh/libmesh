@@ -1444,7 +1444,7 @@ tr.heading h2 {
   display: block;
   width: 100%;
   height: 208px;
-  background: url('http://benkirk.github.io/libmesh/images/libmesh_mesh_small.png') top left no-repeat;
+  background: url('../images/libmesh_mesh_small.png') top left no-repeat;
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
