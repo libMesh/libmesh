@@ -78,18 +78,6 @@ private:
   // private implementaion of the automatic differentiation algorithm
   ADImplementation<Value_t> * ad;
 
-public:
-  // Exceptions
-  static class UnsupportedOpcode : public std::exception {
-    virtual const char* what() const throw() { return "Unsupported opcode"; }
-  } UnsupportedOpcodeException;
-  static class EmptySubtree : public std::exception {
-    virtual const char* what() const throw() { return "Empty subtree (missing parameter) encountered."; }
-  } EmptySubtreeException;
-  static class RefuseToTakeCrazyDerivative : public std::exception {
-    virtual const char* what() const throw() { return "The derivative of this expression would be undefined at a countable number of points."; }
-  } RefuseToTakeCrazyDerivativeException;
-
   // the firewalled implementation class of the AD algorithm has full access to the FParser object
   friend class ADImplementation<Value_t>;
 };

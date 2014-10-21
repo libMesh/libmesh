@@ -126,8 +126,6 @@ util_tree_grammar_parser_SOURCES   = \
                                  fparser_mpfr.hh \
                                  fparser.hh \
 			 	 fparser.cc \
-                                 fparser_ad.hh \
-			 	 fparser_ad.cc \
                                  fpoptimizer/logic_comparisons.hh \
                                  fpoptimizer/constantfolding.hh \
                                  fpoptimizer/logic_ifoperations.hh \
