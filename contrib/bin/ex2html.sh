@@ -23,9 +23,9 @@ cat <<EOF > $output_file
       <li><a href="../support.html">About Us</a></li>
       <li><a href="../publications.html">Publications</a></li>
       <li><a href="../developers.html">Developers</a></li>
-      <li><a href="../index.html">Contact</a></li>
       <li><a href="../installation.html">Installation</a></li>
-      <li><a href="../doxygen/index.html">Documentation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="../doxygen/index.html">Documentation</a></li>
     </ul>
   </nav>
 
@@ -38,8 +38,8 @@ cat <<EOF > $output_file
         <li><a href="../support.html">About Us</a></li>
         <li><a href="../publications.html">Publications</a></li>
         <li><a href="../developers.html">Developers</a></li>
-        <li><a href="../index.html">Contact</a></li>
         <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
         <li><a href="../doxygen/index.html">Documentation</a></li>
       </ul>
     </nav>
