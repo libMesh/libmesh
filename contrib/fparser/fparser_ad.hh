@@ -15,6 +15,7 @@ public:
    * auto-differentiate for var
    */
   int AutoDiff(const std::string& var);
+  int AutoDiff2(const std::string& var_name);
 
   /**
    * check if the function is equal to 0
@@ -124,17 +125,18 @@ private:
   // user function plog
   static Value_t fp_plog(const Value_t * params);
 
+public:
   // Exceptions
-  class UnsupportedOpcode : public std::exception {
+  static class UnsupportedOpcode : public std::exception {
     virtual const char* what() const throw() { return "Unsupported opcode"; }
   } UnsupportedOpcodeException;
-  class StackExhausted : public std::exception {
+  static class StackExhausted : public std::exception {
     virtual const char* what() const throw() { return "Stack exhausted."; }
   } StackExhaustedException;
-  class EmptyProgram : public std::exception {
+  static class EmptyProgram : public std::exception {
     virtual const char* what() const throw() { return "Empty programm passed in."; }
   } EmptyProgramException;
-  class UnsupportedArgumentCount : public std::exception {
+  static class UnsupportedArgumentCount : public std::exception {
     virtual const char* what() const throw() { return "Unsupported argument count."; }
   } UnsupportedArgumentCountException;
 };

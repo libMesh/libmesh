@@ -6,6 +6,9 @@
 
 using namespace FUNCTIONPARSERTYPES;
 
+#include "fpoptimizer/codetree.hh"
+using namespace FPoptimizer_CodeTree;
+
 #include <iostream>
 
 #if LIBMESH_HAVE_FPARSER_JIT
@@ -718,6 +721,76 @@ FunctionParserADBase<Value_t>::Expand()
   }
 
   return orig;
+}
+
+// this is a namespaced function because we cannot easily export CodeTree in the
+// public interface of the FunctionParserADBase class in its installed state in libMesh
+// as the codetree.hh header is not installed (part of FPoptimizer)
+namespace FParser_AutoDiff2 {
+  // return the derivative of func and put it into diff
+  template<typename Value_t>
+  CodeTree<Value_t> DiffTree(const CodeTree<Value_t> & func, unsigned int var)
+  {
+    if (func.IsImmed())
+      return CodeTreeImmed(Value_t(0));
+
+    if (func.IsVar())
+    {
+      if (func.GetVar() == var)
+        return CodeTreeImmed(Value_t(1));
+      else
+        return CodeTreeImmed(Value_t(0));
+    }
+
+    OPCODE op = func.GetOpcode();
+    CodeTree<Value_t> diff;
+    switch (op)
+    {
+      case cAdd:
+        diff.SetOpcode(op);
+
+      default:
+        throw FunctionParserADBase<Value_t>::UnsupportedOpcodeException;
+    }
+
+    return diff;
+  }
+}
+
+template<typename Value_t>
+int FunctionParserADBase<Value_t>::AutoDiff2(const std::string& var_name)
+{
+  this->ForceDeepCopy();
+  mData = this->getParserData();
+
+  CodeTree<Value_t> orig;
+  orig.GenerateFrom(*mData);
+
+  DumpTreeWithIndent(orig);
+
+  // get c string and length of var argument
+  const unsigned len = unsigned(var_name.size());
+  const char* name = var_name.c_str();
+
+  // figure out the opcode number that corresponds to 'var', the variable we diff for
+  unsigned int var = 0;
+  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t> & NamePtrs = mData->mNamePtrs;
+  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t>::iterator vi;
+  for (vi = NamePtrs.begin(); vi != NamePtrs.end(); ++vi)
+  {
+    if (len == vi->first.nameLength &&
+        std::memcmp(name, vi->first.name, len) == 0) {
+      var = vi->second.index;
+      break;
+    }
+  }
+
+  // invalid var argument, variable not found
+  if (var == 0) return 1;
+
+  FParser_AutoDiff2::DiffTree(orig, var);
+
+  return 0;
 }
 
 template<typename Value_t>
