@@ -103,16 +103,19 @@ public:
   virtual ~MeshBase ();
 
   /**
-   * This class holds the boundary information.  It can store nodes, edges,
-   * and faces with a corresponding id that facilitates setting boundary
-   * conditions.
-   */
-  AutoPtr<BoundaryInfo> boundary_info;
-
-  /**
    * A partitioner to use at each prepare_for_use()
    */
   virtual AutoPtr<Partitioner> &partitioner() { return _partitioner; }
+
+  /**
+   * The information about boundary ids on the mesh
+   */
+  const BoundaryInfo& get_boundary_info() const { return *boundary_info; }
+
+  /**
+   * Writeable information about boundary ids on the mesh
+   */
+  BoundaryInfo& get_boundary_info() { return *boundary_info; }
 
   /**
    * Deletes all the data that are currently stored.
@@ -704,10 +707,6 @@ public:
    */
   subdomain_id_type get_id_by_name(const std::string& name) const;
 
-public:
-
-
-
   /**
    * Elem iterator accessor functions.  These must be defined in
    * Concrete base classes.
@@ -850,6 +849,19 @@ public:
   { return _block_id_to_name; }
   const std::map<subdomain_id_type, std::string>& get_subdomain_name_map () const
   { return _block_id_to_name; }
+
+
+
+  /**
+   * This class holds the boundary information.  It can store nodes, edges,
+   * and faces with a corresponding id that facilitates setting boundary
+   * conditions.
+   *
+   * Direct access to this class will be removed in future libMesh
+   * versions.  Use the \p get_boundary_info() accessor instead.
+   */
+  AutoPtr<BoundaryInfo> boundary_info;
+
 
 protected:
 

@@ -647,7 +647,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 
       // Add to the boundary_info
       for (int ibc=0; ibc < numBCs; ibc++)
-        mesh.boundary_info->add_side
+        mesh.get_boundary_info().add_side
           (cast_int<dof_id_type>(bcs[0+ibc*3]),
            cast_int<unsigned short>(bcs[1+ibc*3]),
            cast_int<boundary_id_type>(bcs[2+ibc*3]));
@@ -739,7 +739,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
 
   const int numElem = n_non_subactive;
   const int numBCs  =
-    cast_int<int>(mesh.boundary_info->n_boundary_conds());
+    cast_int<int>(mesh.get_boundary_info().n_boundary_conds());
 
   // Fill the etypes vector with all of the element types found in the mesh
   MeshTools::elem_types(mesh, etypes);
@@ -943,7 +943,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
       std::vector<unsigned short int> side_list;
       std::vector<boundary_id_type> elem_id_list;
 
-      mesh.boundary_info->build_side_list (elem_list, side_list, elem_id_list);
+      mesh.get_boundary_info().build_side_list (elem_list, side_list, elem_id_list);
 
       for (int ibc=0;  ibc<numBCs; ibc++)
         {
@@ -1046,7 +1046,7 @@ void LegacyXdrIO::write_soln (const std::string& name,
   sh.setWrtVar(cast_int<int>(var_names.size()));
   sh.setNumVar(cast_int<int>(var_names.size()));
   sh.setNumNodes(cast_int<int>(mesh.n_nodes()));
-  sh.setNumBCs(cast_int<int>(mesh.boundary_info->n_boundary_conds()));
+  sh.setNumBCs(cast_int<int>(mesh.get_boundary_info().n_boundary_conds()));
   sh.setMeshCnt(0);
   sh.setKstep(0);
   sh.setTime(0.);

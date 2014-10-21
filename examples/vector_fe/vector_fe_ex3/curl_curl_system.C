@@ -19,7 +19,6 @@
 
 #include "curl_curl_system.h"
 
-#include "libmesh/boundary_info.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"

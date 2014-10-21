@@ -40,7 +40,7 @@ FEMContext::FEMContext (const System &sys)
     _mesh_y_var(0),
     _mesh_z_var(0),
     side(0), edge(0),
-    _boundary_info(sys.get_mesh().boundary_info.get()),
+    _boundary_info(sys.get_mesh().get_boundary_info()),
     elem(NULL),
     dim(sys.get_mesh().mesh_dimension()),
     element_qrule(NULL), side_qrule(NULL),
@@ -142,13 +142,13 @@ FEMContext::~FEMContext()
 
 bool FEMContext::has_side_boundary_id(boundary_id_type id) const
 {
-  return _boundary_info->has_boundary_id(elem, side, id);
+  return _boundary_info.has_boundary_id(elem, side, id);
 }
 
 
 std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 {
-  return _boundary_info->boundary_ids(elem, side);
+  return _boundary_info.boundary_ids(elem, side);
 }
 
 

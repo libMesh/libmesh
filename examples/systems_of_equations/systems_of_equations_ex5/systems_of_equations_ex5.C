@@ -333,7 +333,7 @@ void assemble_elasticity(EquationSystems& es,
           if (elem->neighbor(side) == NULL)
             {
               const std::vector<boundary_id_type> bc_ids =
-                mesh.boundary_info->boundary_ids (elem,side);
+                mesh.get_boundary_info().boundary_ids (elem,side);
 
               const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
               const std::vector<Real>& JxW_face = fe_face->get_JxW();

@@ -1026,10 +1026,11 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Finally, we are ready to add the element and its side to the BoundaryInfo object.
       // Call the version of add_side which takes a pointer, since we have already gone to
       // the trouble of getting said pointer...
-      mesh.boundary_info->add_side (elem,
-                                    cast_int<unsigned short>
-                                    (conv.get_side_map(nemhelper->side_list[e]-1/*Exodus numbering is 1-based*/)),
-                                    cast_int<boundary_id_type>(nemhelper->id_list[e]));
+      mesh.get_boundary_info().add_side 
+        (elem,
+         cast_int<unsigned short>
+           (conv.get_side_map(nemhelper->side_list[e]-1/*Exodus numbering is 1-based*/)),
+         cast_int<boundary_id_type>(nemhelper->id_list[e]));
     }
 
   // Debugging: make sure there are as many boundary conditions in the
@@ -1038,7 +1039,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   // local number of boundary conditions (and is therefore cheap)
   // which should match nemhelper->elem_list.size().
   {
-    std::size_t nbcs = mesh.boundary_info->n_boundary_conds();
+    std::size_t nbcs = mesh.get_boundary_info().n_boundary_conds();
     if (nbcs != nemhelper->elem_list.size())
       libmesh_error_msg("[" << this->processor_id() << "] "   \
                         << "BoundaryInfo contains "                     \
@@ -1104,7 +1105,7 @@ void Nemesis_IO::read (const std::string& base_filename)
             }
 
           // Add the node to the BoundaryInfo object with the proper nodeset_id
-          mesh.boundary_info->add_node
+          mesh.get_boundary_info().add_node
             (cast_int<dof_id_type>(global_node_id),
              cast_int<boundary_id_type>(nodeset_id));
         }
@@ -1195,7 +1196,7 @@ void Nemesis_IO::write (const std::string& base_filename)
   // once we have written all this stuff.
   nemhelper->ex_err = exII::ex_update(nemhelper->ex_id);
 
-  if( (mesh.boundary_info->n_edge_conds() > 0) &&
+  if( (mesh.get_boundary_info().n_edge_conds() > 0) &&
       _verbose )
     {
       libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
@@ -1274,7 +1275,7 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
           nemhelper->write_nodesets(mesh);
           nemhelper->write_sidesets(mesh);
 
-          if( (mesh.boundary_info->n_edge_conds() > 0) &&
+          if( (mesh.get_boundary_info().n_edge_conds() > 0) &&
               _verbose )
             {
               libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "

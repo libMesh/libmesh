@@ -594,7 +594,7 @@ int main (int argc, char** argv)
       if (verbose)
         {
           mesh.print_info();
-          mesh.boundary_info->print_summary();
+          mesh.get_boundary_info().print_summary();
         }
 
     }
@@ -649,7 +649,7 @@ int main (int argc, char** argv)
       if (verbose)
         {
           mesh.print_info();
-          mesh.boundary_info->print_summary();
+          mesh.get_boundary_info().print_summary();
         }
 
     }
@@ -806,7 +806,7 @@ int main (int argc, char** argv)
       if (verbose)
         {
           mesh.print_info();
-          mesh.boundary_info->print_summary();
+          mesh.get_boundary_info().print_summary();
         }
     }
 
@@ -829,7 +829,7 @@ int main (int argc, char** argv)
       if (verbose)
         {
           mesh.print_info();
-          mesh.boundary_info->print_summary();
+          mesh.get_boundary_info().print_summary();
         }
     }
 
@@ -961,10 +961,10 @@ int main (int argc, char** argv)
             boundary_name += names[1];
 
             if (write_bndry == BM_MESH_ONLY)
-              mesh.boundary_info->sync(boundary_mesh);
+              mesh.get_boundary_info().sync(boundary_mesh);
 
             else if  (write_bndry == BM_WITH_MESHDATA)
-              mesh.boundary_info->sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
+              mesh.get_boundary_info().sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
 
             else
               libmesh_error_msg("Invalid value write_bndry = " << write_bndry);

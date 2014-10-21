@@ -63,7 +63,7 @@ unsigned int packable_size (const Node* node, const MeshBase* mesh)
 #endif
     header_size + LIBMESH_DIM*idtypes_per_Real +
     node->packed_indexing_size() +
-    1 + mesh->boundary_info->n_boundary_ids(node);
+    1 + mesh->get_boundary_info().n_boundary_ids(node);
 }
 
 
@@ -161,7 +161,7 @@ void pack (const Node* node,
 
   // Add any nodal boundary condition ids
   std::vector<boundary_id_type> bcs =
-    mesh->boundary_info->boundary_ids(node);
+    mesh->get_boundary_info().boundary_ids(node);
 
   libmesh_assert(bcs.size() < std::numeric_limits<largest_id_type>::max());
 
@@ -272,7 +272,7 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
   // libmesh_assert_greater_equal (num_bcs, 0);
 
   for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
-    mesh->boundary_info->add_node
+    mesh->get_boundary_info().add_node
       (node, cast_int<boundary_id_type>(*in++));
 
   *out = node;

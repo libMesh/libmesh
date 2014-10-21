@@ -234,7 +234,7 @@ void assemble_poisson(EquationSystems& es,
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if (elem->neighbor(side) == NULL)
             {
-              if( mesh.boundary_info->has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
+              if( mesh.get_boundary_info().has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
                 {
                   fe_elem_face->reinit(elem, side);
 
@@ -256,7 +256,7 @@ void assemble_poisson(EquationSystems& es,
           if (elem->neighbor(side) == NULL)
             {
               // Found the lower side of the crack. Assemble terms due to lower and upper in here.
-              if( mesh.boundary_info->has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
+              if( mesh.get_boundary_info().has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
                 {
                   fe_elem_face->reinit(elem, side);
 

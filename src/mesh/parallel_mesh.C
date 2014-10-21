@@ -100,7 +100,7 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
     other_mesh._next_free_unpartitioned_node_id;
   _next_free_unpartitioned_elem_id =
     other_mesh._next_free_unpartitioned_elem_id;
-  *this->boundary_info = *other_mesh.boundary_info;
+  this->get_boundary_info() = other_mesh.get_boundary_info();
 
   // Need to copy extra_ghost_elems
   for(std::set<Elem *>::iterator it = other_mesh._extra_ghost_elems.begin();
@@ -120,7 +120,7 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
   this->copy_nodes_and_elements(other_mesh);
-  *this->boundary_info = *other_mesh.boundary_info;
+  this->get_boundary_info() = other_mesh.get_boundary_info();
 
   this->update_parallel_id_counts();
 }
@@ -462,7 +462,7 @@ void ParallelMesh::delete_elem(Elem* e)
   libmesh_assert (e);
 
   // Delete the element from the BoundaryInfo object
-  this->boundary_info->remove(e);
+  this->get_boundary_info().remove(e);
 
   // But not yet from the container; we might invalidate
   // an iterator that way!
@@ -621,7 +621,7 @@ void ParallelMesh::delete_node(Node* n)
   libmesh_assert(_nodes[n->id()]);
 
   // Delete the node from the BoundaryInfo object
-  this->boundary_info->remove(n);
+  this->get_boundary_info().remove(n);
 
   // But not yet from the container; we might invalidate
   // an iterator that way!
@@ -1108,7 +1108,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
           {
             // remove any boundary information associated with
             // this node
-            this->boundary_info->remove (nd);
+            this->get_boundary_info().remove (nd);
 
             // delete the node
             delete nd;

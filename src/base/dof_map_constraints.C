@@ -326,7 +326,7 @@ private:
     const unsigned int dim = mesh.mesh_dimension();
 
     // Boundary info for the current mesh
-    const BoundaryInfo& boundary_info = *mesh.boundary_info;
+    const BoundaryInfo& boundary_info = mesh.get_boundary_info();
 
     unsigned int n_vec_dim = FEInterface::n_vec_dim(mesh, fe_type);
 

@@ -125,19 +125,19 @@ int main(int argc, char** argv) {
       bool found_side_max_x = false, found_side_max_y = false, found_side_max_z = false;
       for(unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
             {
               side_max_x = side;
               found_side_max_x = true;
             }
 
-          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
             {
               side_max_y = side;
               found_side_max_y = true;
             }
 
-          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
             {
               side_max_z = side;
               found_side_max_z = true;
@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
                   elem->is_node_on_side(n, side_max_y) &&
                   elem->is_node_on_side(n, side_max_z) )
                 {
-                  mesh.boundary_info->add_node(elem->get_node(n), NODE_BOUNDARY_ID);
+                  mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
                 }
             }
         }

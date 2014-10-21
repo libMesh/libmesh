@@ -162,6 +162,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
   // Clear the mesh and start from scratch
   mesh.clear();
 
+  BoundaryInfo& boundary_info = mesh.get_boundary_info();
+
   if (nz != 0)
     mesh.set_mesh_dimension(3);
   else if (ny != 0)
@@ -378,10 +380,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   elem->set_node(1) = mesh.node_ptr(i+1);
 
                   if (i == 0)
-                    mesh.boundary_info->add_side(elem, 0, 0);
+                    boundary_info.add_side(elem, 0, 0);
 
                   if (i == (nx-1))
-                    mesh.boundary_info->add_side(elem, 1, 1);
+                    boundary_info.add_side(elem, 1, 1);
                 }
               break;
             }
@@ -396,10 +398,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   elem->set_node(1) = mesh.node_ptr(2*i+2);
 
                   if (i == 0)
-                    mesh.boundary_info->add_side(elem, 0, 0);
+                    boundary_info.add_side(elem, 0, 0);
 
                   if (i == (nx-1))
-                    mesh.boundary_info->add_side(elem, 1, 1);
+                    boundary_info.add_side(elem, 1, 1);
                 }
               break;
             }
@@ -415,10 +417,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   elem->set_node(1) = mesh.node_ptr(3*i+3);
 
                   if (i == 0)
-                    mesh.boundary_info->add_side(elem, 0, 0);
+                    boundary_info.add_side(elem, 0, 0);
 
                   if (i == (nx-1))
-                    mesh.boundary_info->add_side(elem, 1, 1);
+                    boundary_info.add_side(elem, 1, 1);
                 }
               break;
             }
@@ -432,12 +434,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
           mesh.node(p)(0) = (mesh.node(p)(0))*(xmax-xmin) + xmin;
 
         // Add sideset names to boundary info
-        mesh.boundary_info->sideset_name(0) = "left";
-        mesh.boundary_info->sideset_name(1) = "right";
+        boundary_info.sideset_name(0) = "left";
+        boundary_info.sideset_name(1) = "right";
 
         // Add nodeset names to boundary info
-        mesh.boundary_info->nodeset_name(0) = "left";
-        mesh.boundary_info->nodeset_name(1) = "right";
+        boundary_info.nodeset_name(0) = "left";
+        boundary_info.nodeset_name(1) = "right";
 
         break;
       }
@@ -621,16 +623,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     elem->set_node(3) = mesh.node_ptr(idx(type,nx,i,j+1)  );
 
                     if (j == 0)
-                      mesh.boundary_info->add_side(elem, 0, 0);
+                      boundary_info.add_side(elem, 0, 0);
 
                     if (j == (ny-1))
-                      mesh.boundary_info->add_side(elem, 2, 2);
+                      boundary_info.add_side(elem, 2, 2);
 
                     if (i == 0)
-                      mesh.boundary_info->add_side(elem, 3, 3);
+                      boundary_info.add_side(elem, 3, 3);
 
                     if (i == (nx-1))
-                      mesh.boundary_info->add_side(elem, 1, 1);
+                      boundary_info.add_side(elem, 1, 1);
                   }
               break;
             }
@@ -651,10 +653,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+1,j+1));
 
                     if (j == 0)
-                      mesh.boundary_info->add_side(elem, 0, 0);
+                      boundary_info.add_side(elem, 0, 0);
 
                     if (i == (nx-1))
-                      mesh.boundary_info->add_side(elem, 1, 1);
+                      boundary_info.add_side(elem, 1, 1);
 
                     // Add second Tri3
                     elem = mesh.add_elem(new Tri3);
@@ -664,10 +666,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     elem->set_node(2) = mesh.node_ptr(idx(type,nx,i,j+1)  );
 
                     if (j == (ny-1))
-                      mesh.boundary_info->add_side(elem, 1, 2);
+                      boundary_info.add_side(elem, 1, 2);
 
                     if (i == 0)
-                      mesh.boundary_info->add_side(elem, 2, 3);
+                      boundary_info.add_side(elem, 2, 3);
                   }
               break;
             }
@@ -698,16 +700,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
                     if (j == 0)
-                      mesh.boundary_info->add_side(elem, 0, 0);
+                      boundary_info.add_side(elem, 0, 0);
 
                     if (j == 2*(ny-1))
-                      mesh.boundary_info->add_side(elem, 2, 2);
+                      boundary_info.add_side(elem, 2, 2);
 
                     if (i == 0)
-                      mesh.boundary_info->add_side(elem, 3, 3);
+                      boundary_info.add_side(elem, 3, 3);
 
                     if (i == 2*(nx-1))
-                      mesh.boundary_info->add_side(elem, 1, 1);
+                      boundary_info.add_side(elem, 1, 1);
                   }
               break;
             }
@@ -731,10 +733,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     elem->set_node(5) = mesh.node_ptr(idx(type,nx,i+1,j+1));
 
                     if (j == 0)
-                      mesh.boundary_info->add_side(elem, 0, 0);
+                      boundary_info.add_side(elem, 0, 0);
 
                     if (i == 2*(nx-1))
-                      mesh.boundary_info->add_side(elem, 1, 1);
+                      boundary_info.add_side(elem, 1, 1);
 
                     // Add second Tri6
                     elem = mesh.add_elem(new Tri6);
@@ -747,10 +749,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     elem->set_node(5) = mesh.node_ptr(idx(type,nx,i,j+1)  );
 
                     if (j == 2*(ny-1))
-                      mesh.boundary_info->add_side(elem, 1, 2);
+                      boundary_info.add_side(elem, 1, 2);
 
                     if (i == 0)
-                      mesh.boundary_info->add_side(elem, 2, 3);
+                      boundary_info.add_side(elem, 2, 3);
 
                   }
               break;
@@ -772,16 +774,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
           }
 
         // Add sideset names to boundary info
-        mesh.boundary_info->sideset_name(0) = "bottom";
-        mesh.boundary_info->sideset_name(1) = "right";
-        mesh.boundary_info->sideset_name(2) = "top";
-        mesh.boundary_info->sideset_name(3) = "left";
+        boundary_info.sideset_name(0) = "bottom";
+        boundary_info.sideset_name(1) = "right";
+        boundary_info.sideset_name(2) = "top";
+        boundary_info.sideset_name(3) = "left";
 
         // Add nodeset names to boundary info
-        mesh.boundary_info->nodeset_name(0) = "bottom";
-        mesh.boundary_info->nodeset_name(1) = "right";
-        mesh.boundary_info->nodeset_name(2) = "top";
-        mesh.boundary_info->nodeset_name(3) = "left";
+        boundary_info.nodeset_name(0) = "bottom";
+        boundary_info.nodeset_name(1) = "right";
+        boundary_info.nodeset_name(2) = "top";
+        boundary_info.nodeset_name(3) = "left";
 
         break;
       }
@@ -1002,22 +1004,22 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                       elem->set_node(7) = mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  );
 
                       if (k == 0)
-                        mesh.boundary_info->add_side(elem, 0, 0);
+                        boundary_info.add_side(elem, 0, 0);
 
                       if (k == (nz-1))
-                        mesh.boundary_info->add_side(elem, 5, 5);
+                        boundary_info.add_side(elem, 5, 5);
 
                       if (j == 0)
-                        mesh.boundary_info->add_side(elem, 1, 1);
+                        boundary_info.add_side(elem, 1, 1);
 
                       if (j == (ny-1))
-                        mesh.boundary_info->add_side(elem, 3, 3);
+                        boundary_info.add_side(elem, 3, 3);
 
                       if (i == 0)
-                        mesh.boundary_info->add_side(elem, 4, 4);
+                        boundary_info.add_side(elem, 4, 4);
 
                       if (i == (nx-1))
-                        mesh.boundary_info->add_side(elem, 2, 2);
+                        boundary_info.add_side(elem, 2, 2);
                     }
               break;
             }
@@ -1044,16 +1046,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
                       // Add sides for first prism to boundary info object
                       if (i==0)
-                        mesh.boundary_info->add_side(elem, 3, 4);
+                        boundary_info.add_side(elem, 3, 4);
 
                       if (j==0)
-                        mesh.boundary_info->add_side(elem, 1, 1);
+                        boundary_info.add_side(elem, 1, 1);
 
                       if (k==0)
-                        mesh.boundary_info->add_side(elem, 0, 0);
+                        boundary_info.add_side(elem, 0, 0);
 
                       if (k == (nz-1))
-                        mesh.boundary_info->add_side(elem, 4, 5);
+                        boundary_info.add_side(elem, 4, 5);
 
                       // Second Prism
                       elem = mesh.add_elem(new Prism6);
@@ -1067,16 +1069,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
                       // Add sides for second prism to boundary info object
                       if (i == (nx-1))
-                        mesh.boundary_info->add_side(elem, 1, 2);
+                        boundary_info.add_side(elem, 1, 2);
 
                       if (j == (ny-1))
-                        mesh.boundary_info->add_side(elem, 2, 3);
+                        boundary_info.add_side(elem, 2, 3);
 
                       if (k==0)
-                        mesh.boundary_info->add_side(elem, 0, 0);
+                        boundary_info.add_side(elem, 0, 0);
 
                       if (k == (nz-1))
-                        mesh.boundary_info->add_side(elem, 4, 5);
+                        boundary_info.add_side(elem, 4, 5);
                     }
               break;
             }
@@ -1136,22 +1138,22 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
                       if (k == 0)
-                        mesh.boundary_info->add_side(elem, 0, 0);
+                        boundary_info.add_side(elem, 0, 0);
 
                       if (k == 2*(nz-1))
-                        mesh.boundary_info->add_side(elem, 5, 5);
+                        boundary_info.add_side(elem, 5, 5);
 
                       if (j == 0)
-                        mesh.boundary_info->add_side(elem, 1, 1);
+                        boundary_info.add_side(elem, 1, 1);
 
                       if (j == 2*(ny-1))
-                        mesh.boundary_info->add_side(elem, 3, 3);
+                        boundary_info.add_side(elem, 3, 3);
 
                       if (i == 0)
-                        mesh.boundary_info->add_side(elem, 4, 4);
+                        boundary_info.add_side(elem, 4, 4);
 
                       if (i == 2*(nx-1))
-                        mesh.boundary_info->add_side(elem, 2, 2);
+                        boundary_info.add_side(elem, 2, 2);
                     }
               break;
             }
@@ -1196,16 +1198,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
                       // Add sides for first prism to boundary info object
                       if (i==0)
-                        mesh.boundary_info->add_side(elem, 3, 4);
+                        boundary_info.add_side(elem, 3, 4);
 
                       if (j==0)
-                        mesh.boundary_info->add_side(elem, 1, 1);
+                        boundary_info.add_side(elem, 1, 1);
 
                       if (k==0)
-                        mesh.boundary_info->add_side(elem, 0, 0);
+                        boundary_info.add_side(elem, 0, 0);
 
                       if (k == 2*(nz-1))
-                        mesh.boundary_info->add_side(elem, 4, 5);
+                        boundary_info.add_side(elem, 4, 5);
 
 
                       // Second Prism
@@ -1237,16 +1239,16 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
                       // Add sides for second prism to boundary info object
                       if (i == 2*(nx-1))
-                        mesh.boundary_info->add_side(elem, 1, 2);
+                        boundary_info.add_side(elem, 1, 2);
 
                       if (j == 2*(ny-1))
-                        mesh.boundary_info->add_side(elem, 2, 3);
+                        boundary_info.add_side(elem, 2, 3);
 
                       if (k==0)
-                        mesh.boundary_info->add_side(elem, 0, 0);
+                        boundary_info.add_side(elem, 0, 0);
 
                       if (k == 2*(nz-1))
-                        mesh.boundary_info->add_side(elem, 4, 5);
+                        boundary_info.add_side(elem, 4, 5);
 
                     }
               break;
@@ -1312,7 +1314,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   for (unsigned short s=0; s<base_hex->n_sides(); ++s)
                     {
                       // Get the boundary ID for this side
-                      boundary_id_type b_id = mesh.boundary_info->boundary_id(*el, s);
+                      boundary_id_type b_id = boundary_info.boundary_id(*el, s);
 
                       // Need to build the full-ordered side!
                       AutoPtr<Elem> side = base_hex->build_side(s);
@@ -1333,7 +1335,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                               // 0 with the same b_id.  Note: the tets are all aligned so that their
                               // side 0 is on the boundary.
                               if (b_id != BoundaryInfo::invalid_id)
-                                mesh.boundary_info->add_side(sub_elem, 0, b_id);
+                                boundary_info.add_side(sub_elem, 0, b_id);
                             }
                         } // end if ((type == TET4) || (type == TET10))
 
@@ -1357,7 +1359,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                           // If the original hex was a boundary hex, add the new sub_pyr's side
                           // 4 (the square base) with the same b_id.
                           if (b_id != BoundaryInfo::invalid_id)
-                            mesh.boundary_info->add_side(sub_elem, 4, b_id);
+                            boundary_info.add_side(sub_elem, 4, b_id);
                         } // end else type==PYRAMID5 || type==PYRAMID13 || type==PYRAMID14
                     }
                 }
@@ -1371,7 +1373,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
               for ( ; el != end_el;  ++el)
                 {
-                  mesh.boundary_info->remove(*el); // Safe even if *el has no boundary info.
+                  boundary_info.remove(*el); // Safe even if *el has no boundary info.
                   mesh.delete_elem(*el);
                 }
             }
@@ -1392,20 +1394,20 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
         // Add sideset names to boundary info (Z axis out of the screen)
-        mesh.boundary_info->sideset_name(0) = "back";
-        mesh.boundary_info->sideset_name(1) = "bottom";
-        mesh.boundary_info->sideset_name(2) = "right";
-        mesh.boundary_info->sideset_name(3) = "top";
-        mesh.boundary_info->sideset_name(4) = "left";
-        mesh.boundary_info->sideset_name(5) = "front";
+        boundary_info.sideset_name(0) = "back";
+        boundary_info.sideset_name(1) = "bottom";
+        boundary_info.sideset_name(2) = "right";
+        boundary_info.sideset_name(3) = "top";
+        boundary_info.sideset_name(4) = "left";
+        boundary_info.sideset_name(5) = "front";
 
         // Add nodeset names to boundary info
-        mesh.boundary_info->nodeset_name(0) = "back";
-        mesh.boundary_info->nodeset_name(1) = "bottom";
-        mesh.boundary_info->nodeset_name(2) = "right";
-        mesh.boundary_info->nodeset_name(3) = "top";
-        mesh.boundary_info->nodeset_name(4) = "left";
-        mesh.boundary_info->nodeset_name(5) = "front";
+        boundary_info.nodeset_name(0) = "back";
+        boundary_info.nodeset_name(1) = "bottom";
+        boundary_info.nodeset_name(2) = "right";
+        boundary_info.nodeset_name(3) = "top";
+        boundary_info.nodeset_name(4) = "left";
+        boundary_info.nodeset_name(5) = "front";
 
         break;
       } // end case dim==3
@@ -1520,6 +1522,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
   // Clear the mesh and start from scratch
   mesh.clear();
+
+  BoundaryInfo& boundary_info = mesh.get_boundary_info();
 
   // Sphere is centered at origin by default
   const Point cent;
@@ -1932,7 +1936,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
         Elem* elem = *it;
         for (unsigned short s=0; s != elem->n_sides(); ++s)
           if (!elem->neighbor(s))
-            mesh.boundary_info->add_side(elem, s, 0);
+            boundary_info.add_side(elem, s, 0);
       }
   }
 
@@ -1961,6 +1965,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   dof_id_type orig_nodes = cross_section.n_nodes();
 
   unsigned int order = 1;
+
+  BoundaryInfo& boundary_info = mesh.get_boundary_info();
 
   // If cross_section is distributed, so is its extrusion
   if (!cross_section.is_serial())
@@ -1993,7 +1999,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           const std::vector<boundary_id_type> ids_to_copy =
             cross_section.boundary_info->boundary_ids(node);
 
-          mesh.boundary_info->add_node(new_node, ids_to_copy);
+          boundary_info.add_node(new_node, ids_to_copy);
         }
     }
 
@@ -2146,7 +2152,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                   // for side s on the old element to side s+1 on the
                   // new element.  This is just a happy coincidence as
                   // far as I can tell...
-                  mesh.boundary_info->add_side
+                  boundary_info.add_side
                     (new_elem, cast_int<unsigned short>(s+1),
                      ids_to_copy);
                 }
@@ -2158,13 +2164,13 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                   // 1        -> 1
                   libmesh_assert_less(s, 2);
                   const unsigned short sidemap[2] = {3, 1};
-                  mesh.boundary_info->add_side(new_elem, sidemap[s], ids_to_copy);
+                  boundary_info.add_side(new_elem, sidemap[s], ids_to_copy);
                 }
             }
 
           // Give new boundary ids to bottom and top
           if (k == 0)
-            mesh.boundary_info->add_side(new_elem, 0, next_side_id);
+            boundary_info.add_side(new_elem, 0, next_side_id);
           if (k == nz-1)
             {
               // For 2D->3D extrusion, the "top" ID is 1+the original
@@ -2172,7 +2178,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
               // "top" ID is side 2.
               const unsigned short top_id = new_elem->dim() == 3 ?
                 cast_int<unsigned short>(elem->n_sides()+1) : 2;
-              mesh.boundary_info->add_side
+              boundary_info.add_side
                 (new_elem, top_id,
                  cast_int<boundary_id_type>(next_side_id+1));
             }
@@ -2207,6 +2213,8 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 
   // Clear out any data which may have been in the Mesh
   mesh.clear();
+
+  BoundaryInfo& boundary_info = mesh.get_boundary_info();
 
   // Make sure the new Mesh will be 2D
   mesh.set_mesh_dimension(2);
@@ -2296,7 +2304,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
             // is on one of the holes....
 
             // Finally, add this element's information to the boundary info object.
-            mesh.boundary_info->add_side(elem->id(), s, bc_id);
+            boundary_info.add_side(elem->id(), s, bc_id);
           }
     }
 

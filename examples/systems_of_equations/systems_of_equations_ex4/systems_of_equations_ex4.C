@@ -318,7 +318,7 @@ void assemble_elasticity(EquationSystems& es,
 
               fe_face->reinit(elem, side);
 
-              if( mesh.boundary_info->has_boundary_id (elem, side, 1) ) // Apply a traction on the right side
+              if( mesh.get_boundary_info().has_boundary_id (elem, side, 1) ) // Apply a traction on the right side
                 {
                   for (unsigned int qp=0; qp<qface.n_points(); qp++)
                     {

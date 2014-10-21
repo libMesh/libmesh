@@ -712,8 +712,8 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
   // Broadcast all of the named entity information
   mesh.comm().broadcast(mesh.set_subdomain_name_map());
-  mesh.comm().broadcast(mesh.boundary_info->set_sideset_name_map());
-  mesh.comm().broadcast(mesh.boundary_info->set_nodeset_name_map());
+  mesh.comm().broadcast(mesh.get_boundary_info().set_sideset_name_map());
+  mesh.comm().broadcast(mesh.get_boundary_info().set_nodeset_name_map());
 
   libmesh_assert (mesh.comm().verify(mesh.n_elem()));
   libmesh_assert (mesh.comm().verify(mesh.n_nodes()));

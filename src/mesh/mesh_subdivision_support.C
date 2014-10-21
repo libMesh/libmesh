@@ -90,7 +90,8 @@ void MeshTools::Subdivision::all_subdivision(MeshBase& mesh)
 {
   std::vector<Elem*> new_elements;
   new_elements.reserve(mesh.n_elem());
-  const bool mesh_has_boundary_data = (mesh.boundary_info->n_boundary_ids() > 0);
+  const bool mesh_has_boundary_data =
+    (mesh.get_boundary_info().n_boundary_ids() > 0);
 
   std::vector<Elem*> new_boundary_elements;
   std::vector<short int> new_boundary_sides;
@@ -114,7 +115,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase& mesh)
           for (unsigned short side = 0; side < elem->n_sides(); ++side)
             {
               const boundary_id_type boundary_id =
-                mesh.boundary_info->boundary_id(elem, side);
+                mesh.get_boundary_info().boundary_id(elem, side);
               if (boundary_id != BoundaryInfo::invalid_id)
                 {
                   // add the boundary id to the list of new boundary ids
@@ -125,7 +126,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase& mesh)
             }
 
           // remove the original element from the BoundaryInfo structure
-          mesh.boundary_info->remove(elem);
+          mesh.get_boundary_info().remove(elem);
         }
 
       new_elements.push_back(tri);
@@ -145,9 +146,9 @@ void MeshTools::Subdivision::all_subdivision(MeshBase& mesh)
 
       // Add the new boundary info to the mesh.
       for (unsigned int s = 0; s < new_boundary_elements.size(); ++s)
-        mesh.boundary_info->add_side(new_boundary_elements[s],
-                                     new_boundary_sides[s],
-                                     new_boundary_ids[s]);
+        mesh.get_boundary_info().add_side(new_boundary_elements[s],
+                                          new_boundary_sides[s],
+                                          new_boundary_ids[s]);
     }
 
   mesh.prepare_for_use();
@@ -287,10 +288,10 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase& mesh)
               elem->set_neighbor(i,newelem);
 
               mesh.add_elem(newelem);
-              mesh.boundary_info->add_node(elem->get_node(i), 1);
-              mesh.boundary_info->add_node(elem->get_node(next[i]), 1);
-              mesh.boundary_info->add_node(elem->get_node(prev[i]), 1);
-              mesh.boundary_info->add_node(node, 1);
+              mesh.get_boundary_info().add_node(elem->get_node(i), 1);
+              mesh.get_boundary_info().add_node(elem->get_node(next[i]), 1);
+              mesh.get_boundary_info().add_node(elem->get_node(prev[i]), 1);
+              mesh.get_boundary_info().add_node(node, 1);
             }
         }
     }

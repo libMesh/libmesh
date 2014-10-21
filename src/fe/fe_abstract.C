@@ -1112,7 +1112,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
       if (elem->neighbor(s))
         continue;
 
-      const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+      const std::vector<boundary_id_type>& bc_ids =
+        mesh.get_boundary_info().boundary_ids (elem, s);
       for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
@@ -1131,7 +1132,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
               if (neigh->level() <= elem->level())
                 {
                   unsigned int s_neigh =
-                    mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
+                    mesh.get_boundary_info()->side_with_boundary_id
+                      (neigh, periodic->pairedboundary);
                   libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
 #ifdef LIBMESH_ENABLE_AMR

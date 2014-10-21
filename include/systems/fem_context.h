@@ -706,10 +706,10 @@ protected:
   std::vector<FEAbstract*> _edge_fe_var;
 
   /**
-   * Saved pointer to BoundaryInfo on the mesh for this System.  Used
-   * to answer boundary id requests.
+   * Saved reference to BoundaryInfo on the mesh for this System.
+   * Used to answer boundary id requests.
    */
-  BoundaryInfo* _boundary_info;
+  const BoundaryInfo& _boundary_info;
 
   /**
    * Current element for element_* to examine

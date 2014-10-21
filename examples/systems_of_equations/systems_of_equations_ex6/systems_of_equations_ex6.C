@@ -130,25 +130,25 @@ int main (int argc, char** argv)
         found_side_min_y = false, found_side_max_z = false;
       for(unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
             {
               side_max_x = side;
               found_side_max_x = true;
             }
 
-          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
             {
               side_min_y = side;
               found_side_min_y = true;
             }
 
-          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
             {
               side_max_y = side;
               found_side_max_y = true;
             }
 
-          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+          if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
             {
               side_max_z = side;
               found_side_max_z = true;
@@ -166,7 +166,7 @@ int main (int argc, char** argv)
                   elem->is_node_on_side(n, side_max_y) &&
                   elem->is_node_on_side(n, side_max_z) )
                 {
-                  mesh.boundary_info->add_node(elem->get_node(n), NODE_BOUNDARY_ID);
+                  mesh.get_boundary_info().add_node(elem->get_node(n), NODE_BOUNDARY_ID);
                 }
             }
         }
@@ -182,7 +182,7 @@ int main (int argc, char** argv)
               if (elem->is_edge_on_side(e, side_max_x) &&
                   elem->is_edge_on_side(e, side_min_y) )
                 {
-                  mesh.boundary_info->add_edge(elem, e, EDGE_BOUNDARY_ID);
+                  mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
                 }
             }
         }
@@ -498,7 +498,9 @@ void assemble_elasticity(EquationSystems& es,
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
                   // Apply a traction
-                  if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X) )
+                  if( mesh.get_boundary_info().has_boundary_id
+                        (elem, side, BOUNDARY_ID_MAX_X)
+                      )
                     {
                       for (unsigned int i=0; i<n_v_dofs; i++)
                         {

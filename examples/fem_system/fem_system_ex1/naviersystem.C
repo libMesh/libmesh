@@ -19,7 +19,6 @@
 
 #include "naviersystem.h"
 
-#include "libmesh/boundary_info.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/fe_base.h"

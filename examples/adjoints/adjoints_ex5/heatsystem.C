@@ -30,7 +30,6 @@
 #include "libmesh/system.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/zero_function.h"
-#include "libmesh/boundary_info.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/dof_map.h"
 

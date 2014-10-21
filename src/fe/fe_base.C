@@ -1887,7 +1887,8 @@ compute_periodic_constraints (DofConstraints &constraints,
       if (elem->neighbor(s))
         continue;
 
-      const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+      const std::vector<boundary_id_type>& bc_ids =
+        mesh.get_boundary_info().boundary_ids (elem, s);
       for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
@@ -1909,7 +1910,8 @@ compute_periodic_constraints (DofConstraints &constraints,
               if (neigh->level() <= elem->level())
                 {
                   unsigned int s_neigh =
-                    mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
+                    mesh.get_boundary_info().side_with_boundary_id
+                      (neigh, periodic->pairedboundary);
                   libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -2099,8 +2101,8 @@ compute_periodic_constraints (DofConstraints &constraints,
                               if (!elem->is_node_on_side(n,new_s))
                                 continue;
 
-                              const std::vector<boundary_id_type>
-                                new_bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+                              const std::vector<boundary_id_type> new_bc_ids =
+                                mesh.get_boundary_info().boundary_ids (elem, s);
                               for (std::vector<boundary_id_type>::const_iterator
                                      new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
@@ -2116,7 +2118,8 @@ compute_periodic_constraints (DofConstraints &constraints,
                           // See if this vertex has point neighbors to
                           // defer to
                           if (primary_boundary_point_neighbor
-                              (elem, *my_node, *mesh.boundary_info, point_bcids) != elem)
+                              (elem, *my_node, mesh.get_boundary_info(), point_bcids)
+                              != elem)
                             continue;
 
                           // Find the complementary boundary id set
@@ -2158,9 +2161,11 @@ compute_periodic_constraints (DofConstraints &constraints,
                               if (!primary_elem)
                                 primary_elem = elem;
 
-                              const Elem *primary_neigh = primary_boundary_point_neighbor
-                                (neigh, neigh_pt, *mesh.boundary_info,
-                                 point_pairedids);
+                              const Elem *primary_neigh =
+                                primary_boundary_point_neighbor
+                                  (neigh, neigh_pt,
+                                   mesh.get_boundary_info(),
+                                   point_pairedids);
 
                               libmesh_assert(primary_neigh);
 
@@ -2241,8 +2246,8 @@ compute_periodic_constraints (DofConstraints &constraints,
                               if (!elem->is_node_on_side(n,new_s))
                                 continue;
 
-                              const std::vector<boundary_id_type>&
-                                new_bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+                              const std::vector<boundary_id_type>& new_bc_ids =
+                                mesh.get_boundary_info().boundary_ids (elem, s);
                               for (std::vector<boundary_id_type>::const_iterator
                                      new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
@@ -2258,7 +2263,8 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                           // See if this edge has neighbors to defer to
                           if (primary_boundary_edge_neighbor
-                              (elem, *e1, *e2, *mesh.boundary_info, edge_bcids) != elem)
+                              (elem, *e1, *e2, mesh.get_boundary_info(), edge_bcids)
+                              != elem)
                             continue;
 
                           // Find the complementary boundary id set
@@ -2305,8 +2311,8 @@ compute_periodic_constraints (DofConstraints &constraints,
                                 primary_elem = elem;
 
                               const Elem *primary_neigh = primary_boundary_edge_neighbor
-                                (neigh, neigh_pt1, neigh_pt2, *mesh.boundary_info,
-                                 edge_pairedids);
+                                (neigh, neigh_pt1, neigh_pt2,
+                                 mesh.get_boundary_info(), edge_pairedids);
 
                               libmesh_assert(primary_neigh);
 

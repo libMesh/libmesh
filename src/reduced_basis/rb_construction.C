@@ -631,13 +631,13 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
   // We only enter this loop if we have at least one
   // nodeset, since we use nodesets to indicate
   // where to impose the node-based terms.
-  if (mesh.boundary_info->n_nodeset_conds() > 0)
+  if (mesh.get_boundary_info().n_nodeset_conds() > 0)
     {
       std::vector<numeric_index_type> node_id_list;
       std::vector<boundary_id_type> bc_id_list;
 
       // Get the list of nodes with boundary IDs
-      mesh.boundary_info->build_node_list(node_id_list, bc_id_list);
+      mesh.get_boundary_info().build_node_list(node_id_list, bc_id_list);
 
       for (unsigned int i=0; i<node_id_list.size(); i++)
         {

@@ -134,11 +134,13 @@ unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
     {
       total_packed_bcs += elem->n_sides();
       for (unsigned short s = 0; s != elem->n_sides(); ++s)
-        total_packed_bcs += mesh->boundary_info->n_boundary_ids(elem,s);
+        total_packed_bcs +=
+          mesh->get_boundary_info().n_boundary_ids(elem,s);
 
       total_packed_bcs += elem->n_edges();
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
-        total_packed_bcs += mesh->boundary_info->n_edge_boundary_ids(elem,e);
+        total_packed_bcs +=
+          mesh->get_boundary_info().n_edge_boundary_ids(elem,e);
     }
 
   return
@@ -248,7 +250,7 @@ void pack (const Elem* elem,
       for (unsigned short s = 0; s != elem->n_sides(); ++s)
         {
           std::vector<boundary_id_type> bcs =
-            mesh->boundary_info->boundary_ids(elem, s);
+            mesh->get_boundary_info().boundary_ids(elem, s);
 
           data.push_back(bcs.size());
 
@@ -259,7 +261,7 @@ void pack (const Elem* elem,
       for (unsigned short e = 0; e != elem->n_edges(); ++e)
         {
           std::vector<boundary_id_type> bcs =
-            mesh->boundary_info->edge_boundary_ids(elem, e);
+            mesh->get_boundary_info().edge_boundary_ids(elem, e);
 
           data.push_back(bcs.size());
 
@@ -597,7 +599,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
             cast_int<boundary_id_type>(*in++);
 
           for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
-            mesh->boundary_info->add_side
+            mesh->get_boundary_info().add_side
               (elem, s, cast_int<boundary_id_type>(*in++));
         }
 
@@ -607,7 +609,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
             cast_int<boundary_id_type>(*in++);
 
           for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
-            mesh->boundary_info->add_edge
+            mesh->get_boundary_info().add_edge
               (elem, e, cast_int<boundary_id_type>(*in++));
         }
     }
