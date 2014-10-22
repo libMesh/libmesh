@@ -497,9 +497,7 @@ examples_doc:
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html:
 	$(MAKE) examples_doc
-	@cd $(top_builddir)/include/libmesh && $(MAKE)
-	$(MKDIR_P) $(top_builddir)/doc/html
-	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
+	$(MAKE) -C doc/html doc
 
 # Upload the web page to sourceforge.  We need a way to specify usernames
 # other than $USER when connecting to sourceforge servers... Please set the
