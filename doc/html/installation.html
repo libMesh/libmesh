@@ -1,16 +1,43 @@
-<?php $root=""; ?>
-<?php require($root."navigation.php"); ?>
 
-<html>
+<!doctype html>
+<html lang="en-US">
 <head>
-  <title>Download and Installation</title>
-  <?php load_style($root); ?>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="Benjamin S. Kirk">
+  <link rel="stylesheet" type="text/css" media="all" href="styles.css">
 </head>
 
 <body>
-<?php make_navigation("download",$root)?>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="support.html">About Us</a></li>
+      <li><a href="publications.html">Publications</a></li>
+      <li><a href="developers.html">Developers</a></li>
+      <li><a href="installation.html">Installation</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="doxygen/index.html">Documentation</a></li>
+    </ul>
+  </nav>
 
-<div class="content">
+  <div id="w">
+    <header id="logo"><a href="index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="support.html">About Us</a></li>
+        <li><a href="publications.html">Publications</a></li>
+        <li><a href="developers.html">Developers</a></li>
+        <li><a href="installation.html">Installation</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="doxygen/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
 <h1>Installation Instructions</h1>
 
 
@@ -22,7 +49,6 @@ Stable releases are located there as compressed tar archives.
 You may also access the Git source tree for the latest code. You can get read-only access
 to the Git repository via:
 <br>
-
 <div class="fragment">
   <pre>git clone git://github.com/libMesh/libmesh.git </pre>
 </div>
@@ -49,7 +75,6 @@ build the code please let us know. You will also need a decent C compiler
 if you want to build some of the contributed packages that add functionality
 to the library.
 
-<p>
 The library is continuously tested with the following compilers:
 
 <br>
@@ -81,14 +106,14 @@ The library is continuously tested with the following compilers:
   <li>Sun Studio/Oracle</li>
     <ul>
       <li><code>CC</code> 12.3</li>
-      <tt>  $ ./configure --disable-fparser CXXFLAGS=-library=stlport4 --disable-unordered-containers</tt>
+      <tt>$ ./configure --disable-fparser CXXFLAGS=-library=stlport4 --disable-unordered-containers</tt>
     </ul>
   <li> Portland Group</li>
     <ul>
       <li><code>pgi</code> 11.7</li>
       <li><code>pgi</code> 12.9</li>
       <li><code>pgi</code> 13.4</li>
-      <tt>  $ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</tt>
+      <tt>$ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</tt>
     </ul>
 </ul>
 
@@ -108,7 +133,6 @@ make
 
 <br>
 in the top-level project directory. To see all the configuration options type
-<p>
 <div class="fragment">
 <pre>./configure --help</pre>
 </div>
@@ -184,8 +208,9 @@ that contains a series of unit tests which can be used to validate a <code>libMe
 installation.  These unit tests require <a href="https://sourceforge.net/apps/mediawiki/cppunit/index.php?title=Main_Page">CPPUnit</a>
 to run properly.  To run the unit test suite, simply do
 
-<pre>make -C test check </pre>
-
+<div class="fragment">
+  <pre>make -C test check </pre>
+</div>
 
 <a name="link"></a><h2>Linking With Your Application</h2>
 
@@ -208,17 +233,37 @@ used by <code>libMesh</code>. For example, you could build the application <code
 
 <br>
 
-
+</p>
 </div>
 
-<?php make_footer() ?>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
 
 </body>
 </html>
-
-
-<?php if (0) { ?>
-# Local Variables:
-# mode: html
-# End:
-<?php } ?>
