@@ -6,10 +6,6 @@
 # not just name the bib files 2009.bib etc?  For some reason
 # multibib can't handle filenames with numbers in them.
 
-# Note: to view the resulting publications.php file which is
-# created by this script, rename it to publications.html and
-# just open it in Firefox.
-
 # This script requires bibtex2html (see associated Makefile and
 # libmesh_html rule)
 if [ "x`which bibtex2html`" == "x" ]; then
@@ -54,26 +50,87 @@ do
   cat ${year_names[$i]}.html >> master.html
 done
 
-# Create php file by adding header/footer
-if [ -f publications.php ]; then
-  rm publications.php
+# The name of the final file that we will produce
+final_file=publications.html
+
+# Create publications.html by adding header/footer
+if [ -f $final_file ]; then
+  rm $final_file
 fi
 
-echo "<?php \$root=\"\"; ?>" >> publications.php
-echo "<?php require(\$root.\"navigation.php\"); ?>" >> publications.php
-echo "<html>" >> publications.php
-echo "<head>" >> publications.php
-echo "  <title>libMesh Publications</title>" >> publications.php
-echo "<?php load_style(\$root); ?>" >> publications.php
-echo "</head>" >> publications.php
-echo "<body>"  >> publications.php
-echo "<?php make_navigation(\"publications\",\$root)?>" >> publications.php
-echo "<div class=\"content\">" >> publications.php
-cat master.html >> publications.php
-echo "<br>"  >> publications.php
-echo "<br>"  >> publications.php
-echo "<?php make_footer() ?>" >> publications.php
-echo "</body>" >> publications.php
-echo "</html>" >> publications.php
+# This is the new header we use, but it probably shouldn't be
+# hard-coded?  Not sure how Ben is auto-generating these now...
+echo "<!doctype html>" >> $final_file
+echo "<html lang=\"en-US\">" >> $final_file
+echo "<head>" >> $final_file
+echo "  <meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">" >> $final_file
+echo "  <title>libMesh - A C++ Finite Element Library</title>" >> $final_file
+echo "  <meta name=\"author\" content=\"Benjamin S. Kirk\">" >> $final_file
+echo "  <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"styles.css\">" >> $final_file
+echo "</head>" >> $final_file
+echo "" >> $final_file
+echo "<body>" >> $final_file
+echo "  <nav id=\"fixedbar\">" >> $final_file
+echo "    <ul id=\"fixednav\">" >> $final_file
+echo "      <li><a href=\"index.html\">Home</a></li>" >> $final_file
+echo "      <li><a href=\"support.html\">About Us</a></li>" >> $final_file
+echo "      <li><a href=\"publications.html\">Publications</a></li>" >> $final_file
+echo "      <li><a href=\"developers.html\">Developers</a></li>" >> $final_file
+echo "      <li><a href=\"installation.html\">Installation</a></li>" >> $final_file
+echo "      <li><a href=\"examples.html\">Examples</a></li>" >> $final_file
+echo "      <li><a href=\"doxygen/index.html\">Documentation</a></li>" >> $final_file
+echo "    </ul>" >> $final_file
+echo "  </nav>" >> $final_file
+echo "" >> $final_file
+echo "  <div id=\"w\">" >> $final_file
+echo "    <header id=\"logo\"><a href=\"index.html\"><span id=\"logobg\">SomeWebsiteLogo</span></a></header>" >> $final_file
+echo "" >> $final_file
+echo "    <nav id=\"navigation\">" >> $final_file
+echo "      <ul>" >> $final_file
+echo "        <li><a href=\"index.html\">Home</a></li>" >> $final_file
+echo "        <li><a href=\"support.html\">About Us</a></li>" >> $final_file
+echo "        <li><a href=\"publications.html\">Publications</a></li>" >> $final_file
+echo "        <li><a href=\"developers.html\">Developers</a></li>" >> $final_file
+echo "        <li><a href=\"installation.html\">Installation</a></li>" >> $final_file
+echo "        <li><a href=\"examples.html\">Examples</a></li>" >> $final_file
+echo "        <li><a href=\"doxygen/index.html\">Documentation</a></li>" >> $final_file
+echo "      </ul>" >> $final_file
+echo "    </nav>" >> $final_file
+echo "" >> $final_file
+echo "<div id=\"content\">" >> $final_file
 
+# Inject all the references
+cat master.html >> $final_file
 
+# Inject Ben's footer
+echo "<br>" >> $final_file
+echo "</div>" >> $final_file
+echo "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script>" >> $final_file
+echo "<script type=\"text/javascript\">" >> $final_file
+echo "\$(document).ready(function(){" >> $final_file
+echo "  \$(window).on('scroll',function() {" >> $final_file
+echo "    var scrolltop = \$(this).scrollTop();" >> $final_file
+echo "" >> $final_file
+echo "    if(scrolltop >= 215) {" >> $final_file
+echo "      \$('#fixedbar').fadeIn(250);" >> $final_file
+echo "    }" >> $final_file
+echo "" >> $final_file
+echo "    else if(scrolltop <= 210) {" >> $final_file
+echo "      \$('#fixedbar').fadeOut(250);" >> $final_file
+echo "    }" >> $final_file
+echo "  });" >> $final_file
+echo "});" >> $final_file
+echo "</script>" >> $final_file
+echo "<!-- Google Analytics stuff -->" >> $final_file
+echo "<script type=\"text/javascript\">" >> $final_file
+echo "  var _gaq = _gaq || [];" >> $final_file
+echo "  _gaq.push(['_setAccount', 'UA-24978333-1']);" >> $final_file
+echo "  _gaq.push(['_trackPageview']);" >> $final_file
+echo "  (function() {" >> $final_file
+echo "    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;" >> $final_file
+echo "    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';" >> $final_file
+echo "    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);" >> $final_file
+echo "  })();" >> $final_file
+echo "</script>" >> $final_file
+echo "</body>" >> $final_file
+echo "</html>" >> $final_file
