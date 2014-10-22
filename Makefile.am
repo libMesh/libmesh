@@ -482,8 +482,11 @@ if LIBMESH_ENABLE_EXAMPLES
   SUBDIRS += examples
 endif
 
-#
-.PHONY: examples_doc doc svnexpand
+###########################################################
+# Documentation
+.PHONY: examples_doc doc
+
+SUBDIRS += doc
 
 #
 # documentation for the examples
