@@ -1967,6 +1967,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   unsigned int order = 1;
 
   BoundaryInfo& boundary_info = mesh.get_boundary_info();
+  const BoundaryInfo& cross_section_boundary_info = cross_section.get_boundary_info();
 
   // If cross_section is distributed, so is its extrusion
   if (!cross_section.is_serial())
@@ -1997,14 +1998,14 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                            node->processor_id());
 
           const std::vector<boundary_id_type> ids_to_copy =
-            cross_section.boundary_info->boundary_ids(node);
+            cross_section_boundary_info.boundary_ids(node);
 
           boundary_info.add_node(new_node, ids_to_copy);
         }
     }
 
   const std::set<boundary_id_type> &side_ids =
-    cross_section.boundary_info->get_side_boundary_ids();
+    cross_section_boundary_info.get_side_boundary_ids();
   const boundary_id_type next_side_id = side_ids.empty() ?
     0 : cast_int<boundary_id_type>(*side_ids.rbegin() + 1);
 
@@ -2144,7 +2145,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
           for (unsigned short s = 0; s != elem->n_sides(); ++s)
             {
               const std::vector<boundary_id_type> ids_to_copy =
-                cross_section.boundary_info->boundary_ids(elem, s);
+                cross_section_boundary_info.boundary_ids(elem, s);
 
               if (new_elem->dim() == 3)
                 {
