@@ -1,8 +1,5 @@
 /* The standard CSS for doxygen 1.8.7 */
 
-body, table, div, p, dl {
-	font: 400 14px/22px Roboto,sans-serif;
-}
 
 /* @group Heading Levels */
 
@@ -11,7 +8,6 @@ h1.groupheader {
 }
 
 .title {
-	font: 400 14px/28px Roboto,sans-serif;
 	font-size: 150%;
 	font-weight: bold;
 	margin: 10px 2px;
@@ -38,7 +34,6 @@ h1, h2, h3, h4, h5, h6 {
 	-ms-transition: text-shadow 0.5s linear;
 	-o-transition: text-shadow 0.5s linear;
 	transition: text-shadow 0.5s linear;
-	margin-right: 15px;
 }
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
@@ -263,9 +258,9 @@ body {
 }
 
 div.contents {
-	margin-top: 10px;
-	margin-left: 12px;
-	margin-right: 8px;
+  display: block;
+  background: #fff;
+  padding: 10px 10px;
 }
 
 td.indexkey {
@@ -803,7 +798,6 @@ div.directory {
 }
 
 table.directory {
-    font: 400 14px Roboto,sans-serif;
 }
 
 /* @end */
@@ -1101,21 +1095,18 @@ dl.section dd {
 
 #projectname
 {
-	font: 300% Tahoma, Arial,sans-serif;
 	margin: 0px;
 	padding: 2px 0px;
 }
 
 #projectbrief
 {
-	font: 120% Tahoma, Arial,sans-serif;
 	margin: 0px;
 	padding: 0px;
 }
 
 #projectnumber
 {
-	font: 50% Tahoma, Arial,sans-serif;
 	margin: 0px;
 	padding: 0px;
 }
@@ -1188,14 +1179,12 @@ div.toc {
 
 div.toc li {
         background: url("bdwn.png") no-repeat scroll 0 5px transparent;
-        font: 10px/1.2 Verdana,DejaVu Sans,Geneva,sans-serif;
         margin-top: 5px;
         padding-left: 10px;
         padding-top: 2px;
 }
 
 div.toc h3 {
-        font: bold 12px/1.2 Arial,FreeSans,sans-serif;
 	color: #4665A2;
         border-bottom: 0 none;
         margin: 0;
@@ -1291,7 +1280,6 @@ tr.heading h2 {
 #powerTip div {
         margin: 0px;
         padding: 0px;
-        font: 12px/16px Roboto,sans-serif;
 }
 
 #powerTip:before, #powerTip:after {
@@ -1434,90 +1422,6 @@ tr.heading h2 {
     height:auto !important;
     width:auto !important;
     overflow:inherit;
-    display:inline;
+    display:block;
   }
 }
-
-/*---- navigation bits ----*/
-#logo { display: block; border: 0px solid #232323; border-bottom-width: 0; }
-#logobg {
-  display: block;
-  width: 100%;
-  height: 208px;
-  background: url('../images/libmesh_mesh_small.png') top left no-repeat;
-  text-indent: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-/* top navigation */
-#navigation {
-  display: block;
-  height: 35px;
-  background-color: #131313;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#202020), to(#131313));
-  background-image: -webkit-linear-gradient(top, #202020, #131313);
-  background-image: -moz-linear-gradient(top, #202020, #131313);
-  background-image: -ms-linear-gradient(top, #202020, #131313);
-  background-image: -o-linear-gradient(top, #202020, #131313);
-  background-image: linear-gradient(top, #202020, #131313);
-}
-
-#navigation ul { list-style: none; padding: 0px 7px; }
-
-#navigation ul li { display: inline; float: left; }
-#navigation ul li a {
-  display: block;
-  padding: 0 8px;
-  color: #fff;
-  font-size: 1.1em;
-  text-decoration: none;
-  line-height: 35px;
-  font-weight: bold;
-  margin-right: 6px;
-  text-shadow: 1px 1px 1px #000;
-  -webkit-transition: all 0.2s linear;
-  -moz-transition: all 0.2s linear;
-  transition: all 0.2s linear;
-}
-#navigation ul li a:hover { color: #a8d6e7; }
-
-/* hidden fixed navigation */
-#fixedbar {
-  display: none;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 80px;
-  background: rgba(0,0,0,0.75);
-}
-
-#fixednav {
-  display: block;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0px 25px;
-}
-
-#fixednav li {list-style: none; }
-
-#fixednav li a {
-  display: block;
-  float: left;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #96aed8;
-  line-height: 80px;
-  text-decoration: none;
-  padding: 0px 4px;
-  margin-right: 6px;
-  -webkit-transition: all 0.2s linear;
-  -moz-transition: all 0.2s linear;
-  transition: all 0.2s linear;
-}
-
-#fixednav li a:hover {
-  color: #fff;
-  background: rgba(0,0,0,0.3);
-}
-/*---- end navigation bits ----*/
