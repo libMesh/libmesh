@@ -18,8 +18,8 @@ doxygen:
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES += .linkstamp
 .linkstamp:
-	-rm -rf examples              && cp -r $(srcdir)/examples .
-	-rm -rf images                && cp -r $(srcdir)/images .
+	-rm -rf examples              && cp -r $(srcdir)/examples . && chmod -R u+rw examples
+	-rm -rf images                && cp -r $(srcdir)/images .   && chmod -R u+rw images
 	-rm -f developers.html        && cp -r $(srcdir)/developers.html .
 	-rm -f examples.html          && cp -r $(srcdir)/examples.html .
 	-rm -f externalsoftware.html  && cp -r $(srcdir)/externalsoftware.html .

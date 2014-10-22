@@ -623,8 +623,8 @@ doxygen:
 	@cd $(top_builddir)/include/libmesh && $(MAKE)
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -rf examples              && cp -r $(srcdir)/examples .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -rf images                && cp -r $(srcdir)/images .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -rf examples              && cp -r $(srcdir)/examples . && chmod -R u+rw examples
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -rf images                && cp -r $(srcdir)/images .   && chmod -R u+rw images
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f developers.html        && cp -r $(srcdir)/developers.html .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples.html          && cp -r $(srcdir)/examples.html .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f externalsoftware.html  && cp -r $(srcdir)/externalsoftware.html .
