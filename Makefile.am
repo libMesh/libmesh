@@ -496,7 +496,7 @@ examples_doc:
 #
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html:
-	$(MAKE) examples_doc
+#	$(MAKE) examples_doc
 	$(MAKE) -C doc/html doc
 
 # Upload the web page to github.io.
