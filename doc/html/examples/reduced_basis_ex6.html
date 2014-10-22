@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -176,7 +177,7 @@ The "z component" of the function we're approximating with EIM
           virtual void boundary_assembly(FEMContext &c)
           {
             const std::vector&lt;boundary_id_type&gt; bc_ids =
-              rb_con-&gt;get_mesh().boundary_info-&gt;boundary_ids (&c.get_elem(),c.side);
+              rb_con-&gt;get_mesh().get_boundary_info().boundary_ids (&c.get_elem(),c.side);
             for (std::vector&lt;boundary_id_type&gt;::const_iterator b =
                    bc_ids.begin(); b != bc_ids.end(); ++b)
               if( *b == 1 || *b == 2 || *b == 3 || *b == 4 )
@@ -231,7 +232,7 @@ Now we will build the affine operator
           virtual void boundary_assembly(FEMContext &c)
           {
             const std::vector&lt;boundary_id_type&gt; bc_ids =
-              rb_con-&gt;get_mesh().boundary_info-&gt;boundary_ids (&c.get_elem(),c.side);
+              rb_con-&gt;get_mesh().get_boundary_info().boundary_ids (&c.get_elem(),c.side);
             for (std::vector&lt;boundary_id_type&gt;::const_iterator b =
                    bc_ids.begin(); b != bc_ids.end(); ++b)
               if( *b == 1 || *b == 3 ) // y == -0.2, y == 0.2
@@ -292,7 +293,7 @@ Now we will build the affine operator
           virtual void boundary_assembly(FEMContext &c)
           {
             const std::vector&lt;boundary_id_type&gt; bc_ids =
-              rb_con-&gt;get_mesh().boundary_info-&gt;boundary_ids (&c.get_elem(),c.side);
+              rb_con-&gt;get_mesh().get_boundary_info().boundary_ids (&c.get_elem(),c.side);
             for (std::vector&lt;boundary_id_type&gt;::const_iterator b =
                    bc_ids.begin(); b != bc_ids.end(); ++b)
               if( *b == 2 || *b == 4) // x == 0.2, x == -0.2
@@ -1630,7 +1631,7 @@ Loop over the mesh nodes and move them!
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> boundary_assembly(FEMContext &amp;c)
     {
       <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;boundary_id_type&gt; bc_ids =
-        rb_con-&gt;get_mesh().boundary_info-&gt;boundary_ids (&amp;c.get_elem(),c.side);
+        rb_con-&gt;get_mesh().get_boundary_info().boundary_ids (&amp;c.get_elem(),c.side);
       <B><FONT COLOR="#A020F0">for</FONT></B> (std::vector&lt;boundary_id_type&gt;::const_iterator b =
              bc_ids.begin(); b != bc_ids.end(); ++b)
         <B><FONT COLOR="#A020F0">if</FONT></B>( *b == 1 || *b == 2 || *b == 3 || *b == 4 )
@@ -1669,7 +1670,7 @@ Loop over the mesh nodes and move them!
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> boundary_assembly(FEMContext &amp;c)
     {
       <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;boundary_id_type&gt; bc_ids =
-        rb_con-&gt;get_mesh().boundary_info-&gt;boundary_ids (&amp;c.get_elem(),c.side);
+        rb_con-&gt;get_mesh().get_boundary_info().boundary_ids (&amp;c.get_elem(),c.side);
       <B><FONT COLOR="#A020F0">for</FONT></B> (std::vector&lt;boundary_id_type&gt;::const_iterator b =
              bc_ids.begin(); b != bc_ids.end(); ++b)
         <B><FONT COLOR="#A020F0">if</FONT></B>( *b == 1 || *b == 3 ) <I><FONT COLOR="#B22222">// y == -0.2, y == 0.2
@@ -1714,7 +1715,7 @@ Loop over the mesh nodes and move them!
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> boundary_assembly(FEMContext &amp;c)
     {
       <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;boundary_id_type&gt; bc_ids =
-        rb_con-&gt;get_mesh().boundary_info-&gt;boundary_ids (&amp;c.get_elem(),c.side);
+        rb_con-&gt;get_mesh().get_boundary_info().boundary_ids (&amp;c.get_elem(),c.side);
       <B><FONT COLOR="#A020F0">for</FONT></B> (std::vector&lt;boundary_id_type&gt;::const_iterator b =
              bc_ids.begin(); b != bc_ids.end(); ++b)
         <B><FONT COLOR="#A020F0">if</FONT></B>( *b == 2 || *b == 4) <I><FONT COLOR="#B22222">// x == 0.2, x == -0.2
@@ -2401,7 +2402,7 @@ Loop over the mesh nodes and move them!
 *   example-opt -online_mode 0 
 ***************************************************************
  
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 20 2014 at 18:39:24 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 10:45:28 ***
  EquationSystems
   n_systems()=2
    System #0, "EIM"
@@ -2481,7 +2482,7 @@ RBEIMConstruction parameters:
 best fit type: projection
 
 Assembling inner product matrix
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/systems/dg_fem_context.C, line 35, compiled Oct 20 2014 at 18:39:51 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/systems/dg_fem_context.C, line 35, compiled Oct 22 2014 at 10:45:52 ***
 Initializing parametrized functions in training set...
 Completed solve for training sample 1 of 25
 Completed solve for training sample 2 of 25
@@ -2598,9 +2599,9 @@ Performing RB solves on training set
 Maximum (relative) error bound is inf
 
 Performing truth solve at parameter:
-Bi: 4.104518e-03
-curvature: 1.446038e-01
-kappa: 7.280326e-01
+Bi: 5.159657e-03
+curvature: 9.117992e-01
+kappa: 6.368558e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -2608,12 +2609,12 @@ Updating RB residual terms
 
 ---- Basis dimension: 1 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.0576038
+Maximum (relative) error bound is 0.0519787
 
 Performing truth solve at parameter:
-Bi: 7.312519e-03
-curvature: 1.035903e+00
-kappa: 1.968264e+00
+Bi: 8.952072e-03
+curvature: 1.118817e-01
+kappa: 1.958465e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -2621,12 +2622,12 @@ Updating RB residual terms
 
 ---- Basis dimension: 2 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.0136088
+Maximum (relative) error bound is 0.0168182
 
 Performing truth solve at parameter:
-Bi: 9.949070e-03
-curvature: 1.084462e-01
-kappa: 1.851938e+00
+Bi: 1.923590e-03
+curvature: 1.395473e-01
+kappa: 1.982321e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -2634,12 +2635,12 @@ Updating RB residual terms
 
 ---- Basis dimension: 3 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.00118448
+Maximum (relative) error bound is 0.00101315
 
 Performing truth solve at parameter:
-Bi: 9.908136e-03
-curvature: 7.074464e-01
-kappa: 1.928252e+00
+Bi: 9.522564e-03
+curvature: 5.424170e-01
+kappa: 1.984197e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -2647,7 +2648,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 4 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.000990766
+Maximum (relative) error bound is 0.000913895
 
 Specified error tolerance reached.
  
@@ -2660,7 +2661,7 @@ Specified error tolerance reached.
 *   example-opt -online_mode 1 
 ***************************************************************
  
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 20 2014 at 18:39:24 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 10:45:28 ***
  EquationSystems
   n_systems()=2
    System #0, "EIM"

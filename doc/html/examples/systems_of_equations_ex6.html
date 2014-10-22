@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -247,25 +248,25 @@ Let's add some node and edge boundary conditions
                 found_side_min_y = false, found_side_max_z = false;
               for(unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
                 {
-                  if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
                     {
                       side_max_x = side;
                       found_side_max_x = true;
                     }
         
-                  if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
                     {
                       side_min_y = side;
                       found_side_min_y = true;
                     }
         
-                  if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
                     {
                       side_max_y = side;
                       found_side_max_y = true;
                     }
         
-                  if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
                     {
                       side_max_z = side;
                       found_side_max_z = true;
@@ -290,7 +291,7 @@ then let's set a node boundary condition
                           elem-&gt;is_node_on_side(n, side_max_y) &&
                           elem-&gt;is_node_on_side(n, side_max_z) )
                         {
-                          mesh.boundary_info-&gt;add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
+                          mesh.get_boundary_info().add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
                         }
                     }
                 }
@@ -313,7 +314,7 @@ then let's set an edge boundary condition
                       if (elem-&gt;is_edge_on_side(e, side_max_x) &&
                           elem-&gt;is_edge_on_side(e, side_min_y) )
                         {
-                          mesh.boundary_info-&gt;add_edge(elem, e, EDGE_BOUNDARY_ID);
+                          mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
                         }
                     }
                 }
@@ -818,7 +819,9 @@ Apply a traction
 
 <div class ="fragment">
 <pre>
-                          if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_X) )
+                          if( mesh.get_boundary_info().has_boundary_id
+                                (elem, side, BOUNDARY_ID_MAX_X)
+                              )
                             {
                               for (unsigned int i=0; i&lt;n_v_dofs; i++)
                                 {
@@ -1165,25 +1168,25 @@ Define the Lame constants (lambda_1 and lambda_2) based on nu and E
           found_side_min_y = false, found_side_max_z = false;
         <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
           {
-            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
               {
                 side_max_x = side;
                 found_side_max_x = true;
               }
   
-            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
               {
                 side_min_y = side;
                 found_side_min_y = true;
               }
   
-            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
               {
                 side_max_y = side;
                 found_side_max_y = true;
               }
   
-            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
               {
                 side_max_z = side;
                 found_side_max_z = true;
@@ -1198,7 +1201,7 @@ Define the Lame constants (lambda_1 and lambda_2) based on nu and E
                     elem-&gt;is_node_on_side(n, side_max_y) &amp;&amp;
                     elem-&gt;is_node_on_side(n, side_max_z) )
                   {
-                    mesh.boundary_info-&gt;add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
+                    mesh.get_boundary_info().add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
                   }
               }
           }
@@ -1211,7 +1214,7 @@ Define the Lame constants (lambda_1 and lambda_2) based on nu and E
                 <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;is_edge_on_side(e, side_max_x) &amp;&amp;
                     elem-&gt;is_edge_on_side(e, side_min_y) )
                   {
-                    mesh.boundary_info-&gt;add_edge(elem, e, EDGE_BOUNDARY_ID);
+                    mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);
                   }
               }
           }
@@ -1498,7 +1501,9 @@ Define the Lame constants (lambda_1 and lambda_2) based on nu and E
   
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
                   {
-                    <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_X) )
+                    <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id
+                          (elem, side, BOUNDARY_ID_MAX_X)
+                        )
                       {
                         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
                           {

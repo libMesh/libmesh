@@ -57,7 +57,7 @@ target_triplet = @target@
 @LIBMESH_VPATH_BUILD_TRUE@	externalsoftware.html images \
 @LIBMESH_VPATH_BUILD_TRUE@	index.html installation.html \
 @LIBMESH_VPATH_BUILD_TRUE@	publications.html styles.css \
-@LIBMESH_VPATH_BUILD_TRUE@	support.html
+@LIBMESH_VPATH_BUILD_TRUE@	doxygen_stylesheet.css support.html
 subdir = doc/html
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -414,7 +414,8 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 BUILT_SOURCES = $(am__append_1)
-DISTCLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES)
+DISTCLEANFILES = 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -522,6 +523,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -622,16 +624,17 @@ doc html:
 clean-local:
 	-rm -rf doxygen
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f developers.html       && $(LN_S) $(srcdir)/developers.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples              && $(LN_S) $(srcdir)/examples .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples.html         && $(LN_S) $(srcdir)/examples.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f externalsoftware.html && $(LN_S) $(srcdir)/externalsoftware.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f images                && $(LN_S) $(srcdir)/images .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f index.html            && $(LN_S) $(srcdir)/index.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f installation.html     && $(LN_S) $(srcdir)/installation.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f publications.html     && $(LN_S) $(srcdir)/publications.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f styles.css            && $(LN_S) $(srcdir)/styles.css  .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f support.html          && $(LN_S) $(srcdir)/support.html .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f developers.html        && $(LN_S) $(srcdir)/developers.html .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples               && $(LN_S) $(srcdir)/examples .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples.html          && $(LN_S) $(srcdir)/examples.html .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f externalsoftware.html  && $(LN_S) $(srcdir)/externalsoftware.html .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f images                 && $(LN_S) $(srcdir)/images .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f index.html             && $(LN_S) $(srcdir)/index.html .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f installation.html      && $(LN_S) $(srcdir)/installation.html .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f publications.html      && $(LN_S) $(srcdir)/publications.html .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f styles.css             && $(LN_S) $(srcdir)/styles.css  .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f doxygen_stylesheet.css && $(LN_S) $(srcdir)/doxygen_stylesheet.css .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f support.html           && $(LN_S) $(srcdir)/support.html .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

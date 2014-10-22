@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -517,7 +518,7 @@ Tensor indices
         
                       fe_face-&gt;reinit(elem, side);
         
-                      if( mesh.boundary_info-&gt;has_boundary_id (elem, side, 1) ) // Apply a traction on the right side
+                      if( mesh.get_boundary_info().has_boundary_id (elem, side, 1) ) // Apply a traction on the right side
                         {
                           for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
                             {
@@ -846,7 +847,7 @@ Define the Kronecker delta functions that we need here
   
                 fe_face-&gt;reinit(elem, side);
   
-                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id (elem, side, 1) ) <I><FONT COLOR="#B22222">// Apply a traction on the right side
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id (elem, side, 1) ) <I><FONT COLOR="#B22222">// Apply a traction on the right side
 </FONT></I>                  {
                     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
                       {

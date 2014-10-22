@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -196,7 +197,8 @@ Map from (elem,side) to centroid
                 for (unsigned char side=0; side&lt;elem-&gt;n_sides(); side++)
                   if (elem-&gt;neighbor(side) == NULL)
                     {
-                      if( mesh.boundary_info-&gt;has_boundary_id (elem,side, _crack_boundary_lower) )
+                      if( mesh.get_boundary_info().has_boundary_id
+                            (elem,side, _crack_boundary_lower) )
                         {
                           AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
         
@@ -209,7 +211,8 @@ Map from (elem,side) to centroid
                 for (unsigned char side=0; side&lt;elem-&gt;n_sides(); side++)
                   if (elem-&gt;neighbor(side) == NULL)
                     {
-                      if( mesh.boundary_info-&gt;has_boundary_id (elem,side, _crack_boundary_upper) )
+                      if( mesh.get_boundary_info().has_boundary_id
+                            (elem,side, _crack_boundary_upper) )
                         {
                           AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
         
@@ -766,7 +769,7 @@ Boundary flux provides forcing in this example
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
                   if (elem-&gt;neighbor(side) == NULL)
                     {
-                      if( mesh.boundary_info-&gt;has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
+                      if( mesh.get_boundary_info().has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
                         {
                           fe_elem_face-&gt;reinit(elem, side);
         
@@ -802,7 +805,7 @@ Found the lower side of the crack. Assemble terms due to lower and upper in here
 
 <div class ="fragment">
 <pre>
-                      if( mesh.boundary_info-&gt;has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
+                      if( mesh.get_boundary_info().has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
                         {
                           fe_elem_face-&gt;reinit(elem, side);
         
@@ -1016,7 +1019,8 @@ Upper-to-lower coupling term
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
               {
-                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id (elem,side, _crack_boundary_lower) )
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id
+                      (elem,side, _crack_boundary_lower) )
                   {
                     AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
   
@@ -1029,7 +1033,8 @@ Upper-to-lower coupling term
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">char</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
               {
-                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id (elem,side, _crack_boundary_upper) )
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id
+                      (elem,side, _crack_boundary_upper) )
                   {
                     AutoPtr&lt;Elem&gt; side_elem = elem-&gt;build_side(side);
   
@@ -1316,7 +1321,7 @@ Upper-to-lower coupling term
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
               {
-                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
                   {
                     fe_elem_face-&gt;reinit(elem, side);
   
@@ -1336,7 +1341,7 @@ Upper-to-lower coupling term
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
               {
-                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
+                <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
                   {
                     fe_elem_face-&gt;reinit(elem, side);
   

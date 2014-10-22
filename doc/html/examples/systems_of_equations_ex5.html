@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -548,7 +549,7 @@ Tensor indices
                   if (elem-&gt;neighbor(side) == NULL)
                     {
                       const std::vector&lt;boundary_id_type&gt; bc_ids =
-                        mesh.boundary_info-&gt;boundary_ids (elem,side);
+                        mesh.get_boundary_info().boundary_ids (elem,side);
         
                       const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
                       const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
@@ -927,7 +928,7 @@ Define the Kronecker delta functions that we need here
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
               {
                 <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;boundary_id_type&gt; bc_ids =
-                  mesh.boundary_info-&gt;boundary_ids (elem,side);
+                  mesh.get_boundary_info().boundary_ids (elem,side);
   
                 <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
                 <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();

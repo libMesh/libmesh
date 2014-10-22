@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -1885,14 +1886,15 @@ Running /Users/benkirk/codes/libmesh/build/examples/subdomains/subdomains_ex1/.l
 
 
  -------------------------------------------------------------------------------------------------------------------
-| Time:           Mon Oct 20 20:15:32 2014                                                                          |
+| Time:           Wed Oct 22 11:54:43 2014                                                                          |
 | OS:             Darwin                                                                                            |
-| HostName:       nakamura-stacey.jsc.nasa.gov                                                                      |
+| HostName:       benjamins-mbp.ndc.nasa.gov                                                                        |
 | OS Release:     13.4.0                                                                                            |
 | OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
 | Machine:        x86_64                                                                                            |
 | Username:       benkirk                                                                                           |
 | Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
+|  'METHODS=opt'                                                                                                    |
 |  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
 |  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
 |  'PETSC_ARCH=macosx'                                                                                              |
@@ -1900,17 +1902,17 @@ Running /Users/benkirk/codes/libmesh/build/examples/subdomains/subdomains_ex1/.l
 |  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
  -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.00053, Active time=0.000235                                      |
+| Matrix Assembly Performance: Alive time=0.000412, Active time=0.000189                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| BCs                           34         0.0000      0.000001    0.0000      0.000001    14.89    14.89    |
-| Fe                            34         0.0000      0.000001    0.0000      0.000001    14.89    14.89    |
-| Ke                            34         0.0000      0.000000    0.0000      0.000000    6.81     6.81     |
-| elem init                     34         0.0001      0.000003    0.0001      0.000003    42.13    42.13    |
-| matrix insertion              34         0.0000      0.000001    0.0000      0.000001    21.28    21.28    |
+| BCs                           34         0.0000      0.000001    0.0000      0.000001    20.11    20.11    |
+| Fe                            34         0.0000      0.000001    0.0000      0.000001    14.29    14.29    |
+| Ke                            34         0.0000      0.000000    0.0000      0.000000    4.76     4.76     |
+| elem init                     34         0.0001      0.000002    0.0001      0.000002    43.39    43.39    |
+| matrix insertion              34         0.0000      0.000001    0.0000      0.000001    17.46    17.46    |
  ------------------------------------------------------------------------------------------------------------
 | Totals:                       170        0.0002                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
@@ -1979,14 +1981,15 @@ Running /Users/benkirk/codes/libmesh/build/examples/subdomains/subdomains_ex1/.l
 
 
  -------------------------------------------------------------------------------------------------------------------
-| Time:           Mon Oct 20 20:15:32 2014                                                                          |
+| Time:           Wed Oct 22 11:54:43 2014                                                                          |
 | OS:             Darwin                                                                                            |
-| HostName:       nakamura-stacey.jsc.nasa.gov                                                                      |
+| HostName:       benjamins-mbp.ndc.nasa.gov                                                                        |
 | OS Release:     13.4.0                                                                                            |
 | OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
 | Machine:        x86_64                                                                                            |
 | Username:       benkirk                                                                                           |
 | Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
+|  'METHODS=opt'                                                                                                    |
 |  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
 |  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
 |  'PETSC_ARCH=macosx'                                                                                              |
@@ -1994,17 +1997,17 @@ Running /Users/benkirk/codes/libmesh/build/examples/subdomains/subdomains_ex1/.l
 |  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
  -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.006483, Active time=0.004771                                     |
+| Matrix Assembly Performance: Alive time=0.006552, Active time=0.004837                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| BCs                           628        0.0012      0.000002    0.0012      0.000002    25.82    25.82    |
-| Fe                            628        0.0014      0.000002    0.0014      0.000002    28.95    28.95    |
-| Ke                            628        0.0003      0.000001    0.0003      0.000001    7.04     7.04     |
-| elem init                     628        0.0013      0.000002    0.0013      0.000002    27.65    27.65    |
-| matrix insertion              628        0.0005      0.000001    0.0005      0.000001    10.54    10.54    |
+| BCs                           628        0.0013      0.000002    0.0013      0.000002    26.05    26.05    |
+| Fe                            628        0.0014      0.000002    0.0014      0.000002    29.44    29.44    |
+| Ke                            628        0.0003      0.000001    0.0003      0.000001    7.07     7.07     |
+| elem init                     628        0.0013      0.000002    0.0013      0.000002    27.29    27.29    |
+| matrix insertion              628        0.0005      0.000001    0.0005      0.000001    10.15    10.15    |
  ------------------------------------------------------------------------------------------------------------
 | Totals:                       3140       0.0048                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
@@ -2073,14 +2076,15 @@ Running /Users/benkirk/codes/libmesh/build/examples/subdomains/subdomains_ex1/.l
 
 
  -------------------------------------------------------------------------------------------------------------------
-| Time:           Mon Oct 20 20:15:33 2014                                                                          |
+| Time:           Wed Oct 22 11:54:43 2014                                                                          |
 | OS:             Darwin                                                                                            |
-| HostName:       nakamura-stacey.jsc.nasa.gov                                                                      |
+| HostName:       benjamins-mbp.ndc.nasa.gov                                                                        |
 | OS Release:     13.4.0                                                                                            |
 | OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
 | Machine:        x86_64                                                                                            |
 | Username:       benkirk                                                                                           |
 | Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
+|  'METHODS=opt'                                                                                                    |
 |  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
 |  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
 |  'PETSC_ARCH=macosx'                                                                                              |
@@ -2088,19 +2092,19 @@ Running /Users/benkirk/codes/libmesh/build/examples/subdomains/subdomains_ex1/.l
 |  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
  -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.137269, Active time=0.118407                                     |
+| Matrix Assembly Performance: Alive time=0.139999, Active time=0.120663                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| BCs                           2931       0.0471      0.000016    0.0471      0.000016    39.78    39.78    |
-| Fe                            2931       0.0219      0.000007    0.0219      0.000007    18.49    18.49    |
-| Ke                            2931       0.0118      0.000004    0.0118      0.000004    9.97     9.97     |
-| elem init                     2931       0.0266      0.000009    0.0266      0.000009    22.43    22.43    |
-| matrix insertion              2931       0.0110      0.000004    0.0110      0.000004    9.32     9.32     |
+| BCs                           2931       0.0471      0.000016    0.0471      0.000016    39.04    39.04    |
+| Fe                            2931       0.0234      0.000008    0.0234      0.000008    19.38    19.38    |
+| Ke                            2931       0.0119      0.000004    0.0119      0.000004    9.84     9.84     |
+| elem init                     2931       0.0269      0.000009    0.0269      0.000009    22.30    22.30    |
+| matrix insertion              2931       0.0114      0.000004    0.0114      0.000004    9.43     9.43     |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       14655      0.1184                                          100.00            |
+| Totals:                       14655      0.1207                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  

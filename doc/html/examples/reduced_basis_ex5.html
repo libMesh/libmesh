@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -1025,7 +1026,8 @@ Now we will build the affine operator
         
         void AssemblyF0::boundary_assembly(FEMContext &c)
         {
-          if(rb_sys.get_mesh().boundary_info-&gt;has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+          if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+               (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
             {
               const unsigned int u_var = 0;
         
@@ -1067,7 +1069,8 @@ Now we will build the affine operator
         
         void AssemblyF1::boundary_assembly(FEMContext &c)
         {
-          if(rb_sys.get_mesh().boundary_info-&gt;has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+          if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+               (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
             {
               const unsigned int u_var = 0;
               const unsigned int v_var = 1;
@@ -1110,7 +1113,8 @@ Now we will build the affine operator
         
         void AssemblyF2::boundary_assembly(FEMContext &c)
         {
-          if(rb_sys.get_mesh().boundary_info-&gt;has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+          if(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+               (&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
             {
               const unsigned int u_var = 0;
               const unsigned int w_var = 2;
@@ -1166,7 +1170,8 @@ First clear the values map
 <pre>
           values.clear();
         
-          if(sys.get_mesh().boundary_info-&gt;has_boundary_id(&node, NODE_BOUNDARY_ID))
+          if(sys.get_mesh().get_boundary_info().has_boundary_id
+               (&node, NODE_BOUNDARY_ID))
           {
             numeric_index_type dof_index =
               node.dof_number(sys.number(), sys.variable_number("u"), 0);
@@ -1189,7 +1194,8 @@ First clear the values map
 <pre>
           values.clear();
         
-          if(sys.get_mesh().boundary_info-&gt;has_boundary_id(&node, NODE_BOUNDARY_ID))
+          if(sys.get_mesh().get_boundary_info().has_boundary_id
+               (&node, NODE_BOUNDARY_ID))
           {
             numeric_index_type dof_index =
               node.dof_number(sys.number(), sys.variable_number("v"), 0);
@@ -1212,7 +1218,8 @@ First clear the values map
 <pre>
           values.clear();
         
-          if(sys.get_mesh().boundary_info-&gt;has_boundary_id(&node, NODE_BOUNDARY_ID))
+          if(sys.get_mesh().get_boundary_info().has_boundary_id
+               (&node, NODE_BOUNDARY_ID))
           {
             numeric_index_type dof_index =
               node.dof_number(sys.number(), sys.variable_number("w"), 0);
@@ -1488,19 +1495,19 @@ Let's add a some node boundary condition so that we can impose a point load
               bool found_side_max_x = false, found_side_max_y = false, found_side_max_z = false;
               for(unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
                 {
-                  if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
                     {
                       side_max_x = side;
                       found_side_max_x = true;
                     }
         
-                  if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
                     {
                       side_max_y = side;
                       found_side_max_y = true;
                     }
         
-                  if( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+                  if( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
                     {
                       side_max_z = side;
                       found_side_max_z = true;
@@ -1525,7 +1532,7 @@ then let's set a node boundary condition
                           elem-&gt;is_node_on_side(n, side_max_y) &&
                           elem-&gt;is_node_on_side(n, side_max_z) )
                         {
-                          mesh.boundary_info-&gt;add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
+                          mesh.get_boundary_info().add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
                         }
                     }
                 }
@@ -2627,7 +2634,8 @@ Should call close and update when we set vector entries directly
   
   <B><FONT COLOR="#228B22">void</FONT></B> AssemblyF0::boundary_assembly(FEMContext &amp;c)
   {
-    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().boundary_info-&gt;has_boundary_id(&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
       {
         <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
   
@@ -2653,7 +2661,8 @@ Should call close and update when we set vector entries directly
   
   <B><FONT COLOR="#228B22">void</FONT></B> AssemblyF1::boundary_assembly(FEMContext &amp;c)
   {
-    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().boundary_info-&gt;has_boundary_id(&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
       {
         <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
         <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var = 1;
@@ -2680,7 +2689,8 @@ Should call close and update when we set vector entries directly
   
   <B><FONT COLOR="#228B22">void</FONT></B> AssemblyF2::boundary_assembly(FEMContext &amp;c)
   {
-    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().boundary_info-&gt;has_boundary_id(&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
+    <B><FONT COLOR="#A020F0">if</FONT></B>(rb_sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
       {
         <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
         <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var = 2;
@@ -2712,7 +2722,8 @@ Should call close and update when we set vector entries directly
   {
     values.clear();
   
-    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().boundary_info-&gt;has_boundary_id(&amp;node, NODE_BOUNDARY_ID))
+    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;node, NODE_BOUNDARY_ID))
     {
       numeric_index_type dof_index =
         node.dof_number(sys.number(), sys.variable_number(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>), 0);
@@ -2727,7 +2738,8 @@ Should call close and update when we set vector entries directly
   {
     values.clear();
   
-    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().boundary_info-&gt;has_boundary_id(&amp;node, NODE_BOUNDARY_ID))
+    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;node, NODE_BOUNDARY_ID))
     {
       numeric_index_type dof_index =
         node.dof_number(sys.number(), sys.variable_number(<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>), 0);
@@ -2742,7 +2754,8 @@ Should call close and update when we set vector entries directly
   {
     values.clear();
   
-    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().boundary_info-&gt;has_boundary_id(&amp;node, NODE_BOUNDARY_ID))
+    <B><FONT COLOR="#A020F0">if</FONT></B>(sys.get_mesh().get_boundary_info().has_boundary_id
+         (&amp;node, NODE_BOUNDARY_ID))
     {
       numeric_index_type dof_index =
         node.dof_number(sys.number(), sys.variable_number(<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>), 0);
@@ -2883,19 +2896,19 @@ Should call close and update when we set vector entries directly
         <B><FONT COLOR="#228B22">bool</FONT></B> found_side_max_x = false, found_side_max_y = false, found_side_max_z = false;
         <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
           {
-            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
               {
                 side_max_x = side;
                 found_side_max_x = true;
               }
   
-            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
               {
                 side_max_y = side;
                 found_side_max_y = true;
               }
   
-            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.boundary_info-&gt;has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+            <B><FONT COLOR="#A020F0">if</FONT></B>( mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
               {
                 side_max_z = side;
                 found_side_max_z = true;
@@ -2910,7 +2923,7 @@ Should call close and update when we set vector entries directly
                     elem-&gt;is_node_on_side(n, side_max_y) &amp;&amp;
                     elem-&gt;is_node_on_side(n, side_max_z) )
                   {
-                    mesh.boundary_info-&gt;add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
+                    mesh.get_boundary_info().add_node(elem-&gt;get_node(n), NODE_BOUNDARY_ID);
                   }
               }
           }
@@ -3170,7 +3183,7 @@ Should call close and update when we set vector entries directly
   n_threads()=1
   processor_id()=0
 
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 20 2014 at 18:39:24 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 10:45:28 ***
  EquationSystems
   n_systems()=2
    System #0, "RBElasticity"
@@ -3244,7 +3257,7 @@ write out data during basis training? 0
 quiet mode? 1
 
 Assembling inner product matrix
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/systems/dg_fem_context.C, line 35, compiled Oct 20 2014 at 18:39:51 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/systems/dg_fem_context.C, line 35, compiled Oct 22 2014 at 10:45:52 ***
 Assembling affine operator 1 of 3
 Assembling affine operator 2 of 3
 Assembling affine operator 3 of 3
@@ -3262,13 +3275,13 @@ Performing RB solves on training set
 Maximum (relative) error bound is inf
 
 Performing truth solve at parameter:
-load_Fx: -1.553431e+00
-load_Fy: -2.857817e+00
-load_Fz: -3.551427e+00
-point_load_Fx: -2.350457e+00
-point_load_Fy: 4.624294e+00
-point_load_Fz: 3.102887e+00
-x_scaling: 5.927896e-01
+load_Fx: -3.812109e-01
+load_Fy: -3.586783e+00
+load_Fz: 7.017191e-01
+point_load_Fx: -4.938732e+00
+point_load_Fy: -1.880504e+00
+point_load_Fz: 2.118724e+00
+x_scaling: 1.537423e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -3276,16 +3289,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 1 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 1660.69
+Maximum (relative) error bound is 21.3643
 
 Performing truth solve at parameter:
-load_Fx: -2.831318e+00
-load_Fy: 3.230145e+00
-load_Fz: 5.068933e-01
-point_load_Fx: -4.342570e+00
-point_load_Fy: 4.907199e-01
-point_load_Fz: -1.530043e+00
-x_scaling: 1.003330e+00
+load_Fx: 3.770349e+00
+load_Fy: -2.350485e-01
+load_Fz: -3.947654e-01
+point_load_Fx: 2.267615e+00
+point_load_Fy: 3.582251e-01
+point_load_Fz: 1.683368e-01
+x_scaling: 1.067301e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -3293,16 +3306,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 2 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 4.2743
+Maximum (relative) error bound is 2.52497
 
 Performing truth solve at parameter:
-load_Fx: 1.922312e+00
-load_Fy: -3.759203e+00
-load_Fz: -7.218196e-01
-point_load_Fx: -3.063145e+00
-point_load_Fy: -4.011922e+00
-point_load_Fz: -1.190242e+00
-x_scaling: 1.802549e+00
+load_Fx: -2.188964e+00
+load_Fy: -3.459868e+00
+load_Fz: 4.542700e+00
+point_load_Fx: 1.249959e+00
+point_load_Fy: 4.505734e+00
+point_load_Fz: -1.277882e-01
+x_scaling: 7.634878e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3310,16 +3323,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 3 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.643433
+Maximum (relative) error bound is 0.63742
 
 Performing truth solve at parameter:
-load_Fx: -1.004117e+00
-load_Fy: 1.478966e+00
-load_Fz: -1.125895e+00
-point_load_Fx: 4.203924e+00
-point_load_Fy: 7.925675e-01
-point_load_Fz: 1.225123e+00
-x_scaling: 5.516254e-01
+load_Fx: -1.871866e+00
+load_Fy: -7.989076e-01
+load_Fz: 1.645518e+00
+point_load_Fx: -2.329267e+00
+point_load_Fy: -2.419775e+00
+point_load_Fz: -4.475040e+00
+x_scaling: 5.318113e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3327,16 +3340,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 4 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.250175
+Maximum (relative) error bound is 0.313512
 
 Performing truth solve at parameter:
-load_Fx: 3.833315e+00
-load_Fy: -2.195211e+00
-load_Fz: -4.612562e+00
-point_load_Fx: -2.588186e+00
-point_load_Fy: -4.424674e+00
-point_load_Fz: 2.053243e-01
-x_scaling: 6.866006e-01
+load_Fx: -8.199735e-01
+load_Fy: 2.313806e+00
+load_Fz: -1.913073e-02
+point_load_Fx: 4.272313e+00
+point_load_Fy: -4.739318e+00
+point_load_Fz: -1.255969e-01
+x_scaling: 1.871492e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -3344,16 +3357,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 5 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.118393
+Maximum (relative) error bound is 0.0670483
 
 Performing truth solve at parameter:
-load_Fx: -4.619617e+00
-load_Fy: -1.946558e+00
-load_Fz: -2.061583e-02
-point_load_Fx: -4.930050e+00
-point_load_Fy: -4.829241e+00
-point_load_Fz: 1.424861e+00
-x_scaling: 1.989059e+00
+load_Fx: -4.863803e+00
+load_Fy: -4.021165e-01
+load_Fz: -3.126472e+00
+point_load_Fx: -2.780864e+00
+point_load_Fy: 5.989228e-01
+point_load_Fz: -4.328627e-01
+x_scaling: 5.921365e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3361,16 +3374,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 6 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.0529849
+Maximum (relative) error bound is 0.0315231
 
 Performing truth solve at parameter:
-load_Fx: -3.276115e-01
-load_Fy: -3.902076e+00
-load_Fz: 1.962598e+00
-point_load_Fx: -4.236484e+00
-point_load_Fy: -3.001383e-01
-point_load_Fz: -3.807815e-01
-x_scaling: 8.215735e-01
+load_Fx: 2.118267e+00
+load_Fy: -2.530013e+00
+load_Fz: -2.499724e+00
+point_load_Fx: -3.541544e+00
+point_load_Fy: -1.187323e+00
+point_load_Fz: -7.280424e-02
+x_scaling: 1.600890e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -3378,16 +3391,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 7 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.0299309
+Maximum (relative) error bound is 0.0254441
 
 Performing truth solve at parameter:
-load_Fx: -2.031309e+00
-load_Fy: 1.305943e+00
-load_Fz: -2.933848e+00
-point_load_Fx: 4.704423e+00
-point_load_Fy: 2.932051e+00
-point_load_Fz: 5.429376e-01
-x_scaling: 9.261674e-01
+load_Fx: -4.973512e+00
+load_Fy: 1.047211e+00
+load_Fz: -4.659665e+00
+point_load_Fx: 3.939542e+00
+point_load_Fy: 3.857482e+00
+point_load_Fz: 3.070245e-01
+x_scaling: 5.939207e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3395,16 +3408,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 8 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.0183872
+Maximum (relative) error bound is 0.0166626
 
 Performing truth solve at parameter:
-load_Fx: 6.585775e-01
-load_Fy: -1.092483e+00
-load_Fz: 2.964052e+00
-point_load_Fx: -4.666044e+00
-point_load_Fy: -5.565990e-02
-point_load_Fz: -1.305438e-01
-x_scaling: 1.281034e+00
+load_Fx: -4.525598e+00
+load_Fy: -4.826647e+00
+load_Fz: 3.090734e+00
+point_load_Fx: 1.717376e+00
+point_load_Fy: 3.924282e+00
+point_load_Fz: -1.430927e+00
+x_scaling: 1.995520e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -3412,16 +3425,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 9 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.0115285
+Maximum (relative) error bound is 0.0062197
 
 Performing truth solve at parameter:
-load_Fx: -2.005492e+00
-load_Fy: -1.645735e+00
-load_Fz: -4.292158e+00
-point_load_Fx: 2.446133e+00
-point_load_Fy: 6.264771e-01
-point_load_Fz: 5.194326e-01
-x_scaling: 5.277401e-01
+load_Fx: 3.782534e+00
+load_Fy: 3.475152e+00
+load_Fz: -4.611610e+00
+point_load_Fx: 3.484484e+00
+point_load_Fy: 4.547167e+00
+point_load_Fz: 3.712611e-01
+x_scaling: 1.359730e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -3429,16 +3442,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 10 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.00765621
+Maximum (relative) error bound is 0.00526678
 
 Performing truth solve at parameter:
-load_Fx: 3.452319e+00
-load_Fy: 2.532769e+00
-load_Fz: 9.290719e-01
-point_load_Fx: -3.620333e+00
-point_load_Fy: 6.333765e-01
-point_load_Fz: -3.268917e-01
-x_scaling: 1.908963e+00
+load_Fx: -1.715710e-01
+load_Fy: 2.523634e+00
+load_Fz: 4.983342e+00
+point_load_Fx: -2.261582e+00
+point_load_Fy: 2.715112e+00
+point_load_Fz: -1.710414e-01
+x_scaling: 5.729148e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3446,16 +3459,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 11 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.00459429
+Maximum (relative) error bound is 0.00490195
 
 Performing truth solve at parameter:
-load_Fx: 4.656866e+00
-load_Fy: -1.981773e-01
-load_Fz: -2.766806e+00
-point_load_Fx: -3.359969e+00
-point_load_Fy: -3.933153e-01
-point_load_Fz: -3.967944e-01
-x_scaling: 6.840792e-01
+load_Fx: -4.498670e+00
+load_Fy: 4.874230e+00
+load_Fz: 1.122816e+00
+point_load_Fx: -2.503927e-01
+point_load_Fy: -4.744646e-02
+point_load_Fz: 1.259402e-01
+x_scaling: 6.604453e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3463,16 +3476,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 12 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.00426621
+Maximum (relative) error bound is 0.00316841
 
 Performing truth solve at parameter:
-load_Fx: -3.459921e+00
-load_Fy: 3.541313e+00
-load_Fz: -4.748711e+00
-point_load_Fx: -4.683115e+00
-point_load_Fy: 3.346370e+00
-point_load_Fz: 8.176676e-02
-x_scaling: 5.021418e-01
+load_Fx: -2.268160e+00
+load_Fy: -2.558938e+00
+load_Fz: -2.771255e+00
+point_load_Fx: -9.034616e-01
+point_load_Fy: -3.702021e-01
+point_load_Fz: 6.887202e-02
+x_scaling: 6.796072e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3480,16 +3493,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 13 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.00419229
+Maximum (relative) error bound is 0.00292296
 
 Performing truth solve at parameter:
-load_Fx: -2.279558e+00
-load_Fy: 2.878284e+00
-load_Fz: -3.016652e+00
-point_load_Fx: -4.513935e-01
-point_load_Fy: -9.987871e-01
-point_load_Fz: 6.182946e-02
-x_scaling: 7.973842e-01
+load_Fx: 9.648489e-01
+load_Fy: 3.512781e+00
+load_Fz: -1.508153e+00
+point_load_Fx: 4.562177e+00
+point_load_Fy: 2.788626e+00
+point_load_Fz: 7.085509e-01
+x_scaling: 7.029575e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -3497,16 +3510,16 @@ Updating RB residual terms
 
 ---- Basis dimension: 14 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.00355594
+Maximum (relative) error bound is 0.00251099
 
 Performing truth solve at parameter:
-load_Fx: -2.997022e-03
-load_Fy: 2.985147e+00
-load_Fz: -3.179336e-02
-point_load_Fx: -4.865600e+00
-point_load_Fy: -2.402522e+00
-point_load_Fz: 1.442650e-01
-x_scaling: 5.222938e-01
+load_Fx: -4.910738e+00
+load_Fy: -4.831350e+00
+load_Fz: 3.852360e+00
+point_load_Fx: 8.179086e-01
+point_load_Fy: 1.702294e+00
+point_load_Fz: 3.297777e-02
+x_scaling: 1.098814e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -3514,7 +3527,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 15 ----
 Performing RB solves on training set
-Maximum (relative) error bound is 0.00230449
+Maximum (relative) error bound is 0.00139068
 
 Maximum number of basis functions reached: Nmax = 15
  
@@ -3541,7 +3554,7 @@ Maximum number of basis functions reached: Nmax = 15
   n_threads()=1
   processor_id()=0
 
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 20 2014 at 18:39:24 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 42, compiled Oct 22 2014 at 10:45:28 ***
  EquationSystems
   n_systems()=2
    System #0, "RBElasticity"

@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -1224,7 +1225,9 @@ build_square().
 
 <div class ="fragment">
 <pre>
-                          const Real u_value = (mesh.boundary_info-&gt;has_boundary_id(elem,s,2)) ? 1. : 0.;
+                          const Real u_value =
+                            (mesh.get_boundary_info().has_boundary_id(elem,s,2))
+                              ? 1. : 0.;
         
 </pre>
 </div>
@@ -1707,7 +1710,9 @@ That's it.
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
                   {
   
-                    <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (mesh.boundary_info-&gt;has_boundary_id(elem,s,2)) ? 1. : 0.;
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real u_value =
+                      (mesh.get_boundary_info().has_boundary_id(elem,s,2))
+                        ? 1. : 0.;
   
                     <B><FONT COLOR="#228B22">const</FONT></B> Real v_value = 0.;
   
@@ -1915,14 +1920,15 @@ Linear solver converged at step: 250, final residual: 1.3932e-11  Nonlinear conv
  Nonlinear solver converged at step 3
 
  -------------------------------------------------------------------------------------------------------------------
-| Time:           Mon Oct 20 20:15:39 2014                                                                          |
+| Time:           Wed Oct 22 11:54:50 2014                                                                          |
 | OS:             Darwin                                                                                            |
-| HostName:       nakamura-stacey.jsc.nasa.gov                                                                      |
+| HostName:       benjamins-mbp.ndc.nasa.gov                                                                        |
 | OS Release:     13.4.0                                                                                            |
 | OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
 | Machine:        x86_64                                                                                            |
 | Username:       benkirk                                                                                           |
 | Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
+|  'METHODS=opt'                                                                                                    |
 |  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
 |  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
 |  'PETSC_ARCH=macosx'                                                                                              |
@@ -1930,15 +1936,15 @@ Linear solver converged at step: 250, final residual: 1.3932e-11  Nonlinear conv
 |  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
  -------------------------------------------------------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Systems Example 2 Performance: Alive time=4.35156, Active time=4.29937                                     |
+| Systems Example 2 Performance: Alive time=4.37947, Active time=4.33615                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| linear solve                  64         4.2994      0.067178    4.2994      0.067178    100.00   100.00   |
+| linear solve                  64         4.3361      0.067752    4.3361      0.067752    100.00   100.00   |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       64         4.2994                                          100.00            |
+| Totals:                       64         4.3361                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
