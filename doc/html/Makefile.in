@@ -52,12 +52,8 @@ host_triplet = @host@
 target_triplet = @target@
 
 #  need to link files for VPATH builds
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = .linkstamp developers.html \
-@LIBMESH_VPATH_BUILD_TRUE@	examples examples.html \
-@LIBMESH_VPATH_BUILD_TRUE@	externalsoftware.html images \
-@LIBMESH_VPATH_BUILD_TRUE@	index.html installation.html \
-@LIBMESH_VPATH_BUILD_TRUE@	publications.html styles.css \
-@LIBMESH_VPATH_BUILD_TRUE@	doxygen_stylesheet.css support.html
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = *.html *.css .linkstamp
 subdir = doc/html
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -414,7 +410,7 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 BUILT_SOURCES = $(am__append_1)
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = $(am__append_2)
 DISTCLEANFILES = 
 EXTRA_DIST = \
 	developers.html examples examples.html externalsoftware.html \
@@ -622,18 +618,16 @@ uninstall-am:
 
 #
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
-doc html:
+doc html: doxygen
+doxygen:
 	@cd $(top_builddir)/include/libmesh && $(MAKE)
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
-
-clean-local:
-	-rm -rf doxygen
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -rf examples              && cp -r $(srcdir)/examples .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -rf images                && cp -r $(srcdir)/images .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f developers.html        && cp -r $(srcdir)/developers.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples               && cp -r $(srcdir)/examples .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples.html          && cp -r $(srcdir)/examples.html .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f externalsoftware.html  && cp -r $(srcdir)/externalsoftware.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f images                 && cp -r $(srcdir)/images .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f index.html             && cp -r $(srcdir)/index.html .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f installation.html      && cp -r $(srcdir)/installation.html .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f publications.html      && cp -r $(srcdir)/publications.html .
@@ -641,6 +635,12 @@ clean-local:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f doxygen_stylesheet.css && cp -r $(srcdir)/doxygen_stylesheet.css .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f support.html           && cp -r $(srcdir)/support.html .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
+
+@LIBMESH_VPATH_BUILD_TRUE@clean-local:
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -rf doxygen images examples
+
+@LIBMESH_VPATH_BUILD_FALSE@clean-local:
+@LIBMESH_VPATH_BUILD_FALSE@	-rm -rf doxygen
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
