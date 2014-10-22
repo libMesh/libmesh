@@ -6,6 +6,10 @@
 
 using namespace FUNCTIONPARSERTYPES;
 
+#include "fpoptimizer/optimize.hh"
+#include "fpoptimizer/codetree.hh"
+using namespace FPoptimizer_CodeTree;
+
 #include <iostream>
 
 #if LIBMESH_HAVE_FPARSER_JIT
@@ -18,13 +22,71 @@ using namespace FUNCTIONPARSERTYPES;
 #  include <sys/stat.h>
 #endif
 
+/**
+ * The internals of the automatic differentiation algorithm are encapsulated in this class
+ * and hidden from the public interface, as the installed FParser version does not have access
+ * to the CodeTree<> class template. (see pimpl idiom).
+ * The ADImplementation has full access to its FParser owner object through the parser pointer.
+ */
+template<typename Value_t>
+class ADImplementation
+{
+  FunctionParserADBase<Value_t> * parser;
+  typename FunctionParserBase<Value_t>::Data * mData;
+public:
+  ADImplementation(FunctionParserADBase<Value_t> * _parser) : parser(_parser) {}
+  int AutoDiff(const std::string& var_name);
+
+private:
+  /**
+   * CodeTreeAD is a helper class derived from CodeTree<> for the purpose of adding overloaded
+   * operators, to make express the elementary derivatives in a compact way. The class carrys
+   * a pointer to the owning ADImplemntation object) which is implicitly sliced of when converting
+   * to CodeTree<>). The pointer is needed to implement the [] derivative operator, which needs
+   * knowledge of the custom function list in the parser object.
+   */
+  class CodeTreeAD : public CodeTree<Value_t> {
+    // pointer to the ad implmentation managing the differentiation (will be sliced on assignment!)
+    class ADImplementation<Value_t> * ad;
+
+  public:
+    CodeTreeAD() : CodeTree<Value_t>(), ad(NULL) {}
+    CodeTreeAD(ADImplementation<Value_t> * _ad) : ad(_ad) {}
+    CodeTreeAD(const CodeTree<Value_t> & tree, ADImplementation<Value_t> * _ad) :
+        CodeTree<Value_t>(tree),
+        ad(_ad)
+    {}
+    CodeTreeAD(const Value_t & val) : CodeTree<Value_t>(CodeTreeImmed(val)) {}
+
+    CodeTreeAD operator* (const CodeTreeAD & a) { return ad->MakeTree(cMul, *this, a); }
+    CodeTreeAD operator/ (const CodeTreeAD & a) { return ad->MakeTree(cDiv, *this, a); }
+    CodeTreeAD operator+ (const CodeTreeAD & a) { return ad->MakeTree(cAdd, *this, a); }
+    CodeTreeAD operator- (const CodeTreeAD & a) { return ad->MakeTree(cSub, *this, a); }
+    CodeTreeAD operator- () { return ad->MakeTree(cNeg, *this); }
+    // overload the [] operator to return the derivative
+    CodeTreeAD operator[] (unsigned int var) {
+      if (ad == NULL)
+        throw FunctionParserADBase<Value_t>::EmptySubtreeException;
+      return ad->DiffTree(*this, var);
+    }
+  };
+
+  // recursive subtree diferentiation - the heart of the AD algorithm
+  CodeTreeAD DiffTree(const CodeTreeAD & func, unsigned int var);
+
+  // helper methods to build trees with parameters in a compact way
+  CodeTreeAD MakeTree(OPCODE op, const CodeTreeAD & param1);
+  CodeTreeAD MakeTree(OPCODE op, const CodeTreeAD & param1, const CodeTreeAD & param2);
+};
+
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
     mData(this->getParserData()),
     compiledFunction(NULL),
     mSilenceErrors(false),
-    mFPlog(mData->mFuncPtrs.size())
+    mFPlog(mData->mFuncPtrs.size()),
+    ad(new ADImplementation<Value_t>(this))
 {
   this->AddFunction("plog", fp_plog, 2);
 }
@@ -35,7 +97,8 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     mData(this->getParserData()),
     compiledFunction(cpy.compiledFunction),
     mSilenceErrors(cpy.mSilenceErrors),
-    mFPlog(cpy.mFPlog)
+    mFPlog(cpy.mFPlog),
+    ad(new ADImplementation<Value_t>(this))
 {
 }
 
@@ -44,593 +107,13 @@ Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
 {
   const Value_t x = params[0];
   const Value_t a = params[1];
-  // return x < a ? fp_log(a) + (params[0] - a) / a : fp_log(params[0]);
-  // return x < a ? fp_log(a) - Value_t(1.5) + Value_t(2.0)/a * x - Value_t(0.5)/(a*a) * x*x : fp_log(x);
   return x < a ? fp_log(a) + (x-a)/a - (x-a)*(x-a)/(Value_t(2)*a*a) + (x-a)*(x-a)*(x-a)/(Value_t(3)*a*a*a) : fp_log(x);
 }
 
 template<typename Value_t>
-int FunctionParserADBase<Value_t>::OpcodeSize(const OpcodePacket & p)
+FunctionParserADBase<Value_t>::~FunctionParserADBase()
 {
-  unsigned op = p.first, index = p.index;
-
-  if (int(op) >= VarBegin || op == cImmed) {
-    return -1;
-  } else if (op == cFCall && index == mFPlog) {
-    return mData->mFuncPtrs[index].mParams;
-  } else {
-    switch(op)
-    {
-      // these opcode takes one argument off the stack
-      case cInv: case cNeg:
-      case cSqr: case cAbs:
-      case cSqrt: case cRSqrt: case cCbrt:
-      case cExp: case cExp2:
-      case cLog: case cLog2: case cLog10:
-      case cSin: case cCos: case cTan:
-      case cAsin: case cAcos: case cAtan:
-      case cInt: case cFloor: case cCeil: case cTrunc:
-        return 1;
-
-      // these opcode takes two arguments off the stack
-      case cAdd: case cSub: case cRSub:
-      case cMul: case cDiv: case cRDiv:
-      case cPow: case cHypot:
-      case cEqual: case cNEqual:
-      case cLess: case cLessOrEq: case cGreater: case cGreaterOrEq:
-        return 2;
-
-      default:
-        throw UnsupportedOpcodeException;
-    }
-  }
-}
-
-template<typename Value_t>
-typename FunctionParserADBase<Value_t>::Interval
-FunctionParserADBase<Value_t>::GetArgument(const DiffProgramFragment & orig)
-{
-  // count the number of elements on the stack (needs to reach 1)
-  int stack_size = 0;
-
-  // Extract the opcode sequence(s) that is responsible for the
-  // top stack entry
-  typename DiffProgramFragment::const_iterator ip = orig.end();
-  do {
-    // take one step back
-    if (ip == orig.begin())
-      throw StackExhaustedException;
-    ip--;
-
-    // a size two opcode needs two elements from the stack, but also puts one back on!
-    int this_size = OpcodeSize(*ip);
-    stack_size -= this_size > 0 ? this_size-1 : this_size;
-  } while (stack_size < 1);
-
-  return Interval(ip, orig.end());
-}
-
-template<typename Value_t>
-typename FunctionParserADBase<Value_t>::Interval
-FunctionParserADBase<Value_t>::GetArgument(const DiffProgramFragment & orig, unsigned int index)
-{
-  // argument loction
-  Interval arg;
-  DiffProgramFragment head;
-  std::copy(orig.begin(), orig.end()-1, std::back_inserter(head));
-
-  // iterate over the past arguments
-  int i = index;
-  do
-  {
-    arg = GetArgument(head);
-    head.resize(std::distance<typename DiffProgramFragment::const_iterator>(head.begin(), arg.first));
-  } while (--i >= 0);
-
-  return arg;
-}
-
-template<typename Value_t>
-typename FunctionParserADBase<Value_t>::DiffProgramFragment
-FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
-{
-  // check for empty DiffProgramFragments
-  if (orig.empty())
-    throw EmptyProgramException;
-
-  // this stores the opcode of the differentiated function
-  DiffProgramFragment outer, prog_a, prog_b, prog_da, prog_db;
-
-  // size of the current end opcode
-  int op_size = OpcodeSize(orig.back());
-
-  // current opcode
-  unsigned op = orig.back().first;
-  unsigned findex = orig.back().index;
-
-  // variable or immediate value
-  if (op_size == -1)
-  {
-    if (op == cImmed)
-      outer.push_back(OpcodeImmediate(Value_t(0)));
-    else
-    {
-      if (op == mVarOp)
-        outer.push_back(OpcodeImmediate(Value_t(1)));
-      else
-        outer.push_back(OpcodeImmediate(Value_t(0)));
-    }
-
-    return outer;
-  }
-
-  // Extract the opcode sequence(s) that generates
-  // the argument(s) for the current opcode
-
-  // get the opcode sequence preceeding the current opcode
-  DiffProgramFragment head, head2;
-  std::copy(orig.begin(), orig.end()-1, std::back_inserter(head));
-
-  // get the opcode interval of the argument immediately preceeding the current opcode
-  Interval arg = GetArgument(head);
-
-  if (op_size == 1)
-    std::copy(arg.first, arg.second, std::back_inserter(prog_a));
-  else if (op_size == 2)
-  {
-    std::copy(arg.first, arg.second, std::back_inserter(prog_b));
-    // get opcode squence before that argument interval
-    std::copy<typename DiffProgramFragment::const_iterator>(head.begin(), arg.first, std::back_inserter(head2));
-    arg = GetArgument(head2);
-    std::copy(arg.first, arg.second, std::back_inserter(prog_a));
-  }
-  else
-    throw UnsupportedArgumentCountException;
-
-  // create derivatives
-  switch (op)
-  {
-    case cRSub:
-      // db - da
-    case cAdd:
-      // da + db
-    case cSub:
-      // da - db
-      prog_da = DiffFunction(prog_a);
-      prog_db = DiffFunction(prog_b);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
-      outer.push_back(OpcodePlain(op));
-      return outer;
-
-    case cMul:
-      // a*db + da*b
-      prog_da = DiffFunction(prog_a);
-      prog_db = DiffFunction(prog_b);
-      outer = prog_a;
-      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
-      outer.push_back(OpcodePlain(cMul));
-      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.push_back(OpcodePlain(cMul));
-      outer.push_back(OpcodePlain(cAdd));
-      return outer;
-
-    case cSqr:
-      // a*da*2
-      prog_da = DiffFunction(prog_a);
-      outer = prog_a;
-      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
-      outer.push_back(OpcodePlain(cMul));
-      outer.push_back(OpcodeImmediate(2));
-      outer.push_back(OpcodePlain(cMul));
-      return outer;
-
-    // also capture cRdiv here but switch a and b first!
-    case cRDiv:
-      std::swap(prog_a, prog_b);
-    case cDiv:
-      // db/a - a*db/b^2
-      prog_da = DiffFunction(prog_a);
-      prog_db = DiffFunction(prog_b);
-      outer = prog_db;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cDiv));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
-      outer.push_back(OpcodePlain(cMul));
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.push_back(OpcodePlain(cSqr));
-      outer.push_back(OpcodePlain(cDiv));
-      outer.push_back(OpcodePlain(cSub));
-      return outer;
-
-    case cLog2:
-    case cLog10:
-      // *1/ln(base)
-    case cLog:
-      // da/a
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cDiv));
-      if (op == cLog2) {
-        outer.push_back(OpcodeImmediate(std::log(Value_t(2))));
-        outer.push_back(OpcodePlain(cDiv));
-      }
-      else if (op == cLog10) {
-        outer.push_back(OpcodeImmediate(std::log(Value_t(10))));
-        outer.push_back(OpcodePlain(cDiv));
-      }
-      return outer;
-
-    case cExp:
-    case cExp2:
-      // da*exp(a)
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(op));
-      outer.push_back(OpcodePlain(cMul));
-      if (op == cExp2) {
-        outer.push_back(OpcodeImmediate(std::log(Value_t(2))));
-        outer.push_back(OpcodePlain(cMul));
-      }
-      return outer;
-
-    case cNeg:
-      // -da
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.push_back(OpcodePlain(cNeg));
-      return outer;
-
-    case cInv:
-      // -da/a^2
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cSqr));
-      outer.push_back(OpcodePlain(cDiv));
-      outer.push_back(OpcodePlain(cNeg));
-      return outer;
-
-    case cPow:
-      // a**b * ( db*log(a) + b*da/a)
-      prog_da = DiffFunction(prog_a);
-      prog_db = DiffFunction(prog_b);
-      outer = prog_a;
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.push_back(OpcodePlain(cPow));
-      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cLog));
-      outer.push_back(OpcodePlain(cMul));
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
-      outer.push_back(OpcodePlain(cMul));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cDiv));
-      outer.push_back(OpcodePlain(cAdd));
-      outer.push_back(OpcodePlain(cMul));
-      return outer;
-
-    case cSin :
-      // da*cos(a)
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cCos));
-      outer.push_back(OpcodePlain(cMul));
-      return outer;
-
-    case cCos :
-      // -da*sin(a)
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cSin));
-      outer.push_back(OpcodePlain(cMul));
-      outer.push_back(OpcodePlain(cNeg));
-      return outer;
-
-    case cTan :
-      // (tan(a)^2+1)*da
-      prog_da = DiffFunction(prog_a);
-      outer = prog_a;
-      outer.push_back(OpcodePlain(cTan));
-      outer.push_back(OpcodePlain(cSqr));
-      outer.push_back(OpcodeImmediate(Value_t(1)));
-      outer.push_back(OpcodePlain(cAdd));
-      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
-      outer.push_back(OpcodePlain(cMul));
-      return outer;
-
-    case cAtan :
-      // da/(a^2+1)
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cSqr));
-      outer.push_back(OpcodeImmediate(Value_t(1)));
-      outer.push_back(OpcodePlain(cAdd));
-      outer.push_back(OpcodePlain(cDiv));
-      return outer;
-
-    case cAsin:
-      // da/sqrt(1-a^2)
-    case cAcos:
-      // -da/sqrt(1-a^2)
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.push_back(OpcodeImmediate(Value_t(1)));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cSqr));
-      outer.push_back(OpcodePlain(cSub));
-      outer.push_back(OpcodePlain(cSqrt));
-      outer.push_back(OpcodePlain(cDiv));
-      if (op == cAcos)
-        outer.push_back(OpcodePlain(cNeg));
-      return outer;
-
-    case cSqrt :
-      // da/(2*sqrt(a))
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.push_back(OpcodeImmediate(Value_t(2)));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cSqrt));
-      outer.push_back(OpcodePlain(cMul));
-      outer.push_back(OpcodePlain(cDiv));
-      return outer;
-
-    case cRSqrt :
-      // -da/(2*a^(3/2)))
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.push_back(OpcodeImmediate(Value_t(2)));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodeImmediate(Value_t(3)));
-      outer.push_back(OpcodePlain(cPow));
-      outer.push_back(OpcodePlain(cSqrt));
-      outer.push_back(OpcodePlain(cMul));
-      outer.push_back(OpcodePlain(cDiv));
-      outer.push_back(OpcodePlain(cNeg));
-      return outer;
-
-    case cCbrt :
-      // da/(3*a^(2/3))
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.push_back(OpcodeImmediate(Value_t(3)));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodePlain(cCbrt));
-      outer.push_back(OpcodePlain(cSqr));
-      outer.push_back(OpcodePlain(cMul));
-      outer.push_back(OpcodePlain(cDiv));
-      return outer;
-
-    case cAbs:
-      // da*a/|a|
-      prog_da = DiffFunction(prog_a);
-      outer = prog_da;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end()); // insert twice, as cDup is not supported
-      outer.push_back(OpcodePlain(cAbs));
-      outer.push_back(OpcodePlain(cDiv));
-      outer.push_back(OpcodePlain(cMul));
-      return outer;
-
-    case cHypot:
-      // (a*da+b*db)/hypot(a,b)
-      prog_da = DiffFunction(prog_a);
-      prog_db = DiffFunction(prog_b);
-      outer = prog_a;
-      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
-      outer.push_back(OpcodePlain(cMul));
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
-      outer.push_back(OpcodePlain(cMul));
-      outer.push_back(OpcodePlain(cAdd));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.push_back(OpcodePlain(cHypot));
-      outer.push_back(OpcodePlain(cDiv));
-      return outer;
-
-    // no idea why anyone would like to diff those
-    // (I'll pretend the discontinuities don't exist -
-    // FP could not deal with them in a useful way in any case)
-    case cInt:
-    case cFloor:
-    case cCeil:
-    case cTrunc:
-      outer.push_back(OpcodeImmediate(Value_t(0)));
-      return outer;
-
-    // we return those undiffed to keep conditionals intact (for piecewise functions like:  (x<0) * 1 + (x>=0) * (1+x^2) )
-    case cEqual:
-    case cNEqual:
-    case cLess:
-    case cLessOrEq:
-    case cGreater:
-    case cGreaterOrEq:
-      outer = prog_a;
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.push_back(OpcodePlain(op));
-      return outer;
-
-    case cFCall:
-      if (findex == mFPlog)
-      {
-        // we assume that the second argument to plog is constant for now (TODO?).
-        /*
-        prog_da = DiffFunction(prog_a);
-        // da (inner derivative)
-        outer = prog_da;
-        // 1/a
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.push_back(OpcodePlain(cInv));
-        // a>b
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cGreater));
-        // *
-        outer.push_back(OpcodePlain(cMul));
-        // 1/b
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cInv));
-        // a<=b
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cLessOrEq));
-        // *
-        outer.push_back(OpcodePlain(cMul));
-        // +
-        outer.push_back(OpcodePlain(cAdd));
-        // multiply by inner derivative da
-        outer.push_back(OpcodePlain(cMul));
-        */
-
-        /*
-        // x<e ? (2/e - 1/(e*e)*x) : 1/x
-        prog_da = DiffFunction(prog_a);
-        // da (inner derivative)
-        outer = prog_da;
-        // 1/a
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.push_back(OpcodePlain(cInv));
-        // a>b
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cGreater));
-        // *
-        outer.push_back(OpcodePlain(cMul));
-        // 2/b
-        outer.push_back(OpcodeImmediate(Value_t(2)));
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cDiv));
-        /// 1/(e*e) = e^-2
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodeImmediate(Value_t(-2)));
-        outer.push_back(OpcodePlain(cPow));
-        // * x
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.push_back(OpcodePlain(cMul));
-        // -
-        outer.push_back(OpcodePlain(cSub));
-        // a<=b
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cLessOrEq));
-        // *
-        outer.push_back(OpcodePlain(cMul));
-        // +
-        outer.push_back(OpcodePlain(cAdd));
-        // multiply by inner derivative da
-        outer.push_back(OpcodePlain(cMul));
-        */
-
-        // x<e ? (1/e - 1/(e*e)*(x-e) + 1/e^3*(x-e)^2) : 1/x
-        prog_da = DiffFunction(prog_a);
-        // da (inner derivative)
-        outer = prog_da;
-        // 1/a
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        // actually do 1/(a + (a==0)). This avoids a 1/0 and a=0 should always make this the false-branch!
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.push_back(OpcodeImmediate(Value_t(0)));
-        outer.push_back(OpcodePlain(cEqual));
-        outer.push_back(OpcodePlain(cAdd));
-
-        outer.push_back(OpcodePlain(cInv));
-        // a>b
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cGreater));
-        // *
-        outer.push_back(OpcodePlain(cMul));
-        // 1/b
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cInv));
-        /// 1/(b*b) = b^-2
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodeImmediate(Value_t(-2)));
-        outer.push_back(OpcodePlain(cPow));
-        // * (a-b)
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cSub));
-        outer.push_back(OpcodePlain(cMul));
-        // -
-        outer.push_back(OpcodePlain(cSub));
-        // 1/(e*e*e) = e^-3
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodeImmediate(Value_t(-3)));
-        outer.push_back(OpcodePlain(cPow));
-        // * (x-e)^2
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cSub));
-        outer.push_back(OpcodeImmediate(Value_t(2)));
-        outer.push_back(OpcodePlain(cPow));
-        outer.push_back(OpcodePlain(cMul));
-        // +
-        outer.push_back(OpcodePlain(cAdd));
-        // a<=b
-        outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-        outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-        outer.push_back(OpcodePlain(cLessOrEq));
-        // *
-        outer.push_back(OpcodePlain(cMul));
-        // +
-        outer.push_back(OpcodePlain(cAdd));
-        // multiply by inner derivative da
-        outer.push_back(OpcodePlain(cMul));
-
-        return outer;
-      }
-      break;
-  }
-
-  // we encountered an unsupported opcode (this should not happen here)
-  throw UnsupportedOpcodeException;
-}
-
-template<typename Value_t>
-void FunctionParserADBase<Value_t>::Commit(const DiffProgramFragment & diff)
-{
-  // loop over diff and fill in mByteCode and mImmed
-  mData->mByteCode.clear();
-  mData->mImmed.clear();
-  mData->mStackSize = 0;
-  int stack_size = 0;
-
-  // compressed immediate data representation
-  for (unsigned int i = 0; i < diff.size(); ++i)
-  {
-    int op_size = OpcodeSize(diff[i]);
-    stack_size -= op_size > 0 ? op_size-1 : op_size;
-    // mData->mStackSize is unsigned, stack_size should be an int
-    // since we subtract from it, so cast mStackSize to int for
-    // comparison to avoid compiler warnings.
-    if (stack_size > static_cast<int>(mData->mStackSize))
-      mData->mStackSize = stack_size;
-
-    mData->mByteCode.push_back(diff[i].first);
-
-    // handle immediate value
-    if (diff[i].first == cImmed)
-      mData->mImmed.push_back(diff[i].second);
-
-    // expand function call opcode
-    if (diff[i].first == cFCall)
-      mData->mByteCode.push_back(diff[i].index);
-  }
-
-#ifndef FP_USE_THREAD_SAFE_EVAL
-  mData->mStack.resize(mData->mStackSize);
-#endif
+  delete ad;
 }
 
 template<typename Value_t>
@@ -654,129 +137,281 @@ void FunctionParserADBase<Value_t>::setZero()
   mData->mImmed[0] = Value_t(0);
 }
 
+
+// this is a namespaced function because we cannot easily export CodeTree in the
+// public interface of the FunctionParserADBase class in its installed state in libMesh
+// as the codetree.hh header is not installed (part of FPoptimizer)
+
+// quick subtree builder helper functions
 template<typename Value_t>
-typename FunctionParserADBase<Value_t>::DiffProgramFragment
-FunctionParserADBase<Value_t>::Expand()
+typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTree(OPCODE op, const CodeTreeAD & param1)
 {
-  // get a reference to the stored bytecode
-  const std::vector<unsigned>& ByteCode = mData->mByteCode;
+  CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op), this);
+  tree.AddParam(param1);
+  return tree;
+}
+template<typename Value_t>
+typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTree(OPCODE op, const CodeTreeAD & param1, const CodeTreeAD & param2)
+{
+  CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op), this);
+  tree.AddParam(param1);
+  tree.AddParam(param2);
+  return tree;
+}
 
-  // get a reference to the immediate values
-  const std::vector<Value_t>& Immed = mData->mImmed;
 
-  DiffProgramFragment orig;
-  unsigned op;
-  unsigned int nImmed = 0;
+// return the derivative of func and put it into diff
+template<typename Value_t>
+typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::DiffTree(const CodeTreeAD & func, unsigned int var)
+{
+  // derivative of a constant number is 0
+  if (func.IsImmed())
+    return CodeTreeAD(CodeTreeImmed(Value_t(0)), this);
 
-  for (unsigned int i = 0; i < ByteCode.size(); ++i)
+  // derivative of a variable is 1 for the variable we are diffing w.r.t. and 0 otherwise
+  if (func.IsVar())
   {
-    op = ByteCode[i];
-    if (op == cImmed)
-      orig.push_back(OpcodeImmediate(Immed[nImmed++]));
-    else if (op == cDup)
-    {
-      // substitute full code for cDup opcodes
-      Interval arg = GetArgument(orig);
-      orig.insert(orig.end(), arg.first, arg.second);
-    }
-    else if (op == cFCall)
-      orig.push_back(OpcodeFCall(ByteCode[++i]));
-    else if (op == cJump)
-      throw UnsupportedOpcodeException;
-    else if (op == cFetch)
-      throw UnsupportedOpcodeException;
-    else if (op == cSinCos)
-    {
-      // this instruction puts two values on the stack!
-      Interval arg = GetArgument(orig);
-      DiffProgramFragment sub(arg.first, arg.second);
-      orig.push_back(OpcodePlain(cSin));
-      orig.insert(orig.end(), sub.begin(), sub.end());
-      orig.push_back(OpcodePlain(cCos));
-    }
-    else if (op == cCsc)
-    {
-      orig.push_back(OpcodePlain(cSin));
-      orig.push_back(OpcodePlain(cInv));
-    }
-    else if (op == cSec)
-    {
-      orig.push_back(OpcodePlain(cCos));
-      orig.push_back(OpcodePlain(cInv));
-    }
-    else if (op == cCot)
-    {
-      orig.push_back(OpcodePlain(cTan));
-      orig.push_back(OpcodePlain(cInv));
-    }
-#ifdef FP_SUPPORT_OPTIMIZER
-    else if (op == cNop)
-      continue;
-#endif
+    if (func.GetVar() == var)
+      return CodeTreeAD(CodeTreeImmed(Value_t(1)), this);
     else
-      orig.push_back(OpcodePlain(op));
+      return CodeTreeAD(CodeTreeImmed(Value_t(0)), this);
   }
 
-  return orig;
+  // derivative being built for regular opcodes
+  CodeTreeAD diff;
+
+  // get opcode and parameter list
+  OPCODE op = func.GetOpcode();
+  const std::vector<CodeTree<Value_t> > & param_plain = func.GetParams();
+
+  // augment the params to use the CodeTreeAD class
+  std::vector<CodeTreeAD> param;
+  unsigned int i, j, nparam = param_plain.size();
+  for (i = 0; i < nparam; ++i)
+    param.push_back(CodeTreeAD(param_plain[i], this));
+
+  // short hand for the first three parameters
+  CodeTreeAD a = nparam > 0 ? param[0] : CodeTreeAD(),
+             b = nparam > 1 ? param[1] : CodeTreeAD(),
+             c = nparam > 2 ? param[2] : CodeTreeAD();
+
+  switch (op)
+  {
+    //
+    // these opcodes can take an arbitrary number of parameters
+    //
+
+    case cAdd:
+    case cSub:
+      diff.SetOpcode(op);
+      for (i = 0; i < nparam; ++i)
+        diff.AddParam(DiffTree(param[i], var));
+      break;
+
+    case cMul:
+      diff.SetOpcode(cAdd);
+      for (i = 0; i < nparam; ++i)
+      {
+        CodeTree<Value_t> sub;
+        sub.SetOpcode(cMul);
+        for (j = 0; j < nparam; ++j)
+          sub.AddParam(i==j ? DiffTree(param[j], var) : param[j]);
+        diff.AddParam(sub);
+      }
+      break;
+
+    //
+    // these opcodes can take a fixed number of parameters
+    //
+
+    case cDiv:
+      // da/b - db/b^2
+      return a[var]/b - b[var] / MakeTree(cPow, b, CodeTreeAD(2));
+
+    case cNeg:
+      return -a[var];
+    case cInv:
+      return -a[var] / MakeTree(cPow, a, CodeTreeAD(2));
+
+    case cSin:
+      return a[var] * MakeTree(cCos, a);
+    case cCos:
+      return -a[var] * MakeTree(cSin, a);
+
+    case cSinh:
+      return a[var] * MakeTree(cCosh, a);
+    case cCosh:
+      return a[var] * MakeTree(cSinh, a); // no -
+
+    case cAsin:
+      // da/sqrt(1-a^2)
+      return a[var] / MakeTree(cSqrt, CodeTreeAD(1) - MakeTree(cSqr, a));
+    case cAcos:
+      // -da/sqrt(1-a^2)
+      return -a[var] / MakeTree(cSqrt, CodeTreeAD(1) - MakeTree(cSqr, a));
+    case cAtan :
+      // da/(a^2+1)
+      return a[var] / (MakeTree(cSqr, a) + CodeTreeAD(1));
+    case cAtan2 :
+      // (b*da-a*db)/(a^2+b^2)
+      return (b * a[var] - a * b[var]) / (MakeTree(cSqr, a) + MakeTree(cSqr, b));
+
+    case cPow:
+      return MakeTree(cPow, a, b) * (b[var] * MakeTree(cLog, a) + b * a[var]/a);
+    case cLog:
+      return a[var]/a;
+    case cExp:
+      return a[var] * MakeTree(cExp, a);
+
+    //
+    // the derivatives of these could be undefined at a finite number of points (one)
+    //
+
+    case cIf:
+      // we diff the two branches, but not the condition
+      diff.SetOpcode(cIf);
+      diff.AddParam(a);
+      diff.AddParam(b[var]);
+      diff.AddParam(c[var]);
+      break;
+
+    case cAbs:
+      // da*a/|a|
+      return a[var]*a/MakeTree(cAbs, a);
+
+    case cMax:
+      diff.SetOpcode(cIf);
+      diff.AddParam(MakeTree(cLess, a, b));
+      diff.AddParam(b[var]);
+      diff.AddParam(a[var]);
+      break;
+    case cMin:
+      diff.SetOpcode(cIf);
+      diff.AddParam(MakeTree(cLess, a, b));
+      diff.AddParam(a[var]);
+      diff.AddParam(b[var]);
+      break;
+
+    //
+    // the derivatives of these are undefined in a countable number of points, we refuse to take them
+    // TODO: we could wrap those in an if statement, that returns 1/0 at the undefined points!
+    //
+
+    case cFloor:
+    case cCeil:
+    case cTrunc:
+    case cEqual:
+    case cNEqual:
+    case cLess:
+    case cLessOrEq:
+    case cGreater:
+    case cGreaterOrEq:
+      throw FunctionParserADBase<Value_t>::RefuseToTakeCrazyDerivativeException;
+
+    // these opcodes will never appear in the tree when building with keep_powi == false
+    // they will be replaced by cPow, cMul, cDiv etc.:
+    // cLog10, cLog2, cHypot, cExp2, cRSqrt, cCbrt, cInv, cCot, cCsc, cSec
+    // cSqr, cSqrt, cInt, cLog2by, cSinCos, cSinhCosh, cRSub, cTan, cTanh
+
+    case cFCall:
+      if (func.GetFuncNo() == this->parser->mFPlog)
+      {
+        // a<b ? (1/b - 1/(b*b)*(a-b) + 1/b^3 * (a-b)^2) : 1/a
+        diff.SetOpcode(cIf);
+        diff.AddParam(MakeTree(cLess, a, b));
+        diff.AddParam(MakeTree(cInv, b) - MakeTree(cInv, b*b) * (a-b)
+                      + MakeTree(cPow, b, CodeTreeAD(-3)) * MakeTree(cSqr, a-b));
+        diff.AddParam(MakeTree(cInv, a));
+        break;
+      }
+      // fall through to undefined
+
+    case cPCall:
+    default:
+      throw FunctionParserADBase<Value_t>::UnsupportedOpcodeException;
+  }
+
+  return diff;
 }
 
 template<typename Value_t>
-int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
+int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 {
   this->ForceDeepCopy();
   mData = this->getParserData();
+  return ad->AutoDiff(var_name);
+}
+
+template<typename Value_t>
+int ADImplementation<Value_t>::AutoDiff(const std::string& var_name)
+{
+  CodeTreeAD orig = CodeTreeAD(this);
+  typename FunctionParserBase<Value_t>::Data * mData = this->parser->mData;
+  orig.GenerateFrom(*mData);
 
   // get c string and length of var argument
-  const unsigned len = unsigned(var.size());
-  const char* name = var.c_str();
-
-  // reset opcode of the variable we diff for
-  mVarOp = 0;
+  const unsigned len = unsigned(var_name.size());
+  const char* name = var_name.c_str();
 
   // figure out the opcode number that corresponds to 'var', the variable we diff for
+  unsigned int var = 0;
   typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t> & NamePtrs = mData->mNamePtrs;
   typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t>::iterator vi;
   for (vi = NamePtrs.begin(); vi != NamePtrs.end(); ++vi)
   {
     if (len == vi->first.nameLength &&
         std::memcmp(name, vi->first.name, len) == 0) {
-      mVarOp = vi->second.index;
+      var = vi->second.index;
       break;
     }
   }
 
   // invalid var argument, variable not found
-  if (mVarOp == 0) return 1;
+  if (var == 0) return 1;
 
-  // uncompressed immediate data representation
-  // we also expand a few multiopcodes into elementary opcodes
-  // to keep the diff rules above simple (cDup must be expanded in this step)
-  DiffProgramFragment orig, diff;
-
+  CodeTree<Value_t> diff;
   try
   {
-    // expand the internal byte code into a more convenient form
-    orig = Expand();
-
-    diff  = DiffFunction(orig);
-
-    // create compressed program representation
-    Commit(diff);
+    diff = DiffTree(orig, var);
   }
   catch(std::exception &e)
   {
     static bool printed_error = false;
-    if (!printed_error && !mSilenceErrors)
+    if (!printed_error && !this->parser->mSilenceErrors)
     {
       std::cerr << "AutoDiff exception: " << e.what() << " (this message will only be shown once per process)"<< std::endl;
       printed_error = true;
     }
-    setZero();
+    this->parser->setZero();
     return 0;
   }
 
+  // DumpTreeWithIndent(diff);
+  // std::cout << '\n';
+  // FPoptimizer_Optimize::ApplyGrammars(diff);
+  // DumpTreeWithIndent(diff);
+
+  std::vector<unsigned> byteCode;
+  std::vector<Value_t> immed;
+  size_t stacktop_max = 0;
+
+  diff.SynthesizeByteCode(byteCode, immed, stacktop_max);
+
+  if(mData->mStackSize != stacktop_max)
+  {
+      mData->mStackSize = unsigned(stacktop_max); // Note: Ignoring GCC warning here.
+  #if !defined(FP_USE_THREAD_SAFE_EVAL) && \
+  !defined(FP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA)
+      mData->mStack.resize(stacktop_max);
+  #endif
+  }
+
+  mData->mByteCode.swap(byteCode);
+  mData->mImmed.swap(immed);
+
   return -1;
 }
+
 
 template<typename Value_t>
 bool FunctionParserADBase<Value_t>::JITCompile(bool)
@@ -1202,20 +837,10 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
 }
 #endif
 
-template<typename Value_t>
-FunctionParserADBase<Value_t>::OpcodeImmediate::OpcodeImmediate(Value_t _second) :
-    OpcodePacket(FUNCTIONPARSERTYPES::cImmed, _second, 0)
-{
-}
-
-template<typename Value_t>
-FunctionParserADBase<Value_t>::OpcodeFCall::OpcodeFCall(unsigned _index) :
-    OpcodePacket(FUNCTIONPARSERTYPES::cFCall, Value_t(), _index)
-{
-}
 
 #define FUNCTIONPARSERAD_INSTANTIATE_CLASS(type) \
-    template class FunctionParserADBase< type >;
+    template class FunctionParserADBase< type >; \
+    template class ADImplementation< type >;
 
 #ifndef FP_DISABLE_DOUBLE_TYPE
 FUNCTIONPARSERAD_INSTANTIATE_CLASS(double)
