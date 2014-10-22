@@ -1493,7 +1493,7 @@ it will print its log to the screen. Pretty easy, huh?
 *   example-opt -d 1 -n 20 
 ***************************************************************
  
-Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex4/.libs/example-opt -d 1 -n 20
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/introduction/introduction_ex4/.libs/example-opt -d 1 -n 20
 
  Mesh Information:
   mesh_dimension()=1
@@ -1514,8 +1514,9 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
    System #0, "Poisson"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" 
     n_dofs()=41
     n_local_dofs()=41
     n_constrained_dofs()=2
@@ -1530,6 +1531,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
     DofMap Constraints
       Number of DoF Constraints = 2
       Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
 
  Mesh Information:
   mesh_dimension()=1
@@ -1546,36 +1548,93 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
   processor_id()=0
 
 
- -------------------------------------------------------------------------------------------------------------------
-| Time:           Wed Oct 22 11:54:05 2014                                                                          |
-| OS:             Darwin                                                                                            |
-| HostName:       benjamins-mbp.ndc.nasa.gov                                                                        |
-| OS Release:     13.4.0                                                                                            |
-| OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
-| Machine:        x86_64                                                                                            |
-| Username:       benkirk                                                                                           |
-| Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
-|  'METHODS=opt'                                                                                                    |
-|  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
-|  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
-|  'PETSC_ARCH=macosx'                                                                                              |
-|  'SLEPC_DIR=/usr/local/slepc/3.5.1'                                                                               |
-|  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
- -------------------------------------------------------------------------------------------------------------------
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:57 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.000366, Active time=0.000123                                     |
+| Matrix Assembly Performance: Alive time=0.011277, Active time=0.000266                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| Fe                            20         0.0000      0.000001    0.0000      0.000001    17.07    17.07    |
-| Ke                            20         0.0000      0.000000    0.0000      0.000000    3.25     3.25     |
-| elem init                     20         0.0001      0.000003    0.0001      0.000003    55.28    55.28    |
-| matrix insertion              20         0.0000      0.000002    0.0000      0.000002    24.39    24.39    |
+| Fe                            20         0.0000      0.000002    0.0000      0.000002    14.29    14.29    |
+| Ke                            20         0.0000      0.000000    0.0000      0.000000    2.26     2.26     |
+| elem init                     20         0.0002      0.000009    0.0002      0.000009    65.04    65.04    |
+| matrix insertion              20         0.0000      0.000002    0.0000      0.000002    18.42    18.42    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       80         0.0001                                          100.00            |
+| Totals:                       80         0.0003                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
+
+ ---------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.100981, Active time=0.014217                                                      |
+ ---------------------------------------------------------------------------------------------------------------------
+| Event                                  nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                   w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|---------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                     |
+|                                                                                                                     |
+| DofMap                                                                                                              |
+|   add_neighbors_to_send_list()         1          0.0000      0.000015    0.0000      0.000015    0.11     0.11     |
+|   build_constraint_matrix_and_vector() 20         0.0000      0.000000    0.0000      0.000000    0.06     0.06     |
+|   build_sparsity()                     1          0.0001      0.000099    0.0001      0.000114    0.70     0.80     |
+|   create_dof_constraints()             1          0.0002      0.000241    0.0003      0.000261    1.70     1.84     |
+|   distribute_dofs()                    1          0.0001      0.000067    0.0002      0.000155    0.47     1.09     |
+|   dof_indices()                        80         0.0001      0.000001    0.0001      0.000001    0.36     0.36     |
+|   hetero_cnstrn_elem_mat_vec()         20         0.0106      0.000532    0.0106      0.000532    74.80    74.80    |
+|   prepare_send_list()                  1          0.0000      0.000001    0.0000      0.000001    0.01     0.01     |
+|   reinit()                             1          0.0001      0.000087    0.0001      0.000087    0.61     0.61     |
+|                                                                                                                     |
+| EquationSystems                                                                                                     |
+|   build_solution_vector()              1          0.0002      0.000153    0.0002      0.000165    1.08     1.16     |
+|                                                                                                                     |
+| FE                                                                                                                  |
+|   compute_shape_functions()            20         0.0000      0.000001    0.0000      0.000001    0.18     0.18     |
+|   init_shape_functions()               1          0.0000      0.000023    0.0000      0.000023    0.16     0.16     |
+|                                                                                                                     |
+| FEMap                                                                                                               |
+|   compute_affine_map()                 20         0.0000      0.000001    0.0000      0.000001    0.13     0.13     |
+|   init_reference_to_physical_map()     1          0.0000      0.000021    0.0000      0.000021    0.15     0.15     |
+|                                                                                                                     |
+| GnuPlotIO                                                                                                           |
+|   write_nodal_data()                   1          0.0004      0.000405    0.0004      0.000405    2.85     2.85     |
+|                                                                                                                     |
+| Mesh                                                                                                                |
+|   find_neighbors()                     1          0.0002      0.000171    0.0002      0.000171    1.20     1.20     |
+|   renumber_nodes_and_elem()            2          0.0001      0.000037    0.0001      0.000037    0.52     0.52     |
+|                                                                                                                     |
+| MeshOutput                                                                                                          |
+|   write_equation_systems()             1          0.0000      0.000045    0.0006      0.000615    0.32     4.33     |
+|                                                                                                                     |
+| MeshTools::Generation                                                                                               |
+|   build_cube()                         1          0.0001      0.000108    0.0001      0.000108    0.76     0.76     |
+|                                                                                                                     |
+| Parallel                                                                                                            |
+|   allgather()                          1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                     |
+| Partitioner                                                                                                         |
+|   single_partition()                   1          0.0000      0.000023    0.0000      0.000023    0.16     0.16     |
+|                                                                                                                     |
+| PetscLinearSolver                                                                                                   |
+|   solve()                              1          0.0012      0.001248    0.0012      0.001248    8.78     8.78     |
+|                                                                                                                     |
+| System                                                                                                              |
+|   assemble()                           1          0.0007      0.000699    0.0115      0.011453    4.92     80.56    |
+ ---------------------------------------------------------------------------------------------------------------------
+| Totals:                                179        0.0142                                          100.00            |
+ ---------------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
@@ -1587,7 +1646,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
 *   example-opt -d 2 -n 15 
 ***************************************************************
  
-Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex4/.libs/example-opt -d 2 -n 15
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/introduction/introduction_ex4/.libs/example-opt -d 2 -n 15
 
  Mesh Information:
   mesh_dimension()=2
@@ -1608,8 +1667,9 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
    System #0, "Poisson"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" 
     n_dofs()=961
     n_local_dofs()=961
     n_constrained_dofs()=120
@@ -1625,6 +1685,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Number of DoF Constraints = 120
       Number of Heterogenous Constraints= 118
       Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
 
  Mesh Information:
   mesh_dimension()=2
@@ -1641,36 +1702,96 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
   processor_id()=0
 
 
- -------------------------------------------------------------------------------------------------------------------
-| Time:           Wed Oct 22 11:54:05 2014                                                                          |
-| OS:             Darwin                                                                                            |
-| HostName:       benjamins-mbp.ndc.nasa.gov                                                                        |
-| OS Release:     13.4.0                                                                                            |
-| OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
-| Machine:        x86_64                                                                                            |
-| Username:       benkirk                                                                                           |
-| Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
-|  'METHODS=opt'                                                                                                    |
-|  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
-|  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
-|  'PETSC_ARCH=macosx'                                                                                              |
-|  'SLEPC_DIR=/usr/local/slepc/3.5.1'                                                                               |
-|  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
- -------------------------------------------------------------------------------------------------------------------
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:57 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.002865, Active time=0.002128                                     |
+| Matrix Assembly Performance: Alive time=0.015157, Active time=0.004465                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| Fe                            225        0.0005      0.000002    0.0005      0.000002    23.50    23.50    |
-| Ke                            225        0.0004      0.000002    0.0004      0.000002    19.03    19.03    |
-| elem init                     225        0.0008      0.000004    0.0008      0.000004    37.88    37.88    |
-| matrix insertion              225        0.0004      0.000002    0.0004      0.000002    19.60    19.60    |
+| Fe                            225        0.0013      0.000006    0.0013      0.000006    28.09    28.09    |
+| Ke                            225        0.0006      0.000003    0.0006      0.000003    13.59    13.59    |
+| elem init                     225        0.0020      0.000009    0.0020      0.000009    43.96    43.96    |
+| matrix insertion              225        0.0006      0.000003    0.0006      0.000003    14.36    14.36    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       900        0.0021                                          100.00            |
+| Totals:                       900        0.0045                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
+
+ ---------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.116423, Active time=0.030562                                                      |
+ ---------------------------------------------------------------------------------------------------------------------
+| Event                                  nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                   w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|---------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                     |
+|                                                                                                                     |
+| DofMap                                                                                                              |
+|   add_neighbors_to_send_list()         1          0.0001      0.000089    0.0001      0.000089    0.29     0.29     |
+|   build_constraint_matrix_and_vector() 225        0.0002      0.000001    0.0002      0.000001    0.62     0.62     |
+|   build_sparsity()                     1          0.0008      0.000819    0.0010      0.001006    2.68     3.29     |
+|   create_dof_constraints()             1          0.0013      0.001282    0.0027      0.002693    4.19     8.81     |
+|   distribute_dofs()                    1          0.0002      0.000184    0.0007      0.000702    0.60     2.30     |
+|   dof_indices()                        900        0.0007      0.000001    0.0007      0.000001    2.43     2.43     |
+|   hetero_cnstrn_elem_mat_vec()         225        0.0095      0.000042    0.0095      0.000042    31.24    31.24    |
+|   prepare_send_list()                  1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                             1          0.0005      0.000517    0.0005      0.000517    1.69     1.69     |
+|                                                                                                                     |
+| EquationSystems                                                                                                     |
+|   build_solution_vector()              1          0.0004      0.000431    0.0006      0.000616    1.41     2.02     |
+|                                                                                                                     |
+| ExodusII_IO                                                                                                         |
+|   write_nodal_data()                   1          0.0022      0.002248    0.0022      0.002248    7.36     7.36     |
+|                                                                                                                     |
+| FE                                                                                                                  |
+|   compute_shape_functions()            285        0.0010      0.000004    0.0010      0.000004    3.28     3.28     |
+|   init_shape_functions()               61         0.0001      0.000001    0.0001      0.000001    0.20     0.20     |
+|   inverse_map()                        180        0.0004      0.000002    0.0004      0.000002    1.21     1.21     |
+|                                                                                                                     |
+| FEMap                                                                                                               |
+|   compute_affine_map()                 285        0.0003      0.000001    0.0003      0.000001    1.02     1.02     |
+|   compute_face_map()                   60         0.0002      0.000004    0.0006      0.000010    0.81     2.05     |
+|   init_face_shape_functions()          60         0.0001      0.000001    0.0001      0.000001    0.17     0.17     |
+|   init_reference_to_physical_map()     61         0.0003      0.000005    0.0003      0.000005    0.91     0.91     |
+|                                                                                                                     |
+| Mesh                                                                                                                |
+|   find_neighbors()                     1          0.0006      0.000641    0.0006      0.000641    2.10     2.10     |
+|   renumber_nodes_and_elem()            2          0.0001      0.000044    0.0001      0.000044    0.28     0.28     |
+|                                                                                                                     |
+| MeshOutput                                                                                                          |
+|   write_equation_systems()             1          0.0000      0.000048    0.0029      0.002913    0.16     9.53     |
+|                                                                                                                     |
+| MeshTools::Generation                                                                                               |
+|   build_cube()                         1          0.0005      0.000496    0.0005      0.000496    1.62     1.62     |
+|                                                                                                                     |
+| Parallel                                                                                                            |
+|   allgather()                          1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                     |
+| Partitioner                                                                                                         |
+|   single_partition()                   1          0.0001      0.000056    0.0001      0.000056    0.18     0.18     |
+|                                                                                                                     |
+| PetscLinearSolver                                                                                                   |
+|   solve()                              1          0.0068      0.006804    0.0068      0.006804    22.26    22.26    |
+|                                                                                                                     |
+| System                                                                                                              |
+|   assemble()                           1          0.0041      0.004053    0.0153      0.015297    13.26    50.05    |
+ ---------------------------------------------------------------------------------------------------------------------
+| Totals:                                2359       0.0306                                          100.00            |
+ ---------------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
@@ -1682,7 +1803,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
 *   example-opt -d 3 -n 6 
 ***************************************************************
  
-Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex4/.libs/example-opt -d 3 -n 6
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/introduction/introduction_ex4/.libs/example-opt -d 3 -n 6
 
  Mesh Information:
   mesh_dimension()=3
@@ -1703,8 +1824,9 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
    System #0, "Poisson"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" 
     n_dofs()=2197
     n_local_dofs()=2197
     n_constrained_dofs()=866
@@ -1720,6 +1842,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Number of DoF Constraints = 866
       Number of Heterogenous Constraints= 818
       Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
 
  Mesh Information:
   mesh_dimension()=3
@@ -1736,36 +1859,98 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
   processor_id()=0
 
 
- -------------------------------------------------------------------------------------------------------------------
-| Time:           Wed Oct 22 11:54:06 2014                                                                          |
-| OS:             Darwin                                                                                            |
-| HostName:       benjamins-mbp.ndc.nasa.gov                                                                        |
-| OS Release:     13.4.0                                                                                            |
-| OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
-| Machine:        x86_64                                                                                            |
-| Username:       benkirk                                                                                           |
-| Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
-|  'METHODS=opt'                                                                                                    |
-|  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
-|  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
-|  'PETSC_ARCH=macosx'                                                                                              |
-|  'SLEPC_DIR=/usr/local/slepc/3.5.1'                                                                               |
-|  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
- -------------------------------------------------------------------------------------------------------------------
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:58 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Matrix Assembly Performance: Alive time=0.024151, Active time=0.020492                                     |
+| Matrix Assembly Performance: Alive time=0.055881, Active time=0.039155                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| Fe                            216        0.0019      0.000009    0.0019      0.000009    9.30     9.30     |
-| Ke                            216        0.0090      0.000042    0.0090      0.000042    44.00    44.00    |
-| elem init                     216        0.0061      0.000028    0.0061      0.000028    29.71    29.71    |
-| matrix insertion              216        0.0035      0.000016    0.0035      0.000016    16.99    16.99    |
+| Fe                            216        0.0047      0.000022    0.0047      0.000022    12.13    12.13    |
+| Ke                            216        0.0151      0.000070    0.0151      0.000070    38.59    38.59    |
+| elem init                     216        0.0121      0.000056    0.0121      0.000056    30.88    30.88    |
+| matrix insertion              216        0.0072      0.000033    0.0072      0.000033    18.40    18.40    |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       864        0.0205                                          100.00            |
+| Totals:                       864        0.0392                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
+
+ ---------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.292585, Active time=0.17899                                                       |
+ ---------------------------------------------------------------------------------------------------------------------
+| Event                                  nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                   w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|---------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                     |
+|                                                                                                                     |
+| DofMap                                                                                                              |
+|   add_neighbors_to_send_list()         1          0.0002      0.000202    0.0002      0.000202    0.11     0.11     |
+|   build_constraint_matrix_and_vector() 216        0.0015      0.000007    0.0015      0.000007    0.83     0.83     |
+|   build_sparsity()                     1          0.0044      0.004390    0.0047      0.004743    2.45     2.65     |
+|   create_dof_constraints()             1          0.0132      0.013250    0.0958      0.095791    7.40     53.52    |
+|   distribute_dofs()                    1          0.0004      0.000359    0.0014      0.001417    0.20     0.79     |
+|   dof_indices()                        864        0.0017      0.000002    0.0017      0.000002    0.95     0.95     |
+|   hetero_cnstrn_elem_mat_vec()         216        0.0139      0.000064    0.0139      0.000064    7.76     7.76     |
+|   prepare_send_list()                  1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                             1          0.0011      0.001057    0.0011      0.001057    0.59     0.59     |
+|                                                                                                                     |
+| EquationSystems                                                                                                     |
+|   build_solution_vector()              1          0.0008      0.000800    0.0011      0.001104    0.45     0.62     |
+|                                                                                                                     |
+| ExodusII_IO                                                                                                         |
+|   write_nodal_data()                   1          0.0034      0.003368    0.0034      0.003368    1.88     1.88     |
+|                                                                                                                     |
+| FE                                                                                                                  |
+|   compute_shape_functions()            1224       0.0150      0.000012    0.0150      0.000012    8.39     8.39     |
+|   init_shape_functions()               1009       0.0008      0.000001    0.0008      0.000001    0.45     0.45     |
+|   inverse_map()                        2376       0.0256      0.000011    0.0256      0.000011    14.29    14.29    |
+|                                                                                                                     |
+| FEMap                                                                                                               |
+|   compute_affine_map()                 1224       0.0036      0.000003    0.0036      0.000003    2.02     2.02     |
+|   compute_edge_map()                   792        0.0005      0.000001    0.0005      0.000001    0.30     0.30     |
+|   compute_face_map()                   216        0.0008      0.000004    0.0008      0.000004    0.44     0.44     |
+|   init_edge_shape_functions()          792        0.0006      0.000001    0.0006      0.000001    0.32     0.32     |
+|   init_face_shape_functions()          216        0.0024      0.000011    0.0024      0.000011    1.35     1.35     |
+|   init_reference_to_physical_map()     1009       0.0424      0.000042    0.0424      0.000042    23.69    23.69    |
+|                                                                                                                     |
+| Mesh                                                                                                                |
+|   find_neighbors()                     1          0.0006      0.000576    0.0006      0.000576    0.32     0.32     |
+|   renumber_nodes_and_elem()            2          0.0002      0.000080    0.0002      0.000080    0.09     0.09     |
+|                                                                                                                     |
+| MeshOutput                                                                                                          |
+|   write_equation_systems()             1          0.0001      0.000055    0.0045      0.004527    0.03     2.53     |
+|                                                                                                                     |
+| MeshTools::Generation                                                                                               |
+|   build_cube()                         1          0.0006      0.000627    0.0006      0.000627    0.35     0.35     |
+|                                                                                                                     |
+| Parallel                                                                                                            |
+|   allgather()                          1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                     |
+| Partitioner                                                                                                         |
+|   single_partition()                   1          0.0001      0.000061    0.0001      0.000061    0.03     0.03     |
+|                                                                                                                     |
+| PetscLinearSolver                                                                                                   |
+|   solve()                              1          0.0157      0.015708    0.0157      0.015708    8.78     8.78     |
+|                                                                                                                     |
+| System                                                                                                              |
+|   assemble()                           1          0.0295      0.029540    0.0561      0.056085    16.50    31.33    |
+ ---------------------------------------------------------------------------------------------------------------------
+| Totals:                                10171      0.1790                                          100.00            |
+ ---------------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************

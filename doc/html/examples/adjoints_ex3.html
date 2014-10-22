@@ -39,58 +39,6 @@
 <div id="content">
 
 <a name="comments"></a> 
-<br><br><br> <h1> The source file H-qoi.h with comments: </h1> 
-<div class = "comment">
-</div>
-
-<div class ="fragment">
-<pre>
-        #ifndef H_QOI_H
-        #define H_QOI_H
-        
-        #include "libmesh/libmesh_common.h"
-        #include "libmesh/elem.h"
-        #include "libmesh/fe_base.h"
-        #include "libmesh/fem_context.h"
-        #include "libmesh/point.h"
-        #include "libmesh/quadrature.h"
-        #include "libmesh/diff_qoi.h"
-        
-</pre>
-</div>
-<div class = "comment">
-Bring in everything from the libMesh namespace
-</div>
-
-<div class ="fragment">
-<pre>
-        using namespace libMesh;
-        
-        class CoupledSystemQoI : public DifferentiableQoI
-        {
-        public:
-          CoupledSystemQoI(){}
-          virtual ~CoupledSystemQoI(){}
-        
-          virtual void init_qoi( std::vector&lt;Number&gt;& sys_qoi);
-          virtual void postprocess( ){}
-        
-          virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);
-        
-          virtual void side_qoi(DiffContext &context, const QoISet & qois);
-        
-          virtual AutoPtr&lt;DifferentiableQoI&gt; clone( )
-          { AutoPtr&lt;DifferentiableQoI&gt; my_clone( new CoupledSystemQoI );
-            *my_clone = *this;
-            return my_clone;
-          }
-        
-        };
-        #endif // H_QOI_H
-</pre>
-</div>
-
-<a name="comments"></a> 
 <br><br><br> <h1> The source file coupled_system.h with comments: </h1> 
 <div class = "comment">
 </div>
@@ -553,6 +501,58 @@ Bring in everything from the libMesh namespace
 </div>
 
 <a name="comments"></a> 
+<br><br><br> <h1> The source file H-qoi.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef H_QOI_H
+        #define H_QOI_H
+        
+        #include "libmesh/libmesh_common.h"
+        #include "libmesh/elem.h"
+        #include "libmesh/fe_base.h"
+        #include "libmesh/fem_context.h"
+        #include "libmesh/point.h"
+        #include "libmesh/quadrature.h"
+        #include "libmesh/diff_qoi.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        class CoupledSystemQoI : public DifferentiableQoI
+        {
+        public:
+          CoupledSystemQoI(){}
+          virtual ~CoupledSystemQoI(){}
+        
+          virtual void init_qoi( std::vector&lt;Number&gt;& sys_qoi);
+          virtual void postprocess( ){}
+        
+          virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);
+        
+          virtual void side_qoi(DiffContext &context, const QoISet & qois);
+        
+          virtual AutoPtr&lt;DifferentiableQoI&gt; clone( )
+          { AutoPtr&lt;DifferentiableQoI&gt; my_clone( new CoupledSystemQoI );
+            *my_clone = *this;
+            return my_clone;
+          }
+        
+        };
+        #endif // H_QOI_H
+</pre>
+</div>
+
+<a name="comments"></a> 
 <br><br><br> <h1> The source file initial.h with comments: </h1> 
 <div class = "comment">
 </div>
@@ -659,279 +659,6 @@ Bring in everything from the libMesh namespace
         void start_output(unsigned int timesteps,
                           std::string filename,
                           std::string varname);
-</pre>
-</div>
-
-<a name="comments"></a> 
-<br><br><br> <h1> The source file H-qoi.C with comments: </h1> 
-<div class = "comment">
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "H-qoi.h"
-        
-</pre>
-</div>
-<div class = "comment">
-Here we define the functions to compute the QoI (side_qoi)
-and supply the right hand side for the associated adjoint problem (side_qoi_derivative)
-
-
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-        using namespace libMesh;
-        
-        void CoupledSystemQoI::init_qoi( std::vector&lt;Number&gt;& sys_qoi)
-        {
-</pre>
-</div>
-<div class = "comment">
-Only 1 qoi to worry about
-</div>
-
-<div class ="fragment">
-<pre>
-          sys_qoi.resize(1);
-          return;
-        }
-        
-</pre>
-</div>
-<div class = "comment">
-This function supplies the right hand side for the adjoint problem
-We only have one QoI, so we don't bother checking the qois argument
-to see if it was requested from us
-</div>
-
-<div class ="fragment">
-<pre>
-        void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
-                                                    const QoISet & /* qois */)
-        {
-          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
-        
-          FEBase* side_fe = NULL;
-          c.get_side_fe( 0, side_fe );
-        
-</pre>
-</div>
-<div class = "comment">
-Element Jacobian * quadrature weights for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = side_fe-&gt;get_JxW();
-        
-</pre>
-</div>
-<div class = "comment">
-Side basis functions
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = side_fe-&gt;get_phi();
-          const std::vector&lt;Point &gt; &q_point = side_fe-&gt;get_xyz();
-        
-</pre>
-</div>
-<div class = "comment">
-The number of local degrees of freedom in each variable
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int n_u_dofs = c.get_dof_indices(1).size();
-        
-          DenseSubVector&lt;Number&gt; &Qu = c.get_qoi_derivatives(0,0);
-          DenseSubVector&lt;Number&gt; &QC = c.get_qoi_derivatives(0,3);
-        
-</pre>
-</div>
-<div class = "comment">
-Now we will build the element Jacobian and residual.
-Constructing the residual requires the solution and its
-gradient from the previous timestep.  This must be
-calculated at each quadrature point by summing the
-solution degree-of-freedom values by the appropriate
-weight functions.
-</div>
-
-<div class ="fragment">
-<pre>
-          unsigned int n_qpoints = c.get_side_qrule().n_points();
-        
-          Number u = 0. ;
-          Number C = 0. ;
-        
-</pre>
-</div>
-<div class = "comment">
-// If side is on outlet
-</div>
-
-<div class ="fragment">
-<pre>
-          if(c.has_side_boundary_id(2))
-            {
-</pre>
-</div>
-<div class = "comment">
-Loop over all the qps on this side
-</div>
-
-<div class ="fragment">
-<pre>
-              for (unsigned int qp=0; qp != n_qpoints; qp++)
-                {
-                  Real x = q_point[qp](0);
-        
-</pre>
-</div>
-<div class = "comment">
-If side is on left outlet
-</div>
-
-<div class ="fragment">
-<pre>
-                  if(x &lt; 0.)
-                    {
-</pre>
-</div>
-<div class = "comment">
-Get u at the qp
-</div>
-
-<div class ="fragment">
-<pre>
-                      u = c.side_value(0,qp);
-                      C = c.side_value(3,qp);
-        
-</pre>
-</div>
-<div class = "comment">
-Add the contribution from each basis function
-</div>
-
-<div class ="fragment">
-<pre>
-                      for (unsigned int i=0; i != n_u_dofs; i++)
-                        {
-                          Qu(i) += JxW[qp] * -phi[i][qp] * C;
-                          QC(i) += JxW[qp] * phi[i][qp] * -u;
-                        }
-                    } // end if
-        
-                } // end quadrature loop
-        
-            } // end if on outlet
-        }
-        
-</pre>
-</div>
-<div class = "comment">
-This function computes the actual QoI
-</div>
-
-<div class ="fragment">
-<pre>
-        void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
-        {
-        
-          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
-        
-</pre>
-</div>
-<div class = "comment">
-First we get some references to cell-specific data that
-will be used to assemble the linear system.
-
-
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-          FEBase* side_fe = NULL;
-          c.get_side_fe( 0, side_fe );
-        
-</pre>
-</div>
-<div class = "comment">
-Element Jacobian * quadrature weights for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = side_fe-&gt;get_JxW();
-        
-          const std::vector&lt;Point &gt; &q_point = side_fe-&gt;get_xyz();
-        
-</pre>
-</div>
-<div class = "comment">
-Loop over qp's, compute the function at each qp and add
-to get the QoI
-
-
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-          unsigned int n_qpoints = c.get_side_qrule().n_points();
-        
-          Number dQoI_0 = 0. ;
-          Number u = 0. ;
-          Number C = 0. ;
-        
-</pre>
-</div>
-<div class = "comment">
-If side is on the left outlet
-</div>
-
-<div class ="fragment">
-<pre>
-          if(c.has_side_boundary_id(2))
-            {
-</pre>
-</div>
-<div class = "comment">
-Loop over all the qps on this side
-</div>
-
-<div class ="fragment">
-<pre>
-              for (unsigned int qp=0; qp != n_qpoints; qp++)
-                {
-                  Real x = q_point[qp](0);
-        
-                  if(x &lt; 0.)
-                    {
-</pre>
-</div>
-<div class = "comment">
-Get u and C at the qp
-</div>
-
-<div class ="fragment">
-<pre>
-                      u = c.side_value(0,qp);
-                      C = c.side_value(3,qp);
-        
-                      dQoI_0 += JxW[qp] * -u * C;
-                    } // end if
-        
-                } // end quadrature loop
-        
-            } // end if on bdry
-        
-          c.get_qois()[0] += dQoI_0;
-        
-        }
 </pre>
 </div>
 
@@ -3868,6 +3595,279 @@ libmesh_error_msg("Fix/remove the unrecognized variables and try again.");
 </div>
 
 <a name="comments"></a> 
+<br><br><br> <h1> The source file H-qoi.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "H-qoi.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Here we define the functions to compute the QoI (side_qoi)
+and supply the right hand side for the associated adjoint problem (side_qoi_derivative)
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        void CoupledSystemQoI::init_qoi( std::vector&lt;Number&gt;& sys_qoi)
+        {
+</pre>
+</div>
+<div class = "comment">
+Only 1 qoi to worry about
+</div>
+
+<div class ="fragment">
+<pre>
+          sys_qoi.resize(1);
+          return;
+        }
+        
+</pre>
+</div>
+<div class = "comment">
+This function supplies the right hand side for the adjoint problem
+We only have one QoI, so we don't bother checking the qois argument
+to see if it was requested from us
+</div>
+
+<div class ="fragment">
+<pre>
+        void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
+                                                    const QoISet & /* qois */)
+        {
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+          FEBase* side_fe = NULL;
+          c.get_side_fe( 0, side_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = side_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+Side basis functions
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = side_fe-&gt;get_phi();
+          const std::vector&lt;Point &gt; &q_point = side_fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_u_dofs = c.get_dof_indices(1).size();
+        
+          DenseSubVector&lt;Number&gt; &Qu = c.get_qoi_derivatives(0,0);
+          DenseSubVector&lt;Number&gt; &QC = c.get_qoi_derivatives(0,3);
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the element Jacobian and residual.
+Constructing the residual requires the solution and its
+gradient from the previous timestep.  This must be
+calculated at each quadrature point by summing the
+solution degree-of-freedom values by the appropriate
+weight functions.
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = c.get_side_qrule().n_points();
+        
+          Number u = 0. ;
+          Number C = 0. ;
+        
+</pre>
+</div>
+<div class = "comment">
+// If side is on outlet
+</div>
+
+<div class ="fragment">
+<pre>
+          if(c.has_side_boundary_id(2))
+            {
+</pre>
+</div>
+<div class = "comment">
+Loop over all the qps on this side
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int qp=0; qp != n_qpoints; qp++)
+                {
+                  Real x = q_point[qp](0);
+        
+</pre>
+</div>
+<div class = "comment">
+If side is on left outlet
+</div>
+
+<div class ="fragment">
+<pre>
+                  if(x &lt; 0.)
+                    {
+</pre>
+</div>
+<div class = "comment">
+Get u at the qp
+</div>
+
+<div class ="fragment">
+<pre>
+                      u = c.side_value(0,qp);
+                      C = c.side_value(3,qp);
+        
+</pre>
+</div>
+<div class = "comment">
+Add the contribution from each basis function
+</div>
+
+<div class ="fragment">
+<pre>
+                      for (unsigned int i=0; i != n_u_dofs; i++)
+                        {
+                          Qu(i) += JxW[qp] * -phi[i][qp] * C;
+                          QC(i) += JxW[qp] * phi[i][qp] * -u;
+                        }
+                    } // end if
+        
+                } // end quadrature loop
+        
+            } // end if on outlet
+        }
+        
+</pre>
+</div>
+<div class = "comment">
+This function computes the actual QoI
+</div>
+
+<div class ="fragment">
+<pre>
+        void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
+        {
+        
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+First we get some references to cell-specific data that
+will be used to assemble the linear system.
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+          FEBase* side_fe = NULL;
+          c.get_side_fe( 0, side_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = side_fe-&gt;get_JxW();
+        
+          const std::vector&lt;Point &gt; &q_point = side_fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over qp's, compute the function at each qp and add
+to get the QoI
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = c.get_side_qrule().n_points();
+        
+          Number dQoI_0 = 0. ;
+          Number u = 0. ;
+          Number C = 0. ;
+        
+</pre>
+</div>
+<div class = "comment">
+If side is on the left outlet
+</div>
+
+<div class ="fragment">
+<pre>
+          if(c.has_side_boundary_id(2))
+            {
+</pre>
+</div>
+<div class = "comment">
+Loop over all the qps on this side
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int qp=0; qp != n_qpoints; qp++)
+                {
+                  Real x = q_point[qp](0);
+        
+                  if(x &lt; 0.)
+                    {
+</pre>
+</div>
+<div class = "comment">
+Get u and C at the qp
+</div>
+
+<div class ="fragment">
+<pre>
+                      u = c.side_value(0,qp);
+                      C = c.side_value(3,qp);
+        
+                      dQoI_0 += JxW[qp] * -u * C;
+                    } // end if
+        
+                } // end quadrature loop
+        
+            } // end if on bdry
+        
+          c.get_qois()[0] += dQoI_0;
+        
+        }
+</pre>
+</div>
+
+<a name="comments"></a> 
 <br><br><br> <h1> The source file initial.C with comments: </h1> 
 <div class = "comment">
 </div>
@@ -4015,44 +4015,6 @@ Write new headers if we're starting a new simulation
 </pre>
 </div>
 
-<a name="nocomments"></a> 
-<br><br><br> <h1> The source file H-qoi.h without comments: </h1> 
-<pre> 
-  #ifndef H_QOI_H
-  #define H_QOI_H
-  
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_common.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_context.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/point.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/diff_qoi.h&quot;</FONT></B>
-  
-  using namespace libMesh;
-  
-  <B><FONT COLOR="#228B22">class</FONT></B> CoupledSystemQoI : <B><FONT COLOR="#228B22">public</FONT></B> DifferentiableQoI
-  {
-  <B><FONT COLOR="#228B22">public</FONT></B>:
-    CoupledSystemQoI(){}
-    <B><FONT COLOR="#228B22">virtual</FONT></B> ~CoupledSystemQoI(){}
-  
-    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_qoi( std::vector&lt;Number&gt;&amp; sys_qoi);
-    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> postprocess( ){}
-  
-    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi_derivative(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
-  
-    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
-  
-    <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;DifferentiableQoI&gt; clone( )
-    { AutoPtr&lt;DifferentiableQoI&gt; my_clone( <B><FONT COLOR="#A020F0">new</FONT></B> CoupledSystemQoI );
-      *my_clone = *<B><FONT COLOR="#A020F0">this</FONT></B>;
-      <B><FONT COLOR="#A020F0">return</FONT></B> my_clone;
-    }
-  
-  };
-  #endif <I><FONT COLOR="#B22222">// H_QOI_H
-</pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file coupled_system.h without comments: </h1> 
 <pre> 
@@ -4333,6 +4295,44 @@ Write new headers if we're starting a new simulation
   #endif <I><FONT COLOR="#B22222">// __fem_parameters_h__
 </pre> 
 <a name="nocomments"></a> 
+<br><br><br> <h1> The source file H-qoi.h without comments: </h1> 
+<pre> 
+  #ifndef H_QOI_H
+  #define H_QOI_H
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_common.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_context.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/point.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/diff_qoi.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> CoupledSystemQoI : <B><FONT COLOR="#228B22">public</FONT></B> DifferentiableQoI
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+    CoupledSystemQoI(){}
+    <B><FONT COLOR="#228B22">virtual</FONT></B> ~CoupledSystemQoI(){}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_qoi( std::vector&lt;Number&gt;&amp; sys_qoi);
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> postprocess( ){}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi_derivative(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;DifferentiableQoI&gt; clone( )
+    { AutoPtr&lt;DifferentiableQoI&gt; my_clone( <B><FONT COLOR="#A020F0">new</FONT></B> CoupledSystemQoI );
+      *my_clone = *<B><FONT COLOR="#A020F0">this</FONT></B>;
+      <B><FONT COLOR="#A020F0">return</FONT></B> my_clone;
+    }
+  
+  };
+  #endif <I><FONT COLOR="#B22222">// H_QOI_H
+</pre> 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The source file initial.h without comments: </h1> 
 <pre> 
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/parameters.h&quot;</FONT></B>
@@ -4399,108 +4399,6 @@ Write new headers if we're starting a new simulation
   <B><FONT COLOR="#228B22">void</FONT></B> start_output(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> timesteps,
                     <B><FONT COLOR="#5F9EA0">std</FONT></B>::string filename,
                     <B><FONT COLOR="#5F9EA0">std</FONT></B>::string varname);
-</pre> 
-<a name="nocomments"></a> 
-<br><br><br> <h1> The source file H-qoi.C without comments: </h1> 
-<pre> 
-  #include <B><FONT COLOR="#BC8F8F">&quot;H-qoi.h&quot;</FONT></B>
-  
-  
-  using namespace libMesh;
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystemQoI::init_qoi( std::vector&lt;Number&gt;&amp; sys_qoi)
-  {
-    sys_qoi.resize(1);
-    <B><FONT COLOR="#A020F0">return</FONT></B>;
-  }
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystemQoI::side_qoi_derivative (DiffContext &amp;context,
-                                              <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
-  {
-    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
-  
-    FEBase* side_fe = NULL;
-    c.get_side_fe( 0, side_fe );
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = side_fe-&gt;get_phi();
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = side_fe-&gt;get_xyz();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(1).size();
-  
-    DenseSubVector&lt;Number&gt; &amp;Qu = c.get_qoi_derivatives(0,0);
-    DenseSubVector&lt;Number&gt; &amp;QC = c.get_qoi_derivatives(0,3);
-  
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
-  
-    Number u = 0. ;
-    Number C = 0. ;
-  
-    <B><FONT COLOR="#A020F0">if</FONT></B>(c.has_side_boundary_id(2))
-      {
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
-          {
-            Real x = q_point[qp](0);
-  
-            <B><FONT COLOR="#A020F0">if</FONT></B>(x &lt; 0.)
-              {
-                u = c.side_value(0,qp);
-                C = c.side_value(3,qp);
-  
-                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
-                  {
-                    Qu(i) += JxW[qp] * -phi[i][qp] * C;
-                    QC(i) += JxW[qp] * phi[i][qp] * -u;
-                  }
-              } <I><FONT COLOR="#B22222">// end if
-</FONT></I>  
-          } <I><FONT COLOR="#B22222">// end quadrature loop
-</FONT></I>  
-      } <I><FONT COLOR="#B22222">// end if on outlet
-</FONT></I>  }
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystemQoI::side_qoi(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
-  {
-  
-    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
-  
-  
-    FEBase* side_fe = NULL;
-    c.get_side_fe( 0, side_fe );
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = side_fe-&gt;get_xyz();
-  
-  
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
-  
-    Number dQoI_0 = 0. ;
-    Number u = 0. ;
-    Number C = 0. ;
-  
-    <B><FONT COLOR="#A020F0">if</FONT></B>(c.has_side_boundary_id(2))
-      {
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
-          {
-            Real x = q_point[qp](0);
-  
-            <B><FONT COLOR="#A020F0">if</FONT></B>(x &lt; 0.)
-              {
-                u = c.side_value(0,qp);
-                C = c.side_value(3,qp);
-  
-                dQoI_0 += JxW[qp] * -u * C;
-              } <I><FONT COLOR="#B22222">// end if
-</FONT></I>  
-          } <I><FONT COLOR="#B22222">// end quadrature loop
-</FONT></I>  
-      } <I><FONT COLOR="#B22222">// end if on bdry
-</FONT></I>  
-    c.get_qois()[0] += dQoI_0;
-  
-  }
 </pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file adjoints_ex3.C without comments: </h1> 
@@ -6006,6 +5904,108 @@ Write new headers if we're starting a new simulation
   }
 </pre> 
 <a name="nocomments"></a> 
+<br><br><br> <h1> The source file H-qoi.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;H-qoi.h&quot;</FONT></B>
+  
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystemQoI::init_qoi( std::vector&lt;Number&gt;&amp; sys_qoi)
+  {
+    sys_qoi.resize(1);
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystemQoI::side_qoi_derivative (DiffContext &amp;context,
+                                              <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
+  {
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* side_fe = NULL;
+    c.get_side_fe( 0, side_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = side_fe-&gt;get_phi();
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = side_fe-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices(1).size();
+  
+    DenseSubVector&lt;Number&gt; &amp;Qu = c.get_qoi_derivatives(0,0);
+    DenseSubVector&lt;Number&gt; &amp;QC = c.get_qoi_derivatives(0,3);
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
+  
+    Number u = 0. ;
+    Number C = 0. ;
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(c.has_side_boundary_id(2))
+      {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+          {
+            Real x = q_point[qp](0);
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B>(x &lt; 0.)
+              {
+                u = c.side_value(0,qp);
+                C = c.side_value(3,qp);
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
+                  {
+                    Qu(i) += JxW[qp] * -phi[i][qp] * C;
+                    QC(i) += JxW[qp] * phi[i][qp] * -u;
+                  }
+              } <I><FONT COLOR="#B22222">// end if
+</FONT></I>  
+          } <I><FONT COLOR="#B22222">// end quadrature loop
+</FONT></I>  
+      } <I><FONT COLOR="#B22222">// end if on outlet
+</FONT></I>  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystemQoI::side_qoi(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
+  {
+  
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+  
+    FEBase* side_fe = NULL;
+    c.get_side_fe( 0, side_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = side_fe-&gt;get_xyz();
+  
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
+  
+    Number dQoI_0 = 0. ;
+    Number u = 0. ;
+    Number C = 0. ;
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(c.has_side_boundary_id(2))
+      {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+          {
+            Real x = q_point[qp](0);
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B>(x &lt; 0.)
+              {
+                u = c.side_value(0,qp);
+                C = c.side_value(3,qp);
+  
+                dQoI_0 += JxW[qp] * -u * C;
+              } <I><FONT COLOR="#B22222">// end if
+</FONT></I>  
+          } <I><FONT COLOR="#B22222">// end quadrature loop
+</FONT></I>  
+      } <I><FONT COLOR="#B22222">// end if on bdry
+</FONT></I>  
+    c.get_qois()[0] += dQoI_0;
+  
+  }
+</pre> 
+<a name="nocomments"></a> 
 <br><br><br> <h1> The source file initial.C without comments: </h1> 
 <pre> 
   #include <B><FONT COLOR="#BC8F8F">&quot;initial.h&quot;</FONT></B>
@@ -6092,7 +6092,7 @@ Write new headers if we're starting a new simulation
 *   example-opt  
 ***************************************************************
  
-Started /Users/benkirk/codes/libmesh/build/examples/adjoints/adjoints_ex3/.libs/example-opt
+Started /aerolab/benkirk/libmesh/gcc-4.6/examples/adjoints/adjoints_ex3/.libs/example-opt
 Building mesh
 Making elements 2nd order
 Building system
@@ -6116,8 +6116,9 @@ Initializing systems
    System #0, "CoupledSystem"
     Type "Implicit"
     Variables={ "u" "v" } "p" "C" 
-    Finite Element Types="LAGRANGE" "LAGRANGE" "LAGRANGE" 
-    Approximation Orders="SECOND" "FIRST" "SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=331
     n_local_dofs()=331
     n_constrained_dofs()=138
@@ -6133,6 +6134,7 @@ Initializing systems
       Number of DoF Constraints = 138
       Number of Heterogenous Constraints= 5
       Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
 
 Starting adaptive loop
 
@@ -6143,20 +6145,20 @@ We have 16 active elements and 193 active dofs.
 Assembling the System
 Nonlinear Residual: 1.96398
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 35, residual 1.7062e-11
+Linear solve finished, step 35, residual 1.70674e-11
 Trying full Newton step
   Current Residual: 0.065306
   Nonlinear step: |du|/|u| = 0.999668, |du| = 68.6283
 Assembling the System
 Nonlinear Residual: 0.065306
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 25, residual 4.7009e-14
+Linear solve finished, step 25, residual 4.70558e-14
 Trying full Newton step
-  Current Residual: 1.72695e-14
-  Nonlinear solver converged, step 1, residual 1.72695e-14
-  Nonlinear solver converged, step 1, residual reduction 8.79311e-15 < 1e-05
+  Current Residual: 1.71413e-14
+  Nonlinear solver converged, step 1, residual 1.71413e-14
+  Nonlinear solver converged, step 1, residual reduction 8.7278e-15 < 1e-05
   Nonlinear solver relative step size 0.00216066 > 1e-05
-The boundary QoI is 0.083341660673352497
+The boundary QoI is 0.083341660673352594
 
 Solving the adjoint problem
 Adaptive step 1
@@ -6164,15 +6166,15 @@ Solving the forward problem
 We have 22 active elements and 249 active dofs.
 
 Assembling the System
-Nonlinear Residual: 0.26099948259782346
+Nonlinear Residual: 0.26099948259782368
 Linear solve starting, tolerance 9.9999999999999998e-13
-Linear solve finished, step 55, residual 3.9050129654031092e-13
+Linear solve finished, step 55, residual 3.9050900506296639e-13
 Trying full Newton step
-  Current Residual: 3.840170437269234e-06
-  Nonlinear solver converged, step 0, residual 3.840170437269234e-06
-  Nonlinear solver relative residual 1.4713325861977238e-05 > 1.0000000000000001e-05
-  Nonlinear solver relative step size 0.0086543295841846751 > 1.0000000000000001e-05
-The boundary QoI is 0.083341613590629235
+  Current Residual: 3.8401704371697677e-06
+  Nonlinear solver converged, step 0, residual 3.8401704371697677e-06
+  Nonlinear solver relative residual 1.4713325861596127e-05 > 1.0000000000000001e-05
+  Nonlinear solver relative step size 0.0086543295841859085 > 1.0000000000000001e-05
+The boundary QoI is 0.083341613590629401
 
 Solving the adjoint problem
 Adaptive step 2
@@ -6180,22 +6182,22 @@ Solving the forward problem
 We have 31 active elements and 370 active dofs.
 
 Assembling the System
-Nonlinear Residual: 0.22717753856100811
+Nonlinear Residual: 0.22717753856100853
 Linear solve starting, tolerance 9.9999999999999998e-13
-Linear solve finished, step 90, residual 3.3701294816060582e-12
+Linear solve finished, step 90, residual 3.3701283958975095e-12
 Trying full Newton step
-  Current Residual: 0.00016704893105426487
-  Nonlinear step: |du|/|u| = 0.12995670049007113, |du| = 12.812688086848343
+  Current Residual: 0.00016704893105433757
+  Nonlinear step: |du|/|u| = 0.12995670049007108, |du| = 12.81268808684835
 Assembling the System
-Nonlinear Residual: 0.00016704893105426487
+Nonlinear Residual: 0.00016704893105433757
 Linear solve starting, tolerance 9.9999999999999998e-13
-Linear solve finished, step 71, residual 7.1712675731356431e-17
+Linear solve finished, step 71, residual 7.1874289286118846e-17
 Trying full Newton step
-  Current Residual: 1.2264424924874545e-14
-  Nonlinear solver converged, step 1, residual 1.2264424924874545e-14
-  Nonlinear solver converged, step 1, residual reduction 5.398608067751802e-14 < 1.0000000000000001e-05
-  Nonlinear solver converged, step 1, relative step size 2.7748318512541032e-06 < 1.0000000000000001e-05
-The boundary QoI is 0.089909981667392683
+  Current Residual: 1.277013911902296e-14
+  Nonlinear solver converged, step 1, residual 1.277013911902296e-14
+  Nonlinear solver converged, step 1, residual reduction 5.6212155479418311e-14 < 1.0000000000000001e-05
+  Nonlinear solver converged, step 1, relative step size 2.7748318512467633e-06 < 1.0000000000000001e-05
+The boundary QoI is 0.089909981667392794
 
 Solving the adjoint problem
 Adaptive step 3
@@ -6203,22 +6205,22 @@ Solving the forward problem
 We have 43 active elements and 522 active dofs.
 
 Assembling the System
-Nonlinear Residual: 0.23495325849278412
+Nonlinear Residual: 0.23495325849278542
 Linear solve starting, tolerance 9.9999999999999998e-13
-Linear solve finished, step 155, residual 1.055616886271458e-12
+Linear solve finished, step 155, residual 1.0555527252388836e-12
 Trying full Newton step
-  Current Residual: 3.5766733430008962e-05
-  Nonlinear step: |du|/|u| = 0.04806699670465496, |du| = 5.6325829329722934
+  Current Residual: 3.5766733430402094e-05
+  Nonlinear step: |du|/|u| = 0.048066996704655321, |du| = 5.6325829329723414
 Assembling the System
-Nonlinear Residual: 3.5766733430008962e-05
+Nonlinear Residual: 3.5766733430402094e-05
 Linear solve starting, tolerance 9.9999999999999998e-13
-Linear solve finished, step 113, residual 1.324324250468468e-17
+Linear solve finished, step 112, residual 2.0461809006138361e-17
 Trying full Newton step
-  Current Residual: 1.5980657136454354e-14
-  Nonlinear solver converged, step 1, residual 1.5980657136454354e-14
-  Nonlinear solver converged, step 1, residual reduction 6.8016324774423806e-14 < 1.0000000000000001e-05
-  Nonlinear solver converged, step 1, relative step size 8.8610478699454519e-07 < 1.0000000000000001e-05
-The boundary QoI is 0.086525948244170453
+  Current Residual: 1.4696610527602269e-14
+  Nonlinear solver converged, step 1, residual 1.4696610527602269e-14
+  Nonlinear solver converged, step 1, residual reduction 6.2551209640080602e-14 < 1.0000000000000001e-05
+  Nonlinear solver converged, step 1, relative step size 8.8610478699114689e-07 < 1.0000000000000001e-05
+The boundary QoI is 0.086525948244170578
 
 Solving the adjoint problem
 Adaptive step 4
@@ -6226,15 +6228,15 @@ Solving the forward problem
 We have 58 active elements and 710 active dofs.
 
 Assembling the System
-Nonlinear Residual: 0.18043924499818001
+Nonlinear Residual: 0.18043924499818004
 Linear solve starting, tolerance 9.9999999999999998e-13
-Linear solve finished, step 166, residual 8.8344350696632642e-13
+Linear solve finished, step 166, residual 8.8345582467009233e-13
 Trying full Newton step
-  Current Residual: 4.1696357773526233e-08
-  Nonlinear solver converged, step 0, residual 4.1696357773526233e-08
-  Nonlinear solver converged, step 0, residual reduction 2.3108253292650833e-07 < 1.0000000000000001e-05
-  Nonlinear solver relative step size 0.016621559343849512 > 1.0000000000000001e-05
-The boundary QoI is 0.083346127788253538
+  Current Residual: 4.1696357635863249e-08
+  Nonlinear solver converged, step 0, residual 4.1696357635863249e-08
+  Nonlinear solver converged, step 0, residual reduction 2.3108253216357567e-07 < 1.0000000000000001e-05
+  Nonlinear solver relative step size 0.01662155934384954 > 1.0000000000000001e-05
+The boundary QoI is 0.083346127788253482
 
 Solving the adjoint problem
 Adaptive step 5
@@ -6242,15 +6244,139 @@ Solving the forward problem
 We have 76 active elements and 898 active dofs.
 
 Assembling the System
-Nonlinear Residual: 0.20089804570019271
+Nonlinear Residual: 0.20089804570019248
 Linear solve starting, tolerance 9.9999999999999998e-13
-Linear solve finished, step 173, residual 1.3242619311872784e-12
+Linear solve finished, step 173, residual 1.3242699804627756e-12
 Trying full Newton step
-  Current Residual: 4.705871842046459e-07
-  Nonlinear solver converged, step 0, residual 4.705871842046459e-07
-  Nonlinear solver converged, step 0, residual reduction 2.3424179292760264e-06 < 1.0000000000000001e-05
-  Nonlinear solver relative step size 0.010519312380673164 > 1.0000000000000001e-05
+  Current Residual: 4.7058718426322765e-07
+  Nonlinear solver converged, step 0, residual 4.7058718426322765e-07
+  Nonlinear solver converged, step 0, residual reduction 2.3424179295676285e-06 < 1.0000000000000001e-05
+  Nonlinear solver relative step size 0.010519312380672824 > 1.0000000000000001e-05
 The boundary QoI is 0.083299401270447687
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:39:36 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=2.10857, Active time=1.95521                                                         |
+ ----------------------------------------------------------------------------------------------------------------------
+| Event                                   nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                    w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|----------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                      |
+|                                                                                                                      |
+| AdjointResidualErrorEstimator                                                                                        |
+|   estimate_error()                      20         0.0011      0.000056    1.5182      0.075912    0.06     77.65    |
+|                                                                                                                      |
+| DofMap                                                                                                               |
+|   add_neighbors_to_send_list()          31         0.0006      0.000018    0.0006      0.000018    0.03     0.03     |
+|   build_constraint_matrix()             1182       0.0096      0.000008    0.0096      0.000008    0.49     0.49     |
+|   build_sparsity()                      6          0.0068      0.001131    0.0073      0.001214    0.35     0.37     |
+|   cnstrn_elem_mat_vec()                 336        0.0186      0.000055    0.0186      0.000055    0.95     0.95     |
+|   constrain_elem_matrix()               170        0.0046      0.000027    0.0046      0.000027    0.24     0.24     |
+|   constrain_elem_vector()               506        0.0015      0.000003    0.0015      0.000003    0.08     0.08     |
+|   create_dof_constraints()              31         0.0125      0.000403    0.0257      0.000829    0.64     1.31     |
+|   distribute_dofs()                     31         0.0012      0.000040    0.0035      0.000112    0.06     0.18     |
+|   dof_indices()                         139855     0.1200      0.000001    0.1200      0.000001    6.14     6.14     |
+|   enforce_adjoint_constraints_exactly() 10         0.0005      0.000054    0.0005      0.000054    0.03     0.03     |
+|   enforce_constraints_exactly()         26         0.0015      0.000058    0.0015      0.000058    0.08     0.08     |
+|   old_dof_indices()                     2300       0.0021      0.000001    0.0021      0.000001    0.11     0.11     |
+|   prepare_send_list()                   31         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                              31         0.0022      0.000072    0.0022      0.000072    0.11     0.11     |
+|                                                                                                                      |
+| EquationSystems                                                                                                      |
+|   build_discontinuous_solution_vector() 25         0.0006      0.000026    0.0011      0.000043    0.03     0.06     |
+|   build_solution_vector()               11         0.0026      0.000240    0.0040      0.000366    0.13     0.21     |
+|                                                                                                                      |
+| FE                                                                                                                   |
+|   compute_shape_functions()             130979     0.2411      0.000002    0.2411      0.000002    12.33    12.33    |
+|   init_shape_functions()                15315      0.0979      0.000006    0.0979      0.000006    5.01     5.01     |
+|   inverse_map()                         23479      0.0465      0.000002    0.0465      0.000002    2.38     2.38     |
+|                                                                                                                      |
+| FEMSystem                                                                                                            |
+|   assemble_qoi()                        6          0.0048      0.000796    0.0269      0.004484    0.24     1.38     |
+|   assemble_qoi_derivative()             5          0.0054      0.001082    0.0261      0.005219    0.28     1.33     |
+|   assembly()                            9          0.0346      0.003842    0.0847      0.009414    1.77     4.33     |
+|   assembly(get_jacobian)                5          0.0173      0.003463    0.0389      0.007772    0.89     1.99     |
+|   assembly(get_residual)                9          0.0103      0.001140    0.0416      0.004623    0.52     2.13     |
+|                                                                                                                      |
+| FEMap                                                                                                                |
+|   compute_affine_map()                  130979     0.1301      0.000001    0.1301      0.000001    6.66     6.66     |
+|   compute_face_map()                    3687       0.0173      0.000005    0.0464      0.000013    0.89     2.37     |
+|   init_face_shape_functions()           631        0.0005      0.000001    0.0005      0.000001    0.03     0.03     |
+|   init_reference_to_physical_map()      15315      0.1162      0.000008    0.1162      0.000008    5.94     5.94     |
+|                                                                                                                      |
+| GMVIO                                                                                                                |
+|   write_nodal_data()                    11         0.0120      0.001090    0.0120      0.001090    0.61     0.61     |
+|                                                                                                                      |
+| ImplicitSystem                                                                                                       |
+|   adjoint_solve()                       5          0.0002      0.000034    0.0946      0.018930    0.01     4.84     |
+|                                                                                                                      |
+| LocationMap                                                                                                          |
+|   find()                                400        0.0003      0.000001    0.0003      0.000001    0.02     0.02     |
+|   init()                                10         0.0004      0.000039    0.0004      0.000039    0.02     0.02     |
+|                                                                                                                      |
+| Mesh                                                                                                                 |
+|   all_first_order()                     25         0.0012      0.000047    0.0012      0.000047    0.06     0.06     |
+|   all_second_order()                    1          0.0001      0.000136    0.0001      0.000136    0.01     0.01     |
+|   contract()                            5          0.0000      0.000004    0.0001      0.000011    0.00     0.00     |
+|   find_neighbors()                      57         0.0036      0.000063    0.0036      0.000063    0.18     0.18     |
+|   renumber_nodes_and_elem()             69         0.0002      0.000003    0.0002      0.000003    0.01     0.01     |
+|                                                                                                                      |
+| MeshOutput                                                                                                           |
+|   write_equation_systems()              11         0.0001      0.000013    0.0162      0.001470    0.01     0.83     |
+|                                                                                                                      |
+| MeshRefinement                                                                                                       |
+|   _coarsen_elements()                   10         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|   _refine_elements()                    10         0.0005      0.000053    0.0012      0.000124    0.03     0.06     |
+|   add_point()                           400        0.0003      0.000001    0.0007      0.000002    0.02     0.03     |
+|   make_coarsening_compatible()          10         0.0001      0.000014    0.0001      0.000014    0.01     0.01     |
+|   make_flags_parallel_consistent()      15         0.0001      0.000008    0.0001      0.000008    0.01     0.01     |
+|   make_refinement_compatible()          10         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|                                                                                                                      |
+| NewtonSolver                                                                                                         |
+|   solve()                               6          0.0015      0.000254    0.2771      0.046189    0.08     14.17    |
+|                                                                                                                      |
+| Parallel                                                                                                             |
+|   allgather()                           31         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                      |
+| Partitioner                                                                                                          |
+|   set_node_processor_ids()              26         0.0005      0.000017    0.0005      0.000017    0.02     0.02     |
+|   single_partition()                    32         0.0001      0.000004    0.0001      0.000004    0.01     0.01     |
+|                                                                                                                      |
+| PatchRecoveryErrorEstimator                                                                                          |
+|   estimate_error()                      120        0.5628      0.004690    0.9595      0.007995    28.78    49.07    |
+|                                                                                                                      |
+| PetscLinearSolver                                                                                                    |
+|   solve()                               14         0.1773      0.012664    0.1773      0.012664    9.07     9.07     |
+|                                                                                                                      |
+| ProjectVector                                                                                                        |
+|   operator()                            10         0.0054      0.000537    0.0129      0.001286    0.27     0.66     |
+|                                                                                                                      |
+| System                                                                                                               |
+|   project_vector()                      10         0.0013      0.000133    0.0155      0.001555    0.07     0.80     |
+|                                                                                                                      |
+| WeightedPatchRecoveryErrorEstimator                                                                                  |
+|   estimate_error()                      40         0.2785      0.006962    0.5576      0.013941    14.24    28.52    |
+|                                                                                                                      |
+| XdrIO                                                                                                                |
+|   read()                                1          0.0003      0.000309    0.0003      0.000309    0.02     0.02     |
+ ----------------------------------------------------------------------------------------------------------------------
+| Totals:                                 466360     1.9552                                          100.00            |
+ ----------------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************

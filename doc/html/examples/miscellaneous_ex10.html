@@ -665,7 +665,7 @@ Create a vector storing the variable numbers which the BC applies to
 *   example-opt -n 2 
 ***************************************************************
  
-Running /Users/benkirk/codes/libmesh/build/examples/miscellaneous/miscellaneous_ex10/.libs/example-opt -n 2
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/miscellaneous/miscellaneous_ex10/.libs/example-opt -n 2
 
 In SerialMesh::stitch_meshes:
 This mesh has 9 nodes on boundary 2.
@@ -735,8 +735,9 @@ Found 25 matching nodes.
    System #0, "Poisson"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=125
     n_local_dofs()=125
     n_constrained_dofs()=98
@@ -751,6 +752,7 @@ Found 25 matching nodes.
     DofMap Constraints
       Number of DoF Constraints = 98
       Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
 
 Error estimate
 l2 norm = 1.15141
@@ -777,8 +779,9 @@ maximum = 0.0504688
    System #0, "Poisson"
     Type "LinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=125
     n_local_dofs()=125
     n_constrained_dofs()=98
@@ -793,6 +796,7 @@ maximum = 0.0504688
     DofMap Constraints
       Number of DoF Constraints = 98
       Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
 
 Error estimate
 l2 norm = 1.15141
@@ -800,7 +804,123 @@ maximum = 0.23987
 Error estimate
 l2 norm = 0.721321
 maximum = 0.0504688
-L2 error between stitched and non-stitched cases: 5.08165e-14
+L2 error between stitched and non-stitched cases: 5.08152e-14
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:09 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=3.61008, Active time=3.53527                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     6          0.0029      0.000479    0.0029      0.000479    0.08     0.08     |
+|   build_constraint_matrix()        8000       0.0149      0.000002    0.0149      0.000002    0.42     0.42     |
+|   build_sparsity()                 6          0.0396      0.006603    0.0460      0.007674    1.12     1.30     |
+|   cnstrn_elem_mat_vec()            8000       0.0310      0.000004    0.0310      0.000004    0.88     0.88     |
+|   create_dof_constraints()         6          0.0885      0.014751    0.1030      0.017174    2.50     2.91     |
+|   distribute_dofs()                6          0.0030      0.000503    0.0129      0.002144    0.09     0.36     |
+|   dof_indices()                    134088     0.1546      0.000001    0.1546      0.000001    4.37     4.37     |
+|   enforce_constraints_exactly()    4          0.0006      0.000154    0.0006      0.000154    0.02     0.02     |
+|   old_dof_indices()                15744      0.0098      0.000001    0.0098      0.000001    0.28     0.28     |
+|   prepare_send_list()              6          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         6          0.0098      0.001640    0.0098      0.001640    0.28     0.28     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          2          0.0090      0.004505    0.0143      0.007164    0.25     0.41     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               2          0.0114      0.005680    0.0114      0.005680    0.32     0.32     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        72728      0.1596      0.000002    0.1596      0.000002    4.51     4.51     |
+|   init_shape_functions()           61255      0.4312      0.000007    0.4312      0.000007    12.20    12.20    |
+|   inverse_map()                    194180     0.5835      0.000003    0.5835      0.000003    16.50    16.50    |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             72728      0.1281      0.000002    0.1281      0.000002    3.62     3.62     |
+|   compute_face_map()               2784       0.0032      0.000001    0.0032      0.000001    0.09     0.09     |
+|   init_face_shape_functions()      4          0.0000      0.000009    0.0000      0.000009    0.00     0.00     |
+|   init_reference_to_physical_map() 61255      0.4500      0.000007    0.4500      0.000007    12.73    12.73    |
+|                                                                                                                 |
+| JumpErrorEstimator                                                                                              |
+|   estimate_error()                 4          0.0367      0.009175    0.1659      0.041470    1.04     4.69     |
+|                                                                                                                 |
+| LocationMap                                                                                                     |
+|   find()                           54656      0.0198      0.000000    0.0198      0.000000    0.56     0.56     |
+|   init()                           8          0.0020      0.000254    0.0020      0.000254    0.06     0.06     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   contract()                       4          0.0002      0.000058    0.0009      0.000237    0.01     0.03     |
+|   find_neighbors()                 13         0.0216      0.001658    0.0216      0.001658    0.61     0.61     |
+|   renumber_nodes_and_elem()        44         0.0023      0.000051    0.0023      0.000051    0.06     0.06     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         2          0.0001      0.000030    0.0257      0.012875    0.00     0.73     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _coarsen_elements()              8          0.0002      0.000027    0.0002      0.000027    0.01     0.01     |
+|   _refine_elements()               8          0.0402      0.005026    0.1037      0.012962    1.14     2.93     |
+|   add_point()                      54656      0.0344      0.000001    0.0588      0.000001    0.97     1.66     |
+|   make_coarsening_compatible()     8          0.0018      0.000226    0.0018      0.000226    0.05     0.05     |
+|   make_flags_parallel_consistent() 12         0.0016      0.000131    0.0016      0.000131    0.04     0.04     |
+|   make_refinement_compatible()     8          0.0001      0.000018    0.0001      0.000018    0.00     0.00     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     9          0.0003      0.000035    0.0003      0.000035    0.01     0.01     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      6          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               20         0.0005      0.000023    0.0005      0.000023    0.01     0.01     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          6          0.0323      0.005389    0.0323      0.005389    0.91     0.91     |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  1          0.0095      0.009507    0.0095      0.009507    0.27     0.27     |
+|   operator()                       83520      0.2518      0.000003    0.5323      0.000006    7.12     15.06    |
+|                                                                                                                 |
+| ProjectVector                                                                                                   |
+|   operator()                       4          0.0230      0.005755    0.0631      0.015779    0.65     1.79     |
+|                                                                                                                 |
+| SerialMesh                                                                                                      |
+|   stitch_meshes()                  7          0.0015      0.000207    0.0015      0.000217    0.04     0.04     |
+|                                                                                                                 |
+| StatisticsVector                                                                                                |
+|   maximum()                        4          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       6          0.1067      0.017787    0.2784      0.046392    3.02     7.87     |
+|   project_vector()                 4          0.0049      0.001219    0.0737      0.018431    0.14     2.09     |
+|                                                                                                                 |
+| main                                                                                                            |
+|   Initialize and create cubes      1          0.0826      0.082617    0.0835      0.083475    2.34     2.36     |
+|   Initialize and solve systems     1          0.0117      0.011737    0.8603      0.860268    0.33     24.33    |
+|   Output                           1          0.0007      0.000722    0.0265      0.026473    0.02     0.75     |
+|   Result comparison                1          0.7180      0.717988    2.6342      2.634202    20.31    74.51    |
+|   Stitching                        1          0.0000      0.000012    0.0015      0.001531    0.00     0.04     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            823833     3.5353                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example miscellaneous_ex10:

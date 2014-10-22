@@ -4452,10 +4452,10 @@ Initial conditions
 *   example-opt  
 ***************************************************************
  
-Started /Users/benkirk/codes/libmesh/build/examples/adjoints/adjoints_ex5/.libs/example-opt
+Started /aerolab/benkirk/libmesh/gcc-4.6/examples/adjoints/adjoints_ex5/.libs/example-opt
 Building mesh
 Building system
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/memory_solution_history.h, line 41, compiled Oct 22 2014 at 11:18:41 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/memory_solution_history.h, line 41, compiled Oct 22 2014 at 13:12:45 ***
 Initializing systems
 Setting primal initial conditions
 |U(0)|= 2.27632
@@ -4479,8 +4479,9 @@ Setting primal initial conditions
    System #0, "HeatSystem"
     Type "Implicit"
     Variables="T" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=4225
     n_local_dofs()=4225
     n_constrained_dofs()=256
@@ -4495,54 +4496,55 @@ Setting primal initial conditions
     DofMap Constraints
       Number of DoF Constraints = 256
       Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
 
  Solving time step 0, time = 0
-  Nonlinear solver converged, step 0, residual reduction 4.82376e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.82832e-14 < 1e-09
 |U(0.1)|= 2.27183
 Advancing timestep
 
  Solving time step 1, time = 0.1
-  Nonlinear solver converged, step 0, residual reduction 4.7958e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.84329e-14 < 1e-09
 |U(0.2)|= 2.26736
 Advancing timestep
 
  Solving time step 2, time = 0.2
-  Nonlinear solver converged, step 0, residual reduction 4.66295e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.61255e-14 < 1e-09
 |U(0.3)|= 2.26289
 Advancing timestep
 
  Solving time step 3, time = 0.3
-  Nonlinear solver converged, step 0, residual reduction 4.89915e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.95638e-14 < 1e-09
 |U(0.4)|= 2.25843
 Advancing timestep
 
  Solving time step 4, time = 0.4
-  Nonlinear solver converged, step 0, residual reduction 4.8835e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.83024e-14 < 1e-09
 |U(0.5)|= 2.25398
 Advancing timestep
 
  Solving time step 5, time = 0.5
-  Nonlinear solver converged, step 0, residual reduction 4.89569e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.84361e-14 < 1e-09
 |U(0.6)|= 2.24954
 Advancing timestep
 
  Solving time step 6, time = 0.6
-  Nonlinear solver converged, step 0, residual reduction 4.92748e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.79655e-14 < 1e-09
 |U(0.7)|= 2.24511
 Advancing timestep
 
  Solving time step 7, time = 0.7
-  Nonlinear solver converged, step 0, residual reduction 4.90396e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.87316e-14 < 1e-09
 |U(0.8)|= 2.24068
 Advancing timestep
 
  Solving time step 8, time = 0.8
-  Nonlinear solver converged, step 0, residual reduction 4.88331e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.94683e-14 < 1e-09
 |U(0.9)|= 2.23627
 Advancing timestep
 
  Solving time step 9, time = 0.9
-  Nonlinear solver converged, step 0, residual reduction 4.69683e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 4.80265e-14 < 1e-09
 |U(1)|= 2.23186
 Advancing timestep
 
@@ -4670,6 +4672,118 @@ Retrieving  final time = 1
 |Z(1)|= 2.27632
 
 Sensitivity of QoI 0 w.r.t parameter 0 is: -5.30953
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:39:46 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=6.5377, Active time=6.11317                                                          |
+ ----------------------------------------------------------------------------------------------------------------------
+| Event                                   nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                    w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|----------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                      |
+|                                                                                                                      |
+| DofMap                                                                                                               |
+|   add_neighbors_to_send_list()          5          0.0012      0.000232    0.0012      0.000232    0.02     0.02     |
+|   build_constraint_matrix()             294912     0.1096      0.000000    0.1096      0.000000    1.79     1.79     |
+|   build_sparsity()                      5          0.0092      0.001834    0.0128      0.002567    0.15     0.21     |
+|   cnstrn_elem_mat_vec()                 40960      0.0275      0.000001    0.0275      0.000001    0.45     0.45     |
+|   constrain_elem_matrix()               40960      0.0143      0.000000    0.0143      0.000000    0.23     0.23     |
+|   constrain_elem_vector()               172032     0.0470      0.000000    0.0470      0.000000    0.77     0.77     |
+|   create_dof_constraints()              5          0.0325      0.006507    0.0363      0.007260    0.53     0.59     |
+|   distribute_dofs()                     5          0.0015      0.000301    0.0067      0.001340    0.02     0.11     |
+|   dof_indices()                         1115560    0.6670      0.000001    0.6670      0.000001    10.91    10.91    |
+|   enforce_adjoint_constraints_exactly() 10         0.0002      0.000023    0.0002      0.000023    0.00     0.00     |
+|   enforce_constraints_exactly()         40         0.0029      0.000073    0.0029      0.000073    0.05     0.05     |
+|   old_dof_indices()                     21760      0.0113      0.000001    0.0113      0.000001    0.18     0.18     |
+|   prepare_send_list()                   5          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                              5          0.0052      0.001039    0.0052      0.001039    0.08     0.08     |
+|                                                                                                                      |
+| EquationSystems                                                                                                      |
+|   build_solution_vector()               22         0.0908      0.004127    0.1490      0.006772    1.49     2.44     |
+|                                                                                                                      |
+| FE                                                                                                                   |
+|   compute_shape_functions()             1008744    1.1150      0.000001    1.1150      0.000001    18.24    18.24    |
+|   init_shape_functions()                13555      0.0288      0.000002    0.0288      0.000002    0.47     0.47     |
+|   inverse_map()                         37992      0.0404      0.000001    0.0404      0.000001    0.66     0.66     |
+|                                                                                                                      |
+| FEMSystem                                                                                                            |
+|   assemble_qoi_derivative()             10         0.3394      0.033940    0.5569      0.055694    5.55     9.11     |
+|   assembly()                            10         0.3725      0.037249    0.7424      0.074235    6.09     12.14    |
+|   assembly(get_jacobian)                10         0.3918      0.039175    0.7684      0.076842    6.41     12.57    |
+|   assembly(get_residual)                32         1.0886      0.034020    2.2518      0.070370    17.81    36.84    |
+|                                                                                                                      |
+| FEMap                                                                                                                |
+|   compute_affine_map()                  1008640    0.5586      0.000001    0.5586      0.000001    9.14     9.14     |
+|   compute_face_map()                    13312      0.0289      0.000002    0.0608      0.000005    0.47     1.00     |
+|   compute_null_map()                    104        0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   init_face_shape_functions()           52         0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
+|   init_reference_to_physical_map()      13451      0.0216      0.000002    0.0216      0.000002    0.35     0.35     |
+|                                                                                                                      |
+| GMVIO                                                                                                                |
+|   write_nodal_data()                    22         0.3111      0.014141    0.3111      0.014141    5.09     5.09     |
+|                                                                                                                      |
+| ImplicitSystem                                                                                                       |
+|   adjoint_solve()                       10         0.0003      0.000027    1.3463      0.134631    0.00     22.02    |
+|                                                                                                                      |
+| LocationMap                                                                                                          |
+|   find()                                16320      0.0068      0.000000    0.0068      0.000000    0.11     0.11     |
+|   init()                                8          0.0011      0.000140    0.0011      0.000140    0.02     0.02     |
+|                                                                                                                      |
+| Mesh                                                                                                                 |
+|   contract()                            4          0.0002      0.000049    0.0005      0.000134    0.00     0.01     |
+|   find_neighbors()                      5          0.0117      0.002348    0.0117      0.002348    0.19     0.19     |
+|   renumber_nodes_and_elem()             14         0.0010      0.000073    0.0010      0.000073    0.02     0.02     |
+|                                                                                                                      |
+| MeshOutput                                                                                                           |
+|   write_equation_systems()              22         0.0004      0.000017    0.4605      0.020931    0.01     7.53     |
+|                                                                                                                      |
+| MeshRefinement                                                                                                       |
+|   _coarsen_elements()                   4          0.0002      0.000039    0.0002      0.000039    0.00     0.00     |
+|   _refine_elements()                    8          0.0135      0.001691    0.0330      0.004131    0.22     0.54     |
+|   add_point()                           16320      0.0099      0.000001    0.0181      0.000001    0.16     0.30     |
+|   make_coarsening_compatible()          4          0.0022      0.000550    0.0022      0.000550    0.04     0.04     |
+|   make_flags_parallel_consistent()      8          0.0012      0.000151    0.0012      0.000151    0.02     0.02     |
+|   make_refinement_compatible()          4          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                      |
+| MeshTools::Generation                                                                                                |
+|   build_cube()                          1          0.0001      0.000134    0.0001      0.000134    0.00     0.00     |
+|                                                                                                                      |
+| NewtonSolver                                                                                                         |
+|   solve()                               10         0.0016      0.000157    1.4350      0.143498    0.03     23.47    |
+|                                                                                                                      |
+| Parallel                                                                                                             |
+|   allgather()                           5          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                      |
+| Partitioner                                                                                                          |
+|   single_partition()                    5          0.0003      0.000058    0.0003      0.000058    0.00     0.00     |
+|                                                                                                                      |
+| PetscLinearSolver                                                                                                    |
+|   solve()                               20         0.0453      0.002266    0.0453      0.002266    0.74     0.74     |
+|                                                                                                                      |
+| ProjectVector                                                                                                        |
+|   operator()                            8          0.0257      0.003215    0.0524      0.006545    0.42     0.86     |
+|                                                                                                                      |
+| System                                                                                                               |
+|   calculate_norm()                      77         0.6533      0.008484    1.4168      0.018400    10.69    23.18    |
+|   project_vector()                      10         0.0212      0.002120    0.0855      0.008554    0.35     1.40     |
+ ----------------------------------------------------------------------------------------------------------------------
+| Totals:                                 3815087    6.1132                                          100.00            |
+ ----------------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example adjoints_ex5:

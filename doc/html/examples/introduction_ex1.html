@@ -279,7 +279,7 @@ checks for leaked memory.
 <pre>
 ***************************************************************
 * Running Example introduction_ex1:
-*   example-opt -d 3 /Users/benkirk/codes/libmesh/build/../reference_elements/3D/one_hex27.xda 
+*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda 
 ***************************************************************
  
  Mesh Information:
@@ -296,14 +296,52 @@ checks for leaked memory.
   n_threads()=1
   processor_id()=0
 
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:53 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.080824, Active time=0.000495                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()            1          0.0001      0.000056    0.0001      0.000056    11.31    11.31    |
+|   renumber_nodes_and_elem()   2          0.0000      0.000011    0.0000      0.000011    4.44     4.44     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   set_node_processor_ids()    1          0.0000      0.000030    0.0000      0.000030    6.06     6.06     |
+|   single_partition()          1          0.0000      0.000004    0.0000      0.000004    0.81     0.81     |
+|                                                                                                            |
+| XdrIO                                                                                                      |
+|   read()                      1          0.0004      0.000383    0.0004      0.000383    77.37    77.37    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                       6          0.0005                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example introduction_ex1:
-*   example-opt -d 3 /Users/benkirk/codes/libmesh/build/../reference_elements/3D/one_hex27.xda 
+*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda 
 ***************************************************************
 ***************************************************************
 * Running Example introduction_ex1:
-*   example-opt -d 3 /Users/benkirk/codes/libmesh/build/../reference_elements/3D/one_hex27.xda -o output.xda 
+*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xda 
 ***************************************************************
  
  Mesh Information:
@@ -320,14 +358,53 @@ checks for leaked memory.
   n_threads()=1
   processor_id()=0
 
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:54 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.081955, Active time=0.000894                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    6.38     6.38     |
+|   renumber_nodes_and_elem()   2          0.0000      0.000012    0.0000      0.000012    2.57     2.57     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   set_node_processor_ids()    1          0.0000      0.000027    0.0000      0.000027    3.02     3.02     |
+|   single_partition()          1          0.0000      0.000004    0.0000      0.000004    0.45     0.45     |
+|                                                                                                            |
+| XdrIO                                                                                                      |
+|   read()                      1          0.0004      0.000388    0.0004      0.000388    43.40    43.40    |
+|   write()                     1          0.0004      0.000395    0.0004      0.000395    44.18    44.18    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                       7          0.0009                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example introduction_ex1:
-*   example-opt -d 3 /Users/benkirk/codes/libmesh/build/../reference_elements/3D/one_hex27.xda -o output.xda 
+*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xda 
 ***************************************************************
 ***************************************************************
 * Running Example introduction_ex1:
-*   example-opt -d 3 /Users/benkirk/codes/libmesh/build/../reference_elements/3D/one_hex27.xda -o output.xdr 
+*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xdr 
 ***************************************************************
  
  Mesh Information:
@@ -344,10 +421,49 @@ checks for leaked memory.
   n_threads()=1
   processor_id()=0
 
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:54 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.081958, Active time=0.000858                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    6.64     6.64     |
+|   renumber_nodes_and_elem()   2          0.0000      0.000013    0.0000      0.000013    3.15     3.15     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   set_node_processor_ids()    1          0.0000      0.000028    0.0000      0.000028    3.26     3.26     |
+|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    0.35     0.35     |
+|                                                                                                            |
+| XdrIO                                                                                                      |
+|   read()                      1          0.0004      0.000385    0.0004      0.000385    44.87    44.87    |
+|   write()                     1          0.0004      0.000358    0.0004      0.000358    41.72    41.72    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                       7          0.0009                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example introduction_ex1:
-*   example-opt -d 3 /Users/benkirk/codes/libmesh/build/../reference_elements/3D/one_hex27.xda -o output.xdr 
+*   example-opt -d 3 /aerolab/benkirk/libmesh/gcc-4.6/../reference_elements/3D/one_hex27.xda -o output.xdr 
 ***************************************************************
 ***************************************************************
 * Running Example introduction_ex1:
@@ -367,6 +483,44 @@ checks for leaked memory.
   n_processors()=1
   n_threads()=1
   processor_id()=0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:54 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.081111, Active time=0.000536                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    10.63    10.63    |
+|   renumber_nodes_and_elem()   2          0.0000      0.000011    0.0000      0.000011    4.10     4.10     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   set_node_processor_ids()    1          0.0000      0.000031    0.0000      0.000031    5.78     5.78     |
+|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    0.56     0.56     |
+|                                                                                                            |
+| XdrIO                                                                                                      |
+|   read()                      1          0.0004      0.000423    0.0004      0.000423    78.92    78.92    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                       6          0.0005                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
@@ -391,6 +545,44 @@ checks for leaked memory.
   n_processors()=1
   n_threads()=1
   processor_id()=0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:55 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.08387, Active time=0.000386                                              |
+ ------------------------------------------------------------------------------------------------------------
+| Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()            1          0.0001      0.000057    0.0001      0.000057    14.77    14.77    |
+|   renumber_nodes_and_elem()   2          0.0000      0.000011    0.0000      0.000011    5.70     5.70     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   set_node_processor_ids()    1          0.0000      0.000038    0.0000      0.000038    9.84     9.84     |
+|   single_partition()          1          0.0000      0.000003    0.0000      0.000003    0.78     0.78     |
+|                                                                                                            |
+| XdrIO                                                                                                      |
+|   read()                      1          0.0003      0.000266    0.0003      0.000266    68.91    68.91    |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                       6          0.0004                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************

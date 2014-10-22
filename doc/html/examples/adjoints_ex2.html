@@ -39,6 +39,91 @@
 <div id="content">
 
 <a name="comments"></a> 
+<br><br><br> <h1> The source file femparameters.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #ifndef __fem_parameters_h__
+        #define __fem_parameters_h__
+        
+        #include &lt;limits&gt;
+        #include &lt;string&gt;
+        
+        #include "libmesh/libmesh_common.h"
+        #include "libmesh/getpot.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        class FEMParameters
+        {
+        public:
+          FEMParameters() :
+            domainfile("lshaped.xda"),
+            coarserefinements(0),
+            solver_quiet(true),
+            require_residual_reduction(true),
+            min_step_length(1e-5),
+            max_linear_iterations(200000), max_nonlinear_iterations(20),
+            relative_step_tolerance(1.e-7), relative_residual_tolerance(1.e-10),
+            initial_linear_tolerance(1.e-3), minimum_linear_tolerance(TOLERANCE*TOLERANCE),
+            linear_tolerance_multiplier(1.e-3),
+            nelem_target(30000), global_tolerance(0.0),
+            refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
+            refine_uniformly(false),
+            max_adaptivesteps(1),
+            indicator_type("kelly"),
+            fe_family(1, "LAGRANGE"), fe_order(1, 1),
+            analytic_jacobians(true), verify_analytic_jacobians(0.0),
+            print_solution_norms(false), print_solutions(false),
+            print_residual_norms(false), print_residuals(false),
+            print_jacobian_norms(false), print_jacobians(false) {}
+        
+          void read(GetPot &input);
+        
+          std::string domainfile;
+          unsigned int coarserefinements;
+        
+          bool solver_quiet, require_residual_reduction;
+          Real min_step_length;
+          unsigned int max_linear_iterations, max_nonlinear_iterations;
+          Real relative_step_tolerance, relative_residual_tolerance,
+            initial_linear_tolerance, minimum_linear_tolerance,
+            linear_tolerance_multiplier;
+        
+          unsigned int nelem_target;
+          Real global_tolerance;
+          Real refine_fraction, coarsen_fraction, coarsen_threshold;
+          bool refine_uniformly;
+          unsigned int max_adaptivesteps;
+        
+          std::string indicator_type;
+        
+          std::vector&lt;std::string&gt; fe_family;
+          std::vector&lt;unsigned int&gt; fe_order;
+        
+          bool analytic_jacobians;
+          Real verify_analytic_jacobians;
+        
+          bool print_solution_norms, print_solutions,
+            print_residual_norms, print_residuals,
+            print_jacobian_norms, print_jacobians;
+        };
+        
+        #endif // __fem_parameters_h__
+</pre>
+</div>
+
+<a name="comments"></a> 
 <br><br><br> <h1> The source file L-qoi.h with comments: </h1> 
 <div class = "comment">
 </div>
@@ -247,719 +332,6 @@ Calculate Jacobians analytically or not?
 <pre>
           bool _analytic_jacobians;
         };
-</pre>
-</div>
-
-<a name="comments"></a> 
-<br><br><br> <h1> The source file femparameters.h with comments: </h1> 
-<div class = "comment">
-</div>
-
-<div class ="fragment">
-<pre>
-        #ifndef __fem_parameters_h__
-        #define __fem_parameters_h__
-        
-        #include &lt;limits&gt;
-        #include &lt;string&gt;
-        
-        #include "libmesh/libmesh_common.h"
-        #include "libmesh/getpot.h"
-        
-</pre>
-</div>
-<div class = "comment">
-Bring in everything from the libMesh namespace
-</div>
-
-<div class ="fragment">
-<pre>
-        using namespace libMesh;
-        
-        class FEMParameters
-        {
-        public:
-          FEMParameters() :
-            domainfile("lshaped.xda"),
-            coarserefinements(0),
-            solver_quiet(true),
-            require_residual_reduction(true),
-            min_step_length(1e-5),
-            max_linear_iterations(200000), max_nonlinear_iterations(20),
-            relative_step_tolerance(1.e-7), relative_residual_tolerance(1.e-10),
-            initial_linear_tolerance(1.e-3), minimum_linear_tolerance(TOLERANCE*TOLERANCE),
-            linear_tolerance_multiplier(1.e-3),
-            nelem_target(30000), global_tolerance(0.0),
-            refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
-            refine_uniformly(false),
-            max_adaptivesteps(1),
-            indicator_type("kelly"),
-            fe_family(1, "LAGRANGE"), fe_order(1, 1),
-            analytic_jacobians(true), verify_analytic_jacobians(0.0),
-            print_solution_norms(false), print_solutions(false),
-            print_residual_norms(false), print_residuals(false),
-            print_jacobian_norms(false), print_jacobians(false) {}
-        
-          void read(GetPot &input);
-        
-          std::string domainfile;
-          unsigned int coarserefinements;
-        
-          bool solver_quiet, require_residual_reduction;
-          Real min_step_length;
-          unsigned int max_linear_iterations, max_nonlinear_iterations;
-          Real relative_step_tolerance, relative_residual_tolerance,
-            initial_linear_tolerance, minimum_linear_tolerance,
-            linear_tolerance_multiplier;
-        
-          unsigned int nelem_target;
-          Real global_tolerance;
-          Real refine_fraction, coarsen_fraction, coarsen_threshold;
-          bool refine_uniformly;
-          unsigned int max_adaptivesteps;
-        
-          std::string indicator_type;
-        
-          std::vector&lt;std::string&gt; fe_family;
-          std::vector&lt;unsigned int&gt; fe_order;
-        
-          bool analytic_jacobians;
-          Real verify_analytic_jacobians;
-        
-          bool print_solution_norms, print_solutions,
-            print_residual_norms, print_residuals,
-            print_jacobian_norms, print_jacobians;
-        };
-        
-        #endif // __fem_parameters_h__
-</pre>
-</div>
-
-<a name="comments"></a> 
-<br><br><br> <h1> The source file L-qoi.C with comments: </h1> 
-<div class = "comment">
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "L-qoi.h"
-        
-        using namespace libMesh;
-        
-        void LaplaceQoI::init_qoi( std::vector&lt;Number&gt;& sys_qoi )
-        {
-</pre>
-</div>
-<div class = "comment">
-Only 1 qoi to worry about
-</div>
-
-<div class ="fragment">
-<pre>
-          sys_qoi.resize(1);
-          return;
-        }
-        
-</pre>
-</div>
-<div class = "comment">
-We only have one QoI, so we don't bother checking the qois argument
-to see if it was requested from us
-</div>
-
-<div class ="fragment">
-<pre>
-        void LaplaceQoI::element_qoi (DiffContext &context,
-                                      const QoISet & /* qois */ )
-        
-        {
-          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
-        
-          FEBase* elem_fe = NULL;
-          c.get_element_fe( 0, elem_fe );
-        
-</pre>
-</div>
-<div class = "comment">
-Element Jacobian * quadrature weights for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
-        
-          const std::vector&lt;Point&gt; &xyz = elem_fe-&gt;get_xyz();
-        
-          unsigned int n_qpoints = c.get_element_qrule().n_points();
-        
-          Number dQoI_0 = 0.;
-        
-</pre>
-</div>
-<div class = "comment">
-Loop over quadrature points
-
-
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-          for (unsigned int qp = 0; qp != n_qpoints; qp++)
-            {
-</pre>
-</div>
-<div class = "comment">
-Get co-ordinate locations of the current quadrature point
-</div>
-
-<div class ="fragment">
-<pre>
-              const Real xf = xyz[qp](0);
-              const Real yf = xyz[qp](1);
-        
-</pre>
-</div>
-<div class = "comment">
-If in the sub-domain omega, add the contribution to the integral R
-</div>
-
-<div class ="fragment">
-<pre>
-              if(fabs(xf - 0.875) &lt;= 0.125 && fabs(yf - 0.125) &lt;= 0.125)
-                {
-</pre>
-</div>
-<div class = "comment">
-Get the solution value at the quadrature point
-</div>
-
-<div class ="fragment">
-<pre>
-                  Number T = c.interior_value(0, qp);
-        
-</pre>
-</div>
-<div class = "comment">
-Update the elemental increment dR for each qp
-</div>
-
-<div class ="fragment">
-<pre>
-                  dQoI_0 += JxW[qp] * T;
-                }
-        
-            }
-        
-</pre>
-</div>
-<div class = "comment">
-Update the computed value of the global functional R, by adding the contribution from this element
-
-
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-          c.get_qois()[0] = c.get_qois()[0] + dQoI_0;
-        
-        }
-        
-</pre>
-</div>
-<div class = "comment">
-We only have one QoI, so we don't bother checking the qois argument
-to see if it was requested from us
-</div>
-
-<div class ="fragment">
-<pre>
-        void LaplaceQoI::element_qoi_derivative (DiffContext &context,
-                                                 const QoISet & /* qois */)
-        {
-          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
-        
-</pre>
-</div>
-<div class = "comment">
-First we get some references to cell-specific data that
-will be used to assemble the linear system.
-</div>
-
-<div class ="fragment">
-<pre>
-          FEBase* elem_fe = NULL;
-          c.get_element_fe( 0, elem_fe );
-        
-</pre>
-</div>
-<div class = "comment">
-Element Jacobian * quadrature weights for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
-        
-</pre>
-</div>
-<div class = "comment">
-The basis functions for the element
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = elem_fe-&gt;get_phi();
-        
-</pre>
-</div>
-<div class = "comment">
-The element quadrature points
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Point &gt; &q_point = elem_fe-&gt;get_xyz();
-        
-</pre>
-</div>
-<div class = "comment">
-The number of local degrees of freedom in each variable
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int n_T_dofs = c.get_dof_indices(0).size();
-          unsigned int n_qpoints = c.get_element_qrule().n_points();
-        
-</pre>
-</div>
-<div class = "comment">
-Fill the QoI RHS corresponding to this QoI. Since this is the 0th QoI
-we fill in the [0][i] subderivatives, i corresponding to the variable index.
-Our system has only one variable, so we only have to fill the [0][0] subderivative
-</div>
-
-<div class ="fragment">
-<pre>
-          DenseSubVector&lt;Number&gt; &Q = c.get_qoi_derivatives(0,0);
-        
-</pre>
-</div>
-<div class = "comment">
-Loop over the qps
-</div>
-
-<div class ="fragment">
-<pre>
-          for (unsigned int qp=0; qp != n_qpoints; qp++)
-            {
-              const Real x = q_point[qp](0);
-              const Real y = q_point[qp](1);
-        
-</pre>
-</div>
-<div class = "comment">
-If in the sub-domain over which QoI 0 is supported, add contributions
-to the adjoint rhs
-</div>
-
-<div class ="fragment">
-<pre>
-              if(fabs(x - 0.875) &lt;= 0.125 && fabs(y - 0.125) &lt;= 0.125)
-                {
-                  for (unsigned int i=0; i != n_T_dofs; i++)
-                    Q(i) += JxW[qp] *phi[i][qp] ;
-                }
-        
-            } // end of the quadrature point qp-loop
-        }
-</pre>
-</div>
-
-<a name="comments"></a> 
-<br><br><br> <h1> The source file L-shaped.C with comments: </h1> 
-<div class = "comment">
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "libmesh/getpot.h"
-        #include "libmesh/fe_base.h"
-        #include "libmesh/quadrature.h"
-        #include "libmesh/string_to_enum.h"
-        #include "libmesh/parallel.h"
-        #include "libmesh/fem_context.h"
-        
-</pre>
-</div>
-<div class = "comment">
-Local includes
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "L-shaped.h"
-        
-</pre>
-</div>
-<div class = "comment">
-Bring in everything from the libMesh namespace
-</div>
-
-<div class ="fragment">
-<pre>
-        using namespace libMesh;
-        
-        void LaplaceSystem::init_data ()
-        {
-          this-&gt;add_variable ("T", static_cast&lt;Order&gt;(_fe_order),
-                              Utility::string_to_enum&lt;FEFamily&gt;(_fe_family));
-        
-          GetPot infile("l-shaped.in");
-          parameters.push_back(infile("alpha_1", 1.0));
-          parameters.push_back(infile("alpha_2", 1.0));
-        
-</pre>
-</div>
-<div class = "comment">
-Do the parent's initialization after variables are defined
-</div>
-
-<div class ="fragment">
-<pre>
-          FEMSystem::init_data();
-        
-          this-&gt;time_evolving(0);
-        }
-        
-        void LaplaceSystem::init_context(DiffContext &context)
-        {
-          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
-        
-</pre>
-</div>
-<div class = "comment">
-Now make sure we have requested all the data
-we need to build the linear system.
-</div>
-
-<div class ="fragment">
-<pre>
-          FEBase* elem_fe = NULL;
-          c.get_element_fe( 0, elem_fe );
-          elem_fe-&gt;get_JxW();
-          elem_fe-&gt;get_phi();
-          elem_fe-&gt;get_dphi();
-        
-          FEBase* side_fe = NULL;
-          c.get_side_fe( 0, side_fe );
-        
-          side_fe-&gt;get_JxW();
-          side_fe-&gt;get_phi();
-          side_fe-&gt;get_dphi();
-        }
-        
-        #define optassert(X) {if (!(X)) libmesh_error_msg("Assertion " #X " failed.");}
-        
-</pre>
-</div>
-<div class = "comment">
-Assemble the element contributions to the stiffness matrix
-</div>
-
-<div class ="fragment">
-<pre>
-        bool LaplaceSystem::element_time_derivative (bool request_jacobian,
-                                                     DiffContext &context)
-        {
-</pre>
-</div>
-<div class = "comment">
-Are the jacobians specified analytically ?
-</div>
-
-<div class ="fragment">
-<pre>
-          bool compute_jacobian = request_jacobian && _analytic_jacobians;
-        
-          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
-        
-</pre>
-</div>
-<div class = "comment">
-First we get some references to cell-specific data that
-will be used to assemble the linear system.
-</div>
-
-<div class ="fragment">
-<pre>
-          FEBase* elem_fe = NULL;
-          c.get_element_fe( 0, elem_fe );
-        
-</pre>
-</div>
-<div class = "comment">
-Element Jacobian * quadrature weights for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
-        
-</pre>
-</div>
-<div class = "comment">
-Element basis functions
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &dphi = elem_fe-&gt;get_dphi();
-        
-</pre>
-</div>
-<div class = "comment">
-The number of local degrees of freedom in each variable
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int n_T_dofs = c.get_dof_indices(0).size();
-        
-</pre>
-</div>
-<div class = "comment">
-The subvectors and submatrices we need to fill:
-</div>
-
-<div class ="fragment">
-<pre>
-          DenseSubMatrix&lt;Number&gt; &K = c.get_elem_jacobian(0,0);
-          DenseSubVector&lt;Number&gt; &F = c.get_elem_residual(0);
-        
-</pre>
-</div>
-<div class = "comment">
-Now we will build the element Jacobian and residual.
-Constructing the residual requires the solution and its
-gradient from the previous timestep.  This must be
-calculated at each quadrature point by summing the
-solution degree-of-freedom values by the appropriate
-weight functions.
-</div>
-
-<div class ="fragment">
-<pre>
-          unsigned int n_qpoints = c.get_element_qrule().n_points();
-        
-          for (unsigned int qp=0; qp != n_qpoints; qp++)
-            {
-</pre>
-</div>
-<div class = "comment">
-Compute the solution gradient at the Newton iterate
-</div>
-
-<div class ="fragment">
-<pre>
-              Gradient grad_T = c.interior_gradient(0, qp);
-        
-</pre>
-</div>
-<div class = "comment">
-The residual contribution from this element
-</div>
-
-<div class ="fragment">
-<pre>
-              for (unsigned int i=0; i != n_T_dofs; i++)
-                F(i) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( grad_T * dphi[i][qp] ) ;
-              if (compute_jacobian)
-                for (unsigned int i=0; i != n_T_dofs; i++)
-                  for (unsigned int j=0; j != n_T_dofs; ++j)
-</pre>
-</div>
-<div class = "comment">
-The analytic jacobian
-</div>
-
-<div class ="fragment">
-<pre>
-                    K(i,j) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( dphi[i][qp] * dphi[j][qp] );
-            } // end of the quadrature point qp-loop
-        
-          return compute_jacobian;
-        }
-        
-</pre>
-</div>
-<div class = "comment">
-Set Dirichlet bcs, side contributions to global stiffness matrix
-</div>
-
-<div class ="fragment">
-<pre>
-        bool LaplaceSystem::side_constraint (bool request_jacobian,
-                                             DiffContext &context)
-        {
-</pre>
-</div>
-<div class = "comment">
-Are the jacobians specified analytically ?
-</div>
-
-<div class ="fragment">
-<pre>
-          bool compute_jacobian = request_jacobian && _analytic_jacobians;
-        
-          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
-        
-</pre>
-</div>
-<div class = "comment">
-First we get some references to cell-specific data that
-will be used to assemble the linear system.
-</div>
-
-<div class ="fragment">
-<pre>
-          FEBase* side_fe = NULL;
-          c.get_side_fe( 0, side_fe );
-        
-</pre>
-</div>
-<div class = "comment">
-Element Jacobian * quadrature weights for interior integration
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Real&gt; &JxW = side_fe-&gt;get_JxW();
-        
-</pre>
-</div>
-<div class = "comment">
-Side basis functions
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = side_fe-&gt;get_phi();
-        
-</pre>
-</div>
-<div class = "comment">
-Side Quadrature points
-</div>
-
-<div class ="fragment">
-<pre>
-          const std::vector&lt;Point &gt; &qside_point = side_fe-&gt;get_xyz();
-        
-</pre>
-</div>
-<div class = "comment">
-The number of local degrees of freedom in each variable
-</div>
-
-<div class ="fragment">
-<pre>
-          const unsigned int n_T_dofs = c.get_dof_indices(0).size();
-        
-</pre>
-</div>
-<div class = "comment">
-The subvectors and submatrices we need to fill:
-</div>
-
-<div class ="fragment">
-<pre>
-          DenseSubMatrix&lt;Number&gt; &K = c.get_elem_jacobian(0,0);
-          DenseSubVector&lt;Number&gt; &F = c.get_elem_residual(0);
-        
-          unsigned int n_qpoints = c.get_side_qrule().n_points();
-        
-          const Real penalty = 1./(TOLERANCE*TOLERANCE);
-        
-          for (unsigned int qp=0; qp != n_qpoints; qp++)
-            {
-</pre>
-</div>
-<div class = "comment">
-Compute the solution at the old Newton iterate
-</div>
-
-<div class ="fragment">
-<pre>
-              Number T = c.side_value(0, qp);
-        
-</pre>
-</div>
-<div class = "comment">
-We get the Dirichlet bcs from the exact solution
-</div>
-
-<div class ="fragment">
-<pre>
-              Number u_dirichlet = exact_solution (qside_point[qp]);
-        
-</pre>
-</div>
-<div class = "comment">
-The residual from the boundary terms, penalize non-zero temperature
-</div>
-
-<div class ="fragment">
-<pre>
-              for (unsigned int i=0; i != n_T_dofs; i++)
-                F(i) += JxW[qp] * penalty * ( T - u_dirichlet) * phi[i][qp];
-              if (compute_jacobian)
-                for (unsigned int i=0; i != n_T_dofs; i++)
-                  for (unsigned int j=0; j != n_T_dofs; ++j)
-</pre>
-</div>
-<div class = "comment">
-The analytic jacobian
-</div>
-
-<div class ="fragment">
-<pre>
-                    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
-        
-            } // end of the quadrature point qp-loop
-        
-          return compute_jacobian;
-        }
-        
-</pre>
-</div>
-<div class = "comment">
-The exact solution to the singular problem,
-u_exact = r^(2/3)*sin(2*theta/3). We use this to set the Dirichlet boundary conditions
-</div>
-
-<div class ="fragment">
-<pre>
-        Number LaplaceSystem::exact_solution(const Point& p)// xyz location
-        {
-          const Real x1 = p(0);
-          const Real x2 = p(1);
-        
-          Real theta = atan2(x2,x1);
-        
-</pre>
-</div>
-<div class = "comment">
-Make sure 0 <= theta <= 2*pi
-</div>
-
-<div class ="fragment">
-<pre>
-          if (theta &lt; 0)
-            theta += 2. * libMesh::pi;
-        
-          return (parameters[0] + (2.*parameters[1])) * pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
-        }
 </pre>
 </div>
 
@@ -1959,6 +1331,705 @@ All done.
 </pre>
 </div>
 
+<a name="comments"></a> 
+<br><br><br> <h1> The source file L-qoi.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "L-qoi.h"
+        
+        using namespace libMesh;
+        
+        void LaplaceQoI::init_qoi( std::vector&lt;Number&gt;& sys_qoi )
+        {
+</pre>
+</div>
+<div class = "comment">
+Only 1 qoi to worry about
+</div>
+
+<div class ="fragment">
+<pre>
+          sys_qoi.resize(1);
+          return;
+        }
+        
+</pre>
+</div>
+<div class = "comment">
+We only have one QoI, so we don't bother checking the qois argument
+to see if it was requested from us
+</div>
+
+<div class ="fragment">
+<pre>
+        void LaplaceQoI::element_qoi (DiffContext &context,
+                                      const QoISet & /* qois */ )
+        
+        {
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+          FEBase* elem_fe = NULL;
+          c.get_element_fe( 0, elem_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+          const std::vector&lt;Point&gt; &xyz = elem_fe-&gt;get_xyz();
+        
+          unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+          Number dQoI_0 = 0.;
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over quadrature points
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+          for (unsigned int qp = 0; qp != n_qpoints; qp++)
+            {
+</pre>
+</div>
+<div class = "comment">
+Get co-ordinate locations of the current quadrature point
+</div>
+
+<div class ="fragment">
+<pre>
+              const Real xf = xyz[qp](0);
+              const Real yf = xyz[qp](1);
+        
+</pre>
+</div>
+<div class = "comment">
+If in the sub-domain omega, add the contribution to the integral R
+</div>
+
+<div class ="fragment">
+<pre>
+              if(fabs(xf - 0.875) &lt;= 0.125 && fabs(yf - 0.125) &lt;= 0.125)
+                {
+</pre>
+</div>
+<div class = "comment">
+Get the solution value at the quadrature point
+</div>
+
+<div class ="fragment">
+<pre>
+                  Number T = c.interior_value(0, qp);
+        
+</pre>
+</div>
+<div class = "comment">
+Update the elemental increment dR for each qp
+</div>
+
+<div class ="fragment">
+<pre>
+                  dQoI_0 += JxW[qp] * T;
+                }
+        
+            }
+        
+</pre>
+</div>
+<div class = "comment">
+Update the computed value of the global functional R, by adding the contribution from this element
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+          c.get_qois()[0] = c.get_qois()[0] + dQoI_0;
+        
+        }
+        
+</pre>
+</div>
+<div class = "comment">
+We only have one QoI, so we don't bother checking the qois argument
+to see if it was requested from us
+</div>
+
+<div class ="fragment">
+<pre>
+        void LaplaceQoI::element_qoi_derivative (DiffContext &context,
+                                                 const QoISet & /* qois */)
+        {
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+First we get some references to cell-specific data that
+will be used to assemble the linear system.
+</div>
+
+<div class ="fragment">
+<pre>
+          FEBase* elem_fe = NULL;
+          c.get_element_fe( 0, elem_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The basis functions for the element
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = elem_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The element quadrature points
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Point &gt; &q_point = elem_fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+          unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+</pre>
+</div>
+<div class = "comment">
+Fill the QoI RHS corresponding to this QoI. Since this is the 0th QoI
+we fill in the [0][i] subderivatives, i corresponding to the variable index.
+Our system has only one variable, so we only have to fill the [0][0] subderivative
+</div>
+
+<div class ="fragment">
+<pre>
+          DenseSubVector&lt;Number&gt; &Q = c.get_qoi_derivatives(0,0);
+        
+</pre>
+</div>
+<div class = "comment">
+Loop over the qps
+</div>
+
+<div class ="fragment">
+<pre>
+          for (unsigned int qp=0; qp != n_qpoints; qp++)
+            {
+              const Real x = q_point[qp](0);
+              const Real y = q_point[qp](1);
+        
+</pre>
+</div>
+<div class = "comment">
+If in the sub-domain over which QoI 0 is supported, add contributions
+to the adjoint rhs
+</div>
+
+<div class ="fragment">
+<pre>
+              if(fabs(x - 0.875) &lt;= 0.125 && fabs(y - 0.125) &lt;= 0.125)
+                {
+                  for (unsigned int i=0; i != n_T_dofs; i++)
+                    Q(i) += JxW[qp] *phi[i][qp] ;
+                }
+        
+            } // end of the quadrature point qp-loop
+        }
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file L-shaped.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/getpot.h"
+        #include "libmesh/fe_base.h"
+        #include "libmesh/quadrature.h"
+        #include "libmesh/string_to_enum.h"
+        #include "libmesh/parallel.h"
+        #include "libmesh/fem_context.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Local includes
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "L-shaped.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        void LaplaceSystem::init_data ()
+        {
+          this-&gt;add_variable ("T", static_cast&lt;Order&gt;(_fe_order),
+                              Utility::string_to_enum&lt;FEFamily&gt;(_fe_family));
+        
+          GetPot infile("l-shaped.in");
+          parameters.push_back(infile("alpha_1", 1.0));
+          parameters.push_back(infile("alpha_2", 1.0));
+        
+</pre>
+</div>
+<div class = "comment">
+Do the parent's initialization after variables are defined
+</div>
+
+<div class ="fragment">
+<pre>
+          FEMSystem::init_data();
+        
+          this-&gt;time_evolving(0);
+        }
+        
+        void LaplaceSystem::init_context(DiffContext &context)
+        {
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+Now make sure we have requested all the data
+we need to build the linear system.
+</div>
+
+<div class ="fragment">
+<pre>
+          FEBase* elem_fe = NULL;
+          c.get_element_fe( 0, elem_fe );
+          elem_fe-&gt;get_JxW();
+          elem_fe-&gt;get_phi();
+          elem_fe-&gt;get_dphi();
+        
+          FEBase* side_fe = NULL;
+          c.get_side_fe( 0, side_fe );
+        
+          side_fe-&gt;get_JxW();
+          side_fe-&gt;get_phi();
+          side_fe-&gt;get_dphi();
+        }
+        
+        #define optassert(X) {if (!(X)) libmesh_error_msg("Assertion " #X " failed.");}
+        
+</pre>
+</div>
+<div class = "comment">
+Assemble the element contributions to the stiffness matrix
+</div>
+
+<div class ="fragment">
+<pre>
+        bool LaplaceSystem::element_time_derivative (bool request_jacobian,
+                                                     DiffContext &context)
+        {
+</pre>
+</div>
+<div class = "comment">
+Are the jacobians specified analytically ?
+</div>
+
+<div class ="fragment">
+<pre>
+          bool compute_jacobian = request_jacobian && _analytic_jacobians;
+        
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+First we get some references to cell-specific data that
+will be used to assemble the linear system.
+</div>
+
+<div class ="fragment">
+<pre>
+          FEBase* elem_fe = NULL;
+          c.get_element_fe( 0, elem_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+Element basis functions
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &dphi = elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+        
+</pre>
+</div>
+<div class = "comment">
+The subvectors and submatrices we need to fill:
+</div>
+
+<div class ="fragment">
+<pre>
+          DenseSubMatrix&lt;Number&gt; &K = c.get_elem_jacobian(0,0);
+          DenseSubVector&lt;Number&gt; &F = c.get_elem_residual(0);
+        
+</pre>
+</div>
+<div class = "comment">
+Now we will build the element Jacobian and residual.
+Constructing the residual requires the solution and its
+gradient from the previous timestep.  This must be
+calculated at each quadrature point by summing the
+solution degree-of-freedom values by the appropriate
+weight functions.
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = c.get_element_qrule().n_points();
+        
+          for (unsigned int qp=0; qp != n_qpoints; qp++)
+            {
+</pre>
+</div>
+<div class = "comment">
+Compute the solution gradient at the Newton iterate
+</div>
+
+<div class ="fragment">
+<pre>
+              Gradient grad_T = c.interior_gradient(0, qp);
+        
+</pre>
+</div>
+<div class = "comment">
+The residual contribution from this element
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int i=0; i != n_T_dofs; i++)
+                F(i) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( grad_T * dphi[i][qp] ) ;
+              if (compute_jacobian)
+                for (unsigned int i=0; i != n_T_dofs; i++)
+                  for (unsigned int j=0; j != n_T_dofs; ++j)
+</pre>
+</div>
+<div class = "comment">
+The analytic jacobian
+</div>
+
+<div class ="fragment">
+<pre>
+                    K(i,j) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( dphi[i][qp] * dphi[j][qp] );
+            } // end of the quadrature point qp-loop
+        
+          return compute_jacobian;
+        }
+        
+</pre>
+</div>
+<div class = "comment">
+Set Dirichlet bcs, side contributions to global stiffness matrix
+</div>
+
+<div class ="fragment">
+<pre>
+        bool LaplaceSystem::side_constraint (bool request_jacobian,
+                                             DiffContext &context)
+        {
+</pre>
+</div>
+<div class = "comment">
+Are the jacobians specified analytically ?
+</div>
+
+<div class ="fragment">
+<pre>
+          bool compute_jacobian = request_jacobian && _analytic_jacobians;
+        
+          FEMContext &c = cast_ref&lt;FEMContext&&gt;(context);
+        
+</pre>
+</div>
+<div class = "comment">
+First we get some references to cell-specific data that
+will be used to assemble the linear system.
+</div>
+
+<div class ="fragment">
+<pre>
+          FEBase* side_fe = NULL;
+          c.get_side_fe( 0, side_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = side_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+Side basis functions
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = side_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+Side Quadrature points
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Point &gt; &qside_point = side_fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+        
+</pre>
+</div>
+<div class = "comment">
+The subvectors and submatrices we need to fill:
+</div>
+
+<div class ="fragment">
+<pre>
+          DenseSubMatrix&lt;Number&gt; &K = c.get_elem_jacobian(0,0);
+          DenseSubVector&lt;Number&gt; &F = c.get_elem_residual(0);
+        
+          unsigned int n_qpoints = c.get_side_qrule().n_points();
+        
+          const Real penalty = 1./(TOLERANCE*TOLERANCE);
+        
+          for (unsigned int qp=0; qp != n_qpoints; qp++)
+            {
+</pre>
+</div>
+<div class = "comment">
+Compute the solution at the old Newton iterate
+</div>
+
+<div class ="fragment">
+<pre>
+              Number T = c.side_value(0, qp);
+        
+</pre>
+</div>
+<div class = "comment">
+We get the Dirichlet bcs from the exact solution
+</div>
+
+<div class ="fragment">
+<pre>
+              Number u_dirichlet = exact_solution (qside_point[qp]);
+        
+</pre>
+</div>
+<div class = "comment">
+The residual from the boundary terms, penalize non-zero temperature
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int i=0; i != n_T_dofs; i++)
+                F(i) += JxW[qp] * penalty * ( T - u_dirichlet) * phi[i][qp];
+              if (compute_jacobian)
+                for (unsigned int i=0; i != n_T_dofs; i++)
+                  for (unsigned int j=0; j != n_T_dofs; ++j)
+</pre>
+</div>
+<div class = "comment">
+The analytic jacobian
+</div>
+
+<div class ="fragment">
+<pre>
+                    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
+        
+            } // end of the quadrature point qp-loop
+        
+          return compute_jacobian;
+        }
+        
+</pre>
+</div>
+<div class = "comment">
+The exact solution to the singular problem,
+u_exact = r^(2/3)*sin(2*theta/3). We use this to set the Dirichlet boundary conditions
+</div>
+
+<div class ="fragment">
+<pre>
+        Number LaplaceSystem::exact_solution(const Point& p)// xyz location
+        {
+          const Real x1 = p(0);
+          const Real x2 = p(1);
+        
+          Real theta = atan2(x2,x1);
+        
+</pre>
+</div>
+<div class = "comment">
+Make sure 0 <= theta <= 2*pi
+</div>
+
+<div class ="fragment">
+<pre>
+          if (theta &lt; 0)
+            theta += 2. * libMesh::pi;
+        
+          return (parameters[0] + (2.*parameters[1])) * pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
+        }
+</pre>
+</div>
+
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file femparameters.h without comments: </h1> 
+<pre> 
+  #ifndef __fem_parameters_h__
+  #define __fem_parameters_h__
+  
+  #include &lt;limits&gt;
+  #include &lt;string&gt;
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_common.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> FEMParameters
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+    FEMParameters() :
+      domainfile(<B><FONT COLOR="#BC8F8F">&quot;lshaped.xda&quot;</FONT></B>),
+      coarserefinements(0),
+      solver_quiet(true),
+      require_residual_reduction(true),
+      min_step_length(1e-5),
+      max_linear_iterations(200000), max_nonlinear_iterations(20),
+      relative_step_tolerance(1.e-7), relative_residual_tolerance(1.e-10),
+      initial_linear_tolerance(1.e-3), minimum_linear_tolerance(TOLERANCE*TOLERANCE),
+      linear_tolerance_multiplier(1.e-3),
+      nelem_target(30000), global_tolerance(0.0),
+      refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
+      refine_uniformly(false),
+      max_adaptivesteps(1),
+      indicator_type(<B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>),
+      fe_family(1, <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>), fe_order(1, 1),
+      analytic_jacobians(true), verify_analytic_jacobians(0.0),
+      print_solution_norms(false), print_solutions(false),
+      print_residual_norms(false), print_residuals(false),
+      print_jacobian_norms(false), print_jacobians(false) {}
+  
+    <B><FONT COLOR="#228B22">void</FONT></B> read(GetPot &amp;input);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string domainfile;
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarserefinements;
+  
+    <B><FONT COLOR="#228B22">bool</FONT></B> solver_quiet, require_residual_reduction;
+    Real min_step_length;
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_linear_iterations, max_nonlinear_iterations;
+    Real relative_step_tolerance, relative_residual_tolerance,
+      initial_linear_tolerance, minimum_linear_tolerance,
+      linear_tolerance_multiplier;
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nelem_target;
+    Real global_tolerance;
+    Real refine_fraction, coarsen_fraction, coarsen_threshold;
+    <B><FONT COLOR="#228B22">bool</FONT></B> refine_uniformly;
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_adaptivesteps;
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string indicator_type;
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::string&gt; fe_family;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; fe_order;
+  
+    <B><FONT COLOR="#228B22">bool</FONT></B> analytic_jacobians;
+    Real verify_analytic_jacobians;
+  
+    <B><FONT COLOR="#228B22">bool</FONT></B> print_solution_norms, print_solutions,
+      print_residual_norms, print_residuals,
+      print_jacobian_norms, print_jacobians;
+  };
+  
+  #endif <I><FONT COLOR="#B22222">// __fem_parameters_h__
+</pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file L-qoi.h without comments: </h1> 
 <pre> 
@@ -2059,300 +2130,6 @@ All done.
   
     <B><FONT COLOR="#228B22">bool</FONT></B> _analytic_jacobians;
   };
-</pre> 
-<a name="nocomments"></a> 
-<br><br><br> <h1> The source file femparameters.h without comments: </h1> 
-<pre> 
-  #ifndef __fem_parameters_h__
-  #define __fem_parameters_h__
-  
-  #include &lt;limits&gt;
-  #include &lt;string&gt;
-  
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh_common.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
-  
-  using namespace libMesh;
-  
-  <B><FONT COLOR="#228B22">class</FONT></B> FEMParameters
-  {
-  <B><FONT COLOR="#228B22">public</FONT></B>:
-    FEMParameters() :
-      domainfile(<B><FONT COLOR="#BC8F8F">&quot;lshaped.xda&quot;</FONT></B>),
-      coarserefinements(0),
-      solver_quiet(true),
-      require_residual_reduction(true),
-      min_step_length(1e-5),
-      max_linear_iterations(200000), max_nonlinear_iterations(20),
-      relative_step_tolerance(1.e-7), relative_residual_tolerance(1.e-10),
-      initial_linear_tolerance(1.e-3), minimum_linear_tolerance(TOLERANCE*TOLERANCE),
-      linear_tolerance_multiplier(1.e-3),
-      nelem_target(30000), global_tolerance(0.0),
-      refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
-      refine_uniformly(false),
-      max_adaptivesteps(1),
-      indicator_type(<B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>),
-      fe_family(1, <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>), fe_order(1, 1),
-      analytic_jacobians(true), verify_analytic_jacobians(0.0),
-      print_solution_norms(false), print_solutions(false),
-      print_residual_norms(false), print_residuals(false),
-      print_jacobian_norms(false), print_jacobians(false) {}
-  
-    <B><FONT COLOR="#228B22">void</FONT></B> read(GetPot &amp;input);
-  
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string domainfile;
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarserefinements;
-  
-    <B><FONT COLOR="#228B22">bool</FONT></B> solver_quiet, require_residual_reduction;
-    Real min_step_length;
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_linear_iterations, max_nonlinear_iterations;
-    Real relative_step_tolerance, relative_residual_tolerance,
-      initial_linear_tolerance, minimum_linear_tolerance,
-      linear_tolerance_multiplier;
-  
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> nelem_target;
-    Real global_tolerance;
-    Real refine_fraction, coarsen_fraction, coarsen_threshold;
-    <B><FONT COLOR="#228B22">bool</FONT></B> refine_uniformly;
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_adaptivesteps;
-  
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string indicator_type;
-  
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::string&gt; fe_family;
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; fe_order;
-  
-    <B><FONT COLOR="#228B22">bool</FONT></B> analytic_jacobians;
-    Real verify_analytic_jacobians;
-  
-    <B><FONT COLOR="#228B22">bool</FONT></B> print_solution_norms, print_solutions,
-      print_residual_norms, print_residuals,
-      print_jacobian_norms, print_jacobians;
-  };
-  
-  #endif <I><FONT COLOR="#B22222">// __fem_parameters_h__
-</pre> 
-<a name="nocomments"></a> 
-<br><br><br> <h1> The source file L-qoi.C without comments: </h1> 
-<pre> 
-  #include <B><FONT COLOR="#BC8F8F">&quot;L-qoi.h&quot;</FONT></B>
-  
-  using namespace libMesh;
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceQoI::init_qoi( std::vector&lt;Number&gt;&amp; sys_qoi )
-  {
-    sys_qoi.resize(1);
-    <B><FONT COLOR="#A020F0">return</FONT></B>;
-  }
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceQoI::element_qoi (DiffContext &amp;context,
-                                <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I> )
-  
-  {
-    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
-  
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( 0, elem_fe );
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt; &amp;xyz = elem_fe-&gt;get_xyz();
-  
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
-  
-    Number dQoI_0 = 0.;
-  
-  
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp = 0; qp != n_qpoints; qp++)
-      {
-        <B><FONT COLOR="#228B22">const</FONT></B> Real xf = xyz[qp](0);
-        <B><FONT COLOR="#228B22">const</FONT></B> Real yf = xyz[qp](1);
-  
-        <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(xf - 0.875) &lt;= 0.125 &amp;&amp; fabs(yf - 0.125) &lt;= 0.125)
-          {
-            Number T = c.interior_value(0, qp);
-  
-            dQoI_0 += JxW[qp] * T;
-          }
-  
-      }
-  
-  
-    c.get_qois()[0] = c.get_qois()[0] + dQoI_0;
-  
-  }
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceQoI::element_qoi_derivative (DiffContext &amp;context,
-                                           <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
-  {
-    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
-  
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( 0, elem_fe );
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = elem_fe-&gt;get_phi();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = elem_fe-&gt;get_xyz();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.get_dof_indices(0).size();
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
-  
-    DenseSubVector&lt;Number&gt; &amp;Q = c.get_qoi_derivatives(0,0);
-  
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
-      {
-        <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
-        <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
-  
-        <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(x - 0.875) &lt;= 0.125 &amp;&amp; fabs(y - 0.125) &lt;= 0.125)
-          {
-            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
-              Q(i) += JxW[qp] *phi[i][qp] ;
-          }
-  
-      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>  }
-</pre> 
-<a name="nocomments"></a> 
-<br><br><br> <h1> The source file L-shaped.C without comments: </h1> 
-<pre> 
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/string_to_enum.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/parallel.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_context.h&quot;</FONT></B>
-  
-  #include <B><FONT COLOR="#BC8F8F">&quot;L-shaped.h&quot;</FONT></B>
-  
-  using namespace libMesh;
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceSystem::init_data ()
-  {
-    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;T&quot;</FONT></B>, static_cast&lt;Order&gt;(_fe_order),
-                        <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;FEFamily&gt;(_fe_family));
-  
-    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;l-shaped.in&quot;</FONT></B>);
-    parameters.push_back(infile(<B><FONT COLOR="#BC8F8F">&quot;alpha_1&quot;</FONT></B>, 1.0));
-    parameters.push_back(infile(<B><FONT COLOR="#BC8F8F">&quot;alpha_2&quot;</FONT></B>, 1.0));
-  
-    <B><FONT COLOR="#5F9EA0">FEMSystem</FONT></B>::init_data();
-  
-    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(0);
-  }
-  
-  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceSystem::init_context(DiffContext &amp;context)
-  {
-    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
-  
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( 0, elem_fe );
-    elem_fe-&gt;get_JxW();
-    elem_fe-&gt;get_phi();
-    elem_fe-&gt;get_dphi();
-  
-    FEBase* side_fe = NULL;
-    c.get_side_fe( 0, side_fe );
-  
-    side_fe-&gt;get_JxW();
-    side_fe-&gt;get_phi();
-    side_fe-&gt;get_dphi();
-  }
-  
-  #define optassert(X) {<B><FONT COLOR="#A020F0">if</FONT></B> (!(X)) libmesh_error_msg(<B><FONT COLOR="#BC8F8F">&quot;Assertion &quot;</FONT></B> #X <B><FONT COLOR="#BC8F8F">&quot; failed.&quot;</FONT></B>);}
-  
-  <B><FONT COLOR="#228B22">bool</FONT></B> LaplaceSystem::element_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
-                                               DiffContext &amp;context)
-  {
-    <B><FONT COLOR="#228B22">bool</FONT></B> compute_jacobian = request_jacobian &amp;&amp; _analytic_jacobians;
-  
-    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
-  
-    FEBase* elem_fe = NULL;
-    c.get_element_fe( 0, elem_fe );
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &amp;dphi = elem_fe-&gt;get_dphi();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.get_dof_indices(0).size();
-  
-    DenseSubMatrix&lt;Number&gt; &amp;K = c.get_elem_jacobian(0,0);
-    DenseSubVector&lt;Number&gt; &amp;F = c.get_elem_residual(0);
-  
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
-  
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
-      {
-        Gradient grad_T = c.interior_gradient(0, qp);
-  
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
-          F(i) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( grad_T * dphi[i][qp] ) ;
-        <B><FONT COLOR="#A020F0">if</FONT></B> (compute_jacobian)
-          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
-            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_T_dofs; ++j)
-              K(i,j) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( dphi[i][qp] * dphi[j][qp] );
-      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>  
-    <B><FONT COLOR="#A020F0">return</FONT></B> compute_jacobian;
-  }
-  
-  <B><FONT COLOR="#228B22">bool</FONT></B> LaplaceSystem::side_constraint (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
-                                       DiffContext &amp;context)
-  {
-    <B><FONT COLOR="#228B22">bool</FONT></B> compute_jacobian = request_jacobian &amp;&amp; _analytic_jacobians;
-  
-    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
-  
-    FEBase* side_fe = NULL;
-    c.get_side_fe( 0, side_fe );
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = side_fe-&gt;get_phi();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;qside_point = side_fe-&gt;get_xyz();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.get_dof_indices(0).size();
-  
-    DenseSubMatrix&lt;Number&gt; &amp;K = c.get_elem_jacobian(0,0);
-    DenseSubVector&lt;Number&gt; &amp;F = c.get_elem_residual(0);
-  
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
-  
-    <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1./(TOLERANCE*TOLERANCE);
-  
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
-      {
-        Number T = c.side_value(0, qp);
-  
-        Number u_dirichlet = exact_solution (qside_point[qp]);
-  
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
-          F(i) += JxW[qp] * penalty * ( T - u_dirichlet) * phi[i][qp];
-        <B><FONT COLOR="#A020F0">if</FONT></B> (compute_jacobian)
-          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
-            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_T_dofs; ++j)
-              K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
-  
-      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>  
-    <B><FONT COLOR="#A020F0">return</FONT></B> compute_jacobian;
-  }
-  
-  Number LaplaceSystem::exact_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p)<I><FONT COLOR="#B22222">// xyz location
-</FONT></I>  {
-    <B><FONT COLOR="#228B22">const</FONT></B> Real x1 = p(0);
-    <B><FONT COLOR="#228B22">const</FONT></B> Real x2 = p(1);
-  
-    Real theta = atan2(x2,x1);
-  
-    <B><FONT COLOR="#A020F0">if</FONT></B> (theta &lt; 0)
-      theta += 2. * libMesh::pi;
-  
-    <B><FONT COLOR="#A020F0">return</FONT></B> (parameters[0] + (2.*parameters[1])) * pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
-  }
 </pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file adjoints_ex2.C without comments: </h1> 
@@ -2817,6 +2594,229 @@ All done.
       }
   }
 </pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file L-qoi.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;L-qoi.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceQoI::init_qoi( std::vector&lt;Number&gt;&amp; sys_qoi )
+  {
+    sys_qoi.resize(1);
+    <B><FONT COLOR="#A020F0">return</FONT></B>;
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceQoI::element_qoi (DiffContext &amp;context,
+                                <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I> )
+  
+  {
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( 0, elem_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt; &amp;xyz = elem_fe-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    Number dQoI_0 = 0.;
+  
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp = 0; qp != n_qpoints; qp++)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Real xf = xyz[qp](0);
+        <B><FONT COLOR="#228B22">const</FONT></B> Real yf = xyz[qp](1);
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(xf - 0.875) &lt;= 0.125 &amp;&amp; fabs(yf - 0.125) &lt;= 0.125)
+          {
+            Number T = c.interior_value(0, qp);
+  
+            dQoI_0 += JxW[qp] * T;
+          }
+  
+      }
+  
+  
+    c.get_qois()[0] = c.get_qois()[0] + dQoI_0;
+  
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceQoI::element_qoi_derivative (DiffContext &amp;context,
+                                           <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
+  {
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( 0, elem_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = elem_fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = elem_fe-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.get_dof_indices(0).size();
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    DenseSubVector&lt;Number&gt; &amp;Q = c.get_qoi_derivatives(0,0);
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
+        <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
+  
+        <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(x - 0.875) &lt;= 0.125 &amp;&amp; fabs(y - 0.125) &lt;= 0.125)
+          {
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
+              Q(i) += JxW[qp] *phi[i][qp] ;
+          }
+  
+      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+</FONT></I>  }
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file L-shaped.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/string_to_enum.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/parallel.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_context.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;L-shaped.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceSystem::init_data ()
+  {
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;T&quot;</FONT></B>, static_cast&lt;Order&gt;(_fe_order),
+                        <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;FEFamily&gt;(_fe_family));
+  
+    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;l-shaped.in&quot;</FONT></B>);
+    parameters.push_back(infile(<B><FONT COLOR="#BC8F8F">&quot;alpha_1&quot;</FONT></B>, 1.0));
+    parameters.push_back(infile(<B><FONT COLOR="#BC8F8F">&quot;alpha_2&quot;</FONT></B>, 1.0));
+  
+    <B><FONT COLOR="#5F9EA0">FEMSystem</FONT></B>::init_data();
+  
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(0);
+  }
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> LaplaceSystem::init_context(DiffContext &amp;context)
+  {
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( 0, elem_fe );
+    elem_fe-&gt;get_JxW();
+    elem_fe-&gt;get_phi();
+    elem_fe-&gt;get_dphi();
+  
+    FEBase* side_fe = NULL;
+    c.get_side_fe( 0, side_fe );
+  
+    side_fe-&gt;get_JxW();
+    side_fe-&gt;get_phi();
+    side_fe-&gt;get_dphi();
+  }
+  
+  #define optassert(X) {<B><FONT COLOR="#A020F0">if</FONT></B> (!(X)) libmesh_error_msg(<B><FONT COLOR="#BC8F8F">&quot;Assertion &quot;</FONT></B> #X <B><FONT COLOR="#BC8F8F">&quot; failed.&quot;</FONT></B>);}
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> LaplaceSystem::element_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                               DiffContext &amp;context)
+  {
+    <B><FONT COLOR="#228B22">bool</FONT></B> compute_jacobian = request_jacobian &amp;&amp; _analytic_jacobians;
+  
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( 0, elem_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &amp;dphi = elem_fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.get_dof_indices(0).size();
+  
+    DenseSubMatrix&lt;Number&gt; &amp;K = c.get_elem_jacobian(0,0);
+    DenseSubVector&lt;Number&gt; &amp;F = c.get_elem_residual(0);
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_element_qrule().n_points();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+      {
+        Gradient grad_T = c.interior_gradient(0, qp);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
+          F(i) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( grad_T * dphi[i][qp] ) ;
+        <B><FONT COLOR="#A020F0">if</FONT></B> (compute_jacobian)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_T_dofs; ++j)
+              K(i,j) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( dphi[i][qp] * dphi[j][qp] );
+      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> compute_jacobian;
+  }
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> LaplaceSystem::side_constraint (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                       DiffContext &amp;context)
+  {
+    <B><FONT COLOR="#228B22">bool</FONT></B> compute_jacobian = request_jacobian &amp;&amp; _analytic_jacobians;
+  
+    FEMContext &amp;c = cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* side_fe = NULL;
+    c.get_side_fe( 0, side_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = side_fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;qside_point = side_fe-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.get_dof_indices(0).size();
+  
+    DenseSubMatrix&lt;Number&gt; &amp;K = c.get_elem_jacobian(0,0);
+    DenseSubVector&lt;Number&gt; &amp;F = c.get_elem_residual(0);
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.get_side_qrule().n_points();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1./(TOLERANCE*TOLERANCE);
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+      {
+        Number T = c.side_value(0, qp);
+  
+        Number u_dirichlet = exact_solution (qside_point[qp]);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
+          F(i) += JxW[qp] * penalty * ( T - u_dirichlet) * phi[i][qp];
+        <B><FONT COLOR="#A020F0">if</FONT></B> (compute_jacobian)
+          <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
+            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_T_dofs; ++j)
+              K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
+  
+      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> compute_jacobian;
+  }
+  
+  Number LaplaceSystem::exact_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p)<I><FONT COLOR="#B22222">// xyz location
+</FONT></I>  {
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x1 = p(0);
+    <B><FONT COLOR="#228B22">const</FONT></B> Real x2 = p(1);
+  
+    Real theta = atan2(x2,x1);
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (theta &lt; 0)
+      theta += 2. * libMesh::pi;
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> (parameters[0] + (2.*parameters[1])) * pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
+  }
+</pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
@@ -2825,7 +2825,7 @@ All done.
 *   example-opt  
 ***************************************************************
  
-Started /Users/benkirk/codes/libmesh/build/examples/adjoints/adjoints_ex2/.libs/example-opt
+Started /aerolab/benkirk/libmesh/gcc-4.6/examples/adjoints/adjoints_ex2/.libs/example-opt
 Reading in and building the mesh
 Building system
 Initializing systems
@@ -2848,8 +2848,9 @@ Initializing systems
    System #0, "LaplaceSystem"
     Type "Implicit"
     Variables="T" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" 
     n_dofs()=225
     n_local_dofs()=225
     n_constrained_dofs()=0
@@ -2863,43 +2864,147 @@ Initializing systems
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
 
-  Nonlinear solver converged, step 0, residual reduction 8.18062e-14 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 8.17664e-14 < 1e-09
 Adaptive step 0, we have 48 active elements and 225 active dofs.
 Sensitivity of QoI one to Parameter one is 0.00543563
 Sensitivity of QoI one to Parameter two is 0.0108713
-The relative error in sensitivity QoI_0_0 is 0.00027992868239221157
-The relative error in sensitivity QoI_0_1 is 0.00027992866916534399
+The relative error in sensitivity QoI_0_0 is 0.00027992856021716962
+The relative error in sensitivity QoI_0_1 is 0.00027992860450980396
 
 Refining Uniformly
 
 Refined mesh to 192 active elements and 833 active dofs.
-  Nonlinear solver converged, step 0, residual reduction 3.8573484613959342e-12 < 1.0000000000000001e-09
+  Nonlinear solver converged, step 0, residual reduction 4.1637053787019208e-12 < 1.0000000000000001e-09
 Adaptive step 1, we have 192 active elements and 833 active dofs.
-Sensitivity of QoI one to Parameter one is 0.0054364698952348274
-Sensitivity of QoI one to Parameter two is 0.010872939788928945
-The relative error in sensitivity QoI_0_0 is 0.00012463765143239816
-The relative error in sensitivity QoI_0_1 is 0.00012463779311576973
+Sensitivity of QoI one to Parameter one is 0.005436469894772495
+Sensitivity of QoI one to Parameter two is 0.010872939788486911
+The relative error in sensitivity QoI_0_0 is 0.00012463773646456317
+The relative error in sensitivity QoI_0_1 is 0.00012463783376516881
 
 Refining Uniformly
 
 Refined mesh to 768 active elements and 3201 active dofs.
-  Nonlinear solver converged, step 0, residual reduction 2.5479007834698864e-11 < 1.0000000000000001e-09
+  Nonlinear solver converged, step 0, residual reduction 2.3298598393207896e-11 < 1.0000000000000001e-09
 Adaptive step 2, we have 768 active elements and 3201 active dofs.
-Sensitivity of QoI one to Parameter one is 0.0054368750520457009
-Sensitivity of QoI one to Parameter two is 0.010873750103248246
-The relative error in sensitivity QoI_0_0 is 5.0121224249526138e-05
-The relative error in sensitivity QoI_0_1 is 5.0121301785764276e-05
+Sensitivity of QoI one to Parameter one is 0.0054368750522531418
+Sensitivity of QoI one to Parameter two is 0.010873750102935374
+The relative error in sensitivity QoI_0_0 is 5.0121186097014606e-05
+The relative error in sensitivity QoI_0_1 is 5.0121330557559369e-05
 
 Refining Uniformly
 
 Refined mesh to 3072 active elements and 12545 active dofs.
-  Nonlinear solver converged, step 0, residual reduction 2.0750039878243249e-10 < 1.0000000000000001e-09
+  Nonlinear solver converged, step 0, residual reduction 2.2994990154191769e-10 < 1.0000000000000001e-09
 Adaptive step 3, we have 3072 active elements and 12545 active dofs.
-Sensitivity of QoI one to Parameter one is 0.0054370390306551237
-Sensitivity of QoI one to Parameter two is 0.010874078059027655
-The error in sensitivity QoI_0_0 is 1.9962283857400438e-05
-The error in sensitivity QoI_0_1 is 1.9962493764251375e-05
+Sensitivity of QoI one to Parameter one is 0.0054370390302414546
+Sensitivity of QoI one to Parameter two is 0.010874078058554478
+The error in sensitivity QoI_0_0 is 1.9962359939407367e-05
+The error in sensitivity QoI_0_1 is 1.9962537277605313e-05
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:39:34 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=1.87007, Active time=1.73723                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     4          0.0015      0.000369    0.0015      0.000369    0.08     0.08     |
+|   build_sparsity()                 4          0.0134      0.003360    0.0170      0.004242    0.77     0.98     |
+|   create_dof_constraints()         4          0.0030      0.000743    0.0030      0.000743    0.17     0.17     |
+|   distribute_dofs()                4          0.0025      0.000622    0.0106      0.002653    0.14     0.61     |
+|   dof_indices()                    134608     0.1074      0.000001    0.1074      0.000001    6.18     6.18     |
+|   old_dof_indices()                16128      0.0114      0.000001    0.0114      0.000001    0.65     0.65     |
+|   prepare_send_list()              4          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         4          0.0081      0.002030    0.0081      0.002030    0.47     0.47     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          8          0.0118      0.001476    0.0185      0.002308    0.68     1.06     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        60960      0.2759      0.000005    0.2759      0.000005    15.88    15.88    |
+|   init_shape_functions()           3896       0.0127      0.000003    0.0127      0.000003    0.73     0.73     |
+|   inverse_map()                    44678      0.0810      0.000002    0.0810      0.000002    4.66     4.66     |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assemble_qoi()                   20         0.0559      0.002795    0.2315      0.011577    3.22     13.33    |
+|   assemble_qoi_derivative()        4          0.0217      0.005426    0.0590      0.014760    1.25     3.40     |
+|   assembly()                       8          0.0871      0.010890    0.1648      0.020599    5.01     9.49     |
+|   assembly(get_jacobian)           4          0.0428      0.010697    0.0811      0.020270    2.46     4.67     |
+|   assembly(get_residual)           20         0.0967      0.004835    0.2867      0.014336    5.57     16.50    |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             60960      0.0610      0.000001    0.0610      0.000001    3.51     3.51     |
+|   compute_face_map()               3840       0.0146      0.000004    0.0383      0.000010    0.84     2.21     |
+|   init_face_shape_functions()      32         0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
+|   init_reference_to_physical_map() 3896       0.0181      0.000005    0.0181      0.000005    1.04     1.04     |
+|                                                                                                                 |
+| GMVIO                                                                                                           |
+|   write_nodal_data()               8          0.1048      0.013095    0.1048      0.013095    6.03     6.03     |
+|                                                                                                                 |
+| ImplicitSystem                                                                                                  |
+|   adjoint_solve()                  4          0.0001      0.000031    0.3542      0.088550    0.01     20.39    |
+|                                                                                                                 |
+| LocationMap                                                                                                     |
+|   find()                           20460      0.0161      0.000001    0.0161      0.000001    0.93     0.93     |
+|   init()                           8          0.0033      0.000412    0.0033      0.000412    0.19     0.19     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   all_second_order()               1          0.0001      0.000095    0.0001      0.000095    0.01     0.01     |
+|   contract()                       3          0.0012      0.000403    0.0044      0.001465    0.07     0.25     |
+|   find_neighbors()                 6          0.0103      0.001719    0.0103      0.001719    0.59     0.59     |
+|   renumber_nodes_and_elem()        3          0.0032      0.001062    0.0032      0.001062    0.18     0.18     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         8          0.0002      0.000019    0.1234      0.015423    0.01     7.10     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _coarsen_elements()              3          0.0001      0.000039    0.0001      0.000039    0.01     0.01     |
+|   _refine_elements()               8          0.0198      0.002477    0.0557      0.006964    1.14     3.21     |
+|   add_point()                      20460      0.0162      0.000001    0.0341      0.000002    0.94     1.96     |
+|   make_coarsening_compatible()     3          0.0027      0.000901    0.0027      0.000901    0.16     0.16     |
+|   make_flags_parallel_consistent() 6          0.0010      0.000172    0.0010      0.000172    0.06     0.06     |
+|   make_refinement_compatible()     3          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          4          0.0094      0.002343    0.5033      0.125826    0.54     28.97    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      4          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               6          0.0004      0.000075    0.0004      0.000075    0.03     0.03     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          8          0.5678      0.070970    0.5678      0.070970    32.68    32.68    |
+|                                                                                                                 |
+| ProjectVector                                                                                                   |
+|   operator()                       6          0.0465      0.007747    0.1215      0.020249    2.68     6.99     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   project_vector()                 6          0.0073      0.001220    0.1351      0.022509    0.42     7.77     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            370104     1.7372                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************

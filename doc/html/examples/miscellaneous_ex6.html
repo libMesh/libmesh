@@ -931,6 +931,44 @@ Node pointer assigned from input mesh
  
 Triangulating an L-shaped domain with holes
 Tetrahedralizing a prismatic domain with a hole
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:39:55 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.105584, Active time=0.005416                                             |
+ ------------------------------------------------------------------------------------------------------------
+| Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|------------------------------------------------------------------------------------------------------------|
+|                                                                                                            |
+|                                                                                                            |
+| Mesh                                                                                                       |
+|   find_neighbors()            4          0.0027      0.000687    0.0027      0.000687    50.74    50.74    |
+|   renumber_nodes_and_elem()   6          0.0002      0.000029    0.0002      0.000029    3.23     3.23     |
+|   write()                     1          0.0023      0.002274    0.0023      0.002274    41.99    41.99    |
+|                                                                                                            |
+| MeshTools::Generation                                                                                      |
+|   build_cube()                2          0.0002      0.000079    0.0002      0.000079    2.94     2.94     |
+|                                                                                                            |
+| Partitioner                                                                                                |
+|   single_partition()          3          0.0001      0.000020    0.0001      0.000020    1.11     1.11     |
+ ------------------------------------------------------------------------------------------------------------
+| Totals:                       16         0.0054                                          100.00            |
+ ------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example miscellaneous_ex6:
