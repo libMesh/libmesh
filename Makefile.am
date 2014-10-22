@@ -499,25 +499,21 @@ doc html:
 	$(MAKE) examples_doc
 	$(MAKE) -C doc/html doc
 
-# Upload the web page to sourceforge.  We need a way to specify usernames
-# other than $USER when connecting to sourceforge servers... Please set the
-# environment variable: $LIBMESH_SVN_USER.
+# Upload the web page to github.io.
 upload:
-	if [ x$(LIBMESH_SVN_USER) = x ]; then echo "Set LIBMESH_SVN_USER environment variable"; false; fi
-	chmod -R g+w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
-	rsync -rltzve ssh --exclude '.svn' $(top_srcdir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -rltzve ssh --exclude '.svn' $(top_builddir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -rltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/howto $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -rltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/xda_format $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	chmod -R g-w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
+#	if [ x$(LIBMESH_SVN_USER) = x ]; then echo "Set LIBMESH_SVN_USER environment variable"; false; fi
+#	chmod -R g+w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
+#	rsync -rltzve ssh --exclude '.svn' $(top_srcdir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+#	rsync -rltzve ssh --exclude '.svn' $(top_builddir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+#	rsync -rltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/howto $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+#	rsync -rltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/xda_format $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
+#	chmod -R g-w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
+	-rm -rf libMesh.github.io && git clone https://github.com/libMesh/libMesh.github.io.git
+	cd libMesh.github.io && git rm -rf doxygen
+	rsync -aLv --exclude=src --exclude=Makefile --exclude=.linkstamp $(top_builddir)/doc/html/ libMesh.github.io/
+	gitcommit=`git log | head -1` && cd libMesh.github.io && git add * && git ci -m'updating web page from "make upload" @$gitcommit'
 
-upload_test:
-	chmod -R g+w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
-	rsync -nrltzve ssh --exclude '.svn' $(top_srcdir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -nrltzve ssh --exclude '.svn' $(top_builddir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -nrltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/howto $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	rsync -nrltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/xda_format $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
-	chmod -R g-w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
+
 
 #
 # special things to do when running 'make dist'
