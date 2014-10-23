@@ -12,7 +12,7 @@ cat <<EOF > $output_file
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <title>libMesh - A C++ Finite Element Library</title>
-  <meta name="author" content="Benjamin S. Kirk">
+  <meta name="author" content="libMesh development team">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
   <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
