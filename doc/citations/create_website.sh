@@ -51,18 +51,12 @@ do
 done
 
 # The name of the final file that we will produce
-final_file=publications.html
+final_file=src/publications.html
 
-# Create publications.html by adding header/footer
+# Create publications.html
 if [ -f $final_file ]; then
   rm $final_file
 fi
 
-# Paste the contents of doc/html/src/simple_header.html here
-cat ../html/src/simple_header.html >> $final_file
-
 # Inject all the references
 cat master.html >> $final_file
-
-# Paste the contents of doc/html/src/simple_footer.html here
-cat ../html/src/simple_footer.html >> $final_file
