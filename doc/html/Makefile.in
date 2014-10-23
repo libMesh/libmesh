@@ -418,7 +418,7 @@ SOURCES = styles.css doxygen_stylesheet.css \
 	  src/externalsoftware.html src/installation.html src/support.html \
 	  src/doxygen_footer.html src/publications.html
 
-EXTRA_DIST = examples images
+EXTRA_DIST = examples images src
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
