@@ -8,15 +8,13 @@ using namespace FUNCTIONPARSERTYPES;
 
 #include <iostream>
 
-#ifdef LIBMESH_HAVE_FPARSER_JIT
-#  include <fstream>
-#  include <cstdio>
-#  include <unistd.h>
-#  include <dlfcn.h>
-#  include "lib/sha1.h"
-#  include <errno.h>
-#  include <sys/stat.h>
-#endif
+#include <fstream>
+#include <cstdio>
+#include <unistd.h>
+#include <dlfcn.h>
+#include "lib/sha1.h"
+#include <errno.h>
+#include <sys/stat.h>
 
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase() :
@@ -785,7 +783,6 @@ bool FunctionParserADBase<Value_t>::JITCompile(bool)
   return false;
 }
 
-#ifdef LIBMESH_HAVE_FPARSER_JIT
 // JIT compile for supported types
 template<>
 bool FunctionParserADBase<double>::JITCompile(bool cacheFunction) { return JITCompileHelper("double", cacheFunction); }
@@ -1200,7 +1197,6 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   std::remove(object_so.c_str());
   return true;
 }
-#endif
 
 template<typename Value_t>
 FunctionParserADBase<Value_t>::OpcodeImmediate::OpcodeImmediate(Value_t _second) :

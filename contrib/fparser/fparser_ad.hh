@@ -42,13 +42,11 @@ public:
    */
   bool JITCompile(bool cacheFunction = true);
 
-#ifdef LIBMESH_HAVE_FPARSER_JIT
   /**
    * Overwrite the Exec function with one that tests for a JIT compiled version
    * and uses that if it exists
    */
   Value_t Eval(const Value_t* Vars);
-#endif
 
 protected:
   /**
