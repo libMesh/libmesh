@@ -15,7 +15,7 @@ SOURCES = styles.css doxygen_stylesheet.css \
 	  src/doxygen_footer.html src/publications.html
 
 
-EXTRA_DIST = examples images src
+EXTRA_DIST = examples images src styles.css doxygen_stylesheet.css
 
 
 
