@@ -53,7 +53,7 @@ target_triplet = @target@
 
 #  need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@am__append_1 = .linkstamp
-@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = *.html *.css .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = *.css .linkstamp
 subdir = doc/html
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -112,7 +112,6 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-SOURCES =
 DIST_SOURCES =
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -409,14 +408,17 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-BUILT_SOURCES = $(am__append_1)
-CLEANFILES = $(am__append_2)
-DISTCLEANFILES = 
-EXTRA_DIST = \
-	developers.html examples examples.html externalsoftware.html \
-	images index.html installation.html publications.html \
-	styles.css doxygen_stylesheet.css support.html src
+BUILT_SOURCES = developers.html examples.html externalsoftware.html \
+	index.html installation.html publications.html support.html \
+	$(am__append_1)
+CLEANFILES = $(BUILT_SOURCES) $(am__append_2)
+SOURCES = styles.css doxygen_stylesheet.css \
+	  src/developers.html src/header.html src/simple_footer.html \
+	  src/examples.html src/index.html src/simple_header.html \
+	  src/externalsoftware.html src/installation.html src/support.html \
+	  src/footer.html src/publications.html
 
+EXTRA_DIST = examples images
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -529,7 +531,6 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -616,6 +617,34 @@ uninstall-am:
 	uninstall uninstall-am
 
 
+developers.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+examples.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+externalsoftware.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+index.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+installation.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+publications.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+support.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
 #
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html: doxygen
@@ -625,15 +654,8 @@ doxygen:
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -rf examples              && cp -r $(srcdir)/examples . && chmod -R u+rw examples
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -rf images                && cp -r $(srcdir)/images .   && chmod -R u+rw images
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f developers.html        && cp -r $(srcdir)/developers.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f examples.html          && cp -r $(srcdir)/examples.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f externalsoftware.html  && cp -r $(srcdir)/externalsoftware.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f index.html             && cp -r $(srcdir)/index.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f installation.html      && cp -r $(srcdir)/installation.html .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f publications.html      && cp -r $(srcdir)/publications.html .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f styles.css             && cp -r $(srcdir)/styles.css  .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f doxygen_stylesheet.css && cp -r $(srcdir)/doxygen_stylesheet.css .
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f support.html           && cp -r $(srcdir)/support.html .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 @LIBMESH_VPATH_BUILD_TRUE@clean-local:

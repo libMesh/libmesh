@@ -1,11 +1,51 @@
-BUILT_SOURCES =
-CLEANFILES =
-DISTCLEANFILES =
+BUILT_SOURCES = developers.html \
+                examples.html \
+                externalsoftware.html \
+                index.html \
+                installation.html \
+                publications.html \
+                support.html
 
-EXTRA_DIST = \
-	developers.html examples examples.html externalsoftware.html \
-	images index.html installation.html publications.html \
-	styles.css doxygen_stylesheet.css support.html src
+CLEANFILES = $(BUILT_SOURCES)
+
+SOURCES = styles.css doxygen_stylesheet.css \
+	  src/developers.html src/header.html src/simple_footer.html \
+	  src/examples.html src/index.html src/simple_header.html \
+	  src/externalsoftware.html src/installation.html src/support.html \
+	  src/footer.html src/publications.html
+
+
+EXTRA_DIST = examples images
+
+
+
+developers.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+examples.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+externalsoftware.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+index.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+installation.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+publications.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
+
+support.html: src/$@ src/simple_header.html src/simple_footer.html
+	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	$(AM_V_GEN)mv $@.html.tmp $@
 
 #
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
@@ -20,18 +60,11 @@ if LIBMESH_VPATH_BUILD
 .linkstamp:
 	-rm -rf examples              && cp -r $(srcdir)/examples . && chmod -R u+rw examples
 	-rm -rf images                && cp -r $(srcdir)/images .   && chmod -R u+rw images
-	-rm -f developers.html        && cp -r $(srcdir)/developers.html .
-	-rm -f examples.html          && cp -r $(srcdir)/examples.html .
-	-rm -f externalsoftware.html  && cp -r $(srcdir)/externalsoftware.html .
-	-rm -f index.html             && cp -r $(srcdir)/index.html .
-	-rm -f installation.html      && cp -r $(srcdir)/installation.html .
-	-rm -f publications.html      && cp -r $(srcdir)/publications.html .
 	-rm -f styles.css             && cp -r $(srcdir)/styles.css  .
 	-rm -f doxygen_stylesheet.css && cp -r $(srcdir)/doxygen_stylesheet.css .
-	-rm -f support.html           && cp -r $(srcdir)/support.html .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += *.html *.css .linkstamp
+  CLEANFILES += *.css .linkstamp
 
 clean-local:
 	-rm -rf doxygen images examples
