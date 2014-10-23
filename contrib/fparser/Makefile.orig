@@ -33,11 +33,8 @@ else
 FEATURE_FLAGS = $(FP_FEATURE_FLAGS)
 endif
 
-OPTIMIZATION=-O3 -ffast-math -march=native
+OPTIMIZATION=-O3 -ffast-math
 #       -ffunction-sections -fdata-sections
-
-# For GCC (not clang):
-OPTIMIZATION += -fexpensive-optimizations -fvpt -fomit-frame-pointer -ffunction-cse
 
 #OPTIMIZATION+=-g
 #OPTIMIZATION=-g -O0 -fno-inline
@@ -56,6 +53,24 @@ LD=g++
 #LD=g++ -g
 # -m32 -mfpmath=sse
 # -m32 -mfpmath=387
+
+# For GCC (not clang):
+ifeq (,$(findstring clang,$(CXX)))
+OPTIMIZATION += -fexpensive-optimizations -march=native -fvpt -fomit-frame-pointer -ffunction-cse
+endif
+
+# Platform specific settings
+HOSTOS = $(shell uname)
+ifneq (,$(findstring Darwin,$(HOSTOS)))
+  SEDFLAG_R = -E
+  SEDFLAG_I = -i ""
+  ECHOCMD = /bin/echo -n
+else
+  SEDFLAG_R = -r
+  SEDFLAG_I = -i
+  ECHOCMD = echo -n
+  OPTIMIZATION += -march=native
+endif
 
 #OPTIMIZATION += -finline -finline-functions -fdefault-inline
 #OPTIMIZATION += -finline-limit=300000
@@ -255,7 +270,7 @@ fpoptimizer.cc: fpoptimizer/fpoptimizer_header.txt \
 	cat fpoptimizer/fpoptimizer_header.txt  > $@
 	for file in $(FPOPTIMIZER_CC_FILES); do \
 		echo "#line 1 \"$$file\""; \
-		sed -r "s@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@" < "$$file"; \
+		sed $(SEDFLAG_R) "s@^(#include \".*)@// line removed for fpoptimizer.cc: \\1@" < "$$file"; \
 		echo; \
 	done | sed 's@BEGIN_EXPLICIT_INSTANTATION.*@@;s@.*END_EXPLICIT_INSTANTATION@@' \
 	     | util/cpp_compress "lnxyceti" >> $@
@@ -270,7 +285,7 @@ util/tree_grammar_parser: \
 util/tree_grammar_parser.cc: \
 		util/tree_grammar_parser.y
 	bison --output=$@ $<
-	sed -i 's/ *$$//' $@
+	sed $(SEDFLAG_I) 's/ *$$//' $@
 
 util/cpp_compress: \
 		util/cpp_compress.o util/cpp_compress_main.o
@@ -394,7 +409,7 @@ TESTBED_TEST_FILES = $(wildcard tests/*/*)
 testbed_tests.inc: $(TESTBED_TEST_FILES)
 
 .dep:
-	echo -n '' > .dep
+	$(ECHOCMD) '' > .dep
 	- g++ -MM -MG $(CPPFLAGS) $(wildcard *.cc) >> .dep
 	- g++ -MM $(CPPFLAGS) $(wildcard examples/*.cc) | sed 's|^.*.o:|examples/&|' >> .dep
 	- g++ -MM $(CPPFLAGS) $(wildcard fpoptimizer/*.cc) | sed 's|^.*.o:|fpoptimizer/&|' >> .dep
@@ -402,6 +417,6 @@ testbed_tests.inc: $(TESTBED_TEST_FILES)
 	- g++ -MM $(CPPFLAGS) $(wildcard util/*.cc) | sed 's|^.*.o:|util/&|' >> .dep
 	- g++ -MM $(CPPFLAGS) $(wildcard mpfr/*.cc) | sed 's|^.*.o:|mpfr/&|' >> .dep
 	- g++ -MM $(CPPFLAGS) $(wildcard lib/*.cc) | sed 's|^.*.o:|lib/&|' >> .dep
-	sed -i "s@`pwd`/@@" .dep
+	sed $(SEDFLAG_I) "s@`pwd`/@@" .dep
 
 -include .dep
