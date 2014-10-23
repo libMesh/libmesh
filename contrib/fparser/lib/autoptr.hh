@@ -22,6 +22,8 @@ public:
 
     ~FPOPT_autoptr() { Forget(); }
 
+    bool isNull() const { return p == 0; }
+
     void UnsafeSetP(Ref* newp) { p = newp; }
     void swap(FPOPT_autoptr<Ref>& b) { Ref* tmp=p; p=b.p; b.p=tmp; }
 
