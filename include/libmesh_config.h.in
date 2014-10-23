@@ -249,10 +249,6 @@
 /* Flag indicating whether FPARSER will build the full development version */
 #undef HAVE_FPARSER_DEVEL
 
-/* Flag indicating whether FPARSER will be built with JIT compilation enabled
-   */
-#undef HAVE_FPARSER_JIT
-
 /* define if the compiler supports GCC C++ ABI name demangling */
 #undef HAVE_GCC_ABI_DEMANGLE
 
