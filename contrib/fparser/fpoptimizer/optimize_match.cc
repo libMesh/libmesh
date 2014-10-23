@@ -375,7 +375,7 @@ namespace FPoptimizer_Optimize
                 }
                 else /* A subtree conforming these specs */
                 {
-                    if(!&*start_at)
+                    if(start_at.isNull())
                     {
                         if(!TestImmedConstraints(param.constraints, tree)) return false;
                         if(tree.GetOpcode() != param.data.subfunc_opcode) return false;
@@ -438,7 +438,7 @@ namespace FPoptimizer_Optimize
     {
         FPOPT_autoptr<MatchPositionSpec_AnyWhere> position;
         unsigned a;
-        if(&*start_at)
+        if(!start_at.isNull())
         {
             position = (MatchPositionSpec_AnyWhere*) &*start_at;
             a = position->trypos;
@@ -470,7 +470,7 @@ namespace FPoptimizer_Optimize
                 return MatchResultType(true, &*position);
             } }
         retry_anywhere_2:
-            if(&*(*position)[a].start_at) // is there another try?
+            if(!(*position)[a].start_at.isNull()) // is there another try?
             {
                 goto retry_anywhere;
             }
@@ -534,7 +534,7 @@ namespace FPoptimizer_Optimize
                 /* Simple: Test all given parameters in succession. */
                 FPOPT_autoptr<MatchPositionSpec_PositionalParams<Value_t> > position;
                 unsigned a;
-                if(&*start_at)
+                if(!start_at.isNull())
                 {
                     position = (MatchPositionSpec_PositionalParams<Value_t> *) &*start_at;
                     a = model_tree.param_count - 1;
@@ -563,7 +563,7 @@ namespace FPoptimizer_Optimize
                   } }
                 retry_positionalparams_2:
                     // doesn't match
-                    if(&*(*position)[a].start_at) // is there another try?
+                    if(!(*position)[a].start_at.isNull()) // is there another try?
                     {
                         info = (*position)[a].info;
                         goto retry_positionalparams;
@@ -609,7 +609,7 @@ namespace FPoptimizer_Optimize
                 }
 
                 unsigned a;
-                if(&*start_at)
+                if(!start_at.isNull())
                 {
                     position = (MatchPositionSpec_AnyParams<Value_t>*) &*start_at;
                     if(model_tree.param_count == 0)
@@ -654,7 +654,7 @@ namespace FPoptimizer_Optimize
                   } }
                 retry_anyparams_2:
                     // doesn't match
-                    if(&*(*position)[a].start_at) // is there another try?
+                    if(!(*position)[a].start_at.isNull()) // is there another try?
                     {
                         info = (*position)[a].info;
                         used = (*position)[a].used;

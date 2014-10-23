@@ -181,7 +181,7 @@ namespace
         #endif
             found = TestParams(rule.match_tree, tree, found.specs, info, true);
             if(found.found) break;
-            if(!&*found.specs)
+            if(found.specs.isNull())
             {
             fail:;
                 // Did not match
