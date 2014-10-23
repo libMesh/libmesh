@@ -413,10 +413,10 @@ BUILT_SOURCES = developers.html examples.html externalsoftware.html \
 	$(am__append_1)
 CLEANFILES = $(BUILT_SOURCES) $(am__append_2)
 SOURCES = styles.css doxygen_stylesheet.css \
-	  src/developers.html src/header.html src/simple_footer.html \
+	  src/developers.html src/doxygen_header.html src/simple_footer.html \
 	  src/examples.html src/index.html src/simple_header.html \
 	  src/externalsoftware.html src/installation.html src/support.html \
-	  src/footer.html src/publications.html
+	  src/doxygen_footer.html src/publications.html
 
 EXTRA_DIST = examples images
 all: $(BUILT_SOURCES)

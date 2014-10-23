@@ -9,10 +9,10 @@ BUILT_SOURCES = developers.html \
 CLEANFILES = $(BUILT_SOURCES)
 
 SOURCES = styles.css doxygen_stylesheet.css \
-	  src/developers.html src/header.html src/simple_footer.html \
+	  src/developers.html src/doxygen_header.html src/simple_footer.html \
 	  src/examples.html src/index.html src/simple_header.html \
 	  src/externalsoftware.html src/installation.html src/support.html \
-	  src/footer.html src/publications.html
+	  src/doxygen_footer.html src/publications.html
 
 
 EXTRA_DIST = examples images
