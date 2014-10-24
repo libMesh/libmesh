@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -1463,7 +1464,7 @@ All done.
 *   example-opt -r 3 -o FIRST 
 ***************************************************************
  
-Running /Users/benkirk/codes/libmesh/build/examples/miscellaneous/miscellaneous_ex3/.libs/example-opt -r 3 -o FIRST
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/miscellaneous/miscellaneous_ex3/.libs/example-opt -r 3 -o FIRST
 
  Mesh Information:
   mesh_dimension()=2
@@ -1484,8 +1485,9 @@ Running /Users/benkirk/codes/libmesh/build/examples/miscellaneous/miscellaneous_
    System #0, "Laplace-Young"
     Type "NonlinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=225
     n_local_dofs()=225
     n_constrained_dofs()=0
@@ -1499,6 +1501,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/miscellaneous/miscellaneous_
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
 
   NL step  0, |residual|_2 = 2.000000e-01
   NL step  1, |residual|_2 = 4.432961e-03
@@ -1508,6 +1511,87 @@ Running /Users/benkirk/codes/libmesh/build/examples/miscellaneous/miscellaneous_
   NL step  5, |residual|_2 = 3.849499e-08
   NL step  6, |residual|_2 = 2.293601e-09
 Laplace-Young system solved at nonlinear iteration 6 , final nonlinear residual norm: 2.293601e-09
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:39:52 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.128931, Active time=0.041372                                                  |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0001      0.000052    0.0001      0.000052    0.13     0.13     |
+|   build_sparsity()                 1          0.0004      0.000436    0.0006      0.000558    1.05     1.35     |
+|   create_dof_constraints()         1          0.0001      0.000116    0.0001      0.000116    0.28     0.28     |
+|   distribute_dofs()                1          0.0001      0.000095    0.0003      0.000341    0.23     0.82     |
+|   dof_indices()                    2880       0.0019      0.000001    0.0019      0.000001    4.54     4.54     |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0002      0.000245    0.0002      0.000245    0.59     0.59     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          1          0.0002      0.000249    0.0004      0.000373    0.60     0.90     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               1          0.0014      0.001407    0.0014      0.001407    3.40     3.40     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        2944       0.0051      0.000002    0.0051      0.000002    12.35    12.35    |
+|   init_shape_functions()           461        0.0003      0.000001    0.0003      0.000001    0.72     0.72     |
+|   inverse_map()                    1344       0.0013      0.000001    0.0013      0.000001    3.04     3.04     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             2944       0.0020      0.000001    0.0020      0.000001    4.77     4.77     |
+|   compute_face_map()               448        0.0011      0.000003    0.0025      0.000006    2.76     6.05     |
+|   init_face_shape_functions()      7          0.0000      0.000002    0.0000      0.000002    0.04     0.04     |
+|   init_reference_to_physical_map() 461        0.0009      0.000002    0.0009      0.000002    2.12     2.12     |
+|                                                                                                                 |
+| LocationMap                                                                                                     |
+|   find()                           756        0.0004      0.000000    0.0004      0.000000    0.86     0.86     |
+|   init()                           3          0.0000      0.000011    0.0000      0.000011    0.08     0.08     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 2          0.0005      0.000264    0.0005      0.000264    1.27     1.27     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         1          0.0001      0.000051    0.0018      0.001831    0.12     4.43     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _refine_elements()               3          0.0005      0.000182    0.0015      0.000496    1.32     3.60     |
+|   add_point()                      756        0.0005      0.000001    0.0009      0.000001    1.14     2.11     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               2          0.0000      0.000014    0.0000      0.000014    0.07     0.07     |
+|                                                                                                                 |
+| PetscNonlinearSolver                                                                                            |
+|   jacobian()                       6          0.0043      0.000720    0.0083      0.001390    10.43    20.16    |
+|   residual()                       7          0.0061      0.000871    0.0153      0.002190    14.73    37.05    |
+|   solve()                          1          0.0136      0.013630    0.0373      0.037303    32.94    90.16    |
+|                                                                                                                 |
+| System                                                                                                          |
+|   solve()                          1          0.0002      0.000170    0.0375      0.037473    0.41     90.58    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            13036      0.0414                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example miscellaneous_ex3:

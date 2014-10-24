@@ -1,16 +1,3 @@
-<?php $root=""; ?>
-<?php require($root."navigation.php"); ?>
-
-<html>
-<head>
-  <title>Download and Installation</title>
-  <?php load_style($root); ?>
-</head>
-
-<body>
-<?php make_navigation("download",$root)?>
-
-<div class="content">
 <h1>Installation Instructions</h1>
 
 
@@ -22,7 +9,6 @@ Stable releases are located there as compressed tar archives.
 You may also access the Git source tree for the latest code. You can get read-only access
 to the Git repository via:
 <br>
-
 <div class="fragment">
   <pre>git clone git://github.com/libMesh/libmesh.git </pre>
 </div>
@@ -49,7 +35,6 @@ build the code please let us know. You will also need a decent C compiler
 if you want to build some of the contributed packages that add functionality
 to the library.
 
-<p>
 The library is continuously tested with the following compilers:
 
 <br>
@@ -81,14 +66,14 @@ The library is continuously tested with the following compilers:
   <li>Sun Studio/Oracle</li>
     <ul>
       <li><code>CC</code> 12.3</li>
-      <tt>  $ ./configure --disable-fparser CXXFLAGS=-library=stlport4 --disable-unordered-containers</tt>
+      <tt>$ ./configure --disable-fparser CXXFLAGS=-library=stlport4 --disable-unordered-containers</tt>
     </ul>
   <li> Portland Group</li>
     <ul>
       <li><code>pgi</code> 11.7</li>
       <li><code>pgi</code> 12.9</li>
       <li><code>pgi</code> 13.4</li>
-      <tt>  $ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</tt>
+      <tt>$ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</tt>
     </ul>
 </ul>
 
@@ -108,7 +93,6 @@ make
 
 <br>
 in the top-level project directory. To see all the configuration options type
-<p>
 <div class="fragment">
 <pre>./configure --help</pre>
 </div>
@@ -184,8 +168,9 @@ that contains a series of unit tests which can be used to validate a <code>libMe
 installation.  These unit tests require <a href="https://sourceforge.net/apps/mediawiki/cppunit/index.php?title=Main_Page">CPPUnit</a>
 to run properly.  To run the unit test suite, simply do
 
-<pre>make -C test check </pre>
-
+<div class="fragment">
+  <pre>make -C test check </pre>
+</div>
 
 <a name="link"></a><h2>Linking With Your Application</h2>
 
@@ -208,17 +193,4 @@ used by <code>libMesh</code>. For example, you could build the application <code
 
 <br>
 
-
-</div>
-
-<?php make_footer() ?>
-
-</body>
-</html>
-
-
-<?php if (0) { ?>
-# Local Variables:
-# mode: html
-# End:
-<?php } ?>
+</p>

@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -1259,7 +1260,9 @@ build_square().
 
 <div class ="fragment">
 <pre>
-                          const Real u_value = (mesh.boundary_info-&gt;has_boundary_id(elem,s,2)) ? 1. : 0.;
+                          const Real u_value =
+                            (mesh.get_boundary_info().has_boundary_id(elem,s,2))
+                              ? 1. : 0.;
         
 </pre>
 </div>
@@ -1739,7 +1742,9 @@ That's it.
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
                   {
   
-                    <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (mesh.boundary_info-&gt;has_boundary_id(elem,s,2)) ? 1. : 0.;
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real u_value =
+                      (mesh.get_boundary_info().has_boundary_id(elem,s,2))
+                        ? 1. : 0.;
   
                     <B><FONT COLOR="#228B22">const</FONT></B> Real v_value = 0.;
   
@@ -1794,8 +1799,9 @@ That's it.
    System #0, "Navier-Stokes"
     Type "TransientLinearImplicit"
     Variables={ "u" "v" } "p" "alpha" 
-    Finite Element Types="LAGRANGE" "LAGRANGE" "SCALAR" 
-    Approximation Orders="SECOND" "FIRST" "FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "SCALAR", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "FIRST", "THIRD" "FIRST", "THIRD" 
     n_dofs()=3804
     n_local_dofs()=3804
     n_constrained_dofs()=0
@@ -1809,6 +1815,7 @@ That's it.
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
 
 
 
@@ -1816,7 +1823,7 @@ That's it.
 Linear solver converged at step: 51, final residual: 0.000282517  Nonlinear convergence: ||u - u_old|| = 351.27
 Linear solver converged at step: 28, final residual: 1.94309e-05  Nonlinear convergence: ||u - u_old|| = 0.669457
 Linear solver converged at step: 26, final residual: 9.95896e-08  Nonlinear convergence: ||u - u_old|| = 0.00106343
-Linear solver converged at step: 51, final residual: 2.26506e-12  Nonlinear convergence: ||u - u_old|| = 1.31622e-06
+Linear solver converged at step: 51, final residual: 2.26521e-12  Nonlinear convergence: ||u - u_old|| = 1.31622e-06
  Nonlinear solver converged at step 3
 
 
@@ -1873,7 +1880,7 @@ Linear solver converged at step: 28, final residual: 2.81987e-08  Nonlinear conv
 Linear solver converged at step: 12, final residual: 0.000267583  Nonlinear convergence: ||u - u_old|| = 0.0836533
 Linear solver converged at step: 16, final residual: 1.73457e-05  Nonlinear convergence: ||u - u_old|| = 0.0149353
 Linear solver converged at step: 26, final residual: 4.4267e-08  Nonlinear convergence: ||u - u_old|| = 0.00101631
-Linear solver converged at step: 57, final residual: 3.90776e-13  Nonlinear convergence: ||u - u_old|| = 1.21151e-06
+Linear solver converged at step: 57, final residual: 3.90656e-13  Nonlinear convergence: ||u - u_old|| = 1.21151e-06
  Nonlinear solver converged at step 3
 
 
@@ -1918,32 +1925,89 @@ Linear solver converged at step: 14, final residual: 1.8148e-05  Nonlinear conve
 Linear solver converged at step: 25, final residual: 1.01115e-07  Nonlinear convergence: ||u - u_old|| = 0.000572797
  Nonlinear solver converged at step 2
 
- -------------------------------------------------------------------------------------------------------------------
-| Time:           Mon Oct 20 20:15:41 2014                                                                          |
-| OS:             Darwin                                                                                            |
-| HostName:       nakamura-stacey.jsc.nasa.gov                                                                      |
-| OS Release:     13.4.0                                                                                            |
-| OS Version:     Darwin Kernel Version 13.4.0: Sun Aug 17 19:50:11 PDT 2014; root:xnu-2422.115.4~1/RELEASE_X86_64  |
-| Machine:        x86_64                                                                                            |
-| Username:       benkirk                                                                                           |
-| Configuration:  ../configure  '--prefix=/Users/benkirk/codes/libmesh/build/_inst'                                 |
-|  'libmesh_CXXFLAGS=-DOMPI_SKIP_MPICXX'                                                                            |
-|  'PETSC_DIR=/usr/local/petsc/3.5.2'                                                                               |
-|  'PETSC_ARCH=macosx'                                                                                              |
-|  'SLEPC_DIR=/usr/local/slepc/3.5.1'                                                                               |
-|  'TRILINOS_DIR=/usr/local/trilinos/11.10.2'                                                                       |
- -------------------------------------------------------------------------------------------------------------------
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:40:25 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| Systems Example 3 Performance: Alive time=1.09913, Active time=1.05176                                     |
+| Systems Example 3 Performance: Alive time=2.13935, Active time=2.04463                                     |
  ------------------------------------------------------------------------------------------------------------
 | Event                         nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |------------------------------------------------------------------------------------------------------------|
 |                                                                                                            |
-| linear solve                  47         1.0518      0.022378    1.0518      0.022378    100.00   100.00   |
+| linear solve                  47         2.0446      0.043503    2.0446      0.043503    100.00   100.00   |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                       47         1.0518                                          100.00            |
+| Totals:                       47         2.0446                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
+
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=2.23841, Active time=2.10975                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   SCALAR_dof_indices()             44400      0.0183      0.000000    0.0183      0.000000    0.87     0.87     |
+|   add_neighbors_to_send_list()     1          0.0005      0.000478    0.0007      0.000658    0.02     0.03     |
+|   build_sparsity()                 1          0.0065      0.006536    0.0076      0.007585    0.31     0.36     |
+|   create_dof_constraints()         1          0.0001      0.000129    0.0001      0.000129    0.01     0.01     |
+|   distribute_dofs()                1          0.0005      0.000480    0.0016      0.001649    0.02     0.08     |
+|   dof_indices()                    118400     0.1106      0.000001    0.1325      0.000001    5.24     6.28     |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0012      0.001168    0.0012      0.001168    0.06     0.06     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          15         0.0305      0.002032    0.0527      0.003510    1.44     2.50     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               15         0.0289      0.001929    0.0289      0.001929    1.37     1.37     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        37600      0.1024      0.000003    0.1024      0.000003    4.86     4.86     |
+|   init_shape_functions()           94         0.0006      0.000006    0.0006      0.000006    0.03     0.03     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             37600      0.0387      0.000001    0.0387      0.000001    1.83     1.83     |
+|   init_reference_to_physical_map() 94         0.0014      0.000015    0.0014      0.000015    0.07     0.07     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          0.0006      0.000609    0.0006      0.000609    0.03     0.03     |
+|   renumber_nodes_and_elem()        2          0.0001      0.000053    0.0001      0.000053    0.01     0.01     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         15         0.0003      0.000021    0.0819      0.005460    0.02     3.88     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0005      0.000483    0.0005      0.000483    0.02     0.02     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0001      0.000054    0.0001      0.000054    0.00     0.00     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          47         0.8232      0.017514    0.8232      0.017514    39.02    39.02    |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       47         0.9448      0.020103    1.2137      0.025824    44.78    57.53    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            238339     2.1098                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************

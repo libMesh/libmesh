@@ -3695,7 +3695,7 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Makefile contrib/utils/Make.common tests/Makefile doc/Doxyfile contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc"
+ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Makefile contrib/utils/Make.common tests/Makefile contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc doc/Doxyfile doc/Makefile doc/html/Makefile"
 
 
 ac_config_files="$ac_config_files contrib/bin/libmesh-config"
@@ -37064,13 +37064,15 @@ do
     "contrib/utils/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/utils/Makefile" ;;
     "contrib/utils/Make.common") CONFIG_FILES="$CONFIG_FILES contrib/utils/Make.common" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
-    "doc/Doxyfile") CONFIG_FILES="$CONFIG_FILES doc/Doxyfile" ;;
     "contrib/utils/libmesh.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in" ;;
     "contrib/utils/libmesh-opt.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-opt.pc" ;;
     "contrib/utils/libmesh-dbg.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-dbg.pc" ;;
     "contrib/utils/libmesh-devel.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-devel.pc" ;;
     "contrib/utils/libmesh-prof.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-prof.pc" ;;
     "contrib/utils/libmesh-oprof.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-oprof.pc" ;;
+    "doc/Doxyfile") CONFIG_FILES="$CONFIG_FILES doc/Doxyfile" ;;
+    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+    "doc/html/Makefile") CONFIG_FILES="$CONFIG_FILES doc/html/Makefile" ;;
     "contrib/bin/libmesh-config") CONFIG_FILES="$CONFIG_FILES contrib/bin/libmesh-config" ;;
     "contrib/bin/xda2mgf") CONFIG_FILES="$CONFIG_FILES contrib/bin/xda2mgf" ;;
     "contrib/bin/create_libmesh_release") CONFIG_FILES="$CONFIG_FILES contrib/bin/create_libmesh_release" ;;

@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -1512,8 +1513,9 @@ That concludes the system matrix assembly routine.
    System #0, "Convection-Diffusion"
     Type "TransientLinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=6273
     n_local_dofs()=6273
     n_constrained_dofs()=0
@@ -1527,6 +1529,7 @@ That concludes the system matrix assembly routine.
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
 
  Solving time step  0, time=0.0250...
  Solving time step  1, time=0.0500...
@@ -1578,6 +1581,91 @@ That concludes the system matrix assembly routine.
  Solving time step 47, time=1.2000...
  Solving time step 48, time=1.2250...
  Solving time step 49, time=1.2500...
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:41:44 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=3.16436, Active time=2.91401                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.0018      0.001822    0.0018      0.001822    0.06     0.06     |
+|   build_sparsity()                 1          0.0128      0.012806    0.0185      0.018511    0.44     0.64     |
+|   create_dof_constraints()         1          0.0070      0.006978    0.0070      0.006978    0.24     0.24     |
+|   distribute_dofs()                1          0.0024      0.002407    0.0110      0.011048    0.08     0.38     |
+|   dof_indices()                    593920     0.3401      0.000001    0.3401      0.000001    11.67    11.67    |
+|   prepare_send_list()              1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                         1          0.0086      0.008641    0.0086      0.008641    0.30     0.30     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_solution_vector()          6          0.0507      0.008452    0.0864      0.014397    1.74     2.96     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               6          0.0531      0.008843    0.0531      0.008843    1.82     1.82     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        524800     0.4100      0.000001    0.4100      0.000001    14.07    14.07    |
+|   init_shape_functions()           12900      0.0056      0.000000    0.0056      0.000000    0.19     0.19     |
+|   inverse_map()                    25600      0.0220      0.000001    0.0220      0.000001    0.75     0.75     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             524800     0.2549      0.000000    0.2549      0.000000    8.75     8.75     |
+|   compute_face_map()               12800      0.0224      0.000002    0.0465      0.000004    0.77     1.60     |
+|   init_face_shape_functions()      100        0.0001      0.000001    0.0001      0.000001    0.00     0.00     |
+|   init_reference_to_physical_map() 12900      0.0132      0.000001    0.0132      0.000001    0.45     0.45     |
+|                                                                                                                 |
+| LocationMap                                                                                                     |
+|   find()                           32736      0.0126      0.000000    0.0126      0.000000    0.43     0.43     |
+|   init()                           5          0.0003      0.000055    0.0003      0.000055    0.01     0.01     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 2          0.0202      0.010113    0.0202      0.010113    0.69     0.69     |
+|   renumber_nodes_and_elem()        4          0.0009      0.000227    0.0009      0.000227    0.03     0.03     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         6          0.0001      0.000024    0.1396      0.023264    0.00     4.79     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _refine_elements()               5          0.0215      0.004291    0.0584      0.011683    0.74     2.00     |
+|   add_point()                      32736      0.0188      0.000001    0.0342      0.000001    0.65     1.17     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   set_node_processor_ids()         1          0.0000      0.000045    0.0000      0.000045    0.00     0.00     |
+|   single_partition()               2          0.0004      0.000193    0.0004      0.000193    0.01     0.01     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          50         0.1867      0.003734    0.1867      0.003734    6.41     6.41     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   assemble()                       50         1.4276      0.028552    2.5933      0.051866    48.99    88.99    |
+|   project_vector()                 1          0.0198      0.019767    0.0260      0.025980    0.68     0.89     |
+|                                                                                                                 |
+| XdrIO                                                                                                           |
+|   read()                           1          0.0003      0.000305    0.0003      0.000305    0.01     0.01     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            1773438    2.9140                                          100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example transient_ex1:

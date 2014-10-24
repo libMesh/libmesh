@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -1666,7 +1667,7 @@ All done.
 Number of elements: 219
  assembling elliptic dg system... done
 System has: 768 degrees of freedom.
-Linear solver converged at step: 21, final residual: 4.10121e-12
+Linear solver converged at step: 21, final residual: 4.1012e-12
 L2-Error is: 0.00666744
   Beginning Solve 1
 Number of elements: 827
@@ -1678,8 +1679,102 @@ L2-Error is: 0.00264921
 Number of elements: 3003
  assembling elliptic dg system... done
 System has: 10512 degrees of freedom.
-Linear solver converged at step: 50, final residual: 2.03713e-11
+Linear solver converged at step: 50, final residual: 2.03714e-11
 L2-Error is: 0.0016323
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:39:54 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=1.56088, Active time=1.34029                                                         |
+ ----------------------------------------------------------------------------------------------------------------------
+| Event                                   nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                                    w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|----------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                      |
+|                                                                                                                      |
+| DofMap                                                                                                               |
+|   add_neighbors_to_send_list()          3          0.0011      0.000378    0.0011      0.000378    0.08     0.08     |
+|   build_sparsity()                      3          0.0986      0.032875    0.1575      0.052503    7.36     11.75    |
+|   create_dof_constraints()              3          0.0088      0.002943    0.0150      0.005012    0.66     1.12     |
+|   distribute_dofs()                     3          0.0012      0.000407    0.0056      0.001867    0.09     0.42     |
+|   dof_indices()                         114483     0.0775      0.000001    0.0775      0.000001    5.78     5.78     |
+|   old_dof_indices()                     7088       0.0040      0.000001    0.0040      0.000001    0.30     0.30     |
+|   prepare_send_list()                   3          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   reinit()                              3          0.0044      0.001458    0.0044      0.001458    0.33     0.33     |
+|                                                                                                                      |
+| EquationSystems                                                                                                      |
+|   build_discontinuous_solution_vector() 1          0.0049      0.004932    0.0068      0.006795    0.37     0.51     |
+|                                                                                                                      |
+| ExodusII_IO                                                                                                          |
+|   write_nodal_data_discontinuous()      1          0.0061      0.006052    0.0061      0.006052    0.45     0.45     |
+|                                                                                                                      |
+| FE                                                                                                                   |
+|   compute_shape_functions()             40918      0.0473      0.000001    0.0473      0.000001    3.53     3.53     |
+|   init_shape_functions()                33836      0.0347      0.000001    0.0347      0.000001    2.59     2.59     |
+|   inverse_map()                         82704      0.2271      0.000003    0.2271      0.000003    16.94    16.94    |
+|                                                                                                                      |
+| FEMap                                                                                                                |
+|   compute_affine_map()                  40918      0.0427      0.000001    0.0427      0.000001    3.19     3.19     |
+|   compute_face_map()                    14626      0.0171      0.000001    0.0171      0.000001    1.27     1.27     |
+|   init_face_shape_functions()           5          0.0000      0.000010    0.0000      0.000010    0.00     0.00     |
+|   init_reference_to_physical_map()      33836      0.3648      0.000011    0.3648      0.000011    27.22    27.22    |
+|                                                                                                                      |
+| JumpErrorEstimator                                                                                                   |
+|   estimate_error()                      2          0.0305      0.015255    0.1299      0.064946    2.28     9.69     |
+|                                                                                                                      |
+| LocationMap                                                                                                          |
+|   find()                                22344      0.0082      0.000000    0.0082      0.000000    0.61     0.61     |
+|   init()                                6          0.0010      0.000169    0.0010      0.000169    0.08     0.08     |
+|                                                                                                                      |
+| Mesh                                                                                                                 |
+|   contract()                            2          0.0002      0.000110    0.0006      0.000290    0.02     0.04     |
+|   find_neighbors()                      5          0.0106      0.002114    0.0106      0.002114    0.79     0.79     |
+|   renumber_nodes_and_elem()             12         0.0010      0.000087    0.0010      0.000087    0.08     0.08     |
+|                                                                                                                      |
+| MeshRefinement                                                                                                       |
+|   _coarsen_elements()                   4          0.0003      0.000067    0.0003      0.000067    0.02     0.02     |
+|   _refine_elements()                    6          0.0168      0.002796    0.0421      0.007021    1.25     3.14     |
+|   add_point()                           22344      0.0133      0.000001    0.0235      0.000001    0.99     1.75     |
+|   make_coarsening_compatible()          4          0.0019      0.000469    0.0019      0.000469    0.14     0.14     |
+|   make_flags_parallel_consistent()      6          0.0007      0.000121    0.0007      0.000121    0.05     0.05     |
+|   make_refinement_compatible()          4          0.0001      0.000026    0.0001      0.000026    0.01     0.01     |
+|                                                                                                                      |
+| Parallel                                                                                                             |
+|   allgather()                           3          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|                                                                                                                      |
+| Partitioner                                                                                                          |
+|   set_node_processor_ids()              1          0.0000      0.000042    0.0000      0.000042    0.00     0.00     |
+|   single_partition()                    5          0.0002      0.000039    0.0002      0.000039    0.01     0.01     |
+|                                                                                                                      |
+| PetscLinearSolver                                                                                                    |
+|   solve()                               3          0.0842      0.028069    0.0842      0.028069    6.28     6.28     |
+|                                                                                                                      |
+| ProjectVector                                                                                                        |
+|   operator()                            2          0.0365      0.018249    0.2375      0.118732    2.72     17.72    |
+|                                                                                                                      |
+| System                                                                                                               |
+|   assemble()                            3          0.1913      0.063762    0.6508      0.216920    14.27    48.55    |
+|   project_vector()                      2          0.0029      0.001427    0.2424      0.121202    0.21     18.09    |
+|                                                                                                                      |
+| XdrIO                                                                                                                |
+|   read()                                1          0.0002      0.000208    0.0002      0.000208    0.02     0.02     |
+ ----------------------------------------------------------------------------------------------------------------------
+| Totals:                                 413193     1.3403                                          100.00            |
+ ----------------------------------------------------------------------------------------------------------------------
+
  
 ***************************************************************
 * Done Running Example miscellaneous_ex5:

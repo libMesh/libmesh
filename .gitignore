@@ -27,6 +27,10 @@ contrib/*/*.la
 contrib/*/*.lo
 contrib/*/*/*.lo
 contrib/*/*/*/*.lo
+contrib/*/*/*/*/*.lo
+contrib/*/*/*/*/.deps
+contrib/*/*/*/*/.dirstamp
+contrib/*/*/*/*/.libs
 contrib/*/*/*/.deps
 contrib/*/*/*/.dirstamp
 contrib/*/*/*/.libs
@@ -86,11 +90,7 @@ tests/.deps/
 tests/.dirstamp
 tests/reduced_basis
 
-doc/html/doxygen/*.php
-doc/html/doxygen/*.png
-doc/html/doxygen/doxygen.css
-doc/html/doxygen/jquery.js
-doc/html/doxygen/tabs.css
+doc/html/doxygen
 doc/man
 
 examples/*/*/*.lo

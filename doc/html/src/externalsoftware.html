@@ -1,22 +1,7 @@
-<?php $root=""; ?>
-<?php require($root."navigation.php"); ?>
-
-<!-- $Id: externalsoftware.php,v 1.7 2007-09-09 20:02:19 benkirk Exp $ -->
-
-<html>
-<head>
-  <title>Packages used by libMesh</title>
-  <?php load_style($root); ?>
-</head>
-
-<body>
-<?php make_navigation("externalsoftware",$root)?>
-
-<div class="content">
 <h1>External Packages</h1>
 <code>libMesh</code> interfaces to a number of high-quality software packages to provide certain functionality.  This page provides a list of packages and a description of their use in the library.
 
-<h2>MPI</h2> The <a href="http://www-unix.mcs.anl.gov/mpi">Message Passing Interface</a> is a standard for parallel programming using the message passing model. PETSc requires MPI for its functionality.  <code>libMesh</code> makes use of MPI to when running in parallel for certain operations, including its <code>ParallelMesh</code> distributed-memory, fully unstructured mesh implementation. 
+<h2>MPI</h2> The <a href="http://www-unix.mcs.anl.gov/mpi">Message Passing Interface</a> is a standard for parallel programming using the message passing model. PETSc requires MPI for its functionality.  <code>libMesh</code> makes use of MPI to when running in parallel for certain operations, including its <code>ParallelMesh</code> distributed-memory, fully unstructured mesh implementation.
 
 <h2>TBB</h2> Since February 2008 <code>libMesh</code> can be configured to use the <a href="http://threadingbuildingblocks.org/">Threading Building Blocks</a> for thread-based parallelism on shared memory machines.  Several key algorithms in the library have been refactored to be multithreaded, and this effort will continue as additional profiling reveals additional serial bottlenecks.  It is envisioned that for certain classes of problems multilevel parallelism (e.g. message passing between nodes and threading within nodes) will prove more scalable than message passing alone, especially with the introduction of commodity multi-core processors.  The reality is that for implicit problems this can only be achieved with a parallel linear algebra library that also uses multilevel parallelism.
 
@@ -56,7 +41,7 @@ Main features:
 
 <hr>
 <h2>Mesh Generation</h2>
-<h3>Triangle</h3> <a href="http://www.cs.cmu.edu/~quake/triangle.html">Triangle</a> is the definitive two-dimensional delaunay triangulator written by Jonathan Richard Shewchuk. <code>libMesh</code> can use Triangle to produce Delaunay triangulizations for hybrid-element (not just triangles) input meshes. 
+<h3>Triangle</h3> <a href="http://www.cs.cmu.edu/~quake/triangle.html">Triangle</a> is the definitive two-dimensional delaunay triangulator written by Jonathan Richard Shewchuk. <code>libMesh</code> can use Triangle to produce Delaunay triangulizations for hybrid-element (not just triangles) input meshes.
 
 <h3>Tetgen</h3> <a href="http://tetgen.berlios.de"> Tetgen</a>generates the Delaunay tetrahedralization, Voronoi diagram, constrained Delaunay tetrahedralizations and quality tetrahedral meshes. The main goal of TetGen is to generate suitable meshes for solving partial differential equations by finite element or finite volume methods.
 
@@ -82,21 +67,3 @@ Main features:
 <h3>GetPot</h3> <a href="http://getpot.sourceforge.net">GetPot</a> is a powerful command line and configuration file parsing for C++, Python, Ruby and Java. This tool provides many features, such as separate treatment for options, variables, and flags, unrecognized object detection, prefixes and much more. <code>libMesh</code> uses GetPot to parse command line options upon initialization and for input file parsing in some of the <a href="examples.php">examples</a>.
 
 <h3>libHilbert</h3> <a href="http://flame.cs.dal.ca/~chamilto/hilbert">libHilbert</a> is library written by <a href="http://flame.cs.dal.ca/~chamilto">Chris Hamilton</a> for producing compact Hilbert indices for multidimensional data.  <code>libMesh</code> uses <code>libHilbert</code> to assign unique, global identifiers for nodes an elements which are independent of a particular domain decomposition.
-
-
-
-<br>
-<br>
-<br>
-
-
-<?php make_footer() ?>
-
-</body>
-</html>
-
-<?php if (0) { ?>
-# Local Variables:
-# mode: html
-# End:
-<?php } ?>

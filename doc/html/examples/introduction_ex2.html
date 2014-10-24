@@ -5,6 +5,7 @@
   <title>libMesh - A C++ Finite Element Library</title>
   <meta name="author" content="Benjamin S. Kirk">
   <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
 </head>
 
 <body>
@@ -447,7 +448,7 @@ checks for leaked memory.
 *   example-opt  
 ***************************************************************
  
-Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex2/.libs/example-opt
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/introduction/introduction_ex2/.libs/example-opt
 
  Mesh Information:
   mesh_dimension()=2
@@ -468,8 +469,9 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
    System #1, "Complex System"
     Type "Explicit"
     Variables={ "c" "T" } "dv" 
-    Finite Element Types="LAGRANGE" "MONOMIAL" 
-    Approximation Orders="FIRST" "SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=222
     n_local_dofs()=222
     n_constrained_dofs()=0
@@ -483,11 +485,13 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
    System #0, "Simple System"
     Type "TransientLinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -501,6 +505,56 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:55 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.086086, Active time=0.000876                                              |
+ -------------------------------------------------------------------------------------------------------------
+| Event                          nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-------------------------------------------------------------------------------------------------------------|
+|                                                                                                             |
+|                                                                                                             |
+| DofMap                                                                                                      |
+|   add_neighbors_to_send_list() 2          0.0000      0.000018    0.0000      0.000018    4.22     4.22     |
+|   build_sparsity()             1          0.0001      0.000147    0.0002      0.000173    16.78    19.75    |
+|   create_dof_constraints()     2          0.0000      0.000023    0.0000      0.000023    5.25     5.25     |
+|   distribute_dofs()            2          0.0001      0.000050    0.0003      0.000126    11.42    28.77    |
+|   dof_indices()                25         0.0000      0.000001    0.0000      0.000001    2.51     2.51     |
+|   prepare_send_list()          2          0.0000      0.000000    0.0000      0.000000    0.11     0.11     |
+|   reinit()                     2          0.0002      0.000075    0.0002      0.000075    17.24    17.24    |
+|                                                                                                             |
+| Mesh                                                                                                        |
+|   find_neighbors()             1          0.0002      0.000167    0.0002      0.000167    19.06    19.06    |
+|   renumber_nodes_and_elem()    2          0.0000      0.000012    0.0000      0.000012    2.74     2.74     |
+|                                                                                                             |
+| MeshTools::Generation                                                                                       |
+|   build_cube()                 1          0.0002      0.000161    0.0002      0.000161    18.38    18.38    |
+|                                                                                                             |
+| Parallel                                                                                                    |
+|   allgather()                  2          0.0000      0.000000    0.0000      0.000000    0.11     0.11     |
+|                                                                                                             |
+| Partitioner                                                                                                 |
+|   single_partition()           1          0.0000      0.000019    0.0000      0.000019    2.17     2.17     |
+ -------------------------------------------------------------------------------------------------------------
+| Totals:                        43         0.0009                                          100.00            |
+ -------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
@@ -513,7 +567,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
 *   example-opt eqn_sys.dat 
 ***************************************************************
  
-Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex2/.libs/example-opt eqn_sys.dat
+Running /aerolab/benkirk/libmesh/gcc-4.6/examples/introduction/introduction_ex2/.libs/example-opt eqn_sys.dat
 
  Mesh Information:
   mesh_dimension()=2
@@ -534,8 +588,9 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
    System #1, "Complex System"
     Type "Explicit"
     Variables={ "c" "T" } "dv" 
-    Finite Element Types="LAGRANGE" "MONOMIAL" 
-    Approximation Orders="FIRST" "SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=222
     n_local_dofs()=222
     n_constrained_dofs()=0
@@ -549,11 +604,13 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
    System #0, "Simple System"
     Type "TransientLinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -567,6 +624,7 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
 
 <<< Writing system to file eqn_sys.dat
 >>> Reading system from file eqn_sys.dat
@@ -576,8 +634,9 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
    System #0, "Complex System"
     Type "Explicit"
     Variables={ "c" "T" } "dv" 
-    Finite Element Types="LAGRANGE" "MONOMIAL" 
-    Approximation Orders="FIRST" "SECOND" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "MONOMIAL", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=222
     n_local_dofs()=222
     n_constrained_dofs()=0
@@ -591,11 +650,13 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
    System #1, "Simple System"
     Type "TransientLinearImplicit"
     Variables="u" 
-    Finite Element Types="LAGRANGE" 
-    Approximation Orders="FIRST" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
     n_dofs()=36
     n_local_dofs()=36
     n_constrained_dofs()=0
@@ -609,6 +670,71 @@ Running /Users/benkirk/codes/libmesh/build/examples/introduction/introduction_ex
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
       Number of DoF Constraints = 0
+      Number of Node Constraints = 0
+
+
+ --------------------------------------------------------------------
+| Time:           Wed Oct 22 13:38:56 2014                           |
+| OS:             Linux                                              |
+| HostName:       benkirk                                            |
+| OS Release:     2.6.32-431.3.1.el6.centos.plus.x86_64              |
+| OS Version:     #1 SMP Fri Jan 3 19:15:22 UTC 2014                 |
+| Machine:        x86_64                                             |
+| Username:       benkirk                                            |
+| Configuration:  ../configure  '--prefix=/aerolab/benkirk/libmesh/gcc-4.6/_inst'|
+|  '--enable-everything'                                             |
+|  'libmesh_CPPFLAGS=-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX'         |
+|  'PETSC_DIR=/software/x86_64/petsc/3.5.2'                          |
+|  'PETSC_ARCH=aerolab_workstations-openmpi-1.7-gcc-4.6'             |
+|  'TRILINOS_DIR=/software/x86_64/trilinos/11.6.1-openmpi-1.7-gcc-4.6'|
+ --------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.08942, Active time=0.007028                                               |
+ -------------------------------------------------------------------------------------------------------------
+| Event                          nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                           w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-------------------------------------------------------------------------------------------------------------|
+|                                                                                                             |
+|                                                                                                             |
+| DofMap                                                                                                      |
+|   add_neighbors_to_send_list() 4          0.0001      0.000015    0.0001      0.000015    0.83     0.83     |
+|   build_sparsity()             2          0.0002      0.000109    0.0003      0.000128    3.10     3.64     |
+|   create_dof_constraints()     4          0.0001      0.000017    0.0001      0.000017    0.94     0.94     |
+|   distribute_dofs()            4          0.0002      0.000040    0.0004      0.000102    2.31     5.81     |
+|   dof_indices()                50         0.0000      0.000001    0.0000      0.000001    0.51     0.51     |
+|   prepare_send_list()          4          0.0000      0.000000    0.0000      0.000000    0.03     0.03     |
+|   reinit()                     4          0.0002      0.000061    0.0002      0.000061    3.49     3.49     |
+|                                                                                                             |
+| EquationSystems                                                                                             |
+|   read()                       1          0.0013      0.001345    0.0024      0.002403    19.14    34.19    |
+|   update()                     1          0.0001      0.000113    0.0001      0.000113    1.61     1.61     |
+|   write()                      1          0.0012      0.001198    0.0029      0.002852    17.05    40.58    |
+|                                                                                                             |
+| Mesh                                                                                                        |
+|   find_neighbors()             1          0.0001      0.000142    0.0001      0.000142    2.02     2.02     |
+|   renumber_nodes_and_elem()    2          0.0000      0.000013    0.0000      0.000013    0.36     0.36     |
+|                                                                                                             |
+| MeshCommunication                                                                                           |
+|   assign_global_indices()      2          0.0015      0.000735    0.0015      0.000737    20.90    20.99    |
+|                                                                                                             |
+| MeshTools::Generation                                                                                       |
+|   build_cube()                 1          0.0002      0.000169    0.0002      0.000169    2.40     2.40     |
+|                                                                                                             |
+| Parallel                                                                                                    |
+|   allgather()                  12         0.0000      0.000000    0.0000      0.000000    0.03     0.03     |
+|   probe()                      24         0.0001      0.000004    0.0001      0.000004    1.37     1.37     |
+|   receive()                    16         0.0001      0.000008    0.0001      0.000008    1.84     1.94     |
+|   send()                       16         0.0015      0.000094    0.0015      0.000094    21.30    21.30    |
+|   send_receive()               8          0.0000      0.000000    0.0000      0.000000    0.04     0.04     |
+|                                                                                                             |
+| Parallel::Request                                                                                           |
+|   wait()                       16         0.0000      0.000002    0.0000      0.000002    0.48     0.48     |
+|                                                                                                             |
+| Partitioner                                                                                                 |
+|   single_partition()           1          0.0000      0.000019    0.0000      0.000019    0.27     0.27     |
+ -------------------------------------------------------------------------------------------------------------
+| Totals:                        174        0.0070                                          100.00            |
+ -------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
