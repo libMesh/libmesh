@@ -51,7 +51,7 @@ do
 done
 
 # The name of the final file that we will produce
-final_file=src/publications.html
+final_file=../html/src/publications.html
 
 # Create publications.html
 if [ -f $final_file ]; then
@@ -60,3 +60,6 @@ fi
 
 # Inject all the references
 cat master.html >> $final_file
+
+# bibtex2html unhelpfully inserts trailing whitespace, so kill that off
+perl -pli -e 's/\s+$//' $final_file
