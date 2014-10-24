@@ -540,7 +540,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
   # GLIBCXX debugging causes untold woes on mac machines - so disable it
   if (test `uname` = "Darwin"); then
-    AC_MSG_RESULT(<< Disabling GLIBCXX debugging on Darwin >>>)
+    AC_MSG_RESULT(<<< Disabling GLIBCXX debugging on Darwin >>>)
     enableglibcxxdebugging=no
   fi
   AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING, test x$enableglibcxxdebugging = xyes)
