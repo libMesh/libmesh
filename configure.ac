@@ -95,6 +95,14 @@ AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 # --------------------------------------------------------------
 AC_LANG([C++])
 
+# -------------------------------------------------------------
+# Perl - look for perl.  Perl is used to generate dependencies.  We
+# also use it to (optionally) parse compiler version strings, so $PERL
+# needs to be set before LIBMESH_SET_COMPILERS is called.
+# -------------------------------------------------------------
+AC_PATH_PROG(PERL, perl)
+AC_SUBST(PERL)
+
 # --------------------------------------------------------------
 # Set our preferred compilers
 # --------------------------------------------------------------
@@ -211,15 +219,6 @@ AC_PROG_MKDIR_P
 AC_PROG_SED
 AC_SUBST(SED)
 # --------------------------------------------------------------
-
-
-# -------------------------------------------------------------
-# Perl - look for perl.  Perl is used to generate dependencies
-# -------------------------------------------------------------
-AC_PATH_PROG(PERL, perl)
-AC_SUBST(PERL)
-# -------------------------------------------------------------
-
 
 
 # -------------------------------------------------------------
