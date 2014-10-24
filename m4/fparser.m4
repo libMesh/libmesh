@@ -38,16 +38,6 @@ AC_DEFUN([CONFIGURE_FPARSER],
                    esac],
                   [enablefparserdebugging=no])
 
-    AC_ARG_ENABLE(fparser-jit,
-                  AS_HELP_STRING([--enable-fparser-jit],
-                                 [Build fparser with experimental JIT compile functions]),
-                  [case "${enableval}" in
-                    yes)  enablefparserjit=yes ;;
-                     no)  enablefparserjit=no ;;
-                      *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-jit) ;;
-                   esac],
-                  [enablefparserjit=no])
-
     AC_ARG_ENABLE(fparser-optimizer,
                   AS_HELP_STRING([--disable-fparser-optimizer],
                                  [do not optimize parsed functions]),
@@ -86,11 +76,6 @@ AC_DEFUN([CONFIGURE_FPARSER],
         AC_MSG_RESULT(<<< Configuring library with fparser support (release version) >>>)
       fi
 
-      if (test $enablefparserjit = yes); then
-        AC_DEFINE(HAVE_FPARSER_JIT, 1, [Flag indicating whether FPARSER will be built with JIT compilation enabled])
-        AC_MSG_RESULT(<<< Configuring library with fparser JIT compilation support (experimental) >>>)
-      fi
-
       # This define in libmesh_config.h is used internally in fparser.hh and various source files
       if (test $enablefparserdebugging = yes); then
         AC_DEFINE(FPARSER_SUPPORT_DEBUGGING, 1, [Enable fparser debugging functions])
@@ -111,5 +96,4 @@ AC_DEFUN([CONFIGURE_FPARSER],
   AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
   AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
   AM_CONDITIONAL(FPARSER_SUPPORT_DEBUGGING,    test x$enablefparserdebugging = xyes)
-  AM_CONDITIONAL(FPARSER_SUPPORT_JIT,    test x$enablefparserjit = xyes)
 ])

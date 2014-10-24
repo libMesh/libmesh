@@ -63,24 +63,22 @@ target_triplet = @target@
 # Wrap code that uses std::move in fparser for compilers that don't support it
 @HAVE_CXX11_MOVE_TRUE@am__append_3 = -DFP_SUPPORT_CXX11_MOVE
 noinst_PROGRAMS = $(am__EXEEXT_1)
-@FPARSER_SUPPORT_JIT_TRUE@am__append_4 = lib/sha1.cpp
-@FPARSER_SUPPORT_JIT_TRUE@am__append_5 = -DFPARSER_JIT_COMPILER="\"$(CXX)\""
-@FPARSER_DEVEL_TRUE@am__append_6 = fpoptimizer/grammar_data.cc
-@FPARSER_DEVEL_TRUE@am__append_7 = util/tree_grammar_parser \
+@FPARSER_DEVEL_TRUE@am__append_4 = fpoptimizer/grammar_data.cc
+@FPARSER_DEVEL_TRUE@am__append_5 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
 @FPARSER_DEVEL_TRUE@	util/cpp_compress
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_8 = $(FPOPTIMIZER_CC_FILES)
-@FPARSER_DEVEL_TRUE@am__append_9 = $(BUILT_SOURCES)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_10 = fpoptimizer.cc
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_6 = $(FPOPTIMIZER_CC_FILES)
+@FPARSER_DEVEL_TRUE@am__append_7 = $(BUILT_SOURCES)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_8 = fpoptimizer.cc
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/build-aux/ylwrap \
 	$(top_srcdir)/contrib/Make.common util/tree_grammar_parser.cc
-@LIBMESH_DBG_MODE_TRUE@am__append_11 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_12 = libdevel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_13 = libopt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_14 = libprof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_15 = liboprof.la
+@LIBMESH_DBG_MODE_TRUE@am__append_9 = libdbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_10 = libdevel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_11 = libopt.la
+@LIBMESH_PROF_MODE_TRUE@am__append_12 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_13 = liboprof.la
 subdir = contrib/fparser
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -150,8 +148,7 @@ am__libdbg_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
 	fpoptimizer/rangeestimation.cc fpoptimizer/transformations.cc \
 	fpoptimizer/cse.cc fpoptimizer/optimize_main.cc fpoptimizer.cc
 am__dirstamp = $(am__leading_dot)dirstamp
-@FPARSER_SUPPORT_JIT_TRUE@am__objects_1 = lib/libdbg_la-sha1.lo
-am__objects_2 = fpoptimizer/libdbg_la-opcodename.lo \
+am__objects_1 = fpoptimizer/libdbg_la-opcodename.lo \
 	fpoptimizer/libdbg_la-bytecodesynth.lo \
 	fpoptimizer/libdbg_la-codetree.lo \
 	fpoptimizer/libdbg_la-debug.lo \
@@ -170,11 +167,11 @@ am__objects_2 = fpoptimizer/libdbg_la-opcodename.lo \
 	fpoptimizer/libdbg_la-transformations.lo \
 	fpoptimizer/libdbg_la-cse.lo \
 	fpoptimizer/libdbg_la-optimize_main.lo
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_3 = $(am__objects_2)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_4 = libdbg_la-fpoptimizer.lo
-am__objects_5 = libdbg_la-fparser.lo libdbg_la-fparser_ad.lo \
-	$(am__objects_1) $(am__objects_3) $(am__objects_4)
-@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_5)
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_2 = $(am__objects_1)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_3 = libdbg_la-fpoptimizer.lo
+am__objects_4 = libdbg_la-fparser.lo libdbg_la-fparser_ad.lo \
+	lib/libdbg_la-sha1.lo $(am__objects_2) $(am__objects_3)
+@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_4)
 libdbg_la_OBJECTS = $(am_libdbg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -206,8 +203,7 @@ am__libdevel_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
 	fpoptimizer/constantfolding.cc fpoptimizer/valuerange.cc \
 	fpoptimizer/rangeestimation.cc fpoptimizer/transformations.cc \
 	fpoptimizer/cse.cc fpoptimizer/optimize_main.cc fpoptimizer.cc
-@FPARSER_SUPPORT_JIT_TRUE@am__objects_6 = lib/libdevel_la-sha1.lo
-am__objects_7 = fpoptimizer/libdevel_la-opcodename.lo \
+am__objects_5 = fpoptimizer/libdevel_la-opcodename.lo \
 	fpoptimizer/libdevel_la-bytecodesynth.lo \
 	fpoptimizer/libdevel_la-codetree.lo \
 	fpoptimizer/libdevel_la-debug.lo \
@@ -226,11 +222,11 @@ am__objects_7 = fpoptimizer/libdevel_la-opcodename.lo \
 	fpoptimizer/libdevel_la-transformations.lo \
 	fpoptimizer/libdevel_la-cse.lo \
 	fpoptimizer/libdevel_la-optimize_main.lo
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_8 = $(am__objects_7)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_9 = libdevel_la-fpoptimizer.lo
-am__objects_10 = libdevel_la-fparser.lo libdevel_la-fparser_ad.lo \
-	$(am__objects_6) $(am__objects_8) $(am__objects_9)
-@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_10)
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_6 = $(am__objects_5)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_7 = libdevel_la-fpoptimizer.lo
+am__objects_8 = libdevel_la-fparser.lo libdevel_la-fparser_ad.lo \
+	lib/libdevel_la-sha1.lo $(am__objects_6) $(am__objects_7)
+@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_8)
 libdevel_la_OBJECTS = $(am_libdevel_la_OBJECTS)
 libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdevel_la_CXXFLAGS) \
@@ -258,8 +254,7 @@ am__liboprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
 	fpoptimizer/constantfolding.cc fpoptimizer/valuerange.cc \
 	fpoptimizer/rangeestimation.cc fpoptimizer/transformations.cc \
 	fpoptimizer/cse.cc fpoptimizer/optimize_main.cc fpoptimizer.cc
-@FPARSER_SUPPORT_JIT_TRUE@am__objects_11 = lib/liboprof_la-sha1.lo
-am__objects_12 = fpoptimizer/liboprof_la-opcodename.lo \
+am__objects_9 = fpoptimizer/liboprof_la-opcodename.lo \
 	fpoptimizer/liboprof_la-bytecodesynth.lo \
 	fpoptimizer/liboprof_la-codetree.lo \
 	fpoptimizer/liboprof_la-debug.lo \
@@ -278,11 +273,11 @@ am__objects_12 = fpoptimizer/liboprof_la-opcodename.lo \
 	fpoptimizer/liboprof_la-transformations.lo \
 	fpoptimizer/liboprof_la-cse.lo \
 	fpoptimizer/liboprof_la-optimize_main.lo
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_13 = $(am__objects_12)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_14 = liboprof_la-fpoptimizer.lo
-am__objects_15 = liboprof_la-fparser.lo liboprof_la-fparser_ad.lo \
-	$(am__objects_11) $(am__objects_13) $(am__objects_14)
-@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_15)
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_10 = $(am__objects_9)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_11 = liboprof_la-fpoptimizer.lo
+am__objects_12 = liboprof_la-fparser.lo liboprof_la-fparser_ad.lo \
+	lib/liboprof_la-sha1.lo $(am__objects_10) $(am__objects_11)
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_12)
 liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
 liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liboprof_la_CXXFLAGS) \
@@ -310,8 +305,7 @@ am__libopt_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
 	fpoptimizer/constantfolding.cc fpoptimizer/valuerange.cc \
 	fpoptimizer/rangeestimation.cc fpoptimizer/transformations.cc \
 	fpoptimizer/cse.cc fpoptimizer/optimize_main.cc fpoptimizer.cc
-@FPARSER_SUPPORT_JIT_TRUE@am__objects_16 = lib/libopt_la-sha1.lo
-am__objects_17 = fpoptimizer/libopt_la-opcodename.lo \
+am__objects_13 = fpoptimizer/libopt_la-opcodename.lo \
 	fpoptimizer/libopt_la-bytecodesynth.lo \
 	fpoptimizer/libopt_la-codetree.lo \
 	fpoptimizer/libopt_la-debug.lo \
@@ -330,11 +324,11 @@ am__objects_17 = fpoptimizer/libopt_la-opcodename.lo \
 	fpoptimizer/libopt_la-transformations.lo \
 	fpoptimizer/libopt_la-cse.lo \
 	fpoptimizer/libopt_la-optimize_main.lo
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_18 = $(am__objects_17)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_19 = libopt_la-fpoptimizer.lo
-am__objects_20 = libopt_la-fparser.lo libopt_la-fparser_ad.lo \
-	$(am__objects_16) $(am__objects_18) $(am__objects_19)
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_20)
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_14 = $(am__objects_13)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_15 = libopt_la-fpoptimizer.lo
+am__objects_16 = libopt_la-fparser.lo libopt_la-fparser_ad.lo \
+	lib/libopt_la-sha1.lo $(am__objects_14) $(am__objects_15)
+@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_16)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libopt_la_CXXFLAGS) \
@@ -362,8 +356,7 @@ am__libprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
 	fpoptimizer/constantfolding.cc fpoptimizer/valuerange.cc \
 	fpoptimizer/rangeestimation.cc fpoptimizer/transformations.cc \
 	fpoptimizer/cse.cc fpoptimizer/optimize_main.cc fpoptimizer.cc
-@FPARSER_SUPPORT_JIT_TRUE@am__objects_21 = lib/libprof_la-sha1.lo
-am__objects_22 = fpoptimizer/libprof_la-opcodename.lo \
+am__objects_17 = fpoptimizer/libprof_la-opcodename.lo \
 	fpoptimizer/libprof_la-bytecodesynth.lo \
 	fpoptimizer/libprof_la-codetree.lo \
 	fpoptimizer/libprof_la-debug.lo \
@@ -382,11 +375,11 @@ am__objects_22 = fpoptimizer/libprof_la-opcodename.lo \
 	fpoptimizer/libprof_la-transformations.lo \
 	fpoptimizer/libprof_la-cse.lo \
 	fpoptimizer/libprof_la-optimize_main.lo
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_23 = $(am__objects_22)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_24 = libprof_la-fpoptimizer.lo
-am__objects_25 = libprof_la-fparser.lo libprof_la-fparser_ad.lo \
-	$(am__objects_21) $(am__objects_23) $(am__objects_24)
-@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_25)
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_18 = $(am__objects_17)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__objects_19 = libprof_la-fpoptimizer.lo
+am__objects_20 = libprof_la-fparser.lo libprof_la-fparser_ad.lo \
+	lib/libprof_la-sha1.lo $(am__objects_18) $(am__objects_19)
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_20)
 libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
 libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libprof_la_CXXFLAGS) \
@@ -870,8 +863,8 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-pkg_cppflags = -I$(srcdir)/fpoptimizer $(am__append_5) \
-	$(FEATURE_FLAGS)
+pkg_cppflags = -I$(srcdir)/fpoptimizer \
+	-DFPARSER_JIT_COMPILER="\"$(CXX)\"" $(FEATURE_FLAGS)
 
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
@@ -890,10 +883,10 @@ EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 	fpoptimizer/treerules.dat $(FPOPTIMIZER_CC_FILES) \
 	fpoptimizer/fpoptimizer_header.txt \
 	fpoptimizer/fpoptimizer_footer.txt
-BUILT_SOURCES = extrasrc/fp_opcode_add.inc $(am__append_6)
+BUILT_SOURCES = extrasrc/fp_opcode_add.inc $(am__append_4)
 
 # when doing 'make clean' we need to remove the generated sources
-CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_9)
+CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_7)
 # in case they weren't conditionally cleaned:
 DISTCLEANFILES = util/bytecoderules_parser util/cpp_compress \
 	util/tree_grammar_parser
@@ -937,8 +930,8 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/cse.cc \
 	    fpoptimizer/optimize_main.cc
 
-pkg_sources = fparser.cc fparser_ad.cc $(am__append_4) $(am__append_8) \
-	$(am__append_10)
+pkg_sources = fparser.cc fparser_ad.cc lib/sha1.cpp $(am__append_6) \
+	$(am__append_8)
 
 # util/tree_grammar_parser is a utility which is required to build
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
@@ -1006,8 +999,8 @@ AM_LDFLAGS = $(libmesh_LDFLAGS)
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_11) $(am__append_12) \
-	$(am__append_13) $(am__append_14) $(am__append_15)
+noinst_LTLIBRARIES = $(am__append_9) $(am__append_10) $(am__append_11) \
+	$(am__append_12) $(am__append_13)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
