@@ -20,31 +20,31 @@ EXTRA_DIST = examples images src styles.css doxygen_stylesheet.css
 
 
 developers.html: src/$@ src/simple_header.html src/simple_footer.html
-	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	-cat $(srcdir)/src/simple_header.html $(srcdir)/src/$@ $(srcdir)/src/simple_footer.html > $@.html.tmp
 	$(AM_V_GEN)mv $@.html.tmp $@
 
 examples.html: src/$@ src/simple_header.html src/simple_footer.html
-	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	-cat $(srcdir)/src/simple_header.html $(srcdir)/src/$@ $(srcdir)/src/simple_footer.html > $@.html.tmp
 	$(AM_V_GEN)mv $@.html.tmp $@
 
 externalsoftware.html: src/$@ src/simple_header.html src/simple_footer.html
-	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	-cat $(srcdir)/src/simple_header.html $(srcdir)/src/$@ $(srcdir)/src/simple_footer.html > $@.html.tmp
 	$(AM_V_GEN)mv $@.html.tmp $@
 
 index.html: src/$@ src/simple_header.html src/simple_footer.html
-	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	-cat $(srcdir)/src/simple_header.html $(srcdir)/src/$@ $(srcdir)/src/simple_footer.html > $@.html.tmp
 	$(AM_V_GEN)mv $@.html.tmp $@
 
 installation.html: src/$@ src/simple_header.html src/simple_footer.html
-	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	-cat $(srcdir)/src/simple_header.html $(srcdir)/src/$@ $(srcdir)/src/simple_footer.html > $@.html.tmp
 	$(AM_V_GEN)mv $@.html.tmp $@
 
 publications.html: src/$@ src/simple_header.html src/simple_footer.html
-	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	-cat $(srcdir)/src/simple_header.html $(srcdir)/src/$@ $(srcdir)/src/simple_footer.html > $@.html.tmp
 	$(AM_V_GEN)mv $@.html.tmp $@
 
 support.html: src/$@ src/simple_header.html src/simple_footer.html
-	-cat $(srcdir)/src/simple_header.html > $@.html.tmp && cat $(srcdir)/src/$@ >> $@.html.tmp && cat $(srcdir)/src/simple_footer.html >> $@.html.tmp
+	-cat $(srcdir)/src/simple_header.html $(srcdir)/src/$@ $(srcdir)/src/simple_footer.html > $@.html.tmp
 	$(AM_V_GEN)mv $@.html.tmp $@
 
 #
