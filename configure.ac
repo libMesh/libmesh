@@ -125,7 +125,7 @@ if (test "x$enablecxx11" = "xyes"); then
 fi
 
 # --------------------------------------------------------------
-# See aclocal.m4 for the definition of this as well.  It uses the
+# See compiler.m4 for the definition of this function.  It uses the
 # output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
 # compilers.  For example, newer versions of GCC have additional C++ debugging
 # flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.

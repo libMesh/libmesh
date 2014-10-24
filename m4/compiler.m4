@@ -42,7 +42,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
 
 
   # --------------------------------------------------------------
-  # See aclocal.m4 for the definition of this function.  It can
+  # See below for the definition of this function.  It can
   # figure out which version of a particular compiler, e.g. GCC 4.0,
   # you are using.
   # --------------------------------------------------------------
