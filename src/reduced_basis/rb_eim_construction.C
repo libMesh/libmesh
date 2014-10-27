@@ -298,7 +298,7 @@ void RBEIMConstruction::enrich_RB_space()
   Point optimal_point;
   Number optimal_value = 0.;
   unsigned int optimal_var;
-  dof_id_type optimal_elem_id;
+  dof_id_type optimal_elem_id = DofObject::invalid_id;
 
   // Compute truth representation via projection
   MeshBase& mesh = this->get_mesh();
@@ -337,6 +337,9 @@ void RBEIMConstruction::enrich_RB_space()
             }
         }
     }
+
+  // In debug mode, assert that we found an optimal_elem_id
+  libmesh_assert_not_equal_to(optimal_elem_id, DofObject::invalid_id);
 
   Real global_abs_value = std::abs(optimal_value);
   unsigned int proc_ID_index;
