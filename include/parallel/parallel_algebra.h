@@ -213,7 +213,11 @@ class StandardType<Point> : public DataType
 {
 public:
   explicit
-  StandardType(const Point *example=NULL) {
+  StandardType(const Point *example=NULL)
+  {
+    // Prevent unused variable warnings when !LIBMESH_HAVE_MPI
+    libmesh_ignore(example);
+
     // _static_type never gets freed, but it only gets committed once
     // per T, so it's not a *huge* memory leak...
     static data_type _static_type;
