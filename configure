@@ -25685,14 +25685,19 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <locale>
-#ifdef HAVE_NAMESPACES
-using namespace std;
-#endif
+
+   #include <locale>
+   #ifdef HAVE_NAMESPACES
+   using namespace std;
+   #endif
+
 int
 main ()
 {
-locale loc; return 0;
+
+   locale loc;
+   return 0;
+
   ;
   return 0;
 }
@@ -25734,14 +25739,20 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
 #include <sstream>
 #ifdef HAVE_NAMESPACES
 using namespace std;
 #endif
+
 int
 main ()
 {
-stringstream message; message << "Hello"; return 0;
+
+  stringstream message;
+  message << "Hello";
+  return 0;
+
   ;
   return 0;
 }
@@ -25785,14 +25796,20 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <strstream>
-#ifdef HAVE_NAMESPACES
-using namespace std;
-#endif
+
+   #include <strstream>
+   #ifdef HAVE_NAMESPACES
+   using namespace std;
+   #endif
+
 int
 main ()
 {
-strstream message; message << "Hello"; return 0;
+
+   strstream message;
+   message << "Hello";
+   return 0;
+
   ;
   return 0;
 }
@@ -27115,25 +27132,22 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <typeinfo>
-#include <cxxabi.h>
-#include <string>
 
-template<typename TYPE>
-class A {};
+   #include <typeinfo>
+   #include <cxxabi.h>
+   #include <string>
+   template<typename TYPE> class A {};
 
 int
 main ()
 {
-A<int> instance;
-int status = 0;
-char* c_name = 0;
 
-c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
-
-std::string name(c_name);
-
-return name == "A<int>";
+   A<int> instance;
+   int status = 0;
+   char* c_name = 0;
+   c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
+   std::string name(c_name);
+   return name == "A<int>";
 
   ;
   return 0;
