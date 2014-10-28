@@ -494,12 +494,15 @@ inline Communicator::~Communicator () {
 }
 
 #ifdef LIBMESH_HAVE_MPI
-inline void Communicator::split(int color, int key, Communicator &target) {
-  MPI_Comm_split(this->get(), color, key, &target.get());
+inline void Communicator::split(int color, int key, Communicator &target) const {
+  target.clear();
+  MPI_Comm newcomm;
+  MPI_Comm_split(this->get(), color, key, &newcomm);
+  target.assign(newcomm);
   target.send_mode(this->send_mode());
 }
 #else
-inline void Communicator::split(int, int, Communicator &target) {
+inline void Communicator::split(int, int, Communicator &target) const {
   target.assign(this->get());
 }
 #endif

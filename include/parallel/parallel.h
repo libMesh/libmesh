@@ -599,7 +599,7 @@ public:
   /*
    * Create a new communicator between some subset of \p this
    */
-  void split(int color, int key, Communicator &target);
+  void split(int color, int key, Communicator &target) const;
 
   /*
    * Create a new duplicate of \p this communicator
