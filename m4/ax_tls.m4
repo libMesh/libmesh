@@ -52,7 +52,7 @@ AC_DEFUN([AX_TLS], [
           none) ac_cv_tls=none ; break ;;
 	  *)
              AC_TRY_COMPILE(
-                [#include <stdlib.h>
+                [@%:@include <stdlib.h>
                  static void
                  foo(void) {
                  static ] $ax_tls_keyword [ int bar;

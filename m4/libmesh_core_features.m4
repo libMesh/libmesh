@@ -68,7 +68,7 @@ fi
 # legacy include paths - disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(legacy-include-paths,
-              [AS_HELP_STRING([--enable-legacy-include-paths],[allow for e.g. #include "header.h" instead of #include "libmesh/header.h"])],
+              [AS_HELP_STRING([--enable-legacy-include-paths],[allow for e.g. @%:@include "header.h" instead of @%:@include "libmesh/header.h"])],
               enablelegacyincludepaths=$enableval,
               enablelegacyincludepaths=no)
 

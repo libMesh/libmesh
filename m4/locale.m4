@@ -7,10 +7,17 @@ ac_cv_cxx_have_locale,
 [AC_REQUIRE([AC_CXX_NAMESPACES])
  AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <locale>
-#ifdef HAVE_NAMESPACES
-using namespace std;
-#endif],[locale loc; return 0;],
+ AC_TRY_COMPILE(
+ [
+   @%:@include <locale>
+   @%:@ifdef HAVE_NAMESPACES
+   using namespace std;
+   @%:@endif
+ ],
+ [
+   locale loc;
+   return 0;
+ ],
  ac_cv_cxx_have_locale=yes, ac_cv_cxx_have_locale=no)
  AC_LANG_RESTORE
 ])

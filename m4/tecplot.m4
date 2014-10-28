@@ -66,7 +66,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 
       AC_LINK_IFELSE(
                   [
-                     AC_LANG_PROGRAM([#include <TECIO.h>],
+                     AC_LANG_PROGRAM([@%:@include <TECIO.h>],
                                      [int ierr = TECEND112 ();])
                   ],
                   [
@@ -79,7 +79,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 		  [
                      AC_LINK_IFELSE(
                                  [
-                                    AC_LANG_PROGRAM([#include <TECIO.h>],
+                                    AC_LANG_PROGRAM([@%:@include <TECIO.h>],
                                                     [int ierr = TECEND ();])
                                  ],
                                  [

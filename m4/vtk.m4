@@ -150,13 +150,13 @@ AC_DEFUN([CONFIGURE_VTK],
            AC_LINK_IFELSE(
            [
              AC_LANG_PROGRAM([
-             #include "vtkSmartPointer.h"
-             #include "vtkCellArray.h"
-             #include "vtkUnstructuredGrid.h"
-             #include "vtkPoints.h"
-             #include "vtkDoubleArray.h"
-             #include "vtkXMLPUnstructuredGridWriter.h"
-             #include "vtkImageThreshold.h"
+             @%:@include "vtkSmartPointer.h"
+             @%:@include "vtkCellArray.h"
+             @%:@include "vtkUnstructuredGrid.h"
+             @%:@include "vtkPoints.h"
+             @%:@include "vtkDoubleArray.h"
+             @%:@include "vtkXMLPUnstructuredGridWriter.h"
+             @%:@include "vtkImageThreshold.h"
                               ],
                              [
              vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();

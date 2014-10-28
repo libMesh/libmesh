@@ -14,7 +14,7 @@ AC_DEFUN([AC_CXX_RTTI],
 ac_cv_cxx_rtti,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <typeinfo>
+ AC_TRY_COMPILE([@%:@include <typeinfo>
 class Base { public :
              Base () {}
              virtual int f () { return 0; }

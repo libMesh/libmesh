@@ -7,7 +7,7 @@ AC_DEFUN([ACX_STD_THREAD],
 ac_cv_cxx_thread,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <thread>],
+ AC_TRY_COMPILE([@%:@include <thread>],
 [
   thread_local int i;
   std::thread t;
@@ -35,7 +35,7 @@ AC_DEFUN([ACX_PTHREAD],
 ac_cv_pthread_thread,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <pthread.h>],
+ AC_TRY_COMPILE([@%:@include <pthread.h>],
 [
   pthread_t thread;
   pthread_join(thread, NULL);
@@ -65,7 +65,7 @@ ac_cv_tbb_cxx_thread,
  AC_LANG_CPLUSPLUS
  saveCXXFLAGS="$CXXFLAGS"
  CXXFLAGS="$TBB_INCLUDE"
- AC_TRY_COMPILE([#include <tbb/tbb_thread.h>],
+ AC_TRY_COMPILE([@%:@include <tbb/tbb_thread.h>],
 [
   tbb::tbb_thread t;
   t.join();

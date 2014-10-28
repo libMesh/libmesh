@@ -11,22 +11,21 @@ AC_DEFUN([AX_CXX_GCC_ABI_DEMANGLE],
 ac_cv_cxx_gcc_abi_demangle,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <typeinfo>
-#include <cxxabi.h>
-#include <string>
-
-template<typename TYPE>
-class A {};
-],[A<int> instance;
-int status = 0;
-char* c_name = 0;
-
-c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
-
-std::string name(c_name);
-
-return name == "A<int>";
-],
+ AC_TRY_COMPILE(
+ [
+   @%:@include <typeinfo>
+   @%:@include <cxxabi.h>
+   @%:@include <string>
+   template<typename TYPE> class A {};
+ ],
+ [
+   A<int> instance;
+   int status = 0;
+   char* c_name = 0;
+   c_name = abi::__cxa_demangle(typeid(instance).name(), 0, 0, &status);
+   std::string name(c_name);
+   return name == "A<int>";
+ ],
  ac_cv_cxx_gcc_abi_demangle=yes, ac_cv_cxx_gcc_abi_demangle=no)
  AC_LANG_RESTORE
 ])

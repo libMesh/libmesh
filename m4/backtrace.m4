@@ -6,7 +6,7 @@ AC_DEFUN([AX_CXX_GLIBC_BACKTRACE],
 ac_cv_cxx_glibc_backtrace,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <execinfo.h>],
+ AC_TRY_COMPILE([@%:@include <execinfo.h>],
 [void *addresses[10];
 int size = backtrace(addresses, 10);
 char** strings = backtrace_symbols(addresses, size);

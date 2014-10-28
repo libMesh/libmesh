@@ -6,7 +6,7 @@ AC_DEFUN([AC_HAVE_FEEXCEPT],
 
 # So try to compile an actual program with these function calls.
 AC_COMPILE_IFELSE(
-            [AC_LANG_PROGRAM([#include <fenv.h>],
+            [AC_LANG_PROGRAM([@%:@include <fenv.h>],
                [feenableexcept(FE_DIVBYZERO | FE_INVALID);])],
             [ac_cv_have_feenableexcept=yes],
             [ac_cv_have_feenableexcept=no])
@@ -16,7 +16,7 @@ fi
 
 # So try to compile an actual program with these function calls.
 AC_COMPILE_IFELSE(
-            [AC_LANG_PROGRAM([#include <fenv.h>],
+            [AC_LANG_PROGRAM([@%:@include <fenv.h>],
                [fedisableexcept(FE_DIVBYZERO | FE_INVALID);])],
             [ac_cv_have_fedisableexcept=yes],
             [ac_cv_have_fedisableexcept=no])

@@ -7,7 +7,7 @@ AC_DEFUN([ACX_TR1_UNORDERED_MAP],
 ac_cv_cxx_tr1_unordered_map,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <tr1/unordered_map>],
+ AC_TRY_COMPILE([@%:@include <tr1/unordered_map>],
 [
   std::tr1::unordered_map<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -46,7 +46,7 @@ AC_DEFUN([ACX_TR1_UNORDERED_MULTIMAP],
 ac_cv_cxx_tr1_unordered_multimap,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <tr1/unordered_map>],
+ AC_TRY_COMPILE([@%:@include <tr1/unordered_map>],
 [
   std::tr1::unordered_multimap<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -87,7 +87,7 @@ AC_DEFUN([ACX_TR1_UNORDERED_SET],
 ac_cv_cxx_tr1_unordered_set,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <tr1/unordered_set>],
+ AC_TRY_COMPILE([@%:@include <tr1/unordered_set>],
 [
   std::tr1::unordered_set<int> m;
   m.insert(1);  m.insert(2);
@@ -126,7 +126,7 @@ AC_DEFUN([ACX_TR1_HASH],
 ac_cv_cxx_tr1_hash,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <tr1/functional>],
+ AC_TRY_COMPILE([@%:@include <tr1/functional>],
 [
   std::tr1::hash<int> m;
   std::size_t hashed = m(12345);
@@ -165,7 +165,7 @@ AC_DEFUN([ACX_STD_UNORDERED_MAP],
 ac_cv_cxx_unordered_map,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <unordered_map>],
+ AC_TRY_COMPILE([@%:@include <unordered_map>],
 [
   std::unordered_map<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -204,7 +204,7 @@ AC_DEFUN([ACX_STD_UNORDERED_MULTIMAP],
 ac_cv_cxx_unordered_multimap,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <unordered_map>],
+ AC_TRY_COMPILE([@%:@include <unordered_map>],
 [
   std::unordered_multimap<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -285,7 +285,7 @@ AC_DEFUN([ACX_STD_HASH],
 ac_cv_cxx_hash,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <functional>],
+ AC_TRY_COMPILE([@%:@include <functional>],
 [
   std::hash<int> m;
   std::size_t hashed = m(12345);
@@ -325,7 +325,7 @@ AC_DEFUN([ACX_EXT_HASH_MAP],
 ac_cv_cxx_ext_hash_map,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <ext/hash_map>],
+ AC_TRY_COMPILE([@%:@include <ext/hash_map>],
 [
   __gnu_cxx::hash_map<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -363,7 +363,7 @@ AC_DEFUN([ACX_EXT_HASH_MULTIMAP],
 ac_cv_cxx_ext_hash_multimap,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <ext/hash_map>],
+ AC_TRY_COMPILE([@%:@include <ext/hash_map>],
 [
   __gnu_cxx::hash_multimap<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -403,7 +403,7 @@ AC_DEFUN([ACX_EXT_HASH_SET],
 ac_cv_cxx_ext_hash_set,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <ext/hash_set>],
+ AC_TRY_COMPILE([@%:@include <ext/hash_set>],
 [
   __gnu_cxx::hash_set<int> m;
   m.insert(1);  m.insert(2);
@@ -441,7 +441,7 @@ AC_DEFUN([ACX_EXT_HASH],
 ac_cv_cxx_ext_hash,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <ext/hash_set>],
+ AC_TRY_COMPILE([@%:@include <ext/hash_set>],
 [
   __gnu_cxx::hash<int> m;
   std::size_t hashed = m(12345);
@@ -479,7 +479,7 @@ AC_DEFUN([ACX_HASH_MAP],
 ac_cv_cxx_hash_map,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <hash_map>],
+ AC_TRY_COMPILE([@%:@include <hash_map>],
 [
   std::hash_map<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -518,7 +518,7 @@ AC_DEFUN([ACX_HASH_MULTIMAP],
 ac_cv_cxx_hash_multimap,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <hash_map>],
+ AC_TRY_COMPILE([@%:@include <hash_map>],
 [
   std::hash_multimap<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -557,7 +557,7 @@ AC_DEFUN([ACX_STD_SET],
 ac_cv_cxx_set,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <set>],
+ AC_TRY_COMPILE([@%:@include <set>],
 [
   std::set<int> m;
   m.insert(1);  m.insert(2);
@@ -593,7 +593,7 @@ AC_DEFUN([ACX_STD_MAP],
 ac_cv_cxx_map,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <map>],
+ AC_TRY_COMPILE([@%:@include <map>],
 [
   std::map<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -630,7 +630,7 @@ AC_DEFUN([ACX_STD_MULTIMAP],
 ac_cv_cxx_multimap,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <map>],
+ AC_TRY_COMPILE([@%:@include <map>],
 [
   std::multimap<int, int> m;
   m.insert(std::make_pair(1, 2));
@@ -667,7 +667,7 @@ AC_DEFUN([ACX_HASH_SET],
 ac_cv_cxx_hash_set,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <hash_set>],
+ AC_TRY_COMPILE([@%:@include <hash_set>],
 [
   std::hash_set<int> m;
   m.insert(1);  m.insert(2);
