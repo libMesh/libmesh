@@ -26592,8 +26592,9 @@ int
 main ()
 {
 
-  std::unordered_set<int, int> m;
-  m.insert(std::make_pair(1, 2));
+  std::unordered_set<int> m;
+  m.insert(1);
+  m.insert(2);
 
   ;
   return 0;
