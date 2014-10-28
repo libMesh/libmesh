@@ -245,10 +245,11 @@ AC_DEFUN([ACX_STD_UNORDERED_SET],
 ac_cv_cxx_unordered_set,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <unordered_set>],
+ AC_TRY_COMPILE([@%:@include <unordered_set>],
 [
-  std::unordered_set<int, int> m;
-  m.insert(std::make_pair(1, 2));
+  std::unordered_set<int> m;
+  m.insert(1);
+  m.insert(2);
 ],
  ac_cv_cxx_unordered_set=yes, ac_cv_cxx_unordered_set=no)
  AC_LANG_RESTORE
