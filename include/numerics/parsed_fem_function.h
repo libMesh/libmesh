@@ -119,7 +119,9 @@ public:
                             std::string::npos : end - nextstart);
 
         // fparser can crash on empty expressions
-        libmesh_assert(!subexpression.empty());
+        if (subexpression.empty())
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+
 
 #ifdef LIBMESH_HAVE_FPARSER
         // Parse (and optimize if possible) the subexpression.
@@ -128,7 +130,8 @@ public:
         fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
-        fp.Parse(subexpression, variables);
+        if (fp.Parse(subexpression, variables) != -1) // -1 for success
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
         fp.Optimize();
         parsers.push_back(fp);
 #else

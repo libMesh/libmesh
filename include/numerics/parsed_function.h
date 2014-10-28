@@ -110,7 +110,8 @@ public:
                             std::string::npos : end - nextstart);
 
         // fparser can crash on empty expressions
-        libmesh_assert(!subexpression.empty());
+        if (subexpression.empty())
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
 
         // Parse (and optimize if possible) the subexpression.
         // Add some basic constants, to Real precision.
