@@ -128,7 +128,8 @@ public:
         fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
-        fp.Parse(subexpression, variables);
+        if (fp.Parse(subexpression, variables) != -1) // -1 for success
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
         fp.Optimize();
         parsers.push_back(fp);
 #else
