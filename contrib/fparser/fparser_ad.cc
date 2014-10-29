@@ -742,12 +742,94 @@ namespace FParser_AutoDiff2 {
         return CodeTreeImmed(Value_t(0));
     }
 
-    OPCODE op = func.GetOpcode();
+    // derivative being built for regular opcodes
     CodeTree<Value_t> diff;
+
+    // get opcode and parameter list
+    OPCODE op = func.GetOpcode();
+    const std::vector<CodeTree<Value_t> > & param = func.GetParams();
+    unsigned int i, j, nparam = param.size();
+
     switch (op)
     {
       case cAdd:
+      case cSub:
         diff.SetOpcode(op);
+        for (i = 0; i < nparam; ++i)
+          diff.AddParam(DiffTree(param[i], var));
+        break;
+
+      case cMul:
+        diff.SetOpcode(cAdd);
+        for (i = 0; i < nparam; ++i)
+        {
+          CodeTree<Value_t> sub;
+          sub.SetOpcode(cMul);
+          for (j = 0; j < nparam; ++j)
+            sub.AddParam(i==j ? DiffTree(param[j], var) : param[j]);
+          diff.AddParam(sub);
+        }
+        break;
+
+      case cSqrt :
+      {
+        // da/(2*sqrt(a))
+        diff.SetOpcode(cDiv);
+        CodeTree<Value_t> sqrtA = CodeTreeOp<Value_t>(cSqrt);
+        sqrtA.AddParam(param[0]);
+        CodeTree<Value_t> denom = CodeTreeOp<Value_t>(cMul);
+        denom.AddParam(CodeTreeImmed(Value_t(2)));
+        denom.AddParam(sqrtA);
+        diff.AddParam(DiffTree(param[0], var));
+        diff.AddParam(denom);
+      }
+
+      case cSin:
+      {
+        // da*cos(a)
+        CodeTree<Value_t> cosA = CodeTreeOp<Value_t>(cCos);
+        cosA.AddParam(param[0]);
+        diff.SetOpcode(cMul);
+        diff.AddParam(DiffTree(param[0], var));
+        diff.AddParam(cosA);
+        break;
+      }
+
+      case cCos:
+      {
+        // -da*sin(a)
+        CodeTree<Value_t> neg = CodeTreeOp<Value_t>(cNeg);;
+        CodeTree<Value_t> sinA = CodeTreeOp<Value_t>(cSin);
+        sinA.AddParam(param[0]);
+        neg.AddParam(sinA);
+        diff.SetOpcode(cMul);
+        diff.AddParam(DiffTree(param[0], var));
+        diff.AddParam(neg);
+        break;
+      }
+
+      case cPow:
+      {
+        // a**b * ( db*log(a) + b*da/a)
+        CodeTree<Value_t> logA = CodeTreeOp<Value_t>(cLog);
+        logA.AddParam(param[0]);
+        CodeTree<Value_t> db_logA = CodeTreeOp<Value_t>(cMul);
+        db_logA.AddParam(DiffTree(param[1], var));
+        db_logA.AddParam(logA);
+        CodeTree<Value_t> da_a = CodeTreeOp<Value_t>(cDiv);
+        da_a.AddParam(DiffTree(param[0], var));
+        da_a.AddParam(param[0]);
+        CodeTree<Value_t> b_daA = CodeTreeOp<Value_t>(cMul);
+        b_daA.AddParam(param[1]);
+        b_daA.AddParam(da_a);
+        CodeTree<Value_t> bracket = CodeTreeOp<Value_t>(cAdd);
+        bracket.AddParam(db_logA);
+        bracket.AddParam(b_daA);
+        diff.SetOpcode(cMul);
+        diff.AddParam(func);
+        diff.AddParam(bracket);
+        break;
+      }
 
       default:
         throw FunctionParserADBase<Value_t>::UnsupportedOpcodeException;
@@ -765,8 +847,6 @@ int FunctionParserADBase<Value_t>::AutoDiff2(const std::string& var_name)
 
   CodeTree<Value_t> orig;
   orig.GenerateFrom(*mData);
-
-  DumpTreeWithIndent(orig);
 
   // get c string and length of var argument
   const unsigned len = unsigned(var_name.size());
@@ -788,7 +868,9 @@ int FunctionParserADBase<Value_t>::AutoDiff2(const std::string& var_name)
   // invalid var argument, variable not found
   if (var == 0) return 1;
 
-  FParser_AutoDiff2::DiffTree(orig, var);
+  DumpTreeWithIndent(orig);
+  std::cout << "\nDerivative w.r.t. " << var << '\n';
+  DumpTreeWithIndent(FParser_AutoDiff2::DiffTree(orig, var));
 
   return 0;
 }
