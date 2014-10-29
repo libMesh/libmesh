@@ -14,8 +14,7 @@ public:
   /**
    * auto-differentiate for var
    */
-  int AutoDiff(const std::string& var);
-  int AutoDiff2(const std::string& var_name);
+  int AutoDiff(const std::string& var_name);
 
   /**
    * check if the function is equal to 0
@@ -51,61 +50,8 @@ public:
   Value_t Eval(const Value_t* Vars);
 #endif
 
-protected:
-  /**
-   * A list of opcodes and immediate values
-   */
-  struct OpcodePacket {
-    unsigned first, index;
-    Value_t second;
-    OpcodePacket() : first(0), index(0), second(Value_t()) {}
-    OpcodePacket(unsigned _first, Value_t _second, unsigned _index) : first(_first), index(_index), second(_second) {}
-  };
-  struct OpcodePlain : OpcodePacket {
-    OpcodePlain(unsigned _first) : OpcodePacket(_first, Value_t(), 0) {}
-  };
-  struct OpcodeImmediate : OpcodePacket {
-    OpcodeImmediate(Value_t _second);
-  };
-  struct OpcodeFCall : OpcodePacket {
-    OpcodeFCall(unsigned _index);
-  };
-
-  typedef std::vector<OpcodePacket> DiffProgramFragment;
-  typedef std::pair<typename DiffProgramFragment::const_iterator,
-                    typename DiffProgramFragment::const_iterator> Interval;
-
-  /**
-   * Recursively differentiate functions from the outside (end of program)
-   * to the inside.
-   */
-  DiffProgramFragment DiffFunction(const DiffProgramFragment & orig);
-
-  /**
-   * how much does the current opcode move the stack pointer
-   */
-  int OpcodeSize(const OpcodePacket & p);
-
 private:
   typename FunctionParserBase<Value_t>::Data * mData;
-
-  /// get the preceeding argument
-  Interval GetArgument(const DiffProgramFragment & code);
-
-  /// get argument n before
-  Interval GetArgument(const DiffProgramFragment & code, unsigned int index);
-
-  /// remove the code fragments that generate the n previous arguments
-  //std::vector<DiffProgramFragment> PopArguments(DiffProgramFragment & code, unsigned int index);
-
-  /// variable to diff for
-  unsigned mVarOp;
-
-  /// expand
-  DiffProgramFragment Expand();
-
-  /// write the DiffProgramFragement into the internal bytecode storage
-  void Commit(const DiffProgramFragment & code);
 
   /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
   bool JITCompileHelper(const std::string &, bool);
@@ -119,9 +65,6 @@ private:
    */
   bool mSilenceErrors;
 
-  /// the function index of the plog function
-  unsigned mFPlog;
-
   // user function plog
   static Value_t fp_plog(const Value_t * params);
 
@@ -130,18 +73,18 @@ public:
   static class UnsupportedOpcode : public std::exception {
     virtual const char* what() const throw() { return "Unsupported opcode"; }
   } UnsupportedOpcodeException;
-  static class StackExhausted : public std::exception {
-    virtual const char* what() const throw() { return "Stack exhausted."; }
-  } StackExhaustedException;
   static class EmptyProgram : public std::exception {
     virtual const char* what() const throw() { return "Empty programm passed in."; }
   } EmptyProgramException;
-  static class UnsupportedArgumentCount : public std::exception {
-    virtual const char* what() const throw() { return "Unsupported argument count."; }
-  } UnsupportedArgumentCountException;
+  static class PreExistingFunctions : public std::exception {
+    virtual const char* what() const throw() { return "No prior user defined functions should exist on the FParser object."; }
+  } PreExistingFunctionsException;
   static class RefuseToTakeCrazyDerivative : public std::exception {
     virtual const char* what() const throw() { return "The derivative of this expression would be undefined at a countable number of points."; }
   } RefuseToTakeCrazyDerivativeException;
+
+  /// the function index of the plog function
+  static const unsigned int sFPlog;
 };
 
 
