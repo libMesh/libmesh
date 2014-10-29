@@ -249,15 +249,18 @@ public:
   }
 
   /**
-   * Adds a mass vector contribution on \p elem to elem_residual.
+   * Subtracts a mass vector contribution on \p elem from
+   * elem_residual.
+   *
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If
    * elem_jacobian has not been computed then the method should
    * return false.
    *
-   * Most problems can use the reimplementation in
-   * FEMPhysics::mass_residual; few users will need to reimplement
-   * this themselves.
+   * Many problems can use the reimplementation in
+   * FEMPhysics::mass_residual which subtracts (du/dt,v) for each
+   * transient variable u; users with more complicated transient
+   * problems will need to reimplement this themselves.
    */
   virtual bool mass_residual (bool request_jacobian,
                               DiffContext &) {
@@ -265,7 +268,7 @@ public:
   }
 
   /**
-   * Adds a mass vector contribution on \p side of \p elem to
+   * Subtracts a mass vector contribution on \p side of \p elem from
    * elem_residual.
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If
@@ -282,8 +285,8 @@ public:
   }
 
   /**
-   * Adds any nonlocal mass vector contributions (e.g. any time
-   * derivative coefficients in scalar variable equations) to
+   * Subtracts any nonlocal mass vector contributions (e.g. any time
+   * derivative coefficients in scalar variable equations) from
    * elem_residual
    *
    * If this method receives request_jacobian = true, then it
@@ -291,10 +294,10 @@ public:
    * the Jacobian changes have not been computed then the method
    * should return false.
    *
-   * Many problems can use the implementation in
-   * DifferentiablePhysics::nonlocal_mass_residual, but users trying
-   * to solve SCALAR variable equations which have time derivative
-   * terms with mass coefficients != 1.0 will need to reimplement this
+   * Many problems can use the reimplementation in
+   * FEMPhysics::mass_residual which subtracts (du/dt,v) for each
+   * transient scalar variable u; users with more complicated
+   * transient scalar variable equations will need to reimplement this
    * themselves.
    */
   virtual bool nonlocal_mass_residual (bool request_jacobian,

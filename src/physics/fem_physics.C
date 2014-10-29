@@ -230,17 +230,17 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
           const Number JxWxU = JxW[qp] * uprime;
           for (unsigned int i = 0; i != n_dofs; ++i)
             {
-              Fu(i) += JxWxU * phi[i][qp];
+              Fu(i) -= JxWxU * phi[i][qp];
               if (request_jacobian && context.elem_solution_rate_derivative)
                 {
                   const Number JxWxPhiIxDeriv = JxW[qp] * phi[i][qp] *
                     context.elem_solution_rate_derivative;
-                  Kuu(i,i) += JxWxPhiIxDeriv * phi[i][qp];
+                  Kuu(i,i) -= JxWxPhiIxDeriv * phi[i][qp];
                   for (unsigned int j = i+1; j < n_dofs; ++j)
                     {
                       const Number Kij = JxWxPhiIxDeriv * phi[j][qp];
-                      Kuu(i,j) += Kij;
-                      Kuu(j,i) += Kij;
+                      Kuu(i,j) -= Kij;
+                      Kuu(j,i) -= Kij;
                     }
                 }
             }
