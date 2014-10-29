@@ -76,6 +76,16 @@ AC_DEFUN([CONFIGURE_FPARSER],
         AC_MSG_RESULT(<<< Configuring library with fparser support (release version) >>>)
       fi
 
+      AC_SEARCH_LIBS([dlopen], [dl dld], [
+        AC_DEFINE(HAVE_FPARSER_JIT, 1, [Flag indicating whether FPARSER will be built with JIT compilation enabled])
+        AC_MSG_RESULT(<<< Configuring library with fparser JIT compilation support >>>)
+        enablefparserjit=yes
+      ], [
+        AC_DEFINE(HAVE_FPARSER_JIT, 0, [Flag indicating whether FPARSER will be built with JIT compilation enabled])
+        AC_MSG_RESULT(<<< dlopen() not found, configuring library without fparser JIT compilation support >>>)
+        enablefparserjit=no
+      ])
+
       # This define in libmesh_config.h is used internally in fparser.hh and various source files
       if (test $enablefparserdebugging = yes); then
         AC_DEFINE(FPARSER_SUPPORT_DEBUGGING, 1, [Enable fparser debugging functions])
@@ -96,4 +106,5 @@ AC_DEFUN([CONFIGURE_FPARSER],
   AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
   AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
   AM_CONDITIONAL(FPARSER_SUPPORT_DEBUGGING,    test x$enablefparserdebugging = xyes)
+  AM_CONDITIONAL(FPARSER_SUPPORT_JIT,    test x$enablefparserjit = xyes)
 ])
