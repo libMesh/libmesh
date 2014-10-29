@@ -1465,7 +1465,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               } // end for loop over sides
 
             // Remove the original element from the BoundaryInfo structure.
-            mesh.boundary_info->remove(elem);
+            mesh.get_boundary_info().remove(elem);
 
           } // end if (mesh_has_boundary_data)
 
