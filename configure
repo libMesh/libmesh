@@ -594,7 +594,7 @@ PACKAGE_TARNAME='libmesh'
 PACKAGE_VERSION='1.0.0-pre'
 PACKAGE_STRING='libmesh 1.0.0-pre'
 PACKAGE_BUGREPORT='libmesh-users@lists.sourceforge.net'
-PACKAGE_URL='http://libmesh.sourceforge.net'
+PACKAGE_URL='http://libmesh.github.io'
 
 # Factoring default headers for most tests.
 ac_includes_default="\
@@ -2044,7 +2044,7 @@ Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
 
 Report bugs to <libmesh-users@lists.sourceforge.net>.
-libmesh home page: <http://libmesh.sourceforge.net>.
+libmesh home page: <http://libmesh.github.io>.
 _ACEOF
 ac_status=$?
 fi
@@ -36389,7 +36389,7 @@ Configuration commands:
 $config_commands
 
 Report bugs to <libmesh-users@lists.sourceforge.net>.
-libmesh home page: <http://libmesh.sourceforge.net>."
+libmesh home page: <http://libmesh.github.io>."
 
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
