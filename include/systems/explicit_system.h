@@ -101,7 +101,9 @@ public:
    * @e Can be overloaded in derived classes.
    */
   virtual void assemble_qoi_derivative
-  (const QoISet& qoi_indices = QoISet());
+  (const QoISet &qoi_indices = QoISet(),
+   bool include_liftfunc = true,
+   bool apply_constraints = true);
 
   /**
    * Assembles & solves the linear system Ax=b.

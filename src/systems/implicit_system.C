@@ -376,7 +376,9 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
   LinearSolver<Number> *linear_solver = this->get_linear_solver();
 
   // Reset and build the RHS from the QOI derivative
-  this->assemble_qoi_derivative(qoi_indices);
+  this->assemble_qoi_derivative(qoi_indices,
+                                /* include_liftfunc = */ false,
+                                /* apply_constraints = */ true);
 
   // Our iteration counts and residuals will be sums of the individual
   // results
@@ -473,7 +475,9 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
   // a matrix-vector product of R_u and z.
   matrix->get_transpose(*matrix);
 
-  this->assemble_qoi_derivative(qoi_indices);
+  this->assemble_qoi_derivative(qoi_indices,
+                                /* include_liftfunc = */ false,
+                                /* apply_constraints = */ true);
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
@@ -491,7 +495,9 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
   this->matrix->close();
   matrix->get_transpose(*matrix);
 
-  this->assemble_qoi_derivative(qoi_indices);
+  this->assemble_qoi_derivative(qoi_indices,
+                                /* include_liftfunc = */ false,
+                                /* apply_constraints = */ true);
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
@@ -737,6 +743,17 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // to derive an equivalent equation:
   // dq/dp = (partial q / partial p) - (z+phi) * (partial R / partial p)
 
+
+  // If we have non-zero adjoint dofs on Dirichlet constrained
+  // boundary dofs, then we need the residual components
+  // corresponding to those dofs when using r*z to compute R(u,z), so
+  // we can't apply constraints.
+  //
+  // If we aren't in that situation we could apply constraints but
+  // it will be faster not to.
+
+  this->get_dof_map().stash_dof_constraints();
+
   for (unsigned int j=0; j != Np; ++j)
     {
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
@@ -776,21 +793,17 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
+            sensitivities[i][j] = partialq_partialp[i] -
+              partialR_partialp->dot(this->get_adjoint_solution(i));
 
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
               {
                 AutoPtr<NumericVector<Number> > lift_func =
                   this->get_adjoint_solution(i).zero_clone();
-                this->get_dof_map().enforce_constraints_exactly
-                  (*this, lift_func.get(),
-                   /* homogeneous = */ false);
-                sensitivities[i][j] = partialq_partialp[i] -
-                  partialR_partialp->dot(*lift_func) -
-                  partialR_partialp->dot(this->get_adjoint_solution(i));
+                this->get_dof_map().enforce_adjoint_constraints_exactly
+                  (*lift_func.get(), i);
+                sensitivities[i][j] += partialR_partialp->dot(*lift_func);
               }
-            else
-              sensitivities[i][j] = partialq_partialp[i] -
-                partialR_partialp->dot(this->get_adjoint_solution(i));
           }
     }
 
@@ -798,6 +811,8 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // We didn't cache the original rhs or matrix for memory reasons,
   // but we can restore them to a state consistent solution -
   // principle of least surprise.
+
+  this->get_dof_map().unstash_dof_constraints();
   this->assembly(true, true);
   this->rhs->close();
   this->matrix->close();
@@ -842,7 +857,9 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
   //         (partial u / partial p)
 
   // We get (partial q / partial u) from the user
-  this->assemble_qoi_derivative(qoi_indices);
+  this->assemble_qoi_derivative(qoi_indices,
+                                /* include_liftfunc = */ true,
+                                /* apply_constraints = */ false);
 
   // FIXME: what do we do with adjoint boundary conditions here?
 
@@ -1051,7 +1068,9 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       this->assembly(true, true);
       this->rhs->close();
       this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices);
+      this->assemble_qoi_derivative(qoi_indices,
+                                    /* include_liftfunc = */ true,
+                                    /* apply_constraints = */ false);
 
       this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
 
@@ -1068,7 +1087,9 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
       this->assembly(true, true);
       this->rhs->close();
       this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices);
+      this->assemble_qoi_derivative(qoi_indices,
+                                    /* include_liftfunc = */ true,
+                                    /* apply_constraints = */ false);
 
       this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
 
@@ -1242,7 +1263,9 @@ void ImplicitSystem::qoi_parameter_hessian
       *parameters[k] = old_parameterk + delta_p;
       this->assembly(false, true);
       this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices);
+      this->assemble_qoi_derivative(qoi_indices,
+                                    /* include_liftfunc = */ true,
+                                    /* apply_constraints = */ false);
 
       for (unsigned int l=0; l != Np; ++l)
         {
@@ -1266,7 +1289,9 @@ void ImplicitSystem::qoi_parameter_hessian
       *parameters[k] = old_parameterk - delta_p;
       this->assembly(false, true);
       this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices);
+      this->assemble_qoi_derivative(qoi_indices,
+                                    /* include_liftfunc = */ true,
+                                    /* apply_constraints = */ false);
 
       for (unsigned int l=0; l != Np; ++l)
         {
@@ -1303,7 +1328,9 @@ void ImplicitSystem::qoi_parameter_hessian
       *this->solution += *oldsolution;
       this->assembly(false, true);
       this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices);
+      this->assemble_qoi_derivative(qoi_indices,
+                                    /* include_liftfunc = */ true,
+                                    /* apply_constraints = */ false);
 
       // The Hessian is symmetric, so we just calculate the lower
       // triangle and the diagonal, and we get the upper triangle from
@@ -1333,7 +1360,9 @@ void ImplicitSystem::qoi_parameter_hessian
       *this->solution += *oldsolution;
       this->assembly(false, true);
       this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices);
+      this->assemble_qoi_derivative(qoi_indices,
+                                    /* include_liftfunc = */ true,
+                                    /* apply_constraints = */ false);
 
       for (unsigned int l=0; l != k+1; ++l)
         {
