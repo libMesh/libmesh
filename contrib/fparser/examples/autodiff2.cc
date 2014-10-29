@@ -25,16 +25,20 @@ int main()
   FunctionParserAD fparser;
 
   //std::string func = "1+2*if(x<0,x,x^2)";
-  std::string func = "1+2*x+x+5*x";
-
+  //std::string func = "1+2*x+x*x+5*x^3";
+  //std::string func = "A := x+1; sin(A)+cos(A)";
+  std::string func = "if(x<0,3*x,sqrt(x))";
 
   // Parse the input expression into bytecode
-  fparser.Parse(func, "x,a");
+  if (fparser.Parse(func, "x,a") != -1)
+    return 1;
   std::cout << "Input Expression:\n" << func << std::endl;
   fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
 
   fparser.AutoDiff2("x");
+  std::cout << std::endl;
+  fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
 
   return 0;

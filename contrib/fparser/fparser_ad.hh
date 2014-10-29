@@ -139,6 +139,9 @@ public:
   static class UnsupportedArgumentCount : public std::exception {
     virtual const char* what() const throw() { return "Unsupported argument count."; }
   } UnsupportedArgumentCountException;
+  static class RefuseToTakeCrazyDerivative : public std::exception {
+    virtual const char* what() const throw() { return "The derivative of this expression would be undefined at a countable number of points."; }
+  } RefuseToTakeCrazyDerivativeException;
 };
 
 
