@@ -119,9 +119,11 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
 
   context.fixed_solution_derivative = 1.0;
 
-  // We might need to save the old jacobian in case one of our physics
-  // terms later is unable to update it analytically.
+  // We need to save the old jacobian and old residual since we'll be 
+  // multiplying some of the new contributions by theta or 1-theta
   DenseMatrix<Number> old_elem_jacobian(n_dofs, n_dofs);
+  DenseVector<Number> old_elem_residual(n_dofs);
+  old_elem_residual.swap(context.get_elem_residual());
   if (request_jacobian)
     old_elem_jacobian.swap(context.get_elem_jacobian());
 
@@ -146,6 +148,17 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   // Add the constraint term
   jacobian_computed = (_system.*constraint)(jacobian_computed, context) &&
     jacobian_computed;
+
+  // The new solution's contribution is scaled by theta
+  context.get_elem_residual() *= theta;
+  context.get_elem_jacobian() *= theta;
+
+  // Save the new solution's term
+  DenseMatrix<Number> elem_jacobian_newterm(n_dofs, n_dofs);
+  DenseVector<Number> elem_residual_newterm(n_dofs);
+  elem_residual_newterm.swap(context.get_elem_residual());
+  if (request_jacobian)
+    elem_jacobian_newterm.swap(context.get_elem_jacobian());
 
   // Add the time-dependent term for the old solution
 
@@ -172,6 +185,10 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
     (_system.*mass)(jacobian_computed, context) &&
     jacobian_computed;
 
+  // The old solution's contribution is scaled by (1-theta)
+  context.get_elem_residual() *= (1-theta);
+  context.get_elem_jacobian() *= (1-theta);
+
   // Restore the elem_solution
   // Move elem_->elem_, old_->old_
   context.get_elem_solution().swap(old_elem_solution);
@@ -180,7 +197,8 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   // Restore the elem position if necessary
   (context.*reinit_func)(1.);
 
-  // Add back (or restore) the old jacobian
+  // Add back (or restore) the old residual/jacobian
+  context.get_elem_residual() += old_elem_residual;
   if (request_jacobian)
     {
       if (jacobian_computed)
@@ -188,6 +206,11 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
       else
         context.get_elem_jacobian().swap(old_elem_jacobian);
     }
+
+  // Add the saved new-solution terms
+  context.get_elem_residual() += elem_residual_newterm;
+  if (jacobian_computed)
+    context.get_elem_jacobian() += elem_jacobian_newterm;
 
   return jacobian_computed;
 }
