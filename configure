@@ -661,6 +661,8 @@ CPPUNIT_CFLAGS
 CPPUNIT_CONFIG
 LIBMESH_ENABLE_FPARSER_FALSE
 LIBMESH_ENABLE_FPARSER_TRUE
+FPARSER_SUPPORT_JIT_FALSE
+FPARSER_SUPPORT_JIT_TRUE
 FPARSER_SUPPORT_DEBUGGING_FALSE
 FPARSER_SUPPORT_DEBUGGING_TRUE
 FPARSER_SUPPORT_OPTIMIZER_FALSE
@@ -35283,6 +35285,79 @@ $as_echo "#define HAVE_FPARSER_DEVEL 0" >>confdefs.h
 $as_echo "<<< Configuring library with fparser support (release version) >>>" >&6; }
       fi
 
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing dlopen" >&5
+$as_echo_n "checking for library containing dlopen... " >&6; }
+if ${ac_cv_search_dlopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen ();
+int
+main ()
+{
+return dlopen ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' dl dld; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_dlopen=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_dlopen+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_dlopen+:} false; then :
+
+else
+  ac_cv_search_dlopen=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_dlopen" >&5
+$as_echo "$ac_cv_search_dlopen" >&6; }
+ac_res=$ac_cv_search_dlopen
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+
+$as_echo "#define HAVE_FPARSER_JIT 1" >>confdefs.h
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with fparser JIT compilation support >>>" >&5
+$as_echo "<<< Configuring library with fparser JIT compilation support >>>" >&6; }
+        enablefparserjit=yes
+
+else
+
+
+$as_echo "#define HAVE_FPARSER_JIT 0" >>confdefs.h
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< dlopen() not found" >&5
+$as_echo "<<< dlopen() not found" >&6; }
+        enablefparserjit=no
+
+fi
+
+
       # This define in libmesh_config.h is used internally in fparser.hh and various source files
       if (test $enablefparserdebugging = yes); then
 
@@ -35339,6 +35414,14 @@ fi
 else
   FPARSER_SUPPORT_DEBUGGING_TRUE='#'
   FPARSER_SUPPORT_DEBUGGING_FALSE=
+fi
+
+   if test x$enablefparserjit = xyes; then
+  FPARSER_SUPPORT_JIT_TRUE=
+  FPARSER_SUPPORT_JIT_FALSE='#'
+else
+  FPARSER_SUPPORT_JIT_TRUE='#'
+  FPARSER_SUPPORT_JIT_FALSE=
 fi
 
 
@@ -36118,6 +36201,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${FPARSER_SUPPORT_DEBUGGING_TRUE}" && test -z "${FPARSER_SUPPORT_DEBUGGING_FALSE}"; then
   as_fn_error $? "conditional \"FPARSER_SUPPORT_DEBUGGING\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${FPARSER_SUPPORT_JIT_TRUE}" && test -z "${FPARSER_SUPPORT_JIT_FALSE}"; then
+  as_fn_error $? "conditional \"FPARSER_SUPPORT_JIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_FPARSER_TRUE}" && test -z "${LIBMESH_ENABLE_FPARSER_FALSE}"; then
