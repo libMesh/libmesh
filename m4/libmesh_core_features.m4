@@ -45,12 +45,12 @@ fi
 
 
 # --------------------------------------------------------------
-# default comm_world - now disabled by default
+# default comm_world - enabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(default-comm-world,
-              [AS_HELP_STRING([--enable-default-comm-world],[Provide global libMesh::CommWorld])],
+              [AS_HELP_STRING([--disable-default-comm-world],[Turn off the global libMesh::CommWorld object])],
               enabledefaultcommworld=$enableval,
-              enabledefaultcommworld=no)
+              enabledefaultcommworld=yes)
 
 AC_SUBST(enabledefaultcommworld)
 if test "$enabledefaultcommworld" != no ; then
