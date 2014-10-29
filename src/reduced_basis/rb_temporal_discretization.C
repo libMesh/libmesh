@@ -85,8 +85,9 @@ Real RBTemporalDiscretization::get_control(const unsigned int k) const
 void RBTemporalDiscretization::set_control(const std::vector<Real>& control)
 {
   libmesh_assert_less_equal(control.size(),_n_time_steps+1);
-  _control.assign(control.begin(),control.end());
-  _control.resize(_n_time_steps+1,0.0);
+  _control = control;
+  // If the input vector is smaller than the number of time steps (+1), we complete it with zeros
+  _control.resize(_n_time_steps+1);
 }
 
 void RBTemporalDiscretization::process_temporal_parameters_file (const std::string& parameters_filename)
