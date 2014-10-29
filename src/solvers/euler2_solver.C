@@ -139,10 +139,6 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
     (_system.*time_deriv)(request_jacobian, context);
 
   // Next, evaluate the mass residual at the new timestep
-  // Evaluating the mass residual at both old and new timesteps will be
-  // redundant in most problems but may be necessary for time accuracy
-  // or stability in moving mesh problems or problems with user-overridden
-  // mass_residual functions
 
   jacobian_computed = (_system.*mass)(jacobian_computed, context) &&
     jacobian_computed;
@@ -166,6 +162,12 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
     jacobian_computed;
 
   // Add the mass residual term for the old solution
+
+  // Evaluating the mass residual at both old and new timesteps will be
+  // redundant in most problems but may be necessary for time accuracy
+  // or stability in moving mesh problems or problems with user-overridden
+  // mass_residual functions
+
   jacobian_computed =
     (_system.*mass)(jacobian_computed, context) &&
     jacobian_computed;
