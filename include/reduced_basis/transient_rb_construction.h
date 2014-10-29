@@ -39,6 +39,9 @@ namespace libMesh
  * TransientRBConstruction extends RBConstruction to add
  * functionality relevant in the time-dependent case.
  *
+ * We can handle time controls on the RHS as h(t)*f(x,\mu).
+ * See Martin Grepl's thesis for more details.
+ *
  * @author David J. Knezevic 2009
  */
 

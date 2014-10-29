@@ -464,7 +464,7 @@ void TransientRBConstruction::truth_assembly()
     for(unsigned int q_f=0; q_f<Q_f; q_f++)
       {
         *temp_vec = *get_Fq(q_f);
-        temp_vec->scale( trans_theta_expansion.eval_F_theta(q_f,mu) );
+        temp_vec->scale( get_control(get_time_step())*trans_theta_expansion.eval_F_theta(q_f,mu) );
         rhs->add(*temp_vec);
       }
     //    zero_dirichlet_dofs_on_rhs();
@@ -883,7 +883,7 @@ void TransientRBConstruction::enrich_RB_space()
 
   // eval and evec now hold the sorted eigenvalues/eigenvectors
   libMesh::out << std::endl << "POD Eigenvalues:" << std::endl;
-  for(unsigned int i=0; i<=2; i++)
+  for(unsigned int i=0; i<=1; i++)
     {
       libMesh::out << "eigenvalue " << i << " = " << W[eigen_size-1-i] << std::endl;
     }
