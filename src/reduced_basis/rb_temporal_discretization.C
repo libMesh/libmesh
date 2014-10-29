@@ -73,6 +73,21 @@ unsigned int RBTemporalDiscretization::get_n_time_steps() const
 void RBTemporalDiscretization::set_n_time_steps(const unsigned int K)
 {
   _n_time_steps = K;
+  _control.assign(_n_time_steps+1,1.0);
+}
+
+Real RBTemporalDiscretization::get_control(const unsigned int k) const
+{
+  libmesh_assert_less_equal (k, get_n_time_steps());
+  return _control[k];
+}
+
+void RBTemporalDiscretization::set_control(const std::vector<Real>& control)
+{
+  libmesh_assert_less_equal(control.size(),_n_time_steps+1);
+  _control = control;
+  // If the input vector is smaller than the number of time steps (+1), we complete it with zeros
+  _control.resize(_n_time_steps+1);
 }
 
 void RBTemporalDiscretization::process_temporal_parameters_file (const std::string& parameters_filename)
@@ -98,6 +113,7 @@ void RBTemporalDiscretization::pull_temporal_discretization_data(RBTemporalDiscr
   this->set_euler_theta( other.get_euler_theta() );
   this->set_n_time_steps( other.get_n_time_steps() );
   this->set_time_step( other.get_time_step() );
+  this->set_control( other._control );
 }
 
 }
