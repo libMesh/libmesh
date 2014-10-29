@@ -120,7 +120,7 @@ public:
   bool print_solution_norms, print_solutions,
     print_residual_norms, print_residuals,
     print_jacobian_norms, print_jacobians,
-    print_element_jacobians;
+    print_element_jacobians, print_element_residuals;
 
   //   Solver options
 

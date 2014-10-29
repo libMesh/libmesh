@@ -86,6 +86,7 @@ FEMParameters::FEMParameters() :
   print_residual_norms(false), print_residuals(false),
   print_jacobian_norms(false), print_jacobians(false),
   print_element_jacobians(false),
+  print_element_residuals(false),
 
   use_petsc_snes(false),
   time_solver_quiet(true), solver_quiet(true), solver_verbose(false),
@@ -594,6 +595,7 @@ void FEMParameters::read(GetPot &input)
   GETPOT_INPUT(print_jacobian_norms);
   GETPOT_INPUT(print_jacobians);
   GETPOT_INPUT(print_element_jacobians);
+  GETPOT_INPUT(print_element_residuals);
 
 
   GETPOT_INPUT(use_petsc_snes);

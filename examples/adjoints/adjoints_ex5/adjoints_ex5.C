@@ -142,6 +142,7 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
   system.print_jacobian_norms    = param.print_jacobian_norms;
   system.print_jacobians         = param.print_jacobians;
   system.print_element_jacobians = param.print_element_jacobians;
+  system.print_element_residuals = param.print_element_residuals;
 
   // Solve this as a time-dependent or steady system
   if (param.transient)
