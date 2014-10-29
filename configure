@@ -8165,7 +8165,7 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-                  if test "$cross_compiling" = yes; then :
+                                                if test "$cross_compiling" = yes; then :
 
                                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -8180,7 +8180,7 @@ int
 main ()
 {
 
-        std::regex integer_regex("(\\+|-)?[[:digit:]]+");
+        std::regex integer_regex("(\\\\+|-)?[[:digit:]]+");
         regex_match("abc", integer_regex);
         regex_match("123", integer_regex);
 
