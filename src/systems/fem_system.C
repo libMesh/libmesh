@@ -539,7 +539,6 @@ private:
 
   FEMSystem& _sys;
   DifferentiableQoI& _diff_qoi;
-  DifferentiablePhysics *_diff_physics;
 
   const QoISet _qoi_indices;
 };
