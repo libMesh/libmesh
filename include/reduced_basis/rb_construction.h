@@ -430,6 +430,12 @@ public:
    */
   static AutoPtr<DirichletBoundary> build_zero_dirichlet_boundary_object();
 
+  /**
+   * Setter for the flag determining if convergence should be
+   * checked after each solve.
+   */
+  void set_convergence_assertion_flag(bool flag);
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -564,6 +570,13 @@ public:
    * with an "empty" (i.e. N=0) reduced basis space.
    */
   bool use_empty_rb_solve_in_greedy;
+
+  /**
+   * A boolean flag to indicate whether or not the Fq representor norms
+   * have already been computed --- used to make sure that we don't
+   * recompute them unnecessarily.
+   */
+  bool Fq_representor_innerprods_computed;
 
 protected:
 
@@ -716,12 +729,6 @@ protected:
   bool get_convergence_assertion_flag() const;
 
   /**
-   * Setter for the flag determining if convergence should be
-   * checked after each solve.
-   */
-  void set_convergence_assertion_flag(bool flag);
-
-  /**
    * Check if the linear solver reports convergence.
    * Throw an error when that is not the case.
    */
@@ -753,13 +760,6 @@ protected:
    * recompute them unnecessarily.
    */
   bool output_dual_innerprods_computed;
-
-  /**
-   * A boolean flag to indicate whether or not the Fq representor norms
-   * have already been computed --- used to make sure that we don't
-   * recompute them unnecessarily.
-   */
-  bool Fq_representor_innerprods_computed;
 
   /**
    * A boolean flag to indicate whether to check for proper convergence

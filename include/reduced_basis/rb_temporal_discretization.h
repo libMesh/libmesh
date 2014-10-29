@@ -23,6 +23,8 @@
 // libMesh includes
 #include "libmesh/libmesh_common.h"
 
+#include <vector>
+
 namespace libMesh
 {
 
@@ -66,6 +68,12 @@ public:
   void set_n_time_steps(const unsigned int K);
 
   /**
+   * Get/set the RHS control.
+   */
+  Real get_control(const unsigned int k) const;
+  void set_control(const std::vector<Real>& control);
+
+  /**
    * Read in and initialize parameters from \p parameters_filename.
    */
   void process_temporal_parameters_file (const std::string& parameters_filename);
@@ -100,6 +108,13 @@ private:
    * The number of time-steps.
    */
   unsigned int _n_time_steps;
+
+  /**
+   * The RHS control (scalar function of time).
+   * A function h(t) that is used in the RHS as h(t)*f(x,\mu).
+   * See Martin Grepl's thesis
+   */
+  std::vector<Real> _control;
 
 };
 
