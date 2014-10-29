@@ -467,7 +467,7 @@ public:
                     for (unsigned int d=0;
                          d != _femcontext.get_dof_indices().size(); ++d)
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
-                          (q, _femcontext.get_dof_indices()[d]))
+                          (q, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
                           have_some_heterogenous_qoi_bc = true;
                           have_heterogenous_qoi_bc[q] = true;
@@ -603,7 +603,7 @@ public:
                     for (unsigned int d=0;
                          d != _femcontext.get_dof_indices().size(); ++d)
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
-                          (q, _femcontext.get_dof_indices()[d]))
+                          (q, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
                           elem_has_some_heterogenous_qoi_bc = true;
                           elem_has_heterogenous_qoi_bc[q] = true;
@@ -651,7 +651,7 @@ public:
                           _sys.get_dof_map().has_heterogenous_adjoint_constraint
                             (q, _femcontext.get_dof_indices()[i]);
 
-                        if (liftfunc_val)
+                        if (liftfunc_val != Number(0))
                           {
                             for (unsigned int j=0;
                                  j != _femcontext.get_dof_indices().size(); ++j)
@@ -711,7 +711,7 @@ public:
                     for (unsigned int d=0;
                          d != _femcontext.get_dof_indices().size(); ++d)
                       if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
-                          (i, _femcontext.get_dof_indices()[d]))
+                          (i, _femcontext.get_dof_indices()[d]) != Number(0))
                         {
                           has_heterogenous_constraint = true;
                           libmesh_assert(elem_has_heterogenous_qoi_bc[i]);
