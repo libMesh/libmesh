@@ -10,8 +10,12 @@
   * improved Abaqus, Gmsh, UNV I/O support
   * VTK 6 support
   * QHull now distributed in contrib/
-  * Automatic differentiation of fparser parsed functions
-  * Allow NaN in fparser parsed functions
+  * Several Fparser enhancements by @dschwen
+    * Automatic differentiation
+    * Allow NaN in fparser parsed functions
+    * Fparser JIT support
+    * Many fpoptimizer bugfixes
+    * plog (polynomial log approximation) function added
   * Support NaN to locally disable DirichletBoundary functions
   * Methods for nonlocal computations with SCALARs in FEMSystem
   * PointLocator option for local element searches
@@ -50,8 +54,11 @@
   * Cut-cell quadrature (ElemCutter, QComposite classes) for XFEM
   * Per-subdomain scalar variable support
   * Added 'meshavg' application for averaging solutions
-  * Fparser JIT support
   * GDB backtraces and backtraces from the segfault handler
+  * Support -fsanitize=address flags on newer Clang and GCC compilers
+  * http://libmesh.github.io created, http://libmesh.sf.net is gone/permanently blocked
+  * "make doc" target completely overhauled
+  * Protect Mesh::BoundaryInfo behind an accessor.
 
 0.9.2 -> 0.9.3
   * FEMContext public members now private, must use API pushed in 0.9.2.
