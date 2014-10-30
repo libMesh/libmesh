@@ -5,11 +5,15 @@
 #include <exception>
 
 template<typename Value_t>
+class ADImplementation;
+
+template<typename Value_t>
 class FunctionParserADBase : public FunctionParserBase<Value_t>
 {
 public:
   FunctionParserADBase();
   FunctionParserADBase(const FunctionParserADBase& cpy);
+  virtual ~FunctionParserADBase();
 
   /**
    * auto-differentiate for var
@@ -68,23 +72,26 @@ private:
   // user function plog
   static Value_t fp_plog(const Value_t * params);
 
+  // function ID for the plog function
+  unsigned int mFPlog;
+
+  // private implementaion of the automatic differentiation algorithm
+  ADImplementation<Value_t> * ad;
+
 public:
   // Exceptions
   static class UnsupportedOpcode : public std::exception {
     virtual const char* what() const throw() { return "Unsupported opcode"; }
   } UnsupportedOpcodeException;
-  static class EmptyProgram : public std::exception {
-    virtual const char* what() const throw() { return "Empty programm passed in."; }
-  } EmptyProgramException;
-  static class PreExistingFunctions : public std::exception {
-    virtual const char* what() const throw() { return "No prior user defined functions should exist on the FParser object."; }
-  } PreExistingFunctionsException;
+  static class EmptySubtree : public std::exception {
+    virtual const char* what() const throw() { return "Empty subtree (missing parameter) encountered."; }
+  } EmptySubtreeException;
   static class RefuseToTakeCrazyDerivative : public std::exception {
     virtual const char* what() const throw() { return "The derivative of this expression would be undefined at a countable number of points."; }
   } RefuseToTakeCrazyDerivativeException;
 
-  /// the function index of the plog function
-  static const unsigned int sFPlog;
+  // the firewalled implementation class of the AD algorithm has full access to the FParser object
+  friend class ADImplementation<Value_t>;
 };
 
 

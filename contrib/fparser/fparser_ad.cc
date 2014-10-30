@@ -22,19 +22,72 @@ using namespace FPoptimizer_CodeTree;
 #  include <sys/stat.h>
 #endif
 
+/**
+ * The internals of the automatic differentiation algorithm are encapsulated in this class
+ * and hidden from the public interface, as the installed FParser version does not have access
+ * to the CodeTree<> class template. (see pimpl idiom).
+ * The ADImplementation has full access to its FParser owner object through the parser pointer.
+ */
 template<typename Value_t>
-const unsigned int FunctionParserADBase<Value_t>::sFPlog = 0;
+class ADImplementation
+{
+  FunctionParserADBase<Value_t> * parser;
+  typename FunctionParserBase<Value_t>::Data * mData;
+public:
+  ADImplementation(FunctionParserADBase<Value_t> * _parser) : parser(_parser) {}
+  int AutoDiff(const std::string& var_name);
+
+private:
+  /**
+   * CodeTreeAD is a helper class derived from CodeTree<> for the purpose of adding overloaded
+   * operators, to make express the elementary derivatives in a compact way. The class carrys
+   * a pointer to the owning ADImplemntation object) which is implicitly sliced of when converting
+   * to CodeTree<>). The pointer is needed to implement the [] derivative operator, which needs
+   * knowledge of the custom function list in the parser object.
+   */
+  class CodeTreeAD : public CodeTree<Value_t> {
+    // pointer to the ad implmentation managing the differentiation (will be sliced on assignment!)
+    class ADImplementation<Value_t> * ad;
+
+  public:
+    CodeTreeAD() : CodeTree<Value_t>(), ad(NULL) {}
+    CodeTreeAD(ADImplementation<Value_t> * _ad) : ad(_ad) {}
+    CodeTreeAD(const CodeTree<Value_t> & tree, ADImplementation<Value_t> * _ad) :
+        CodeTree<Value_t>(tree),
+        ad(_ad)
+    {}
+    CodeTreeAD(const Value_t & val) : CodeTree<Value_t>(CodeTreeImmed(val)) {}
+
+    CodeTreeAD operator* (const CodeTreeAD & a) { return ad->MakeTree(cMul, *this, a); }
+    CodeTreeAD operator/ (const CodeTreeAD & a) { return ad->MakeTree(cDiv, *this, a); }
+    CodeTreeAD operator+ (const CodeTreeAD & a) { return ad->MakeTree(cAdd, *this, a); }
+    CodeTreeAD operator- (const CodeTreeAD & a) { return ad->MakeTree(cSub, *this, a); }
+    CodeTreeAD operator- () { return ad->MakeTree(cNeg, *this); }
+    // overload the [] operator to return the derivative
+    CodeTreeAD operator[] (unsigned int var) {
+      if (ad == NULL)
+        throw FunctionParserADBase<Value_t>::EmptySubtreeException;
+      return ad->DiffTree(*this, var);
+    }
+  };
+
+  // recursive subtree diferentiation - the heart of the AD algorithm
+  CodeTreeAD DiffTree(const CodeTreeAD & func, unsigned int var);
+
+  // helper methods to build trees with parameters in a compact way
+  CodeTreeAD MakeTree(OPCODE op, const CodeTreeAD & param1);
+  CodeTreeAD MakeTree(OPCODE op, const CodeTreeAD & param1, const CodeTreeAD & param2);
+};
 
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
     mData(this->getParserData()),
     compiledFunction(NULL),
-    mSilenceErrors(false)
+    mSilenceErrors(false),
+    mFPlog(mData->mFuncPtrs.size()),
+    ad(new ADImplementation<Value_t>(this))
 {
-  if (mData->mFuncPtrs.size() != sFPlog)
-    throw PreExistingFunctionsException;
-
   this->AddFunction("plog", fp_plog, 2);
 }
 
@@ -43,7 +96,9 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     FunctionParserBase<Value_t>(cpy),
     mData(this->getParserData()),
     compiledFunction(cpy.compiledFunction),
-    mSilenceErrors(cpy.mSilenceErrors)
+    mSilenceErrors(cpy.mSilenceErrors),
+    mFPlog(cpy.mFPlog),
+    ad(new ADImplementation<Value_t>(this))
 {
 }
 
@@ -55,6 +110,11 @@ Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
   return x < a ? fp_log(a) + (x-a)/a - (x-a)*(x-a)/(Value_t(2)*a*a) + (x-a)*(x-a)*(x-a)/(Value_t(3)*a*a*a) : fp_log(x);
 }
 
+template<typename Value_t>
+FunctionParserADBase<Value_t>::~FunctionParserADBase()
+{
+  delete ad;
+}
 
 template<typename Value_t>
 bool FunctionParserADBase<Value_t>::isZero()
@@ -81,208 +141,197 @@ void FunctionParserADBase<Value_t>::setZero()
 // this is a namespaced function because we cannot easily export CodeTree in the
 // public interface of the FunctionParserADBase class in its installed state in libMesh
 // as the codetree.hh header is not installed (part of FPoptimizer)
-namespace FParser_AutoDiff2 {
-  template<typename Value_t> class CodeTreeAD;
-  template<typename Value_t>
-  CodeTree<Value_t> DiffTree(const CodeTree<Value_t> & func, unsigned int var);
 
-  // quick subtree builder helper functions
-  template<typename Value_t>
-  CodeTreeAD<Value_t> MakeTree(OPCODE op, const std::vector<CodeTree<Value_t> > & params)
+// quick subtree builder helper functions
+template<typename Value_t>
+typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTree(OPCODE op, const CodeTreeAD & param1)
+{
+  CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op), this);
+  tree.AddParam(param1);
+  return tree;
+}
+template<typename Value_t>
+typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTree(OPCODE op, const CodeTreeAD & param1, const CodeTreeAD & param2)
+{
+  CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op), this);
+  tree.AddParam(param1);
+  tree.AddParam(param2);
+  return tree;
+}
+
+
+// return the derivative of func and put it into diff
+template<typename Value_t>
+typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::DiffTree(const CodeTreeAD & func, unsigned int var)
+{
+  // derivative of a constant number is 0
+  if (func.IsImmed())
+    return CodeTreeAD(CodeTreeImmed(Value_t(0)), this);
+
+  // derivative of a variable is 1 for the variable we are diffing w.r.t. and 0 otherwise
+  if (func.IsVar())
   {
-    CodeTree<Value_t> tree = CodeTreeOp<Value_t>(op);
-    tree.AddParams(params);
-    return tree;
+    if (func.GetVar() == var)
+      return CodeTreeAD(CodeTreeImmed(Value_t(1)), this);
+    else
+      return CodeTreeAD(CodeTreeImmed(Value_t(0)), this);
   }
-  template<typename Value_t>
-  CodeTreeAD<Value_t> MakeTree(OPCODE op, const CodeTree<Value_t> & param1)
+
+  // derivative being built for regular opcodes
+  CodeTreeAD diff;
+
+  // get opcode and parameter list
+  OPCODE op = func.GetOpcode();
+  const std::vector<CodeTree<Value_t> > & param_plain = func.GetParams();
+
+  // augment the params to use the CodeTreeAD class
+  std::vector<CodeTreeAD> param;
+  unsigned int i, j, nparam = param_plain.size();
+  for (i = 0; i < nparam; ++i)
+    param.push_back(CodeTreeAD(param_plain[i], this));
+
+  // short hand for the first three parameters
+  CodeTreeAD a = nparam > 0 ? param[0] : CodeTreeAD(),
+             b = nparam > 1 ? param[1] : CodeTreeAD(),
+             c = nparam > 2 ? param[2] : CodeTreeAD();
+
+  switch (op)
   {
-    CodeTree<Value_t> tree = CodeTreeOp<Value_t>(op);
-    tree.AddParam(param1);
-    return tree;
-  }
-  template<typename Value_t>
-  CodeTreeAD<Value_t> MakeTree(OPCODE op, const CodeTree<Value_t> & param1, const CodeTree<Value_t> & param2)
-  {
-    CodeTree<Value_t> tree = CodeTreeOp<Value_t>(op);
-    tree.AddParam(param1);
-    tree.AddParam(param2);
-    return tree;
-  }
+    //
+    // these opcodes can take an arbitrary number of parameters
+    //
 
-  template<typename Value_t>
-  class CodeTreeAD : public CodeTree<Value_t> {
-  public:
-    CodeTreeAD() : CodeTree<Value_t>() {};
-    CodeTreeAD(const CodeTree<Value_t> & tree) : CodeTree<Value_t>(tree) {};
-    CodeTreeAD(const Value_t & val) : CodeTree<Value_t>(CodeTreeImmed(val)) {};
-    // operators, OPERATORS!!!
-    CodeTreeAD<Value_t> operator* (const CodeTreeAD<Value_t> & a) { return MakeTree(cMul, *this, a); }
-    CodeTreeAD<Value_t> operator/ (const CodeTreeAD<Value_t> & a) { return MakeTree(cDiv, *this, a); }
-    CodeTreeAD<Value_t> operator+ (const CodeTreeAD<Value_t> & a) { return MakeTree(cAdd, *this, a); }
-    CodeTreeAD<Value_t> operator- (const CodeTreeAD<Value_t> & a) { return MakeTree(cSub, *this, a); }
-    CodeTreeAD<Value_t> operator- () { return MakeTree(cNeg, *this); }
-    // overload the [] operator to return the derivative
-    CodeTreeAD<Value_t> operator[] (unsigned int var) { return FParser_AutoDiff2::DiffTree(*this, var); }
-  };
+    case cAdd:
+    case cSub:
+      diff.SetOpcode(op);
+      for (i = 0; i < nparam; ++i)
+        diff.AddParam(DiffTree(param[i], var));
+      break;
 
-  // return the derivative of func and put it into diff
-  template<typename Value_t>
-  CodeTree<Value_t> DiffTree(const CodeTree<Value_t> & func, unsigned int var)
-  {
-    if (func.IsImmed())
-      return CodeTreeImmed(Value_t(0));
+    case cMul:
+      diff.SetOpcode(cAdd);
+      for (i = 0; i < nparam; ++i)
+      {
+        CodeTree<Value_t> sub;
+        sub.SetOpcode(cMul);
+        for (j = 0; j < nparam; ++j)
+          sub.AddParam(i==j ? DiffTree(param[j], var) : param[j]);
+        diff.AddParam(sub);
+      }
+      break;
 
-    if (func.IsVar())
-    {
-      if (func.GetVar() == var)
-        return CodeTreeImmed(Value_t(1));
-      else
-        return CodeTreeImmed(Value_t(0));
-    }
+    //
+    // these opcodes can take a fixed number of parameters
+    //
 
-    // derivative being built for regular opcodes
-    CodeTree<Value_t> diff;
+    case cDiv:
+      // da/b - db/b^2
+      return a[var]/b - b[var] / MakeTree(cPow, b, CodeTreeAD(2));
 
-    // get opcode and parameter list
-    OPCODE op = func.GetOpcode();
-    const std::vector<CodeTree<Value_t> > & param = func.GetParams();
-    unsigned int i, j, nparam = param.size();
+    case cNeg:
+      return -a[var];
+    case cInv:
+      return -a[var] / MakeTree(cPow, a, CodeTreeAD(2));
 
-    // parameters in CodeTreeAD form
-    CodeTreeAD<Value_t> a = nparam > 0 ? param[0] : CodeTreeAD<Value_t>();
-    CodeTreeAD<Value_t> b = nparam > 1 ? param[1] : CodeTreeAD<Value_t>();
-    CodeTreeAD<Value_t> c = nparam > 2 ? param[2] : CodeTreeAD<Value_t>();
+    case cSin:
+      return a[var] * MakeTree(cCos, a);
+    case cCos:
+      return -a[var] * MakeTree(cSin, a);
 
-    switch (op)
-    {
-      // these opcodes can take an arbitrary number of parameters
+    case cSinh:
+      return a[var] * MakeTree(cCosh, a);
+    case cCosh:
+      return a[var] * MakeTree(cSinh, a); // no -
 
-      case cAdd:
-      case cSub:
-        diff.SetOpcode(op);
-        for (i = 0; i < nparam; ++i)
-          diff.AddParam(DiffTree(param[i], var));
-        break;
+    case cAsin:
+      // da/sqrt(1-a^2)
+      return a[var] / MakeTree(cSqrt, CodeTreeAD(1) - MakeTree(cSqr, a));
+    case cAcos:
+      // -da/sqrt(1-a^2)
+      return -a[var] / MakeTree(cSqrt, CodeTreeAD(1) - MakeTree(cSqr, a));
+    case cAtan :
+      // da/(a^2+1)
+      return a[var] / (MakeTree(cSqr, a) + CodeTreeAD(1));
+    case cAtan2 :
+      // (b*da-a*db)/(a^2+b^2)
+      return (b * a[var] - a * b[var]) / (MakeTree(cSqr, a) + MakeTree(cSqr, b));
 
-      case cMul:
-        diff.SetOpcode(cAdd);
-        for (i = 0; i < nparam; ++i)
-        {
-          CodeTree<Value_t> sub;
-          sub.SetOpcode(cMul);
-          for (j = 0; j < nparam; ++j)
-            sub.AddParam(i==j ? DiffTree(param[j], var) : param[j]);
-          diff.AddParam(sub);
-        }
-        break;
+    case cPow:
+      return MakeTree(cPow, a, b) * (b[var] * MakeTree(cLog, a) + b * a[var]/a);
+    case cLog:
+      return a[var]/a;
+    case cExp:
+      return a[var] * MakeTree(cExp, a);
 
-      // these opcodes can take a fixed number of parameters
+    //
+    // the derivatives of these could be undefined at a finite number of points (one)
+    //
 
-      case cDiv:
-        // da/b - db/b^2
-        return a[var]/b - b[var] / MakeTree(cPow, b, CodeTreeAD<Value_t>(2));
+    case cIf:
+      // we diff the two branches, but not the condition
+      diff.SetOpcode(cIf);
+      diff.AddParam(a);
+      diff.AddParam(b[var]);
+      diff.AddParam(c[var]);
+      break;
 
-      case cNeg:
-        return -a[var];
-      case cInv:
-        return -a[var] / MakeTree(cPow, a, CodeTreeAD<Value_t>(2));
+    case cAbs:
+      // da*a/|a|
+      return a[var]*a/MakeTree(cAbs, a);
 
-      case cSin:
-        return a[var] * MakeTree(cCos, a);
-      case cCos:
-        return -a[var] * MakeTree(cSin, a);
+    case cMax:
+      diff.SetOpcode(cIf);
+      diff.AddParam(MakeTree(cLess, a, b));
+      diff.AddParam(b[var]);
+      diff.AddParam(a[var]);
+      break;
+    case cMin:
+      diff.SetOpcode(cIf);
+      diff.AddParam(MakeTree(cLess, a, b));
+      diff.AddParam(a[var]);
+      diff.AddParam(b[var]);
+      break;
 
-      case cSinh:
-        return a[var] * MakeTree(cCosh, a);
-      case cCosh:
-        return a[var] * MakeTree(cSinh, a); // no -
+    //
+    // the derivatives of these are undefined in a countable number of points, we refuse to take them
+    // TODO: we could wrap those in an if statement, that returns 1/0 at the undefined points!
+    //
 
-      case cAsin:
-        // da/sqrt(1-a^2)
-        return a[var] / MakeTree(cSqrt, CodeTreeAD<Value_t>(1) - MakeTree(cSqr, a));
-      case cAcos:
-        // -da/sqrt(1-a^2)
-        return -a[var] / MakeTree(cSqrt, CodeTreeAD<Value_t>(1) - MakeTree(cSqr, a));
-      case cAtan :
-        // da/(a^2+1)
-        return a[var] / (MakeTree(cSqr, a) + CodeTreeAD<Value_t>(1));
-      case cAtan2 :
-        // (b*da-a*db)/(a^2+b^2)
-        return (b * a[var] - a * b[var]) / (MakeTree(cSqr, a) + MakeTree(cSqr, b));
+    case cFloor:
+    case cCeil:
+    case cTrunc:
+    case cEqual:
+    case cNEqual:
+    case cLess:
+    case cLessOrEq:
+    case cGreater:
+    case cGreaterOrEq:
+      throw FunctionParserADBase<Value_t>::RefuseToTakeCrazyDerivativeException;
 
-      case cPow:
-        return MakeTree(cPow, a, b) * (b[var] * MakeTree(cLog, a) + b * a[var]/a);
-      case cLog:
-        return a[var]/a;
-      case cExp:
-        return a[var] * MakeTree(cExp, a);
+    // these opcodes will never appear in the tree when building with keep_powi == false
+    // they will be replaced by cPow, cMul, cDiv etc.:
+    // cLog10, cLog2, cHypot, cExp2, cRSqrt, cCbrt, cInv, cCot, cCsc, cSec
+    // cSqr, cSqrt, cInt, cLog2by, cSinCos, cSinhCosh, cRSub, cTan, cTanh
 
-      // the derivatives of these could be undefined at a finite number of points (one)
-
-      case cIf:
-        // we diff the two branches, but not the condition
-        diff.SetOpcode(cIf);
-        diff.AddParam(a);
-        diff.AddParam(b[var]);
-        diff.AddParam(c[var]);
-        break;
-
-      case cAbs:
-        // da*a/|a|
-        return a[var]*a/MakeTree(cAbs, a);
-
-      case cMax:
+    case cFCall:
+      if (func.GetFuncNo() == this->parser->mFPlog)
+      {
+        // a<b ? (1/b - 1/(b*b)*(a-b) + 1/b^3 * (a-b)^2) : 1/a
         diff.SetOpcode(cIf);
         diff.AddParam(MakeTree(cLess, a, b));
-        diff.AddParam(b[var]);
-        diff.AddParam(a[var]);
+        diff.AddParam(MakeTree(cInv, b) - MakeTree(cInv, b*b) * (a-b)
+                      + MakeTree(cPow, b, CodeTreeAD(-3)) * MakeTree(cSqr, a-b));
+        diff.AddParam(MakeTree(cInv, a));
         break;
-      case cMin:
-        diff.SetOpcode(cIf);
-        diff.AddParam(MakeTree(cLess, a, b));
-        diff.AddParam(a[var]);
-        diff.AddParam(b[var]);
-        break;
+      }
+      // fall through to undefined
 
-      // the derivatives of these are undefined in a countable number of points, we refuse to take them
-
-      case cFloor:
-      case cCeil:
-      case cTrunc:
-      case cEqual:
-      case cNEqual:
-      case cLess:
-      case cLessOrEq:
-      case cGreater:
-      case cGreaterOrEq:
-        throw FunctionParserADBase<Value_t>::RefuseToTakeCrazyDerivativeException;
-
-      // these opcodes will never appear in the tree when buildig with keep_powi == false
-      // they will be replaced by cPow, cMul, cDiv etc.:
-      // cLog10, cLog2, cHypot, cExp2, cRSqrt, cCbrt, cInv, cCot, cCsc, cSec
-      // cSqr, cSqrt, cInt, cLog2by, cSinCos, cSinhCosh, cRSub, cTan, cTanh
-
-      case cFCall:
-        if (func.GetFuncNo() == FunctionParserADBase<Value_t>::sFPlog)
-        {
-          // a<b ? (1/b - 1/(b*b)*(a-b) + 1/b^3 * (a-b)^2) : 1/a
-          diff.SetOpcode(cIf);
-          diff.AddParam(MakeTree(cLess, a, b));
-          diff.AddParam(MakeTree(cInv, b) - MakeTree(cInv, b*b) * (a-b)
-                        + MakeTree(cPow, b, CodeTreeAD<Value_t>(-3)) * MakeTree(cSqr, a-b));
-          diff.AddParam(MakeTree(cInv, a));
-          break;
-        }
-        // fall through to undefined
-
-      case cPCall:
-      default:
-        throw FunctionParserADBase<Value_t>::UnsupportedOpcodeException;
-    }
-
-    return diff;
+    case cPCall:
+    default:
+      throw FunctionParserADBase<Value_t>::UnsupportedOpcodeException;
   }
+
+  return diff;
 }
 
 template<typename Value_t>
@@ -290,8 +339,14 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 {
   this->ForceDeepCopy();
   mData = this->getParserData();
+  return ad->AutoDiff(var_name);
+}
 
-  CodeTree<Value_t> orig;
+template<typename Value_t>
+int ADImplementation<Value_t>::AutoDiff(const std::string& var_name)
+{
+  CodeTreeAD orig = CodeTreeAD(this);
+  typename FunctionParserBase<Value_t>::Data * mData = this->parser->mData;
   orig.GenerateFrom(*mData);
 
   // get c string and length of var argument
@@ -317,17 +372,17 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
   CodeTree<Value_t> diff;
   try
   {
-    diff = FParser_AutoDiff2::DiffTree(orig, var);
+    diff = DiffTree(orig, var);
   }
   catch(std::exception &e)
   {
     static bool printed_error = false;
-    if (!printed_error && !mSilenceErrors)
+    if (!printed_error && !this->parser->mSilenceErrors)
     {
       std::cerr << "AutoDiff exception: " << e.what() << " (this message will only be shown once per process)"<< std::endl;
       printed_error = true;
     }
-    setZero();
+    this->parser->setZero();
     return 0;
   }
 
@@ -626,7 +681,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
       case cFCall:
       {
         unsigned function = ByteCode[++i];
-        if (function == sFPlog)
+        if (function == mFPlog)
         {
           // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
           // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) - 1.5 + 2.0/s[" << (sp+1) << "] * s[" << sp << "] - 0.5/(s[" << (sp+1) << "]*s[" << (sp+1) << "]) * s[" << sp << "]*s[" << sp << "] : std::log(s[" << sp << "]);\n";
@@ -784,7 +839,8 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
 
 
 #define FUNCTIONPARSERAD_INSTANTIATE_CLASS(type) \
-    template class FunctionParserADBase< type >;
+    template class FunctionParserADBase< type >; \
+    template class ADImplementation< type >;
 
 #ifndef FP_DISABLE_DOUBLE_TYPE
 FUNCTIONPARSERAD_INSTANTIATE_CLASS(double)

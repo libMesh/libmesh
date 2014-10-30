@@ -102,7 +102,7 @@ class FunctionParserBase
 
 
     FunctionParserBase();
-    ~FunctionParserBase();
+    virtual ~FunctionParserBase();
 
     // Copy constructor and assignment operator (implemented using the
     // copy-on-write technique for efficiency):
