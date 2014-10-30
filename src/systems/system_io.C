@@ -1796,7 +1796,7 @@ void System::write_serialized_data (Xdr& io,
 
 
 template <typename iterator_type>
-dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
+std::size_t System::write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
                                                           const dof_id_type n_objs,
                                                           const iterator_type begin,
                                                           const iterator_type end,
@@ -2064,7 +2064,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
           // output_vals buffer is now filled for this block.
           // write it to disk
           async_io.reset(new Threads::Thread(threaded_io));
-          written_length += cast_int<dof_id_type>(output_vals.size());
+          written_length += output_vals.size();
         }
 
       // wait on any previous asynchronous IO - this *must* complete before
@@ -2157,21 +2157,21 @@ dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number
 
   //---------------------------------
   // Collect the values for all nodes
-  written_length +=
-    this->write_serialized_blocked_dof_objects (std::vector<const NumericVector<Number>*>(1,&vec),
-                                                this->get_mesh().n_nodes(),
-                                                this->get_mesh().local_nodes_begin(),
-                                                this->get_mesh().local_nodes_end(),
-                                                io);
+  written_length += cast_int<dof_id_type>
+    (this->write_serialized_blocked_dof_objects (std::vector<const NumericVector<Number>*>(1,&vec),
+                                                 this->get_mesh().n_nodes(),
+                                                 this->get_mesh().local_nodes_begin(),
+                                                 this->get_mesh().local_nodes_end(),
+                                                 io));
 
   //------------------------------------
   // Collect the values for all elements
-  written_length +=
-    this->write_serialized_blocked_dof_objects (std::vector<const NumericVector<Number>*>(1,&vec),
-                                                this->get_mesh().n_elem(),
-                                                this->get_mesh().local_elements_begin(),
-                                                this->get_mesh().local_elements_end(),
-                                                io);
+  written_length += cast_int<dof_id_type>
+    (this->write_serialized_blocked_dof_objects (std::vector<const NumericVector<Number>*>(1,&vec),
+                                                 this->get_mesh().n_elem(),
+                                                 this->get_mesh().local_elements_begin(),
+                                                 this->get_mesh().local_elements_end(),
+                                                 io));
 
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
@@ -2284,7 +2284,7 @@ std::size_t System::read_serialized_vectors (Xdr &io,
 
 
 
-dof_id_type System::write_serialized_vectors (Xdr &io,
+std::size_t System::write_serialized_vectors (Xdr &io,
                                               const std::vector<const NumericVector<Number>*> &vectors) const
 {
   parallel_object_only();
@@ -2296,7 +2296,7 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
     n_nodes       = this->get_mesh().n_nodes(),
     n_elem        = this->get_mesh().n_elem();
 
-  dof_id_type written_length = 0.;
+  std::size_t written_length = 0.;
 
   if (this->processor_id() == 0)
     {
