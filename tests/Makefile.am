@@ -25,6 +25,11 @@ unit_tests_sources = \
 	quadrature/quadrature_test.C \
 	utils/vectormap_test.C
 
+if LIBMESH_ENABLE_FPARSER
+  unit_tests_sources += \
+	fparser/autodiff.C
+endif
+
 check_PROGRAMS = # empty, append below
 
 if LIBMESH_OPT_MODE
