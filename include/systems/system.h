@@ -1301,7 +1301,7 @@ public:
    * allows for optimization for the multiple vector case by only communicating
    * the metadata once.
    */
-  dof_id_type write_serialized_vectors (Xdr &io,
+  std::size_t write_serialized_vectors (Xdr &io,
                                         const std::vector<const NumericVector<Number>*> &vectors) const;
 
   /**
@@ -1718,7 +1718,7 @@ private:
    * Returns the number of values written
    */
   template <typename iterator_type>
-  dof_id_type write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
+  std::size_t write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
                                                     const dof_id_type n_objects,
                                                     const iterator_type begin,
                                                     const iterator_type end,
