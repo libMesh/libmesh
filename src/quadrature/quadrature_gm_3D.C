@@ -44,11 +44,16 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
         switch(_order + 2*p)
           {
             // We hard-code the first few orders based on output from
-            // the mp-quadrature library, https://code.google.com/p/mp-quadrature.
-            // The points are ordered so that the weights are in
-            // increasing ordrer.  The hope is that this will somewhat
-            // reduce the amount of round-off error in the quadrature
-            // calculations...
+            // the mp-quadrature library:
+            //
+            // https://code.google.com/p/mp-quadrature
+            //
+            // The points are ordered in such a way that the amount of
+            // round-off error in the quadrature calculations is
+            // (hopefully) minimized.  These orderings were obtained
+            // via a simple permutation optimization strategy designed
+            // to produce the smallest overall average error while
+            // integrating all polynomials of degree <= d.
           case CONSTANT:
           case FIRST:
             {
@@ -69,11 +74,11 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
               _points.resize(5);
               _weights.resize(5);
 
-              _points[0](0) = 1.L/4.L;  _points[0](1) = 1.L/4.L;  _points[0](2) = 1.L/4.L;  _weights[0] = -2.L/15.L;
-              _points[1](0) = 1.L/2.L;  _points[1](1) = 1.L/6.L;  _points[1](2) = 1.L/6.L;  _weights[1] =  3.L/40.L;
-              _points[2](0) = 1.L/6.L;  _points[2](1) = 1.L/2.L;  _points[2](2) = 1.L/6.L;  _weights[2] =  3.L/40.L;
-              _points[3](0) = 1.L/6.L;  _points[3](1) = 1.L/6.L;  _points[3](2) = 1.L/2.L;  _weights[3] =  3.L/40.L;
-              _points[4](0) = 1.L/6.L;  _points[4](1) = 1.L/6.L;  _points[4](2) = 1.L/6.L;  _weights[4] =  3.L/40.L;
+              _points[0](0) = 1.L/6.L;  _points[0](1) = 1.L/6.L;  _points[0](2) = 1.L/2.L;  _weights[0] =  3.L/40.L;
+              _points[1](0) = 1.L/6.L;  _points[1](1) = 1.L/6.L;  _points[1](2) = 1.L/6.L;  _weights[1] =  3.L/40.L;
+              _points[2](0) = 1.L/4.L;  _points[2](1) = 1.L/4.L;  _points[2](2) = 1.L/4.L;  _weights[2] = -2.L/15.L;
+              _points[3](0) = 1.L/2.L;  _points[3](1) = 1.L/6.L;  _points[3](2) = 1.L/6.L;  _weights[3] =  3.L/40.L;
+              _points[4](0) = 1.L/6.L;  _points[4](1) = 1.L/2.L;  _points[4](2) = 1.L/6.L;  _weights[4] =  3.L/40.L;
               return;
             }
 
@@ -83,21 +88,21 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
               _points.resize(15);
               _weights.resize(15);
 
-              _points[ 0](0) = 1.L/2.L;  _points[ 0](1) = 1.L/6.L;  _points[ 0](2) = 1.L/6.L;  _weights[ 0] = -27.L/280.L;
-              _points[ 1](0) = 1.L/6.L;  _points[ 1](1) = 1.L/2.L;  _points[ 1](2) = 1.L/6.L;  _weights[ 1] = -27.L/280.L;
-              _points[ 2](0) = 1.L/6.L;  _points[ 2](1) = 1.L/6.L;  _points[ 2](2) = 1.L/2.L;  _weights[ 2] = -27.L/280.L;
-              _points[ 3](0) = 1.L/6.L;  _points[ 3](1) = 1.L/6.L;  _points[ 3](2) = 1.L/6.L;  _weights[ 3] = -27.L/280.L;
-              _points[ 4](0) = 1.L/4.L;  _points[ 4](1) = 1.L/4.L;  _points[ 4](2) = 1.L/4.L;  _weights[ 4] =    2.L/45.L;
-              _points[ 5](0) = 5.L/8.L;  _points[ 5](1) = 1.L/8.L;  _points[ 5](2) = 1.L/8.L;  _weights[ 5] =  16.L/315.L;
-              _points[ 6](0) = 3.L/8.L;  _points[ 6](1) = 3.L/8.L;  _points[ 6](2) = 1.L/8.L;  _weights[ 6] =  16.L/315.L;
-              _points[ 7](0) = 1.L/8.L;  _points[ 7](1) = 5.L/8.L;  _points[ 7](2) = 1.L/8.L;  _weights[ 7] =  16.L/315.L;
-              _points[ 8](0) = 3.L/8.L;  _points[ 8](1) = 1.L/8.L;  _points[ 8](2) = 3.L/8.L;  _weights[ 8] =  16.L/315.L;
-              _points[ 9](0) = 1.L/8.L;  _points[ 9](1) = 3.L/8.L;  _points[ 9](2) = 3.L/8.L;  _weights[ 9] =  16.L/315.L;
-              _points[10](0) = 1.L/8.L;  _points[10](1) = 1.L/8.L;  _points[10](2) = 5.L/8.L;  _weights[10] =  16.L/315.L;
-              _points[11](0) = 3.L/8.L;  _points[11](1) = 1.L/8.L;  _points[11](2) = 1.L/8.L;  _weights[11] =  16.L/315.L;
-              _points[12](0) = 1.L/8.L;  _points[12](1) = 3.L/8.L;  _points[12](2) = 1.L/8.L;  _weights[12] =  16.L/315.L;
-              _points[13](0) = 1.L/8.L;  _points[13](1) = 1.L/8.L;  _points[13](2) = 3.L/8.L;  _weights[13] =  16.L/315.L;
-              _points[14](0) = 1.L/8.L;  _points[14](1) = 1.L/8.L;  _points[14](2) = 1.L/8.L;  _weights[14] =  16.L/315.L;
+              _points[ 0](0) = 1.L/8.L;  _points[ 0](1) = 3.L/8.L;  _points[ 0](2) = 1.L/8.L;  _weights[ 0] =  16.L/315.L;
+              _points[ 1](0) = 1.L/8.L;  _points[ 1](1) = 1.L/8.L;  _points[ 1](2) = 5.L/8.L;  _weights[ 1] =  16.L/315.L;
+              _points[ 2](0) = 3.L/8.L;  _points[ 2](1) = 1.L/8.L;  _points[ 2](2) = 1.L/8.L;  _weights[ 2] =  16.L/315.L;
+              _points[ 3](0) = 1.L/6.L;  _points[ 3](1) = 1.L/2.L;  _points[ 3](2) = 1.L/6.L;  _weights[ 3] = -27.L/280.L;
+              _points[ 4](0) = 3.L/8.L;  _points[ 4](1) = 1.L/8.L;  _points[ 4](2) = 3.L/8.L;  _weights[ 4] =  16.L/315.L;
+              _points[ 5](0) = 1.L/8.L;  _points[ 5](1) = 3.L/8.L;  _points[ 5](2) = 3.L/8.L;  _weights[ 5] =  16.L/315.L;
+              _points[ 6](0) = 1.L/6.L;  _points[ 6](1) = 1.L/6.L;  _points[ 6](2) = 1.L/6.L;  _weights[ 6] = -27.L/280.L;
+              _points[ 7](0) = 1.L/6.L;  _points[ 7](1) = 1.L/6.L;  _points[ 7](2) = 1.L/2.L;  _weights[ 7] = -27.L/280.L;
+              _points[ 8](0) = 1.L/8.L;  _points[ 8](1) = 1.L/8.L;  _points[ 8](2) = 1.L/8.L;  _weights[ 8] =  16.L/315.L;
+              _points[ 9](0) = 1.L/4.L;  _points[ 9](1) = 1.L/4.L;  _points[ 9](2) = 1.L/4.L;  _weights[ 9] =    2.L/45.L;
+              _points[10](0) = 1.L/8.L;  _points[10](1) = 5.L/8.L;  _points[10](2) = 1.L/8.L;  _weights[10] =  16.L/315.L;
+              _points[11](0) = 1.L/2.L;  _points[11](1) = 1.L/6.L;  _points[11](2) = 1.L/6.L;  _weights[11] = -27.L/280.L;
+              _points[12](0) = 1.L/8.L;  _points[12](1) = 1.L/8.L;  _points[12](2) = 3.L/8.L;  _weights[12] =  16.L/315.L;
+              _points[13](0) = 5.L/8.L;  _points[13](1) = 1.L/8.L;  _points[13](2) = 1.L/8.L;  _weights[13] =  16.L/315.L;
+              _points[14](0) = 3.L/8.L;  _points[14](1) = 3.L/8.L;  _points[14](2) = 1.L/8.L;  _weights[14] =  16.L/315.L;
               return;
             }
 
@@ -107,41 +112,41 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
               _points.resize(35);
               _weights.resize(35);
 
-              _points[ 0](0) =  1.L/8.L;  _points[ 0](1) =  1.L/8.L;  _points[ 0](2) =  1.L/8.L;  _weights[ 0] =  -256.L/2835.L;
-              _points[ 1](0) =  1.L/8.L;  _points[ 1](1) =  1.L/8.L;  _points[ 1](2) =  3.L/8.L;  _weights[ 1] =  -256.L/2835.L;
-              _points[ 2](0) =  1.L/8.L;  _points[ 2](1) =  3.L/8.L;  _points[ 2](2) =  1.L/8.L;  _weights[ 2] =  -256.L/2835.L;
-              _points[ 3](0) =  3.L/8.L;  _points[ 3](1) =  1.L/8.L;  _points[ 3](2) =  1.L/8.L;  _weights[ 3] =  -256.L/2835.L;
-              _points[ 4](0) =  1.L/8.L;  _points[ 4](1) =  1.L/8.L;  _points[ 4](2) =  5.L/8.L;  _weights[ 4] =  -256.L/2835.L;
-              _points[ 5](0) =  1.L/8.L;  _points[ 5](1) =  3.L/8.L;  _points[ 5](2) =  3.L/8.L;  _weights[ 5] =  -256.L/2835.L;
-              _points[ 6](0) =  3.L/8.L;  _points[ 6](1) =  1.L/8.L;  _points[ 6](2) =  3.L/8.L;  _weights[ 6] =  -256.L/2835.L;
-              _points[ 7](0) =  1.L/8.L;  _points[ 7](1) =  5.L/8.L;  _points[ 7](2) =  1.L/8.L;  _weights[ 7] =  -256.L/2835.L;
-              _points[ 8](0) =  3.L/8.L;  _points[ 8](1) =  3.L/8.L;  _points[ 8](2) =  1.L/8.L;  _weights[ 8] =  -256.L/2835.L;
-              _points[ 9](0) =  5.L/8.L;  _points[ 9](1) =  1.L/8.L;  _points[ 9](2) =  1.L/8.L;  _weights[ 9] =  -256.L/2835.L;
-              _points[10](0) =  1.L/4.L;  _points[10](1) =  1.L/4.L;  _points[10](2) =  1.L/4.L;  _weights[10] =     -8.L/945.L;
-              _points[11](0) = 1.L/10.L;  _points[11](1) = 1.L/10.L;  _points[11](2) = 1.L/10.L;  _weights[11] = 3125.L/72576.L;
-              _points[12](0) = 1.L/10.L;  _points[12](1) = 1.L/10.L;  _points[12](2) = 3.L/10.L;  _weights[12] = 3125.L/72576.L;
-              _points[13](0) = 1.L/10.L;  _points[13](1) = 3.L/10.L;  _points[13](2) = 1.L/10.L;  _weights[13] = 3125.L/72576.L;
-              _points[14](0) = 3.L/10.L;  _points[14](1) = 1.L/10.L;  _points[14](2) = 1.L/10.L;  _weights[14] = 3125.L/72576.L;
-              _points[15](0) = 7.L/10.L;  _points[15](1) = 1.L/10.L;  _points[15](2) = 1.L/10.L;  _weights[15] = 3125.L/72576.L;
-              _points[16](0) =  1.L/2.L;  _points[16](1) = 3.L/10.L;  _points[16](2) = 1.L/10.L;  _weights[16] = 3125.L/72576.L;
+              _points[ 0](0) = 3.L/10.L;  _points[ 0](1) = 1.L/10.L;  _points[ 0](2) = 3.L/10.L;  _weights[ 0] = 3125.L/72576.L;
+              _points[ 1](0) =  1.L/2.L;  _points[ 1](1) = 1.L/10.L;  _points[ 1](2) = 3.L/10.L;  _weights[ 1] = 3125.L/72576.L;
+              _points[ 2](0) =  1.L/2.L;  _points[ 2](1) = 3.L/10.L;  _points[ 2](2) = 1.L/10.L;  _weights[ 2] = 3125.L/72576.L;
+              _points[ 3](0) = 1.L/10.L;  _points[ 3](1) = 3.L/10.L;  _points[ 3](2) =  1.L/2.L;  _weights[ 3] = 3125.L/72576.L;
+              _points[ 4](0) = 1.L/10.L;  _points[ 4](1) = 7.L/10.L;  _points[ 4](2) = 1.L/10.L;  _weights[ 4] = 3125.L/72576.L;
+              _points[ 5](0) = 1.L/10.L;  _points[ 5](1) =  1.L/2.L;  _points[ 5](2) = 3.L/10.L;  _weights[ 5] = 3125.L/72576.L;
+              _points[ 6](0) = 1.L/10.L;  _points[ 6](1) = 3.L/10.L;  _points[ 6](2) = 1.L/10.L;  _weights[ 6] = 3125.L/72576.L;
+              _points[ 7](0) = 3.L/10.L;  _points[ 7](1) = 3.L/10.L;  _points[ 7](2) = 3.L/10.L;  _weights[ 7] = 3125.L/72576.L;
+              _points[ 8](0) = 3.L/10.L;  _points[ 8](1) = 1.L/10.L;  _points[ 8](2) = 1.L/10.L;  _weights[ 8] = 3125.L/72576.L;
+              _points[ 9](0) = 1.L/10.L;  _points[ 9](1) = 3.L/10.L;  _points[ 9](2) = 3.L/10.L;  _weights[ 9] = 3125.L/72576.L;
+              _points[10](0) =  1.L/6.L;  _points[10](1) =  1.L/2.L;  _points[10](2) =  1.L/6.L;  _weights[10] =   243.L/4480.L;
+              _points[11](0) =  1.L/6.L;  _points[11](1) =  1.L/6.L;  _points[11](2) =  1.L/2.L;  _weights[11] =   243.L/4480.L;
+              _points[12](0) = 1.L/10.L;  _points[12](1) = 1.L/10.L;  _points[12](2) =  1.L/2.L;  _weights[12] = 3125.L/72576.L;
+              _points[13](0) = 1.L/10.L;  _points[13](1) = 1.L/10.L;  _points[13](2) = 7.L/10.L;  _weights[13] = 3125.L/72576.L;
+              _points[14](0) =  3.L/8.L;  _points[14](1) =  1.L/8.L;  _points[14](2) =  3.L/8.L;  _weights[14] =  -256.L/2835.L;
+              _points[15](0) =  1.L/8.L;  _points[15](1) =  3.L/8.L;  _points[15](2) =  1.L/8.L;  _weights[15] =  -256.L/2835.L;
+              _points[16](0) =  1.L/8.L;  _points[16](1) =  5.L/8.L;  _points[16](2) =  1.L/8.L;  _weights[16] =  -256.L/2835.L;
               _points[17](0) = 3.L/10.L;  _points[17](1) =  1.L/2.L;  _points[17](2) = 1.L/10.L;  _weights[17] = 3125.L/72576.L;
-              _points[18](0) = 1.L/10.L;  _points[18](1) = 7.L/10.L;  _points[18](2) = 1.L/10.L;  _weights[18] = 3125.L/72576.L;
-              _points[19](0) =  1.L/2.L;  _points[19](1) = 1.L/10.L;  _points[19](2) = 3.L/10.L;  _weights[19] = 3125.L/72576.L;
-              _points[20](0) = 3.L/10.L;  _points[20](1) = 3.L/10.L;  _points[20](2) = 3.L/10.L;  _weights[20] = 3125.L/72576.L;
-              _points[21](0) = 1.L/10.L;  _points[21](1) =  1.L/2.L;  _points[21](2) = 3.L/10.L;  _weights[21] = 3125.L/72576.L;
-              _points[22](0) = 3.L/10.L;  _points[22](1) = 1.L/10.L;  _points[22](2) =  1.L/2.L;  _weights[22] = 3125.L/72576.L;
-              _points[23](0) = 1.L/10.L;  _points[23](1) = 3.L/10.L;  _points[23](2) =  1.L/2.L;  _weights[23] = 3125.L/72576.L;
-              _points[24](0) = 1.L/10.L;  _points[24](1) = 1.L/10.L;  _points[24](2) = 7.L/10.L;  _weights[24] = 3125.L/72576.L;
-              _points[25](0) =  1.L/2.L;  _points[25](1) = 1.L/10.L;  _points[25](2) = 1.L/10.L;  _weights[25] = 3125.L/72576.L;
-              _points[26](0) = 3.L/10.L;  _points[26](1) = 3.L/10.L;  _points[26](2) = 1.L/10.L;  _weights[26] = 3125.L/72576.L;
-              _points[27](0) = 1.L/10.L;  _points[27](1) =  1.L/2.L;  _points[27](2) = 1.L/10.L;  _weights[27] = 3125.L/72576.L;
-              _points[28](0) = 3.L/10.L;  _points[28](1) = 1.L/10.L;  _points[28](2) = 3.L/10.L;  _weights[28] = 3125.L/72576.L;
-              _points[29](0) = 1.L/10.L;  _points[29](1) = 3.L/10.L;  _points[29](2) = 3.L/10.L;  _weights[29] = 3125.L/72576.L;
-              _points[30](0) = 1.L/10.L;  _points[30](1) = 1.L/10.L;  _points[30](2) =  1.L/2.L;  _weights[30] = 3125.L/72576.L;
-              _points[31](0) =  1.L/2.L;  _points[31](1) =  1.L/6.L;  _points[31](2) =  1.L/6.L;  _weights[31] =   243.L/4480.L;
-              _points[32](0) =  1.L/6.L;  _points[32](1) =  1.L/2.L;  _points[32](2) =  1.L/6.L;  _weights[32] =   243.L/4480.L;
-              _points[33](0) =  1.L/6.L;  _points[33](1) =  1.L/6.L;  _points[33](2) =  1.L/2.L;  _weights[33] =   243.L/4480.L;
-              _points[34](0) =  1.L/6.L;  _points[34](1) =  1.L/6.L;  _points[34](2) =  1.L/6.L;  _weights[34] =   243.L/4480.L;
+              _points[18](0) =  1.L/8.L;  _points[18](1) =  1.L/8.L;  _points[18](2) =  1.L/8.L;  _weights[18] =  -256.L/2835.L;
+              _points[19](0) = 1.L/10.L;  _points[19](1) = 1.L/10.L;  _points[19](2) = 1.L/10.L;  _weights[19] = 3125.L/72576.L;
+              _points[20](0) =  1.L/8.L;  _points[20](1) =  1.L/8.L;  _points[20](2) =  5.L/8.L;  _weights[20] =  -256.L/2835.L;
+              _points[21](0) =  1.L/8.L;  _points[21](1) =  1.L/8.L;  _points[21](2) =  3.L/8.L;  _weights[21] =  -256.L/2835.L;
+              _points[22](0) =  1.L/2.L;  _points[22](1) =  1.L/6.L;  _points[22](2) =  1.L/6.L;  _weights[22] =   243.L/4480.L;
+              _points[23](0) = 7.L/10.L;  _points[23](1) = 1.L/10.L;  _points[23](2) = 1.L/10.L;  _weights[23] = 3125.L/72576.L;
+              _points[24](0) =  3.L/8.L;  _points[24](1) =  1.L/8.L;  _points[24](2) =  1.L/8.L;  _weights[24] =  -256.L/2835.L;
+              _points[25](0) =  1.L/6.L;  _points[25](1) =  1.L/6.L;  _points[25](2) =  1.L/6.L;  _weights[25] =   243.L/4480.L;
+              _points[26](0) =  3.L/8.L;  _points[26](1) =  3.L/8.L;  _points[26](2) =  1.L/8.L;  _weights[26] =  -256.L/2835.L;
+              _points[27](0) =  5.L/8.L;  _points[27](1) =  1.L/8.L;  _points[27](2) =  1.L/8.L;  _weights[27] =  -256.L/2835.L;
+              _points[28](0) =  1.L/8.L;  _points[28](1) =  3.L/8.L;  _points[28](2) =  3.L/8.L;  _weights[28] =  -256.L/2835.L;
+              _points[29](0) = 3.L/10.L;  _points[29](1) = 3.L/10.L;  _points[29](2) = 1.L/10.L;  _weights[29] = 3125.L/72576.L;
+              _points[30](0) = 1.L/10.L;  _points[30](1) = 1.L/10.L;  _points[30](2) = 3.L/10.L;  _weights[30] = 3125.L/72576.L;
+              _points[31](0) =  1.L/2.L;  _points[31](1) = 1.L/10.L;  _points[31](2) = 1.L/10.L;  _weights[31] = 3125.L/72576.L;
+              _points[32](0) =  1.L/4.L;  _points[32](1) =  1.L/4.L;  _points[32](2) =  1.L/4.L;  _weights[32] =     -8.L/945.L;
+              _points[33](0) = 1.L/10.L;  _points[33](1) =  1.L/2.L;  _points[33](2) = 1.L/10.L;  _weights[33] = 3125.L/72576.L;
+              _points[34](0) = 3.L/10.L;  _points[34](1) = 1.L/10.L;  _points[34](2) =  1.L/2.L;  _weights[34] = 3125.L/72576.L;
               return;
             }
 
