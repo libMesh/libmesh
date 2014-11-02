@@ -337,9 +337,7 @@ else
   set (gcf, "paperposition", [0.25, 0.25, 8.0, 10.5]);
 end
 
-print('-dpsc', [plot_filename,'.ps'], ['-FHelvetica:', num2str(print_fontsize)]);
-system (['ps2pdf ', plot_filename, '.ps ', plot_filename, '.pdf']);
-system(['rm ', plot_filename,'.ps']);
+print('-dpdf', [plot_filename,'.pdf'], ['-FHelvetica:', num2str(print_fontsize)]);
 
 % At some point, Octave started printing directly to PDF so
 % print('libmesh_mailinglists.pdf', '-dpdf', '-landscape');
