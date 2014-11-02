@@ -108,6 +108,10 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
       // libMesh::out << "Generalized Non-Hermitian" << std::endl;
       break;
 
+    case GHIEP:
+      // libMesh::out << "Generalized indefinite Hermitian" << std::endl;
+      break;
+
     default:
       // libMesh::out << "not properly specified" << std::endl;
       libmesh_error_msg("Unrecognized _eigen_problem_type = " << _eigen_problem_type);
@@ -123,7 +127,9 @@ void EigenSystem::init_data ()
   Parent::init_data();
 
   // define the type of eigenproblem
-  if (_eigen_problem_type == GNHEP || _eigen_problem_type == GHEP)
+  if (_eigen_problem_type == GNHEP ||
+      _eigen_problem_type == GHEP  ||
+      _eigen_problem_type == GHIEP)
     _is_generalized_eigenproblem = true;
 
   // build the system matrix
