@@ -621,6 +621,8 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
       ierr = EPSSetProblemType (_eps, EPS_HEP);   LIBMESH_CHKERRABORT(ierr); return;
     case GHEP:
       ierr = EPSSetProblemType (_eps, EPS_GHEP);  LIBMESH_CHKERRABORT(ierr); return;
+    case GHIEP:
+      ierr = EPSSetProblemType (_eps, EPS_GHIEP);  LIBMESH_CHKERRABORT(ierr); return;
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Problem: "
