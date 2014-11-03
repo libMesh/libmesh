@@ -6,8 +6,5 @@ libmesh_mailinglists(2) % plot membership data over time
 % libmesh_sflogos % *+
 % libmesh_svn % +
 
-% Data now available from Google analytics
-libmesh_pagehits
-
 % * May not be completely up to date on the first of each month...
 % + Site no longer exists
