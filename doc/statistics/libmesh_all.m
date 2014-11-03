@@ -10,8 +10,5 @@ libmesh_citations
 % Data now available from Google analytics
 libmesh_pagehits
 
-% Make plot of GitHub traffic
-github_traffic
-
 % * May not be completely up to date on the first of each month...
 % + Site no longer exists
