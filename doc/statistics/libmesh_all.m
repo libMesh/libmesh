@@ -5,7 +5,6 @@ libmesh_mailinglists(1) % plot by month (this looks really bad with Octave on my
 libmesh_mailinglists(2) % plot membership data over time
 % libmesh_sflogos % *+
 % libmesh_svn % +
-libmesh_citations
 
 % Data now available from Google analytics
 libmesh_pagehits
