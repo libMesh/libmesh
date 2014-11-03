@@ -109,7 +109,7 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
       break;
 
     case GHIEP:
-      // libMesh::out << "Generalized Non-Hermitian" << std::endl;
+      // libMesh::out << "Generalized indefinite Hermitian" << std::endl;
       break;
 
     default:
