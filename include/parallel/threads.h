@@ -553,7 +553,14 @@ void parallel_for (const Range &range, const Body &body)
 
 #if !LIBMESH_HAVE_OPENMP
   // Wait for them to finish
-  for(unsigned int i=0; i<n_threads; i++)
+
+  // The use of 'int' instead of unsigned for the iteration variable
+  // is deliberate here.  This is an OpenMP loop, and some older
+  // compilers warn when you don't use int for the loop index.  The
+  // reason has to do with signed vs. unsigned integer overflow
+  // behavior and optimization.
+  // http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
+  for (int i=0; i<static_cast<int>(n_threads); i++)
     {
       pthread_join(threads[i], NULL);
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
@@ -640,7 +647,13 @@ void parallel_reduce (const Range &range, Body &body)
   std::vector<pthread_t> threads(n_threads);
 
 #pragma omp parallel for schedule (static)
-  for(unsigned int i=0; i<n_threads; i++)
+  // The use of 'int' instead of unsigned for the iteration variable
+  // is deliberate here.  This is an OpenMP loop, and some older
+  // compilers warn when you don't use int for the loop index.  The
+  // reason has to do with signed vs. unsigned integer overflow
+  // behavior and optimization.
+  // http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
+  for (int i=0; i<static_cast<int>(n_threads); i++)
     {
 #if LIBMESH_HAVE_OPENMP
       run_body<Range, Body>((void*)&range_bodies[i]);
