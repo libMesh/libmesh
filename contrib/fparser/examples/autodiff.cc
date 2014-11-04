@@ -2,9 +2,9 @@
 // (c) 2014 by Daniel Schwen
 // =======================================================
 
-// $CXX -o autodiff autodiff.cc `$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include --libs` -DFUNCTIONPARSER_SUPPORT_DEBUGGING -I $LIBMESH_DIR/include/libmesh
+// $CXX -o autodiff autodiff.cc `$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include --libs` -I $LIBMESH_DIR/include/libmesh
 
-#include "../fparser_ad.hh"
+#include "libmesh/fparser_ad.hh"
 
 #include <fstream>
 #include <iostream>
@@ -21,6 +21,10 @@ void write(const char *fname, FunctionParserAD & F)
 
 int main()
 {
+#ifndef FUNCTIONPARSER_SUPPORT_DEBUGGING
+  std::cout << "Please configure libMesh with --enable-fparser-debugging and rebuild to enable bytecode output.\n";
+#endif
+
   std::string function;
   FunctionParserAD fparser;
 
@@ -29,14 +33,18 @@ int main()
   // Parse the input expression into bytecode
   fparser.Parse(func, "x,a");
   std::cout << "Input Expression:\n" << func << std::endl;
+#ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
   fparser.PrintByteCode(std::cout);
+#endif
   std::cout << std::endl;
   write("input_orig.dat", fparser);
 
   // output optimized version
   fparser.Optimize();
   std::cout << "Optimized Input Expression:\n" << func << std::endl;
+#ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
   fparser.PrintByteCode(std::cout);
+#endif
   std::cout << std::endl;
   write("input_opt.dat", fparser);
 
@@ -46,14 +54,18 @@ int main()
   // Generate derivative with respect to x
   std::cout << "AutoDiff returned " << fparser.AutoDiff("x") << std::endl;
   std::cout << "Unsimplified derivative:\n";
+#ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
   fparser.PrintByteCode(std::cout);
+#endif
   std::cout << std::endl;
   write("first_orig.dat", fparser);
 
   // Run the bytecode optimizer on the derivative
   fparser.Optimize();
   std::cout << "Simplified derivative:\n";
+#ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
   fparser.PrintByteCode(std::cout);
+#endif
   std::cout << std::endl;
   write("first_opt.dat", fparser);
 
@@ -66,7 +78,9 @@ int main()
   std::cout << "AutoDiff 2nd time returned " << fparser.AutoDiff("x") << std::endl;
   std::cout << "Simplified second derivative:\n";
   fparser.Optimize();
+#ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
   fparser.PrintByteCode(std::cout);
+#endif
   std::cout << std::endl;
 
   fparser2.JITCompile();
