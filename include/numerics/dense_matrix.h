@@ -700,7 +700,7 @@ void DenseMatrix<T>::resize(const unsigned int new_m,
   this->_m = new_m;
   this->_n = new_n;
 
-  _decomposition_type = NONE;
+  // zero and set decomposition_type to NONE
   this->zero();
 }
 
