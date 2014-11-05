@@ -1072,10 +1072,24 @@ int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
     while ((eindex < elen) && (findex < flen)) {
       if ((fnow > enow) == (fnow > -enow)) {
         Two_Sum(Q, enow, Qnew, hh);
-        enow = e[++eindex];
+        /**
+         * [JWP] Increment 'eindex,' but only update 'enow' if it is
+         * safe.  Otherwise, 'enow' remains unchanged from the previous
+         * iteration...
+         */
+        ++eindex;
+        if (eindex < elen)
+          enow = e[eindex];
       } else {
         Two_Sum(Q, fnow, Qnew, hh);
-        fnow = f[++findex];
+        /**
+         * [JWP] Increment 'findex,' but only update 'fnow' if it is
+         * safe.  Otherwise, 'fnow' remains unchanged from the previous
+         * iteration...
+         */
+        ++findex;
+        if (findex < flen)
+          fnow = f[findex];
       }
       Q = Qnew;
       if (hh != 0.0) {
@@ -1085,7 +1099,14 @@ int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
   }
   while (eindex < elen) {
     Two_Sum(Q, enow, Qnew, hh);
-    enow = e[++eindex];
+    /**
+     * [JWP] Increment 'eindex,' but only update 'enow' if it is
+     * safe.  Otherwise, 'enow' remains unchanged from the previous
+     * iteration...
+     */
+    ++eindex;
+    if (eindex < elen)
+      enow = e[eindex];
     Q = Qnew;
     if (hh != 0.0) {
       h[hindex++] = hh;
@@ -1093,7 +1114,14 @@ int fast_expansion_sum_zeroelim(int elen, REAL *e, int flen, REAL *f, REAL *h)
   }
   while (findex < flen) {
     Two_Sum(Q, fnow, Qnew, hh);
-    fnow = f[++findex];
+    /**
+     * [JWP] Increment 'findex,' but only update 'fnow' if it is
+     * safe.  Otherwise, 'fnow' remains unchanged from the previous
+     * iteration...
+     */
+    ++findex;
+    if (findex < flen)
+      fnow = f[findex];
     Q = Qnew;
     if (hh != 0.0) {
       h[hindex++] = hh;
