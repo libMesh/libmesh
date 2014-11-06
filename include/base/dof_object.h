@@ -481,6 +481,7 @@ private:
    * will recgnize later that  #/ncv_magic is simply a bitshift
    */
   static const index_t ncv_magic = 256; // = 2^8, in case we want to manually bitshift
+  static const index_t ncv_magic_exp = 8; // Let's manually bitshift
 
   /**
    * The starting index for system \p s.
@@ -739,7 +740,7 @@ unsigned int DofObject::n_vars(const unsigned int s,
   libmesh_assert_less ((start_idx_sys + 2*vg), _idx_buf.size());
 
   return (cast_int<unsigned int>
-          (_idx_buf[start_idx_sys + 2*vg]) / ncv_magic);
+          (_idx_buf[start_idx_sys + 2*vg]) >> ncv_magic_exp);
 }
 
 
