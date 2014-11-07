@@ -1771,7 +1771,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
       */
 
       this->subdomain_map[cur_subdomain].push_back
-        (cast_int<subdomain_id_type>(elem->id()));
+        (cast_int<unsigned>(elem->id()));
     }
 
   // Set num_nodes which is used by exodusII_io_helper
