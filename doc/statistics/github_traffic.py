@@ -481,13 +481,15 @@ ax1.plot(x, month_views, 'bo-')
 ax1.set_ylabel('Monthly page views (blue circles)')
 
 # Set the xticks and labels.
-n_months = len(x)
-
 tick_labels = []
 for date in month_intervals:
     month_string = date[5:8]
     year_string = date[0:4]
     tick_labels.append(month_string + '\n' + year_string)
+
+# This gives us an extra tick label (there are N dates, N-1 ranges)
+# and we want to report the end of the period, so pop the first entry
+tick_labels.pop(0)
 
 # Apply the tick labels to the figure
 ax1.set_xticklabels(tick_labels)
