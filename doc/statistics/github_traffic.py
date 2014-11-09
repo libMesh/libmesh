@@ -421,8 +421,10 @@ ax1.set_ylabel('Weekly page views (blue circles)')
 ticks = [1, int(math.ceil(Nx/2)), Nx]
 ax1.set_xticks(ticks)
 
-# Create a list of tick labels using an in-place for loop
-tick_labels = ['Week of \n' + dates[i] for i in ticks]
+# Create a list of tick labels using an in-place for loop.  Translate
+# the weekly tick indices chosen above back into the array of daily
+# values by multiplying by 7.
+tick_labels = ['Week of \n' + dates[7*(i-1)] for i in ticks]
 
 # Apply the tick labels to the figure
 ax1.set_xticklabels(tick_labels)
