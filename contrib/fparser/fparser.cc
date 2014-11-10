@@ -3823,7 +3823,8 @@ void FunctionParserBase<Value_t>::PrintByteCode(std::ostream& dest,
 #endif
 
 
-#ifndef FP_SUPPORT_OPTIMIZER
+//#ifndef FP_SUPPORT_OPTIMIZER
+#ifdef FP_DUMMY_OPTIMIZER
 template<typename Value_t>
 void FunctionParserBase<Value_t>::Optimize()
 {

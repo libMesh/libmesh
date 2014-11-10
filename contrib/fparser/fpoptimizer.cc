@@ -4770,7 +4770,8 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-# include "instantiate.hh"
+/*
+// line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
 #define FP_INSTANTIATE(type) \
@@ -4778,14 +4779,8 @@ namespace FPoptimizer_CodeTree
     template struct CodeTreeData<type>;
     FPOPTIMIZER_EXPLICITLY_INSTANTIATE(FP_INSTANTIATE)
 #undef FP_INSTANTIATE
-
-#ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
-#define FP_INSTANTIATE(type) \
-    template void DumpTreeWithIndent<type>(const CodeTree<type>&, std::ostream&, const std::string&);
-    FPOPTIMIZER_EXPLICITLY_INSTANTIATE(FP_INSTANTIATE)
-#undef FP_INSTANTIATE
-#endif
 }
+ */
 
 #endif
 
@@ -13167,7 +13162,7 @@ namespace FPoptimizer_CodeTree
 // line removed for fpoptimizer.cc: #include "codetree.hh"
 // line removed for fpoptimizer.cc: #include "optimize.hh"
 
-#ifdef FP_SUPPORT_OPTIMIZER
+#ifndef FP_DUMMY_OPTIMIZER
 
 template<typename Value_t>
 void FunctionParserBase<Value_t>::Optimize()
@@ -13259,7 +13254,9 @@ FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(long double)
 FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(long)
 #endif
 
-#endif // FP_SUPPORT_OPTIMIZER
+#endif //FP_DUMMY_OPTIMIZER
 
 
 #endif
+
+#include "instantiate_for_ad.hh"
