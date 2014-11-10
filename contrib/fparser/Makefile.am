@@ -7,7 +7,7 @@ FEATURE_FLAGS += -DFP_ENABLE_EVAL
 
 # some systems have trouble with the fparser optimizer
 if FPARSER_NO_SUPPORT_OPTIMIZER
-  FEATURE_FLAGS += -DFP_NO_SUPPORT_OPTIMIZER
+  FEATURE_FLAGS += -DFP_DUMMY_OPTIMIZER
 endif
 
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
@@ -205,6 +205,8 @@ if FPARSER_DEVEL
 
 if FPARSER_SUPPORT_OPTIMIZER
     pkg_sources += $(FPOPTIMIZER_CC_FILES)
+else
+    pkg_sources += fpoptimizer.cc
 endif
 
    # when doing 'make clean' we need to remove the generated sources
@@ -213,9 +215,7 @@ endif
 else !FPARSER_DEVEL
   SUBDIRS = extrasrc
 
-if FPARSER_SUPPORT_OPTIMIZER
   pkg_sources += fpoptimizer.cc
-endif
 endif
 
 include $(top_srcdir)/contrib/Make.common
