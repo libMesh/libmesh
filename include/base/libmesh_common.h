@@ -552,4 +552,9 @@ inline Tnew libmesh_cast_int (Told oldvar)
 } // namespace libMesh
 
 
+// Backwards compatibility
+namespace libMeshEnums {
+  using namespace libMesh;
+}
+
 #endif // LIBMESH_LIBMESH_COMMON_H
