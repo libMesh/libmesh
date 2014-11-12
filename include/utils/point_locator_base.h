@@ -129,6 +129,11 @@ public:
    */
   virtual void unset_close_to_point_tol();
 
+  /**
+   * Boolean flag to indicate whether to print out extra info.
+   */
+  bool _verbose;
+
 protected:
   /**
    * Const pointer to our master, initialized to \p NULL if none

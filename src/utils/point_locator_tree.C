@@ -227,9 +227,12 @@ const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdoma
           // specified tolerance).
           if( _use_close_to_point_tol )
             {
-              libMesh::out << "Performing linear search using close-to-point tolerance "
-                           << _close_to_point_tol
-                           << std::endl;
+              if(_verbose)
+                {
+                  libMesh::out << "Performing linear search using close-to-point tolerance "
+                               << _close_to_point_tol
+                               << std::endl;
+                }
 
               this->_element =
                 this->perform_linear_search(p,
