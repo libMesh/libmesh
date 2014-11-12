@@ -35,6 +35,7 @@ namespace libMesh
 // PointLocatorBase methods
 PointLocatorBase::PointLocatorBase (const MeshBase& mesh,
                                     const PointLocatorBase* master) :
+  _verbose                 (false),
   _master                  (master),
   _mesh                    (mesh),
   _initialized             (false),
