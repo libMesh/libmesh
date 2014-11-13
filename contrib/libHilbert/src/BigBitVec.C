@@ -899,7 +899,7 @@ CBigBitVec::operator<(const CBigBitVec& b) const
 }
 
 
-// Comparison operator
+// Comparison operators
 bool
 CBigBitVec::operator==(const CBigBitVec& b) const
 {
@@ -913,4 +913,11 @@ CBigBitVec::operator==(const CBigBitVec& b) const
   while (rack > 0 && a.racks()[rack] == b.racks()[rack]) rack--;
 
   return a.racks()[rack] == b.racks()[rack];
+}
+
+
+bool
+CBigBitVec::operator!=(const CBigBitVec& b) const
+{
+  return !(*this == b);
 }

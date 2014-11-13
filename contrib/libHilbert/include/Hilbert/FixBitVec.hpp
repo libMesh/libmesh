@@ -288,10 +288,14 @@ class CFixBitVec
 	operator<(const CFixBitVec& other) const
         { return this->m_uiRack < other.m_uiRack; }
 
-        // Comparison operator
+        // Comparison operators
         bool
 	operator==(const CFixBitVec& other) const
         { return this->m_uiRack == other.m_uiRack; }
+
+        bool
+        operator!=(const CFixBitVec& other) const
+        { return !(*this == other); }
 
   private:
 

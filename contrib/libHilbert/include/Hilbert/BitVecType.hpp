@@ -91,6 +91,12 @@ namespace Hilbert
       return other.rack0 == this->rack0;
     }
 
+    bool
+    operator!=(const HilbertIndices& other) const
+    {
+      return !(*this == other);
+    }
+
     // <= operator
     bool
     operator<=(const HilbertIndices& other) const

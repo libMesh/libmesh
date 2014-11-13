@@ -301,9 +301,11 @@ class CBigBitVec
         bool
 	operator<(const CBigBitVec& other) const;
 
-        // Comparison operator
+        // Comparison operators
         bool
 	operator==(const CBigBitVec& other) const;
+        bool
+        operator!=(const CBigBitVec& other) const;
 
   private:
 
