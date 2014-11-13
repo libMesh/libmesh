@@ -283,12 +283,10 @@ namespace Hilbert
 	template<class P,class H>
 	H_INLINE
 	void
-	indexToCoords(
-		P *p,				// [out] point
-		int m,			// [in ] precision of each dimension in bits
-		int n,			// [in ] number of dimensions
-		const H &h	// [out] Hilbert index
-		)
+        indexToCoords(P *p,       // [out] point
+                      int m,      // [in ] precision of each dimension in bits
+                      int n,      // [in ] number of dimensions
+                      const H &h) // [in ] Hilbert index
 	{
 		// Intermediate variables will fit in fixed width?
 		if ( n <= FBV_BITS )
