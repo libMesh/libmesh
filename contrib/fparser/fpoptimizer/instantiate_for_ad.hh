@@ -1,6 +1,8 @@
 // the space is needed to preserve the include in the postprocessor
 # include "instantiate.hh"
 
+#ifdef FP_DUMMY_OPTIMIZER
+
 namespace FPoptimizer_CodeTree
 {
 
@@ -34,3 +36,5 @@ namespace FPoptimizer_CodeTree
 #endif
 
 }
+
+#endif
