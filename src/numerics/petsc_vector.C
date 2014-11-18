@@ -454,9 +454,18 @@ void PetscVector<T>::insert (const std::vector<T>& v,
                              const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (v.size(), dof_indices.size());
+  if (v.empty())
+    return;
 
-  for (unsigned int i=0; i<v.size(); i++)
-    this->set (dof_indices[i], v[i]);
+  this->_restore_array();
+
+  PetscErrorCode ierr=0;
+  const PetscScalar *petsc_values = &v[0];
+  PetscInt *idx_values = numeric_petsc_cast(&dof_indices[0]);
+  ierr = VecSetValues (_vec, v.size(), idx_values, petsc_values, INSERT_VALUES);
+  LIBMESH_CHKERRABORT(ierr);
+
+  this->_is_closed = false;
 }
 
 
@@ -478,9 +487,18 @@ void PetscVector<T>::insert (const DenseVector<T>& V,
                              const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
+  if (V.empty())
+    return;
 
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
+  this->_restore_array();
+
+  PetscErrorCode ierr=0;
+  const PetscScalar *petsc_values = &(V(0));
+  PetscInt *idx_values = numeric_petsc_cast(&dof_indices[0]);
+  ierr = VecSetValues (_vec, V.size(), idx_values, petsc_values, INSERT_VALUES);
+  LIBMESH_CHKERRABORT(ierr);
+
+  this->_is_closed = false;
 }
 
 
@@ -490,9 +508,18 @@ void PetscVector<T>::insert (const DenseSubVector<T>& V,
                              const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
+  if (V.empty())
+    return;
 
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
+  this->_restore_array();
+
+  PetscErrorCode ierr=0;
+  const PetscScalar *petsc_values = &(V(0));
+  PetscInt *idx_values = numeric_petsc_cast(&dof_indices[0]);
+  ierr = VecSetValues (_vec, V.size(), idx_values, petsc_values, INSERT_VALUES);
+  LIBMESH_CHKERRABORT(ierr);
+
+  this->_is_closed = false;
 }
 
 
