@@ -1793,18 +1793,10 @@ void DofMap::dof_indices (const Elem* const elem,
   // active)
   libmesh_assert(!elem || elem->active());
 
+  START_LOG("dof_indices()", "DofMap");
+
   // Clear the DOF indices vector
   di.clear();
-
-  // Ghost subdivision elements have no real dofs
-  if (elem && elem->type() == TRI3SUBDIVISION)
-    {
-      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
-      if (sd_elem->is_ghost())
-        return;
-    }
-
-  START_LOG("dof_indices()", "DofMap");
 
   const unsigned int n_vars  = this->n_variables();
 
@@ -1813,22 +1805,42 @@ void DofMap::dof_indices (const Elem* const elem,
   std::size_t tot_size = 0;
 #endif
 
-  // Determine the nodes contributing to element elem
-  std::vector<Node*> elem_nodes;
   if (elem)
     {
       if (elem->type() == TRI3SUBDIVISION)
         {
           // Subdivision surface FE require the 1-ring around elem
           const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+
+          // Ghost subdivision elements have no real dofs
+          if (sd_elem->is_ghost())
+            return;
+
+          // Determine the nodes contributing to element elem
+          std::vector<Node*> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
-        }
-      else
-        {
-          // All other FE use only the nodes of elem itself
-          elem_nodes.resize(elem->n_nodes(), NULL);
-          for (unsigned int i=0; i<elem->n_nodes(); i++)
-            elem_nodes[i] = elem->get_node(i);
+
+          // Get the dof numbers
+          for (unsigned int v=0; v<n_vars; v++)
+            {
+              if(this->variable(v).type().family == SCALAR &&
+                 this->variable(v).active_on_subdomain(elem->subdomain_id()))
+                {
+#ifdef DEBUG
+                  tot_size += this->variable(v).type().order;
+#endif
+                  std::vector<dof_id_type> di_new;
+                  this->SCALAR_dof_indices(di_new,v);
+                  di.insert( di.end(), di_new.begin(), di_new.end());
+                }
+              else
+                _dof_indices(elem, di, v, &elem_nodes[0], elem_nodes.size()
+#ifdef DEBUG
+                             , tot_size
+#endif
+                            );
+            }
+          return;
         }
     }
 
@@ -1847,7 +1859,7 @@ void DofMap::dof_indices (const Elem* const elem,
           di.insert( di.end(), di_new.begin(), di_new.end());
         }
       else if (elem)
-        _dof_indices(elem, di, v, elem_nodes
+        _dof_indices(elem, di, v, elem->get_nodes(), elem->n_nodes()
 #ifdef DEBUG
                      , tot_size
 #endif
@@ -1869,40 +1881,37 @@ void DofMap::dof_indices (const Elem* const elem,
   // We now allow elem==NULL to request just SCALAR dofs
   // libmesh_assert(elem);
 
+  START_LOG("dof_indices()", "DofMap");
+
   // Clear the DOF indices vector
   di.clear();
-
-  // Ghost subdivision elements have no real dofs
-  if (elem && elem->type() == TRI3SUBDIVISION)
-    {
-      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
-      if (sd_elem->is_ghost())
-        return;
-    }
-
-  START_LOG("dof_indices()", "DofMap");
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
   std::size_t tot_size = 0;
 #endif
 
-  // Determine the nodes contributing to element elem
-  std::vector<Node*> elem_nodes;
   if (elem)
     {
       if (elem->type() == TRI3SUBDIVISION)
         {
           // Subdivision surface FE require the 1-ring around elem
           const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+
+          // Ghost subdivision elements have no real dofs
+          if (sd_elem->is_ghost())
+            return;
+
+          // Determine the nodes contributing to element elem
+          std::vector<Node*> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
-        }
-      else
-        {
-          // All other FE use only the nodes of elem itself
-          elem_nodes.resize(elem->n_nodes(), NULL);
-          for (unsigned int i=0; i<elem->n_nodes(); i++)
-            elem_nodes[i] = elem->get_node(i);
+
+          _dof_indices(elem, di, vn, &elem_nodes[0], elem_nodes.size()
+#ifdef DEBUG
+                       , tot_size
+#endif
+                      );
+          return;
         }
     }
 
@@ -1919,7 +1928,7 @@ void DofMap::dof_indices (const Elem* const elem,
       di.insert( di.end(), di_new.begin(), di_new.end());
     }
   else if (elem)
-    _dof_indices(elem, di, vn, elem_nodes
+    _dof_indices(elem, di, vn, elem->get_nodes(), elem->n_nodes()
 #ifdef DEBUG
                  , tot_size
 #endif
@@ -1936,7 +1945,8 @@ void DofMap::dof_indices (const Elem* const elem,
 void DofMap::_dof_indices (const Elem* const elem,
                            std::vector<dof_id_type>& di,
                            const unsigned int v,
-                           const std::vector<Node*>& elem_nodes
+                           const Node * const * nodes,
+                           unsigned int       n_nodes
 #ifdef DEBUG
                            ,
                            std::size_t & tot_size
@@ -1965,15 +1975,15 @@ void DofMap::_dof_indices (const Elem* const elem,
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
       if (this->variable(v).type().family == SUBDIVISION)
-        tot_size += elem_nodes.size();
+        tot_size += n_nodes;
       else
         tot_size += FEInterface::n_dofs(dim,fe_type,type);
 #endif
 
       // Get the node-based DOF numbers
-      for (unsigned int n=0; n<elem_nodes.size(); n++)
+      for (unsigned int n=0; n<n_nodes; n++)
         {
-          const Node* node      = elem_nodes[n];
+          const Node* node      = nodes[n];
 
           // There is a potential problem with h refinement.  Imagine a
           // quad9 that has a linear FE on it.  Then, on the hanging side,

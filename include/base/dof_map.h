@@ -1096,7 +1096,8 @@ private:
    */
   void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di,
                      const unsigned int v,
-                     const std::vector<Node*>& elem_nodes
+                     const Node * const * nodes,
+                     unsigned int       n_nodes
 #ifdef DEBUG
                      ,
                      std::size_t & tot_size
