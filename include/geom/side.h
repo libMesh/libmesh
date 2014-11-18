@@ -63,47 +63,14 @@ public:
     // may not be true when building infinite element sides
     // libmesh_assert_less (_side_number, this->parent()->n_sides());
     libmesh_assert_equal_to ((this->dim()+1), this->parent()->dim());
+
+    for (unsigned int n=0; n != this->n_nodes(); ++n)
+      this->_nodes[n] = this->parent()->get_node
+        (ParentType::side_nodes_map[_side_number][n]);
   }
 
   /**
-   * @returns the \p Point associated with local \p Node \p i.
-   */
-  virtual const Point & point (const unsigned int i) const
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->point (ParentType::side_nodes_map[_side_number][i]);
-  }
-
-  /**
-   * @returns the \p Point associated with local \p Node \p i
-   * as a writeable reference.
-   */
-  virtual Point & point (const unsigned int i)
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->point (ParentType::side_nodes_map[_side_number][i]);
-  }
-
-  /**
-   * @returns the global id number of local \p Node \p i.
-   */
-  virtual dof_id_type node (const unsigned int i) const
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->node (ParentType::side_nodes_map[_side_number][i]);
-  }
-
-  /**
-   * @returns the pointer to local \p Node \p i.
-   */
-  virtual Node* get_node (const unsigned int i) const
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->get_node (ParentType::side_nodes_map[_side_number][i]);
-  }
-
-  /**
-   * @returns the pointer to local \p Node \p i as a writeable reference.
+   * Setting a side node changes the node on the parent
    */
   virtual Node* & set_node (const unsigned int i)
   {
@@ -162,47 +129,14 @@ public:
     libmesh_assert(my_parent);
     libmesh_assert_less (_edge_number, this->parent()->n_edges());
     libmesh_assert_equal_to (this->dim(), 1);
+
+    for (unsigned int n=0; n != this->n_nodes(); ++n)
+      this->_nodes[n] = this->parent()->get_node
+        (ParentType::edge_nodes_map[_edge_number][n]);
   }
 
   /**
-   * @returns the \p Point associated with local \p Node \p i.
-   */
-  virtual const Point & point (const unsigned int i) const
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->point (ParentType::edge_nodes_map[_edge_number][i]);
-  }
-
-  /**
-   * @returns the \p Point associated with local \p Node \p i
-   * as a writeable reference.
-   */
-  virtual Point & point (const unsigned int i)
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->point (ParentType::edge_nodes_map[_edge_number][i]);
-  }
-
-  /**
-   * @returns the global id number of local \p Node \p i.
-   */
-  virtual dof_id_type node (const unsigned int i) const
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->node (ParentType::edge_nodes_map[_edge_number][i]);
-  }
-
-  /**
-   * @returns the pointer to local \p Node \p i.
-   */
-  virtual Node* get_node (const unsigned int i) const
-  {
-    libmesh_assert_less (i, this->n_nodes());
-    return this->parent()->get_node (ParentType::edge_nodes_map[_edge_number][i]);
-  }
-
-  /**
-   * @returns the pointer to local \p Node \p i as a writeable reference.
+   * Setting an edge node changes the node on the parent
    */
   virtual Node* & set_node (const unsigned int i)
   {
@@ -211,7 +145,7 @@ public:
   }
 
   /**
-   * @returns 0. Sides effectively do not have sides, so
+   * @returns 0. Edges effectively do not have sides, so
    * don't even ask!
    */
   virtual unsigned int n_sides () const { return 0; }

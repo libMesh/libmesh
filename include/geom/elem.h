@@ -114,24 +114,24 @@ public:
   /**
    * @returns the \p Point associated with local \p Node \p i.
    */
-  virtual const Point & point (const unsigned int i) const;
+  const Point & point (const unsigned int i) const;
 
   /**
    * @returns the \p Point associated with local \p Node \p i
    * as a writeable reference.
    */
-  virtual Point & point (const unsigned int i);
+  Point & point (const unsigned int i);
 
   /**
    * @returns the global id number of local \p Node \p i.
    */
-  virtual dof_id_type node (const unsigned int i) const;
+  dof_id_type node (const unsigned int i) const;
 
   /**
    * @returns the local id number of global \p Node id \p i,
    * or \p invalid_uint if Node id \p i is not local.
    */
-  virtual unsigned int local_node (const dof_id_type i) const;
+  unsigned int local_node (const dof_id_type i) const;
 
   /**
    * @returns the local index for the \p Node pointer \p node_ptr,
@@ -140,9 +140,14 @@ public:
   unsigned int get_node_index (const Node* node_ptr) const;
 
   /**
+   * @returns a pointer to an array of local node pointers.
+   */
+  const Node* const * get_nodes () const;
+
+  /**
    * @returns the pointer to local \p Node \p i.
    */
-  virtual Node* get_node (const unsigned int i) const;
+  Node* get_node (const unsigned int i) const;
 
   /**
    * @returns the pointer to local \p Node \p i as a writeable reference.
@@ -1367,6 +1372,14 @@ unsigned int Elem::local_node (const dof_id_type i) const
       return n;
 
   return libMesh::invalid_uint;
+}
+
+
+
+inline
+const Node * const * Elem::get_nodes () const
+{
+  return _nodes;
 }
 
 
