@@ -360,38 +360,6 @@ public:
                              const SparseMatrix<T> &);
 
   /**
-   * \f$ U=v \f$ where v is a \p std::vector<T>
-   * and you want to specify WHERE to insert it
-   */
-  virtual void insert (const std::vector<T>& v,
-                       const std::vector<numeric_index_type>& dof_indices);
-
-  /**
-   * \f$U=V\f$, where U and V are type
-   * NumericVector<T> and you
-   * want to specify WHERE to insert
-   * the NumericVector<T> V
-   */
-  virtual void insert (const NumericVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices);
-
-  /**
-   * \f$ U=V \f$ where V is type
-   * DenseVector<T> and you
-   * want to specify WHERE to insert it
-   */
-  virtual void insert (const DenseVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices);
-
-  /**
-   * \f$ U=V \f$ where V is type
-   * DenseSubVector<T> and you
-   * want to specify WHERE to insert it
-   */
-  virtual void insert (const DenseSubVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices);
-
-  /**
    * Scale each element of the
    * vector by the given factor.
    */
