@@ -80,6 +80,11 @@ public:
   virtual unsigned int size() const = 0;
 
   /**
+   * @returns true iff size() is 0.
+   */
+  virtual bool empty() const { return (this->size() == 0); }
+
+  /**
    * Pretty-print the vector to \p stdout.
    */
   void print(std::ostream& os) const;
