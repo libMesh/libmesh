@@ -73,9 +73,10 @@ public:
   virtual void zero();
 
   /**
-   * @returns the \p (i,j) element of the subvector.
+   * @returns the \p (i,j) element of the subvector as a const
+   * reference.
    */
-  T operator() (const unsigned int i) const;
+  const T & operator() (const unsigned int i) const;
 
   /**
    * @returns the \p (i,j) element of the subvector as a writeable reference.
@@ -96,6 +97,11 @@ public:
    * @returns the size of the subvector.
    */
   virtual unsigned int size() const { return _n; }
+
+  /**
+   * @returns true iff size() is 0.
+   */
+  virtual bool empty() const { return (_n == 0); }
 
   /**
    * @returns the row offset into the parent vector.
@@ -203,7 +209,7 @@ void DenseSubVector<T>::zero()
 
 template<typename T>
 inline
-T DenseSubVector<T>::operator () (const unsigned int i) const
+const T & DenseSubVector<T>::operator () (const unsigned int i) const
 {
   libmesh_assert_less (i, this->size());
   libmesh_assert_less (i + this->i_off(), _parent_vector.size());

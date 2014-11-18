@@ -83,14 +83,19 @@ public:
   }
 
   /**
+   * @returns true iff size() is 0
+   */
+  virtual bool empty() const { return _val.empty(); }
+
+  /**
    * Set every element in the vector to 0.
    */
   virtual void zero();
 
   /**
-   * @returns the \p (i) element of the vector.
+   * @returns the \p (i) element of the vector as a const reference.
    */
-  T operator() (const unsigned int i) const;
+  const T & operator() (const unsigned int i) const;
 
   /**
    * @returns the \p (i,j) element of the vector as a writeable reference.
@@ -340,7 +345,7 @@ void DenseVector<T>::zero()
 
 template<typename T>
 inline
-T DenseVector<T>::operator () (const unsigned int i) const
+const T & DenseVector<T>::operator () (const unsigned int i) const
 {
   libmesh_assert_less (i, _val.size());
 
