@@ -450,73 +450,17 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 
 
 template <typename T>
-void PetscVector<T>::insert (const std::vector<T>& v,
+void PetscVector<T>::insert (const T* v,
                              const std::vector<numeric_index_type>& dof_indices)
 {
-  libmesh_assert_equal_to (v.size(), dof_indices.size());
-  if (v.empty())
+  if (dof_indices.empty())
     return;
 
   this->_restore_array();
 
   PetscErrorCode ierr=0;
-  const PetscScalar *petsc_values = &v[0];
   PetscInt *idx_values = numeric_petsc_cast(&dof_indices[0]);
-  ierr = VecSetValues (_vec, v.size(), idx_values, petsc_values, INSERT_VALUES);
-  LIBMESH_CHKERRABORT(ierr);
-
-  this->_is_closed = false;
-}
-
-
-
-template <typename T>
-void PetscVector<T>::insert (const NumericVector<T>& V,
-                             const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
-}
-
-
-
-template <typename T>
-void PetscVector<T>::insert (const DenseVector<T>& V,
-                             const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-  if (V.empty())
-    return;
-
-  this->_restore_array();
-
-  PetscErrorCode ierr=0;
-  const PetscScalar *petsc_values = &(V(0));
-  PetscInt *idx_values = numeric_petsc_cast(&dof_indices[0]);
-  ierr = VecSetValues (_vec, V.size(), idx_values, petsc_values, INSERT_VALUES);
-  LIBMESH_CHKERRABORT(ierr);
-
-  this->_is_closed = false;
-}
-
-
-
-template <typename T>
-void PetscVector<T>::insert (const DenseSubVector<T>& V,
-                             const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-  if (V.empty())
-    return;
-
-  this->_restore_array();
-
-  PetscErrorCode ierr=0;
-  const PetscScalar *petsc_values = &(V(0));
-  PetscInt *idx_values = numeric_petsc_cast(&dof_indices[0]);
-  ierr = VecSetValues (_vec, V.size(), idx_values, petsc_values, INSERT_VALUES);
+  ierr = VecSetValues (_vec, dof_indices.size(), idx_values, v, INSERT_VALUES);
   LIBMESH_CHKERRABORT(ierr);
 
   this->_is_closed = false;

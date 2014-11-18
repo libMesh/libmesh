@@ -292,67 +292,6 @@ void DistributedVector<T>::add (const T a, const NumericVector<T>& v)
 
 
 template <typename T>
-void DistributedVector<T>::insert (const std::vector<T>& v,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert (!v.empty());
-  libmesh_assert_equal_to (v.size(), dof_indices.size());
-  libmesh_assert (this->initialized());
-  libmesh_assert_equal_to (_values.size(), _local_size);
-  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
-
-  for (std::size_t i=0; i<v.size(); i++)
-    this->set (dof_indices[i], v[i]);
-}
-
-
-
-template <typename T>
-void DistributedVector<T>::insert (const NumericVector<T>& V,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-  libmesh_assert (this->initialized());
-  libmesh_assert_equal_to (_values.size(), _local_size);
-  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
-
-  for (numeric_index_type i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
-}
-
-
-
-template <typename T>
-void DistributedVector<T>::insert (const DenseVector<T>& V,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-  libmesh_assert (this->initialized());
-  libmesh_assert_equal_to (_values.size(), _local_size);
-  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
-
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
-}
-
-
-
-template <typename T>
-void DistributedVector<T>::insert (const DenseSubVector<T>& V,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-  libmesh_assert (this->initialized());
-  libmesh_assert_equal_to (_values.size(), _local_size);
-  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
-
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
-}
-
-
-
-template <typename T>
 void DistributedVector<T>::scale (const T factor)
 {
   libmesh_assert (this->initialized());
