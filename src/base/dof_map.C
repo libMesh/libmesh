@@ -1846,12 +1846,13 @@ void DofMap::dof_indices (const Elem* const elem,
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
     {
-      if(this->variable(v).type().family == SCALAR &&
+      const Variable & var = this->variable(v);
+      if(var.type().family == SCALAR &&
          (!elem ||
-          this->variable(v).active_on_subdomain(elem->subdomain_id())))
+          var.active_on_subdomain(elem->subdomain_id())))
         {
 #ifdef DEBUG
-          tot_size += this->variable(v).type().order;
+          tot_size += var.type().order;
 #endif
           std::vector<dof_id_type> di_new;
           this->SCALAR_dof_indices(di_new,v);
@@ -1913,13 +1914,15 @@ void DofMap::dof_indices (const Elem* const elem,
       return;
     }
 
+  const Variable & var = this->variable(vn);
+
   // Get the dof numbers
-  if(this->variable(vn).type().family == SCALAR &&
+  if(var.type().family == SCALAR &&
      (!elem ||
-      this->variable(vn).active_on_subdomain(elem->subdomain_id())))
+      var.active_on_subdomain(elem->subdomain_id())))
     {
 #ifdef DEBUG
-      tot_size += this->variable(vn).type().order;
+      tot_size += var.type().order;
 #endif
       std::vector<dof_id_type> di_new;
       this->SCALAR_dof_indices(di_new,vn);
@@ -1954,14 +1957,16 @@ void DofMap::_dof_indices (const Elem* const elem,
   // This internal function is only useful on valid elements
   libmesh_assert(elem);
 
-  if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
+  const Variable & var = this->variable(v);
+
+  if (var.active_on_subdomain(elem->subdomain_id()))
     {
       const ElemType type        = elem->type();
       const unsigned int sys_num = this->sys_number();
       const unsigned int dim     = elem->dim();
 
       // Increase the polynomial order on p refined elements
-      FEType fe_type = this->variable_type(v);
+      FEType fe_type = var.type();
       fe_type.order = static_cast<Order>(fe_type.order +
                                          elem->p_level());
 
@@ -1970,7 +1975,7 @@ void DofMap::_dof_indices (const Elem* const elem,
 
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
-      if (this->variable(v).type().family == SUBDIVISION)
+      if (fe_type.family == SUBDIVISION)
         tot_size += n_nodes;
       else
         tot_size += FEInterface::n_dofs(dim,fe_type,type);
