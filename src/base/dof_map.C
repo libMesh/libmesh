@@ -2073,11 +2073,7 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type>& di,
 {
   START_LOG("SCALAR_dof_indices()", "DofMap");
 
-  if(this->variable(vn).type().family != SCALAR)
-    {
-      libMesh::err << "ERROR: SCALAR_dof_indices called for a non-SCALAR variable."
-                   << std::endl;
-    }
+  libmesh_assert(this->variable(vn).type().family == SCALAR);
 
   // Clear the DOF indices vector
   di.clear();
