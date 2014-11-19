@@ -1813,33 +1813,35 @@ void DofMap::dof_indices (const Elem* const elem,
           const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
 
           // Ghost subdivision elements have no real dofs
-          if (sd_elem->is_ghost())
-            return;
-
-          // Determine the nodes contributing to element elem
-          std::vector<Node*> elem_nodes;
-          MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
-
-          // Get the dof numbers
-          for (unsigned int v=0; v<n_vars; v++)
+          if (!sd_elem->is_ghost())
             {
-              if(this->variable(v).type().family == SCALAR &&
-                 this->variable(v).active_on_subdomain(elem->subdomain_id()))
+              // Determine the nodes contributing to element elem
+              std::vector<Node*> elem_nodes;
+              MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+
+              // Get the dof numbers
+              for (unsigned int v=0; v<n_vars; v++)
                 {
+                  if(this->variable(v).type().family == SCALAR &&
+                     this->variable(v).active_on_subdomain(elem->subdomain_id()))
+                    {
 #ifdef DEBUG
-                  tot_size += this->variable(v).type().order;
+                      tot_size += this->variable(v).type().order;
 #endif
-                  std::vector<dof_id_type> di_new;
-                  this->SCALAR_dof_indices(di_new,v);
-                  di.insert( di.end(), di_new.begin(), di_new.end());
+                      std::vector<dof_id_type> di_new;
+                      this->SCALAR_dof_indices(di_new,v);
+                      di.insert( di.end(), di_new.begin(), di_new.end());
+                    }
+                  else
+                    _dof_indices(elem, di, v, &elem_nodes[0], elem_nodes.size()
+#ifdef DEBUG
+                                 , tot_size
+#endif
+                                );
                 }
-              else
-                _dof_indices(elem, di, v, &elem_nodes[0], elem_nodes.size()
-#ifdef DEBUG
-                             , tot_size
-#endif
-                            );
             }
+
+          STOP_LOG("dof_indices()", "DofMap");
           return;
         }
     }
@@ -1899,18 +1901,20 @@ void DofMap::dof_indices (const Elem* const elem,
           const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
 
           // Ghost subdivision elements have no real dofs
-          if (sd_elem->is_ghost())
-            return;
+          if (!sd_elem->is_ghost())
+            {
+              // Determine the nodes contributing to element elem
+              std::vector<Node*> elem_nodes;
+              MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
-          // Determine the nodes contributing to element elem
-          std::vector<Node*> elem_nodes;
-          MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
-
-          _dof_indices(elem, di, vn, &elem_nodes[0], elem_nodes.size()
+              _dof_indices(elem, di, vn, &elem_nodes[0], elem_nodes.size()
 #ifdef DEBUG
-                       , tot_size
+                           , tot_size
 #endif
-                      );
+                          );
+            }
+
+          STOP_LOG("dof_indices()", "DofMap");
           return;
         }
     }
