@@ -2106,6 +2106,8 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type>& di,
   dof_id_type my_idx = this->_first_scalar_df[vn];
 #endif
 
+  libmesh_assert_not_equal_to(my_idx, DofObject::invalid_id);
+
   // The number of SCALAR dofs comes from the variable order
   const int n_dofs_vn = this->variable(vn).type().order;
 
