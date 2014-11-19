@@ -221,55 +221,6 @@ void EigenSparseVector<T>::add_vector (const DenseVector<T>& V,
 
 
 template <typename T>
-void EigenSparseVector<T>::insert (const std::vector<T>& v,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert (!v.empty());
-  libmesh_assert_equal_to (v.size(), dof_indices.size());
-
-  for (numeric_index_type i=0; i<v.size(); i++)
-    this->set (dof_indices[i], v[i]);
-}
-
-
-
-template <typename T>
-void EigenSparseVector<T>::insert (const NumericVector<T>& V,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-
-  for (numeric_index_type i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
-}
-
-
-
-template <typename T>
-void EigenSparseVector<T>::insert (const DenseVector<T>& V,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
-}
-
-
-
-template <typename T>
-void EigenSparseVector<T>::insert (const DenseSubVector<T>& V,
-                                   const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-
-  for (unsigned int i=0; i<V.size(); i++)
-    this->set (dof_indices[i], V(i));
-}
-
-
-
-template <typename T>
 void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
                                        const SparseMatrix<T>  &mat_in)
 {

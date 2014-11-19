@@ -29,6 +29,8 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/dense_subvector.h"
+#include "libmesh/dense_vector.h"
 
 // C++ includes
 #include <cstddef>
@@ -468,11 +470,18 @@ public:
                                      const SparseMatrix<T>&) = 0;
 
   /**
+   * \f$ U=v \f$ where v is a \p T[] or T*
+   * and you want to specify WHERE to insert it
+   */
+  virtual void insert (const T* v,
+                       const std::vector<numeric_index_type>& dof_indices);
+
+  /**
    * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
-  virtual void insert (const std::vector<T>& v,
-                       const std::vector<numeric_index_type>& dof_indices) = 0;
+  void insert (const std::vector<T>& v,
+               const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -481,7 +490,7 @@ public:
    * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices) = 0;
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where U and V are type
@@ -489,16 +498,16 @@ public:
    * want to specify WHERE to insert
    * the DenseVector<T> V
    */
-  virtual void insert (const DenseVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices) = 0;
+  void insert (const DenseVector<T>& V,
+               const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is a
    * DenseSubVector<T> and you
    * want to specify WHERE to insert it
    */
-  virtual void insert (const DenseSubVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices) = 0;
+  void insert (const DenseSubVector<T>& V,
+               const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * Scale each element of the
@@ -763,6 +772,45 @@ void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::ve
     {
       values[i] = (*this)(index[i]);
     }
+}
+
+
+
+template <typename T>
+inline
+void NumericVector<T>::insert 
+  (const std::vector<T>& v,
+   const std::vector<numeric_index_type>& dof_indices)
+{
+  libmesh_assert(v.size() == dof_indices.size());
+  if (!v.empty())
+    this->insert(&v[0], dof_indices);
+}
+
+
+
+template <typename T>
+inline
+void NumericVector<T>::insert 
+  (const DenseVector<T>& v,
+   const std::vector<numeric_index_type>& dof_indices)
+{
+  libmesh_assert(v.size() == dof_indices.size());
+  if (!v.empty())
+    this->insert(&v(0), dof_indices);
+}
+
+
+
+template <typename T>
+inline
+void NumericVector<T>::insert 
+  (const DenseSubVector<T>& v,
+   const std::vector<numeric_index_type>& dof_indices)
+{
+  libmesh_assert(v.size() == dof_indices.size());
+  if (!v.empty())
+    this->insert(&v(0), dof_indices);
 }
 
 
