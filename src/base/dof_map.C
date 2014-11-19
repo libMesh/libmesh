@@ -1960,13 +1960,11 @@ void DofMap::_dof_indices (const Elem* const elem,
   // This internal function is only useful on valid elements
   libmesh_assert(elem);
 
-  const ElemType type        = elem->type();
-  const unsigned int sys_num = this->sys_number();
-  const unsigned int dim     = elem->dim();
-
   if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
-    { // Do this for all the variables if one was not specified
-      // or just for the specified variable
+    {
+      const ElemType type        = elem->type();
+      const unsigned int sys_num = this->sys_number();
+      const unsigned int dim     = elem->dim();
 
       // Increase the polynomial order on p refined elements
       FEType fe_type = this->variable_type(v);
