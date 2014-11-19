@@ -135,6 +135,7 @@ DofMap::DofMap(const unsigned int number,
   _matrices(),
   _first_df(),
   _end_df(),
+  _first_scalar_df(),
   _send_list(),
   _augment_sparsity_pattern(NULL),
   _extra_sparsity_function(NULL),
@@ -150,7 +151,8 @@ DofMap::DofMap(const unsigned int number,
 #ifdef LIBMESH_ENABLE_AMR
   , _n_old_dfs(0),
   _first_old_df(),
-  _end_old_df()
+  _end_old_df(),
+  _first_old_scalar_df()
 #endif
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   , _dof_constraints()
@@ -815,6 +817,7 @@ void DofMap::clear()
   _variable_groups.clear();
   _first_df.clear();
   _end_df.clear();
+  _first_scalar_df.clear();
   _send_list.clear();
   this->clear_sparsity();
   need_full_sparsity_pattern = false;
@@ -828,6 +831,7 @@ void DofMap::clear()
   _n_old_dfs = 0;
   _first_old_df.clear();
   _end_old_df.clear();
+  _first_old_scalar_df.clear();
 
 #endif
 
@@ -968,11 +972,27 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   }
 #endif
 
-  // Set the total number of degrees of freedom
+  // Set the total number of degrees of freedom, then start finding
+  // SCALAR degrees of freedom
 #ifdef LIBMESH_ENABLE_AMR
   _n_old_dfs = _n_dfs;
+  _first_old_scalar_df = _first_scalar_df;
 #endif
   _n_dfs = _end_df[n_proc-1];
+  _first_scalar_df.clear();
+  _first_scalar_df.resize(this->n_variables(), DofObject::invalid_id);
+  dof_id_type current_SCALAR_dof_index = n_dofs() - n_SCALAR_dofs();
+
+  // Calculate and cache the initial DoF indices for SCALAR variables.
+  // This is an O(N_vars) calculation so we want to do it once per
+  // renumbering rather than once per SCALAR_dof_indices() call
+
+  for (unsigned int v=0; v<this->n_variables(); v++)
+    if(this->variable(v).type().family == SCALAR)
+      {
+        _first_scalar_df[v] = current_SCALAR_dof_index;
+        current_SCALAR_dof_index += this->variable(v).type().order;
+      }
 
   STOP_LOG("distribute_dofs()", "DofMap");
 
@@ -2075,53 +2095,23 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type>& di,
 
   libmesh_assert(this->variable(vn).type().family == SCALAR);
 
-  // Clear the DOF indices vector
-  di.clear();
-
-  // First we need to find out the first dof
-  // index for each SCALAR.
 #ifdef LIBMESH_ENABLE_AMR
-
   // If we're asking for old dofs then we'd better have some
   if (old_dofs)
     libmesh_assert_greater_equal(n_old_dofs(), n_SCALAR_dofs());
 
-  dof_id_type first_SCALAR_dof_index = (old_dofs ? n_old_dofs() : n_dofs()) - n_SCALAR_dofs();
+  dof_id_type my_idx = old_dofs ?
+    this->_first_old_scalar_df[vn] : this->_first_scalar_df[vn];
 #else
-  dof_id_type first_SCALAR_dof_index = n_dofs() - n_SCALAR_dofs();
-#endif
-  std::map<unsigned int, dof_id_type> SCALAR_first_dof_index;
-  SCALAR_first_dof_index.clear();
-
-  // Iterate over _all_ of the SCALARs and store each one's first dof index
-  // We need to do this since the SCALAR dofs are packed contiguously
-  for (unsigned int v=0; v<this->n_variables(); v++)
-    if(this->variable(v).type().family == SCALAR)
-      {
-        unsigned int current_n_SCALAR_dofs = this->variable(v).type().order;
-        SCALAR_first_dof_index.insert(
-                                      std::pair<unsigned int, dof_id_type>(v,first_SCALAR_dof_index) );
-        first_SCALAR_dof_index += current_n_SCALAR_dofs;
-      }
-
-  // Now use vn to index into SCALAR_first_dof_index
-  std::map<unsigned int, dof_id_type>::const_iterator iter =
-    SCALAR_first_dof_index.find(vn);
-
-#ifdef DEBUG
-  libmesh_assert (iter != SCALAR_first_dof_index.end());
+  dof_id_type my_idx = this->_first_scalar_df[vn];
 #endif
 
-  dof_id_type current_first_SCALAR_dof_index = iter->second;
+  // The number of SCALAR dofs comes from the variable order
+  const int n_dofs_vn = this->variable(vn).type().order;
 
-  // Also, get the number of SCALAR dofs from the variable order
-  unsigned int current_n_SCALAR_dofs = this->variable(vn).type().order;
-
-  for(unsigned int j=0; j<current_n_SCALAR_dofs; j++)
-    {
-      dof_id_type index = current_first_SCALAR_dof_index+j;
-      di.push_back(index);
-    }
+  di.resize(n_dofs_vn);
+  for(int i = 0; i != n_dofs_vn; ++i)
+    di[i] = my_idx++;
 
   STOP_LOG("SCALAR_dof_indices()", "DofMap");
 }
