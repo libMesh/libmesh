@@ -298,11 +298,12 @@ public:
   T operator() (const numeric_index_type i) const;
 
   /**
-   * Access multiple components at once.  Overloaded method that
-   * should be faster (probably much faster) than calling \p
-   * operator() individually for each index.
+   * Access multiple components at once.  \p values will *not* be
+   * reallocated; it should already have enough space.  Overloaded
+   * method that should be faster (probably much faster) than calling
+   * \p operator() individually for each index.
    */
-  virtual void get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const;
+  virtual void get(const std::vector<numeric_index_type>& index, T* values) const;
 
   /**
    * Addition operator.
@@ -1247,12 +1248,11 @@ T PetscVector<T>::operator() (const numeric_index_type i) const
 
 template <typename T>
 inline
-void PetscVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
+void PetscVector<T>::get(const std::vector<numeric_index_type>& index, T* values) const
 {
   this->_get_array();
 
   const std::size_t num = index.size();
-  values.resize(num);
 
   for(std::size_t i=0; i<num; i++)
     {

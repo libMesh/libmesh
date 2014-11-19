@@ -344,12 +344,20 @@ public:
   virtual T el(const numeric_index_type i) const { return (*this)(i); }
 
   /**
+   * Access multiple components at once.  \p values will *not* be
+   * reallocated; it should already have enough space.  The default
+   * implementation calls \p operator() for each index, but some
+   * implementations may supply faster methods here.
+   */
+  virtual void get(const std::vector<numeric_index_type>& index, T* values) const;
+
+  /**
    * Access multiple components at once.  \p values will be resized,
    * if necessary, and filled.  The default implementation calls \p
    * operator() for each index, but some implementations may supply
    * faster methods here.
    */
-  virtual void get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const;
+  void get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const;
 
   /**
    * Addition operator.
@@ -764,14 +772,27 @@ void NumericVector<T>::clear ()
 
 template <typename T>
 inline
-void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
+void NumericVector<T>::get(const std::vector<numeric_index_type>& index, T* values) const
 {
   const std::size_t num = index.size();
-  values.resize(num);
   for(std::size_t i=0; i<num; i++)
     {
       values[i] = (*this)(index[i]);
     }
+}
+
+
+
+template <typename T>
+inline
+void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
+{
+  const std::size_t num = index.size();
+  values.resize(num);
+  if (!num)
+    return;
+
+  this->get(index, &values[0]);
 }
 
 
