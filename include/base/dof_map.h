@@ -1096,7 +1096,8 @@ private:
    */
   void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di,
                      const unsigned int v,
-                     const std::vector<Node*>& elem_nodes
+                     const Node * const * nodes,
+                     unsigned int       n_nodes
 #ifdef DEBUG
                      ,
                      std::size_t & tot_size
@@ -1261,6 +1262,12 @@ private:
   std::vector<dof_id_type> _end_df;
 
   /**
+   * First DOF index for SCALAR variable v, or garbage for non-SCALAR
+   * variable v
+   */
+  std::vector<dof_id_type> _first_scalar_df;
+
+  /**
    * A list containing all the global DOF indices that affect the
    * solution on my processor.
    */
@@ -1351,6 +1358,12 @@ private:
    * Last old DOF index (plus 1) on processor \p p.
    */
   std::vector<dof_id_type> _end_old_df;
+
+  /**
+   * First old DOF index for SCALAR variable v, or garbage for
+   * non-SCALAR variable v
+   */
+  std::vector<dof_id_type> _first_old_scalar_df;
 
 #endif
 
