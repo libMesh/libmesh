@@ -314,21 +314,10 @@ public:
   void add (const T a, const NumericVector<T>& v);
 
   /**
-   * \f$U+=v\f$ where v is a \p std::vector<T>
-   * and you
-   * want to specify WHERE to add it
+   * We override one NumericVector<T>::add_vector() method but don't
+   * want to hide the other defaults.
    */
-  void add_vector (const std::vector<T>& v,
-                   const std::vector<numeric_index_type>& dof_indices);
-
-  /**
-   * \f$U+=V\f$ where U and V are type
-   * \p NumericVector<T> and you
-   * want to specify WHERE to add
-   * the \p NumericVector<T> V
-   */
-  void add_vector (const NumericVector<T>& V,
-                   const std::vector<numeric_index_type>& dof_indices);
+  using NumericVector<T>::add_vector;
 
   /**
    * \f$U+=A*V\f$.
@@ -339,15 +328,6 @@ public:
   void add_vector (const NumericVector<T>&,
                    const SparseMatrix<T>&)
   { libmesh_not_implemented(); }
-
-  /**
-   * \f$U+=V\f$ where U and V are type
-   * \p DenseVector<T> and you
-   * want to specify WHERE to add
-   * the \p DenseVector<T> V
-   */
-  void add_vector (const DenseVector<T>& V,
-                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A^T*V\f$.

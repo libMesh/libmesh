@@ -320,21 +320,10 @@ public:
   void add (const T a, const NumericVector<T>& v);
 
   /**
-   * \f$ U+=v \f$ where v is a \p std::vector<T>
-   * and you
-   * want to specify WHERE to add it
+   * We override one NumericVector<T>::add_vector() method but don't
+   * want to hide the other defaults.
    */
-  void add_vector (const std::vector<T>& v,
-                   const std::vector<numeric_index_type>& dof_indices);
-
-  /**
-   * \f$ U+=V \f$ where U and V are type
-   * NumericVector<T> and you
-   * want to specify WHERE to add
-   * the NumericVector<T> V
-   */
-  void add_vector (const NumericVector<T>& V,
-                   const std::vector<numeric_index_type>& dof_indices);
+  using NumericVector<T>::add_vector;
 
   /**
    * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
@@ -342,15 +331,6 @@ public:
    */
   void add_vector (const NumericVector<T> &,
                    const SparseMatrix<T> &);
-
-  /**
-   * \f$U+=V \f$ where U and V are type
-   * DenseVector<T> and you
-   * want to specify WHERE to add
-   * the DenseVector<T> V
-   */
-  void add_vector (const DenseVector<T>& V,
-                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
