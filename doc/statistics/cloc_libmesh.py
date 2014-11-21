@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+# git checkout `git rev-list -n 1 --before="$my_date" master`
+# cloc.pl src/*/*.C include/*/*.h
+
 data = [
 # 2003 - All data from archived svn repo
     # '2003-01-10', 158, 29088, # SVN revision 4 - this is the first revision with trunk/libmesh
@@ -159,7 +162,8 @@ data = [
     '2014-07-04', 807, 171220,
     '2014-08-04', 808, 172534,
     '2014-09-04', 808, 173639,
-    '2014-10-04', 819, 175750
+    '2014-10-04', 819, 175750,
+    '2014-11-04', 819, 176415
        ]
 
 # Extract the dates from the data array
