@@ -431,21 +431,34 @@ public:
   virtual void add (const T a, const NumericVector<T>& v) = 0;
 
   /**
-   * \f$ U+=v \f$ where v is a \p std::vector<T>
-   * and you
-   * want to specify WHERE to add it
+   * \f$ U+=v \f$ where v is a pointer and each \p dof_indices[i]
+   * specifies where to add value \p v[i]
+   *
+   * This should be overridden in subclasses for efficiency
    */
-  virtual void add_vector (const std::vector<T>& v,
-                           const std::vector<numeric_index_type>& dof_indices) = 0;
+  virtual void add_vector (const T* v,
+                           const std::vector<numeric_index_type>& dof_indices);
 
   /**
-   * \f$U+=V\f$, where U and V are type
-   * NumericVector<T> and you
-   * want to specify WHERE to add
-   * the NumericVector<T> V
+   * \f$ U+=v \f$ where v is a std::vector and each \p dof_indices[i]
+   * specifies where to add value \p v[i]
+   */
+  void add_vector (const std::vector<T>& v,
+                   const std::vector<numeric_index_type>& dof_indices);
+
+  /**
+   * \f$ U+=v \f$ where v is a NumericVector and each \p dof_indices[i]
+   * specifies where to add value \p v(i)
    */
   virtual void add_vector (const NumericVector<T>& V,
-                           const std::vector<numeric_index_type>& dof_indices) = 0;
+                           const std::vector<numeric_index_type>& dof_indices);
+
+  /**
+   * \f$ U+=v \f$ where v is a DenseVector and each \p dof_indices[i]
+   * specifies where to add value \p v(i)
+   */
+  void add_vector (const DenseVector<T>& V,
+                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
@@ -460,15 +473,6 @@ public:
    */
   void add_vector (const NumericVector<T>& v,
                    const ShellMatrix<T>& a);
-
-  /**
-   * \f$ U+=V \f$ where U and V are type
-   * DenseVector<T> and you
-   * want to specify WHERE to add
-   * the DenseVector<T> V
-   */
-  virtual void add_vector (const DenseVector<T>& V,
-                           const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
@@ -793,6 +797,32 @@ void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::ve
     return;
 
   this->get(index, &values[0]);
+}
+
+
+
+template <typename T>
+inline
+void NumericVector<T>::add_vector 
+  (const std::vector<T>& v,
+   const std::vector<numeric_index_type>& dof_indices)
+{
+  libmesh_assert(v.size() == dof_indices.size());
+  if (!v.empty())
+    this->add_vector(&v[0], dof_indices);
+}
+
+
+
+template <typename T>
+inline
+void NumericVector<T>::add_vector 
+  (const DenseVector<T>& v,
+   const std::vector<numeric_index_type>& dof_indices)
+{
+  libmesh_assert(v.size() == dof_indices.size());
+  if (!v.empty())
+    this->add_vector(&v(0), dof_indices);
 }
 
 

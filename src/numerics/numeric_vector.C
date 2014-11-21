@@ -400,6 +400,29 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
 
 
 template <typename T>
+void NumericVector<T>::add_vector (const T* v,
+                                   const std::vector<numeric_index_type>& dof_indices)
+{
+  int n = dof_indices.size();
+  for (int i=0; i<n; i++)
+    this->add (dof_indices[i], v[i]);
+}
+
+
+
+template <typename T>
+void NumericVector<T>::add_vector (const NumericVector<T>& v,
+                                   const std::vector<numeric_index_type>& dof_indices)
+{
+  int n = dof_indices.size();
+  libmesh_assert_equal_to(v.size(), n);
+  for (int i=0; i<n; i++)
+    this->add (dof_indices[i], v(i));
+}
+
+
+
+template <typename T>
 void NumericVector<T>::add_vector (const NumericVector<T>& v,
                                    const ShellMatrix<T>& a)
 {
