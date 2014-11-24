@@ -23,6 +23,15 @@
 // The library configuration options
 #include "libmesh/libmesh_config.h"
 
+// Use actual timestamps or constant dummies (to aid ccache)
+#ifdef LIBMESH_ENABLE_TIMESTAMPS
+#  define  __LIBMESH_TIME__ __TIME__
+#  define  __LIBMESH_DATE__ __DATE__
+#else
+#  define  __LIBMESH_TIME__ "notime"
+#  define  __LIBMESH_DATE__ "nodate"
+#endif
+
 // C/C++ includes everyone should know about
 #include <cstdlib>
 #ifdef __PGI
@@ -227,7 +236,7 @@ extern OStreamProxy err;
 // stick a libmesh_here(); in it, for example
 #define libmesh_here()                                                  \
   do {                                                                  \
-    libMesh::MacroFunctions::here(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::here(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
   } while(0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
@@ -238,7 +247,7 @@ extern OStreamProxy err;
 // serial cases.
 #define libmesh_stop()                                                  \
   do {                                                                  \
-    libMesh::MacroFunctions::stop(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::stop(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
   } while(0)
 
 // The libmesh_dbg_var() macro indicates that an argument to a function
@@ -343,45 +352,45 @@ extern OStreamProxy err;
 // throws a ConvergenceFailure exception
 #define libmesh_error()                                                 \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
 #define libmesh_exceptionless_error()                                   \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     std::terminate();                                                   \
   } while(0)
 
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     libMesh::err << msg << std::endl;                                   \
     LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
 #define libmesh_not_implemented()                                       \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
 #define libmesh_not_implemented_msg(msg)                                \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     libMesh::err << msg << std::endl;                                   \
     LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
 #define libmesh_file_error(filename)                                    \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
     LIBMESH_THROW(libMesh::FileError(filename));                        \
   } while(0)
 
 #define libmesh_file_error_msg(filename, msg)                           \
   do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
   libMesh:err << msg << std::endl;                                      \
     LIBMESH_THROW(libMesh::FileError(filename));                        \
   } while(0)
@@ -427,7 +436,7 @@ extern OStreamProxy err;
 #ifdef LIBMESH_ENABLE_WARNINGS
 #define libmesh_warning(message)                                        \
   libmesh_do_once(libMesh::out << message                               \
-                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __LIBMESH_DATE__ << " at " << __LIBMESH_TIME__ << " ***" << std::endl;)
 #else
 #define libmesh_warning(message)  ((void) 0)
 #endif

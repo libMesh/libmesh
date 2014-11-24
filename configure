@@ -1080,6 +1080,7 @@ enable_tripleprecision
 enable_quadrupleprecision
 enable_getpwuid
 enable_exceptions
+enable_timestamps
 enable_unordered_containers
 enable_openmp
 enable_warnings
@@ -1855,6 +1856,8 @@ Optional Features:
   --disable-getpwuid      do not make calls to getpwuid
   --disable-exceptions    exit rather than throw exceptions on unexpected
                           errors
+  --disable-timestamps    do not add preprocessor timestamps to the library
+                          (helps ccache)
   --disable-unordered-containers
                           Use map/set instead of unordered_map/unordered_set
   --disable-openmp        Build without OpenMP Support
@@ -25495,6 +25498,30 @@ $as_echo "#define ENABLE_EXCEPTIONS 1" >>confdefs.h
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with exception throwing support >>>" >&5
 $as_echo "<<< Configuring library with exception throwing support >>>" >&6; }
+fi
+# --------------------------------------------------------------
+
+
+
+# --------------------------------------------------------------
+# __TIME__ __DATE__ stamps - enabled by default
+# disabling preprocessor timestamps helps compiler caches such
+# as ccache to work more effectively.
+# --------------------------------------------------------------
+# Check whether --enable-timestamps was given.
+if test "${enable_timestamps+set}" = set; then :
+  enableval=$enable_timestamps; enabletimestamps=$enableval
+else
+  enabletimestamps=yes
+fi
+
+
+if test "$enabletimestamps" != no ; then
+
+$as_echo "#define ENABLE_TIMESTAMPS 1" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with compile timestamps >>>" >&5
+$as_echo "<<< Configuring library with compile timestamps >>>" >&6; }
 fi
 # --------------------------------------------------------------
 
