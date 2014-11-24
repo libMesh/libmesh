@@ -415,7 +415,7 @@ void NumericVector<T>::add_vector (const NumericVector<T>& v,
                                    const std::vector<numeric_index_type>& dof_indices)
 {
   int n = dof_indices.size();
-  libmesh_assert_equal_to(v.size(), n);
+  libmesh_assert_equal_to(v.size(), static_cast<unsigned>(n));
   for (int i=0; i<n; i++)
     this->add (dof_indices[i], v(i));
 }
