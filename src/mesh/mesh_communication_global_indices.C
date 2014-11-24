@@ -749,25 +749,30 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
             // and therefore the Hilbert indices don't agree.
             if (*pos != hilbert_indices)
               {
-                // Convert the HilbertIndices back to (x, y, z) coordinates
-                CFixBitVec icoords[3] = {hilbert_indices.rack0,
-                                         hilbert_indices.rack1,
-                                         hilbert_indices.rack2};
+                // The input will be hilbert_indices.  We convert it
+                // to BitVecType using the operator= provided by the
+                // BitVecType class. BitVecType is a CBigBitVec!
+                Hilbert::BitVecType input;
+                input = hilbert_indices;
 
-                Hilbert::BitVecType output;
-                Hilbert::indexToCoords(icoords, 8*sizeof(Hilbert::inttype), 3, output);
+                // Get output in a vector of CBigBitVec
+                std::vector<CBigBitVec> output(3);
+
+                // Call the indexToCoords function
+                Hilbert::indexToCoords(&output[0], 8*sizeof(Hilbert::inttype), 3, input);
 
                 // The entries in the output racks are integers in the
                 // range [0, Hilbert::inttype::max] which can be
                 // converted to floating point values in [0,1] and
                 // finally to actual values using the bounding box.
-                Hilbert::inttype max_inttype = std::numeric_limits<Hilbert::inttype>::max();
+                Real max_int_as_real = static_cast<Real>(std::numeric_limits<Hilbert::inttype>::max());
 
-                // Get the points in [0,1]^3.  This (2,1,0) ordering
-                // mimics the one used by HilbertIndices::operator<<
-                Point p_hat(static_cast<Real>(output.racks()[2]) / static_cast<Real>(max_inttype),
-                            static_cast<Real>(output.racks()[1]) / static_cast<Real>(max_inttype),
-                            static_cast<Real>(output.racks()[0]) / static_cast<Real>(max_inttype));
+                // Get the points in [0,1]^3.  The zeroth rack of each entry in
+                // 'output' maps to the normalized x, y, and z locations,
+                // respectively.
+                Point p_hat(static_cast<Real>(output[0].racks()[0]) / max_int_as_real,
+                            static_cast<Real>(output[1].racks()[0]) / max_int_as_real,
+                            static_cast<Real>(output[2].racks()[0]) / max_int_as_real);
 
                 // Convert the points from [0,1]^3 to their actual (x,y,z) locations
                 Real
@@ -778,6 +783,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
                   zmin = bbox.first(2),
                   zmax = bbox.second(2);
 
+                // Convert the points from [0,1]^3 to their actual (x,y,z) locations
                 Point p(xmin + (xmax-xmin)*p_hat(0),
                         ymin + (ymax-ymin)*p_hat(1),
                         zmin + (zmax-zmin)*p_hat(2));
