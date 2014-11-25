@@ -167,8 +167,20 @@ public:
   /**
    * Push the event \p label onto the stack, pausing any active event.
    */
+  void push (const char *label,
+             const char *header="");
+
+  /**
+   * Push the event \p label onto the stack, pausing any active event.
+   */
   void push (const std::string &label,
              const std::string &header="");
+
+  /**
+   * Pop the event \p label off the stack, resuming any lower event.
+   */
+  void pop (const char *label,
+            const char *header="");
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
@@ -382,6 +394,16 @@ void PerfLog::push (const std::string &label,
 
 
 inline
+void PerfLog::push (const char *label,
+                    const char *header)
+{
+  if (this->log_events)
+    this->push(std::string(label), std::string(header));
+}
+
+
+
+inline
 void PerfLog::pop (const std::string &libmesh_dbg_var(label),
                    const std::string &libmesh_dbg_var(header))
 {
@@ -412,6 +434,16 @@ void PerfLog::pop (const std::string &libmesh_dbg_var(label),
       if (!log_stack.empty())
         log_stack.top()->restart();
     }
+}
+
+
+
+inline
+void PerfLog::pop(const char *label,
+                    const char *header)
+{
+  if (this->log_events)
+    this->pop(std::string(label), std::string(header));
 }
 
 
