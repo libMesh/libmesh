@@ -32,11 +32,10 @@ CFixBitVec::type()
 // Default constructor.  The bits parameter
 // is completely ignored, but accepted in order
 // to look and feel the same as a BigBitVec.
-CFixBitVec::CFixBitVec(
-		       int /* iBits */
-		       )
+CFixBitVec::CFixBitVec(int /* iBits */) :
+  // Don't let m_uiRack go uninitialized!
+  m_uiRack(0)
 {
-	return;
 }
 
 // Copy constructor.
