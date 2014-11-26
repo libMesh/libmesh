@@ -1250,8 +1250,8 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
        last_elem<n_elem; blk++)
     {
       first_elem = cast_int<dof_id_type>(blk*io_blksize);
-      last_elem  = cast_int<dof_id_type>(std::min((blk+1)*io_blksize,
-                            cast_int<std::size_t>(n_elem)));
+      last_elem  = cast_int<dof_id_type>(std::min(cast_int<std::size_t>((blk+1)*io_blksize),
+                                                  cast_int<std::size_t>(n_elem)));
 
       conn.clear();
 
