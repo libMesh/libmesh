@@ -160,7 +160,7 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
 
       // Scale Jacobian by -1 to get positive matrix from new negative
       // mass_residual convention
-      context.elem_jacobian *= -1.0;
+      context.get_elem_jacobian() *= -1.0;
 
       return mass_jacobian_computed;
     }
@@ -207,7 +207,7 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
 
       // Scale Jacobian by -1 to get positive matrix from new negative
       // mass_residual convention
-      context.elem_jacobian *= -1.0;
+      context.get_elem_jacobian() *= -1.0;
 
       return mass_jacobian_computed;
     }
@@ -251,7 +251,7 @@ bool EigenTimeSolver::nonlocal_residual(bool request_jacobian,
 
       // Scale Jacobian by -1 to get positive matrix from new negative
       // mass_residual convention
-      context.elem_jacobian *= -1.0;
+      context.get_elem_jacobian() *= -1.0;
 
       return mass_jacobian_computed;
     }
