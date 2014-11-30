@@ -293,6 +293,12 @@ data = [
     '2014-Nov-21', 66,  24,
     '2014-Nov-22', 38,  13,
     '2014-Nov-23', 12,  8 ,
+    '2014-Nov-24', 102, 25,
+    '2014-Nov-25', 113, 20,
+    '2014-Nov-26', 63,  22,
+    '2014-Nov-27', 39,  14,
+    '2014-Nov-28', 67,  21,
+    '2014-Nov-29', 29,  11,
     ]
 
 # Github now tracks the total number of clones and unique cloners
@@ -410,6 +416,12 @@ clone_data = [
     '2014-Nov-21', 14, 10,
     '2014-Nov-22', 7,   5,
     '2014-Nov-23', 4,   4,
+    '2014-Nov-24', 11,  8,
+    '2014-Nov-25', 8,   6,
+    '2014-Nov-26', 19, 13,
+    '2014-Nov-27', 3,   3,
+    '2014-Nov-28', 12,  7,
+    '2014-Nov-29', 5,   4,
     ]
 
 # Extract the dates from the data array
