@@ -225,22 +225,22 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
         {
-          Number u = context.interior_value(var, qp);
-          Number JxWxU = JxW[qp] * u;
+          Number uprime;
+          context.interior_rate(var, qp, uprime);
+          const Number JxWxU = JxW[qp] * uprime;
           for (unsigned int i = 0; i != n_dofs; ++i)
             {
-              Fu(i) += JxWxU * phi[i][qp];
-              if (request_jacobian && context.elem_solution_derivative)
+              Fu(i) -= JxWxU * phi[i][qp];
+              if (request_jacobian && context.elem_solution_rate_derivative)
                 {
-                  libmesh_assert_equal_to (context.elem_solution_derivative, 1.0);
-
-                  Number JxWxPhiI = JxW[qp] * phi[i][qp];
-                  Kuu(i,i) += JxWxPhiI * phi[i][qp];
+                  const Number JxWxPhiIxDeriv = JxW[qp] * phi[i][qp] *
+                    context.elem_solution_rate_derivative;
+                  Kuu(i,i) -= JxWxPhiIxDeriv * phi[i][qp];
                   for (unsigned int j = i+1; j < n_dofs; ++j)
                     {
-                      Number Kij = JxWxPhiI * phi[j][qp];
-                      Kuu(i,j) += Kij;
-                      Kuu(j,i) += Kij;
+                      const Number Kij = JxWxPhiIxDeriv * phi[j][qp];
+                      Kuu(i,j) -= Kij;
+                      Kuu(j,i) -= Kij;
                     }
                 }
             }

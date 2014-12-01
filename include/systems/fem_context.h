@@ -218,6 +218,8 @@ public:
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+
+
   /**
    * Accessor for interior finite element object for variable var.
    */
@@ -375,6 +377,31 @@ public:
                      OutputType& hess_u) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * Returns the time derivative (rate) of the solution variable 
+   * \p var at the quadrature point \p qp on the current element
+   * interior.
+   */
+  template<typename OutputType>
+  void interior_rate(unsigned int var, unsigned int qp,
+                     OutputType& u) const;
+
+  /**
+   * Returns the time derivative (rate) of the solution variable
+   * \p var at the quadrature point \p qp on the current element side.
+   */
+  template<typename OutputType>
+  void side_rate(unsigned int var, unsigned int qp,
+                 OutputType& u) const;
+
+  /**
+   * Returns the time derivative (rate) of the solution variable
+   * \p var at the physical point \p p on the current element.
+   */
+  template<typename OutputType>
+  void point_rate(unsigned int var, const Point &p,
+                  OutputType& u) const;
 
   /**
    * Returns the value of the fixed_solution variable \p var at the quadrature
@@ -688,6 +715,52 @@ protected:
    */
   template<typename OutputShape>
   AutoPtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe, const Point &p ) const;
+
+  /**
+   * Helper typedef to simplify refactoring
+   */
+  typedef
+    const DenseSubVector<Number>&
+      (DiffContext::*diff_subsolution_getter)(unsigned int) const;
+
+  /**
+   * Helper function to reduce some code duplication in the
+   * *interior_value methods.
+   */
+  template<typename OutputType,
+           diff_subsolution_getter subsolution_getter>
+  void some_interior_value
+    (unsigned int var, unsigned int qp, OutputType& u) const;
+
+  /**
+   * Helper function to reduce some code duplication in the
+   * *interior_gradient methods.
+   */
+  template<typename OutputType,
+           diff_subsolution_getter subsolution_getter>
+  void some_interior_gradient
+    (unsigned int var, unsigned int qp, OutputType& u) const;
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  /**
+   * Helper function to reduce some code duplication in the
+   * *interior_hessian methods.
+   */
+  template<typename OutputType,
+           diff_subsolution_getter subsolution_getter>
+  void some_interior_hessian
+    (unsigned int var, unsigned int qp, OutputType& u) const;
+#endif
+
+  /**
+   * Helper function to reduce some code duplication in the
+   * *side_value methods.
+   */
+  template<typename OutputType,
+           diff_subsolution_getter subsolution_getter>
+  void some_side_value
+    (unsigned int var, unsigned int qp, OutputType& u) const;
+
 
   /**
    * Finite element objects for each variable's interior, sides and edges.

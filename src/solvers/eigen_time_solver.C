@@ -130,6 +130,9 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
   // The EigenTimeSolver always computes jacobians!
   libmesh_assert (request_jacobian);
 
+  context.elem_solution_rate_derivative = 1;
+  context.elem_solution_derivative = 1;
+
   // Assemble the operator for the spatial part.
   if (now_assembling == Matrix_A)
     {
@@ -155,8 +158,9 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
       bool mass_jacobian_computed =
         _system.mass_residual(request_jacobian, context);
 
-      // Scale Jacobian by -1?
-      //context.elem_jacobian *= -1.0;
+      // Scale Jacobian by -1 to get positive matrix from new negative
+      // mass_residual convention
+      context.get_elem_jacobian() *= -1.0;
 
       return mass_jacobian_computed;
     }
@@ -172,6 +176,9 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
 {
   // The EigenTimeSolver always requests jacobians?
   //libmesh_assert (request_jacobian);
+
+  context.elem_solution_rate_derivative = 1;
+  context.elem_solution_derivative = 1;
 
   // Assemble the operator for the spatial part.
   if (now_assembling == Matrix_A)
@@ -197,6 +204,10 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
     {
       bool mass_jacobian_computed =
         _system.side_mass_residual(request_jacobian, context);
+
+      // Scale Jacobian by -1 to get positive matrix from new negative
+      // mass_residual convention
+      context.get_elem_jacobian() *= -1.0;
 
       return mass_jacobian_computed;
     }
@@ -237,6 +248,10 @@ bool EigenTimeSolver::nonlocal_residual(bool request_jacobian,
     {
       bool mass_jacobian_computed =
         _system.nonlocal_mass_residual(request_jacobian, context);
+
+      // Scale Jacobian by -1 to get positive matrix from new negative
+      // mass_residual convention
+      context.get_elem_jacobian() *= -1.0;
 
       return mass_jacobian_computed;
     }

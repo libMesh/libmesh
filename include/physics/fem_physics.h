@@ -78,17 +78,19 @@ public:
   virtual bool eulerian_residual (bool request_jacobian,
                                   DiffContext &context);
 
-
   /**
-   * Adds a mass vector contribution on \p elem to elem_residual.
+   * Subtracts a mass vector contribution on \p elem from
+   * elem_residual.
+   *
    * If this method receives request_jacobian = true, then it
    * should compute elem_jacobian and return true if possible.  If
    * elem_jacobian has not been computed then the method should
    * return false.
    *
-   * Most problems can use the reimplementation in
-   * FEMPhysics::mass_residual; few users will need to reimplement
-   * this themselves.
+   * Many problems can use the reimplementation in
+   * FEMPhysics::mass_residual which subtracts (du/dt,v) for each
+   * transient variable u; users with more complicated transient
+   * problems will need to reimplement this themselves.
    */
   virtual bool mass_residual (bool request_jacobian,
                               DiffContext &);

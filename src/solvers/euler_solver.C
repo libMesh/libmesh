@@ -95,26 +95,32 @@ bool EulerSolver::_general_residual (bool request_jacobian,
 {
   unsigned int n_dofs = context.get_elem_solution().size();
 
+  // We might need to save the old jacobian in case one of our physics
+  // terms later is unable to update it analytically.
+  DenseMatrix<Number> old_elem_jacobian(n_dofs, n_dofs);
+  if (request_jacobian)
+    old_elem_jacobian.swap(context.get_elem_jacobian());
+
   // Local nonlinear solution at old timestep
   DenseVector<Number> old_elem_solution(n_dofs);
   for (unsigned int i=0; i != n_dofs; ++i)
     old_elem_solution(i) =
       old_nonlinear_solution(context.get_dof_indices()[i]);
 
+  // Local time derivative of solution
+  context.get_elem_solution_rate() = context.get_elem_solution();
+  context.get_elem_solution_rate() -= old_elem_solution;
+  context.elem_solution_rate_derivative = 1 / _system.deltat;
+  context.get_elem_solution_rate() *=
+    context.elem_solution_rate_derivative;
+
   // Local nonlinear solution at time t_theta
   DenseVector<Number> theta_solution(context.get_elem_solution());
   theta_solution *= theta;
   theta_solution.add(1. - theta, old_elem_solution);
 
-  // Technically the elem_solution_derivative is either theta
-  // or -1.0 in this implementation, but we scale the former part
-  // ourselves
-  context.elem_solution_derivative = 1.0;
-
-  // Technically the fixed_solution_derivative is always theta,
-  // but we're scaling a whole jacobian by theta after these first
-  // evaluations
-  context.fixed_solution_derivative = 1.0;
+  context.elem_solution_derivative = theta;
+  context.fixed_solution_derivative = theta;
 
   // If a fixed solution is requested, we'll use theta_solution
   if (_system.use_fixed_solution)
@@ -126,61 +132,25 @@ bool EulerSolver::_general_residual (bool request_jacobian,
   // Move the mesh into place first if necessary
   (context.*reinit_func)(theta);
 
-  // We're going to compute just the change in elem_residual
-  // (and possibly elem_jacobian), then add back the old values
-  DenseVector<Number> old_elem_residual(context.get_elem_residual());
-  DenseMatrix<Number> old_elem_jacobian;
-  if (request_jacobian)
-    {
-      old_elem_jacobian = context.get_elem_jacobian();
-      context.get_elem_jacobian().zero();
-    }
-  context.get_elem_residual().zero();
-
   // Get the time derivative at t_theta
   bool jacobian_computed =
     (_system.*time_deriv)(request_jacobian, context);
 
-  // Scale the time-dependent residual and jacobian correctly
-  context.get_elem_residual() *= _system.deltat;
-  if (jacobian_computed)
-    context.get_elem_jacobian() *= (theta * _system.deltat);
-
-  // The fixed_solution_derivative is always theta,
-  // and now we're done scaling jacobians
-  context.fixed_solution_derivative = theta;
-
-  // We evaluate mass_residual with the change in solution
-  // to get the mass matrix, reusing old_elem_solution to hold that
-  // delta_solution.  We're solving dt*F(u) - du = 0, so our
-  // delta_solution is old_solution - new_solution.
-  // We're still keeping elem_solution in theta_solution for now
-  old_elem_solution -= theta_solution;
-
-  // Move old_->elem_, theta_->old_
-  context.get_elem_solution().swap(old_elem_solution);
-
-  // We do a trick here to avoid using a non-1
-  // elem_solution_derivative:
-  context.get_elem_jacobian() *= -1.0;
-  context.fixed_solution_derivative *= -1.0;
   jacobian_computed = (_system.*mass)(jacobian_computed, context) &&
     jacobian_computed;
-  context.get_elem_jacobian() *= -1.0;
-  context.fixed_solution_derivative *= -1.0;
-
-  // Move elem_->elem_, old_->theta_
-  context.get_elem_solution().swap(theta_solution);
 
   // Restore the elem position if necessary
-  (context.*reinit_func)(1.);
+  (context.*reinit_func)(1);
+
+  // Move elem_->elem_, theta_->theta_
+  context.get_elem_solution().swap(theta_solution);
+  context.elem_solution_derivative = 1;
 
   // Add the constraint term
   jacobian_computed = (_system.*constraint)(jacobian_computed, context) &&
     jacobian_computed;
 
-  // Add back the old residual and jacobian
-  context.get_elem_residual() += old_elem_residual;
+  // Add back (or restore) the old jacobian
   if (request_jacobian)
     {
       if (jacobian_computed)
