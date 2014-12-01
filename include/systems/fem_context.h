@@ -379,7 +379,7 @@ public:
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
-   * Returns the time derivative (rate) of the solution variable 
+   * Returns the time derivative (rate) of the solution variable
    * \p var at the quadrature point \p qp on the current element
    * interior.
    */
@@ -716,6 +716,11 @@ protected:
   template<typename OutputShape>
   AutoPtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe, const Point &p ) const;
 
+
+  // gcc-3.4, oracle 12.3 require this typedef to be public
+  // in order to use it in a return type
+public:
+
   /**
    * Helper typedef to simplify refactoring
    */
@@ -723,6 +728,7 @@ protected:
     const DenseSubVector<Number>&
       (DiffContext::*diff_subsolution_getter)(unsigned int) const;
 
+protected:
   /**
    * Helper function to reduce some code duplication in the
    * *interior_value methods.
