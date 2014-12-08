@@ -173,14 +173,13 @@ void compute_jacobian (const NumericVector<Number>& soln,
 
   DenseMatrix<Number> Ke;
 
-  std::vector< std::vector< std::unique_ptr< DenseSubMatrix<Number> > > > Ke_var(3);
+  std::vector< std::vector< DenseSubMatrix<Number>* > > Ke_var(3);
   for(unsigned int var_i=0; var_i<3; var_i++)
   {
     Ke_var[var_i].resize(3);
     for(unsigned int var_j=0; var_j<3; var_j++)
     {
-      std::unique_ptr< DenseSubMatrix<Number> > Ke_submatrix(new DenseSubMatrix<Number>(Ke));
-      Ke_var[var_i][var_j] = std::move(Ke_submatrix);
+      Ke_var[var_i][var_j] = new DenseSubMatrix<Number>(Ke);
     }
   }
 
@@ -346,6 +345,15 @@ void compute_jacobian (const NumericVector<Number>& soln,
     jacobian.add_matrix (Ke, dof_indices);
   }
 
+  for(unsigned int var_i=0; var_i<3; var_i++)
+  {
+    for(unsigned int var_j=0; var_j<3; var_j++)
+    {
+      delete Ke_var[var_i][var_j];
+      Ke_var[var_i][var_j] = NULL;
+    }
+  }
+  Ke_var.clear();
 }
 
 /**
@@ -387,12 +395,11 @@ void compute_residual (const NumericVector<Number>& soln,
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
   DenseVector<Number> Re;
-  std::vector< std::unique_ptr< DenseSubVector<Number> > > Re_var(3);
+  std::vector< DenseSubVector<Number>* > Re_var(3);
   for(unsigned int var=0; var<3; var++)
   {
-    std::unique_ptr< DenseSubVector<Number> > Re_subvector(new DenseSubVector<Number>(Re));
-    Re_var[var] = std::move(Re_subvector);
-  } 
+    Re_var[var] = new DenseSubVector<Number>(Re);
+  }
 
   std::vector<unsigned int> dof_indices;
   std::vector< std::vector<unsigned int> > dof_indices_var(3);
@@ -505,6 +512,13 @@ void compute_residual (const NumericVector<Number>& soln,
     dof_map.constrain_element_vector (Re, dof_indices);
     residual.add_vector (Re, dof_indices);
   }
+
+  for(unsigned int var=0; var<3; var++)
+  {
+    delete Re_var[var];
+    Re_var[var] = NULL;
+  }
+  Re_var.clear();
 
 }
 
