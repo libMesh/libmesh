@@ -171,21 +171,21 @@ void compute_jacobian (const NumericVector<Number>& soln,
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
-	DenseMatrix<Number> Ke;
+  DenseMatrix<Number> Ke;
 
-	std::vector< std::vector< std::unique_ptr< DenseSubMatrix<Number> > > > Ke_var(3);
-	for(unsigned int var_i=0; var_i<3; var_i++)
-	{
-	  Ke_var[var_i].resize(3);
-	  for(unsigned int var_j=0; var_j<3; var_j++)
-  	{
-	    std::unique_ptr< DenseSubMatrix<Number> > Ke_submatrix(new DenseSubMatrix<Number>(Ke));
-	    Ke_var[var_i][var_j] = std::move(Ke_submatrix);
-  	}
+  std::vector< std::vector< std::unique_ptr< DenseSubMatrix<Number> > > > Ke_var(3);
+  for(unsigned int var_i=0; var_i<3; var_i++)
+  {
+    Ke_var[var_i].resize(3);
+    for(unsigned int var_j=0; var_j<3; var_j++)
+    {
+      std::unique_ptr< DenseSubMatrix<Number> > Ke_submatrix(new DenseSubMatrix<Number>(Ke));
+      Ke_var[var_i][var_j] = std::move(Ke_submatrix);
+    }
   }
 
-	std::vector<unsigned int> dof_indices;
-	std::vector< std::vector<unsigned int> > dof_indices_var(3);
+  std::vector<unsigned int> dof_indices;
+  std::vector< std::vector<unsigned int> > dof_indices_var(3);
 
   jacobian.zero();
 
@@ -195,11 +195,11 @@ void compute_jacobian (const NumericVector<Number>& soln,
   for ( ; el != end_el; ++el)
   {
     const Elem* elem = *el;
-		dof_map.dof_indices (elem, dof_indices);
-		for(unsigned int var=0; var<3; var++)
-		{
-		  dof_map.dof_indices (elem, dof_indices_var[var], var);
-		}
+    dof_map.dof_indices (elem, dof_indices);
+    for(unsigned int var=0; var<3; var++)
+    {
+      dof_map.dof_indices (elem, dof_indices_var[var], var);
+    }
 
     const unsigned int n_dofs = dof_indices.size(); 
 		const unsigned int n_var_dofs = dof_indices_var[0].size();
@@ -386,16 +386,16 @@ void compute_residual (const NumericVector<Number>& soln,
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
-	DenseVector<Number> Re;
-	std::vector< std::unique_ptr< DenseSubVector<Number> > > Re_var(3);
-	for(unsigned int var=0; var<3; var++)
-	{
-	  std::unique_ptr< DenseSubVector<Number> > Re_subvector(new DenseSubVector<Number>(Re));
-	  Re_var[var] = std::move(Re_subvector);
-	}
+  DenseVector<Number> Re;
+  std::vector< std::unique_ptr< DenseSubVector<Number> > > Re_var(3);
+  for(unsigned int var=0; var<3; var++)
+  {
+    std::unique_ptr< DenseSubVector<Number> > Re_subvector(new DenseSubVector<Number>(Re));
+    Re_var[var] = std::move(Re_subvector);
+  } 
 
-	std::vector<unsigned int> dof_indices;
-	std::vector< std::vector<unsigned int> > dof_indices_var(3);
+  std::vector<unsigned int> dof_indices;
+  std::vector< std::vector<unsigned int> > dof_indices_var(3);
 
   residual.zero();
 
@@ -405,14 +405,14 @@ void compute_residual (const NumericVector<Number>& soln,
   for ( ; el != end_el; ++el)
   {
     const Elem* elem = *el;
-		dof_map.dof_indices (elem, dof_indices);
-		for(unsigned int var=0; var<3; var++)
-		{
-		  dof_map.dof_indices (elem, dof_indices_var[var], var);
-		}
+    dof_map.dof_indices (elem, dof_indices);
+    for(unsigned int var=0; var<3; var++)
+    {
+      dof_map.dof_indices (elem, dof_indices_var[var], var);
+    }
 
     const unsigned int n_dofs = dof_indices.size(); 
-		const unsigned int n_var_dofs = dof_indices_var[0].size();
+    const unsigned int n_var_dofs = dof_indices_var[0].size();
 
     fe->reinit (elem);
 
