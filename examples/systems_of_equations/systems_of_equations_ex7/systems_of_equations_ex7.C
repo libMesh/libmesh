@@ -152,9 +152,9 @@ void compute_jacobian (const NumericVector<Number>& soln,
   NonlinearImplicitSystem& system =
     es.get_system<NonlinearImplicitSystem>("NonlinearElasticity");
 
-	const unsigned int u_var = system.variable_number ("u");
-	const unsigned int v_var = system.variable_number ("v");
-	const unsigned int w_var = system.variable_number ("w");
+  const unsigned int u_var = system.variable_number ("u");
+  const unsigned int v_var = system.variable_number ("v");
+  const unsigned int w_var = system.variable_number ("w");
 
   const DofMap& dof_map = system.get_dof_map();
 
@@ -367,9 +367,9 @@ void compute_residual (const NumericVector<Number>& soln,
   NonlinearImplicitSystem& system =
     es.get_system<NonlinearImplicitSystem>("NonlinearElasticity");
 
-	const unsigned int u_var = system.variable_number ("u");
-	const unsigned int v_var = system.variable_number ("v");
-	const unsigned int w_var = system.variable_number ("w");
+  const unsigned int u_var = system.variable_number ("u");
+  const unsigned int v_var = system.variable_number ("v");
+  const unsigned int w_var = system.variable_number ("w");
 
   const DofMap& dof_map = system.get_dof_map();
 
