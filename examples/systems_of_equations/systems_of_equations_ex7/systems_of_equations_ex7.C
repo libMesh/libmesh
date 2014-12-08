@@ -18,7 +18,7 @@
 
 // <h1> Systems Example 7 - Large deformation elasticity (St. Venant-Kirchoff material) </h1>
 //
-// We consider an elastic oaded cantilever beam (hence the constitutive law is the 
+// We consider an elastic loaded cantilever beam (hence the constitutive law is the 
 // same as in example 6) but the system is now nonlinear since we don't neglect 
 // the nonlinear terms in the strain, i.e. we consider a St. Venant-Kirchoff material.
 // The implementation uses NonlinearImplicitSystem.
