@@ -202,7 +202,7 @@ void compute_jacobian (const NumericVector<Number>& soln,
     }
 
     const unsigned int n_dofs = dof_indices.size(); 
-		const unsigned int n_var_dofs = dof_indices_var[0].size();
+    const unsigned int n_var_dofs = dof_indices_var[0].size();
 
     fe->reinit (elem);
 
