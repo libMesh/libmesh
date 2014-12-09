@@ -76,9 +76,6 @@
 
 using namespace libMesh;
 
-// TODO: Global variables are ugly... let's fix this up later (once the code is working well)
-EquationSystems *_equation_system = NULL;
-
 /**
  * Kronecker delta function.
  */
@@ -113,9 +110,9 @@ Real elasticity_tensor(
  */
 void compute_jacobian (const NumericVector<Number>& soln,
                        SparseMatrix<Number>&  jacobian,
-                       NonlinearImplicitSystem& /*sys*/)
+                       NonlinearImplicitSystem& sys)
 {
-  EquationSystems &es = *_equation_system;
+  EquationSystems &es = sys.get_equation_systems();
 
   const Real young_modulus = es.parameters.get<Real>("young_modulus");
   const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
@@ -316,9 +313,9 @@ void compute_jacobian (const NumericVector<Number>& soln,
  */
 void compute_residual (const NumericVector<Number>& soln,
                        NumericVector<Number>& residual,
-                       NonlinearImplicitSystem& /*sys*/)
+                       NonlinearImplicitSystem& sys)
 {
-  EquationSystems &es = *_equation_system;
+  EquationSystems &es = sys.get_equation_systems();
 
   const Real young_modulus = es.parameters.get<Real>("young_modulus");
   const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
@@ -519,7 +516,6 @@ int main (int argc, char** argv)
   mesh.print_info();
 
   EquationSystems equation_systems (mesh);
-  _equation_system = &equation_systems;
 
   NonlinearImplicitSystem& system =
     equation_systems.add_system<NonlinearImplicitSystem> ("NonlinearElasticity");
