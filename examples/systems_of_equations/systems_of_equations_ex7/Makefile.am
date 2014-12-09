@@ -6,6 +6,16 @@ sources       = $(data) run.sh
 
 CLEANFILES = solution.exo
 
+# also need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f systems_of_equations_ex7.in && $(LN_S) -f $(srcdir)/systems_of_equations_ex7.in .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += systems_of_equations_ex7.in .linkstamp
+endif
+
 ##############################################
 # include common example environment
 include $(top_srcdir)/examples/Make.common
