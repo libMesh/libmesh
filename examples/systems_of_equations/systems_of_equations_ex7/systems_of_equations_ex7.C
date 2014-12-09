@@ -18,8 +18,8 @@
 
 // <h1> Systems Example 7 - Large deformation elasticity (St. Venant-Kirchoff material) </h1>
 //
-// We consider an elastic loaded cantilever beam (hence the constitutive law is the 
-// same as in example 6) but the system is now nonlinear since we don't neglect 
+// We consider an elastic loaded cantilever beam (hence the constitutive law is the
+// same as in example 6) but the system is now nonlinear since we don't neglect
 // the nonlinear terms in the strain, i.e. we consider a St. Venant-Kirchoff material.
 // The implementation uses NonlinearImplicitSystem.
 //
@@ -76,9 +76,6 @@
 
 using namespace libMesh;
 
-// TODO: Global variables are ugly... let's fix this up later (once the code is working well)
-EquationSystems *_equation_system = NULL;
-
 /**
  * Kronecker delta function.
  */
@@ -104,378 +101,388 @@ Real elasticity_tensor(
   const Real lambda_1 = (young_modulus*poisson_ratio)/((1.+poisson_ratio)*(1.-2.*poisson_ratio));
   const Real lambda_2 = young_modulus/(2.*(1.+poisson_ratio));
 
-  return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l) + 
+  return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l) +
          lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
 }
 
-/**
- * Evaluate the jacobian of the nonlinear system.
- */
-void compute_jacobian (const NumericVector<Number>& soln,
-                       SparseMatrix<Number>&  jacobian,
-                       NonlinearImplicitSystem& /*sys*/)
+
+
+class LargeDeformationElasticity : public NonlinearImplicitSystem::ComputeResidual,
+                                   public NonlinearImplicitSystem::ComputeJacobian
 {
-  EquationSystems &es = *_equation_system;
+private:
+  EquationSystems &es;
 
-  const Real young_modulus = es.parameters.get<Real>("young_modulus");
-  const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
-  const Real forcing_magnitude = es.parameters.get<Real>("forcing_magnitude");
+public:
 
-  const MeshBase& mesh = es.get_mesh();
-  const unsigned int dim = mesh.mesh_dimension();
+  LargeDeformationElasticity (EquationSystems &es_in) :
+    es(es_in)
+  {}
 
-  NonlinearImplicitSystem& system =
-    es.get_system<NonlinearImplicitSystem>("NonlinearElasticity");
-
-  const unsigned int u_var = system.variable_number ("u");
-  const unsigned int v_var = system.variable_number ("v");
-  const unsigned int w_var = system.variable_number ("w");
-
-  const DofMap& dof_map = system.get_dof_map();
-
-  FEType fe_type = dof_map.variable_type(u_var);
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  QGauss qrule (dim, FIFTH);
-  fe->attach_quadrature_rule (&qrule);
-
-  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-  QGauss qface(dim-1, FIFTH);
-  fe_face->attach_quadrature_rule (&qface);
-
-  const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-
-  DenseMatrix<Number> Ke;
-
-  std::vector< std::vector< DenseSubMatrix<Number>* > > Ke_var(3);
-  for(unsigned int var_i=0; var_i<3; var_i++)
+  virtual void jacobian (const NumericVector<Number>& soln,
+                         SparseMatrix<Number>&  jacobian,
+                         NonlinearImplicitSystem& /*sys*/)
   {
-    Ke_var[var_i].resize(3);
-    for(unsigned int var_j=0; var_j<3; var_j++)
-    {
-      Ke_var[var_i][var_j] = new DenseSubMatrix<Number>(Ke);
-    }
-  }
+    const Real young_modulus = es.parameters.get<Real>("young_modulus");
+    const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
+    const Real forcing_magnitude = es.parameters.get<Real>("forcing_magnitude");
 
-  std::vector<unsigned int> dof_indices;
-  std::vector< std::vector<unsigned int> > dof_indices_var(3);
+    const MeshBase& mesh = es.get_mesh();
+    const unsigned int dim = mesh.mesh_dimension();
 
-  jacobian.zero();
+    NonlinearImplicitSystem& system =
+      es.get_system<NonlinearImplicitSystem>("NonlinearElasticity");
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+    const unsigned int u_var = system.variable_number ("u");
+    const unsigned int v_var = system.variable_number ("v");
+    const unsigned int w_var = system.variable_number ("w");
 
-  for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-    dof_map.dof_indices (elem, dof_indices);
-    for(unsigned int var=0; var<3; var++)
-    {
-      dof_map.dof_indices (elem, dof_indices_var[var], var);
-    }
+    const DofMap& dof_map = system.get_dof_map();
 
-    const unsigned int n_dofs = dof_indices.size(); 
-    const unsigned int n_var_dofs = dof_indices_var[0].size();
+    FEType fe_type = dof_map.variable_type(u_var);
+    AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+    QGauss qrule (dim, FIFTH);
+    fe->attach_quadrature_rule (&qrule);
 
-    fe->reinit (elem);
+    AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+    QGauss qface(dim-1, FIFTH);
+    fe_face->attach_quadrature_rule (&qface);
 
-    Ke.resize (n_dofs,n_dofs);
+    const std::vector<Real>& JxW = fe->get_JxW();
+    const std::vector<std::vector<Real> >& phi = fe->get_phi();
+    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+    DenseMatrix<Number> Ke;
+
+    std::vector< std::vector< DenseSubMatrix<Number>* > > Ke_var(3);
     for(unsigned int var_i=0; var_i<3; var_i++)
-      for(unsigned int var_j=0; var_j<3; var_j++)
       {
-        Ke_var[var_i][var_j]->reposition (var_i*n_var_dofs, var_j*n_var_dofs, n_var_dofs, n_var_dofs);
-      }
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-    {
-      DenseVector<Number> u_vec(3);
-      DenseMatrix<Number> grad_u(3,3);
-      for(unsigned int var_i=0; var_i<3; var_i++)
-      {
-        for (unsigned int j=0; j<n_var_dofs; j++)
-        {
-          u_vec(var_i) += phi[j][qp]*soln(dof_indices_var[var_i][j]);
-        }
-
+        Ke_var[var_i].resize(3);
         for(unsigned int var_j=0; var_j<3; var_j++)
-        {
-          for (unsigned int j=0; j<n_var_dofs; j++)
           {
-            // Row is variable u1, u2, or u3, column is x, y, or z
-            grad_u(var_i,var_j) += dphi[j][qp](var_j)*soln(dof_indices_var[var_i][j]);
+            Ke_var[var_i][var_j] = new DenseSubMatrix<Number>(Ke);
           }
-        }
       }
 
-      DenseMatrix<Real> strain_tensor(3,3);
-      for(unsigned int i=0; i<3; i++)
-        for(unsigned int j=0; j<3; j++)
-        {
-          strain_tensor(i,j) += 0.5 * ( grad_u(i,j) + grad_u(j,i) );
+    std::vector<unsigned int> dof_indices;
+    std::vector< std::vector<unsigned int> > dof_indices_var(3);
 
-          for(unsigned int k=0; k<3; k++)
-          {
-            strain_tensor(i,j) += 0.5 * grad_u(k,i)*grad_u(k,j);
-          }
-        }
+    jacobian.zero();
 
-      // Define the deformation gradient
-      DenseMatrix<Number> F(3,3);
-      F = grad_u;
-      for(unsigned int var=0; var<3; var++)
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+    for ( ; el != end_el; ++el)
       {
-        F(var,var) += 1.;
-      }
+        const Elem* elem = *el;
+        dof_map.dof_indices (elem, dof_indices);
+        for(unsigned int var=0; var<3; var++)
+          {
+            dof_map.dof_indices (elem, dof_indices_var[var], var);
+          }
 
-      DenseMatrix<Number> stress_tensor(3,3);
+        const unsigned int n_dofs = dof_indices.size();
+        const unsigned int n_var_dofs = dof_indices_var[0].size();
 
-      for(unsigned int i=0; i<3; i++)
-        for(unsigned int j=0; j<3; j++)
-          for(unsigned int k=0; k<3; k++)
-            for(unsigned int l=0; l<3; l++)
+        fe->reinit (elem);
+
+        Ke.resize (n_dofs,n_dofs);
+        for(unsigned int var_i=0; var_i<3; var_i++)
+          for(unsigned int var_j=0; var_j<3; var_j++)
             {
-              stress_tensor(i,j) +=
-                elasticity_tensor(young_modulus,poisson_ratio,i,j,k,l) *
-                strain_tensor(k,l);
+              Ke_var[var_i][var_j]->reposition (var_i*n_var_dofs, var_j*n_var_dofs, n_var_dofs, n_var_dofs);
             }
 
-      DenseVector<Number> f_vec(3);
-      f_vec(0) = 0.;
-      f_vec(1) = 0.;
-      f_vec(2) = -forcing_magnitude;
-
-      for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-        for (unsigned int dof_j=0; dof_j<n_var_dofs; dof_j++)
-        {
-          for(unsigned int i=0; i<3; i++)
-            for(unsigned int j=0; j<3; j++)
-              for(unsigned int m=0; m<3; m++)
+        for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+          {
+            DenseVector<Number> u_vec(3);
+            DenseMatrix<Number> grad_u(3,3);
+            for(unsigned int var_i=0; var_i<3; var_i++)
               {
-                (*Ke_var[i][i])(dof_i,dof_j) += JxW[qp] *
-                  ( -dphi[dof_j][qp](m) * stress_tensor(m,j) * dphi[dof_i][qp](j) );
+                for (unsigned int j=0; j<n_var_dofs; j++)
+                  {
+                    u_vec(var_i) += phi[j][qp]*soln(dof_indices_var[var_i][j]);
+                  }
+
+                for(unsigned int var_j=0; var_j<3; var_j++)
+                  {
+                    for (unsigned int j=0; j<n_var_dofs; j++)
+                      {
+                        // Row is variable u1, u2, or u3, column is x, y, or z
+                        grad_u(var_i,var_j) += dphi[j][qp](var_j)*soln(dof_indices_var[var_i][j]);
+                      }
+                  }
               }
 
-          for(unsigned int i=0; i<3; i++)
-            for(unsigned int j=0; j<3; j++)
-              for(unsigned int k=0; k<3; k++)
-                for(unsigned int l=0; l<3; l++)
+            DenseMatrix<Real> strain_tensor(3,3);
+            for(unsigned int i=0; i<3; i++)
+              for(unsigned int j=0; j<3; j++)
                 {
-                  Real FxC_ijkl = 0.;
-                  for(unsigned int m=0; m<3; m++)
-                  {
-                    FxC_ijkl += 
-                      F(i,m) * 
-                      elasticity_tensor(young_modulus,poisson_ratio,m,j,k,l);
-                  }
+                  strain_tensor(i,j) += 0.5 * ( grad_u(i,j) + grad_u(j,i) );
 
-                  (*Ke_var[i][k])(dof_i,dof_j) += JxW[qp] *
-                    ( -0.5 * FxC_ijkl *
-                      dphi[dof_j][qp](l) *
-                      dphi[dof_i][qp](j)
-                    );
-
-                  (*Ke_var[i][l])(dof_i,dof_j) += JxW[qp] *
-                    ( -0.5 * FxC_ijkl *
-                      dphi[dof_j][qp](k) *
-                      dphi[dof_i][qp](j)
-                    );
-
-                  for(unsigned int n=0; n<3; n++)
-                  {
-                    (*Ke_var[i][n])(dof_i,dof_j) += JxW[qp] *
-                      ( -0.5 * FxC_ijkl *
-                        ( dphi[dof_j][qp](k) * grad_u(n,l) +
-                          dphi[dof_j][qp](l) * grad_u(n,k) ) *
-                        dphi[dof_i][qp](j)
-                      );
-                  }
-
+                  for(unsigned int k=0; k<3; k++)
+                    {
+                      strain_tensor(i,j) += 0.5 * grad_u(k,i)*grad_u(k,j);
+                    }
                 }
-        }
 
-    }
+            // Define the deformation gradient
+            DenseMatrix<Number> F(3,3);
+            F = grad_u;
+            for(unsigned int var=0; var<3; var++)
+              {
+                F(var,var) += 1.;
+              }
 
-    dof_map.constrain_element_matrix (Ke, dof_indices);
-    jacobian.add_matrix (Ke, dof_indices);
-  }
+            DenseMatrix<Number> stress_tensor(3,3);
 
-  for(unsigned int var_i=0; var_i<3; var_i++)
-  {
-    for(unsigned int var_j=0; var_j<3; var_j++)
-    {
-      delete Ke_var[var_i][var_j];
-      Ke_var[var_i][var_j] = NULL;
-    }
-  }
-  Ke_var.clear();
-}
+            for(unsigned int i=0; i<3; i++)
+              for(unsigned int j=0; j<3; j++)
+                for(unsigned int k=0; k<3; k++)
+                  for(unsigned int l=0; l<3; l++)
+                    {
+                      stress_tensor(i,j) +=
+                        elasticity_tensor(young_modulus,poisson_ratio,i,j,k,l) *
+                        strain_tensor(k,l);
+                    }
 
-/**
- * Evaluate the residual of the nonlinear system.
- */
-void compute_residual (const NumericVector<Number>& soln,
-                       NumericVector<Number>& residual,
-                       NonlinearImplicitSystem& /*sys*/)
-{
-  EquationSystems &es = *_equation_system;
+            DenseVector<Number> f_vec(3);
+            f_vec(0) = 0.;
+            f_vec(1) = 0.;
+            f_vec(2) = -forcing_magnitude;
 
-  const Real young_modulus = es.parameters.get<Real>("young_modulus");
-  const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
-  const Real forcing_magnitude = es.parameters.get<Real>("forcing_magnitude");
+            for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
+              for (unsigned int dof_j=0; dof_j<n_var_dofs; dof_j++)
+                {
+                  for(unsigned int i=0; i<3; i++)
+                    for(unsigned int j=0; j<3; j++)
+                      for(unsigned int m=0; m<3; m++)
+                        {
+                          (*Ke_var[i][i])(dof_i,dof_j) += JxW[qp] *
+                            ( -dphi[dof_j][qp](m) * stress_tensor(m,j) * dphi[dof_i][qp](j) );
+                        }
 
-  const MeshBase& mesh = es.get_mesh();
-  const unsigned int dim = mesh.mesh_dimension();
+                  for(unsigned int i=0; i<3; i++)
+                    for(unsigned int j=0; j<3; j++)
+                      for(unsigned int k=0; k<3; k++)
+                        for(unsigned int l=0; l<3; l++)
+                          {
+                            Real FxC_ijkl = 0.;
+                            for(unsigned int m=0; m<3; m++)
+                              {
+                                FxC_ijkl +=
+                                  F(i,m) *
+                                  elasticity_tensor(young_modulus,poisson_ratio,m,j,k,l);
+                              }
 
-  NonlinearImplicitSystem& system =
-    es.get_system<NonlinearImplicitSystem>("NonlinearElasticity");
+                            (*Ke_var[i][k])(dof_i,dof_j) += JxW[qp] *
+                              ( -0.5 * FxC_ijkl *
+                                dphi[dof_j][qp](l) *
+                                dphi[dof_i][qp](j)
+                                );
 
-  const unsigned int u_var = system.variable_number ("u");
-  const unsigned int v_var = system.variable_number ("v");
-  const unsigned int w_var = system.variable_number ("w");
+                            (*Ke_var[i][l])(dof_i,dof_j) += JxW[qp] *
+                              ( -0.5 * FxC_ijkl *
+                                dphi[dof_j][qp](k) *
+                                dphi[dof_i][qp](j)
+                                );
 
-  const DofMap& dof_map = system.get_dof_map();
+                            for(unsigned int n=0; n<3; n++)
+                              {
+                                (*Ke_var[i][n])(dof_i,dof_j) += JxW[qp] *
+                                  ( -0.5 * FxC_ijkl *
+                                    ( dphi[dof_j][qp](k) * grad_u(n,l) +
+                                      dphi[dof_j][qp](l) * grad_u(n,k) ) *
+                                    dphi[dof_i][qp](j)
+                                    );
+                              }
 
-  FEType fe_type = dof_map.variable_type(u_var);
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  QGauss qrule (dim, FIFTH);
-  fe->attach_quadrature_rule (&qrule);
+                          }
+                }
 
-  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-  QGauss qface(dim-1, FIFTH);
-  fe_face->attach_quadrature_rule (&qface);
+          }
 
-  const std::vector<Real>& JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+        dof_map.constrain_element_matrix (Ke, dof_indices);
+        jacobian.add_matrix (Ke, dof_indices);
+      }
 
-  DenseVector<Number> Re;
-  std::vector< DenseSubVector<Number>* > Re_var(3);
-  for(unsigned int var=0; var<3; var++)
-  {
-    Re_var[var] = new DenseSubVector<Number>(Re);
-  }
-
-  std::vector<unsigned int> dof_indices;
-  std::vector< std::vector<unsigned int> > dof_indices_var(3);
-
-  residual.zero();
-
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-    dof_map.dof_indices (elem, dof_indices);
-    for(unsigned int var=0; var<3; var++)
-    {
-      dof_map.dof_indices (elem, dof_indices_var[var], var);
-    }
-
-    const unsigned int n_dofs = dof_indices.size(); 
-    const unsigned int n_var_dofs = dof_indices_var[0].size();
-
-    fe->reinit (elem);
-
-    Re.resize (n_dofs);
-    for(unsigned int var=0; var<3; var++)
-    {
-      Re_var[var]->reposition (var*n_var_dofs, n_var_dofs);
-    }
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-    {
-      DenseVector<Number> u_vec(3);
-      DenseMatrix<Number> grad_u(3,3);
-      for(unsigned int var_i=0; var_i<3; var_i++)
+    for(unsigned int var_i=0; var_i<3; var_i++)
       {
-        for (unsigned int j=0; j<n_var_dofs; j++)
-        {
-          u_vec(var_i) += phi[j][qp]*soln(dof_indices_var[var_i][j]);
-        }
-
         for(unsigned int var_j=0; var_j<3; var_j++)
-        {
-          for (unsigned int j=0; j<n_var_dofs; j++)
           {
-            // Row is variable u, v, or w column is x, y, or z
-            grad_u(var_i,var_j) += dphi[j][qp](var_j)*soln(dof_indices_var[var_i][j]);
+            delete Ke_var[var_i][var_j];
+            Ke_var[var_i][var_j] = NULL;
           }
-        }
       }
-
-      DenseMatrix<Real> strain_tensor(3,3);
-      for(unsigned int i=0; i<3; i++)
-        for(unsigned int j=0; j<3; j++)
-        {
-          strain_tensor(i,j) += 0.5 * ( grad_u(i,j) + grad_u(j,i) );
-
-          for(unsigned int k=0; k<3; k++)
-          {
-            strain_tensor(i,j) += 0.5 * grad_u(k,i)*grad_u(k,j);
-          }
-        }
-
-      // Define the deformation gradient
-      DenseMatrix<Number> F(3,3);
-      F = grad_u;
-      for(unsigned int var=0; var<3; var++)
-      {
-        F(var,var) += 1.;
-      }
-
-      DenseMatrix<Number> stress_tensor(3,3);
-
-      for(unsigned int i=0; i<3; i++)
-        for(unsigned int j=0; j<3; j++)
-          for(unsigned int k=0; k<3; k++)
-            for(unsigned int l=0; l<3; l++)
-            {
-              stress_tensor(i,j) +=
-                elasticity_tensor(young_modulus,poisson_ratio,i,j,k,l) *
-                strain_tensor(k,l);
-            }
-
-      DenseVector<Number> f_vec(3);
-      f_vec(0) = 0.;
-      f_vec(1) = 0.;
-      f_vec(2) = -forcing_magnitude;
-
-      for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
-      {
-        for(unsigned int i=0; i<3; i++)
-        {
-          for(unsigned int j=0; j<3; j++)
-          {
-            Real FxStress_ij = 0.;
-            for(unsigned int m=0; m<3; m++)
-            {
-              FxStress_ij += F(i,m) * stress_tensor(m,j);
-            }
-
-            (*Re_var[i])(dof_i) += JxW[qp] *
-              ( -FxStress_ij * dphi[dof_i][qp](j) );
-          }
-          (*Re_var[i])(dof_i) += JxW[qp] *
-            ( f_vec(i) * phi[dof_i][qp] );
-        }
-      }
-
-    }
-
-    dof_map.constrain_element_vector (Re, dof_indices);
-    residual.add_vector (Re, dof_indices);
+    Ke_var.clear();
   }
 
-  for(unsigned int var=0; var<3; var++)
+  /**
+   * Evaluate the residual of the nonlinear system.
+   */
+  virtual void residual (const NumericVector<Number>& soln,
+                         NumericVector<Number>& residual,
+                         NonlinearImplicitSystem& /*sys*/)
   {
-    delete Re_var[var];
-    Re_var[var] = NULL;
-  }
-  Re_var.clear();
+    const Real young_modulus = es.parameters.get<Real>("young_modulus");
+    const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
+    const Real forcing_magnitude = es.parameters.get<Real>("forcing_magnitude");
 
-}
+    const MeshBase& mesh = es.get_mesh();
+    const unsigned int dim = mesh.mesh_dimension();
+
+    NonlinearImplicitSystem& system =
+      es.get_system<NonlinearImplicitSystem>("NonlinearElasticity");
+
+    const unsigned int u_var = system.variable_number ("u");
+    const unsigned int v_var = system.variable_number ("v");
+    const unsigned int w_var = system.variable_number ("w");
+
+    const DofMap& dof_map = system.get_dof_map();
+
+    FEType fe_type = dof_map.variable_type(u_var);
+    AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+    QGauss qrule (dim, FIFTH);
+    fe->attach_quadrature_rule (&qrule);
+
+    AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+    QGauss qface(dim-1, FIFTH);
+    fe_face->attach_quadrature_rule (&qface);
+
+    const std::vector<Real>& JxW = fe->get_JxW();
+    const std::vector<std::vector<Real> >& phi = fe->get_phi();
+    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+    DenseVector<Number> Re;
+    std::vector< DenseSubVector<Number>* > Re_var(3);
+    for(unsigned int var=0; var<3; var++)
+      {
+        Re_var[var] = new DenseSubVector<Number>(Re);
+      }
+
+    std::vector<unsigned int> dof_indices;
+    std::vector< std::vector<unsigned int> > dof_indices_var(3);
+
+    residual.zero();
+
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+    for ( ; el != end_el; ++el)
+      {
+        const Elem* elem = *el;
+        dof_map.dof_indices (elem, dof_indices);
+        for(unsigned int var=0; var<3; var++)
+          {
+            dof_map.dof_indices (elem, dof_indices_var[var], var);
+          }
+
+        const unsigned int n_dofs = dof_indices.size();
+        const unsigned int n_var_dofs = dof_indices_var[0].size();
+
+        fe->reinit (elem);
+
+        Re.resize (n_dofs);
+        for(unsigned int var=0; var<3; var++)
+          {
+            Re_var[var]->reposition (var*n_var_dofs, n_var_dofs);
+          }
+
+        for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+          {
+            DenseVector<Number> u_vec(3);
+            DenseMatrix<Number> grad_u(3,3);
+            for(unsigned int var_i=0; var_i<3; var_i++)
+              {
+                for (unsigned int j=0; j<n_var_dofs; j++)
+                  {
+                    u_vec(var_i) += phi[j][qp]*soln(dof_indices_var[var_i][j]);
+                  }
+
+                for(unsigned int var_j=0; var_j<3; var_j++)
+                  {
+                    for (unsigned int j=0; j<n_var_dofs; j++)
+                      {
+                        // Row is variable u, v, or w column is x, y, or z
+                        grad_u(var_i,var_j) += dphi[j][qp](var_j)*soln(dof_indices_var[var_i][j]);
+                      }
+                  }
+              }
+
+            DenseMatrix<Real> strain_tensor(3,3);
+            for(unsigned int i=0; i<3; i++)
+              for(unsigned int j=0; j<3; j++)
+                {
+                  strain_tensor(i,j) += 0.5 * ( grad_u(i,j) + grad_u(j,i) );
+
+                  for(unsigned int k=0; k<3; k++)
+                    {
+                      strain_tensor(i,j) += 0.5 * grad_u(k,i)*grad_u(k,j);
+                    }
+                }
+
+            // Define the deformation gradient
+            DenseMatrix<Number> F(3,3);
+            F = grad_u;
+            for(unsigned int var=0; var<3; var++)
+            {
+              F(var,var) += 1.;
+            }
+
+            DenseMatrix<Number> stress_tensor(3,3);
+
+            for(unsigned int i=0; i<3; i++)
+              for(unsigned int j=0; j<3; j++)
+                for(unsigned int k=0; k<3; k++)
+                  for(unsigned int l=0; l<3; l++)
+                    {
+                      stress_tensor(i,j) +=
+                        elasticity_tensor(young_modulus,poisson_ratio,i,j,k,l) *
+                        strain_tensor(k,l);
+                    }
+
+            DenseVector<Number> f_vec(3);
+            f_vec(0) = 0.;
+            f_vec(1) = 0.;
+            f_vec(2) = -forcing_magnitude;
+
+            for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
+              {
+                for(unsigned int i=0; i<3; i++)
+                  {
+                    for(unsigned int j=0; j<3; j++)
+                      {
+                        Real FxStress_ij = 0.;
+                        for(unsigned int m=0; m<3; m++)
+                          {
+                            FxStress_ij += F(i,m) * stress_tensor(m,j);
+                          }
+
+                        (*Re_var[i])(dof_i) += JxW[qp] *
+                          ( -FxStress_ij * dphi[dof_i][qp](j) );
+                      }
+                    (*Re_var[i])(dof_i) += JxW[qp] *
+                      ( f_vec(i) * phi[dof_i][qp] );
+                  }
+              }
+
+          }
+
+        dof_map.constrain_element_vector (Re, dof_indices);
+        residual.add_vector (Re, dof_indices);
+      }
+
+    for(unsigned int var=0; var<3; var++)
+      {
+        delete Re_var[var];
+        Re_var[var] = NULL;
+      }
+    Re_var.clear();
+
+  }
+
+};
+
 
 
 
@@ -519,7 +526,7 @@ int main (int argc, char** argv)
   mesh.print_info();
 
   EquationSystems equation_systems (mesh);
-  _equation_system = &equation_systems;
+  LargeDeformationElasticity lde(equation_systems);
 
   NonlinearImplicitSystem& system =
     equation_systems.add_system<NonlinearImplicitSystem> ("NonlinearElasticity");
@@ -538,8 +545,8 @@ int main (int argc, char** argv)
                       Utility::string_to_enum<Order>   (approx_order),
                       Utility::string_to_enum<FEFamily>(fe_family));
 
-  system.nonlinear_solver->residual = compute_residual;
-  system.nonlinear_solver->jacobian = compute_jacobian;
+  system.nonlinear_solver->residual_object = &lde;
+  system.nonlinear_solver->jacobian_object = &lde;
 
   equation_systems.parameters.set<Real>("young_modulus") = young_modulus;
   equation_systems.parameters.set<Real>("poisson_ratio") = poisson_ratio;
