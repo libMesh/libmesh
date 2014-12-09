@@ -34,9 +34,7 @@
 //  * Sigma is the second Piola-Kirchoff stress. We consider St. Venant Kirchoff material here
 //    so that Sigma_ij = C_ijkl E_kl (as in systems_of_equations_ex6 except now E_kl contains
 //    a nonlinear term).
-//  * E_kl is the strain, E_ij = 0.5 * ( u_i,j + u_j,i + u_k,i u_k,j )
-//  * f = \det(F) f^(deformed).
-//  * g = det(F) | F^{-T} n| g^(deformed).
+//  * E_kl is the strain, E_ij = 0.5 * ( u_i,j + u_j,i + u_k,i u_k,j ).
 //
 // In this example we only consider a body load (e.g. gravity), hence we set g = 0.
 
@@ -80,29 +78,6 @@ using namespace libMesh;
 
 // TODO: Global variables are ugly... let's fix this up later (once the code is working well)
 EquationSystems *_equation_system = NULL;
-
-/**
- * Invert a 3x3 matrix. This is needed to evaluate the jacobian below.
- */
-DenseMatrix<Real> invert_3by3_matrix(const DenseMatrix<Real>& original)
-{
-  libmesh_assert(original.m() == 3 && original.n() == 3);
-  
-  DenseMatrix<Real> inv(3,3);
-  
-  Real a11 = original(0,0), a12 = original(0,1), a13 = original(0,2);
-  Real a21 = original(1,0), a22 = original(1,1), a23 = original(1,2);
-  Real a31 = original(2,0), a32 = original(2,1), a33 = original(2,2);
-  Real DET = a11*(a33*a22-a32*a23)-a21*(a33*a12-a32*a13)+a31*(a23*a12-a22*a13);
-  
-  inv(0,0) =   a33*a22-a32*a23;  inv(0,1) = -(a33*a12-a32*a13); inv(0,2) =   a23*a12-a22*a13;
-  inv(1,0) = -(a33*a21-a31*a23); inv(1,1) =   a33*a11-a31*a13;  inv(1,2) = -(a23*a11-a21*a13);
-  inv(2,0) =   a32*a21-a31*a22;  inv(2,1) = -(a32*a11-a31*a12); inv(2,2) =   a22*a11-a21*a12;
-  
-  inv.scale(1./DET);
-  
-  return inv;
-}
 
 /**
  * Kronecker delta function.
@@ -317,26 +292,6 @@ void compute_jacobian (const NumericVector<Number>& soln,
                   }
 
                 }
-
-          // Jacobian terms due to \int_\Omega f_i det(F) v_i dx
-          // Use the formula for differentiating a determinant:
-          //  d det(F) / dF_ij = det(F) * (inv(F))_ji.
-          //
-          // We want d det(F) / du_i, which, via the chain rule, is:
-          //  d det(F) / du_i = d det(F) / dF_kj * dF_kj / du_i.
-          // But since F_kj = \delta_kj + u_k,j, we obtain:
-          //  d det(F) / du_i = d det(F) / dF_ij * dF_ij / du_i
-          //                  = det(F) * (inv(F))_ji * dF_ij / du_i
-          // Hence the overall term is:
-          //  f_vec(i) * det(F) * (inv(F))_kj * dF_jk / du_j v_i
-          for(unsigned int i=0; i<3; i++)
-            for(unsigned int j=0; j<3; j++)
-              for(unsigned int k=0; k<3; k++)
-              {
-                (*Ke_var[i][j])(dof_i,dof_j) += JxW[qp] *
-                  ( F.det() * invert_3by3_matrix(F)(j,k) * dphi[dof_j][qp](k) *
-                    f_vec(i) * phi[dof_i][qp] );
-              }
         }
 
     }
@@ -503,7 +458,7 @@ void compute_residual (const NumericVector<Number>& soln,
               ( -FxStress_ij * dphi[dof_i][qp](j) );
           }
           (*Re_var[i])(dof_i) += JxW[qp] *
-            ( f_vec(i) * F.det() * phi[dof_i][qp] );
+            ( f_vec(i) * phi[dof_i][qp] );
         }
       }
 
