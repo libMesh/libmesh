@@ -118,8 +118,9 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
-	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C utils/vectormap_test.C
+	numerics/type_vector_test.h numerics/type_tensor_test.C \
+	parallel/parallel_test.C quadrature/quadrature_test.C \
+	utils/vectormap_test.C
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = unit_tests_dbg-driver.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
@@ -128,6 +129,7 @@ am__objects_1 = unit_tests_dbg-driver.$(OBJEXT) \
 	numerics/unit_tests_dbg-laspack_vector_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-trilinos_epetra_vector_test.$(OBJEXT) \
+	numerics/unit_tests_dbg-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_test.$(OBJEXT) \
 	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT) \
 	utils/unit_tests_dbg-vectormap_test.$(OBJEXT)
@@ -148,8 +150,9 @@ am__unit_tests_devel_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
-	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C utils/vectormap_test.C
+	numerics/type_vector_test.h numerics/type_tensor_test.C \
+	parallel/parallel_test.C quadrature/quadrature_test.C \
+	utils/vectormap_test.C
 am__objects_2 = unit_tests_devel-driver.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
@@ -157,6 +160,7 @@ am__objects_2 = unit_tests_devel-driver.$(OBJEXT) \
 	numerics/unit_tests_devel-laspack_vector_test.$(OBJEXT) \
 	numerics/unit_tests_devel-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_devel-trilinos_epetra_vector_test.$(OBJEXT) \
+	numerics/unit_tests_devel-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_test.$(OBJEXT) \
 	quadrature/unit_tests_devel-quadrature_test.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT)
@@ -175,8 +179,9 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
-	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C utils/vectormap_test.C
+	numerics/type_vector_test.h numerics/type_tensor_test.C \
+	parallel/parallel_test.C quadrature/quadrature_test.C \
+	utils/vectormap_test.C
 am__objects_3 = unit_tests_oprof-driver.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
@@ -184,6 +189,7 @@ am__objects_3 = unit_tests_oprof-driver.$(OBJEXT) \
 	numerics/unit_tests_oprof-laspack_vector_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT) \
+	numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_test.$(OBJEXT) \
 	quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT)
@@ -202,8 +208,9 @@ am__unit_tests_opt_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
-	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C utils/vectormap_test.C
+	numerics/type_vector_test.h numerics/type_tensor_test.C \
+	parallel/parallel_test.C quadrature/quadrature_test.C \
+	utils/vectormap_test.C
 am__objects_4 = unit_tests_opt-driver.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
@@ -211,6 +218,7 @@ am__objects_4 = unit_tests_opt-driver.$(OBJEXT) \
 	numerics/unit_tests_opt-laspack_vector_test.$(OBJEXT) \
 	numerics/unit_tests_opt-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_opt-trilinos_epetra_vector_test.$(OBJEXT) \
+	numerics/unit_tests_opt-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_test.$(OBJEXT) \
 	quadrature/unit_tests_opt-quadrature_test.$(OBJEXT) \
 	utils/unit_tests_opt-vectormap_test.$(OBJEXT)
@@ -228,8 +236,9 @@ am__unit_tests_prof_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
-	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C utils/vectormap_test.C
+	numerics/type_vector_test.h numerics/type_tensor_test.C \
+	parallel/parallel_test.C quadrature/quadrature_test.C \
+	utils/vectormap_test.C
 am__objects_5 = unit_tests_prof-driver.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
@@ -237,6 +246,7 @@ am__objects_5 = unit_tests_prof-driver.$(OBJEXT) \
 	numerics/unit_tests_prof-laspack_vector_test.$(OBJEXT) \
 	numerics/unit_tests_prof-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT) \
+	numerics/unit_tests_prof-type_tensor_test.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_test.$(OBJEXT) \
 	quadrature/unit_tests_prof-quadrature_test.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT)
@@ -647,6 +657,7 @@ unit_tests_sources = \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h \
+	numerics/type_tensor_test.C \
 	parallel/parallel_test.C \
 	quadrature/quadrature_test.C \
 	utils/vectormap_test.C
@@ -744,6 +755,8 @@ numerics/unit_tests_dbg-petsc_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_dbg-trilinos_epetra_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_dbg-type_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/$(am__dirstamp):
 	@$(MKDIR_P) parallel
 	@: > parallel/$(am__dirstamp)
@@ -784,6 +797,8 @@ numerics/unit_tests_devel-petsc_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-trilinos_epetra_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_devel-type_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_devel-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_devel-quadrature_test.$(OBJEXT):  \
@@ -805,6 +820,8 @@ numerics/unit_tests_oprof-laspack_vector_test.$(OBJEXT):  \
 numerics/unit_tests_oprof-petsc_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_oprof-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
@@ -828,6 +845,8 @@ numerics/unit_tests_opt-petsc_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-trilinos_epetra_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_opt-type_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_opt-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/unit_tests_opt-quadrature_test.$(OBJEXT):  \
@@ -849,6 +868,8 @@ numerics/unit_tests_prof-laspack_vector_test.$(OBJEXT):  \
 numerics/unit_tests_prof-petsc_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_prof-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/unit_tests_prof-parallel_test.$(OBJEXT):  \
 	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
@@ -891,22 +912,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-laspack_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-petsc_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Po@am__quote@
@@ -1044,6 +1070,20 @@ numerics/unit_tests_dbg-trilinos_epetra_vector_test.obj: numerics/trilinos_epetr
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_dbg-trilinos_epetra_vector_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_dbg-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+
+numerics/unit_tests_dbg-type_tensor_test.o: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_dbg-type_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Tpo -c -o numerics/unit_tests_dbg-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_dbg-type_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_dbg-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+
+numerics/unit_tests_dbg-type_tensor_test.obj: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_dbg-type_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Tpo -c -o numerics/unit_tests_dbg-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_dbg-type_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_dbg-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
 
 parallel/unit_tests_dbg-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_dbg-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_dbg-parallel_test.Tpo -c -o parallel/unit_tests_dbg-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
@@ -1185,6 +1225,20 @@ numerics/unit_tests_devel-trilinos_epetra_vector_test.obj: numerics/trilinos_epe
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
 
+numerics/unit_tests_devel-type_tensor_test.o: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-type_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Tpo -c -o numerics/unit_tests_devel-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_devel-type_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+
+numerics/unit_tests_devel-type_tensor_test.obj: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-type_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Tpo -c -o numerics/unit_tests_devel-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_devel-type_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+
 parallel/unit_tests_devel-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo -c -o parallel/unit_tests_devel-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po
@@ -1324,6 +1378,20 @@ numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj: numerics/trilinos_epe
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+
+numerics/unit_tests_oprof-type_tensor_test.o: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-type_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Tpo -c -o numerics/unit_tests_oprof-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_oprof-type_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+
+numerics/unit_tests_oprof-type_tensor_test.obj: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-type_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Tpo -c -o numerics/unit_tests_oprof-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_oprof-type_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
 
 parallel/unit_tests_oprof-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Tpo -c -o parallel/unit_tests_oprof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
@@ -1465,6 +1533,20 @@ numerics/unit_tests_opt-trilinos_epetra_vector_test.obj: numerics/trilinos_epetr
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
 
+numerics/unit_tests_opt-type_tensor_test.o: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-type_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Tpo -c -o numerics/unit_tests_opt-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_opt-type_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+
+numerics/unit_tests_opt-type_tensor_test.obj: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-type_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Tpo -c -o numerics/unit_tests_opt-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_opt-type_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+
 parallel/unit_tests_opt-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo -c -o parallel/unit_tests_opt-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Po
@@ -1604,6 +1686,20 @@ numerics/unit_tests_prof-trilinos_epetra_vector_test.obj: numerics/trilinos_epet
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_prof-trilinos_epetra_vector_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+
+numerics/unit_tests_prof-type_tensor_test.o: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-type_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Tpo -c -o numerics/unit_tests_prof-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_prof-type_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-type_tensor_test.o `test -f 'numerics/type_tensor_test.C' || echo '$(srcdir)/'`numerics/type_tensor_test.C
+
+numerics/unit_tests_prof-type_tensor_test.obj: numerics/type_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-type_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Tpo -c -o numerics/unit_tests_prof-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_prof-type_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
 
 parallel/unit_tests_prof-parallel_test.o: parallel/parallel_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Tpo -c -o parallel/unit_tests_prof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
