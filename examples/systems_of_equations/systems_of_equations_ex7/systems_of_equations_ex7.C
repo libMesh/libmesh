@@ -19,7 +19,7 @@
 // <h1> Systems Example 7 - Large deformation elasticity (St. Venant-Kirchoff material) </h1>
 //
 // In this example, we consider an elastic cantilever beam modeled as a St. Venant-Kirchoff
-// material (which is an an extension of the linear elastic material model to the nonlinear
+// material (which is an extension of the linear elastic material model to the nonlinear
 // regime). The implementation presented here uses NonlinearImplicitSystem.
 //
 // We formulate the PDE on the reference geometry (\Omega) as opposed to the deformed
@@ -33,7 +33,7 @@
 //  * Sigma is the second Piola-Kirchoff stress, which for the St. Venant Kirchoff model is
 //    given by Sigma_ij = C_ijkl E_kl, where E_kl is the strain,
 //    E_kl = 0.5 * ( u_k,l + u_l,k + u_m,k u_m,l ).
-//  * f is a body load
+//  * f is a body load.
 //  * g is a surface traction on the surface \Gamma.
 //
 // In this example we only consider a body load (e.g. gravity), hence we set g = 0.
