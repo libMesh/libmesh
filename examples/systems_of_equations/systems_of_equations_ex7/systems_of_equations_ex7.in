@@ -1,0 +1,20 @@
+x_length = 1
+y_length = 0.1
+z_length = 0.1
+n_elem_x = 10
+n_elem_y = 2
+n_elem_z = 2
+
+approx_order = FIRST
+fe_family = LAGRANGE
+
+young_modulus = 1.
+poisson_ratio = 0.3
+forcing_magnitude = 0.001
+
+nonlinear_abs_tol = 1.e-12
+nonlinear_rel_tol = 1.e-6
+nonlinear_max_its = 50
+
+n_solves = 1
+force_scaling = 1.0
