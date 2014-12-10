@@ -478,12 +478,139 @@ public:
         Re_var[var] = NULL;
       }
     Re_var.clear();
+  }
 
+  void compute_stresses()
+  {
+    const Real young_modulus = es.parameters.get<Real>("young_modulus");
+    const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
+
+    const MeshBase& mesh = es.get_mesh();
+    const unsigned int dim = mesh.mesh_dimension();
+
+    NonlinearImplicitSystem& system =
+      es.get_system<NonlinearImplicitSystem>("NonlinearElasticity");
+
+    unsigned int displacement_vars[3];
+    displacement_vars[0] = system.variable_number ("u");
+    displacement_vars[1] = system.variable_number ("v");
+    displacement_vars[2] = system.variable_number ("w");
+    const unsigned int u_var = system.variable_number ("u");
+
+    const DofMap& dof_map = system.get_dof_map();
+    FEType fe_type = dof_map.variable_type(u_var);
+    AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+    QGauss qrule (dim, fe_type.default_quadrature_order());
+    fe->attach_quadrature_rule (&qrule);
+
+    const std::vector<Real>& JxW = fe->get_JxW();
+    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+
+    // Also, get a reference to the ExplicitSystem
+    ExplicitSystem& stress_system = es.get_system<ExplicitSystem>("StressSystem");
+    const DofMap& stress_dof_map = stress_system.get_dof_map();
+    unsigned int sigma_vars[6];
+    sigma_vars[0] = stress_system.variable_number ("sigma_00");
+    sigma_vars[1] = stress_system.variable_number ("sigma_01");
+    sigma_vars[2] = stress_system.variable_number ("sigma_02");
+    sigma_vars[3] = stress_system.variable_number ("sigma_11");
+    sigma_vars[4] = stress_system.variable_number ("sigma_12");
+    sigma_vars[5] = stress_system.variable_number ("sigma_22");
+
+    // Storage for the stress dof indices on each element
+    std::vector< std::vector<dof_id_type> > dof_indices_var(system.n_vars());
+    std::vector<dof_id_type> stress_dof_indices_var;
+
+    // To store the stress tensor on each element
+    DenseMatrix<Number> stress_tensor(3,3);
+
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+    for ( ; el != end_el; ++el)
+      {
+        const Elem* elem = *el;
+
+        for(unsigned int var=0; var<3; var++)
+          {
+            dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
+          }
+
+        const unsigned int n_var_dofs = dof_indices_var[0].size();
+
+        fe->reinit (elem);
+
+        // clear the stress tensor
+        stress_tensor.resize(3,3);
+
+        for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+          {
+            DenseMatrix<Number> grad_u(3,3);
+            for(unsigned int var_i=0; var_i<3; var_i++)
+              for(unsigned int var_j=0; var_j<3; var_j++)
+                {
+                  for (unsigned int j=0; j<n_var_dofs; j++)
+                    {
+                      // Row is variable u1, u2, or u3, column is x, y, or z
+                      grad_u(var_i,var_j) += dphi[j][qp](var_j)*
+                        system.current_solution(dof_indices_var[var_i][j]);
+                    }
+                }
+
+            DenseMatrix<Real> strain_tensor(3,3);
+            for(unsigned int i=0; i<3; i++)
+              for(unsigned int j=0; j<3; j++)
+                {
+                  strain_tensor(i,j) += 0.5 * ( grad_u(i,j) + grad_u(j,i) );
+
+                  for(unsigned int k=0; k<3; k++)
+                    {
+                      strain_tensor(i,j) += 0.5 * grad_u(k,i)*grad_u(k,j);
+                    }
+                }
+
+            // Integrate the stress on this element
+            for(unsigned int i=0; i<3; i++)
+              for(unsigned int j=0; j<3; j++)
+                for(unsigned int k=0; k<3; k++)
+                  for(unsigned int l=0; l<3; l++)
+                    {
+                      stress_tensor(i,j) += JxW[qp]*
+                        elasticity_tensor(young_modulus,poisson_ratio,i,j,k,l) *
+                        strain_tensor(k,l);
+                    }
+          }
+
+        // Get the average stress per element by dividing by the element volume
+        stress_tensor.scale(1./elem->volume());
+
+        // load elem_sigma data into stress_system
+        unsigned int stress_var_index = 0;
+        for(unsigned int i=0; i<3; i++)
+          for(unsigned int j=i; j<3; j++)
+            {
+              stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[stress_var_index]);
+
+              // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
+              // one dof index per variable
+              dof_id_type dof_index = stress_dof_indices_var[0];
+
+              if( (stress_system.solution->first_local_index() <= dof_index) &&
+                  (dof_index < stress_system.solution->last_local_index()) )
+                {
+                  stress_system.solution->set(dof_index, stress_tensor(i,j));
+                }
+
+              stress_var_index++;
+            }
+      }
+
+    // Should call close and update when we set vector entries directly
+    stress_system.solution->close();
+    stress_system.update();
   }
 
 };
-
-
 
 
 int main (int argc, char** argv)
@@ -531,10 +658,6 @@ int main (int argc, char** argv)
   NonlinearImplicitSystem& system =
     equation_systems.add_system<NonlinearImplicitSystem> ("NonlinearElasticity");
 
-  equation_systems.parameters.set<Real>         ("nonlinear solver absolute residual tolerance") = nonlinear_abs_tol;
-  equation_systems.parameters.set<Real>         ("nonlinear solver relative residual tolerance") = nonlinear_rel_tol;
-  equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations")          = nonlinear_max_its;
-
   unsigned int u_var = system.add_variable("u",
                       Utility::string_to_enum<Order>   (approx_order),
                       Utility::string_to_enum<FEFamily>(fe_family));
@@ -544,6 +667,20 @@ int main (int argc, char** argv)
   unsigned int w_var = system.add_variable("w",
                       Utility::string_to_enum<Order>   (approx_order),
                       Utility::string_to_enum<FEFamily>(fe_family));
+
+  // Also, initialize an ExplicitSystem to store stresses
+  ExplicitSystem& stress_system =
+    equation_systems.add_system<ExplicitSystem> ("StressSystem");
+  stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_11", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_12", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
+
+  equation_systems.parameters.set<Real>         ("nonlinear solver absolute residual tolerance") = nonlinear_abs_tol;
+  equation_systems.parameters.set<Real>         ("nonlinear solver relative residual tolerance") = nonlinear_rel_tol;
+  equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations")          = nonlinear_max_its;
 
   system.nonlinear_solver->residual_object = &lde;
   system.nonlinear_solver->jacobian_object = &lde;
@@ -591,6 +728,10 @@ int main (int argc, char** argv)
       << " , final nonlinear residual norm: "
       << system.final_nonlinear_residual()
       << std::endl << std::endl;
+
+    libMesh::out << "Computing stresses..." << std::endl;
+
+    lde.compute_stresses();
 
     std::stringstream filename;
     filename << "solution_" << count << ".exo";
