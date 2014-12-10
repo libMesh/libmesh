@@ -358,6 +358,7 @@ if (test "x$enableexamples" = "xyes"); then
                 examples/systems_of_equations/systems_of_equations_ex4/Makefile
                 examples/systems_of_equations/systems_of_equations_ex5/Makefile
                 examples/systems_of_equations/systems_of_equations_ex6/Makefile
+                examples/systems_of_equations/systems_of_equations_ex7/Makefile
                 examples/reduced_basis/reduced_basis_ex1/Makefile
                 examples/reduced_basis/reduced_basis_ex2/Makefile
                 examples/reduced_basis/reduced_basis_ex3/Makefile
