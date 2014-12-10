@@ -1,9 +1,9 @@
 x_length = 1
 y_length = 0.1
 z_length = 0.1
-n_elem_x = 20
-n_elem_y = 4
-n_elem_z = 4
+n_elem_x = 10
+n_elem_y = 2
+n_elem_z = 2
 
 approx_order = FIRST
 fe_family = LAGRANGE

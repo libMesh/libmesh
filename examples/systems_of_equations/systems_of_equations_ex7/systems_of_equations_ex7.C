@@ -151,16 +151,12 @@ public:
     const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
     DenseMatrix<Number> Ke;
-
-    std::vector< std::vector< DenseSubMatrix<Number>* > > Ke_var(3);
-    for(unsigned int var_i=0; var_i<3; var_i++)
+    DenseSubMatrix<Number> Ke_var[3][3] =
       {
-        Ke_var[var_i].resize(3);
-        for(unsigned int var_j=0; var_j<3; var_j++)
-          {
-            Ke_var[var_i][var_j] = new DenseSubMatrix<Number>(Ke);
-          }
-      }
+        {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)},
+        {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)},
+        {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)}
+      };
 
     std::vector<unsigned int> dof_indices;
     std::vector< std::vector<unsigned int> > dof_indices_var(3);
@@ -188,7 +184,7 @@ public:
         for(unsigned int var_i=0; var_i<3; var_i++)
           for(unsigned int var_j=0; var_j<3; var_j++)
             {
-              Ke_var[var_i][var_j]->reposition (var_i*n_var_dofs, var_j*n_var_dofs, n_var_dofs, n_var_dofs);
+              Ke_var[var_i][var_j].reposition (var_i*n_var_dofs, var_j*n_var_dofs, n_var_dofs, n_var_dofs);
             }
 
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
@@ -256,7 +252,7 @@ public:
                     for(unsigned int j=0; j<3; j++)
                       for(unsigned int m=0; m<3; m++)
                         {
-                          (*Ke_var[i][i])(dof_i,dof_j) += JxW[qp] *
+                          Ke_var[i][i](dof_i,dof_j) += JxW[qp] *
                             ( -dphi[dof_j][qp](m) * stress_tensor(m,j) * dphi[dof_i][qp](j) );
                         }
 
@@ -273,13 +269,13 @@ public:
                                   elasticity_tensor(young_modulus,poisson_ratio,m,j,k,l);
                               }
 
-                            (*Ke_var[i][k])(dof_i,dof_j) += JxW[qp] *
+                            Ke_var[i][k](dof_i,dof_j) += JxW[qp] *
                               ( -0.5 * FxC_ijkl *
                                 dphi[dof_j][qp](l) *
                                 dphi[dof_i][qp](j)
                                 );
 
-                            (*Ke_var[i][l])(dof_i,dof_j) += JxW[qp] *
+                            Ke_var[i][l](dof_i,dof_j) += JxW[qp] *
                               ( -0.5 * FxC_ijkl *
                                 dphi[dof_j][qp](k) *
                                 dphi[dof_i][qp](j)
@@ -287,7 +283,7 @@ public:
 
                             for(unsigned int n=0; n<3; n++)
                               {
-                                (*Ke_var[i][n])(dof_i,dof_j) += JxW[qp] *
+                                Ke_var[i][n](dof_i,dof_j) += JxW[qp] *
                                   ( -0.5 * FxC_ijkl *
                                     ( dphi[dof_j][qp](k) * grad_u(n,l) +
                                       dphi[dof_j][qp](l) * grad_u(n,k) ) *
@@ -303,16 +299,6 @@ public:
         dof_map.constrain_element_matrix (Ke, dof_indices);
         jacobian.add_matrix (Ke, dof_indices);
       }
-
-    for(unsigned int var_i=0; var_i<3; var_i++)
-      {
-        for(unsigned int var_j=0; var_j<3; var_j++)
-          {
-            delete Ke_var[var_i][var_j];
-            Ke_var[var_i][var_j] = NULL;
-          }
-      }
-    Ke_var.clear();
   }
 
   /**
@@ -350,11 +336,8 @@ public:
     const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
     DenseVector<Number> Re;
-    std::vector< DenseSubVector<Number>* > Re_var(3);
-    for(unsigned int var=0; var<3; var++)
-      {
-        Re_var[var] = new DenseSubVector<Number>(Re);
-      }
+    DenseSubVector<Number> Re_var[3] =
+      {DenseSubVector<Number>(Re), DenseSubVector<Number>(Re), DenseSubVector<Number>(Re)};
 
     std::vector<unsigned int> dof_indices;
     std::vector< std::vector<unsigned int> > dof_indices_var(3);
@@ -381,7 +364,7 @@ public:
         Re.resize (n_dofs);
         for(unsigned int var=0; var<3; var++)
           {
-            Re_var[var]->reposition (var*n_var_dofs, n_var_dofs);
+            Re_var[var].reposition (var*n_var_dofs, n_var_dofs);
           }
 
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
@@ -454,10 +437,10 @@ public:
                             FxStress_ij += F(i,m) * stress_tensor(m,j);
                           }
 
-                        (*Re_var[i])(dof_i) += JxW[qp] *
+                        Re_var[i](dof_i) += JxW[qp] *
                           ( -FxStress_ij * dphi[dof_i][qp](j) );
                       }
-                    (*Re_var[i])(dof_i) += JxW[qp] *
+                    Re_var[i](dof_i) += JxW[qp] *
                       ( f_vec(i) * phi[dof_i][qp] );
                   }
               }
@@ -467,13 +450,6 @@ public:
         dof_map.constrain_element_vector (Re, dof_indices);
         residual.add_vector (Re, dof_indices);
       }
-
-    for(unsigned int var=0; var<3; var++)
-      {
-        delete Re_var[var];
-        Re_var[var] = NULL;
-      }
-    Re_var.clear();
   }
 
   void compute_stresses()
