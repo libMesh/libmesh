@@ -452,6 +452,9 @@ public:
       }
   }
 
+  /**
+   * Compute the Cauchy stress for the current solution.
+   */
   void compute_stresses()
   {
     const Real young_modulus = es.parameters.get<Real>("young_modulus");
@@ -494,7 +497,7 @@ public:
     std::vector<dof_id_type> stress_dof_indices_var;
 
     // To store the stress tensor on each element
-    DenseMatrix<Number> stress_tensor(3,3);
+    DenseMatrix<Number> elem_avg_stress_tensor(3,3);
 
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -513,7 +516,7 @@ public:
         fe->reinit (elem);
 
         // clear the stress tensor
-        stress_tensor.resize(3,3);
+        elem_avg_stress_tensor.resize(3,3);
 
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
           {
@@ -541,20 +544,39 @@ public:
                     }
                 }
 
-            // Integrate the stress on this element
+            // Define the deformation gradient
+            DenseMatrix<Number> F(3,3);
+            F = grad_u;
+            for(unsigned int var=0; var<3; var++)
+            {
+              F(var,var) += 1.;
+            }
+
+            DenseMatrix<Number> stress_tensor(3,3);
             for(unsigned int i=0; i<3; i++)
               for(unsigned int j=0; j<3; j++)
                 for(unsigned int k=0; k<3; k++)
                   for(unsigned int l=0; l<3; l++)
                     {
-                      stress_tensor(i,j) += JxW[qp]*
+                      stress_tensor(i,j) +=
                         elasticity_tensor(young_modulus,poisson_ratio,i,j,k,l) *
                         strain_tensor(k,l);
                     }
+
+            // stress_tensor now holds the average value of the second Piola-Kirchoff stress (PK2)
+            // on each element. However, in this case we want to compute the Cauchy stress
+            // which is given by 1/det(F) * F * PK2 * F^T, hence we now apply this transformation.
+            stress_tensor.scale(1./F.det());
+            stress_tensor.left_multiply(F);
+            stress_tensor.right_multiply_transpose(F);
+
+            // We want to plot the average Cauchy stress on each element, hence
+            // we integrate stress_tensor
+            elem_avg_stress_tensor.add(JxW[qp], stress_tensor);
           }
 
-        // Get the average stress per element by dividing by the element volume
-        stress_tensor.scale(1./elem->volume());
+        // Get the average stress per element by dividing by volume
+        elem_avg_stress_tensor.scale(1./elem->volume());
 
         // load elem_sigma data into stress_system
         unsigned int stress_var_index = 0;
@@ -570,7 +592,7 @@ public:
               if( (stress_system.solution->first_local_index() <= dof_index) &&
                   (dof_index < stress_system.solution->last_local_index()) )
                 {
-                  stress_system.solution->set(dof_index, stress_tensor(i,j));
+                  stress_system.solution->set(dof_index, elem_avg_stress_tensor(i,j));
                 }
 
               stress_var_index++;
