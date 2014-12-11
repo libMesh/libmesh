@@ -563,7 +563,7 @@ public:
                         strain_tensor(k,l);
                     }
 
-            // stress_tensor now holds the the second Piola-Kirchoff stress (PK2) at point qp.
+            // stress_tensor now holds the second Piola-Kirchoff stress (PK2) at point qp.
             // However, in this example we want to compute the Cauchy stress which is given by
             // 1/det(F) * F * PK2 * F^T, hence we now apply this transformation.
             stress_tensor.scale(1./F.det());
