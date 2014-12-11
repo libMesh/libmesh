@@ -19,33 +19,6 @@
 
 #include "nonlinear_neohooke_cc.h"
 
-/**
- * Return the inverse of the given TypeTensor. Algorithm taken from the tensor classes
- * of Ton van den Boogaard (http://tmku209.ctw.utwente.nl/~ton/tensor.html)
- */
-template <typename T> TypeTensor<T> inv(const TypeTensor<T> &A ) {
-  double Sub11, Sub12, Sub13;
-  Sub11 = A._coords[4]*A._coords[8] - A._coords[5]*A._coords[7];
-  Sub12 = A._coords[3]*A._coords[8] - A._coords[6]*A._coords[5];
-  Sub13 = A._coords[3]*A._coords[7] - A._coords[6]*A._coords[4];
-  double detA = A._coords[0]*Sub11 - A._coords[1]*Sub12 + A._coords[2]*Sub13;
-  libmesh_assert( std::fabs(detA)>1.e-15 );
-
-  TypeTensor<T> Ainv(A);
-
-  Ainv._coords[0] =  Sub11/detA;
-  Ainv._coords[1] = (-A._coords[1]*A._coords[8]+A._coords[2]*A._coords[7])/detA;
-  Ainv._coords[2] = ( A._coords[1]*A._coords[5]-A._coords[2]*A._coords[4])/detA;
-  Ainv._coords[3] = -Sub12/detA;
-  Ainv._coords[4] = ( A._coords[0]*A._coords[8]-A._coords[2]*A._coords[6])/detA;
-  Ainv._coords[5] = (-A._coords[0]*A._coords[5]+A._coords[2]*A._coords[3])/detA;
-  Ainv._coords[6] =  Sub13/detA;
-  Ainv._coords[7] = (-A._coords[0]*A._coords[7]+A._coords[1]*A._coords[6])/detA;
-  Ainv._coords[8] = ( A._coords[0]*A._coords[4]-A._coords[1]*A._coords[3])/detA;
-
-  return Ainv;
-}
-
 void NonlinearNeoHookeCurrentConfig::init_for_qp(VectorValue<Gradient> & grad_u, unsigned int qp) {
   this->current_qp = qp;
   F.zero();
@@ -58,7 +31,7 @@ void NonlinearNeoHookeCurrentConfig::init_for_qp(VectorValue<Gradient> & grad_u,
       for (unsigned int j = 0; j < 3; ++j) {
         invF(i, j) += libmesh_real(grad_u(i)(j));
       }
-    F.add(inv(invF));
+    F.add(invF.inverse());
 
     libmesh_assert_greater (F.det(), -TOLERANCE);
   }
@@ -104,7 +77,7 @@ void NonlinearNeoHookeCurrentConfig::calculate_stress() {
   RealTensor b = F * Ft;
   RealTensor identity;
   identity(0, 0) = 1.0; identity(1, 1) = 1.0; identity(2, 2) = 1.0;
-  RealTensor invC = inv(C);
+  RealTensor invC = C.inverse();
 
   S = 0.5 * lambda * (detF * detF - 1) * invC + mu * (identity - invC);
 

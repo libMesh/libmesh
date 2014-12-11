@@ -279,6 +279,11 @@ public:
   TypeTensor<T> transpose() const;
 
   /**
+   * Returns the inverse of the tensor.
+   */
+  TypeTensor<T> inverse() const;
+
+  /**
    * Returns the Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    */
@@ -947,6 +952,50 @@ TypeTensor<T> TypeTensor<T>::transpose() const
                     _coords[2],
                     _coords[5],
                     _coords[8]);
+#endif
+}
+
+
+
+template <typename T>
+inline
+TypeTensor<T> TypeTensor<T>::inverse() const
+{
+#if LIBMESH_DIM == 1
+  libmesh_assert_not_equal_to(_coords[0], static_cast<T>(0.));
+  return TypeTensor(1. / _coords[0]);
+#endif
+
+#if LIBMESH_DIM == 2
+  // Get convenient reference to this.
+  const TypeTensor<T> & A = *this;
+
+  // Use temporary variables, avoid multiple accesses
+  T a = A(0,0), b = A(0,1),
+    c = A(1,0), d = A(1,1);
+
+  // Make sure det = ad - bc is not zero
+  T det = a*d - b*c;
+  libmesh_assert_not_equal_to(det, static_cast<T>(0.));
+
+  return TypeTensor(d/det, -b/det, -c/det, a/det);
+#endif
+
+#if LIBMESH_DIM == 3
+  // Get convenient reference to this.
+  const TypeTensor<T> & A = *this;
+
+  T a11 = A(0,0), a12 = A(0,1), a13 = A(0,2),
+    a21 = A(1,0), a22 = A(1,1), a23 = A(1,2),
+    a31 = A(2,0), a32 = A(2,1), a33 = A(2,2);
+
+  T det = a11*(a33*a22-a32*a23) - a21*(a33*a12-a32*a13) + a31*(a23*a12-a22*a13);
+  libmesh_assert_not_equal_to(det, static_cast<T>(0.));
+
+  // Inline comment characters are for lining up columns.
+  return TypeTensor(/**/  (a33*a22-a32*a23)/det, -(a33*a12-a32*a13)/det,  (a23*a12-a22*a13)/det,
+                    /**/ -(a33*a21-a31*a23)/det,  (a33*a11-a31*a13)/det, -(a23*a11-a21*a13)/det,
+                    /**/  (a32*a21-a31*a22)/det, -(a32*a11-a31*a12)/det,  (a22*a11-a21*a12)/det);
 #endif
 }
 

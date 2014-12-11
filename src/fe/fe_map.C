@@ -1090,44 +1090,9 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
             //  {dp} = [J]^-1 ({X} - {X_n})
             //
             //  which involves the inversion of the 3x3 matrix [J]
-            const Real
-              J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
-              J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
-              J31 = dxi(2), J32 = deta(2), J33 = dzeta(2);
-
-            const Real det = (J11*(J22*J33 - J23*J32) +
-                              J12*(J23*J31 - J21*J33) +
-                              J13*(J21*J32 - J22*J31));
-
-            if (secure)
-              libmesh_assert_not_equal_to (det, 0.);
-
-            const Real inv_det = 1./det;
-
-            const Real
-              Jinv11 =  (J22*J33 - J23*J32)*inv_det,
-              Jinv12 = -(J12*J33 - J13*J32)*inv_det,
-              Jinv13 =  (J12*J23 - J13*J22)*inv_det,
-
-              Jinv21 = -(J21*J33 - J23*J31)*inv_det,
-              Jinv22 =  (J11*J33 - J13*J31)*inv_det,
-              Jinv23 = -(J11*J23 - J13*J21)*inv_det,
-
-              Jinv31 =  (J21*J32 - J22*J31)*inv_det,
-              Jinv32 = -(J11*J32 - J12*J31)*inv_det,
-              Jinv33 =  (J11*J22 - J12*J21)*inv_det;
-
-            dp(0) = (Jinv11*delta(0) +
-                     Jinv12*delta(1) +
-                     Jinv13*delta(2));
-
-            dp(1) = (Jinv21*delta(0) +
-                     Jinv22*delta(1) +
-                     Jinv23*delta(2));
-
-            dp(2) = (Jinv31*delta(0) +
-                     Jinv32*delta(1) +
-                     Jinv33*delta(2));
+            dp = RealTensorValue(dxi(0), deta(0), dzeta(0),
+                                 dxi(1), deta(1), dzeta(1),
+                                 dxi(2), deta(2), dzeta(2)).inverse() * delta;
 
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging

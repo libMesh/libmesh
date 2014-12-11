@@ -20,6 +20,7 @@ unit_tests_sources = \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h \
+	numerics/type_tensor_test.C \
 	parallel/parallel_test.C \
 	quadrature/quadrature_test.C \
 	utils/vectormap_test.C
