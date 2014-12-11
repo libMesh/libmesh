@@ -574,7 +574,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = solution.exo $(am__append_1) $(example_name).html \
+CLEANFILES = solution_0.exo $(am__append_1) $(example_name).html \
 	stdout.log
 
 # also need to link files for VPATH builds

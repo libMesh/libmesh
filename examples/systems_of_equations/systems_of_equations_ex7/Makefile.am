@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/systems_of_equations/ex7
 data          = systems_of_equations_ex7.C run.sh systems_of_equations_ex7.in
 sources       = $(data) run.sh
 
-CLEANFILES = solution.exo
+CLEANFILES = solution_0.exo
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
