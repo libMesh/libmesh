@@ -76,35 +76,6 @@
 
 using namespace libMesh;
 
-/**
- * Kronecker delta function.
- */
-Real kronecker_delta(
-  unsigned int i,
-  unsigned int j)
-{
-  return i == j ? 1. : 0.;
-}
-
-/**
- * Evaluate the fourth order tensor (C_ijkl) that relates stress to strain.
- */
-Real elasticity_tensor(
-  Real young_modulus,
-  Real poisson_ratio,
-  unsigned int i,
-  unsigned int j,
-  unsigned int k,
-  unsigned int l)
-{
-  // Define the Lame constants
-  const Real lambda_1 = (young_modulus*poisson_ratio)/((1.+poisson_ratio)*(1.-2.*poisson_ratio));
-  const Real lambda_2 = young_modulus/(2.*(1.+poisson_ratio));
-
-  return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l) +
-         lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
-}
-
 
 
 class LargeDeformationElasticity : public NonlinearImplicitSystem::ComputeResidual,
@@ -119,6 +90,39 @@ public:
     es(es_in)
   {}
 
+  /**
+   * Kronecker delta function.
+   */
+  Real kronecker_delta(
+    unsigned int i,
+    unsigned int j)
+  {
+    return i == j ? 1. : 0.;
+  }
+
+  /**
+   * Evaluate the fourth order tensor (C_ijkl) that relates stress to strain.
+   */
+  Real elasticity_tensor(
+    Real young_modulus,
+    Real poisson_ratio,
+    unsigned int i,
+    unsigned int j,
+    unsigned int k,
+    unsigned int l)
+  {
+    // Define the Lame constants
+    const Real lambda_1 = (young_modulus*poisson_ratio)/((1.+poisson_ratio)*(1.-2.*poisson_ratio));
+    const Real lambda_2 = young_modulus/(2.*(1.+poisson_ratio));
+
+    return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l) +
+           lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+  }
+
+
+  /**
+   * Evaluate the Jacobian of the nonlinear system.
+   */
   virtual void jacobian (const NumericVector<Number>& soln,
                          SparseMatrix<Number>&  jacobian,
                          NonlinearImplicitSystem& /*sys*/)
