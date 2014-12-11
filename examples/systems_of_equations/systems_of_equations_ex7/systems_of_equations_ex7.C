@@ -708,7 +708,7 @@ int main (int argc, char** argv)
   // where solve n gives a good starting guess for solve n+1.
   // This "continuation" approach is helpful for solving for
   // large values of "forcing_magnitude".
-  // Set n_solves and force_scaling in nonlinear_elasticity.in,
+  // Set n_solves and force_scaling in nonlinear_elasticity.in.
   for(unsigned int count=0; count<n_solves; count++)
   {
     Real previous_forcing_magnitude =
