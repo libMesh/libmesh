@@ -615,6 +615,9 @@ int main (int argc, char** argv)
 {
   LibMeshInit init (argc, argv);
 
+  // This example requires the PETSc nonlinear solvers
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+
   GetPot infile("systems_of_equations_ex7.in");
   const Real x_length = infile("x_length", 0.);
   const Real y_length = infile("y_length", 0.);
