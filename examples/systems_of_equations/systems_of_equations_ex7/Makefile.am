@@ -1,7 +1,7 @@
 example_name  = systems_of_equations_ex7
 check_SCRIPTS = run.sh
-install_dir   = $(examples_install_path)/systems_of_equations/ex6
-data          = systems_of_equations_ex7.C run.sh
+install_dir   = $(examples_install_path)/systems_of_equations/ex7
+data          = systems_of_equations_ex7.C run.sh systems_of_equations_ex7.in
 sources       = $(data) run.sh
 
 CLEANFILES = solution.exo
