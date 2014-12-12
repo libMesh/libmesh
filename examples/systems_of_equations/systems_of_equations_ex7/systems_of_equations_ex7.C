@@ -130,7 +130,6 @@ public:
   {
     const Real young_modulus = es.parameters.get<Real>("young_modulus");
     const Real poisson_ratio = es.parameters.get<Real>("poisson_ratio");
-    const Real forcing_magnitude = es.parameters.get<Real>("forcing_magnitude");
 
     const MeshBase& mesh = es.get_mesh();
     const unsigned int dim = mesh.mesh_dimension();
