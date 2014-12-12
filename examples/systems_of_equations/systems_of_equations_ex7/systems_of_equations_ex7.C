@@ -17,6 +17,7 @@
 
 
 // <h1> Systems Example 7 - Large deformation elasticity (St. Venant-Kirchoff material) </h1>
+// Example contributed by Lorenzo Zanon and David Knezevic.
 //
 // In this example, we consider an elastic cantilever beam modeled as a St. Venant-Kirchoff
 // material (which is an extension of the linear elastic material model to the nonlinear
@@ -243,11 +244,6 @@ public:
                         elasticity_tensor(young_modulus,poisson_ratio,i,j,k,l) *
                         strain_tensor(k,l);
                     }
-
-            DenseVector<Number> f_vec(3);
-            f_vec(0) = 0.;
-            f_vec(1) = 0.;
-            f_vec(2) = -forcing_magnitude;
 
             for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
               for (unsigned int dof_j=0; dof_j<n_var_dofs; dof_j++)
