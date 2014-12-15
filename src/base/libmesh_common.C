@@ -64,8 +64,7 @@ void stop(const char* file, int line, const char* date, const char* time)
 void report_error(const char* file, int line, const char* date, const char* time)
 {
   if (libMesh::global_n_processors() == 1 ||
-      libMesh::on_command_line("--print_trace") ||
-      libMesh::on_command_line("--print-trace"))
+      libMesh::on_command_line("--print_trace"))
     libMesh::print_trace();
   else
     libMesh::write_traceout();
