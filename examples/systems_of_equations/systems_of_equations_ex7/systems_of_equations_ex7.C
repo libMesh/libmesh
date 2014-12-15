@@ -143,11 +143,11 @@ public:
 
     FEType fe_type = dof_map.variable_type(u_var);
     AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-    QGauss qrule (dim, FIFTH);
+    QGauss qrule (dim, fe_type.default_quadrature_order());
     fe->attach_quadrature_rule (&qrule);
 
     AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-    QGauss qface(dim-1, FIFTH);
+    QGauss qface (dim-1, fe_type.default_quadrature_order());
     fe_face->attach_quadrature_rule (&qface);
 
     const std::vector<Real>& JxW = fe->get_JxW();
@@ -323,11 +323,11 @@ public:
 
     FEType fe_type = dof_map.variable_type(u_var);
     AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-    QGauss qrule (dim, FIFTH);
+    QGauss qrule (dim, fe_type.default_quadrature_order());
     fe->attach_quadrature_rule (&qrule);
 
     AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-    QGauss qface(dim-1, FIFTH);
+    QGauss qface (dim-1, fe_type.default_quadrature_order());
     fe_face->attach_quadrature_rule (&qface);
 
     const std::vector<Real>& JxW = fe->get_JxW();
