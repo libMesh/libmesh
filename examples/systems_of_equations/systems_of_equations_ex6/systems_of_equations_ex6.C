@@ -23,7 +23,7 @@
 // This is a 3D version of systems_of_equations_ex4. The weak form PDE for
 // equilibrium elasticity is:
 //
-//     \int_\Omega Sigma : \grad v = \int_\Omega f v + \int_\Gamma g v ds,
+//     \int_\Omega Sigma_ij v_i,j = \int_\Omega f_i v_i + \int_\Gamma g_i v_i ds,
 //
 // for all admissible test functions v, where:
 //  * Sigma is the stress tensor, which for linear elasiticity is

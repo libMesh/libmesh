@@ -27,7 +27,7 @@
 // geometry (\Omega^deformed). As a result (e.g. see Ciarlet's 3D elasticity book,
 // Theorem 2.6-2) the PDE is given as follows:
 //
-//     \int_\Omega (F Sigma) : \grad v = \int_\Omega f v + \int_\Gamma g v ds
+//     \int_\Omega F_im Sigma_mj v_i,j = \int_\Omega f_i v_i + \int_\Gamma g_i v_i ds
 //
 // where:
 //  * F is the deformation gradient, F = I + du/dx (x here refers to reference coordinates).
