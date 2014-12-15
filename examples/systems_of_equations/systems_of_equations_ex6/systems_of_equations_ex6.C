@@ -26,7 +26,7 @@
 //     \int_\Omega Sigma : \grad v = \int_\Omega f v + \int_\Gamma g v ds,
 //
 // for all admissible test functions v, where:
-//  * Sigma is the second stress tensor, which for linear elasiticity is
+//  * Sigma is the stress tensor, which for linear elasiticity is
 //    given by Sigma_ij = C_ijkl u_k,l.
 //  * f is a body load.
 //  * g is a surface traction on the surface \Gamma.
