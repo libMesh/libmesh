@@ -212,7 +212,7 @@ public:
                   }
               }
 
-            DenseMatrix<Real> strain_tensor(3,3);
+            DenseMatrix<Number> strain_tensor(3,3);
             for(unsigned int i=0; i<3; i++)
               for(unsigned int j=0; j<3; j++)
                 {
@@ -260,7 +260,7 @@ public:
                       for(unsigned int k=0; k<3; k++)
                         for(unsigned int l=0; l<3; l++)
                           {
-                            Real FxC_ijkl = 0.;
+                            Number FxC_ijkl = 0.;
                             for(unsigned int m=0; m<3; m++)
                               {
                                 FxC_ijkl +=
@@ -387,7 +387,7 @@ public:
                   }
               }
 
-            DenseMatrix<Real> strain_tensor(3,3);
+            DenseMatrix<Number> strain_tensor(3,3);
             for(unsigned int i=0; i<3; i++)
               for(unsigned int j=0; j<3; j++)
                 {
@@ -430,7 +430,7 @@ public:
                   {
                     for(unsigned int j=0; j<3; j++)
                       {
-                        Real FxStress_ij = 0.;
+                        Number FxStress_ij = 0.;
                         for(unsigned int m=0; m<3; m++)
                           {
                             FxStress_ij += F(i,m) * stress_tensor(m,j);
@@ -531,7 +531,7 @@ public:
                     }
                 }
 
-            DenseMatrix<Real> strain_tensor(3,3);
+            DenseMatrix<Number> strain_tensor(3,3);
             for(unsigned int i=0; i<3; i++)
               for(unsigned int j=0; j<3; j++)
                 {
