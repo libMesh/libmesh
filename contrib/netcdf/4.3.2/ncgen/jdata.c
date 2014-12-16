@@ -8,7 +8,7 @@
 
 #ifdef ENABLE_JAVA
 
-#include <math.h> 
+#include <math.h>
 
 static int j_uid = 0;
 
@@ -35,7 +35,7 @@ j_constant(Generator* generator, NCConstant* con, Bytebuffer* buf,...)
 
     switch (con->nctype) {
     case NC_CHAR:
-	if(con->value.charv == '\'') 
+	if(con->value.charv == '\'')
 	    bbprintf(codetmp,"'\\''");
 	else
 	    bbprintf(codetmp,"'%c'",con->value.charv);

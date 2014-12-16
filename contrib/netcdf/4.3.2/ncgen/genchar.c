@@ -198,7 +198,7 @@ getfillchar(Datalist* fillsrc)
 	NCConstant* ccon = fillsrc->data;
 	if(ccon->nctype == NC_CHAR) {
 	    fillchar = ccon->value.charv;
-	} else if(ccon->nctype == NC_STRING) {	    
+	} else if(ccon->nctype == NC_STRING) {
 	    if(ccon->value.stringv.len > 0) {
 	        fillchar = ccon->value.stringv.stringv[0];
 	    }

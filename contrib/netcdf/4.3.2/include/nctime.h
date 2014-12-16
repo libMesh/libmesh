@@ -14,7 +14,7 @@ struct bounds_node{
 
 typedef struct bounds_node bounds_node_t;
 
-/* 
+/*
  * This code was extracted with permission from the CDMS time
  * conversion and arithmetic routines developed by Bob Drach, Lawrence
  * Livermore National Laboratory as part of the cdtime library.
@@ -154,6 +154,3 @@ extern void Cdh2e(CdTime *htime, double *etime);
 extern void Cde2h(double etime, CdTimeType timeType, long baseYear, CdTime *htime);
 extern int cdParseRelunits(cdCalenType timetype, char* relunits, cdUnitTime* unit, cdCompTime* base_comptime);
 #endif /* DLL Considerations. */
-
-
-

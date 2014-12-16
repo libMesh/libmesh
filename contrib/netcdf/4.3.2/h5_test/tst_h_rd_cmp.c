@@ -2,7 +2,7 @@
    Copyright 2007 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test HDF5 compound types. 
+   Test HDF5 compound types.
 */
 
 #include "h5_err_macros.h"
@@ -26,7 +26,7 @@ main()
 
    printf("\n*** Checking HDF5 compound types (we're almost there kids).\n");
    printf("*** Checking packing of HDF5 compound types...");
-   
+
    /* Open file. */
    if ((access_plist = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
    if (H5Pset_fclose_degree(access_plist, H5F_CLOSE_STRONG)) ERR;
@@ -46,7 +46,7 @@ main()
 /*   if ((native_type = H5Tget_native_type(typeid, H5T_DIR_DEFAULT)) < 0) ERR;*/
 
    /* Read the data. */
-   if (H5Dread(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+   if (H5Dread(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 	       data) < 0) ERR;
 
    /* Check the data. */

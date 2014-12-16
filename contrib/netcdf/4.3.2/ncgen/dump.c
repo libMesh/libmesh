@@ -162,9 +162,9 @@ dumpdataprim(NCConstant* ci, Bytebuffer* buf)
 void
 dumpgroup(Symbol* g)
 {
-    if(debug <= 1) return; 
+    if(debug <= 1) return;
     fdebug("group %s {\n",(g==NULL?"null":g->name));
-    if(g != NULL && g->subnodes != NULL) {    
+    if(g != NULL && g->subnodes != NULL) {
 	int i;
 	for(i=0;i<listlength(g->subnodes);i++) {
 	    Symbol* sym = (Symbol*)listget(g->subnodes,i);
@@ -196,7 +196,7 @@ dumpconstant1(NCConstant* con)
 /*	fprintf(stderr,"(0x%lx){",(unsigned long)dl);*/
 	fprintf(stderr,"{%s}",bbDup(buf));
 	bbFree(buf);
-	} break;	
+	} break;
     case NC_STRING:
 	if(con->value.stringv.len > 0 && con->value.stringv.stringv != NULL)
 	    fprintf(stderr,"\"%s\"",con->value.stringv.stringv);
@@ -280,7 +280,7 @@ dumpsrc0(Datasrc* src,char* tag)
 	    dumpconstant1(&src->data[i]);
 	}
         if(count < src->length) fprintf(stderr,"...");
-	fprintf(stderr," | ");	
+	fprintf(stderr," | ");
         src = src->prev;
     } while(src != NULL && depth > 0);
     if(src != NULL) fprintf(stderr,"---");

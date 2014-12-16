@@ -21,7 +21,7 @@ main()
    {
 
 /* Misspelling is deliberite. Please dont correct. */
-#define INTERGERS "Intergers"      
+#define INTERGERS "Intergers"
 #define NUM_STR 1
 #define NDIMS 1
       hid_t fileid, grpid, spaceid;
@@ -33,10 +33,10 @@ main()
       int empty = -42;
 
       /* Create the file, open root group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Create a space for the dataset. */
       if ((spaceid = H5Screate_simple(1, dims, max_dims)) < 0) ERR;
 
@@ -44,13 +44,13 @@ main()
       if ((plistid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
       if (H5Pset_chunk(plistid, 1, chunk_dims) < 0) ERR;
       if (H5Pset_fill_value(plistid, H5T_NATIVE_INT32, &empty) < 0) ERR;
-      if ((datasetid = H5Dcreate1(grpid, INTERGERS, H5T_NATIVE_INT32, 
+      if ((datasetid = H5Dcreate1(grpid, INTERGERS, H5T_NATIVE_INT32,
 				  spaceid, plistid)) < 0) ERR;
 
       /* Now extend the dataset. */
       if (H5Dextend(datasetid, xtend_size) < 0) ERR;
 
-      if (H5Dwrite(datasetid, H5T_NATIVE_INT, spaceid, spaceid, 
+      if (H5Dwrite(datasetid, H5T_NATIVE_INT, spaceid, spaceid,
 		   H5P_DEFAULT, &data) < 0) ERR;
 
       /* Close up. */

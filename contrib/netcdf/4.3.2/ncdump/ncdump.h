@@ -7,7 +7,7 @@
 #define _NCDUMP_H_
 
 typedef
-enum {LANG_C, LANG_F} Nclang; 
+enum {LANG_C, LANG_F} Nclang;
 
 typedef struct {			/* specification for how to format dump */
 
@@ -64,7 +64,7 @@ typedef struct {			/* specification for how to format dump */
 
     char** lgrps;		/* list of group names specified with -g
 				 * option on command line */
-    
+
     idnode_t* grpids;		/* list of grpids matching list specified with -g option */
 
     int nc_kind;		/* kind of netCDF file named on

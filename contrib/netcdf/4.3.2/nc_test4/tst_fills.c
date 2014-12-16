@@ -12,10 +12,10 @@
 #include <stdio.h>
 #include <netcdf.h>
 
-#define FILE_NAME "tst_fills.nc" 
+#define FILE_NAME "tst_fills.nc"
 
 int
-main(int argc, char **argv) 
+main(int argc, char **argv)
 {			/* create tst_classic_fills.nc */
    printf("\n*** Testing fill values.\n");
    printf("*** testing very simple scalar string var...");

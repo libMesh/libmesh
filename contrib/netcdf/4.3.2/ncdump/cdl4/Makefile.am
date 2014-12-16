@@ -25,5 +25,3 @@ ref_tst_vlen_data.cdl ref_tst_vlen_data2.cdl \
 ref_niltest.cdl ref_tst_h_scalar.cdl ref_tst_econst.cdl \
 ref_tst_nul3.cdl ref_tst_nul4.cdl ref_tst_names.cdl \
 CMakeLists.txt
-
-

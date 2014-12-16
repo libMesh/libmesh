@@ -38,7 +38,7 @@ main()
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set H5P_CRT_ORDER_TRACKED in the creation property list. This
        * turns on HDF5 creation ordering in the file. */
       if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
@@ -63,11 +63,11 @@ main()
       if (H5Sclose(spaceid) < 0) ERR;
       if (H5Pclose(create_propid) < 0) ERR;
       if (H5Dclose(dimscaleid) < 0) ERR;
-      
+
       /* Create string type. */
       if ((typeid = H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-      
+
       /* Create a space for our dataset. 0 data but unlimited dimension. */
       if ((spaceid = H5Screate_simple(NDIMS, dims, max_dims)) < 0) ERR;
 
@@ -116,7 +116,7 @@ main()
    SUMMARIZE_ERR;
    printf("*** Checking string dataset with unlimited dimension...");
    {
-#define VAR_NAME "Mark_Twain"      
+#define VAR_NAME "Mark_Twain"
 #define NDIMS 1
 #define MY_CHUNK_CACHE_NELEMS 1009
 #define MY_CHUNK_CACHE_SIZE 4194304
@@ -125,20 +125,20 @@ main()
       hid_t fapl_id, fcpl_id, fileid, grpid, spaceid, access_plistid;
       hid_t typeid, datasetid, plistid;
       hid_t file_spaceid, mem_spaceid;
-      hsize_t dims[1] = {2}, chunk_dims[1] = {1}; 
+      hsize_t dims[1] = {2}, chunk_dims[1] = {1};
       hsize_t start[NDIMS] = {1}, count[NDIMS] = {1};
 /*      void *fillp;*/
       char *data = "A man who carries a cat by the tail learns "
 	 "something he can learn in no other way.";
-/* Man - a creature made at the end of the week's work when God was tired. 
-There are basically two types of people. People who accomplish things, and people who claim to have accomplished things. The first group is less crowded. 
+/* Man - a creature made at the end of the week's work when God was tired.
+There are basically two types of people. People who accomplish things, and people who claim to have accomplished things. The first group is less crowded.
 To be good is noble; but to show others how to be good is nobler and no trouble. */
 /*      char *empty = "";*/
 
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set H5P_CRT_ORDER_TRACKED in the creation property list. This
        * turns on HDF5 creation ordering in the file. */
       if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
@@ -155,7 +155,7 @@ To be good is noble; but to show others how to be good is nobler and no trouble.
       /* Create string type. */
       if ((typeid = H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-      
+
       /* Create a space for our dataset. */
       if ((spaceid = H5Screate_simple(NDIMS, dims, dims)) < 0) ERR;
 
@@ -170,7 +170,7 @@ To be good is noble; but to show others how to be good is nobler and no trouble.
 			     MY_CHUNK_CACHE_SIZE, MY_CHUNK_CACHE_PREEMPTION) < 0) ERR;
 
       /* Create the dataset. It has zero records. */
-      if ((datasetid = H5Dcreate2(grpid, VAR_NAME, typeid, spaceid, 
+      if ((datasetid = H5Dcreate2(grpid, VAR_NAME, typeid, spaceid,
 				  H5P_DEFAULT, plistid, access_plistid)) < 0) ERR;
 
       /* Now extend the dataset. */
@@ -178,16 +178,16 @@ To be good is noble; but to show others how to be good is nobler and no trouble.
 
       /* Select space in file to write a record. */
       if ((file_spaceid = H5Dget_space(datasetid)) < 0) ERR;
-      if (H5Sselect_hyperslab(file_spaceid, H5S_SELECT_SET, 
+      if (H5Sselect_hyperslab(file_spaceid, H5S_SELECT_SET,
 			      start, NULL, count, NULL) < 0) ERR;
 
       /* Select space in memory to read from. */
-      if ((mem_spaceid = H5Screate_simple(NDIMS, count, NULL)) < 0) 
+      if ((mem_spaceid = H5Screate_simple(NDIMS, count, NULL)) < 0)
 
 	 /*if ((xfer_plistid = H5Pcreate(H5P_DATASET_XFER)) < 0) ERR;*/
 
       /* Write the data. */
-      if (H5Dwrite(datasetid, typeid, mem_spaceid, file_spaceid, 
+      if (H5Dwrite(datasetid, typeid, mem_spaceid, file_spaceid,
 		   H5P_DEFAULT, &data) < 0)
 
       /* Close up. */

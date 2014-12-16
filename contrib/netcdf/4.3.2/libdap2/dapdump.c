@@ -89,7 +89,7 @@ dumpmetadata(int ncid, NChdr** hdrp)
         CHECK(stat);
 	fprintf(stdout,"dim[%d]: name=%s size=%lu\n",
 		i,hdr->dims[i].name,(unsigned long)hdr->dims[i].size);
-    }    
+    }
     hdr->vars = (Var*)malloc(hdr->nvars*sizeof(Var));
     MEMCHECK(hdr->vars,NC_ENOMEM);
     for(i=0;i<hdr->nvars;i++) {
@@ -143,7 +143,7 @@ dumpmetadata(int ncid, NChdr** hdrp)
 	    }
 	    fprintf(stdout,"\n");
 	}
-    }    
+    }
     fflush(stdout);
     return NC_NOERR;
 }
@@ -346,7 +346,7 @@ dumptreer(CDFnode* root, NCbytes* buf, int indent, int visible)
 	ncbytescat(buf," ");
         ncbytescat(buf,(root->ncbasename?root->ncbasename:"<?>"));
 	break;
-    default: break;    
+    default: break;
     }
 
     if(nclistlength(root->array.dimsetplus) > 0) dimset = root->array.dimsetplus;
@@ -423,7 +423,7 @@ dumpnode(CDFnode* node)
 	default: break;
 	}
 	break;
-    default: break;    
+    default: break;
     }
     snprintf(tmp,sizeof(tmp),"%s %s {\n",
 		(nctype?nctype:primtype),node->ocname);

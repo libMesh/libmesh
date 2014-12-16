@@ -2,7 +2,7 @@
    Copyright 2010 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf files a bit. 
+   Test netcdf files a bit.
 */
 
 #include <nc_tests.h>
@@ -55,5 +55,3 @@ main(int argc, char **argv)
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }
-
-

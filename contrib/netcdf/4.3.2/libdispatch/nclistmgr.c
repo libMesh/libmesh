@@ -105,10 +105,8 @@ find_in_NCList_by_name(const char* path)
 	    if(strcmp(nc_filelist[i]->path,path)==0) {
 		f = nc_filelist[i];
 		break;
-	    }				
+	    }
 	}
    }
    return f;
 }
-
-

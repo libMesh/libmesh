@@ -102,7 +102,7 @@ ocfetchurl(CURL* curl, const char* url, OCbytes* buf, long* filetime,
 	cstat = curl_easy_setopt(curl, CURLOPT_URL, (void*)url);
 	if (cstat != CURLE_OK)
 		goto fail;
-	
+
 #if 0
 	if(creds != NULL && creds->password != NULL  && creds->username != NULL) {
 	    /* Set user and password */
@@ -113,8 +113,8 @@ ocfetchurl(CURL* curl, const char* url, OCbytes* buf, long* filetime,
 	    cstat = curl_easy_setopt(curl, CURLOPT_PASSWORD, creds->password);
 	    if (cstat != CURLE_OK)
 		goto fail;
-#else		
-		snprintf(tbuf,1023,"%s:%s",creds->username,creds->password);	
+#else
+		snprintf(tbuf,1023,"%s:%s",creds->username,creds->password);
 		cstat = curl_easy_setopt(curl, CURLOPT_USERPWD, tbuf);
 		if (cstat != CURLE_OK)
 			goto fail;
@@ -328,7 +328,7 @@ ocping(const char* url)
 
     /* Create a CURL instance */
     stat = occurlopen(&curl);
-    if(stat != OC_NOERR) return stat;    
+    if(stat != OC_NOERR) return stat;
 
     /* use a very short timeout: 10 seconds */
     cstat = curl_easy_setopt(curl, CURLOPT_TIMEOUT, (long)10);
@@ -365,5 +365,3 @@ done:
     }
     return OCTHROW(stat);
 }
-
-

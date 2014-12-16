@@ -196,4 +196,3 @@ extern void xxdr_init();
 #define xxdr_length(xdrs) ((xdrs)->length)
 
 #endif /*XXDR_H*/
-

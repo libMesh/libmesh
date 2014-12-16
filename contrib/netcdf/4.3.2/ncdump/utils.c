@@ -56,7 +56,7 @@ check(int err, const char* file, const int line)
 }
 
 
-/* 
+/*
  * Returns malloced name with chars special to CDL escaped.
  * Caller should free result when done with it.
  */
@@ -132,7 +132,7 @@ escaped_name(const char* cp) {
 }
 
 
-/* 
+/*
  * Print name with escapes for special characters
  */
 void
@@ -145,7 +145,7 @@ print_name(const char* name) {
 /* Missing functionality that should be in nc_inq_dimid(), to get
  * dimid from a full dimension path name that may include group
  * names */
-int 
+int
 nc_inq_dimid2(int ncid, const char *dimname, int *dimidp) {
     int ret = NC_NOERR;
     /* If '/' doesn't occur in dimname, just return id found by
@@ -153,12 +153,12 @@ nc_inq_dimid2(int ncid, const char *dimname, int *dimidp) {
     char *sp = strrchr(dimname, '/');
     if(!sp) { /* No '/' in dimname, so return nc_inq_dimid() result */
 	ret = nc_inq_dimid(ncid, dimname, dimidp);
-    } 
+    }
 #ifdef USE_NETCDF4
     else {  /* Parse group name out and get dimid using that */
       size_t grp_namelen = sp - dimname;
       char *grpname = emalloc(grp_namelen+1);
-      
+
       int grpid;
       strncpy(grpname, dimname, grp_namelen+1);
       grpname[grp_namelen] = '\0';
@@ -167,7 +167,7 @@ nc_inq_dimid2(int ncid, const char *dimname, int *dimidp) {
 	ret = nc_inq_dimid(grpid, dimname, dimidp);
       }
       free(grpname);
-    }	
+    }
 #endif	/* USE_NETCDF4 */
     return ret;
 }
@@ -200,7 +200,7 @@ isrecvar(int ncid, int varid)
 		if(dimids[dim] == recdimids[recdim]) {
 		    is_recvar = 1;
 		    break;
-		}		
+		}
 	    }
 	}
 	free(dimids);
@@ -242,13 +242,13 @@ newidlist(void) {
 void
 idadd(idnode_t* vlist, int varid) {
     idnode_t *newvp = newidnode();
-    
+
     newvp -> next = vlist -> next;
     newvp -> id = varid;
     vlist -> next = newvp;
 }
 
-/* 
+/*
  * return true if id is member of list that idlist points to.
  */
 bool_t
@@ -259,7 +259,7 @@ idmember(const idnode_t* idlist, int id)
     for (; vp ; vp = vp->next)
       if (vp->id == id)
 	return true;
-    return false;    
+    return false;
 }
 
 /*
@@ -275,7 +275,7 @@ freeidlist(idnode_t *idlist)
    }
 }
 
-/* 
+/*
  * Return true if group identified by grpid is member of grpids, a list of groups.
  * nlgrps is number of groups in the list.
  */
@@ -294,7 +294,7 @@ group_wanted(int grpid, int nlgrps, const idnode_t* grpids)
  * the name begins with "/", it is interpreted as an absolute group
  * name, in which case only 0 or 1 is returned.  Otherwise, interpret
  * it as a relative name, and the total number of occurrences within
- * the file/group identified by ncid is returned.  
+ * the file/group identified by ncid is returned.
  *
  * Also has side effect of updating the ngrpids and the associate
  * grpids array that represent the group list specified by the -g
@@ -313,7 +313,7 @@ nc_inq_grpname_count(int ncid, int igrp, char **lgrps, idnode_t *grpids) {
     char *grpname = lgrps[igrp];
 
     /* permit empty string to also designate root group */
-    if(grpname[0] == '\0' || STREQ(grpname,"/")) { 
+    if(grpname[0] == '\0' || STREQ(grpname,"/")) {
 	count = 1;
 	idadd(grpids, ncid);
 	return count;
@@ -333,7 +333,7 @@ nc_inq_grpname_count(int ncid, int igrp, char **lgrps, idnode_t *grpids) {
 	}
 	return count;
     }
-    
+
     /* look in this group */
     status = nc_inq_grp_ncid(ncid, grpname, &grpid);
     if (status == NC_NOERR) {
@@ -354,7 +354,7 @@ nc_inq_grpname_count(int ncid, int igrp, char **lgrps, idnode_t *grpids) {
 	free(ncids);
     }
 #endif /* USE_NETCDF4 */
-    return count;    
+    return count;
 }
 
 /* Check if any group names specified with "-g grp1,...,grpn" are
@@ -392,12 +392,12 @@ strendswith(const char *s1, const char *s2) {
  * case, grpname for grpid must be exactly "/gp1/gp2".  If variable
  * named "var" is not in group grpid, returns NC_ENOTVAR, else sets
  * varid and returns NC_NOERR.  */
-int 
+int
 nc_inq_gvarid(int grpid, const char *varname, int *varidp) {
     /* if varname has no "/" chars, then
           return varidp from nc_inq_varid(grpid, varname, varidp)
        if varname begins with "/"
-          
+
        else
           get groupname corresponding to grpid
           get vargroup = substring of varname up to last "/"
@@ -408,7 +408,7 @@ nc_inq_gvarid(int grpid, const char *varname, int *varidp) {
           else
              return NC_ENOTVAR
     */
-    
+
 #ifdef USE_NETCDF4
     char *vargroup;
     char *relname;
@@ -417,7 +417,7 @@ nc_inq_gvarid(int grpid, const char *varname, int *varidp) {
     if (varname[0] == '\0')
 	return NC_ENOTVAR;
     vargroup = strdup(varname);
-    if (vargroup == NULL) 
+    if (vargroup == NULL)
 	return NC_ENOMEM;
     relname = strrchr(vargroup, NC_GRP_DELIM);
     if (relname != NULL) {	/* name has a "/" in it */
@@ -461,7 +461,7 @@ nc_inq_gvarid(int grpid, const char *varname, int *varidp) {
    group is examined for a variable with that relative name.  */
 size_t
 nc_inq_varname_count(int ncid, char *varname) {
-    /* 
+    /*
        count = 0;
        status = nc_inq_gvarid(ncid, varname, varid);
        if (status == NC_NOERR)
@@ -487,21 +487,21 @@ nc_inq_varname_count(int ncid, char *varname) {
 #ifdef USE_NETCDF4
     /* if this group has subgroups, call recursively on each of them */
     NC_CHECK( nc_inq_grps(ncid, &numgrps, NULL) );
-	 
+
     /* Allocate memory to hold the list of group ids. */
     ncids = emalloc((numgrps + 1) * sizeof(int));
-	
+
     /* Get the list of group ids. */
     NC_CHECK( nc_inq_grps(ncid, NULL, ncids) );
-	
+
     /* Call this function for each group. */
     for (g = 0; g < numgrps; g++) {
 	count += nc_inq_varname_count(ncids[g], varname);
     }
     free(ncids);
 #endif /* USE_NETCDF4 */
-    return count;    
-   
+    return count;
+
 }
 
 /* Check if any variable names specified with "-v var1,...,varn" are
@@ -597,7 +597,7 @@ static void
 gs_push(ncgiter_t *s, int grpid)
 {
     grpnode_t *node = emalloc(sizeof(grpnode_t));
- 
+
     node->grpid = grpid;
     node->next = gs_empty(s) ? NULL : s->top;
     s->top = node;
@@ -605,7 +605,7 @@ gs_push(ncgiter_t *s, int grpid)
 }
 
 /* pop value off stack and return */
-static int 
+static int
 gs_pop(ncgiter_t *s)
 {
     if (gs_empty(s)) {
@@ -624,7 +624,7 @@ gs_pop(ncgiter_t *s)
 #ifdef UNUSED
 /* Return top value on stack without popping stack.  Defined for
  * completeness but not used (here). */
-static int 
+static int
 gs_top(ncgiter_t *s)
 {
     if (gs_empty(s)) {
@@ -661,7 +661,7 @@ nc_inq_grps2(int ncid, int *numgrps, int *grpids)
 int
 nc_get_giter(int grpid,	       /* start group id */
 	    ncgiter_t **iterp  /* returned opaque iteration state */
-    ) 
+    )
 {
     int stat = NC_NOERR;
 
@@ -674,7 +674,7 @@ nc_get_giter(int grpid,	       /* start group id */
     return stat;
 }
 
-/* 
+/*
  * Get group id of next group.  On first call gets start group id,
  * subsequently returns other subgroup ids in preorder.  Returns zero
  * when no more groups left.
@@ -712,7 +712,7 @@ nc_free_giter(ncgiter_t *iterp)
     gs_free(iterp);
 }
 
-/* 
+/*
  * Get total number of groups (including the top-level group and all
  * descendant groups, recursively) and all descendant subgroup ids
  * (including the input rootid of the start group) for a group and
@@ -723,7 +723,7 @@ nc_free_giter(ncgiter_t *iterp)
  * for the group ids, then call again to get them.
  */
 int
-nc_inq_grps_full(int rootid, int *numgrps, int *grpids) 
+nc_inq_grps_full(int rootid, int *numgrps, int *grpids)
 {
     int stat = NC_NOERR;
     ncgiter_t *giter;		/* pointer to group iterator */
@@ -731,7 +731,7 @@ nc_inq_grps_full(int rootid, int *numgrps, int *grpids)
     size_t count;
 
     NC_CHECK(nc_get_giter(rootid, &giter));
-    
+
     count = 0;
     NC_CHECK(nc_next_giter(giter, &grpid));
     while(grpid != 0) {

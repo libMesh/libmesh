@@ -47,7 +47,7 @@
 #define X_DOUBLE_MAX    1.79769313486230e+308
 #else
 /* scalb(1. - scalb(.5 , -52), 1024) */
-#define X_DOUBLE_MAX	1.7976931348623157e+308 
+#define X_DOUBLE_MAX	1.7976931348623157e+308
 #endif
 #define X_DOUBLE_MIN	(-X_DOUBLE_MAX)
 

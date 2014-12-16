@@ -95,7 +95,7 @@ generate_vardata(Symbol* vsym, Generator* generator, Writer writer, Bytebuffer* 
 	generate_array(vsym,code,filler,generator,writer);
     }
 }
-		
+
 static void
 generate_array(Symbol* vsym,
                Bytebuffer* code,
@@ -153,7 +153,7 @@ generate_array(Symbol* vsym,
 	 	Constant* con = datalistith(vsym->data,i);
 #else
         NCConstant* con = datalistith(vsym->data,i+offset);
-#endif	
+#endif
                 generator->list(generator,LISTDATA,uid,i,code);
 #ifdef USE_NOFILL
 		if(nofill_flag && con == NULL)
@@ -221,7 +221,7 @@ generate_arrayr(Symbol* vsym,
     ASSERT(dimindex >= 0 && dimindex < rank);
 
 #ifdef CHARBUG
-    ASSERT(typecode != NC_CHAR); 
+    ASSERT(typecode != NC_CHAR);
 #else /*!CHARBUG*/
     if(dimindex == lastunlimited && typecode == NC_CHAR) {
 	Bytebuffer* charbuf = bbNew();
@@ -237,7 +237,7 @@ generate_arrayr(Symbol* vsym,
 	   (similar to case 2 above)
 	*/
         slabodom = newsubodometer(odom,dimset,dimindex,rank);
-	/* compute the starting offset in our datalist 
+	/* compute the starting offset in our datalist
 	   (Assumes that slabodom->index[i] == slabodom->start[i])
         */
         generator->listbegin(generator,LISTDATA,list->length,code,&uid);
@@ -267,7 +267,7 @@ generate_arrayr(Symbol* vsym,
                 && (dimset->dimsyms[nextunlimited]->dim.isunlimited)));
 	/* build a sub odometer */
         slabodom = newsubodometer(odom,dimset,dimindex,nextunlimited);
-	/* compute the starting offset in our datalist 
+	/* compute the starting offset in our datalist
 	   (Assumes that slabodom->index[i] == slabodom->start[i])
         */
 	for(i=0;odometermore(slabodom);i++) {
@@ -281,7 +281,7 @@ generate_arrayr(Symbol* vsym,
 		if(filler == NULL)
 		    filler = getfiller(vsym);
 	        generate_arrayr(vsym,code,filler,odom,nextunlimited,NULL,generator);
-		
+
 	    } else if(!islistconst(con))
 	        semwarn(constline(con),"Expected {...} representing unlimited list");
 	    else {
@@ -361,7 +361,7 @@ generate_basetype(Symbol* tsym, NCConstant* con, Bytebuffer* codebuf, Datalist* 
         }
         data = con->value.compoundv;
         /* generate the nc_vlen_t instance*/
-	vlenbuf = bbNew();	
+	vlenbuf = bbNew();
 	if(tsym->typ.basetype->typ.typecode == NC_CHAR) {
 	    gen_charvlen(data,vlenbuf);
 	    generator->vlenstring(generator,vlenbuf,&uid,&count);
@@ -382,7 +382,7 @@ generate_basetype(Symbol* tsym, NCConstant* con, Bytebuffer* codebuf, Datalist* 
     case NC_FIELD:
 	if(tsym->typ.dimset.ndims > 0) {
 	    /* Verify that we have a sublist (or fill situation) */
-	    if(con != NULL && !isfillconst(con) && !islistconst(con)) 
+	    if(con != NULL && !isfillconst(con) && !islistconst(con))
 		semerror(constline(con),"Dimensioned fields must be enclose in {...}");
             generate_fieldarray(tsym->typ.basetype,con,&tsym->typ.dimset,codebuf,filler,generator);
 	} else {
@@ -413,7 +413,7 @@ generate_fieldarray(Symbol* basetype, NCConstant* con, Dimset* dimset,
     if(chartype) {
 	/* Collect the char field in a separate buffer */
 	Bytebuffer* charbuf = bbNew();
-        gen_chararray(dimset,data,charbuf,filler);	
+        gen_chararray(dimset,data,charbuf,filler);
 	generator->charconstant(generator,codebuf,charbuf);
 	bbFree(charbuf);
     } else {
@@ -441,7 +441,7 @@ normalizeopaquelength(NCConstant* prim, unsigned long nbytes)
 {
     int nnibs = 2*nbytes;
     ASSERT(prim->nctype==NC_OPAQUE);
-    if(prim->value.opaquev.len == nnibs) { 
+    if(prim->value.opaquev.len == nnibs) {
         /* do nothing*/
     } else if(prim->value.opaquev.len > nnibs) { /* truncate*/
 	prim->value.opaquev.stringv[nnibs] = '\0';
@@ -530,13 +530,13 @@ generate_primdata(Symbol* basetype, NCConstant* prim, Bytebuffer* codebuf,
         if(basetype->subclass != NC_ENUM) {
 	    semerror(constline(prim),"Conversion to enum not supported (yet)");
 	} break;
-     case NC_OPAQUE: 
+     case NC_OPAQUE:
 	normalizeopaquelength(&target,basetype->typ.size);
 	break;
     default:
 	break;
     }
     generator->constant(generator,&target,codebuf);
-    
+
     return;
 }

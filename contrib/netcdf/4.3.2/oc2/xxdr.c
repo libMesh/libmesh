@@ -175,14 +175,14 @@ xxdr_string(XXDR* xdrs, char** sp, off_t* lenp)
     s = (char*)malloc((size_t)len+1);
     if(s == NULL) return 0;
     if(!xxdr_opaque(xdrs,s,(off_t)len)) {
-	free((void*)s);	
+	free((void*)s);
 	return 0;
     }
     s[len] = '\0'; /* make sure it is null terminated */
     if(sp) *sp = s;
     if(lenp) *lenp = len;
     /* xxdr_opaque will have skippped any trailing bytes */
-    return 1;    
+    return 1;
 }
 
 /* returns bytes off from beginning*/
@@ -210,7 +210,7 @@ xxdr_getavail(XXDR* xdr)
 void
 xxdr_free(XXDR* xdr)
 {
-    xdr->free(xdr);    
+    xdr->free(xdr);
 }
 
 /***********************************/
@@ -318,8 +318,8 @@ xxdrtrace(xdrs,"getavail",0);
 }
 
 static int
-xxdr_filesetpos(XXDR* xdrs, off_t pos) 
-{ 
+xxdr_filesetpos(XXDR* xdrs, off_t pos)
+{
     int ok = 1;
 xxdrtrace(xdrs,"setpos",pos);
     if(pos == xdrs->pos) goto done;
@@ -408,8 +408,8 @@ xxdrtrace(xdrs,"getavail",0);
 
 
 static int
-xxdr_memsetpos(XXDR* xdrs, off_t pos) 
-{ 
+xxdr_memsetpos(XXDR* xdrs, off_t pos)
+{
     int ok = 1;
 xxdrtrace(xdrs,"setpos",pos);
     if(pos == xdrs->pos) goto done;
@@ -513,7 +513,7 @@ xxdr_init()
 	if(!xxdr_network_order) {
 	    fprintf(stderr,"xxdr_init: endian mismatch\n");
 	    fflush(stderr);
-	    exit(1);	
+	    exit(1);
 	}
     }
 #endif

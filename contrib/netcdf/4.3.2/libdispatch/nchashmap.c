@@ -65,14 +65,14 @@ nchashinsert(NChashmap* hm, nchashid hash, void* value)
     NClist* seq;
     void** list;
 
-    offset = (hash % hm->alloc);    
+    offset = (hash % hm->alloc);
     seq = hm->table[offset];
     if(seq == NULL) {seq = nclistnew(); hm->table[offset] = seq;}
     len = nclistlength(seq);
     list = nclistcontents(seq);
     for(i=0;i<len;i+=2,list+=2) {
 	if(hash==(nchashid)(*list)) return FALSE;
-    }    
+    }
     nclistpush(seq,(void*)hash);
     nclistpush(seq,value);
     hm->size++;
@@ -89,14 +89,14 @@ nchashreplace(NChashmap* hm, nchashid hash, void* value)
     NClist* seq;
     void** list;
 
-    offset = (hash % hm->alloc);    
+    offset = (hash % hm->alloc);
     seq = hm->table[offset];
     if(seq == NULL) {seq = nclistnew(); hm->table[offset] = seq;}
     len = nclistlength(seq);
     list = nclistcontents(seq);
     for(i=0;i<len;i+=2,list+=2) {
 	if(hash==(nchashid)(*list)) {list[1] = value; return TRUE;}
-    }    
+    }
     nclistpush(seq,(void*)hash);
     nclistpush(seq,value);
     hm->size++;
@@ -113,7 +113,7 @@ nchashremove(NChashmap* hm, nchashid hash)
     NClist* seq;
     void** list;
 
-    offset = (hash % hm->alloc);    
+    offset = (hash % hm->alloc);
     seq = hm->table[offset];
     if(seq == NULL) return TRUE;
     len = nclistlength(seq);
@@ -126,7 +126,7 @@ nchashremove(NChashmap* hm, nchashid hash)
 	    if(nclistlength(seq) == 0) {nclistfree(seq); hm->table[offset] = NULL;}
 	    return TRUE;
 	}
-    }    
+    }
     return FALSE;
 }
 
@@ -148,7 +148,7 @@ nchashlookup(NChashmap* hm, nchashid hash, void** valuep)
     NClist* seq;
     void** list;
 
-    offset = (hash % hm->alloc);    
+    offset = (hash % hm->alloc);
     seq = hm->table[offset];
     if(seq == NULL) return TRUE;
     len = nclistlength(seq);
@@ -194,14 +194,13 @@ nchashkeys(NChashmap* hm, nchashid** keylist)
         keys = (nchashid*)malloc(sizeof(nchashid)*hm->size);
         for(index=0,i=0;i<hm->alloc;i++) {
  	    NClist* seq = hm->table[i];
-	    for(j=0;j<nclistlength(seq);j+=2) {	
+	    for(j=0;j<nclistlength(seq);j+=2) {
 	        keys[index++] = (nchashid)nclistget(seq,j);
 	    }
 	}
     }
     if(keylist) {*keylist = keys;}
     else {free(keys);}
-    
+
     return TRUE;
 }
-

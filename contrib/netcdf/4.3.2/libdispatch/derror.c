@@ -50,7 +50,7 @@ status value.
 
  */
 
-/*! Given an error number, return an error message. 
+/*! Given an error number, return an error message.
 \addtogroup error
 
 This function returns a static reference to an error message string
@@ -202,7 +202,7 @@ nc_strerror(int ncerr1)
 	 return "NetCDF: Can't create file";
       case NC_EFILEMETA:
 	 return "NetCDF: Can't add HDF5 file metadata";
-      case NC_EDIMMETA:      
+      case NC_EDIMMETA:
 	 return "NetCDF: Can't define dimensional metadata";
       case NC_EATTMETA:
 	 return "NetCDF: Can't open HDF5 attribute";
@@ -255,5 +255,3 @@ nc_strerror(int ncerr1)
 	 return "Unknown Error";
    }
 }
-
-

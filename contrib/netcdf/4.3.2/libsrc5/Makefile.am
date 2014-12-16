@@ -21,4 +21,4 @@ libnetcdf5_la_SOURCES = nc5dispatch.c
 
 noinst_LTLIBRARIES = libnetcdf5.la
 
-EXTRA_DIST = CMakeLists.txt 
+EXTRA_DIST = CMakeLists.txt

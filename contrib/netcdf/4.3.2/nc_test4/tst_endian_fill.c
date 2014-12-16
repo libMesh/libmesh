@@ -13,13 +13,13 @@
 #include <stdio.h>
 #include <netcdf.h>
 
-#define FILE_NAME "tst_endian_fill.nc" 
+#define FILE_NAME "tst_endian_fill.nc"
 #define VAR_NAME "v1"
 #define VAR2_NAME "v2"
 #define VAR3_NAME "v3"
 #define VAR_RANK 0
 int
-main(int argc, char **argv) 
+main(int argc, char **argv)
 {
    printf("\n*** Testing specified endiannesss fill values.\n");
    printf("*** testing simple case with int...");
@@ -40,7 +40,7 @@ main(int argc, char **argv)
       if (nc_def_var_endian(ncid, var3id, NC_ENDIAN_BIG)) ERR;
       if (nc_put_var(ncid, var3id, &fill)) ERR;
       if (nc_close(ncid)) ERR;
-    
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_varid(ncid, VAR_NAME, &varid)) ERR;
@@ -56,12 +56,12 @@ main(int argc, char **argv)
    {
 #define NUM_TYPES_TO_CHECK 6
       int  ncid, varid[NUM_TYPES_TO_CHECK];
-      int check_type[NUM_TYPES_TO_CHECK] = {NC_SHORT, NC_USHORT, NC_INT, 
+      int check_type[NUM_TYPES_TO_CHECK] = {NC_SHORT, NC_USHORT, NC_INT,
 					    NC_UINT, NC_INT64, NC_UINT64};
-      char var_name[NUM_TYPES_TO_CHECK][NC_MAX_NAME + 1] = {"SHORT", "USHORT", 
-							   "INT", "UINT", "INT64", 
+      char var_name[NUM_TYPES_TO_CHECK][NC_MAX_NAME + 1] = {"SHORT", "USHORT",
+							   "INT", "UINT", "INT64",
 							   "UINT64"};
-      long long fill_value[NUM_TYPES_TO_CHECK] = {NC_FILL_SHORT, NC_FILL_USHORT, NC_FILL_INT, 
+      long long fill_value[NUM_TYPES_TO_CHECK] = {NC_FILL_SHORT, NC_FILL_USHORT, NC_FILL_INT,
 						  NC_FILL_UINT, NC_FILL_INT64, NC_FILL_UINT64};
       long long data_in;
       int t;
@@ -74,7 +74,7 @@ main(int argc, char **argv)
 	 if (nc_def_var_endian(ncid, varid[t], NC_ENDIAN_BIG)) ERR;
       }
       if (nc_close(ncid)) ERR;
-    
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       for (t = 0; t < NUM_TYPES_TO_CHECK; t++)
@@ -89,6 +89,6 @@ main(int argc, char **argv)
    }
    SUMMARIZE_ERR;
    FINAL_RESULTS;
-    
+
    return 0;
 }

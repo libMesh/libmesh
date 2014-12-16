@@ -19,7 +19,7 @@
     * netcdf-4 files. The ext_ncid contains the ncid for the root
     * group (i.e. group zero). */
 
-/* Common Shared Structure for all Dispatched Objects */ 
+/* Common Shared Structure for all Dispatched Objects */
 typedef struct NC {
 	int ext_ncid;
 	int int_ncid;

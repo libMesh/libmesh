@@ -46,11 +46,11 @@ set_max_len(int len) {
 }
 
 
-/* 
+/*
  * Output a string that should not be split across lines.  If it would
  * make current line too long, first output a newline and current
  * (nested group) indentation, then continuation indentation, then
- * output string.  If string ends with a newline to force short line, 
+ * output string.  If string ends with a newline to force short line,
  * reset indentation after output.
  */
 void
@@ -98,19 +98,19 @@ lput2(
     					/*   chars); saved between calls    */
     int len_prefix = strlen (CDL_COMMENT_PREFIX);
     bool_t make_newline;
-    
+
     size_t len1 = strlen(cp);		/* length of input string */
 
     assert (len1 > 0);
 
 /* (1) Single space or newline/indent sequence, as needed. */
-    
+
     linep = linep + 1 + len1;		/* new line position, without newline */
     					/* add 1 extra for preceeding space   */
-    
+
     make_newline = (wrap && (first_item || linep > max_line_len + 2));
     					/* NEVER new line in no-wrap mode */
-    
+
     if (make_newline) {			/* start new line, if needed */
         printf ("\n");
 	indent_out();			/* same exact indentation as pr_att */
@@ -164,8 +164,8 @@ print_any_val(
     const void *valp		/* pointer to the value */
 	    )
 {
-    if (varp->has_fillval && 
-	(*(varp->tinfo->val_equals))((const nctype_t *)varp->tinfo, 
+    if (varp->has_fillval &&
+	(*(varp->tinfo->val_equals))((const nctype_t *)varp->tinfo,
 				     (const void*)varp->fillvalp, valp) ) {
 	sbuf_cpy(sb, FILL_STRING);
     } else {
@@ -235,7 +235,7 @@ pr_any_att_vals(
     sbuf_free(sb);
 }
 
-/* 
+/*
  * Prints brief annotation for a row of data values
  */
 static void
@@ -243,7 +243,7 @@ annotate_brief(
     const ncvar_t *vp,		/* variable */
     const size_t *cor,		/* corner coordinates */
     size_t vdims[]		/* variable dimension sizes */
-    ) 
+    )
 {
     int vrank = vp->ndims;
     int id;
@@ -290,7 +290,7 @@ annotate(
 {
     int vrank = vp->ndims;
     int id;
-    
+
     /* print indices according to data_lang */
 /*     printf("  // %s(", vp->name); */
     printf("  // ");
@@ -415,7 +415,7 @@ upcorner(
     return ret;
 }
 
-/*  Print data values for variable varid.  
+/*  Print data values for variable varid.
  *
  * Recursive to handle possibility of variables with multiple
  * unlimited dimensions, for which the CDL syntax requires use of "{"
@@ -423,7 +423,7 @@ upcorner(
  * in a simple linear list of values.
  */
 static int
-print_rows(     
+print_rows(
     int level,          /* 0 at top-level, incremented for each recursive level */
     int ncid,		/* netcdf id */
     int varid,		/* variable id */
@@ -435,7 +435,7 @@ print_rows(
     size_t edg[],      	/* edges of hypercube */
     void *vals,   	/* allocated buffer for ncols values in a row */
     int marks_pending	/* number of pending closing "}" record markers */
-    ) 
+    )
 {
     int d0 = 0;
     size_t inc = 1;
@@ -461,11 +461,11 @@ print_rows(
 	local_cor[level] = 0;
 	local_edg[level] = 1;
 	for(i = 0; i < d0 - 1; i++) {
-	    print_rows(level + 1, ncid, varid, vp, ncols, rank, vdims, 
+	    print_rows(level + 1, ncid, varid, vp, ncols, rank, vdims,
 		       local_cor, local_edg, vals, 0);
 	    local_cor[level] += 1;
 	}
-	print_rows(level + 1, ncid, varid, vp, ncols, rank, vdims, 
+	print_rows(level + 1, ncid, varid, vp, ncols, rank, vdims,
 		   local_cor, local_edg, vals, marks_pending);
 	free(local_edg);
 	free(local_cor);
@@ -510,7 +510,7 @@ print_rows(
 	    }
 	    lput(sbuf_str(sb));
 	    lastdelim2 (0, lastrow);
-	}    
+	}
     }
     sbuf_free(sb);
     return NC_NOERR;
@@ -577,7 +577,7 @@ vardata(
     }
     nrows = nels/ncols;		/* number of "rows" */
     vals = emalloc(ncols * vp->tinfo->size);
-    
+
     /* Test if we should treat array of chars as a string  */
     if(vp->type == NC_CHAR && (vp->fmt == 0 || STREQ(vp->fmt,"%s") || STREQ(vp->fmt,""))) {
 	for (ir = 0; ir < nrows; ir++) {
@@ -597,7 +597,7 @@ vardata(
 	int level = 0;
 	int rank = vp->ndims;
 	int marks_pending = 0;
-	NC_CHECK(print_rows(level, ncid, varid, vp, ncols, rank, vdims, cor, edg, 
+	NC_CHECK(print_rows(level, ncid, varid, vp, ncols, rank, vdims, cor, edg,
 			    vals, marks_pending));
     }
     free(vals);
@@ -773,7 +773,7 @@ vardatax(
     }
     nrows = nels/ncols;		/* number of "rows" */
     vals = emalloc(ncols * vp->tinfo->size);
-    
+
     for (ir = 0; ir < nrows; ir++) {
 	size_t corsav;
 	bool_t lastrow;
@@ -787,16 +787,16 @@ vardatax(
 	    edg[vrank-1] = ncols;
 	NC_CHECK(nc_get_vara(ncid, varid, cor, edg, vals) );
 	/* Test if we should treat array of chars as a string  */
-	if(vp->type == NC_CHAR && 
+	if(vp->type == NC_CHAR &&
 	   (vp->fmt == 0 || STREQ(vp->fmt,"%s") || STREQ(vp->fmt,""))) {
 	    pr_tvalsx(vp, ncols, 0, lastrow, (char *) vals);
 	} else {
 	    pr_any_valsx(vp, ncols, 0, lastrow, vals);
 	}
-	
+
 	if (vrank > 0)
 	    cor[vrank-1] += ncols;
-	
+
 	if (vrank > 0)
 	  cor[vrank-1] = corsav;
 	if (ir < nrows-1)

@@ -1,5 +1,5 @@
 ## This is a automake file, part of Unidata's netCDF package.
-# Copyright 2006, see the COPYRIGHT file for more information.  
+# Copyright 2006, see the COPYRIGHT file for more information.
 
 # This file builds CDL examples.
 
@@ -17,4 +17,3 @@ sfc_pres_temp.cdl pres_temp_4D.cdl CMakeLists.txt
 
 # Clean up files created during the process.
 CLEANFILES = simple_xy.nc sfc_pres_temp.nc pres_temp_4D.nc
-

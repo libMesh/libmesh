@@ -103,7 +103,7 @@ markcdf4(const char* msg)
         markcdf4_msg = (char*)msg;
 }
 
-char* 
+char*
 getmarkcdf4(void)
 {
     return markcdf4_msg;

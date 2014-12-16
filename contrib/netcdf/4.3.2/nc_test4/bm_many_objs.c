@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     int g, grp, numgrp;
     char gname[16];
     int v, var, numvar, vn, vleft, nvars;
-    
+
     if(argc > 2) { 	/* Usage */
 	printf("NetCDF performance test, writing many groups and variables.\n");
 	printf("Usage:\t%s [N]\n", argv[0]);
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	}
     }
     nc_close(ncid);
-    
+
     /*  create new file */
     if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
     /* create N variables, printing time after every 1000.  Because only
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     vleft = numvar - (NC_MAX_VARS * (numgrp - 1));
     if (gettimeofday(&start_time, NULL))
 	ERR;
-    
+
     for(g = 1; g < numgrp + 1; g++) {
 	sprintf(gname, "group%d", g);
 	if (nc_def_grp(ncid, gname, &grp)) ERR;

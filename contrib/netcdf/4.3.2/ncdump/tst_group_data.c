@@ -1,4 +1,4 @@
-/* This is part of the netCDF package.  
+/* This is part of the netCDF package.
 
    Copyright 2005-2007, University Corporation for Atmospheric
    Research/Unidata See COPYRIGHT file for conditions of use.
@@ -41,9 +41,9 @@ main(int argc, char **argv) {
     int var_dims[VAR_RANK], var2_dims[VAR2_RANK];
     int g1id, g2id, g3id;
     float vals[] = {1.0, 2.0, 3.0, 4.0};
-    float vals2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 
+    float vals2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
 		     13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
-    
+
     printf("\n*** Testing groups.\n");
     printf("*** creating nested group file %s...", FILE_NAME);
 
@@ -54,18 +54,18 @@ main(int argc, char **argv) {
     var_dims[0] = dimid;
     if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
     if (nc_put_att_text(ncid, varid, ATT_NAME, strlen(ATT_VAL), ATT_VAL)) ERR;
-    if (nc_put_att_text(ncid, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL), 
+    if (nc_put_att_text(ncid, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL),
 			GATT_VAL)) ERR;
     if (nc_enddef(ncid)) ERR;
     if (nc_put_var_float(ncid, varid, vals)) ERR;
-    
+
     /* put dim, var, atts with same names in a group */
     if (nc_def_grp(ncid, G1_NAME, &g1id)) ERR;
     if (nc_def_dim(g1id, DIM_NAME, DIM_LEN1, &dimid1)) ERR;
     var_dims[0] = dimid1;
     if (nc_def_var(g1id, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
     if (nc_put_att_text(g1id, varid, ATT_NAME, strlen(ATT_VAL1), ATT_VAL1)) ERR;
-    if (nc_put_att_text(g1id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL1), 
+    if (nc_put_att_text(g1id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL1),
 			GATT_VAL1)) ERR;
     if (nc_enddef(g1id)) ERR;
     if (nc_put_var_float(g1id, varid, vals)) ERR;
@@ -76,18 +76,18 @@ main(int argc, char **argv) {
     var_dims[0] = dimid2;
     if (nc_def_var(g2id, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
     if (nc_put_att_text(g2id, varid, ATT_NAME, strlen(ATT_VAL2), ATT_VAL2)) ERR;
-    if (nc_put_att_text(g2id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL2), 
+    if (nc_put_att_text(g2id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL2),
 			GATT_VAL2)) ERR;
     if (nc_enddef(g2id)) ERR;
     if (nc_put_var_float(g2id, varid, vals)) ERR;
-    
+
     /* put dim, var, atts with same names in a subgroup of second group */
     if (nc_def_grp(g2id, G3_NAME, &g3id)) ERR;
     if (nc_def_dim(g3id, DIM_NAME, DIM_LEN3, &dimid3)) ERR;
     var_dims[0] = dimid3;
     if (nc_def_var(g3id, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
     if (nc_put_att_text(g3id, varid, ATT_NAME, strlen(ATT_VAL3), ATT_VAL3)) ERR;
-    if (nc_put_att_text(g3id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL3), 
+    if (nc_put_att_text(g3id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL3),
 			GATT_VAL3)) ERR;
     var2_dims[0] = dimid;
     var2_dims[1] = dimid2;

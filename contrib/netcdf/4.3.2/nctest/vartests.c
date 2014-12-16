@@ -242,7 +242,7 @@ struct cdfelm {			/* coordinates and generic value */
 };
 
 
-/* 
+/*
  * Test both ncvarput1 and ncvarget1 with all types of data
  *    use points in "lower-left", "middle", and "upper-right"
  *    for each existing variable, put values of its type at each point
@@ -365,7 +365,7 @@ test_varputget1(cdfid)
 	    }
 	}
     }
-   
+
     return nerrs;
 }
 

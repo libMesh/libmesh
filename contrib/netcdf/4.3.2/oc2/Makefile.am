@@ -34,7 +34,7 @@ EXTRA_DIST = dap.y CMakeLists.txt
 
 if BUILD_DAP
 noinst_LTLIBRARIES = liboc.la
-liboc_la_SOURCES = $(SRC) $(HDRS) 
+liboc_la_SOURCES = $(SRC) $(HDRS)
 liboc_la_CPPFLAGS = $(AM_CPPFLAGS)
 endif
 
@@ -49,5 +49,3 @@ bison:: dap.y
 	rm -f dap.tab.c dap.tab.h
 	bison --debug -d -p dap dap.y
 	mv dap.tab.c daptab.c; mv dap.tab.h daptab.h
-
-

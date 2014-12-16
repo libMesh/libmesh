@@ -3,7 +3,7 @@
    See COPYRIGHT file for conditions of use.
 
    Test netcdf-4 file from user-reported error. This code based on an
-   ncgen output. 
+   ncgen output.
 
    $Id: tst_files4.c,v 1.4 2010/05/18 12:30:05 ed Exp $
 */
@@ -26,7 +26,7 @@
 int
 main() {/* create data.nc */
 
-    int  ncid;  
+    int  ncid;
     int classical_grp;
 
     /* dimension ids */
@@ -60,7 +60,7 @@ main() {/* create data.nc */
        /* Sample data. */
        for (i = 0; i < SLICE_LEN * PARTICLE_LEN * AXIS_LEN; i++)
 	  data[i] = 42.42;
-       
+
        if (nc_create(FILE_NAME, NC_CLOBBER|NC_NETCDF4, &ncid)) ERR;
        if (nc_def_grp(ncid, CLASSICAL, &classical_grp)) ERR;
 
@@ -74,17 +74,17 @@ main() {/* create data.nc */
        dimids[1] = slice_dim;
        dimids[2] = particle_dim;
        dimids[3] = axis_dim;
-       if (nc_def_var(classical_grp, "position", NC_DOUBLE, NDIMS4, 
+       if (nc_def_var(classical_grp, "position", NC_DOUBLE, NDIMS4,
 		      dimids, &position_id)) ERR;
 
        /* First write some position data. */
-       if (nc_put_vara_double(classical_grp, position_id, 
+       if (nc_put_vara_double(classical_grp, position_id,
 			      start, count, data)) ERR;
 
        /* Now define some coordinate variables. */
-       if (nc_def_var(classical_grp, "snapshot", NC_INT, NDIMS1, 
+       if (nc_def_var(classical_grp, "snapshot", NC_INT, NDIMS1,
 		      &snapshot_dim, &snapshot_id)) ERR;
-       if (nc_def_var(classical_grp, "axis", NC_CHAR, NDIMS1, 
+       if (nc_def_var(classical_grp, "axis", NC_CHAR, NDIMS1,
 		      &axis_dim, &axis_id)) ERR;
 
        /* Check some stuff. */
@@ -96,7 +96,7 @@ main() {/* create data.nc */
        if (strcmp(name_in, CLASSICAL)) ERR;
        if (nc_inq(classical_grp, &ndims_in, &nvars_in, &natts_in, &unlimdimid)) ERR;
        if (ndims_in != 4 || nvars_in != 3 || natts_in != 0 || unlimdimid != 0) ERR;
-       
+
 
        if (nc_close(ncid)) ERR;
 
@@ -109,7 +109,7 @@ main() {/* create data.nc */
     {
        int i, ncid;
 
-       for (i = 0; i < 32768; i++) 
+       for (i = 0; i < 32768; i++)
        {
 	  if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR_RET;
 	  if (nc_close(ncid)) ERR_RET;

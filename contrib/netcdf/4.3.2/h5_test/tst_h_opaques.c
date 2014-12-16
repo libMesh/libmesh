@@ -29,9 +29,9 @@ main()
 
    printf("\n*** Checking HDF5 opaque types.\n");
    printf("*** Checking simple HDF5 opaque types...");
-   
+
    /* Open file. */
-   if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+   if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			   H5P_DEFAULT)) < 0) ERR;
    if ((grpid = H5Gcreate(fileid, "grp1", 0)) < 0) ERR;
 
@@ -44,7 +44,7 @@ main()
 
    /* Write an attribute of this type. */
    if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-   if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid, 
+   if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid,
 			  H5P_DEFAULT)) < 0) ERR;
    if (H5Awrite(attid, typeid, data) < 0) ERR;
    if (H5Aclose(attid) < 0) ERR;

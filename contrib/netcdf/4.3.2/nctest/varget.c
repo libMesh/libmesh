@@ -48,7 +48,7 @@ test_ncvarget(path)
 
     /* try putting hypercube and getting various interior slabs */
     nerrs += test_slabs (cdfid);
-    
+
     /* find a variable with at least one dimension */
     iv = 0;
     while (test.vars[iv].ndims <= 0 && iv < test.nvars)
@@ -80,7 +80,7 @@ test_ncvarget(path)
 	}
 	hc.edg[id] = tmp;
 
-	{ 
+	{
 		long mqv = test.vars[iv].ndims -1 ;
 		int dim = test.vars[iv].dims[mqv] ;
 

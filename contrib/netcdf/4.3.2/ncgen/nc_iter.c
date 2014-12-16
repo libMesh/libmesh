@@ -17,9 +17,9 @@ It has diverged slightly over time.
 #define CHECK(stat,f) if(stat != NC_NOERR) {check(stat,#f,__FILE__,__LINE__);} else {}
 
 /* forward declarations */
-static int nc_blkio_init(size_t bufsize, size_t value_size, int rank, 
+static int nc_blkio_init(size_t bufsize, size_t value_size, int rank,
 			  const size_t *dims, nciter_t *iter);
-static int up_start(int ndims, const size_t *dims, int incdim, size_t inc, 
+static int up_start(int ndims, const size_t *dims, int incdim, size_t inc,
 		    size_t* odom);
 
 static int nciter_ndims(Symbol*,int*);
@@ -43,7 +43,7 @@ check(int err, const char* fcn, const char* file, const int line)
 int
 nc_get_iter(Symbol* vsym,
 	     size_t bufsize,   /* size in bytes of memory buffer */
-	     nciter_t *iterp    /* returned opaque iteration state */) 
+	     nciter_t *iterp    /* returned opaque iteration state */)
 {
     int stat = NC_NOERR;
     Symbol* vartype;
@@ -77,11 +77,11 @@ nc_get_iter(Symbol* vsym,
 /* Iterate on blocks for variables, by updating start and count vector
  * for next vara call.  Assumes nc_get_iter called first.  Returns
  * number of variable values to get, 0 if done, negative number if
- * error, so use like this: 
+ * error, so use like this:
    size_t to_get;
-   while((to_get = nc_next_iter(&iter, start, count)) > 0) { 
-      ... iteration ... 
-   } 
+   while((to_get = nc_next_iter(&iter, start, count)) > 0) {
+      ... iteration ...
+   }
    if(to_get < 0) { ... handle error ... }
  */
 size_t
@@ -103,7 +103,7 @@ nc_next_iter(nciter_t *iter,	/* returned opaque iteration state */
         }
         iter->first = 0;
     } else {
-        iter->more = up_start(iter->rank, iter->dimsizes, iter->right_dim, 
+        iter->more = up_start(iter->rank, iter->dimsizes, iter->right_dim,
                               iter->inc, start);
         /* iterate on pieces of variable */
         if(iter->cur < iter->numrows) {
@@ -117,7 +117,7 @@ nc_next_iter(nciter_t *iter,	/* returned opaque iteration state */
                 iter->cur = 0;
             }
         }
-        
+
     }
     iter->to_get = 1;
     for(i = 0; i < iter->rank; i++) {

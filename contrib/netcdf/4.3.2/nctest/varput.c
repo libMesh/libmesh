@@ -54,7 +54,7 @@ test_ncvarput(path)
 
     /* opened in data mode, try putting and getting hypercubes of each type */
     nerrs += test_varputget (cdfid);	/* prints messages for discrepencies */
-    
+
     /* find a variable with at least one dimension */
     iv = 0;
     while (test.vars[iv].ndims <= 0 && iv < test.nvars)
@@ -84,7 +84,7 @@ test_ncvarput(path)
 	    ncclose(cdfid); return ++nerrs;
 	}
 	hc.edg[id] = tmp;
-	{ 
+	{
 		long mqv = test.vars[iv].ndims -1 ;
 		int dim = test.vars[iv].dims[mqv] ;
 
@@ -95,7 +95,7 @@ test_ncvarput(path)
 		    ncclose(cdfid); return ++nerrs;
 		}
 		hc.cor[mqv] = tmp;
-	
+
 		tmp = hc.edg[mqv];
 		hc.edg[mqv] = test.dims[dim].size + 1; /* try big edge, should fail */
 		if(ncvarput (cdfid, iv, hc.cor, hc.edg, hc.vals) != -1) {

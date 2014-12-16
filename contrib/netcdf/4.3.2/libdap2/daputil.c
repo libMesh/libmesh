@@ -289,7 +289,7 @@ dapparamcheck(NCDAPCOMMON* nccomm, const char* key, const char* subkey)
 }
 
 
-/* This is NOT UNION */ 
+/* This is NOT UNION */
 int
 nclistconcat(NClist* l1, NClist* l2)
 {
@@ -324,7 +324,7 @@ nclistdeleteall(NClist* l, void* elem)
             found=1;
         }
     }
-    return found;    
+    return found;
 }
 
 /* Collect the set of container nodes ending in "container"*/
@@ -556,7 +556,7 @@ daptopseq(CDFnode* seq)
 BOOL
 daptoplevel(CDFnode* node)
 {
-    if(node->container == NULL 
+    if(node->container == NULL
        || node->container->nctype != NC_Dataset) return FALSE;
     return TRUE;
 }
@@ -601,7 +601,7 @@ void
 dapexpandescapes(char *termstring)
 {
     char *s, *t, *endp;
-    
+
     /* expand "\" escapes, e.g. "\t" to tab character;
        will only shorten string length, never increase it
     */
@@ -725,7 +725,7 @@ dap_fetch(NCDAPCOMMON* nccomm, OClink conn, const char* ce,
 	char* baseurl = ncuribuild(nccomm->oc.url,NULL,ext,0);
 	if(ce == NULL)
             LOG1(NCLOGNOTE,"fetch: %s",baseurl);
-	else	
+	else
             LOG2(NCLOGNOTE,"fetch: %s?%s",baseurl,ce);
 	nullfree(baseurl);
 #ifdef HAVE_GETTIMEOFDAY
@@ -747,7 +747,7 @@ dap_fetch(NCDAPCOMMON* nccomm, OClink conn, const char* ce,
 fprintf(stderr,"fetch: dds:\n");
 oc_dumpnode(conn,*rootp);
 #endif
-    
+
     /* Look at the HTTP return code */
     httpcode = oc_httpcode(conn);
     if(httpcode < 400) {
@@ -810,7 +810,7 @@ repairname(const char* name, const char* badchars)
         if(strchr(badchars,c) != NULL) {
 	    int digit;
             char newchar[4];
-	    newchar[0] = '%';	
+	    newchar[0] = '%';
             digit = (c & 0xf0) >> 4;
 	    newchar[1] = hexdigits[digit];
             digit = (c & 0x0f);

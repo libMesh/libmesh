@@ -1,9 +1,9 @@
 /*
  * Copyright 1993-1996 University Corporation for Atmospheric Research/Unidata
- * 
- * Portions of this software were developed by the Unidata Program at the 
+ *
+ * Portions of this software were developed by the Unidata Program at the
  * University Corporation for Atmospheric Research.
- * 
+ *
  * Access and use of this software shall impose the following obligations
  * and understandings on the user. The user is granted the right, without
  * any fee or cost, to use, copy, modify, alter, enhance and distribute
@@ -20,7 +20,7 @@
  * any support, consulting, training or assistance of any kind with regard
  * to the use, operation and performance of this software nor to provide
  * the user with any updates, revisions, new versions or "bug fixes."
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY UCAR/UNIDATA "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -127,7 +127,7 @@ EXTERNL int
 NC3_inq_att(int ncid, int varid, const char *name,
 	 nc_type *xtypep, size_t *lenp);
 
-EXTERNL int 
+EXTERNL int
 NC3_inq_attid(int ncid, int varid, const char *name, int *idp);
 
 EXTERNL int

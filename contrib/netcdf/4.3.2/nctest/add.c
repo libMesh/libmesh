@@ -4,8 +4,8 @@
  *   $Header: /upc/share/CVS/netcdf-3/nctest/add.c,v 1.18 2008/06/10 19:38:03 russ Exp $
  *********************************************************************/
 
-/* 
- * utility functions to update in-memory netcdf by adding new 
+/*
+ * utility functions to update in-memory netcdf by adding new
  * dimensions, variables, and attributes.
  */
 #include <config.h>

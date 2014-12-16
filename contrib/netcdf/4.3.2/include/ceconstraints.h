@@ -28,4 +28,3 @@ CES_VALUE=18, CES_SLICE=19
 } CEsort;
 
 #endif /*CECONSTRAINTS_H*/
-

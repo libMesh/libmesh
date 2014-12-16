@@ -1,4 +1,4 @@
-/** \file 
+/** \file
 
 This program benchmarks creating a netCDF file and reading records.
 
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     int g, grp, numgrp;
     char gname[16];
     int v, var, numvar, vn, vleft, nvars;
-    
+
     int  stat;  /* return status */
 
     /* dimension ids */
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     temperature_2m_dims[1] = forecast_dim;
     temperature_2m_dims[2] = latitude_dim;
     temperature_2m_dims[3] = longitude_dim;
-    if (nc_def_var(ncid, "temperature_2m", NC_FLOAT, RANK_temperature_2m, 
+    if (nc_def_var(ncid, "temperature_2m", NC_FLOAT, RANK_temperature_2m,
 		   temperature_2m_dims, &temperature_2m_id)) ERR;
 
     /* assign per-variable attributes */
@@ -89,6 +89,6 @@ int main(int argc, char **argv)
     if (nc_close(ncid)) ERR;
 
     if (gettimeofday(&start_time, NULL)) ERR;
-    
+
     return(0);
 }

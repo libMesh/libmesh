@@ -39,12 +39,12 @@ main()
       if (H5Pset_fclose_degree(access_plist, H5F_CLOSE_SEMI)) ERR;
 
       /* Create file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      access_plist)) < 0) ERR;
       /* Add an opaque type. */
       if ((typeid = H5Tcreate(H5T_OPAQUE, OPAQUE_SIZE)) < 0) ERR;
       if (H5Tcommit(fileid, OPAQUE_NAME, typeid) < 0) ERR;
-      
+
       /* Add attribute of this type. */
       dims[0] = 3;
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;

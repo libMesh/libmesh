@@ -33,7 +33,7 @@
 #define DIM3 1000000		/* DIM2*DIM3 > 2**32 */
 #define FIRST_VAL   65
 #define SECOND_VAL  90
-/* 
+/*
  * This program tests the fix for a large file bug in versions
  * previous to netCDF-4.1.2 for 32-bit platforms, writing to a
  * variable with more than 1 dimension and more than 2**32 values,
@@ -42,7 +42,7 @@
  * as well, but that's not tested here.
  */
 static int
-test_big_var(const char *testfile) 
+test_big_var(const char *testfile)
 {
     int ncid, varid, dimids[NUMDIMS];
     size_t start[NUMDIMS] = {0, 0, 0, 0};
@@ -50,7 +50,7 @@ test_big_var(const char *testfile)
     short data[DIM3];
     int i, j, k;
     int nerrs = 0;
-    
+
     /* Create a file with one big 4D variable. */
     if (nc_create(testfile, NC_CLOBBER, &ncid)) ERR;
     if (nc_set_fill(ncid, NC_NOFILL, NULL)) ERR;
@@ -84,7 +84,7 @@ test_big_var(const char *testfile)
     if (nc_get_vara_short(ncid, varid, start, count, &data[0])) ERR;
     for (j = 0; j < DIM3; j++) {
 	if (data[j] != FIRST_VAL ) {
-	    printf("error on start[0..2]: %d,%d,%d  j: %d, expected %d got %d\n", 
+	    printf("error on start[0..2]: %d,%d,%d  j: %d, expected %d got %d\n",
 		   start[0], start[1], start[2], j, FIRST_VAL, data[j]);
 	    ERR;
 	    if(nerrs++ > 1)
@@ -110,6 +110,6 @@ main(int argc, char **argv) {
        (void) remove(testfile);
        SUMMARIZE_ERR;
    }
-    
+
     FINAL_RESULTS;
 }

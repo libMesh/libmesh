@@ -5,10 +5,10 @@
    Program to create a cdf, exercise all cdf functions.  Creates cdf,
    stuff it full of numbers, closes it. Then reopens it, and checks
    for consistency.  Leaves the file around afterwards.
- 
+
    Based on a program to test the nasa look-alike program, so not the
    most appropropriate test. See ../nctest for a complete spec test.
- 
+
    $Id: t_nc.c,v 1.94 2010/05/27 21:34:13 dmh Exp $ */
 
 #define REDEF
@@ -197,32 +197,32 @@ createtestvars(int id, const struct tcdfvar *testvars, size_t count)
 	{
 		assert(nc_def_var(id, vp->mnem, vp->type, vp->ndims, vp->dims,
 				 &varid)
-			 == NC_NOERR ); 
+			 == NC_NOERR );
 
 	 	assert(
 			nc_put_att_text(id,ii,reqattr[0],strlen(vp->units),
 				vp->units)
-			== NC_NOERR); 
+			== NC_NOERR);
 	 	assert(
 			nc_put_att_double(id,ii,reqattr[1],NC_DOUBLE,1,
 				&vp->validmin)
-			== NC_NOERR); 
+			== NC_NOERR);
 	 	assert(
 			nc_put_att_double(id,ii,reqattr[2],NC_DOUBLE,1,
 				&vp->validmax)
-			== NC_NOERR); 
+			== NC_NOERR);
 	 	assert(
 			nc_put_att_double(id,ii,reqattr[3],NC_DOUBLE,1,
 				&vp->scalemin)
-			== NC_NOERR); 
+			== NC_NOERR);
 	 	assert(
 			nc_put_att_double(id,ii,reqattr[4],NC_DOUBLE,1,
 				&vp->scalemax)
-			== NC_NOERR); 
+			== NC_NOERR);
 	 	assert(
 			nc_put_att_text(id,ii,reqattr[5],strlen(vp->fieldnam),
 				vp->fieldnam)
-			== NC_NOERR); 
+			== NC_NOERR);
 	}
 }
 
@@ -254,7 +254,7 @@ fill_seq(int id)
 	{
 		size_t *cc = vindices;
 		while (cc < &vindices[num_dims])
-			*cc++ = 0; 
+			*cc++ = 0;
 	}
 
 	sizes[0] = NUM_RECS;
@@ -275,7 +275,7 @@ check_fill_seq(int id)
 	sizes[0] = NUM_RECS;
 	cc = vindices;
 	while (cc < &vindices[num_dims])
-		*cc++ = 0; 
+		*cc++ = 0;
 
 	/* ripple counter */
 	cc = vindices;
@@ -286,7 +286,7 @@ check_fill_seq(int id)
 	    {
 		if (mm == &sizes[num_dims - 1])
 		{
-	if(nc_get_var1_float(id, Float_id, vindices, &got.fl[0]) == -1) 
+	if(nc_get_var1_float(id, Float_id, vindices, &got.fl[0]) == -1)
 		goto bad_ret;
 	/* val = (float) ii;  */
 	/* if(val != got.fl[0]) */
@@ -360,9 +360,9 @@ main(int ac, char *av[])
  		/* (void) fprintf(stderr, "trying again\n"); */
 		ret = nc__create(fname,NC_CLOBBER, initialsz, &chunksz, &id);
 	}
-	if(ret != NC_NOERR) 
+	if(ret != NC_NOERR)
 		exit(ret);
-	
+
 	assert( nc_put_att_text(id, NC_GLOBAL,
 		"TITLE", 12, "another name") == NC_NOERR);
 	assert( nc_get_att_text(id, NC_GLOBAL,
@@ -379,7 +379,7 @@ main(int ac, char *av[])
 	createtestdims(id, NUM_DIMS, sizes, dim_names);
 	testdims(id, NUM_DIMS, sizes, dim_names);
 
-	createtestvars(id, testvars, NUM_TESTVARS); 
+	createtestvars(id, testvars, NUM_TESTVARS);
 
  	{
  	int ifill = -1; double dfill = -9999;
@@ -391,7 +391,7 @@ main(int ac, char *av[])
 
 #ifdef REDEF
 	assert( nc__enddef(id, 0, align, 0, 2*align) == NC_NOERR );
-	assert( nc_put_var1_int(id, Long_id, indices[3], &birthday) 
+	assert( nc_put_var1_int(id, Long_id, indices[3], &birthday)
 		== NC_NOERR );
 	fill_seq(id);
 	assert( nc_redef(id) == NC_NOERR );
@@ -469,7 +469,7 @@ main(int ac, char *av[])
 	/* (void) printf("reopen id = %d for filename %s\n", */
 	/* 	id, fname); */
 
-	/*	NC	*/ 
+	/*	NC	*/
 	/* (void) printf("NC "); */
 	assert( nc_inq(id, &(cdesc->num_dims), &(cdesc->num_vars),
 		&(cdesc->num_attrs), &(cdesc->xtendim) ) == NC_NOERR);
@@ -477,7 +477,7 @@ main(int ac, char *av[])
 	assert(cdesc->num_attrs == 1);
 	assert(cdesc->num_vars == NUM_TESTVARS);
 	/* (void) printf("done\n"); */
-	
+
 	/*	GATTR	*/
 	/* (void) printf("GATTR "); */
 
@@ -494,7 +494,7 @@ main(int ac, char *av[])
 	/* (void) printf("VAR "); */
 	assert( cdesc->num_vars == NUM_TESTVARS );
 
-	for(ii = 0; ii < cdesc->num_vars; ii++, tvp++ ) 
+	for(ii = 0; ii < cdesc->num_vars; ii++, tvp++ )
 	{
 		int jj;
 		assert( nc_inq_var(id, ii,
@@ -528,7 +528,7 @@ main(int ac, char *av[])
 
 		/* VATTR */
 		/* (void) printf("VATTR\n"); */
-		for(jj=0; jj<vdesc->num_attrs; jj++ ) 
+		for(jj=0; jj<vdesc->num_attrs; jj++ )
 		{
 			assert( nc_inq_attname(id, ii, jj, adesc->mnem) == NC_NOERR);
 			if( strcmp(adesc->mnem, reqattr[jj]) != 0 )
@@ -543,7 +543,7 @@ main(int ac, char *av[])
 			!= -1) {
 		assert( adesc->type == NC_CHAR );
 		assert( adesc->len == strlen(tvp->units) );
-	 	assert( nc_get_att_text(id,ii,reqattr[0],buf)== NC_NOERR); 
+	 	assert( nc_get_att_text(id,ii,reqattr[0],buf)== NC_NOERR);
 		buf[adesc->len] = 0;
 		assert( strcmp(tvp->units, buf) == 0);
 		}
@@ -592,7 +592,7 @@ main(int ac, char *av[])
 		{
 		assert( adesc->type == NC_CHAR );
 		assert( adesc->len == strlen(tvp->fieldnam) );
-	 	assert( nc_get_att_text(id,ii,reqattr[5],buf)== NC_NOERR); 
+	 	assert( nc_get_att_text(id,ii,reqattr[5],buf)== NC_NOERR);
 		buf[adesc->len] = 0;
 		assert( strcmp(tvp->fieldnam, buf) == 0);
 		}

@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 int
-main() 
+main()
 {
    printf("NetCDF version: %s\n", nc_inq_libvers());
    printf("*** SUCCESS!\n");

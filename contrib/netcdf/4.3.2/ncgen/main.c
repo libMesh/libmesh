@@ -176,7 +176,7 @@ main(
 #ifdef __hpux
     setlocale(LC_CTYPE,"");
 #endif
-    
+
     init_netcdf();
 
     opterr = 1;			/* print error message if bad option */
@@ -207,7 +207,7 @@ main(
     while ((c = getopt(argc, argv, "hbcfk:l:no:v:xdM:D:B:P")) != EOF)
       switch(c) {
 	case 'd':
-	  debug = 1;	  
+	  debug = 1;
 	  break;
 	case 'D':
 	  debug = atoi(optarg);
@@ -236,7 +236,7 @@ main(
 	  l_flag = L_BINARY;
 	  break;
 	case 'h':
-	  header_only = 1;	  
+	  header_only = 1;
 	  break;
      case 'l': /* specify language, instead of using -c or -f or -b */
 
@@ -254,7 +254,7 @@ main(
 		    }
 		}
 		if(langs->name == NULL) {
-		    derror("%s: output language %s not implemented", 
+		    derror("%s: output language %s not implemented",
 			   progname, lang_name);
 		    return(1);
 		}
@@ -276,7 +276,7 @@ main(
 	  break;
         case 'v': /* a deprecated alias for "kind" option */
 	    /*FALLTHRU*/
-        case 'k': /* for specifying variant of netCDF format to be generated 
+        case 'k': /* for specifying variant of netCDF format to be generated
                      Possible values are:
                      1 (=> classic 32 bit)
                      2 (=> classic 64 bit)
@@ -413,7 +413,7 @@ main(
 	cdlname = (char*)emalloc(NC_MAX_NAME);
 	cdlname = nulldup(argv[0]);
 	if(cdlname != NULL) {
-	  if(strlen(cdlname) > NC_MAX_NAME) 
+	  if(strlen(cdlname) > NC_MAX_NAME)
 	    cdlname[NC_MAX_NAME] = '\0';
 	}
     }
@@ -479,7 +479,7 @@ main(
 	cmode_modifier |= (NC_DISKLESS|NC_NOCLOBBER);
 
     processsemantics();
-    if(!syntax_only && error_count == 0) 
+    if(!syntax_only && error_count == 0)
         define_netcdf();
 
     return 0;

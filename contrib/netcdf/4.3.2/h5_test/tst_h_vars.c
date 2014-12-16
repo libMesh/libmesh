@@ -30,16 +30,16 @@ main()
    printf("*** Checking HDF5 boolen variables...");
 
    /* Open file and create group. */
-   if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+   if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			   H5P_DEFAULT)) < 0) ERR;
    if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
 
    /* Write an array of bools. */
    dims[0] = DIM1_LEN;
    if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
-   if ((datasetid = H5Dcreate(grpid, VAR_BOOL_NAME, H5T_NATIVE_HBOOL, 
+   if ((datasetid = H5Dcreate(grpid, VAR_BOOL_NAME, H5T_NATIVE_HBOOL,
 			      spaceid, H5P_DEFAULT)) < 0) ERR;
-   if (H5Dwrite(datasetid, H5T_NATIVE_HBOOL, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+   if (H5Dwrite(datasetid, H5T_NATIVE_HBOOL, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		bool_out) < 0) ERR;
    if (H5Dclose(datasetid) < 0 ||
        H5Sclose(spaceid) < 0 ||
@@ -75,7 +75,7 @@ main()
 	    float_data_out[lat][lon] = -666.666;
 
       /* Create file and group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP2_NAME, 0)) < 0) ERR;
 
@@ -96,14 +96,14 @@ main()
       if (H5Pset_chunk(cparmsid, NDIMS, dims) < 0) ERR;
 
       /* Create two variables which use this space. */
-      if ((pres_dsid = H5Dcreate(grpid, PRES_NAME, H5T_NATIVE_FLOAT, 
+      if ((pres_dsid = H5Dcreate(grpid, PRES_NAME, H5T_NATIVE_FLOAT,
 				 spaceid, cparmsid)) < 0) ERR;
-      if ((temp_dsid = H5Dcreate(grpid, TEMP_NAME, H5T_NATIVE_FLOAT, 
+      if ((temp_dsid = H5Dcreate(grpid, TEMP_NAME, H5T_NATIVE_FLOAT,
 				 spaceid, cparmsid)) < 0) ERR;
 
       /* Get the spaceid and check various things. */
       if ((spaceid_in = H5Dget_space(pres_dsid)) < 0) ERR;
-      if (H5Sget_simple_extent_dims(spaceid_in, dims_in, 
+      if (H5Sget_simple_extent_dims(spaceid_in, dims_in,
 				    max_dims_in) < 0) ERR;
       if (dims_in[0] != 0 || dims_in[1] != LAT_LEN || dims_in[2] != LON_LEN) ERR;
       if (max_dims_in[0] != H5S_UNLIMITED || max_dims_in[1] != LAT_LEN || max_dims_in[2] != LON_LEN) ERR;
@@ -122,14 +122,14 @@ main()
       if ((write_spaceid = H5Screate_simple(NDIMS, dims, NULL)) < 0) ERR;
 
       /* Write one record of data to each dataset. */
-      if (H5Dwrite(pres_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid, 
+      if (H5Dwrite(pres_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid,
 		   H5P_DEFAULT, float_data_out) < 0) ERR;
-      if (H5Dwrite(temp_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid, 
+      if (H5Dwrite(temp_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid,
 		   H5P_DEFAULT, float_data_out) < 0) ERR;
-      
+
       /* Get the spaceid and check various things. */
       if ((spaceid_in = H5Dget_space(temp_dsid)) < 0) ERR;
-      if (H5Sget_simple_extent_dims(spaceid_in, dims_in, 
+      if (H5Sget_simple_extent_dims(spaceid_in, dims_in,
 				    max_dims_in) < 0) ERR;
       if (dims_in[0] != 1 || dims_in[1] != LAT_LEN || dims_in[2] != LON_LEN) ERR;
       if (max_dims_in[0] != H5S_UNLIMITED || max_dims_in[1] != LAT_LEN || max_dims_in[2] != LON_LEN) ERR;
@@ -149,18 +149,18 @@ main()
       start[0] = 1;
       start[1] = 0;
       start[2] = 0;
-      if (H5Sselect_hyperslab(write_spaceid, H5S_SELECT_SET, 
+      if (H5Sselect_hyperslab(write_spaceid, H5S_SELECT_SET,
 			      start, NULL, count, NULL) < 0) ERR;
 
       /* Write second record of data to each dataset. */
-      if (H5Dwrite(pres_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid, 
+      if (H5Dwrite(pres_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid,
 		   H5P_DEFAULT, float_data_out) < 0) ERR;
-      if (H5Dwrite(temp_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid, 
+      if (H5Dwrite(temp_dsid, H5T_IEEE_F32LE, mem_spaceid, write_spaceid,
 		   H5P_DEFAULT, float_data_out) < 0) ERR;
-      
+
       /* Get the spaceid and check various things. */
       if ((spaceid_in = H5Dget_space(pres_dsid)) < 0) ERR;
-      if (H5Sget_simple_extent_dims(spaceid_in, dims_in, 
+      if (H5Sget_simple_extent_dims(spaceid_in, dims_in,
 				    max_dims_in) < 0) ERR;
       if (dims_in[0] != 2 || dims_in[1] != LAT_LEN || dims_in[2] != LON_LEN) ERR;
       if (max_dims_in[0] != H5S_UNLIMITED || max_dims_in[1] != LAT_LEN || max_dims_in[2] != LON_LEN) ERR;
@@ -171,13 +171,13 @@ main()
 	  H5Sclose(spaceid) < 0 ||
 	  H5Gclose(grpid) < 0 ||
 	  H5Fclose(fileid) < 0) ERR;
-      
+
    }
 
    SUMMARIZE_ERR;
    printf("*** Checking HDF5 deflate filter setting and getting...");
 #define DEFLATE_LEVEL 9
-#define MAX_NAME 100   
+#define MAX_NAME 100
 #define NUM_CD_ELEM 10
 /* HDF5 defines this... */
 #define DEFLATE_NAME "deflate"
@@ -189,13 +189,13 @@ main()
       size_t cd_nelems = NUM_CD_ELEM;
       size_t namelen = MAX_NAME;
       char name[MAX_NAME + 1];
-      
+
 
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Write an array of bools, with compression. */
       dims[0] = DIM1_LEN;
       if ((propid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
@@ -203,9 +203,9 @@ main()
       if (H5Pset_chunk(propid, 1, dims)) ERR;
       if (H5Pset_deflate(propid, DEFLATE_LEVEL)) ERR;
       if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
-      if ((datasetid = H5Dcreate(grpid, VAR_BOOL_NAME, H5T_NATIVE_HBOOL, 
+      if ((datasetid = H5Dcreate(grpid, VAR_BOOL_NAME, H5T_NATIVE_HBOOL,
 				 spaceid, propid)) < 0) ERR;
-      if (H5Dwrite(datasetid, H5T_NATIVE_HBOOL, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dwrite(datasetid, H5T_NATIVE_HBOOL, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   bool_out) < 0) ERR;
       if (H5Dclose(datasetid) < 0 ||
 	  H5Pclose(propid) < 0 ||
@@ -224,11 +224,11 @@ main()
        * found in H5Zpublic.h. */
       if ((num_filters = H5Pget_nfilters(propid)) < 0) ERR;
       if (num_filters != 1) ERR;
-      if ((filter = H5Pget_filter2(propid, 0, &flags, &cd_nelems, cd_values, 
+      if ((filter = H5Pget_filter2(propid, 0, &flags, &cd_nelems, cd_values,
 				  namelen, name, &filter_config)) < 0) ERR;
       if (filter != H5Z_FILTER_DEFLATE || cd_nelems != 1 ||
 	  cd_values[0] != DEFLATE_LEVEL || strcmp(name, DEFLATE_NAME)) ERR;
-	  
+
       if (H5Dclose(datasetid) < 0 ||
 	  H5Pclose(propid) < 0 ||
 	  H5Gclose(grpid) < 0 ||
@@ -250,10 +250,10 @@ main()
       int f;
 
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Write an array of bools, with compression, fletcher32
        * checksum, shuffle filters. Like a hoogie with "the works." */
       dims[0] = DIM1_LEN;
@@ -264,9 +264,9 @@ main()
       if (H5Pset_deflate(propid, DEFLATE_LEVEL)) ERR;
       if (H5Pset_fletcher32(propid)) ERR;
       if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
-      if ((datasetid = H5Dcreate(grpid, VAR_BOOL_NAME, H5T_NATIVE_HBOOL, 
+      if ((datasetid = H5Dcreate(grpid, VAR_BOOL_NAME, H5T_NATIVE_HBOOL,
 				 spaceid, propid)) < 0) ERR;
-      if (H5Dwrite(datasetid, H5T_NATIVE_HBOOL, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dwrite(datasetid, H5T_NATIVE_HBOOL, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   bool_out) < 0) ERR;
       if (H5Dclose(datasetid) < 0 ||
 	  H5Pclose(propid) < 0 ||
@@ -287,7 +287,7 @@ main()
       if (num_filters != 3) ERR;
       for (f = 0; f < num_filters; f++)
       {
-	 if ((filter = H5Pget_filter2(propid, f, &flags, &cd_nelems, cd_values, 
+	 if ((filter = H5Pget_filter2(propid, f, &flags, &cd_nelems, cd_values,
 				      namelen, name, &filter_config)) < 0) ERR;
 	 switch (filter)
 	 {
@@ -299,7 +299,7 @@ main()
 	       break;
 	    case H5Z_FILTER_DEFLATE:
 	       found_deflate++;
-	       if (cd_nelems != 1 || cd_values[0] != DEFLATE_LEVEL || 
+	       if (cd_nelems != 1 || cd_values[0] != DEFLATE_LEVEL ||
 		   strcmp(name, DEFLATE_NAME)) ERR;
 	       break;
 	    default:
@@ -307,7 +307,7 @@ main()
 	 }
       }
       if (!found_fletcher32 || !found_deflate || !found_shuffle) ERR;
-	  
+
       if (H5Dclose(datasetid) < 0 ||
 	  H5Pclose(propid) < 0 ||
 	  H5Gclose(grpid) < 0 ||
@@ -333,24 +333,24 @@ main()
 	 data[i] = i;
 
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Create a dataset of native endian. */
       dims[0] = DIM1_LEN;
       if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
-      if ((native_did = H5Dcreate(grpid, NATIVE_VAR_NAME, H5T_NATIVE_INT, 
+      if ((native_did = H5Dcreate(grpid, NATIVE_VAR_NAME, H5T_NATIVE_INT,
 				  spaceid, H5P_DEFAULT)) < 0) ERR;
-      if ((le_did = H5Dcreate(grpid, LE_VAR_NAME, H5T_STD_I32LE, 
+      if ((le_did = H5Dcreate(grpid, LE_VAR_NAME, H5T_STD_I32LE,
 			      spaceid, H5P_DEFAULT)) < 0) ERR;
-      if ((be_did = H5Dcreate(grpid, BE_VAR_NAME, H5T_STD_I32BE, 
+      if ((be_did = H5Dcreate(grpid, BE_VAR_NAME, H5T_STD_I32BE,
 			      spaceid, H5P_DEFAULT)) < 0) ERR;
-      if (H5Dwrite(native_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dwrite(native_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   data) < 0) ERR;
-      if (H5Dwrite(le_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dwrite(le_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   data) < 0) ERR;
-      if (H5Dwrite(be_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dwrite(be_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   data) < 0) ERR;
       if (H5Dclose(native_did) < 0 ||
 	  H5Dclose(le_did) < 0 ||
@@ -371,7 +371,7 @@ main()
       if ((equal = H5Tequal(typeid, native_typeid)) < 0) ERR;
       if (!equal) ERR;
 
-      if (H5Dread(native_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dread(native_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   data_in) < 0) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 if (data[i] != data_in[i]) ERR;
@@ -381,7 +381,7 @@ main()
       if ((order = H5Tget_order(typeid)) < 0) ERR;
       if (order != H5T_ORDER_LE) ERR;
 
-      if (H5Dread(le_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dread(le_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   data_in) < 0) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 if (data[i] != data_in[i]) ERR;
@@ -391,7 +391,7 @@ main()
       if ((order = H5Tget_order(typeid)) < 0) ERR;
       if (order != H5T_ORDER_BE) ERR;
 
-      if (H5Dread(be_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dread(be_did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   data_in) < 0) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 if (data[i] != data_in[i]) ERR;

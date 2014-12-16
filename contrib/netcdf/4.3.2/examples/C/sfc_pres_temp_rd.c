@@ -5,7 +5,7 @@ This is an example which reads some surface pressure and
 temperatures. The data file read by this program is produced by the
 companion program sfc_pres_temp_wr.c. It is intended to illustrate the
 use of the netCDF C API.
-   
+
 Copyright 2006 University Corporation for Atmospheric
 Research/Unidata.  See COPYRIGHT file for conditions of use.
 
@@ -82,14 +82,14 @@ main()
       many netCDF variables, dimensions, and global attributes are in
       the file; also the dimension id of the unlimited dimension, if
       there is one. */
-   if ((retval = nc_inq(ncid, &ndims_in, &nvars_in, &ngatts_in, 
+   if ((retval = nc_inq(ncid, &ndims_in, &nvars_in, &ngatts_in,
 			&unlimdimid_in)))
       ERR(retval);
 
    /* In this case we know that there are 2 netCDF dimensions, 4
       netCDF variables, no global attributes, and no unlimited
       dimension. */
-   if (ndims_in != 2 || nvars_in != 4 || ngatts_in != 0 || 
+   if (ndims_in != 2 || nvars_in != 4 || ngatts_in != 0 ||
        unlimdimid_in != -1) return 2;
 
    /* Get the varids of the latitude and longitude coordinate
@@ -139,12 +139,12 @@ main()
       them and check them. */
    if ((retval = nc_get_att_text(ncid, lat_varid, UNITS, lat_units_in)))
       ERR(retval);
-   if (strncmp(lat_units_in, LAT_UNITS, strlen(LAT_UNITS))) 
+   if (strncmp(lat_units_in, LAT_UNITS, strlen(LAT_UNITS)))
       return 2;
 
    if ((retval = nc_get_att_text(ncid, lon_varid, UNITS, lon_units_in)))
       ERR(retval);
-   if (strncmp(lon_units_in, LON_UNITS, strlen(LON_UNITS))) 
+   if (strncmp(lon_units_in, LON_UNITS, strlen(LON_UNITS)))
       return 2;
 
    if ((retval = nc_get_att_text(ncid, pres_varid, UNITS, pres_units_in)))

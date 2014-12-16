@@ -187,7 +187,7 @@ NCD2_initialize(void)
     int i;
     /* Create our dispatch table as the merge of NCD2 table and NCSUBSTRATE */
     /* watch the order because we want NCD2 to overwrite NCSUBSTRATE */
-    NC_dispatch_overlay(&NCD2_dispatch_base, NCSUBSTRATE_dispatch_table, &NCD2_dispatcher);    
+    NC_dispatch_overlay(&NCD2_dispatch_base, NCSUBSTRATE_dispatch_table, &NCD2_dispatcher);
     NCD2_dispatch_table = &NCD2_dispatcher;
     /* Local Initialization */
     compute_nccalignments();
@@ -315,7 +315,7 @@ NCD2_open(const char * path, int mode,
     /* set the compile flag by default */
     dapcomm->oc.rawurltext = (char*)emalloc(strlen(path)+strlen("[compile]")+1);
     strcpy(dapcomm->oc.rawurltext,"[compile]");
-    strcat(dapcomm->oc.rawurltext, path);    
+    strcat(dapcomm->oc.rawurltext, path);
 #else
     dapcomm->oc.rawurltext = strdup(path);
 #endif
@@ -338,7 +338,7 @@ NCD2_open(const char * path, int mode,
 		    SETFLAG(dapcomm->controls,NCF_COLUMBIA);
 	    }
 	}
-    } 
+    }
 #endif
 
     /* fail if we are unconstrainable but have constraints */
@@ -371,7 +371,7 @@ NCD2_open(const char * path, int mode,
     dapcomm->oc.dapconstraint = (DCEconstraint*)dcecreate(CES_CONSTRAINT);
     dapcomm->oc.dapconstraint->projections = nclistnew();
     dapcomm->oc.dapconstraint->selections = nclistnew();
-    
+
      /* Parse constraints to make sure they are syntactically correct */
      ncstat = parsedapconstraints(dapcomm,dapcomm->oc.url->constraint,dapcomm->oc.dapconstraint);
      if(ncstat != NC_NOERR) {THROWCHK(ncstat); goto done;}
@@ -483,7 +483,7 @@ fprintf(stderr,"constrained dds: %s\n",dumptree(dapcomm->cdf.ddsroot));
     if(dapcomm->cdf.recorddimname != NULL
        && nclistlength(dapcomm->cdf.ddsroot->tree->seqnodes) > 0) {
 	/*nclog(NCLOGWARN,"unlimited dimension specified, but sequences exist in DDS");*/
-	PANIC("unlimited dimension specified, but sequences exist in DDS");	
+	PANIC("unlimited dimension specified, but sequences exist in DDS");
     }
 
     /* Re-compute the var names*/
@@ -543,7 +543,7 @@ fprintf(stderr,"ncdap3: final constraint: %s\n",dapcomm->oc.url->constraint);
     if(ncstat != NC_NOERR && ncstat != NC_EVARSIZE)
         {THROWCHK(ncstat); goto done;}
 #endif
-	
+
     {
         NC* ncsub;
         NC* drno = dapcomm->controller;
@@ -563,7 +563,7 @@ fprintf(stderr,"ncdap3: final constraint: %s\n",dapcomm->oc.url->constraint);
 
         /* Pretend the substrate is read-only */
 	NC_set_readonly(nc3i);
-	
+
     }
 
     /* Do any necessary data prefetch */
@@ -591,7 +591,7 @@ NCD2_close(int ncid)
     NCDAPCOMMON* dapcomm;
     int ncstatus = NC_NOERR;
 
-    ncstatus = NC_check_id(ncid, (NC**)&drno); 
+    ncstatus = NC_check_id(ncid, (NC**)&drno);
     if(ncstatus != NC_NOERR) return THROW(ncstatus);
     dapcomm = (NCDAPCOMMON*)drno->dispatchdata;
 
@@ -662,7 +662,7 @@ builddims(NCDAPCOMMON* dapcomm)
 	if(!swap) break;
     }
 
-    /* Define unlimited only if needed */ 
+    /* Define unlimited only if needed */
     if(dapcomm->cdf.recorddim != NULL) {
 	CDFnode* unlimited = dapcomm->cdf.recorddim;
 	definename = getdefinename(unlimited);
@@ -747,7 +747,7 @@ fprintf(stderr,"buildvars.candidate=|%s|\n",var->ncfullname);
                 CDFnode* dim = (CDFnode*)nclistget(vardims,j);
                 dimids[j] = dim->ncid;
  	    }
-        }   
+        }
 
 
 
@@ -787,7 +787,7 @@ fprintf(stderr,"\n");
 	/* Tag the variable with its DAP path */
 	if(dapparamcheck(dapcomm,"show","projection"))
 	    showprojection(dapcomm,var);
-    }    
+    }
 done:
     return THROW(ncstat);
 }
@@ -949,7 +949,7 @@ getdefinename(CDFnode* node)
 
     case NC_Dimension:
 	/* Return just the node's ncname */
-	spath = nulldup(node->ncbasename);	
+	spath = nulldup(node->ncbasename);
 	break;
 
     default:
@@ -993,10 +993,10 @@ computecdfdimnames(NCDAPCOMMON* nccomm)
     NClist* varnodes = nccomm->cdf.ddsroot->tree->varnodes;
     NClist* alldims;
     NClist* basedims;
-    
+
     /* Collect all dimension nodes from dimsetall lists */
 
-    alldims = getalldims(nccomm,0);    
+    alldims = getalldims(nccomm,0);
 
     /* Assign an index to all anonymous dimensions
        vis-a-vis its containing variable
@@ -1237,7 +1237,7 @@ applyclientparams(NCDAPCOMMON* nccomm)
 	pathstr = makeocpathstring(conn,var->ocnode,".");
 	strncat(tmpname,pathstr,NC_MAX_NAME);
 	nullfree(pathstr);
-	value = oc_clientparam_get(conn,tmpname);	
+	value = oc_clientparam_get(conn,tmpname);
         if(value != NULL && strlen(value) != 0) {
             if(sscanf(value,"%d",&len) && len > 0) var->maxstringlength = len;
 	}
@@ -1316,7 +1316,7 @@ replacedims(NClist* dims)
  Two dimensions are equivalent if
  1. they have the same size
  2. neither are anonymous
- 3. they ave the same names. 
+ 3. they ave the same names.
  */
 static int
 equivalentdim(CDFnode* basedim, CDFnode* dupdim)
@@ -1408,7 +1408,7 @@ addstringdims(NCDAPCOMMON* dapcomm)
 	    dimsize = var->maxstringlength;
 
 	/* check is a variable-specific string length was specified */
-	if(dimsize == 0) 
+	if(dimsize == 0)
 	    sdim = dapcomm->cdf.globalstringdim; /* use default */
 	else {
 	    /* create a psuedo dimension for the charification of the string*/
@@ -1487,7 +1487,7 @@ defseqdims(NCDAPCOMMON* dapcomm)
 	    if(container->nctype != NC_Structure
 	       || nclistlength(container->array.dimset0) > 0)
 		{seq->usesequence = 0; break;}/* no good */
-	}	
+	}
 	/* Does the user want us to compute the actual sequence dim size? */
 	if(seq->usesequence && seqdims) {
 	    ncstat = getseqdimsize(dapcomm,seq,&seqsize);
@@ -1496,7 +1496,7 @@ defseqdims(NCDAPCOMMON* dapcomm)
 	        seq->usesequence = 0;
 	    }
 	} else { /* !seqdims default to size = 1 */
-	    seqsize = 1; 
+	    seqsize = 1;
 	}
 	if(seq->usesequence) {
 	    /* Note: we are making the dimension in the dds root tree */
@@ -1536,7 +1536,7 @@ showprojection(NCDAPCOMMON* dapcomm, CDFnode* var)
 	snprintf(tmp,sizeof(tmp),"%lu",(unsigned long)dim->dim.declsize);
 	ncbytescat(projection,tmp);
 	ncbytescat(projection,"]");
-    }    
+    }
     /* Define the attribute */
     ncstat = nc_put_att_text(getncid(drno),var->ncid,
                                "_projection",
@@ -1573,10 +1573,10 @@ fprintf(stderr,"seqcountconstraints: %s\n",ncbytescontents(seqcountconstraints))
     if(ncstat) goto fail;
 
     ncstat = buildcdftree(dapcomm,ocroot,OCDATA,&dxdroot);
-    if(ncstat) goto fail;	
+    if(ncstat) goto fail;
     /* attach DATADDS to DDS */
     ncstat = attach(dxdroot,seq);
-    if(ncstat) goto fail;	
+    if(ncstat) goto fail;
 
     /* WARNING: we are now switching to datadds tree */
     xseq = seq->attachment;
@@ -1601,7 +1601,7 @@ fprintf(stderr,"sequencesize: %s = %lu\n",seq->ocname,(unsigned long)seqsize);
 			code,msg,httperr);
 	}
 	ocstat = OC_NOERR;
-    }		
+    }
     if(sizep) *sizep = seqsize;
 
 fail:
@@ -1664,7 +1664,7 @@ countsequence(NCDAPCOMMON* dapcomm, CDFnode* xseq, size_t* sizep)
         CDFnode* current = (CDFnode*)nclistget(path,i);
 	OCdatanode nextdata = NULL;
 	CDFnode* next = NULL;
-	
+
 	/* invariant: current = ith node in path; data = corresponding
            datanode
         */
@@ -1804,7 +1804,7 @@ computeseqcountconstraints(NCDAPCOMMON* dapcomm, CDFnode* seq, NCbytes* seqcount
     if(dapcomm->oc.url->selection != NULL)
         ncbytescat(seqcountconstraints,dapcomm->oc.url->selection);
     nclistfree(path);
-    return NC_NOERR;    
+    return NC_NOERR;
 }
 
 
@@ -1833,7 +1833,7 @@ prefer(CDFnode* candidate, CDFnode* newchoice)
     canisscalar = (nclistlength(candidate->array.dimset0) == 0);
 
     ASSERT(candidate->nctype == NC_Atomic && newchoice->nctype == NC_Atomic);
-    
+
     /* choose non-string over string */
     if(canisstring && !newisstring)
 	return newchoice;
@@ -1974,7 +1974,7 @@ fetchtemplatemetadata(NCDAPCOMMON* dapcomm)
     if(ncstat != NC_NOERR) {
 	/* Ignore but complain */
 	nclog(NCLOGWARN,"Could not read DAS; ignored");
-        dapcomm->oc.ocdasroot = NULL;	
+        dapcomm->oc.ocdasroot = NULL;
 	ncstat = NC_NOERR;
     }
 
@@ -2028,7 +2028,7 @@ fetchconstrainedmetadata(NCDAPCOMMON* dapcomm)
 
         if(!FLAGSET(dapcomm->controls,NCF_UNCONSTRAINABLE)) {
             /* fix DAP server problem by adding back any inserting needed structure nodes */
-            ncstat = restruct(dapcomm, dapcomm->cdf.ddsroot,dapcomm->cdf.fullddsroot,dapcomm->oc.dapconstraint->projections);    
+            ncstat = restruct(dapcomm, dapcomm->cdf.ddsroot,dapcomm->cdf.fullddsroot,dapcomm->oc.dapconstraint->projections);
             if(ncstat) goto fail;
 	}
 
@@ -2127,7 +2127,7 @@ applyclientparamcontrols(NCDAPCOMMON* dapcomm)
     CLRFLAG(dapcomm->controls,NCF_PREFETCH_EAGER);
 
     /* Turn on any default on flags */
-    SETFLAG(dapcomm->controls,DFALT_ON_FLAGS);    
+    SETFLAG(dapcomm->controls,DFALT_ON_FLAGS);
     SETFLAG(dapcomm->controls,(NCF_NC3|NCF_NCDAP));
 
     /* enable/disable caching */

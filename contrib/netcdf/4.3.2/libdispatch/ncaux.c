@@ -29,7 +29,7 @@ struct NCAUX_FIELD {
     char* name;
     nc_type fieldtype;
     size_t ndims;
-    int dimsizes[NC_MAX_VAR_DIMS];    
+    int dimsizes[NC_MAX_VAR_DIMS];
     size_t size;
     size_t offset;
     size_t alignment;
@@ -63,13 +63,13 @@ ncaux_begin_compound(int ncid, const char *name, int alignmode, void** tagp)
     }
 
     if(tagp) *tagp = NULL;
-	
+
     cmpd = (struct NCAUX_CMPD*)calloc(1,sizeof(struct NCAUX_CMPD));
     if(cmpd == NULL) {status = NC_ENOMEM; goto fail;}
     cmpd->ncid = ncid;
     cmpd->mode = alignmode;
     cmpd->nfields = 0;
-    cmpd->name = strdup(name);    
+    cmpd->name = strdup(name);
     if(cmpd->name == NULL) {status = NC_ENOMEM; goto fail;}
 
     if(tagp) *tagp = (void*)cmpd;
@@ -124,7 +124,7 @@ ncaux_add_field(void* tag,  const char *name, nc_type field_type,
     field = &cmpd->fields[cmpd->nfields+1];
     field->name = strdup(name);
     field->fieldtype = field_type;
-    if(field->name == NULL) {status = NC_ENOMEM; goto done;}    
+    if(field->name == NULL) {status = NC_ENOMEM; goto done;}
     field->ndims = (size_t)ndims;
     memcpy(field->dimsizes,dimsizes,sizeof(int)*field->ndims);
     cmpd->nfields++;
@@ -277,7 +277,7 @@ compute_alignments(void)
 
     /* Then the vector*/
     COMP_ALIGNMENT(vec[CHARINDEX],char);
-    COMP_ALIGNMENT(vec[UCHARINDEX],unsigned char); 
+    COMP_ALIGNMENT(vec[UCHARINDEX],unsigned char);
     COMP_ALIGNMENT(vec[SHORTINDEX],short);
     COMP_ALIGNMENT(vec[USHORTINDEX],unsigned short);
     COMP_ALIGNMENT(vec[INTINDEX],int);
@@ -333,7 +333,7 @@ findfirstfield(int ncid, nc_type xtype)
     int status = NC_NOERR;
     nc_type fieldtype = xtype;
     if(xtype <= NC_MAX_ATOMIC_TYPE) goto done;
-        
+
     status = nc_inq_compound_fieldtype(ncid, xtype, 0, &fieldtype);
     if(status != NC_NOERR) goto done;
     fieldtype = findfirstfield(ncid,fieldtype);
@@ -352,7 +352,7 @@ computefieldinfo(struct NCAUX_CMPD* cmpd)
 
     /* Assign the sizes for the fields */
     for(i=0;i<cmpd->nfields;i++) {
-	struct NCAUX_FIELD* field = &cmpd->fields[i];	
+	struct NCAUX_FIELD* field = &cmpd->fields[i];
 	status = nc_inq_type(cmpd->ncid,field->fieldtype,NULL,&field->size);
         if(status != NC_NOERR) goto done;
 	totaldimsize = dimproduct(field->ndims,field->dimsizes);
@@ -371,7 +371,7 @@ computefieldinfo(struct NCAUX_CMPD* cmpd)
 	    break;
 	case NC_ENUM:
             field->alignment = nctypealignment(firsttype);
-	    break;	
+	    break;
 	case NC_VLEN: /*fall thru*/
 	case NC_COMPOUND:
             field->alignment = nctypealignment(firsttype);
@@ -390,5 +390,3 @@ computefieldinfo(struct NCAUX_CMPD* cmpd)
 done:
     return status;
 }
-
-

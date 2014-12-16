@@ -27,4 +27,3 @@ dimmap_ounlim(int odimid);
 /* return whether idimid dimension is unlimited */
 extern int
 dimmap_iunlim(int idimid);
-

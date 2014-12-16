@@ -41,7 +41,7 @@ computecdfnodesets(NCDAPCOMMON* nccomm, CDFtree* tree)
     NClist* allnodes;
 
     allnodes = tree->nodes;
-    varnodes = nclistnew(); 
+    varnodes = nclistnew();
 
     if(tree->seqnodes == NULL) tree->seqnodes = nclistnew();
     if(tree->gridnodes == NULL) tree->gridnodes = nclistnew();
@@ -140,7 +140,7 @@ fixgrid(NCDAPCOMMON* nccomm, CDFnode* grid)
     CDFnode* array;
 
     glen = nclistlength(grid->subnodes);
-    array = (CDFnode*)nclistget(grid->subnodes,0);	        
+    array = (CDFnode*)nclistget(grid->subnodes,0);
     if(nccomm->controls.flags & (NCF_NC3)) {
         /* Rename grid Array: variable, but leave its oc base name alone */
         nullfree(array->ncbasename);
@@ -298,7 +298,7 @@ NCerror
 sequencecheck(NCDAPCOMMON* nccomm)
 {
     (void)sequencecheckr(nccomm->cdf.ddsroot,
-                          nccomm->cdf.ddsroot->tree->varnodes,NULL);    
+                          nccomm->cdf.ddsroot->tree->varnodes,NULL);
     return NC_NOERR;
 }
 
@@ -556,7 +556,7 @@ findin(CDFnode* parent, CDFnode* child)
    this occurs because some servers (that means you ferret and you thredds!)
    do not adhere to the DAP2 protocol spec.
 */
-  
+
 static CDFnode*
 makenewstruct(NCDAPCOMMON* ncc, CDFnode* node, CDFnode* templatenode)
 {
@@ -599,7 +599,7 @@ mapnodesr(CDFnode* connode, CDFnode* fullnode, int depth)
     NCerror ncstat = NC_NOERR;
 
     ASSERT((simplenodematch(connode,fullnode)));
-    
+
 #ifdef DEBUG
   {
 char* path1 = makecdfpathstring(fullnode,".");
@@ -667,7 +667,7 @@ unmap(CDFnode* root)
     }
 }
 
-/* 
+/*
 Move dimension data from basenodes to nodes
 */
 
@@ -700,7 +700,7 @@ fprintf(stderr,"dimimprint %s/%d -> %s/%d\n",
         for(j=0;j<noderank;j++) {
 	    CDFnode* dim = (CDFnode*)nclistget(node->array.dimset0,j);
 	    CDFnode* basedim = (CDFnode*)nclistget(basenode->array.dimset0,j);
-	    dim->dim.declsize0 = basedim->dim.declsize;	
+	    dim->dim.declsize0 = basedim->dim.declsize;
 #ifdef DEBUG
 fprintf(stderr,"dimimprint: %d: %lu -> %lu\n",i,basedim->dim.declsize,dim->dim.declsize0);
 #endif
@@ -956,7 +956,7 @@ buildcdftree(NCDAPCOMMON* nccomm, OCddsnode ocroot, OCdxd occlass, CDFnode** cdf
 	if(cdfrootp) *cdfrootp = root;
     }
     return err;
-}        
+}
 
 static NCerror
 buildcdftreer(NCDAPCOMMON* nccomm, OCddsnode ocnode, CDFnode* container,
@@ -1002,7 +1002,7 @@ buildcdftreer(NCDAPCOMMON* nccomm, OCddsnode ocnode, CDFnode* container,
 	if(tree->root == NULL) {
 	    tree->root = cdfnode;
 	    cdfnode->tree = tree;
-	}		
+	}
 #endif
 	break;
 
@@ -1013,7 +1013,7 @@ buildcdftreer(NCDAPCOMMON* nccomm, OCddsnode ocnode, CDFnode* container,
 	if(tree->root == NULL) {
 	    tree->root = cdfnode;
 	    cdfnode->tree = tree;
-	}		
+	}
 #endif
 	break;
 
@@ -1021,7 +1021,7 @@ buildcdftreer(NCDAPCOMMON* nccomm, OCddsnode ocnode, CDFnode* container,
     default: PANIC1("buildcdftree: unexpect OC node type: %d",(int)octype);
 
     }
-    /* Avoid a rare but perhaps possible null-dereference 
+    /* Avoid a rare but perhaps possible null-dereference
        of cdfnode. Not sure what error to throw, so using
        NC_EDAP: generic DAP error. */
     if(!cdfnode) {
@@ -1074,7 +1074,7 @@ freecdfroot(CDFnode* root)
 
 /* Free up a single node, but not any
    nodes it points to.
-*/  
+*/
 static void
 free1cdfnode(CDFnode* node)
 {
@@ -1193,7 +1193,7 @@ static void
 defdimensions(OCddsnode ocnode, CDFnode* cdfnode, NCDAPCOMMON* nccomm, CDFtree* tree)
 {
     size_t i,ocrank;
- 
+
     oc_dds_rank(nccomm->oc.conn,ocnode,&ocrank);
     assert(ocrank > 0);
     for(i=0;i<ocrank;i++) {
@@ -1201,7 +1201,7 @@ defdimensions(OCddsnode ocnode, CDFnode* cdfnode, NCDAPCOMMON* nccomm, CDFtree* 
 	OCddsnode ocdim;
 	char* ocname;
 	size_t declsize;
-	
+
 	oc_dds_ithdimension(nccomm->oc.conn,ocnode,i,&ocdim);
 	oc_dimension_properties(nccomm->oc.conn,ocdim,&declsize,&ocname);
 
@@ -1212,9 +1212,8 @@ defdimensions(OCddsnode ocnode, CDFnode* cdfnode, NCDAPCOMMON* nccomm, CDFtree* 
 	/* Initially, constrained and unconstrained are same */
 	cdfdim->dim.declsize = declsize;
 	cdfdim->dim.array = cdfnode;
-	if(cdfnode->array.dimset0 == NULL) 
+	if(cdfnode->array.dimset0 == NULL)
 	    cdfnode->array.dimset0 = nclistnew();
 	nclistpush(cdfnode->array.dimset0,(void*)cdfdim);
-    }    
+    }
 }
-

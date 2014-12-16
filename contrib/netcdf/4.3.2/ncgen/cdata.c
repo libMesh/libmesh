@@ -8,7 +8,7 @@
 
 #ifdef ENABLE_C
 
-#include <math.h> 
+#include <math.h>
 
 static int c_uid = 0;
 
@@ -35,7 +35,7 @@ c_constant(Generator* generator, NCConstant* con, Bytebuffer* buf,...)
 
     switch (con->nctype) {
     case NC_CHAR:
-	if(con->value.charv == '\'') 
+	if(con->value.charv == '\'')
 	    bbprintf(codetmp,"'\\''");
 	else
 	    bbprintf(codetmp,"'%s'",cescapifychar(con->value.charv,'\''));
@@ -103,8 +103,8 @@ c_constant(Generator* generator, NCConstant* con, Bytebuffer* buf,...)
 	p = con->value.opaquev.stringv;
 	while(*p) {
 	    strcat(special,"\\x");
-	    strncat(special,p,2);	    	    
-	    p += 2;	
+	    strncat(special,p,2);
+	    p += 2;
 	}
 	strcat(special,"\"");
 	} break;

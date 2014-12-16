@@ -3,7 +3,7 @@
  * Research/Unidata. See COPYRIGHT file for more info.
  *
  * This header file is for the parallel I/O functions of netCDF.
- * 
+ *
  */
 /* "$Id: netcdf_par.h,v 1.1 2010/06/01 15:46:49 ed Exp $" */
 
@@ -40,7 +40,7 @@ extern char* strdup(const char*);
 #else
 char *nulldup(const char* s);
 #endif
-#endif 
+#endif
 
 
 #ifndef nulldup

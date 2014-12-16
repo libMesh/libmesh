@@ -56,4 +56,3 @@ externC int nchashkeys(NChashmap* hm, nchashid** keylist);
 #define nchashsize(hm) ((hm)?(hm)->size:0)
 
 #endif /*NCHASHMAP_H*/
-

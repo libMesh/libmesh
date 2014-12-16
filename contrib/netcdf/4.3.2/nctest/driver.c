@@ -30,7 +30,7 @@ int
 main(int argc, char **argv)
 {
 	//EXTERNL int ncopts;		/* netCDF error options */
-    char *testfiles[] = {"nonesuch", "nctest_classic.nc", 
+    char *testfiles[] = {"nonesuch", "nctest_classic.nc",
 			 "nctest_64bit_offset.nc", "nctest_netcdf4.nc"};
     char *testfile;
     int i, nerrs = 0;
@@ -38,12 +38,12 @@ main(int argc, char **argv)
     ncopts &= ~NC_FATAL;	/* make errors nonfatal */
     ncopts &= ~NC_VERBOSE;	/* turn off error messages */
 
-    fprintf(stderr, "Testing V2 API with %d different netCDF formats.\n", 
+    fprintf(stderr, "Testing V2 API with %d different netCDF formats.\n",
 	   NUM_FORMATS);
 
     for (i = 1; i <= NUM_FORMATS; i++)
     {
-       switch (i) 
+       switch (i)
        {
 	  case NC_FORMAT_CLASSIC:
 	     nc_set_default_format(NC_FORMAT_CLASSIC, NULL);
@@ -53,7 +53,7 @@ main(int argc, char **argv)
 	     nc_set_default_format(NC_FORMAT_64BIT, NULL);
 	     fprintf(stderr, "\n\nSwitching to 64-bit offset format.\n");
 	     break;
-#ifdef USE_NETCDF4 
+#ifdef USE_NETCDF4
 	  case NC_FORMAT_NETCDF4: /* actually it's _CLASSIC. */
 	     nc_set_default_format(NC_FORMAT_NETCDF4_CLASSIC, NULL);
 	     fprintf(stderr, "\n\nSwitching to netCDF-4 format (with NC_CLASSIC_MODEL).\n");
@@ -118,7 +118,7 @@ main(int argc, char **argv)
 
        }
     }
-    
+
     fprintf(stderr, "\nTotal number of failures: %d\n", nerrs);
 
     if (nerrs)

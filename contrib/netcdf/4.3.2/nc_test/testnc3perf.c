@@ -66,7 +66,7 @@ static int DEFAULTDIMS[NDIMS] = {10, 20, 30, 40};
 
 /*
  * Fill typed array element with specified value, that is
- * 	
+ *
  * 	v[ii] = val;
  */
 static void
@@ -111,7 +111,7 @@ val_stuff(type, v, ii, val)	/* v[ii] = val */
  *
  * 	(v[ii] != val)
  *
- * returns 0 if equal, 1 if not equal 
+ * returns 0 if equal, 1 if not equal
  */
 
 static int
@@ -170,7 +170,7 @@ val_diff(type, v, ii, val)	/* v[ii] != val */
 	clock_t TMus, TMsy;	/* user and system time in clock ticks */ \
 	float TMelapsed;	/* elapsed time in seconds */ \
 	struct tms TMru;
-      
+
 #define TIMING_START \
 	TMrepeats = 1; \
 	do {  /* loop enough times for at least 0.1 second elapsed time */ \
@@ -179,7 +179,7 @@ val_diff(type, v, ii, val)	/* v[ii] != val */
 	    TMus = TMru.tms_utime; \
 	    TMsy = TMru.tms_stime; \
 	    for(TMreps=0;TMreps < TMrepeats;TMreps++) {
-	
+
 #define TIMING_END \
             } \
 	    times(&TMru); \
@@ -231,7 +231,7 @@ test_slabs(ncid, sizes)
 	dims[idim].size = sizes[idim];
 	dims[idim].name = dnames[idim];
     }
-    
+
     /* back in define mode OK, now add dimensions */
 
     dimids[0] = ncdimdef(ncid, dims[0].name, NC_UNLIMITED);
@@ -263,7 +263,7 @@ test_slabs(ncid, sizes)
     if (ncendef (ncid) == -1) {
 	ncclose(ncid); return;
     }
-    
+
     printf("Note: first ncvarput writes fill values for all variables.\n");
 
     for (iv = 0; iv < NVARS; iv++) { /* test each type of variable */
@@ -291,7 +291,7 @@ test_slabs(ncid, sizes)
 		}
 	    }
 	}
-	
+
 	for (idim = 0; idim < NDIMS; idim++) {
 	    corner[idim] = 0;
 	    edge[idim] = dims[idim].size;
@@ -319,19 +319,19 @@ test_slabs(ncid, sizes)
 	    edge[idim] = 1;
 	    point[idim] = corner[idim];
 	}
-	
+
 	sprintf(time_mess,"ncvarget %ldx%ldx%ldx%ld"
 		,edge[0],edge[1],edge[2],edge[3]);
-      
+
 	TIMING_START ;
 	if (ncvarget(ncid, varid[iv], corner, edge, (void *) v) == -1)
 	    return;
 	TIMING_END ;
-	
+
 	/* if (v[0] != VF(point)) */
 	if (val_diff(va[iv].type, v, 0, VF(point)))
 	  fprintf(stderr,"ncvarget got wrong value for point");
-	
+
 	/* get a vector in each direction */
 	for (idim=0; idim < NDIMS; idim++) {
 	    for (jdim=0; jdim < NDIMS; jdim++) {
@@ -370,7 +370,7 @@ test_slabs(ncid, sizes)
 		corner[jdim] = 0;
 		edge[idim] = dims[idim].size;
 		edge[jdim] = dims[jdim].size;
-		
+
 		sprintf(time_mess,"ncvarget %ldx%ldx%ldx%ld"
 			,edge[0],edge[1],edge[2],edge[3]);
 
@@ -393,7 +393,7 @@ test_slabs(ncid, sizes)
 		}
 	    }
 	}
-	
+
 	/* get a cube in each direction */
 	for (idim=0; idim < NDIMS; idim++) {
 	    for (jdim=idim+1; jdim < NDIMS; jdim++) {
@@ -409,7 +409,7 @@ test_slabs(ncid, sizes)
 		    edge[idim] = dims[idim].size;
 		    edge[jdim] = dims[jdim].size;
 		    edge[kdim] = dims[kdim].size;
-		
+
 		    sprintf(time_mess,"ncvarget %ldx%ldx%ldx%ld"
 			    ,edge[0],edge[1],edge[2],edge[3]);
 
@@ -439,13 +439,13 @@ test_slabs(ncid, sizes)
 		}
 	    }
 	}
-	
+
 	/* get one 4-D slab of data */
 	for(idim = 0; idim < NDIMS; idim++) {
 	    corner[idim] = 0;
 	    edge[idim] = dims[idim].size;
 	}
-		
+
 	sprintf(time_mess,"ncvarget %ldx%ldx%ldx%ld"
 		,edge[0],edge[1],edge[2],edge[3]);
 

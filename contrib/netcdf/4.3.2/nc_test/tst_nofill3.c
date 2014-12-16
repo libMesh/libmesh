@@ -3,7 +3,7 @@
   See COPYRIGHT file for copying and redistribution conditions.
 
   This is part of netCDF.
-   
+
   This program tests for a bug discovered with nofill mode that failed
   only on file systems with block size in a particular range.  This version
   of the test showed failure using a normal nc_create() call rather tha
@@ -31,7 +31,7 @@
 #define LVL_LEN 34
 
 int
-create_file(char *file_name, int fill_mode) 
+create_file(char *file_name, int fill_mode)
 {
    int ncid;
    int lon_dim, lat_dim, lvl_dim, time_dim;

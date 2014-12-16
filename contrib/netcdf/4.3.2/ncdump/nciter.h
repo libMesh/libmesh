@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-/* 
+/*
  * The opaque structure to hold per-variable state of data iteration
  */
 typedef struct {

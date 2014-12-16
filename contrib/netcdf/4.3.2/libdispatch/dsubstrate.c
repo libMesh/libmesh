@@ -15,7 +15,7 @@ So, these functions end up calling functions in another
 dispatch table using the substrate field of struct NC.
 
 Copyright 2010 University Corporation for Atmospheric
-Research/Unidata. See COPYRIGHT file for more info.  
+Research/Unidata. See COPYRIGHT file for more info.
 */
 
 #include "netcdf.h"
@@ -405,11 +405,11 @@ NCSUB_put_varm(int ncid, int a1, const size_t* a2, const size_t* a3, const ptrdi
 
 
 static int
-NCSUB_inq_var_all(int ncid, int varid, char* name, nc_type* xtypep, 
-               int* ndimsp, int* dimidsp, int* nattsp, 
-               int* shufflep, int* deflatep, int* deflate_levelp, 
-               int* fletcher32p, int* contiguousp, size_t* chunksizesp, 
-               int* no_fill, void* fill_valuep, int* endiannessp, 
+NCSUB_inq_var_all(int ncid, int varid, char* name, nc_type* xtypep,
+               int* ndimsp, int* dimidsp, int* nattsp,
+               int* shufflep, int* deflatep, int* deflate_levelp,
+               int* fletcher32p, int* contiguousp, size_t* chunksizesp,
+               int* no_fill, void* fill_valuep, int* endiannessp,
 	       int* options_maskp, int* pixels_per_blockp)
 {
    NC *nc, *ncsub;
@@ -837,7 +837,7 @@ NCSUB_get_var_chunk_cache(int ncid, int a1, size_t* a2, size_t* a3, float* a4)
 
 #endif /*USE_NETCDF4*/
 
-/* Declare here to avoid having a bunch of static forward declarations */ 
+/* Declare here to avoid having a bunch of static forward declarations */
 
 static NC_Dispatch NCSUBSTRATE_dispatch_base =  {
 

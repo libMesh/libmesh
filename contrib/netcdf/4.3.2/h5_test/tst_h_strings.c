@@ -35,17 +35,17 @@ main()
       char *data_in = NULL;
 
       /* Open file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Create string type. */
       if ((typeid =  H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-      
+
       /* Write an attribute of this type. */
       if ((spaceid = H5Screate(H5S_SCALAR)) < 0) ERR;
-      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid, 
+      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, typeid, &data) < 0) ERR;
 
@@ -62,7 +62,7 @@ main()
       if ((attid = H5Aopen_name(grpid, ATT_NAME)) < 0) ERR;
       if ((typeid = H5Aget_type(attid)) < 0) ERR;
       if ((spaceid = H5Aget_space(attid)) < 0) ERR;
-      
+
       /* Given this type id, how would we know this is a string
        * attribute? */
       if ((class = H5Tget_class(typeid)) < 0) ERR;
@@ -93,7 +93,7 @@ main()
    }
    SUMMARIZE_ERR;
    printf("*** Checking simple HDF5 string types...");
-   {   
+   {
       hid_t fileid, grpid, spaceid, typeid, attid;
       hsize_t dims[1] = {DIM1_LEN};
 /*      size_t type_size;
@@ -104,21 +104,21 @@ main()
       int i;
 
       /* Open file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
 
       /* Create string type. */
       if ((typeid =  H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-   
+
       /* I thought the following should work instead of the H5Tcopy and
        * H5Tset_size functions above, but it doesn't. */
       /*if ((typeid = H5Tvlen_create(H5T_NATIVE_CHAR)) < 0) ERR;*/
 
       /* Write an attribute of this (string) type. */
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid, 
+      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, typeid, data) < 0) ERR;
 
@@ -188,21 +188,21 @@ main()
       strcpy(data[1], S2);
 
       /* Open file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			   H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Create string type. */
       if ((typeid =  H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-      
+
       /* I thought the following should work instead of the H5Tcopy and
        * H5Tset_size functions above, but it doesn't. */
       /*if ((typeid = H5Tvlen_create(H5T_NATIVE_CHAR)) < 0) ERR;*/
-      
+
       /* Write an attribute of this type. */
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid, 
+      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, typeid, data) < 0) ERR;
 
@@ -211,13 +211,13 @@ main()
       if (H5Tclose(typeid) < 0) ERR;
       if (H5Gclose(grpid) < 0) ERR;
       if (H5Fclose(fileid) < 0) ERR;
-      
+
       /* Now reopen the file and check it out. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gopen(fileid, GRP_NAME)) < 0) ERR;
       if ((attid = H5Aopen_name(grpid, ATT_NAME)) < 0) ERR;
       if ((typeid = H5Aget_type(attid)) < 0) ERR;
-      
+
       /* Given this type id, how would we know this is a string
        * attribute? */
       if ((class = H5Tget_class(typeid)) < 0) ERR;
@@ -226,7 +226,7 @@ main()
       /* How many strings are in the array? */
       if (H5Sget_simple_extent_dims(spaceid, dims_in, NULL) != 1) ERR;
       if (dims_in[0] != dims[0]) ERR;
-      
+
       /* Allocate enough pointers to read the data. The HDF5 library
        * will allocate the space needed for each string. */
       if (!(data_in = malloc(dims_in[0] * sizeof(char *)))) ERR;
@@ -271,21 +271,21 @@ main()
       strcpy(data[1], "");
 
       /* Open file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			   H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Create string type. */
       if ((typeid =  H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-      
+
       /* I thought the following should work instead of the H5Tcopy and
        * H5Tset_size functions above, but it doesn't. */
       /*if ((typeid = H5Tvlen_create(H5T_NATIVE_CHAR)) < 0) ERR;*/
-      
+
       /* Write an attribute of this type. */
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid, 
+      if ((attid = H5Acreate(grpid, ATT_NAME, typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, typeid, data) < 0) ERR;
 
@@ -294,13 +294,13 @@ main()
       if (H5Tclose(typeid) < 0) ERR;
       if (H5Gclose(grpid) < 0) ERR;
       if (H5Fclose(fileid) < 0) ERR;
-      
+
       /* Now reopen the file and check it out. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gopen(fileid, GRP_NAME)) < 0) ERR;
       if ((attid = H5Aopen_name(grpid, ATT_NAME)) < 0) ERR;
       if ((typeid = H5Aget_type(attid)) < 0) ERR;
-      
+
       /* Given this type id, how would we know this is a string
        * attribute? */
       if ((class = H5Tget_class(typeid)) < 0) ERR;
@@ -309,7 +309,7 @@ main()
       /* How many strings are in the array? */
       if (H5Sget_simple_extent_dims(spaceid, dims_in, NULL) != 1) ERR;
       if (dims_in[0] != dims[0]) ERR;
-      
+
       /* Allocate enough pointers to read the data. The HDF5 library
        * will allocate the space needed for each string. */
       if (!(data_in = malloc(dims_in[0] * sizeof(char *)))) ERR;

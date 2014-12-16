@@ -66,4 +66,3 @@ extern void dumpraw(void*);
 extern void dumplistraw(NClist*);
 
 #endif /*DUMP_H*/
-

@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     int g, grp, numgrp;
     char gname[16];
     int a, numatt, an, aleft, natts;
-    
+
     if(argc > 2) { 	/* Usage */
 	printf("NetCDF performance test, writing many groups, variables, and attributes.\n");
 	printf("Usage:\t%s [N]\n", argv[0]);
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     for(i = 1; i < argc; i++) {
 	nitem = atoi(argv[i]);
     }
-    
+
     /*  create new file */
     if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
     /* create N group/global attributes, printing time after every 100.

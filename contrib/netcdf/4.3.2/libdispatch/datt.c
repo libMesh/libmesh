@@ -16,14 +16,14 @@ Attributes hold metadata about data and files.
 
 Attributes may be associated with a netCDF variable to specify such
 properties as units, special values, maximum and minimum valid values,
-scaling factors, and offsets. 
+scaling factors, and offsets.
 
 Attributes for a netCDF dataset are defined when the dataset is first
 created, while the netCDF dataset is in define mode. Additional
-attributes may be added later by reentering define mode. 
+attributes may be added later by reentering define mode.
 
 A netCDF attribute has a netCDF variable to which it is assigned, a
-name, a type, a length, and a sequence of one or more values. 
+name, a type, a length, and a sequence of one or more values.
 
 An attribute is designated by its variable ID and name. When an
 attribute name is not known, it may be designated by its variable ID
@@ -50,7 +50,7 @@ Operations supported on attributes are:
 - Copy attribute from one netCDF variable to another.
 - Get name of attribute from its number.
 - Rename an attribute.
-- Delete an attribute. 
+- Delete an attribute.
 */
 
 /*! \{*/ /* All these functions are part of the above defgroup... */
@@ -69,16 +69,16 @@ new name is longer than the original name, the netCDF dataset must be
 in define mode. You cannot rename an attribute to have the same name
 as another attribute of the same variable.
 
-\param ncid NetCDF or group ID, from a previous call to nc_open(), 
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+\param ncid NetCDF or group ID, from a previous call to nc_open(),
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL for
 a global attribute.
 
-\param name Attribute \ref object_name. 
+\param name Attribute \ref object_name.
 
-\param newname The new attribute \ref object_name. 
+\param newname The new attribute \ref object_name.
 
 <h1>Example</h1>
 
@@ -90,8 +90,8 @@ dataset named foo.nc:
      #include <netcdf.h>
         ...
      int  status;
-     int  ncid;  
-     int  rh_id; 
+     int  ncid;
+     int  rh_id;
         ...
      status = nc_open("foo.nc", NC_NOWRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
@@ -119,13 +119,13 @@ The function nc_del_att() deletes a netCDF attribute from an open
 netCDF dataset. The netCDF dataset must be in define mode.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL
 for a global attribute.
 
-\param name Attribute name. 
+\param name Attribute name.
 
 <h1>Example</h1>
 
@@ -135,9 +135,9 @@ Units for a variable rh in an existing netCDF dataset named foo.nc:
 \code
      #include <netcdf.h>
         ...
-     int  status;     
-     int  ncid;      
-     int  rh_id;     
+     int  status;
+     int  ncid;
+     int  rh_id;
         ...
      status = nc_open("foo.nc", NC_WRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
@@ -145,7 +145,7 @@ Units for a variable rh in an existing netCDF dataset named foo.nc:
      status = nc_inq_varid (ncid, "rh", &rh_id);
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_redef(ncid); 
+     status = nc_redef(ncid);
      if (status != NC_NOERR) handle_error(status);
      status = nc_del_att(ncid, rh_id, "Units");
      if (status != NC_NOERR) handle_error(status);

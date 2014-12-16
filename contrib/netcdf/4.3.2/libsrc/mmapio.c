@@ -141,7 +141,7 @@ mmapio_new(const char* path, int ioflags, off_t initialsize, ncio** nciopp, NCMM
 
     nciop = (ncio* )calloc(1,sizeof(ncio));
     if(nciop == NULL) {status = NC_ENOMEM; goto fail;}
-    
+
     nciop->ioflags = ioflags;
     *((int*)&nciop->fd) = -1; /* caller will fix */
 
@@ -193,8 +193,8 @@ fail:
    ioflags - flags from nc_create
    initialsz - From the netcdf man page: "The argument
    Iinitialsize sets the initial size of the file at creation time."
-   igeto - 
-   igetsz - 
+   igeto -
+   igetsz -
    sizehintp - the size of a page of data for buffered reads and writes.
    nciopp - pointer to a pointer that will get location of newly
    created and inited ncio struct.
@@ -234,7 +234,7 @@ mmapio_create(const char* path, int ioflags,
 	{mmapio->memory[0] = 0;} /* test writing of the mmap'd memory */
     } else { /*persist */
         /* Open the file, but make sure we can write it if needed */
-        oflags = (persist ? O_RDWR : O_RDONLY);    
+        oflags = (persist ? O_RDWR : O_RDONLY);
 #ifdef O_BINARY
         fSet(oflags, O_BINARY);
 #endif
@@ -268,7 +268,7 @@ fprintf(stderr,"mmap_create: initial memory: %lu/%lu\n",(unsigned long)mmapio->m
 #endif
 
     fd = nc__pseudofd();
-    *((int* )&nciop->fd) = fd; 
+    *((int* )&nciop->fd) = fd;
 
     fSet(nciop->ioflags, NC_WRITE);
 
@@ -300,7 +300,7 @@ unwind_open:
    ioflags - flags passed into nc_open.
    igeto - looks like this function can do an initial page get, and
    igeto is going to be the offset for that. But it appears to be
-   unused 
+   unused
    igetsz - the size in bytes of initial page get (a.k.a. extent). Not
    ever used in the library.
    sizehintp - the size of a page of data for buffered reads and writes.
@@ -330,7 +330,7 @@ mmapio_open(const char* path,
     sizehint = *sizehintp;
 
     /* Open the file, but make sure we can write it if needed */
-    oflags = (persist ? O_RDWR : O_RDONLY);    
+    oflags = (persist ? O_RDWR : O_RDONLY);
 #ifdef O_BINARY
     fSet(oflags, O_BINARY);
 #endif
@@ -368,7 +368,7 @@ fprintf(stderr,"mmapio_open: initial memory: %lu/%lu\n",(unsigned long)mmapio->m
     sizehint = filesize/2;
 
     fd = nc__pseudofd();
-    *((int* )&nciop->fd) = fd; 
+    *((int* )&nciop->fd) = fd;
 
     if(igetsz != 0)
     {
@@ -390,7 +390,7 @@ unwind_open:
 }
 
 
-/* 
+/*
  *  Get file size in bytes.
  */
 static int
@@ -450,7 +450,7 @@ fprintf(stderr,"realloc: %lu/%lu -> %lu/%lu\n",
 #endif
 	mmapio->memory = newmem;
 	mmapio->alloc = newsize;
-    }  
+    }
     mmapio->size = length;
     return NC_NOERR;
 }
@@ -463,7 +463,7 @@ fprintf(stderr,"realloc: %lu/%lu -> %lu/%lu\n",
    doUnlink - if true, unlink file
 */
 
-static int 
+static int
 mmapio_close(ncio* nciop, int doUnlink)
 {
     int status = NC_NOERR;

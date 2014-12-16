@@ -18,14 +18,14 @@
 /*#define FILE_NAME "/machine/downloads/T159_1978110112.nc4"*/
 
 herr_t
-obj_iter(hid_t o_id, const char *name, const H5O_info_t *object_info, 
-	 void *op_data) 
+obj_iter(hid_t o_id, const char *name, const H5O_info_t *object_info,
+	 void *op_data)
 {
    *(int *)op_data = object_info->type;
    return 1;
 }
 
-/* This is a callback function for H5Literate(). 
+/* This is a callback function for H5Literate().
 
 The parameters of this callback function have the following values or
 meanings:
@@ -44,8 +44,8 @@ with the H5Lvisit function call
 
 */
 herr_t
-op_func (hid_t g_id, const char *name, const H5L_info_t *info, 
-	 void *op_data)  
+op_func (hid_t g_id, const char *name, const H5L_info_t *info,
+	 void *op_data)
 {
    hid_t id;
    H5I_type_t obj_type;
@@ -91,10 +91,10 @@ main()
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set latest_format in access propertly list. This ensures that
-       * the latest, greatest, HDF5 versions are used in the file. */ 
-/*      if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, 
+       * the latest, greatest, HDF5 versions are used in the file. */
+/*      if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST,
 	H5F_LIBVER_LATEST) < 0) ERR;*/
 
       /* Set H5P_CRT_ORDER_TRACKED in the creation property list. This
@@ -147,7 +147,7 @@ main()
 
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if (H5Pset_fclose_degree(fapl_id, H5F_CLOSE_STRONG)) ERR;
-      if (H5Pset_cache(fapl_id, 0, CHUNK_CACHE_NELEMS, CHUNK_CACHE_SIZE, 
+      if (H5Pset_cache(fapl_id, 0, CHUNK_CACHE_NELEMS, CHUNK_CACHE_SIZE,
 		       CHUNK_CACHE_PREEMPTION) < 0) ERR;
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDONLY, fapl_id)) < 0) ERR;
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
@@ -155,7 +155,7 @@ main()
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i = 0; i < num_obj; i++)
       {
-	 if (H5Literate(grpid, H5_INDEX_CRT_ORDER, H5_ITER_INC, &idx, op_func, 
+	 if (H5Literate(grpid, H5_INDEX_CRT_ORDER, H5_ITER_INC, &idx, op_func,
 			(void *)obj_name) != 1) ERR;
 	 printf("encountered object %s\n", obj_name);
       }
@@ -177,7 +177,7 @@ main()
 
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if (H5Pset_fclose_degree(fapl_id, H5F_CLOSE_STRONG)) ERR;
-      if (H5Pset_cache(fapl_id, 0, CHUNK_CACHE_NELEMS, CHUNK_CACHE_SIZE, 
+      if (H5Pset_cache(fapl_id, 0, CHUNK_CACHE_NELEMS, CHUNK_CACHE_SIZE,
 		       CHUNK_CACHE_PREEMPTION) < 0) ERR;
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDONLY, fapl_id)) < 0) ERR;
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
@@ -186,7 +186,7 @@ main()
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i = 0; i < num_obj; i++)
       {
-	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
+	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i, &obj_info, H5P_DEFAULT)) ERR;
 	 if ((size = H5Lget_name_by_idx(grpid, ".", idx_field, H5_ITER_INC, i,
 					NULL, 0, H5P_DEFAULT)) < 0) ERR;

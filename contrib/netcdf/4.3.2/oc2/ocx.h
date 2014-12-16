@@ -30,4 +30,3 @@ extern OCerror oc_data_ddpath(OClink, OCdatanode, char**);
 extern OCerror oc_data_ddtree(OClink, OCdatanode root);
 
 #endif /*OCX_H*/
-

@@ -18,8 +18,3 @@ libnetcdf4_la_SOURCES = nc4dispatch.c nc4dispatch.h nc4attr.c nc4dim.c	\
 nc4file.c nc4grp.c nc4hdf.c nc4internal.c nc4type.c nc4var.c ncfunc.c error4.c
 
 EXTRA_DIST=CMakeLists.txt
-
-
-
-
-

@@ -50,16 +50,16 @@ main()
       if (H5Pset_fclose_degree(access_plist, H5F_CLOSE_SEMI)) ERR;
 
       /* Create file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      access_plist)) < 0) ERR;
       /* Add an opaque type. */
       if ((typeid = H5Tcreate(H5T_OPAQUE, OPAQUE_SIZE)) < 0) ERR;
       if (H5Tcommit(fileid, OPAQUE_NAME, typeid) < 0) ERR;
-      
+
       /* Add attribute of this type. */
       dims[0] = 3;
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(fileid, ATT_NAME, typeid, spaceid, 
+      if ((attid = H5Acreate(fileid, ATT_NAME, typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, typeid, data) < 0) ERR;
 
@@ -82,7 +82,7 @@ main()
       for (i = 0; i < num_obj; i++)
       {
 	 if ((obj_class = H5Gget_objtype_by_idx(grpid, i)) < 0) ERR;
-	 if (H5Gget_objname_by_idx(grpid, i, obj_name, 
+	 if (H5Gget_objname_by_idx(grpid, i, obj_name,
 				   STR_LEN) < 0) ERR;
 	 if (obj_class != H5G_TYPE) ERR;
 	 if ((typeid = H5Topen(grpid, obj_name)) < 0) ERR;
@@ -116,7 +116,7 @@ main()
       if (H5Pset_fclose_degree(access_plist, H5F_CLOSE_SEMI)) ERR;
 
       /* Create file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      access_plist)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
 
@@ -138,7 +138,7 @@ main()
 
       /* Now create the file again, to make sure that it really is not
        * just mearly dead, but really most sincerely dead. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      access_plist)) < 0) ERR;
       if (H5Fclose(fileid) < 0) ERR;
 
@@ -185,9 +185,9 @@ main()
 	 ERR_RET;
       for (i = 0; i < SC; i++)
 	 data[i] = rand();
-      
+
       /* Create file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
 
       /* Create a space to deal with one slice in memory. */
@@ -199,7 +199,7 @@ main()
       if ((write_spaceid = H5Screate_simple(NDIMS, dims, NULL)) < 0) ERR;
 
       /* Create dataset. */
-      if ((datasetid = H5Dcreate1(fileid, VAR_NAME, H5T_NATIVE_INT, 
+      if ((datasetid = H5Dcreate1(fileid, VAR_NAME, H5T_NATIVE_INT,
 				  write_spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Write the data in num_step steps. */
@@ -209,13 +209,13 @@ main()
       {
 	 /* Select hyperslab for write of one slice. */
 	 start[0] = s * SC;
-	 if (H5Sselect_hyperslab(write_spaceid, H5S_SELECT_SET, 
+	 if (H5Sselect_hyperslab(write_spaceid, H5S_SELECT_SET,
 				 start, NULL, count, NULL) < 0) ERR;
 
-	 if (H5Dwrite(datasetid, H5T_NATIVE_INT, mem_spaceid, write_spaceid, 
+	 if (H5Dwrite(datasetid, H5T_NATIVE_INT, mem_spaceid, write_spaceid,
 		      H5P_DEFAULT, data) < 0) ERR;
       }
-      
+
       /* Close. */
       free(data);
       if (H5Dclose(datasetid) < 0 ||
@@ -248,13 +248,13 @@ main()
       void *fillp;
 
       sprintf(file_name, "%s/%s", TEMP_LARGE, FILE_NAME);
-      
+
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set latest_format in access propertly list. This ensures that
-       * the latest, greatest, HDF5 versions are used in the file. */ 
+       * the latest, greatest, HDF5 versions are used in the file. */
       if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) ERR;
 
       /* Set H5P_CRT_ORDER_TRACKED in the creation property list. This
@@ -302,7 +302,7 @@ main()
       if (H5DSset_scale(dim2_dimscaleid, dimscale_wo_var) < 0) ERR;
 
       /* Now create the 2D dataset. */
-      if ((plistid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;      
+      if ((plistid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
       if (!(fillp = malloc(1))) ERR;
 #define FILL_BYTE 255
       *(signed char *)fillp = FILL_BYTE;
@@ -321,7 +321,7 @@ main()
       if (H5Pset_attr_creation_order(plistid, H5P_CRT_ORDER_TRACKED|
 				     H5P_CRT_ORDER_INDEXED) < 0) ERR;
       if ((datasetid = H5Dcreate(grpid, VAR_NAME2, H5T_NATIVE_SCHAR, spaceid, plistid)) < 0)
-      
+
       free(fillp);
       free(chunksize);
       free(dimsize);
@@ -366,7 +366,7 @@ main()
 /*       if (H5Fclose(fileid) < 0) ERR; */
 
       /* Delete the huge data file we created. */
-      (void) remove(file_name); 
+      (void) remove(file_name);
    }
    SUMMARIZE_ERR;
 #endif /* LARGE_FILE_TESTS */

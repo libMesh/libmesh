@@ -32,7 +32,7 @@ odom_init(struct GETodometer* odom,
 	odom->stride[i] = (stride != NULL ? stride[i] : 1);
 	odom->stop[i] = odom->start[i] + (odom->edges[i]*((size_t)odom->stride[i]));
 	odom->index[i] = odom->start[i];
-    }    
+    }
 }
 
 static int
@@ -57,7 +57,7 @@ odom_next(struct GETodometer* odom)
 #endif
 
 /** \internal
-\ingroup variables 
+\ingroup variables
 
  */
 int
@@ -75,7 +75,7 @@ NC_get_vara(int ncid, int varid,
    if(edges == NULL) {
       size_t shape[NC_MAX_VAR_DIMS];
       int ndims;
-      stat = nc_inq_varndims(ncid, varid, &ndims); 
+      stat = nc_inq_varndims(ncid, varid, &ndims);
       if(stat != NC_NOERR) return stat;
       stat = NC_getshape(ncid,varid,ndims,shape);
       if(stat != NC_NOERR) return stat;
@@ -85,7 +85,7 @@ NC_get_vara(int ncid, int varid,
    return stat;
 }
 
-/** \ingroup variables 
+/** \ingroup variables
 \internal
  */
 static int
@@ -101,7 +101,7 @@ NC_get_var(int ncid, int varid, void *value, nc_type memtype)
 }
 
 /** \internal
-\ingroup variables 
+\ingroup variables
  Most dispatch tables will use the default procedures
 */
 int
@@ -117,7 +117,7 @@ NCDEFAULT_get_vars(int ncid, int varid, const size_t * start,
    return ncp->dispatch->get_varm(ncid,varid,start,edges,stride,NULL,value0,memtype);
 #else
   /* Rebuilt get_vars code to simplify and avoid use of get_varm */
-  
+
    int status = NC_NOERR;
    int i,simplestride,isrecvar;
    int rank;
@@ -137,7 +137,7 @@ NCDEFAULT_get_vars(int ncid, int varid, const size_t * start,
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
 
-   status = nc_inq_vartype(ncid, varid, &vartype); 
+   status = nc_inq_vartype(ncid, varid, &vartype);
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) memtype = vartype;
@@ -163,12 +163,12 @@ NCDEFAULT_get_vars(int ncid, int varid, const size_t * start,
    }
 
    /* Get the variable rank */
-   status = nc_inq_varndims(ncid, varid, &rank); 
+   status = nc_inq_varndims(ncid, varid, &rank);
    if(status != NC_NOERR) return status;
 
    /* Get variable dimension sizes */
    isrecvar = NC_is_recvar(ncid,varid,&numrecs);
-   NC_getshape(ncid,varid,rank,varshape);	
+   NC_getshape(ncid,varid,rank,varshape);
 
    /* Optimize out using various checks */
    if (rank == 0) {
@@ -200,10 +200,10 @@ NCDEFAULT_get_vars(int ncid, int varid, const size_t * start,
 	   /* cast needed for braindead systems with signed size_t */
            || ((unsigned long) mystride[i] >= X_INT_MAX))
            return NC_ESTRIDE;
-  	if(mystride[i] != 1) simplestride = 0;	
+  	if(mystride[i] != 1) simplestride = 0;
         /* illegal value checks */
 	dimlen = (i == 0 && isrecvar ? numrecs : varshape[i]);
-        /* mystart is unsigned, never < 0 */  
+        /* mystart is unsigned, never < 0 */
 	//if(mystart[i] < 0 || mystart[i] >= dimlen)
 	if(mystart[i] >= dimlen)
 	  return NC_EINVALCOORDS;
@@ -241,17 +241,17 @@ NCDEFAULT_get_vars(int ncid, int varid, const size_t * start,
 }
 
 /** \internal
-\ingroup variables 
+\ingroup variables
  */
 static int
-NC_get_var1(int ncid, int varid, const size_t *coord, void* value, 
+NC_get_var1(int ncid, int varid, const size_t *coord, void* value,
 	    nc_type memtype)
 {
    return NC_get_vara(ncid, varid, coord, NC_coord_one, value, memtype);
 }
 
 /** \internal
-\ingroup variables 
+\ingroup variables
  */
 int
 NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
@@ -273,13 +273,13 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
   if(NC_indef(ncp)) return NC_EINDEFINE;
 */
 
-   status = nc_inq_vartype(ncid, varid, &vartype); 
+   status = nc_inq_vartype(ncid, varid, &vartype);
    if(status != NC_NOERR) return status;
    /* Check that this is an atomic type */
    if(vartype > NC_MAX_ATOMIC_TYPE)
 	return NC_EMAPTYPE;
 
-   status = nc_inq_varndims(ncid, varid, &varndims); 
+   status = nc_inq_varndims(ncid, varid, &varndims);
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) {
@@ -303,7 +303,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 
    if(memtype == NC_CHAR && vartype != NC_CHAR)
       return NC_ECHAR;
-   else if(memtype != NC_CHAR && vartype == NC_CHAR)  
+   else if(memtype != NC_CHAR && vartype == NC_CHAR)
       return NC_ECHAR;
 
    memtypelen = nctypelen(memtype);
@@ -340,7 +340,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 
       /* Compute some dimension related values */
       isrecvar = NC_is_recvar(ncid,varid,&numrecs);
-      NC_getshape(ncid,varid,varndims,varshape);	
+      NC_getshape(ncid,varid,varndims,varshape);
 
       /*
        * Verify stride argument; also see if stride is all ones
@@ -357,7 +357,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
             }
 	    if(stride[idim] != 1) stride1 = 0;
 	 }
-         /* If stride1 is true, and there is no imap 
+         /* If stride1 is true, and there is no imap
             then call get_vara directly.
          */
          if(stride1 && imapp == NULL) {
@@ -422,7 +422,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 	 else if (idim == maxidim)
 	    mymap[idim] = 1;
 	 else
-	    mymap[idim] = 
+	    mymap[idim] =
 	       mymap[idim + 1] * (ptrdiff_t) myedges[idim + 1];
 #endif
 	 iocount[idim] = 1;
@@ -435,7 +435,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
        */
       for (idim = maxidim; idim >= 0; --idim)
       {
-	 size_t dimlen = 
+	 size_t dimlen =
 	    idim == 0 && isrecvar
 	    ? numrecs
 	    : varshape[idim];
@@ -456,7 +456,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 
       /* Lower body */
       /*
-       * As an optimization, adjust I/O parameters when the fastest 
+       * As an optimization, adjust I/O parameters when the fastest
        * dimension has unity stride both externally and internally.
        * In this case, the user could have called a simpler routine
        * (i.e. ncvar$1()
@@ -469,7 +469,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 	 mymap[maxidim] = (ptrdiff_t) length[maxidim];
       }
 
-      /* 
+      /*
        * Perform I/O.  Exit when done.
        */
       for (;;)
@@ -507,11 +507,11 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
    return status;
 }
 
-/** \ingroup variables 
+/** \ingroup variables
 \internal
 Called by externally visible nc_get_vars_xxx routines */
 static int
-NC_get_vars(int ncid, int varid, const size_t *start, 
+NC_get_vars(int ncid, int varid, const size_t *start,
 	    const size_t *edges, const ptrdiff_t *stride, void *value,
 	    nc_type memtype)
 {
@@ -525,12 +525,12 @@ NC_get_vars(int ncid, int varid, const size_t *start,
    return ncp->dispatch->get_vars(ncid,varid,start,edges,stride,value,memtype);
 }
 
-/** \ingroup variables 
+/** \ingroup variables
 \internal
-Called by externally visible nc_get_varm_xxx routines 
+Called by externally visible nc_get_varm_xxx routines
  */
 static int
-NC_get_varm(int ncid, int varid, const size_t *start, 
+NC_get_varm(int ncid, int varid, const size_t *start,
 	    const size_t *edges, const ptrdiff_t *stride, const ptrdiff_t* map,
 	    void *value, nc_type memtype)
 {
@@ -550,10 +550,10 @@ Functions to read data from variables. */
 /*! \{ */ /* All these functions are part of this named group... */
 
 /** \ingroup variables
-Read an array of values from a variable. 
+Read an array of values from a variable.
 
 The array to be read is specified by giving a corner and a vector of
-edge lengths to \ref specify_hyperslab. 
+edge lengths to \ref specify_hyperslab.
 
 The data values are read into consecutive locations with the last
 dimension varying fastest. The netCDF dataset must be in data mode
@@ -569,7 +569,7 @@ Other nc_get_vara_ functions will convert data to the desired output
 type as needed.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -605,12 +605,12 @@ values, five lat values, and ten lon values.
      #define TIMES 3
      #define LATS 5
      #define LONS 10
-     int  status;                      
-     int ncid;                         
-     int rh_id;                        
+     int  status;
+     int ncid;
+     int rh_id;
      static size_t start[] = {0, 0, 0};
      static size_t count[] = {TIMES, LATS, LONS};
-     double rh_vals[TIMES*LATS*LONS]; 
+     double rh_vals[TIMES*LATS*LONS];
         ...
      status = nc_open("foo.nc", NC_NOWRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
@@ -624,7 +624,7 @@ values, five lat values, and ten lon values.
  */
 /**@{*/
 int
-nc_get_vara(int ncid, int varid, const size_t *startp, 
+nc_get_vara(int ncid, int varid, const size_t *startp,
 	    const size_t *countp, void *ip)
 {
    NC* ncp = NULL;
@@ -637,46 +637,46 @@ nc_get_vara(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vara_text(int ncid, int varid, const size_t *startp, 
+nc_get_vara_text(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, char *ip)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_get_vara(ncid, varid, startp, countp, 
+   return NC_get_vara(ncid, varid, startp, countp,
 		      (void *)ip, NC_CHAR);
 }
 
 int
-nc_get_vara_schar(int ncid, int varid, const size_t *startp, 
+nc_get_vara_schar(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, signed char *ip)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_get_vara(ncid, varid, startp, countp, 
+   return NC_get_vara(ncid, varid, startp, countp,
 		      (void *)ip, NC_BYTE);
 }
 
 int
-nc_get_vara_uchar(int ncid, int varid, const size_t *startp, 
+nc_get_vara_uchar(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, unsigned char *ip)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_get_vara(ncid, varid, startp, countp, 
+   return NC_get_vara(ncid, varid, startp, countp,
 		      (void *)ip, T_uchar);
 }
 
 int
-nc_get_vara_short(int ncid, int varid, const size_t *startp, 
+nc_get_vara_short(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, short *ip)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_get_vara(ncid, varid, startp, countp, 
+   return NC_get_vara(ncid, varid, startp, countp,
 		      (void *)ip, NC_SHORT);
 }
 
@@ -712,7 +712,7 @@ nc_get_vara_float(int ncid, int varid,
 
 
 int
-nc_get_vara_double(int ncid, int varid, const size_t *startp, 
+nc_get_vara_double(int ncid, int varid, const size_t *startp,
 		   const size_t *countp, double *ip)
 {
    NC* ncp;
@@ -786,7 +786,7 @@ nc_get_vara_string(int ncid, int varid,
 /**@}*/
 
 /** \ingroup variables
-Read a single datum from a variable. 
+Read a single datum from a variable.
 
 Inputs are the netCDF ID, the variable ID, a multidimensional index
 that specifies which value to get, and the address of a location into
@@ -801,7 +801,7 @@ Other nc_get_var1_ functions will convert data to the desired output
 type as needed.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -871,7 +871,7 @@ nc_get_var1_int(int ncid, int varid, const size_t *indexp, int *ip)
 }
 
 int
-nc_get_var1_long(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_long(int ncid, int varid, const size_t *indexp,
 		 long *ip)
 {
    NC* ncp;
@@ -881,7 +881,7 @@ nc_get_var1_long(int ncid, int varid, const size_t *indexp,
 }
 
 int
-nc_get_var1_float(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_float(int ncid, int varid, const size_t *indexp,
 		  float *ip)
 {
    NC* ncp;
@@ -891,7 +891,7 @@ nc_get_var1_float(int ncid, int varid, const size_t *indexp,
 }
 
 int
-nc_get_var1_double(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_double(int ncid, int varid, const size_t *indexp,
 		   double *ip)
 {
    NC* ncp;
@@ -901,7 +901,7 @@ nc_get_var1_double(int ncid, int varid, const size_t *indexp,
 }
 
 int
-nc_get_var1_ubyte(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_ubyte(int ncid, int varid, const size_t *indexp,
 		  unsigned char *ip)
 {
    NC* ncp;
@@ -911,7 +911,7 @@ nc_get_var1_ubyte(int ncid, int varid, const size_t *indexp,
 }
 
 int
-nc_get_var1_ushort(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_ushort(int ncid, int varid, const size_t *indexp,
 		   unsigned short *ip)
 {
    NC* ncp;
@@ -921,7 +921,7 @@ nc_get_var1_ushort(int ncid, int varid, const size_t *indexp,
 }
 
 int
-nc_get_var1_uint(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_uint(int ncid, int varid, const size_t *indexp,
 		 unsigned int *ip)
 {
    NC* ncp;
@@ -931,7 +931,7 @@ nc_get_var1_uint(int ncid, int varid, const size_t *indexp,
 }
 
 int
-nc_get_var1_longlong(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_longlong(int ncid, int varid, const size_t *indexp,
 		     long long *ip)
 {
    NC* ncp;
@@ -941,7 +941,7 @@ nc_get_var1_longlong(int ncid, int varid, const size_t *indexp,
 }
 
 int
-nc_get_var1_ulonglong(int ncid, int varid, const size_t *indexp, 
+nc_get_var1_ulonglong(int ncid, int varid, const size_t *indexp,
 		      unsigned long long *ip)
 {
    NC* ncp;
@@ -963,7 +963,7 @@ nc_get_var1_string(int ncid, int varid, const size_t *indexp, char* *ip)
 /** \} */
 
 /** \ingroup variables
-Read an entire variable in one call. 
+Read an entire variable in one call.
 
 This function will read all the values from a netCDF variable of an
 open netCDF dataset.
@@ -990,7 +990,7 @@ user defined type. For this function, the type of the data in memory
 must match the type of the variable - no data conversion is done.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -1141,7 +1141,7 @@ nc_get_var_string(int ncid, int varid, char* *ip)
 /** \} */
 
 /** \ingroup variables
-Read a strided array from a variable. 
+Read a strided array from a variable.
 
 This function reads a subsampled (strided) array section of values
 from a netCDF variable of an open netCDF dataset. The subsampled array
@@ -1155,7 +1155,7 @@ user defined type. For this function, the type of the data in memory
 must match the type of the variable - no data conversion is done.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -1195,7 +1195,7 @@ nc_get_vars (int ncid, int varid, const size_t * startp,
 }
 
 int
-nc_get_vars_text(int ncid, int varid, const size_t *startp, 
+nc_get_vars_text(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, const ptrdiff_t * stridep,
 		 char *ip)
 {
@@ -1207,7 +1207,7 @@ nc_get_vars_text(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_schar(int ncid, int varid, const size_t *startp, 
+nc_get_vars_schar(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const ptrdiff_t * stridep,
 		  signed char *ip)
 {
@@ -1219,7 +1219,7 @@ nc_get_vars_schar(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_uchar(int ncid, int varid, const size_t *startp, 
+nc_get_vars_uchar(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const ptrdiff_t * stridep,
 		  unsigned char *ip)
 {
@@ -1231,19 +1231,19 @@ nc_get_vars_uchar(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_short(int ncid, int varid, const size_t *startp, 
+nc_get_vars_short(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const ptrdiff_t *stridep,
 		  short *ip)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_get_vars(ncid,varid,startp, countp, stridep, 
+   return NC_get_vars(ncid,varid,startp, countp, stridep,
 		      (void *)ip, NC_SHORT);
 }
 
 int
-nc_get_vars_int(int ncid, int varid, const size_t *startp, 
+nc_get_vars_int(int ncid, int varid, const size_t *startp,
 		const size_t *countp, const ptrdiff_t * stridep,
 		int *ip)
 {
@@ -1255,7 +1255,7 @@ nc_get_vars_int(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_long(int ncid, int varid, const size_t *startp, 
+nc_get_vars_long(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, const ptrdiff_t * stridep,
 		 long *ip)
 {
@@ -1267,7 +1267,7 @@ nc_get_vars_long(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_float(int ncid, int varid, const size_t *startp, 
+nc_get_vars_float(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const ptrdiff_t * stridep,
 		  float *ip)
 {
@@ -1279,7 +1279,7 @@ nc_get_vars_float(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_double(int ncid, int varid, const size_t *startp, 
+nc_get_vars_double(int ncid, int varid, const size_t *startp,
 		   const size_t *countp, const ptrdiff_t * stridep,
 		   double *ip)
 {
@@ -1291,7 +1291,7 @@ nc_get_vars_double(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_ubyte(int ncid, int varid, const size_t *startp, 
+nc_get_vars_ubyte(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const ptrdiff_t * stridep,
 		  unsigned char *ip)
 {
@@ -1303,7 +1303,7 @@ nc_get_vars_ubyte(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_ushort(int ncid, int varid, const size_t *startp, 
+nc_get_vars_ushort(int ncid, int varid, const size_t *startp,
 		   const size_t *countp, const ptrdiff_t * stridep,
 		   unsigned short *ip)
 {
@@ -1315,7 +1315,7 @@ nc_get_vars_ushort(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_uint(int ncid, int varid, const size_t *startp, 
+nc_get_vars_uint(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, const ptrdiff_t * stridep,
 		 unsigned int *ip)
 {
@@ -1327,7 +1327,7 @@ nc_get_vars_uint(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_longlong(int ncid, int varid, const size_t *startp, 
+nc_get_vars_longlong(int ncid, int varid, const size_t *startp,
 		     const size_t *countp, const ptrdiff_t * stridep,
 		     long long *ip)
 {
@@ -1339,7 +1339,7 @@ nc_get_vars_longlong(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_get_vars_ulonglong(int ncid, int varid, const size_t *startp, 
+nc_get_vars_ulonglong(int ncid, int varid, const size_t *startp,
 		      const size_t *countp, const ptrdiff_t * stridep,
 		      unsigned long long *ip)
 {
@@ -1360,14 +1360,14 @@ nc_get_vars_string(int ncid, int varid,
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_get_vars(ncid, varid, startp, countp, stridep, 
+   return NC_get_vars(ncid, varid, startp, countp, stridep,
 		      (void *)ip, NC_STRING);
 }
 #endif /*USE_NETCDF4*/
 /** \} */
 
 /** \ingroup variables
-Read a mapped array from a variable. 
+Read a mapped array from a variable.
 
 The nc_get_varm_ type family of functions reads a mapped array section
 of values from a netCDF variable of an open netCDF dataset. The mapped
@@ -1392,7 +1392,7 @@ formally deprecated. The reason is the complexity of the
 algorithm makes its use difficult for users to properly use.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -1430,14 +1430,14 @@ nc_get_varm(int ncid, int varid, const size_t * startp,
 
    if ((stat = NC_check_id(ncid, &ncp)))
        return stat;
-   return ncp->dispatch->get_varm(ncid, varid, startp, countp, 
+   return ncp->dispatch->get_varm(ncid, varid, startp, countp,
 				  stridep, imapp, ip, NC_NAT);
 }
 
 int
 nc_get_varm_schar(int ncid, int varid,
 		  const size_t *startp, const size_t *countp,
-		  const ptrdiff_t *stridep, 
+		  const ptrdiff_t *stridep,
 		  const ptrdiff_t *imapp, signed char *ip)
 {
    NC *ncp;
@@ -1460,8 +1460,8 @@ nc_get_varm_uchar(int ncid, int varid,
 }
 
 int
-nc_get_varm_short(int ncid, int varid, const size_t *startp, 
-		  const size_t *countp, const ptrdiff_t *stridep, 
+nc_get_varm_short(int ncid, int varid, const size_t *startp,
+		  const size_t *countp, const ptrdiff_t *stridep,
 		  const ptrdiff_t *imapp, short *ip)
 {
    NC *ncp;
@@ -1558,8 +1558,8 @@ nc_get_varm_uint(int ncid, int varid,
 }
 
 int
-nc_get_varm_longlong(int ncid, int varid, const size_t *startp, 
-		     const size_t *countp, const ptrdiff_t *stridep, 
+nc_get_varm_longlong(int ncid, int varid, const size_t *startp,
+		     const size_t *countp, const ptrdiff_t *stridep,
 		     const ptrdiff_t *imapp, long long *ip)
 {
    NC *ncp;
@@ -1583,8 +1583,8 @@ nc_get_varm_ulonglong(int ncid, int varid,
 }
 
 int
-nc_get_varm_text(int ncid, int varid, const size_t *startp, 
-		 const size_t *countp, const ptrdiff_t *stridep, 
+nc_get_varm_text(int ncid, int varid, const size_t *startp,
+		 const size_t *countp, const ptrdiff_t *stridep,
 		 const ptrdiff_t *imapp, char *ip)
 {
    NC *ncp;
@@ -1596,8 +1596,8 @@ nc_get_varm_text(int ncid, int varid, const size_t *startp,
 
 #ifdef USE_NETCDF4
 int
-nc_get_varm_string(int ncid, int varid, const size_t *startp, 
-		   const size_t *countp, const ptrdiff_t *stridep, 
+nc_get_varm_string(int ncid, int varid, const size_t *startp,
+		   const size_t *countp, const ptrdiff_t *stridep,
 		   const ptrdiff_t *imapp, char **ip)
 {
    NC *ncp;
@@ -1611,4 +1611,3 @@ nc_get_varm_string(int ncid, int varid, const size_t *startp,
 
 
 /*! \} */ /* End of named group... */
-

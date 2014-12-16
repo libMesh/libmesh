@@ -21,5 +21,3 @@ main(int argc, char** argv)
     fflush(stdout);
     exit(0);
 }
-
-

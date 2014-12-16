@@ -286,7 +286,7 @@ struct NC3_INFO {
 	fIsSet((ncp)->flags, NC_CREAT)
 
 #define NC_indef(ncp) \
-	(NC_IsNew(ncp) || fIsSet((ncp)->flags, NC_INDEF)) 
+	(NC_IsNew(ncp) || fIsSet((ncp)->flags, NC_INDEF))
 
 #define set_NC_ndirty(ncp) \
 	fSet((ncp)->flags, NC_NDIRTY)

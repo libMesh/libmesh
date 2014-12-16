@@ -18,6 +18,3 @@ extern void oc_curl_debug(OCstate* state);
 extern void oc_curl_printerror(OCstate* state);
 
 #endif /*_CURLFUNCTION_H_*/
-
-
-

@@ -678,11 +678,11 @@ get_mem_used2(int *mem_used)
    /*unsigned dt;          dirty pages (unused in Linux 2.6)*/
 
    assert(mem_used);
-   
+
    snprintf(buf, 30, "/proc/%u/statm", (unsigned)getpid());
-   if ((pf = fopen(buf, "r"))) 
+   if ((pf = fopen(buf, "r")))
    {
-      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share, 
+      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share,
 	     &text, &lib, &data);
       *mem_used = (data * page_size) / MEGABYTE;
    }
@@ -690,10 +690,10 @@ get_mem_used2(int *mem_used)
       *mem_used = -1;
   fclose(pf);
 }
-#endif 
+#endif
 
 int
-main() 
+main()
 {
    int  ncid;  /* netCDF id */
 
@@ -7391,7 +7391,7 @@ main()
 #ifdef EXTRA_TESTS
    get_mem_used2(&memused);
    printf("before enddef data memory %d MB\n", memused);
-#endif 
+#endif
 
    /* leave define mode */
    if (nc_enddef (ncid)) ERR;
@@ -7399,7 +7399,7 @@ main()
 #ifdef EXTRA_TESTS
    get_mem_used2(&memused);
    printf("before close data memory %d MB\n", memused);
-#endif 
+#endif
 
    /* assign variable data */
    if (nc_close(ncid)) ERR;
@@ -7407,8 +7407,8 @@ main()
 #ifdef EXTRA_TESTS
    get_mem_used2(&memused);
    printf("after close data memory %d MB\n", memused);
-#endif 
-   
+#endif
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

@@ -48,7 +48,7 @@ main(int argc, char **argv)
    char name_in[UNAMELEN + 1], strings_in[UNAMELEN + 1];
    nc_type att_type;
    size_t att_len;
-   
+
    printf("\n*** Testing UTF-8.\n");
    printf("*** creating UTF-8 test file %s...", FILE7_NAME);
   if (nc_create(FILE7_NAME, NC_CLOBBER, &ncid))
@@ -78,7 +78,7 @@ main(int argc, char **argv)
        ERR;
 
    /* Check it out. */
-   
+
    /* Reopen the file. */
    if (nc_open(FILE7_NAME, NC_NOWRITE, &ncid))
        ERR;
@@ -90,7 +90,7 @@ main(int argc, char **argv)
        /* Note, name was normalized before storing, so retrieved name
 	  won't match original unnormalized name.  Check that we get
 	  normalized version, instead.  */
-       
+
        /* NFC normalized UTF-8 for Unicode 8-character "Hello" in Greek */
        unsigned char norm_utf8[] = {
 	   0xCE, 0x9A,	  /* GREEK CAPITAL LETTER KAPPA  : 2-bytes utf8 */
@@ -98,7 +98,7 @@ main(int argc, char **argv)
 	   0xCE, 0xBB,	  /* GREEK SMALL LETTER ALPHA    : 2-bytes utf8 */
 	   0xCE, 0xB7,	  /* GREEK SMALL LETTER ETA      : 2-bytes utf8 */
 	   0xCE, 0xBC,	  /* GREEK SMALL LETTER MU       : 2-bytes utf8 */
-	   0xCE, 0xAD,    /* GREEK SMALL LETTER EPSILON WITH TONOS 
+	   0xCE, 0xAD,    /* GREEK SMALL LETTER EPSILON WITH TONOS
 			                                 : 2-bytes utf8 */
 	   0xCF, 0x81,	  /* GREEK SMALL LETTER RHO      : 2-bytes utf8 */
 	   0xCE, 0xB1,	  /* GREEK SMALL LETTER ALPHA    : 2-bytes utf8 */

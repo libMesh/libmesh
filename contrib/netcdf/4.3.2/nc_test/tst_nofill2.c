@@ -3,7 +3,7 @@
   See COPYRIGHT file for copying and redistribution conditions.
 
   This is part of netCDF.
-   
+
   This program tests for a bug discovered with nofill mode that failed
   only on file systems with block size in a particular range.  It fails
   when invoked with the blksize argument between 2091953 and 2150032,
@@ -27,7 +27,7 @@
 #define NDIMS4 4
 
 int
-create_file(char *file_name, int fill_mode, size_t* sizehintp) 
+create_file(char *file_name, int fill_mode, size_t* sizehintp)
 {
    int ncid, time_id, zonal_wnd_id;
    int dimids[NDIMS4];
@@ -39,7 +39,7 @@ create_file(char *file_name, int fill_mode, size_t* sizehintp)
    int i;
 
    /* Init data. */
-   for(i = 0; i < TIME_LEN * LAT_LEN * LON_LEN; i++) 
+   for(i = 0; i < TIME_LEN * LAT_LEN * LON_LEN; i++)
       zonal_wnd[i] = 100 + i;
 
    /* To test bug on filesystem without large block size, we can get

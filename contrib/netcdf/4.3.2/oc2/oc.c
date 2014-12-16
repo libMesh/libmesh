@@ -245,7 +245,7 @@ oc_dds_properties(OCobject link,
     if(octypep) *octypep = node->octype;
     if(atomtypep) *atomtypep = node->etype;
     if(rankp) *rankp = node->array.rank;
-    if(containerp) *containerp = (OCobject)node->container;    
+    if(containerp) *containerp = (OCobject)node->container;
     if(nsubnodesp) *nsubnodesp = oclistlength(node->subnodes);
     if(nattrp) {
         if(node->octype == OC_Attribute) {
@@ -611,7 +611,7 @@ oc_dds_dimensions(OCobject link, OCobject ddsnode, OCobject* dims)
         for(i=0;i<node->array.rank;i++) {
             OCnode* dim = (OCnode*)oclistget(node->array.dimensions,i);
 	    dims[i] = (OCobject)dim;
-	}	
+	}
     }
     return OCTHROW(OC_NOERR);
 }
@@ -701,7 +701,7 @@ oc_dds_dimensionsizes(OCobject link, OCobject ddsnode, size_t* dimsizes)
         for(i=0;i<node->array.rank;i++) {
             OCnode* dim = (OCnode*)oclistget(node->array.dimensions,i);
 	    dimsizes[i] = dim->dim.declsize;
-	}	
+	}
     }
     return OCTHROW(OC_NOERR);
 }
@@ -757,7 +757,7 @@ oc_dds_attr(OCobject link, OCobject ddsnode, size_t index,
 	        strings[i] = nulldup(attr->values[i]);
 	}
     }
-    return OCTHROW(OC_NOERR);    
+    return OCTHROW(OC_NOERR);
 }
 
 /*!
@@ -996,7 +996,7 @@ oc_data_fieldbyname(OCobject link, OCobject datanode, const char* name, OCobject
 	if(match == 0) {
 	    /* Get the ith datasubnode */
 	    err = oc_data_ithfield(link,datanode,i,&field);
-            if(err != OC_NOERR) return err;	
+            if(err != OC_NOERR) return err;
 	    if(fieldp) *fieldp = field;
 	    return OCTHROW(OC_NOERR);
 	}
@@ -1045,7 +1045,7 @@ oc_data_gridmap(OCobject link, OCobject grid, size_t index, OCobject* mapdatap)
 }
 
 /*!
-Obtain the data instance corresponding to the container 
+Obtain the data instance corresponding to the container
 of a specied instance object.
 
 \param[in] link The link through which the server is accessed.
@@ -1117,7 +1117,7 @@ to the element instance specified by the indices argument.
 \param[in] link The link through which the server is accessed.
 \param[in] datanode The data node instance of interest.
 \param[in] indices A vector of indices specifying the element instance
-to return. This vector must be allocated and free'd by the caller. 
+to return. This vector must be allocated and free'd by the caller.
 \param[out] elementp  A pointer into which the element instance is stored.
 
 \retval OC_NOERR The procedure executed normally.
@@ -1147,7 +1147,7 @@ oc_data_ithelement(OCobject link, OCobject datanode, size_t* indices, OCobject* 
 }
 
 /*!
-Return the i'th record instance 
+Return the i'th record instance
 of a Sequence data instance.
 
 \param[in] link The link through which the server is accessed.
@@ -1181,7 +1181,7 @@ extern OCerror oc_data_ithrecord(OCobject link, OCobject datanode, size_t index,
 }
 
 /*!
-Return the i'th record instance 
+Return the i'th record instance
 of a Sequence data instance.
 Return the indices for this data instance; Assumes the data
 was obtained using oc_data_ithelement or oc_data_ithrecord.
@@ -1305,7 +1305,7 @@ a record in a Sequence).
 \param[in] link The link through which the server is accessed.
 \param[in] datanode The data node instance of interest.
 
-\retval one(1) if the specified data instance is indexable. 
+\retval one(1) if the specified data instance is indexable.
 \retval zero(0) otherwise.
 */
 
@@ -1391,7 +1391,7 @@ oc_data_read(OCobject link, OCobject datanode,
 
     if(start == NULL && edges == NULL) /* Assume it is a scalar read */
         return OCTHROW(oc_data_readn(link,datanode,start,0,memsize,memory));
- 
+
     if(edges == NULL)
 	return OCTHROW(OCTHROW(OC_EINVALCOORDS));
 
@@ -1476,7 +1476,7 @@ oc_data_readn(OCobject link, OCobject datanode,
     OCDEREF(OCstate*,state,link);
     OCVERIFY(OC_Data,datanode);
     OCDEREF(OCdata*,data,datanode);
-    
+
     /* Do argument validation */
 
     if(memory == NULL || memsize == 0)
@@ -1661,7 +1661,7 @@ oc_typesize(OCtype etype)
 Return a string corresponding to the
 to a given OCtype.
 For example,
-oc_typetostring(OC_Int32) == "Int32" and 
+oc_typetostring(OC_Int32) == "Int32" and
 oc_typesize(OC_Structure) == "Structure".
 The caller MUST NOT free the returned string.
 
@@ -1712,7 +1712,7 @@ oc_typeprint(OCtype etype, void* value, size_t bufsize, char* buffer)
 Return a user-readable error message corresponding
 to a given OCerror value.
 
-\param[in] err The OCerror value. 
+\param[in] err The OCerror value.
 
 \return The error message
 */

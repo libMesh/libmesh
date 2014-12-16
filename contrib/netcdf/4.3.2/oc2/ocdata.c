@@ -215,7 +215,7 @@ ocdata_recordcount(OCstate* state, OCdata* data, size_t* countp)
        || !fisset(data->datamode,OCDT_SEQUENCE))
 	return OCTHROW(OC_EBADTYPE);
 
-    *countp = data->ninstances;		
+    *countp = data->ninstances;
 
     return OC_NOERR;
 }
@@ -234,7 +234,7 @@ arguments.
 int
 ocdata_read(OCstate* state, OCdata* data, size_t start, size_t count,
 		void* memory, size_t memsize)
-             
+
 {
     int stat = OC_NOERR;
     XXDR* xdrs;
@@ -329,7 +329,7 @@ ocread(OCdata* data, XXDR* xdrs, char* memory, size_t memsize, size_t start, siz
 	    }
 	}
 	break;
-	
+
     case OC_Int64: case OC_UInt64:
 	xxdr_setpos(xdrs,data->xdroffset+xdrstart);
 	if(!xxdr_getbytes(xdrs,memory,xdrtotal)) {OCTHROW(OC_EDATADDS); goto xdrfail;}
@@ -418,4 +418,3 @@ xdrfail:
     oclog(OCLOGERR,"DAP DATADDS packet is apparently too short");
     return OCTHROW(OC_EDATADDS);
 }
-

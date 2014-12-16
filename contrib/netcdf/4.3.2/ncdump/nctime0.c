@@ -4,7 +4,7 @@
  *   $Id: nctime.c,v 1.9 2010/05/05 22:15:39 dmh Exp $
  *********************************************************************/
 
-/* 
+/*
  * This code was extracted with permission from the CDMS time
  * conversion and arithmetic routines developed by Bob Drach, Lawrence
  * Livermore National Laboratory as part of the cdtime library.  Russ
@@ -82,7 +82,7 @@ calendar_type(int ncid, int varid) {
     if(stat == NC_NOERR && catt.type == NC_CHAR && catt.len > 0) {
 	char *calstr = (char *)emalloc(catt.len + 1);
 	int itype;
-	NC_CHECK(nc_get_att(ncid, varid, CF_CAL_ATT_NAME, calstr));	
+	NC_CHECK(nc_get_att(ncid, varid, CF_CAL_ATT_NAME, calstr));
 	calstr[catt.len] = '\0';
 	for(itype = 0; itype < ncals; itype++) {
 	    if(strncmp(calstr, calmap[itype].attname, catt.len) == 0) {
@@ -106,12 +106,12 @@ is_bounds_var(char *varname, int *pargrpidp, int *parvaridp) {
 	}
     }
     return false;
-} 
+}
 
-/* Test if attribute is of form required by cdtime: 
+/* Test if attribute is of form required by cdtime:
  *     <time_unit> since <base_time>
  * where
- *     <time_unit>: 
+ *     <time_unit>:
  */
 bool_t
 is_valid_time_unit(const char *units) {
@@ -217,7 +217,7 @@ get_timeinfo(int ncid1, int varid1, ncvar_t *vp) {
 	memset((void*)vp->timeinfo,0,sizeof(timeinfo_t));
 	vp->timeinfo->calendar = calendar_type(ncid, varid);
 	/* Parse relative units, returning the unit and base component time. */
- 	if(cdParseRelunits(vp->timeinfo->calendar, units, 
+ 	if(cdParseRelunits(vp->timeinfo->calendar, units,
 			   &vp->timeinfo->unit, &vp->timeinfo->origin) != 0) {
 	    /* error parsing units so just treat as not a time variable */
 	    free(vp->timeinfo);
@@ -234,8 +234,8 @@ get_timeinfo(int ncid1, int varid1, ncvar_t *vp) {
     return;
 }
 
-/* print_att_times 
- * by Dave Allured, NOAA/PSD/CIRES.  
+/* print_att_times
+ * by Dave Allured, NOAA/PSD/CIRES.
  * This version supports only primitive attribute types; do not call
  * for user defined types.  Print interpreted, human readable (ISO)
  * time strings for an attribute of a CF-like time variable.
@@ -308,11 +308,11 @@ print_att_times(
 
     memset((void*)&var,0,sizeof(var));	/* clear the fake var structure */
     get_timeinfo(ncid, varid, &var);	/* sets has_timeval, timeinfo members */
-    
+
     if (var.has_timeval) {		/* no print unless time qualified */
 
 /* Convert each value to ISO date/time string, and print. */
-	
+
 	size_t iel;				     /* attrib index */
 	const char *valp = (const char *)att->valgp;  /* attrib value pointer */
 	safebuf_t *sb = sbuf_new();		/* allocate new string buffer */
@@ -322,7 +322,7 @@ print_att_times(
 	if(formatting_specs.iso_separator)
 	    separator = 'T';
 #endif
-        
+
 	var.type = att->type;		/* insert attrib type into fake var */
 
 	for (iel = 0; iel < att->len; iel++) {
@@ -332,7 +332,7 @@ print_att_times(
 		sbuf_cat(sb, ",");
 
             first_item = (iel == 0);	/* identify start of list */
-            
+
             wrap = (att->len > 2);	/* specify line wrap variations:     */
 					/* 1 or 2 values: keep on same line, */
 					/* more than 2: enable line wrap     */

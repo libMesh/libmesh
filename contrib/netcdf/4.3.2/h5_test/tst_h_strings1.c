@@ -19,7 +19,7 @@ main()
    printf("\n*** Checking HDF5 string types some more.\n");
    printf("*** Checking fill value of scalar string dataset...");
    {
-#define VAR_NAME "Chamber_of_Secrets"      
+#define VAR_NAME "Chamber_of_Secrets"
       hid_t fapl_id, fcpl_id, fileid, grpid, spaceid;
       hid_t typeid, datasetid, plistid;
 /*      void *fillp;*/
@@ -32,9 +32,9 @@ main()
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set latest_format in access propertly list. This ensures that
-       * the latest, greatest, HDF5 versions are used in the file. */ 
+       * the latest, greatest, HDF5 versions are used in the file. */
       if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) ERR;
 
       /* Set H5P_CRT_ORDER_TRACKED in the creation property list. This
@@ -47,20 +47,20 @@ main()
       /* Create the file, open root group. */
       if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, fcpl_id, fapl_id)) < 0) ERR;
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Create string type. */
       if ((typeid = H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-      
+
       /* Create a scalar space. */
       if ((spaceid = H5Screate(H5S_SCALAR)) < 0) ERR;
 
       /* Write an scalar dataset of this type. */
       if ((plistid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
       if (H5Pset_fill_value(plistid, typeid, &empty) < 0) ERR;
-      if ((datasetid = H5Dcreate1(grpid, VAR_NAME, typeid, 
+      if ((datasetid = H5Dcreate1(grpid, VAR_NAME, typeid,
 				  spaceid, plistid)) < 0) ERR;
-      if (H5Dwrite(datasetid, typeid, spaceid, spaceid, 
+      if (H5Dwrite(datasetid, typeid, spaceid, spaceid,
 		   H5P_DEFAULT, &data) < 0) ERR;
 
       /* Close up. */
@@ -101,7 +101,7 @@ main()
 /*       /\* Create file access and create property lists. *\/ */
 /*       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR; */
 /*       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR; */
-      
+
 /*       /\* Set latest_format in access propertly list. This ensures that */
 /*        * the latest, greatest, HDF5 versions are used in the file. *\/  */
 /*       if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) ERR; */
@@ -116,11 +116,11 @@ main()
 /*       /\* Create the file, open root group. *\/ */
 /*       if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, fcpl_id, fapl_id)) < 0) ERR; */
 /*       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR; */
-      
+
 /*       /\* Create string type. *\/ */
 /*       if ((typeid = H5Tcopy(H5T_C_S1)) < 0) ERR; */
 /*       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR; */
-      
+
 /*       /\* Create a space for the dataset. *\/ */
 /*       if ((spaceid = H5Screate_simple(1, dims, max_dims)) < 0) ERR; */
 
@@ -150,7 +150,7 @@ main()
 /*    SUMMARIZE_ERR; */
    printf("*** Checking string 1D dataset...");
    {
-#define MARK_TWAIN "Mark_Twain"      
+#define MARK_TWAIN "Mark_Twain"
 #define NUM_STR 1
 #define NDIMS 1
       hid_t fapl_id, fcpl_id, fileid, grpid, spaceid;
@@ -166,9 +166,9 @@ main()
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set latest_format in access propertly list. This ensures that
-       * the latest, greatest, HDF5 versions are used in the file. */ 
+       * the latest, greatest, HDF5 versions are used in the file. */
       if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) ERR;
 
       /* Set H5P_CRT_ORDER_TRACKED in the creation property list. This
@@ -181,11 +181,11 @@ main()
       /* Create the file, open root group. */
       if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, fcpl_id, fapl_id)) < 0) ERR;
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Create string type. */
       if ((typeid = H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, H5T_VARIABLE) < 0) ERR;
-      
+
       /* Create a space for the dataset. */
       if ((spaceid = H5Screate_simple(1, dims, max_dims)) < 0) ERR;
 
@@ -193,13 +193,13 @@ main()
       if ((plistid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
       if (H5Pset_chunk(plistid, 1, chunk_dims) < 0) ERR;
       if (H5Pset_fill_value(plistid, typeid, &empty) < 0) ERR;
-      if ((datasetid = H5Dcreate1(grpid, MARK_TWAIN, typeid, 
+      if ((datasetid = H5Dcreate1(grpid, MARK_TWAIN, typeid,
 				  spaceid, plistid)) < 0) ERR;
 
       /* Now extend the dataset. */
       if (H5Dextend(datasetid, xtend_size) < 0) ERR;
 
-      if (H5Dwrite(datasetid, typeid, spaceid, spaceid, 
+      if (H5Dwrite(datasetid, typeid, spaceid, spaceid,
 		   H5P_DEFAULT, &data) < 0) ERR;
 
       /* Close up. */

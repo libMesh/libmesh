@@ -17,28 +17,28 @@ struct ncvar_t;
 struct timeinfo_t;
 
 /*
- * Member function to determine if values for this type are equal, 
+ * Member function to determine if values for this type are equal,
  * used to compare with fill value.
  */
 typedef bool_t (*val_equals_func)(const struct nctype_t *this,
 				   const void *v1p, const void *v2p);
-/* 
+/*
  * Member function to convert value of this type to a string. Returns
  * number of bytes in output string sb (not including trailing null)
  */
-typedef int (*typ_tostring_func)(const struct nctype_t *this, 
-				 struct safebuf_t *sb, 
+typedef int (*typ_tostring_func)(const struct nctype_t *this,
+				 struct safebuf_t *sb,
 				 const void *valp);
 
-/* 
+/*
  * Per-variable member function to convert value of this type to a
  * string. Returns number of bytes in output string sb (not
  * including trailing null).  This is needed because a variable
  * can override its type for output, if a variable-specific format
  * is specified in an attribute.
  */
-typedef int (*val_tostring_func)(const struct ncvar_t *this, 
-				 struct safebuf_t *sb, 
+typedef int (*val_tostring_func)(const struct ncvar_t *this,
+				 struct safebuf_t *sb,
 				 const void *valp);
 
 typedef struct nctype_t {	/* type */
@@ -81,7 +81,7 @@ typedef struct ncvar_t {	/* variable */
 				   printing values or base values, if any */
     int locid;			/* group id */
     /* member functions */
-    val_tostring_func val_tostring; /* function to convert value to string for 
+    val_tostring_func val_tostring; /* function to convert value to string for
 				       output */
 } ncvar_t;
 

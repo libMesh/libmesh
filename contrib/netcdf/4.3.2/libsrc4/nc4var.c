@@ -52,13 +52,13 @@ nc4_reopen_dataset(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
 #ifdef EXTRA_TESTS
       num_plists++;
 #endif
-      if (H5Pset_chunk_cache(access_pid, var->chunk_cache_nelems, 
-			     var->chunk_cache_size, 
+      if (H5Pset_chunk_cache(access_pid, var->chunk_cache_nelems,
+			     var->chunk_cache_size,
 			     var->chunk_cache_preemption) < 0)
 	 return NC_EHDFERR;
       if (H5Dclose(var->hdf_datasetid) < 0)
 	 return NC_EHDFERR;
-      if ((var->hdf_datasetid = H5Dopen2(grp->hdf_grpid, var->name, 
+      if ((var->hdf_datasetid = H5Dopen2(grp->hdf_grpid, var->name,
 					 access_pid)) < 0)
 	 return NC_EHDFERR;
       if (H5Pclose(access_pid) < 0)
@@ -67,17 +67,17 @@ nc4_reopen_dataset(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
       num_plists--;
 #endif
    }
-   
+
    return NC_NOERR;
 }
 
 /* Set chunk cache size for a variable. */
 int
-NC4_set_var_chunk_cache(int ncid, int varid, size_t size, size_t nelems, 
+NC4_set_var_chunk_cache(int ncid, int varid, size_t size, size_t nelems,
 			float preemption)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var;
    int retval;
@@ -118,7 +118,7 @@ NC4_set_var_chunk_cache(int ncid, int varid, size_t size, size_t nelems,
 /* Need this version for fortran. Accept negative numbers to leave
  * settings as they are. */
 int
-nc_set_var_chunk_cache_ints(int ncid, int varid, int size, int nelems, 
+nc_set_var_chunk_cache_ints(int ncid, int varid, int size, int nelems,
 			    int preemption)
 {
    size_t real_size = H5D_CHUNK_CACHE_NBYTES_DEFAULT;
@@ -133,18 +133,18 @@ nc_set_var_chunk_cache_ints(int ncid, int varid, int size, int nelems,
 
    if (preemption >= 0)
       real_preemption = preemption / 100.;
-	 
-   return NC4_set_var_chunk_cache(ncid, varid, real_size, real_nelems, 
+
+   return NC4_set_var_chunk_cache(ncid, varid, real_size, real_nelems,
 				 real_preemption);
 }
 
 /* Get chunk cache size for a variable. */
 int
-NC4_get_var_chunk_cache(int ncid, int varid, size_t *sizep, 
+NC4_get_var_chunk_cache(int ncid, int varid, size_t *sizep,
 			size_t *nelemsp, float *preemptionp)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var;
    int retval;
@@ -180,17 +180,17 @@ NC4_get_var_chunk_cache(int ncid, int varid, size_t *sizep,
 
 /* Get chunk cache size for a variable. */
 int
-nc_get_var_chunk_cache_ints(int ncid, int varid, int *sizep, 
+nc_get_var_chunk_cache_ints(int ncid, int varid, int *sizep,
 			    int *nelemsp, int *preemptionp)
 {
    size_t real_size, real_nelems;
    float real_preemption;
    int ret;
 
-   if ((ret = NC4_get_var_chunk_cache(ncid, varid, &real_size, 
+   if ((ret = NC4_get_var_chunk_cache(ncid, varid, &real_size,
 				     &real_nelems, &real_preemption)))
       return ret;
-   
+
    if (sizep)
       *sizep = real_size / MEGABYTE;
    if (nelemsp)
@@ -209,7 +209,7 @@ check_chunksizes(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var, const size_t *chunksize
    size_t type_len;
    int d;
    int retval;
-   
+
    if ((retval = nc4_get_typelen_mem(grp->nc4_info, var->type_info->nc_typeid, 0, &type_len)))
       return retval;
    if (var->type_info->nc_type_class == NC_VLEN)
@@ -222,7 +222,7 @@ check_chunksizes(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var, const size_t *chunksize
 	 return NC_EINVAL;
       dprod *= (double) chunksizes[d];
    }
-   
+
    if (dprod > (double) NC_MAX_UINT)
       return NC_EBADCHUNK;
 
@@ -231,7 +231,7 @@ check_chunksizes(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var, const size_t *chunksize
 
 /* Find the default chunk nelems (i.e. length of chunk along each
  * dimension). */
-static int 
+static int
 nc4_find_default_chunksizes2(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
 {
    int d;
@@ -239,7 +239,7 @@ nc4_find_default_chunksizes2(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
    float num_values = 1, num_unlim = 0;
    int retval;
    size_t suggested_size;
-#ifdef LOGGING   
+#ifdef LOGGING
    double total_chunk_size;
 #endif
 
@@ -248,7 +248,7 @@ nc4_find_default_chunksizes2(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
    else
       type_size = var->type_info->size;
 
-#ifdef LOGGING   
+#ifdef LOGGING
    /* Later this will become the total number of bytes in the default
     * chunk. */
    total_chunk_size = (double) type_size;
@@ -259,7 +259,7 @@ nc4_find_default_chunksizes2(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
    for (d = 0; d < var->ndims; d++)
    {
       assert(var->dim[d]);
-      if (! var->dim[d]->unlimited) 
+      if (! var->dim[d]->unlimited)
 	 num_values *= (float)var->dim[d]->len;
       else {
 	  num_unlim++;
@@ -282,7 +282,7 @@ nc4_find_default_chunksizes2(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
    for (d = 0; d < var->ndims; d++)
       if (!var->chunksizes[d])
       {
-	 suggested_size = (pow((double)DEFAULT_CHUNK_SIZE/(num_values * type_size), 
+	 suggested_size = (pow((double)DEFAULT_CHUNK_SIZE/(num_values * type_size),
 			       1.0/(double)(var->ndims - num_unlim)) * var->dim[d]->len - .5);
 	 if (suggested_size > var->dim[d]->len)
 	    suggested_size = var->dim[d]->len;
@@ -291,13 +291,13 @@ nc4_find_default_chunksizes2(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
 	      "chunksize %ld", __func__, var->name, d, DEFAULT_CHUNK_SIZE, num_values, type_size, var->chunksizes[d]));
       }
 
-#ifdef LOGGING   
+#ifdef LOGGING
    /* Find total chunk size. */
    for (d = 0; d < var->ndims; d++)
        total_chunk_size *= (double) var->chunksizes[d];
    LOG((4, "total_chunk_size %f", total_chunk_size));
 #endif
-   
+
    /* But did this result in a chunk that is too big? */
    retval = check_chunksizes(grp, var, var->chunksizes);
    if (retval)
@@ -332,8 +332,8 @@ nc4_find_default_chunksizes2(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var)
 
 /* This is called when a new netCDF-4 variable is defined. Break it
  * down! */
-static int 
-nc_def_var_nc4(int ncid, const char *name, nc_type xtype, 
+static int
+nc_def_var_nc4(int ncid, const char *name, nc_type xtype,
                int ndims, const int *dimidsp, int *varidp)
 {
    NC_GRP_INFO_T *grp;
@@ -367,7 +367,7 @@ nc_def_var_nc4(int ncid, const char *name, nc_type xtype,
    /* Not a Type is, well, not a type.*/
    if (xtype == NC_NAT)
       BAIL(NC_EBADTYPE);
-   
+
    /* For classic files, only classic types are allowed. */
    if (h5->cmode & NC_CLASSIC_MODEL && xtype > NC_DOUBLE)
       BAIL(NC_ESTRICTNC3);
@@ -414,7 +414,7 @@ nc_def_var_nc4(int ncid, const char *name, nc_type xtype,
    var->varid = grp->nvars++;
    var->ndims = ndims;
    var->dirty = NC_TRUE;
-   
+
    /* If this is a user-defined type, there is a type_info struct with
     * all the type information. For atomic types, fake up a type_info
     * struct. */
@@ -424,13 +424,13 @@ nc_def_var_nc4(int ncid, const char *name, nc_type xtype,
 	 BAIL(NC_ENOMEM);
       type_info->nc_typeid = xtype;
       type_info->endianness = NC_ENDIAN_NATIVE;
-      if ((retval = nc4_get_hdf_typeid(h5, xtype, &type_info->hdf_typeid, 
+      if ((retval = nc4_get_hdf_typeid(h5, xtype, &type_info->hdf_typeid,
 				       type_info->endianness)))
 	 BAIL(retval);
-      if ((type_info->native_hdf_typeid = H5Tget_native_type(type_info->hdf_typeid, 
+      if ((type_info->native_hdf_typeid = H5Tget_native_type(type_info->hdf_typeid,
 							      H5T_DIR_DEFAULT)) < 0)
          BAIL(NC_EHDFERR);
-      if ((retval = nc4_get_typelen_mem(h5, type_info->nc_typeid, 0, 
+      if ((retval = nc4_get_typelen_mem(h5, type_info->nc_typeid, 0,
 					&type_info->size)))
 	 BAIL(retval);
 
@@ -552,17 +552,17 @@ nc_def_var_nc4(int ncid, const char *name, nc_type xtype,
     * because the dimension will cause a HDF5 dataset to be created,
     * and this var has the same name. */
    for (dim = grp->dim; dim; dim = dim->l.next)
-      if (!strcmp(dim->name, norm_name) && 
+      if (!strcmp(dim->name, norm_name) &&
 	  (!var->ndims || dimidsp[0] != dim->dimid))
       {
 	 /* Set a different hdf5 name for this variable to avoid name
 	  * clash. */
 	 if (strlen(norm_name) + strlen(NON_COORD_PREPEND) > NC_MAX_NAME)
 	    BAIL(NC_EMAXNAME);
-	 if (!(var->hdf5_name = malloc((strlen(NON_COORD_PREPEND) + 
+	 if (!(var->hdf5_name = malloc((strlen(NON_COORD_PREPEND) +
 					strlen(norm_name) + 1) * sizeof(char))))
 	    BAIL(NC_ENOMEM);
-	 
+
 	 sprintf(var->hdf5_name, "%s%s", NON_COORD_PREPEND, norm_name);
       }
 
@@ -590,7 +590,7 @@ exit:
 /* Create a new variable to hold user data. This is what it's all
  * about baby! */
 int
-NC4_def_var(int ncid, const char *name, nc_type xtype, int ndims, 
+NC4_def_var(int ncid, const char *name, nc_type xtype, int ndims,
            const int *dimidsp, int *varidp)
 {
    NC *nc;
@@ -613,7 +613,7 @@ NC4_def_var(int ncid, const char *name, nc_type xtype, int ndims,
    {
       int ret;
 
-      ret = ncmpi_def_var(nc->int_ncid, name, xtype, ndims, 
+      ret = ncmpi_def_var(nc->int_ncid, name, xtype, ndims,
 			  dimidsp, varidp);
       h5->pnetcdf_ndims[*varidp] = ndims;
       return ret;
@@ -627,16 +627,16 @@ NC4_def_var(int ncid, const char *name, nc_type xtype, int ndims,
 /* Get all the information about a variable. Pass NULL for whatever
  * you don't care about. This is an internal function, not exposed to
  * the user. */
-int 
-NC4_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep, 
-               int *ndimsp, int *dimidsp, int *nattsp, 
+int
+NC4_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
+               int *ndimsp, int *dimidsp, int *nattsp,
                int *shufflep, int *deflatep, int *deflate_levelp,
-               int *fletcher32p, int *contiguousp, size_t *chunksizesp, 
-               int *no_fill, void *fill_valuep, int *endiannessp, 
+               int *fletcher32p, int *contiguousp, size_t *chunksizesp,
+               int *no_fill, void *fill_valuep, int *endiannessp,
 	       int *options_maskp, int *pixels_per_blockp)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var;
    NC_ATT_INFO_T *att;
@@ -656,7 +656,7 @@ NC4_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
 #if 0 /*def USE_PNETCDF*/
    /* Take care of files created/opened with parallel-netcdf library. */
    if (h5->pnetcdf_file)
-      return ncmpi_inq_var(nc->int_ncid, varid, name, xtypep, ndimsp, 
+      return ncmpi_inq_var(nc->int_ncid, varid, name, xtypep, ndimsp,
 			   dimidsp, nattsp);
 #endif /* USE_PNETCDF */
 
@@ -678,11 +678,11 @@ NC4_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
    for (var = grp->var; var; var = var->l.next)
       if (var->varid == varid)
          break;
-   
+
    /* Oh no! Maybe we couldn't find it (*sob*)! */
    if (!var)
       return NC_ENOTVAR;
-   
+
    /* Copy the data to the user's data buffers. */
    if (name)
       strcpy(name, var->name);
@@ -699,7 +699,7 @@ NC4_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
          natts++;
       *nattsp = natts;
    }
-   
+
    /* Chunking stuff. */
    if (!var->contiguous && chunksizesp)
       for (d = 0; d < var->ndims; d++)
@@ -761,7 +761,7 @@ NC4_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
          {
             if (!(fill_valuep = calloc(1, sizeof(char *))))
                return NC_ENOMEM;
-	    
+
             if ((retval = nc4_get_default_fill_value(var->type_info, (char **)fill_valuep)))
             {
                free(fill_valuep);
@@ -790,13 +790,13 @@ NC4_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
    internal function, deliberately hidden from the user so that we can
    change the prototype of this functions without changing the API. */
 static int
-nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate, 
-		 int *deflate_level, int *fletcher32, int *contiguous, 
-		 const size_t *chunksizes, int *no_fill, 
+nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate,
+		 int *deflate_level, int *fletcher32, int *contiguous,
+		 const size_t *chunksizes, int *no_fill,
                  const void *fill_value, int *endianness)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var;
    NC_DIM_INFO_T *dim;
@@ -820,14 +820,14 @@ nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate,
    for (var = grp->var; var; var = var->l.next)
       if (var->varid == varid)
          break;
-   
+
    /* Oh no! Maybe we couldn't find it (*sob*)! */
    if (!var)
       return NC_ENOTVAR;
 
    /* Can't turn on contiguous and deflate/fletcher32/szip. */
    if (contiguous)
-      if ((*contiguous != NC_CHUNKED && deflate) || 
+      if ((*contiguous != NC_CHUNKED && deflate) ||
 	  (*contiguous != NC_CHUNKED && fletcher32))
 	 return NC_EINVAL;
 
@@ -838,8 +838,8 @@ nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate,
 
    /* Check compression options. */
    if (deflate && !deflate_level)
-      return NC_EINVAL;      
-       
+      return NC_EINVAL;
+
    /* Valid deflate level? */
    if (deflate && deflate_level)
    {
@@ -874,7 +874,7 @@ nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate,
       var->fletcher32 = *fletcher32;
       var->contiguous = NC_FALSE;
    }
-   
+
    /* Does the user want a contiguous dataset? Not so fast! Make sure
     * that there are no unlimited dimensions, and no filters in use
     * for this data. */
@@ -882,7 +882,7 @@ nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate,
    {
       if (var->deflate || var->fletcher32 || var->shuffle)
 	 return NC_EINVAL;
-      
+
       for (d = 0; d < var->ndims; d++)
       {
 	 if ((retval = nc4_find_dim(grp, var->dimids[d], &dim, NULL)))
@@ -940,7 +940,7 @@ nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate,
    if (fill_value && !var->no_fill)
    {
       /* Copy the fill_value. */
-      LOG((4, "Copying fill value into metadata for variable %s", 
+      LOG((4, "Copying fill value into metadata for variable %s",
            var->name));
 
       /* If there's a _FillValue attribute, delete it. */
@@ -964,10 +964,10 @@ nc_def_var_extra(int ncid, int varid, int *shuffle, int *deflate,
  * better. Must be called after nc_def_var and before nc_enddef or any
  * functions which writes data to the file. */
 int
-NC4_def_var_deflate(int ncid, int varid, int shuffle, int deflate, 
+NC4_def_var_deflate(int ncid, int varid, int shuffle, int deflate,
                    int deflate_level)
 {
-   return nc_def_var_extra(ncid, varid, &shuffle, &deflate, 
+   return nc_def_var_extra(ncid, varid, &shuffle, &deflate,
                            &deflate_level, NULL, NULL, NULL, NULL, NULL, NULL);
 }
 
@@ -976,23 +976,23 @@ NC4_def_var_deflate(int ncid, int varid, int shuffle, int deflate,
 int
 NC4_def_var_fletcher32(int ncid, int varid, int fletcher32)
 {
-   return nc_def_var_extra(ncid, varid, NULL, NULL, NULL, &fletcher32, 
+   return nc_def_var_extra(ncid, varid, NULL, NULL, NULL, &fletcher32,
                            NULL, NULL, NULL, NULL, NULL);
 }
-   
+
 /* Define chunking stuff for a var. This must be done after nc_def_var
-   and before nc_enddef. 
+   and before nc_enddef.
 
    Chunking is required in any dataset with one or more unlimited
    dimension in HDF5, or any dataset using a filter.
 
    Where chunksize is a pointer to an array of size ndims, with the
-   chunksize in each dimension. 
+   chunksize in each dimension.
 */
 int
 NC4_def_var_chunking(int ncid, int varid, int contiguous, const size_t *chunksizesp)
 {
-   return nc_def_var_extra(ncid, varid, NULL, NULL, NULL, NULL, 
+   return nc_def_var_extra(ncid, varid, NULL, NULL, NULL, NULL,
                            &contiguous, chunksizesp, NULL, NULL, NULL);
 }
 
@@ -1003,7 +1003,7 @@ int
 nc_inq_var_chunking_ints(int ncid, int varid, int *contiguousp, int *chunksizesp)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_VAR_INFO_T *var;
    size_t *cs = NULL;
    int i, retval;
@@ -1016,13 +1016,13 @@ nc_inq_var_chunking_ints(int ncid, int varid, int *contiguousp, int *chunksizesp
    /* Find var cause I need the number of dims. */
    if ((retval = nc4_find_g_var_nc(nc, ncid, varid, &grp, &var)))
       return retval;
-   
+
    /* Allocate space for the size_t copy of the chunksizes array. */
    if (var->ndims)
       if (!(cs = malloc(var->ndims * sizeof(size_t))))
 	 return NC_ENOMEM;
-   
-   retval = NC4_inq_var_all(ncid, varid, NULL, NULL, NULL, NULL, NULL, 
+
+   retval = NC4_inq_var_all(ncid, varid, NULL, NULL, NULL, NULL, NULL,
                            NULL, NULL, NULL, NULL, contiguousp, cs, NULL,
                            NULL, NULL, NULL, NULL);
 
@@ -1048,7 +1048,7 @@ int
 nc_def_var_chunking_ints(int ncid, int varid, int contiguous, int *chunksizesp)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_VAR_INFO_T *var;
    size_t *cs = NULL;
    int i, retval;
@@ -1061,17 +1061,17 @@ nc_def_var_chunking_ints(int ncid, int varid, int contiguous, int *chunksizesp)
    /* Find var cause I need the number of dims. */
    if ((retval = nc4_find_g_var_nc(nc, ncid, varid, &grp, &var)))
       return retval;
-   
+
    /* Allocate space for the size_t copy of the chunksizes array. */
    if (var->ndims)
       if (!(cs = malloc(var->ndims * sizeof(size_t))))
 	 return NC_ENOMEM;
-   
+
    /* Copy to size_t array. */
    for (i = 0; i < var->ndims; i++)
       cs[i] = chunksizesp[i];
 
-   retval = nc_def_var_extra(ncid, varid, NULL, NULL, NULL, NULL, 
+   retval = nc_def_var_extra(ncid, varid, NULL, NULL, NULL, NULL,
                              &contiguous, cs, NULL, NULL, NULL);
 
    if (var->ndims)
@@ -1084,7 +1084,7 @@ nc_def_var_chunking_ints(int ncid, int varid, int contiguous, int *chunksizesp)
 int
 NC4_def_var_fill(int ncid, int varid, int no_fill, const void *fill_value)
 {
-   return nc_def_var_extra(ncid, varid, NULL, NULL, NULL, NULL, NULL, 
+   return nc_def_var_extra(ncid, varid, NULL, NULL, NULL, NULL, NULL,
                            NULL, &no_fill, fill_value, NULL);
 }
 
@@ -1102,21 +1102,21 @@ int
 NC4_inq_varid(int ncid, const char *name, int *varidp)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_VAR_INFO_T *var;
    char norm_name[NC_MAX_NAME + 1];
    int retval;
 #if 0 /*def USE_PNETCDF*/
    NC_HDF5_FILE_INFO_T *h5;
 #endif
-   
+
    if (!name)
       return NC_EINVAL;
    if (!varidp)
       return NC_NOERR;
 
    LOG((2, "%s: ncid 0x%x name %s", __func__, ncid, name));
-   
+
    /* Find info for this file and group, and set pointer to each. */
    if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, NULL)))
       return retval;
@@ -1130,7 +1130,7 @@ NC4_inq_varid(int ncid, const char *name, int *varidp)
      return ncmpi_inq_varid(nc->int_ncid, name, varidp);
    }
 #endif /* USE_PNETCDF */
-   
+
    /* Normalize name. */
    if ((retval = nc4_normalize_name(name, norm_name)))
       return retval;
@@ -1147,25 +1147,25 @@ NC4_inq_varid(int ncid, const char *name, int *varidp)
 }
 
 /* Rename a var to "bubba," for example.
-   
+
    According to the netcdf-3.5 docs: If the new name is longer than
    the old name, the netCDF dataset must be in define mode.  */
 int
 NC4_rename_var(int ncid, int varid, const char *name)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var;
    int retval = NC_NOERR;
 
-   LOG((2, "%s: ncid 0x%x varid %d name %s", 
+   LOG((2, "%s: ncid 0x%x varid %d name %s",
         __func__, ncid, varid, name));
 
    /* Find info for this file and group, and set pointer to each. */
    if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))
       return retval;
-   
+
    assert(h5);
 
 #if 0 /*def USE_PNETCDF*/
@@ -1190,7 +1190,7 @@ NC4_rename_var(int ncid, int varid, const char *name)
    /* Is name in use? */
    for (var = grp->var; var; var = var->l.next)
       if (!strncmp(var->name, name, NC_MAX_NAME))
-         return NC_ENAMEINUSE;   
+         return NC_ENAMEINUSE;
 
    /* Find the var. */
    for (var = grp->var; var; var = var->l.next)
@@ -1257,23 +1257,23 @@ NC4_rename_var(int ncid, int varid, const char *name)
 
 
 int
-NC4_var_par_access(int ncid, int varid, int par_access) 
+NC4_var_par_access(int ncid, int varid, int par_access)
 {
 #ifndef USE_PARALLEL
    return NC_ENOPAR;
 #else
-   NC *nc; 
-   NC_GRP_INFO_T *grp; 
+   NC *nc;
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var;
    int retval;
 
-   LOG((1, "%s: ncid 0x%x varid %d par_access %d", __func__, ncid, 
+   LOG((1, "%s: ncid 0x%x varid %d par_access %d", __func__, ncid,
         varid, par_access));
 
    if (par_access != NC_INDEPENDENT && par_access != NC_COLLECTIVE)
       return NC_EINVAL;
-   
+
    /* Find info for this file and group, and set pointer to each. */
    if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))
       return retval;
@@ -1291,8 +1291,8 @@ NC4_var_par_access(int ncid, int varid, int par_access)
       else
 	 return ncmpi_end_indep_data(nc->int_ncid);
    }
-#endif /* USE_PNETCDF */   
-   
+#endif /* USE_PNETCDF */
+
    /* This function only for files opened with nc_open_par or nc_create_par. */
    if (!h5->parallel)
       return NC_ENOPAR;
@@ -1304,7 +1304,7 @@ NC4_var_par_access(int ncid, int varid, int par_access)
    if (!var)
       return NC_ENOTVAR;
 
-   if (par_access) 
+   if (par_access)
       var->parallel_access = NC_COLLECTIVE;
    else
       var->parallel_access = NC_INDEPENDENT;
@@ -1313,7 +1313,7 @@ NC4_var_par_access(int ncid, int varid, int par_access)
 }
 
 static int
-nc4_put_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long, 
+nc4_put_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
                 const size_t *startp, const size_t *countp, const void *op)
 {
    NC *nc;
@@ -1321,8 +1321,8 @@ nc4_put_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
 #if 0 /*def USE_PNETCDF*/
    NC_HDF5_FILE_INFO_T *h5;
 #endif
-   
-   LOG((2, "%s: ncid 0x%x varid %d mem_type %d mem_type_is_long %d", 
+
+   LOG((2, "%s: ncid 0x%x varid %d mem_type %d mem_type_is_long %d",
         __func__, ncid, varid, mem_type, mem_type_is_long));
 
    if (!(nc = nc4_find_nc_file(ncid,NULL)))
@@ -1338,14 +1338,14 @@ nc4_put_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
      MPI_Offset *mpi_start;
      MPI_Offset *mpi_count;
      int d;
-     
+
      mpi_start = (MPI_Offset*)alloca(sizeof(MPI_Offset)*h5->pnetcdf_ndims[varid]);
      mpi_count = (MPI_Offset*)alloca(sizeof(MPI_Offset)*h5->pnetcdf_ndims[varid]);
 
       /* No NC_LONGs for parallel-netcdf library! */
       if (mem_type_is_long)
 	 return NC_EINVAL;
-      
+
       /* We must convert the start, count, and stride arrays to
        * MPI_Offset type. */
       for (d = 0; d < h5->pnetcdf_ndims[varid]; d++)
@@ -1403,16 +1403,16 @@ nc4_put_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
 
       return NC_EBADTYPE;
    }
-   
-#endif /* USE_PNETCDF */   
-   
-   return nc4_put_vara(nc, ncid, varid, startp, countp, mem_type, 
+
+#endif /* USE_PNETCDF */
+
+   return nc4_put_vara(nc, ncid, varid, startp, countp, mem_type,
                        mem_type_is_long, (void *)op);
 }
 
-#ifdef USE_HDF4   
-static int 
-nc4_get_hdf4_vara(NC *nc, int ncid, int varid, const size_t *startp, 
+#ifdef USE_HDF4
+static int
+nc4_get_hdf4_vara(NC *nc, int ncid, int varid, const size_t *startp,
 		  const size_t *countp, nc_type mem_nc_type, int is_long, void *data)
 {
    NC_GRP_INFO_T *grp;
@@ -1423,20 +1423,20 @@ nc4_get_hdf4_vara(NC *nc, int ncid, int varid, const size_t *startp,
 #if 0
    NC_GRP_INFO_T *g;
    NC_DIM_INFO_T *dim;
-#endif   
+#endif
    /* Find our metadata for this file, group, and var. */
    assert(nc);
    if ((retval = nc4_find_g_var_nc(nc, ncid, varid, &grp, &var)))
       return retval;
    h5 = NC4_DATA(nc);
    assert(grp && h5 && var && var->name);
-   
+
    for (d = 0; d < var->ndims; d++)
    {
       start32[d] = startp[d];
       edge32[d] = countp[d];
    }
-   
+
    if (SDreaddata(var->sdsid, start32, NULL, edge32, data))
       return NC_EHDFERR;
 
@@ -1452,12 +1452,12 @@ nc4_get_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
    NC *nc;
    NC_HDF5_FILE_INFO_T* h5;
 
-   LOG((2, "%s: ncid 0x%x varid %d mem_type %d mem_type_is_long %d", 
+   LOG((2, "%s: ncid 0x%x varid %d mem_type %d mem_type_is_long %d",
         __func__, ncid, varid, mem_type, mem_type_is_long));
 
    if (!(nc = nc4_find_nc_file(ncid,&h5)))
       return NC_EBADID;
-   
+
 #if 0 /*def USE_PNETCDF*/
    /* Handle files opened/created with the parallel-netcdf library. */
    if (h5->pnetcdf_file)
@@ -1468,7 +1468,7 @@ nc4_get_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
       /* No NC_LONGs for parallel-netcdf library! */
       if (mem_type_is_long)
 	 return NC_EINVAL;
-      
+
       /* We must convert the start, count, and stride arrays to
        * MPI_Offset type. */
       for (d = 0; d < h5->pnetcdf_ndims[varid]; d++)
@@ -1499,7 +1499,7 @@ nc4_get_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
 	    default:
 	       return NC_EBADTYPE;
 	 }
-      } 
+      }
       else
       {
 	 switch(mem_type)
@@ -1524,22 +1524,22 @@ nc4_get_vara_tc(int ncid, int varid, nc_type mem_type, int mem_type_is_long,
 	 }
       }
    }
-#endif /* USE_PNETCDF */   
-   
-#ifdef USE_HDF4   
+#endif /* USE_PNETCDF */
+
+#ifdef USE_HDF4
    /* Handle HDF4 cases. */
    if (h5->hdf4)
-      return nc4_get_hdf4_vara(nc, ncid, varid, startp, countp, mem_type, 
+      return nc4_get_hdf4_vara(nc, ncid, varid, startp, countp, mem_type,
 			       mem_type_is_long, (void *)ip);
 #endif /* USE_HDF4 */
-   
+
    /* Handle HDF5 cases. */
-   return nc4_get_vara(nc, ncid, varid, startp, countp, mem_type, 
+   return nc4_get_vara(nc, ncid, varid, startp, countp, mem_type,
                        mem_type_is_long, (void *)ip);
 }
 
 int
-NC4_put_vara(int ncid, int varid, const size_t *startp, 
+NC4_put_vara(int ncid, int varid, const size_t *startp,
             const size_t *countp, const void *op, int memtype)
 {
    return nc4_put_vara_tc(ncid, varid, memtype, 0, startp, countp, op);
@@ -1548,7 +1548,7 @@ NC4_put_vara(int ncid, int varid, const size_t *startp,
 
 /* Read an array of values. */
 int
-NC4_get_vara(int ncid, int varid, const size_t *startp, 
+NC4_get_vara(int ncid, int varid, const size_t *startp,
             const size_t *countp, void *ip, int memtype)
 {
    return nc4_get_vara_tc(ncid, varid, memtype, 0, startp, countp, ip);

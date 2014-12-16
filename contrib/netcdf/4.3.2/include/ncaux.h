@@ -22,4 +22,3 @@ extern int ncaux_add_field(void* tag,  const char *name, nc_type field_type,
 			   int ndims, const int* dimsizes);
 
 #endif /*NCAUX_H*/
-

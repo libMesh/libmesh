@@ -114,8 +114,8 @@ val_fill_zero(type, len, vals)
 
 
 
-/* 
- * compare two typed value blocks, return 0 if equal, 1+n otherwise, 
+/*
+ * compare two typed value blocks, return 0 if equal, 1+n otherwise,
  * where n is the index of the first differing element.
  */
 int

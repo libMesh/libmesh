@@ -2,7 +2,7 @@
    Copyright 2011 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 chunking. 
+   Test netcdf-4 chunking.
 */
 
 #include <nc_tests.h>
@@ -32,19 +32,19 @@ calculate_waste(int ndims, size_t *dimlen, size_t *chunksize, float *waste)
    for (d = 0; d < ndims; d++)
    {
       /* How many chunks along this dimension are required to hold all the data? */
-      for (num_chunks[d] = 0; (num_chunks[d] * chunksize[d]) < (dimlen[d] ? dimlen[d] : 1); 
+      for (num_chunks[d] = 0; (num_chunks[d] * chunksize[d]) < (dimlen[d] ? dimlen[d] : 1);
 	   num_chunks[d]++)
 	 ;
       chunked *= (num_chunks[d] * chunksize[d]);
    }
-   
+
    /* Calculate the minimum space required for this data
     * (i.e. unchunked) or one record of it. */
    for (d = 0; d < ndims; d++)
       unchunked *= (dimlen[d] ? dimlen[d] : 1);
 
 #ifdef PRINT_CHUNK_WASTE_REPORT
-   printf("size for unchunked %g elements; size for chunked %g elements\n", 
+   printf("size for unchunked %g elements; size for chunked %g elements\n",
 	  unchunked, chunked);
 #endif
 
@@ -57,16 +57,16 @@ calculate_waste(int ndims, size_t *dimlen, size_t *chunksize, float *waste)
    for (d = 0; d < ndims; d++)
    {
 #ifdef PRINT_CHUNK_WASTE_REPORT
-      printf("%ld\t%ld\t\t%ld\n", (long int)dimlen[d], (long int)chunksize[d], 
+      printf("%ld\t%ld\t\t%ld\n", (long int)dimlen[d], (long int)chunksize[d],
 	     (long int)num_chunks[d]);
 #endif
       chunk_size *= chunksize[d];
    }
 #ifdef PRINT_CHUNK_WASTE_REPORT
-   printf("size of chunk: %ld elements; wasted space: %2.2f percent\n", 
+   printf("size of chunk: %ld elements; wasted space: %2.2f percent\n",
 	  (long int)chunk_size, *waste);
 #endif
-   
+
    free(num_chunks);
    return 0;
 }
@@ -148,7 +148,7 @@ main(int argc, char **argv)
       int varid, ncid;
       int dimids[NDIMS3];
       size_t dim_len[NDIMS3] = {1, 11, 152750};
-				  
+
       int storage = 0;
       size_t chunksizes[NDIMS3];
       int d;
@@ -163,7 +163,7 @@ main(int argc, char **argv)
 	 sprintf(dim_name, "dim_%d", d);
 	 if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
       }
-      
+
       /* Define a var with these dimensions, and turn on chunking. */
       if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
       if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;
@@ -186,7 +186,7 @@ main(int argc, char **argv)
       int varid, ncid;
       int dimids[NDIMS3];
       size_t dim_len[NDIMS3] = {1804289383, 846930886, 1681692777};
-				  
+
       int storage = 0;
       size_t chunksizes[NDIMS3];
       int d;
@@ -201,7 +201,7 @@ main(int argc, char **argv)
 	 sprintf(dim_name, "dim_%d", d);
 	 if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
       }
-      
+
       /* Define a var with these dimensions, and turn on chunking. */
       if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
       if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;
@@ -224,7 +224,7 @@ main(int argc, char **argv)
       int varid, ncid;
       int dimids[NDIMS3];
       size_t dim_len[NDIMS3] = {1714636915, 1957747793, 424238335};
-				  
+
       int storage = 0;
       size_t chunksizes[NDIMS3];
       int d;
@@ -239,7 +239,7 @@ main(int argc, char **argv)
 	 sprintf(dim_name, "dim_%d", d);
 	 if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
       }
-      
+
       /* Define a var with these dimensions, and turn on chunking. */
       if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
       if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;
@@ -265,7 +265,7 @@ main(int argc, char **argv)
       int varid, ncid;
       int dimids[NDIMS3];
       size_t dim_len[NDIMS3] = {1967513926, 1365180540, 426};
-				  
+
       int storage = 0;
       size_t chunksizes[NDIMS3];
       int d;
@@ -280,7 +280,7 @@ main(int argc, char **argv)
 	 sprintf(dim_name, "dim_%d", d);
 	 if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
       }
-      
+
       /* Define a var with these dimensions, and turn on chunking. */
       if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
       if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;
@@ -305,7 +305,7 @@ main(int argc, char **argv)
       int varid, ncid;
       int dimids[NDIMS3];
       size_t dim_len[NDIMS3] = {1804289383, 846930886, 1681692777};
-				  
+
       int storage = 0;
       size_t chunksizes[NDIMS3];
       int d;
@@ -320,7 +320,7 @@ main(int argc, char **argv)
 	 sprintf(dim_name, "dim_%d", d);
 	 if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
       }
-      
+
       /* Define a var with these dimensions, and turn on chunking. */
       if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
       if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;
@@ -362,7 +362,7 @@ main(int argc, char **argv)
 	    sprintf(dim_name, "dim_%d", d);
 	    if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
 	 }
-      
+
 	 /* Define a var with these dimensions, and turn on chunking. */
 	 if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
 	 if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;
@@ -401,7 +401,7 @@ main(int argc, char **argv)
 	    sprintf(dim_name, "dim_%d", d);
 	    if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
 	 }
-      
+
 	 /* Define a var with these dimensions, and turn on chunking. */
 	 if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
 	 if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;
@@ -440,7 +440,7 @@ main(int argc, char **argv)
 	    sprintf(dim_name, "dim_%d", d);
 	    if (nc_def_dim(ncid, dim_name, dim_len[d], &dimids[d])) ERR;
 	 }
-      
+
 	 /* Define a var with these dimensions, and turn on chunking. */
 	 if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, NDIMS3, dimids, &varid)) ERR;
 	 if (nc_def_var_chunking(ncid, varid, NC_CHUNKED, NULL)) ERR;

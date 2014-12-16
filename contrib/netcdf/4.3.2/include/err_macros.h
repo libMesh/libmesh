@@ -22,7 +22,7 @@ static int total_err = 0, err = 0;
 
 #if 0
 /* This is handy for print statements. */
-static char *format_name[] = {"", "classic", "64-bit offset", "netCDF-4", 
+static char *format_name[] = {"", "classic", "64-bit offset", "netCDF-4",
 			      "netCDF-4 classic model"};
 #endif
 

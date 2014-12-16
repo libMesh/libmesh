@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test internal netcdf-4 file code. 
+   Test internal netcdf-4 file code.
    $Id: tst_v2.c,v 1.9 2009/02/14 14:09:44 ed Exp $
 */
 

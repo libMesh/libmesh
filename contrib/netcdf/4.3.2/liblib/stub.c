@@ -76,5 +76,3 @@ NC_initialize(void)
 
     return NC_NOERR;
 }
-
-

@@ -198,4 +198,3 @@ ocbytesnull(OCbytes* bb)
     bb->length--;
     return 1;
 }
-

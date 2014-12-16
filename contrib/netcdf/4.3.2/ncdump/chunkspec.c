@@ -22,7 +22,7 @@ static struct {
 /*
  * Parse chunkspec string and convert into chunkspec_t structure.
  *   ncid: location ID of open netCDF file or group in an open file
- *   spec: string of form 
+ *   spec: string of form
  *           dim1/n1,dim2/n2,...,dimk/nk
  *
  *         specifying chunk size (ni) to be used for dimension named
@@ -31,7 +31,7 @@ static struct {
  *         omitted, in which case it is assumed to be the entire
  *         dimension size.  That is also the default for dimensions
  *         not mentioned in the string.
- *         If the chunkspec string is "/", specifiying no dimensions or 
+ *         If the chunkspec string is "/", specifiying no dimensions or
  *         chunk sizes, it indicates chunking to be turned off on output.
  *
  * Returns NC_NOERR if no error, NC_EINVAL if spec has consecutive
@@ -50,7 +50,7 @@ chunkspec_parse(int ncid, const char *spec) {
     chunkspecs.ndims = 0;
     chunkspecs.omit = false;
     if (!spec || *spec == '\0') /* default chunking */
-	return NC_NOERR; 
+	return NC_NOERR;
     if (spec[0] == '/' && spec[1] == '\0') { /* no chunking */
 	chunkspecs.omit = true;
 	return NC_NOERR;
@@ -82,7 +82,7 @@ chunkspec_parse(int ncid, const char *spec) {
 	    char *dp;
 	    int dimid;
 	    size_t chunksize;
-	 
+
 	    for(; pp > np && *pp != '/'; pp--) { /* look backwards for "/" */
 		continue;
 	    }
@@ -136,7 +136,7 @@ chunkspec_size(int dimid) {
     for(idim = 0; idim < chunkspecs.ndims; idim++) {
 	if(dimid == chunkspecs.dimids[idim]) {
 	    return chunkspecs.chunksizes[idim];
-	}	
+	}
     }
     return 0;
 }
@@ -155,5 +155,3 @@ bool_t
 chunkspec_omit(void) {
     return chunkspecs.omit;
 }
-
-

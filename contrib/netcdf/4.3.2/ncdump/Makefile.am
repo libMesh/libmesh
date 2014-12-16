@@ -6,12 +6,12 @@
 
 # Put together AM_CPPFLAGS and AM_LDFLAGS.
 include $(top_srcdir)/lib_flags.am
-LDADD = ${top_builddir}/liblib/libnetcdf.la 
+LDADD = ${top_builddir}/liblib/libnetcdf.la
 
 TESTS_ENVIRONMENT=CC=${CC}
 
 # This is the program we're building, and it's sources.
-bin_PROGRAMS = ncdump 
+bin_PROGRAMS = ncdump
 ncdump_SOURCES = ncdump.c vardata.c dumplib.c indent.c nctime0.c	\
 ncdump.h vardata.h dumplib.h indent.h isnan.h nctime0.h cdl.h \
 utils.h utils.c nciter.h nciter.c nccomps.h

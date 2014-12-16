@@ -89,4 +89,3 @@ main()
    printf("*** SUCCESS writing example file simple_xy_nc4.nc!\n");
    return 0;
 }
-

@@ -5,10 +5,10 @@
 #include "netcdf.h"
 
 /* Embedded user:pwd */
-static char* URL1 = 
+static char* URL1 =
 "http://tiggeUser:tigge@remotetest.unidata.ucar.edu/thredds/dodsC/restrict/testData.nc";
 /* user:pwd from .dodsrc*/
-static char* URL2 = 
+static char* URL2 =
 "http://remotetest.unidata.ucar.edu/thredds/dodsC/restrict/testData.nc";
 
 /* .dodsrc file */
@@ -36,7 +36,7 @@ main(int argc, char** argv)
     if(dodsrc == NULL) {
         fprintf(stderr,"Cannot create .dodsrc\n");
         exit(1);
-    }    
+    }
     fprintf(dodsrc,CONTENT);
     fclose(dodsrc);
 

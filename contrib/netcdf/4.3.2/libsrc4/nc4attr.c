@@ -27,9 +27,9 @@ int nc4typelen(nc_type type);
    info. Always locate the attribute by name, never by attnum.
    The mem_type is ignored if data=NULL. */
 int
-nc4_get_att(int ncid, NC *nc, int varid, const char *name, 
-	    nc_type *xtype, nc_type mem_type, size_t *lenp, 
-	    int *attnum, int is_long, void *data) 
+nc4_get_att(int ncid, NC *nc, int varid, const char *name,
+	    nc_type *xtype, nc_type mem_type, size_t *lenp,
+	    int *attnum, int is_long, void *data)
 {
    NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
@@ -38,7 +38,7 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
 
    int need_to_convert = 0;
    int range_error = NC_NOERR;
-   void *bufr = NULL; 
+   void *bufr = NULL;
    size_t type_size;
    char norm_name[NC_MAX_NAME + 1];
    int i;
@@ -48,7 +48,7 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
       my_attnum = *attnum;
    assert(nc && NC4_DATA(nc));
 
-   LOG((3, "%s: ncid 0x%x varid %d name %s attnum %d mem_type %d", 
+   LOG((3, "%s: ncid 0x%x varid %d name %s attnum %d mem_type %d",
 	__func__, ncid, varid, name, my_attnum, mem_type));
 
    /* Find info for this file and group, and set pointer to each. */
@@ -64,7 +64,7 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
       major failures. */
    if ((retval = nc4_find_grp_att(grp, varid, norm_name, my_attnum, &att)))
       BAIL(retval);
-   
+
    /* If mem_type is NC_NAT, it means we want to use the attribute's
     * file type as the mem type as well. */
    if (mem_type == NC_NAT)
@@ -100,14 +100,14 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
     * the attribute's type. */
    if (data && att->len && mem_type != att->nc_typeid &&
        mem_type != NC_NAT &&
-       !(mem_type == NC_CHAR && 
+       !(mem_type == NC_CHAR &&
 	 (att->nc_typeid == NC_UBYTE || att->nc_typeid == NC_BYTE)))
    {
       if (!(bufr = malloc((size_t)(att->len * type_size))))
 	 BAIL(NC_ENOMEM);
       need_to_convert++;
-      if ((retval = nc4_convert_type(att->data, bufr, att->nc_typeid, 
-				     mem_type, (size_t)att->len, &range_error, 
+      if ((retval = nc4_convert_type(att->data, bufr, att->nc_typeid,
+				     mem_type, (size_t)att->len, &range_error,
 				     NULL, (h5->cmode & NC_CLASSIC_MODEL), 0, is_long)))
 	 BAIL(retval);
 
@@ -192,11 +192,11 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
 
 /* Put attribute metadata into our global metadata. */
 static int
-nc4_put_att(int ncid, NC *nc, int varid, const char *name, 
-	    nc_type file_type, nc_type mem_type, size_t len, int is_long, 
+nc4_put_att(int ncid, NC *nc, int varid, const char *name,
+	    nc_type file_type, nc_type mem_type, size_t len, int is_long,
 	    const void *data)
 {
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var = NULL;
    NC_ATT_INFO_T *att, **attlist = NULL, *varatt;
@@ -207,7 +207,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
    int i;
    int res;
 
-   if (!name) 
+   if (!name)
       return NC_EBADNAME;
    assert(nc && NC4_DATA(nc));
 
@@ -222,7 +222,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
    /* Find info for this file and group, and set pointer to each. */
    h5 = NC4_DATA(nc);
    if (!(grp = nc4_rec_find_grp(h5->root_grp, (ncid & GRP_ID_MASK))))
-      return NC_EBADGRPID;      
+      return NC_EBADGRPID;
 
    /* If the file is read-only, return an error. */
    if (h5->no_write)
@@ -266,7 +266,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
    {
       /* For an existing att, if we're not in define mode, the len
 	 must not be greater than the existing len for classic model. */
-      if (!(h5->flags & NC_INDEF) && 
+      if (!(h5->flags & NC_INDEF) &&
 	  len * nc4typelen(file_type) > (size_t)att->len * nc4typelen(att->nc_typeid))
       {
 	 if (h5->cmode & NC_CLASSIC_MODEL)
@@ -285,8 +285,8 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
       return retval;
 
    /* No character conversions are allowed. */
-   if (file_type != mem_type && 
-       (file_type == NC_CHAR || mem_type == NC_CHAR || 
+   if (file_type != mem_type &&
+       (file_type == NC_CHAR || mem_type == NC_CHAR ||
 	file_type == NC_STRING || mem_type == NC_STRING))
       return NC_ECHAR;
 
@@ -353,10 +353,10 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
 
       /* If fill value hasn't been set, allocate space. Of course,
        * vlens have to be different... */
-      if ((retval = nc4_get_typelen_mem(grp->nc4_info, var->type_info->nc_typeid, 0, 
+      if ((retval = nc4_get_typelen_mem(grp->nc4_info, var->type_info->nc_typeid, 0,
 					&type_size)))
 	 return retval;
-      
+
       /* Already set a fill value? Now I'll have to free the old
        * one. Make up your damn mind, would you? */
       if (var->fill_value)
@@ -444,7 +444,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
 
          vldata1 = data;
          if (!(att->vldata = malloc(att->len * sizeof(hvl_t))))
-            BAIL(NC_ENOMEM);	 
+            BAIL(NC_ENOMEM);
          for (i = 0; i < att->len; i++)
          {
             att->vldata[i].len = vldata1[i].len;
@@ -457,7 +457,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
       {
          LOG((4, "copying array of NC_STRING"));
          if (!(att->stdata = malloc(sizeof(char *) * att->len)))
-            BAIL(NC_ENOMEM);	 
+            BAIL(NC_ENOMEM);
          for (i = 0; i < att->len; i++)
          {
             if(NULL != ((char **)data)[i]) {
@@ -483,8 +483,8 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
          else
          {
             /* Data types are like religions, in that one can convert.  */
-            if ((retval = nc4_convert_type(data, att->data, mem_type, file_type, 
-                                           len, &range_error, NULL, 
+            if ((retval = nc4_convert_type(data, att->data, mem_type, file_type,
+                                           len, &range_error, NULL,
                                            (h5->cmode & NC_CLASSIC_MODEL), is_long, 0)))
                BAIL(retval);
          }
@@ -496,7 +496,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
  exit:
    /* If there was an error return it, otherwise return any potential
       range error value. If none, return NC_NOERR as usual.*/
-   if (retval)      
+   if (retval)
       return retval;
    if (range_error)
       return NC_ERANGE;
@@ -526,7 +526,7 @@ NC4_inq_att(int ncid, int varid, const char *name, nc_type *xtypep, size_t *lenp
    if (h5->pnetcdf_file)
    {
       MPI_Offset mpi_len;
-      int ret = ncmpi_inq_att(nc->int_ncid, varid, name, xtypep, &mpi_len);	
+      int ret = ncmpi_inq_att(nc->int_ncid, varid, name, xtypep, &mpi_len);
       if (ret != NC_NOERR)
 	 return ret;
       if (lenp)
@@ -539,7 +539,7 @@ NC4_inq_att(int ncid, int varid, const char *name, nc_type *xtypep, size_t *lenp
 }
 
 /* Learn an attnum, given a name. */
-int 
+int
 NC4_inq_attid(int ncid, int varid, const char *name, int *attnump)
 {
    NC *nc;
@@ -562,7 +562,7 @@ NC4_inq_attid(int ncid, int varid, const char *name, int *attnump)
 #endif /* USE_PNETCDF */
 
    /* Handle netcdf-4 files. */
-   return nc4_get_att(ncid, nc, varid, name, NULL, NC_UBYTE, 
+   return nc4_get_att(ncid, nc, varid, name, NULL, NC_UBYTE,
 		      NULL, attnump, 0, NULL);
 }
 
@@ -576,7 +576,7 @@ NC4_inq_attname(int ncid, int varid, int attnum, char *name)
    NC_HDF5_FILE_INFO_T *h5;
    int retval = NC_NOERR;
 
-   LOG((2, "nc_inq_attname: ncid 0x%x varid %d attnum %d", 
+   LOG((2, "nc_inq_attname: ncid 0x%x varid %d attnum %d",
 	ncid, varid, attnum));
 
    /* Find metadata. */
@@ -607,11 +607,11 @@ NC4_inq_attname(int ncid, int varid, int attnum, char *name)
 /* I think all atts should be named the exact same thing, to avoid
    confusion! */
 int
-NC4_rename_att(int ncid, int varid, const char *name, 
+NC4_rename_att(int ncid, int varid, const char *name,
 	      const char *newname)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_VAR_INFO_T *var;
    NC_ATT_INFO_T *att, *list;
@@ -714,14 +714,14 @@ NC4_rename_att(int ncid, int varid, const char *name,
 
 /* Delete an att. Rub it out. Push the button on it. Liquidate
    it. Bump it off. Take it for a one-way ride. Terminate it. Drop the
-   bomb on it. You get the idea. 
-   Ed Hartnett, 10/1/3 
+   bomb on it. You get the idea.
+   Ed Hartnett, 10/1/3
 */
 int
 NC4_del_att(int ncid, int varid, const char *name)
 {
    NC *nc;
-   NC_GRP_INFO_T *grp; 
+   NC_GRP_INFO_T *grp;
    NC_HDF5_FILE_INFO_T *h5;
    NC_ATT_INFO_T *att, *natt;
    NC_VAR_INFO_T *var;
@@ -734,7 +734,7 @@ NC4_del_att(int ncid, int varid, const char *name)
 
    LOG((2, "nc_del_att: ncid 0x%x varid %d name %s",
 	ncid, varid, name));
-   
+
    /* Find metadata for this file. */
    if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))
       return retval;
@@ -748,7 +748,7 @@ NC4_del_att(int ncid, int varid, const char *name)
 #if 0 /*def USE_PNETCDF*/
    /* Take care of files created/opened with parallel-netcdf library. */
    if (h5->pnetcdf_file)
-      return ncmpi_del_att(nc->int_ncid, varid, name);   
+      return ncmpi_del_att(nc->int_ncid, varid, name);
 #endif /* USE_PNETCDF */
 
    /* If it's not in define mode, forget it. */
@@ -789,9 +789,9 @@ NC4_del_att(int ncid, int varid, const char *name)
 	 break;
 
    /* If att is NULL, we couldn't find the attribute. */
-   if (!att) 
+   if (!att)
       BAIL_QUIET(NC_ENOTATT);
-   
+
    /* Delete it from the HDF5 file, if it's been created. */
    if (att->created)
       if(H5Adelete(locid, att->name) < 0)
@@ -804,7 +804,7 @@ NC4_del_att(int ncid, int varid, const char *name)
    /* Delete this attribute from this list. */
    if ((retval = nc4_att_list_del(attlist, att)))
       BAIL(retval);
-   
+
  exit:
    if (datasetid > 0) H5Dclose(datasetid);
    return retval;
@@ -812,8 +812,8 @@ NC4_del_att(int ncid, int varid, const char *name)
 
 /* Write an attribute with type conversion. */
 static int
-nc4_put_att_tc(int ncid, int varid, const char *name, nc_type file_type, 
-	       nc_type mem_type, int mem_type_is_long, size_t len, 
+nc4_put_att_tc(int ncid, int varid, const char *name, nc_type file_type,
+	       nc_type mem_type, int mem_type_is_long, size_t len,
 	       const void *op)
 {
    NC *nc;
@@ -827,7 +827,7 @@ nc4_put_att_tc(int ncid, int varid, const char *name, nc_type file_type,
 
    /* The length needs to be positive (cast needed for braindead
       systems with signed size_t). */
-   if((unsigned long) len > X_INT_MAX) 
+   if((unsigned long) len > X_INT_MAX)
       return NC_EINVAL;
 
    /* Find metadata. */
@@ -848,26 +848,26 @@ nc4_put_att_tc(int ncid, int varid, const char *name, nc_type file_type,
       switch(mem_type)
       {
 	 case NC_BYTE:
-	    return ncmpi_put_att_schar(nc->int_ncid, varid, name, 
+	    return ncmpi_put_att_schar(nc->int_ncid, varid, name,
 				     file_type, len, op);
 	 case NC_CHAR:
-	    return ncmpi_put_att_text(nc->int_ncid, varid, name, 
+	    return ncmpi_put_att_text(nc->int_ncid, varid, name,
 				    len, op);
 	 case NC_SHORT:
-	    return ncmpi_put_att_short(nc->int_ncid, varid, name, 
+	    return ncmpi_put_att_short(nc->int_ncid, varid, name,
 				     file_type, len, op);
 	 case NC_INT:
 	    if (mem_type_is_long)
-	       return ncmpi_put_att_long(nc->int_ncid, varid, name, 
+	       return ncmpi_put_att_long(nc->int_ncid, varid, name,
 				       file_type, len, op);
 	    else
-	       return ncmpi_put_att_int(nc->int_ncid, varid, name, 
+	       return ncmpi_put_att_int(nc->int_ncid, varid, name,
 				      file_type, len, op);
 	 case NC_FLOAT:
-	    return ncmpi_put_att_float(nc->int_ncid, varid, name, 
+	    return ncmpi_put_att_float(nc->int_ncid, varid, name,
 				     file_type, len, op);
 	 case NC_DOUBLE:
-	    return ncmpi_put_att_double(nc->int_ncid, varid, name, 
+	    return ncmpi_put_att_double(nc->int_ncid, varid, name,
 				      file_type, len, op);
 	 case NC_NAT:
 	 default:
@@ -877,20 +877,20 @@ nc4_put_att_tc(int ncid, int varid, const char *name, nc_type file_type,
 #endif /* USE_PNETCDF */
 
    /* Otherwise, handle things the netcdf-4 way. */
-   return nc4_put_att(ncid, nc, varid, name, file_type, mem_type, len, 
+   return nc4_put_att(ncid, nc, varid, name, file_type, mem_type, len,
 		      mem_type_is_long, op);
 }
 
 /* Read an attribute of any type, with type conversion. This may be
  * called by any of the nc_get_att_* functions. */
 int
-nc4_get_att_tc(int ncid, int varid, const char *name, nc_type mem_type, 
+nc4_get_att_tc(int ncid, int varid, const char *name, nc_type mem_type,
 	       int mem_type_is_long, void *ip)
 {
    NC *nc;
    NC_HDF5_FILE_INFO_T *h5;
 
-   LOG((3, "nc4_get_att_tc: ncid 0x%x varid %d name %s mem_type %d", 
+   LOG((3, "nc4_get_att_tc: ncid 0x%x varid %d name %s mem_type %d",
 	ncid, varid, name, mem_type));
 
    /* Find metadata. */
@@ -932,12 +932,12 @@ nc4_get_att_tc(int ncid, int varid, const char *name, nc_type mem_type,
    }
 #endif /* USE_PNETCDF */
 
-   return nc4_get_att(ncid, nc, varid, name, NULL, mem_type, 
+   return nc4_get_att(ncid, nc, varid, name, NULL, mem_type,
 		      NULL, NULL, mem_type_is_long, ip);
 }
 
 int
-NC4_put_att(int ncid, int varid, const char *name, nc_type xtype, 
+NC4_put_att(int ncid, int varid, const char *name, nc_type xtype,
 	           size_t nelems, const void *value, nc_type memtype)
 {
    return nc4_put_att_tc(ncid, varid, name, xtype, memtype, 0, nelems, value);

@@ -4,10 +4,10 @@
  *   $Header: /upc/share/CVS/netcdf-3/nctest/testcdf.h,v 1.9 2006/10/31 16:23:43 ed Exp $
  *********************************************************************/
 
-/* 
- * In-memory structure holding netcdf structure for comparing with 
- * on-disk netcdf.  Whenever a disk netcdf is updated in the test 
- * package, this structure should be updated at the same time, to keep 
+/*
+ * In-memory structure holding netcdf structure for comparing with
+ * on-disk netcdf.  Whenever a disk netcdf is updated in the test
+ * package, this structure should be updated at the same time, to keep
  * them in sync.
  */
 
