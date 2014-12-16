@@ -209,7 +209,7 @@ public:
                           {
                             Ke_var[i][k](dof_i,dof_j) += JxW[qp] *
                               elasticity_tensor(i,j,k,l) *
-                              dphi[dof_j][qp](l) * 
+                              dphi[dof_j][qp](l) *
                               dphi[dof_i][qp](j);
                           }
                 }
@@ -390,7 +390,7 @@ public:
         Number vonMises_value = std::sqrt( 0.5*( pow(elem_avg_stress_tensor(0,0) - elem_avg_stress_tensor(1,1),2.) +
                                                  pow(elem_avg_stress_tensor(1,1) - elem_avg_stress_tensor(2,2),2.) +
                                                  pow(elem_avg_stress_tensor(2,2) - elem_avg_stress_tensor(0,0),2.) +
-                                                 6.*(pow(elem_avg_stress_tensor(0,1),2.) + 
+                                                 6.*(pow(elem_avg_stress_tensor(0,1),2.) +
                                                      pow(elem_avg_stress_tensor(1,2),2.) +
                                                      pow(elem_avg_stress_tensor(2,0),2.))
                                                  ) );
