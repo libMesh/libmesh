@@ -26,7 +26,7 @@
 //     \int_\Omega Sigma_ij v_i,j = \int_\Omega f_i v_i + \int_\Gamma g_i v_i ds,
 //
 // for all admissible test functions v, where:
-//  * Sigma is the stress tensor, which for linear elasiticity is
+//  * Sigma is the stress tensor, which for linear elasticity is
 //    given by Sigma_ij = C_ijkl u_k,l.
 //  * f is a body load.
 //  * g is a surface traction on the surface \Gamma.
@@ -414,7 +414,7 @@ public:
 // Begin the main program.
 int main (int argc, char** argv)
 {
-  // Initialize libMesh and any dependent libaries
+  // Initialize libMesh and any dependent libraries
   LibMeshInit init (argc, argv);
 
   // Initialize the cantilever mesh
