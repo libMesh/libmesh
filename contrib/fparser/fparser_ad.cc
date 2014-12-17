@@ -795,7 +795,12 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   }
 
   // run compiler
+#if defined(__GNUC__) && defined(__APPLE__) && !defined(__INTEL_COMPILER)
+  // gcc on OSX does neither need nor accept the  -rdynamic switch
+  std::string command = FPARSER_JIT_COMPILER" -O2 -shared -fPIC ";
+#else
   std::string command = FPARSER_JIT_COMPILER" -O2 -shared -rdynamic -fPIC ";
+#endif
   command += ccname_cc + " -o " + object;
   status = system(command.c_str());
   std::remove(ccname_cc.c_str());
