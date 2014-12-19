@@ -72,6 +72,8 @@
 namespace libMesh
 {
 
+const subdomain_id_type Elem::invalid_subdomain_id = std::numeric_limits<subdomain_id_type>::max();
+
 // Initialize static member variables
 const unsigned int Elem::type_to_n_nodes_map [] =
   {

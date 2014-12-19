@@ -166,6 +166,22 @@ public:
   subdomain_id_type & subdomain_id ();
 
   /**
+   * A static integral constant representing an invalid subdomain id.
+   * See also DofObject::{invalid_id, invalid_unique_id, invalid_processor_id}.
+   *
+   * Note 1: we don't use the static_cast(-1) trick here since
+   * subdomain_id_type is sometimes a *signed* integer for
+   * compatibility reasons (see libmesh/id_types.h).
+   *
+   * Note 2: Normally you can declare static const integral types
+   * directly in the header file (C++ standard, 9.4.2/4) but
+   * std::numeric_limits<T>::max() is not considered a "constant
+   * expression".  This one is therefore defined in elem.C.
+   * http://stackoverflow.com/questions/2738435/using-numeric-limitsmax-in-constant-expressions
+   */
+  static const subdomain_id_type invalid_subdomain_id;
+
+  /**
    * @returns a pointer to the "reference element" associated
    * with this element.  The reference element is the image of this
    * element in reference parametric space. Importantly, it is *not*
