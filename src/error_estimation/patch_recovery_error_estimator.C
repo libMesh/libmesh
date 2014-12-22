@@ -442,7 +442,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
                       // Patch RHS contributions
                       for (unsigned int i=0; i<psi.size(); i++)
-                        F(i) = JxW[qp]*u_h*psi[i];
+                        F(i) += JxW[qp]*u_h*psi[i];
 
                     }
                   else if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
