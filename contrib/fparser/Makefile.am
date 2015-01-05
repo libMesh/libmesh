@@ -5,11 +5,6 @@ FEATURE_FLAGS =
 FEATURE_FLAGS += -DFP_ENABLE_EVAL
 #FEATURE_FLAGS += -DFP_SUPPORT_TR1_MATH_FUNCS
 
-# some systems have trouble with the fparser optimizer
-if FPARSER_NO_SUPPORT_OPTIMIZER
-  FEATURE_FLAGS += -DFP_DUMMY_OPTIMIZER
-endif
-
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
 #FEATURE_FLAGS += -DFP_NO_EVALUATION_CHECKS
@@ -103,7 +98,6 @@ FPOPTIMIZER_CC_FILES=\
 EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptimizer/fpoptimizer_footer.txt
 
 
-
 pkg_sources = fparser.cc fparser_ad.cc
 if FPARSER_SUPPORT_JIT
   pkg_sources += lib/sha1.cpp
@@ -125,7 +119,7 @@ util_tree_grammar_parser_SOURCES   = \
                                  mpfr/GmpInt.hh \
                                  fparser_mpfr.hh \
                                  fparser.hh \
-			 	 fparser.cc \
+                                 fparser.cc \
                                  fpoptimizer/logic_comparisons.hh \
                                  fpoptimizer/constantfolding.hh \
                                  fpoptimizer/logic_ifoperations.hh \
@@ -203,13 +197,9 @@ if FPARSER_DEVEL
   noinst_PROGRAMS           += util/cpp_compress
   # noinst_PROGRAMS           += util/make_function_name_parser
 
-if FPARSER_SUPPORT_OPTIMIZER
-    pkg_sources += $(FPOPTIMIZER_CC_FILES)
-else
-    pkg_sources += fpoptimizer.cc
-endif
+  pkg_sources += $(FPOPTIMIZER_CC_FILES)
 
-   # when doing 'make clean' we need to remove the generated sources
+  # when doing 'make clean' we need to remove the generated sources
   CLEANFILES += $(BUILT_SOURCES)
 
 else !FPARSER_DEVEL
