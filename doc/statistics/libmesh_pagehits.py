@@ -13,6 +13,7 @@ import numpy as np
 
 #                    Hits,  pages, GB served
 data = [
+    'Dec', '2014',  10714,      0, 0.0,
     'Nov', '2014',   9243,      0, 0.0,
     'Oct', '2014',   8052,      0, 0.0, # Google analytics number moved over to libmesh.github.io in Oct 2014
     'Sep', '2014',   9226,      0, 0.0,

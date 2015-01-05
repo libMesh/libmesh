@@ -55,6 +55,7 @@ membership_data = [
     'Sep 2014', 117, 254,
     'Oct 2014', 118, 257,
     'Nov 2014', 119, 261,
+    'Dec 2014', 120, 262,
 ] # remember to update the indices below!
 
 # The early membership data is spotty, so set indices which are meaningful
@@ -62,8 +63,7 @@ membership_data = [
 # concatenates lists in Python.
 membership_indices = [1]                                         # 2010
 membership_indices += [i+12 for i in [7, 8, 9, 11, 12]]          # 2011
-membership_indices += [int(i)+24 for i in np.linspace(1,24,24)]  # 2012, 2013
-membership_indices += [int(i)+48 for i in np.linspace(1,11,11)]; # 2014 <-- Update me
+membership_indices += [int(i)+24 for i in np.linspace(1,36,36)]  # 2012, 2013, 2014
 
 # print membership_indices
 
@@ -131,7 +131,7 @@ devel_data = [
     '2011',   26,  48, 151, 108,  61, 108,  27,  50,  43,  43,  27,  37,
     '2012',   56, 120,  72,  57,  82,  66,  51,  75, 166, 232, 284, 105, # Dec 10, 2012 libmesh moved to github
     '2013',  168, 151,  30, 145,  26,  53,  76,  33,  23,  72, 125,  38,
-    '2014',   47,  62,  27,   8,  12,   2,  22,  22,   0,  17,  20,
+    '2014',   47,  62,  27,   8,  12,   2,  22,  22,   0,  17,  20,  12,
 ]
 
 # libmesh-users starts in Sept 2003!
@@ -149,7 +149,7 @@ users_data = [
     '2011',   22,  19,  92,  93,  35,  91,  32,  61,   7,  69,  81,  23,
     '2012',   64,  95,  35,  36,  63,  98,  70, 171, 149,  64,  67, 126, # Dec 10, 2012 libmesh moved to github
     '2013',  108, 104, 171, 133, 108, 100,  93, 126,  74,  59, 145,  93,
-    '2014',   38,  45,  26,  41, 125,  70,  61,  66,  60, 110,  27,
+    '2014',   38,  45,  26,  41, 125,  70,  61,  66,  60, 110,  27,  30,
 ]
 
 # Make plot of monthly data
@@ -239,10 +239,10 @@ combined_bars = ax.bar(x, combined_devel_users_number, width, color='c')
 devel_bars = ax.bar(x, devel_numbers, width, color='b')
 
 # Set the xticks and xticklabels
-xticks = [1, 25, 49, 73, 97, 121]
+xticks = [1, 25, 49, 73, 97, 121, 145]
 xticks = [x+width/2. for x in xticks]
 ax.set_xticks(xticks)
-ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013'])
+ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013', '2015'])
 
 # Add a legend to the plot. loc=2 corresponds to "upper left" of the plot.
 plt.legend([combined_bars[0], devel_bars[0]], ['libmesh-users', 'libmesh-devel'], loc=2)
