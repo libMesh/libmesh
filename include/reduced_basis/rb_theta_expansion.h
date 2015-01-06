@@ -62,21 +62,21 @@ public:
    * if the theta functions need to be treated differently
    * in subclasses.
    */
-  Number eval_A_theta(unsigned int q,
-                      const RBParameters& mu);
+  virtual Number eval_A_theta(unsigned int q,
+                              const RBParameters& mu);
 
   /**
    * Evaluate theta_q_f at the current parameter.
    */
-  Number eval_F_theta(unsigned int q,
-                      const RBParameters& mu);
+  virtual Number eval_F_theta(unsigned int q,
+                              const RBParameters& mu);
 
   /**
    * Evaluate theta_q_l at the current parameter.
    */
-  Number eval_output_theta(unsigned int output_index,
-                           unsigned int q_l,
-                           const RBParameters& mu);
+  virtual Number eval_output_theta(unsigned int output_index,
+                                   unsigned int q_l,
+                                   const RBParameters& mu);
 
   /**
    * Get Q_a, the number of terms in the affine
