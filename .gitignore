@@ -48,6 +48,7 @@ contrib/bin/test_headers.log
 contrib/fparser/.dep
 contrib/fparser/examples/example
 contrib/fparser/examples/example2
+contrib/fparser/examples/autodiff
 contrib/fparser/extrasrc/fp_opcode_add.inc
 contrib/fparser/fpoptimizer/grammar_data.cc
 contrib/fparser/ftest

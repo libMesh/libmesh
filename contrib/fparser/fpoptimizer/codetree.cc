@@ -453,4 +453,3 @@ namespace FPoptimizer_CodeTree
 /* END_EXPLICIT_INSTANTATION */
 
 #endif
-
