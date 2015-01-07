@@ -146,6 +146,7 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTr
 {
   CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op));
   tree.AddParam(param1);
+  tree.Rehash();
   return tree;
 }
 template<typename Value_t>
@@ -154,6 +155,7 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::MakeTr
   CodeTreeAD tree = CodeTreeAD(CodeTreeOp<Value_t>(op));
   tree.AddParam(param1);
   tree.AddParam(param2);
+  tree.Rehash();
   return tree;
 }
 
@@ -204,6 +206,7 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
       diff.SetOpcode(op);
       for (i = 0; i < nparam; ++i)
         diff.AddParam(D(param[i]));
+      diff.Rehash();
       break;
 
     case cMul:
@@ -216,6 +219,7 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
           sub.AddParam(i==j ? D(param[j]) : param[j]);
         diff.AddParam(sub);
       }
+      diff.Rehash();
       break;
 
     //
@@ -271,6 +275,7 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
       diff.AddParam(a);
       diff.AddParam(D(b));
       diff.AddParam(D(c));
+      diff.Rehash();
       break;
 
     case cAbs:
@@ -282,12 +287,14 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
       diff.AddParam(MakeTree(cLess, a, b));
       diff.AddParam(D(b));
       diff.AddParam(D(a));
+      diff.Rehash();
       break;
     case cMin:
       diff.SetOpcode(cIf);
       diff.AddParam(MakeTree(cLess, a, b));
       diff.AddParam(D(a));
       diff.AddParam(D(b));
+      diff.Rehash();
       break;
 
     //
@@ -320,6 +327,7 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
         diff.AddParam(MakeTree(cInv, b) - MakeTree(cInv, b*b) * (a-b)
                       + MakeTree(cPow, b, CodeTreeAD(-3)) * MakeTree(cSqr, a-b));
         diff.AddParam(MakeTree(cInv, a));
+        diff.Rehash();
         break;
       }
       // fall through to undefined
@@ -390,7 +398,6 @@ int ADImplementation<Value_t>::AutoDiff(const std::string& var_name)
     return 0;
   }
 
-  // DumpTreeWithIndent(diff);
   // std::cout << '\n';
   // FPoptimizer_Optimize::ApplyGrammars(diff);
   // DumpTreeWithIndent(diff);
