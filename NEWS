@@ -1,4 +1,4 @@
-0.9.3 -> 1.0.0
+0.9.3 -> 0.9.4
   * Pyramid13 elements
   * Subdivision surfaces
   * Support for PETSc fieldsplits
@@ -59,6 +59,7 @@
   * http://libmesh.github.io created, http://libmesh.sf.net is gone/permanently blocked
   * "make doc" target completely overhauled
   * Protect Mesh::BoundaryInfo behind an accessor.
+  * NumericVector::add_vector(), ::get(), ::insert() refactoring.
 
 0.9.2 -> 0.9.3
   * FEMContext public members now private, must use API pushed in 0.9.2.
