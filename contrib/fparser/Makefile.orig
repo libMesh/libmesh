@@ -56,7 +56,7 @@ LD=g++
 
 # For GCC (not clang):
 ifeq (,$(findstring clang,$(CXX)))
-OPTIMIZATION += -fexpensive-optimizations -march=native -fvpt -fomit-frame-pointer -ffunction-cse
+OPTIMIZATION += -fexpensive-optimizations -fvpt -fomit-frame-pointer -ffunction-cse
 endif
 
 # Platform specific settings

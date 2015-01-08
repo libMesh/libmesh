@@ -5,7 +5,7 @@
 #include "codetree.hh"
 #include "optimize.hh"
 
-#ifdef FP_SUPPORT_OPTIMIZER
+#ifndef FP_DUMMY_OPTIMIZER
 
 template<typename Value_t>
 void FunctionParserBase<Value_t>::Optimize()
@@ -97,4 +97,4 @@ FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(long double)
 FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(long)
 #endif
 
-#endif // FP_SUPPORT_OPTIMIZER
+#endif //FP_DUMMY_OPTIMIZER

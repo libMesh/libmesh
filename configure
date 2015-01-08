@@ -665,10 +665,6 @@ FPARSER_SUPPORT_JIT_FALSE
 FPARSER_SUPPORT_JIT_TRUE
 FPARSER_SUPPORT_DEBUGGING_FALSE
 FPARSER_SUPPORT_DEBUGGING_TRUE
-FPARSER_SUPPORT_OPTIMIZER_FALSE
-FPARSER_SUPPORT_OPTIMIZER_TRUE
-FPARSER_NO_SUPPORT_OPTIMIZER_FALSE
-FPARSER_NO_SUPPORT_OPTIMIZER_TRUE
 FPARSER_DEVEL_FALSE
 FPARSER_DEVEL_TRUE
 FPARSER_RELEASE_FALSE
@@ -1168,7 +1164,6 @@ enable_libHilbert
 enable_fparser
 with_fparser
 enable_fparser_debugging
-enable_fparser_optimizer
 enable_cppunit
 with_cppunit_prefix
 with_cppunit_exec_prefix
@@ -1938,8 +1933,6 @@ Optional Features:
   --disable-fparser       build without C++ function parser support
   --enable-fparser-debugging
                           Build fparser with bytecode debugging functions
-  --disable-fparser-optimizer
-                          do not optimize parsed functions
   --disable-cppunit       Build without cppunit C++ unit testing support
   --disable-nanoflann     build without nanoflann KD-tree suppport
 
@@ -35153,28 +35146,6 @@ else
 fi
 
 
-    # Check whether --enable-fparser-optimizer was given.
-if test "${enable_fparser_optimizer+set}" = set; then :
-  enableval=$enable_fparser_optimizer; case "${enableval}" in
-                    yes)  enablefparseroptimizer=yes ;;
-                     no)  enablefparseroptimizer=no ;;
-                      *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-optimizer" "$LINENO" 5 ;;
-                   esac
-else
-  enablefparseroptimizer=yes
-fi
-
-
-    # note - fparser optimization may fail on cygwin (please test), so disable it regardless
-    case "${host_os}" in
-      *cygwin*)
-        enablefparseroptimizer=no
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Disabling fparser optimization on ${host_os} <<<" >&5
-$as_echo ">>> Disabling fparser optimization on ${host_os} <<<" >&6; }
-        ;;
-        *) ;;
-      esac
-
     # The FPARSER API is distributed with libmesh, so we don't have to guess
     # where it might be installed...
 
@@ -35417,22 +35388,6 @@ fi
 else
   FPARSER_DEVEL_TRUE='#'
   FPARSER_DEVEL_FALSE=
-fi
-
-   if test x$enablefparseroptimizer = xno; then
-  FPARSER_NO_SUPPORT_OPTIMIZER_TRUE=
-  FPARSER_NO_SUPPORT_OPTIMIZER_FALSE='#'
-else
-  FPARSER_NO_SUPPORT_OPTIMIZER_TRUE='#'
-  FPARSER_NO_SUPPORT_OPTIMIZER_FALSE=
-fi
-
-   if test x$enablefparseroptimizer = xyes; then
-  FPARSER_SUPPORT_OPTIMIZER_TRUE=
-  FPARSER_SUPPORT_OPTIMIZER_FALSE='#'
-else
-  FPARSER_SUPPORT_OPTIMIZER_TRUE='#'
-  FPARSER_SUPPORT_OPTIMIZER_FALSE=
 fi
 
    if test x$enablefparserdebugging = xyes; then
@@ -36216,14 +36171,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${FPARSER_DEVEL_TRUE}" && test -z "${FPARSER_DEVEL_FALSE}"; then
   as_fn_error $? "conditional \"FPARSER_DEVEL\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${FPARSER_NO_SUPPORT_OPTIMIZER_TRUE}" && test -z "${FPARSER_NO_SUPPORT_OPTIMIZER_FALSE}"; then
-  as_fn_error $? "conditional \"FPARSER_NO_SUPPORT_OPTIMIZER\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${FPARSER_SUPPORT_OPTIMIZER_TRUE}" && test -z "${FPARSER_SUPPORT_OPTIMIZER_FALSE}"; then
-  as_fn_error $? "conditional \"FPARSER_SUPPORT_OPTIMIZER\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${FPARSER_SUPPORT_DEBUGGING_TRUE}" && test -z "${FPARSER_SUPPORT_DEBUGGING_FALSE}"; then
