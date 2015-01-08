@@ -1,3 +1,66 @@
+0.9.3 -> 0.9.4
+  * Pyramid13 elements
+  * Subdivision surfaces
+  * Support for PETSc fieldsplits
+  * Point loads in reduced basis problems
+  * Improved AdjointRefinementErrorEstimator indicator quality
+  * Discontinous plotting can be done with subsets of EquationSystems
+  * complex-valued and single-precision ExodusII/Nemesis output
+  * allow appending to Tecplot ASCII files
+  * improved Abaqus, Gmsh, UNV I/O support
+  * VTK 6 support
+  * QHull now distributed in contrib/
+  * Several Fparser enhancements by @dschwen
+    * Automatic differentiation
+    * Allow NaN in fparser parsed functions
+    * Fparser JIT support
+    * Many fpoptimizer bugfixes
+    * plog (polynomial log approximation) function added
+  * Support NaN to locally disable DirichletBoundary functions
+  * Methods for nonlocal computations with SCALARs in FEMSystem
+  * PointLocator option for local element searches
+  * PointLocator/MeshFunction option for searches close to elements
+  * Better solver convergence reporting
+  * Better 16-bit and 64-bit hash functions
+  * Better QGrid behavior, documentation
+  * DenseMatrix eigenvalue computations
+  * DenseMatrix operations with mixed scalar types
+  * Mesh stitching can now be done using node and edge boundary IDs
+  * Variational mesh smoother refactoring
+  * MeshModification::transform() with arbitrary warping functions
+  * Use MPI_THREAD_FUNNELED when available
+  * libmesh_cast_ptr/ref/int deprecated, replaced by cast_ptr/ref/int
+  * libMeshEnums namespace removed; enumerations in libMesh namespace
+  * Configure tests for more C++11 features
+  * Default complation with -std=c++11, easier for users to disable
+  * Better configure autodetection of slepc, eigen compatibility
+  * configure options for software licensing
+    * non-LGPL-compatible options disabled by default
+    * libHilbert now under LGPL
+  * clearer "configure --help" output
+  * more verbose error messages using libmesh_error_msg()
+  * reformatted source code, no tabs should be in code from now on
+  * Assorted bug fixes, optimizations, new regression tests
+    * all_first_order() and build_extrusion() bugs fixed
+    * fixed libHilbert interface regression
+      * some xda/xdr files created with 0.9.3 MAY BE CORRUPTED when
+        read with older/newer libMesh versions, and vice-versa!
+    * fixed bug with stitching "slivers"
+    * fixed std::memset bug which pops up for newer GCCs on OSX
+    * fixed misc. distcheck bugs
+  * Many fixes to silence paranoid compiler warnings (see doc/notes/compiler_warnings.txt)
+  * Use -f when symbolic linking files during build/install stage
+  * 1D Gauss-Lobatto quadrature rules, additional quadrature unit testing
+  * Cut-cell quadrature (ElemCutter, QComposite classes) for XFEM
+  * Per-subdomain scalar variable support
+  * Added 'meshavg' application for averaging solutions
+  * GDB backtraces and backtraces from the segfault handler
+  * Support -fsanitize=address flags on newer Clang and GCC compilers
+  * http://libmesh.github.io created, http://libmesh.sf.net is gone/permanently blocked
+  * "make doc" target completely overhauled
+  * Protect Mesh::BoundaryInfo behind an accessor.
+  * NumericVector::add_vector(), ::get(), ::insert() refactoring.
+
 0.9.2 -> 0.9.3
   * FEMContext public members now private, must use API pushed in 0.9.2.
     Breaks backward compatibility of FEMContext.
