@@ -872,15 +872,14 @@ FUNCTIONPARSERAD_INSTANTIATE_CLASS(float)
 FUNCTIONPARSERAD_INSTANTIATE_CLASS(long double)
 #endif
 
-// Complex numbers are not yet supported (they would require explicit instantiation of CodeTree classes to complex)
-//#ifdef FP_SUPPORT_COMPLEX_DOUBLE_TYPE
-// FUNCTIONPARSERAD_INSTANTIATE_CLASS(std::complex<double>)
-//#endif
+#ifdef FP_SUPPORT_COMPLEX_DOUBLE_TYPE
+FUNCTIONPARSERAD_INSTANTIATE_CLASS(std::complex<double>)
+#endif
 
-// #ifdef FP_SUPPORT_COMPLEX_FLOAT_TYPE
-// FUNCTIONPARSERAD_INSTANTIATE_CLASS(std::complex<float>)
-// #endif
+#ifdef FP_SUPPORT_COMPLEX_FLOAT_TYPE
+FUNCTIONPARSERAD_INSTANTIATE_CLASS(std::complex<float>)
+#endif
 
-//#ifdef FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
-//FUNCTIONPARSERAD_INSTANTIATE_CLASS(std::complex<long double>)
-//#endif
+#ifdef FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
+FUNCTIONPARSERAD_INSTANTIATE_CLASS(std::complex<long double>)
+#endif
