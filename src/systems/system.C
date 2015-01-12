@@ -408,6 +408,14 @@ void System::reinit ()
 }
 
 
+void System::reinit_constraints()
+{
+  get_dof_map().create_dof_constraints(_mesh, this->time);
+  user_constrain();
+  get_dof_map().process_constraints(_mesh);
+  get_dof_map().prepare_send_list();
+}
+
 
 void System::update ()
 {
