@@ -975,10 +975,10 @@ TypeTensor<T> TypeTensor<T>::inverse() const
     c = A(1,0), d = A(1,1);
 
   // Make sure det = ad - bc is not zero
-  T det = a*d - b*c;
-  libmesh_assert_not_equal_to(det, static_cast<T>(0.));
+  T my_det = a*d - b*c;
+  libmesh_assert_not_equal_to(my_det, static_cast<T>(0.));
 
-  return TypeTensor(d/det, -b/det, -c/det, a/det);
+  return TypeTensor(d/my_det, -b/my_det, -c/my_det, a/my_det);
 #endif
 
 #if LIBMESH_DIM == 3
@@ -989,13 +989,13 @@ TypeTensor<T> TypeTensor<T>::inverse() const
     a21 = A(1,0), a22 = A(1,1), a23 = A(1,2),
     a31 = A(2,0), a32 = A(2,1), a33 = A(2,2);
 
-  T det = a11*(a33*a22-a32*a23) - a21*(a33*a12-a32*a13) + a31*(a23*a12-a22*a13);
-  libmesh_assert_not_equal_to(det, static_cast<T>(0.));
+  T my_det = a11*(a33*a22-a32*a23) - a21*(a33*a12-a32*a13) + a31*(a23*a12-a22*a13);
+  libmesh_assert_not_equal_to(my_det, static_cast<T>(0.));
 
   // Inline comment characters are for lining up columns.
-  return TypeTensor(/**/  (a33*a22-a32*a23)/det, -(a33*a12-a32*a13)/det,  (a23*a12-a22*a13)/det,
-                    /**/ -(a33*a21-a31*a23)/det,  (a33*a11-a31*a13)/det, -(a23*a11-a21*a13)/det,
-                    /**/  (a32*a21-a31*a22)/det, -(a32*a11-a31*a12)/det,  (a22*a11-a21*a12)/det);
+  return TypeTensor(/**/  (a33*a22-a32*a23)/my_det, -(a33*a12-a32*a13)/my_det,  (a23*a12-a22*a13)/my_det,
+                    /**/ -(a33*a21-a31*a23)/my_det,  (a33*a11-a31*a13)/my_det, -(a23*a11-a21*a13)/my_det,
+                    /**/  (a32*a21-a31*a22)/my_det, -(a32*a11-a31*a12)/my_det,  (a22*a11-a21*a12)/my_det);
 #endif
 }
 
