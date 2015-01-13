@@ -248,6 +248,11 @@ public:
   virtual void reinit ();
 
   /**
+   * Reinitializes the constraints for this system.
+   */
+  virtual void reinit_constraints ();
+
+  /**
    * Update the local values to reflect the solution
    * on neighboring processors.
    */
