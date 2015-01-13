@@ -124,6 +124,7 @@ util_tree_grammar_parser_SOURCES   = \
                                  fpoptimizer/constantfolding.hh \
                                  fpoptimizer/logic_ifoperations.hh \
                                  fpoptimizer/instantiate.hh \
+                                 fpoptimizer/instantiate_for_ad.hh \
                                  fpoptimizer/opcodename.hh \
                                  fpoptimizer/consts.hh \
                                  fpoptimizer/optimize.hh \
