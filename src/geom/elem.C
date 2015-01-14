@@ -28,6 +28,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/node_elem.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/edge_edge4.h"
@@ -215,6 +216,13 @@ AutoPtr<Elem> Elem::build(const ElemType type,
 
   switch (type)
     {
+      // 0D elements
+    case NODEELEM:
+      {
+        elem = new NodeElem(p);
+        break;
+      }
+
       // 1D elements
     case EDGE2:
       {
