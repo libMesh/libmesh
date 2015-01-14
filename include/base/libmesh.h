@@ -75,6 +75,8 @@ public:
 
   const Parallel::Communicator& comm() const { return _comm; }
 
+  Parallel::Communicator& comm() { return _comm; }
+
 private:
   Parallel::Communicator _comm;
 };
