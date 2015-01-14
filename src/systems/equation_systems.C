@@ -54,7 +54,8 @@ namespace libMesh
 EquationSystems::EquationSystems (MeshBase& m, MeshData* mesh_data) :
   ParallelObject (m),
   _mesh          (m),
-  _mesh_data     (mesh_data)
+  _mesh_data     (mesh_data),
+  _can_add_systems (true)
 {
   // Set default parameters
   this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
@@ -87,6 +88,8 @@ void EquationSystems::clear ()
 
       _systems.erase (pos);
     }
+
+  _can_add_systems = true;
 }
 
 
@@ -116,6 +119,10 @@ void EquationSystems::init ()
     for ( ; elem_it != elem_end; ++elem_it)
       (*elem_it)->set_n_systems(n_sys);
   }
+
+  // from now on, adding additional systems can't be done without
+  // immediately resizing dof objects and initializing new systems
+  _can_add_systems = false;
 
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).init();
@@ -158,6 +165,9 @@ void EquationSystems::reinit ()
         libmesh_assert_equal_to (elem->n_systems(), this->n_systems());
       }
   }
+
+  // If we're in reinit(), we should already be initialized
+  libmesh_assert_equal_to (_can_add_systems, false);
 #endif
 
   // Localize each system's vectors
