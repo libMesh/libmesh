@@ -284,7 +284,8 @@ void System::init_data ()
   current_local_solution->init (this->n_dofs(), false, SERIAL);
 #endif
 
-  // from now on, no chance to add additional vectors
+  // from now on, adding additional vectors can't be done without
+  // immediately initializing them
   _can_add_vectors = false;
 
   // initialize & zero other vectors, if necessary
