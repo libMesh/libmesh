@@ -89,30 +89,30 @@ namespace
     template<typename Value_t>
     const Value_t RootPowerTable<Value_t>::RootPowers[(1+4)*(1+3)] =
     {
-        // (sqrt^n(x))
+        // (sqrt^n(x)) // Workaround for gcc-4.6 bug by RHS
         Value_t(1),
-        Value_t(1) / Value_t(2),
-        Value_t(1) / Value_t(2*2),
-        Value_t(1) / Value_t(2*2*2),
-        Value_t(1) / Value_t(2*2*2*2),
+        Value_t(1.L/2.L),
+        Value_t(1.L/ (2.L*2.L)),
+        Value_t(1.L/ (2.L*2.L*2.L)),
+        Value_t(1.L/ (2.L*2.L*2.L*2.L)),
         // cbrt^1(sqrt^n(x))
-        Value_t(1) / Value_t(3),
-        Value_t(1) / Value_t(3*2),
-        Value_t(1) / Value_t(3*2*2),
-        Value_t(1) / Value_t(3*2*2*2),
-        Value_t(1) / Value_t(3*2*2*2*2),
+        Value_t(1.L/ (3.L)),
+        Value_t(1.L/ (3.L*2.L)),
+        Value_t(1.L/ (3.L*2.L*2.L)),
+        Value_t(1.L/ (3.L*2.L*2.L*2.L)),
+        Value_t(1.L/ (3.L*2.L*2.L*2.L*2.L)),
         // cbrt^2(sqrt^n(x))
-        Value_t(1) / Value_t(3*3),
-        Value_t(1) / Value_t(3*3*2),
-        Value_t(1) / Value_t(3*3*2*2),
-        Value_t(1) / Value_t(3*3*2*2*2),
-        Value_t(1) / Value_t(3*3*2*2*2*2),
+        Value_t(1.L/ (3.L*3.L)),
+        Value_t(1.L/ (3.L*3.L*2.L)),
+        Value_t(1.L/ (3.L*3.L*2.L*2.L)),
+        Value_t(1.L/ (3.L*3.L*2.L*2.L*2.L)),
+        Value_t(1.L/ (3.L*3.L*2.L*2.L*2.L*2.L)),
         // cbrt^3(sqrt^n(x))
-        Value_t(1) / Value_t(3*3*3),
-        Value_t(1) / Value_t(3*3*3*2),
-        Value_t(1) / Value_t(3*3*3*2*2),
-        Value_t(1) / Value_t(3*3*3*2*2*2),
-        Value_t(1) / Value_t(3*3*3*2*2*2*2)
+        Value_t(1.L/ (3.L*3.L*3.L)),
+        Value_t(1.L/ (3.L*3.L*3.L*2.L)),
+        Value_t(1.L/ (3.L*3.L*3.L*2.L*2.L)),
+        Value_t(1.L/ (3.L*3.L*3.L*2.L*2.L*2.L)),
+        Value_t(1.L/ (3.L*3.L*3.L*2.L*2.L*2.L*2.L))
     };
 
     struct PowiResolver
