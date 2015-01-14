@@ -24,6 +24,7 @@ unit_tests_sources = \
 	numerics/type_tensor_test.C \
 	parallel/parallel_test.C \
 	quadrature/quadrature_test.C \
+        systems/equation_systems_test.C \
 	utils/vectormap_test.C
 
 if LIBMESH_ENABLE_FPARSER
