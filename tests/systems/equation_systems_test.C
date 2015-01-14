@@ -6,6 +6,7 @@
 
 #include <libmesh/equation_systems.h>
 #include <libmesh/mesh.h>
+#include <libmesh/mesh_generation.h>
 
 #include "test_comm.h"
 
@@ -16,6 +17,9 @@ public:
   CPPUNIT_TEST_SUITE( EquationSystemsTest );
 
   CPPUNIT_TEST( testConstruction );
+  CPPUNIT_TEST( testAddSystem );
+  CPPUNIT_TEST( testInit );
+  CPPUNIT_TEST( testPostInitAddSystem );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -35,6 +39,34 @@ public:
     Mesh mesh(*TestCommWorld);
     EquationSystems es(mesh);
   }
+
+  void testAddSystem()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+  }
+
+  void testInit()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+    MeshTools::Generation::build_point(mesh);
+    es.init();
+  }
+
+  void testPostInitAddSystem()
+  {
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_point(mesh);
+    EquationSystems es(mesh);
+    System &sys1 = es.add_system<System> ("SimpleSystem");
+    es.init();
+    System &sys2 = es.add_system<System> ("SecondSystem");
+  }
+
+
 
 };
 
