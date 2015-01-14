@@ -10,6 +10,7 @@ LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 
 unit_tests_sources = \
 	driver.C \
+        test_comm.h \
 	base/dof_object_test.h \
 	geom/node_test.C \
 	geom/point_test.C \

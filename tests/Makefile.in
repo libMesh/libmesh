@@ -115,9 +115,9 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
-am__unit_tests_dbg_SOURCES_DIST = driver.C base/dof_object_test.h \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	numerics/distributed_vector_test.C \
+am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
+	base/dof_object_test.h geom/node_test.C geom/point_test.C \
+	geom/point_test.h numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
@@ -148,9 +148,9 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_devel_SOURCES_DIST = driver.C base/dof_object_test.h \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	numerics/distributed_vector_test.C \
+am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
+	base/dof_object_test.h geom/node_test.C geom/point_test.C \
+	geom/point_test.h numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
@@ -179,9 +179,9 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_oprof_SOURCES_DIST = driver.C base/dof_object_test.h \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	numerics/distributed_vector_test.C \
+am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
+	base/dof_object_test.h geom/node_test.C geom/point_test.C \
+	geom/point_test.h numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
@@ -210,9 +210,9 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_opt_SOURCES_DIST = driver.C base/dof_object_test.h \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	numerics/distributed_vector_test.C \
+am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
+	base/dof_object_test.h geom/node_test.C geom/point_test.C \
+	geom/point_test.h numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
@@ -239,9 +239,9 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__unit_tests_prof_SOURCES_DIST = driver.C base/dof_object_test.h \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	numerics/distributed_vector_test.C \
+am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
+	base/dof_object_test.h geom/node_test.C geom/point_test.C \
+	geom/point_test.h numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
@@ -657,8 +657,8 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 	       -DLIBMESH_IS_UNIT_TESTING
 
 AM_LDFLAGS = $(libmesh_LDFLAGS)
-unit_tests_sources = driver.C base/dof_object_test.h geom/node_test.C \
-	geom/point_test.C geom/point_test.h \
+unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
