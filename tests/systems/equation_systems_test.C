@@ -44,14 +44,14 @@ public:
   {
     Mesh mesh(*TestCommWorld);
     EquationSystems es(mesh);
-    System &sys = es.add_system<System> ("SimpleSystem");
+    es.add_system<System> ("SimpleSystem");
   }
 
   void testInit()
   {
     Mesh mesh(*TestCommWorld);
     EquationSystems es(mesh);
-    System &sys = es.add_system<System> ("SimpleSystem");
+    es.add_system<System> ("SimpleSystem");
     MeshTools::Generation::build_point(mesh);
     es.init();
   }
@@ -61,10 +61,26 @@ public:
     Mesh mesh(*TestCommWorld);
     MeshTools::Generation::build_point(mesh);
     EquationSystems es(mesh);
+    es.add_system<System> ("SimpleSystem");
+    es.init();
+    es.add_system<System> ("SecondSystem");
+    es.reinit();
+  }
+
+  void testPostInitAddRealSystem()
+  {
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_point(mesh);
+    EquationSystems es(mesh);
     System &sys1 = es.add_system<System> ("SimpleSystem");
+    sys1.add_variable("u1", FIRST);
     es.init();
     System &sys2 = es.add_system<System> ("SecondSystem");
+    sys1.add_variable("u2", FIRST);
+    es.reinit();
   }
+
+
 
 
 
