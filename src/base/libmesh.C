@@ -306,6 +306,11 @@ void libmesh_terminate_handler()
   // unwind, for example.
   libMesh::write_traceout();
 
+  // We may care about performance data pre-crash; it would be sad to
+  // throw that away.
+  libMesh::perflog.print_log();
+  libMesh::perflog.clear();
+
   // If we have MPI and it has been initialized, we need to be sure
   // and call MPI_Abort instead of std::abort, so that the parallel
   // job can die nicely.
