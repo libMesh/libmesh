@@ -177,6 +177,10 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
+  // Search the mesh for all the dimensions of the elements
+  // and cache them.
+  this->cache_elem_dims();
+
   // Reset our PointLocator.  This needs to happen any time the elements
   // in the underlying elements in the mesh have changed, so we do it here.
   this->clear_point_locator();
@@ -197,6 +201,9 @@ void MeshBase::clear ()
 
   // Clear boundary information
   this->get_boundary_info().clear();
+
+  // Clear element dimensions
+  _elem_dims.clear();
 
   // Clear our point locator.
   this->clear_point_locator();
@@ -459,5 +466,19 @@ subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
   libmesh_error_msg("Block '" << name << "' does not exist in mesh");
 }
 
+void MeshBase::cache_elem_dims()
+{
+  // This requires an inspection on every processor
+  parallel_object_only();
+
+  const_element_iterator       el  = this->active_elements_begin();
+  const const_element_iterator end = this->active_elements_end();
+
+  for (; el!=end; ++el)
+    _elem_dims.insert((*el)->dim());
+
+  // Some different dimension elements may only live on other processors
+  this->comm().set_union(_elem_dims);
+}
 
 } // namespace libMesh

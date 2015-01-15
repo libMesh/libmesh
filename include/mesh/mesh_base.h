@@ -165,6 +165,12 @@ public:
   { _dim = d; }
 
   /**
+   * @returns set of dimensions of elements present in the mesh.
+   */
+  const std::set<unsigned char>& elem_dimensions() const
+  { return _elem_dims; }
+
+  /**
    * Returns the spatial dimension of the mesh.  Note that this is
    * defined at compile time in the header \p libmesh_common.h.
    */
@@ -880,6 +886,12 @@ protected:
   { return _n_parts; }
 
   /**
+   * Search the mesh and cache the different dimenions of the elements
+   * present in the mesh.
+   */
+  void cache_elem_dims();
+
+  /**
    * The number of partitions the mesh has.  This is set by
    * the partitioners, and may not be changed directly by
    * the user.
@@ -943,6 +955,12 @@ protected:
    */
   std::map<subdomain_id_type, std::string> _block_id_to_name;
 
+  /**
+   * We cache the dimension of the elements present in the mesh.
+   * So, if we have a mesh with 1D and 2D elements, this structure
+   * will contain 1 and 2.
+   */
+  std::set<unsigned char> _elem_dims;
   /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.
