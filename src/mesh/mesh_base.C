@@ -211,8 +211,8 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
 
   ids.clear();
 
-  const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end();
+  const_element_iterator el  = this->active_local_elements_begin();
+  const_element_iterator end = this->active_local_elements_end();
 
   for (; el!=end; ++el)
     ids.insert((*el)->subdomain_id());
@@ -363,8 +363,11 @@ void MeshBase::partition (const unsigned int n_parts)
 
 unsigned int MeshBase::recalculate_n_partitions()
 {
-  const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end();
+  // This requires an inspection on every processor
+  parallel_object_only();
+
+  const_element_iterator el  = this->active_local_elements_begin();
+  const_element_iterator end = this->active_local_elements_end();
 
   unsigned int max_proc_id=0;
 
