@@ -448,6 +448,25 @@ public:
   std::vector<Real> training_error_bounds;
 
   /**
+   * We store an extra linear solver object which we can optionally
+   * use for solving all systems in which the system matrix is set
+   * to inner_product_matrix.
+   */
+  AutoPtr< LinearSolver<Number> > inner_product_solver;
+
+  /**
+   * We also need a pointer to store the original linear solver in
+   * case we switch to inner_product_solver.
+   */
+  LinearSolver<Number> *original_linear_solver;
+
+  /**
+   * Boolean flag to indicate whether we use inner_product_solver or
+   * not.
+   */
+  bool use_inner_product_solver;
+
+  /**
    * The inner product matrix.
    */
   AutoPtr< SparseMatrix<Number> > inner_product_matrix;

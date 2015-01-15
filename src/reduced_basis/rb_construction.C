@@ -56,6 +56,9 @@ RBConstruction::RBConstruction (EquationSystems& es,
                                 const std::string& name_in,
                                 const unsigned int number_in)
   : Parent(es, name_in, number_in),
+    inner_product_solver(LinearSolver<Number>::build(es.comm())),
+    original_linear_solver(NULL),
+    use_inner_product_solver(true),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     constraint_matrix(SparseMatrix<Number>::build(es.comm())),
@@ -1152,6 +1155,10 @@ Real RBConstruction::truth_solve(int plot_solution)
 
   truth_assembly();
 
+  // The truth solve may require a different LHS matrix each time
+  // hence make sure we don't reuse_preconditioner.
+  linear_solver->reuse_preconditioner(false);
+
   // Safer to zero the solution first, especially when using iterative solvers
   solution->zero();
   solve();
@@ -1252,18 +1259,21 @@ void RBConstruction::update_system()
 
   libMesh::out << "Updating RB residual terms" << std::endl;
 
-  // Note: the solves in this function employ a single system matrix and multiple
-  // right-hand sides, so we may get better performance using a different
-  // preconditioner, or even a direct solver.
-  std::pair<std::string,std::string> orig_solver =
-    this->set_alternative_solver(this->linear_solver);
+  if(use_inner_product_solver)
+  {
+    // Switch to inner_product_solver
+    original_linear_solver = this->linear_solver.release();
+    this->linear_solver.reset(inner_product_solver.release());
+  }
 
   update_residual_terms();
 
-  // Change the preconditioner, Krylov solver back to their original
-  // value.  Note: does nothing if RBBase::alternative_solver ==
-  // "unchanged".
-  this->reset_alternative_solver(this->linear_solver, orig_solver);
+  if(use_inner_product_solver)
+  {
+    // Switch back to original_linear_solver
+    inner_product_solver.reset(this->linear_solver.release());
+    this->linear_solver.reset(original_linear_solver);
+  }
 }
 
 Real RBConstruction::get_RB_error_bound()
@@ -1283,9 +1293,12 @@ Real RBConstruction::get_RB_error_bound()
 
 void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
 {
-  // Use alternative solver for residual terms solves
-  std::pair<std::string,std::string> orig_solver =
-    this->set_alternative_solver(this->linear_solver);
+  if(use_inner_product_solver)
+  {
+    // Switch to inner_product_solver
+    original_linear_solver = this->linear_solver.release();
+    this->linear_solver.reset(inner_product_solver.release());
+  }
 
   // Compute the basis independent terms
   Fq_representor_innerprods_computed = false;
@@ -1299,8 +1312,12 @@ void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
 
   delta_N = saved_delta_N;
 
-  // Return to original solver
-  this->reset_alternative_solver(this->linear_solver, orig_solver);
+  if(use_inner_product_solver)
+  {
+    // Switch back to original_linear_solver
+    inner_product_solver.reset(this->linear_solver.release());
+    this->linear_solver.reset(original_linear_solver);
+  }
 }
 
 Real RBConstruction::compute_max_error_bound()
@@ -1464,8 +1481,17 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
   if(reuse_preconditioner)
     {
-      // For the first solve, make sure we generate a new preconditioner
-      linear_solver->reuse_preconditioner(false);
+      if(use_inner_product_solver)
+      {
+        // If we're using inner_product_solver, then we
+        // can reuse the preconditioner
+        linear_solver->reuse_preconditioner(true);
+      }
+      else
+      {
+        // For the first solve, make sure we generate a new preconditioner
+        linear_solver->reuse_preconditioner(false);
+      }
     }
 
   for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
@@ -1495,6 +1521,12 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
             }
 
           solve();
+
+          if(reuse_preconditioner)
+            {
+              linear_solver->reuse_preconditioner(true);
+            }
+
           if (assert_convergence)
             check_convergence();
 
@@ -1508,19 +1540,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
           // Store the representor
           *get_rb_evaluation().Aq_representor[q_a][i] = *solution;
-
-
-          if(reuse_preconditioner)
-            {
-              // set this flag again in case we didn't do any F solves
-              linear_solver->reuse_preconditioner(true);
-            }
         }
-    }
-
-  if(reuse_preconditioner)
-    {
-      linear_solver->reuse_preconditioner(false);
     }
 
   // Now compute and store the inner products (if requested)
@@ -1599,12 +1619,6 @@ void RBConstruction::compute_output_dual_innerprods()
 
       libMesh::out << "Compute output dual inner products" << std::endl;
 
-      // Note: the solves in this function employ a single system matrix and multiple
-      // right-hand sides, so we may get better performance using a different
-      // preconditioner, or even a direct solver.
-      std::pair<std::string,std::string> orig_solver =
-        this->set_alternative_solver(this->linear_solver);
-
       // Find out the largest value of Q_l
       unsigned int max_Q_l = 0;
       for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
@@ -1617,11 +1631,10 @@ void RBConstruction::compute_output_dual_innerprods()
           L_q_representor[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
         }
 
-      if(reuse_preconditioner)
-        {
-          // For the first solve, make sure we generate a new preconditioner
-          linear_solver->reuse_preconditioner(false);
-        }
+      // Don't use inner_product_solver here since
+      // assemble_matrix_for_output_dual_solves may not
+      // give us the inner product matrix.
+      linear_solver->reuse_preconditioner(false);
 
       for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
         {
@@ -1650,6 +1663,14 @@ void RBConstruction::compute_output_dual_innerprods()
                              << Utility::get_timestamp() << std::endl;
 
               solve();
+
+              if(reuse_preconditioner)
+                {
+                  // After we do a solve, tell PETSc we want to reuse the preconditioner
+                  // since the system matrix is not changing.
+                  linear_solver->reuse_preconditioner(true);
+                }
+
               if (assert_convergence)
                 check_convergence();
 
@@ -1665,13 +1686,6 @@ void RBConstruction::compute_output_dual_innerprods()
                 }
 
               *L_q_representor[q_l] = *solution;
-
-              if(reuse_preconditioner)
-                {
-                  // After we do a solve, tell PETSc we want to reuse the preconditioner
-                  // since the system matrix is not changing.
-                  linear_solver->reuse_preconditioner(true);
-                }
             }
 
           // Get rid of the constraint part of the matrix before computing inner products
@@ -1693,12 +1707,6 @@ void RBConstruction::compute_output_dual_innerprods()
             }
         }
 
-      // reset same_preconditioner to false once all solves are finished
-      if(reuse_preconditioner)
-        {
-          linear_solver->reuse_preconditioner(false);
-        }
-
       // Finally clear the L_q_representor vectors
       for(unsigned int q=0; q<max_Q_l; q++)
         {
@@ -1710,11 +1718,6 @@ void RBConstruction::compute_output_dual_innerprods()
         }
 
       output_dual_innerprods_computed = true;
-
-      // Change the preconditioner, Krylov solver back to their original
-      // value.  Note: does nothing if RBBase::alternative_solver ==
-      // "unchanged".
-      this->reset_alternative_solver(this->linear_solver, orig_solver);
 
       STOP_LOG("compute_output_dual_innerprods()", "RBConstruction");
 
@@ -1739,10 +1742,26 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
           matrix->add(1., *constraint_matrix);
       }
 
+      if(use_inner_product_solver)
+        {
+          // Switch to inner_product_solver
+          original_linear_solver = this->linear_solver.release();
+          this->linear_solver.reset(inner_product_solver.release());
+        }
+
       if(reuse_preconditioner)
         {
-          // For the first solve, make sure we generate a new preconditioner
-          linear_solver->reuse_preconditioner(false);
+          if(use_inner_product_solver)
+          {
+            // If we're using inner_product_solver, then we
+            // can reuse the preconditioner
+            linear_solver->reuse_preconditioner(true);
+          }
+          else
+          {
+            // For the first solve, make sure we generate a new preconditioner
+            linear_solver->reuse_preconditioner(false);
+          }
         }
 
       for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
@@ -1768,6 +1787,14 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
                          << Utility::get_timestamp() << std::endl;
 
           solve();
+
+          if(reuse_preconditioner)
+            {
+              // After we do a solve, tell PETSc we want to reuse the preconditioner
+              // since the system matrix is not changing.
+              linear_solver->reuse_preconditioner(true);
+            }
+
           if (assert_convergence)
             check_convergence();
 
@@ -1783,19 +1810,13 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
             }
 
           *Fq_representor[q_f] = *solution;
-
-          if(reuse_preconditioner)
-            {
-              // After we do a solve, tell PETSc we want to reuse the preconditioner
-              // since the system matrix is not changing.
-              linear_solver->reuse_preconditioner(true);
-            }
         }
 
-      // Reset the same_preconditioner flag
-      if(reuse_preconditioner)
+      if(use_inner_product_solver)
         {
-          linear_solver->reuse_preconditioner(false);
+          // Switch back to original_linear_solver
+          inner_product_solver.reset(this->linear_solver.release());
+          this->linear_solver.reset(original_linear_solver);
         }
 
       if (compute_inner_products)
