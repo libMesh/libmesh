@@ -471,8 +471,8 @@ void MeshBase::cache_elem_dims()
   // This requires an inspection on every processor
   parallel_object_only();
 
-  const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end();
+  const_element_iterator el  = this->active_local_elements_begin();
+  const_element_iterator end = this->active_local_elements_end();
 
   for (; el!=end; ++el)
     _elem_dims.insert((*el)->dim());
