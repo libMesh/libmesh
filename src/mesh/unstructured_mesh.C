@@ -340,7 +340,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                         // any of our neighbor's descendants
                         if( (*my_side == *their_side) &&
                             (element->level() == neighbor->level()) &&
-                            ((_dim != 1) || (ns != ms)) )
+                            ((element->dim() != 1) || (ns != ms)) )
                           {
                             // So share a side.  Is this a mixed pair
                             // of subactive and active/ancestor

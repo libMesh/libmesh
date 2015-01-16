@@ -1386,7 +1386,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                                   // any of our neighbor's descendants
                                   if( (*my_side == *their_side) &&
                                       (el->level() == neighbor->level()) &&
-                                      ((_dim != 1) || (ns != s)) )
+                                      ((el->dim() != 1) || (ns != s)) )
                                     {
                                       // So share a side.  Is this a mixed pair
                                       // of subactive and active/ancestor
