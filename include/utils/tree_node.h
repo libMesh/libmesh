@@ -76,14 +76,18 @@ public:
   bool active() const { return children.empty(); }
 
   /**
-   * Inserts \p Node \p nd into the TreeNode.
+   * Tries to insert \p Node \p nd into the TreeNode.
+   * Returns \p true iff \p nd is inserted into the TreeNode or one of
+   * its children.
    */
-  void insert (const Node* nd);
+  bool insert (const Node* nd);
 
   /**
    * Inserts \p Elem \p el into the TreeNode.
+   * Returns \p true iff \p el is inserted into the TreeNode or one of
+   * its children.
    */
-  void insert (const Elem* nd);
+  bool insert (const Elem* nd);
 
   /**
    * Refine the tree node into N children if it contains
