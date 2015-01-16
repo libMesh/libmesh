@@ -155,10 +155,7 @@ public:
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
    */
-  unsigned int mesh_dimension () const
-  { libmesh_assert(!_elem_dims.empty());
-    typedef std::set<unsigned char>::const_iterator it_type;
-    return cast_int<unsigned int>(*(std::max_element<it_type>(_elem_dims.begin(),_elem_dims.end()))); }
+  unsigned int mesh_dimension () const;
 
   /**
    * Resets the logical dimension of the mesh. If the mesh has
