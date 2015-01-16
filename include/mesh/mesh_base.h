@@ -156,13 +156,19 @@ public:
    * then this will return the largest such dimension.
    */
   unsigned int mesh_dimension () const
-  { return cast_int<unsigned int>(_dim); }
+  { libmesh_assert(!_elem_dims.empty());
+    typedef std::set<unsigned char>::const_iterator it_type;
+    return cast_int<unsigned int>(*(std::max_element<it_type>(_elem_dims.begin(),_elem_dims.end()))); }
 
   /**
-   * Resets the logical dimension of the mesh.
+   * Resets the logical dimension of the mesh. If the mesh has
+   * elements of multiple dimensions, this should be set to the largest
+   * dimension. E.g. if the mesh has 1D and 2D elements, this should
+   * be set to 2. If the mesh has 2D and 3D elements, this should be
+   * set to 3.
    */
   void set_mesh_dimension (unsigned char d)
-  { _dim = d; }
+  { _elem_dims.clear(); _elem_dims.insert(d); }
 
   /**
    * @returns set of dimensions of elements present in the mesh.
@@ -505,10 +511,11 @@ public:
 
   /**
    * Prepare a newly created (or read) mesh for use.
-   * This involves 3 steps:
+   * This involves 4 steps:
    *  1.) call \p find_neighbors()
    *  2.) call \p partition()
    *  3.) call \p renumber_nodes_and_elements()
+   *  4.) call \p cache_elem_dims()
    *
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false).

@@ -106,7 +106,7 @@ void UnstructuredMesh::copy_nodes_and_elements
 {
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
-  libmesh_assert_equal_to (_dim, other_mesh._dim);
+  libmesh_assert (std::equal(_elem_dims.begin(), _elem_dims.end(), other_mesh._elem_dims.begin()));
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
   // We're assuming the other mesh has proper element number ordering,
