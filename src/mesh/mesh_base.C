@@ -47,7 +47,6 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
   ParallelObject (comm_in),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
-  _dim           (d),
   _is_prepared   (false),
   _point_locator (NULL),
   _partitioner   (NULL),
@@ -59,7 +58,7 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
 {
   _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
-  libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
+  libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
 }
 
@@ -69,7 +68,6 @@ MeshBase::MeshBase (unsigned char d) :
   ParallelObject (CommWorld),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
-  _dim           (d),
   _is_prepared   (false),
   _point_locator (NULL),
   _partitioner   (NULL),
@@ -81,7 +79,7 @@ MeshBase::MeshBase (unsigned char d) :
 {
   _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
-  libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
+  libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
 }
 #endif // !LIBMESH_DISABLE_COMMWORLD
@@ -92,7 +90,6 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   ParallelObject (other_mesh),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
-  _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
   _partitioner   (NULL),

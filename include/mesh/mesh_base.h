@@ -910,11 +910,6 @@ protected:
   unsigned int _n_parts;
 
   /**
-   * The logical dimension of the mesh.
-   */
-  unsigned char _dim;
-
-  /**
    * Flag indicating if the mesh has been prepared for use.
    */
   bool _is_prepared;
