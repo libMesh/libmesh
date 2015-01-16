@@ -57,6 +57,7 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
   _skip_partitioning(false),
   _skip_renumber_nodes_and_elements(false)
 {
+  _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
   libmesh_assert (libMesh::initialized());
@@ -78,6 +79,7 @@ MeshBase::MeshBase (unsigned char d) :
   _skip_partitioning(false),
   _skip_renumber_nodes_and_elements(false)
 {
+  _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
   libmesh_assert (libMesh::initialized());
@@ -98,7 +100,8 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _next_unique_id(other_mesh._next_unique_id),
 #endif
   _skip_partitioning(other_mesh._skip_partitioning),
-  _skip_renumber_nodes_and_elements(false)
+  _skip_renumber_nodes_and_elements(false),
+  _elem_dims(other_mesh._elem_dims)
 {
   if(other_mesh._partitioner.get())
     {
