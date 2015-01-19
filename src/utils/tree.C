@@ -53,7 +53,13 @@ Tree<N>::Tree (const MeshBase& m,
       const MeshBase::const_node_iterator end = mesh.nodes_end();
 
       for (; it != end; ++it)
-        root.insert (*it);
+        {
+#ifndef NDEBUG
+          bool node_was_inserted =
+#endif
+            root.insert (*it);
+          libmesh_assert(node_was_inserted);
+        }
 
       // Now the tree contains the nodes.
       // However, we want element pointers, so here we
@@ -72,7 +78,13 @@ Tree<N>::Tree (const MeshBase& m,
       const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
       for (; it != end; ++it)
-        root.insert (*it);
+        {
+#ifndef NDEBUG
+          bool elem_was_inserted =
+#endif
+            root.insert (*it);
+          libmesh_assert(elem_was_inserted);
+        }
     }
 
   else if (build_type == Trees::LOCAL_ELEMENTS)
@@ -83,7 +95,13 @@ Tree<N>::Tree (const MeshBase& m,
       const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
 
       for (; it != end; ++it)
-        root.insert (*it);
+        {
+#ifndef NDEBUG
+          bool elem_was_inserted =
+#endif
+            root.insert (*it);
+          libmesh_assert(elem_was_inserted);
+        }
     }
 
   else

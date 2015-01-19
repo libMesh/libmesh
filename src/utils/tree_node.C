@@ -32,16 +32,16 @@ namespace libMesh
 // ------------------------------------------------------------
 // TreeNode class methods
 template <unsigned int N>
-void TreeNode<N>::insert (const Node* nd)
+bool TreeNode<N>::insert (const Node* nd)
 {
   libmesh_assert(nd);
   libmesh_assert_less (nd->id(), mesh.n_nodes());
 
   // Return if we don't bound the node
   if (!this->bounds_node(nd))
-    return;
+    return false;
 
-  // Only add the node if we are active
+  // Add the node to ourself if we are active
   if (this->active())
     {
       nodes.push_back (nd);
@@ -49,23 +49,25 @@ void TreeNode<N>::insert (const Node* nd)
       // Refine ourself if we reach the target bin size for a TreeNode.
       if (nodes.size() == tgt_bin_size)
         this->refine();
+
+      return true;
     }
 
   // If we are not active simply pass the node along to
   // our children
-  else
-    {
-      libmesh_assert_equal_to (children.size(), N);
+  libmesh_assert_equal_to (children.size(), N);
 
-      for (unsigned int c=0; c<N; c++)
-        children[c]->insert (nd);
-    }
+  bool was_inserted = false;
+  for (unsigned int c=0; c<N; c++)
+    if (children[c]->insert (nd))
+      was_inserted = true;
+  return was_inserted;
 }
 
 
 
 template <unsigned int N>
-void TreeNode<N>::insert (const Elem* elem)
+bool TreeNode<N>::insert (const Elem* elem)
 {
   libmesh_assert(elem);
 
@@ -96,7 +98,7 @@ void TreeNode<N>::insert (const Elem* elem)
 
   // If not, we should not care about this element.
   if (!intersects)
-    return;
+    return false;
 
   // Only add the element if we are active
   if (this->active())
@@ -115,17 +117,19 @@ void TreeNode<N>::insert (const Elem* elem)
       // Refine ourself if we reach the target bin size for a TreeNode.
       if (elements.size() == tgt_bin_size)
         this->refine();
+
+      return true;
     }
 
   // If we are not active simply pass the element along to
   // our children
-  else
-    {
-      libmesh_assert_equal_to (children.size(), N);
+  libmesh_assert_equal_to (children.size(), N);
 
-      for (unsigned int c=0; c<N; c++)
-        children[c]->insert (elem);
-    }
+  bool was_inserted = false;
+  for (unsigned int c=0; c<N; c++)
+    if (children[c]->insert (elem))
+      was_inserted = true;
+  return was_inserted;
 }
 
 
