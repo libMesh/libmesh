@@ -60,7 +60,7 @@ target_triplet = @target@
 @HAVE_CXX11_MOVE_TRUE@am__append_2 = -DFP_SUPPORT_CXX11_MOVE
 noinst_PROGRAMS = $(am__EXEEXT_1)
 @FPARSER_SUPPORT_JIT_TRUE@am__append_3 = lib/sha1.cpp
-@FPARSER_SUPPORT_JIT_TRUE@am__append_4 = -DFPARSER_JIT_COMPILER="$(CXX)"
+@FPARSER_SUPPORT_JIT_TRUE@am__append_4 = -DFPARSER_JIT_COMPILER="\"$(CXX)\""
 @FPARSER_DEVEL_TRUE@am__append_5 = fpoptimizer/grammar_data.cc
 @FPARSER_DEVEL_TRUE@am__append_6 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
