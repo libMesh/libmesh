@@ -57,7 +57,9 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
 @LIBMESH_OPT_MODE_TRUE@am__append_2 = unit_tests-opt
 
-# our GLIBC debugging preprocessor flags break this.
+# our GLIBC debugging preprocessor flags seem to potentially conflict
+# with libcppunit binaries.  Some cppunit versions work fine for us,
+# others segfault and/or hang.
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_3 = unit_tests-dbg
 @LIBMESH_DEVEL_MODE_TRUE@am__append_4 = unit_tests-devel
 @LIBMESH_PROF_MODE_TRUE@am__append_5 = unit_tests-prof
