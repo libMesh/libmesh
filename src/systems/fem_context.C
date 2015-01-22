@@ -482,7 +482,7 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -517,7 +517,7 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -560,7 +560,7 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -643,7 +643,7 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -731,7 +731,7 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -821,7 +821,7 @@ void FEMContext::point_value(unsigned int var, const Point &p,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -870,7 +870,7 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -922,7 +922,7 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -959,7 +959,7 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
@@ -1483,15 +1483,15 @@ void FEMContext::elem_position_get()
   // Get degree of freedom coefficients from point coordinates
   if (this->get_mesh_x_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[this->get_mesh_x_var()])(i) = this->get_elem().point(i)(0);
+      (this->get_elem_solution(this->get_mesh_x_var()))(i) = this->get_elem().point(i)(0);
 
   if (this->get_mesh_y_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[this->get_mesh_y_var()])(i) = this->get_elem().point(i)(1);
+      (this->get_elem_solution(this->get_mesh_y_var()))(i) = this->get_elem().point(i)(1);
 
   if (this->get_mesh_z_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[this->get_mesh_z_var()])(i) = this->get_elem().point(i)(2);
+      (this->get_elem_solution(this->get_mesh_z_var()))(i) = this->get_elem().point(i)(2);
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
@@ -1655,8 +1655,8 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   }
 
   // Now do the localization for the user requested vectors
-  DiffContext::localized_vectors_iterator localized_vec_it = localized_vectors.begin();
-  const DiffContext::localized_vectors_iterator localized_vec_end = localized_vectors.end();
+  DiffContext::localized_vectors_iterator localized_vec_it = this->_localized_vectors.begin();
+  const DiffContext::localized_vectors_iterator localized_vec_end = this->_localized_vectors.end();
 
   for(; localized_vec_it != localized_vec_end; ++localized_vec_it)
     {

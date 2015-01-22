@@ -111,13 +111,13 @@ public:
    * Accessor for element solution.
    */
   const DenseVector<Number>& get_elem_solution() const
-  { return elem_solution; }
+  { return _elem_solution; }
 
   /**
    * Non-const accessor for element solution.
    */
   DenseVector<Number>& get_elem_solution()
-  { return elem_solution; }
+  { return _elem_solution; }
 
   /**
    * Accessor for element solution of a particular variable corresponding
@@ -125,9 +125,9 @@ public:
    */
   const DenseSubVector<Number>& get_elem_solution( unsigned int var ) const
   {
-    libmesh_assert_greater(elem_subsolutions.size(), var);
-    libmesh_assert(elem_subsolutions[var]);
-    return *(elem_subsolutions[var]);
+    libmesh_assert_greater(_elem_subsolutions.size(), var);
+    libmesh_assert(_elem_subsolutions[var]);
+    return *(_elem_subsolutions[var]);
   }
 
   /**
@@ -136,9 +136,9 @@ public:
    */
   DenseSubVector<Number>& get_elem_solution( unsigned int var )
   {
-    libmesh_assert_greater(elem_subsolutions.size(), var);
-    libmesh_assert(elem_subsolutions[var]);
-    return *(elem_subsolutions[var]);
+    libmesh_assert_greater(_elem_subsolutions.size(), var);
+    libmesh_assert(_elem_subsolutions[var]);
+    return *(_elem_subsolutions[var]);
   }
 
   /**
@@ -472,7 +472,7 @@ public:
    * Adds a vector to the map of localized vectors. We can later evaluate interior_values,
    * interior_gradients and side_values for these fields these vectors represent.
    */
-  void add_localized_vector (NumericVector<Number> & _localized_vector, const System & _sys);
+  void add_localized_vector (NumericVector<Number> & localized_vector, const System & sys);
 
   /**
    * Typedef for the localized_vectors iterator
@@ -480,26 +480,26 @@ public:
   typedef std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::iterator localized_vectors_iterator;
 
   /**
-   * Return a reference to DenseVector localization of _localized_vector
-   * contained in the localized_vectors map
+   * Return a reference to DenseVector localization of localized_vector
+   * contained in the _localized_vectors map
    */
-  DenseVector<Number> & get_localized_vector (const NumericVector<Number> & _localized_vector);
+  DenseVector<Number> & get_localized_vector (const NumericVector<Number> & localized_vector);
 
   /**
    * const accessible version of get_localized_vector function
    */
-  const DenseVector<Number> & get_localized_vector (const NumericVector<Number> & _localized_vector) const;
+  const DenseVector<Number> & get_localized_vector (const NumericVector<Number> & localized_vector) const;
 
   /**
-   * Return a reference to DenseSubVector localization of _localized_vector at variable _var
-   * contained in the localized_vectors map
+   * Return a reference to DenseSubVector localization of localized_vector at variable var
+   * contained in the _localized_vectors map
    */
-  DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var);
+  DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var);
 
   /**
    * const accessible version of get_localized_subvector function
    */
-  const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var) const;
+  const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var) const;
 
 protected:
 
@@ -508,14 +508,14 @@ protected:
    * pairs of element localized versions of that vector and per variable views
    */
 
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > localized_vectors;
+  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > _localized_vectors;
 
   /**
    * Element by element components of nonlinear_solution
    * as adjusted by a time_solver
    */
-  DenseVector<Number> elem_solution;
-  std::vector<DenseSubVector<Number> *> elem_subsolutions;
+  DenseVector<Number> _elem_solution;
+  std::vector<DenseSubVector<Number> *> _elem_subsolutions;
 
   /**
    * Element by element components of du/dt
