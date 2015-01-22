@@ -10,6 +10,7 @@ LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 
 unit_tests_sources = \
 	driver.C \
+        test_comm.h \
 	base/dof_object_test.h \
 	geom/node_test.C \
 	geom/point_test.C \
@@ -23,6 +24,7 @@ unit_tests_sources = \
 	numerics/type_tensor_test.C \
 	parallel/parallel_test.C \
 	quadrature/quadrature_test.C \
+        systems/equation_systems_test.C \
 	utils/vectormap_test.C
 
 if LIBMESH_ENABLE_FPARSER
@@ -40,7 +42,9 @@ if LIBMESH_OPT_MODE
   unit_tests_opt_LDADD    = $(top_builddir)/libmesh_opt.la
 endif
 
-# our GLIBC debugging preprocessor flags break this.
+# our GLIBC debugging preprocessor flags seem to potentially conflict
+# with libcppunit binaries.  Some cppunit versions work fine for us,
+# others segfault and/or hang.
 if !LIBMESH_ENABLE_GLIBCXX_DEBUGGING
 if LIBMESH_DBG_MODE
   check_PROGRAMS         += unit_tests-dbg
