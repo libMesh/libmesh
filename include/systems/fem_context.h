@@ -560,19 +560,19 @@ public:
    * Accessor for element interior quadrature rule.
    */
   const QBase& get_element_qrule() const
-  { return *(this->element_qrule); }
+  { return *(this->_element_qrule); }
 
   /**
    * Accessor for element side quadrature rule.
    */
   const QBase& get_side_qrule() const
-  { return *(this->side_qrule); }
+  { return *(this->_side_qrule); }
 
   /**
    * Accessor for element edge quadrature rule.
    */
   const QBase& get_edge_qrule() const
-  { return *(this->edge_qrule); }
+  { return *(this->_edge_qrule); }
 
   /**
    * Tells the FEMContext that system \p sys contains the
@@ -805,21 +805,21 @@ protected:
    * The FEM context will try to find a quadrature rule that
    * correctly integrates all variables
    */
-  QBase *element_qrule;
+  QBase *_element_qrule;
 
   /**
    * Quadrature rules for element sides
    * The FEM context will try to find a quadrature rule that
    * correctly integrates all variables
    */
-  QBase *side_qrule;
+  QBase *_side_qrule;
 
   /**
    * Quadrature rules for element edges.  If the FEM context is told
    * to prepare for edge integration on 3D elements, it will try to
    * find a quadrature rule that correctly integrates all variables
    */
-  QBase *edge_qrule;
+  QBase *_edge_qrule;
 
 private:
   /**

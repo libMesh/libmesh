@@ -43,8 +43,8 @@ FEMContext::FEMContext (const System &sys)
     _boundary_info(sys.get_mesh().get_boundary_info()),
     _elem(NULL),
     _dim(sys.get_mesh().mesh_dimension()),
-    element_qrule(NULL), side_qrule(NULL),
-    edge_qrule(NULL)
+    _element_qrule(NULL), _side_qrule(NULL),
+    _edge_qrule(NULL)
 {
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
@@ -67,12 +67,12 @@ FEMContext::FEMContext (const System &sys)
     }
 
   // Create an adequate quadrature rule
-  element_qrule = hardest_fe_type.default_quadrature_rule
+  _element_qrule = hardest_fe_type.default_quadrature_rule
     (this->_dim, sys.extra_quadrature_order).release();
-  side_qrule = hardest_fe_type.default_quadrature_rule
+  _side_qrule = hardest_fe_type.default_quadrature_rule
     (this->_dim-1, sys.extra_quadrature_order).release();
   if (this->_dim == 3)
-    edge_qrule = hardest_fe_type.default_quadrature_rule
+    _edge_qrule = hardest_fe_type.default_quadrature_rule
       (1, sys.extra_quadrature_order).release();
 
   // Next, create finite element objects
@@ -90,14 +90,14 @@ FEMContext::FEMContext (const System &sys)
       if ( _element_fe[fe_type] == NULL )
         {
           _element_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
-          _element_fe[fe_type]->attach_quadrature_rule(element_qrule);
+          _element_fe[fe_type]->attach_quadrature_rule(_element_qrule);
           _side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
-          _side_fe[fe_type]->attach_quadrature_rule(side_qrule);
+          _side_fe[fe_type]->attach_quadrature_rule(_side_qrule);
 
           if (this->_dim == 3)
             {
               _edge_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
-              _edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
+              _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule);
             }
         }
       _element_fe_var[i] = _element_fe[fe_type];
@@ -128,14 +128,14 @@ FEMContext::~FEMContext()
     delete i->second;
   _edge_fe.clear();
 
-  delete element_qrule;
-  element_qrule = NULL;
+  delete _element_qrule;
+  _element_qrule = NULL;
 
-  delete side_qrule;
-  side_qrule = NULL;
+  delete _side_qrule;
+  _side_qrule = NULL;
 
-  delete edge_qrule;
-  side_qrule = NULL;
+  delete _edge_qrule;
+  _side_qrule = NULL;
 }
 
 
