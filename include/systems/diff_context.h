@@ -124,7 +124,18 @@ public:
    * to the variable index argument.
    */
   const DenseSubVector<Number>& get_elem_solution( unsigned int var ) const
-  { 
+  {
+    libmesh_assert_greater(elem_subsolutions.size(), var);
+    libmesh_assert(elem_subsolutions[var]);
+    return *(elem_subsolutions[var]);
+  }
+
+  /**
+   * Accessor for element solution of a particular variable corresponding
+   * to the variable index argument.
+   */
+  DenseSubVector<Number>& get_elem_solution( unsigned int var )
+  {
     libmesh_assert_greater(elem_subsolutions.size(), var);
     libmesh_assert(elem_subsolutions[var]);
     return *(elem_subsolutions[var]);
@@ -148,7 +159,18 @@ public:
    * corresponding to the variable index argument.
    */
   const DenseSubVector<Number>& get_elem_solution_rate( unsigned int var ) const
-  { 
+  {
+    libmesh_assert_greater(elem_subsolution_rates.size(), var);
+    libmesh_assert(elem_subsolution_rates[var]);
+    return *(elem_subsolution_rates[var]);
+  }
+
+  /**
+   * Accessor for element solution rate for a particular variable
+   * corresponding to the variable index argument.
+   */
+  DenseSubVector<Number>& get_elem_solution_rate( unsigned int var )
+  {
     libmesh_assert_greater(elem_subsolution_rates.size(), var);
     libmesh_assert(elem_subsolution_rates[var]);
     return *(elem_subsolution_rates[var]);
@@ -172,7 +194,18 @@ public:
    * to the variable index argument.
    */
   const DenseSubVector<Number>& get_elem_fixed_solution( unsigned int var ) const
-  { 
+  {
+    libmesh_assert_greater(elem_fixed_subsolutions.size(), var);
+    libmesh_assert(elem_fixed_subsolutions[var]);
+    return *(elem_fixed_subsolutions[var]);
+  }
+
+  /**
+   * Accessor for element fixed solution of a particular variable corresponding
+   * to the variable index argument.
+   */
+  DenseSubVector<Number>& get_elem_fixed_solution( unsigned int var )
+  {
     libmesh_assert_greater(elem_fixed_subsolutions.size(), var);
     libmesh_assert(elem_fixed_subsolutions[var]);
     return *(elem_fixed_subsolutions[var]);
@@ -313,6 +346,16 @@ public:
    * to the index argument.
    */
   const std::vector<dof_id_type>& get_dof_indices( unsigned int var ) const
+  {
+    libmesh_assert_greater(dof_indices_var.size(), var);
+    return dof_indices_var[var];
+  }
+
+  /**
+   * Accessor for element dof indices of a particular variable corresponding
+   * to the index argument.
+   */
+  std::vector<dof_id_type>& get_dof_indices( unsigned int var )
   {
     libmesh_assert_greater(dof_indices_var.size(), var);
     return dof_indices_var[var];
