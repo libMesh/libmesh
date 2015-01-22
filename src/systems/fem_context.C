@@ -42,7 +42,7 @@ FEMContext::FEMContext (const System &sys)
     side(0), edge(0),
     _boundary_info(sys.get_mesh().get_boundary_info()),
     _elem(NULL),
-    dim(sys.get_mesh().mesh_dimension()),
+    _dim(sys.get_mesh().mesh_dimension()),
     element_qrule(NULL), side_qrule(NULL),
     edge_qrule(NULL)
 {
@@ -68,10 +68,10 @@ FEMContext::FEMContext (const System &sys)
 
   // Create an adequate quadrature rule
   element_qrule = hardest_fe_type.default_quadrature_rule
-    (dim, sys.extra_quadrature_order).release();
+    (this->_dim, sys.extra_quadrature_order).release();
   side_qrule = hardest_fe_type.default_quadrature_rule
-    (dim-1, sys.extra_quadrature_order).release();
-  if (dim == 3)
+    (this->_dim-1, sys.extra_quadrature_order).release();
+  if (this->_dim == 3)
     edge_qrule = hardest_fe_type.default_quadrature_rule
       (1, sys.extra_quadrature_order).release();
 
@@ -80,7 +80,7 @@ FEMContext::FEMContext (const System &sys)
   // Should move to the protected/FEAbstract interface
   _element_fe_var.resize(nv);
   _side_fe_var.resize(nv);
-  if (dim == 3)
+  if (this->_dim == 3)
     _edge_fe_var.resize(nv);
 
   for (unsigned int i=0; i != nv; ++i)
@@ -89,20 +89,20 @@ FEMContext::FEMContext (const System &sys)
 
       if ( _element_fe[fe_type] == NULL )
         {
-          _element_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+          _element_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
           _element_fe[fe_type]->attach_quadrature_rule(element_qrule);
-          _side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+          _side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
           _side_fe[fe_type]->attach_quadrature_rule(side_qrule);
 
-          if (dim == 3)
+          if (this->_dim == 3)
             {
-              _edge_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+              _edge_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
               _edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
             }
         }
       _element_fe_var[i] = _element_fe[fe_type];
       _side_fe_var[i] = _side_fe[fe_type];
-      if (dim == 3)
+      if (this->_dim == 3)
         _edge_fe_var[i] = _edge_fe[fe_type];
 
     }
@@ -1434,7 +1434,7 @@ void FEMContext::side_fe_reinit ()
 
 void FEMContext::edge_fe_reinit ()
 {
-  libmesh_assert_equal_to (dim, 3);
+  libmesh_assert_equal_to (this->_dim, 3);
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions

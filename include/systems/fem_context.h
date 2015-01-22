@@ -673,7 +673,7 @@ public:
    * Accessor for cached element dimension
    */
   unsigned char get_dim() const
-  { return dim; }
+  { return this->_dim; }
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -798,7 +798,7 @@ protected:
   /**
    * Cached dimension of elements in this mesh
    */
-  unsigned char dim;
+  unsigned char _dim;
 
   /**
    * Quadrature rule for element interior.

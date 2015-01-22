@@ -71,7 +71,7 @@ DGFEMContext::DGFEMContext (const System &sys)
 
       if ( _neighbor_side_fe[fe_type] == NULL )
         {
-          _neighbor_side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+          _neighbor_side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
         }
       _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
     }
@@ -125,7 +125,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
       FEAbstract* side_fe = _side_fe[neighbor_side_fe_type];
       qface_side_points = side_fe->get_xyz();
 
-      FEInterface::inverse_map (dim,
+      FEInterface::inverse_map (this->_dim,
                                 neighbor_side_fe_type,
                                 &get_neighbor(),
                                 qface_side_points,
@@ -226,4 +226,3 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 }
 
 }
-
