@@ -484,7 +484,7 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -519,7 +519,7 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -562,7 +562,7 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -645,7 +645,7 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -733,7 +733,7 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -823,7 +823,7 @@ void FEMContext::point_value(unsigned int var, const Point &p,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -872,7 +872,7 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -924,7 +924,7 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -961,7 +961,7 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
   libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -1461,37 +1461,37 @@ void FEMContext::elem_position_get()
   // been set up for us
   //  if (_mesh_sys == this->number())
   //    {
-  unsigned int n_nodes = this->_elem->n_nodes();
+  unsigned int n_nodes = this->get_elem().n_nodes();
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
   libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
                  (_element_fe_var[_mesh_x_var]->get_fe_type().family
                   == LAGRANGE &&
                   _element_fe_var[_mesh_x_var]->get_fe_type().order
-                  == this->_elem->default_order()));
+                  == this->get_elem().default_order()));
   libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
                  (_element_fe_var[_mesh_y_var]->get_fe_type().family
                   == LAGRANGE &&
                   _element_fe_var[_mesh_y_var]->get_fe_type().order
-                  == this->_elem->default_order()));
+                  == this->get_elem().default_order()));
   libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
                  (_element_fe_var[_mesh_z_var]->get_fe_type().family
                   == LAGRANGE &&
                   _element_fe_var[_mesh_z_var]->get_fe_type().order
-                  == this->_elem->default_order()));
+                  == this->get_elem().default_order()));
 
   // Get degree of freedom coefficients from point coordinates
   if (_mesh_x_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_x_var])(i) = this->_elem->point(i)(0);
+      (*elem_subsolutions[_mesh_x_var])(i) = this->get_elem().point(i)(0);
 
   if (_mesh_y_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_y_var])(i) = this->_elem->point(i)(1);
+      (*elem_subsolutions[_mesh_y_var])(i) = this->get_elem().point(i)(1);
 
   if (_mesh_z_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_z_var])(i) = this->_elem->point(i)(2);
+      (*elem_subsolutions[_mesh_z_var])(i) = this->get_elem().point(i)(2);
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
@@ -1521,7 +1521,7 @@ void FEMContext::_do_elem_position_set(Real)
   // been set up for us, and we can ignore our input parameter theta
   //  if (_mesh_sys == this->number())
   //    {
-  unsigned int n_nodes = this->_elem->n_nodes();
+  unsigned int n_nodes = this->get_elem().n_nodes();
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
   libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
@@ -1708,7 +1708,7 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   // everywhere.
   libmesh_assert(this->_elem || fe_type.family == SCALAR);
 
-  unsigned int elem_dim = this->_elem ? this->_elem->dim() : 0;
+  unsigned int elem_dim = this->_elem ? this->get_elem().dim() : 0;
 
   AutoPtr<FEGenericBase<OutputShape> >
     fe_new(FEGenericBase<OutputShape>::build(elem_dim, fe_type));
@@ -1716,13 +1716,13 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
   Point master_point = this->_elem ?
-    FEInterface::inverse_map(elem_dim, fe_type, this->_elem, p) :
+    FEInterface::inverse_map(elem_dim, fe_type, &this->get_elem(), p) :
     Point(0);
 
   std::vector<Point> coor(1, master_point);
 
   // Reinitialize the element and compute the shape function values at coor
-  fe_new->reinit (this->_elem, &coor);
+  fe_new->reinit (&this->get_elem(), &coor);
 
   return fe_new;
 }
