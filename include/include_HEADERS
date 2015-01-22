@@ -207,6 +207,8 @@ include_HEADERS =  \
         mesh/xdr_shead.h \
         mesh/xdr_soln.h \
         numerics/analytic_function.h \
+        numerics/composite_fem_function.h \
+        numerics/composite_function.h \
         numerics/const_fem_function.h \
         numerics/const_function.h \
         numerics/coupling_matrix.h \
