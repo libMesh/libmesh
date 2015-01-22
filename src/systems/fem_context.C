@@ -142,13 +142,13 @@ FEMContext::~FEMContext()
 
 bool FEMContext::has_side_boundary_id(boundary_id_type id) const
 {
-  return _boundary_info.has_boundary_id(this->_elem, side, id);
+  return _boundary_info.has_boundary_id(&(this->get_elem()), side, id);
 }
 
 
 std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 {
-  return _boundary_info.boundary_ids(this->_elem, side);
+  return _boundary_info.boundary_ids(&(this->get_elem()), side);
 }
 
 
@@ -161,9 +161,9 @@ void FEMContext::some_interior_value
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -194,9 +194,9 @@ void FEMContext::some_interior_gradient
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -232,9 +232,9 @@ void FEMContext::some_interior_hessian
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -266,9 +266,9 @@ void FEMContext::some_side_value
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -315,9 +315,9 @@ void FEMContext::interior_values (unsigned int var,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -376,9 +376,9 @@ void FEMContext::interior_gradients
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -437,9 +437,9 @@ void FEMContext::interior_hessians
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -477,9 +477,9 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -512,9 +512,9 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
     <typename TensorTools::MakeReal<OutputType>::type>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -555,9 +555,9 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -590,9 +590,9 @@ void FEMContext::side_values
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -638,9 +638,9 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -676,9 +676,9 @@ void FEMContext::side_gradients
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -726,9 +726,9 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -765,9 +765,9 @@ void FEMContext::side_hessians
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -816,9 +816,9 @@ void FEMContext::point_value(unsigned int var, const Point &p,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -865,9 +865,9 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -917,9 +917,9 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -954,7 +954,7 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices_var[var].size());
 
@@ -1063,9 +1063,9 @@ void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
@@ -1109,9 +1109,9 @@ void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
@@ -1157,9 +1157,9 @@ void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
@@ -1201,9 +1201,9 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
@@ -1250,9 +1250,9 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
@@ -1302,9 +1302,9 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
@@ -1584,9 +1584,9 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   this->_elem = e;
 
   // Initialize the per-element data for elem.
-  sys.get_dof_map().dof_indices (this->_elem, dof_indices);
+  sys.get_dof_map().dof_indices (this->_elem, this->get_dof_indices());
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices.size());
+    (this->get_dof_indices().size());
   const std::size_t n_qoi = sys.qoi.size();
 
   // This also resizes elem_solution
