@@ -716,6 +716,12 @@ protected:
   template<typename OutputShape>
   AutoPtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe, const Point &p ) const;
 
+  /**
+   * Helper function to promote accessor usage
+   */
+  void set_elem( const Elem* e )
+  { this->_elem = e; }
+
 
   // gcc-3.4, oracle 12.3 require this typedef to be public
   // in order to use it in a return type
