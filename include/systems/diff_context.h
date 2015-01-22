@@ -145,14 +145,14 @@ public:
    * Accessor for element solution rate of change w.r.t. time.
    */
   const DenseVector<Number>& get_elem_solution_rate() const
-  { return elem_solution_rate; }
+  { return _elem_solution_rate; }
 
   /**
    * Non-const accessor for element solution rate of change w.r.t.
    * time.
    */
   DenseVector<Number>& get_elem_solution_rate()
-  { return elem_solution_rate; }
+  { return _elem_solution_rate; }
 
   /**
    * Accessor for element solution rate for a particular variable
@@ -160,9 +160,9 @@ public:
    */
   const DenseSubVector<Number>& get_elem_solution_rate( unsigned int var ) const
   {
-    libmesh_assert_greater(elem_subsolution_rates.size(), var);
-    libmesh_assert(elem_subsolution_rates[var]);
-    return *(elem_subsolution_rates[var]);
+    libmesh_assert_greater(_elem_subsolution_rates.size(), var);
+    libmesh_assert(_elem_subsolution_rates[var]);
+    return *(_elem_subsolution_rates[var]);
   }
 
   /**
@@ -171,9 +171,9 @@ public:
    */
   DenseSubVector<Number>& get_elem_solution_rate( unsigned int var )
   {
-    libmesh_assert_greater(elem_subsolution_rates.size(), var);
-    libmesh_assert(elem_subsolution_rates[var]);
-    return *(elem_subsolution_rates[var]);
+    libmesh_assert_greater(_elem_subsolution_rates.size(), var);
+    libmesh_assert(_elem_subsolution_rates[var]);
+    return *(_elem_subsolution_rates[var]);
   }
 
 
@@ -521,8 +521,8 @@ protected:
    * Element by element components of du/dt
    * as adjusted by a time_solver
    */
-  DenseVector<Number> elem_solution_rate;
-  std::vector<DenseSubVector<Number> *> elem_subsolution_rates;
+  DenseVector<Number> _elem_solution_rate;
+  std::vector<DenseSubVector<Number> *> _elem_subsolution_rates;
 
   /**
    * Element by element components of nonlinear_solution
