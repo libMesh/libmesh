@@ -41,7 +41,7 @@ FEMContext::FEMContext (const System &sys)
     _mesh_z_var(0),
     side(0), edge(0),
     _boundary_info(sys.get_mesh().get_boundary_info()),
-    elem(NULL),
+    _elem(NULL),
     dim(sys.get_mesh().mesh_dimension()),
     element_qrule(NULL), side_qrule(NULL),
     edge_qrule(NULL)
@@ -142,13 +142,13 @@ FEMContext::~FEMContext()
 
 bool FEMContext::has_side_boundary_id(boundary_id_type id) const
 {
-  return _boundary_info.has_boundary_id(elem, side, id);
+  return _boundary_info.has_boundary_id(this->_elem, side, id);
 }
 
 
 std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 {
-  return _boundary_info.boundary_ids(elem, side);
+  return _boundary_info.boundary_ids(this->_elem, side);
 }
 
 
@@ -1413,7 +1413,7 @@ void FEMContext::elem_fe_reinit ()
   for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
        i != local_fe_end; ++i)
     {
-      i->second->reinit(elem);
+      i->second->reinit(this->_elem);
     }
 }
 
@@ -1426,7 +1426,7 @@ void FEMContext::side_fe_reinit ()
   for (std::map<FEType, FEAbstract *>::iterator i = _side_fe.begin();
        i != local_fe_end; ++i)
     {
-      i->second->reinit(elem, side);
+      i->second->reinit(this->_elem, side);
     }
 }
 
@@ -1442,7 +1442,7 @@ void FEMContext::edge_fe_reinit ()
   for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
        i != local_fe_end; ++i)
     {
-      i->second->edge_reinit(elem, edge);
+      i->second->edge_reinit(this->_elem, edge);
     }
 }
 
@@ -1461,37 +1461,37 @@ void FEMContext::elem_position_get()
   // been set up for us
   //  if (_mesh_sys == this->number())
   //    {
-  unsigned int n_nodes = elem->n_nodes();
+  unsigned int n_nodes = this->_elem->n_nodes();
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
   libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
                  (_element_fe_var[_mesh_x_var]->get_fe_type().family
                   == LAGRANGE &&
                   _element_fe_var[_mesh_x_var]->get_fe_type().order
-                  == elem->default_order()));
+                  == this->_elem->default_order()));
   libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
                  (_element_fe_var[_mesh_y_var]->get_fe_type().family
                   == LAGRANGE &&
                   _element_fe_var[_mesh_y_var]->get_fe_type().order
-                  == elem->default_order()));
+                  == this->_elem->default_order()));
   libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
                  (_element_fe_var[_mesh_z_var]->get_fe_type().family
                   == LAGRANGE &&
                   _element_fe_var[_mesh_z_var]->get_fe_type().order
-                  == elem->default_order()));
+                  == this->_elem->default_order()));
 
   // Get degree of freedom coefficients from point coordinates
   if (_mesh_x_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_x_var])(i) = elem->point(i)(0);
+      (*elem_subsolutions[_mesh_x_var])(i) = this->_elem->point(i)(0);
 
   if (_mesh_y_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_y_var])(i) = elem->point(i)(1);
+      (*elem_subsolutions[_mesh_y_var])(i) = this->_elem->point(i)(1);
 
   if (_mesh_z_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_z_var])(i) = elem->point(i)(2);
+      (*elem_subsolutions[_mesh_z_var])(i) = this->_elem->point(i)(2);
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
@@ -1521,7 +1521,7 @@ void FEMContext::_do_elem_position_set(Real)
   // been set up for us, and we can ignore our input parameter theta
   //  if (_mesh_sys == this->number())
   //    {
-  unsigned int n_nodes = elem->n_nodes();
+  unsigned int n_nodes = this->_elem->n_nodes();
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
   libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
@@ -1540,17 +1540,17 @@ void FEMContext::_do_elem_position_set(Real)
   // Set the new point coordinates
   if (_mesh_x_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(elem)->point(i)(0) =
+      const_cast<Elem*>(this->_elem)->point(i)(0) =
         libmesh_real((*elem_subsolutions[_mesh_x_var])(i));
 
   if (_mesh_y_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(elem)->point(i)(1) =
+      const_cast<Elem*>(this->_elem)->point(i)(1) =
         libmesh_real((*elem_subsolutions[_mesh_y_var])(i));
 
   if (_mesh_z_var != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(elem)->point(i)(2) =
+      const_cast<Elem*>(this->_elem)->point(i)(2) =
         libmesh_real((*elem_subsolutions[_mesh_z_var])(i));
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
@@ -1581,10 +1581,10 @@ void FEMContext::_do_elem_position_set(Real)
 
 void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
 {
-  elem = e;
+  this->_elem = e;
 
   // Initialize the per-element data for elem.
-  sys.get_dof_map().dof_indices (elem, dof_indices);
+  sys.get_dof_map().dof_indices (this->_elem, dof_indices);
   const unsigned int n_dofs = cast_int<unsigned int>
     (dof_indices.size());
   const std::size_t n_qoi = sys.qoi.size();
@@ -1610,7 +1610,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
     unsigned int sub_dofs = 0;
     for (unsigned int i=0; i != sys.n_vars(); ++i)
       {
-        sys.get_dof_map().dof_indices (elem, dof_indices_var[i], i);
+        sys.get_dof_map().dof_indices (this->_elem, dof_indices_var[i], i);
 
         const unsigned int n_dofs_var = cast_int<unsigned int>
           (dof_indices_var[i].size());
@@ -1671,7 +1671,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
         {
           const unsigned int n_dofs_var = cast_int<unsigned int>
             (dof_indices_var[i].size());
-          sys.get_dof_map().dof_indices (elem, dof_indices_var[i], i);
+          sys.get_dof_map().dof_indices (this->_elem, dof_indices_var[i], i);
 
           localized_vec_it->second.second[i]->reposition
             (sub_dofs, n_dofs_var);
@@ -1706,23 +1706,23 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   // If we don't have an Elem to evaluate on, then the only functions
   // we can sensibly evaluate are the scalar dofs which are the same
   // everywhere.
-  libmesh_assert(elem || fe_type.family == SCALAR);
+  libmesh_assert(this->_elem || fe_type.family == SCALAR);
 
-  unsigned int elem_dim = elem ? elem->dim() : 0;
+  unsigned int elem_dim = this->_elem ? this->_elem->dim() : 0;
 
   AutoPtr<FEGenericBase<OutputShape> >
     fe_new(FEGenericBase<OutputShape>::build(elem_dim, fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
-  Point master_point = elem ?
-    FEInterface::inverse_map(elem_dim, fe_type, elem, p) :
+  Point master_point = this->_elem ?
+    FEInterface::inverse_map(elem_dim, fe_type, this->_elem, p) :
     Point(0);
 
   std::vector<Point> coor(1, master_point);
 
   // Reinitialize the element and compute the shape function values at coor
-  fe_new->reinit (elem, &coor);
+  fe_new->reinit (this->_elem, &coor);
 
   return fe_new;
 }

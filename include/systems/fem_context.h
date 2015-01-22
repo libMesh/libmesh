@@ -643,19 +643,19 @@ public:
    * Test for current Elem object
    */
   bool has_elem() const
-  { return (elem != NULL); }
+  { return (this->_elem != NULL); }
 
   /**
    * Accessor for current Elem object
    */
   const Elem& get_elem() const
-  { return *elem; }
+  { return *(this->_elem); }
 
   /**
    * Accessor for current Elem object
    */
   Elem& get_elem()
-  { return *(const_cast<Elem*>(elem)); }
+  { return *(const_cast<Elem*>(this->_elem)); }
 
   /**
    * Accessor for current side of Elem object
@@ -793,7 +793,7 @@ protected:
   /**
    * Current element for element_* to examine
    */
-  const Elem *elem;
+  const Elem *_elem;
 
   /**
    * Cached dimension of elements in this mesh
