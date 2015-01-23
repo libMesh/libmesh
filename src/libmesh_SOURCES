@@ -209,6 +209,7 @@ libmesh_SOURCES =  \
         src/mesh/mesh_triangle_holes.C \
         src/mesh/mesh_triangle_interface.C \
         src/mesh/mesh_triangle_wrapper.C \
+        src/mesh/namebased_io.C \
         src/mesh/nemesis_io.C \
         src/mesh/nemesis_io_helper.C \
         src/mesh/off_io.C \

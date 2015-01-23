@@ -480,16 +480,16 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	mesh_smoother_vsmoother.h mesh_subdivision_support.h \
 	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
 	mesh_triangle_holes.h mesh_triangle_interface.h \
-	mesh_triangle_wrapper.h nemesis_io.h nemesis_io_helper.h \
-	off_io.h parallel_mesh.h patch.h postscript_io.h serial_mesh.h \
-	tecplot_io.h tetgen_io.h ucd_io.h unstructured_mesh.h unv_io.h \
-	vtk_io.h xdr_head.h xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h \
-	xdr_shead.h xdr_soln.h analytic_function.h \
-	composite_fem_function.h composite_function.h \
-	const_fem_function.h const_function.h coupling_matrix.h \
-	dense_matrix.h dense_matrix_base.h dense_submatrix.h \
-	dense_subvector.h dense_vector.h dense_vector_base.h \
-	distributed_vector.h eigen_core_support.h \
+	mesh_triangle_wrapper.h namebased_io.h nemesis_io.h \
+	nemesis_io_helper.h off_io.h parallel_mesh.h patch.h \
+	postscript_io.h serial_mesh.h tecplot_io.h tetgen_io.h \
+	ucd_io.h unstructured_mesh.h unv_io.h vtk_io.h xdr_head.h \
+	xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h xdr_shead.h \
+	xdr_soln.h analytic_function.h composite_fem_function.h \
+	composite_function.h const_fem_function.h const_function.h \
+	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
+	dense_submatrix.h dense_subvector.h dense_vector.h \
+	dense_vector_base.h distributed_vector.h eigen_core_support.h \
 	eigen_preconditioner.h eigen_sparse_matrix.h \
 	eigen_sparse_vector.h fem_function_base.h function_base.h \
 	laspack_matrix.h laspack_vector.h numeric_vector.h \
@@ -1309,6 +1309,9 @@ mesh_triangle_interface.h: $(top_srcdir)/include/mesh/mesh_triangle_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_triangle_wrapper.h: $(top_srcdir)/include/mesh/mesh_triangle_wrapper.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+namebased_io.h: $(top_srcdir)/include/mesh/namebased_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nemesis_io.h: $(top_srcdir)/include/mesh/nemesis_io.h

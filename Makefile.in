@@ -303,12 +303,13 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/mesh/mesh_tetgen_wrapper.C src/mesh/mesh_tools.C \
 	src/mesh/mesh_triangle_holes.C \
 	src/mesh/mesh_triangle_interface.C \
-	src/mesh/mesh_triangle_wrapper.C src/mesh/nemesis_io.C \
-	src/mesh/nemesis_io_helper.C src/mesh/off_io.C \
-	src/mesh/parallel_mesh.C src/mesh/parallel_mesh_iterators.C \
-	src/mesh/patch.C src/mesh/postscript_io.C \
-	src/mesh/serial_mesh.C src/mesh/serial_mesh_iterators.C \
-	src/mesh/tecplot_io.C src/mesh/tetgen_io.C src/mesh/ucd_io.C \
+	src/mesh/mesh_triangle_wrapper.C src/mesh/namebased_io.C \
+	src/mesh/nemesis_io.C src/mesh/nemesis_io_helper.C \
+	src/mesh/off_io.C src/mesh/parallel_mesh.C \
+	src/mesh/parallel_mesh_iterators.C src/mesh/patch.C \
+	src/mesh/postscript_io.C src/mesh/serial_mesh.C \
+	src/mesh/serial_mesh_iterators.C src/mesh/tecplot_io.C \
+	src/mesh/tetgen_io.C src/mesh/ucd_io.C \
 	src/mesh/unstructured_mesh.C src/mesh/unv_io.C \
 	src/mesh/vtk_io.C src/mesh/xdr_head.C src/mesh/xdr_io.C \
 	src/mesh/xdr_mesh.C src/mesh/xdr_mgf.C src/mesh/xdr_soln.C \
@@ -671,6 +672,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/mesh/libmesh_dbg_la-mesh_triangle_holes.lo \
 	src/mesh/libmesh_dbg_la-mesh_triangle_interface.lo \
 	src/mesh/libmesh_dbg_la-mesh_triangle_wrapper.lo \
+	src/mesh/libmesh_dbg_la-namebased_io.lo \
 	src/mesh/libmesh_dbg_la-nemesis_io.lo \
 	src/mesh/libmesh_dbg_la-nemesis_io_helper.lo \
 	src/mesh/libmesh_dbg_la-off_io.lo \
@@ -1010,12 +1012,13 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/mesh/mesh_tetgen_wrapper.C src/mesh/mesh_tools.C \
 	src/mesh/mesh_triangle_holes.C \
 	src/mesh/mesh_triangle_interface.C \
-	src/mesh/mesh_triangle_wrapper.C src/mesh/nemesis_io.C \
-	src/mesh/nemesis_io_helper.C src/mesh/off_io.C \
-	src/mesh/parallel_mesh.C src/mesh/parallel_mesh_iterators.C \
-	src/mesh/patch.C src/mesh/postscript_io.C \
-	src/mesh/serial_mesh.C src/mesh/serial_mesh_iterators.C \
-	src/mesh/tecplot_io.C src/mesh/tetgen_io.C src/mesh/ucd_io.C \
+	src/mesh/mesh_triangle_wrapper.C src/mesh/namebased_io.C \
+	src/mesh/nemesis_io.C src/mesh/nemesis_io_helper.C \
+	src/mesh/off_io.C src/mesh/parallel_mesh.C \
+	src/mesh/parallel_mesh_iterators.C src/mesh/patch.C \
+	src/mesh/postscript_io.C src/mesh/serial_mesh.C \
+	src/mesh/serial_mesh_iterators.C src/mesh/tecplot_io.C \
+	src/mesh/tetgen_io.C src/mesh/ucd_io.C \
 	src/mesh/unstructured_mesh.C src/mesh/unv_io.C \
 	src/mesh/vtk_io.C src/mesh/xdr_head.C src/mesh/xdr_io.C \
 	src/mesh/xdr_mesh.C src/mesh/xdr_mgf.C src/mesh/xdr_soln.C \
@@ -1377,6 +1380,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/mesh/libmesh_devel_la-mesh_triangle_holes.lo \
 	src/mesh/libmesh_devel_la-mesh_triangle_interface.lo \
 	src/mesh/libmesh_devel_la-mesh_triangle_wrapper.lo \
+	src/mesh/libmesh_devel_la-namebased_io.lo \
 	src/mesh/libmesh_devel_la-nemesis_io.lo \
 	src/mesh/libmesh_devel_la-nemesis_io_helper.lo \
 	src/mesh/libmesh_devel_la-off_io.lo \
@@ -1713,12 +1717,13 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/mesh/mesh_tetgen_wrapper.C src/mesh/mesh_tools.C \
 	src/mesh/mesh_triangle_holes.C \
 	src/mesh/mesh_triangle_interface.C \
-	src/mesh/mesh_triangle_wrapper.C src/mesh/nemesis_io.C \
-	src/mesh/nemesis_io_helper.C src/mesh/off_io.C \
-	src/mesh/parallel_mesh.C src/mesh/parallel_mesh_iterators.C \
-	src/mesh/patch.C src/mesh/postscript_io.C \
-	src/mesh/serial_mesh.C src/mesh/serial_mesh_iterators.C \
-	src/mesh/tecplot_io.C src/mesh/tetgen_io.C src/mesh/ucd_io.C \
+	src/mesh/mesh_triangle_wrapper.C src/mesh/namebased_io.C \
+	src/mesh/nemesis_io.C src/mesh/nemesis_io_helper.C \
+	src/mesh/off_io.C src/mesh/parallel_mesh.C \
+	src/mesh/parallel_mesh_iterators.C src/mesh/patch.C \
+	src/mesh/postscript_io.C src/mesh/serial_mesh.C \
+	src/mesh/serial_mesh_iterators.C src/mesh/tecplot_io.C \
+	src/mesh/tetgen_io.C src/mesh/ucd_io.C \
 	src/mesh/unstructured_mesh.C src/mesh/unv_io.C \
 	src/mesh/vtk_io.C src/mesh/xdr_head.C src/mesh/xdr_io.C \
 	src/mesh/xdr_mesh.C src/mesh/xdr_mgf.C src/mesh/xdr_soln.C \
@@ -2080,6 +2085,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/mesh/libmesh_oprof_la-mesh_triangle_holes.lo \
 	src/mesh/libmesh_oprof_la-mesh_triangle_interface.lo \
 	src/mesh/libmesh_oprof_la-mesh_triangle_wrapper.lo \
+	src/mesh/libmesh_oprof_la-namebased_io.lo \
 	src/mesh/libmesh_oprof_la-nemesis_io.lo \
 	src/mesh/libmesh_oprof_la-nemesis_io_helper.lo \
 	src/mesh/libmesh_oprof_la-off_io.lo \
@@ -2416,12 +2422,13 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/mesh/mesh_tetgen_wrapper.C src/mesh/mesh_tools.C \
 	src/mesh/mesh_triangle_holes.C \
 	src/mesh/mesh_triangle_interface.C \
-	src/mesh/mesh_triangle_wrapper.C src/mesh/nemesis_io.C \
-	src/mesh/nemesis_io_helper.C src/mesh/off_io.C \
-	src/mesh/parallel_mesh.C src/mesh/parallel_mesh_iterators.C \
-	src/mesh/patch.C src/mesh/postscript_io.C \
-	src/mesh/serial_mesh.C src/mesh/serial_mesh_iterators.C \
-	src/mesh/tecplot_io.C src/mesh/tetgen_io.C src/mesh/ucd_io.C \
+	src/mesh/mesh_triangle_wrapper.C src/mesh/namebased_io.C \
+	src/mesh/nemesis_io.C src/mesh/nemesis_io_helper.C \
+	src/mesh/off_io.C src/mesh/parallel_mesh.C \
+	src/mesh/parallel_mesh_iterators.C src/mesh/patch.C \
+	src/mesh/postscript_io.C src/mesh/serial_mesh.C \
+	src/mesh/serial_mesh_iterators.C src/mesh/tecplot_io.C \
+	src/mesh/tetgen_io.C src/mesh/ucd_io.C \
 	src/mesh/unstructured_mesh.C src/mesh/unv_io.C \
 	src/mesh/vtk_io.C src/mesh/xdr_head.C src/mesh/xdr_io.C \
 	src/mesh/xdr_mesh.C src/mesh/xdr_mgf.C src/mesh/xdr_soln.C \
@@ -2783,6 +2790,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/mesh/libmesh_opt_la-mesh_triangle_holes.lo \
 	src/mesh/libmesh_opt_la-mesh_triangle_interface.lo \
 	src/mesh/libmesh_opt_la-mesh_triangle_wrapper.lo \
+	src/mesh/libmesh_opt_la-namebased_io.lo \
 	src/mesh/libmesh_opt_la-nemesis_io.lo \
 	src/mesh/libmesh_opt_la-nemesis_io_helper.lo \
 	src/mesh/libmesh_opt_la-off_io.lo \
@@ -3118,12 +3126,13 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/mesh/mesh_tetgen_wrapper.C src/mesh/mesh_tools.C \
 	src/mesh/mesh_triangle_holes.C \
 	src/mesh/mesh_triangle_interface.C \
-	src/mesh/mesh_triangle_wrapper.C src/mesh/nemesis_io.C \
-	src/mesh/nemesis_io_helper.C src/mesh/off_io.C \
-	src/mesh/parallel_mesh.C src/mesh/parallel_mesh_iterators.C \
-	src/mesh/patch.C src/mesh/postscript_io.C \
-	src/mesh/serial_mesh.C src/mesh/serial_mesh_iterators.C \
-	src/mesh/tecplot_io.C src/mesh/tetgen_io.C src/mesh/ucd_io.C \
+	src/mesh/mesh_triangle_wrapper.C src/mesh/namebased_io.C \
+	src/mesh/nemesis_io.C src/mesh/nemesis_io_helper.C \
+	src/mesh/off_io.C src/mesh/parallel_mesh.C \
+	src/mesh/parallel_mesh_iterators.C src/mesh/patch.C \
+	src/mesh/postscript_io.C src/mesh/serial_mesh.C \
+	src/mesh/serial_mesh_iterators.C src/mesh/tecplot_io.C \
+	src/mesh/tetgen_io.C src/mesh/ucd_io.C \
 	src/mesh/unstructured_mesh.C src/mesh/unv_io.C \
 	src/mesh/vtk_io.C src/mesh/xdr_head.C src/mesh/xdr_io.C \
 	src/mesh/xdr_mesh.C src/mesh/xdr_mgf.C src/mesh/xdr_soln.C \
@@ -3485,6 +3494,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/mesh/libmesh_prof_la-mesh_triangle_holes.lo \
 	src/mesh/libmesh_prof_la-mesh_triangle_interface.lo \
 	src/mesh/libmesh_prof_la-mesh_triangle_wrapper.lo \
+	src/mesh/libmesh_prof_la-namebased_io.lo \
 	src/mesh/libmesh_prof_la-nemesis_io.lo \
 	src/mesh/libmesh_prof_la-nemesis_io_helper.lo \
 	src/mesh/libmesh_prof_la-off_io.lo \
@@ -4768,6 +4778,7 @@ libmesh_SOURCES = \
         src/mesh/mesh_triangle_holes.C \
         src/mesh/mesh_triangle_interface.C \
         src/mesh/mesh_triangle_wrapper.C \
+        src/mesh/namebased_io.C \
         src/mesh/nemesis_io.C \
         src/mesh/nemesis_io_helper.C \
         src/mesh/off_io.C \
@@ -5771,6 +5782,8 @@ src/mesh/libmesh_dbg_la-mesh_triangle_interface.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_dbg_la-mesh_triangle_wrapper.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_dbg_la-namebased_io.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_dbg_la-nemesis_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_dbg_la-nemesis_io_helper.lo:  \
@@ -6840,6 +6853,8 @@ src/mesh/libmesh_devel_la-mesh_triangle_interface.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_devel_la-mesh_triangle_wrapper.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_devel_la-namebased_io.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_devel_la-nemesis_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_devel_la-nemesis_io_helper.lo:  \
@@ -7852,6 +7867,8 @@ src/mesh/libmesh_oprof_la-mesh_triangle_interface.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_oprof_la-mesh_triangle_wrapper.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_oprof_la-namebased_io.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_oprof_la-nemesis_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_oprof_la-nemesis_io_helper.lo:  \
@@ -8864,6 +8881,8 @@ src/mesh/libmesh_opt_la-mesh_triangle_interface.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_opt_la-mesh_triangle_wrapper.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_opt_la-namebased_io.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_opt_la-nemesis_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_opt_la-nemesis_io_helper.lo:  \
@@ -9873,6 +9892,8 @@ src/mesh/libmesh_prof_la-mesh_triangle_interface.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_prof_la-mesh_triangle_wrapper.lo:  \
 	src/mesh/$(am__dirstamp) src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_prof_la-namebased_io.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_prof_la-nemesis_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_prof_la-nemesis_io_helper.lo:  \
@@ -11757,6 +11778,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-mesh_triangle_holes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-mesh_triangle_interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-mesh_triangle_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-namebased_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-nemesis_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-nemesis_io_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-off_io.Plo@am__quote@
@@ -11818,6 +11840,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-mesh_triangle_holes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-mesh_triangle_interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-mesh_triangle_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-namebased_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-nemesis_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-nemesis_io_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-off_io.Plo@am__quote@
@@ -11879,6 +11902,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-mesh_triangle_holes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-mesh_triangle_interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-mesh_triangle_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-namebased_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-nemesis_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-nemesis_io_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-off_io.Plo@am__quote@
@@ -11940,6 +11964,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-mesh_triangle_holes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-mesh_triangle_interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-mesh_triangle_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-namebased_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-nemesis_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-nemesis_io_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-off_io.Plo@am__quote@
@@ -12001,6 +12026,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-mesh_triangle_holes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-mesh_triangle_interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-mesh_triangle_wrapper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-namebased_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-nemesis_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-nemesis_io_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-off_io.Plo@am__quote@
@@ -14429,6 +14455,13 @@ src/mesh/libmesh_dbg_la-mesh_triangle_wrapper.lo: src/mesh/mesh_triangle_wrapper
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/mesh_triangle_wrapper.C' object='src/mesh/libmesh_dbg_la-mesh_triangle_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_dbg_la-mesh_triangle_wrapper.lo `test -f 'src/mesh/mesh_triangle_wrapper.C' || echo '$(srcdir)/'`src/mesh/mesh_triangle_wrapper.C
+
+src/mesh/libmesh_dbg_la-namebased_io.lo: src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_dbg_la-namebased_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_dbg_la-namebased_io.Tpo -c -o src/mesh/libmesh_dbg_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_dbg_la-namebased_io.Tpo src/mesh/$(DEPDIR)/libmesh_dbg_la-namebased_io.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/namebased_io.C' object='src/mesh/libmesh_dbg_la-namebased_io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_dbg_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
 
 src/mesh/libmesh_dbg_la-nemesis_io.lo: src/mesh/nemesis_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_dbg_la-nemesis_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_dbg_la-nemesis_io.Tpo -c -o src/mesh/libmesh_dbg_la-nemesis_io.lo `test -f 'src/mesh/nemesis_io.C' || echo '$(srcdir)/'`src/mesh/nemesis_io.C
@@ -17328,6 +17361,13 @@ src/mesh/libmesh_devel_la-mesh_triangle_wrapper.lo: src/mesh/mesh_triangle_wrapp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_devel_la-mesh_triangle_wrapper.lo `test -f 'src/mesh/mesh_triangle_wrapper.C' || echo '$(srcdir)/'`src/mesh/mesh_triangle_wrapper.C
 
+src/mesh/libmesh_devel_la-namebased_io.lo: src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_devel_la-namebased_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_devel_la-namebased_io.Tpo -c -o src/mesh/libmesh_devel_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_devel_la-namebased_io.Tpo src/mesh/$(DEPDIR)/libmesh_devel_la-namebased_io.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/namebased_io.C' object='src/mesh/libmesh_devel_la-namebased_io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_devel_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
+
 src/mesh/libmesh_devel_la-nemesis_io.lo: src/mesh/nemesis_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_devel_la-nemesis_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_devel_la-nemesis_io.Tpo -c -o src/mesh/libmesh_devel_la-nemesis_io.lo `test -f 'src/mesh/nemesis_io.C' || echo '$(srcdir)/'`src/mesh/nemesis_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_devel_la-nemesis_io.Tpo src/mesh/$(DEPDIR)/libmesh_devel_la-nemesis_io.Plo
@@ -20225,6 +20265,13 @@ src/mesh/libmesh_oprof_la-mesh_triangle_wrapper.lo: src/mesh/mesh_triangle_wrapp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/mesh_triangle_wrapper.C' object='src/mesh/libmesh_oprof_la-mesh_triangle_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_oprof_la-mesh_triangle_wrapper.lo `test -f 'src/mesh/mesh_triangle_wrapper.C' || echo '$(srcdir)/'`src/mesh/mesh_triangle_wrapper.C
+
+src/mesh/libmesh_oprof_la-namebased_io.lo: src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_oprof_la-namebased_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_oprof_la-namebased_io.Tpo -c -o src/mesh/libmesh_oprof_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_oprof_la-namebased_io.Tpo src/mesh/$(DEPDIR)/libmesh_oprof_la-namebased_io.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/namebased_io.C' object='src/mesh/libmesh_oprof_la-namebased_io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_oprof_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
 
 src/mesh/libmesh_oprof_la-nemesis_io.lo: src/mesh/nemesis_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_oprof_la-nemesis_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_oprof_la-nemesis_io.Tpo -c -o src/mesh/libmesh_oprof_la-nemesis_io.lo `test -f 'src/mesh/nemesis_io.C' || echo '$(srcdir)/'`src/mesh/nemesis_io.C
@@ -23124,6 +23171,13 @@ src/mesh/libmesh_opt_la-mesh_triangle_wrapper.lo: src/mesh/mesh_triangle_wrapper
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_opt_la-mesh_triangle_wrapper.lo `test -f 'src/mesh/mesh_triangle_wrapper.C' || echo '$(srcdir)/'`src/mesh/mesh_triangle_wrapper.C
 
+src/mesh/libmesh_opt_la-namebased_io.lo: src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_opt_la-namebased_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_opt_la-namebased_io.Tpo -c -o src/mesh/libmesh_opt_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_opt_la-namebased_io.Tpo src/mesh/$(DEPDIR)/libmesh_opt_la-namebased_io.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/namebased_io.C' object='src/mesh/libmesh_opt_la-namebased_io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_opt_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
+
 src/mesh/libmesh_opt_la-nemesis_io.lo: src/mesh/nemesis_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_opt_la-nemesis_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_opt_la-nemesis_io.Tpo -c -o src/mesh/libmesh_opt_la-nemesis_io.lo `test -f 'src/mesh/nemesis_io.C' || echo '$(srcdir)/'`src/mesh/nemesis_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_opt_la-nemesis_io.Tpo src/mesh/$(DEPDIR)/libmesh_opt_la-nemesis_io.Plo
@@ -26021,6 +26075,13 @@ src/mesh/libmesh_prof_la-mesh_triangle_wrapper.lo: src/mesh/mesh_triangle_wrappe
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/mesh_triangle_wrapper.C' object='src/mesh/libmesh_prof_la-mesh_triangle_wrapper.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_prof_la-mesh_triangle_wrapper.lo `test -f 'src/mesh/mesh_triangle_wrapper.C' || echo '$(srcdir)/'`src/mesh/mesh_triangle_wrapper.C
+
+src/mesh/libmesh_prof_la-namebased_io.lo: src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_prof_la-namebased_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_prof_la-namebased_io.Tpo -c -o src/mesh/libmesh_prof_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_prof_la-namebased_io.Tpo src/mesh/$(DEPDIR)/libmesh_prof_la-namebased_io.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/namebased_io.C' object='src/mesh/libmesh_prof_la-namebased_io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_prof_la-namebased_io.lo `test -f 'src/mesh/namebased_io.C' || echo '$(srcdir)/'`src/mesh/namebased_io.C
 
 src/mesh/libmesh_prof_la-nemesis_io.lo: src/mesh/nemesis_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_prof_la-nemesis_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_prof_la-nemesis_io.Tpo -c -o src/mesh/libmesh_prof_la-nemesis_io.lo `test -f 'src/mesh/nemesis_io.C' || echo '$(srcdir)/'`src/mesh/nemesis_io.C
