@@ -1068,7 +1068,7 @@ void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
@@ -1114,7 +1114,7 @@ void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
@@ -1162,7 +1162,7 @@ void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
@@ -1206,7 +1206,7 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
@@ -1255,7 +1255,7 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
@@ -1307,7 +1307,7 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
     (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
   libmesh_assert(&(this->get_elem_fixed_solution(var)));
   const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
@@ -1601,7 +1601,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   this->get_elem_jacobian().resize(n_dofs, n_dofs);
 
   this->get_qoi_derivatives().resize(n_qoi);
-  elem_qoi_subderivatives.resize(n_qoi);
+  this->_elem_qoi_subderivatives.resize(n_qoi);
   for (std::size_t q=0; q != n_qoi; ++q)
     (this->get_qoi_derivatives())[q].resize(n_dofs);
 
@@ -1663,7 +1663,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
       const NumericVector<Number>& current_localized_vector = *localized_vec_it->first;
       DenseVector<Number>& target_vector = localized_vec_it->second.first;
 
-      current_localized_vector.get(dof_indices, target_vector.get_values());
+      current_localized_vector.get(this->get_dof_indices(), target_vector.get_values());
 
       // Initialize the per-variable data for elem.
       unsigned int sub_dofs = 0;
