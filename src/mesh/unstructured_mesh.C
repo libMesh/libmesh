@@ -29,51 +29,20 @@
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/unstructured_mesh.h"
-#include "libmesh/mesh_communication.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_tools.h" // For n_levels
 #include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
 
-#include "libmesh/diva_io.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/gmv_io.h"
-#include "libmesh/tecplot_io.h"
-#include "libmesh/tetgen_io.h"
-#include "libmesh/ucd_io.h"
+// For most I/O
+#include "libmesh/namebased_io.h"
+
+// for MeshData backward compatibility
 #include "libmesh/unv_io.h"
-#include "libmesh/matlab_io.h"
-#include "libmesh/off_io.h"
-#include "libmesh/medit_io.h"
-#include "libmesh/nemesis_io.h"
-#include "libmesh/gmsh_io.h"
-#include "libmesh/fro_io.h"
-#include "libmesh/xdr_io.h"
-#include "libmesh/legacy_xdr_io.h"
-#include "libmesh/vtk_io.h"
-#include "libmesh/abaqus_io.h"
-#include "libmesh/checkpoint_io.h"
+#include "libmesh/tetgen_io.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_MAP
-
-
-
-// ------------------------------------------------------------
-// Anonymous namespace for implementation details
-namespace {
-bool is_parallel_file_format (const std::string &name)
-{
-  // Certain mesh formats can support parallel I/O, including the
-  // "new" Xdr format and the Nemesis format.
-  return ((name.rfind(".xda") < name.size()) ||
-          (name.rfind(".xdr") < name.size()) ||
-          (name.rfind(".nem") < name.size()) ||
-          (name.rfind(".n") < name.size())   ||
-          (name.rfind(".cp") < name.size())
-          );
-}
-}
 
 
 namespace libMesh
@@ -491,7 +460,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                                      << (neigh->subactive()?"subactive":"ancestor")
                                      << " neighbor at level " << neigh->level()
                                      << std::endl;
-                        GMVIO(*this).write ("bad_mesh.gmv");
+                        NameBasedIO(*this).write ("bad_mesh.gmv");
                         libmesh_error_msg("Problematic mesh written to bad_mesh.gmv.");
                       }
 #endif // DEBUG
@@ -516,44 +485,8 @@ void UnstructuredMesh::read (const std::string& name,
                              MeshData* mesh_data,
                              bool skip_renumber_nodes_and_elements)
 {
-  // See if the file exists.  Perform this check on all processors
-  // so that the code is terminated properly in the case that the
-  // file does not exist.
-
-  // For Nemesis files, the name we try to read will have suffixes
-  // identifying processor rank
-  if (name.rfind(".nem") + 4 == name.size() ||
-      name.rfind(".n") + 2 == name.size())
-    {
-      std::ostringstream full_name;
-
-      // Find the length of a string which represents the highest processor ID
-      full_name << (this->n_processors());
-      int field_width = cast_int<int>(full_name.str().size());
-
-      // reset the string stream
-      full_name.str("");
-
-      // And build up the full filename
-      full_name << name
-                << '.' << this->n_processors()
-                << '.' << std::setfill('0') << std::setw(field_width) << this->processor_id();
-
-      std::ifstream in (full_name.str().c_str());
-
-      if (!in.good())
-        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << full_name.str());
-    }
-  else if(name.rfind(".cp")) {} // Do error checking in the reader
-  else
-    {
-      std::ifstream in (name.c_str());
-
-      if (!in.good())
-        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << name);
-    }
-
-  // Set the skip_renumber_nodes_and_elements flag on all processors.
+  // Set the skip_renumber_nodes_and_elements flag on all processors
+  // if necessary.
   // This ensures that renumber_nodes_and_elements is *not* called
   // during prepare_for_use() for certain types of mesh files.
   // This is required in cases where there is an associated solution
@@ -563,187 +496,17 @@ void UnstructuredMesh::read (const std::string& name,
       skip_renumber_nodes_and_elements =  true;
     }
 
-  // Look for parallel formats first
-  if (is_parallel_file_format(name))
+  if (mesh_data)
     {
-      // no need to handle bz2 files here -- the Xdr class does that.
-      if ((name.rfind(".xda") < name.size()) ||
-          (name.rfind(".xdr") < name.size()))
-        {
-          XdrIO xdr_io(*this);
-
-          // .xda* ==> bzip2/gzip/ASCII flavors
-          if (name.rfind(".xda") < name.size())
-            {
-              xdr_io.binary() = false;
-              xdr_io.read (name);
-            }
-          else // .xdr* ==> true binary XDR file
-            {
-              xdr_io.binary() = true;
-              xdr_io.read (name);
-            }
-
-          // The xdr_io object gets constructed with legacy() == false.
-          // if legacy() == true then it means that a legacy file was detected and
-          // thus processor 0 performed the read. We therefore need to broadcast the
-          // mesh.  Further, for this flavor of mesh solution data ordering is tied
-          // to the node ordering, so we better not reorder the nodes!
-          if (xdr_io.legacy())
-            {
-              this->allow_renumbering(false);
-              MeshCommunication().broadcast(*this);
-            }
-
-          // libHilbert-enabled libMesh builds should construct files
-          // with a canonical node ordering, which libHilbert-enabled
-          // builds will be able to read in again regardless of any
-          // renumbering.  So in that case we're free to renumber.
-          // However, if either the writer or the reader of this file
-          // don't have libHilbert, then we'll have to skip
-          // renumbering because we need the numbering to remain
-          // consistent with any solution file we read in next.
-#ifdef LIBMESH_HAVE_LIBHILBERT
-          // if (!xdr_io.libhilbert_ordering())
-          //   skip_renumber_nodes_and_elements = true;
-#else
-          this->allow_renumbering(false);
-#endif
-        }
-      else if (name.rfind(".nem") < name.size() ||
-               name.rfind(".n")   < name.size())
-        Nemesis_IO(*this).read (name);
-      else if (name.rfind(".cp") < name.size())
-        {
-          if(name.rfind(".cpa") < name.size())
-            CheckpointIO(*this, false).read(name);
-          else
-            CheckpointIO(*this, true).read(name);
-        }
+      libmesh_deprecated();
+      if (name.rfind(".unv") < name.size())
+        UNVIO(*this, mesh_data).read (name);
+      else if ((name.rfind(".node")  < name.size()) ||
+               (name.rfind(".ele")   < name.size()))
+        TetGenIO(*this,mesh_data).read (name);
     }
-
-  // Serial mesh formats
   else
-    {
-      START_LOG("read()", "Mesh");
-
-      // Read the file based on extension.  Only processor 0
-      // needs to read the mesh.  It will then broadcast it and
-      // the other processors will pick it up
-      if (this->processor_id() == 0)
-        {
-          std::ostringstream pid_suffix;
-          pid_suffix << '_' << getpid();
-          // Nasty hack for reading/writing zipped files
-          std::string new_name = name;
-          if (name.size() - name.rfind(".bz2") == 4)
-            {
-#ifdef LIBMESH_HAVE_BZIP
-              new_name.erase(new_name.end() - 4, new_name.end());
-              new_name += pid_suffix.str();
-              std::string system_string = "bunzip2 -f -k -c ";
-              system_string += name + " > " + new_name;
-              START_LOG("system(bunzip2)", "Mesh");
-              if (std::system(system_string.c_str()))
-                libmesh_file_error(system_string);
-              STOP_LOG("system(bunzip2)", "Mesh");
-#else
-              libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
-#endif
-            }
-          else if (name.size() - name.rfind(".xz") == 3)
-            {
-#ifdef LIBMESH_HAVE_XZ
-              new_name.erase(new_name.end() - 3, new_name.end());
-              new_name += pid_suffix.str();
-              std::string system_string = "xz -f -d -k -c ";
-              system_string += name + " > " + new_name;
-              START_LOG("system(xz -d)", "XdrIO");
-              if (std::system(system_string.c_str()))
-                libmesh_file_error(system_string);
-              STOP_LOG("system(xz -d)", "XdrIO");
-#else
-              libmesh_error_msg("ERROR: need xz to open .xz file " << name);
-#endif
-            }
-
-          if (new_name.rfind(".mat") < new_name.size())
-            MatlabIO(*this).read(new_name);
-
-          else if (new_name.rfind(".ucd") < new_name.size())
-            UCDIO(*this).read (new_name);
-
-          else if ((new_name.rfind(".off")  < new_name.size()) ||
-                   (new_name.rfind(".ogl")  < new_name.size()) ||
-                   (new_name.rfind(".oogl") < new_name.size()))
-            OFFIO(*this).read (new_name);
-
-          else if (new_name.rfind(".mgf") < new_name.size())
-            LegacyXdrIO(*this,true).read_mgf (new_name);
-
-          else if (new_name.rfind(".unv") < new_name.size())
-            UNVIO(*this, mesh_data).read (new_name);
-
-          else if ((new_name.rfind(".node")  < new_name.size()) ||
-                   (new_name.rfind(".ele")   < new_name.size()))
-            TetGenIO(*this,mesh_data).read (new_name);
-
-          else if (new_name.rfind(".exd") < new_name.size() ||
-                   new_name.rfind(".e") < new_name.size())
-            ExodusII_IO(*this).read (new_name);
-
-          else if (new_name.rfind(".msh") < new_name.size())
-            GmshIO(*this).read (new_name);
-
-          else if (new_name.rfind(".gmv") < new_name.size())
-            GMVIO(*this).read (new_name);
-
-          else if (new_name.rfind(".vtu") < new_name.size())
-            VTKIO(*this).read(new_name);
-
-          else if (new_name.rfind(".inp") < new_name.size())
-            AbaqusIO(*this).read(new_name);
-
-          else
-            {
-              libmesh_error_msg(" ERROR: Unrecognized file extension: " \
-                                << name                                 \
-                                << "\n   I understand the following:\n\n" \
-                                << "     *.e    -- Sandia's ExodusII format\n" \
-                                << "     *.exd  -- Sandia's ExodusII format\n" \
-                                << "     *.gmv  -- LANL's General Mesh Viewer format\n" \
-                                << "     *.mat  -- Matlab triangular ASCII file\n" \
-                                << "     *.n    -- Sandia's Nemesis format\n" \
-                                << "     *.nem  -- Sandia's Nemesis format\n" \
-                                << "     *.off  -- OOGL OFF surface format\n" \
-                                << "     *.ucd  -- AVS's ASCII UCD format\n" \
-                                << "     *.unv  -- I-deas Universal format\n" \
-                                << "     *.vtu  -- Paraview VTK format\n" \
-                                << "     *.inp  -- Abaqus .inp format\n" \
-                                << "     *.xda  -- libMesh ASCII format\n" \
-                                << "     *.xdr  -- libMesh binary format\n" \
-                                << "     *.gz   -- any above format gzipped\n" \
-                                << "     *.bz2  -- any above format bzip2'ed\n" \
-                                << "     *.xz   -- any above format xzipped\n" \
-                                << "     *.cpa  -- libMesh Checkpoint ASCII format\n" \
-                                << "     *.cpr  -- libMesh Checkpoint binary format\n");
-            }
-
-          // If we temporarily decompressed a file, remove the
-          // uncompressed version
-          if (name.size() - name.rfind(".bz2") == 4)
-            std::remove(new_name.c_str());
-          if (name.size() - name.rfind(".xz") == 3)
-            std::remove(new_name.c_str());
-        }
-
-
-      STOP_LOG("read()", "Mesh");
-
-      // Send the mesh & bcs (which are now only on processor 0) to the other
-      // processors
-      MeshCommunication().broadcast (*this);
-    }
+    NameBasedIO(*this).read(name);
 
   if (skip_renumber_nodes_and_elements)
     {
@@ -761,155 +524,24 @@ void UnstructuredMesh::read (const std::string& name,
 void UnstructuredMesh::write (const std::string& name,
                               MeshData* mesh_data)
 {
-  // parallel formats are special -- they may choose to write
-  // separate files, let's not try to handle the zipping here.
-  if (is_parallel_file_format(name))
+  START_LOG("write()", "Mesh");
+
+  if (mesh_data)
     {
-      // no need to handle bz2 files here -- the Xdr class does that.
-      if (name.rfind(".xda") < name.size())
-        XdrIO(*this).write(name);
-
-      else if (name.rfind(".xdr") < name.size())
-        XdrIO(*this,true).write(name);
-
-      else if (name.rfind(".nem") < name.size() ||
-               name.rfind(".n")   < name.size())
-        Nemesis_IO(*this).write(name);
+      libmesh_deprecated();
+      if (name.rfind(".unv") < name.size())
+        UNVIO(*this, mesh_data).write (name);
+      else
+        {
+          libMesh::err << "Only UNV output supports MeshData" <<
+                          std::endl;
+          libmesh_error();
+        }
     }
 
-  // serial file formats
-  else
-    {
-      START_LOG("write()", "Mesh");
+  NameBasedIO(*this).write(name);
 
-      // Nasty hack for reading/writing zipped files
-      std::string new_name = name;
-      pid_t pid_0 = 0;
-      if (this->processor_id() == 0)
-        pid_0 = getpid();
-      this->comm().broadcast(pid_0);
-      std::ostringstream pid_suffix;
-      pid_suffix << '_' << pid_0;
-
-      if (name.size() - name.rfind(".bz2") == 4)
-        {
-          new_name.erase(new_name.end() - 4, new_name.end());
-          new_name += pid_suffix.str();
-        }
-      else if (name.size() - name.rfind(".xz") == 3)
-        {
-          new_name.erase(new_name.end() - 3, new_name.end());
-          new_name += pid_suffix.str();
-        }
-
-      // New scope so that io will close before we try to zip the file
-      {
-        // Write the file based on extension
-        if (new_name.rfind(".dat") < new_name.size())
-          TecplotIO(*this).write (new_name);
-
-        else if (new_name.rfind(".plt") < new_name.size())
-          TecplotIO(*this,true).write (new_name);
-
-        else if (new_name.rfind(".ucd") < new_name.size())
-          UCDIO (*this).write (new_name);
-
-        else if (new_name.rfind(".gmv") < new_name.size())
-          if (this->n_partitions() > 1)
-            GMVIO(*this).write (new_name);
-          else
-            {
-              GMVIO io(*this);
-              io.partitioning() = false;
-              io.write (new_name);
-            }
-
-        else if (new_name.rfind(".ugrid") < new_name.size())
-          DivaIO(*this).write(new_name);
-        else if (new_name.rfind(".exd") < new_name.size() ||
-                 new_name.rfind(".e") < new_name.size())
-          ExodusII_IO(*this).write(new_name);
-        else if (new_name.rfind(".mgf")  < new_name.size())
-          LegacyXdrIO(*this,true).write_mgf(new_name);
-
-        else if (new_name.rfind(".unv") < new_name.size())
-          UNVIO(*this, mesh_data).write (new_name);
-
-        else if (new_name.rfind(".mesh") < new_name.size())
-          MEDITIO(*this).write (new_name);
-
-        else if (new_name.rfind(".poly") < new_name.size())
-          TetGenIO(*this).write (new_name);
-
-        else if (new_name.rfind(".msh") < new_name.size())
-          GmshIO(*this).write (new_name);
-
-        else if (new_name.rfind(".fro") < new_name.size())
-          FroIO(*this).write (new_name);
-
-        else if (new_name.rfind(".vtu") < new_name.size())
-          VTKIO(*this).write (new_name);
-
-        else
-          {
-            libMesh::err
-              << " ERROR: Unrecognized file extension: " << name
-              << "\n   I understand the following:\n\n"
-              << "     *.dat   -- Tecplot ASCII file\n"
-              << "     *.e     -- Sandia's ExodusII format\n"
-              << "     *.exd   -- Sandia's ExodusII format\n"
-              << "     *.fro   -- ACDL's surface triangulation file\n"
-              << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
-              << "     *.mesh  -- MEdit mesh format\n"
-              << "     *.mgf   -- MGF binary mesh format\n"
-              << "     *.msh   -- GMSH ASCII file\n"
-              << "     *.n     -- Sandia's Nemesis format\n"
-              << "     *.nem   -- Sandia's Nemesis format\n"
-              << "     *.plt   -- Tecplot binary file\n"
-              << "     *.poly  -- TetGen ASCII file\n"
-              << "     *.ucd   -- AVS's ASCII UCD format\n"
-              << "     *.ugrid -- Kelly's DIVA ASCII format\n"
-              << "     *.unv   -- I-deas Universal format\n"
-              << "     *.vtu   -- VTK (paraview-readable) format\n"
-              << "     *.xda   -- libMesh ASCII format\n"
-              << "     *.xdr   -- libMesh binary format,\n"
-              << std::endl
-              << "\n Exiting without writing output\n";
-          }
-      }
-
-      // Nasty hack for reading/writing zipped files
-      if (name.size() - name.rfind(".bz2") == 4)
-        {
-          START_LOG("system(bzip2)", "Mesh");
-          if (this->processor_id() == 0)
-            {
-              std::string system_string = "bzip2 -f -c ";
-              system_string += new_name + " > " + name;
-              if (std::system(system_string.c_str()))
-                libmesh_file_error(system_string);
-              std::remove(new_name.c_str());
-            }
-          this->comm().barrier();
-          STOP_LOG("system(bzip2)", "Mesh");
-        }
-      if (name.size() - name.rfind(".xz") == 3)
-        {
-          START_LOG("system(xz)", "Mesh");
-          if (this->processor_id() == 0)
-            {
-              std::string system_string = "xz -f -c ";
-              system_string += new_name + " > " + name;
-              if (std::system(system_string.c_str()))
-                libmesh_file_error(system_string);
-              std::remove(new_name.c_str());
-            }
-          this->comm().barrier();
-          STOP_LOG("system(xz)", "Mesh");
-        }
-
-      STOP_LOG("write()", "Mesh");
-    }
+  STOP_LOG("write()", "Mesh");
 }
 
 
@@ -920,39 +552,7 @@ void UnstructuredMesh::write (const std::string& name,
 {
   START_LOG("write()", "Mesh");
 
-  // Write the file based on extension
-  if (name.rfind(".dat") < name.size())
-    TecplotIO(*this).write_nodal_data (name, v, vn);
-
-  else if (name.rfind(".plt") < name.size())
-    TecplotIO(*this,true).write_nodal_data (name, v, vn);
-
-  else if (name.rfind(".gmv") < name.size())
-    {
-      if (n_subdomains() > 1)
-        GMVIO(*this).write_nodal_data (name, v, vn);
-      else
-        {
-          GMVIO io(*this);
-          io.partitioning() = false;
-          io.write_nodal_data (name, v, vn);
-        }
-    }
-  else if (name.rfind(".pvtu") < name.size())
-    {
-      VTKIO(*this).write_nodal_data (name, v, vn);
-    }
-  else
-    {
-      libMesh::err
-        << " ERROR: Unrecognized file extension: " << name
-        << "\n   I understand the following:\n\n"
-        << "     *.dat  -- Tecplot ASCII file\n"
-        << "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
-        << "     *.plt  -- Tecplot binary file\n"
-        << "     *.pvtu -- Paraview VTK file\n"
-        << "\n Exiting without writing output\n";
-    }
+  NameBasedIO(*this).write_nodal_data(name, v, vn);
 
   STOP_LOG("write()", "Mesh");
 }
