@@ -560,19 +560,19 @@ public:
    * Accessor for element interior quadrature rule.
    */
   const QBase& get_element_qrule() const
-  { return *(this->element_qrule); }
+  { return *(this->_element_qrule); }
 
   /**
    * Accessor for element side quadrature rule.
    */
   const QBase& get_side_qrule() const
-  { return *(this->side_qrule); }
+  { return *(this->_side_qrule); }
 
   /**
    * Accessor for element edge quadrature rule.
    */
   const QBase& get_edge_qrule() const
-  { return *(this->edge_qrule); }
+  { return *(this->_edge_qrule); }
 
   /**
    * Tells the FEMContext that system \p sys contains the
@@ -643,19 +643,19 @@ public:
    * Test for current Elem object
    */
   bool has_elem() const
-  { return (elem != NULL); }
+  { return (this->_elem != NULL); }
 
   /**
    * Accessor for current Elem object
    */
   const Elem& get_elem() const
-  { return *elem; }
+  { return *(this->_elem); }
 
   /**
    * Accessor for current Elem object
    */
   Elem& get_elem()
-  { return *(const_cast<Elem*>(elem)); }
+  { return *(const_cast<Elem*>(this->_elem)); }
 
   /**
    * Accessor for current side of Elem object
@@ -673,7 +673,7 @@ public:
    * Accessor for cached element dimension
    */
   unsigned char get_dim() const
-  { return dim; }
+  { return this->_dim; }
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -715,6 +715,12 @@ protected:
    */
   template<typename OutputShape>
   AutoPtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe, const Point &p ) const;
+
+  /**
+   * Helper function to promote accessor usage
+   */
+  void set_elem( const Elem* e )
+  { this->_elem = e; }
 
 
   // gcc-3.4, oracle 12.3 require this typedef to be public
@@ -793,33 +799,33 @@ protected:
   /**
    * Current element for element_* to examine
    */
-  const Elem *elem;
+  const Elem *_elem;
 
   /**
    * Cached dimension of elements in this mesh
    */
-  unsigned char dim;
+  unsigned char _dim;
 
   /**
    * Quadrature rule for element interior.
    * The FEM context will try to find a quadrature rule that
    * correctly integrates all variables
    */
-  QBase *element_qrule;
+  QBase *_element_qrule;
 
   /**
    * Quadrature rules for element sides
    * The FEM context will try to find a quadrature rule that
    * correctly integrates all variables
    */
-  QBase *side_qrule;
+  QBase *_side_qrule;
 
   /**
    * Quadrature rules for element edges.  If the FEM context is told
    * to prepare for edge integration on 3D elements, it will try to
    * find a quadrature rule that correctly integrates all variables
    */
-  QBase *edge_qrule;
+  QBase *_edge_qrule;
 
 private:
   /**

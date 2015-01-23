@@ -41,10 +41,10 @@ FEMContext::FEMContext (const System &sys)
     _mesh_z_var(0),
     side(0), edge(0),
     _boundary_info(sys.get_mesh().get_boundary_info()),
-    elem(NULL),
-    dim(sys.get_mesh().mesh_dimension()),
-    element_qrule(NULL), side_qrule(NULL),
-    edge_qrule(NULL)
+    _elem(NULL),
+    _dim(sys.get_mesh().mesh_dimension()),
+    _element_qrule(NULL), _side_qrule(NULL),
+    _edge_qrule(NULL)
 {
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
@@ -67,12 +67,12 @@ FEMContext::FEMContext (const System &sys)
     }
 
   // Create an adequate quadrature rule
-  element_qrule = hardest_fe_type.default_quadrature_rule
-    (dim, sys.extra_quadrature_order).release();
-  side_qrule = hardest_fe_type.default_quadrature_rule
-    (dim-1, sys.extra_quadrature_order).release();
-  if (dim == 3)
-    edge_qrule = hardest_fe_type.default_quadrature_rule
+  _element_qrule = hardest_fe_type.default_quadrature_rule
+    (this->_dim, sys.extra_quadrature_order).release();
+  _side_qrule = hardest_fe_type.default_quadrature_rule
+    (this->_dim-1, sys.extra_quadrature_order).release();
+  if (this->_dim == 3)
+    _edge_qrule = hardest_fe_type.default_quadrature_rule
       (1, sys.extra_quadrature_order).release();
 
   // Next, create finite element objects
@@ -80,7 +80,7 @@ FEMContext::FEMContext (const System &sys)
   // Should move to the protected/FEAbstract interface
   _element_fe_var.resize(nv);
   _side_fe_var.resize(nv);
-  if (dim == 3)
+  if (this->_dim == 3)
     _edge_fe_var.resize(nv);
 
   for (unsigned int i=0; i != nv; ++i)
@@ -89,20 +89,20 @@ FEMContext::FEMContext (const System &sys)
 
       if ( _element_fe[fe_type] == NULL )
         {
-          _element_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
-          _element_fe[fe_type]->attach_quadrature_rule(element_qrule);
-          _side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
-          _side_fe[fe_type]->attach_quadrature_rule(side_qrule);
+          _element_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
+          _element_fe[fe_type]->attach_quadrature_rule(_element_qrule);
+          _side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
+          _side_fe[fe_type]->attach_quadrature_rule(_side_qrule);
 
-          if (dim == 3)
+          if (this->_dim == 3)
             {
-              _edge_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
-              _edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
+              _edge_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
+              _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule);
             }
         }
       _element_fe_var[i] = _element_fe[fe_type];
       _side_fe_var[i] = _side_fe[fe_type];
-      if (dim == 3)
+      if (this->_dim == 3)
         _edge_fe_var[i] = _edge_fe[fe_type];
 
     }
@@ -128,27 +128,27 @@ FEMContext::~FEMContext()
     delete i->second;
   _edge_fe.clear();
 
-  delete element_qrule;
-  element_qrule = NULL;
+  delete _element_qrule;
+  _element_qrule = NULL;
 
-  delete side_qrule;
-  side_qrule = NULL;
+  delete _side_qrule;
+  _side_qrule = NULL;
 
-  delete edge_qrule;
-  side_qrule = NULL;
+  delete _edge_qrule;
+  _side_qrule = NULL;
 }
 
 
 
 bool FEMContext::has_side_boundary_id(boundary_id_type id) const
 {
-  return _boundary_info.has_boundary_id(elem, side, id);
+  return _boundary_info.has_boundary_id(&(this->get_elem()), side, id);
 }
 
 
 std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 {
-  return _boundary_info.boundary_ids(elem, side);
+  return _boundary_info.boundary_ids(&(this->get_elem()), side);
 }
 
 
@@ -161,9 +161,9 @@ void FEMContext::some_interior_value
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -194,9 +194,9 @@ void FEMContext::some_interior_gradient
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -232,9 +232,9 @@ void FEMContext::some_interior_hessian
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -266,9 +266,9 @@ void FEMContext::some_side_value
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
@@ -315,9 +315,9 @@ void FEMContext::interior_values (unsigned int var,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -376,9 +376,9 @@ void FEMContext::interior_gradients
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -437,9 +437,9 @@ void FEMContext::interior_hessians
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -477,14 +477,14 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -512,14 +512,14 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
     <typename TensorTools::MakeReal<OutputType>::type>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -555,14 +555,14 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -590,9 +590,9 @@ void FEMContext::side_values
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -638,14 +638,14 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -676,9 +676,9 @@ void FEMContext::side_gradients
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -726,14 +726,14 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -765,9 +765,9 @@ void FEMContext::side_hessians
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -816,14 +816,14 @@ void FEMContext::point_value(unsigned int var, const Point &p,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -865,14 +865,14 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -917,14 +917,14 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -954,14 +954,14 @@ void FEMContext::point_curl(unsigned int var, const Point &p,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_subsolutions.size(), var);
-  libmesh_assert(elem_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+  libmesh_assert_greater (this->_elem_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -1063,14 +1063,14 @@ void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
-  libmesh_assert(elem_fixed_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_fixed_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -1109,14 +1109,14 @@ void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
-  libmesh_assert(elem_fixed_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_fixed_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -1157,14 +1157,14 @@ void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
-  libmesh_assert(elem_fixed_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_fixed_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* the_side_fe = NULL;
@@ -1201,14 +1201,14 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
-  libmesh_assert(elem_fixed_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_fixed_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -1250,14 +1250,14 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
-  libmesh_assert(elem_fixed_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_fixed_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -1302,14 +1302,14 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (dof_indices.size(), var);
+  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices_var[var].size());
+    (this->get_dof_indices(var).size());
 
   // Get current local coefficients
-  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
-  libmesh_assert(elem_fixed_subsolutions[var]);
-  DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
+  libmesh_assert_greater (_elem_fixed_subsolutions.size(), var);
+  libmesh_assert(&(this->get_elem_fixed_solution(var)));
+  const DenseSubVector<Number> &coef = this->get_elem_fixed_solution(var);
 
   // Get finite element object
   FEGenericBase<OutputShape>* fe = NULL;
@@ -1413,7 +1413,7 @@ void FEMContext::elem_fe_reinit ()
   for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
        i != local_fe_end; ++i)
     {
-      i->second->reinit(elem);
+      i->second->reinit(&(this->get_elem()));
     }
 }
 
@@ -1426,7 +1426,7 @@ void FEMContext::side_fe_reinit ()
   for (std::map<FEType, FEAbstract *>::iterator i = _side_fe.begin();
        i != local_fe_end; ++i)
     {
-      i->second->reinit(elem, side);
+      i->second->reinit(&(this->get_elem()), this->get_side());
     }
 }
 
@@ -1434,7 +1434,7 @@ void FEMContext::side_fe_reinit ()
 
 void FEMContext::edge_fe_reinit ()
 {
-  libmesh_assert_equal_to (dim, 3);
+  libmesh_assert_equal_to (this->_dim, 3);
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions
@@ -1442,7 +1442,7 @@ void FEMContext::edge_fe_reinit ()
   for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
        i != local_fe_end; ++i)
     {
-      i->second->edge_reinit(elem, edge);
+      i->second->edge_reinit(&(this->get_elem()), this->get_edge());
     }
 }
 
@@ -1461,37 +1461,37 @@ void FEMContext::elem_position_get()
   // been set up for us
   //  if (_mesh_sys == this->number())
   //    {
-  unsigned int n_nodes = elem->n_nodes();
+  unsigned int n_nodes = this->get_elem().n_nodes();
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
-  libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                 (_element_fe_var[_mesh_x_var]->get_fe_type().family
+  libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
+                 (this->get_element_fe(this->get_mesh_x_var())->get_fe_type().family
                   == LAGRANGE &&
-                  _element_fe_var[_mesh_x_var]->get_fe_type().order
-                  == elem->default_order()));
-  libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                 (_element_fe_var[_mesh_y_var]->get_fe_type().family
+                  this->get_element_fe(this->get_mesh_x_var())->get_fe_type().order
+                  == this->get_elem().default_order()));
+  libmesh_assert(this->get_mesh_y_var() == libMesh::invalid_uint ||
+                 (this->get_element_fe(this->get_mesh_y_var())->get_fe_type().family
                   == LAGRANGE &&
-                  _element_fe_var[_mesh_y_var]->get_fe_type().order
-                  == elem->default_order()));
-  libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                 (_element_fe_var[_mesh_z_var]->get_fe_type().family
+                  this->get_element_fe(this->get_mesh_y_var())->get_fe_type().order
+                  == this->get_elem().default_order()));
+  libmesh_assert(this->get_mesh_z_var() == libMesh::invalid_uint ||
+                 (this->get_element_fe(this->get_mesh_z_var())->get_fe_type().family
                   == LAGRANGE &&
-                  _element_fe_var[_mesh_z_var]->get_fe_type().order
-                  == elem->default_order()));
+                  this->get_element_fe(this->get_mesh_z_var())->get_fe_type().order
+                  == this->get_elem().default_order()));
 
   // Get degree of freedom coefficients from point coordinates
-  if (_mesh_x_var != libMesh::invalid_uint)
+  if (this->get_mesh_x_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_x_var])(i) = elem->point(i)(0);
+      (this->get_elem_solution(this->get_mesh_x_var()))(i) = this->get_elem().point(i)(0);
 
-  if (_mesh_y_var != libMesh::invalid_uint)
+  if (this->get_mesh_y_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_y_var])(i) = elem->point(i)(1);
+      (this->get_elem_solution(this->get_mesh_y_var()))(i) = this->get_elem().point(i)(1);
 
-  if (_mesh_z_var != libMesh::invalid_uint)
+  if (this->get_mesh_z_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      (*elem_subsolutions[_mesh_z_var])(i) = elem->point(i)(2);
+      (this->get_elem_solution(this->get_mesh_z_var()))(i) = this->get_elem().point(i)(2);
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
@@ -1521,37 +1521,37 @@ void FEMContext::_do_elem_position_set(Real)
   // been set up for us, and we can ignore our input parameter theta
   //  if (_mesh_sys == this->number())
   //    {
-  unsigned int n_nodes = elem->n_nodes();
+  unsigned int n_nodes = this->get_elem().n_nodes();
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
-  libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                 (_element_fe_var[_mesh_x_var]->get_fe_type().family
+  libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
+                 (this->get_element_fe(this->get_mesh_x_var())->get_fe_type().family
                   == LAGRANGE &&
-                  elem_subsolutions[_mesh_x_var]->size() == n_nodes));
-  libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                 (_element_fe_var[_mesh_y_var]->get_fe_type().family
+                  this->get_elem_solution(this->get_mesh_x_var()).size() == n_nodes));
+  libmesh_assert(this->get_mesh_y_var() == libMesh::invalid_uint ||
+                 (this->get_element_fe(this->get_mesh_y_var())->get_fe_type().family
                   == LAGRANGE &&
-                  elem_subsolutions[_mesh_y_var]->size() == n_nodes));
-  libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                 (_element_fe_var[_mesh_z_var]->get_fe_type().family
+                  this->get_elem_solution(this->get_mesh_y_var()).size() == n_nodes));
+  libmesh_assert(this->get_mesh_z_var() == libMesh::invalid_uint ||
+                 (this->get_element_fe(this->get_mesh_z_var())->get_fe_type().family
                   == LAGRANGE &&
-                  elem_subsolutions[_mesh_z_var]->size() == n_nodes));
+                  this->get_elem_solution(this->get_mesh_z_var()).size() == n_nodes));
 
   // Set the new point coordinates
-  if (_mesh_x_var != libMesh::invalid_uint)
+  if (this->get_mesh_x_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(elem)->point(i)(0) =
-        libmesh_real((*elem_subsolutions[_mesh_x_var])(i));
+      const_cast<Elem*>(&(this->get_elem()))->point(i)(0) =
+        libmesh_real(this->get_elem_solution(this->get_mesh_x_var())(i));
 
-  if (_mesh_y_var != libMesh::invalid_uint)
+  if (this->get_mesh_y_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(elem)->point(i)(1) =
-        libmesh_real((*elem_subsolutions[_mesh_y_var])(i));
+      const_cast<Elem*>(&(this->get_elem()))->point(i)(1) =
+        libmesh_real(this->get_elem_solution(this->get_mesh_y_var())(i));
 
-  if (_mesh_z_var != libMesh::invalid_uint)
+  if (this->get_mesh_z_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(elem)->point(i)(2) =
-        libmesh_real((*elem_subsolutions[_mesh_z_var])(i));
+      const_cast<Elem*>(&(this->get_elem()))->point(i)(2) =
+        libmesh_real(this->get_elem_solution(this->get_mesh_z_var())(i));
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
@@ -1581,71 +1581,71 @@ void FEMContext::_do_elem_position_set(Real)
 
 void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
 {
-  elem = e;
+  this->set_elem(e);
 
   // Initialize the per-element data for elem.
-  sys.get_dof_map().dof_indices (elem, dof_indices);
+  sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices.size());
+    (this->get_dof_indices().size());
   const std::size_t n_qoi = sys.qoi.size();
 
   // This also resizes elem_solution
-  sys.current_local_solution->get(dof_indices, elem_solution.get_values());
+  sys.current_local_solution->get(this->get_dof_indices(), this->get_elem_solution().get_values());
 
   if (sys.use_fixed_solution)
-    elem_fixed_solution.resize(n_dofs);
-  elem_solution_rate.resize(n_dofs);
+    this->get_elem_fixed_solution().resize(n_dofs);
+  this->get_elem_solution_rate().resize(n_dofs);
 
   // These resize calls also zero out the residual and jacobian
-  elem_residual.resize(n_dofs);
-  elem_jacobian.resize(n_dofs, n_dofs);
+  this->get_elem_residual().resize(n_dofs);
+  this->get_elem_jacobian().resize(n_dofs, n_dofs);
 
-  elem_qoi_derivative.resize(n_qoi);
-  elem_qoi_subderivatives.resize(n_qoi);
+  this->get_qoi_derivatives().resize(n_qoi);
+  this->_elem_qoi_subderivatives.resize(n_qoi);
   for (std::size_t q=0; q != n_qoi; ++q)
-    elem_qoi_derivative[q].resize(n_dofs);
+    (this->get_qoi_derivatives())[q].resize(n_dofs);
 
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;
     for (unsigned int i=0; i != sys.n_vars(); ++i)
       {
-        sys.get_dof_map().dof_indices (elem, dof_indices_var[i], i);
+        sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
 
         const unsigned int n_dofs_var = cast_int<unsigned int>
-          (dof_indices_var[i].size());
+          (this->get_dof_indices(i).size());
 
-        elem_subsolutions[i]->reposition
+        this->get_elem_solution(i).reposition
           (sub_dofs, n_dofs_var);
 
-        elem_subsolution_rates[i]->reposition
+        this->get_elem_solution_rate(i).reposition
           (sub_dofs, n_dofs_var);
 
         if (sys.use_fixed_solution)
-          elem_fixed_subsolutions[i]->reposition
+          this->get_elem_fixed_solution(i).reposition
             (sub_dofs, n_dofs_var);
 
-        elem_subresiduals[i]->reposition
+        this->get_elem_residual(i).reposition
           (sub_dofs, n_dofs_var);
 
         for (std::size_t q=0; q != n_qoi; ++q)
-          elem_qoi_subderivatives[q][i]->reposition
+          this->get_qoi_derivatives(q,i).reposition
             (sub_dofs, n_dofs_var);
 
         for (unsigned int j=0; j != i; ++j)
           {
             const unsigned int n_dofs_var_j =
               cast_int<unsigned int>
-              (dof_indices_var[j].size());
+              (this->get_dof_indices(j).size());
 
-            elem_subjacobians[i][j]->reposition
-              (sub_dofs, elem_subresiduals[j]->i_off(),
+            this->get_elem_jacobian(i,j).reposition
+              (sub_dofs, this->get_elem_residual(j).i_off(),
                n_dofs_var, n_dofs_var_j);
-            elem_subjacobians[j][i]->reposition
-              (elem_subresiduals[j]->i_off(), sub_dofs,
+            this->get_elem_jacobian(j,i).reposition
+              (this->get_elem_residual(j).i_off(), sub_dofs,
                n_dofs_var_j, n_dofs_var);
           }
-        elem_subjacobians[i][i]->reposition
+        this->get_elem_jacobian(i,i).reposition
           (sub_dofs, sub_dofs,
            n_dofs_var,
            n_dofs_var);
@@ -1655,23 +1655,23 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   }
 
   // Now do the localization for the user requested vectors
-  DiffContext::localized_vectors_iterator localized_vec_it = localized_vectors.begin();
-  const DiffContext::localized_vectors_iterator localized_vec_end = localized_vectors.end();
+  DiffContext::localized_vectors_iterator localized_vec_it = this->_localized_vectors.begin();
+  const DiffContext::localized_vectors_iterator localized_vec_end = this->_localized_vectors.end();
 
   for(; localized_vec_it != localized_vec_end; ++localized_vec_it)
     {
       const NumericVector<Number>& current_localized_vector = *localized_vec_it->first;
       DenseVector<Number>& target_vector = localized_vec_it->second.first;
 
-      current_localized_vector.get(dof_indices, target_vector.get_values());
+      current_localized_vector.get(this->get_dof_indices(), target_vector.get_values());
 
       // Initialize the per-variable data for elem.
       unsigned int sub_dofs = 0;
       for (unsigned int i=0; i != sys.n_vars(); ++i)
         {
           const unsigned int n_dofs_var = cast_int<unsigned int>
-            (dof_indices_var[i].size());
-          sys.get_dof_map().dof_indices (elem, dof_indices_var[i], i);
+            (this->get_dof_indices(i).size());
+          sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
 
           localized_vec_it->second.second[i]->reposition
             (sub_dofs, n_dofs_var);
@@ -1692,7 +1692,7 @@ void FEMContext::_update_time_from_system(Real theta)
   // assert in debug mode if the requested pointer is NULL.
   const Real deltat = this->get_deltat_value();
 
-  this->time = theta*(this->system_time + deltat) + (1.-theta)*this->system_time;
+  this->set_time(theta*(this->get_system_time() + deltat) + (1.-theta)*this->get_system_time());
 }
 
 
@@ -1706,23 +1706,23 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   // If we don't have an Elem to evaluate on, then the only functions
   // we can sensibly evaluate are the scalar dofs which are the same
   // everywhere.
-  libmesh_assert(elem || fe_type.family == SCALAR);
+  libmesh_assert(&(this->get_elem()) || fe_type.family == SCALAR);
 
-  unsigned int elem_dim = elem ? elem->dim() : 0;
+  unsigned int elem_dim = &(this->get_elem()) ? this->get_elem().dim() : 0;
 
   AutoPtr<FEGenericBase<OutputShape> >
     fe_new(FEGenericBase<OutputShape>::build(elem_dim, fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
-  Point master_point = elem ?
-    FEInterface::inverse_map(elem_dim, fe_type, elem, p) :
+  Point master_point = &(this->get_elem()) ?
+    FEInterface::inverse_map(elem_dim, fe_type, &this->get_elem(), p) :
     Point(0);
 
   std::vector<Point> coor(1, master_point);
 
   // Reinitialize the element and compute the shape function values at coor
-  fe_new->reinit (elem, &coor);
+  fe_new->reinit (&this->get_elem(), &coor);
 
   return fe_new;
 }

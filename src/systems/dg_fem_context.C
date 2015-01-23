@@ -71,7 +71,7 @@ DGFEMContext::DGFEMContext (const System &sys)
 
       if ( _neighbor_side_fe[fe_type] == NULL )
         {
-          _neighbor_side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+          _neighbor_side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
         }
       _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
     }
@@ -125,7 +125,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
       FEAbstract* side_fe = _side_fe[neighbor_side_fe_type];
       qface_side_points = side_fe->get_xyz();
 
-      FEInterface::inverse_map (dim,
+      FEInterface::inverse_map (this->_dim,
                                 neighbor_side_fe_type,
                                 &get_neighbor(),
                                 qface_side_points,
@@ -144,7 +144,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices);
 
   const unsigned int n_dofs = cast_int<unsigned int>
-    (dof_indices.size());
+    (this->get_dof_indices().size());
   const unsigned int n_neighbor_dofs = cast_int<unsigned int>
     (_neighbor_dof_indices.size());
 
@@ -172,7 +172,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
           {
             const unsigned int n_dofs_var_j =
               cast_int<unsigned int>
-              (dof_indices_var[j].size());
+              (this->get_dof_indices(j).size());
 
             _elem_elem_subjacobians[i][j]->reposition
               (sub_dofs, _neighbor_subresiduals[j]->i_off(),
@@ -226,4 +226,3 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 }
 
 }
-
