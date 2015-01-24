@@ -47,6 +47,8 @@
 #include "libmesh/abaqus_io.h"
 #include "libmesh/checkpoint_io.h"
 
+#include "libmesh/equation_systems.h"
+
 
 
 namespace libMesh
@@ -496,6 +498,33 @@ void NameBasedIO::write_nodal_data (const std::string& name,
         << "\n Exiting without writing output\n";
     }
 }
+
+
+void NameBasedIO::write_equation_systems (const std::string& filename,
+                                          const EquationSystems& es,
+                                          const std::set<std::string>* system_names)
+{
+  // XDA/XDR require a separate code path, and currently only support
+  // writing complete restarts
+  if (!system_names)
+    {
+      if (filename.rfind(".xda") < filename.size())
+        es.write(filename,WRITE,
+                 EquationSystems::WRITE_DATA |
+                 EquationSystems::WRITE_ADDITIONAL_DATA);
+      else if (filename.rfind(".xdr") < filename.size())
+        es.write(filename,ENCODE,
+                 EquationSystems::WRITE_DATA |
+                 EquationSystems::WRITE_ADDITIONAL_DATA);
+
+      return;
+    }
+
+  // Other formats just use the default "write nodal values" path
+  MeshOutput<MeshBase>::write_equation_systems 
+    (filename, es, system_names);
+}
+
 
 
 } // namespace libMesh

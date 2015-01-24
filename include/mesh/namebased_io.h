@@ -73,6 +73,19 @@ public:
   virtual void write (const std::string& mesh_file);
 
   /**
+   * This method implements writing a mesh with data to a specified file
+   * where the data is taken from the \p EquationSystems object.
+   *
+   * We override the default MeshOutput::write_equation_systems
+   * because it only outputs nodal data by default, whereas we want to
+   * output a proper restart file if the requested filename is an XDA
+   * or XDR type.
+   */
+  virtual void write_equation_systems (const std::string& filename,
+                                       const EquationSystems& es,
+                                       const std::set<std::string>* system_names=NULL);
+
+  /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
