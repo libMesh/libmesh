@@ -393,7 +393,7 @@ const PointLocatorBase& MeshBase::point_locator () const
       // PointLocator construction may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
-      _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
+      _point_locator.reset (PointLocatorBase::build(TREE_ELEMENTS, *this).release());
     }
 
   return *_point_locator;
@@ -407,10 +407,10 @@ AutoPtr<PointLocatorBase> MeshBase::sub_point_locator () const
       // PointLocator construction may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
-      _point_locator.reset (PointLocatorBase::build(TREE, *this).release());
+      _point_locator.reset (PointLocatorBase::build(TREE_ELEMENTS, *this).release());
     }
 
-  return PointLocatorBase::build(TREE, *this, _point_locator.get());
+  return PointLocatorBase::build(TREE_ELEMENTS, *this, _point_locator.get());
 }
 
 
