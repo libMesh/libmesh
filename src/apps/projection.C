@@ -122,6 +122,7 @@ int main(int argc, char** argv)
     assert_argument(cl, "--inmesh", argv[0], std::string("mesh.xda"));
 
   old_mesh.read(meshname);
+  std::cout << "Old Mesh:" << std::endl;
   old_mesh.print_info();
 
   // Load the new mesh from --outmesh filename
@@ -130,6 +131,8 @@ int main(int argc, char** argv)
   const std::string outmeshname = cl.follow(std::string("out_"+meshname), "--outmesh");
 
   new_mesh.read(outmeshname);
+  std::cout << "New Mesh:" << std::endl;
+  new_mesh.print_info();
 
   // Load the old solution from --insoln filename
   // Construct the new solution from the old solution's headers, so
