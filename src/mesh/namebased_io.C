@@ -21,6 +21,9 @@
 #include <fstream>
 #include <vector>
 
+#include <sys/types.h> // getpid
+#include <unistd.h>
+
 // Local includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
@@ -525,7 +528,7 @@ void NameBasedIO::write_equation_systems (const std::string& filename,
     }
 
   // Other formats just use the default "write nodal values" path
-  MeshOutput<MeshBase>::write_equation_systems 
+  MeshOutput<MeshBase>::write_equation_systems
     (filename, es, system_names);
 }
 
