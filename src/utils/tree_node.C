@@ -500,40 +500,26 @@ const Elem* TreeNode<N>::find_element_in_children
 {
   libmesh_assert (!this->active());
 
-  unsigned int excluded_child = libMesh::invalid_uint;
+  std::vector<bool> searched_child(children.size(), false);
 
   // First only look in the children whose bounding box
-  // contain the point p.  Note that only one child will
-  // bound the point since the bounding boxes are not
-  // overlapping
+  // contain the point p.
   for (unsigned int c=0; c<children.size(); c++)
     if (children[c]->bounds_point(p, relative_tol))
       {
-        if (children[c]->active())
-          {
-            const Elem* e =
-              children[c]->find_element(p,allowed_subdomains,
-                                        relative_tol);
+        const Elem* e =
+          children[c]->find_element(p,allowed_subdomains,
+                                    relative_tol);
 
-            if (e != NULL)
-              return e;
-          }
-        else
-          {
-            const Elem* e =
-              children[c]->find_element_in_children(p,allowed_subdomains,
-                                                    relative_tol);
+        if (e != NULL)
+          return e;
 
-            if (e != NULL)
-              return e;
-          }
-
-        // If we get here than the child that bounds the
+        // If we get here then a child that bounds the
         // point does not have any elements that contain
         // the point.  So, we will search all our children.
         // However, we have already searched child c so there
         // is no use searching her again.
-        excluded_child = c;
+        searched_child[c] = true;
       }
 
 
@@ -542,26 +528,14 @@ const Elem* TreeNode<N>::find_element_in_children
   // the point p.  So, let's look at the other children
   // but exclude the one we have already searched.
   for (unsigned int c=0; c<children.size(); c++)
-    if (c != excluded_child)
+    if (!searched_child[c])
       {
-        if (children[c]->active())
-          {
-            const Elem* e =
-              children[c]->find_element(p,allowed_subdomains,
-                                        relative_tol);
+        const Elem* e =
+          children[c]->find_element(p,allowed_subdomains,
+                                    relative_tol);
 
-            if (e != NULL)
-              return e;
-          }
-        else
-          {
-            const Elem* e =
-              children[c]->find_element_in_children(p,allowed_subdomains,
-                                                    relative_tol);
-
-            if (e != NULL)
-              return e;
-          }
+        if (e != NULL)
+          return e;
       }
 
   // If we get here we have searched all our children.
