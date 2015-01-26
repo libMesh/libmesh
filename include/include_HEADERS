@@ -187,6 +187,7 @@ include_HEADERS =  \
         mesh/mesh_triangle_holes.h \
         mesh/mesh_triangle_interface.h \
         mesh/mesh_triangle_wrapper.h \
+        mesh/namebased_io.h \
         mesh/nemesis_io.h \
         mesh/off_io.h \
         mesh/parallel_mesh.h \
