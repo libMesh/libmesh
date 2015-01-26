@@ -101,16 +101,18 @@ public:
   void set_bounding_box (const std::pair<Point, Point>& bbox);
 
   /**
-   * @returns true if this TreeNode (or its children) contain node n,
-   * false otherwise.
+   * @returns true if this TreeNode (or its children) contain node n
+   * (within relative tolerance), false otherwise.
    */
-  bool bounds_node (const Node* nd) const;
+  bool bounds_node (const Node* nd,
+                    Real relative_tol = 0) const;
 
   /**
-   * @returns true if this TreeNode (or its children) contain point p,
-   * false otherwise.
+   * @returns true if this TreeNode (or its children) contain point p
+   * (within relative tolerance), false otherwise.
    */
-  bool bounds_point (const Point &p) const;
+  bool bounds_point (const Point &p,
+                     Real relative_tol = 0) const;
 
   /**
    * @returns the level of the node.
@@ -144,7 +146,10 @@ public:
    * @returns an element containing point p,
    * optionally restricted to a set of allowed subdomains.
    */
-  const Elem* find_element (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
+  const Elem* find_element (const Point& p,
+                            const std::set<subdomain_id_type>
+                              *allowed_subdomains = NULL,
+                            Real relative_tol = TOLERANCE) const;
 
 
 private:
@@ -152,7 +157,10 @@ private:
    * Look for point \p p in our children,
    * optionally restricted to a set of allowed subdomains.
    */
-  const Elem* find_element_in_children (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const;
+  const Elem* find_element_in_children (const Point& p,
+                                        const std::set<subdomain_id_type>
+                                          *allowed_subdomains,
+                                        Real relative_tol) const;
 
   /**
    * Constructs the bounding box for child \p c.

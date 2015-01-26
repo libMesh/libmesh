@@ -180,30 +180,33 @@ void TreeNode<N>::set_bounding_box (const std::pair<Point, Point>& bbox)
 
 
 template <unsigned int N>
-bool TreeNode<N>::bounds_node (const Node* nd) const
+bool TreeNode<N>::bounds_node (const Node* nd,
+                               Real relative_tol) const
 {
   libmesh_assert(nd);
-  return bounds_point(*nd);
+  return bounds_point(*nd, relative_tol);
 }
 
 
 
 template <unsigned int N>
-bool TreeNode<N>::bounds_point (const Point& p) const
+bool TreeNode<N>::bounds_point (const Point& p,
+                                Real relative_tol) const
 {
   const Point& min = bounding_box.first;
   const Point& max = bounding_box.second;
 
+  const Real tol = (max - min).size();
 
-  if ((p(0) >= min(0))
-      && (p(0) <= max(0))
+  if ((p(0) >= min(0) - tol)
+      && (p(0) <= max(0) + tol)
 #if LIBMESH_DIM > 1
-      && (p(1) >= min(1))
-      && (p(1) <= max(1))
+      && (p(1) >= min(1) - tol)
+      && (p(1) <= max(1) + tol)
 #endif
 #if LIBMESH_DIM > 2
-      && (p(2) >= min(2))
-      && (p(2) <= max(2))
+      && (p(2) >= min(2) - tol)
+      && (p(2) <= max(2) + tol)
 #endif
       )
     return true;
@@ -457,25 +460,30 @@ unsigned int TreeNode<N>::n_active_bins() const
 
 
 template <unsigned int N>
-const Elem* TreeNode<N>::find_element(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem*
+TreeNode<N>::find_element
+(const Point& p,
+ const std::set<subdomain_id_type> *allowed_subdomains,
+ Real relative_tol) const
 {
   if (this->active())
     {
       // Only check our children if the point is in our bounding box
       // or if the node contains infinite elements
-      if (this->bounds_point(p) || this->contains_ifems)
+      if (this->bounds_point(p, relative_tol) || this->contains_ifems)
         // Search the active elements in the active TreeNode.
         for (std::vector<const Elem*>::const_iterator pos=elements.begin();
              pos != elements.end(); ++pos)
           if (!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id()))
-            if ((*pos)->active() && (*pos)->contains_point(p))
+            if ((*pos)->active() && (*pos)->contains_point(p, relative_tol))
               return *pos;
 
       // The point was not found in any element
       return NULL;
     }
   else
-    return this->find_element_in_children(p,allowed_subdomains);
+    return this->find_element_in_children(p,allowed_subdomains,
+                                          relative_tol);
 
   libmesh_error_msg("We'll never get here!");
   return NULL;
@@ -485,7 +493,10 @@ const Elem* TreeNode<N>::find_element(const Point& p, const std::set<subdomain_i
 
 
 template <unsigned int N>
-const Elem* TreeNode<N>::find_element_in_children(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem* TreeNode<N>::find_element_in_children
+(const Point& p,
+ const std::set<subdomain_id_type> *allowed_subdomains,
+ Real relative_tol) const
 {
   libmesh_assert (!this->active());
 
@@ -496,18 +507,22 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p, const std::set
   // bound the point since the bounding boxes are not
   // overlapping
   for (unsigned int c=0; c<children.size(); c++)
-    if (children[c]->bounds_point(p))
+    if (children[c]->bounds_point(p, relative_tol))
       {
         if (children[c]->active())
           {
-            const Elem* e = children[c]->find_element(p,allowed_subdomains);
+            const Elem* e =
+              children[c]->find_element(p,allowed_subdomains,
+                                        relative_tol);
 
             if (e != NULL)
               return e;
           }
         else
           {
-            const Elem* e = children[c]->find_element_in_children(p,allowed_subdomains);
+            const Elem* e =
+              children[c]->find_element_in_children(p,allowed_subdomains,
+                                                    relative_tol);
 
             if (e != NULL)
               return e;
@@ -531,14 +546,18 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p, const std::set
       {
         if (children[c]->active())
           {
-            const Elem* e = children[c]->find_element(p,allowed_subdomains);
+            const Elem* e =
+              children[c]->find_element(p,allowed_subdomains,
+                                        relative_tol);
 
             if (e != NULL)
               return e;
           }
         else
           {
-            const Elem* e = children[c]->find_element_in_children(p,allowed_subdomains);
+            const Elem* e =
+              children[c]->find_element_in_children(p,allowed_subdomains,
+                                                    relative_tol);
 
             if (e != NULL)
               return e;

@@ -90,9 +90,13 @@ public:
 
   /**
    * @returns a pointer to the element containing point p,
-   * optionally restricted to a set of allowed subdomains.
+   * optionally restricted to a set of allowed subdomains,
+   * optionally using a non-zero relative tolerance for searches.
    */
-  virtual const Elem* find_element(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const = 0;
+  virtual const Elem* find_element(const Point& p,
+                                   const std::set<subdomain_id_type>
+                                   *allowed_subdomains = NULL,
+                                   Real relative_tol = TOLERANCE) const = 0;
 
 protected:
 

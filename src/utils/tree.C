@@ -144,17 +144,25 @@ void Tree<N>::print_elements(std::ostream& my_out) const
 
 
 template <unsigned int N>
-const Elem* Tree<N>::find_element(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem*
+Tree<N>::find_element
+(const Point& p,
+ const std::set<subdomain_id_type> *allowed_subdomains,
+ Real relative_tol) const
 {
-  return root.find_element(p,allowed_subdomains);
+  return root.find_element(p, allowed_subdomains, relative_tol);
 }
 
 
 
 template <unsigned int N>
-const Elem* Tree<N>::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem*
+Tree<N>::operator()
+(const Point& p,
+ const std::set<subdomain_id_type> *allowed_subdomains,
+ Real relative_tol) const
 {
-  return this->find_element(p,allowed_subdomains);
+  return this->find_element(p, allowed_subdomains, relative_tol);
 }
 
 
