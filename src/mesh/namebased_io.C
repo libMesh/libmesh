@@ -509,15 +509,19 @@ void NameBasedIO::write_equation_systems (const std::string& filename,
   if (!system_names)
     {
       if (filename.rfind(".xda") < filename.size())
-        es.write(filename,WRITE,
-                 EquationSystems::WRITE_DATA |
-                 EquationSystems::WRITE_ADDITIONAL_DATA);
+        {
+          es.write(filename,WRITE,
+                   EquationSystems::WRITE_DATA |
+                   EquationSystems::WRITE_ADDITIONAL_DATA);
+          return;
+        }
       else if (filename.rfind(".xdr") < filename.size())
-        es.write(filename,ENCODE,
-                 EquationSystems::WRITE_DATA |
-                 EquationSystems::WRITE_ADDITIONAL_DATA);
-
-      return;
+        {
+          es.write(filename,ENCODE,
+                   EquationSystems::WRITE_DATA |
+                   EquationSystems::WRITE_ADDITIONAL_DATA);
+          return;
+        }
     }
 
   // Other formats just use the default "write nodal values" path
