@@ -153,7 +153,7 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
           default:
             {
               // Untested above _order=23 but should work...
-              gm_rule( (_order + 2*p)/2 );
+              gm_rule((_order + 2*p)/2, /*dim=*/3);
               return;
             }
           } // end switch (order)

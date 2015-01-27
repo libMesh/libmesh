@@ -132,10 +132,11 @@ private:
                 unsigned int p_level=0);
 
   /**
-   * This routine is called from the different cases of init_3D().
-   * It actually fills the _points and _weights vectors for a given rule index, s.
+   * This routine is called from init_2D() and init_3D().  It actually
+   * fills the _points and _weights vectors for a given rule index, s
+   * and dimension, dim.
    */
-  void gm_rule(unsigned int s);
+  void gm_rule(unsigned int s, unsigned int dim);
 
 
   /**
