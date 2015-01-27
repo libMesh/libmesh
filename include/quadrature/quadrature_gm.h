@@ -125,10 +125,15 @@ private:
   }
 
   /**
-   * The GM rules are only defined for 3D since better 2D rules
-   * for simplexes are available.
+   * Initialize a 3D GM rule.  Only makes sense for Tets.
    */
   void init_3D (const ElemType _type=INVALID_ELEM,
+                unsigned int p_level=0);
+
+  /**
+   * Initialize a 2D GM rule.  Only makes sense for Tris.
+   */
+  void init_2D (const ElemType _type=INVALID_ELEM,
                 unsigned int p_level=0);
 
   /**
@@ -138,7 +143,6 @@ private:
    */
   void gm_rule(unsigned int s, unsigned int dim);
 
-
   /**
    * Routine which generates p-compositions of a given order, s,
    * as well as permutations thereof.  This routine is called internally by
@@ -147,7 +151,6 @@ private:
   void compose_all(unsigned int s, // number to be compositioned
                    unsigned int p, // # of partitions
                    std::vector<std::vector<unsigned int> >& result);
-
 };
 
 
