@@ -239,10 +239,9 @@ public:
 
   void testTriQuadrature ()
   {
-    // There are 2 main families of quadrature rules for triangles
-    QuadratureType qtype[3] = {QCONICAL, QCLOUGH, QGAUSS};
+    QuadratureType qtype[4] = {QCONICAL, QCLOUGH, QGAUSS, QGRUNDMANN_MOLLER};
 
-    for (int qt=0; qt<3; ++qt)
+    for (int qt=0; qt<4; ++qt)
       for (int order=0; order<10; ++order)
         {
           AutoPtr<QBase> qrule = QBase::build(qtype[qt],

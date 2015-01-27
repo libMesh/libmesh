@@ -56,30 +56,30 @@ namespace libMesh
  * 1.0 by definition.)
  *
  * \verbatim
- * s	degree	n_pts(conical)	n_pts(GM)	% neg wts	amp. factor
+ * s   degree  n_pts(conical)  n_pts(GM)   % neg wts  amp. factor
  * ------------------------------------------------------------------------
- * 0	1	1		1		 0.00		1.00e+00
- * 1	3	8		5		20.00		2.60e+00
- * 2	5	27		15		26.67		5.63e+00
- * 3	7	64		35		31.43		1.19e+01
- * 4	9	125		70		34.29		2.54e+01
- * 5	11	216		126		36.51		5.41e+01
- * 6	13	343		210		38.10		1.16e+02
- * 7	15	512		330		39.39		2.51e+02
- * 8	17	729		495		40.40		5.45e+02
- * 9	19	1000		715		41.26		1.19e+03
- * 10	21	1331		1001		41.96		2.59e+03
- * 11	23	1728		1365		42.56		5.68e+03
- * 12	25	2197		1820		43.08		1.25e+04
- * 13	27	2744		2380		43.53		2.75e+04
- * 14	29	3375		3060		43.92		6.07e+04
- * 15	31	4096		3876		44.27		1.34e+05
- * 16	33	4913		4845		44.58		2.97e+05
- * 17	35	5832		5985		44.86		6.59e+05 <= Conical rule has fewer points for degree >= 34
- * 18	37	6859		7315		45.11		1.46e+06
- * 19	39	8000		8855		45.34		3.25e+06
- * 20	41	9261		10626		45.55		7.23e+06
- * 21	43	10648		12650		45.74		1.61e+07
+ * 0   1       1               1            0.00      1.00e+00
+ * 1   3       8               5           20.00      2.60e+00
+ * 2   5       27              15          26.67      5.63e+00
+ * 3   7       64              35          31.43      1.19e+01
+ * 4   9       125             70          34.29      2.54e+01
+ * 5   11      216             126         36.51      5.41e+01
+ * 6   13      343             210         38.10      1.16e+02
+ * 7   15      512             330         39.39      2.51e+02
+ * 8   17      729             495         40.40      5.45e+02
+ * 9   19      1000            715         41.26      1.19e+03
+ * 10  21      1331            1001        41.96      2.59e+03
+ * 11  23      1728            1365        42.56      5.68e+03
+ * 12  25      2197            1820        43.08      1.25e+04
+ * 13  27      2744            2380        43.53      2.75e+04
+ * 14  29      3375            3060        43.92      6.07e+04
+ * 15  31      4096            3876        44.27      1.34e+05
+ * 16  33      4913            4845        44.58      2.97e+05
+ * 17  35      5832            5985        44.86      6.59e+05 <= Conical rule has fewer points for degree >= 34
+ * 18  37      6859            7315        45.11      1.46e+06
+ * 19  39      8000            8855        45.34      3.25e+06
+ * 20  41      9261            10626       45.55      7.23e+06
+ * 21  43      10648           12650       45.74      1.61e+07
  * \endverbatim
  *
  * Reference:
@@ -125,18 +125,23 @@ private:
   }
 
   /**
-   * The GM rules are only defined for 3D since better 2D rules
-   * for simplexes are available.
+   * Initialize a 3D GM rule.  Only makes sense for Tets.
    */
   void init_3D (const ElemType _type=INVALID_ELEM,
                 unsigned int p_level=0);
 
   /**
-   * This routine is called from the different cases of init_3D().
-   * It actually fills the _points and _weights vectors for a given rule index, s.
+   * Initialize a 2D GM rule.  Only makes sense for Tris.
    */
-  void gm_rule(unsigned int s);
+  void init_2D (const ElemType _type=INVALID_ELEM,
+                unsigned int p_level=0);
 
+  /**
+   * This routine is called from init_2D() and init_3D().  It actually
+   * fills the _points and _weights vectors for a given rule index, s
+   * and dimension, dim.
+   */
+  void gm_rule(unsigned int s, unsigned int dim);
 
   /**
    * Routine which generates p-compositions of a given order, s,
@@ -146,7 +151,6 @@ private:
   void compose_all(unsigned int s, // number to be compositioned
                    unsigned int p, // # of partitions
                    std::vector<std::vector<unsigned int> >& result);
-
 };
 
 

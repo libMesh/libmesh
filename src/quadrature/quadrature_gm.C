@@ -44,18 +44,19 @@ QGrundmann_Moller::~QGrundmann_Moller()
 
 
 
-void QGrundmann_Moller::gm_rule(unsigned int s)
+void QGrundmann_Moller::gm_rule(unsigned int s, unsigned int dim)
 {
+  // Only dim==2 or dim==3 is allowed
+  libmesh_assert(dim==2 || dim==3);
+
   // A GM rule of index s can integrate polynomials of degree 2*s+1 exactly
   const unsigned int degree = 2*s+1;
 
-  // Here we are considering only tetrahedra rules, so dim==3
-  const unsigned int dim = 3;
-
   // The number of points for rule of index s is
   // (dim+1+s)! / (dim+1)! / s!
-  // In 3D, this is = 1/24 * P_{i=1}^4 (s+i)
-  const unsigned int n_pts = (s+4)*(s+3)*(s+2)*(s+1) / 24;
+  // In 3D, this is = 1/24 * Pi_{i=1}^4 (s+i)
+  // In 2D, this is =  1/6 * Pi_{i=1}^3 (s+i)
+  const unsigned int n_pts = dim==2 ? (s+3)*(s+2)*(s+1) / 6 : (s+4)*(s+3)*(s+2)*(s+1) / 24;
   //libMesh::out << "n_pts=" << n_pts << std::endl;
 
   // Allocate space for points and weights
@@ -75,15 +76,15 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
   for (unsigned int i=0; i<=s; ++i)
     {
       // Get all the ordered compositions (and their permutations)
-      // of |beta| = s-i into dim+1=4 parts
+      // of |beta| = s-i into dim+1 parts
       compose_all(s-i, dim+1, permutations);
       //libMesh::out << "n. permutations=" << permutations.size() << std::endl;
 
       for (unsigned int p=0; p<permutations.size(); ++p)
         {
-          // We use the first dim=3 entries of each permutation to
+          // We use the first dim entries of each permutation to
           // construct an integration point.
-          for (unsigned int j=0; j<3; ++j)
+          for (unsigned int j=0; j<dim; ++j)
             _points[offset+p](j) =
               static_cast<Real>(2.*permutations[p][j] + 1.) /
               static_cast<Real>(  degree + dim - 2.*i     );
