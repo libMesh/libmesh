@@ -27476,32 +27476,37 @@ ax_cv_cxx_openmp=unknown
 # Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
 #                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
 ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+
 if test "x$OPENMP_CXXFLAGS" != x; then
   ax_openmp_flags="$OPENMP_CXXFLAGS $ax_openmp_flags"
 fi
+
 for ax_openmp_flag in $ax_openmp_flags; do
   case $ax_openmp_flag in
     none) CXXFLAGS=$saveCXX ;;
-    *) CXXFLAGS="$saveCXXFLAGS $ax_openmp_flag" ;;
+    *)    CXXFLAGS="$saveCXXFLAGS $ax_openmp_flag" ;;
   esac
+
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-void omp_set_num_threads(int);
+
+    #include <omp.h>
+
 int
 main ()
 {
-const int N = 100000;
-  int i, arr[N];
 
-  omp_set_num_threads(2);
+    const int N = 100000;
+    int i, arr[N];
 
-  #pragma omp parallel for
-  for (i = 0; i < N; i++) {
-    arr[i] = i;
-  }
+    omp_set_num_threads(2);
+
+    #pragma omp parallel for
+    for (i = 0; i < N; i++)
+    {
+      arr[i] = i;
+    }
+
   ;
   return 0;
 }
@@ -27512,11 +27517,13 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 done
+
 CXXFLAGS=$saveCXXFLAGS
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_openmp" >&5
 $as_echo "$ax_cv_cxx_openmp" >&6; }
+
 if test "x$ax_cv_cxx_openmp" = "xunknown"; then
   enableopenmp=no
 else

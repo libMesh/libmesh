@@ -38,6 +38,7 @@
 # LICENSE
 #
 #   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
+#   Copyright (c) 2015 John W. Peterson <jwpeterson@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -75,29 +76,39 @@ ax_cv_[]_AC_LANG_ABBREV[]_openmp=unknown
 # Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
 #                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
 ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+
 if test "x$OPENMP_[]_AC_LANG_PREFIX[]FLAGS" != x; then
   ax_openmp_flags="$OPENMP_[]_AC_LANG_PREFIX[]FLAGS $ax_openmp_flags"
 fi
+
 for ax_openmp_flag in $ax_openmp_flags; do
   case $ax_openmp_flag in
     none) []_AC_LANG_PREFIX[]FLAGS=$save[]_AC_LANG_PREFIX[] ;;
-    *) []_AC_LANG_PREFIX[]FLAGS="$save[]_AC_LANG_PREFIX[]FLAGS $ax_openmp_flag" ;;
+    *)    []_AC_LANG_PREFIX[]FLAGS="$save[]_AC_LANG_PREFIX[]FLAGS $ax_openmp_flag" ;;
   esac
-  AC_TRY_LINK([#ifdef __cplusplus
-extern "C"
-#endif
-void omp_set_num_threads(int);], [const int N = 100000;
-  int i, arr[N];
 
-  omp_set_num_threads(2);
+  AC_TRY_LINK(
+  [
+    @%:@include <omp.h>
+  ],
+  [
+    const int N = 100000;
+    int i, arr[N];
 
-  #pragma omp parallel for
-  for (i = 0; i < N; i++) {
-    arr[i] = i;
-  }], [ax_cv_[]_AC_LANG_ABBREV[]_openmp=$ax_openmp_flag; break])
+    omp_set_num_threads(2);
+
+    @%:@pragma omp parallel for
+    for (i = 0; i < N; i++)
+    {
+      arr[i] = i;
+    }
+  ],
+  [ax_cv_[]_AC_LANG_ABBREV[]_openmp=$ax_openmp_flag; break])
 done
+
 []_AC_LANG_PREFIX[]FLAGS=$save[]_AC_LANG_PREFIX[]FLAGS
 ])
+
 if test "x$ax_cv_[]_AC_LANG_ABBREV[]_openmp" = "xunknown"; then
   m4_default([$2],:)
 else
