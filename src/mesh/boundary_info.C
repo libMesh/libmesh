@@ -1914,27 +1914,25 @@ std::string& BoundaryInfo::nodeset_name(boundary_id_type id)
 
 boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
 {
-  // This function is searching the keys of the map
-  // We might want to make this more efficient
-  std::map<boundary_id_type, std::string>::const_iterator iter = _ss_id_to_name.begin();
-  std::map<boundary_id_type, std::string>::const_iterator end_iter = _ss_id_to_name.end();
+  // Search sidesets
+  std::map<boundary_id_type, std::string>::const_iterator
+    iter = _ss_id_to_name.begin(),
+    end_iter = _ss_id_to_name.end();
 
-  for ( ; iter != end_iter; ++iter)
-    {
-      if (iter->second == name)
-        return iter->first;
-    }
+  for (; iter != end_iter; ++iter)
+    if (iter->second == name)
+      return iter->first;
 
-  // Loop over nodesets
+  // Search nodesets
   iter = _ns_id_to_name.begin();
   end_iter = _ns_id_to_name.end();
-  for ( ; iter != end_iter; ++iter)
-    {
-      if (iter->second == name)
-        return iter->first;
-    }
+  for (; iter != end_iter; ++iter)
+    if (iter->second == name)
+      return iter->first;
 
-  libmesh_error_msg("The sideset/nodeset named " << name << " does not exist in mesh!");
+  // If we made it here without returning, we don't have a sideset or
+  // nodeset by the requested name, so return invalid_id
+  return invalid_id;
 }
 
 } // namespace libMesh

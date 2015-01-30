@@ -468,8 +468,8 @@ public:
   std::string& nodeset_name(boundary_id_type id);
 
   /**
-   * Returns a the id of the requested boundary by name.  Throws an error
-   * if a sideset or nodeset by name is not found
+   * Returns the id of the named boundary if it exists, invalid_id
+   * otherwise.
    */
   boundary_id_type get_id_by_name(const std::string& name) const;
 
