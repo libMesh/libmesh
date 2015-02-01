@@ -355,6 +355,13 @@ data = [
     '2015-Jan-22', 69,  26,
     '2015-Jan-23', 77,  17,
     '2015-Jan-24', 63,  14,
+    '2015-Jan-25', 27,  9,
+    '2015-Jan-26', 57,  22,
+    '2015-Jan-27', 118, 19,
+    '2015-Jan-28', 91,  21,
+    '2015-Jan-29', 66,  21,
+    '2015-Jan-30', 123, 28,
+    '2015-Jan-31', 27,  11,
     ]
 
 # Github now tracks the total number of clones and unique cloners
@@ -534,6 +541,13 @@ clone_data = [
     '2015-Jan-22', 24, 14,
     '2015-Jan-23', 11, 9,
     '2015-Jan-24', 5,  4,
+    '2015-Jan-25', 5,  5,
+    '2015-Jan-26', 27, 12,
+    '2015-Jan-27', 25, 19,
+    '2015-Jan-28', 45, 20,
+    '2015-Jan-29', 39, 26,
+    '2015-Jan-30', 26, 19,
+    '2015-Jan-31', 8,  6,
     ]
 
 # Extract the dates from the data array
@@ -613,7 +627,8 @@ month_intervals = ['2014-Feb-17',
                    '2014-Aug-17',
                    '2014-Sep-17',
                    '2014-Oct-17',
-                   '2014-Nov-17']
+                   '2014-Nov-17',
+                   '2014-Dec-17']
 
 # Find the indexes of each date
 month_indexes = []
