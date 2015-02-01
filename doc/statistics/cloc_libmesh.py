@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+# Import stuff for working with dates
+from datetime import datetime
+from matplotlib.dates import date2num
+
 # git checkout `git rev-list -n 1 --before="$my_date" master`
 # cloc.pl src/*/*.C include/*/*.h
 
@@ -170,7 +174,12 @@ data = [
        ]
 
 # Extract the dates from the data array
-dates = data[0::3]
+date_strings = data[0::3]
+
+# Convert date strings into numbers
+date_nums = []
+for d in date_strings:
+  date_nums.append(date2num(datetime.strptime(d, '%Y-%m-%d')))
 
 # Extract number of files from data array
 n_files = data[1::3]
@@ -178,47 +187,44 @@ n_files = data[1::3]
 # Extract number of lines of code from data array
 n_lines = data[2::3]
 
-# Set up x array
-N = len(n_files)
-x = np.linspace(1, N, N)
-
 # Get a reference to the figure
 fig = plt.figure()
 
 # 111 is equivalent to Matlab's subplot(1,1,1) command
 ax1 = fig.add_subplot(111)
-ax1.plot(x, n_files, 'bo-')
+ax1.plot(date_nums, n_files, 'bo-')
 ax1.set_ylabel('Files (blue circles)')
 
-# Set up the xticks which are to be shown.  I tried to start with
-# zero, but the label did not show up in the final figure... hence the
-# 1.
-ticks = [1, int(math.ceil(N/3)), int(math.floor(2*N/3)), N-1]
-ax1.set_xticks(ticks)
+# Set up x-tick locations
+ticks_names = ['2003-03-04', '2007-03-04', '2011-03-04', '2015-01-04']
 
-# Create a list of tick labels using an in-place for loop
-tick_labels = [dates[i] for i in ticks]
+# Get numerical values for the names
+tick_nums = []
+for x in ticks_names:
+  tick_nums.append(date2num(datetime.strptime(x, '%Y-%m-%d')))
 
-# Apply the tick labels to the figure
-ax1.set_xticklabels(tick_labels)
+# Set tick labels and positions
+ax1.set_xticks(tick_nums)
+ax1.set_xticklabels(ticks_names)
 
 # Use the twinx() command to plot more data on the other axis
 ax2 = ax1.twinx()
-ax2.plot(x, np.divide(n_lines, 1000.), 'gs-')
+ax2.plot(date_nums, np.divide(n_lines, 1000.), 'gs-')
 ax2.set_ylabel('Lines of code in thousands (green squares)')
 
 # Create linear curve fits of the data
-files_fit = np.polyfit(x, n_files, 1)
-lines_fit = np.polyfit(x, n_lines, 1)
+files_fit = np.polyfit(date_nums, n_files, 1)
+lines_fit = np.polyfit(date_nums, n_lines, 1)
+
+# Convert to files/month
+files_per_month = files_fit[0]*(365./12.)
+lines_per_month = lines_fit[0]*(365./12.)
 
 # Print curve fit data on the plot , '%.1f'
-files_msg = 'Approx. ' + '%.1f' % files_fit[0] + ' files added/month'
-lines_msg = 'Approx. ' + '%.1f' % lines_fit[0] + ' lines added/month'
-ax1.text(50, 300, files_msg);
-ax1.text(50, 250, lines_msg);
-
-# Show the plot - only needed showing interactively in a separate window while python is running.
-# plt.show()
+files_msg = 'Approx. ' + '%.1f' % files_per_month + ' files added/month'
+lines_msg = 'Approx. ' + '%.1f' % lines_per_month + ' lines added/month'
+ax1.text(date_nums[len(date_nums)/4], 300, files_msg);
+ax1.text(date_nums[len(date_nums)/4], 250, lines_msg);
 
 # Save as PDF
 plt.savefig('cloc_libmesh.pdf', format='pdf')
