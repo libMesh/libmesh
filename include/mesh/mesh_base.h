@@ -702,8 +702,8 @@ public:
   const std::string& subdomain_name(subdomain_id_type id) const;
 
   /**
-   * Returns a the id of the requested block by name.  Throws an error
-   * if a block by name is not found
+   * Returns the id of the named subdomain if it exists,
+   * Elem::invalid_subdomain_id otherwise.
    */
   subdomain_id_type get_id_by_name(const std::string& name) const;
 
