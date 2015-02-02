@@ -444,19 +444,18 @@ const std::string& MeshBase::subdomain_name(subdomain_id_type id) const
 
 subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
 {
-  // This function is searching the *values* of the map (linear search)
-  // We might want to make this more efficient...
+  // Linear search over the map values.
   std::map<subdomain_id_type, std::string>::const_iterator
     iter = _block_id_to_name.begin(),
     end_iter = _block_id_to_name.end();
 
   for ( ; iter != end_iter; ++iter)
-    {
-      if (iter->second == name)
-        return iter->first;
-    }
+    if (iter->second == name)
+      return iter->first;
 
-  libmesh_error_msg("Block '" << name << "' does not exist in mesh");
+  // If we made it here without returning, we don't have a subdomain
+  // with the requested name, so return Elem::invalid_subdomain_id.
+  return Elem::invalid_subdomain_id;
 }
 
 
