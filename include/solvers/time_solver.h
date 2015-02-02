@@ -40,7 +40,6 @@ class DifferentiablePhysics;
 class DifferentiableSystem;
 class ParameterVector;
 class SystemNorm;
-class TimeSolver;
 
 /**
  * This is a generic class that defines a solver to handle

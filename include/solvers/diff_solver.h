@@ -33,9 +33,7 @@ namespace libMesh
 {
 
 // Forward Declarations
-class DiffSolver;
 class ImplicitSystem;
-class ParameterVector;
 template <typename T> class NumericVector;
 
 /**
