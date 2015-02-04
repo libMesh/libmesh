@@ -706,7 +706,11 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
                                        mesh_inserter_iterator<Elem>(mesh));
 
   // Make sure mesh dimension is consistent
-  unsigned char mesh_dimension = mesh.mesh_dimension();
+  // We need to set a default first because other processors mesh_dimension is empty.
+  unsigned char mesh_dimension = 1;
+  if(mesh.processor_id() == 0)
+    mesh_dimension = mesh.mesh_dimension();
+
   mesh.comm().broadcast(mesh_dimension);
   mesh.set_mesh_dimension(mesh_dimension);
 

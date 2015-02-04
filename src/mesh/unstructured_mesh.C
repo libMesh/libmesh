@@ -75,7 +75,7 @@ void UnstructuredMesh::copy_nodes_and_elements
 {
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
-  libmesh_assert_equal_to (_dim, other_mesh._dim);
+  libmesh_assert (std::equal(_elem_dims.begin(), _elem_dims.end(), other_mesh._elem_dims.begin()));
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
   // We're assuming the other mesh has proper element number ordering,
@@ -309,7 +309,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                         // any of our neighbor's descendants
                         if( (*my_side == *their_side) &&
                             (element->level() == neighbor->level()) &&
-                            ((_dim != 1) || (ns != ms)) )
+                            ((element->dim() != 1) || (ns != ms)) )
                           {
                             // So share a side.  Is this a mixed pair
                             // of subactive and active/ancestor

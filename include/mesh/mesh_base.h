@@ -155,14 +155,23 @@ public:
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
    */
-  unsigned int mesh_dimension () const
-  { return cast_int<unsigned int>(_dim); }
+  unsigned int mesh_dimension () const;
 
   /**
-   * Resets the logical dimension of the mesh.
+   * Resets the logical dimension of the mesh. If the mesh has
+   * elements of multiple dimensions, this should be set to the largest
+   * dimension. E.g. if the mesh has 1D and 2D elements, this should
+   * be set to 2. If the mesh has 2D and 3D elements, this should be
+   * set to 3.
    */
   void set_mesh_dimension (unsigned char d)
-  { _dim = d; }
+  { _elem_dims.clear(); _elem_dims.insert(d); }
+
+  /**
+   * @returns set of dimensions of elements present in the mesh.
+   */
+  const std::set<unsigned char>& elem_dimensions() const
+  { return _elem_dims; }
 
   /**
    * Returns the spatial dimension of the mesh.  Note that this is
@@ -499,10 +508,11 @@ public:
 
   /**
    * Prepare a newly created (or read) mesh for use.
-   * This involves 3 steps:
+   * This involves 4 steps:
    *  1.) call \p find_neighbors()
    *  2.) call \p partition()
    *  3.) call \p renumber_nodes_and_elements()
+   *  4.) call \p cache_elem_dims()
    *
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false).
@@ -880,6 +890,12 @@ protected:
   { return _n_parts; }
 
   /**
+   * Search the mesh and cache the different dimenions of the elements
+   * present in the mesh.
+   */
+  void cache_elem_dims();
+
+  /**
    * The number of partitions the mesh has.  This is set by
    * the partitioners, and may not be changed directly by
    * the user.
@@ -889,11 +905,6 @@ protected:
    * processor and view the result in GMV.
    */
   unsigned int _n_parts;
-
-  /**
-   * The logical dimension of the mesh.
-   */
-  unsigned char _dim;
 
   /**
    * Flag indicating if the mesh has been prepared for use.
@@ -943,6 +954,12 @@ protected:
    */
   std::map<subdomain_id_type, std::string> _block_id_to_name;
 
+  /**
+   * We cache the dimension of the elements present in the mesh.
+   * So, if we have a mesh with 1D and 2D elements, this structure
+   * will contain 1 and 2.
+   */
+  std::set<unsigned char> _elem_dims;
   /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.

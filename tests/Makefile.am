@@ -15,6 +15,7 @@ unit_tests_sources = \
 	geom/node_test.C \
 	geom/point_test.C \
 	geom/point_test.h \
+	mesh/mixed_dim_mesh_test.C \
 	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C \

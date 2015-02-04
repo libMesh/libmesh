@@ -119,7 +119,8 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h numerics/composite_function_test.C \
+	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
@@ -133,6 +134,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
+	mesh/unit_tests_dbg-mixed_dim_mesh_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-distributed_vector_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-laspack_vector_test.$(OBJEXT) \
@@ -156,7 +158,8 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h numerics/composite_function_test.C \
+	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
@@ -169,6 +172,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
+	mesh/unit_tests_devel-mixed_dim_mesh_test.$(OBJEXT) \
 	numerics/unit_tests_devel-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_devel-distributed_vector_test.$(OBJEXT) \
 	numerics/unit_tests_devel-laspack_vector_test.$(OBJEXT) \
@@ -191,7 +195,8 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h numerics/composite_function_test.C \
+	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
@@ -204,6 +209,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
+	mesh/unit_tests_oprof-mixed_dim_mesh_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-distributed_vector_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-laspack_vector_test.$(OBJEXT) \
@@ -226,7 +232,8 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h numerics/composite_function_test.C \
+	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
@@ -239,6 +246,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
+	mesh/unit_tests_opt-mixed_dim_mesh_test.$(OBJEXT) \
 	numerics/unit_tests_opt-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_opt-distributed_vector_test.$(OBJEXT) \
 	numerics/unit_tests_opt-laspack_vector_test.$(OBJEXT) \
@@ -259,7 +267,8 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h numerics/composite_function_test.C \
+	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
@@ -272,6 +281,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
+	mesh/unit_tests_prof-mixed_dim_mesh_test.$(OBJEXT) \
 	numerics/unit_tests_prof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_prof-distributed_vector_test.$(OBJEXT) \
 	numerics/unit_tests_prof-laspack_vector_test.$(OBJEXT) \
@@ -681,7 +691,7 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	geom/node_test.C geom/point_test.C geom/point_test.h \
-	numerics/composite_function_test.C \
+	mesh/mixed_dim_mesh_test.C numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
@@ -769,6 +779,14 @@ geom/unit_tests_dbg-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/$(am__dirstamp):
+	@$(MKDIR_P) mesh
+	@: > mesh/$(am__dirstamp)
+mesh/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) mesh/$(DEPDIR)
+	@: > mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-mixed_dim_mesh_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/$(am__dirstamp):
 	@$(MKDIR_P) numerics
 	@: > numerics/$(am__dirstamp)
@@ -835,6 +853,8 @@ geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-mixed_dim_mesh_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-distributed_vector_test.$(OBJEXT):  \
@@ -865,6 +885,8 @@ geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-mixed_dim_mesh_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_oprof-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_oprof-distributed_vector_test.$(OBJEXT):  \
@@ -895,6 +917,8 @@ geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-mixed_dim_mesh_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-distributed_vector_test.$(OBJEXT):  \
@@ -925,6 +949,8 @@ geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-mixed_dim_mesh_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-distributed_vector_test.$(OBJEXT):  \
@@ -956,6 +982,7 @@ mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f fparser/*.$(OBJEXT)
 	-rm -f geom/*.$(OBJEXT)
+	-rm -f mesh/*.$(OBJEXT)
 	-rm -f numerics/*.$(OBJEXT)
 	-rm -f parallel/*.$(OBJEXT)
 	-rm -f quadrature/*.$(OBJEXT)
@@ -985,6 +1012,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-node_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-composite_function_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-distributed_vector_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-laspack_vector_test.Po@am__quote@
@@ -1101,6 +1133,20 @@ geom/unit_tests_dbg-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_dbg-point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+mesh/unit_tests_dbg-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_dbg-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_dbg-mixed_dim_mesh_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+
+mesh/unit_tests_dbg-mixed_dim_mesh_test.obj: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mixed_dim_mesh_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_dbg-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_dbg-mixed_dim_mesh_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
 
 numerics/unit_tests_dbg-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_dbg-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_dbg-composite_function_test.Tpo -c -o numerics/unit_tests_dbg-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
@@ -1298,6 +1344,20 @@ geom/unit_tests_devel-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
 
+mesh/unit_tests_devel-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_devel-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_devel-mixed_dim_mesh_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+
+mesh/unit_tests_devel-mixed_dim_mesh_test.obj: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mixed_dim_mesh_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_devel-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_devel-mixed_dim_mesh_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
+
 numerics/unit_tests_devel-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Tpo -c -o numerics/unit_tests_devel-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Po
@@ -1493,6 +1553,20 @@ geom/unit_tests_oprof-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_oprof-point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+mesh/unit_tests_oprof-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_oprof-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_oprof-mixed_dim_mesh_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+
+mesh/unit_tests_oprof-mixed_dim_mesh_test.obj: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mixed_dim_mesh_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_oprof-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_oprof-mixed_dim_mesh_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
 
 numerics/unit_tests_oprof-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-composite_function_test.Tpo -c -o numerics/unit_tests_oprof-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
@@ -1690,6 +1764,20 @@ geom/unit_tests_opt-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
 
+mesh/unit_tests_opt-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_opt-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_opt-mixed_dim_mesh_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+
+mesh/unit_tests_opt-mixed_dim_mesh_test.obj: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mixed_dim_mesh_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_opt-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_opt-mixed_dim_mesh_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
+
 numerics/unit_tests_opt-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Tpo -c -o numerics/unit_tests_opt-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Po
@@ -1885,6 +1973,20 @@ geom/unit_tests_prof-point_test.obj: geom/point_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_prof-point_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+mesh/unit_tests_prof-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_prof-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_prof-mixed_dim_mesh_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
+
+mesh/unit_tests_prof-mixed_dim_mesh_test.obj: mesh/mixed_dim_mesh_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mixed_dim_mesh_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_prof-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mixed_dim_mesh_test.C' object='mesh/unit_tests_prof-mixed_dim_mesh_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mixed_dim_mesh_test.obj `if test -f 'mesh/mixed_dim_mesh_test.C'; then $(CYGPATH_W) 'mesh/mixed_dim_mesh_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mixed_dim_mesh_test.C'; fi`
 
 numerics/unit_tests_prof-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-composite_function_test.Tpo -c -o numerics/unit_tests_prof-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
@@ -2272,6 +2374,8 @@ distclean-generic:
 	-rm -f fparser/$(am__dirstamp)
 	-rm -f geom/$(DEPDIR)/$(am__dirstamp)
 	-rm -f geom/$(am__dirstamp)
+	-rm -f mesh/$(DEPDIR)/$(am__dirstamp)
+	-rm -f mesh/$(am__dirstamp)
 	-rm -f numerics/$(DEPDIR)/$(am__dirstamp)
 	-rm -f numerics/$(am__dirstamp)
 	-rm -f parallel/$(DEPDIR)/$(am__dirstamp)
@@ -2292,7 +2396,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -2338,7 +2442,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

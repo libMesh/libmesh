@@ -47,7 +47,6 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
   ParallelObject (comm_in),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
-  _dim           (d),
   _is_prepared   (false),
   _point_locator (NULL),
   _partitioner   (NULL),
@@ -57,8 +56,9 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
   _skip_partitioning(false),
   _skip_renumber_nodes_and_elements(false)
 {
+  _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
-  libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
+  libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
 }
 
@@ -68,7 +68,6 @@ MeshBase::MeshBase (unsigned char d) :
   ParallelObject (CommWorld),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
-  _dim           (d),
   _is_prepared   (false),
   _point_locator (NULL),
   _partitioner   (NULL),
@@ -78,8 +77,9 @@ MeshBase::MeshBase (unsigned char d) :
   _skip_partitioning(false),
   _skip_renumber_nodes_and_elements(false)
 {
+  _elem_dims.insert(d);
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
-  libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
+  libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
 }
 #endif // !LIBMESH_DISABLE_COMMWORLD
@@ -90,7 +90,6 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   ParallelObject (other_mesh),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
-  _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
   _partitioner   (NULL),
@@ -98,7 +97,8 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _next_unique_id(other_mesh._next_unique_id),
 #endif
   _skip_partitioning(other_mesh._skip_partitioning),
-  _skip_renumber_nodes_and_elements(false)
+  _skip_renumber_nodes_and_elements(false),
+  _elem_dims(other_mesh._elem_dims)
 {
   if(other_mesh._partitioner.get())
     {
@@ -115,7 +115,11 @@ MeshBase::~MeshBase()
   libmesh_exceptionless_assert (!libMesh::closed());
 }
 
-
+unsigned int MeshBase::mesh_dimension() const
+{
+  libmesh_assert(!_elem_dims.empty());
+  return cast_int<unsigned int>(*_elem_dims.rbegin());
+}
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
@@ -177,6 +181,10 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
+  // Search the mesh for all the dimensions of the elements
+  // and cache them.
+  this->cache_elem_dims();
+
   // Reset our PointLocator.  This needs to happen any time the elements
   // in the underlying elements in the mesh have changed, so we do it here.
   this->clear_point_locator();
@@ -197,6 +205,9 @@ void MeshBase::clear ()
 
   // Clear boundary information
   this->get_boundary_info().clear();
+
+  // Clear element dimensions
+  _elem_dims.clear();
 
   // Clear our point locator.
   this->clear_point_locator();
@@ -458,5 +469,19 @@ subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
   return Elem::invalid_subdomain_id;
 }
 
+void MeshBase::cache_elem_dims()
+{
+  // This requires an inspection on every processor
+  parallel_object_only();
+
+  const_element_iterator el  = this->active_local_elements_begin();
+  const_element_iterator end = this->active_local_elements_end();
+
+  for (; el!=end; ++el)
+    _elem_dims.insert((*el)->dim());
+
+  // Some different dimension elements may only live on other processors
+  this->comm().set_union(_elem_dims);
+}
 
 } // namespace libMesh
