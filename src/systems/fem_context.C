@@ -43,6 +43,7 @@ FEMContext::FEMContext (const System &sys)
     _boundary_info(sys.get_mesh().get_boundary_info()),
     _elem(NULL),
     _dim(sys.get_mesh().mesh_dimension()),
+    _elem_dim(0), /* This will be reset in set_elem(). */
     _element_qrule(NULL), _side_qrule(NULL),
     _edge_qrule(NULL)
 {
@@ -1682,7 +1683,13 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
     }
 }
 
+void FEMContext::set_elem( const Elem* e )
+{
+  this->_elem = e;
 
+  // If e is NULL, we assume it's SCALAR and set _elem_dim to 0.
+  this->_elem_dim = this->_elem ? this->_elem->dim() : 0;
+}
 
 void FEMContext::_update_time_from_system(Real theta)
 {

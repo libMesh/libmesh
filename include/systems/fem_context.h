@@ -670,10 +670,20 @@ public:
   { return edge; }
 
   /**
-   * Accessor for cached element dimension
+   * Accessor for cached mesh dimension. This is the largest dimension
+   * of the elements in the mesh. For the dimension of this->_elem, use
+   * get_elem_dim();
    */
   unsigned char get_dim() const
   { return this->_dim; }
+
+  /**
+   * Returns the dimension of this->_elem. For mixed dimension meshes, this
+   * may be different from get_dim().
+   */
+  unsigned char get_elem_dim() const
+  { return _elem_dim; }
+
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -719,9 +729,7 @@ protected:
   /**
    * Helper function to promote accessor usage
    */
-  void set_elem( const Elem* e )
-  { this->_elem = e; }
-
+  void set_elem( const Elem* e );
 
   // gcc-3.4, oracle 12.3 require this typedef to be public
   // in order to use it in a return type
@@ -802,9 +810,14 @@ protected:
   const Elem *_elem;
 
   /**
-   * Cached dimension of elements in this mesh
+   * Cached dimension of largest dimension element in this mesh
    */
   unsigned char _dim;
+
+  /**
+   * Cached dimension of this->_elem.
+   */
+  unsigned char _elem_dim;
 
   /**
    * Quadrature rule for element interior.
