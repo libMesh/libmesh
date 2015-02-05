@@ -1435,7 +1435,7 @@ void FEMContext::side_fe_reinit ()
 
 void FEMContext::edge_fe_reinit ()
 {
-  libmesh_assert_equal_to (this->_dim, 3);
+  libmesh_assert_equal_to (this->get_elem_dim(), 3);
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions
