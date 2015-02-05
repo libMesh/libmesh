@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from operator import add
 
+# Import stuff for working with dates
+from datetime import datetime
+from matplotlib.dates import date2num, num2date
+
 # Number of messages to libmesh-devel and libmesh-users over the life
 # of the project.  I cut and pasted these from the sf website: they
 # are in basically the same format as those pages, which is to say,
@@ -56,29 +60,22 @@ membership_data = [
     'Oct 2014', 118, 257,
     'Nov 2014', 119, 261,
     'Dec 2014', 120, 262,
-    'Jan 2014', 120, 263,
+    'Jan 2015', 120, 263,
 ] # remember to update the indices below!
 
-# The early membership data is spotty, so set indices which are meaningful
-# based on the chronology.  Arbitrarily start with index=1.  Note that +=
-# concatenates lists in Python.
-membership_indices = [1]                                         # 2010
-membership_indices += [i+12 for i in [7, 8, 9, 11, 12]]          # 2011
-membership_indices += [int(i)+24 for i in np.linspace(1,37,37)]  # 2012, 2013, 2014
-
-# print membership_indices
-
 # Strip out the dates from membership_data
-dates = membership_data[0::3]
+date_strings = membership_data[0::3]
+
+# Convert date strings into numbers
+date_nums = []
+for d in date_strings:
+  date_nums.append(date2num(datetime.strptime(d, '%b %Y')))
 
 # Strip out the number of libmesh-devel subscribers from membership_data
 devel_count = membership_data[1::3]
 
 # Strip out the number of libmesh-users subscribers from membership_data
 users_count = membership_data[2::3]
-
-# print devel_count
-# print users_count
 
 # Get a reference to the figure
 fig = plt.figure()
@@ -87,13 +84,13 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 
 # Plot libmesh-devel mailing list membership over time
-devel_line, = ax.plot(membership_indices, devel_count, 'bo-')
+ax.plot(date_nums, devel_count, 'bo-', label='libmesh-devel')
 
 # Plot libmesh-users mailing list membership over time
-users_line, = ax.plot(membership_indices, users_count, 'gs--')
+ax.plot(date_nums, users_count, 'gs--', label='libmesh-users')
 
-# Add a legend to the plot. loc=2 corresponds to "upper left" of the plot.
-plt.legend([devel_line, users_line], ['libmesh-devel', 'libmesh-users'], loc=2)
+# Add a legend to the plot.
+plt.legend(loc='upper left')
 
 # Create title
 fig.suptitle('LibMesh Mailing List Membership Size')
@@ -105,8 +102,8 @@ xtick_indexes = [0, 1, N-1]
 xticks = []
 xticklabels = []
 for index in xtick_indexes:
-    xticks.append(membership_indices[index])
-    xticklabels.append(dates[index])
+    xticks.append(date_nums[index])
+    xticklabels.append(date_strings[index])
 
 ax.set_xticks(xticks)
 ax.set_xticklabels(xticklabels)
@@ -171,8 +168,8 @@ for i in range(0, 12):
     # Strip out the users_data for the current month
     users_data_current_month = users_data[i+1::13]
 
-    # Use the map function to add these lists element-by-element
-    combined_data_current_month = map(add, devel_data_current_month, users_data_current_month)
+    # Get the combined number of messages
+    combined_data_current_month = np.add(devel_data_current_month, users_data_current_month)
 
     # Get reference to the ith axes on a 3x4 grid.  Note that the plot
     # numbering starts at 1, simiarly to Matlab.
@@ -225,8 +222,8 @@ fig.clf()
 devel_numbers = [x for x in devel_data if (isinstance(x, str)==False)]
 users_numbers = [x for x in users_data if (isinstance(x, str)==False)]
 
-# Get the combined data using map
-combined_devel_users_number = map(add, devel_numbers, users_numbers)
+# Get the combined number of messages
+combined_devel_users_number = np.add(devel_numbers, users_numbers)
 
 # 111 is equivalent to Matlab's subplot(1,1,1) command
 ax = fig.add_subplot(111)
@@ -236,10 +233,10 @@ N = len(combined_devel_users_number)
 x = np.linspace(1, N, N)
 
 # Plot the combined data
-combined_bars = ax.bar(x, combined_devel_users_number, width, color='c')
+ax.bar(x, combined_devel_users_number, width, color='c', label='libmesh-users')
 
 # Plot the libmesh-devel data alone
-devel_bars = ax.bar(x, devel_numbers, width, color='b')
+ax.bar(x, devel_numbers, width, color='b', label='libmesh-devel')
 
 # Set the xticks and xticklabels
 xticks = [1, 25, 49, 73, 97, 121, 145]
@@ -247,8 +244,8 @@ xticks = [x+width/2. for x in xticks]
 ax.set_xticks(xticks)
 ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013', '2015'])
 
-# Add a legend to the plot. loc=2 corresponds to "upper left" of the plot.
-plt.legend([combined_bars[0], devel_bars[0]], ['libmesh-users', 'libmesh-devel'], loc=2)
+# Add a legend to the plot.
+plt.legend(loc='upper left')
 
 # Set the xlimits
 plt.xlim(0, N+2);
