@@ -871,9 +871,20 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
                                          mesh.active_local_elements_end()),
                         AssemblyContributions(*this, get_residual, get_jacobian));
 
+  // Check and see if we have SCALAR variables
+  bool have_scalar = false;
+  for(unsigned int i=0; i != this->n_variable_groups(); ++i)
+    {
+      if( this->variable_group(i).type().family == SCALAR )
+        {
+          have_scalar = true;
+          break;
+        }
+    }
+
   // SCALAR dofs are stored on the last processor, so we'll evaluate
-  // their equation terms there
-  if ( this->processor_id() == (this->n_processors()-1) )
+  // their equation terms there and only if we have a SCALAR variable
+  if ( this->processor_id() == (this->n_processors()-1) && have_scalar )
     {
       AutoPtr<DiffContext> con = this->build_context();
       FEMContext &_femcontext = cast_ref<FEMContext&>(*con);
