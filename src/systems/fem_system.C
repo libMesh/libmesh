@@ -873,9 +873,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   // Check and see if we have SCALAR variables
   bool have_scalar = false;
-  for(unsigned int i=0; i != this->n_vars(); ++i)
+  for(unsigned int i=0; i != this->n_variable_groups(); ++i)
     {
-      if( this->variable_type(i).family == SCALAR )
+      if( this->variable_group(i).type().family == SCALAR )
         {
           have_scalar = true;
           break;
