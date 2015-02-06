@@ -860,6 +860,8 @@ include_HEADERS = \
         systems/linear_implicit_system.h \
         systems/newmark_system.h \
         systems/nonlinear_implicit_system.h \
+        systems/parameter_accessor.h \
+        systems/parameter_pointer.h \
         systems/parameter_vector.h \
         systems/qoi_set.h \
         systems/sensitivity_data.h \

@@ -547,7 +547,8 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	equation_systems.h explicit_system.h fem_context.h \
 	fem_system.h frequency_system.h implicit_system.h \
 	linear_implicit_system.h newmark_system.h \
-	nonlinear_implicit_system.h parameter_vector.h qoi_set.h \
+	nonlinear_implicit_system.h parameter_accessor.h \
+	parameter_pointer.h parameter_vector.h qoi_set.h \
 	sensitivity_data.h steady_system.h system.h system_norm.h \
 	system_subset.h system_subset_by_subdomain.h \
 	transient_system.h compare_types.h error_vector.h hashword.h \
@@ -1864,6 +1865,12 @@ newmark_system.h: $(top_srcdir)/include/systems/newmark_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nonlinear_implicit_system.h: $(top_srcdir)/include/systems/nonlinear_implicit_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parameter_accessor.h: $(top_srcdir)/include/systems/parameter_accessor.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parameter_pointer.h: $(top_srcdir)/include/systems/parameter_pointer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_vector.h: $(top_srcdir)/include/systems/parameter_vector.h
