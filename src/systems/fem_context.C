@@ -43,9 +43,18 @@ FEMContext::FEMContext (const System &sys)
     _boundary_info(sys.get_mesh().get_boundary_info()),
     _elem(NULL),
     _dim(sys.get_mesh().mesh_dimension()),
-    _element_qrule(NULL), _side_qrule(NULL),
+    _elem_dim(0), /* This will be reset in set_elem(). */
+    _element_qrule(4,NULL),
+    _side_qrule(4,NULL),
     _edge_qrule(NULL)
 {
+  // Reserve space for the FEAbstract and QBase objects for each
+  // element dimension possiblity (0,1,2,3)
+  _element_fe.resize(4);
+  _side_fe.resize(4);
+  _element_fe_var.resize(4);
+  _side_fe_var.resize(4);
+
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
 
@@ -53,6 +62,8 @@ FEMContext::FEMContext (const System &sys)
 
   libmesh_assert (nv);
   FEType hardest_fe_type = sys.variable_type(0);
+
+  bool have_scalar = false;
 
   for (unsigned int i=0; i != nv; ++i)
     {
@@ -64,78 +75,98 @@ FEMContext::FEMContext (const System &sys)
 
       if (fe_type.order > hardest_fe_type.order)
         hardest_fe_type = fe_type;
+
+      // We need to detect SCALAR's so we can prepare FE objects for them.
+      if( fe_type.family == SCALAR )
+        have_scalar = true;
     }
 
-  // Create an adequate quadrature rule
-  _element_qrule = hardest_fe_type.default_quadrature_rule
-    (this->_dim, sys.extra_quadrature_order).release();
-  _side_qrule = hardest_fe_type.default_quadrature_rule
-    (this->_dim-1, sys.extra_quadrature_order).release();
-  if (this->_dim == 3)
-    _edge_qrule = hardest_fe_type.default_quadrature_rule
-      (1, sys.extra_quadrature_order).release();
+  std::set<unsigned char> elem_dims( sys.get_mesh().elem_dimensions() );
+  if(have_scalar)
+    // SCALAR FEs have dimension 0 by assumption
+    elem_dims.insert(0);
 
-  // Next, create finite element objects
-  // Preserving backward compatibility here for now
-  // Should move to the protected/FEAbstract interface
-  _element_fe_var.resize(nv);
-  _side_fe_var.resize(nv);
-  if (this->_dim == 3)
-    _edge_fe_var.resize(nv);
-
-  for (unsigned int i=0; i != nv; ++i)
+  for( std::set<unsigned char>::const_iterator dim_it = elem_dims.begin();
+       dim_it != elem_dims.end(); ++dim_it )
     {
-      FEType fe_type = sys.variable_type(i);
+      const unsigned char dim = *dim_it;
 
-      if ( _element_fe[fe_type] == NULL )
+      // Create an adequate quadrature rule
+      _element_qrule[dim] = hardest_fe_type.default_quadrature_rule
+        (dim, sys.extra_quadrature_order).release();
+      _side_qrule[dim] = hardest_fe_type.default_quadrature_rule
+        (dim-1, sys.extra_quadrature_order).release();
+      if (dim == 3)
+        _edge_qrule = hardest_fe_type.default_quadrature_rule
+          (1, sys.extra_quadrature_order).release();
+
+      // Next, create finite element objects
+      _element_fe_var[dim].resize(nv);
+      _side_fe_var[dim].resize(nv);
+      if (dim == 3)
+        _edge_fe_var.resize(nv);
+
+
+      for (unsigned int i=0; i != nv; ++i)
         {
-          _element_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
-          _element_fe[fe_type]->attach_quadrature_rule(_element_qrule);
-          _side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
-          _side_fe[fe_type]->attach_quadrature_rule(_side_qrule);
+          FEType fe_type = sys.variable_type(i);
 
-          if (this->_dim == 3)
+          if ( _element_fe[dim][fe_type] == NULL )
             {
-              _edge_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
-              _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule);
-            }
-        }
-      _element_fe_var[i] = _element_fe[fe_type];
-      _side_fe_var[i] = _side_fe[fe_type];
-      if (this->_dim == 3)
-        _edge_fe_var[i] = _edge_fe[fe_type];
+              _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type).release();
+              _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim]);
+              _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type).release();
+              _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim]);
 
+              if (this->_dim == 3)
+                {
+                  _edge_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+                  _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule);
+                }
+            }
+
+          _element_fe_var[dim][i] = _element_fe[dim][fe_type];
+          _side_fe_var[dim][i] = _side_fe[dim][fe_type];
+          if ((dim) == 3)
+            _edge_fe_var[i] = _edge_fe[fe_type];
+
+        }
     }
 }
-
 
 FEMContext::~FEMContext()
 {
   // We don't want to store AutoPtrs in STL containers, but we don't
   // want to leak memory either
-  for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
-       i != _element_fe.end(); ++i)
-    delete i->second;
-  _element_fe.clear();
+  for (std::vector<std::map<FEType, FEAbstract *> >::iterator d = _element_fe.begin();
+       d != _element_fe.end(); ++d)
+    for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
+         i != d->end(); ++i)
+      delete i->second;
 
-  for (std::map<FEType, FEAbstract *>::iterator i = _side_fe.begin();
-       i != _side_fe.end(); ++i)
-    delete i->second;
-  _side_fe.clear();
+  for (std::vector<std::map<FEType, FEAbstract *> >::iterator d = _side_fe.begin();
+       d != _side_fe.end(); ++d)
+    for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
+         i != d->end(); ++i)
+      delete i->second;
 
   for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
        i != _edge_fe.end(); ++i)
     delete i->second;
   _edge_fe.clear();
 
-  delete _element_qrule;
-  _element_qrule = NULL;
+  for (std::vector<QBase*>::iterator i = _element_qrule.begin();
+       i != _element_qrule.end(); ++i)
+    delete *i;
+  _element_qrule.clear();
 
-  delete _side_qrule;
-  _side_qrule = NULL;
+  for (std::vector<QBase*>::iterator i = _side_qrule.begin();
+       i != _side_qrule.end(); ++i)
+    delete *i;
+  _side_qrule.clear();
 
   delete _edge_qrule;
-  _side_qrule = NULL;
+  _edge_qrule = NULL;
 }
 
 
@@ -1409,8 +1440,14 @@ void FEMContext::elem_fe_reinit ()
 {
   // Initialize all the interior FE objects on elem.
   // Logging of FE::reinit is done in the FE functions
-  std::map<FEType, FEAbstract *>::iterator local_fe_end = _element_fe.end();
-  for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
+  // We only reinit the FE objects for the current element
+  // dimension
+  const unsigned char dim = this->get_elem_dim();
+
+  libmesh_assert( !_element_fe[dim].empty() );
+
+  std::map<FEType, FEAbstract *>::iterator local_fe_end = _element_fe[dim].end();
+  for (std::map<FEType, FEAbstract *>::iterator i = _element_fe[dim].begin();
        i != local_fe_end; ++i)
     {
       i->second->reinit(&(this->get_elem()));
@@ -1422,8 +1459,14 @@ void FEMContext::side_fe_reinit ()
 {
   // Initialize all the side FE objects on elem/side.
   // Logging of FE::reinit is done in the FE functions
-  std::map<FEType, FEAbstract *>::iterator local_fe_end = _side_fe.end();
-  for (std::map<FEType, FEAbstract *>::iterator i = _side_fe.begin();
+  // We only reinit the FE objects for the current element
+  // dimension
+  const unsigned char dim = this->get_elem_dim();
+
+  libmesh_assert( !_side_fe[dim].empty() );
+
+  std::map<FEType, FEAbstract *>::iterator local_fe_end = _side_fe[dim].end();
+  for (std::map<FEType, FEAbstract *>::iterator i = _side_fe[dim].begin();
        i != local_fe_end; ++i)
     {
       i->second->reinit(&(this->get_elem()), this->get_side());
@@ -1434,7 +1477,7 @@ void FEMContext::side_fe_reinit ()
 
 void FEMContext::edge_fe_reinit ()
 {
-  libmesh_assert_equal_to (this->_dim, 3);
+  libmesh_assert_equal_to (this->get_elem_dim(), 3);
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions
@@ -1462,22 +1505,25 @@ void FEMContext::elem_position_get()
   //  if (_mesh_sys == this->number())
   //    {
   unsigned int n_nodes = this->get_elem().n_nodes();
+
+  const unsigned char dim = this->get_elem_dim();
+
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
   libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
-                 (this->get_element_fe(this->get_mesh_x_var())->get_fe_type().family
+                 (this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
-                  this->get_element_fe(this->get_mesh_x_var())->get_fe_type().order
+                  this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().order
                   == this->get_elem().default_order()));
   libmesh_assert(this->get_mesh_y_var() == libMesh::invalid_uint ||
-                 (this->get_element_fe(this->get_mesh_y_var())->get_fe_type().family
+                 (this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
-                  this->get_element_fe(this->get_mesh_y_var())->get_fe_type().order
+                  this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().order
                   == this->get_elem().default_order()));
   libmesh_assert(this->get_mesh_z_var() == libMesh::invalid_uint ||
-                 (this->get_element_fe(this->get_mesh_z_var())->get_fe_type().family
+                 (this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
-                  this->get_element_fe(this->get_mesh_z_var())->get_fe_type().order
+                  this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().order
                   == this->get_elem().default_order()));
 
   // Get degree of freedom coefficients from point coordinates
@@ -1517,6 +1563,8 @@ void FEMContext::_do_elem_position_set(Real)
   // operating on elements which share a node
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
+  const unsigned char dim = this->get_elem_dim();
+
   // If the coordinate data is in our own system, it's already
   // been set up for us, and we can ignore our input parameter theta
   //  if (_mesh_sys == this->number())
@@ -1525,15 +1573,15 @@ void FEMContext::_do_elem_position_set(Real)
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
   libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
-                 (this->get_element_fe(this->get_mesh_x_var())->get_fe_type().family
+                 (this->get_element_fe(this->get_mesh_x_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
                   this->get_elem_solution(this->get_mesh_x_var()).size() == n_nodes));
   libmesh_assert(this->get_mesh_y_var() == libMesh::invalid_uint ||
-                 (this->get_element_fe(this->get_mesh_y_var())->get_fe_type().family
+                 (this->get_element_fe(this->get_mesh_y_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
                   this->get_elem_solution(this->get_mesh_y_var()).size() == n_nodes));
   libmesh_assert(this->get_mesh_z_var() == libMesh::invalid_uint ||
-                 (this->get_element_fe(this->get_mesh_z_var())->get_fe_type().family
+                 (this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
                   this->get_elem_solution(this->get_mesh_z_var()).size() == n_nodes));
 
@@ -1682,7 +1730,13 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
     }
 }
 
+void FEMContext::set_elem( const Elem* e )
+{
+  this->_elem = e;
 
+  // If e is NULL, we assume it's SCALAR and set _elem_dim to 0.
+  this->_elem_dim = this->_elem ? this->_elem->dim() : 0;
+}
 
 void FEMContext::_update_time_from_system(Real theta)
 {

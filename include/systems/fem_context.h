@@ -218,29 +218,71 @@ public:
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-
-
   /**
-   * Accessor for interior finite element object for variable var.
+   * Accessor for interior finite element object for variable var for
+   * the largest dimension in the mesh. If you have lower dimensional elements
+   * in the mesh and need to query for those FE objects, use the alternative
+   * get_element_fe method.
    */
   template<typename OutputShape>
-  void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+  void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+  { this->get_element_fe<OutputShape>(var,fe,this->get_dim()); }
 
   /**
-   * Accessor for interior finite element object for scalar-valued variable var.
+   * Accessor for interior finite element object for scalar-valued variable var
+   * for the largest dimension in the mesh. If you have lower dimensional elements
+   * in the mesh and need to query for those FE objects, use the alternative
+   * get_element_fe method.
    */
-  FEBase* get_element_fe( unsigned int var ) const;
+  FEBase* get_element_fe( unsigned int var ) const
+  { return this->get_element_fe(var,this->get_dim()); }
 
   /**
-   * Accessor for edge/face (2D/3D) finite element object for variable var.
+   * Accessor for interior finite element object for variable var for
+   * dimension dim.
    */
   template<typename OutputShape>
-  void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+  void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
+                       unsigned char dim ) const;
 
   /**
-   * Accessor for side finite element object for scalar-valued variable var.
+   * Accessor for interior finite element object for scalar-valued variable var for
+   * dimension dim.
    */
-  FEBase* get_side_fe( unsigned int var ) const;
+  FEBase* get_element_fe( unsigned int var, unsigned char dim ) const;
+
+  /**
+   * Accessor for edge/face (2D/3D) finite element object for variable var
+   * for the largest dimension in the mesh. If you have lower dimensional elements
+   * in the mesh and need to query for those FE objects, use the alternative
+   * get_side_fe method.
+   */
+  template<typename OutputShape>
+  void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+  { this->get_side_fe<OutputShape>(var,fe,this->get_dim()); }
+
+  /**
+   * Accessor for side finite element object for scalar-valued variable var
+   * for the largest dimension in the mesh. If you have lower dimensional elements
+   * in the mesh and need to query for those FE objects, use the alternative
+   * get_side_fe method.
+   */
+  FEBase* get_side_fe( unsigned int var ) const
+  { return this->get_side_fe(var,this->get_dim()); }
+
+  /**
+   * Accessor for edge/face (2D/3D) finite element object for variable var
+   * for dimension dim.
+   */
+  template<typename OutputShape>
+  void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
+                    unsigned char dim ) const;
+
+  /**
+   * Accessor for side finite element object for scalar-valued variable var
+   * for dimension dim.
+   */
+  FEBase* get_side_fe( unsigned int var, unsigned char dim ) const;
 
   /**
    * Accessor for edge (3D only!) finite element object for variable var.
@@ -249,7 +291,7 @@ public:
   void get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
 
   /**
-   * Accessor for edge finite element object for scalar-valued variable var.
+   * Accessor for edge (3D only!) finite element object for scalar-valued variable var.
    */
   FEBase* get_edge_fe( unsigned int var ) const;
 
@@ -557,16 +599,32 @@ public:
   void edge_fe_reinit();
 
   /**
-   * Accessor for element interior quadrature rule.
+   * Accessor for element interior quadrature rule for the dimension of the
+   * current _elem.
    */
   const QBase& get_element_qrule() const
-  { return *(this->_element_qrule); }
+  { return this->get_element_qrule(this->get_elem_dim()); }
+
+  /**
+   * Accessor for element side quadrature rule for the dimension of the
+   * current _elem.
+   */
+  const QBase& get_side_qrule() const
+  { return this->get_side_qrule(this->get_elem_dim()); }
+
+  /**
+   * Accessor for element interior quadrature rule.
+   */
+  const QBase& get_element_qrule( unsigned char dim ) const
+  { libmesh_assert(_element_qrule[dim]);
+    return *(this->_element_qrule[dim]); }
 
   /**
    * Accessor for element side quadrature rule.
    */
-  const QBase& get_side_qrule() const
-  { return *(this->_side_qrule); }
+  const QBase& get_side_qrule( unsigned char dim ) const
+  { libmesh_assert(_side_qrule[dim]);
+    return *(this->_side_qrule[dim]); }
 
   /**
    * Accessor for element edge quadrature rule.
@@ -670,10 +728,20 @@ public:
   { return edge; }
 
   /**
-   * Accessor for cached element dimension
+   * Accessor for cached mesh dimension. This is the largest dimension
+   * of the elements in the mesh. For the dimension of this->_elem, use
+   * get_elem_dim();
    */
   unsigned char get_dim() const
   { return this->_dim; }
+
+  /**
+   * Returns the dimension of this->_elem. For mixed dimension meshes, this
+   * may be different from get_dim().
+   */
+  unsigned char get_elem_dim() const
+  { return _elem_dim; }
+
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -719,9 +787,7 @@ protected:
   /**
    * Helper function to promote accessor usage
    */
-  void set_elem( const Elem* e )
-  { this->_elem = e; }
-
+  void set_elem( const Elem* e );
 
   // gcc-3.4, oracle 12.3 require this typedef to be public
   // in order to use it in a return type
@@ -776,18 +842,22 @@ protected:
 
   /**
    * Finite element objects for each variable's interior, sides and edges.
+   * We store FE objects for each element dimension present in the mesh,
+   * except for edge_fe which only applies to 3D elements.
    */
-  std::map<FEType, FEAbstract*> _element_fe;
-  std::map<FEType, FEAbstract*> _side_fe;
+  std::vector<std::map<FEType, FEAbstract*> > _element_fe;
+  std::vector<std::map<FEType, FEAbstract*> > _side_fe;
   std::map<FEType, FEAbstract*> _edge_fe;
 
 
   /**
    * Pointers to the same finite element objects, but indexed
-   * by variable number
+   * by variable number. We store FE objects for each element dimension
+   * present in the mesh, except for edge_fe_var which only applies
+   * for 3D elements.
    */
-  std::vector<FEAbstract*> _element_fe_var;
-  std::vector<FEAbstract*> _side_fe_var;
+  std::vector<std::vector<FEAbstract*> > _element_fe_var;
+  std::vector<std::vector<FEAbstract*> > _side_fe_var;
   std::vector<FEAbstract*> _edge_fe_var;
 
   /**
@@ -802,28 +872,37 @@ protected:
   const Elem *_elem;
 
   /**
-   * Cached dimension of elements in this mesh
+   * Cached dimension of largest dimension element in this mesh
    */
   unsigned char _dim;
 
   /**
+   * Cached dimension of this->_elem.
+   */
+  unsigned char _elem_dim;
+
+  /**
    * Quadrature rule for element interior.
    * The FEM context will try to find a quadrature rule that
-   * correctly integrates all variables
+   * correctly integrates all variables. We prepare quadrature
+   * rules for each element dimension in the mesh.
    */
-  QBase *_element_qrule;
+  std::vector<QBase*> _element_qrule;
 
   /**
    * Quadrature rules for element sides
    * The FEM context will try to find a quadrature rule that
-   * correctly integrates all variables
+   * correctly integrates all variables. We prepare quadrature
+   * rules for each element dimension in the mesh.
    */
-  QBase *_side_qrule;
+  std::vector<QBase*> _side_qrule;
 
   /**
    * Quadrature rules for element edges.  If the FEM context is told
    * to prepare for edge integration on 3D elements, it will try to
-   * find a quadrature rule that correctly integrates all variables
+   * find a quadrature rule that correctly integrates all variables.
+   * Because edge rules only apply to 3D elements, we don't need to
+   * worry about multiple dimensions
    */
   QBase *_edge_qrule;
 
@@ -860,32 +939,38 @@ void FEMContext::elem_position_set(Real theta)
 
 template<typename OutputShape>
 inline
-void FEMContext::get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+void FEMContext::get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
+                                 unsigned char dim ) const
 {
-  libmesh_assert_less ( var, _element_fe_var.size() );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( _element_fe_var[var] );
+  libmesh_assert( !_element_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_element_fe_var[dim].size() ) );
+  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_element_fe_var[dim][var] ) );
 }
 
 inline
-FEBase* FEMContext::get_element_fe( unsigned int var ) const
+FEBase* FEMContext::get_element_fe( unsigned int var, unsigned char dim ) const
 {
-  libmesh_assert_less ( var, _element_fe_var.size() );
-  return cast_ptr<FEBase*>( _element_fe_var[var] );
+  libmesh_assert( !_element_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_element_fe_var[dim].size() ) );
+  return cast_ptr<FEBase*>( (_element_fe_var[dim][var] ) );
 }
 
 template<typename OutputShape>
 inline
-void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
+                              unsigned char dim ) const
 {
-  libmesh_assert_less ( var, _side_fe_var.size() );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( _side_fe_var[var] );
+  libmesh_assert( !_side_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_side_fe_var[dim].size() ) );
+  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_side_fe_var[dim][var] ) );
 }
 
 inline
-FEBase* FEMContext::get_side_fe( unsigned int var ) const
+FEBase* FEMContext::get_side_fe( unsigned int var, unsigned char dim ) const
 {
-  libmesh_assert_less ( var, _side_fe_var.size() );
-  return cast_ptr<FEBase*>( _side_fe_var[var] );
+  libmesh_assert( !_side_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_side_fe_var[dim].size() ) );
+  return cast_ptr<FEBase*>( (_side_fe_var[dim][var] ) );
 }
 
 template<typename OutputShape>
