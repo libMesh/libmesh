@@ -418,7 +418,7 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
 
 
 std::pair<unsigned int, Real>
-ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
+ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& parameters_in,
                                                     const ParameterVector& weights,
                                                     const QoISet& qoi_indices)
 {
@@ -427,6 +427,9 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
 
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
+
+  ParameterVector& parameters =
+    const_cast<ParameterVector&>(parameters_in);
 
   // The forward system should now already be solved.
   // The adjoint system should now already be solved.
@@ -568,7 +571,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
 
 
 std::pair<unsigned int, Real>
-ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
+ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters_in,
                                             const ParameterVector& weights)
 {
   // Log how long the linear solve takes.
@@ -576,6 +579,9 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
 
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
+
+  ParameterVector& parameters =
+    const_cast<ParameterVector&>(parameters_in);
 
   // The forward system should now already be solved.
 
@@ -651,11 +657,15 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
 
 
 
-void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
+void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters_in)
 {
+  Real deltap = TOLERANCE;
+
+  ParameterVector& parameters =
+    const_cast<ParameterVector&>(parameters_in);
+
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
-  Real deltap = TOLERANCE;
 
   for (unsigned int p=0; p != Np; ++p)
     {
@@ -688,16 +698,19 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parame
 
 void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 (const QoISet&          qoi_indices,
- const ParameterVector& parameters,
+ const ParameterVector& parameters_in,
  SensitivityData&       sensitivities)
 {
+  // We currently get partial derivatives via central differencing
+  const Real delta_p = TOLERANCE;
+
+  ParameterVector& parameters =
+    const_cast<ParameterVector&>(parameters_in);
+
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
   const unsigned int Nq = cast_int<unsigned int>
     (qoi.size());
-
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
 
   // An introduction to the problem:
   //
@@ -823,16 +836,19 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
 void ImplicitSystem::forward_qoi_parameter_sensitivity
 (const QoISet&          qoi_indices,
- const ParameterVector& parameters,
+ const ParameterVector& parameters_in,
  SensitivityData&       sensitivities)
 {
+  // We currently get partial derivatives via central differencing
+  const Real delta_p = TOLERANCE;
+
+  ParameterVector& parameters =
+    const_cast<ParameterVector&>(parameters_in);
+
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
   const unsigned int Nq = cast_int<unsigned int>
     (qoi.size());
-
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
 
   // An introduction to the problem:
   //
@@ -912,12 +928,15 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
 
 void ImplicitSystem::qoi_parameter_hessian_vector_product
 (const QoISet& qoi_indices,
- const ParameterVector& parameters,
+ const ParameterVector& parameters_in,
  const ParameterVector& vector,
  SensitivityData& sensitivities)
 {
   // We currently get partial derivatives via finite differencing
   const Real delta_p = TOLERANCE;
+
+  ParameterVector& parameters =
+    const_cast<ParameterVector&>(parameters_in);
 
   // We'll use a single temporary vector for matrix-vector-vector products
   AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
@@ -1116,11 +1135,14 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
 void ImplicitSystem::qoi_parameter_hessian
 (const QoISet& qoi_indices,
- const ParameterVector& parameters,
+ const ParameterVector& parameters_in,
  SensitivityData& sensitivities)
 {
   // We currently get partial derivatives via finite differencing
   const Real delta_p = TOLERANCE;
+
+  ParameterVector& parameters =
+    const_cast<ParameterVector&>(parameters_in);
 
   // We'll use one temporary vector for matrix-vector-vector products
   AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
