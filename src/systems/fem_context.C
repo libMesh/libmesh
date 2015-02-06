@@ -44,8 +44,17 @@ FEMContext::FEMContext (const System &sys)
     _elem(NULL),
     _dim(sys.get_mesh().mesh_dimension()),
     _elem_dim(0), /* This will be reset in set_elem(). */
+    _element_qrule(4,NULL),
+    _side_qrule(4,NULL),
     _edge_qrule(NULL)
 {
+  // Reserve space for the FEAbstract and QBase objects for each
+  // element dimension possiblity (0,1,2,3)
+  _element_fe.resize(4);
+  _side_fe.resize(4);
+  _element_fe_var.resize(4);
+  _side_fe_var.resize(4);
+
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
 
@@ -129,16 +138,16 @@ FEMContext::~FEMContext()
 {
   // We don't want to store AutoPtrs in STL containers, but we don't
   // want to leak memory either
-  for (std::map<unsigned char, std::map<FEType, FEAbstract *> >::iterator d = _element_fe.begin();
+  for (std::vector<std::map<FEType, FEAbstract *> >::iterator d = _element_fe.begin();
        d != _element_fe.end(); ++d)
-    for (std::map<FEType, FEAbstract *>::iterator i = (d->second).begin();
-         i != (d->second).end(); ++i)
+    for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
+         i != d->end(); ++i)
       delete i->second;
 
-  for (std::map<unsigned char, std::map<FEType, FEAbstract *> >::iterator d = _side_fe.begin();
+  for (std::vector<std::map<FEType, FEAbstract *> >::iterator d = _side_fe.begin();
        d != _side_fe.end(); ++d)
-    for (std::map<FEType, FEAbstract *>::iterator i = (d->second).begin();
-         i != (d->second).end(); ++i)
+    for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
+         i != d->end(); ++i)
       delete i->second;
 
   for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
@@ -146,14 +155,14 @@ FEMContext::~FEMContext()
     delete i->second;
   _edge_fe.clear();
 
-  for (std::map<unsigned char, QBase*>::iterator i = _element_qrule.begin();
+  for (std::vector<QBase*>::iterator i = _element_qrule.begin();
        i != _element_qrule.end(); ++i)
-    delete i->second;
+    delete *i;
   _element_qrule.clear();
 
-  for (std::map<unsigned char, QBase*>::iterator i = _side_qrule.begin();
+  for (std::vector<QBase*>::iterator i = _side_qrule.begin();
        i != _side_qrule.end(); ++i)
-    delete i->second;
+    delete *i;
   _side_qrule.clear();
 
   delete _edge_qrule;
@@ -1435,7 +1444,7 @@ void FEMContext::elem_fe_reinit ()
   // dimension
   const unsigned char dim = this->get_elem_dim();
 
-  libmesh_assert( _element_fe.find(dim) != _element_fe.end() );
+  libmesh_assert( !_element_fe[dim].empty() );
 
   std::map<FEType, FEAbstract *>::iterator local_fe_end = _element_fe[dim].end();
   for (std::map<FEType, FEAbstract *>::iterator i = _element_fe[dim].begin();
@@ -1454,7 +1463,7 @@ void FEMContext::side_fe_reinit ()
   // dimension
   const unsigned char dim = this->get_elem_dim();
 
-  libmesh_assert( _side_fe.find(dim) != _side_fe.end() );
+  libmesh_assert( !_side_fe[dim].empty() );
 
   std::map<FEType, FEAbstract *>::iterator local_fe_end = _side_fe[dim].end();
   for (std::map<FEType, FEAbstract *>::iterator i = _side_fe[dim].begin();

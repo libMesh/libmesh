@@ -616,15 +616,15 @@ public:
    * Accessor for element interior quadrature rule.
    */
   const QBase& get_element_qrule( unsigned char dim ) const
-  { libmesh_assert(_element_qrule.find(dim) != _element_qrule.end());
-    return *(this->_element_qrule.find(dim)->second); }
+  { libmesh_assert(_element_qrule[dim]);
+    return *(this->_element_qrule[dim]); }
 
   /**
    * Accessor for element side quadrature rule.
    */
   const QBase& get_side_qrule( unsigned char dim ) const
-  { libmesh_assert(_side_qrule.find(dim) != _side_qrule.end());
-    return *(this->_side_qrule.find(dim)->second); }
+  { libmesh_assert(_side_qrule[dim]);
+    return *(this->_side_qrule[dim]); }
 
   /**
    * Accessor for element edge quadrature rule.
@@ -845,8 +845,8 @@ protected:
    * We store FE objects for each element dimension present in the mesh,
    * except for edge_fe which only applies to 3D elements.
    */
-  std::map<unsigned char, std::map<FEType, FEAbstract*> > _element_fe;
-  std::map<unsigned char, std::map<FEType, FEAbstract*> > _side_fe;
+  std::vector<std::map<FEType, FEAbstract*> > _element_fe;
+  std::vector<std::map<FEType, FEAbstract*> > _side_fe;
   std::map<FEType, FEAbstract*> _edge_fe;
 
 
@@ -856,8 +856,8 @@ protected:
    * present in the mesh, except for edge_fe_var which only applies
    * for 3D elements.
    */
-  std::map<unsigned char, std::vector<FEAbstract*> > _element_fe_var;
-  std::map<unsigned char, std::vector<FEAbstract*> > _side_fe_var;
+  std::vector<std::vector<FEAbstract*> > _element_fe_var;
+  std::vector<std::vector<FEAbstract*> > _side_fe_var;
   std::vector<FEAbstract*> _edge_fe_var;
 
   /**
@@ -887,7 +887,7 @@ protected:
    * correctly integrates all variables. We prepare quadrature
    * rules for each element dimension in the mesh.
    */
-  std::map<unsigned char, QBase*> _element_qrule;
+  std::vector<QBase*> _element_qrule;
 
   /**
    * Quadrature rules for element sides
@@ -895,7 +895,7 @@ protected:
    * correctly integrates all variables. We prepare quadrature
    * rules for each element dimension in the mesh.
    */
-  std::map<unsigned char, QBase*> _side_qrule;
+  std::vector<QBase*> _side_qrule;
 
   /**
    * Quadrature rules for element edges.  If the FEM context is told
@@ -942,17 +942,17 @@ inline
 void FEMContext::get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
                                  unsigned char dim ) const
 {
-  libmesh_assert( _element_fe_var.find(dim) != _element_fe_var.end() );
-  libmesh_assert_less ( var, (_element_fe_var.find(dim)->second).size() );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_element_fe_var.find(dim)->second)[var] );
+  libmesh_assert( !_element_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_element_fe_var[dim].size() ) );
+  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_element_fe_var[dim][var] ) );
 }
 
 inline
 FEBase* FEMContext::get_element_fe( unsigned int var, unsigned char dim ) const
 {
-  libmesh_assert( _element_fe_var.find(dim) != _element_fe_var.end() );
-  libmesh_assert_less ( var, (_element_fe_var.find(dim)->second).size() );
-  return cast_ptr<FEBase*>( (_element_fe_var.find(dim)->second)[var] );
+  libmesh_assert( !_element_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_element_fe_var[dim].size() ) );
+  return cast_ptr<FEBase*>( (_element_fe_var[dim][var] ) );
 }
 
 template<typename OutputShape>
@@ -960,17 +960,17 @@ inline
 void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
                               unsigned char dim ) const
 {
-  libmesh_assert( _side_fe_var.find(dim) != _side_fe_var.end() );
-  libmesh_assert_less ( var, (_side_fe_var.find(dim)->second).size() );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_side_fe_var.find(dim)->second)[var] );
+  libmesh_assert( !_side_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_side_fe_var[dim].size() ) );
+  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_side_fe_var[dim][var] ) );
 }
 
 inline
 FEBase* FEMContext::get_side_fe( unsigned int var, unsigned char dim ) const
 {
-  libmesh_assert( _side_fe_var.find(dim) != _side_fe_var.end() );
-  libmesh_assert_less ( var, (_side_fe_var.find(dim)->second).size() );
-  return cast_ptr<FEBase*>( (_side_fe_var.find(dim)->second)[var] );
+  libmesh_assert( !_side_fe_var[dim].empty() );
+  libmesh_assert_less ( var, (_side_fe_var[dim].size() ) );
+  return cast_ptr<FEBase*>( (_side_fe_var[dim][var] ) );
 }
 
 template<typename OutputShape>
