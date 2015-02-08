@@ -48,13 +48,13 @@ public:
    * Setter: change the value of the parameter we access.
    */
   virtual void set (const T & new_value)
-    { *_ptr = new_value; }
+    { libmesh_assert(_ptr); *_ptr = new_value; }
 
   /**
    * Getter: get the value of the parameter we access.
    */
   virtual const T& get () const
-    { return *_ptr; }
+    { libmesh_assert(_ptr); return *_ptr; }
 
   /**
    * Reseater: change the location of the parameter we access.
