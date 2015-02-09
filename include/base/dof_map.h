@@ -723,6 +723,12 @@ public:
                                               const dof_id_type dof) const;
 
   /**
+   * @returns a reference to the set of right-hand-side values in
+   * primal constraint equations
+   */
+  DofConstraintValueMap & get_primal_constraint_values();
+
+  /**
    * @returns true if the Node is constrained,
    * false otherwise.
    */
@@ -1550,6 +1556,15 @@ Number DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
 
   return 0;
 }
+
+
+
+inline
+DofConstraintValueMap & DofMap::get_primal_constraint_values()
+{
+  return _primal_constraint_values;
+}
+         
 
 
 #else
