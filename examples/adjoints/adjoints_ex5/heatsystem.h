@@ -43,7 +43,7 @@ public:
   bool & analytic_jacobians() { return _analytic_jacobians; }
 
   // A function to compute and accumulate residuals
-  void perturb_accumulate_residuals(const ParameterVector& parameters);
+  void perturb_accumulate_residuals(ParameterVector& parameters);
 
   // Sensitivity Calculation
   Number & compute_final_sensitivity()
