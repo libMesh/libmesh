@@ -53,7 +53,7 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
-  _skip_partitioning(false),
+  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false)
 {
   _elem_dims.insert(d);
@@ -74,7 +74,7 @@ MeshBase::MeshBase (unsigned char d) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
-  _skip_partitioning(false),
+  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false)
 {
   _elem_dims.insert(d);
@@ -96,7 +96,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(other_mesh._next_unique_id),
 #endif
-  _skip_partitioning(other_mesh._skip_partitioning),
+  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
   _elem_dims(other_mesh._elem_dims)
 {
