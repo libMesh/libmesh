@@ -83,8 +83,9 @@ public:
 
 #ifdef LIBMESH_ENABLE_PERIODIC
     AutoPtr<PointLocatorBase> point_locator;
-    bool have_periodic_boundaries = !_periodic_boundaries.empty();
-    if (have_periodic_boundaries)
+    const bool have_periodic_boundaries =
+      !_periodic_boundaries.empty();
+    if (have_periodic_boundaries && !range.empty())
       point_locator = _mesh.sub_point_locator();
 #endif
 
@@ -146,7 +147,7 @@ public:
 #ifdef LIBMESH_ENABLE_PERIODIC
     AutoPtr<PointLocatorBase> point_locator;
     bool have_periodic_boundaries = !_periodic_boundaries.empty();
-    if (have_periodic_boundaries)
+    if (have_periodic_boundaries && !range.empty())
       point_locator = _mesh.sub_point_locator();
 #endif
 
@@ -1088,10 +1089,16 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   //                       mesh.elements_end());
 
   // compute_periodic_constraints requires a point_locator() from our
-  // Mesh, that point_locator() construction is threaded.  Rather than
-  // nest threads within threads we'll make sure it's preconstructed.
+  // Mesh, but point_locator() construction is parallel and threaded.
+  // Rather than nest threads within threads we'll make sure it's
+  // preconstructed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (!_periodic_boundaries->empty() && !range.empty())
+  bool need_point_locator = !_periodic_boundaries->empty() &&
+          !range.empty();
+
+  this->comm().max(need_point_locator);
+
+  if (need_point_locator)
     mesh.sub_point_locator();
 #endif
 
