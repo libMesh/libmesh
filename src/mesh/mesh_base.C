@@ -354,9 +354,17 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  // NULL partitioner means don't partition
-  // Non-serial meshes aren't ready for partitioning yet.
-  if(!skip_partitioning() &&
+  // If we get here and we have unpartitioned elements, we need that
+  // fixed.
+  if (this->n_unpartitioned_elem() > 0)
+    {
+      libmesh_assert (partitioner().get());
+      libmesh_assert (this->is_serial());
+      partitioner()->partition (*this, n_parts);
+    }
+  // NULL partitioner means don't repartition
+  // Non-serial meshes may not be ready for repartitioning here.
+  else if(!skip_partitioning() &&
      partitioner().get() &&
      this->is_serial())
     {
