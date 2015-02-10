@@ -364,6 +364,11 @@ void MeshBase::partition (const unsigned int n_parts)
     }
   else
     {
+      // Adaptive coarsening may have "orphaned" nodes on processors
+      // whose elements no longer share them.  We need to check for
+      // and possibly fix that.
+      Partitioner::set_node_processor_ids(*this);
+
       // Make sure locally cached partition count
       this->recalculate_n_partitions();
 
