@@ -426,14 +426,20 @@ const PointLocatorBase& MeshBase::point_locator () const
 
 AutoPtr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
+  // If there's no master point locator, then we need one.
   if (_point_locator.get() == NULL)
     {
       // PointLocator construction may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
+      // And it may require parallel communication
+      parallel_object_only();
+
       _point_locator.reset (PointLocatorBase::build(TREE_ELEMENTS, *this).release());
     }
 
+  // Otherwise there was a master point locator, and we can grab a
+  // sub-locator easily.
   return PointLocatorBase::build(TREE_ELEMENTS, *this, _point_locator.get());
 }
 
