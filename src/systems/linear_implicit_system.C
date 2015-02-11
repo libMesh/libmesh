@@ -377,6 +377,7 @@ void LinearImplicitSystem::release_linear_solver(LinearSolver<Number>*) const
 
 
 void LinearImplicitSystem::assembly(bool,
+                                    bool,
                                     bool)
 {
   // Residual R(u(p),p) := A(p)*u(p) - b(p)

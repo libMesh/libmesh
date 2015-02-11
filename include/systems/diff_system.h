@@ -124,7 +124,8 @@ public:
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
    * as requested.
    */
-  virtual void assembly (bool get_residual, bool get_jacobian) = 0;
+  virtual void assembly (bool get_residual, bool get_jacobian,
+                         bool apply_heterogeneous_constraints = false) = 0;
 
   /**
    * Invokes the solver associated with the system.  For steady state
