@@ -677,13 +677,13 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parame
       Number old_parameter = *parameters[p];
       *parameters[p] -= deltap;
 
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
       sensitivity_rhs = *this->rhs;
 
       *parameters[p] = old_parameter + deltap;
 
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
 
       sensitivity_rhs -= *this->rhs;
