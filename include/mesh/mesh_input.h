@@ -87,6 +87,14 @@ protected:
   MT& mesh ();
 
   /**
+   * Sets the number of partitions in the mesh.  Typically this gets
+   * done by the partitioner, but some parallel file formats begin
+   * "pre-partitioned".
+   */
+  void set_n_partitions (unsigned int n_parts)
+    { this->mesh().set_n_partitions() = n_parts; }
+
+  /**
    * A vector of bools describing what dimension elements
    * have been encountered when reading a mesh.
    */

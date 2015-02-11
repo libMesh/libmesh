@@ -47,6 +47,8 @@ class Node;
 class Point;
 class MeshData;
 
+template <class MT>
+class MeshInput;
 
 
 /**
@@ -960,11 +962,18 @@ protected:
    * will contain 1 and 2.
    */
   std::set<unsigned char> _elem_dims;
+
   /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.
    */
   friend class Partitioner;
+
+  /**
+   * The MeshInput classes are friends so that they can set the number
+   * of partitions.
+   */
+  friend class MeshInput<MeshBase>;
 
   /**
    * Make the \p BoundaryInfo class a friend so that

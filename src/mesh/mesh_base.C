@@ -53,7 +53,7 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
-  _skip_partitioning(false),
+  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false)
 {
   _elem_dims.insert(d);
@@ -74,7 +74,7 @@ MeshBase::MeshBase (unsigned char d) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
-  _skip_partitioning(false),
+  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false)
 {
   _elem_dims.insert(d);
@@ -96,7 +96,7 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(other_mesh._next_unique_id),
 #endif
-  _skip_partitioning(other_mesh._skip_partitioning),
+  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
   _elem_dims(other_mesh._elem_dims)
 {
@@ -354,9 +354,17 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 
 void MeshBase::partition (const unsigned int n_parts)
 {
-  // NULL partitioner means don't partition
-  // Non-serial meshes aren't ready for partitioning yet.
-  if(!skip_partitioning() &&
+  // If we get here and we have unpartitioned elements, we need that
+  // fixed.
+  if (this->n_unpartitioned_elem() > 0)
+    {
+      libmesh_assert (partitioner().get());
+      libmesh_assert (this->is_serial());
+      partitioner()->partition (*this, n_parts);
+    }
+  // NULL partitioner means don't repartition
+  // Non-serial meshes may not be ready for repartitioning here.
+  else if(!skip_partitioning() &&
      partitioner().get() &&
      this->is_serial())
     {
@@ -364,6 +372,11 @@ void MeshBase::partition (const unsigned int n_parts)
     }
   else
     {
+      // Adaptive coarsening may have "orphaned" nodes on processors
+      // whose elements no longer share them.  We need to check for
+      // and possibly fix that.
+      Partitioner::set_node_processor_ids(*this);
+
       // Make sure locally cached partition count
       this->recalculate_n_partitions();
 
@@ -413,14 +426,20 @@ const PointLocatorBase& MeshBase::point_locator () const
 
 AutoPtr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
+  // If there's no master point locator, then we need one.
   if (_point_locator.get() == NULL)
     {
       // PointLocator construction may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
+      // And it may require parallel communication
+      parallel_object_only();
+
       _point_locator.reset (PointLocatorBase::build(TREE_ELEMENTS, *this).release());
     }
 
+  // Otherwise there was a master point locator, and we can grab a
+  // sub-locator easily.
   return PointLocatorBase::build(TREE_ELEMENTS, *this, _point_locator.get());
 }
 
