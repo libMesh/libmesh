@@ -156,7 +156,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 }
 
 // Perturb and accumulate dual weighted residuals
-void HeatSystem::perturb_accumulate_residuals(const ParameterVector& parameters_in)
+void HeatSystem::perturb_accumulate_residuals(ParameterVector& parameters_in)
 {
   const unsigned int Np = parameters_in.size();
 

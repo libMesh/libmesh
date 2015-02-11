@@ -23,6 +23,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_common.h"
+#include "libmesh/parameter_pointer.h"
 
 // C++ Includes   -----------------------------------
 #include <vector>
@@ -41,13 +42,18 @@ public:
   /**
    * Default constructor: "no parameters"
    */
-  ParameterVector() {}
+  ParameterVector() : _is_shallow_copy(false) {}
 
   /**
    * Constructor-from-vector-of-Number*: each points to a parameter
    */
   explicit
-  ParameterVector(const std::vector<Number *> &params) : _params(params) {}
+  ParameterVector(const std::vector<Number *> &params);
+
+  /**
+   * Destructor - deletes ParameterAccessor objects
+   */
+  ~ParameterVector();
 
   /**
    * Deep copy constructor: the \p target will now own new copies of
@@ -66,12 +72,12 @@ public:
    * many parameters as I do, will now have those parameters set to my
    * values.
    */
-  void value_copy(const ParameterVector &target) const;
+  void value_copy(ParameterVector &target) const;
 
   /**
    * Resets to "no parameters"
    */
-  void clear() { _params.clear(); }
+  void clear();
 
   /**
    * Returns the number of parameters to be used
@@ -83,7 +89,7 @@ public:
    * resizing a ParameterVector that acts as a proxy to other
    * parameter values
    */
-  void resize(unsigned int s) { _params.resize(s); }
+  void resize(unsigned int s);
 
   /**
    * Sets the number of parameters to be used.  This method is for
@@ -92,15 +98,17 @@ public:
   void deep_resize(unsigned int s);
 
   /**
-   * Returns a pointer to a parameter value
+   * Returns a smart-pointer to a parameter value
    */
-  Number * operator[](unsigned int i) const;
+  const ParameterAccessor<Number>& operator[](unsigned int i) const;
 
   /**
-   * Returns a reference to a pointer to a parameter value,
+   * Returns a reference to a smart-pointer to a parameter value,
    * suitable for repointing it to a different address.
+   * This method is deprecated and may not work with more
+   * sophisticated ParameterAccessor subclasses.
    */
-  Number *& operator[](unsigned int i);
+  ParameterAccessor<Number>& operator[](unsigned int i);
 
   /**
    * Multiplication operator; acts individually on each parameter.
@@ -113,22 +121,22 @@ public:
    */
   ParameterVector& operator += (const ParameterVector& a);
 
-  /**
-   * Addition operator.  The parameter vector to be added in must
-   * have the same number of values.
-   */
-  const ParameterVector& operator += (const ParameterVector& a) const;
-
 private:
   /**
    * Pointers to parameters which may exist elsewhere
    */
-  std::vector<Number *> _params;
+  std::vector<ParameterAccessor<Number> *> _params;
 
   /**
    * Parameters which I own; e.g. as the result of a deep copy
    */
   std::vector<Number> _my_data;
+
+  /**
+   * Am I a shallow copy?  If so then I shouldn't be deleting my
+   * ParameterAccessors.
+   */
+  bool _is_shallow_copy;
 };
 
 
@@ -136,24 +144,54 @@ private:
 // ------------------------------------------------------------
 // ParameterVector inline methods
 
+inline
+ParameterVector::ParameterVector(const std::vector<Number *> &params)
+  : _is_shallow_copy(false)
+{
+  _params.reserve(params.size());
+
+  for (unsigned int i=0; i != params.size(); ++i)
+    _params.push_back(new ParameterPointer<Number>(params[i]));
+}
 
 
 inline
-Number* ParameterVector::operator[] (unsigned int i) const
+ParameterVector::~ParameterVector()
 {
-  libmesh_assert_greater (_params.size(), i);
+  this->clear();
+}
 
-  return _params[i];
+
+inline
+void
+ParameterVector::clear()
+{
+  if (_is_shallow_copy)
+    for (unsigned int i=0; i != _params.size(); ++i)
+      delete _params[i];
+
+  _params.clear();
+  _my_data.clear();
 }
 
 
 
 inline
-Number*& ParameterVector::operator[] (unsigned int i)
+const ParameterAccessor<Number>& ParameterVector::operator[] (unsigned int i) const
 {
   libmesh_assert_greater (_params.size(), i);
 
-  return _params[i];
+  return *_params[i];
+}
+
+
+
+inline
+ParameterAccessor<Number>& ParameterVector::operator[] (unsigned int i)
+{
+  libmesh_assert_greater (_params.size(), i);
+
+  return *_params[i];
 }
 
 } // namespace libMesh
