@@ -1114,6 +1114,9 @@ void XdrIO::read (const std::string& name)
   mesh.reserve_elem(n_elem);
   mesh.reserve_nodes(n_nodes);
 
+  // Our mesh is pre-partitioned as it's created
+  this->set_n_partitions(this->n_processors());
+
   /**
    * We are future proofing the layout of this file by adding in size information for all stored types.
    * TODO: All types are stored as the same size. Use the size information to pack things efficiently.

@@ -169,6 +169,10 @@ void Nemesis_IO::read (const std::string& base_filename)
   // MeshBase& mesh = this->mesh();
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
+  // We're reading a file on each processor, so our mesh is
+  // partitioned into that many parts as it's created
+  this->set_n_partitions(this->n_processors());
+
   // Local information: Read the following information from the standard Exodus header
   //  title[0]
   //  num_dim
