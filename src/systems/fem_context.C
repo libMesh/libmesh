@@ -1588,17 +1588,17 @@ void FEMContext::_do_elem_position_set(Real)
   // Set the new point coordinates
   if (this->get_mesh_x_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(&(this->get_elem()))->point(i)(0) =
+      const_cast<Elem&>(this->get_elem()).point(i)(0) =
         libmesh_real(this->get_elem_solution(this->get_mesh_x_var())(i));
 
   if (this->get_mesh_y_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(&(this->get_elem()))->point(i)(1) =
+      const_cast<Elem&>(this->get_elem()).point(i)(1) =
         libmesh_real(this->get_elem_solution(this->get_mesh_y_var())(i));
 
   if (this->get_mesh_z_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(&(this->get_elem()))->point(i)(2) =
+      const_cast<Elem&>(this->get_elem()).point(i)(2) =
         libmesh_real(this->get_elem_solution(this->get_mesh_z_var())(i));
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
