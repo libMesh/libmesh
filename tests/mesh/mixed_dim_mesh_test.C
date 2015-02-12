@@ -5,7 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/equation_systems.h>
-#include <libmesh/mesh.h>
+#include <libmesh/serial_mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/edge_edge2.h>
 #include <libmesh/face_quad4.h>
