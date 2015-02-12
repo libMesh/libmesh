@@ -707,13 +707,15 @@ public:
    * Accessor for current Elem object
    */
   const Elem& get_elem() const
-  { return *(this->_elem); }
+  { libmesh_assert(this->_elem);
+    return *(this->_elem); }
 
   /**
    * Accessor for current Elem object
    */
   Elem& get_elem()
-  { return *(const_cast<Elem*>(this->_elem)); }
+  { libmesh_assert(this->_elem);
+    return *(const_cast<Elem*>(this->_elem)); }
 
   /**
    * Accessor for current side of Elem object

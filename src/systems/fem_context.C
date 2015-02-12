@@ -1588,17 +1588,17 @@ void FEMContext::_do_elem_position_set(Real)
   // Set the new point coordinates
   if (this->get_mesh_x_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(&(this->get_elem()))->point(i)(0) =
+      const_cast<Elem&>(this->get_elem()).point(i)(0) =
         libmesh_real(this->get_elem_solution(this->get_mesh_x_var())(i));
 
   if (this->get_mesh_y_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(&(this->get_elem()))->point(i)(1) =
+      const_cast<Elem&>(this->get_elem()).point(i)(1) =
         libmesh_real(this->get_elem_solution(this->get_mesh_y_var())(i));
 
   if (this->get_mesh_z_var() != libMesh::invalid_uint)
     for (unsigned int i=0; i != n_nodes; ++i)
-      const_cast<Elem*>(&(this->get_elem()))->point(i)(2) =
+      const_cast<Elem&>(this->get_elem()).point(i)(2) =
         libmesh_real(this->get_elem_solution(this->get_mesh_z_var())(i));
   //    }
   // FIXME - If the coordinate data is not in our own system, someone
@@ -1760,16 +1760,16 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   // If we don't have an Elem to evaluate on, then the only functions
   // we can sensibly evaluate are the scalar dofs which are the same
   // everywhere.
-  libmesh_assert(&(this->get_elem()) || fe_type.family == SCALAR);
+  libmesh_assert(this->has_elem() || fe_type.family == SCALAR);
 
-  unsigned int elem_dim = &(this->get_elem()) ? this->get_elem().dim() : 0;
+  unsigned int elem_dim = this->has_elem() ? this->get_elem().dim() : 0;
 
   AutoPtr<FEGenericBase<OutputShape> >
     fe_new(FEGenericBase<OutputShape>::build(elem_dim, fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
-  Point master_point = &(this->get_elem()) ?
+  Point master_point = this->has_elem() ?
     FEInterface::inverse_map(elem_dim, fe_type, &this->get_elem(), p) :
     Point(0);
 
