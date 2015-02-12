@@ -1762,16 +1762,14 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   // everywhere.
   libmesh_assert(&(this->get_elem()) || fe_type.family == SCALAR);
 
-  unsigned int elem_dim = &(this->get_elem()) ? this->get_elem().dim() : 0;
+  unsigned int elem_dim = this->get_elem().dim();
 
   AutoPtr<FEGenericBase<OutputShape> >
     fe_new(FEGenericBase<OutputShape>::build(elem_dim, fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
-  Point master_point = &(this->get_elem()) ?
-    FEInterface::inverse_map(elem_dim, fe_type, &this->get_elem(), p) :
-    Point(0);
+  Point master_point = FEInterface::inverse_map(elem_dim, fe_type, &this->get_elem(), p);
 
   std::vector<Point> coor(1, master_point);
 
