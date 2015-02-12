@@ -18,7 +18,7 @@ public:
   /**
    * auto-differentiate for var
    */
-  int AutoDiff(const std::string& var_name);
+  int AutoDiff(const std::string & var_name);
 
   /**
    * check if the function is equal to 0
@@ -54,6 +54,17 @@ public:
   Value_t Eval(const Value_t* Vars);
 #endif
 
+  /**
+   * look up the opcode number for a given variable name
+   * throws UnknownVariableException if the variable is not found
+   */
+  unsigned int LookUpVarOpcode(const std::string & var_name);
+
+  /**
+   * register a dependency between variables so that da/db = c
+   */
+  void RegisterDerivative(const std::string & a, const std::string & b, const std::string & c);
+
 private:
   typename FunctionParserBase<Value_t>::Data * mData;
 
@@ -75,11 +86,22 @@ private:
   // function ID for the plog function
   unsigned int mFPlog;
 
+  // registered derivative table, and entry structure
+  struct VariableDerivative {
+    unsigned int var, dependence, derivative;
+  };
+  std::vector<VariableDerivative> mRegisteredDerivatives;
+
   // private implementaion of the automatic differentiation algorithm
   ADImplementation<Value_t> * ad;
 
   // the firewalled implementation class of the AD algorithm has full access to the FParser object
   friend class ADImplementation<Value_t>;
+
+  // Exceptions
+  class UnknownVariable : public std::exception {
+    virtual const char* what() const throw() { return "Unknown variable"; }
+  } UnknownVariableException;
 };
 
 

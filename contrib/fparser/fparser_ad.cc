@@ -38,7 +38,7 @@ public:
       parser(_parser),
       UnsupportedOpcodeException(),
       RefuseToTakeCrazyDerivativeException() {}
-  int AutoDiff(const std::string& var_name);
+  int AutoDiff(unsigned int);
 
 private:
   /**
@@ -84,6 +84,7 @@ FunctionParserADBase<Value_t>::FunctionParserADBase() :
     compiledFunction(NULL),
     mSilenceErrors(false),
     mFPlog(mData->mFuncPtrs.size()),
+    mRegisteredDerivatives(),
     ad(new ADImplementation<Value_t>(this))
 {
   this->AddFunction("plog", fp_plog, 2);
@@ -96,6 +97,7 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     compiledFunction(cpy.compiledFunction),
     mSilenceErrors(cpy.mSilenceErrors),
     mFPlog(cpy.mFPlog),
+    mRegisteredDerivatives(cpy.mRegisteredDerivatives),
     ad(new ADImplementation<Value_t>(this))
 {
 }
@@ -171,10 +173,20 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
   // derivative of a variable is 1 for the variable we are diffing w.r.t. and 0 otherwise
   if (func.IsVar())
   {
-    if (func.GetVar() == var)
+    if (func.GetVar() == var) {
+      // dx/dx = 1
       return CodeTreeAD(CodeTreeImmed(Value_t(1)));
-    else
+    } else {
+      // check if this derivative is registered
+      typename std::vector<typename FunctionParserADBase<Value_t>::VariableDerivative>::const_iterator it;
+      for (it = this->parser->mRegisteredDerivatives.begin();
+           it != this->parser->mRegisteredDerivatives.end(); ++it)
+        if (it->var == func.GetVar() && it->dependence == var)
+          return CodeTreeAD(CodeTreeVar<Value_t>(it->derivative));
+
+      // otherwise return zero
       return CodeTreeAD(CodeTreeImmed(Value_t(0)));
+    }
   }
 
   // derivative being built for regular opcodes
@@ -345,11 +357,39 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 {
   this->ForceDeepCopy();
   mData = this->getParserData();
-  return ad->AutoDiff(var_name);
+  return ad->AutoDiff(LookUpVarOpcode(var_name));
 }
 
 template<typename Value_t>
-int ADImplementation<Value_t>::AutoDiff(const std::string& var_name)
+unsigned int
+FunctionParserADBase<Value_t>::LookUpVarOpcode(const std::string & var_name)
+{
+  // get c string and length of var argument
+  const unsigned len = unsigned(var_name.size());
+  const char* name = var_name.c_str();
+
+  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t> & NamePtrs = mData->mNamePtrs;
+  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t>::iterator vi;
+  for (vi = NamePtrs.begin(); vi != NamePtrs.end(); ++vi)
+    if (len == vi->first.nameLength && std::memcmp(name, vi->first.name, len) == 0)
+      return vi->second.index;
+
+  throw UnknownVariableException;
+}
+
+template<typename Value_t>
+void
+FunctionParserADBase<Value_t>::RegisterDerivative(const std::string & a, const std::string & b, const std::string & c)
+{
+  VariableDerivative rule;
+  rule.var        = LookUpVarOpcode(a);
+  rule.dependence = LookUpVarOpcode(b);
+  rule.derivative = LookUpVarOpcode(c);
+  mRegisteredDerivatives.push_back(rule);
+}
+
+template<typename Value_t>
+int ADImplementation<Value_t>::AutoDiff(unsigned int _var)
 {
   CodeTreeAD orig;
   typename FunctionParserADBase<Value_t>::Data * mData = this->parser->mData;
@@ -361,26 +401,10 @@ int ADImplementation<Value_t>::AutoDiff(const std::string& var_name)
 
   orig.GenerateFrom(*mData, var_trees, false);
 
-  // get c string and length of var argument
-  const unsigned len = unsigned(var_name.size());
-  const char* name = var_name.c_str();
+  // store variable we are diffing for as a member
+  var = _var;
 
-  // figure out the opcode number that corresponds to 'var', the variable we diff for
-  var = 0;
-  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t> & NamePtrs = mData->mNamePtrs;
-  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t>::iterator vi;
-  for (vi = NamePtrs.begin(); vi != NamePtrs.end(); ++vi)
-  {
-    if (len == vi->first.nameLength &&
-        std::memcmp(name, vi->first.name, len) == 0) {
-      var = vi->second.index;
-      break;
-    }
-  }
-
-  // invalid var argument, variable not found
-  if (var == 0) return 1;
-
+  // start recursing the code tree
   CodeTree<Value_t> diff;
   try
   {
