@@ -6,16 +6,13 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
-#define VECTORMAPOBJECTTEST                     \
-  CPPUNIT_TEST( testCreate );                   \
-
-
 class FParserAutodiffTest : public CppUnit::TestCase
 {
 public:
   CPPUNIT_TEST_SUITE ( FParserAutodiffTest );
 
   CPPUNIT_TEST ( runTests );
+  CPPUNIT_TEST ( registerDerivativeTest );
 
   CPPUNIT_TEST_SUITE_END ();
 
@@ -118,6 +115,42 @@ public:
       passed += tests[i].run() ? 1 : 0;
 
     CPPUNIT_ASSERT_EQUAL (passed, ntests);
+  }
+
+  void registerDerivativeTest()
+  {
+    FunctionParserAD R;
+    std::string func = "x*a";
+
+    // Parse the input expression into bytecode
+    R.Parse(func, "x,a,y");
+    R.RegisterDerivative("a", "x", "y");
+
+    // parameter vector
+    double p[3];
+    double & x = p[0];
+    double & a = p[1];
+    double & y = p[2];
+
+    FunctionParserAD dR(R);
+    CPPUNIT_ASSERT_EQUAL (dR.AutoDiff("x"), -1);
+    dR.Optimize();
+    // dR = a+x*y
+
+    FunctionParserAD d2R(dR);
+    CPPUNIT_ASSERT_EQUAL (d2R.AutoDiff("x"), -1);
+    d2R.Optimize();
+    // d2R = 2*y
+
+    // we probe the parsers and check if they agree with the reference solution
+    for (x = -1.0; x < 1.0; x+=0.3726)
+      for (a = -1.0; a < 1.0; a+=0.2642)
+        for (y = -1.0; y < 1.0; y+=0.3156)
+        {
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(R.Eval(p), x*a, 1.e-12);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(dR.Eval(p), a+x*y, 1.e-12);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(d2R.Eval(p), 2*y, 1.e-12);
+        }
   }
 };
 
