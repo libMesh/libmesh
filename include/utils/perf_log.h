@@ -440,7 +440,7 @@ void PerfLog::pop (const std::string &libmesh_dbg_var(label),
 
 inline
 void PerfLog::pop(const char *label,
-                    const char *header)
+                  const char *header)
 {
   if (this->log_events)
     this->pop(std::string(label), std::string(header));

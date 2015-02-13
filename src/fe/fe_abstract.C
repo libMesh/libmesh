@@ -1132,8 +1132,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
               if (neigh->level() <= elem->level())
                 {
                   unsigned int s_neigh =
-                    mesh.get_boundary_info().side_with_boundary_id
-                      (neigh, periodic->pairedboundary);
+                    mesh.get_boundary_info().side_with_boundary_id(neigh, periodic->pairedboundary);
                   libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
 #ifdef LIBMESH_ENABLE_AMR

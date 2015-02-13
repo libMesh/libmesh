@@ -55,8 +55,8 @@ namespace libMesh
 #undef libmesh_parallel_only
 #ifndef NDEBUG
 #define libmesh_parallel_only(comm_obj) do {                            \
-    libmesh_assert((comm_obj).verify(std::string(__FILE__).size()));      \
-    libmesh_assert((comm_obj).verify(std::string(__FILE__)));             \
+    libmesh_assert((comm_obj).verify(std::string(__FILE__).size()));    \
+    libmesh_assert((comm_obj).verify(std::string(__FILE__)));           \
     libmesh_assert((comm_obj).verify(__LINE__)); } while (0)
 #else
 #define libmesh_parallel_only(comm_obj)  ((void) 0)

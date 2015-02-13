@@ -99,10 +99,9 @@ void ExplicitSystem::assemble_qoi (const QoISet& qoi_indices)
 
 
 
-void ExplicitSystem::assemble_qoi_derivative
-  (const QoISet& qoi_indices,
-   bool include_liftfunc,
-   bool apply_constraints)
+void ExplicitSystem::assemble_qoi_derivative (const QoISet& qoi_indices,
+                                              bool include_liftfunc,
+                                              bool apply_constraints)
 {
   // The user quantity of interest derivative assembly gets to expect
   // to accumulate on initially zero vectors

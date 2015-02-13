@@ -92,7 +92,7 @@ extern "C" {
 // Clang provides the __has_builtin macro, we define it for compilers
 // that don't...
 #ifndef __has_builtin
-  #define __has_builtin(x) 0
+#define __has_builtin(x) 0
 #endif
 
 // Fine-grained ifdefs for all three inverse hyperbolic trig
@@ -2983,8 +2983,8 @@ GetPot::_DBE_expand(const std::string& expr)
             return _convert_from_type(std::time(NULL));
           else
             {
-              getpot_cerr << "ERROR: unrecognized function " <<
-                             funcname << std::endl;
+              getpot_cerr << "ERROR: unrecognized function "
+                          << funcname << std::endl;
               getpot_error();
             }
         }

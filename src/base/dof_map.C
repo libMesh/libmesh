@@ -1855,7 +1855,7 @@ void DofMap::dof_indices (const Elem* const elem,
 #ifdef DEBUG
                              , tot_size
 #endif
-                            );
+                             );
             }
         }
 
@@ -1927,7 +1927,7 @@ void DofMap::dof_indices (const Elem* const elem,
 #ifdef DEBUG
                        , tot_size
 #endif
-                      );
+                       );
         }
 
       STOP_LOG("dof_indices()", "DofMap");

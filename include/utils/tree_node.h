@@ -147,8 +147,7 @@ public:
    * optionally restricted to a set of allowed subdomains.
    */
   const Elem* find_element (const Point& p,
-                            const std::set<subdomain_id_type>
-                              *allowed_subdomains = NULL,
+                            const std::set<subdomain_id_type>* allowed_subdomains = NULL,
                             Real relative_tol = TOLERANCE) const;
 
 
@@ -158,8 +157,7 @@ private:
    * optionally restricted to a set of allowed subdomains.
    */
   const Elem* find_element_in_children (const Point& p,
-                                        const std::set<subdomain_id_type>
-                                          *allowed_subdomains,
+                                        const std::set<subdomain_id_type>* allowed_subdomains,
                                         Real relative_tol) const;
 
   /**

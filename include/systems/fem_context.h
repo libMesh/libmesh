@@ -798,9 +798,7 @@ public:
   /**
    * Helper typedef to simplify refactoring
    */
-  typedef
-    const DenseSubVector<Number>&
-      (DiffContext::*diff_subsolution_getter)(unsigned int) const;
+  typedef const DenseSubVector<Number>& (DiffContext::*diff_subsolution_getter)(unsigned int) const;
 
 protected:
   /**
@@ -809,8 +807,7 @@ protected:
    */
   template<typename OutputType,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_value
-    (unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_interior_value(unsigned int var, unsigned int qp, OutputType& u) const;
 
   /**
    * Helper function to reduce some code duplication in the
@@ -818,8 +815,7 @@ protected:
    */
   template<typename OutputType,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_gradient
-    (unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_interior_gradient(unsigned int var, unsigned int qp, OutputType& u) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -828,8 +824,7 @@ protected:
    */
   template<typename OutputType,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_hessian
-    (unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_interior_hessian(unsigned int var, unsigned int qp, OutputType& u) const;
 #endif
 
   /**
@@ -838,8 +833,7 @@ protected:
    */
   template<typename OutputType,
            diff_subsolution_getter subsolution_getter>
-  void some_side_value
-    (unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_side_value(unsigned int var, unsigned int qp, OutputType& u) const;
 
 
   /**

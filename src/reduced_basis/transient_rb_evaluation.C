@@ -221,15 +221,15 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
       RB_RHS_matrix.add( -(1.-euler_theta)*trans_theta_expansion.eval_A_theta(q_a,mu), RB_Aq_a);
     }
 
-   // Add forcing terms
-   DenseVector<Number> RB_Fq_f;
-   RB_RHS_save.resize(N);
-   RB_RHS_save.zero();
-   for(unsigned int q_f=0; q_f<Q_f; q_f++)
-   {
-     RB_Fq_vector[q_f].get_principal_subvector(N, RB_Fq_f);
-     RB_RHS_save.add(trans_theta_expansion.eval_F_theta(q_f,mu), RB_Fq_f);
-   }
+  // Add forcing terms
+  DenseVector<Number> RB_Fq_f;
+  RB_RHS_save.resize(N);
+  RB_RHS_save.zero();
+  for(unsigned int q_f=0; q_f<Q_f; q_f++)
+    {
+      RB_Fq_vector[q_f].get_principal_subvector(N, RB_Fq_f);
+      RB_RHS_save.add(trans_theta_expansion.eval_F_theta(q_f,mu), RB_Fq_f);
+    }
 
   // Set system time level to 0
   set_time_step(0);
@@ -388,9 +388,7 @@ Real TransientRBEvaluation::rb_solve_again()
 
   // Load the initial condition into RB_solution
   if(N > 0)
-  {
     RB_solution = RB_initial_condition_all_N[N-1];
-  }
 
   // Resize/clear the old solution vector
   old_RB_solution.resize(N);
@@ -399,22 +397,20 @@ Real TransientRBEvaluation::rb_solve_again()
   DenseVector<Number> RB_rhs(N);
   RB_rhs.zero();
 
-  for(unsigned int time_level=1; time_level<=n_time_steps; time_level++)
-  {
-    set_time_step(time_level);
-    old_RB_solution = RB_solution;
-
-    // Compute RB_rhs, as *RB_lhs_matrix x old_RB_solution
-    RB_RHS_matrix.vector_mult(RB_rhs, old_RB_solution);
-
-    // Add forcing terms
-    RB_rhs.add(get_control(time_level), RB_RHS_save);
-
-    if(N > 0)
+  for (unsigned int time_level=1; time_level<=n_time_steps; time_level++)
     {
-      RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
+      set_time_step(time_level);
+      old_RB_solution = RB_solution;
+
+      // Compute RB_rhs, as *RB_lhs_matrix x old_RB_solution
+      RB_RHS_matrix.vector_mult(RB_rhs, old_RB_solution);
+
+      // Add forcing terms
+      RB_rhs.add(get_control(time_level), RB_RHS_save);
+
+      if (N > 0)
+        RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
     }
-  }
 
   {
     // Just return -1. We did not compute the error bound

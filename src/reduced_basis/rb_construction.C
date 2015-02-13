@@ -1260,20 +1260,20 @@ void RBConstruction::update_system()
   libMesh::out << "Updating RB residual terms" << std::endl;
 
   if(use_inner_product_solver)
-  {
-    // Switch to inner_product_solver
-    original_linear_solver = this->linear_solver.release();
-    this->linear_solver.reset(inner_product_solver.release());
-  }
+    {
+      // Switch to inner_product_solver
+      original_linear_solver = this->linear_solver.release();
+      this->linear_solver.reset(inner_product_solver.release());
+    }
 
   update_residual_terms();
 
   if(use_inner_product_solver)
-  {
-    // Switch back to original_linear_solver
-    inner_product_solver.reset(this->linear_solver.release());
-    this->linear_solver.reset(original_linear_solver);
-  }
+    {
+      // Switch back to original_linear_solver
+      inner_product_solver.reset(this->linear_solver.release());
+      this->linear_solver.reset(original_linear_solver);
+    }
 }
 
 Real RBConstruction::get_RB_error_bound()
@@ -1294,11 +1294,11 @@ Real RBConstruction::get_RB_error_bound()
 void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
 {
   if(use_inner_product_solver)
-  {
-    // Switch to inner_product_solver
-    original_linear_solver = this->linear_solver.release();
-    this->linear_solver.reset(inner_product_solver.release());
-  }
+    {
+      // Switch to inner_product_solver
+      original_linear_solver = this->linear_solver.release();
+      this->linear_solver.reset(inner_product_solver.release());
+    }
 
   // Compute the basis independent terms
   Fq_representor_innerprods_computed = false;
@@ -1313,11 +1313,11 @@ void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
   delta_N = saved_delta_N;
 
   if(use_inner_product_solver)
-  {
-    // Switch back to original_linear_solver
-    inner_product_solver.reset(this->linear_solver.release());
-    this->linear_solver.reset(original_linear_solver);
-  }
+    {
+      // Switch back to original_linear_solver
+      inner_product_solver.reset(this->linear_solver.release());
+      this->linear_solver.reset(original_linear_solver);
+    }
 }
 
 Real RBConstruction::compute_max_error_bound()
@@ -1482,16 +1482,16 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
   if(reuse_preconditioner)
     {
       if(use_inner_product_solver)
-      {
-        // If we're using inner_product_solver, then we
-        // can reuse the preconditioner
-        linear_solver->reuse_preconditioner(true);
-      }
+        {
+          // If we're using inner_product_solver, then we
+          // can reuse the preconditioner
+          linear_solver->reuse_preconditioner(true);
+        }
       else
-      {
-        // For the first solve, make sure we generate a new preconditioner
-        linear_solver->reuse_preconditioner(false);
-      }
+        {
+          // For the first solve, make sure we generate a new preconditioner
+          linear_solver->reuse_preconditioner(false);
+        }
     }
 
   for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
@@ -1752,16 +1752,16 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
       if(reuse_preconditioner)
         {
           if(use_inner_product_solver)
-          {
-            // If we're using inner_product_solver, then we
-            // can reuse the preconditioner
-            linear_solver->reuse_preconditioner(true);
-          }
+            {
+              // If we're using inner_product_solver, then we
+              // can reuse the preconditioner
+              linear_solver->reuse_preconditioner(true);
+            }
           else
-          {
-            // For the first solve, make sure we generate a new preconditioner
-            linear_solver->reuse_preconditioner(false);
-          }
+            {
+              // For the first solve, make sure we generate a new preconditioner
+              linear_solver->reuse_preconditioner(false);
+            }
         }
 
       for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)

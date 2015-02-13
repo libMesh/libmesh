@@ -622,7 +622,7 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
     case GHEP:
       ierr = EPSSetProblemType (_eps, EPS_GHEP);  LIBMESH_CHKERRABORT(ierr); return;
 #if !SLEPC_VERSION_LESS_THAN(3,3,0)
-    // EPS_GHIEP added in 3.3.0
+      // EPS_GHIEP added in 3.3.0
     case GHIEP:
       ierr = EPSSetProblemType (_eps, EPS_GHIEP);  LIBMESH_CHKERRABORT(ierr); return;
 #endif

@@ -157,10 +157,9 @@ Tree<N>::find_element
 
 template <unsigned int N>
 const Elem*
-Tree<N>::operator()
-(const Point& p,
- const std::set<subdomain_id_type> *allowed_subdomains,
- Real relative_tol) const
+Tree<N>::operator() (const Point& p,
+                     const std::set<subdomain_id_type> *allowed_subdomains,
+                     Real relative_tol) const
 {
   return this->find_element(p, allowed_subdomains, relative_tol);
 }

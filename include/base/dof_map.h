@@ -1378,8 +1378,7 @@ private:
    * Data structure containing DOF constraints.  The ith
    * entry is the constraint matrix row for DOF i.
    */
-  DofConstraints             _dof_constraints,
-                             _stashed_dof_constraints;
+  DofConstraints _dof_constraints, _stashed_dof_constraints;
 
   DofConstraintValueMap      _primal_constraint_values;
 

@@ -532,11 +532,7 @@ void UnstructuredMesh::write (const std::string& name,
       if (name.rfind(".unv") < name.size())
         UNVIO(*this, mesh_data).write (name);
       else
-        {
-          libMesh::err << "Only UNV output supports MeshData" <<
-                          std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Only UNV output supports MeshData");
     }
 
   NameBasedIO(*this).write(name);

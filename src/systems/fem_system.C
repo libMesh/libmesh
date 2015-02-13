@@ -500,8 +500,7 @@ public:
                     for (unsigned int d=0;
                          d != _femcontext.get_dof_indices().size(); ++d)
                       this->qoi[q] -= _femcontext.get_elem_residual()(d) *
-                        _sys.get_dof_map().has_heterogenous_adjoint_constraint
-                          (q, _femcontext.get_dof_indices()[d]);
+                        _sys.get_dof_map().has_heterogenous_adjoint_constraint(q, _femcontext.get_dof_indices()[d]);
                   }
               }
 
@@ -632,7 +631,7 @@ public:
         // and/or for constraint application.
         if ((_include_liftfunc || _apply_constraints) &&
             elem_has_some_heterogenous_qoi_bc)
-            _sys.time_solver->element_residual(true, _femcontext);
+          _sys.time_solver->element_residual(true, _femcontext);
 
         // If we have some heterogenous dofs here, those are
         // themselves part of a regularized flux QoI which the library
@@ -647,8 +646,7 @@ public:
                          i != _femcontext.get_dof_indices().size(); ++i)
                       {
                         Number liftfunc_val =
-                          _sys.get_dof_map().has_heterogenous_adjoint_constraint
-                            (q, _femcontext.get_dof_indices()[i]);
+                          _sys.get_dof_map().has_heterogenous_adjoint_constraint(q, _femcontext.get_dof_indices()[i]);
 
                         if (liftfunc_val != Number(0))
                           {

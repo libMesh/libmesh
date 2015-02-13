@@ -91,8 +91,7 @@ protected:
    * done by the partitioner, but some parallel file formats begin
    * "pre-partitioned".
    */
-  void set_n_partitions (unsigned int n_parts)
-    { this->mesh().set_n_partitions() = n_parts; }
+  void set_n_partitions (unsigned int n_parts) { this->mesh().set_n_partitions() = n_parts; }
 
   /**
    * A vector of bools describing what dimension elements

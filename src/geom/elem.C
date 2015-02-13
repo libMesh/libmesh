@@ -886,8 +886,7 @@ Elem* Elem::topological_neighbor (const unsigned int i,
       // topological neighbor
 
       std::vector<boundary_id_type> boundary_ids =
-        mesh.get_boundary_info().boundary_ids
-          (this, cast_int<unsigned short>(i));
+        mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i));
       for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
         if (pb->boundary(*j))
           {
@@ -926,8 +925,7 @@ const Elem* Elem::topological_neighbor (const unsigned int i,
       // topological neighbor
 
       std::vector<boundary_id_type> boundary_ids =
-        mesh.get_boundary_info().boundary_ids
-          (this, cast_int<unsigned short>(i));
+        mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i));
       for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
         if (pb->boundary(*j))
           {

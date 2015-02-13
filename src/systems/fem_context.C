@@ -186,8 +186,7 @@ std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 
 template<typename OutputType,
          FEMContext::diff_subsolution_getter subsolution_getter>
-void FEMContext::some_interior_value
-  (unsigned int var, unsigned int qp, OutputType& u) const
+void FEMContext::some_interior_value(unsigned int var, unsigned int qp, OutputType& u) const
 {
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
@@ -217,8 +216,7 @@ void FEMContext::some_interior_value
 
 template<typename OutputType,
          FEMContext::diff_subsolution_getter subsolution_getter>
-void FEMContext::some_interior_gradient
-  (unsigned int var, unsigned int qp, OutputType& du) const
+void FEMContext::some_interior_gradient(unsigned int var, unsigned int qp, OutputType& du) const
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
@@ -253,8 +251,7 @@ void FEMContext::some_interior_gradient
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template<typename OutputType,
          FEMContext::diff_subsolution_getter subsolution_getter>
-void FEMContext::some_interior_hessian
-  (unsigned int var, unsigned int qp, OutputType& d2u) const
+void FEMContext::some_interior_hessian(unsigned int var, unsigned int qp, OutputType& d2u) const
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
@@ -291,8 +288,7 @@ void FEMContext::some_interior_hessian
 
 template<typename OutputType,
          FEMContext::diff_subsolution_getter subsolution_getter>
-void FEMContext::some_side_value
-  (unsigned int var, unsigned int qp, OutputType& u) const
+void FEMContext::some_side_value(unsigned int var, unsigned int qp, OutputType& u) const
 {
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 

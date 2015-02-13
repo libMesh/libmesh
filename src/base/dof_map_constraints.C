@@ -1093,8 +1093,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // Rather than nest threads within threads we'll make sure it's
   // preconstructed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  bool need_point_locator = !_periodic_boundaries->empty() &&
-          !range.empty();
+  bool need_point_locator = !_periodic_boundaries->empty() && !range.empty();
 
   this->comm().max(need_point_locator);
 

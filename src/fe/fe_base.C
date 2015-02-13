@@ -1910,8 +1910,7 @@ compute_periodic_constraints (DofConstraints &constraints,
               if (neigh->level() <= elem->level())
                 {
                   unsigned int s_neigh =
-                    mesh.get_boundary_info().side_with_boundary_id
-                      (neigh, periodic->pairedboundary);
+                    mesh.get_boundary_info().side_with_boundary_id(neigh, periodic->pairedboundary);
                   libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -2162,10 +2161,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                                 primary_elem = elem;
 
                               const Elem *primary_neigh =
-                                primary_boundary_point_neighbor
-                                  (neigh, neigh_pt,
-                                   mesh.get_boundary_info(),
-                                   point_pairedids);
+                                primary_boundary_point_neighbor(neigh, neigh_pt,
+                                                                mesh.get_boundary_info(),
+                                                                point_pairedids);
 
                               libmesh_assert(primary_neigh);
 

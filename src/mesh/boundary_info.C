@@ -1411,8 +1411,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
 }
 
 void
-BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> &b_ids)
-const
+BoundaryInfo::build_node_boundary_ids(std::vector<boundary_id_type> &b_ids) const
 {
   b_ids.clear();
 
@@ -1429,8 +1428,7 @@ const
 }
 
 void
-BoundaryInfo::build_side_boundary_ids(std::vector<boundary_id_type> &b_ids)
-const
+BoundaryInfo::build_side_boundary_ids(std::vector<boundary_id_type> &b_ids) const
 {
   b_ids.clear();
 

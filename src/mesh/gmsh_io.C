@@ -712,10 +712,9 @@ void GmshIO::read_mesh(std::istream& in)
                                     //              << std::endl;
 
                                     // Add boundary information based on the lower-dimensional element's subdomain id.
-                                    mesh.get_boundary_info().add_side
-                                      (elem, sn,
-                                       cast_int<boundary_id_type>
-                                         (lower_dim_elem->subdomain_id()));
+                                    mesh.get_boundary_info().add_side(elem,
+                                                                      sn,
+                                                                      cast_int<boundary_id_type>(lower_dim_elem->subdomain_id()));
                                   }
                               }
                           }

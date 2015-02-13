@@ -365,8 +365,8 @@ void MeshBase::partition (const unsigned int n_parts)
   // NULL partitioner means don't repartition
   // Non-serial meshes may not be ready for repartitioning here.
   else if(!skip_partitioning() &&
-     partitioner().get() &&
-     this->is_serial())
+          partitioner().get() &&
+          this->is_serial())
     {
       partitioner()->partition (*this, n_parts);
     }

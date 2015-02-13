@@ -47,21 +47,18 @@ public:
   /**
    * Setter: change the value of the parameter we access.
    */
-  virtual void set (const T & new_value)
-    { libmesh_assert(_ptr); *_ptr = new_value; }
+  virtual void set (const T & new_value) { libmesh_assert(_ptr); *_ptr = new_value; }
 
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T& get () const
-    { libmesh_assert(_ptr); return *_ptr; }
+  virtual const T& get () const { libmesh_assert(_ptr); return *_ptr; }
 
   /**
    * Reseater: change the location of the parameter we access.
    * This is included for backward compatibility, but is deprecated.
    */
-  virtual void operator= (T * new_ptr)
-    { libmesh_deprecated(); _ptr = new_ptr; }
+  virtual void operator= (T * new_ptr) { libmesh_deprecated(); _ptr = new_ptr; }
 
 private:
   T* _ptr;
