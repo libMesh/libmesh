@@ -11,9 +11,10 @@ if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
 	-rm -f systems_of_equations_ex8.in && $(LN_S) -f $(srcdir)/systems_of_equations_ex8.in .
+	-rm -f systems_of_equations_ex8.exo && $(LN_S) -f $(srcdir)/systems_of_equations_ex8.exo .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += systems_of_equations_ex8.in .linkstamp
+  CLEANFILES += systems_of_equations_ex8.in systems_of_equations_ex8.exo .linkstamp
 endif
 
 ##############################################
