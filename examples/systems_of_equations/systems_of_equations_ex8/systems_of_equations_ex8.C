@@ -163,7 +163,8 @@ int main (int argc, char** argv)
       previous_forcing_magnitude*force_scaling;
 
     libMesh::out << "Performing solve " << count << ", forcing_magnitude: "
-      << equation_systems.parameters.get<Real>("forcing_magnitude") << std::endl;
+      << equation_systems.parameters.get<Real>("forcing_magnitude") 
+      << ", contact_penalty: " << contact_penalty << std::endl;
 
     system.solve();
     system.nonlinear_solver->print_converged_reason();
