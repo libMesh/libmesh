@@ -42,14 +42,14 @@ public:
   ~CompositeFEMFunction ()
     {
       for (unsigned int i=0; i != subfunctions.size(); ++i)
-	delete subfunctions[i];
+        delete subfunctions[i];
     }
 
   // Attach a new subfunction, along with a map from the indices of
   // that subfunction to the indices of the global function.
   // (*this)(index_map[i]) will return f(i).
   void attach_subfunction (const FEMFunctionBase<Output>& f,
-			   const std::vector<unsigned int>& index_map)
+                           const std::vector<unsigned int>& index_map)
     {
       const unsigned int subfunction_index = subfunctions.size();
       libmesh_assert_equal_to(subfunctions.size(), index_maps.size());
@@ -61,20 +61,20 @@ public:
         *std::max_element(index_map.begin(), index_map.end());
 
       if (max_index >= reverse_index_map.size())
-	reverse_index_map.resize
+        reverse_index_map.resize
           (max_index+1, std::make_pair(libMesh::invalid_uint,
-	                               libMesh::invalid_uint));
+                                       libMesh::invalid_uint));
 
       for (unsigned int j=0; j != index_map.size(); ++j)
         {
           libmesh_assert_less(index_map[j], reverse_index_map.size());
           libmesh_assert_equal_to(reverse_index_map[index_map[j]].first,
-			          libMesh::invalid_uint);
+                                  libMesh::invalid_uint);
           libmesh_assert_equal_to(reverse_index_map[index_map[j]].second,
-			          libMesh::invalid_uint);
-	  reverse_index_map[index_map[j]] =
+                                  libMesh::invalid_uint);
+          reverse_index_map[index_map[j]] =
             std::make_pair(subfunction_index, j);
-	}
+        }
     }
 
   virtual Output operator() (const FEMContext& c,
@@ -90,7 +90,7 @@ public:
                            DenseVector<Output>& output)
     {
       libmesh_assert_greater_equal (output.size(),
-			            reverse_index_map.size());
+                                    reverse_index_map.size());
 
       // Necessary in case we have output components not covered by
       // any subfunctions
@@ -98,12 +98,12 @@ public:
 
       DenseVector<Output> temp;
       for (unsigned int i=0; i != subfunctions.size(); ++i)
-	{
+        {
           temp.resize(index_maps[i].size());
           (*subfunctions[i])(c, p, time, temp);
-	  for (unsigned int j=0; j != temp.size(); ++j)
-	    output(index_maps[i][j]) = temp(j);
-	}
+          for (unsigned int j=0; j != temp.size(); ++j)
+            output(index_maps[i][j]) = temp(j);
+        }
     }
 
   /**
@@ -120,9 +120,9 @@ public:
         return 0;
 
       libmesh_assert_less(reverse_index_map[i].first,
-		          subfunctions.size());
+                          subfunctions.size());
       libmesh_assert_not_equal_to(reverse_index_map[i].second,
-		                  libMesh::invalid_uint);
+                                  libMesh::invalid_uint);
       return subfunctions[reverse_index_map[i].first]->
                component(c, reverse_index_map[i].second, p, time);
     }
