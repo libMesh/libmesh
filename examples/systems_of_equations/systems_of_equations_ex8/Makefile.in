@@ -51,7 +51,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = systems_of_equations_ex8.in .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = systems_of_equations_ex8.in systems_of_equations_ex8.exo .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/examples/Make.common
@@ -1344,6 +1344,7 @@ uninstall-am: uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f systems_of_equations_ex8.in && $(LN_S) -f $(srcdir)/systems_of_equations_ex8.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f systems_of_equations_ex8.exo && $(LN_S) -f $(srcdir)/systems_of_equations_ex8.exo .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
