@@ -1079,6 +1079,7 @@ enable_exceptions
 enable_timestamps
 enable_unordered_containers
 enable_openmp
+with_gdb_command
 enable_warnings
 enable_blocked_storage
 enable_default_comm_world
@@ -1950,6 +1951,8 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
+  --with-gdb-command=commandname
+                          command to invoke gdb
   --with-boundary-id-bytes=<1|2|4|8>
                           bytes used per boundary side per boundary_id [2]
   --with-dof-id-bytes=<1|2|4|8>
@@ -27738,6 +27741,29 @@ $as_echo "---------------------------------------------" >&6; }
 $as_echo "----- Configuring core library features -----" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ---------------------------------------------" >&5
 $as_echo "---------------------------------------------" >&6; }
+
+
+# -------------------------------------------------------------
+# gdb backtrace command-- default "gdb"
+# -------------------------------------------------------------
+
+# Check whether --with-gdb-command was given.
+if test "${with_gdb_command+set}" = set; then :
+  withval=$with_gdb_command; gdb_command="$withval"
+else
+  gdb_command="gdb"
+fi
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define GDB_COMMAND "$gdb_command"
+_ACEOF
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring gdb command... \"$gdb_command\"" >&5
+$as_echo "configuring gdb command... \"$gdb_command\"" >&6; }
+# -------------------------------------------------------------
+
 
 
 # --------------------------------------------------------------
