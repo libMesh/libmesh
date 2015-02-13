@@ -7,6 +7,21 @@ AC_MSG_RESULT(----- Configuring core library features -----)
 AC_MSG_RESULT(---------------------------------------------)
 
 
+# -------------------------------------------------------------
+# gdb backtrace command-- default "gdb"
+# -------------------------------------------------------------
+AC_ARG_WITH([gdb-command],
+    AS_HELP_STRING([--with-gdb-command=commandname],
+                          [command to invoke gdb]),
+    [gdb_command="$withval"],
+    [gdb_command="gdb"])
+
+AC_DEFINE_UNQUOTED(GDB_COMMAND, "$gdb_command", [command to invoke gdb])
+AC_MSG_RESULT([configuring gdb command... "$gdb_command"])
+# -------------------------------------------------------------
+
+
+
 # --------------------------------------------------------------
 # library warnings - enable by default
 # --------------------------------------------------------------
