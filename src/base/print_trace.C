@@ -110,6 +110,7 @@ std::string process_trace(const char *name)
 // source code, a really helpful feature when debugging something...
 bool gdb_backtrace(std::ostream &out_stream)
 {
+#ifdef LIBMESH_GDB_COMMAND
   // Eventual return value, true if gdb succeeds, false otherwise.
   bool success = true;
 
@@ -127,8 +128,12 @@ bool gdb_backtrace(std::ostream &out_stream)
       // Run gdb using a system() call, redirecting the output to our
       // temporary file.
       pid_t this_pid = getpid();
+
+      std::string gdb_command =
+        libMesh::command_line_value("gdb",std::string(LIBMESH_GDB_COMMAND));
+
       std::ostringstream command;
-      command << "gdb -p " << this_pid << " -batch -ex bt 2>/dev/null 1>" << temp_file;
+      command << gdb_command << " -p " << this_pid << " -batch -ex bt 2>/dev/null 1>" << temp_file;
       int exit_status = std::system(command.str().c_str());
 
       // If we can open the temp_file, the file is not empty, and the
@@ -147,6 +152,9 @@ bool gdb_backtrace(std::ostream &out_stream)
   std::remove(temp_file);
 
   return success;
+#else
+  return false;
+#endif
 }
 
 } // end anonymous namespace
