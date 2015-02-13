@@ -338,9 +338,9 @@ void PetscNonlinearSolver<T>::init (const char* name)
       ierr = DMSetType(dm,DMLIBMESH);LIBMESH_CHKERRABORT(ierr);
       ierr = DMlibMeshSetSystem(dm,this->system());LIBMESH_CHKERRABORT(ierr);
       if (name)
-	{
-	  ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
-	}
+        {
+          ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
+        }
       ierr = DMSetFromOptions(dm);               LIBMESH_CHKERRABORT(ierr);
       ierr = DMSetUp(dm);                        LIBMESH_CHKERRABORT(ierr);
       ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERRABORT(ierr);
