@@ -119,7 +119,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
 
   context.fixed_solution_derivative = 1.0;
 
-  // We need to save the old jacobian and old residual since we'll be 
+  // We need to save the old jacobian and old residual since we'll be
   // multiplying some of the new contributions by theta or 1-theta
   DenseMatrix<Number> old_elem_jacobian(n_dofs, n_dofs);
   DenseVector<Number> old_elem_residual(n_dofs);

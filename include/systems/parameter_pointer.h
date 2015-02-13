@@ -34,7 +34,7 @@ namespace libMesh
  *
  * This is the "default" ParameterAccessor subclass: it simply stores
  * a user-provided pointer to the parameter, and modifies the value at
- * that location in memory. 
+ * that location in memory.
  */
 template <typename T=Number>
 class ParameterPointer : public ParameterAccessor<T>

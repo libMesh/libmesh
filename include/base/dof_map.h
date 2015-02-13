@@ -1564,7 +1564,7 @@ DofConstraintValueMap & DofMap::get_primal_constraint_values()
 {
   return _primal_constraint_values;
 }
-         
+
 
 
 #else

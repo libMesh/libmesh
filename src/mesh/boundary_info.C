@@ -1882,7 +1882,7 @@ void BoundaryInfo::print_summary(std::ostream& out_stream) const
 const std::string& BoundaryInfo::get_sideset_name(boundary_id_type id) const
 {
   static const std::string empty_string;
-  std::map<boundary_id_type, std::string>::const_iterator it = 
+  std::map<boundary_id_type, std::string>::const_iterator it =
     _ss_id_to_name.find(id);
   if (it == _ss_id_to_name.end())
     return empty_string;
@@ -1899,7 +1899,7 @@ std::string& BoundaryInfo::sideset_name(boundary_id_type id)
 const std::string& BoundaryInfo::get_nodeset_name(boundary_id_type id) const
 {
   static const std::string empty_string;
-  std::map<boundary_id_type, std::string>::const_iterator it = 
+  std::map<boundary_id_type, std::string>::const_iterator it =
     _ns_id_to_name.find(id);
   if (it == _ns_id_to_name.end())
     return empty_string;

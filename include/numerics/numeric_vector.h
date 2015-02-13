@@ -803,7 +803,7 @@ void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::ve
 
 template <typename T>
 inline
-void NumericVector<T>::add_vector 
+void NumericVector<T>::add_vector
   (const std::vector<T>& v,
    const std::vector<numeric_index_type>& dof_indices)
 {
@@ -816,7 +816,7 @@ void NumericVector<T>::add_vector
 
 template <typename T>
 inline
-void NumericVector<T>::add_vector 
+void NumericVector<T>::add_vector
   (const DenseVector<T>& v,
    const std::vector<numeric_index_type>& dof_indices)
 {
@@ -829,7 +829,7 @@ void NumericVector<T>::add_vector
 
 template <typename T>
 inline
-void NumericVector<T>::insert 
+void NumericVector<T>::insert
   (const std::vector<T>& v,
    const std::vector<numeric_index_type>& dof_indices)
 {
@@ -842,7 +842,7 @@ void NumericVector<T>::insert
 
 template <typename T>
 inline
-void NumericVector<T>::insert 
+void NumericVector<T>::insert
   (const DenseVector<T>& v,
    const std::vector<numeric_index_type>& dof_indices)
 {
@@ -855,7 +855,7 @@ void NumericVector<T>::insert
 
 template <typename T>
 inline
-void NumericVector<T>::insert 
+void NumericVector<T>::insert
   (const DenseSubVector<T>& v,
    const std::vector<numeric_index_type>& dof_indices)
 {

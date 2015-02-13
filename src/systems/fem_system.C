@@ -499,7 +499,7 @@ public:
                   {
                     for (unsigned int d=0;
                          d != _femcontext.get_dof_indices().size(); ++d)
-                      this->qoi[q] -= _femcontext.get_elem_residual()(d) * 
+                      this->qoi[q] -= _femcontext.get_elem_residual()(d) *
                         _sys.get_dof_map().has_heterogenous_adjoint_constraint
                           (q, _femcontext.get_dof_indices()[d]);
                   }

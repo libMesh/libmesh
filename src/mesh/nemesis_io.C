@@ -1030,7 +1030,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Finally, we are ready to add the element and its side to the BoundaryInfo object.
       // Call the version of add_side which takes a pointer, since we have already gone to
       // the trouble of getting said pointer...
-      mesh.get_boundary_info().add_side 
+      mesh.get_boundary_info().add_side
         (elem,
          cast_int<unsigned short>
            (conv.get_side_map(nemhelper->side_list[e]-1/*Exodus numbering is 1-based*/)),
