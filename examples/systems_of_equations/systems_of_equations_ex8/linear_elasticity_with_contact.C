@@ -776,6 +776,7 @@ void LinearElasticityWithContact::compute_stresses()
   sigma_vars[3] = stress_system.variable_number ("sigma_11");
   sigma_vars[4] = stress_system.variable_number ("sigma_12");
   sigma_vars[5] = stress_system.variable_number ("sigma_22");
+  unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
   // Storage for the stress dof indices on each element
   std::vector< std::vector<dof_id_type> > dof_indices_var(_sys.n_vars());
@@ -855,6 +856,22 @@ void LinearElasticityWithContact::compute_stresses()
 
             stress_var_index++;
           }
+
+      // Also, the von Mises stress
+      Number vonMises_value = std::sqrt( 0.5*( pow(elem_avg_stress_tensor(0,0) - elem_avg_stress_tensor(1,1),2.) +
+                                               pow(elem_avg_stress_tensor(1,1) - elem_avg_stress_tensor(2,2),2.) +
+                                               pow(elem_avg_stress_tensor(2,2) - elem_avg_stress_tensor(0,0),2.) +
+                                               6.*(pow(elem_avg_stress_tensor(0,1),2.) +
+                                                   pow(elem_avg_stress_tensor(1,2),2.) +
+                                                   pow(elem_avg_stress_tensor(2,0),2.))
+                                               ) );
+      stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
+      dof_id_type dof_index = stress_dof_indices_var[0];
+      if( (stress_system.solution->first_local_index() <= dof_index) &&
+          (dof_index < stress_system.solution->last_local_index()) )
+        {
+          stress_system.solution->set(dof_index, vonMises_value);
+        }
     }
 
   // Should call close and update when we set vector entries directly

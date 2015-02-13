@@ -119,6 +119,7 @@ int main (int argc, char** argv)
   stress_system.add_variable("sigma_11", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_12", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
+  stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
 
   equation_systems.parameters.set<Real>         ("nonlinear solver absolute residual tolerance") = nonlinear_abs_tol;
   equation_systems.parameters.set<Real>         ("nonlinear solver relative residual tolerance") = nonlinear_rel_tol;
