@@ -191,7 +191,7 @@ void CoupledSystem::init_context(DiffContext &context)
 
   side_fe->get_JxW();
   side_fe->get_phi();
-  side_fe->get_dphi();
+  side_fe->get_xyz();
 }
 
 
@@ -332,6 +332,9 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
   FEBase* u_elem_fe = NULL;
   c.get_element_fe( u_var, u_elem_fe );
 
+  FEBase* p_elem_fe = NULL;
+  c.get_element_fe( p_var, p_elem_fe );
+
   // Element Jacobian * quadrature weight for interior integration
   const std::vector<Real> &JxW = u_elem_fe->get_JxW();
 
@@ -341,7 +344,7 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> >& psi = u_elem_fe->get_phi();
+  const std::vector<std::vector<Real> >& psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
