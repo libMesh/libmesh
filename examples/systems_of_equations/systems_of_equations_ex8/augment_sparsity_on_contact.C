@@ -3,6 +3,7 @@
 
 // libMesh includes
 #include "libmesh/linear_implicit_system.h"
+#include LIBMESH_INCLUDE_UNORDERED_SET
 
 using namespace libMesh;
 
@@ -21,7 +22,7 @@ void AugmentSparsityOnContact::add_contact_element(
   dof_id_type element_id,
   dof_id_type other_element_id)
 {
-  std::map<dof_id_type, std::set<dof_id_type> >::iterator it =
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, std::set<dof_id_type> >::iterator it =
     _contact_element_map.find(element_id);
 
   if(it == _contact_element_map.end())
@@ -51,10 +52,10 @@ void AugmentSparsityOnContact::augment_sparsity_pattern(
   const DofMap& dof_map = _sys.get_dof_map();
 
   // Create a set that will have the DoF numbers we need to augment the sparsity pattern
-  std::set<dof_id_type> local_coupled_dofs, remote_coupled_dofs;
+  LIBMESH_BEST_UNORDERED_SET<dof_id_type> local_coupled_dofs, remote_coupled_dofs;
 
-  std::map<dof_id_type, std::set<dof_id_type> >::iterator it     = _contact_element_map.begin();
-  std::map<dof_id_type, std::set<dof_id_type> >::iterator it_end = _contact_element_map.end();
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, std::set<dof_id_type> >::iterator it     = _contact_element_map.begin();
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, std::set<dof_id_type> >::iterator it_end = _contact_element_map.end();
 
   for( ; it != it_end; ++it)
   {  

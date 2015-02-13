@@ -3,6 +3,7 @@
 
 #include "libmesh/dof_map.h"
 #include "libmesh/system.h"
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 using libMesh::DofMap;
 using libMesh::System;
@@ -22,7 +23,7 @@ private:
    * This maps from element --> elements it is in contact with.
    * We use a set as the value to enfore uniqueness of the values.
    */
-  std::map<dof_id_type, std::set<dof_id_type> > _contact_element_map;
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, std::set<dof_id_type> > _contact_element_map;
 
 public:
 
