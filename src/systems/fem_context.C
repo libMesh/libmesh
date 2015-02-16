@@ -1628,7 +1628,12 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   this->set_elem(e);
 
   // Initialize the per-element data for elem.
-  sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
+  if(this->has_elem())
+    sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
+  else
+    // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+    sys.get_dof_map().dof_indices (NULL, this->get_dof_indices());
+
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices().size());
   const std::size_t n_qoi = sys.qoi.size();
@@ -1654,7 +1659,12 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
     unsigned int sub_dofs = 0;
     for (unsigned int i=0; i != sys.n_vars(); ++i)
       {
-        sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
+        if(this->has_elem())
+          sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
+        else
+          // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+          sys.get_dof_map().dof_indices (NULL, this->get_dof_indices(i), i);
+
 
         const unsigned int n_dofs_var = cast_int<unsigned int>
           (this->get_dof_indices(i).size());
