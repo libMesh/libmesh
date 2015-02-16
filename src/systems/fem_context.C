@@ -1446,7 +1446,11 @@ void FEMContext::elem_fe_reinit ()
   for (std::map<FEType, FEAbstract *>::iterator i = _element_fe[dim].begin();
        i != local_fe_end; ++i)
     {
-      i->second->reinit(&(this->get_elem()));
+      if(this->has_elem())
+        i->second->reinit(&(this->get_elem()));
+      else
+        // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+        i->second->reinit(NULL);
     }
 }
 
@@ -1782,7 +1786,11 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
   std::vector<Point> coor(1, master_point);
 
   // Reinitialize the element and compute the shape function values at coor
-  fe_new->reinit (&this->get_elem(), &coor);
+  if(this->has_elem())
+    fe_new->reinit (&this->get_elem(), &coor);
+  else
+    // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
+    fe_new->reinit (NULL, &coor);
 
   return fe_new;
 }
