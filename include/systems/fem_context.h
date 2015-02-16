@@ -707,14 +707,14 @@ public:
    * Accessor for current Elem object
    */
   const Elem& get_elem() const
-  { libmesh_assert(this->_elem);
+  { //libmesh_assert(this->_elem); PB: SCALAR variables have elem=NULL
     return *(this->_elem); }
 
   /**
    * Accessor for current Elem object
    */
   Elem& get_elem()
-  { libmesh_assert(this->_elem);
+  { //libmesh_assert(this->_elem); PB: SCALAR variables have elem=NULL
     return *(const_cast<Elem*>(this->_elem)); }
 
   /**
