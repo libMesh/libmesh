@@ -262,7 +262,7 @@ private:
         if (c)
           return f_fem->component(*c, i, p, time);
         else
-          return std::numeric_limits<Number>::quiet_NaN();
+          return std::numeric_limits<Real>::quiet_NaN();
       }
     return f->component(i, p, time);
   }
@@ -279,7 +279,7 @@ private:
         if (c)
           return g_fem->component(*c, i, p, time);
         else
-          return std::numeric_limits<Number>::quiet_NaN();
+          return std::numeric_limits<Real>::quiet_NaN();
       }
     return g->component(i, p, time);
   }
@@ -2973,8 +2973,19 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                     }
                 }
               else
-                dof_row_rhss[i] =
-                  std::numeric_limits<Number>::quiet_NaN();
+                {
+		  // Get NaN from Real, where it should exist, not
+		  // from Number, which may be std::complex, in which
+		  // case quiet_NaN() silently returns zero, rather
+		  // than sanely returning NaN or throwing an
+		  // exception or sending Stroustrop hate mail.
+		  dof_row_rhss[i] =
+                    std::numeric_limits<Real>::quiet_NaN();
+
+		  // Make sure we don't get caught by "!isnan(NaN)"
+		  // bugs again.
+                  libmesh_assert(libmesh_isnan(dof_row_rhss[i]));
+                }
             }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
