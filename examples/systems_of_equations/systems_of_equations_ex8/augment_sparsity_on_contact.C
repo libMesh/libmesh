@@ -125,8 +125,10 @@ void AugmentSparsityOnContact::augment_sparsity_pattern(
           libmesh_assert_less (dof_offset, n_nz.size());
           libmesh_assert_less (dof_offset, n_oz.size());
 
-          n_nz[dof_offset] += local_coupled_dofs.size();
-          n_oz[dof_offset] += remote_coupled_dofs.size();
+          // TODO: This factor of 5 should not be needed. We must be making
+          // a mistake somewhere with keeping track of the dof coupling.
+          n_nz[dof_offset] += 5*local_coupled_dofs.size();
+          n_oz[dof_offset] += 5*remote_coupled_dofs.size();
 
           // for crazy coarse problems on many processors we need to impose sane limits
           // since we shouldn't allow n_nz > n_local_dofs, for example

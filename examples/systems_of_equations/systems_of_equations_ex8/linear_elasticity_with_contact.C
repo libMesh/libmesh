@@ -439,21 +439,11 @@ void LinearElasticityWithContact::residual_and_jacobian (
   // we get the updated sparsity pattern
   if(jacobian)
   {
-    jacobian->zero();
+    dof_map.clear_sparsity();
+    dof_map.compute_sparsity(mesh);
 
-    // We should update the sparsity pattern using the commented-out code below,
-    // but that code doesn't work. It leads to the jacobian matrix being in the
-    // wrong state, not sure why yet.
-    //    jacobian->clear();
-    //    jacobian->attach_dof_map(dof_map);
-    //    dof_map.clear_sparsity();
-    //    dof_map.compute_sparsity(mesh);
-    //    jacobian->init();
-
-    // So instead, let's just do a hack for now: Turn off the PETSc error
-    // due to allocating new non-zeros in the sparsity pattern.
-    PetscMatrix<Number>* petsc_jac = libmesh_cast_ptr< PetscMatrix<Number>* >(jacobian);
-    MatSetOption(petsc_jac->mat(), MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+    PetscMatrix<Number>* petsc_jacobian = cast_ptr<PetscMatrix<Number>*>(jacobian);
+    petsc_jacobian->update_preallocation_and_zero();
   }
 
   if(residual)
