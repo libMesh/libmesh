@@ -196,11 +196,14 @@ public:
 
      */
     this->build_mesh();
+#ifdef LIBMESH_ENABLE_AMR
     MeshRefinement(*_mesh).uniformly_refine(1);
+#endif
   }
 
   void testMesh()
   {
+#ifdef LIBMESH_ENABLE_AMR
     // We should have 13 total and 10 active elements.
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)13, _mesh->n_elem() );
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)10, _mesh->n_active_elem() );
@@ -226,10 +229,12 @@ public:
 
     // Shared node between the EDGE2 elements should have the same global id
     CPPUNIT_ASSERT_EQUAL( _mesh->elem(11)->node(1), _mesh->elem(12)->node(0) );
+#endif
   }
 
   void testDofOrdering()
   {
+#ifdef LIBMESH_ENABLE_AMR
     EquationSystems es(*_mesh);
     es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
@@ -266,6 +271,7 @@ public:
 
     //EDGE2 elements should have same shared dof number
     CPPUNIT_ASSERT_EQUAL( edge11_dof_indices[1], edge12_dof_indices[0] );
+#endif
   }
 
 };
