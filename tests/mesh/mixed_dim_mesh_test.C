@@ -10,7 +10,7 @@
 #include <libmesh/edge_edge2.h>
 #include <libmesh/face_quad4.h>
 #include <libmesh/dof_map.h>
-#include <libmesh/nonlinear_implicit_system.h>
+#include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh_refinement.h>
 
 #include "test_comm.h"
@@ -128,7 +128,7 @@ public:
   void testDofOrdering()
   {
     EquationSystems es(*_mesh);
-    es.add_system<NonlinearImplicitSystem>("TestDofSystem");
+    es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
     es.init();
 
@@ -231,7 +231,7 @@ public:
   void testDofOrdering()
   {
     EquationSystems es(*_mesh);
-    es.add_system<NonlinearImplicitSystem>("TestDofSystem");
+    es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
     es.init();
 
