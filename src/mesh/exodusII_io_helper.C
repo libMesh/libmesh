@@ -1792,7 +1792,7 @@ std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector
   // (i.e. names that start with r_, i_ or a_
   for (; names_it != names_end; ++names_it)
     {
-      std::cout << "VARIABLE: " << *names_it << std::endl;
+//      std::cout << "VARIABLE: " << *names_it << std::endl;
       std::stringstream name_real, name_imag, name_abs;
       name_real << "r_" << *names_it;
       name_imag << "i_" << *names_it;
