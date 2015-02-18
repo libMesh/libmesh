@@ -58,7 +58,7 @@ void AugmentSparsityOnContact::augment_sparsity_pattern(
   LIBMESH_BEST_UNORDERED_MAP<dof_id_type, std::set<dof_id_type> >::iterator it_end = _contact_element_map.end();
 
   for( ; it != it_end; ++it)
-  {  
+  {
     const Elem* this_elem = mesh.elem(it->first);
     std::set<dof_id_type> neighbor_elem_ids = it->second;
 
@@ -125,10 +125,8 @@ void AugmentSparsityOnContact::augment_sparsity_pattern(
           libmesh_assert_less (dof_offset, n_nz.size());
           libmesh_assert_less (dof_offset, n_oz.size());
 
-          // TODO: This factor of 5 should not be needed. We must be making
-          // a mistake somewhere with keeping track of the dof coupling.
-          n_nz[dof_offset] += 5*local_coupled_dofs.size();
-          n_oz[dof_offset] += 5*remote_coupled_dofs.size();
+          n_nz[dof_offset] += local_coupled_dofs.size();
+          n_oz[dof_offset] += remote_coupled_dofs.size();
 
           // for crazy coarse problems on many processors we need to impose sane limits
           // since we shouldn't allow n_nz > n_local_dofs, for example

@@ -32,7 +32,7 @@ using namespace libMesh;
 
 bool operator< (QuadraturePointOnSideId const& a, QuadraturePointOnSideId const& b)
 {
-  if( (a._element_id == b._element_id) || (a._side_index == b._side_index) )
+  if( (a._element_id == b._element_id) && (a._side_index == b._side_index) )
   {
     return (a._qp < b._qp);
   }
