@@ -28,6 +28,7 @@ public:
 
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
+  CPPUNIT_TEST( testPointLocatorList );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -154,6 +155,25 @@ public:
        the same global ids as the top edge of the bottom QUAD4 element */
     CPPUNIT_ASSERT_EQUAL( top_quad_dof_indices[0], bottom_quad_dof_indices[3] );
     CPPUNIT_ASSERT_EQUAL( top_quad_dof_indices[1], bottom_quad_dof_indices[2] );
+  }
+
+  void testPointLocatorList()
+  {
+    AutoPtr<PointLocatorBase> locator = PointLocatorBase::build(LIST,*_mesh);
+
+    Point top_point(0.4, 0.5);
+    const Elem* top_elem = (*locator)(top_point);
+    CPPUNIT_ASSERT(top_elem);
+
+    // We should have gotten back the top quad
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)0, top_elem->id() );
+
+    Point bottom_point(0.5, -0.5);
+    const Elem* bottom_elem = (*locator)(bottom_point);
+    CPPUNIT_ASSERT(bottom_elem);
+
+    // We should have gotten back the bottom quad
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
   }
 
 };
