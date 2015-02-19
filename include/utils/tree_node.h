@@ -144,9 +144,20 @@ public:
 
   /**
    * @returns an element containing point p,
+   * but only if there's an element of dimension mesh.mesh_dimension(),
    * optionally restricted to a set of allowed subdomains.
    */
   const Elem* find_element (const Point& p,
+                            const std::set<subdomain_id_type>* allowed_subdomains = NULL,
+                            Real relative_tol = TOLERANCE) const;
+
+  /**
+   * @returns an element containing point p,
+   * but only if there's an element of dimension elem_dim,
+   * optionally restricted to a set of allowed subdomains.
+   */
+  const Elem* find_element (const Point& p,
+                            unsigned int elem_dim,
                             const std::set<subdomain_id_type>* allowed_subdomains = NULL,
                             Real relative_tol = TOLERANCE) const;
 

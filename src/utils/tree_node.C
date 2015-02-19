@@ -457,12 +457,21 @@ unsigned int TreeNode<N>::n_active_bins() const
     }
 }
 
-
+template <unsigned int N>
+const Elem*
+TreeNode<N>::find_element
+(const Point& p,
+ const std::set<subdomain_id_type> *allowed_subdomains,
+ Real relative_tol) const
+{
+  return this->find_element(p, this->mesh.mesh_dimension(), allowed_subdomains, relative_tol);
+}
 
 template <unsigned int N>
 const Elem*
 TreeNode<N>::find_element
 (const Point& p,
+ unsigned int elem_dim,
  const std::set<subdomain_id_type> *allowed_subdomains,
  Real relative_tol) const
 {
@@ -474,7 +483,8 @@ TreeNode<N>::find_element
         // Search the active elements in the active TreeNode.
         for (std::vector<const Elem*>::const_iterator pos=elements.begin();
              pos != elements.end(); ++pos)
-          if (!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id()))
+          if ( (!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id())) &&
+               (*pos)->dim() == elem_dim )
             if ((*pos)->active() && (*pos)->contains_point(p, relative_tol))
               return *pos;
 
