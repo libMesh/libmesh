@@ -2973,16 +2973,16 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                 }
               else
                 {
-		  // Get NaN from Real, where it should exist, not
-		  // from Number, which may be std::complex, in which
-		  // case quiet_NaN() silently returns zero, rather
-		  // than sanely returning NaN or throwing an
-		  // exception or sending Stroustrop hate mail.
-		  dof_row_rhss[i] =
+                  // Get NaN from Real, where it should exist, not
+                  // from Number, which may be std::complex, in which
+                  // case quiet_NaN() silently returns zero, rather
+                  // than sanely returning NaN or throwing an
+                  // exception or sending Stroustrop hate mail.
+                  dof_row_rhss[i] =
                     std::numeric_limits<Real>::quiet_NaN();
 
-		  // Make sure we don't get caught by "!isnan(NaN)"
-		  // bugs again.
+                  // Make sure we don't get caught by "!isnan(NaN)"
+                  // bugs again.
                   libmesh_assert(libmesh_isnan(dof_row_rhss[i]));
                 }
             }
