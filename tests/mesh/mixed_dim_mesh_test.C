@@ -175,6 +175,15 @@ public:
 
     // We should have gotten back the bottom quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
+
+    // Now try to find the 1d element overlapping the interface edge
+    Point interface_point(0.2, 0.0);
+    const Elem* interface_elem = (*locator)(interface_point,1);
+
+    CPPUNIT_ASSERT(interface_elem);
+
+    // We should have gotten back the bottom quad
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
   }
 
   void testPointLocatorTree()
@@ -192,6 +201,15 @@ public:
 
     // We should have gotten back the bottom quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
+
+    // Now try to find the 1d element overlapping the interface edge
+    Point interface_point(0.2, 0.0);
+    const Elem* interface_elem = (*locator)(interface_point,1);
+
+    CPPUNIT_ASSERT(interface_elem);
+
+    // We should have gotten back the bottom quad
+    CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
   }
 
 };
