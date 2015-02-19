@@ -205,6 +205,9 @@ const Elem* PointLocatorTree::operator() (const Point& p, const unsigned int ele
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
   if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = NULL;
 
+  // If we have a cached element, make sure it is of the right dimension
+  if( this->_element && this->_element->dim() != elem_dim ) this->_element = NULL;
+
   // First check the element from last time before asking the tree
   if (this->_element==NULL || !(this->_element->contains_point(p)))
     {

@@ -177,8 +177,9 @@ const Elem* PointLocatorList::operator() (const Point& p, const unsigned int ele
     for (std::size_t n=0; n<max_index; n++)
       {
         // Only consider elements in the allowed_subdomains list, if it exists
-        if (!allowed_subdomains ||
-            allowed_subdomains->count(my_list[n].second->subdomain_id()))
+        if ( (!allowed_subdomains ||
+              allowed_subdomains->count(my_list[n].second->subdomain_id())) &&
+             my_list[n].second->dim() == elem_dim )
           {
             const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
 
