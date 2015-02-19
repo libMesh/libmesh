@@ -165,9 +165,11 @@ public:
 private:
   /**
    * Look for point \p p in our children,
+   * but only for elements of dimension elem_dim
    * optionally restricted to a set of allowed subdomains.
    */
   const Elem* find_element_in_children (const Point& p,
+                                        unsigned int elem_dim,
                                         const std::set<subdomain_id_type>* allowed_subdomains,
                                         Real relative_tol) const;
 

@@ -492,7 +492,7 @@ TreeNode<N>::find_element
       return NULL;
     }
   else
-    return this->find_element_in_children(p,allowed_subdomains,
+    return this->find_element_in_children(p,elem_dim,allowed_subdomains,
                                           relative_tol);
 
   libmesh_error_msg("We'll never get here!");
@@ -505,6 +505,7 @@ TreeNode<N>::find_element
 template <unsigned int N>
 const Elem* TreeNode<N>::find_element_in_children
 (const Point& p,
+ unsigned int elem_dim,
  const std::set<subdomain_id_type> *allowed_subdomains,
  Real relative_tol) const
 {
@@ -518,7 +519,7 @@ const Elem* TreeNode<N>::find_element_in_children
     if (children[c]->bounds_point(p, relative_tol))
       {
         const Elem* e =
-          children[c]->find_element(p,allowed_subdomains,
+          children[c]->find_element(p,elem_dim,allowed_subdomains,
                                     relative_tol);
 
         if (e != NULL)
@@ -541,7 +542,7 @@ const Elem* TreeNode<N>::find_element_in_children
     if (!searched_child[c])
       {
         const Elem* e =
-          children[c]->find_element(p,allowed_subdomains,
+          children[c]->find_element(p,elem_dim,allowed_subdomains,
                                     relative_tol);
 
         if (e != NULL)
