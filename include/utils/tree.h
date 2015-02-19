@@ -88,6 +88,7 @@ public:
 
   /**
    * @returns a pointer to the element containing point p,
+   * for elements with dimension mesh.mesh_dimension(),
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */

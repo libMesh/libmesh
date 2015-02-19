@@ -147,11 +147,11 @@ template <unsigned int N>
 const Elem*
 Tree<N>::find_element
 (const Point& p,
- unsigned int /*elem_dim*/,
+ unsigned int elem_dim,
  const std::set<subdomain_id_type> *allowed_subdomains,
  Real relative_tol) const
 {
-  return root.find_element(p, allowed_subdomains, relative_tol);
+  return root.find_element(p, elem_dim, allowed_subdomains, relative_tol);
 }
 
 
