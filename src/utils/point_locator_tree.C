@@ -187,9 +187,18 @@ void PointLocatorTree::init (Trees::BuildType build_type)
 
 
 
-const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem* PointLocatorTree::operator() (const Point& p, const unsigned int elem_dim,
+                                          const std::set<subdomain_id_type> *allowed_subdomains) const
 {
   libmesh_assert (this->_initialized);
+
+  // Make sure the mesh has elements of dimension elem_dim
+  if( _mesh.elem_dimensions().find(elem_dim) == _mesh.elem_dimensions().end() )
+    {
+      libMesh::err << "ERROR: There are no elements of dimension " << elem_dim
+                   << " in the mesh to find!" << std::endl;
+      libmesh_error();
+    }
 
   START_LOG("operator()", "PointLocatorTree");
 

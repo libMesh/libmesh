@@ -134,7 +134,8 @@ void PointLocatorList::init ()
 
 
 
-const Elem* PointLocatorList::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem* PointLocatorList::operator() (const Point& p, const unsigned int elem_dim,
+                                          const std::set<subdomain_id_type> *allowed_subdomains) const
 {
   libmesh_assert (this->_initialized);
 
@@ -159,6 +160,14 @@ const Elem* PointLocatorList::operator() (const Point& p, const std::set<subdoma
   // here to avoid repeated calls to std::sqrt(), which is
   // pretty expensive.
   {
+    // Make sure the mesh has elements of dimension elem_dim
+    if( _mesh.elem_dimensions().find(elem_dim) == _mesh.elem_dimensions().end() )
+      {
+        libMesh::err << "ERROR: There are no elements of dimension " << elem_dim
+                     << " in the mesh to find!" << std::endl;
+        libmesh_error();
+      }
+
     std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
 
     Real              last_distance_sq = std::numeric_limits<Real>::max();
