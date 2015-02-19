@@ -161,11 +161,11 @@ const Elem* PointLocatorList::operator() (const Point& p, const std::set<subdoma
   {
     std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
 
-    Real              last_distance_sq = Point(my_list[0].first -p).size_sq();
+    Real              last_distance_sq = std::numeric_limits<Real>::max();
     const Elem *      last_elem        = NULL;
     const std::size_t max_index        = my_list.size();
 
-    for (std::size_t n=1; n<max_index; n++)
+    for (std::size_t n=0; n<max_index; n++)
       {
         // Only consider elements in the allowed_subdomains list, if it exists
         if (!allowed_subdomains ||
