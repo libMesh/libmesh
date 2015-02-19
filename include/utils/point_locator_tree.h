@@ -113,10 +113,26 @@ public:
    * search over the entire mesh. This can be used if operator()
    * fails to find an element that contains \p p, for example.
    * Optionally specify a "close to point" tolerance to use in
-   * the linear search.
+   * the linear search. This only looks for elements with
+   * dimension mesh.mesh_dimension().
    * Return NULL if no element is found.
    */
   const Elem* perform_linear_search(const Point& p,
+                                    const std::set<subdomain_id_type> *allowed_subdomains,
+                                    bool use_close_to_point,
+                                    Real close_to_point_tolerance=TOLERANCE) const;
+
+  /**
+   * As a fallback option, it's helpful to be able to do a linear
+   * search over the entire mesh. This can be used if operator()
+   * fails to find an element that contains \p p, for example.
+   * Optionally specify a "close to point" tolerance to use in
+   * the linear search. This only looks for elements with
+   * dimension elem_dim.
+   * Return NULL if no element is found.
+   */
+  const Elem* perform_linear_search(const Point& p,
+                                    unsigned int elem_dim,
                                     const std::set<subdomain_id_type> *allowed_subdomains,
                                     bool use_close_to_point,
                                     Real close_to_point_tolerance=TOLERANCE) const;

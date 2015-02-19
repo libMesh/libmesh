@@ -271,8 +271,18 @@ const Elem* PointLocatorTree::operator() (const Point& p, const unsigned int ele
 }
 
 
+const Elem* PointLocatorTree::perform_linear_search(const Point& p,
+                                                    const std::set<subdomain_id_type> *allowed_subdomains,
+                                                    bool use_close_to_point,
+                                                    Real close_to_point_tolerance) const
+{
+  return this->perform_linear_search(p, this->_mesh.mesh_dimension(), allowed_subdomains,
+                                     use_close_to_point, close_to_point_tolerance);
+}
+
 
 const Elem* PointLocatorTree::perform_linear_search(const Point& p,
+                                                    unsigned int elem_dim,
                                                     const std::set<subdomain_id_type> *allowed_subdomains,
                                                     bool use_close_to_point,
                                                     Real close_to_point_tolerance) const
@@ -293,8 +303,9 @@ const Elem* PointLocatorTree::perform_linear_search(const Point& p,
 
   for ( ; pos != end_pos; ++pos)
     {
-      if (!allowed_subdomains ||
-          allowed_subdomains->count((*pos)->subdomain_id()))
+      if ( (!allowed_subdomains ||
+            allowed_subdomains->count((*pos)->subdomain_id())) &&
+           (*pos)->dim() == elem_dim )
         {
           if(!use_close_to_point)
             {
