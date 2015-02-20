@@ -53,7 +53,7 @@ LinearElasticityWithContact::LinearElasticityWithContact
     _sys(sys_in),
     _contact_penalty(contact_penalty_in),
     _contact_proximity_tol(contact_proximity_tol_in),
-    _contains_point_tol(0.001),
+    _contains_point_tol(TOLERANCE),
     _augment_sparsity(_sys)
 {}
 
@@ -149,8 +149,16 @@ void LinearElasticityWithContact::move_mesh(
   // Maintain a set of node ids that we've encountered.
   LIBMESH_BEST_UNORDERED_SET<dof_id_type> encountered_node_ids;
 
-  MeshBase::const_element_iterator       el     = input_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = input_mesh.active_local_elements_end();
+  // Localize input_solution so that we have the data to move all
+  // elements (not just elements local to this processor).
+  AutoPtr< NumericVector<Number> > localized_input_solution =
+    NumericVector<Number>::build(input_solution.comm());
+  localized_input_solution->init (
+    input_solution.size(), false, SERIAL);
+  input_solution.localize(*localized_input_solution);
+
+  MeshBase::const_element_iterator       el     = input_mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end_el = input_mesh.active_elements_end();
 
   for ( ; el != end_el; ++el)
   {
@@ -208,7 +216,7 @@ void LinearElasticityWithContact::move_mesh(
 
               for (unsigned int i=0; i<dof_indices_var.size(); i++)
               {
-                value += input_solution(dof_indices_var[i]) * data.shape[i];
+                value += (*localized_input_solution)(dof_indices_var[i]) * data.shape[i];
               }
 
               uvw(index) = value;
@@ -264,7 +272,6 @@ void LinearElasticityWithContact::residual_and_jacobian (
   const std::vector<Real>& JxW = fe->get_JxW();
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  const std::vector<Point>& elem_xyz = fe->get_xyz();
 
   const std::vector<Real>& JxW_face = fe_face->get_JxW();
   const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
@@ -283,8 +290,8 @@ void LinearElasticityWithContact::residual_and_jacobian (
     _augment_sparsity.clear_contact_element_map();
     clear_contact_data();
 
-    MeshBase::const_element_iterator       el     = mesh_clone->active_local_elements_begin();
-    const MeshBase::const_element_iterator end_el = mesh_clone->active_local_elements_end();
+    MeshBase::const_element_iterator       el     = mesh_clone->active_elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh_clone->active_elements_end();
 
     for ( ; el != end_el; ++el)
     {
@@ -324,8 +331,10 @@ void LinearElasticityWithContact::residual_and_jacobian (
               // defined by the normal at the centroid of the other element
               bool found_other_elem = false;
 
-              MeshBase::const_element_iterator       other_el     = mesh_clone->active_local_elements_begin();
-              const MeshBase::const_element_iterator other_end_el = mesh_clone->active_local_elements_end();
+              // Note that here we loop over all elements (not just local elements)
+              // to be sure we find the appropriate other element.
+              MeshBase::const_element_iterator       other_el     = mesh_clone->active_elements_begin();
+              const MeshBase::const_element_iterator other_end_el = mesh_clone->active_elements_end();
               for ( ; other_el != other_end_el; ++other_el)
               {
                 const Elem* other_elem = *other_el;
@@ -390,10 +399,23 @@ void LinearElasticityWithContact::residual_and_jacobian (
                               // We need to store the intersection point, and the element/side
                               // that it belongs to. We can use this to calculate the contact
                               // force later on.
+
+                              std::vector<Point> intersection_point_vec;
+                              intersection_point_vec.push_back(intersection_point);
+                              std::vector<Point> inverse_intersection_point_vec;
+
+                              FEInterface::inverse_map(
+                                other_elem->dim(),
+                                fe->get_fe_type(),
+                                other_elem,
+                                intersection_point_vec,
+                                inverse_intersection_point_vec);
+
                               IntersectionPointData contact_intersection_pt_data(
                                 other_elem->id(),
                                 other_side,
                                 intersection_point,
+                                inverse_intersection_point_vec[0],
                                 line_point,
                                 line_direction);
 
@@ -655,16 +677,9 @@ void LinearElasticityWithContact::residual_and_jacobian (
 
                 unsigned char neighbor_side_index = intersection_pt_data._neighbor_side_index;
 
-                std::vector<Point> intersection_point_vec;
-                intersection_point_vec.push_back(intersection_point);
                 std::vector<Point> inverse_intersection_point_vec;
-
-                FEInterface::inverse_map(
-                  contact_neighbor->dim(),
-                  fe->get_fe_type(),
-                  contact_neighbor,
-                  intersection_point_vec,
-                  inverse_intersection_point_vec);
+                inverse_intersection_point_vec.push_back(
+                  intersection_pt_data._inverse_mapped_intersection_point);
 
                 fe_neighbor_face->reinit(
                   contact_neighbor,

@@ -102,12 +102,14 @@ public:
     dof_id_type neighbor_element_id,
     unsigned char neighbor_side_index,
     Point intersection_point,
+    Point inverse_mapped_intersection_point,
     Point line_point,
     Point line_direction)
   :
     _neighbor_element_id(neighbor_element_id),
     _neighbor_side_index(neighbor_side_index),
     _intersection_point(intersection_point),
+    _inverse_mapped_intersection_point(inverse_mapped_intersection_point),
     _line_point(line_point),
     _line_direction(line_direction)
   {
@@ -127,6 +129,11 @@ public:
    * The intersection point.
    */
   Point _intersection_point;
+
+  /**
+   * The intersection point mapped back to the reference element.
+   */
+  Point _inverse_mapped_intersection_point;
 
   /**
    * The point on the "master" element.
