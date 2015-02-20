@@ -219,6 +219,10 @@ public:
 
 protected:
 
+  /**
+   * Helper function to reduce code duplication
+   */
+  const Elem* find_element( const Point& p ) const;
 
   /**
    * The equation systems handler, from which
