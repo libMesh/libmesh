@@ -222,7 +222,7 @@ protected:
   /**
    * Helper function to reduce code duplication
    */
-  const Elem* find_element( const Point& p ) const;
+  const Elem* find_element( const Point& p, unsigned int elem_dim ) const;
 
   /**
    * The equation systems handler, from which

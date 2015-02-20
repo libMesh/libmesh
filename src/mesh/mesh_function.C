@@ -216,7 +216,9 @@ void MeshFunction::operator() (const Point& p,
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p);
+  const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+
+  const Elem* element = this->find_element(p,dim);
 
   if (!element)
     {
@@ -231,8 +233,6 @@ void MeshFunction::operator() (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-
 
         /*
          * Get local coordinates to feed these into compute_data().
@@ -296,7 +296,9 @@ void MeshFunction::gradient (const Point& p,
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p);
+  const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+
+  const Elem* element = this->find_element(p,dim);
 
   if (!element)
     {
@@ -310,8 +312,6 @@ void MeshFunction::gradient (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-
 
         /*
          * Get local coordinates to feed these into compute_data().
@@ -366,7 +366,9 @@ void MeshFunction::hessian (const Point& p,
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p);
+  const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+
+  const Elem* element = this->find_element(p,dim);
 
   if (!element)
     {
@@ -380,8 +382,6 @@ void MeshFunction::hessian (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-
 
         /*
          * Get local coordinates to feed these into compute_data().
@@ -429,7 +429,7 @@ void MeshFunction::hessian (const Point& p,
 }
 #endif
 
-const Elem* MeshFunction::find_element( const Point& p ) const
+const Elem* MeshFunction::find_element( const Point& p, unsigned int elem_dim ) const
 {
   /* Ensure that in the case of a master mesh function, the
      out-of-mesh mode is enabled either for both or for none.  This is
@@ -448,7 +448,7 @@ const Elem* MeshFunction::find_element( const Point& p ) const
 #endif
 
   // locate the point in the other mesh
-  const Elem* element = this->_point_locator->operator()(p);
+  const Elem* element = this->_point_locator->operator()(p,elem_dim);
 
   // If we have an element, but it's not a local element, then we
   // either need to have a serialized vector or we need to find a
