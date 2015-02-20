@@ -91,7 +91,8 @@ public:
    * Users may reimplement this to add pre- or post-assembly
    * code before or after calling FEMSystem::assembly()
    */
-  virtual void assembly (bool get_residual, bool get_jacobian);
+  virtual void assembly (bool get_residual, bool get_jacobian,
+                         bool apply_heterogeneous_constraints = false);
 
   /**
    * Invokes the solver associated with the system.  For steady state

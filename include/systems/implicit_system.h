@@ -146,7 +146,10 @@ public:
    * This is undefined in ImplicitSystem; subclasses each have their
    * own way of handling assembly.
    */
-  virtual void assembly(bool /* get_residual */ , bool /* get_jacobian */)
+  virtual void assembly
+    (bool /* get_residual */,
+     bool /* get_jacobian */,
+     bool /* apply_heterogeneous_constraints */ = false)
   { libmesh_not_implemented(); }
 
   /**

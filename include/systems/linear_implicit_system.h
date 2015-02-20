@@ -132,7 +132,8 @@ public:
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
    * as requested.
    */
-  virtual void assembly(bool get_residual, bool get_jacobian);
+  virtual void assembly(bool get_residual, bool get_jacobian,
+                        bool apply_heterogeneous_constraints = false);
 
   /**
    * @returns \p "LinearImplicit".  Helps in identifying

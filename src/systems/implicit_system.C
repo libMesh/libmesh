@@ -605,7 +605,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters_in
   parameterperturbation *= delta_p;
   parameters += parameterperturbation;
 
-  this->assembly(true, false);
+  this->assembly(true, false, true);
   this->rhs->close();
 
   AutoPtr<NumericVector<Number> > temprhs = this->rhs->clone();
@@ -614,7 +614,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters_in
   parameterperturbation *= -1.0;
   parameters += parameterperturbation;
 
-  this->assembly(true, false);
+  this->assembly(true, false, true);
   this->rhs->close();
 
   *temprhs -= *(this->rhs);
@@ -677,13 +677,13 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parame
       Number old_parameter = *parameters[p];
       *parameters[p] -= deltap;
 
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
       sensitivity_rhs = *this->rhs;
 
       *parameters[p] = old_parameter + deltap;
 
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
 
       sensitivity_rhs -= *this->rhs;
@@ -779,7 +779,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       this->assemble_qoi(qoi_indices);
       std::vector<Number> qoi_minus = this->qoi;
 
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
 
       // FIXME - this can and should be optimized to avoid the clone()
@@ -795,7 +795,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
         if (qoi_indices.has_index(i))
           partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
       *partialR_partialp += *this->rhs;
       *partialR_partialp /= (2.*delta_p);
@@ -1008,7 +1008,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
       *parameters[k] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
       std::vector<Number> partial2q_term = this->qoi;
       std::vector<Number> partial2R_term(this->qoi.size());
@@ -1018,7 +1018,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
       *parameters[k] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
@@ -1036,7 +1036,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
       *parameters[k] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
@@ -1047,7 +1047,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
       *parameters[k] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
-      this->assembly(true, false);
+      this->assembly(true, false, true);
       this->rhs->close();
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
@@ -1212,7 +1212,7 @@ void ImplicitSystem::qoi_parameter_hessian
           *parameters[k] += delta_p;
           *parameters[l] += delta_p;
           this->assemble_qoi(qoi_indices);
-          this->assembly(true, false);
+          this->assembly(true, false, true);
           this->rhs->close();
           std::vector<Number> partial2q_term = this->qoi;
           std::vector<Number> partial2R_term(this->qoi.size());
@@ -1222,7 +1222,7 @@ void ImplicitSystem::qoi_parameter_hessian
 
           *parameters[l] -= 2.*delta_p;
           this->assemble_qoi(qoi_indices);
-          this->assembly(true, false);
+          this->assembly(true, false, true);
           this->rhs->close();
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
@@ -1233,7 +1233,7 @@ void ImplicitSystem::qoi_parameter_hessian
 
           *parameters[k] -= 2.*delta_p;
           this->assemble_qoi(qoi_indices);
-          this->assembly(true, false);
+          this->assembly(true, false, true);
           this->rhs->close();
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
@@ -1244,7 +1244,7 @@ void ImplicitSystem::qoi_parameter_hessian
 
           *parameters[l] += 2.*delta_p;
           this->assemble_qoi(qoi_indices);
-          this->assembly(true, false);
+          this->assembly(true, false, true);
           this->rhs->close();
           for (unsigned int i=0; i != Nq; ++i)
             if (qoi_indices.has_index(i))
