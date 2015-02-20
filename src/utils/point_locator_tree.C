@@ -187,20 +187,32 @@ void PointLocatorTree::init (Trees::BuildType build_type)
 
 
 
-const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+const Elem* PointLocatorTree::operator() (const Point& p, const unsigned int elem_dim,
+                                          const std::set<subdomain_id_type> *allowed_subdomains) const
 {
   libmesh_assert (this->_initialized);
+
+  // Make sure the mesh has elements of dimension elem_dim
+  if( _mesh.elem_dimensions().find(elem_dim) == _mesh.elem_dimensions().end() )
+    {
+      libMesh::err << "ERROR: There are no elements of dimension " << elem_dim
+                   << " in the mesh to find!" << std::endl;
+      libmesh_error();
+    }
 
   START_LOG("operator()", "PointLocatorTree");
 
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
   if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = NULL;
 
+  // If we have a cached element, make sure it is of the right dimension
+  if( this->_element && this->_element->dim() != elem_dim ) this->_element = NULL;
+
   // First check the element from last time before asking the tree
   if (this->_element==NULL || !(this->_element->contains_point(p)))
     {
       // ask the tree
-      this->_element = this->_tree->find_element (p,allowed_subdomains);
+      this->_element = this->_tree->find_element (p,elem_dim,allowed_subdomains);
 
       if (this->_element == NULL)
         {
@@ -259,8 +271,18 @@ const Elem* PointLocatorTree::operator() (const Point& p, const std::set<subdoma
 }
 
 
+const Elem* PointLocatorTree::perform_linear_search(const Point& p,
+                                                    const std::set<subdomain_id_type> *allowed_subdomains,
+                                                    bool use_close_to_point,
+                                                    Real close_to_point_tolerance) const
+{
+  return this->perform_linear_search(p, this->_mesh.mesh_dimension(), allowed_subdomains,
+                                     use_close_to_point, close_to_point_tolerance);
+}
+
 
 const Elem* PointLocatorTree::perform_linear_search(const Point& p,
+                                                    unsigned int elem_dim,
                                                     const std::set<subdomain_id_type> *allowed_subdomains,
                                                     bool use_close_to_point,
                                                     Real close_to_point_tolerance) const
@@ -281,8 +303,9 @@ const Elem* PointLocatorTree::perform_linear_search(const Point& p,
 
   for ( ; pos != end_pos; ++pos)
     {
-      if (!allowed_subdomains ||
-          allowed_subdomains->count((*pos)->subdomain_id()))
+      if ( (!allowed_subdomains ||
+            allowed_subdomains->count((*pos)->subdomain_id())) &&
+           (*pos)->dim() == elem_dim )
         {
           if(!use_close_to_point)
             {

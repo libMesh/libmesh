@@ -99,23 +99,40 @@ public:
   virtual void init();
 
   /**
-   * Locates the element in which the point with global coordinates
-   * \p p is located, optionally restricted to a set of allowed subdomains.
-   * The mutable _element member is used to cache
+   * Locates the element, with dimension elem_dim, in which the point with
+   * global coordinates \p p is located, optionally restricted to a set of
+   * allowed subdomains. The mutable _element member is used to cache
    * the result and allow it to be used during the next call to
    * operator().
    */
-  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
+  virtual const Elem* operator() (const Point& p, const unsigned int elem_dim,
+                                  const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
 
   /**
    * As a fallback option, it's helpful to be able to do a linear
    * search over the entire mesh. This can be used if operator()
    * fails to find an element that contains \p p, for example.
    * Optionally specify a "close to point" tolerance to use in
-   * the linear search.
+   * the linear search. This only looks for elements with
+   * dimension mesh.mesh_dimension().
    * Return NULL if no element is found.
    */
   const Elem* perform_linear_search(const Point& p,
+                                    const std::set<subdomain_id_type> *allowed_subdomains,
+                                    bool use_close_to_point,
+                                    Real close_to_point_tolerance=TOLERANCE) const;
+
+  /**
+   * As a fallback option, it's helpful to be able to do a linear
+   * search over the entire mesh. This can be used if operator()
+   * fails to find an element that contains \p p, for example.
+   * Optionally specify a "close to point" tolerance to use in
+   * the linear search. This only looks for elements with
+   * dimension elem_dim.
+   * Return NULL if no element is found.
+   */
+  const Elem* perform_linear_search(const Point& p,
+                                    unsigned int elem_dim,
                                     const std::set<subdomain_id_type> *allowed_subdomains,
                                     bool use_close_to_point,
                                     Real close_to_point_tolerance=TOLERANCE) const;

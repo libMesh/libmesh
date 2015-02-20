@@ -24,6 +24,7 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/point_locator_tree.h"
 #include "libmesh/point_locator_list.h"
+#include "libmesh/mesh_base.h"
 
 namespace libMesh
 {
@@ -98,6 +99,11 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
   libmesh_error_msg("We'll never get here!");
   AutoPtr<PointLocatorBase> ap(NULL);
   return ap;
+}
+
+const Elem* PointLocatorBase:: operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+{
+  return (*this)(p, _mesh.mesh_dimension(), allowed_subdomains);
 }
 
 void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)

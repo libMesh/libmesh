@@ -462,8 +462,8 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/point_locator_base.C src/utils/point_locator_list.C \
 	src/utils/point_locator_tree.C src/utils/statistics.C \
 	src/utils/string_to_enum.C src/utils/timestamp.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/tree.C src/utils/tree_base.C src/utils/tree_node.C \
+	src/utils/utility.C src/utils/xdr_cxx.C
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/base/libmesh_dbg_la-dof_map_constraints.lo \
@@ -879,6 +879,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/utils/libmesh_dbg_la-string_to_enum.lo \
 	src/utils/libmesh_dbg_la-timestamp.lo \
 	src/utils/libmesh_dbg_la-tree.lo \
+	src/utils/libmesh_dbg_la-tree_base.lo \
 	src/utils/libmesh_dbg_la-tree_node.lo \
 	src/utils/libmesh_dbg_la-utility.lo \
 	src/utils/libmesh_dbg_la-xdr_cxx.lo
@@ -1173,8 +1174,8 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/point_locator_base.C src/utils/point_locator_list.C \
 	src/utils/point_locator_tree.C src/utils/statistics.C \
 	src/utils/string_to_enum.C src/utils/timestamp.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/tree.C src/utils/tree_base.C src/utils/tree_node.C \
+	src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/base/libmesh_devel_la-dof_map_constraints.lo \
 	src/base/libmesh_devel_la-dof_object.lo \
@@ -1589,6 +1590,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/utils/libmesh_devel_la-string_to_enum.lo \
 	src/utils/libmesh_devel_la-timestamp.lo \
 	src/utils/libmesh_devel_la-tree.lo \
+	src/utils/libmesh_devel_la-tree_base.lo \
 	src/utils/libmesh_devel_la-tree_node.lo \
 	src/utils/libmesh_devel_la-utility.lo \
 	src/utils/libmesh_devel_la-xdr_cxx.lo
@@ -1880,8 +1882,8 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/point_locator_base.C src/utils/point_locator_list.C \
 	src/utils/point_locator_tree.C src/utils/statistics.C \
 	src/utils/string_to_enum.C src/utils/timestamp.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/tree.C src/utils/tree_base.C src/utils/tree_node.C \
+	src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/base/libmesh_oprof_la-dof_map_constraints.lo \
 	src/base/libmesh_oprof_la-dof_object.lo \
@@ -2296,6 +2298,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/utils/libmesh_oprof_la-string_to_enum.lo \
 	src/utils/libmesh_oprof_la-timestamp.lo \
 	src/utils/libmesh_oprof_la-tree.lo \
+	src/utils/libmesh_oprof_la-tree_base.lo \
 	src/utils/libmesh_oprof_la-tree_node.lo \
 	src/utils/libmesh_oprof_la-utility.lo \
 	src/utils/libmesh_oprof_la-xdr_cxx.lo
@@ -2587,8 +2590,8 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/point_locator_base.C src/utils/point_locator_list.C \
 	src/utils/point_locator_tree.C src/utils/statistics.C \
 	src/utils/string_to_enum.C src/utils/timestamp.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/tree.C src/utils/tree_base.C src/utils/tree_node.C \
+	src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/base/libmesh_opt_la-dof_map_constraints.lo \
 	src/base/libmesh_opt_la-dof_object.lo \
@@ -3003,6 +3006,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/utils/libmesh_opt_la-string_to_enum.lo \
 	src/utils/libmesh_opt_la-timestamp.lo \
 	src/utils/libmesh_opt_la-tree.lo \
+	src/utils/libmesh_opt_la-tree_base.lo \
 	src/utils/libmesh_opt_la-tree_node.lo \
 	src/utils/libmesh_opt_la-utility.lo \
 	src/utils/libmesh_opt_la-xdr_cxx.lo
@@ -3293,8 +3297,8 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/point_locator_base.C src/utils/point_locator_list.C \
 	src/utils/point_locator_tree.C src/utils/statistics.C \
 	src/utils/string_to_enum.C src/utils/timestamp.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/tree.C src/utils/tree_base.C src/utils/tree_node.C \
+	src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/base/libmesh_prof_la-dof_map_constraints.lo \
 	src/base/libmesh_prof_la-dof_object.lo \
@@ -3709,6 +3713,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/utils/libmesh_prof_la-string_to_enum.lo \
 	src/utils/libmesh_prof_la-timestamp.lo \
 	src/utils/libmesh_prof_la-tree.lo \
+	src/utils/libmesh_prof_la-tree_base.lo \
 	src/utils/libmesh_prof_la-tree_node.lo \
 	src/utils/libmesh_prof_la-utility.lo \
 	src/utils/libmesh_prof_la-xdr_cxx.lo
@@ -4994,6 +4999,7 @@ libmesh_SOURCES = \
         src/utils/string_to_enum.C \
         src/utils/timestamp.C \
         src/utils/tree.C \
+        src/utils/tree_base.C \
         src/utils/tree_node.C \
         src/utils/utility.C \
         src/utils/xdr_cxx.C 
@@ -6428,6 +6434,8 @@ src/utils/libmesh_dbg_la-timestamp.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-tree.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_dbg_la-tree_base.lo: src/utils/$(am__dirstamp) \
+	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-tree_node.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-utility.lo: src/utils/$(am__dirstamp) \
@@ -7444,6 +7452,8 @@ src/utils/libmesh_devel_la-string_to_enum.lo:  \
 src/utils/libmesh_devel_la-timestamp.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-tree.lo: src/utils/$(am__dirstamp) \
+	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_devel_la-tree_base.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-tree_node.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -8462,6 +8472,8 @@ src/utils/libmesh_oprof_la-timestamp.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-tree.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_oprof_la-tree_base.lo: src/utils/$(am__dirstamp) \
+	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-tree_node.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-utility.lo: src/utils/$(am__dirstamp) \
@@ -9475,6 +9487,8 @@ src/utils/libmesh_opt_la-string_to_enum.lo: src/utils/$(am__dirstamp) \
 src/utils/libmesh_opt_la-timestamp.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-tree.lo: src/utils/$(am__dirstamp) \
+	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_opt_la-tree_base.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-tree_node.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -10490,6 +10504,8 @@ src/utils/libmesh_prof_la-string_to_enum.lo:  \
 src/utils/libmesh_prof_la-timestamp.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-tree.lo: src/utils/$(am__dirstamp) \
+	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_prof_la-tree_base.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-tree_node.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -12934,6 +12950,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-string_to_enum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-timestamp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-tree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-tree_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-tree_node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-utility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-xdr_cxx.Plo@am__quote@
@@ -12953,6 +12970,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-string_to_enum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-timestamp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-tree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-tree_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-tree_node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-utility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-xdr_cxx.Plo@am__quote@
@@ -12972,6 +12990,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-string_to_enum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-timestamp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-tree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-tree_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-tree_node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-utility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-xdr_cxx.Plo@am__quote@
@@ -12991,6 +13010,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-string_to_enum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-timestamp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-tree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-tree_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-tree_node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-utility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-xdr_cxx.Plo@am__quote@
@@ -13010,6 +13030,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-string_to_enum.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-timestamp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-tree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-tree_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-tree_node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-utility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-xdr_cxx.Plo@am__quote@
@@ -15929,6 +15950,13 @@ src/utils/libmesh_dbg_la-tree.lo: src/utils/tree.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-tree.lo `test -f 'src/utils/tree.C' || echo '$(srcdir)/'`src/utils/tree.C
 
+src/utils/libmesh_dbg_la-tree_base.lo: src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-tree_base.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-tree_base.Tpo -c -o src/utils/libmesh_dbg_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_dbg_la-tree_base.Tpo src/utils/$(DEPDIR)/libmesh_dbg_la-tree_base.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/tree_base.C' object='src/utils/libmesh_dbg_la-tree_base.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+
 src/utils/libmesh_dbg_la-tree_node.lo: src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-tree_node.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-tree_node.Tpo -c -o src/utils/libmesh_dbg_la-tree_node.lo `test -f 'src/utils/tree_node.C' || echo '$(srcdir)/'`src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_dbg_la-tree_node.Tpo src/utils/$(DEPDIR)/libmesh_dbg_la-tree_node.Plo
@@ -18840,6 +18868,13 @@ src/utils/libmesh_devel_la-tree.lo: src/utils/tree.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/tree.C' object='src/utils/libmesh_devel_la-tree.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-tree.lo `test -f 'src/utils/tree.C' || echo '$(srcdir)/'`src/utils/tree.C
+
+src/utils/libmesh_devel_la-tree_base.lo: src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-tree_base.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-tree_base.Tpo -c -o src/utils/libmesh_devel_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_devel_la-tree_base.Tpo src/utils/$(DEPDIR)/libmesh_devel_la-tree_base.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/tree_base.C' object='src/utils/libmesh_devel_la-tree_base.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
 
 src/utils/libmesh_devel_la-tree_node.lo: src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-tree_node.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-tree_node.Tpo -c -o src/utils/libmesh_devel_la-tree_node.lo `test -f 'src/utils/tree_node.C' || echo '$(srcdir)/'`src/utils/tree_node.C
@@ -21753,6 +21788,13 @@ src/utils/libmesh_oprof_la-tree.lo: src/utils/tree.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-tree.lo `test -f 'src/utils/tree.C' || echo '$(srcdir)/'`src/utils/tree.C
 
+src/utils/libmesh_oprof_la-tree_base.lo: src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-tree_base.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-tree_base.Tpo -c -o src/utils/libmesh_oprof_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_oprof_la-tree_base.Tpo src/utils/$(DEPDIR)/libmesh_oprof_la-tree_base.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/tree_base.C' object='src/utils/libmesh_oprof_la-tree_base.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+
 src/utils/libmesh_oprof_la-tree_node.lo: src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-tree_node.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-tree_node.Tpo -c -o src/utils/libmesh_oprof_la-tree_node.lo `test -f 'src/utils/tree_node.C' || echo '$(srcdir)/'`src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_oprof_la-tree_node.Tpo src/utils/$(DEPDIR)/libmesh_oprof_la-tree_node.Plo
@@ -24665,6 +24707,13 @@ src/utils/libmesh_opt_la-tree.lo: src/utils/tree.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-tree.lo `test -f 'src/utils/tree.C' || echo '$(srcdir)/'`src/utils/tree.C
 
+src/utils/libmesh_opt_la-tree_base.lo: src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-tree_base.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-tree_base.Tpo -c -o src/utils/libmesh_opt_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-tree_base.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-tree_base.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/tree_base.C' object='src/utils/libmesh_opt_la-tree_base.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+
 src/utils/libmesh_opt_la-tree_node.lo: src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-tree_node.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-tree_node.Tpo -c -o src/utils/libmesh_opt_la-tree_node.lo `test -f 'src/utils/tree_node.C' || echo '$(srcdir)/'`src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-tree_node.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-tree_node.Plo
@@ -27576,6 +27625,13 @@ src/utils/libmesh_prof_la-tree.lo: src/utils/tree.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/tree.C' object='src/utils/libmesh_prof_la-tree.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-tree.lo `test -f 'src/utils/tree.C' || echo '$(srcdir)/'`src/utils/tree.C
+
+src/utils/libmesh_prof_la-tree_base.lo: src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-tree_base.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-tree_base.Tpo -c -o src/utils/libmesh_prof_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_prof_la-tree_base.Tpo src/utils/$(DEPDIR)/libmesh_prof_la-tree_base.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/tree_base.C' object='src/utils/libmesh_prof_la-tree_base.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-tree_base.lo `test -f 'src/utils/tree_base.C' || echo '$(srcdir)/'`src/utils/tree_base.C
 
 src/utils/libmesh_prof_la-tree_node.lo: src/utils/tree_node.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-tree_node.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-tree_node.Tpo -c -o src/utils/libmesh_prof_la-tree_node.lo `test -f 'src/utils/tree_node.C' || echo '$(srcdir)/'`src/utils/tree_node.C
