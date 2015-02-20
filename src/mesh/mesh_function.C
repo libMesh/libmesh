@@ -182,6 +182,15 @@ Number MeshFunction::operator() (const Point& p,
   return buf(0);
 }
 
+void MeshFunction::operator() (const Point& p,
+                               const Real time,
+                               DenseVector<Number>& output)
+{
+  libmesh_assert (this->initialized());
+  unsigned int mesh_dim = this->_eqn_systems.get_mesh().mesh_dimension();
+  this->operator() (p, mesh_dim, time, output);
+}
+
 
 
 Gradient MeshFunction::gradient (const Point& p,
@@ -211,14 +220,13 @@ Tensor MeshFunction::hessian (const Point& p,
 
 
 void MeshFunction::operator() (const Point& p,
+                               unsigned int elem_dim,
                                const Real,
                                DenseVector<Number>& output)
 {
   libmesh_assert (this->initialized());
 
-  const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-
-  const Elem* element = this->find_element(p,dim);
+  const Elem* element = this->find_element(p,elem_dim);
 
   if (!element)
     {
@@ -239,7 +247,7 @@ void MeshFunction::operator() (const Point& p,
          * Note that the fe_type can safely be used from the 0-variable,
          * since the inverse mapping is the same for all FEFamilies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
+        const Point mapped_point (FEInterface::inverse_map (elem_dim,
                                                             this->_dof_map.variable_type(0),
                                                             element,
                                                             p));
@@ -261,7 +269,7 @@ void MeshFunction::operator() (const Point& p,
             {
               FEComputeData data (this->_eqn_systems, mapped_point);
 
-              FEInterface::compute_data (dim, fe_type, element, data);
+              FEInterface::compute_data (elem_dim, fe_type, element, data);
 
               // where the solution values for the var-th variable are stored
               std::vector<dof_id_type> dof_indices;
