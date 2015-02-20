@@ -183,10 +183,21 @@ public:
                  std::vector<Gradient>& output);
 
   /**
-   * Computes gradients at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * Computes gradients at coordinate \p p, that lies in element with
+   * dimemnsion mesh_dimension() (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
    */
   void hessian (const Point& p,
+                const Real time,
+                std::vector<Tensor>& output);
+
+  /**
+   * Computes gradients at coordinate \p p, that lies in element with
+   * dimemnsion elem_dim (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
+   */
+  void hessian (const Point& p,
+                unsigned int elem_dim,
                 const Real time,
                 std::vector<Tensor>& output);
 

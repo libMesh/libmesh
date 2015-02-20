@@ -224,6 +224,15 @@ Tensor MeshFunction::hessian (const Point& p,
   this->hessian(p, time, buf);
   return buf[0];
 }
+
+void MeshFunction::hessian (const Point& p,
+                            const Real time,
+                            std::vector<Tensor>& output)
+{
+  libmesh_assert (this->initialized());
+  unsigned int mesh_dim = this->_eqn_systems.get_mesh().mesh_dimension();
+  this->hessian(p, mesh_dim, time, output);
+}
 #endif
 
 
@@ -377,14 +386,13 @@ void MeshFunction::gradient (const Point& p,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 void MeshFunction::hessian (const Point& p,
+                            unsigned int elem_dim,
                             const Real,
                             std::vector<Tensor>& output)
 {
   libmesh_assert (this->initialized());
 
-  const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
-
-  const Elem* element = this->find_element(p,dim);
+  const Elem* element = this->find_element(p,elem_dim);
 
   if (!element)
     {
@@ -404,7 +412,7 @@ void MeshFunction::hessian (const Point& p,
          * Note that the fe_type can safely be used from the 0-variable,
          * since the inverse mapping is the same for all FEFamilies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
+        const Point mapped_point (FEInterface::inverse_map (elem_dim,
                                                             this->_dof_map.variable_type(0),
                                                             element,
                                                             p));
@@ -420,7 +428,7 @@ void MeshFunction::hessian (const Point& p,
             const unsigned int var = _system_vars[index];
             const FEType& fe_type = this->_dof_map.variable_type(var);
 
-            AutoPtr<FEBase> point_fe (FEBase::build(dim, fe_type));
+            AutoPtr<FEBase> point_fe (FEBase::build(elem_dim, fe_type));
             const std::vector<std::vector<RealTensor> >& d2phi =
               point_fe->get_d2phi();
             point_fe->reinit(element, &point_list);
