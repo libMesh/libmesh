@@ -429,7 +429,8 @@ void MeshFunction::hessian (const Point& p,
 }
 #endif
 
-const Elem* MeshFunction::find_element( const Point& p ) const
+const Elem* MeshFunction::find_element( const Point& p,
+                                        const std::set<subdomain_id_type>* subdomain_ids ) const
 {
   /* Ensure that in the case of a master mesh function, the
      out-of-mesh mode is enabled either for both or for none.  This is
@@ -448,7 +449,7 @@ const Elem* MeshFunction::find_element( const Point& p ) const
 #endif
 
   // locate the point in the other mesh
-  const Elem* element = this->_point_locator->operator()(p);
+  const Elem* element = this->_point_locator->operator()(p,subdomain_ids);
 
   // If we have an element, but it's not a local element, then we
   // either need to have a serialized vector or we need to find a

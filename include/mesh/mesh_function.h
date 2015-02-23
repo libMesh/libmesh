@@ -222,7 +222,8 @@ protected:
   /**
    * Helper function to reduce code duplication
    */
-  const Elem* find_element( const Point& p ) const;
+  const Elem* find_element( const Point& p,
+                            const std::set<subdomain_id_type>* subdomain_ids = NULL ) const;
 
   /**
    * The equation systems handler, from which
