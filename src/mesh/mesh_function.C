@@ -292,11 +292,12 @@ void MeshFunction::operator() (const Point& p,
 
 void MeshFunction::gradient (const Point& p,
                              const Real,
-                             std::vector<Gradient>& output)
+                             std::vector<Gradient>& output,
+                             const std::set<subdomain_id_type>* subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p);
+  const Elem* element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {

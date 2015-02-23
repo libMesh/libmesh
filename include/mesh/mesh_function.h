@@ -154,11 +154,14 @@ public:
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * defaults to zero, optionally restricting the point to the passed
+   * subdomain_ids. This is useful in cases where there are multiple
+   * dimensioned elements, for example.
    */
   void gradient (const Point& p,
                  const Real time,
-                 std::vector<Gradient>& output);
+                 std::vector<Gradient>& output,
+                 const std::set<subdomain_id_type>* subdomain_ids = NULL);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
