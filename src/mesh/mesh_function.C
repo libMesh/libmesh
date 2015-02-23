@@ -363,11 +363,12 @@ void MeshFunction::gradient (const Point& p,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 void MeshFunction::hessian (const Point& p,
                             const Real,
-                            std::vector<Tensor>& output)
+                            std::vector<Tensor>& output,
+                            const std::set<subdomain_id_type>* subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p);
+  const Elem* element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {
