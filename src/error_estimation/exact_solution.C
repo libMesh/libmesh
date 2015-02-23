@@ -609,40 +609,6 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Attach quadrature rule to FE object
   fe->attach_quadrature_rule (qrule.get());
 
-  // The Jacobian*weight at the quadrature points.
-  const std::vector<Real>& JxW                               = fe->get_JxW();
-
-  // The value of the shape functions at the quadrature points
-  // i.e. phi(i) = phi_values[i][qp]
-  const std::vector<std::vector<OutputShape> >&  phi_values         = fe->get_phi();
-
-  // The value of the shape function gradients at the quadrature points
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&
-    dphi_values = fe->get_dphi();
-
-  // The value of the shape function curls at the quadrature points
-  // Only computed for vector-valued elements
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> >* curl_values = NULL;
-
-  // The value of the shape function divergences at the quadrature points
-  // Only computed for vector-valued elements
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >* div_values = NULL;
-
-  if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
-    {
-      curl_values = &fe->get_curl_phi();
-      div_values = &fe->get_div_phi();
-    }
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  // The value of the shape function second derivatives at the quadrature points
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&
-    d2phi_values = fe->get_d2phi();
-#endif
-
-  // The XYZ locations (in physical space) of the quadrature points
-  const std::vector<Point>& q_point                          = fe->get_xyz();
-
   // The global degree of freedom indices associated
   // with the local degrees of freedom.
   std::vector<dof_id_type> dof_indices;
@@ -662,6 +628,40 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
       const Elem* elem = *el;
+
+      // The Jacobian*weight at the quadrature points.
+      const std::vector<Real>& JxW = fe->get_JxW();
+
+      // The value of the shape functions at the quadrature points
+      // i.e. phi(i) = phi_values[i][qp]
+      const std::vector<std::vector<OutputShape> >&  phi_values = fe->get_phi();
+
+      // The value of the shape function gradients at the quadrature points
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&
+        dphi_values = fe->get_dphi();
+
+      // The value of the shape function curls at the quadrature points
+      // Only computed for vector-valued elements
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> >* curl_values = NULL;
+
+      // The value of the shape function divergences at the quadrature points
+      // Only computed for vector-valued elements
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >* div_values = NULL;
+
+      if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+        {
+          curl_values = &fe->get_curl_phi();
+          div_values = &fe->get_div_phi();
+        }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      // The value of the shape function second derivatives at the quadrature points
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&
+        d2phi_values = fe->get_d2phi();
+#endif
+
+      // The XYZ locations (in physical space) of the quadrature points
+      const std::vector<Point>& q_point = fe->get_xyz();
 
       // reinitialize the element-specific data
       // for the current element
