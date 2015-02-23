@@ -208,15 +208,21 @@ Tensor MeshFunction::hessian (const Point& p,
 }
 #endif
 
-
+void MeshFunction::operator() (const Point& p,
+                               const Real time,
+                               DenseVector<Number>& output)
+{
+  this->operator() (p,time,output,NULL);
+}
 
 void MeshFunction::operator() (const Point& p,
                                const Real,
-                               DenseVector<Number>& output)
+                               DenseVector<Number>& output,
+                               const std::set<subdomain_id_type>* subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  const Elem* element = this->find_element(p);
+  const Elem* element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {

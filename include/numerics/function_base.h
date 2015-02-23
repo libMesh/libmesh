@@ -122,6 +122,10 @@ public:
    * coordinate \p p and for time \p time.
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
+   * Can optionally provide subdomain_ids which will restrict
+   * the function to operate on elements with subdomain id contained
+   * in the set. This is useful in cases where there are multiple
+   * dimensioned elements, for example.
    */
   virtual void operator() (const Point& p,
                            const Real time,
