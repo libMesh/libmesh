@@ -801,6 +801,10 @@ int main (int argc, char** argv)
 
       std::cout<< "The boundary QoI is " << std::setprecision(17) << QoI_0_computed << std::endl << std::endl;
 
+      // Hard coded assert to ensure that the actual numbers we are getting are what they should be
+      if(a_step == param.max_adaptivesteps)
+	libmesh_assert_less(std::abs(QoI_0_computed - 0.083294260583914453), 1.e-5);
+
       // You dont need to compute error estimates and refine at the last
       // adaptive step, only before that
       if(a_step!=param.max_adaptivesteps)

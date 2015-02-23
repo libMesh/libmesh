@@ -496,6 +496,10 @@ int main (int argc, char** argv)
                  << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl << std::endl;
 
+	// Hard coded asserts to ensure that the actual numbers we are getting are what they should be     
+	libmesh_assert_less(std::abs((sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact), 1.e-4);
+	libmesh_assert_less(std::abs((sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact), 1.e-4);
+
         NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 
         primal_solution.swap(dual_solution_0);

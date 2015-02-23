@@ -505,6 +505,10 @@ int main (int argc, char** argv)
         std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
                  << std::abs(QoI_1_computed - QoI_1_exact) /
           std::abs(QoI_1_exact) << std::endl << std::endl;
+
+	// Hard coded asserts to ensure that the actual numbers we are getting are what they should be      
+	libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact)/std::abs(QoI_0_exact), 1.e-6);
+	libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact)/std::abs(QoI_1_exact), 1.e-5);
       }
   }
 
