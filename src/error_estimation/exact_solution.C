@@ -646,6 +646,13 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       if(!computed_system.variable(var).active_on_subdomain(elem_subid))
         continue;
 
+      /* If the variable is active, then we're going to restrict the
+         MeshFunction evaluations to the current element subdomain.
+         This is for cases such as mixed dimension meshes where we want
+         to restrict the calculation to one particular domain. */
+      std::set<subdomain_id_type> subdomain_id;
+      subdomain_id.insert(elem_subid);
+
       FEGenericBase<OutputShape>* fe = fe_ptrs[dim];
       QBase* qrule = q_rules[dim];
       libmesh_assert(fe);
@@ -748,7 +755,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
           else if (_equation_systems_fine)
             {
               // FIXME: Needs to be updated for vector-valued elements
-              exact_val = (*coarse_values)(q_point[qp]);
+              DenseVector<Number> output(1);
+              (*coarse_values)(q_point[qp],time,output,&subdomain_id);
+              exact_val = output(0);
             }
           const typename FEGenericBase<OutputShape>::OutputNumber val_error = u_h - exact_val;
 
@@ -776,7 +785,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
           else if (_equation_systems_fine)
             {
               // FIXME: Needs to be updated for vector-valued elements
-              exact_grad = coarse_values->gradient(q_point[qp]);
+              std::vector<Gradient> output(1);
+              coarse_values->gradient(q_point[qp],time,output,&subdomain_id);
+              exact_grad = output[0];
             }
 
           const typename FEGenericBase<OutputShape>::OutputNumberGradient grad_error = grad_u_h - exact_grad;
@@ -844,7 +855,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
           else if (_equation_systems_fine)
             {
               // FIXME: Needs to be updated for vector-valued elements
-              exact_hess = coarse_values->hessian(q_point[qp]);
+              std::vector<Tensor> output(1);
+              coarse_values->hessian(q_point[qp],time,output,&subdomain_id);
+              exact_hess = output[0];
             }
 
           const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
