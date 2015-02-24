@@ -237,7 +237,7 @@ void MeshFunction::operator() (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+        const unsigned int dim = element->dim();
 
 
         /*
@@ -317,7 +317,7 @@ void MeshFunction::gradient (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+        const unsigned int dim = element->dim();
 
 
         /*
@@ -388,7 +388,7 @@ void MeshFunction::hessian (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+        const unsigned int dim = element->dim();
 
 
         /*
