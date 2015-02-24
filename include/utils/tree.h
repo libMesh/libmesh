@@ -76,19 +76,16 @@ public:
 
   /**
    * @returns a pointer to the element containing point p,
-   * for elements of dimension elem_dim,
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */
-  virtual const Elem* find_element(const Point& p,
-                                   unsigned int elem_dim,
-                                   const std::set<subdomain_id_type>
-                                   *allowed_subdomains = NULL,
-                                   Real relative_tol = TOLERANCE) const;
+  const Elem* find_element(const Point& p,
+                           const std::set<subdomain_id_type>
+                           *allowed_subdomains = NULL,
+                           Real relative_tol = TOLERANCE) const;
 
   /**
    * @returns a pointer to the element containing point p,
-   * for elements with dimension mesh.mesh_dimension(),
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */

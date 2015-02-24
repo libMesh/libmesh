@@ -29,7 +29,6 @@ public:
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testDofOrdering );
   CPPUNIT_TEST( testPointLocatorList );
-  CPPUNIT_TEST( testPointLocatorTree );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -87,7 +86,7 @@ protected:
     }
 
     // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequently,
+    // anyway. We do this because when we call uniformly_refine subsequenly,
     // it's going use skip_renumber=false.
     _mesh->prepare_for_use(false /*skip_renumber*/);
   }
@@ -175,41 +174,6 @@ public:
 
     // We should have gotten back the bottom quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
-
-    // Now try to find the 1d element overlapping the interface edge
-    Point interface_point(0.2, 0.0);
-    const Elem* interface_elem = (*locator)(interface_point,1);
-
-    CPPUNIT_ASSERT(interface_elem);
-
-    // We should have gotten back the bottom quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
-  }
-
-  void testPointLocatorTree()
-  {
-    AutoPtr<PointLocatorBase> locator = _mesh->sub_point_locator();
-
-    Point top_point(0.5, 0.5);
-    const Elem* top_elem = (*locator)(top_point);
-
-    // We should have gotten back the top quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)0, top_elem->id() );
-
-    Point bottom_point(0.5, -0.5);
-    const Elem* bottom_elem = (*locator)(bottom_point);
-
-    // We should have gotten back the bottom quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
-
-    // Now try to find the 1d element overlapping the interface edge
-    Point interface_point(0.2, 0.0);
-    const Elem* interface_elem = (*locator)(interface_point,1);
-
-    CPPUNIT_ASSERT(interface_elem);
-
-    // We should have gotten back the bottom quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
   }
 
 };
@@ -229,7 +193,7 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
-  // Yes, this is necessary. Somewhere in those macros is a protected/private
+  // Yes, this is necesarry. Somewhere in those macros is a protected/private
 public:
 
   void setUp()
