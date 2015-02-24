@@ -208,56 +208,21 @@ Tensor MeshFunction::hessian (const Point& p,
 }
 #endif
 
-
+void MeshFunction::operator() (const Point& p,
+                               const Real time,
+                               DenseVector<Number>& output)
+{
+  this->operator() (p,time,output,NULL);
+}
 
 void MeshFunction::operator() (const Point& p,
                                const Real,
-                               DenseVector<Number>& output)
+                               DenseVector<Number>& output,
+                               const std::set<subdomain_id_type>* subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
-#ifdef DEBUG
-  if (this->_master != NULL)
-    {
-      const MeshFunction* master =
-        cast_ptr<const MeshFunction*>(this->_master);
-      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
-        libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
-                          << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
-    }
-#endif
-
-  // locate the point in the other mesh
-  const Elem* element = this->_point_locator->operator()(p);
-
-  // If we have an element, but it's not a local element, then we
-  // either need to have a serialized vector or we need to find a
-  // local element sharing the same point.
-  if (element &&
-      (element->processor_id() != this->processor_id()) &&
-      _vector.type() != SERIAL)
-    {
-      // look for a local element containing the point
-      std::set<const Elem*> point_neighbors;
-      element->find_point_neighbors(p, point_neighbors);
-      element = NULL;
-      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
-      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
-      for (; it != end; ++it)
-        {
-          const Elem* elem = *it;
-          if (elem->processor_id() == this->processor_id())
-            {
-              element = elem;
-              break;
-            }
-        }
-    }
+  const Elem* element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {
@@ -272,7 +237,7 @@ void MeshFunction::operator() (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+        const unsigned int dim = element->dim();
 
 
         /*
@@ -333,52 +298,12 @@ void MeshFunction::operator() (const Point& p,
 
 void MeshFunction::gradient (const Point& p,
                              const Real,
-                             std::vector<Gradient>& output)
+                             std::vector<Gradient>& output,
+                             const std::set<subdomain_id_type>* subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
-#ifdef DEBUG
-  if (this->_master != NULL)
-    {
-      const MeshFunction* master =
-        cast_ptr<const MeshFunction*>(this->_master);
-      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
-        libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
-                          << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
-    }
-#endif
-
-  // locate the point in the other mesh
-  const Elem* element = this->_point_locator->operator()(p);
-
-  // If we have an element, but it's not a local element, then we
-  // either need to have a serialized vector or we need to find a
-  // local element sharing the same point.
-  if (element &&
-      (element->processor_id() != this->processor_id()) &&
-      _vector.type() != SERIAL)
-    {
-      // look for a local element containing the point
-      std::set<const Elem*> point_neighbors;
-      element->find_point_neighbors(p, point_neighbors);
-      element = NULL;
-      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
-      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
-      for (; it != end; ++it)
-        {
-          const Elem* elem = *it;
-          if (elem->processor_id() == this->processor_id())
-            {
-              element = elem;
-              break;
-            }
-        }
-    }
+  const Elem* element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {
@@ -392,7 +317,7 @@ void MeshFunction::gradient (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+        const unsigned int dim = element->dim();
 
 
         /*
@@ -444,52 +369,12 @@ void MeshFunction::gradient (const Point& p,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 void MeshFunction::hessian (const Point& p,
                             const Real,
-                            std::vector<Tensor>& output)
+                            std::vector<Tensor>& output,
+                            const std::set<subdomain_id_type>* subdomain_ids)
 {
   libmesh_assert (this->initialized());
 
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
-#ifdef DEBUG
-  if (this->_master != NULL)
-    {
-      const MeshFunction* master =
-        cast_ptr<const MeshFunction*>(this->_master);
-      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
-        libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
-                          << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
-    }
-#endif
-
-  // locate the point in the other mesh
-  const Elem* element = this->_point_locator->operator()(p);
-
-  // If we have an element, but it's not a local element, then we
-  // either need to have a serialized vector or we need to find a
-  // local element sharing the same point.
-  if (element &&
-      (element->processor_id() != this->processor_id()) &&
-      _vector.type() != SERIAL)
-    {
-      // look for a local element containing the point
-      std::set<const Elem*> point_neighbors;
-      element->find_point_neighbors(p, point_neighbors);
-      element = NULL;
-      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
-      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
-      for (; it != end; ++it)
-        {
-          const Elem* elem = *it;
-          if (elem->processor_id() == this->processor_id())
-            {
-              element = elem;
-              break;
-            }
-        }
-    }
+  const Elem* element = this->find_element(p,subdomain_ids);
 
   if (!element)
     {
@@ -503,7 +388,7 @@ void MeshFunction::hessian (const Point& p,
 
 
       {
-        const unsigned int dim = this->_eqn_systems.get_mesh().mesh_dimension();
+        const unsigned int dim = element->dim();
 
 
         /*
@@ -552,7 +437,54 @@ void MeshFunction::hessian (const Point& p,
 }
 #endif
 
+const Elem* MeshFunction::find_element( const Point& p,
+                                        const std::set<subdomain_id_type>* subdomain_ids ) const
+{
+  /* Ensure that in the case of a master mesh function, the
+     out-of-mesh mode is enabled either for both or for none.  This is
+     important because the out-of-mesh mode is also communicated to
+     the point locator.  Since this is time consuming, enable it only
+     in debug mode.  */
+#ifdef DEBUG
+  if (this->_master != NULL)
+    {
+      const MeshFunction* master =
+        cast_ptr<const MeshFunction*>(this->_master);
+      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
+        libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
+                          << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
+    }
+#endif
 
+  // locate the point in the other mesh
+  const Elem* element = this->_point_locator->operator()(p,subdomain_ids);
+
+  // If we have an element, but it's not a local element, then we
+  // either need to have a serialized vector or we need to find a
+  // local element sharing the same point.
+  if (element &&
+      (element->processor_id() != this->processor_id()) &&
+      _vector.type() != SERIAL)
+    {
+      // look for a local element containing the point
+      std::set<const Elem*> point_neighbors;
+      element->find_point_neighbors(p, point_neighbors);
+      element = NULL;
+      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
+      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
+      for (; it != end; ++it)
+        {
+          const Elem* elem = *it;
+          if (elem->processor_id() == this->processor_id())
+            {
+              element = elem;
+              break;
+            }
+        }
+    }
+
+  return element;
+}
 
 const PointLocatorBase& MeshFunction::get_point_locator (void) const
 {

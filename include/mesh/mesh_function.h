@@ -146,27 +146,45 @@ public:
 
   /**
    * Computes values at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * defaults to zero, optionally restricting the point to the passed
+   * subdomain_ids. This is useful in cases where there are multiple
+   * dimensioned elements, for example.
    */
   void operator() (const Point& p,
                    const Real time,
                    DenseVector<Number>& output);
 
   /**
-   * Computes gradients at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * Computes values at coordinate \p p and for time \p time,
+   * restricting the point to the passed subdomain_ids. This is useful in
+   * cases where there are multiple dimensioned elements, for example.
    */
-  void gradient (const Point& p,
-                 const Real time,
-                 std::vector<Gradient>& output);
+  void operator() (const Point& p,
+                   const Real time,
+                   DenseVector<Number>& output,
+                   const std::set<subdomain_id_type>* subdomain_ids);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * defaults to zero, optionally restricting the point to the passed
+   * subdomain_ids. This is useful in cases where there are multiple
+   * dimensioned elements, for example.
+   */
+  void gradient (const Point& p,
+                 const Real time,
+                 std::vector<Gradient>& output,
+                 const std::set<subdomain_id_type>* subdomain_ids = NULL);
+
+  /**
+   * Computes gradients at coordinate \p p and for time \p time, which
+   * defaults to zero, optionally restricting the point to the passed
+   * subdomain_ids. This is useful in cases where there are multiple
+   * dimensioned elements, for example.
    */
   void hessian (const Point& p,
                 const Real time,
-                std::vector<Tensor>& output);
+                std::vector<Tensor>& output,
+                const std::set<subdomain_id_type>* subdomain_ids = NULL);
 
   /**
    * Returns the current \p PointLocator object, for you might want to
@@ -219,6 +237,11 @@ public:
 
 protected:
 
+  /**
+   * Helper function to reduce code duplication
+   */
+  const Elem* find_element( const Point& p,
+                            const std::set<subdomain_id_type>* subdomain_ids = NULL ) const;
 
   /**
    * The equation systems handler, from which
