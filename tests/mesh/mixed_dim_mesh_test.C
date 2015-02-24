@@ -84,6 +84,9 @@ protected:
       Elem* edge = _mesh->add_elem( new Edge2 );
       edge->set_node(0) = _mesh->node_ptr(0);
       edge->set_node(1) = _mesh->node_ptr(1);
+
+      // 2D elements will have subdomain id 0, this one will have 1
+      edge->subdomain_id() = 1;
     }
 
     // libMesh will renumber, but we numbered according to its scheme
@@ -175,6 +178,17 @@ public:
 
     // We should have gotten back the bottom quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
+
+    // Test getting back the edge
+    {
+      std::set<subdomain_id_type> subdomain_id; subdomain_id.insert(1);
+      Point interface_point( 0.2, 0.0 );
+      const Elem* interface_elem = (*locator)(interface_point, &subdomain_id);
+      CPPUNIT_ASSERT(interface_elem);
+
+      // We should have gotten back the overlapping edge element
+      CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
+    }
   }
 
   void testPointLocatorTree()
@@ -194,6 +208,17 @@ public:
 
     // We should have gotten back the bottom quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
+
+    // Test getting back the edge
+    {
+      std::set<subdomain_id_type> subdomain_id; subdomain_id.insert(1);
+      Point interface_point( 0.5, 0.0 );
+      const Elem* interface_elem = (*locator)(interface_point, &subdomain_id);
+      CPPUNIT_ASSERT(interface_elem);
+
+      // We should have gotten back the overlapping edge element
+      CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
+    }
   }
 
 };
