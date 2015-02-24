@@ -145,26 +145,59 @@ public:
 #endif
 
   /**
-   * Computes values at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * Computes values at coordinate \p p, that lies in element with
+   * dimemnsion mesh_dimension() (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
    */
   void operator() (const Point& p,
                    const Real time,
                    DenseVector<Number>& output);
 
   /**
-   * Computes gradients at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * Computes values at coordinate \p p, that lies in element with
+   * dimemnsion elem_dim (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
+   */
+  void operator() (const Point& p,
+                   unsigned int elem_dim,
+                   const Real time,
+                   DenseVector<Number>& output);
+
+  /**
+   * Computes gradients at coordinate \p p, that lies in element with
+   * dimemnsion mesh_dimension() (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
    */
   void gradient (const Point& p,
                  const Real time,
                  std::vector<Gradient>& output);
 
   /**
-   * Computes gradients at coordinate \p p and for time \p time, which
-   * defaults to zero.
+   * Computes gradients at coordinate \p p, that lies in element with
+   * dimemnsion elem_dim (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
+   */
+  void gradient (const Point& p,
+                 unsigned int elem_dim,
+                 const Real time,
+                 std::vector<Gradient>& output);
+
+  /**
+   * Computes gradients at coordinate \p p, that lies in element with
+   * dimemnsion mesh_dimension() (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
    */
   void hessian (const Point& p,
+                const Real time,
+                std::vector<Tensor>& output);
+
+  /**
+   * Computes gradients at coordinate \p p, that lies in element with
+   * dimemnsion elem_dim (for mixed dimension meshes), and for
+   * time \p time, which defaults to zero.
+   */
+  void hessian (const Point& p,
+                unsigned int elem_dim,
                 const Real time,
                 std::vector<Tensor>& output);
 
@@ -219,6 +252,10 @@ public:
 
 protected:
 
+  /**
+   * Helper function to reduce code duplication
+   */
+  const Elem* find_element( const Point& p, unsigned int elem_dim ) const;
 
   /**
    * The equation systems handler, from which
