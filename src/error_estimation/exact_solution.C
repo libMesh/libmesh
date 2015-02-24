@@ -640,6 +640,12 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       const Elem* elem = *el;
       const unsigned int dim = elem->dim();
 
+      const subdomain_id_type elem_subid = elem->subdomain_id();
+
+      // If the variable is not active on this subdomain, don't bother
+      if(!computed_system.variable(var).active_on_subdomain(elem_subid))
+        continue;
+
       FEGenericBase<OutputShape>* fe = fe_ptrs[dim];
       QBase* qrule = q_rules[dim];
       libmesh_assert(fe);
