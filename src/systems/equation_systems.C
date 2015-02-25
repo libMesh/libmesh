@@ -54,8 +54,7 @@ namespace libMesh
 EquationSystems::EquationSystems (MeshBase& m, MeshData* mesh_data) :
   ParallelObject (m),
   _mesh          (m),
-  _mesh_data     (mesh_data),
-  _can_add_systems (true)
+  _mesh_data     (mesh_data)
 {
   // Set default parameters
   this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
@@ -88,8 +87,6 @@ void EquationSystems::clear ()
 
       _systems.erase (pos);
     }
-
-  _can_add_systems = true;
 }
 
 
@@ -120,10 +117,6 @@ void EquationSystems::init ()
       (*elem_it)->set_n_systems(n_sys);
   }
 
-  // from now on, adding additional systems can't be done without
-  // immediately resizing dof objects and initializing new systems
-  _can_add_systems = false;
-
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).init();
 
@@ -139,7 +132,36 @@ void EquationSystems::reinit ()
 {
   parallel_object_only();
 
-  libmesh_assert_not_equal_to (this->n_systems(), 0);
+  const unsigned int n_sys = this->n_systems();
+  libmesh_assert_not_equal_to (n_sys, 0);
+
+  // We may have added new systems since our last
+  // EquationSystems::(re)init call
+  bool _added_new_systems = false;
+  for (unsigned int i=0; i != n_sys; ++i)
+    if (!this->get_system(i).is_initialized())
+      _added_new_systems = true;
+
+  if (_added_new_systems)
+    {
+      // Our DofObjects will need space for the additional systems
+      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+      const MeshBase::node_iterator node_end = _mesh.nodes_end();
+
+      for ( ; node_it != node_end; ++node_it)
+        (*node_it)->set_n_systems(n_sys);
+
+      MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+      const MeshBase::element_iterator elem_end = _mesh.elements_end();
+
+      for ( ; elem_it != elem_end; ++elem_it)
+        (*elem_it)->set_n_systems(n_sys);
+
+      // And any new systems will need initialization
+      for (unsigned int i=0; i != n_sys; ++i)
+        if (!this->get_system(i).is_initialized())
+          this->get_system(i).init();
+    }
 
 #ifdef DEBUG
   // Make sure all the \p DofObject entities know how many systems
@@ -165,9 +187,6 @@ void EquationSystems::reinit ()
         libmesh_assert_equal_to (elem->n_systems(), this->n_systems());
       }
   }
-
-  // If we're in reinit(), we should already be initialized
-  libmesh_assert_equal_to (_can_add_systems, false);
 #endif
 
   // Localize each system's vectors

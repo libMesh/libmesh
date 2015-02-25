@@ -477,12 +477,6 @@ protected:
 private:
 
   /**
-   * \p true when additional systems do not require immediate
-   * initialization, \p false otherwise.
-   */
-  bool _can_add_systems;
-
-  /**
    * Actual read implementation.  This can be called repeatedly
    * inside a try-catch block in an attempt to read broken files.
    *
@@ -571,11 +565,6 @@ T_sys & EquationSystems::add_system (const std::string& name)
 
       // Tell all the \p DofObject entities to add a system.
       this->_add_system_to_nodes_and_elems();
-
-      // If we've already initialized our other systems, we need to
-      // initialize this one too.
-      if (!_can_add_systems)
-        ptr->init();
     }
   else
     {
