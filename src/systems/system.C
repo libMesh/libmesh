@@ -82,7 +82,7 @@ System::System (EquationSystems& es,
   _active                           (true),
   _solution_projection              (true),
   _basic_system_only                (false),
-  _can_add_vectors                  (true),
+  _is_initialized                   (false),
   _identify_variable_groups         (true),
   _additional_data_written          (false),
   adjoint_already_solved            (false)
@@ -217,7 +217,7 @@ void System::clear ()
     _vector_projections.clear();
     _vector_is_adjoint.clear();
     _vector_types.clear();
-    _can_add_vectors = true;
+    _is_initialized = false;
   }
 
 }
@@ -284,9 +284,9 @@ void System::init_data ()
   current_local_solution->init (this->n_dofs(), false, SERIAL);
 #endif
 
-  // from now on, adding additional vectors can't be done without
-  // immediately initializing them
-  _can_add_vectors = false;
+  // from now on, adding additional vectors or variables can't be done
+  // without immediately initializing them
+  _is_initialized = true;
 
   // initialize & zero other vectors, if necessary
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
@@ -541,8 +541,8 @@ bool System::compare (const System& other_system,
                       const bool verbose) const
 {
   // we do not care for matrices, but for vectors
-  libmesh_assert (!_can_add_vectors);
-  libmesh_assert (!other_system._can_add_vectors);
+  libmesh_assert (_is_initialized);
+  libmesh_assert (other_system._is_initialized);
 
   if (verbose)
     {
@@ -705,7 +705,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
   _vector_is_adjoint.insert (std::make_pair (vec_name, -1));
 
   // Initialize it if necessary
-  if (!_can_add_vectors)
+  if (_is_initialized)
     {
       if(type == GHOSTED)
         {
