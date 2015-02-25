@@ -30,7 +30,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
-
+#include "petsc-private/matimpl.h"
 
 // For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earier.
 // For example:
@@ -416,6 +416,20 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
   PetscErrorCode ierr = 0;
 
   {
+    ierr = (*_mat->ops->destroy)(_mat);
+    LIBMESH_CHKERRABORT(ierr);
+    _mat->ops->destroy = NULL;
+    _mat->preallocated = PETSC_FALSE;
+    _mat->assembled    = PETSC_FALSE;
+   _mat->assembled = PETSC_FALSE;
+    _mat->was_assembled = PETSC_FALSE;
+    ++_mat->nonzerostate;
+    ierr = PetscObjectStateIncrease((PetscObject)_mat);
+    LIBMESH_CHKERRABORT(ierr);
+
+    ierr = MatSetType(_mat,MATAIJ);
+    LIBMESH_CHKERRABORT(ierr);
+
     ierr = MatSeqAIJSetPreallocation (_mat,
                                       0,
                                       numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]));
