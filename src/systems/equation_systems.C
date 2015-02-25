@@ -206,9 +206,14 @@ void EquationSystems::reinit ()
       {
         System &sys = this->get_system(i);
 
-        // Don't do anything if the system doesn't have any variables in it
-        if(!sys.n_vars())
-          continue;
+        // Even if the system doesn't have any variables in it we want
+        // consistent behavior; e.g. distribute_dofs should have the
+        // opportunity to count up zero dofs on each processor.
+        //
+        // Who's been adding zero-var systems anyway, outside of my
+        // unit tests? - RHS
+        // if(!sys.n_vars())
+          // continue;
 
         sys.get_dof_map().distribute_dofs(_mesh);
 
