@@ -1109,6 +1109,8 @@ unsigned int System::add_variable (const std::string& var,
                                    const FEType& type,
                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
+  libmesh_assert(!this->is_initialized());
+
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (unsigned int v=0; v<this->n_vars(); v++)
@@ -1197,6 +1199,8 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
                                     const FEType& type,
                                     const std::set<subdomain_id_type> * const active_subdomains)
 {
+  libmesh_assert(!this->is_initialized());
+
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (unsigned int ov=0; ov<vars.size(); ov++)
