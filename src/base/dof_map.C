@@ -2150,13 +2150,18 @@ void DofMap::old_dof_indices (const Elem* const elem,
   START_LOG("old_dof_indices()", "DofMap");
 
   libmesh_assert(elem);
-  libmesh_assert(elem->old_dof_object);
-
 
   const ElemType type        = elem->type();
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
   const unsigned int dim     = elem->dim();
+
+  // If we have dof indices stored on the elem, and there's no chance
+  // that we only have those indices because we were just p refined,
+  // then we should have old dof indices too.
+  libmesh_assert(!elem->has_dofs(sys_num) ||
+                 elem->p_refinement_flag() == Elem::JUST_REFINED ||
+                 elem->old_dof_object);
 
   // Clear the DOF indices vector.
   di.clear();
