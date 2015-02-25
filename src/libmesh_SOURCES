@@ -415,7 +415,6 @@ libmesh_SOURCES =  \
         src/utils/string_to_enum.C \
         src/utils/timestamp.C \
         src/utils/tree.C \
-        src/utils/tree_base.C \
         src/utils/tree_node.C \
         src/utils/utility.C \
         src/utils/xdr_cxx.C 

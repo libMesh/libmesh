@@ -84,10 +84,13 @@ protected:
       Elem* edge = _mesh->add_elem( new Edge2 );
       edge->set_node(0) = _mesh->node_ptr(0);
       edge->set_node(1) = _mesh->node_ptr(1);
+
+      // 2D elements will have subdomain id 0, this one will have 1
+      edge->subdomain_id() = 1;
     }
 
     // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequently,
+    // anyway. We do this because when we call uniformly_refine subsequenly,
     // it's going use skip_renumber=false.
     _mesh->prepare_for_use(false /*skip_renumber*/);
   }
@@ -176,14 +179,16 @@ public:
     // We should have gotten back the bottom quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
 
-    // Now try to find the 1d element overlapping the interface edge
-    Point interface_point(0.2, 0.0);
-    const Elem* interface_elem = (*locator)(interface_point,1);
+    // Test getting back the edge
+    {
+      std::set<subdomain_id_type> subdomain_id; subdomain_id.insert(1);
+      Point interface_point( 0.2, 0.0 );
+      const Elem* interface_elem = (*locator)(interface_point, &subdomain_id);
+      CPPUNIT_ASSERT(interface_elem);
 
-    CPPUNIT_ASSERT(interface_elem);
-
-    // We should have gotten back the bottom quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
+      // We should have gotten back the overlapping edge element
+      CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
+    }
   }
 
   void testPointLocatorTree()
@@ -192,24 +197,28 @@ public:
 
     Point top_point(0.5, 0.5);
     const Elem* top_elem = (*locator)(top_point);
+    CPPUNIT_ASSERT(top_elem);
 
     // We should have gotten back the top quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)0, top_elem->id() );
 
     Point bottom_point(0.5, -0.5);
     const Elem* bottom_elem = (*locator)(bottom_point);
+    CPPUNIT_ASSERT(bottom_elem);
 
     // We should have gotten back the bottom quad
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
 
-    // Now try to find the 1d element overlapping the interface edge
-    Point interface_point(0.2, 0.0);
-    const Elem* interface_elem = (*locator)(interface_point,1);
+    // Test getting back the edge
+    {
+      std::set<subdomain_id_type> subdomain_id; subdomain_id.insert(1);
+      Point interface_point( 0.5, 0.0 );
+      const Elem* interface_elem = (*locator)(interface_point, &subdomain_id);
+      CPPUNIT_ASSERT(interface_elem);
 
-    CPPUNIT_ASSERT(interface_elem);
-
-    // We should have gotten back the bottom quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
+      // We should have gotten back the overlapping edge element
+      CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
+    }
   }
 
 };
@@ -229,7 +238,7 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
-  // Yes, this is necessary. Somewhere in those macros is a protected/private
+  // Yes, this is necesarry. Somewhere in those macros is a protected/private
 public:
 
   void setUp()

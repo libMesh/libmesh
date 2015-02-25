@@ -91,23 +91,10 @@ public:
 
   /**
    * Locates the element in which the point with global coordinates
-   * \p p is located. Optionally allows the user to restrict
-   * the subdomains searched. To restrict the search to element dimension other
-   * than _mesh.mesh_dimension(), use the more general form of this function
-   * (for mixed dimension meshes).
+   * \p p is located.  Pure virtual. Optionally allows the user to restrict
+   * the subdomains searched.
    */
-  const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL ) const;
-
-  /**
-   * Locates the element in which the point with global coordinates
-   * \p p is located.  Pure virtual. Restricts the search to elements
-   * with dimension elem_dim. Optionally allows the user to restrict
-   * the subdomains searched. For the default elem_dim = _mesh.mesh_dimension(),
-   * use operator()(const Point& p, const std::set<subdomain_id_type> *allowed_subdomains)
-   * version of this function.
-   */
-  virtual const Elem* operator() (const Point& p, const unsigned int elem_dim,
-                                  const std::set<subdomain_id_type> *allowed_subdomains = NULL ) const = 0;
+  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const = 0;
 
   /**
    * @returns \p true when this object is properly initialized
