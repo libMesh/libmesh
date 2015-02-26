@@ -32,6 +32,9 @@
 #pragma warning(disable : 4661)
 #endif
 
+template<typename Value_t>
+class FunctionParserADBase;
+
 namespace FPoptimizer_CodeTree { template<typename Value_t> class CodeTree; }
 
 template<typename Value_t>
@@ -140,6 +143,7 @@ class FunctionParserBase
  private:
 //========================================================================
 
+    friend class FunctionParserADBase<Value_t>;
     friend class FPoptimizer_CodeTree::CodeTree<Value_t>;
 
 // Private data:

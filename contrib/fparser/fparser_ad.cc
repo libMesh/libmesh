@@ -38,7 +38,7 @@ public:
       parser(_parser),
       UnsupportedOpcodeException(),
       RefuseToTakeCrazyDerivativeException() {}
-  int AutoDiff(unsigned int);
+  int AutoDiff(unsigned int, typename FunctionParserADBase<Value_t>::Data * mData);
 
 private:
   /**
@@ -80,10 +80,9 @@ private:
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
-    mData(this->getParserData()),
     compiledFunction(NULL),
     mSilenceErrors(false),
-    mFPlog(mData->mFuncPtrs.size()),
+    mFPlog(this->mData->mFuncPtrs.size()),
     mRegisteredDerivatives(),
     ad(new ADImplementation<Value_t>(this))
 {
@@ -93,7 +92,6 @@ FunctionParserADBase<Value_t>::FunctionParserADBase() :
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& cpy) :
     FunctionParserBase<Value_t>(cpy),
-    mData(this->getParserData()),
     compiledFunction(cpy.compiledFunction),
     mSilenceErrors(cpy.mSilenceErrors),
     mFPlog(cpy.mFPlog),
@@ -117,24 +115,33 @@ FunctionParserADBase<Value_t>::~FunctionParserADBase()
 }
 
 template<typename Value_t>
+bool FunctionParserADBase<Value_t>::AddVariable(const std::string & var_name)
+{
+  this->CopyOnWrite();
+
+  // append new variable to variables string
+  const std::string & vars = this->mData->mVariablesString;
+  return this->ParseVariables(vars == "" ? var_name : vars + "," + var_name);
+}
+
+template<typename Value_t>
 bool FunctionParserADBase<Value_t>::isZero()
 {
   // determine if the program is a single cImmed 0
-  return (mData->mByteCode.size() == 1  && mData->mImmed.size() == 1 &&
-          mData->mByteCode[0] == cImmed && mData->mImmed[0] == Value_t(0));
+  return (this->mData->mByteCode.size() == 1  && this->mData->mImmed.size() == 1 &&
+          this->mData->mByteCode[0] == cImmed && this->mData->mImmed[0] == Value_t(0));
 }
 
 template<typename Value_t>
 void FunctionParserADBase<Value_t>::setZero()
 {
-  this->ForceDeepCopy();
-  mData = this->getParserData();
+  this->CopyOnWrite();
 
   // set program to a single cImmed 0
-  mData->mByteCode.resize(1);
-  mData->mImmed.resize(1);
-  mData->mByteCode[0] = cImmed;
-  mData->mImmed[0] = Value_t(0);
+  this->mData->mByteCode.resize(1);
+  this->mData->mImmed.resize(1);
+  this->mData->mByteCode[0] = cImmed;
+  this->mData->mImmed[0] = Value_t(0);
 }
 
 
@@ -355,9 +362,8 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
 template<typename Value_t>
 int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 {
-  this->ForceDeepCopy();
-  mData = this->getParserData();
-  return ad->AutoDiff(LookUpVarOpcode(var_name));
+  this->CopyOnWrite();
+  return ad->AutoDiff(LookUpVarOpcode(var_name), this->mData);
 }
 
 template<typename Value_t>
@@ -368,7 +374,7 @@ FunctionParserADBase<Value_t>::LookUpVarOpcode(const std::string & var_name)
   const unsigned len = unsigned(var_name.size());
   const char* name = var_name.c_str();
 
-  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t> & NamePtrs = mData->mNamePtrs;
+  typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t> & NamePtrs = this->mData->mNamePtrs;
   typename FUNCTIONPARSERTYPES::NamePtrsMap<Value_t>::iterator vi;
   for (vi = NamePtrs.begin(); vi != NamePtrs.end(); ++vi)
     if (len == vi->first.nameLength && std::memcmp(name, vi->first.name, len) == 0)
@@ -389,11 +395,10 @@ FunctionParserADBase<Value_t>::RegisterDerivative(const std::string & a, const s
 }
 
 template<typename Value_t>
-int ADImplementation<Value_t>::AutoDiff(unsigned int _var)
+int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionParserADBase<Value_t>::Data * mData)
 {
   CodeTreeAD orig;
-  typename FunctionParserADBase<Value_t>::Data * mData = this->parser->mData;
-  //orig.GenerateFrom(*mData);
+
   std::vector<CodeTree<Value_t> > var_trees;
   var_trees.reserve(mData->mVariablesAmount);
   for(unsigned n=0; n<mData->mVariablesAmount; ++n)
@@ -470,14 +475,14 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
   if (compiledFunction == NULL)
     return FunctionParserBase<Value_t>::Eval(Vars);
   else
-    return (*compiledFunction)(Vars, &(mData->mImmed[0]), Epsilon<Value_t>::value);
+    return (*compiledFunction)(Vars, &(this->mData->mImmed[0]), Epsilon<Value_t>::value);
 }
 
 template<typename Value_t>
 bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name, bool cacheFunction)
 {
   // get a reference to the stored bytecode
-  const std::vector<unsigned>& ByteCode = mData->mByteCode;
+  const std::vector<unsigned>& ByteCode = this->mData->mByteCode;
 
   // generate a sha1 hash of the current program and the Value type name
   SHA1 *sha1 = new SHA1();
@@ -563,7 +568,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   ccfile << "#include <cmath>\n";
   ccfile << "extern \"C\" " << Value_t_name << ' '
          << fnname << "(const " << Value_t_name << " *params, const " << Value_t_name << " *immed, const " << Value_t_name << " eps) {\n";
-  ccfile << Value_t_name << " r, s[" << mData->mStackSize << "];\n";
+  ccfile << Value_t_name << " r, s[" << this->mData->mStackSize << "];\n";
   int nImmed = 0, sp = -1, op;
   for (unsigned int i = 0; i < ByteCode.size(); ++i)
   {
@@ -607,7 +612,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
         ccfile << "s[" << sp << "] = std::cosh(s[" << sp << "]);\n"; break;
       case cTanh:
         ccfile << "s[" << sp << "] = std::tanh(s[" << sp << "]);\n"; break;
-      // TODO: div by zero -> mData->mEvalErrorType=1; return Value_t(0);
+      // TODO: div by zero -> this->mData->mEvalErrorType=1; return Value_t(0);
       case cCsc:
         ccfile << "s[" << sp << "] = 1.0/std::sin(s[" << sp << "]);\n"; break;
       case cSec:
@@ -863,7 +868,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   }
 
   // clear evalerror (this will not get set again by the JIT code)
-  mData->mEvalErrorType = 0;
+  this->mData->mEvalErrorType = 0;
 
   // rename successfully compiled obj to cache file
   if (cacheFunction && (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)) {
