@@ -123,7 +123,10 @@ public:
     std::string func = "x*a";
 
     // Parse the input expression into bytecode
-    R.Parse(func, "x,a,y");
+    R.Parse(func, "x,a");
+
+    // add a new variable y and map it to the da/dx derivative
+    R.AddVariable("y");
     R.RegisterDerivative("a", "x", "y");
 
     // parameter vector
