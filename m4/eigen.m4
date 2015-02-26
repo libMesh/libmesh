@@ -54,17 +54,19 @@ AC_DEFUN([CONFIGURE_EIGEN],
 
     elif (test "x$EIGEN3_INCLUDE" != x -a -f $EIGEN3_INCLUDE/Eigen/Eigen); then
 	EIGEN_INC=$EIGEN3_INCLUDE
-	echo "Environment EIGEN_INC=$EIGEN_INC"
+	echo "Environment EIGEN3_INCLUDE=$EIGEN_INC"
 
     elif (test "x$EIGEN_INCLUDE" != x -a -f $EIGEN_INCLUDE/Eigen/Eigen); then
 	EIGEN_INC=$EIGEN_INCLUDE
-	echo "Environment EIGEN_INC=$EIGEN_INC"
+	echo "Environment EIGEN_INCLUDE=$EIGEN_INC"
 
     elif (test -f /usr/include/eigen3/Eigen/Eigen); then
 	EIGEN_INC="/usr/include/eigen3"
+	echo "System EIGEN_INC=$EIGEN_INC"
 
     else
 	EIGEN_INC="/usr/include"
+	echo "Testing EIGEN_INC=$EIGEN_INC"
     fi
 
     # Initialize Makefile/config.h substitution variables
@@ -94,7 +96,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
     fi
 
 
-    if (test x$externaleigenincFound = xyes); then
+    if (test x$enableeigenincFound = xyes); then
         EIGEN_INCLUDE="-I$EIGEN_INC"
     elif (test -d $top_srcdir/contrib/eigen/eigen); then
         AC_MSG_RESULT([<<< external Eigen header files not found, using Eigen from ./contrib >>>])
@@ -111,6 +113,10 @@ AC_DEFUN([CONFIGURE_EIGEN],
 
         ac_eigen_save_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
+
+        # Do not use cached results for the header checks
+        AS_UNSET([ac_cv_header_Eigen_Dense])
+        AS_UNSET([ac_cv_header_Eigen_Sparse])
 
 	AC_CHECK_HEADERS([Eigen/Dense],[],[enableeigen=no])
 
