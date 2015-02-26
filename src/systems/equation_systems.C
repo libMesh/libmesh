@@ -132,7 +132,36 @@ void EquationSystems::reinit ()
 {
   parallel_object_only();
 
-  libmesh_assert_not_equal_to (this->n_systems(), 0);
+  const unsigned int n_sys = this->n_systems();
+  libmesh_assert_not_equal_to (n_sys, 0);
+
+  // We may have added new systems since our last
+  // EquationSystems::(re)init call
+  bool _added_new_systems = false;
+  for (unsigned int i=0; i != n_sys; ++i)
+    if (!this->get_system(i).is_initialized())
+      _added_new_systems = true;
+
+  if (_added_new_systems)
+    {
+      // Our DofObjects will need space for the additional systems
+      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+      const MeshBase::node_iterator node_end = _mesh.nodes_end();
+
+      for ( ; node_it != node_end; ++node_it)
+        (*node_it)->set_n_systems(n_sys);
+
+      MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
+      const MeshBase::element_iterator elem_end = _mesh.elements_end();
+
+      for ( ; elem_it != elem_end; ++elem_it)
+        (*elem_it)->set_n_systems(n_sys);
+
+      // And any new systems will need initialization
+      for (unsigned int i=0; i != n_sys; ++i)
+        if (!this->get_system(i).is_initialized())
+          this->get_system(i).init();
+    }
 
 #ifdef DEBUG
   // Make sure all the \p DofObject entities know how many systems
@@ -177,9 +206,14 @@ void EquationSystems::reinit ()
       {
         System &sys = this->get_system(i);
 
-        // Don't do anything if the system doesn't have any variables in it
-        if(!sys.n_vars())
-          continue;
+        // Even if the system doesn't have any variables in it we want
+        // consistent behavior; e.g. distribute_dofs should have the
+        // opportunity to count up zero dofs on each processor.
+        //
+        // Who's been adding zero-var systems anyway, outside of my
+        // unit tests? - RHS
+        // if(!sys.n_vars())
+          // continue;
 
         sys.get_dof_map().distribute_dofs(_mesh);
 

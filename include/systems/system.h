@@ -252,6 +252,11 @@ public:
   virtual void reinit_constraints ();
 
   /**
+   * Returns true iff this system has been initialized.
+   */
+  bool is_initialized();
+
+  /**
    * Update the local values to reflect the solution
    * on neighboring processors.
    */
@@ -1894,10 +1899,10 @@ private:
   bool _basic_system_only;
 
   /**
-   * \p true when additional vectors do not require immediate
-   * initialization, \p false otherwise.
+   * \p true when additional vectors and variables do not require
+   * immediate initialization, \p false otherwise.
    */
-  bool _can_add_vectors;
+  bool _is_initialized;
 
   /**
    * \p true when \p VariableGroup structures should be automatically
@@ -2004,6 +2009,14 @@ inline
 void System::deactivate ()
 {
   _active = false;
+}
+
+
+
+inline
+bool System::is_initialized ()
+{
+  return _is_initialized;
 }
 
 
