@@ -514,6 +514,7 @@ upload:
 # special things to do when running 'make dist'
 dist-hook:
 	rm -rf `find $(distdir) -name libmesh_config.h`
+	rm -rf `find $(distdir) -name getpot_test.C`
 	rm -rf `find $(distdir) -name .svn`
 
 

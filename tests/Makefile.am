@@ -30,6 +30,8 @@ unit_tests_sources = \
         systems/equation_systems_test.C \
 	utils/vectormap_test.C
 
+EXTRA_DIST = base/getpot_test_input.in
+
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \
 	fparser/autodiff.C
