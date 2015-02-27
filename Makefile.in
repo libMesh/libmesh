@@ -75,7 +75,8 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/contrib/utils/libmesh-devel.pc.in \
 	$(top_srcdir)/contrib/utils/libmesh-oprof.pc.in \
 	$(top_srcdir)/contrib/utils/libmesh-opt.pc.in \
-	$(top_srcdir)/contrib/utils/libmesh-prof.pc.in AUTHORS COPYING \
+	$(top_srcdir)/contrib/utils/libmesh-prof.pc.in \
+	$(top_srcdir)/tests/base/getpot_test.C.in AUTHORS COPYING \
 	ChangeLog INSTALL NEWS build-aux/compile \
 	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
@@ -142,11 +143,11 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES = contrib/utils/Makefile contrib/utils/Make.common \
-	contrib/utils/libmesh.pc contrib/utils/libmesh-opt.pc \
-	contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc \
-	contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc \
-	contrib/bin/libmesh-config contrib/bin/xda2mgf \
-	contrib/bin/create_libmesh_release
+	tests/base/getpot_test.C contrib/utils/libmesh.pc \
+	contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc \
+	contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc \
+	contrib/utils/libmesh-oprof.pc contrib/bin/libmesh-config \
+	contrib/bin/xda2mgf contrib/bin/create_libmesh_release
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -5279,6 +5280,8 @@ $(am__aclocal_m4_deps):
 contrib/utils/Makefile: $(top_builddir)/config.status $(top_srcdir)/contrib/utils/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 contrib/utils/Make.common: $(top_builddir)/config.status $(top_srcdir)/contrib/utils/Make.common.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+tests/base/getpot_test.C: $(top_builddir)/config.status $(top_srcdir)/tests/base/getpot_test.C.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 contrib/utils/libmesh.pc: $(top_builddir)/config.status $(top_srcdir)/contrib/utils/libmesh-opt.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -28859,6 +28862,7 @@ upload:
 # special things to do when running 'make dist'
 dist-hook:
 	rm -rf `find $(distdir) -name libmesh_config.h`
+	rm -rf `find $(distdir) -name getpot_test.C`
 	rm -rf `find $(distdir) -name .svn`
 
 #
