@@ -201,6 +201,9 @@ public:
   inline bool have_variable(const char* VarName) const;
   inline bool have_variable(const std::string& VarName) const;
 
+  bool have_section(const char* section_name) const;
+  bool have_section(const std::string& section_name) const;
+
   /**
    * scalar values
    */
@@ -2141,7 +2144,20 @@ GetPot::have_variable(const std::string& VarName) const
   return have_variable(VarName.c_str());
 }
 
+inline bool
+GetPot::have_section(const char* section_name) const
+{
+  std::string s = std::string(section_name);
+  return this->have_section(s);
+}
 
+inline bool
+GetPot::have_section(const std::string& section_name) const
+{
+  /* We sorted the section_list after we were done parsing
+     so we can use a binary search instead of a linear search. */
+  return std::binary_search( section_list.begin(), section_list.end(), section_name );
+}
 
 template <typename T>
 inline T
