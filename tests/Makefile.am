@@ -12,6 +12,7 @@ unit_tests_sources = \
 	driver.C \
         test_comm.h \
 	base/dof_object_test.h \
+        base/getpot_test.C \
 	geom/node_test.C \
 	geom/point_test.C \
 	geom/point_test.h \
