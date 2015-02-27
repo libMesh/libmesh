@@ -1,0 +1,31 @@
+[Section1]
+
+  var1 = '5.0'
+
+  [./SubSection1]
+
+      var2 = 'blah'
+
+[]
+
+[Section2]
+
+   #var3 = '5'
+
+   [./Subsection2]
+
+       var4 = 'false'
+
+       [./Subsection3]
+
+           var5 = '6.02e23'
+
+   [../../Subsection4]
+
+           var6 = '42'
+
+[]
+
+[Section3]
+
+     unused_var = 'not_used'
