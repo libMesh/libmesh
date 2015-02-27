@@ -830,7 +830,7 @@ struct SyncIds
   // renumber_obj &renumber;
 
   // Find the id of each requested DofObject -
-  // sync_dofobject_data_by_xyz already did the work for us
+  // Parallel::sync_* already did the work for us
   void gather_data (const std::vector<dof_id_type>& ids,
                     std::vector<datum>& ids_out)
   {
@@ -860,10 +860,8 @@ void MeshCommunication::make_node_ids_parallel_consistent
   START_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
   SyncIds syncids(mesh, &MeshBase::renumber_node);
-  Parallel::sync_dofobject_data_by_xyz
-    (mesh.comm(),
-     mesh.nodes_begin(), mesh.nodes_end(),
-     loc_map, syncids);
+  Parallel::sync_node_data_by_element_id
+    (mesh, mesh.elements_begin(), mesh.elements_end(), syncids);
 
   STOP_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
 }
@@ -958,8 +956,8 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
   // them.
 
   SyncProcIds sync(mesh);
-  Parallel::sync_dofobject_data_by_xyz
-    (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
+  Parallel::sync_node_data_by_element_id
+    (mesh, mesh.elements_begin(), mesh.elements_end(), sync);
 
   STOP_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 }
