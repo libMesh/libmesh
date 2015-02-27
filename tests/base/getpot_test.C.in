@@ -14,6 +14,7 @@ public:
   CPPUNIT_TEST_SUITE( GetPotTest );
 
   CPPUNIT_TEST( testVariables );
+  CPPUNIT_TEST( testSections );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -61,6 +62,20 @@ public:
     std::vector<std::string> ufos = input.unidentified_variables();
     CPPUNIT_ASSERT_EQUAL( ufos.size(),  (std::vector<std::string>::size_type)1 );
     CPPUNIT_ASSERT_EQUAL( ufos[0], std::string("Section3/unused_var") );
+  }
+
+  void testSections()
+  {
+    // GetPot stores the '/' at the end of each section name
+    CPPUNIT_ASSERT(input.have_section("Section1/"));
+    CPPUNIT_ASSERT(input.have_section("Section1/SubSection1/"));
+    CPPUNIT_ASSERT(input.have_section("Section2/Subsection2/"));
+    CPPUNIT_ASSERT(input.have_section("Section2/Subsection2/Subsection3/"));
+    CPPUNIT_ASSERT(input.have_section("Section2/Subsection4/"));
+    CPPUNIT_ASSERT(input.have_section("Section3/"));
+
+    // No such thing as this section
+    CPPUNIT_ASSERT(!input.have_section("ImNotASection/"));
   }
 
 };
