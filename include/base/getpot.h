@@ -1094,6 +1094,10 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
                         arg.substr(equals_pos+1), false);
         }
     }
+
+  // We're done parsing, so go ahead and sort the section_list
+  // This is so we can use a binary search in have_section
+  std::sort( section_list.begin(), section_list.end() );
 }
 
 
