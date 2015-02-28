@@ -1112,10 +1112,6 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
                         arg.substr(equals_pos+1), false);
         }
     }
-
-  // We're done parsing, so go ahead and sort the section_list
-  // This is so we can use a binary search in have_section
-  std::sort( section_list.begin(), section_list.end() );
 }
 
 
@@ -2169,9 +2165,9 @@ GetPot::have_section(const char* section_name) const
 inline bool
 GetPot::have_section(const std::string& section_name) const
 {
-  /* We sorted the section_list after we were done parsing
-     so we can use a binary search instead of a linear search. */
-  return std::binary_search( section_list.begin(), section_list.end(), section_name );
+  /* We need to use a linear search because we can't sort section_list
+     without violating some assumptions. See libMesh #481 for more discussion. */
+  return ( std::find(section_list.begin(), section_list.end(), section_name) != section_list.end() );
 }
 
 template <typename T>
