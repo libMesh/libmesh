@@ -201,7 +201,22 @@ public:
   inline bool have_variable(const char* VarName) const;
   inline bool have_variable(const std::string& VarName) const;
 
+  /**
+   * Check for a section name. When querying, the section_name
+   * MUST end in a forward slash. e.g.
+   * /Section1/
+   * /Section1/Section2/
+   * /Section1/Section2/Section3/
+   */
   bool have_section(const char* section_name) const;
+
+  /**
+   * Check for a section name. When querying, the section_name
+   * MUST end in a forward slash. e.g.
+   * /Section1/
+   * /Section1/Section2/
+   * /Section1/Section2/Section3/
+   */
   bool have_section(const std::string& section_name) const;
 
   /**
