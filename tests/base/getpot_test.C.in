@@ -74,6 +74,11 @@ public:
     CPPUNIT_ASSERT(input.have_section("Section2/Subsection4/"));
     CPPUNIT_ASSERT(input.have_section("Section3/"));
 
+    // But we don't need to supply the trailing '/'
+    CPPUNIT_ASSERT(input.have_section("Section1"));
+    CPPUNIT_ASSERT(input.have_section("Section1/SubSection1"));
+    CPPUNIT_ASSERT(input.have_section("Section2/Subsection2/Subsection3"));
+
     // No such thing as this section
     CPPUNIT_ASSERT(!input.have_section("ImNotASection/"));
   }
