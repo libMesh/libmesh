@@ -28,6 +28,8 @@
 #include "libmesh/parallel.h"
 
 // C++ Includes   -----------------------------------
+#include LIBMESH_INCLUDE_UNORDERED_SET
+
 
 namespace libMesh
 {
@@ -466,8 +468,7 @@ void sync_node_data_by_element_id(MeshBase&       mesh,
 
   // Keep track of which nodes we've asked about, so we only hit each
   // once.
-  const dof_id_type max_node_id = mesh.max_node_id();
-  std::vector<bool> queried_node(max_node_id, false);
+  LIBMESH_BEST_UNORDERED_SET<dof_id_type> queried_nodes;
 
   // Count the objects to ask each processor about
   std::vector<dof_id_type>
@@ -478,27 +479,27 @@ void sync_node_data_by_element_id(MeshBase&       mesh,
     {
       const Elem *elem = *it;
       libmesh_assert (elem);
-      const processor_id_type proc_id = elem->processor_id();
-      if (proc_id == comm.rank() ||
-          proc_id == DofObject::invalid_processor_id)
-        continue;
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
           const Node *node = elem->get_node(n);
+
+          const processor_id_type proc_id = node->processor_id();
+          if (proc_id == comm.rank() ||
+              proc_id == DofObject::invalid_processor_id)
+            continue;
+
           dof_id_type node_id = node->id();
-          libmesh_assert_less (node_id, max_node_id);
-          if (!queried_node[node_id])
+          if (!queried_nodes.count(node_id))
             {
               ghost_objects_from_proc[proc_id]++;
-              queried_node[node_id] = true;
+              queried_nodes.insert(node_id);
             }
         }
     }
 
   // Now repeat that iteration, filling request sets this time.
-  queried_node.clear();
-  queried_node.resize(max_node_id, false);
+  queried_nodes.clear();
 
   // Request sets to send to each processor
   std::vector<std::vector<dof_id_type> >
@@ -525,10 +526,6 @@ void sync_node_data_by_element_id(MeshBase&       mesh,
     {
       const Elem *elem = *it;
       libmesh_assert (elem);
-      const processor_id_type proc_id = elem->processor_id();
-      if (proc_id == comm.rank() ||
-          proc_id == DofObject::invalid_processor_id)
-        continue;
 
       const dof_id_type elem_id = elem->id();
 
@@ -536,14 +533,19 @@ void sync_node_data_by_element_id(MeshBase&       mesh,
         {
           const Node *node = elem->get_node(n);
           const dof_id_type node_id = node->id();
-          libmesh_assert_less (node_id, max_node_id);
-          if (!queried_node[node_id])
+
+          const processor_id_type proc_id = node->processor_id();
+          if (proc_id == comm.rank() ||
+              proc_id == DofObject::invalid_processor_id)
+            continue;
+
+          if (!queried_nodes.count(node_id))
             {
               requested_objs_elem_id[proc_id].push_back(elem_id);
               requested_objs_node_num[proc_id].push_back
                 (cast_int<unsigned char>(n));
               requested_objs_id[proc_id].push_back(node_id);
-              queried_node[node_id] = true;
+              queried_nodes.insert(node_id);
             }
         }
     }
@@ -559,6 +561,14 @@ void sync_node_data_by_element_id(MeshBase&       mesh,
         cast_int<processor_id_type>
         ((comm.size() + comm.rank() - p) %
          comm.size());
+
+      libmesh_assert_equal_to (requested_objs_id[procup].size(),
+                               ghost_objects_from_proc[procup]);
+      libmesh_assert_equal_to (requested_objs_elem_id[procup].size(),
+                               ghost_objects_from_proc[procup]);
+      libmesh_assert_equal_to (requested_objs_node_num[procup].size(),
+                               ghost_objects_from_proc[procup]);
+
       std::vector<dof_id_type>   request_to_fill_elem_id;
       std::vector<unsigned char> request_to_fill_node_num;
       comm.send_receive(procup, requested_objs_elem_id[procup],
@@ -579,6 +589,7 @@ void sync_node_data_by_element_id(MeshBase&       mesh,
 
           Node *node = elem->get_node(n);
           libmesh_assert(node);
+          libmesh_assert_equal_to (node->processor_id(), comm.rank());
           request_to_fill_id[i] = node->id();
         }
 
