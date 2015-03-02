@@ -21,6 +21,11 @@ public:
   int AutoDiff(const std::string & var_name);
 
   /**
+   * add another variable
+   */
+  bool AddVariable(const std::string & var_name);
+
+  /**
    * check if the function is equal to 0
    * This is a common case for vanishing derivatives. This relies on the
    * function to be optimized.
@@ -66,8 +71,6 @@ public:
   void RegisterDerivative(const std::string & a, const std::string & b, const std::string & c);
 
 private:
-  typename FunctionParserBase<Value_t>::Data * mData;
-
   /// helper function to perform the JIT compilation (needs the Value_t typename as a string)
   bool JITCompileHelper(const std::string &, bool);
 
