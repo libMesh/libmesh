@@ -30,7 +30,6 @@
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/location_maps.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_tools.h"
@@ -704,11 +703,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   // the ids of nodes touching remote elements may be inconsistent.
   // Fix them.
   if (!this->is_serial())
-    {
-      LocationMap<Node> loc_map;
-      MeshCommunication().make_nodes_parallel_consistent
-        (*this, loc_map);
-    }
+    MeshCommunication().make_nodes_parallel_consistent (*this);
 
   // renumber nodes, elements etc
   this->prepare_for_use(/*skip_renumber =*/ false);

@@ -43,7 +43,6 @@ class SerialMesh;
 class ParallelMesh;
 class Sphere;
 class Elem;
-template <typename T> class LocationMap;
 
 /**
  * Utility functions for operations on a \p Mesh object.  Here is where
@@ -335,7 +334,7 @@ void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<dof_id_type, 
  * On a distributed mesh, this function must be called in parallel
  * to sync everyone's corrected processor ids on ghost nodes.
  */
-void correct_node_proc_ids(MeshBase &, LocationMap<Node> &);
+void correct_node_proc_ids(MeshBase &);
 
 
 #ifdef DEBUG

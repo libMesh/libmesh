@@ -1593,8 +1593,7 @@ bool MeshRefinement::_coarsen_elements ()
       // find requested nodes
       this->update_nodes_map ();
 
-      MeshCommunication().make_nodes_parallel_consistent
-        (_mesh, _new_nodes_map);
+      MeshCommunication().make_nodes_parallel_consistent (_mesh);
 
       // Clear the _new_nodes_map
       this->clear();
@@ -1677,8 +1676,7 @@ bool MeshRefinement::_refine_elements ()
   if (mesh_changed && !_mesh.is_serial())
     {
       MeshCommunication().make_elems_parallel_consistent (_mesh);
-      MeshCommunication().make_nodes_parallel_consistent
-        (_mesh, _new_nodes_map);
+      MeshCommunication().make_nodes_parallel_consistent (_mesh);
 #ifdef DEBUG
       _mesh.libmesh_assert_valid_parallel_ids();
 #endif
