@@ -803,7 +803,7 @@ int main (int argc, char** argv)
 
       // Hard coded assert to ensure that the actual numbers we are getting are what they should be
       if(a_step == param.max_adaptivesteps)
-	libmesh_assert_less(std::abs(QoI_0_computed - 0.083294260583914453), 1.e-5);
+	libmesh_assert_less(std::abs(QoI_0_computed - 0.08335), 1.e-4);
 
       // You dont need to compute error estimates and refine at the last
       // adaptive step, only before that
