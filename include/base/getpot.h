@@ -202,6 +202,28 @@ public:
   inline bool have_variable(const std::string& VarName) const;
 
   /**
+   * Check for a section name. When querying, the section_name
+   * can be of the form
+   * Section1 or Section1/
+   *
+   * Section1/Section2 or Section1/Section2/
+   *
+   * etc.
+   */
+  bool have_section(const char* section_name) const;
+
+  /**
+   * Check for a section name. When querying, the section_name
+   * can be of the form
+   * Section1 or Section1/
+   *
+   * Section1/Section2 or Section1/Section2/
+   *
+   * etc.
+   */
+  bool have_section(const std::string& section_name) const;
+
+  /**
    * scalar values
    */
   template<typename T>
@@ -2137,7 +2159,33 @@ GetPot::have_variable(const std::string& VarName) const
   return have_variable(VarName.c_str());
 }
 
+inline bool
+GetPot::have_section(const char* section_name) const
+{
+  std::string s = std::string(section_name);
+  return this->have_section(s);
+}
 
+inline bool
+GetPot::have_section(const std::string& section_name) const
+{
+  const char slash('/');
+
+  std::string::const_reverse_iterator it = section_name.rbegin();
+
+  bool found_section = false;
+
+  /* Check if section_name ends with a "/". If not, append it for the search since
+     the section names are stored with a "/" at the end.*/
+  if( (*it) != slash )
+    /* We need to use a linear search because we can't sort section_list
+     without violating some assumptions. See libMesh #481 for more discussion. */
+    found_section = ( std::find(section_list.begin(), section_list.end(), section_name+slash) != section_list.end() );
+  else
+    found_section = ( std::find(section_list.begin(), section_list.end(), section_name) != section_list.end() );
+
+  return found_section;
+}
 
 template <typename T>
 inline T

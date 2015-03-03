@@ -118,8 +118,8 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
+	geom/point_test.C geom/point_test.h mesh/mixed_dim_mesh_test.C \
 	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
@@ -132,6 +132,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 am__dirstamp = $(am__leading_dot)dirstamp
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
+	base/unit_tests_dbg-getpot_test.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mixed_dim_mesh_test.$(OBJEXT) \
@@ -157,8 +158,8 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
+	geom/point_test.C geom/point_test.h mesh/mixed_dim_mesh_test.C \
 	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
@@ -170,6 +171,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_3 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
 am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
+	base/unit_tests_devel-getpot_test.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mixed_dim_mesh_test.$(OBJEXT) \
@@ -194,8 +196,8 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
+	geom/point_test.C geom/point_test.h mesh/mixed_dim_mesh_test.C \
 	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
@@ -207,6 +209,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_5 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
 am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
+	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mixed_dim_mesh_test.$(OBJEXT) \
@@ -231,8 +234,8 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
+	geom/point_test.C geom/point_test.h mesh/mixed_dim_mesh_test.C \
 	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
@@ -244,6 +247,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_7 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
 am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
+	base/unit_tests_opt-getpot_test.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mixed_dim_mesh_test.$(OBJEXT) \
@@ -266,8 +270,8 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
-	base/dof_object_test.h geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
+	geom/point_test.C geom/point_test.h mesh/mixed_dim_mesh_test.C \
 	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
@@ -279,6 +283,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_9 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
 am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
+	base/unit_tests_prof-getpot_test.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mixed_dim_mesh_test.$(OBJEXT) \
@@ -690,8 +695,9 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/mixed_dim_mesh_test.C numerics/composite_function_test.C \
+	base/getpot_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h mesh/mixed_dim_mesh_test.C \
+	numerics/composite_function_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
 	numerics/petsc_vector_test.C \
@@ -700,6 +706,7 @@ unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	parallel/parallel_test.C quadrature/quadrature_test.C \
 	systems/equation_systems_test.C utils/vectormap_test.C \
 	$(am__append_1)
+EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -769,6 +776,14 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+base/$(am__dirstamp):
+	@$(MKDIR_P) base
+	@: > base/$(am__dirstamp)
+base/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) base/$(DEPDIR)
+	@: > base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_dbg-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/$(am__dirstamp):
 	@$(MKDIR_P) geom
 	@: > geom/$(am__dirstamp)
@@ -849,6 +864,8 @@ fparser/unit_tests_dbg-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 unit_tests-dbg$(EXEEXT): $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_DEPENDENCIES) $(EXTRA_unit_tests_dbg_DEPENDENCIES) 
 	@rm -f unit_tests-dbg$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_dbg_LINK) $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_LDADD) $(LIBS)
+base/unit_tests_devel-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -881,6 +898,8 @@ fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES) 
 	@rm -f unit_tests-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
+base/unit_tests_oprof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -913,6 +932,8 @@ fparser/unit_tests_oprof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 unit_tests-oprof$(EXEEXT): $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_DEPENDENCIES) $(EXTRA_unit_tests_oprof_DEPENDENCIES) 
 	@rm -f unit_tests-oprof$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_oprof_LINK) $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_LDADD) $(LIBS)
+base/unit_tests_opt-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -945,6 +966,8 @@ fparser/unit_tests_opt-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 unit_tests-opt$(EXEEXT): $(unit_tests_opt_OBJECTS) $(unit_tests_opt_DEPENDENCIES) $(EXTRA_unit_tests_opt_DEPENDENCIES) 
 	@rm -f unit_tests-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_opt_LINK) $(unit_tests_opt_OBJECTS) $(unit_tests_opt_LDADD) $(LIBS)
+base/unit_tests_prof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
+	base/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -980,6 +1003,7 @@ unit_tests-prof$(EXEEXT): $(unit_tests_prof_OBJECTS) $(unit_tests_prof_DEPENDENC
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f base/*.$(OBJEXT)
 	-rm -f fparser/*.$(OBJEXT)
 	-rm -f geom/*.$(OBJEXT)
 	-rm -f mesh/*.$(OBJEXT)
@@ -997,6 +1021,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_oprof-driver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_opt-driver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_prof-driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-getpot_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_dbg-autodiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_devel-autodiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_oprof-autodiff.Po@am__quote@
@@ -1105,6 +1134,20 @@ unit_tests_dbg-driver.obj: driver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_dbg-driver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_dbg-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+
+base/unit_tests_dbg-getpot_test.o: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-getpot_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-getpot_test.Tpo -c -o base/unit_tests_dbg-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-getpot_test.Tpo base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_dbg-getpot_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+
+base/unit_tests_dbg-getpot_test.obj: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-getpot_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-getpot_test.Tpo -c -o base/unit_tests_dbg-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-getpot_test.Tpo base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_dbg-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
 
 geom/unit_tests_dbg-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo -c -o geom/unit_tests_dbg-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -1316,6 +1359,20 @@ unit_tests_devel-driver.obj: driver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_devel-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
 
+base/unit_tests_devel-getpot_test.o: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-getpot_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-getpot_test.Tpo -c -o base/unit_tests_devel-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-getpot_test.Tpo base/$(DEPDIR)/unit_tests_devel-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_devel-getpot_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+
+base/unit_tests_devel-getpot_test.obj: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-getpot_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-getpot_test.Tpo -c -o base/unit_tests_devel-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-getpot_test.Tpo base/$(DEPDIR)/unit_tests_devel-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_devel-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
 geom/unit_tests_devel-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo geom/$(DEPDIR)/unit_tests_devel-node_test.Po
@@ -1525,6 +1582,20 @@ unit_tests_oprof-driver.obj: driver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_oprof-driver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_oprof-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+
+base/unit_tests_oprof-getpot_test.o: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-getpot_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-getpot_test.Tpo -c -o base/unit_tests_oprof-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-getpot_test.Tpo base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_oprof-getpot_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+
+base/unit_tests_oprof-getpot_test.obj: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-getpot_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-getpot_test.Tpo -c -o base/unit_tests_oprof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-getpot_test.Tpo base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_oprof-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
 
 geom/unit_tests_oprof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -1736,6 +1807,20 @@ unit_tests_opt-driver.obj: driver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_opt-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
 
+base/unit_tests_opt-getpot_test.o: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-getpot_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-getpot_test.Tpo -c -o base/unit_tests_opt-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-getpot_test.Tpo base/$(DEPDIR)/unit_tests_opt-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_opt-getpot_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+
+base/unit_tests_opt-getpot_test.obj: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-getpot_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-getpot_test.Tpo -c -o base/unit_tests_opt-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-getpot_test.Tpo base/$(DEPDIR)/unit_tests_opt-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_opt-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
 geom/unit_tests_opt-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo geom/$(DEPDIR)/unit_tests_opt-node_test.Po
@@ -1945,6 +2030,20 @@ unit_tests_prof-driver.obj: driver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_prof-driver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_prof-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+
+base/unit_tests_prof-getpot_test.o: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-getpot_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-getpot_test.Tpo -c -o base/unit_tests_prof-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-getpot_test.Tpo base/$(DEPDIR)/unit_tests_prof-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_prof-getpot_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-getpot_test.o `test -f 'base/getpot_test.C' || echo '$(srcdir)/'`base/getpot_test.C
+
+base/unit_tests_prof-getpot_test.obj: base/getpot_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-getpot_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-getpot_test.Tpo -c -o base/unit_tests_prof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-getpot_test.Tpo base/$(DEPDIR)/unit_tests_prof-getpot_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_prof-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
 
 geom/unit_tests_prof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -2370,6 +2469,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f base/$(DEPDIR)/$(am__dirstamp)
+	-rm -f base/$(am__dirstamp)
 	-rm -f fparser/$(DEPDIR)/$(am__dirstamp)
 	-rm -f fparser/$(am__dirstamp)
 	-rm -f geom/$(DEPDIR)/$(am__dirstamp)
@@ -2396,7 +2497,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -2442,7 +2543,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

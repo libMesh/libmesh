@@ -12,6 +12,7 @@ unit_tests_sources = \
 	driver.C \
         test_comm.h \
 	base/dof_object_test.h \
+        base/getpot_test.C \
 	geom/node_test.C \
 	geom/point_test.C \
 	geom/point_test.h \
@@ -28,6 +29,8 @@ unit_tests_sources = \
 	quadrature/quadrature_test.C \
         systems/equation_systems_test.C \
 	utils/vectormap_test.C
+
+EXTRA_DIST = base/getpot_test_input.in
 
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \
