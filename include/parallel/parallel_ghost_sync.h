@@ -589,7 +589,11 @@ void sync_node_data_by_element_id(MeshBase&       mesh,
 
           Node *node = elem->get_node(n);
           libmesh_assert(node);
-          libmesh_assert_equal_to (node->processor_id(), comm.rank());
+
+          // This isn't a safe assertion in the case where we're
+          // synching processor ids
+          // libmesh_assert_equal_to (node->processor_id(), comm.rank());
+
           request_to_fill_id[i] = node->id();
         }
 
