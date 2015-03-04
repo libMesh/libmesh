@@ -21,6 +21,23 @@
 #include "libmesh/face_quad.h"
 #include "libmesh/edge_edge2.h"
 
+
+
+// anonymous namespace for helper functions
+namespace {
+  void conditional_push_back
+    (const libMesh::Elem *e,
+     std::vector<std::pair<unsigned char, unsigned char> >& v,
+     unsigned char n1,
+     unsigned char n2)
+    {
+      if (n1 < e->n_nodes() && n2 < e->n_nodes())
+        v.push_back(std::make_pair(n1, n2));
+    }
+}
+
+
+
 namespace libMesh
 {
 
@@ -314,4 +331,133 @@ const unsigned short int Quad::_second_order_vertex_child_index[9] =
     2            // Interior
   };
 
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+// We number 25 "possible node locations" for a 2x2 refinement of
+// quads with up to 3x3 nodes each
+const int Quad::_child_node_lookup[4][9] =
+  {
+    // node lookup for child 0 (near node 0)
+    { 0, 2, 12, 10,  1, 7, 11, 5,  6},
+
+    // node lookup for child 1 (near node 1)
+    { 2, 4, 14, 12,  3, 9, 13, 7,  8},
+
+    // node lookup for child 2 (near node 3)
+    { 10, 12, 22, 20,  11, 17, 21, 15,  16},
+
+    // node lookup for child 3 (near node 2)
+    { 12, 14, 24, 22,  13, 19, 23, 17,  18}
+  };
+
+// Each child element node (indexed by "possible node location"), may exist in
+// the parent.
+unsigned int Quad::_parent_node_of(int possible_i) const
+{
+  // indexed by reduced possible_y,x
+  static const unsigned char _parent_nodes_array[3][3] =
+    {{0, 4, 1},
+     {7, 8, 5},
+     {3, 6, 2}};
+
+  const int possible_x = possible_i % 5;
+  if (possible_x % 2)
+    return libMesh::invalid_uint;
+  const int possible_y = (possible_i / 5) % 5;
+  if (possible_y % 2)
+    return libMesh::invalid_uint;
+ 
+  return _parent_nodes_array[possible_y/2][possible_x/2];
+}
+
+
+unsigned int Quad::as_parent_node(unsigned int child,
+                                  unsigned int child_node) const
+{
+  libmesh_assert_less (child, 4);
+  libmesh_assert_less (child_node, 9);
+  const unsigned int possible_index = _child_node_lookup[child][child_node];
+  unsigned int possible_parent_node = _parent_node_of(possible_index);
+  if (possible_parent_node >= this->n_nodes())
+    possible_parent_node = libMesh::invalid_uint;
+  return possible_parent_node;
+}
+
+
+const std::vector<std::pair<unsigned char, unsigned char> >&
+Quad::parent_bracketing_nodes(unsigned int child,
+                              unsigned int child_node) const
+{
+  return this->_parent_bracketing_nodes
+    (this->_child_node_lookup[child][child_node]);
+}
+
+const std::vector<std::pair<unsigned char, unsigned char> >&
+Quad::_parent_bracketing_nodes(unsigned int possible_index) const
+{
+  // We're using this cache differently than the defaults; indexing by
+  // "possible index" rather than by child index, child node index.
+
+  std::vector<std::vector<std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > > > >
+    & full_cache = this->_get_bracketing_node_cache();
+
+  // We have *got* to start requiring C++11 support...
+  if (full_cache.empty())
+    {
+      full_cache.resize(1);
+
+      full_cache[0].resize(1);
+    }
+
+  std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > >
+    & bn_cache = full_cache[0][0];
+
+  if (bn_cache.empty())
+    {
+      bn_cache.resize(25);
+
+      conditional_push_back(this, bn_cache[1], 0,4);
+      conditional_push_back(this, bn_cache[2], 0,1);
+      conditional_push_back(this, bn_cache[3], 1,4);
+
+      conditional_push_back(this, bn_cache[5], 0,7);
+      conditional_push_back(this, bn_cache[6], 0,8);
+      conditional_push_back(this, bn_cache[6], 4,7);
+      conditional_push_back(this, bn_cache[7], 4,8);
+      conditional_push_back(this, bn_cache[8], 1,8);
+      conditional_push_back(this, bn_cache[8], 4,5);
+      conditional_push_back(this, bn_cache[9], 1,5);
+
+      conditional_push_back(this, bn_cache[10], 0,3);
+      conditional_push_back(this, bn_cache[11], 7,8);
+      conditional_push_back(this, bn_cache[12], 0,2);
+      conditional_push_back(this, bn_cache[12], 1,3);
+      conditional_push_back(this, bn_cache[12], 4,6);
+      conditional_push_back(this, bn_cache[12], 5,7);
+      conditional_push_back(this, bn_cache[13], 5,8);
+      conditional_push_back(this, bn_cache[14], 1,2);
+
+      conditional_push_back(this, bn_cache[15], 3,7);
+      conditional_push_back(this, bn_cache[16], 3,8);
+      conditional_push_back(this, bn_cache[16], 6,7);
+      conditional_push_back(this, bn_cache[17], 6,8);
+      conditional_push_back(this, bn_cache[18], 2,8);
+      conditional_push_back(this, bn_cache[18], 5,6);
+      conditional_push_back(this, bn_cache[19], 2,5);
+
+      conditional_push_back(this, bn_cache[21], 3,6);
+      conditional_push_back(this, bn_cache[22], 2,3);
+      conditional_push_back(this, bn_cache[23], 2,6);
+    }
+
+  return bn_cache[possible_index];
+}
+
+
+#endif
+ 
 } // namespace libMesh

@@ -120,9 +120,41 @@ public:
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
 
+#ifdef LIBMESH_ENABLE_AMR
+
+  /**
+   * Returns the local node id on the parent which corresponds to 
+   * node n of child c, or returns invalid_uint if no such parent node
+   * exists.
+   */
+  virtual unsigned int as_parent_node (unsigned int c,
+                                       unsigned int n) const;
+
+  /**
+   * Returns all the pairs of nodes (indexed by local node id) which
+   * should bracket node n of child c.
+   */
+  const std::vector<std::pair<unsigned char, unsigned char> >&
+  parent_bracketing_nodes(unsigned int c,
+                          unsigned int n) const;
+
+#endif // LIBMESH_ENABLE_AMR
+
+
 
 
 protected:
+
+  /**
+   * A helper function for calculating bracketing nodes
+   */
+  const std::vector<std::pair<unsigned char, unsigned char> >&
+  _parent_bracketing_nodes(unsigned int possible_index) const;
+
+  /**
+   * A helper function for finding child nodes in parents
+   */
+  unsigned int _parent_node_of(int possible_i) const;
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.

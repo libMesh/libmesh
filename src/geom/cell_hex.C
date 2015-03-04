@@ -24,6 +24,23 @@
 #include "libmesh/cell_hex8.h"
 #include "libmesh/face_quad4.h"
 
+
+
+// anonymous namespace for helper functions
+namespace {
+  void conditional_push_back
+    (const libMesh::Elem *e,
+     std::vector<std::pair<unsigned char, unsigned char> >& v,
+     unsigned char n1,
+     unsigned char n2)
+    {
+      if (n1 < e->n_nodes() && n2 < e->n_nodes())
+        v.push_back(std::make_pair(n1, n2));
+    }
+}
+
+
+
 namespace libMesh
 {
 
@@ -547,13 +564,8 @@ const int Hex::_child_node_lookup[8][27] =
   };
 
 // Each child element node (indexed by "possible node location"), may exist in
-// the parent.  We use _parent_bracketing_node[foo][0] to store the
-// local node location where, or -1 otherwise.  Non-vertex nodes will
-// be bracketed (often in multiple directions) by pairs of nodes
-// (indexed by parent local node number) which exist in the element.
-// We use _parent_bracketing_node[foo][i,i+1] to store indices of
-// these pairs, with -1 as an indicator for "no more pairs".
-int Hex::_parent_node_of(int possible_i)
+// the parent.
+unsigned int Hex::_parent_node_of(int possible_i) const
 {
   // indexed by reduced possible_z,y,x
   static const unsigned char _parent_nodes_array[3][3][3] =
@@ -563,276 +575,294 @@ int Hex::_parent_node_of(int possible_i)
 
   const int possible_x = possible_i % 5;
   if (possible_x % 2)
-    return -1;
+    return libMesh::invalid_uint;
   const int possible_y = (possible_i / 5) % 5;
   if (possible_y % 2)
-    return -1;
-  const int possible_z = (possible_i / 25)
+    return libMesh::invalid_uint;
+  const int possible_z = (possible_i / 25);
   if (possible_z % 2)
-    return -1;
+    return libMesh::invalid_uint;
  
-  return _parent_nodes_array[possible_z][possible_y][possible_x];
+  return _parent_nodes_array[possible_z/2][possible_y/2][possible_x/2];
 }
 
 
-int Hex::as_parent_node(unsigned int child,
-                        unsigned int child_node)
+unsigned int Hex::as_parent_node(unsigned int child,
+                                 unsigned int child_node) const
 {
   libmesh_assert_less (child, 9);
   libmesh_assert_less (child_node, 27);
-  unsigned int possible_index = _child_node_lookup[child][child_node];
-  return _parent_node_of(possible_index);
+  const unsigned int possible_index = _child_node_lookup[child][child_node];
+  unsigned int possible_parent_node = _parent_node_of(possible_index);
+  if (possible_parent_node >= this->n_nodes())
+    possible_parent_node = libMesh::invalid_uint;
+  return possible_parent_node;
 }
 
 
 const std::vector<std::pair<unsigned char, unsigned char> >&
 Hex::parent_bracketing_nodes(unsigned int child,
-                             unsigned int child_node)
+                             unsigned int child_node) const
 {
-  unsigned int 
+  return this->_parent_bracketing_nodes
+    (this->_child_node_lookup[child][child_node]);
 }
 
 const std::vector<std::pair<unsigned char, unsigned char> >&
-Hex::_parent_bracketing_nodes(unsigned int possible_index)
+Hex::_parent_bracketing_nodes(unsigned int possible_index) const
 {
-  static std::vector<std::vector<
-          std::pair<unsigned char, unsigned char> > >
-    cached_bracketing_nodes;
+  // We're using this cache differently than the defaults; indexing by
+  // "possible index" rather than by child index, child node index.
+
+  std::vector<std::vector<std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > > > >
+    & full_cache = this->_get_bracketing_node_cache();
 
   // We have *got* to start requiring C++11 support...
-  if (cached_bracketing_nodes.empty())
+  if (full_cache.empty())
     {
-      cached_bracketing_nodes.resize(125);
+      full_cache.resize(1);
 
-      cached_bracketing_nodes[1].push_back(std::make_pair(0,8));
-      cached_bracketing_nodes[2].push_back(std::make_pair(0,1));
-      cached_bracketing_nodes[3].push_back(std::make_pair(1,8));
-
-      cached_bracketing_nodes[5].push_back(std::make_pair(0,11));
-      cached_bracketing_nodes[6].push_back(std::make_pair(0,20));
-      cached_bracketing_nodes[6].push_back(std::make_pair(8,11));
-      cached_bracketing_nodes[7].push_back(std::make_pair(8,20));
-      cached_bracketing_nodes[8].push_back(std::make_pair(1,20));
-      cached_bracketing_nodes[8].push_back(std::make_pair(8,9));
-      cached_bracketing_nodes[9].push_back(std::make_pair(1,9));
-
-      cached_bracketing_nodes[10].push_back(std::make_pair(0,3));
-      cached_bracketing_nodes[11].push_back(std::make_pair(11,20));
-      cached_bracketing_nodes[12].push_back(std::make_pair(9,11);
-      cached_bracketing_nodes[12].push_back(std::make_pair(8,10);
-      cached_bracketing_nodes[12].push_back(std::make_pair(0,2);
-      cached_bracketing_nodes[12].push_back(std::make_pair(1,3);
-      cached_bracketing_nodes[13].push_back(std::make_pair(9,20));
-      cached_bracketing_nodes[14].push_back(std::make_pair(1,2));
-
-      cached_bracketing_nodes[15].push_back(std::make_pair(3,11));
-      cached_bracketing_nodes[16].push_back(std::make_pair(3,20));
-      cached_bracketing_nodes[16].push_back(std::make_pair(10,11));
-      cached_bracketing_nodes[17].push_back(std::make_pair(10,20));
-      cached_bracketing_nodes[18].push_back(std::make_pair(2,20));
-      cached_bracketing_nodes[18].push_back(std::make_pair(9,10));
-      cached_bracketing_nodes[19].push_back(std::make_pair(2,9));
-
-      cached_bracketing_nodes[21].push_back(std::make_pair(3,10));
-      cached_bracketing_nodes[22].push_back(std::make_pair(2,3));
-      cached_bracketing_nodes[23].push_back(std::make_pair(2,10));
-
-      cached_bracketing_nodes[25].push_back(std::make_pair(0,12));
-      cached_bracketing_nodes[26].push_back(std::make_pair(0,21));
-      cached_bracketing_nodes[26].push_back(std::make_pair(8,12));
-      cached_bracketing_nodes[27].push_back(std::make_pair(8,21));
-      cached_bracketing_nodes[28].push_back(std::make_pair(8,13));
-      cached_bracketing_nodes[28].push_back(std::make_pair(1,21));
-      cached_bracketing_nodes[29].push_back(std::make_pair(1,13));
-
-      cached_bracketing_nodes[30].push_back(std::make_pair(0,24));
-      cached_bracketing_nodes[30].push_back(std::make_pair(11,12));
-      cached_bracketing_nodes[31].push_back(std::make_pair(0,26));
-      cached_bracketing_nodes[31].push_back(std::make_pair(8,24));
-      cached_bracketing_nodes[31].push_back(std::make_pair(11,21));
-      cached_bracketing_nodes[31].push_back(std::make_pair(12,20));
-      cached_bracketing_nodes[32].push_back(std::make_pair(8,26));
-      cached_bracketing_nodes[32].push_back(std::make_pair(20,21));
-      cached_bracketing_nodes[33].push_back(std::make_pair(1,26));
-      cached_bracketing_nodes[33].push_back(std::make_pair(8,22));
-      cached_bracketing_nodes[33].push_back(std::make_pair(9,21));
-      cached_bracketing_nodes[33].push_back(std::make_pair(13,20));
-      cached_bracketing_nodes[34].push_back(std::make_pair(8,26));
-      cached_bracketing_nodes[34].push_back(std::make_pair(20,21));
-
-      cached_bracketing_nodes[35].push_back(std::make_pair(11,24));
-      cached_bracketing_nodes[36].push_back(std::make_pair(20,24));
-      cached_bracketing_nodes[36].push_back(std::make_pair(11,26));
-      cached_bracketing_nodes[37].push_back(std::make_pair(20,26));
-      cached_bracketing_nodes[38].push_back(std::make_pair(20,22));
-      cached_bracketing_nodes[38].push_back(std::make_pair(9,26));
-      cached_bracketing_nodes[39].push_back(std::make_pair(9,22));
-
-      cached_bracketing_nodes[40].push_back(std::make_pair(3,24));
-      cached_bracketing_nodes[40].push_back(std::make_pair(11,15));
-      cached_bracketing_nodes[41].push_back(std::make_pair(3,26));
-      cached_bracketing_nodes[41].push_back(std::make_pair(10,24));
-      cached_bracketing_nodes[41].push_back(std::make_pair(11,23));
-      cached_bracketing_nodes[41].push_back(std::make_pair(15,20));
-      cached_bracketing_nodes[42].push_back(std::make_pair(10,26));
-      cached_bracketing_nodes[42].push_back(std::make_pair(20,23));
-      cached_bracketing_nodes[43].push_back(std::make_pair(2,26));
-      cached_bracketing_nodes[43].push_back(std::make_pair(10,22));
-      cached_bracketing_nodes[43].push_back(std::make_pair(9,23));
-      cached_bracketing_nodes[43].push_back(std::make_pair(14,20));
-      cached_bracketing_nodes[44].push_back(std::make_pair(2,22));
-      cached_bracketing_nodes[44].push_back(std::make_pair(9,14));
-
-      cached_bracketing_nodes[45].push_back(std::make_pair(3,15));
-      cached_bracketing_nodes[46].push_back(std::make_pair(3,23));
-      cached_bracketing_nodes[46].push_back(std::make_pair(10,15));
-      cached_bracketing_nodes[47].push_back(std::make_pair(10,23));
-      cached_bracketing_nodes[48].push_back(std::make_pair(10,14));
-      cached_bracketing_nodes[48].push_back(std::make_pair(2,23));
-      cached_bracketing_nodes[49].push_back(std::make_pair(2,14));
-
-      cached_bracketing_nodes[50].push_back(std::make_pair(0,4));
-      cached_bracketing_nodes[51].push_back(std::make_pair(12,21));
-      cached_bracketing_nodes[52].push_back(std::make_pair(12,13));
-      cached_bracketing_nodes[52].push_back(std::make_pair(8,16));
-      cached_bracketing_nodes[52].push_back(std::make_pair(0,5));
-      cached_bracketing_nodes[52].push_back(std::make_pair(1,4));
-      cached_bracketing_nodes[53].push_back(std::make_pair(13,21));
-      cached_bracketing_nodes[54].push_back(std::make_pair(1,5));
-
-      cached_bracketing_nodes[55].push_back(std::make_pair(12,24));
-      cached_bracketing_nodes[56].push_back(std::make_pair(12,26));
-      cached_bracketing_nodes[56].push_back(std::make_pair(21,24));
-      cached_bracketing_nodes[57].push_back(std::make_pair(21,26));
-      cached_bracketing_nodes[58].push_back(std::make_pair(21,22));
-      cached_bracketing_nodes[58].push_back(std::make_pair(13,26));
-      cached_bracketing_nodes[59].push_back(std::make_pair(13,22));
-
-      cached_bracketing_nodes[60].push_back(std::make_pair(0,7));
-      cached_bracketing_nodes[60].push_back(std::make_pair(3,4));
-      cached_bracketing_nodes[60].push_back(std::make_pair(11,19));
-      cached_bracketing_nodes[60].push_back(std::make_pair(12,15));
-      cached_bracketing_nodes[61].push_back(std::make_pair(24,26));
-      cached_bracketing_nodes[62].push_back(std::make_pair(0,6));
-      cached_bracketing_nodes[62].push_back(std::make_pair(1,7));
-      cached_bracketing_nodes[62].push_back(std::make_pair(2,4));
-      cached_bracketing_nodes[62].push_back(std::make_pair(3,5));
-      cached_bracketing_nodes[63].push_back(std::make_pair(22,26));
-      cached_bracketing_nodes[64].push_back(std::make_pair(1,6));
-      cached_bracketing_nodes[64].push_back(std::make_pair(2,5));
-      cached_bracketing_nodes[64].push_back(std::make_pair(9,17));
-      cached_bracketing_nodes[64].push_back(std::make_pair(13,14));
-
-      cached_bracketing_nodes[65].push_back(std::make_pair(15,24));
-      cached_bracketing_nodes[66].push_back(std::make_pair(15,26));
-      cached_bracketing_nodes[66].push_back(std::make_pair(23,24));
-      cached_bracketing_nodes[67].push_back(std::make_pair(23,26));
-      cached_bracketing_nodes[68].push_back(std::make_pair(22,23));
-      cached_bracketing_nodes[68].push_back(std::make_pair(14,26));
-      cached_bracketing_nodes[69].push_back(std::make_pair(14,22));
-
-      cached_bracketing_nodes[70].push_back(std::make_pair(3,7));
-      cached_bracketing_nodes[71].push_back(std::make_pair(15,23));
-      cached_bracketing_nodes[72].push_back(std::make_pair(14,15));
-      cached_bracketing_nodes[72].push_back(std::make_pair(10,18));
-      cached_bracketing_nodes[72].push_back(std::make_pair(3,6));
-      cached_bracketing_nodes[72].push_back(std::make_pair(2,7));
-      cached_bracketing_nodes[73].push_back(std::make_pair(14,23));
-      cached_bracketing_nodes[74].push_back(std::make_pair(2,6));
-
-      cached_bracketing_nodes[75].push_back(std::make_pair(4,12));
-      cached_bracketing_nodes[76].push_back(std::make_pair(4,21));
-      cached_bracketing_nodes[76].push_back(std::make_pair(12,16));
-      cached_bracketing_nodes[77].push_back(std::make_pair(16,21));
-      cached_bracketing_nodes[78].push_back(std::make_pair(13,16));
-      cached_bracketing_nodes[78].push_back(std::make_pair(5,21));
-      cached_bracketing_nodes[79].push_back(std::make_pair(5,13));
-
-      cached_bracketing_nodes[80].push_back(std::make_pair(4,24));
-      cached_bracketing_nodes[80].push_back(std::make_pair(12,19));
-      cached_bracketing_nodes[81].push_back(std::make_pair(4,26));
-      cached_bracketing_nodes[81].push_back(std::make_pair(12,25));
-      cached_bracketing_nodes[81].push_back(std::make_pair(19,21));
-      cached_bracketing_nodes[81].push_back(std::make_pair(16,24));
-      cached_bracketing_nodes[82].push_back(std::make_pair(16,26));
-      cached_bracketing_nodes[82].push_back(std::make_pair(21,25));
-      cached_bracketing_nodes[83].push_back(std::make_pair(5,26));
-      cached_bracketing_nodes[83].push_back(std::make_pair(13,25));
-      cached_bracketing_nodes[83].push_back(std::make_pair(16,22));
-      cached_bracketing_nodes[83].push_back(std::make_pair(17,21));
-      cached_bracketing_nodes[84].push_back(std::make_pair(5,22));
-      cached_bracketing_nodes[84].push_back(std::make_pair(13,17));
-
-      cached_bracketing_nodes[85].push_back(std::make_pair(19,24));
-      cached_bracketing_nodes[86].push_back(std::make_pair(24,25));
-      cached_bracketing_nodes[86].push_back(std::make_pair(19,26));
-      cached_bracketing_nodes[87].push_back(std::make_pair(25,26));
-      cached_bracketing_nodes[88].push_back(std::make_pair(17,26));
-      cached_bracketing_nodes[88].push_back(std::make_pair(22,25));
-      cached_bracketing_nodes[89].push_back(std::make_pair(17,22));
-
-      cached_bracketing_nodes[90].push_back(std::make_pair(7,24));
-      cached_bracketing_nodes[90].push_back(std::make_pair(15,19));
-      cached_bracketing_nodes[91].push_back(std::make_pair(7,26));
-      cached_bracketing_nodes[91].push_back(std::make_pair(15,25));
-      cached_bracketing_nodes[91].push_back(std::make_pair(18,24));
-      cached_bracketing_nodes[91].push_back(std::make_pair(19,23));
-      cached_bracketing_nodes[92].push_back(std::make_pair(18,26));
-      cached_bracketing_nodes[92].push_back(std::make_pair(23,25));
-      cached_bracketing_nodes[93].push_back(std::make_pair(6,26));
-      cached_bracketing_nodes[93].push_back(std::make_pair(14,25));
-      cached_bracketing_nodes[93].push_back(std::make_pair(17,23));
-      cached_bracketing_nodes[93].push_back(std::make_pair(18,22));
-      cached_bracketing_nodes[94].push_back(std::make_pair(6,22));
-      cached_bracketing_nodes[94].push_back(std::make_pair(14,17));
-
-      cached_bracketing_nodes[95].push_back(std::make_pair(7,15));
-      cached_bracketing_nodes[96].push_back(std::make_pair(7,23));
-      cached_bracketing_nodes[96].push_back(std::make_pair(15,18));
-      cached_bracketing_nodes[97].push_back(std::make_pair(18,23));
-      cached_bracketing_nodes[98].push_back(std::make_pair(6,23));
-      cached_bracketing_nodes[98].push_back(std::make_pair(14,18));
-      cached_bracketing_nodes[99].push_back(std::make_pair(6,14));
-
-      cached_bracketing_nodes[101].push_back(std::make_pair(4,16));
-      cached_bracketing_nodes[102].push_back(std::make_pair(4,5));
-      cached_bracketing_nodes[103].push_back(std::make_pair(5,16));
-
-      cached_bracketing_nodes[105].push_back(std::make_pair(4,19));
-      cached_bracketing_nodes[106].push_back(std::make_pair(4,25));
-      cached_bracketing_nodes[106].push_back(std::make_pair(16,19));
-      cached_bracketing_nodes[107].push_back(std::make_pair(16,25));
-      cached_bracketing_nodes[108].push_back(std::make_pair(5,25));
-      cached_bracketing_nodes[108].push_back(std::make_pair(16,17));
-      cached_bracketing_nodes[109].push_back(std::make_pair(5,17));
-
-      cached_bracketing_nodes[110].push_back(std::make_pair(4,7));
-      cached_bracketing_nodes[111].push_back(std::make_pair(19,25));
-      cached_bracketing_nodes[112].push_back(std::make_pair(4,6);
-      cached_bracketing_nodes[112].push_back(std::make_pair(5,7);
-      cached_bracketing_nodes[112].push_back(std::make_pair(16,18);
-      cached_bracketing_nodes[112].push_back(std::make_pair(17,19);
-      cached_bracketing_nodes[113].push_back(std::make_pair(17,25));
-      cached_bracketing_nodes[114].push_back(std::make_pair(5,6));
-
-      cached_bracketing_nodes[115].push_back(std::make_pair(7,19));
-      cached_bracketing_nodes[116].push_back(std::make_pair(7,25));
-      cached_bracketing_nodes[116].push_back(std::make_pair(18,19));
-      cached_bracketing_nodes[117].push_back(std::make_pair(18,25));
-      cached_bracketing_nodes[118].push_back(std::make_pair(6,25));
-      cached_bracketing_nodes[118].push_back(std::make_pair(17,18));
-      cached_bracketing_nodes[119].push_back(std::make_pair(6,17));
-
-      cached_bracketing_nodes[121].push_back(std::make_pair(7,18));
-      cached_bracketing_nodes[122].push_back(std::make_pair(6,7));
-      cached_bracketing_nodes[123].push_back(std::make_pair(6,18));
+      full_cache[0].resize(1);
     }
 
-  return cached_bracketing_nodes[possible_index];
+  std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > >
+    & bn_cache = full_cache[0][0];
+
+  if (bn_cache.empty())
+    {
+      bn_cache.resize(125);
+
+      conditional_push_back(this, bn_cache[1], 0,8);
+      conditional_push_back(this, bn_cache[2], 0,1);
+      conditional_push_back(this, bn_cache[3], 1,8);
+
+      conditional_push_back(this, bn_cache[5], 0,11);
+      conditional_push_back(this, bn_cache[6], 0,20);
+      conditional_push_back(this, bn_cache[6], 8,11);
+      conditional_push_back(this, bn_cache[7], 8,20);
+      conditional_push_back(this, bn_cache[8], 1,20);
+      conditional_push_back(this, bn_cache[8], 8,9);
+      conditional_push_back(this, bn_cache[9], 1,9);
+
+      conditional_push_back(this, bn_cache[10], 0,3);
+      conditional_push_back(this, bn_cache[11], 11,20);
+      conditional_push_back(this, bn_cache[12], 9,11);
+      conditional_push_back(this, bn_cache[12], 8,10);
+      conditional_push_back(this, bn_cache[12], 0,2);
+      conditional_push_back(this, bn_cache[12], 1,3);
+      conditional_push_back(this, bn_cache[13], 9,20);
+      conditional_push_back(this, bn_cache[14], 1,2);
+
+      conditional_push_back(this, bn_cache[15], 3,11);
+      conditional_push_back(this, bn_cache[16], 3,20);
+      conditional_push_back(this, bn_cache[16], 10,11);
+      conditional_push_back(this, bn_cache[17], 10,20);
+      conditional_push_back(this, bn_cache[18], 2,20);
+      conditional_push_back(this, bn_cache[18], 9,10);
+      conditional_push_back(this, bn_cache[19], 2,9);
+
+      conditional_push_back(this, bn_cache[21], 3,10);
+      conditional_push_back(this, bn_cache[22], 2,3);
+      conditional_push_back(this, bn_cache[23], 2,10);
+
+      conditional_push_back(this, bn_cache[25], 0,12);
+      conditional_push_back(this, bn_cache[26], 0,21);
+      conditional_push_back(this, bn_cache[26], 8,12);
+      conditional_push_back(this, bn_cache[27], 8,21);
+      conditional_push_back(this, bn_cache[28], 8,13);
+      conditional_push_back(this, bn_cache[28], 1,21);
+      conditional_push_back(this, bn_cache[29], 1,13);
+
+      conditional_push_back(this, bn_cache[30], 0,24);
+      conditional_push_back(this, bn_cache[30], 11,12);
+      conditional_push_back(this, bn_cache[31], 0,26);
+      conditional_push_back(this, bn_cache[31], 8,24);
+      conditional_push_back(this, bn_cache[31], 11,21);
+      conditional_push_back(this, bn_cache[31], 12,20);
+      conditional_push_back(this, bn_cache[32], 8,26);
+      conditional_push_back(this, bn_cache[32], 20,21);
+      conditional_push_back(this, bn_cache[33], 1,26);
+      conditional_push_back(this, bn_cache[33], 8,22);
+      conditional_push_back(this, bn_cache[33], 9,21);
+      conditional_push_back(this, bn_cache[33], 13,20);
+      conditional_push_back(this, bn_cache[34], 8,26);
+      conditional_push_back(this, bn_cache[34], 20,21);
+
+      conditional_push_back(this, bn_cache[35], 11,24);
+      conditional_push_back(this, bn_cache[36], 20,24);
+      conditional_push_back(this, bn_cache[36], 11,26);
+      conditional_push_back(this, bn_cache[37], 20,26);
+      conditional_push_back(this, bn_cache[38], 20,22);
+      conditional_push_back(this, bn_cache[38], 9,26);
+      conditional_push_back(this, bn_cache[39], 9,22);
+
+      conditional_push_back(this, bn_cache[40], 3,24);
+      conditional_push_back(this, bn_cache[40], 11,15);
+      conditional_push_back(this, bn_cache[41], 3,26);
+      conditional_push_back(this, bn_cache[41], 10,24);
+      conditional_push_back(this, bn_cache[41], 11,23);
+      conditional_push_back(this, bn_cache[41], 15,20);
+      conditional_push_back(this, bn_cache[42], 10,26);
+      conditional_push_back(this, bn_cache[42], 20,23);
+      conditional_push_back(this, bn_cache[43], 2,26);
+      conditional_push_back(this, bn_cache[43], 10,22);
+      conditional_push_back(this, bn_cache[43], 9,23);
+      conditional_push_back(this, bn_cache[43], 14,20);
+      conditional_push_back(this, bn_cache[44], 2,22);
+      conditional_push_back(this, bn_cache[44], 9,14);
+
+      conditional_push_back(this, bn_cache[45], 3,15);
+      conditional_push_back(this, bn_cache[46], 3,23);
+      conditional_push_back(this, bn_cache[46], 10,15);
+      conditional_push_back(this, bn_cache[47], 10,23);
+      conditional_push_back(this, bn_cache[48], 10,14);
+      conditional_push_back(this, bn_cache[48], 2,23);
+      conditional_push_back(this, bn_cache[49], 2,14);
+
+      conditional_push_back(this, bn_cache[50], 0,4);
+      conditional_push_back(this, bn_cache[51], 12,21);
+      conditional_push_back(this, bn_cache[52], 12,13);
+      conditional_push_back(this, bn_cache[52], 8,16);
+      conditional_push_back(this, bn_cache[52], 0,5);
+      conditional_push_back(this, bn_cache[52], 1,4);
+      conditional_push_back(this, bn_cache[53], 13,21);
+      conditional_push_back(this, bn_cache[54], 1,5);
+
+      conditional_push_back(this, bn_cache[55], 12,24);
+      conditional_push_back(this, bn_cache[56], 12,26);
+      conditional_push_back(this, bn_cache[56], 21,24);
+      conditional_push_back(this, bn_cache[57], 21,26);
+      conditional_push_back(this, bn_cache[58], 21,22);
+      conditional_push_back(this, bn_cache[58], 13,26);
+      conditional_push_back(this, bn_cache[59], 13,22);
+
+      conditional_push_back(this, bn_cache[60], 0,7);
+      conditional_push_back(this, bn_cache[60], 3,4);
+      conditional_push_back(this, bn_cache[60], 11,19);
+      conditional_push_back(this, bn_cache[60], 12,15);
+      conditional_push_back(this, bn_cache[61], 24,26);
+      conditional_push_back(this, bn_cache[62], 0,6);
+      conditional_push_back(this, bn_cache[62], 1,7);
+      conditional_push_back(this, bn_cache[62], 2,4);
+      conditional_push_back(this, bn_cache[62], 3,5);
+      conditional_push_back(this, bn_cache[63], 22,26);
+      conditional_push_back(this, bn_cache[64], 1,6);
+      conditional_push_back(this, bn_cache[64], 2,5);
+      conditional_push_back(this, bn_cache[64], 9,17);
+      conditional_push_back(this, bn_cache[64], 13,14);
+
+      conditional_push_back(this, bn_cache[65], 15,24);
+      conditional_push_back(this, bn_cache[66], 15,26);
+      conditional_push_back(this, bn_cache[66], 23,24);
+      conditional_push_back(this, bn_cache[67], 23,26);
+      conditional_push_back(this, bn_cache[68], 22,23);
+      conditional_push_back(this, bn_cache[68], 14,26);
+      conditional_push_back(this, bn_cache[69], 14,22);
+
+      conditional_push_back(this, bn_cache[70], 3,7);
+      conditional_push_back(this, bn_cache[71], 15,23);
+      conditional_push_back(this, bn_cache[72], 14,15);
+      conditional_push_back(this, bn_cache[72], 10,18);
+      conditional_push_back(this, bn_cache[72], 3,6);
+      conditional_push_back(this, bn_cache[72], 2,7);
+      conditional_push_back(this, bn_cache[73], 14,23);
+      conditional_push_back(this, bn_cache[74], 2,6);
+
+      conditional_push_back(this, bn_cache[75], 4,12);
+      conditional_push_back(this, bn_cache[76], 4,21);
+      conditional_push_back(this, bn_cache[76], 12,16);
+      conditional_push_back(this, bn_cache[77], 16,21);
+      conditional_push_back(this, bn_cache[78], 13,16);
+      conditional_push_back(this, bn_cache[78], 5,21);
+      conditional_push_back(this, bn_cache[79], 5,13);
+
+      conditional_push_back(this, bn_cache[80], 4,24);
+      conditional_push_back(this, bn_cache[80], 12,19);
+      conditional_push_back(this, bn_cache[81], 4,26);
+      conditional_push_back(this, bn_cache[81], 12,25);
+      conditional_push_back(this, bn_cache[81], 19,21);
+      conditional_push_back(this, bn_cache[81], 16,24);
+      conditional_push_back(this, bn_cache[82], 16,26);
+      conditional_push_back(this, bn_cache[82], 21,25);
+      conditional_push_back(this, bn_cache[83], 5,26);
+      conditional_push_back(this, bn_cache[83], 13,25);
+      conditional_push_back(this, bn_cache[83], 16,22);
+      conditional_push_back(this, bn_cache[83], 17,21);
+      conditional_push_back(this, bn_cache[84], 5,22);
+      conditional_push_back(this, bn_cache[84], 13,17);
+
+      conditional_push_back(this, bn_cache[85], 19,24);
+      conditional_push_back(this, bn_cache[86], 24,25);
+      conditional_push_back(this, bn_cache[86], 19,26);
+      conditional_push_back(this, bn_cache[87], 25,26);
+      conditional_push_back(this, bn_cache[88], 17,26);
+      conditional_push_back(this, bn_cache[88], 22,25);
+      conditional_push_back(this, bn_cache[89], 17,22);
+
+      conditional_push_back(this, bn_cache[90], 7,24);
+      conditional_push_back(this, bn_cache[90], 15,19);
+      conditional_push_back(this, bn_cache[91], 7,26);
+      conditional_push_back(this, bn_cache[91], 15,25);
+      conditional_push_back(this, bn_cache[91], 18,24);
+      conditional_push_back(this, bn_cache[91], 19,23);
+      conditional_push_back(this, bn_cache[92], 18,26);
+      conditional_push_back(this, bn_cache[92], 23,25);
+      conditional_push_back(this, bn_cache[93], 6,26);
+      conditional_push_back(this, bn_cache[93], 14,25);
+      conditional_push_back(this, bn_cache[93], 17,23);
+      conditional_push_back(this, bn_cache[93], 18,22);
+      conditional_push_back(this, bn_cache[94], 6,22);
+      conditional_push_back(this, bn_cache[94], 14,17);
+
+      conditional_push_back(this, bn_cache[95], 7,15);
+      conditional_push_back(this, bn_cache[96], 7,23);
+      conditional_push_back(this, bn_cache[96], 15,18);
+      conditional_push_back(this, bn_cache[97], 18,23);
+      conditional_push_back(this, bn_cache[98], 6,23);
+      conditional_push_back(this, bn_cache[98], 14,18);
+      conditional_push_back(this, bn_cache[99], 6,14);
+
+      conditional_push_back(this, bn_cache[101], 4,16);
+      conditional_push_back(this, bn_cache[102], 4,5);
+      conditional_push_back(this, bn_cache[103], 5,16);
+
+      conditional_push_back(this, bn_cache[105], 4,19);
+      conditional_push_back(this, bn_cache[106], 4,25);
+      conditional_push_back(this, bn_cache[106], 16,19);
+      conditional_push_back(this, bn_cache[107], 16,25);
+      conditional_push_back(this, bn_cache[108], 5,25);
+      conditional_push_back(this, bn_cache[108], 16,17);
+      conditional_push_back(this, bn_cache[109], 5,17);
+
+      conditional_push_back(this, bn_cache[110], 4,7);
+      conditional_push_back(this, bn_cache[111], 19,25);
+      conditional_push_back(this, bn_cache[112], 4,6);
+      conditional_push_back(this, bn_cache[112], 5,7);
+      conditional_push_back(this, bn_cache[112], 16,18);
+      conditional_push_back(this, bn_cache[112], 17,19);
+      conditional_push_back(this, bn_cache[113], 17,25);
+      conditional_push_back(this, bn_cache[114], 5,6);
+
+      conditional_push_back(this, bn_cache[115], 7,19);
+      conditional_push_back(this, bn_cache[116], 7,25);
+      conditional_push_back(this, bn_cache[116], 18,19);
+      conditional_push_back(this, bn_cache[117], 18,25);
+      conditional_push_back(this, bn_cache[118], 6,25);
+      conditional_push_back(this, bn_cache[118], 17,18);
+      conditional_push_back(this, bn_cache[119], 6,17);
+
+      conditional_push_back(this, bn_cache[121], 7,18);
+      conditional_push_back(this, bn_cache[122], 6,7);
+      conditional_push_back(this, bn_cache[123], 6,18);
+    }
+
+  return bn_cache[possible_index];
 }
 
 
-#endif
+#endif // LIBMESH_ENABLE_AMR
        
 
 } // namespace libMesh
