@@ -278,6 +278,15 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
       return (b * D(a) - a * D(b)) / (MakeTree(cSqr, a) + MakeTree(cSqr, b));
 
     case cPow:
+      if (b.IsImmed())
+      {
+        Value_t exponent = b.GetImmed();
+        if (exponent == Value_t(1))
+          return D(a);
+        if (exponent == Value_t(0))
+          return CodeTreeAD(CodeTreeImmed(Value_t(0)));
+        return MakeTree(cPow, a, CodeTreeAD(exponent - Value_t(1))) * b * D(a);
+      }
       return MakeTree(cPow, a, b) * (D(b) * MakeTree(cLog, a) + b * D(a)/a);
     case cLog:
       return D(a)/a;
