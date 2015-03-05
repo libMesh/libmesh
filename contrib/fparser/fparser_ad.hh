@@ -51,6 +51,12 @@ public:
    */
   bool JITCompile(bool cacheFunction = true);
 
+  /**
+   * wrap Optimize of the parent class to check for a JIT compiled version and redo
+   * the compilation after Optimization
+   */
+  void Optimize();
+
 #if LIBMESH_HAVE_FPARSER_JIT
   /**
    * Overwrite the Exec function with one that tests for a JIT compiled version
@@ -76,6 +82,9 @@ private:
 
   /// JIT function pointer
   Value_t (*compiledFunction)(const Value_t *, const Value_t *, const Value_t);
+
+  /// pointer to the mImmed values (or NULL if the mImmed vector is empty)
+  Value_t * pImmed;
 
   /**
    * In certain applications derivatives are built proactively and may never be used.
