@@ -468,7 +468,7 @@ inline void unpack_range (const std::vector<buffertype>& buffer,
 
 inline Communicator::Communicator () :
 #ifdef LIBMESH_HAVE_MPI
-  _communicator(MPI_COMM_NULL),
+  _communicator(MPI_COMM_SELF),
 #endif
   _rank(0),
   _size(1),
@@ -478,7 +478,7 @@ inline Communicator::Communicator () :
 
 inline Communicator::Communicator (const communicator &comm) :
 #ifdef LIBMESH_HAVE_MPI
-  _communicator(MPI_COMM_NULL),
+  _communicator(MPI_COMM_SELF),
 #endif
   _rank(0),
   _size(1),
