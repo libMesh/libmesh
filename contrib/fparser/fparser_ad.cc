@@ -475,7 +475,7 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
   if (compiledFunction == NULL)
     return FunctionParserBase<Value_t>::Eval(Vars);
   else
-    return (*compiledFunction)(Vars, &(this->mData->mImmed[0]), Epsilon<Value_t>::value);
+    return (*compiledFunction)(Vars, this->mData->mImmed.empty() ? 0 : &(this->mData->mImmed[0]), Epsilon<Value_t>::value);
 }
 
 template<typename Value_t>
@@ -483,6 +483,10 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
 {
   // get a reference to the stored bytecode
   const std::vector<unsigned>& ByteCode = this->mData->mByteCode;
+
+  // drop out if the ByteCode is empty
+  if (ByteCode.empty())
+    return false;
 
   // generate a sha1 hash of the current program and the Value type name
   SHA1 *sha1 = new SHA1();
