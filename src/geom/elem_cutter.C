@@ -40,15 +40,11 @@ namespace libMesh
 // ElemCutter implementation
 ElemCutter::ElemCutter()
 {
-  _comm_self.reset (new Parallel::Communicator (MPI_COMM_SELF));
+  _inside_mesh_2D.reset  (new SerialMesh(_comm_self,2)); /**/ _triangle_inside.reset  (new TriangleInterface (*_inside_mesh_2D));
+  _outside_mesh_2D.reset (new SerialMesh(_comm_self,2)); /**/ _triangle_outside.reset (new TriangleInterface (*_outside_mesh_2D));
 
-  libmesh_assert (_comm_self.get() != NULL);
-
-  _inside_mesh_2D.reset  (new SerialMesh(*_comm_self,2)); /**/ _triangle_inside.reset  (new TriangleInterface (*_inside_mesh_2D));
-  _outside_mesh_2D.reset (new SerialMesh(*_comm_self,2)); /**/ _triangle_outside.reset (new TriangleInterface (*_outside_mesh_2D));
-
-  _inside_mesh_3D.reset  (new SerialMesh(*_comm_self,3)); /**/ _tetgen_inside.reset  (new TetGenMeshInterface (*_inside_mesh_3D));
-  _outside_mesh_3D.reset (new SerialMesh(*_comm_self,3)); /**/ _tetgen_outside.reset (new TetGenMeshInterface (*_outside_mesh_3D));
+  _inside_mesh_3D.reset  (new SerialMesh(_comm_self,3)); /**/ _tetgen_inside.reset  (new TetGenMeshInterface (*_inside_mesh_3D));
+  _outside_mesh_3D.reset (new SerialMesh(_comm_self,3)); /**/ _tetgen_outside.reset (new TetGenMeshInterface (*_outside_mesh_3D));
 
   cut_cntr = 0;
 }

@@ -157,7 +157,7 @@ protected:
   AutoPtr<SerialMesh> _inside_mesh_3D;
   AutoPtr<SerialMesh> _outside_mesh_3D;
 
-  AutoPtr<Parallel::Communicator> _comm_self;
+  Parallel::Communicator _comm_self; // defaults to MPI_COMM_SELF
 
   AutoPtr<TriangleInterface>   _triangle_inside;
   AutoPtr<TriangleInterface>   _triangle_outside;
