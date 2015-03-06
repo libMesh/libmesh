@@ -26,7 +26,6 @@
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_inserter_iterator.h"
@@ -830,7 +829,7 @@ struct SyncIds
   // renumber_obj &renumber;
 
   // Find the id of each requested DofObject -
-  // sync_dofobject_data_by_xyz already did the work for us
+  // Parallel::sync_* already did the work for us
   void gather_data (const std::vector<dof_id_type>& ids,
                     std::vector<datum>& ids_out)
   {
@@ -851,8 +850,7 @@ struct SyncIds
 
 // ------------------------------------------------------------
 void MeshCommunication::make_node_ids_parallel_consistent
-(MeshBase &mesh,
- LocationMap<Node> &loc_map)
+(MeshBase &mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -860,10 +858,8 @@ void MeshCommunication::make_node_ids_parallel_consistent
   START_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
   SyncIds syncids(mesh, &MeshBase::renumber_node);
-  Parallel::sync_dofobject_data_by_xyz
-    (mesh.comm(),
-     mesh.nodes_begin(), mesh.nodes_end(),
-     loc_map, syncids);
+  Parallel::sync_node_data_by_element_id
+    (mesh, mesh.elements_begin(), mesh.elements_end(), syncids);
 
   STOP_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
 }
@@ -935,8 +931,7 @@ struct SyncProcIds
 
 // ------------------------------------------------------------
 void MeshCommunication::make_node_proc_ids_parallel_consistent
-(MeshBase& mesh,
- LocationMap<Node>& loc_map)
+(MeshBase& mesh)
 {
   START_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 
@@ -958,8 +953,8 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
   // them.
 
   SyncProcIds sync(mesh);
-  Parallel::sync_dofobject_data_by_xyz
-    (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
+  Parallel::sync_node_data_by_element_id
+    (mesh, mesh.elements_begin(), mesh.elements_end(), sync);
 
   STOP_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 }
@@ -968,19 +963,10 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
 
 // ------------------------------------------------------------
 void MeshCommunication::make_nodes_parallel_consistent
-(MeshBase &mesh,
- LocationMap<Node> &loc_map)
+(MeshBase &mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
-
-  // Create the loc_map if it hasn't been done already
-  bool need_map_update = (mesh.nodes_begin() != mesh.nodes_end() &&
-                          loc_map.empty());
-  mesh.comm().max(need_map_update);
-
-  if (need_map_update)
-    loc_map.init(mesh);
 
   // When this function is called, each section of a parallelized mesh
   // should be in the following state:
@@ -1003,13 +989,13 @@ void MeshCommunication::make_nodes_parallel_consistent
   // may be "wrong" from coarsening, but they're right in the sense
   // that they'll tell us who has the authoritative dofobject ids for
   // each node.
-  this->make_node_proc_ids_parallel_consistent(mesh, loc_map);
+  this->make_node_proc_ids_parallel_consistent(mesh);
 
   // Second, sync up dofobject ids.
-  this->make_node_ids_parallel_consistent(mesh, loc_map);
+  this->make_node_ids_parallel_consistent(mesh);
 
   // Finally, correct the processor ids to make DofMap happy
-  MeshTools::correct_node_proc_ids(mesh, loc_map);
+  MeshTools::correct_node_proc_ids(mesh);
 }
 
 

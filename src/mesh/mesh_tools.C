@@ -25,7 +25,6 @@
 // Local includes
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
-#include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_tools.h"
@@ -887,18 +886,10 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<do
 
 
 
-void MeshTools::correct_node_proc_ids
-(MeshBase &mesh,
- LocationMap<Node> &loc_map)
+void MeshTools::correct_node_proc_ids (MeshBase &mesh)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
-
-  // We'll need the new_nodes_map to answer other processors'
-  // requests.  It should never be empty unless we don't have any
-  // nodes.
-  libmesh_assert(mesh.nodes_begin() == mesh.nodes_end() ||
-                 !loc_map.empty());
 
   // Fix all nodes' processor ids.  Coarsening may have left us with
   // nodes which are no longer touched by any elements of the same
@@ -936,8 +927,7 @@ void MeshTools::correct_node_proc_ids
   // Those two passes will correct every node that touches a local
   // element, but we can't be sure about nodes touching remote
   // elements.  Fix those now.
-  MeshCommunication().make_node_proc_ids_parallel_consistent
-    (mesh, loc_map);
+  MeshCommunication().make_node_proc_ids_parallel_consistent (mesh);
 }
 
 
