@@ -147,7 +147,7 @@ public:
    * But we want to cache topology data based on that matrix.  So we return a
    * "version number" based on the diagonal selection.
    */
-  virtual unsigned int embedding_matrix_version () {
+  virtual unsigned int embedding_matrix_version () const {
     this->choose_diagonal();
     return this->diagonal_selection();
   }

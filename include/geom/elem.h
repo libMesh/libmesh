@@ -1182,9 +1182,17 @@ public:
    * Matrix that transforms the parents nodes into the children's
    * nodes
    */
-  virtual float embedding_matrix (const unsigned int i,
-                                  const unsigned int j,
-                                  const unsigned int k) const = 0;
+  virtual float embedding_matrix (const unsigned int child_num,
+                                  const unsigned int child_node_num,
+                                  const unsigned int parent_node_num) const = 0;
+
+  /**
+   * Some element types may use a different embedding matrix for
+   * different elements.  But we may want to cache data based on that
+   * matrix.  So we return a "version number" that can be used to
+   * identify which matrix is in use.
+   */
+  virtual unsigned int embedding_matrix_version () const { return 0; }
 
 #endif
 
