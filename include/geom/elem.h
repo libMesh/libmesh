@@ -429,6 +429,14 @@ public:
   virtual unsigned int n_nodes () const = 0;
 
   /**
+   * @returns the number of nodes the given child of this element
+   * contains.  Except in odd cases like pyramid refinement this will
+   * be the same as the number of nodes in the parent element.
+   */
+  virtual unsigned int n_nodes_in_child (unsigned int /*c*/) const
+  { return this->n_nodes(); }
+
+  /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of sides on the element.
    */
