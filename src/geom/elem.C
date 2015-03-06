@@ -1932,6 +1932,23 @@ Elem::parent_bracketing_nodes(unsigned int child,
 }
 
 
+const std::vector<std::pair<dof_id_type, dof_id_type> >
+Elem::bracketing_nodes(unsigned int child,
+                       unsigned int child_node) const
+{
+  std::vector<std::pair<dof_id_type, dof_id_type> > returnval;
+
+  const std::vector<std::pair<unsigned char, unsigned char> > & pbc =
+    this->parent_bracketing_nodes(child,child_node);
+
+  for (unsigned int i = 0; i != pbc.size(); ++i)
+    returnval.push_back
+      (std::make_pair
+        (this->node(pbc[i].first),
+         this->node(pbc[i].second)));
+
+  return returnval;
+}
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 

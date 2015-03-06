@@ -1192,6 +1192,16 @@ public:
                           unsigned int n) const;
 
   /**
+   * Returns all the pairs of nodes (indexed by global node id) which
+   * should bracket node n of child c.
+   */
+  virtual
+  const std::vector<std::pair<dof_id_type, dof_id_type> >
+  bracketing_nodes(unsigned int c,
+                   unsigned int n) const;
+
+
+  /**
    * Matrix that transforms the parents nodes into the children's
    * nodes
    */
