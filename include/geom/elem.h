@@ -1180,15 +1180,16 @@ public:
    * exists.
    */
   virtual unsigned int as_parent_node (unsigned int c,
-                                       unsigned int n) const = 0;
+                                       unsigned int n) const;
 
   /**
    * Returns all the pairs of nodes (indexed by local node id) which
    * should bracket node n of child c.
    */
+  virtual
   const std::vector<std::pair<unsigned char, unsigned char> >&
   parent_bracketing_nodes(unsigned int c,
-                          unsigned int n) const = 0;
+                          unsigned int n) const;
 
   /**
    * Matrix that transforms the parents nodes into the children's
@@ -1242,8 +1243,35 @@ protected:
                                   dof_id_type n3);
   //-------------------------------------------------------
 
+  /**
+   * Elem subclasses which don't do their own bracketing node
+   * calculations will need to supply a static cache, since the
+   * default calculation is slow.
+   */
+  virtual 
+  std::vector<std::vector<std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > > > > &
+    _get_bracketing_node_cache() const
+  {
+    static std::vector<std::vector<std::vector<std::vector<
+             std::pair<unsigned char, unsigned char> > > > > c;
+    libmesh_error();
+    return c;
+  }
 
-
+  /**
+   * Elem subclasses which don't do their own child-to-parent node
+   * calculations will need to supply a static cache, since the
+   * default calculation is slow.
+   */
+  virtual
+  std::vector<std::vector<std::vector<signed char> > > &
+  _get_parent_indices_cache() const
+  {
+    static std::vector<std::vector<std::vector<signed char> > > c;
+    libmesh_error();
+    return c;
+  }
 public:
 
   /**
