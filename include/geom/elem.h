@@ -123,6 +123,12 @@ public:
   Point & point (const unsigned int i);
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  virtual Point master_point (const unsigned int i) const = 0;
+
+  /**
    * @returns the global id number of local \p Node \p i.
    */
   dof_id_type node (const unsigned int i) const;
