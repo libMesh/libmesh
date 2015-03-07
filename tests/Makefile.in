@@ -116,11 +116,11 @@ CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_6 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_6 = unit_tests-dbg$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
