@@ -13,6 +13,7 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -55,15 +56,17 @@ target_triplet = @target@
 
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
+noinst_PROGRAMS = $(am__EXEEXT_6)
 @LIBMESH_OPT_MODE_TRUE@am__append_2 = unit_tests-opt
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_3 = unit_tests-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_4 = unit_tests-devel
-@LIBMESH_PROF_MODE_TRUE@am__append_5 = unit_tests-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_6 = unit_tests-oprof
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_3 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_4 = unit_tests-dbg
+@LIBMESH_DEVEL_MODE_TRUE@am__append_5 = unit_tests-devel
+@LIBMESH_PROF_MODE_TRUE@am__append_6 = unit_tests-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_7 = unit_tests-oprof
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp
@@ -113,10 +116,12 @@ CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_6 = unit_tests-dbg$(EXEEXT)
+PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/getpot_test.C geom/node_test.C \
 	geom/point_test.C geom/point_test.h mesh/mixed_dim_mesh_test.C \
@@ -146,9 +151,10 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT) \
 	systems/unit_tests_dbg-equation_systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
+@LIBMESH_DBG_MODE_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
+@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_DEPENDENCIES =  \
+@LIBMESH_DBG_MODE_TRUE@	$(top_builddir)/libmesh_dbg.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -711,10 +717,10 @@ EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
+@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
+@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_SOURCES = $(unit_tests_sources)
 @LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 @LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
@@ -770,6 +776,15 @@ $(am__aclocal_m4_deps):
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
 	echo " rm -f" $$list; \
 	rm -f $$list || exit $$?; \
 	test -n "$(EXEEXT)" || exit 0; \
@@ -2440,7 +2455,7 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile
+all-am: Makefile $(PROGRAMS)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -2494,7 +2509,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
-	mostlyclean-am
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
@@ -2565,18 +2580,18 @@ uninstall-am:
 .MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
-	clean-checkPROGRAMS clean-generic clean-libtool cscopelist \
-	ctags distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am
+	clean-checkPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS cscopelist ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
