@@ -38,6 +38,7 @@ if LIBMESH_ENABLE_FPARSER
 endif
 
 check_PROGRAMS = # empty, append below
+noinst_PROGRAMS = # empty, append below
 
 if LIBMESH_OPT_MODE
   check_PROGRAMS         += unit_tests-opt
@@ -50,14 +51,16 @@ endif
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.
-if !LIBMESH_ENABLE_GLIBCXX_DEBUGGING
 if LIBMESH_DBG_MODE
+if LIBMESH_ENABLE_GLIBCXX_DEBUGGING
+  noinst_PROGRAMS        += unit_tests-dbg
+else
   check_PROGRAMS         += unit_tests-dbg
+endif
   unit_tests_dbg_SOURCES  = $(unit_tests_sources)
   unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
   unit_tests_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
-endif
 endif
 
 if LIBMESH_DEVEL_MODE
