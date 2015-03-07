@@ -185,7 +185,10 @@ public:
                                   const unsigned int) const
   { libmesh_not_implemented(); return 0.; }
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
+
 
 protected:
 

@@ -224,7 +224,9 @@ protected:
    */
   static const float _embedding_matrix[8][18][18];
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
 
   /**
    * Matrix that tells which vertices define the location

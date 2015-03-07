@@ -196,7 +196,9 @@ protected:
    */
   static const float _embedding_matrix[4][8][8];
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
 
 };
 

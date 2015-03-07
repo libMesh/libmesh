@@ -197,6 +197,8 @@ protected:
    */
   static const float _embedding_matrix[8][4][4];
 
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
   // public:
   //
   //  /**

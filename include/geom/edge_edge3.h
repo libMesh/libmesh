@@ -190,7 +190,10 @@ protected:
    */
   static const float _embedding_matrix[2][3][3];
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
+
 };
 
 } // namespace libMesh

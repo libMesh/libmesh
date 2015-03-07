@@ -1217,7 +1217,7 @@ public:
    */
   virtual unsigned int embedding_matrix_version () const { return 0; }
 
-#endif
+#endif // LIBMESH_ENABLE_AMR
 
 
 protected:
@@ -1251,7 +1251,9 @@ protected:
                                   dof_id_type n1,
                                   dof_id_type n2,
                                   dof_id_type n3);
-  //-------------------------------------------------------
+
+
+#ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Elem subclasses which don't do their own bracketing node
@@ -1282,6 +1284,9 @@ protected:
     libmesh_error();
     return c;
   }
+
+#endif // LIBMESH_ENABLE_AMR
+
 public:
 
   /**
@@ -2268,6 +2273,28 @@ variant_filter_iterator<Elem::Predicate,
 
 
 } // namespace libMesh
+
+
+// Helper function for default caches in Elem subclases
+
+#define LIBMESH_ENABLE_TOPOLOGY_CACHES \
+  virtual \
+  std::vector<std::vector<std::vector<std::vector< \
+    std::pair<unsigned char, unsigned char> > > > > & \
+    _get_bracketing_node_cache() const \
+  { \
+    static std::vector<std::vector<std::vector<std::vector< \
+             std::pair<unsigned char, unsigned char> > > > > c; \
+    return c; \
+  } \
+ \
+  virtual \
+  std::vector<std::vector<std::vector<signed char> > > & \
+  _get_parent_indices_cache() const \
+  { \
+    static std::vector<std::vector<std::vector<signed char> > > c; \
+    return c; \
+  }
 
 
 #endif // LIBMESH_ELEM_H
