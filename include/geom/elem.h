@@ -494,6 +494,18 @@ public:
   virtual bool is_vertex(const unsigned int i) const = 0;
 
   /**
+   * @returns true iff the specified child has a vertex at the
+   * specified (child-local) node number.
+   * Except in odd cases like pyramid refinement the child will have
+   * the same local structure as the parent element.
+   * same as the parent element.
+   */
+  virtual unsigned int is_vertex_on_child (unsigned int /*c*/,
+                                           unsigned int i) const
+  { return this->is_vertex(i); }
+
+
+  /**
    * @returns true iff the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const = 0;
