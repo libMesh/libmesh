@@ -136,6 +136,26 @@ public:
    */
   void select_diagonal (const Diagonal diag) const;
 
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+
+  /**
+   * Tetrahedral elements permute the embedding matrix depending on which
+   * interior diagonal is used to subdivide into child elements.
+   * But we want to cache topology data based on that matrix.  So we return a
+   * "version number" based on the diagonal selection.
+   */
+  virtual unsigned int embedding_matrix_version () {
+    this->choose_diagonal();
+    return this->diagonal_selection();
+  }
+
+#endif // LIBMESH_ENABLE_AMR
+
+
+
 protected:
 
   /**
