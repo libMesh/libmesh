@@ -49,6 +49,17 @@ public:
     Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data, _nodelinks_data) {}
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_equal_to (i, 0);
+    return Point(0,0,0);
+  }
+
+
+  /**
    * @returns 0, the dimensionality of the object.
    */
   unsigned int dim () const { return 0; }

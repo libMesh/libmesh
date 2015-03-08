@@ -29,6 +29,28 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
+// Tet class static member initializations
+
+
+// We need to require C++11...
+const Real Tet::_master_points[10][3] =
+  {
+    {0, 0, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {0, 0, 1},
+    {0.5, 0, 0},
+    {0.5, 0.5, 0},
+    {0, 0.5, 0},
+    {0, 0, 0.5},
+    {0.5, 0, 0.5},
+    {0, 0.5, 0.5}
+  };
+
+
+
+
+// ------------------------------------------------------------
 // Tet class member functions
 dof_id_type Tet::key (const unsigned int s) const
 {

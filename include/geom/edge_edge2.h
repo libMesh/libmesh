@@ -52,6 +52,16 @@ public:
     Edge(Edge2::n_nodes(), p, _nodelinks_data) {}
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(2.0f*i-1,0,0);
+  }
+
+  /**
    * @returns 1
    */
   unsigned int n_sub_elem() const { return 1; }

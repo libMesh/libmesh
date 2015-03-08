@@ -73,6 +73,9 @@ public:
    */
   static const Elem & create ();
 
+  virtual Point master_point (const unsigned int /*i*/) const
+  { libmesh_not_implemented(); return Point(); }
+
   virtual const Point & point (const unsigned int i) const
   { libmesh_not_implemented(); return Elem::point(i); }
 

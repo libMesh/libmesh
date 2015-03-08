@@ -25,6 +25,24 @@ namespace libMesh
 {
 
 
+// ------------------------------------------------------------
+// Tri class static member initializations
+
+
+// We need to require C++11...
+const Real Tri::_master_points[6][3] =
+  {
+    {0, 0},
+    {1, 0},
+    {0, 1},
+    {0.5, 0},
+    {0.5, 0.5},
+    {0, 0.5}
+  };
+
+
+
+
 
 
 

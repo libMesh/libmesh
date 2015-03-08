@@ -32,6 +32,22 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
+// InfQuad class static member initializations
+
+
+// We need to require C++11...
+const Real InfQuad::_master_points[6][3] =
+  {
+    {-1, 0},
+    {1, 0},
+    {-1, 1},
+    {1, 1},
+    {0, 0},
+    {0, 1}
+  };
+
+
+// ------------------------------------------------------------
 // InfQuad class member functions
 dof_id_type InfQuad::key (const unsigned int s) const
 {

@@ -43,6 +43,18 @@ public:
   Tet  (const unsigned int nn, Elem* p, Node** nodelinkdata);
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
+
+  /**
    * @returns 4
    */
   unsigned int n_sides() const { return 4; }
@@ -130,6 +142,11 @@ protected:
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[10][3];
 
   /**
    * Called by descendant classes with appropriate data to determine

@@ -42,6 +42,27 @@ namespace libMesh
 {
 
 
+
+// ------------------------------------------------------------
+// Quad class static member initializations
+
+
+// We need to require C++11...
+const Real Quad::_master_points[9][3] =
+  {
+    {-1, -1},
+    {1, -1},
+    {1, 1},
+    {-1, 1},
+    {0, -1},
+    {1, 0},
+    {0, 1},
+    {-1, 0},
+    {0, 0}
+  };
+
+
+
 // ------------------------------------------------------------
 // Quad class member functions
 dof_id_type Quad::key (const unsigned int s) const
