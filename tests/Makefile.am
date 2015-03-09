@@ -87,6 +87,39 @@ if LIBMESH_OPROF_MODE
   unit_tests_oprof_LDADD    = $(top_builddir)/libmesh_oprof.la
 endif
 
+
+# Recursive automake builds subdirectories before parent directories.
+# But here we need the subdirectory to be able to link to
+# already-built parent directory libraries.
+# For most of our modes, this means "you can't run make check unless
+# make already completed", which is an annoying bug; for the dbg
+# noinst case this means "you can't run make unless make already
+# completed", which is a devastating bug.
+
+# As a quick fix we'll ensure library dependencies are built manually:
+# http://lists.gnu.org/archive/html/automake/2009-03/msg00011.html
+
+FORCE:
+
+.PHONY: FORCE
+
+$(top_builddir)/libmesh_dbg.la: FORCE
+	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_dbg.la)
+
+$(top_builddir)/libmesh_devel.la: FORCE
+	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_devel.la)
+
+$(top_builddir)/libmesh_opt.la: FORCE
+	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_opt.la)
+
+$(top_builddir)/libmesh_prof.la: FORCE
+	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_prof.la)
+
+$(top_builddir)/libmesh_oprof.la: FORCE
+	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
+
+
+
 TESTS = $(check_PROGRAMS)
 
 ######################################################################
