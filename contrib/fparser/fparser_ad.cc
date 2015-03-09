@@ -278,6 +278,15 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
       return (b * D(a) - a * D(b)) / (MakeTree(cSqr, a) + MakeTree(cSqr, b));
 
     case cPow:
+      if (b.IsImmed())
+      {
+        Value_t exponent = b.GetImmed();
+        if (exponent == Value_t(1))
+          return D(a);
+        if (exponent == Value_t(0))
+          return CodeTreeAD(CodeTreeImmed(Value_t(0)));
+        return MakeTree(cPow, a, CodeTreeAD(exponent - Value_t(1))) * b * D(a);
+      }
       return MakeTree(cPow, a, b) * (D(b) * MakeTree(cLog, a) + b * D(a)/a);
     case cLog:
       return D(a)/a;
@@ -452,6 +461,13 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
   return -1;
 }
 
+template<typename Value_t>
+void FunctionParserADBase<Value_t>::Optimize()
+{
+  FunctionParserBase<Value_t>::Optimize();
+  if (compiledFunction)
+    JITCompile();
+}
 
 template<typename Value_t>
 bool FunctionParserADBase<Value_t>::JITCompile(bool)
@@ -475,14 +491,24 @@ Value_t FunctionParserADBase<Value_t>::Eval(const Value_t* Vars)
   if (compiledFunction == NULL)
     return FunctionParserBase<Value_t>::Eval(Vars);
   else
-    return (*compiledFunction)(Vars, &(this->mData->mImmed[0]), Epsilon<Value_t>::value);
+    return (*compiledFunction)(Vars, pImmed, Epsilon<Value_t>::value);
 }
 
 template<typename Value_t>
 bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t_name, bool cacheFunction)
 {
+  // set compiled function pointer to zero to avoid stale values if JIT compilation fails
+  compiledFunction = NULL;
+
+  // get a pointer to the mImmed values
+  pImmed = this->mData->mImmed.empty() ? NULL : &(this->mData->mImmed[0]);
+
   // get a reference to the stored bytecode
   const std::vector<unsigned>& ByteCode = this->mData->mByteCode;
+
+  // drop out if the ByteCode is empty
+  if (ByteCode.empty())
+    return false;
 
   // generate a sha1 hash of the current program and the Value type name
   SHA1 *sha1 = new SHA1();
