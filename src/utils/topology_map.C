@@ -153,14 +153,19 @@ void TopologyMap::fill(const MeshBase& mesh)
         continue;
 
       for (unsigned int c = 0; c != elem->n_children(); ++c)
-        for (unsigned int n = 0; n != elem->n_nodes_in_child(c); ++n)
-          {
-            const std::vector<std::pair<dof_id_type, dof_id_type> >
-              bracketing_nodes = elem->bracketing_nodes(c,n);
+        {
+          if (elem->child(c)->is_remote())
+            continue;
 
-            this->add_node(*elem->child(c)->get_node(n),
-                           bracketing_nodes);
-          }
+          for (unsigned int n = 0; n != elem->n_nodes_in_child(c); ++n)
+            {
+              const std::vector<std::pair<dof_id_type, dof_id_type> >
+                bracketing_nodes = elem->bracketing_nodes(c,n);
+
+              this->add_node(*elem->child(c)->get_node(n),
+                             bracketing_nodes);
+            }
+        }
     }
 }
 
