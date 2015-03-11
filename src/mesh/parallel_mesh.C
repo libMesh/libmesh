@@ -664,7 +664,27 @@ void ParallelMesh::renumber_node(const dof_id_type old_id,
   libmesh_assert_equal_to (nd->id(), old_id);
 
   nd->set_id(new_id);
+
+  // If we have nodes shipped to this processor for NodeConstraints
+  // use, then those nodes will exist in _nodes, but may not be
+  // locatable via a TopologyMap due to the insufficiency of elements
+  // connecting to them.  If local refinement then wants to create a
+  // *new* node in the same location, it will initally get a temporary
+  // id, and then make_node_ids_parallel_consistent() will try to move
+  // it to the canonical id.  We need to account for this case to
+  // avoid false positives and memory leaks.
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  if (_nodes[new_id])
+    {
+      libmesh_assert_equal_to (*(Point*)_nodes[new_id],
+                               *(Point*)_nodes[old_id]);
+      _nodes.erase(new_id);
+    }
+#else
+  // If we aren't shipping nodes for NodeConstraints, there should be
+  // no reason for renumbering one node onto another.
   libmesh_assert (!_nodes[new_id]);
+#endif
   _nodes[new_id] = nd;
   _nodes.erase(old_id);
 }
