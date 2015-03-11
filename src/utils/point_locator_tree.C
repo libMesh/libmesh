@@ -40,6 +40,7 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
   _tree            (NULL),
   _element         (NULL),
   _out_of_mesh_mode(false),
+  _target_bin_size (250),
   _build_type(Trees::NODES)
 {
   this->init(_build_type);
@@ -54,6 +55,7 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
   _tree            (NULL),
   _element         (NULL),
   _out_of_mesh_mode(false),
+  _target_bin_size (250),
   _build_type(build_type)
 {
   this->init(_build_type);
@@ -120,7 +122,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
           START_LOG("init(no master)", "PointLocatorTree");
 
           if (this->_mesh.mesh_dimension() == 3)
-            _tree = new Trees::OctTree (this->_mesh, 200, _build_type);
+            _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
           else
             {
               // A 1D/2D mesh in 3D space needs special consideration.
@@ -144,13 +146,13 @@ void PointLocatorTree::init (Trees::BuildType build_type)
               }
 
               if (!is_planar_xy)
-                _tree = new Trees::OctTree (this->_mesh, 200, _build_type);
+                _tree = new Trees::OctTree (this->_mesh, get_target_bin_size(), _build_type);
               else
 #endif
 #if LIBMESH_DIM > 1
-                _tree = new Trees::QuadTree (this->_mesh, 200, _build_type);
+                _tree = new Trees::QuadTree (this->_mesh, get_target_bin_size(), _build_type);
 #else
-              _tree = new Trees::BinaryTree (this->_mesh, 200, _build_type);
+              _tree = new Trees::BinaryTree (this->_mesh, get_target_bin_size(), _build_type);
 #endif
             }
 
@@ -334,6 +336,18 @@ void PointLocatorTree::enable_out_of_mesh_mode ()
 void PointLocatorTree::disable_out_of_mesh_mode ()
 {
   _out_of_mesh_mode = false;
+}
+
+
+void PointLocatorTree::set_target_bin_size (unsigned int target_bin_size)
+{
+  _target_bin_size = target_bin_size;
+}
+
+
+unsigned int PointLocatorTree::get_target_bin_size () const
+{
+  return _target_bin_size;
 }
 
 

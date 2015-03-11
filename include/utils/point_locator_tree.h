@@ -135,6 +135,16 @@ public:
    */
   virtual void disable_out_of_mesh_mode ();
 
+  /**
+   * Set the target bin size.
+   */
+  void set_target_bin_size(unsigned int target);
+
+  /**
+   * Get the target bin size.
+   */
+  unsigned int get_target_bin_size() const;
+
 protected:
   /**
    * Pointer to our tree.  The tree is built at run-time
@@ -155,6 +165,11 @@ protected:
    * enable_out_of_mesh_mode() for details.
    */
   bool _out_of_mesh_mode;
+
+  /**
+   * Target bin size, which gets passed to the constructor of _tree.
+   */
+  unsigned int _target_bin_size;
 
   /**
    * How the underlying tree is built.
