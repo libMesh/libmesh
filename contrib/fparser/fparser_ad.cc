@@ -518,6 +518,7 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   unsigned char* digest = sha1->getDigest();
   for (unsigned int i = 0; i<20; ++i)
     sprintf(&(result[i*2]), "%02x", digest[i]);
+  free(digest);
   delete sha1;
 
   // function name
