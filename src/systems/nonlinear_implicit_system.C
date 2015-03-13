@@ -210,7 +210,7 @@ std::pair<unsigned int, Real> NonlinearImplicitSystem::get_linear_solve_paramete
 
 void NonlinearImplicitSystem::assembly(bool get_residual,
                                        bool get_jacobian,
-                                       bool apply_heterogeneous_constraints)
+                                       bool /*apply_heterogeneous_constraints*/)
 {
   // Get current_local_solution in sync
   this->update();
