@@ -167,7 +167,7 @@
 /* Define to 1 if the system has the type `longlong'. */
 #undef HAVE_LONGLONG
 
-/* Define to 1 if the system has the type 'long long int'. */
+/* Define to 1 if the system has the type `long long int'. */
 #undef HAVE_LONG_LONG_INT
 
 /* Define to 1 if you have the <malloc.h> header file. */
@@ -311,7 +311,7 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define to 1 if the system has the type 'unsigned long long int'. */
+/* Define to 1 if the system has the type `unsigned long long int'. */
 #undef HAVE_UNSIGNED_LONG_LONG_INT
 
 /* Define to 1 if you have the `vprintf' function. */
@@ -341,6 +341,9 @@
 
 /* no IEEE float on this platform */
 #undef NO_IEEE_FLOAT
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
 
 /* do not build the netCDF version 2 API */
 #undef NO_NETCDF_2
