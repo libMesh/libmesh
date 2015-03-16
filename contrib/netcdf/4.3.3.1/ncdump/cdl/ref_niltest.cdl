@@ -1,0 +1,18 @@
+netcdf ref_niltest {
+dimensions:
+	d1 = 1 ;
+	d2 = 2 ;
+variables:
+	string v1 ;
+	string v2(d1) ;
+	string v3(d2, d2) ;
+data:
+
+ v1 = NIL ;
+
+ v2 = NIL ;
+
+ v3 =
+  NIL, NIL,
+  NIL, NIL ;
+}

@@ -1,0 +1,16 @@
+netcdf ref_tst_econst {
+types:
+  byte enum e1 {pass = 0, fail = 1, undefined = 2} ;
+  byte enum e2 {defined = 0, undefined = 1} ;
+variables:
+	e1 test1 ;
+	e2 test2 ;
+	e1 test3 ;
+data:
+
+ test1 = pass ;
+
+ test2 = undefined;
+
+ test3 = fail;
+}

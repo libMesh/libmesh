@@ -1,0 +1,27 @@
+netcdf tst_chararray {
+dimensions:
+	F2 = 2 ;
+	F3 = 3 ;
+variables:
+	char ch1(F2, F3) ;
+	char ch2(F2, F3) ;
+	char ch3(F2, F3) ;
+	char ch4(F2, F3) ;
+data:
+
+ ch1 =
+  "abc",
+  "def" ;
+
+ ch2 =
+  "abc",
+  "def" ;
+
+ ch3 =
+  "a",
+  "b" ;
+
+ ch4 =
+  "abc",
+  "def" ;
+}
