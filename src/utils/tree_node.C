@@ -77,7 +77,9 @@ bool TreeNode<N>::insert (const Elem* elem)
   for (unsigned i=1; i<elem->n_nodes(); ++i)
     {
       Point p = elem->point(i);
-      for (unsigned d=0; d<elem->dim(); ++d)
+
+      // LIBMESH_DIM gives the number of non-zero components in a Point
+      for (unsigned d=0; d<LIBMESH_DIM; ++d)
         {
           if (min_coord(d) > p(d))
             min_coord(d) = p(d);
@@ -90,7 +92,9 @@ bool TreeNode<N>::insert (const Elem* elem)
   // Next, find out whether this cuboid has got non-empty intersection
   // with the bounding box of the current tree node.
   bool intersects = true;
-  for (unsigned int d=0; d<elem->dim(); d++)
+
+  // LIBMESH_DIM gives the number of non-zero components in a Point
+  for (unsigned int d=0; d<LIBMESH_DIM; d++)
     {
       if (max_coord(d) < this->bounding_box.first(d) || min_coord(d) > this->bounding_box.second(d))
         intersects = false;
