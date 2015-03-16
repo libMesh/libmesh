@@ -863,6 +863,13 @@ public:
   { return _block_id_to_name; }
 
 
+  /**
+   * Search the mesh and cache the different dimenions of the elements
+   * present in the mesh.  This is done in prepare_for_use(), but can
+   * be done manually by other classes after major mesh modifications.
+   */
+  void cache_elem_dims();
+
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,
@@ -890,12 +897,6 @@ protected:
    */
   unsigned int& set_n_partitions ()
   { return _n_parts; }
-
-  /**
-   * Search the mesh and cache the different dimenions of the elements
-   * present in the mesh.
-   */
-  void cache_elem_dims();
 
   /**
    * The number of partitions the mesh has.  This is set by
