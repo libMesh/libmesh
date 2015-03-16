@@ -209,6 +209,9 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "--enable-amr");
 #else
 
+  // This doesn't converge with Eigen BICGSTAB for some reason...
+  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
+
   std::cout << "Started " << argv[0] << std::endl;
 
   // Make sure the general input file exists, and parse it
