@@ -40,7 +40,7 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
   _tree            (NULL),
   _element         (NULL),
   _out_of_mesh_mode(false),
-  _target_bin_size (300),
+  _target_bin_size (200),
   _build_type(Trees::NODES)
 {
   this->init(_build_type);
@@ -55,7 +55,7 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
   _tree            (NULL),
   _element         (NULL),
   _out_of_mesh_mode(false),
-  _target_bin_size (300),
+  _target_bin_size (200),
   _build_type(build_type)
 {
   this->init(_build_type);
