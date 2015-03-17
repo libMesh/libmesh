@@ -1,0 +1,5 @@
+/** \defgroup lib_version Library Version 
+    Functions related to querying the library version.
+*/
+
+

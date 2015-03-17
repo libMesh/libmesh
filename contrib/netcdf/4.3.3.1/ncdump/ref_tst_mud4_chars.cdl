@@ -1,0 +1,114 @@
+netcdf tst_mud4_chars {
+dimensions:
+	F1 = 1 ;
+	F2 = 2 ;
+	F3 = 3 ;
+	F5 = 5 ;
+	U1 = UNLIMITED ; // (1 currently)
+	U2 = UNLIMITED ; // (2 currently)
+	U3 = UNLIMITED ; // (3 currently)
+	U5 = UNLIMITED ; // (5 currently)
+variables:
+	char ff(F2, F3) ;
+	char uf(U2, F3) ;
+	char fu(F2, U3) ;
+	char uu(U2, U3) ;
+	char ufff(U1, F2, F3, F5) ;
+	char uffu(U1, F2, F3, U5) ;
+	char ufuf(U1, F2, U3, F5) ;
+	char ufuu(U1, F2, U3, U5) ;
+	char uuff(U1, U2, F3, F5) ;
+	char uufu(U1, U2, F3, U5) ;
+	char uuuf(U1, U2, U3, F5) ;
+	char uuuu(U1, U2, U3, U5) ;
+	char ffff(F1, F2, F3, F5) ;
+data:
+
+ ff =
+  "abc",
+  "def" ;
+
+ uf =
+  "abc",
+  "def" ;
+
+ fu =
+  {"efg"},
+  {"hij"} ;
+
+ uu =
+  {"efg"},
+  {"hij"} ;
+
+ ufff =
+  "efghi",
+  "jklmJ",
+  "KLMNO",
+  "PQRST",
+  "UVWXY",
+  "Zabcd" ;
+
+ uffu =
+  {"efghi"},
+  {"jklmJ"},
+  {"KLMNO"},
+  {"PQRST"},
+  {"UVWXY"},
+  {"Zabcd"} ;
+
+ ufuf =
+  {"efghi",
+  "jklmJ",
+  "KLMNO"},
+  {"PQRST",
+  "UVWXY",
+  "Zabcd"} ;
+
+ ufuu =
+  {{"efghi"},
+  {"jklmJ"},
+  {"KLMNO"}},
+  {{"PQRST"},
+  {"UVWXY"},
+  {"Zabcd"}} ;
+
+ uuff =
+  {"efghi",
+  "jklmJ",
+  "KLMNO",
+  "PQRST",
+  "UVWXY",
+  "Zabcd"} ;
+
+ uufu =
+  {{"efghi"},
+  {"jklmJ"},
+  {"KLMNO"},
+  {"PQRST"},
+  {"UVWXY"},
+  {"Zabcd"}} ;
+
+ uuuf =
+  {{"efghi",
+  "jklmJ",
+  "KLMNO"},
+  {"PQRST",
+  "UVWXY",
+  "Zabcd"}} ;
+
+ uuuu =
+  {{{"efghi"},
+  {"jklmJ"},
+  {"KLMNO"}},
+  {{"PQRST"},
+  {"UVWXY"},
+  {"Zabcd"}}} ;
+
+ ffff =
+  "efghi",
+  "jklmJ",
+  "KLMNO",
+  "PQRST",
+  "UVWXY",
+  "Zabcd" ;
+}

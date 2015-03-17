@@ -1,0 +1,24 @@
+netcdf ref_tst_array {
+dimensions:
+    F2 = 2 ;
+    F3 = 3 ;
+variables:
+    char ch1(F2, F3) ;
+    char ch2(F2, F3) ;
+    char ch3(F2, F3) ;
+    char ch4(F2, F3) ;
+data:
+
+     ch1 =
+      "abc",
+      "def" ;
+
+     ch2 =
+      "abcdef" ;  // equivalent to how ff is specified, and works fine
+
+    ch3 =
+      "a", "b" ;
+
+    ch4 =
+      'a', 'b', 'c', 'd', 'e', 'f';
+}
