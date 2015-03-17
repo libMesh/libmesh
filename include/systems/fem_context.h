@@ -67,9 +67,14 @@ public:
 
   /**
    * Constructor.  Allocates some but fills no data structures.
+   *
+   * If no variable_number is specified, structures for all variables
+   * are prepared.  If a variable number is specified, only structures
+   * for that variable are prepared.
    */
   explicit
-  FEMContext (const System &sys);
+  FEMContext (const System &sys,
+              int variable_number = -1);
 
   /**
    * Destructor.
