@@ -1,0 +1,68 @@
+/** \file mainpage.dox Main Documentation Page
+
+\brief This header file holds the documentation for the main page.
+
+\mainpage
+
+\tableofcontents
+
+\section mainpage_netcdf NetCDF Overview
+
+\subsection what_is_netcdf What is NetCDF?
+
+NetCDF is a set of software libraries and self-describing, machine-independent data formats that support the creation, access, and sharing of array-oriented scientific data.  NetCDF was developed and is maintained at <a href="http://www.unidata.ucar.edu">Unidata</a>. Unidata provides data and software tools for use in geoscience education and research. Unidata is part of the University Corporation for Atmospheric Research (<a href="http://www.ucar.edu">UCAR</a>) Community Programs (<a href="http://www.uop.ucar.edu">UCP</a>). Unidata is funded primarily by the National Science Foundation.
+
+The NetCDF homepage may be found at <a href="http://www.unidata.ucar.edu/netcdf">http://www.unidata.ucar.edu/netcdf</a>.  The NetCDF source-code is hosted at <a href="http://github.com">GitHub</a>, and may be found directly at <a href="http://github.com/Unidata/netcdf-c">http://github.com/Unidata/netcdf-c</a>.
+
+\subsection this_release Learn more about the current NetCDF-C Release
+
+- \ref release_notes
+- \ref getting_and_building_netcdf
+
+\subsubsection nightly_status The Latest NetCDF-C Build Status
+
+- <A href="http://my.cdash.org/index.php?project=netcdf-c">The NetCDF-C Nightly and Continuous Integration Dashboard</A>
+
+\subsection learn-more Learn more about using NetCDF-C
+
+- \ref sec_tut
+- \ref user_guide
+- \ref netcdf_working_with_netcdf_files
+- <a class="el" href="http://www.unidata.ucar.edu/software/netcdf/docs/index-413.html">Older Documentation, plus details regarding netcdf-fortran and netcdf-cxx.</a>
+
+\subsection netcdf-cmake-windows NetCDF CMake and Windows support:
+- \ref netCDF-CMake
+- \ref winbin
+
+\subsection netcdf_credits Credits
+
+\authors Russ Rew, Glenn Davis, Steve Emmerson, Harvey Davies, Ed
+Hartnett, Dennis Heimbigner and Ward Fisher
+
+<p>NetCDF was developed and is maintained
+at <a href="http://www.unidata.ucar.edu">Unidata</a>, part of the
+<a href="http://www.ucar.edu">University Corporation for Atmospheric Research</a> (UCAR) <a href="http://www.ucp.ucar.edu">Community
+Programs</a> (UCP). Unidata is funded primarily by the National Science
+Foundation.
+
+
+<a href="http://www.unidata.ucar.edu">Unidata</a> provides data and
+software tools for use in geoscience education and research.
+
+
+\internal
+
+Internal Documentation 
+
+The dispatch interface within the netCDF library allows the netCDF API
+to be used for different types of back-ends, for example, the HDF5
+library, or a DAP client accessing remote data.
+- \ref nc_dispatch
+- \ref adding_dispatch
+- \ref dispatch_notes
+- \ref put_vara_dispatch
+- \ref put_attr_dispatch
+
+\endinternal
+
+*/
