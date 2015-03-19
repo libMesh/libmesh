@@ -63,6 +63,18 @@ void stop(const char* file, int line, const char* date, const char* time)
 
 void report_error(const char* file, int line, const char* date, const char* time)
 {
+  // It is possible to have an error *inside* report_error; e.g. from
+  // print_trace.  We don't want to infinitely recurse.
+  static bool reporting_error = false;
+  if (reporting_error)
+    {
+      // I heard you like error reporting, so we put an error report
+      // in report_error() so you can report errors from the report.
+      libMesh::err << "libMesh encountered an error while attempting to report_error." << std::endl;
+      return;
+    }
+  reporting_error = true;
+
   if (libMesh::global_n_processors() == 1 ||
       // Note: support both 'underscore' and 'dash' flavors of the option
       libMesh::on_command_line("--print_trace") ||
@@ -71,6 +83,8 @@ void report_error(const char* file, int line, const char* date, const char* time
   else
     libMesh::write_traceout();
   libMesh::MacroFunctions::here(file, line, date, time);
+
+  reporting_error = false;
 }
 
 } // namespace MacroFunctions
