@@ -135,12 +135,6 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // cache_elem_dims() should get the elem_dimensions() and
   // mesh_dimension() correct later, and we don't need it earlier.
 
-  // if (!this->is_serial())
-  //   {
-  //     unsigned char dim = this->mesh_dimension();
-  //     this->comm().max(dim);
-  //     this->set_mesh_dimension(dim);
-  //   }
 
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, _skip_renumber_nodes_and_elements is false.

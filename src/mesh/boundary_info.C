@@ -174,14 +174,10 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
    * The boundary mesh elements will be one lower dimension than the
    * interior mesh elements.
    *
-   * cast_int will scream if the interior is a 0-D mesh
-   *
-   * This is incorrect for the case of mixed-dimension meshes, and
-   * we can skip it entirely because prepare_for_use() will call
-   * cache_elem_dims()
+   * We no longer need to set_mesh_dimension() explicitly here,
+   * though: prepare_for_use() will call cache_elem_dims(), which will
+   * also be correct in the multi-dimensional case.
    */
-  // boundary_mesh.set_mesh_dimension
-  //   (cast_int<unsigned char>(_mesh.mesh_dimension() - 1));
 
   /**
    * Re-create the boundary mesh.
