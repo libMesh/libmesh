@@ -125,18 +125,16 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 {
   parallel_object_only();
 
+  libmesh_assert(this->comm().verify(this->is_serial()));
+
   // A distributed mesh may have processors with no elements (or
   // processors with no elements of higher dimension, if we ever
   // support mixed-dimension meshes), but we want consistent
   // mesh_dimension anyways.
-  libmesh_assert(this->comm().verify(this->is_serial()));
+  //
+  // cache_elem_dims() should get the elem_dimensions() and
+  // mesh_dimension() correct later, and we don't need it earlier.
 
-  if (!this->is_serial())
-    {
-      unsigned char dim = this->mesh_dimension();
-      this->comm().max(dim);
-      this->set_mesh_dimension(dim);
-    }
 
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, _skip_renumber_nodes_and_elements is false.
@@ -319,8 +317,16 @@ std::string MeshBase::get_info() const
   std::ostringstream oss;
 
   oss << " Mesh Information:"                                  << '\n'
-      << "  mesh_dimension()="    << this->mesh_dimension()    << '\n'
-      << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
+      << "  elem_dimensions()={";
+  {
+    std::set<unsigned char>::const_iterator it =
+      this->elem_dimensions().begin();
+    if (it != this->elem_dimensions().end())
+      oss << *it;
+    for (; it != this->elem_dimensions().end(); ++it)
+      oss << ',' << *it;
+  }
+  oss << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
       << "  n_nodes()="           << this->n_nodes()           << '\n'
       << "    n_local_nodes()="   << this->n_local_nodes()     << '\n'
       << "  n_elem()="            << this->n_elem()            << '\n'
