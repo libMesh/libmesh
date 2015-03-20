@@ -23,6 +23,33 @@ AC_MSG_RESULT([configuring gdb command... "$gdb_command"])
 
 
 # --------------------------------------------------------------
+# Use a true unique_ptr implementation - disabled by default.
+#
+# When enabled, the 'UniquePtr' type in libMesh is a C++03/11
+# compatible (non-deprecated) unique_ptr type.  Otherwise, it is
+# libMesh's (deprecated) AutoPtr type, allowing for backwards
+# compatibility.
+#
+# At some point in the future, this option will become enabled by
+# default, forcing applications to either upgrade or explicitly
+# configure with --disable-unique-ptr.
+# --------------------------------------------------------------
+AC_ARG_ENABLE(unique-ptr,
+              [AS_HELP_STRING([--enable-unique-ptr],[Use a true unique_ptr implementation instead of libMesh AutoPtr])],
+              enableuniqueptr=$enableval,
+              enableuniqueptr=no)
+
+AC_SUBST(enableuniqueptr)
+
+if test "$enableuniqueptr" = yes ; then
+  AC_MSG_RESULT([<<< Configuring library with a non-deprecated UniquePtr implementation >>>])
+  AC_DEFINE(ENABLE_UNIQUE_PTR, 1,
+           [Flag indicating if the library should use a non-deprecated UniquePtr implementation])
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # library warnings - enable by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(warnings,

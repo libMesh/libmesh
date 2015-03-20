@@ -155,7 +155,7 @@ public:
   /**
    * Copy of this object. User should override to copy any needed state.
    */
-  virtual AutoPtr<DifferentiableQoI> clone() =0;
+  virtual UniquePtr<DifferentiableQoI> clone() =0;
 
   /**
    * Method to combine thread-local qois. By default, simply sums thread qois.

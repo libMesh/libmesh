@@ -373,7 +373,7 @@ private:
    * custom systems of equations and/or things which do not require
    * a full-blown NewtonSolver.
    */
-  AutoPtr<LinearSolver<Number> > linear_solver;
+  UniquePtr<LinearSolver<Number> > linear_solver;
 
   /**
    * False until initialize_tangent() is called

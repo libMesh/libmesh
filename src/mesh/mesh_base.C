@@ -48,8 +48,8 @@ MeshBase::MeshBase (const Parallel::Communicator &comm_in,
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
   _is_prepared   (false),
-  _point_locator (NULL),
-  _partitioner   (NULL),
+  _point_locator (),
+  _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
@@ -69,8 +69,8 @@ MeshBase::MeshBase (unsigned char d) :
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
   _is_prepared   (false),
-  _point_locator (NULL),
-  _partitioner   (NULL),
+  _point_locator (),
+  _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
@@ -91,8 +91,8 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
   _is_prepared   (other_mesh._is_prepared),
-  _point_locator (NULL),
-  _partitioner   (NULL),
+  _point_locator (),
+  _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(other_mesh._next_unique_id),
 #endif
@@ -424,7 +424,7 @@ const PointLocatorBase& MeshBase::point_locator () const
 }
 
 
-AutoPtr<PointLocatorBase> MeshBase::sub_point_locator () const
+UniquePtr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
   // If there's no master point locator, then we need one.
   if (_point_locator.get() == NULL)

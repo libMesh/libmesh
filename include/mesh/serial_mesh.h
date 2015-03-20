@@ -83,8 +83,8 @@ public:
   /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
-  virtual AutoPtr<MeshBase> clone () const
-  { return AutoPtr<MeshBase>(new SerialMesh(*this)); }
+  virtual UniquePtr<MeshBase> clone () const
+  { return UniquePtr<MeshBase>(new SerialMesh(*this)); }
 
   /**
    * Destructor.

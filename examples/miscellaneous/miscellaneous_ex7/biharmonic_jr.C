@@ -218,14 +218,14 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> &u,
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // store the object as an \p UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe (FEBase::build(_biharmonic._dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(_biharmonic._dim, fe_type));
 
   // Quadrature rule for numerical integration.
   // With 2D triangles, the Clough quadrature rule puts a Gaussian
   // quadrature rule on each of the 3 subelements
-  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(_biharmonic._dim));
+  UniquePtr<QBase> qrule(fe_type.default_quadrature_rule(_biharmonic._dim));
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (qrule.get());
@@ -505,9 +505,9 @@ void Biharmonic::JR::bounds(NumericVector<Number> &XL, NumericVector<Number>& XU
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // store the object as an \p UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe (FEBase::build(_biharmonic._dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(_biharmonic._dim, fe_type));
 
   // Define data structures to contain the bound vectors contributions.
   DenseVector<Number> XLe, XUe;

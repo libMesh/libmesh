@@ -163,7 +163,7 @@ public:
 
   void testPointLocatorList()
   {
-    AutoPtr<PointLocatorBase> locator = PointLocatorBase::build(LIST,*_mesh);
+    UniquePtr<PointLocatorBase> locator = PointLocatorBase::build(LIST,*_mesh);
 
     Point top_point(0.4, 0.5);
     const Elem* top_elem = (*locator)(top_point);
@@ -193,7 +193,7 @@ public:
 
   void testPointLocatorTree()
   {
-    AutoPtr<PointLocatorBase> locator = _mesh->sub_point_locator();
+    UniquePtr<PointLocatorBase> locator = _mesh->sub_point_locator();
 
     Point top_point(0.5, 0.5);
     const Elem* top_elem = (*locator)(top_point);

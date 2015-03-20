@@ -137,16 +137,16 @@ public:
 
   /**
    * Builds a \p QUAD9 or \p TRI6 coincident with face i.
-   * The \p AutoPtr<Elem> handles the memory aspect.
+   * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  AutoPtr<Elem> build_side (const unsigned int i,
-                            bool proxy) const;
+  UniquePtr<Elem> build_side (const unsigned int i,
+                              bool proxy) const;
 
   /**
    * Builds a \p EDGE3 coincident with edge i.
-   * The \p AutoPtr<Elem> handles the memory aspect.
+   * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  AutoPtr<Elem> build_edge (const unsigned int i) const;
+  UniquePtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,

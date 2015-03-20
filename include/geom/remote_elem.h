@@ -151,15 +151,15 @@ public:
   virtual unsigned int n_sub_elem () const
   { libmesh_not_implemented(); return 0; }
 
-  virtual AutoPtr<Elem> side (const unsigned int) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
+  virtual UniquePtr<Elem> side (const unsigned int) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
-  virtual AutoPtr<Elem> build_side (const unsigned int,
-                                    bool) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
+  virtual UniquePtr<Elem> build_side (const unsigned int,
+                                      bool) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
-  virtual AutoPtr<Elem> build_edge (const unsigned int) const
-  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
+  virtual UniquePtr<Elem> build_edge (const unsigned int) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   virtual Order default_order () const
   { libmesh_not_implemented(); return FIRST; }

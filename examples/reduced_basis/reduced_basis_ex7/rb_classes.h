@@ -22,6 +22,7 @@
 
 #include "libmesh/rb_construction.h"
 #include "libmesh/fe_base.h"
+#include "libmesh/auto_ptr.h"
 
 // local include
 #include "assembly.h"
@@ -30,7 +31,6 @@
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
-using libMesh::AutoPtr;
 using libMesh::DirichletBoundary;
 using libMesh::EquationSystems;
 using libMesh::FEMContext;

@@ -44,8 +44,8 @@ public:
   virtual void retrieve();
 
   // Definition of the clone function needed for the setter function
-  virtual AutoPtr<SolutionHistory > clone() const {
-    return AutoPtr<SolutionHistory >
+  virtual UniquePtr<SolutionHistory > clone() const {
+    return UniquePtr<SolutionHistory >
       (new NoSolutionHistory());}
 
 }; // end NoSolutionHistory class definition

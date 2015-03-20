@@ -143,7 +143,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // libmesh_assert_not_equal_to (Dim, 1);
 
   // Build the side of interest
-  const AutoPtr<Elem> side(elem->build_side(s));
+  const UniquePtr<Elem> side(elem->build_side(s));
 
   // Find the max p_level to select
   // the right quadrature rule for side integration
@@ -253,7 +253,7 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
   libmesh_assert_not_equal_to (Dim, 1);
 
   // Build the side of interest
-  const AutoPtr<Elem> edge(elem->build_edge(e));
+  const UniquePtr<Elem> edge(elem->build_edge(e));
 
   // Initialize the shape functions at the user-specified
   // points

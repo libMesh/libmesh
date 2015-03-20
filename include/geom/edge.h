@@ -132,20 +132,20 @@ public:
    * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
   /**
    * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
-  AutoPtr<Elem> build_side (const unsigned int i,
-                            bool proxy) const;
+  UniquePtr<Elem> build_side (const unsigned int i,
+                              bool proxy) const;
 
   /**
    * The \p Elem::build_edge() member makes no sense for edges.
    */
-  AutoPtr<Elem> build_edge (const unsigned int) const
-  { libmesh_not_implemented(); AutoPtr<Elem> ap(NULL); return ap; }
+  UniquePtr<Elem> build_edge (const unsigned int) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
 
 protected:

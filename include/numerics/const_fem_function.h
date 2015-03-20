@@ -34,8 +34,8 @@ public:
 
   ~ConstFEMFunction() {}
 
-  virtual AutoPtr<FEMFunctionBase<Output> > clone () const
-  {return AutoPtr<FEMFunctionBase<Output> >( new ConstFEMFunction(*this) ); }
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
+  {return UniquePtr<FEMFunctionBase<Output> >( new ConstFEMFunction(*this) ); }
 
   virtual Output operator() (const FEMContext&, const Point&,
                              const Real /* time */ = 0.)

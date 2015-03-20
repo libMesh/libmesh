@@ -45,7 +45,7 @@ ParallelMesh::ParallelMesh (const Parallel::Communicator &comm_in,
 #endif
 
   // FIXME: give parmetis the communicator!
-  _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
+  _partitioner = UniquePtr<Partitioner>(new ParmetisPartitioner());
 }
 
 
@@ -65,7 +65,7 @@ ParallelMesh::ParallelMesh (unsigned char d) :
 #endif
 
   // FIXME: give parmetis the communicator!
-  _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
+  _partitioner = UniquePtr<Partitioner>(new ParmetisPartitioner());
 }
 #endif
 

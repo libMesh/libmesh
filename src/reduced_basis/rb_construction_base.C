@@ -649,7 +649,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
 template <class Base>
 std::pair<std::string,std::string>
 RBConstructionBase<Base>::set_alternative_solver
-(AutoPtr<LinearSolver<Number> >&
+(UniquePtr<LinearSolver<Number> >&
 #ifdef LIBMESH_HAVE_PETSC
  ls
 #endif
@@ -744,10 +744,10 @@ RBConstructionBase<Base>::set_alternative_solver
 template <class Base>
 void RBConstructionBase<Base>::reset_alternative_solver(
 #ifdef LIBMESH_HAVE_PETSC
-                                                        AutoPtr<LinearSolver<Number> >& ls,
+                                                        UniquePtr<LinearSolver<Number> >& ls,
                                                         const std::pair<std::string,std::string>& orig
 #else
-                                                        AutoPtr<LinearSolver<Number> >&,
+                                                        UniquePtr<LinearSolver<Number> >&,
                                                         const std::pair<std::string,std::string>&
 #endif
                                                         )

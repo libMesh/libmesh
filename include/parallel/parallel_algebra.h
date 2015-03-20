@@ -58,7 +58,7 @@ public:
   StandardType(const TypeVector<T> *example=NULL) {
     // We need an example for MPI_Address to use
     TypeVector<T> *ex;
-    AutoPtr<TypeVector<T> > temp;
+    UniquePtr<TypeVector<T> > temp;
     if (example)
       ex = const_cast<TypeVector<T> *>(example);
     else
@@ -137,7 +137,7 @@ public:
   StandardType(const VectorValue<T> *example=NULL) {
     // We need an example for MPI_Address to use
     VectorValue<T> *ex;
-    AutoPtr<VectorValue<T> > temp;
+    UniquePtr<VectorValue<T> > temp;
     if (example)
       ex = const_cast<VectorValue<T> *>(example);
     else
@@ -229,7 +229,7 @@ public:
         // We need an example for MPI_Address to use
         Point *ex;
 
-        AutoPtr<Point> temp;
+        UniquePtr<Point> temp;
         if (example)
           ex = const_cast<Point *>(example);
         else

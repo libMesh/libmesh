@@ -35,7 +35,7 @@ namespace libMesh
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 Elem* InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem* inf_elem)
 {
-  AutoPtr<Elem> ape(inf_elem->build_side(0));
+  UniquePtr<Elem> ape(inf_elem->build_side(0));
   return ape.release();
 }
 

@@ -102,18 +102,18 @@ public:
   /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
-  virtual AutoPtr<DiffSolver> &diff_solver();
+  virtual UniquePtr<DiffSolver> &diff_solver();
 
   /**
    * An implicit linear solver to use for adjoint and sensitivity
    * problems.
    */
-  virtual AutoPtr<LinearSolver<Number> > &linear_solver();
+  virtual UniquePtr<LinearSolver<Number> > &linear_solver();
 
   /**
    * This object is used to take timesteps
    */
-  AutoPtr<UnsteadySolver> core_time_solver;
+  UniquePtr<UnsteadySolver> core_time_solver;
 
   /**
    * Error calculations are done in this norm, DISCRETE_L2 by default.

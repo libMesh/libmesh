@@ -49,8 +49,8 @@ public:
       output(i) = _c;
   }
 
-  virtual AutoPtr<FunctionBase<Output> > clone() const {
-    return AutoPtr<FunctionBase<Output> >
+  virtual UniquePtr<FunctionBase<Output> > clone() const {
+    return UniquePtr<FunctionBase<Output> >
       (new ConstFunction<Output>(_c));
   }
 

@@ -102,12 +102,12 @@ public:
   /**
    * The (condensed) system matrix for standard eigenvalue problems.
    */
-  AutoPtr< SparseMatrix<Number> > condensed_matrix_A;
+  UniquePtr< SparseMatrix<Number> > condensed_matrix_A;
 
   /**
    * A second (condensed) system matrix for generalized eigenvalue problems.
    */
-  AutoPtr< SparseMatrix<Number> > condensed_matrix_B;
+  UniquePtr< SparseMatrix<Number> > condensed_matrix_B;
 
   /**
    * Vector storing the local dof indices that will not be condensed.

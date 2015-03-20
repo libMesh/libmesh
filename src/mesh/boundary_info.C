@@ -253,7 +253,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                 next_elem_id += this->n_processors() + 1;
 
                 // Use a proxy element for the side to query nodes
-                AutoPtr<Elem> side (elem->build_side(s));
+                UniquePtr<Elem> side (elem->build_side(s));
                 for (unsigned int n = 0; n != side->n_nodes(); ++n)
                   {
                     Node *node = side->get_node(n);
@@ -338,7 +338,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                 next_elem_id += this->n_processors() + 1;
 
                 // Use a proxy element for the side to query nodes
-                AutoPtr<Elem> side (elem->build_side(s));
+                UniquePtr<Elem> side (elem->build_side(s));
                 for (unsigned int n = 0; n != side->n_nodes(); ++n)
                   {
                     Node *node = side->get_node(n);
@@ -424,7 +424,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                 // Build the side - do not use a "proxy" element here:
                 // This will be going into the boundary_mesh and needs to
                 // stand on its own.
-                AutoPtr<Elem> side (elem->build_side(s, false));
+                UniquePtr<Elem> side (elem->build_side(s, false));
 
                 side->processor_id() = elem->processor_id();
 
@@ -1564,7 +1564,7 @@ BoundaryInfo::build_node_list_from_side_list()
         {
           const Elem * cur_elem = family[elem_it];
 
-          AutoPtr<Elem> side = cur_elem->build_side(pos->second.first);
+          UniquePtr<Elem> side = cur_elem->build_side(pos->second.first);
 
           //Add each node node on the side with the side's boundary id
           for(unsigned int i=0; i<side->n_nodes(); i++)
@@ -1605,7 +1605,7 @@ void BoundaryInfo::build_side_list_from_node_list()
 
       for (unsigned short side=0; side<elem->n_sides(); ++side)
         {
-          AutoPtr<Elem> side_elem = elem->build_side(side);
+          UniquePtr<Elem> side_elem = elem->build_side(side);
 
           // map from nodeset_id to count for that ID
           std::map<boundary_id_type, unsigned> nodesets_node_count;

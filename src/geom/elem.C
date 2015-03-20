@@ -209,8 +209,8 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
 // ------------------------------------------------------------
 // Elem class member funcions
-AutoPtr<Elem> Elem::build(const ElemType type,
-                          Elem* p)
+UniquePtr<Elem> Elem::build(const ElemType type,
+                            Elem* p)
 {
   Elem* elem = NULL;
 
@@ -390,8 +390,7 @@ AutoPtr<Elem> Elem::build(const ElemType type,
       libmesh_error_msg("ERROR: Undefined element type!");
     }
 
-  AutoPtr<Elem> ap(elem);
-  return ap;
+  return UniquePtr<Elem>(elem);
 }
 
 
@@ -1085,11 +1084,11 @@ void Elem::make_links_to_me_local(unsigned int n)
 
   // What side of neigh are we on?  We can't use the usual Elem
   // method because we're in the middle of restoring topology
-  const AutoPtr<Elem> my_side = this->side(n);
+  const UniquePtr<Elem> my_side = this->side(n);
   unsigned int nn = 0;
   for (; nn != neigh->n_sides(); ++nn)
     {
-      const AutoPtr<Elem> neigh_side = neigh->side(nn);
+      const UniquePtr<Elem> neigh_side = neigh->side(nn);
       if (*my_side == *neigh_side)
         break;
     }
@@ -1405,8 +1404,8 @@ bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
   libmesh_assert_less (c, this->n_children());
   libmesh_assert_less (e, this->n_edges());
 
-  AutoPtr<Elem> my_edge = this->build_edge(e);
-  AutoPtr<Elem> child_edge = this->build_edge(e);
+  UniquePtr<Elem> my_edge = this->build_edge(e);
+  UniquePtr<Elem> child_edge = this->build_edge(e);
 
   // We're assuming that an overlapping child edge has the same
   // number and orientation as its parent
@@ -2181,8 +2180,8 @@ Real Elem::volume () const
   // the volume more efficiently.
   FEType fe_type (this->default_order() , LAGRANGE);
 
-  AutoPtr<FEBase> fe (FEBase::build(this->dim(),
-                                    fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(this->dim(),
+                                      fe_type));
 
   const std::vector<Real>& JxW = fe->get_JxW();
 

@@ -66,9 +66,9 @@ Point PeriodicBoundary::get_corresponding_pos(const Point& pt) const
 
 
 
-AutoPtr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) const
+UniquePtr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) const
 {
-  return AutoPtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
+  return UniquePtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
 }
 
 

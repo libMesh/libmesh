@@ -192,7 +192,7 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
 
   // This function assumes that condensed_solve has just been called.
   // If this is not the case, then we will trip an asset in get_eigenpair
-  AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
+  UniquePtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
   unsigned int n_local = local_non_condensed_dofs_vector.size();
   unsigned int n       = n_local;
   this->comm().sum(n);

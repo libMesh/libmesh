@@ -233,9 +233,9 @@ std::vector<RBTheta*> RBEIMEvaluation::get_eim_theta_objects()
   return _rb_eim_theta_objects;
 }
 
-AutoPtr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
+UniquePtr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
 {
-  return AutoPtr<RBTheta>( new RBEIMTheta(*this, index) );
+  return UniquePtr<RBTheta>( new RBEIMTheta(*this, index) );
 }
 
 void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name,

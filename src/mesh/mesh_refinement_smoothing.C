@@ -169,7 +169,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         // Set the max_level at each edge
         for (unsigned int n=0; n<elem->n_edges(); n++)
           {
-            AutoPtr<Elem> edge = elem->build_edge(n);
+            UniquePtr<Elem> edge = elem->build_edge(n);
             dof_id_type childnode0 = edge->node(0);
             dof_id_type childnode1 = edge->node(1);
             if (childnode1 < childnode0)
@@ -177,7 +177,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
             for (const Elem *p = elem; p != NULL; p = p->parent())
               {
-                AutoPtr<Elem> pedge = p->build_edge(n);
+                UniquePtr<Elem> pedge = p->build_edge(n);
                 dof_id_type node0 = pedge->node(0);
                 dof_id_type node1 = pedge->node(1);
 
@@ -239,7 +239,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
         // Loop over the nodes, check for possible mismatch
         for (unsigned int n=0; n<elem->n_edges(); n++)
           {
-            AutoPtr<Elem> edge = elem->build_edge(n);
+            UniquePtr<Elem> edge = elem->build_edge(n);
             dof_id_type node0 = edge->node(0);
             dof_id_type node1 = edge->node(1);
             if (node1 < node0)

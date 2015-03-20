@@ -132,14 +132,14 @@ public:
   /**
    * Creates a vector which has the same type, size and partitioning
    * as this vector, but whose data is all zero.  Returns it in an \p
-   * AutoPtr.
+   * UniquePtr.
    */
-  virtual AutoPtr<NumericVector<T> > zero_clone () const;
+  virtual UniquePtr<NumericVector<T> > zero_clone () const;
 
   /**
-   * Creates a copy of this vector and returns it in an \p AutoPtr.
+   * Creates a copy of this vector and returns it in an \p UniquePtr.
    */
-  AutoPtr<NumericVector<T> > clone () const;
+  UniquePtr<NumericVector<T> > clone () const;
 
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
@@ -892,9 +892,9 @@ void EpetraVector<T>::zero ()
 
 template <typename T>
 inline
-AutoPtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
+UniquePtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector
+  UniquePtr<NumericVector<T> > cloned_vector
     (new EpetraVector<T>(this->comm(), AUTOMATIC));
 
   cloned_vector->init(*this);
@@ -906,9 +906,9 @@ AutoPtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
 
 template <typename T>
 inline
-AutoPtr<NumericVector<T> > EpetraVector<T>::clone () const
+UniquePtr<NumericVector<T> > EpetraVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector
+  UniquePtr<NumericVector<T> > cloned_vector
     (new EpetraVector<T>(this->comm(), AUTOMATIC));
 
   cloned_vector->init(*this, true);

@@ -217,7 +217,7 @@ bool ErrorVector::is_active_elem (dof_id_type i) const
 void ErrorVector::plot_error(const std::string& filename,
                              const MeshBase& oldmesh) const
 {
-  AutoPtr<MeshBase> meshptr = oldmesh.clone();
+  UniquePtr<MeshBase> meshptr = oldmesh.clone();
   MeshBase &mesh = *meshptr;
 
   // The all_first_order routine requires that renumbering be allowed

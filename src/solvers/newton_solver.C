@@ -283,7 +283,7 @@ unsigned int NewtonSolver::solve()
 
   NumericVector<Number> &newton_iterate = *(_system.solution);
 
-  AutoPtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.zero_clone();
+  UniquePtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.zero_clone();
   NumericVector<Number> &linear_solution = *linear_solution_ptr;
   NumericVector<Number> &rhs = *(_system.rhs);
 

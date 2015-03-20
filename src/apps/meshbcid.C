@@ -134,7 +134,7 @@ int main(int argc, char** argv)
         oldbcid = BoundaryInfo::invalid_id;
     }
 
-  AutoPtr<FEBase> fe = FEBase::build(dim, FEType(FIRST,LAGRANGE));
+  UniquePtr<FEBase> fe = FEBase::build(dim, FEType(FIRST,LAGRANGE));
   QGauss qface(dim-1, CONSTANT);
   fe->attach_quadrature_rule(&qface);
   const std::vector<Point> &face_points = fe->get_xyz();

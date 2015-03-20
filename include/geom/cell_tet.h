@@ -84,7 +84,7 @@ public:
    * @returns a primitive (3-noded) triangle for
    * face i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
   /**
    * Based on the quality metric q specified by the user,

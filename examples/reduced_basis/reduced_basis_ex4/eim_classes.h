@@ -7,7 +7,6 @@
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
-using libMesh::AutoPtr;
 using libMesh::EquationSystems;
 using libMesh::RBEIMEvaluation;
 
@@ -54,9 +53,9 @@ public:
   /**
    * Provide an implementation of build_eim_assembly
    */
-  virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int index)
+  virtual UniquePtr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return AutoPtr<ElemAssembly>(new EIM_F(*this, index));
+    return UniquePtr<ElemAssembly>(new EIM_F(*this, index));
   }
 
   /**

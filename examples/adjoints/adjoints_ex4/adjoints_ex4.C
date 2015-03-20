@@ -129,12 +129,12 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
   // No transient time solver
   system.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system));
+    UniquePtr<TimeSolver>(new SteadySolver(system));
 
   // Nonlinear solver options
   {
     NewtonSolver *solver = new NewtonSolver(system);
-    system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver);
+    system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
 
     solver->quiet                       = param.solver_quiet;
     solver->max_nonlinear_iterations    = param.max_nonlinear_iterations;
@@ -160,10 +160,10 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
 #ifdef LIBMESH_ENABLE_AMR
 
-AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
+UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
                                               FEMParameters &param)
 {
-  AutoPtr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));
+  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -171,28 +171,24 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return mesh_refinement;
+  return UniquePtr<MeshRefinement>(mesh_refinement);
 }
 
 // This is where declare the adjoint refined error estimator. This estimator builds an error bound
 // for Q(u) - Q(u_h), by solving the adjoint problem on a finer Finite Element space. For more details
 // see the description of the Adjoint Refinement Error Estimator in adjoint_refinement_error_estimator.C
-AutoPtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet &qois)
+UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet &qois)
 {
-  AutoPtr<AdjointRefinementEstimator> error_estimator;
-
   std::cout<<"Computing the error estimate using the Adjoint Refinement Error Estimator"<<std::endl<<std::endl;
 
   AdjointRefinementEstimator *adjoint_refinement_estimator = new AdjointRefinementEstimator;
-
-  error_estimator.reset (adjoint_refinement_estimator);
 
   adjoint_refinement_estimator->qoi_set() = qois;
 
   // We enrich the FE space for the dual problem by doing 2 uniform h refinements
   adjoint_refinement_estimator->number_h_refinements = 2;
 
-  return error_estimator;
+  return UniquePtr<AdjointRefinementEstimator>(adjoint_refinement_estimator);
 }
 
 #endif // LIBMESH_ENABLE_AMR
@@ -234,7 +230,7 @@ int main (int argc, char** argv)
   Mesh mesh(init.comm());
 
   // And an object to refine it
-  AutoPtr<MeshRefinement> mesh_refinement =
+  UniquePtr<MeshRefinement> mesh_refinement =
     build_mesh_refinement(mesh, param);
 
   // And an EquationSystems to run on it
@@ -369,7 +365,7 @@ int main (int argc, char** argv)
         ErrorVector QoI_elementwise_error;
 
         // Build an adjoint refinement error estimator object
-        AutoPtr<AdjointRefinementEstimator> adjoint_refinement_error_estimator =
+        UniquePtr<AdjointRefinementEstimator> adjoint_refinement_error_estimator =
           build_adjoint_refinement_error_estimator(qois);
 
         // Estimate the error in each element using the Adjoint Refinement estimator
@@ -510,7 +506,7 @@ int main (int argc, char** argv)
         ErrorVector QoI_elementwise_error;
 
         // Build an adjoint refinement error estimator object
-        AutoPtr<AdjointRefinementEstimator> adjoint_refinement_error_estimator =
+        UniquePtr<AdjointRefinementEstimator> adjoint_refinement_error_estimator =
           build_adjoint_refinement_error_estimator(qois);
 
         // Estimate the error in each element using the Adjoint Refinement estimator

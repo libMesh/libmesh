@@ -76,7 +76,7 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
   libmesh_assert_not_equal_to (Dim, 1);
 
   // Build the side of interest
-  const AutoPtr<Elem> side(elem->build_side(s));
+  const UniquePtr<Elem> side(elem->build_side(s));
 
   // Initialize the shape functions at the user-specified
   // points

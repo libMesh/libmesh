@@ -147,7 +147,7 @@ public:
    * details of interfacing with various linear algebra packages
    * like PETSc or LASPACK.
    */
-  AutoPtr<LinearSolver<Number> > linear_solver;
+  UniquePtr<LinearSolver<Number> > linear_solver;
 
   /**
    * Returns  the number of iterations

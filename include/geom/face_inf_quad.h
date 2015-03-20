@@ -127,12 +127,12 @@ public:
    * @returns a primitive (2-noded) edge or infedge for
    * edge \p i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
   /**
    * build_edge and build_side are identical in 2D
    */
-  AutoPtr<Elem> build_edge (const unsigned int i) const
+  UniquePtr<Elem> build_edge (const unsigned int i) const
   { return build_side(i); }
 
   /*

@@ -73,7 +73,7 @@ public:
   /**
    * Copy of this object. User should override to copy any needed state.
    */
-  virtual AutoPtr<DifferentiablePhysics> clone_physics() = 0;
+  virtual UniquePtr<DifferentiablePhysics> clone_physics() = 0;
 
   /**
    * Clear any data structures associated with the physics.

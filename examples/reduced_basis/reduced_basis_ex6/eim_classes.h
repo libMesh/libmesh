@@ -24,9 +24,9 @@ public:
   /**
    * Build a ThetaEIM rather than an RBEIMTheta.
    */
-  virtual AutoPtr<RBTheta> build_eim_theta(unsigned int index)
+  virtual UniquePtr<RBTheta> build_eim_theta(unsigned int index)
   {
-    return AutoPtr<RBTheta>(new ThetaEIM(*this, index));
+    return UniquePtr<RBTheta>(new ThetaEIM(*this, index));
   }
 
   /**
@@ -61,9 +61,9 @@ public:
   /**
    * Provide an implementation of build_eim_assembly
    */
-  virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int index)
+  virtual UniquePtr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return AutoPtr<ElemAssembly>(new AssemblyEIM(*this, index));
+    return UniquePtr<ElemAssembly>(new AssemblyEIM(*this, index));
   }
 
   /**

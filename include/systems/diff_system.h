@@ -143,21 +143,21 @@ public:
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual AutoPtr<DifferentiablePhysics> clone_physics()
+  virtual UniquePtr<DifferentiablePhysics> clone_physics()
   {
     libmesh_not_implemented();
     // dummy
-    return AutoPtr<DifferentiablePhysics>(this);
+    return UniquePtr<DifferentiablePhysics>(this);
   }
 
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual AutoPtr<DifferentiableQoI> clone()
+  virtual UniquePtr<DifferentiableQoI> clone()
   {
     libmesh_not_implemented();
     // dummy
-    return AutoPtr<DifferentiableQoI>(this);
+    return UniquePtr<DifferentiableQoI>(this);
   }
 
   /**
@@ -208,14 +208,17 @@ public:
    * A pointer to the solver object we're going to use.
    * This must be instantiated by the user before solving!
    */
-  AutoPtr<TimeSolver> time_solver;
+  UniquePtr<TimeSolver> time_solver;
 
   /**
    * Sets the time_solver
+   * FIXME: This code is a little dangerous as it transfers ownership
+   * from the TimeSolver creator to this class.  The user must no longer
+   * access his original TimeSolver object after calling this function.
    */
-  void set_time_solver(AutoPtr<TimeSolver> _time_solver)
+  void set_time_solver(UniquePtr<TimeSolver> _time_solver)
   {
-    time_solver = _time_solver;
+    time_solver.reset(_time_solver.release());
   }
 
   /**
@@ -242,7 +245,7 @@ public:
    * reimplementation is correct; users who subclass FEMContext will need to
    * also reimplement this method to build it.
    */
-  virtual AutoPtr<DiffContext> build_context();
+  virtual UniquePtr<DiffContext> build_context();
 
   /**
    * Executes a postprocessing loop over all elements, and if

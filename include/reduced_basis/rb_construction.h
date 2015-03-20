@@ -428,7 +428,7 @@ public:
    * It's helpful to be able to generate a DirichletBoundary that stores a ZeroFunction in order
    * to impose Dirichlet boundary conditions.
    */
-  static AutoPtr<DirichletBoundary> build_zero_dirichlet_boundary_object();
+  static UniquePtr<DirichletBoundary> build_zero_dirichlet_boundary_object();
 
   /**
    * Setter for the flag determining if convergence should be
@@ -452,7 +452,7 @@ public:
    * use for solving all systems in which the system matrix is set
    * to inner_product_matrix.
    */
-  AutoPtr< LinearSolver<Number> > inner_product_solver;
+  UniquePtr< LinearSolver<Number> > inner_product_solver;
 
   /**
    * We also need a pointer to store the original linear solver in
@@ -469,19 +469,19 @@ public:
   /**
    * The inner product matrix.
    */
-  AutoPtr< SparseMatrix<Number> > inner_product_matrix;
+  UniquePtr< SparseMatrix<Number> > inner_product_matrix;
 
   /**
    * The inner product matrix without Dirichlet conditions enforced.
    * (This is only computed if store_non_dirichlet_operators == true.)
    */
-  AutoPtr< SparseMatrix<Number> > non_dirichlet_inner_product_matrix;
+  UniquePtr< SparseMatrix<Number> > non_dirichlet_inner_product_matrix;
 
   /**
    * The constraint matrix, e.g. the pressure matrix entries
    * in a Stokes problem.
    */
-  AutoPtr< SparseMatrix<Number> > constraint_matrix;
+  UniquePtr< SparseMatrix<Number> > constraint_matrix;
 
   /**
    * Vector storing the truth output values from the most
@@ -616,7 +616,7 @@ protected:
    * evaluations on each element. We use DGFEMContext since it
    * allows for both DG and continuous Galerkin formulations.
    */
-  virtual AutoPtr<DGFEMContext> build_context();
+  virtual UniquePtr<DGFEMContext> build_context();
 
   /**
    * Define the matrix assembly for the output residual dual

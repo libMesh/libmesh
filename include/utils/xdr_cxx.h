@@ -220,12 +220,12 @@ private:
   /**
    * The input file stream.
    */
-  AutoPtr<std::istream> in;
+  UniquePtr<std::istream> in;
 
   /**
    * The output file stream.
    */
-  AutoPtr<std::ostream> out;
+  UniquePtr<std::ostream> out;
 
   /**
    * A buffer to put comment strings into.

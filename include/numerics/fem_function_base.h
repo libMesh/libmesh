@@ -72,7 +72,7 @@ public:
    * ``deep'' as necessary to allow independent destruction and
    * simultaneous evaluations of the copies in different threads.
    */
-  virtual AutoPtr<FEMFunctionBase<Output> > clone () const = 0;
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const = 0;
 
   // ------------------------------------------------------
   // misc

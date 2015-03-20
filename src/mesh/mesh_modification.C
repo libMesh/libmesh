@@ -145,7 +145,7 @@ void MeshTools::Modification::redistribute (MeshBase& mesh,
   DenseVector<Real> output_vec(LIBMESH_DIM);
 
   // FIXME - we should thread this later.
-  AutoPtr<FunctionBase<Real> > myfunc = mapfunc.clone();
+  UniquePtr<FunctionBase<Real> > myfunc = mapfunc.clone();
 
   MeshBase::node_iterator       it  = mesh.nodes_begin();
   const MeshBase::node_iterator end = mesh.nodes_end();
@@ -1235,7 +1235,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                         if ((elem->neighbor(s) != NULL) &&
                             (elem->id() > elem->neighbor(s)->id()) )
                           {
-                            AutoPtr<Elem> side(elem->build_side(s));
+                            UniquePtr<Elem> side(elem->build_side(s));
 
                             Node* node0 = side->get_node(0);
                             Node* node1 = side->get_node(1);

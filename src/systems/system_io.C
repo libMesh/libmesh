@@ -1957,7 +1957,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
 
       // a ThreadedIO object to perform asychronous file IO
       ThreadedIO<Number> threaded_io(io, output_vals);
-      AutoPtr<Threads::Thread> async_io;
+      UniquePtr<Threads::Thread> async_io;
 
       for (unsigned int blk=0; blk<num_blks; blk++)
         {

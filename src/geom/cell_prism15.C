@@ -129,8 +129,8 @@ bool Prism15::has_affine_map() const
 
 
 
-AutoPtr<Elem> Prism15::build_side (const unsigned int i,
-                                   bool proxy) const
+UniquePtr<Elem> Prism15::build_side (const unsigned int i,
+                                     bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -140,18 +140,12 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
         {
         case 0:  // the triangular face at z=-1
         case 4:
-          {
-            AutoPtr<Elem> face(new Side<Tri6,Prism15>(this,i));
-            return face;
-          }
+          return UniquePtr<Elem>(new Side<Tri6,Prism15>(this,i));
 
         case 1:
         case 2:
         case 3:
-          {
-            AutoPtr<Elem> face(new Side<Quad8,Prism15>(this,i));
-            return face;
-          }
+          return UniquePtr<Elem>(new Side<Quad8,Prism15>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -161,13 +155,13 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      AutoPtr<Elem> face(NULL);
+      Elem* face = NULL;
 
       switch (i)
         {
         case 0:  // the triangular face at z=-1
           {
-            face.reset(new Tri6);
+            face = new Tri6;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(2);
@@ -180,7 +174,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
           }
         case 1:  // the quad face at y=0
           {
-            face.reset(new Quad8);
+            face = new Quad8;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(1);
@@ -195,7 +189,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
           }
         case 2:  // the other quad face
           {
-            face.reset(new Quad8);
+            face = new Quad8;
 
             face->set_node(0) = this->get_node(1);
             face->set_node(1) = this->get_node(2);
@@ -210,7 +204,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
           }
         case 3: // the quad face at x=0
           {
-            face.reset(new Quad8);
+            face = new Quad8;
 
             face->set_node(0) = this->get_node(2);
             face->set_node(1) = this->get_node(0);
@@ -225,7 +219,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
           }
         case 4: // the triangular face at z=1
           {
-            face.reset(new Tri6);
+            face = new Tri6;
 
             face->set_node(0) = this->get_node(3);
             face->set_node(1) = this->get_node(4);
@@ -241,20 +235,19 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
-      return face;
+      return UniquePtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return UniquePtr<Elem>();
 }
 
 
-AutoPtr<Elem> Prism15::build_edge (const unsigned int i) const
+UniquePtr<Elem> Prism15::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return AutoPtr<Elem>(new SideEdge<Edge3,Prism15>(this,i));
+  return UniquePtr<Elem>(new SideEdge<Edge3,Prism15>(this,i));
 }
 
 

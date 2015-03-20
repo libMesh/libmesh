@@ -50,12 +50,11 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p AutoPtr.
+   * an \p UniquePtr.
    */
-  virtual AutoPtr<Partitioner> clone () const {
-    AutoPtr<Partitioner> cloned_partitioner
-      (new LinearPartitioner());
-    return cloned_partitioner;
+  virtual UniquePtr<Partitioner> clone () const
+  {
+    return UniquePtr<Partitioner>(new LinearPartitioner());
   }
 
 protected:

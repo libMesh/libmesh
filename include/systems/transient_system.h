@@ -113,7 +113,7 @@ public:
    * current solution with any ghost values needed from
    * other processors.
    */
-  AutoPtr<NumericVector<Number> > old_local_solution;
+  UniquePtr<NumericVector<Number> > old_local_solution;
 
   /**
    * All the values I need to compute my contribution
@@ -121,7 +121,7 @@ public:
    * current solution with any ghost values needed from
    * other processors.
    */
-  AutoPtr<NumericVector<Number> > older_local_solution;
+  UniquePtr<NumericVector<Number> > older_local_solution;
 
 
 protected:

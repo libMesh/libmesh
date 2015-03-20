@@ -59,7 +59,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
   libmesh_assert_not_equal_to (s, 0);
 
   // Build the side of interest
-  const AutoPtr<Elem> side(inf_elem->build_side(s));
+  const UniquePtr<Elem> side(inf_elem->build_side(s));
 
   // set the element type
   elem_type = inf_elem->type();
@@ -146,7 +146,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   {
     libmesh_assert_equal_to (Dim, 3);
 
-    AutoPtr<FEBase> ap_fb(FEBase::build(Dim-2, this->fe_type));
+    UniquePtr<FEBase> ap_fb(FEBase::build(Dim-2, this->fe_type));
 
     delete base_fe;
     base_fe = ap_fb.release();

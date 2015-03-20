@@ -114,8 +114,8 @@ public:
   // Destructor
   virtual ~CoupledFEMFunctionsx () {}
 
-  virtual AutoPtr<FEMFunctionBase<Number> > clone () const
-  {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsx(*this) ); }
+  virtual UniquePtr<FEMFunctionBase<Number> > clone () const
+  {return UniquePtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsx(*this) ); }
 
   virtual void operator() (const FEMContext&, const Point&,
                            const Real, DenseVector<Number>&)
@@ -140,8 +140,8 @@ public:
   // Destructor
   virtual ~CoupledFEMFunctionsy () {}
 
-  virtual AutoPtr<FEMFunctionBase<Number> > clone () const
-  {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsy(*this) ); }
+  virtual UniquePtr<FEMFunctionBase<Number> > clone () const
+  {return UniquePtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsy(*this) ); }
 
   virtual void operator() (const FEMContext&, const Point&,
                            const Real,

@@ -31,8 +31,8 @@ class ZeroFunction : public ConstFunction<Output>
 public:
   ZeroFunction () : ConstFunction<Output>(0) {}
 
-  virtual AutoPtr<FunctionBase<Output> > clone() const {
-    return AutoPtr<FunctionBase<Output> >
+  virtual UniquePtr<FunctionBase<Output> > clone() const {
+    return UniquePtr<FunctionBase<Output> >
       (new ZeroFunction<Output>());
   }
 };

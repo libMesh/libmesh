@@ -97,7 +97,7 @@ public:
    * @returns a primitive triangle or quad for
    * face i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
 
 

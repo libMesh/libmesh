@@ -99,7 +99,7 @@ public:
   /**
    * Returns a new deep copy of the function.
    */
-  virtual AutoPtr<FunctionBase<Output> > clone () const;
+  virtual UniquePtr<FunctionBase<Output> > clone () const;
 
   /**
    * @returns the value at point \p p and time
@@ -210,10 +210,10 @@ void AnalyticFunction<Output>::clear ()
 
 template <typename Output>
 inline
-AutoPtr<FunctionBase<Output> >
+UniquePtr<FunctionBase<Output> >
 AnalyticFunction<Output>::clone () const
 {
-  return AutoPtr<FunctionBase<Output> >
+  return UniquePtr<FunctionBase<Output> >
     ( _number_fptr ?
       new AnalyticFunction<Output>(_number_fptr) :
       new AnalyticFunction<Output>(_vector_fptr) );

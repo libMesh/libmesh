@@ -44,8 +44,8 @@ class ExampleOneFunction : public FunctionBase<Number>
 
   virtual void init() {}
   virtual void clear() {}
-  virtual AutoPtr<FunctionBase<Number> > clone() const {
-    return AutoPtr<FunctionBase<Number> >
+  virtual UniquePtr<FunctionBase<Number> > clone() const {
+    return UniquePtr<FunctionBase<Number> >
       (new ExampleOneFunction());
   }
 };

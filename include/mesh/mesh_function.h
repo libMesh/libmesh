@@ -119,7 +119,7 @@ public:
    * Note that this implies the copy should not be used after the
    * original is destroyed.
    */
-  virtual AutoPtr<FunctionBase<Number> > clone () const;
+  virtual UniquePtr<FunctionBase<Number> > clone () const;
 
   /**
    * @returns the value of variable 0 at point

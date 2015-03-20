@@ -161,7 +161,7 @@ public:
    * The EigenSolver, definig which interface, i.e solver
    * package to use.
    */
-  AutoPtr<EigenSolver<Number> > eigen_solver;
+  UniquePtr<EigenSolver<Number> > eigen_solver;
 
 
 protected:

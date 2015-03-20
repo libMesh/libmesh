@@ -48,9 +48,9 @@ public:
   void init () {}
   void clear () {}
 
-  virtual AutoPtr<FunctionBase<Number> > clone () const
+  virtual UniquePtr<FunctionBase<Number> > clone () const
   {
-    return AutoPtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
+    return UniquePtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
   }
 
   Number operator() (const Point& p,

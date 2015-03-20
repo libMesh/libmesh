@@ -219,13 +219,13 @@ public:
    * details of interfacing with various nonlinear algebra packages
    * like PETSc or LASPACK.
    */
-  AutoPtr<NonlinearSolver<Number> > nonlinear_solver;
+  UniquePtr<NonlinearSolver<Number> > nonlinear_solver;
 
   /**
    * The \p DiffSolver defines an optional interface used to
    * solve the nonlinear_implicit system.
    */
-  AutoPtr<DiffSolver> diff_solver;
+  UniquePtr<DiffSolver> diff_solver;
 
   /**
    * Returns  the number of iterations

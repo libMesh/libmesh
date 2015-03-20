@@ -132,7 +132,7 @@ public:
    * The return strings are names of the original PC and KSP objects,
    * you can reset these using the reset_alternative_solver() function below.
    */
-  std::pair<std::string,std::string> set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls);
+  std::pair<std::string,std::string> set_alternative_solver(UniquePtr<LinearSolver<Number> >& ls);
 
   /**
    * Resets the PC (and iterative solver, if desired) in the passed-in
@@ -140,7 +140,7 @@ public:
    * passed as the second argument.  If the "alternative_solver" string,
    * defined below, is "unchanged", this function does nothing.
    */
-  void reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
+  void reset_alternative_solver(UniquePtr<LinearSolver<Number> >& ls,
                                 const std::pair<std::string,std::string>& orig);
 
   /**
@@ -254,7 +254,7 @@ protected:
    * performing inner products (avoids unnecessary memory
    * allocation/deallocation).
    */
-  AutoPtr< NumericVector<Number> > inner_product_storage_vector;
+  UniquePtr< NumericVector<Number> > inner_product_storage_vector;
 
   /**
    * Set this string to specify an alternative solver used in the set_alternative_solver()

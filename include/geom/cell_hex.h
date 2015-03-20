@@ -105,7 +105,7 @@ public:
    * @returns a primitive (4-noded) quad for
    * face i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
   /**
    * Based on the quality metric q specified by the user,
