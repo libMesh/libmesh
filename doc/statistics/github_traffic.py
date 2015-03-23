@@ -730,7 +730,9 @@ month_intervals = ['2014-Feb-17',
                    '2014-Oct-17',
                    '2014-Nov-17',
                    '2014-Dec-17',
-                   '2015-Jan-17']
+                   '2015-Jan-17',
+                   '2015-Feb-17',
+                   '2015-Mar-17']
 
 # Find the indexes of each date
 month_indexes = []
@@ -753,9 +755,12 @@ ax1 = fig.add_subplot(111)
 ax1.plot(x_axis, month_views, 'bo-')
 ax1.set_ylabel('Monthly page views (blue circles)')
 
-# Choose the number of labels to create, then use linspace to create them and convert them to ints
-n_labels = 6
-x_axis_ticks = np.linspace(0, len(x_axis)-1, n_labels).astype(int)
+# For an odd number of months, include a middle tick mark, otherwise just
+# label the endpoints.
+n_months = len(x_axis)
+x_axis_ticks = [0, len(x_axis)-1]
+if n_months % 2 != 0:
+  x_axis_ticks.insert(1, n_months/2)
 
 # Set tick labels and positions
 ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
