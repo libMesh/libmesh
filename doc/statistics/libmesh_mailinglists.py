@@ -61,7 +61,8 @@ membership_data = [
     'Nov 2014', 119, 261,
     'Dec 2014', 120, 262,
     'Jan 2015', 120, 263,
-] # remember to update the indices below!
+    'Mar 2015', 120, 266, # I missed getting data for Feb 2015
+]
 
 # Strip out the dates from membership_data
 date_strings = membership_data[0::3]
@@ -130,7 +131,7 @@ devel_data = [
     '2012',   56, 120,  72,  57,  82,  66,  51,  75, 166, 232, 284, 105, # Dec 10, 2012 libmesh moved to github
     '2013',  168, 151,  30, 145,  26,  53,  76,  33,  23,  72, 125,  38,
     '2014',   47,  62,  27,   8,  12,   2,  22,  22,   0,  17,  20,  12,
-    '2015',   25,
+    '2015',   25,   2,
 ]
 
 # libmesh-users starts in Sept 2003!
@@ -149,7 +150,7 @@ users_data = [
     '2012',   64,  95,  35,  36,  63,  98,  70, 171, 149,  64,  67, 126, # Dec 10, 2012 libmesh moved to github
     '2013',  108, 104, 171, 133, 108, 100,  93, 126,  74,  59, 145,  93,
     '2014',   38,  45,  26,  41, 125,  70,  61,  66,  60, 110,  27,  30,
-    '2015',   43,
+    '2015',   43,  67,
 ]
 
 # Make plot of monthly data
