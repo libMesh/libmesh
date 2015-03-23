@@ -211,3 +211,7 @@ ax.get_xaxis().set_tick_params(direction='out')
 
 # Save as PDF
 plt.savefig('libmesh_pagehits.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

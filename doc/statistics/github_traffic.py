@@ -677,11 +677,11 @@ week_views = []
 week_visitors = []
 x_axis = []
 for i in range(0, len(week_indexes)-1):
-    start = week_indexes[i]
-    stop = week_indexes[i+1]
-    week_views.append(sum(n_views[start:stop]));
-    week_visitors.append(np.mean(n_visitors[start:stop]));
-    x_axis.append(date_nums[week_indexes[i]])
+  start = week_indexes[i]
+  stop = week_indexes[i+1]
+  week_views.append(sum(n_views[start:stop]));
+  week_visitors.append(np.mean(n_visitors[start:stop]));
+  x_axis.append(date_nums[week_indexes[i]])
 
 # Get a reference to the figure
 fig = plt.figure()
@@ -737,18 +737,18 @@ month_intervals = ['2014-Feb-17',
 # Find the indexes of each date
 month_indexes = []
 for date in month_intervals:
-    month_indexes.append(date_strings.index(date))
+  month_indexes.append(date_strings.index(date))
 
 # Get total views and average unique viewers for each month
 month_views = [];
 month_visitors = [];
 x_axis = []
 for i in range(0, len(month_indexes)-1):
-    start = month_indexes[i]
-    stop = month_indexes[i+1]
-    month_views.append(sum(n_views[start:stop]));
-    month_visitors.append(np.mean(n_visitors[start:stop]));
-    x_axis.append(date_nums[month_indexes[i]])
+  start = month_indexes[i]
+  stop = month_indexes[i+1]
+  month_views.append(sum(n_views[start:stop]));
+  month_visitors.append(np.mean(n_visitors[start:stop]));
+  x_axis.append(date_nums[month_indexes[i]])
 
 # 111 is equivalent to Matlab's subplot(1,1,1) command
 ax1 = fig.add_subplot(111)
@@ -773,3 +773,7 @@ ax2.set_ylabel('Avg. Daily Unique Visitors (green squares)')
 
 # Save as PDF
 plt.savefig('monthly_github_traffic.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

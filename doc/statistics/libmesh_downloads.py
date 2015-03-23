@@ -176,9 +176,9 @@ moving_average = []
 running_total = 0
 counter = 1
 for dl in n_downloads:
-    running_total += dl
-    moving_average.append(float(running_total) / counter);
-    counter += 1
+  running_total += dl
+  moving_average.append(float(running_total) / counter);
+  counter += 1
 
 # Get a reference to the figure
 fig = plt.figure()
@@ -218,3 +218,7 @@ plt.xlim(date_nums[0], date_nums[-1]+30);
 
 # Save as PDF
 plt.savefig('libmesh_downloads.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

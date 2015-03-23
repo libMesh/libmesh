@@ -79,3 +79,7 @@ fig.suptitle(title_string)
 
 # Save as PDF
 plt.savefig('libmesh_citations.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:
