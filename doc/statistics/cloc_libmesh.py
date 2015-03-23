@@ -230,3 +230,7 @@ ax1.text(date_nums[len(date_nums)/4], 250, lines_msg);
 
 # Save as PDF
 plt.savefig('cloc_libmesh.pdf', format='pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

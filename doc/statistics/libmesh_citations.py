@@ -33,9 +33,9 @@ data = [
     '\'11', 37,
     '\'12', 50,
     '\'13', 78,
-    '\'14', 58,
-    '\'15',  8,
-    'P',     7, # Preprints
+    '\'14', 60,
+    '\'15', 11,
+    'P',     8, # Preprints
     'T',    36  # Theses
     ]
 
@@ -79,3 +79,7 @@ fig.suptitle(title_string)
 
 # Save as PDF
 plt.savefig('libmesh_citations.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

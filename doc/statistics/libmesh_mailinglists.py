@@ -61,7 +61,8 @@ membership_data = [
     'Nov 2014', 119, 261,
     'Dec 2014', 120, 262,
     'Jan 2015', 120, 263,
-] # remember to update the indices below!
+    'Mar 2015', 120, 266, # I missed getting data for Feb 2015
+]
 
 # Strip out the dates from membership_data
 date_strings = membership_data[0::3]
@@ -130,7 +131,7 @@ devel_data = [
     '2012',   56, 120,  72,  57,  82,  66,  51,  75, 166, 232, 284, 105, # Dec 10, 2012 libmesh moved to github
     '2013',  168, 151,  30, 145,  26,  53,  76,  33,  23,  72, 125,  38,
     '2014',   47,  62,  27,   8,  12,   2,  22,  22,   0,  17,  20,  12,
-    '2015',   25,
+    '2015',   25,   2,
 ]
 
 # libmesh-users starts in Sept 2003!
@@ -149,7 +150,7 @@ users_data = [
     '2012',   64,  95,  35,  36,  63,  98,  70, 171, 149,  64,  67, 126, # Dec 10, 2012 libmesh moved to github
     '2013',  108, 104, 171, 133, 108, 100,  93, 126,  74,  59, 145,  93,
     '2014',   38,  45,  26,  41, 125,  70,  61,  66,  60, 110,  27,  30,
-    '2015',   43,
+    '2015',   43,  67,
 ]
 
 # Make plot of monthly data
@@ -161,46 +162,46 @@ month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'O
 year_strings = devel_data[0::13]
 
 for i in range(0, 12):
-    # Strip out the devel_data for the current month.  Note that the
-    # stride is 13 since the year string also appears in each row.
-    devel_data_current_month = devel_data[i+1::13]
+  # Strip out the devel_data for the current month.  Note that the
+  # stride is 13 since the year string also appears in each row.
+  devel_data_current_month = devel_data[i+1::13]
 
-    # Strip out the users_data for the current month
-    users_data_current_month = users_data[i+1::13]
+  # Strip out the users_data for the current month
+  users_data_current_month = users_data[i+1::13]
 
-    # Get the combined number of messages
-    combined_data_current_month = np.add(devel_data_current_month, users_data_current_month)
+  # Get the combined number of messages
+  combined_data_current_month = np.add(devel_data_current_month, users_data_current_month)
 
-    # Get reference to the ith axes on a 3x4 grid.  Note that the plot
-    # numbering starts at 1, simiarly to Matlab.
-    ax = fig.add_subplot(3, 4, i+1)
+  # Get reference to the ith axes on a 3x4 grid.  Note that the plot
+  # numbering starts at 1, simiarly to Matlab.
+  ax = fig.add_subplot(3, 4, i+1)
 
-    # The width of the bars to use in the bar chart
-    width=.8
+  # The width of the bars to use in the bar chart
+  width=.8
 
-    # Make an x-axis to plot against
-    N = len(devel_data_current_month)
-    x = np.linspace(1, N, N)
+  # Make an x-axis to plot against
+  N = len(devel_data_current_month)
+  x = np.linspace(1, N, N)
 
-    # Plot the summed data
-    ax.bar(x, combined_data_current_month, width, color='c')
+  # Plot the summed data
+  ax.bar(x, combined_data_current_month, width, color='c')
 
-    # Plot only the libmesh-devel data
-    ax.bar(x, devel_data_current_month, width, color='b')
+  # Plot only the libmesh-devel data
+  ax.bar(x, devel_data_current_month, width, color='b')
 
-    # Set up the xticks and labels
-    xticks = [0, N-1]
-    xticks = [x + 1.5*width for x in xticks]
-    xticklabels = [year_strings[0], year_strings[N-1]]
-    ax.set_xticks(xticks)
-    ax.set_xticklabels(xticklabels, fontsize=10)
+  # Set up the xticks and labels
+  xticks = [0, N-1]
+  xticks = [x + 1.5*width for x in xticks]
+  xticklabels = [year_strings[0], year_strings[N-1]]
+  ax.set_xticks(xticks)
+  ax.set_xticklabels(xticklabels, fontsize=10)
 
-    # Set month name as subplot title
-    ax.set_title(month_names[i] + ' (max ' + str(max(combined_data_current_month)) + ')', fontsize=10)
+  # Set month name as subplot title
+  ax.set_title(month_names[i] + ' (max ' + str(max(combined_data_current_month)) + ')', fontsize=10)
 
-    # Set an empty set of ticks for the y-axis to turn it off.  This
-    # is necessary to declutter the figure.
-    ax.get_yaxis().set_ticks([])
+  # Set an empty set of ticks for the y-axis to turn it off.  This
+  # is necessary to declutter the figure.
+  ax.get_yaxis().set_ticks([])
 
 # We need to leave a bit more room between the subplots to balance the
 # font size we can use with the amount of space available on the
@@ -252,3 +253,7 @@ plt.xlim(0, N+2);
 
 # Save as PDF
 plt.savefig('libmesh_mailinglists.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:
