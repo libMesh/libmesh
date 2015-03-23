@@ -1,34 +1,25 @@
 What is this?
 -------------
-A set of GNU Octave (may also work with Matlab?) scripts for making
-plots of the usage statistics for libMesh over time.  Some information
-is only available if you have a password...
+A set of Matplotlib scripts for making plots of the usage statistics
+for libMesh over time.
 
+List of files
+-------------
+libmesh_all.sh         - Run to regenerate all the "active" statistics plots.
 
-libmesh_all.m          - Run to regenerate all the plots.
-libmesh_downloads.m    - Number of downloads per month as reported by sourceforge.net
-libmesh_mailinglists.m - Approximate subscriber counts and mailing list volume, organized
-                         chronologically and by month.  Subscriber counts require a password.
-libmesh_sflogos.m      - The number of sourceforge "logos" served up due to libmesh web content.
-libmesh_svn.m          - SVN usage for libmesh.  This is now deprecated because we don't use SVN
-                         anymore.
-libmesh_citations.m    - Numbers of publications per year, thesis/dissertations and preprints.
-                         Numbers are a byproduct of generating the publications.php page, see
-                         doc/citations for more information.
-libmesh_pagehits       - Number of visitors to the libmesh pages on sf.net, as reported by
-                         Google Analytics.  Note: you will need a google account (and I will
-                         have to give it access) to get these numbers.
+* Active statistics
+  libmesh_mailinglists.py - Approximate subscriber counts and mailing list volume, organized
+                            chronologically and by month.  Subscriber counts require a password.
+  libmesh_citations.py    - Numbers of publications per year, thesis/dissertations and preprints.
+                            See doc/citations for more information.
+  libmesh_pagehits.py     - Number of visitors to libmesh.github.io, as reported by Google Analytics.
+                            Note: you will need a google analytics account (and I will
+                            have to give it access) to get these numbers.
+  cloc_libmesh.py         - Number of files and lines of source code, as determined by cloc.pl.
+  github_traffic.py       - Number of pageviews and unique visitors to the github.com/libmesh/libmesh site.
 
-
-Obviously, most of these statistics are Sourceforge-specific and need
-to be updated now that we have moved to github.  The hope is that by
-checking this in, other people might think of something new to plot.
-
-It would be really nice to have more data on github site traffic: How
-may people have fetched?  How much data was pushed/pulled?  We have
-rudimentary Google Analytics set up for the README file, but there is
-a lot that only github knows...
-
-LocalWords:  Matlab libMesh libmesh sourceforge mailinglists sflogos
-LocalWords:  svn SVN preprints php pagehits Analytics google github
-LocalWords:  README
+* Inactive statistics
+  libmesh_downloads.py   - Number of downloads per month as reported by sourceforge.net
+  libmesh_sflogos.py     - The number of sourceforge "logos" served up due to libmesh web content.
+  libmesh_svn.py         - SVN usage for libmesh.  This is now deprecated because we don't use SVN
+                           anymore.
