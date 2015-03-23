@@ -30,10 +30,11 @@
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
+#include "libmesh/parmetis_helper.h"
 
+// Include the ParMETIS header file.
 #ifdef LIBMESH_HAVE_PARMETIS
 
-// Include the ParMETIS header files
 namespace Parmetis {
 extern "C" {
 #     include "libmesh/ignore_warnings.h"
@@ -42,7 +43,8 @@ extern "C" {
 }
 }
 
-#endif // #ifdef LIBMESH_HAVE_PARMETIS ... else ...
+#endif
+
 
 namespace libMesh
 {
@@ -54,6 +56,23 @@ const unsigned int MIN_ELEM_PER_PROC = 4;
 
 // ------------------------------------------------------------
 // ParmetisPartitioner implementation
+ParmetisPartitioner::ParmetisPartitioner() :
+#ifdef LIBMESH_HAVE_PARMETIS
+  _pmetis(new ParmetisHelper)
+#endif
+{}
+
+
+
+ParmetisPartitioner::~ParmetisPartitioner()
+{
+#ifdef LIBMESH_HAVE_PARMETIS
+  delete _pmetis;
+#endif
+}
+
+
+
 void ParmetisPartitioner::_do_partition (MeshBase& mesh,
                                          const unsigned int n_sbdmns)
 {
@@ -81,9 +100,9 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
 #ifndef LIBMESH_HAVE_PARMETIS
 
   libmesh_here();
-  libMesh::err << "ERROR: The library has been built without"  << std::endl
-               << "Parmetis support.  Using a Metis"           << std::endl
-               << "partitioner instead!"                       << std::endl;
+  libMesh::err << "ERROR: The library has been built without" << std::endl
+               << "Parmetis support.  Using a Metis"          << std::endl
+               << "partitioner instead!"                      << std::endl;
 
   MetisPartitioner mp;
 
@@ -136,29 +155,29 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
 
 
   // Partition the graph
-  std::vector<int> vsize(_vwgt.size(), 1);
-  float itr = 1000000.0;
+  std::vector<Parmetis::idx_t> vsize(_pmetis->vwgt.size(), 1);
+  Parmetis::real_t itr = 1000000.0;
   MPI_Comm mpi_comm = mesh.comm().get();
 
   // Call the ParMETIS adaptive repartitioning method.  This respects the
   // original partitioning when computing the new partitioning so as to
   // minimize the required data redistribution.
-  Parmetis::ParMETIS_V3_AdaptiveRepart(_vtxdist.empty() ? NULL : &_vtxdist[0],
-                                       _xadj.empty()    ? NULL : &_xadj[0],
-                                       _adjncy.empty()  ? NULL : &_adjncy[0],
-                                       _vwgt.empty()    ? NULL : &_vwgt[0],
-                                       vsize.empty()    ? NULL : &vsize[0],
+  Parmetis::ParMETIS_V3_AdaptiveRepart(_pmetis->vtxdist.empty() ? NULL : &_pmetis->vtxdist[0],
+                                       _pmetis->xadj.empty()    ? NULL : &_pmetis->xadj[0],
+                                       _pmetis->adjncy.empty()  ? NULL : &_pmetis->adjncy[0],
+                                       _pmetis->vwgt.empty()    ? NULL : &_pmetis->vwgt[0],
+                                       vsize.empty()            ? NULL : &vsize[0],
                                        NULL,
-                                       &_wgtflag,
-                                       &_numflag,
-                                       &_ncon,
-                                       &_nparts,
-                                       _tpwgts.empty()  ? NULL : &_tpwgts[0],
-                                       _ubvec.empty()   ? NULL : &_ubvec[0],
+                                       &_pmetis->wgtflag,
+                                       &_pmetis->numflag,
+                                       &_pmetis->ncon,
+                                       &_pmetis->nparts,
+                                       _pmetis->tpwgts.empty()  ? NULL : &_pmetis->tpwgts[0],
+                                       _pmetis->ubvec.empty()   ? NULL : &_pmetis->ubvec[0],
                                        &itr,
-                                       &_options[0],
-                                       &_edgecut,
-                                       _part.empty()    ? NULL : &_part[0],
+                                       &_pmetis->options[0],
+                                       &_pmetis->edgecut,
+                                       _pmetis->part.empty()    ? NULL : &_pmetis->part[0],
                                        &mpi_comm);
 
   // Assign the returned processor ids
@@ -182,26 +201,26 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
   const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
 
   // Set parameters.
-  _wgtflag = 2;                          // weights on vertices only
-  _ncon    = 1;                          // one weight per vertex
-  _numflag = 0;                          // C-style 0-based numbering
-  _nparts  = static_cast<int>(n_sbdmns); // number of subdomains to create
-  _edgecut = 0;                          // the numbers of edges cut by the
-                                         //   partition
+  _pmetis->wgtflag = 2;                                      // weights on vertices only
+  _pmetis->ncon    = 1;                                      // one weight per vertex
+  _pmetis->numflag = 0;                                      // C-style 0-based numbering
+  _pmetis->nparts  = static_cast<Parmetis::idx_t>(n_sbdmns); // number of subdomains to create
+  _pmetis->edgecut = 0;                                      // the numbers of edges cut by the
+                                                             // partition
 
   // Initialize data structures for ParMETIS
-  _vtxdist.resize (mesh.n_processors()+1); std::fill (_vtxdist.begin(), _vtxdist.end(), 0);
-  _tpwgts.resize  (_nparts);               std::fill (_tpwgts.begin(),  _tpwgts.end(),  1./_nparts);
-  _ubvec.resize   (_ncon);                 std::fill (_ubvec.begin(),   _ubvec.end(),   1.05);
-  _part.resize    (n_active_local_elem);   std::fill (_part.begin(),    _part.end(), 0);
-  _options.resize (5);
-  _vwgt.resize    (n_active_local_elem);
+  _pmetis->vtxdist.resize (mesh.n_processors()+1); std::fill (_pmetis->vtxdist.begin(), _pmetis->vtxdist.end(), 0);
+  _pmetis->tpwgts.resize  (_pmetis->nparts);       std::fill (_pmetis->tpwgts.begin(),  _pmetis->tpwgts.end(),  1./_pmetis->nparts);
+  _pmetis->ubvec.resize   (_pmetis->ncon);         std::fill (_pmetis->ubvec.begin(),   _pmetis->ubvec.end(),   1.05);
+  _pmetis->part.resize    (n_active_local_elem);   std::fill (_pmetis->part.begin(),    _pmetis->part.end(), 0);
+  _pmetis->options.resize (5);
+  _pmetis->vwgt.resize    (n_active_local_elem);
 
   // Set the options
-  _options[0] = 1;  // don't use default options
-  _options[1] = 0;  // default (level of timing)
-  _options[2] = 15; // random seed (default)
-  _options[3] = 2;  // processor distribution and subdomain distribution are decoupled
+  _pmetis->options[0] = 1;  // don't use default options
+  _pmetis->options[1] = 0;  // default (level of timing)
+  _pmetis->options[2] = 15; // random seed (default)
+  _pmetis->options[3] = 2;  // processor distribution and subdomain distribution are decoupled
 
   // Find the number of active elements on each processor.  We cannot use
   // mesh.n_active_elem_on_proc(pid) since that only returns the number of
@@ -220,16 +239,16 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 
   // Set up the vtxdist array.  This will be the same on each processor.
   // ***** Consult the Parmetis documentation. *****
-  libmesh_assert_equal_to (_vtxdist.size(),
+  libmesh_assert_equal_to (_pmetis->vtxdist.size(),
                            cast_int<std::size_t>(mesh.n_processors()+1));
-  libmesh_assert_equal_to (_vtxdist[0], 0);
+  libmesh_assert_equal_to (_pmetis->vtxdist[0], 0);
 
   for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
     {
-      _vtxdist[pid+1] = _vtxdist[pid] + _n_active_elem_on_proc[pid];
+      _pmetis->vtxdist[pid+1] = _pmetis->vtxdist[pid] + _n_active_elem_on_proc[pid];
       n_active_elem += _n_active_elem_on_proc[pid];
     }
-  libmesh_assert_equal_to (_vtxdist.back(), static_cast<int>(n_active_elem));
+  libmesh_assert_equal_to (_pmetis->vtxdist.back(), static_cast<Parmetis::idx_t>(n_active_elem));
 
   // ParMetis expects the elements to be numbered in contiguous blocks
   // by processor, i.e. [0, ne0), [ne0, ne0+ne1), ...
@@ -318,19 +337,19 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
   {
     std::vector<dof_id_type> subdomain_bounds(mesh.n_processors());
 
-    const dof_id_type first_local_elem = _vtxdist[mesh.processor_id()];
+    const dof_id_type first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
 
     for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
       {
         dof_id_type tgt_subdomain_size = 0;
 
         // watch out for the case that n_subdomains < n_processors
-        if (pid < static_cast<unsigned int>(_nparts))
+        if (pid < static_cast<unsigned int>(_pmetis->nparts))
           {
             tgt_subdomain_size = n_active_elem/std::min
-              (cast_int<int>(mesh.n_processors()), _nparts);
+              (cast_int<Parmetis::idx_t>(mesh.n_processors()), _pmetis->nparts);
 
-            if (pid < n_active_elem%_nparts)
+            if (pid < n_active_elem%_pmetis->nparts)
               tgt_subdomain_size++;
           }
         if (pid == 0)
@@ -357,10 +376,10 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
           global_index_by_pid - first_local_elem;
 
         libmesh_assert_less (local_index, n_active_local_elem);
-        libmesh_assert_less (local_index, _vwgt.size());
+        libmesh_assert_less (local_index, _pmetis->vwgt.size());
 
         // TODO:[BSK] maybe there is a better weight?
-        _vwgt[local_index] = elem->n_nodes();
+        _pmetis->vwgt[local_index] = elem->n_nodes();
 
         // find the subdomain this element belongs in
         libmesh_assert (global_index_map.count(elem->id()));
@@ -374,10 +393,10 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
                         std::lower_bound(subdomain_bounds.begin(),
                                          subdomain_bounds.end(),
                                          global_index));
-        libmesh_assert_less (subdomain_id, static_cast<unsigned int>(_nparts));
-        libmesh_assert_less (local_index, _part.size());
+        libmesh_assert_less (subdomain_id, static_cast<unsigned int>(_pmetis->nparts));
+        libmesh_assert_less (local_index, _pmetis->part.size());
 
-        _part[local_index] = subdomain_id;
+        _pmetis->part[local_index] = subdomain_id;
       }
   }
 }
@@ -398,7 +417,7 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
   std::vector<std::vector<dof_id_type> > graph(n_active_local_elem);
   dof_id_type graph_size=0;
 
-  const dof_id_type first_local_elem = _vtxdist[mesh.processor_id()];
+  const dof_id_type first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
 
   MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
@@ -486,26 +505,26 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
     }
 
   // Reserve space in the adjacency array
-  _xadj.clear();
-  _xadj.reserve (n_active_local_elem + 1);
-  _adjncy.clear();
-  _adjncy.reserve (graph_size);
+  _pmetis->xadj.clear();
+  _pmetis->xadj.reserve (n_active_local_elem + 1);
+  _pmetis->adjncy.clear();
+  _pmetis->adjncy.reserve (graph_size);
 
   for (std::size_t r=0; r<graph.size(); r++)
     {
-      _xadj.push_back(_adjncy.size());
+      _pmetis->xadj.push_back(_pmetis->adjncy.size());
       std::vector<dof_id_type> graph_row; // build this emtpy
       graph_row.swap(graph[r]); // this will deallocate at the end of scope
-      _adjncy.insert(_adjncy.end(),
+      _pmetis->adjncy.insert(_pmetis->adjncy.end(),
                      graph_row.begin(),
                      graph_row.end());
     }
 
   // The end of the adjacency array for the last elem
-  _xadj.push_back(_adjncy.size());
+  _pmetis->xadj.push_back(_pmetis->adjncy.size());
 
-  libmesh_assert_equal_to (_xadj.size(), n_active_local_elem+1);
-  libmesh_assert_equal_to (_adjncy.size(), graph_size);
+  libmesh_assert_equal_to (_pmetis->xadj.size(), n_active_local_elem+1);
+  libmesh_assert_equal_to (_pmetis->adjncy.size(), graph_size);
 }
 
 
@@ -516,7 +535,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
   libmesh_parallel_only(mesh.comm());
 
   const dof_id_type
-    first_local_elem = _vtxdist[mesh.processor_id()];
+    first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
 
   std::vector<std::vector<dof_id_type> >
     requested_ids(mesh.n_processors()),
@@ -540,11 +559,9 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
   for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
     {
       // Trade my requests with processor procup and procdown
-      const processor_id_type procup = (mesh.processor_id() + pid) %
-        mesh.n_processors();
+      const processor_id_type procup = (mesh.processor_id() + pid) % mesh.n_processors();
       const processor_id_type procdown = (mesh.n_processors() +
-                                          mesh.processor_id() - pid) %
-        mesh.n_processors();
+                                          mesh.processor_id() - pid) % mesh.n_processors();
 
       mesh.comm().send_receive (procup,   requested_ids[procup],
                                 procdown, requests_to_fill[procdown]);
@@ -563,13 +580,13 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
           const dof_id_type local_index =
             global_index_by_pid - first_local_elem;
 
-          libmesh_assert_less (local_index, _part.size());
+          libmesh_assert_less (local_index, _pmetis->part.size());
           libmesh_assert_less (local_index, mesh.n_active_local_elem());
 
           const unsigned int elem_procid =
-            static_cast<unsigned int>(_part[local_index]);
+            static_cast<unsigned int>(_pmetis->part[local_index]);
 
-          libmesh_assert_less (elem_procid, static_cast<unsigned int>(_nparts));
+          libmesh_assert_less (elem_procid, static_cast<unsigned int>(_pmetis->nparts));
 
           requests_to_fill[procdown][i] = elem_procid;
         }
@@ -598,7 +615,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
       const processor_id_type elem_procid =
         requested_ids[current_pid][counters[current_pid]++];
 
-      libmesh_assert_less (elem_procid, static_cast<unsigned int>(_nparts));
+      libmesh_assert_less (elem_procid, static_cast<unsigned int>(_pmetis->nparts));
       elem->processor_id() = elem_procid;
     }
 }

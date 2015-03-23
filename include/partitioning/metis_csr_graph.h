@@ -37,10 +37,11 @@ namespace libMesh
  * building the compressed-row-storage graph required for the METIS/ParMETIS
  * graph partitioning schemes.
  */
+template <class IndexType>
 class METIS_CSR_Graph
 {
 public:
-  std::vector<int> offsets, vals;
+  std::vector<IndexType> offsets, vals;
 
   void prep_n_nonzeros(const libMesh::dof_id_type row,
                        const libMesh::dof_id_type n_nonzeros_in)
@@ -70,7 +71,7 @@ public:
 
 
 
-  int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
+  IndexType& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
   {
     libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
 
@@ -79,7 +80,7 @@ public:
 
 
 
-  const int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
+  const IndexType& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
   {
     libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
 

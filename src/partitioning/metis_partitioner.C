@@ -88,19 +88,19 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   const dof_id_type n_active_elem = mesh.n_active_elem();
 
   // build the graph
-  // std::vector<int> options(5);
-  std::vector<int> vwgt(n_active_elem);
-  std::vector<int> part(n_active_elem);
+  // std::vector<Metis::idx_t> options(5);
+  std::vector<Metis::idx_t> vwgt(n_active_elem);
+  std::vector<Metis::idx_t> part(n_active_elem);
 
-  int
-    n = static_cast<int>(n_active_elem),  // number of "nodes" (elements)
-                                          //   in the graph
-    //    wgtflag = 2,                          // weights on vertices only,
-    //                                          //   none on edges
-    //    numflag = 0,                          // C-style 0-based numbering
-    nparts  = static_cast<int>(n_pieces), // number of subdomains to create
-    edgecut = 0;                          // the numbers of edges cut by the
-                                          //   resulting partition
+  Metis::idx_t
+    n = static_cast<Metis::idx_t>(n_active_elem),  // number of "nodes" (elements)
+                                                   //   in the graph
+    //    wgtflag = 2,                             // weights on vertices only,
+    //                                             //   none on edges
+    //    numflag = 0,                             // C-style 0-based numbering
+    nparts  = static_cast<Metis::idx_t>(n_pieces), // number of subdomains to create
+    edgecut = 0;                                   // the numbers of edges cut by the
+                                                   //   resulting partition
 
   // Set the options
   // options[0] = 0; // use default options
@@ -140,7 +140,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // Then broadcast the resulting decomposition
   if (mesh.processor_id() == 0)
     {
-      METIS_CSR_Graph csr_graph;
+      METIS_CSR_Graph<Metis::idx_t> csr_graph;
 
       csr_graph.offsets.resize(n_active_elem+1, 0);
 
@@ -177,7 +177,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
             if(!_weights)
               vwgt[elem_global_index] = elem->n_nodes();
             else
-              vwgt[elem_global_index] = static_cast<int>((*_weights)[elem->id()]);
+              vwgt[elem_global_index] = static_cast<Metis::idx_t>((*_weights)[elem->id()]);
 
             unsigned int num_neighbors = 0;
 
@@ -317,7 +317,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
                                  std::max(graph_size,std::size_t(1)));
       } // done building the graph
 
-      int ncon = 1;
+      Metis::idx_t ncon = 1;
 
       // Select which type of partitioning to create
 
