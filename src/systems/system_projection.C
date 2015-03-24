@@ -56,22 +56,68 @@ private:
   const System &system;
 
   FFunctor & f;
-  GFunctor & g;
+  GFunctor * g;  // Needed for C1 type elements only
   ProjectionAction & action;
+  const std::vector<unsigned int>& variables;
 
 public:
   GenericProjector (const System &system_in,
                     FFunctor & f_in,
-                    GFunctor & g_in,
-                    ProjectionAction & act_in) :
+                    GFunctor * g_in,
+                    ProjectionAction & act_in,
+                    const std::vector<unsigned int>& variables_in) :
     system(system_in),
     f(f_in),
     g(g_in),
-    action(act_in)
+    action(act_in),
+    variables(variables_in)
   {}
 
-  void operator()
-    (const ConstElemRange &, const std::vector<unsigned int>& variables) const;
+  void operator() (const ConstElemRange &range) const;
+};
+
+
+/**
+ * This action class can be used with a GenericProjector to set 
+ * projection values (which must be of type Val) as coefficients of
+ * the given NumericVector.
+ */
+
+template <typename Val>
+class VectorSetAction
+{
+private:
+  NumericVector<Val> &target_vector;
+
+public:
+  VectorSetAction(NumericVector<Val> &target_vec) :
+    target_vector(target_vec) {}
+
+  void insert(const FEMContext &c,
+              unsigned int var_num,
+              const DenseVector<Val> &Ue)
+    {
+      const numeric_index_type
+        first = target_vector.first_local_index(),
+        last  = target_vector.last_local_index();
+
+      const std::vector<dof_id_type> & dof_indices =
+        c.get_dof_indices(var_num);
+
+      unsigned int size = Ue.size();
+
+      libmesh_assert_equal_to(size, dof_indices.size());
+
+      // Lock the new vector since it is shared among threads.
+      {
+        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+        for (unsigned int i = 0; i != size; ++i)
+          if ((dof_indices[i] >= first) &&
+              (dof_indices[i] <  last))
+            target_vector.set(dof_indices[i], Ue(i));
+      }
+    }
 };
 
 
@@ -623,11 +669,26 @@ void System::project_vector (NumericVector<Number>& new_vector,
 {
   START_LOG ("project_fem_vector()", "System");
 
+  libmesh_assert (f);
+
+  ConstElemRange active_local_range
+    (this->get_mesh().active_local_elements_begin(),
+     this->get_mesh().active_local_elements_end() );
+
+  VectorSetAction<Number> setter(new_vector);
+
+  const unsigned int n_variables = this->n_vars();
+
+  std::vector<unsigned int> vars(n_variables);
+  for (unsigned int i=0; i != n_variables; ++i)
+    vars[i] = i;
+
   Threads::parallel_for
-    (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-                     this->get_mesh().active_local_elements_end() ),
-     ProjectFEMSolution(*this, f, g, new_vector)
-     );
+    (active_local_range,
+     GenericProjector<FEMFunctionBase<Number>,
+                      FEMFunctionBase<Gradient>,
+                      Number, VectorSetAction<Number> >
+       (*this, *f, g, setter, vars));
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
@@ -789,14 +850,9 @@ void System::boundary_project_vector
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
-  (const ConstElemRange &range,
-   const std::vector<unsigned int>& variables)
-  const
+  (const ConstElemRange &range) const
 {
   START_LOG ("operator()","GenericProjector");
-
-  // The number of variables in this system
-  const unsigned int n_variables = system.n_vars();
 
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
@@ -820,7 +876,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
       const unsigned int var = variables[v];
 
       const Variable& variable = dof_map.variable(var);
-      const FEType& base_fe_type = variable.type();
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
       FEBase* fe = NULL;
@@ -853,7 +908,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           const FEContinuity cont = fe->get_continuity();
           if(cont == C_ONE)
             {
-              libmesh_assert(g.get());
+              // Our C1 elements need gradient information
+              libmesh_assert(g);
+
               fe->get_dphi();
               if( dim > 1 )
                 side_fe->get_dphi();
@@ -864,7 +921,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
     }
 
   // Now initialize any user requested shape functions, xyz vals, etc
-  this->init_context(context);
+  // this->init_context(context);
 
   // Iterate over all the elements in the range
   for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end();
@@ -983,10 +1040,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
-                    g.component(context,
-                                var_component,
-                                elem->point(n),
-                                system.time);
+                    g->component(context,
+                                 var_component,
+                                 elem->point(n),
+                                 system.time);
                   // x derivative
                   Ue(current_dof) = grad(0);
                   dof_is_fixed[current_dof] = true;
@@ -999,15 +1056,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       nxminus(0) -= TOLERANCE;
                       nxplus(0) += TOLERANCE;
                       VectorValue<FValue> gxminus =
-                        g.component(context,
-                                    var_component,
-                                    nxminus,
-                                    system.time);
+                        g->component(context,
+                                     var_component,
+                                     nxminus,
+                                     system.time);
                       VectorValue<FValue> gxplus =
-                        g.component(context,
-                                    var_component,
-                                    nxplus,
-                                    system.time);
+                        g->component(context,
+                                     var_component,
+                                     nxplus,
+                                     system.time);
                       // y derivative
                       Ue(current_dof) = grad(1);
                       dof_is_fixed[current_dof] = true;
@@ -1035,15 +1092,15 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           nyminus(1) -= TOLERANCE;
                           nyplus(1) += TOLERANCE;
                           VectorValue<FValue> gyminus =
-                            g.component(context,
-                                        var_component,
-                                        nyminus,
-                                        system.time);
+                            g->component(context,
+                                         var_component,
+                                         nyminus,
+                                         system.time);
                           VectorValue<FValue> gyplus =
-                            g.component(context,
-                                        var_component,
-                                        nyplus,
-                                        system.time);
+                            g->component(context,
+                                         var_component,
+                                         nyplus,
+                                         system.time);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
                             / 2. / TOLERANCE;
@@ -1063,25 +1120,25 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                           nxpyp(0) += TOLERANCE;
                           nxpyp(1) += TOLERANCE;
                           VectorValue<FValue> gxmym =
-                            g.component(context,
-                                        var_component,
-                                        nxmym,
-                                        system.time);
+                            g->component(context,
+                                         var_component,
+                                         nxmym,
+                                         system.time);
                           VectorValue<FValue> gxmyp =
-                            g.component(context,
-                                        var_component,
-                                        nxmyp,
-                                        system.time);
+                            g->component(context,
+                                         var_component,
+                                         nxmyp,
+                                         system.time);
                           VectorValue<FValue> gxpym =
-                            g.component(context,
-                                        var_component,
-                                        nxpym,
-                                        system.time);
+                            g->component(context,
+                                         var_component,
+                                         nxpym,
+                                         system.time);
                           VectorValue<FValue> gxpyp =
-                            g.component(context,
-                                        var_component,
-                                        nxpyp,
-                                        system.time);
+                            g->component(context,
+                                         var_component,
+                                         nxpyp,
+                                         system.time);
                           FValue gxzplus = (gxpyp(2) - gxmyp(2))
                             / 2. / TOLERANCE;
                           FValue gxzminus = (gxpym(2) - gxmym(2))
@@ -1107,10 +1164,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                   VectorValue<FValue> grad =
-                    g.component(context,
-                                var_component,
-                                elem->point(n),
-                                system.time);
+                    g->component(context,
+                                 var_component,
+                                 elem->point(n),
+                                 system.time);
                   for (unsigned int i=0; i!= dim; ++i)
                     {
                       Ue(current_dof) = grad(i);
@@ -1171,10 +1228,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       // solution grad at the quadrature point
                       VectorValue<FValue> finegrad;
                       if (cont == C_ONE)
-                        finegrad = g.component(context,
-                                               var_component,
-                                               xyz_values[qp],
-                                               system.time);
+                        finegrad = g->component(context,
+                                                var_component,
+                                                xyz_values[qp],
+                                                system.time);
 
                       // Form edge projection matrix
                       for (unsigned int sidei=0, freei=0;
@@ -1279,10 +1336,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       // solution grad at the quadrature point
                       VectorValue<FValue> finegrad;
                       if (cont == C_ONE)
-                        finegrad = g.component(context,
-                                               var_component,
-                                               xyz_values[qp],
-                                               system.time);
+                        finegrad = g->component(context,
+                                                var_component,
+                                                xyz_values[qp],
+                                                system.time);
 
                       // Form side projection matrix
                       for (unsigned int sidei=0, freei=0;
@@ -1378,10 +1435,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   // solution grad at the quadrature point
                   VectorValue<FValue> finegrad;
                   if (cont == C_ONE)
-                    finegrad = g.component(context,
-                                           var_component,
-                                           xyz_values[qp],
-                                           system.time);
+                    finegrad = g->component(context,
+                                            var_component,
+                                            xyz_values[qp],
+                                            system.time);
 
                   // Form interior projection matrix
                   for (unsigned int i=0, freei=0; i != n_dofs; ++i)
@@ -1435,7 +1492,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           for (unsigned int i=0; i != n_dofs; ++i)
             libmesh_assert(dof_is_fixed[i]);
 
-          action.insert(context, Ue);
+          action.insert(context, var, Ue);
 
         } // end variables loop
     } // end elements loop
