@@ -922,6 +922,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
     }   
 
   // Now initialize any user requested shape functions, xyz vals, etc
+  f.init_context(context);
+  if(g)
+    g->init_context(context);
+
   // this->init_context(context);
 
   // Iterate over all the elements in the range
