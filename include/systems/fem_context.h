@@ -744,6 +744,12 @@ public:
   unsigned char get_elem_dim() const
   { return _elem_dim; }
 
+  /**
+   * @returns set of dimensions of elements present in the mesh at
+   * context initialization.
+   */
+  const std::set<unsigned char>& elem_dimensions() const
+  { return _elem_dims; }
 
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -876,6 +882,12 @@ protected:
    * Cached dimension of this->_elem.
    */
   unsigned char _elem_dim;
+
+  /**
+   * Cached dimensions of elements in the mesh, plus dimension 0 if
+   * SCALAR variables are in use.
+   */
+  std::set<unsigned char> _elem_dims;
 
   /**
    * Quadrature rule for element interior.
