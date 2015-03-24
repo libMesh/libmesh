@@ -251,6 +251,7 @@ include_HEADERS =  \
         numerics/type_vector.h \
         numerics/vector_value.h \
         numerics/wrapped_function.h \
+        numerics/wrapped_functor.h \
         numerics/zero_function.h \
         parallel/parallel.h \
         parallel/parallel_algebra.h \
