@@ -45,6 +45,7 @@ FEMContext::FEMContext (const System &sys,
     _elem(NULL),
     _dim(sys.get_mesh().mesh_dimension()),
     _elem_dim(0), /* This will be reset in set_elem(). */
+    _elem_dims(sys.get_mesh().elem_dimensions()),
     _element_qrule(4,NULL),
     _side_qrule(4,NULL),
     _edge_qrule(NULL)
@@ -89,13 +90,12 @@ FEMContext::FEMContext (const System &sys,
         have_scalar = true;
     }
 
-  std::set<unsigned char> elem_dims( sys.get_mesh().elem_dimensions() );
   if(have_scalar)
     // SCALAR FEs have dimension 0 by assumption
-    elem_dims.insert(0);
+    _elem_dims.insert(0);
 
-  for( std::set<unsigned char>::const_iterator dim_it = elem_dims.begin();
-       dim_it != elem_dims.end(); ++dim_it )
+  for( std::set<unsigned char>::const_iterator dim_it = _elem_dims.begin();
+       dim_it != _elem_dims.end(); ++dim_it )
     {
       const unsigned char dim = *dim_it;
 
