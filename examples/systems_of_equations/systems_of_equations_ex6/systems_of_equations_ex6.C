@@ -158,8 +158,8 @@ public:
     DenseSubVector<Number> Fe_var[3] =
       {DenseSubVector<Number>(Fe), DenseSubVector<Number>(Fe), DenseSubVector<Number>(Fe)};
 
-    std::vector<unsigned int> dof_indices;
-    std::vector< std::vector<unsigned int> > dof_indices_var(3);
+    std::vector<dof_id_type> dof_indices;
+    std::vector< std::vector<dof_id_type> > dof_indices_var(3);
 
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
