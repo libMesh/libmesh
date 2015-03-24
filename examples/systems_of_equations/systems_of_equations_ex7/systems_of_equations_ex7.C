@@ -162,8 +162,8 @@ public:
         {DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke), DenseSubMatrix<Number>(Ke)}
       };
 
-    std::vector<unsigned int> dof_indices;
-    std::vector< std::vector<unsigned int> > dof_indices_var(3);
+    std::vector<dof_id_type> dof_indices;
+    std::vector< std::vector<dof_id_type> > dof_indices_var(3);
 
     jacobian.zero();
 
@@ -338,8 +338,8 @@ public:
     DenseSubVector<Number> Re_var[3] =
       {DenseSubVector<Number>(Re), DenseSubVector<Number>(Re), DenseSubVector<Number>(Re)};
 
-    std::vector<unsigned int> dof_indices;
-    std::vector< std::vector<unsigned int> > dof_indices_var(3);
+    std::vector<dof_id_type> dof_indices;
+    std::vector< std::vector<dof_id_type> > dof_indices_var(3);
 
     residual.zero();
 
