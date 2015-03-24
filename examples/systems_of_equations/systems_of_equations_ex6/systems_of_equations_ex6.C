@@ -130,10 +130,7 @@ public:
 
     LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Elasticity");
 
-    const unsigned int n_components = 3;
     const unsigned int u_var = system.variable_number ("u");
-    const unsigned int v_var = system.variable_number ("v");
-    const unsigned int w_var = system.variable_number ("w");
 
     const DofMap& dof_map = system.get_dof_map();
     FEType fe_type = dof_map.variable_type(u_var);
@@ -161,8 +158,8 @@ public:
     DenseSubVector<Number> Fe_var[3] =
       {DenseSubVector<Number>(Fe), DenseSubVector<Number>(Fe), DenseSubVector<Number>(Fe)};
 
-    std::vector<unsigned int> dof_indices;
-    std::vector< std::vector<unsigned int> > dof_indices_var(3);
+    std::vector<dof_id_type> dof_indices;
+    std::vector< std::vector<dof_id_type> > dof_indices_var(3);
 
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
