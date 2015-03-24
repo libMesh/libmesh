@@ -130,10 +130,7 @@ public:
 
     LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Elasticity");
 
-    const unsigned int n_components = 3;
     const unsigned int u_var = system.variable_number ("u");
-    const unsigned int v_var = system.variable_number ("v");
-    const unsigned int w_var = system.variable_number ("w");
 
     const DofMap& dof_map = system.get_dof_map();
     FEType fe_type = dof_map.variable_type(u_var);
