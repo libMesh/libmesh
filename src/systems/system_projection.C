@@ -882,13 +882,14 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
       FEBase* side_fe = NULL;
       FEBase* edge_fe = NULL;
 
-      // We don't have a cached list of element dimensions, so we'll just
-      // request what we need from every dimension.  This isn't expensive -
-      // only the dimensions actually needed by each element will be hit by
-      // reinit()
+      const std::set<unsigned char>& elem_dims =
+        context.elem_dimensions();
      
-      for (unsigned int dim = 0; dim != LIBMESH_DIM; ++dim)
+      for( std::set<unsigned char>::const_iterator dim_it =
+           elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it )
         {
+          const unsigned char dim = *dim_it;
+
           context.get_element_fe( var, fe, dim );
           if (fe->get_fe_type().family == SCALAR)
             continue;
