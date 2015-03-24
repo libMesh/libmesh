@@ -3,7 +3,8 @@ pkg_cppflags  = -DLIBMESH_IS_COMPILING_PARMETIS
 pkg_cppflags += -I$(top_srcdir)/contrib/metis/GKlib \
                 -I$(top_srcdir)/contrib/metis/include \
                 -I$(srcdir)/include \
-                -I$(srcdir)/libparmetis
+                -I$(srcdir)/libparmetis \
+                -I$(top_srcdir)/contrib/metis/libmetis
 pkg_cppflags += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
 pkg_cppflags += $(libmesh_optional_INCLUDES) # for a PETSc-provided MPI, if required
 pkg_sources   = \
