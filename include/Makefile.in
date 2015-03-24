@@ -504,7 +504,8 @@ noinst_HEADERS = \
         numerics/laspack_vector.h \
         solvers/laspack_linear_solver.h \
         parallel/parallel_conversion_utils.h \
-        parallel/parallel_hilbert.h 
+        parallel/parallel_hilbert.h \
+        partitioning/parmetis_helper.h
 
 
 # These are the headers we actually want to install and make available
