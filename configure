@@ -33138,12 +33138,14 @@ fi
 
 
       if (test $enablemetis = yes); then
-     METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/include"
-     METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
+        if (test $build_metis = yes); then
+      METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/include"
+      METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
+    fi
 
 $as_echo "#define HAVE_METIS 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Metis support >>>" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Metis support >>>" >&5
 $as_echo "<<< Configuring library with Metis support >>>" >&6; }
 
 
@@ -33253,17 +33255,19 @@ fi
 
 
       if (test $enableparmetis = yes); then
-     PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
-     PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
+            if (test $build_metis = yes); then
+      PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
+      PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
+    fi
 
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Parmetis support >>>" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Parmetis support >>>" >&5
 $as_echo "<<< Configuring library with Parmetis support >>>" >&6; }
   else
-     PARMETIS_INCLUDE=""
-     PARMETIS_LIB=""
-     enableparmetis=no
+    PARMETIS_INCLUDE=""
+    PARMETIS_LIB=""
+    enableparmetis=no
   fi
 
 
