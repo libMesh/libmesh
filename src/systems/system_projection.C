@@ -37,6 +37,7 @@
 #include "libmesh/system.h"
 #include "libmesh/threads.h"
 #include "libmesh/wrapped_function.h"
+#include "libmesh/wrapped_functor.h"
 
 namespace libMesh
 {
