@@ -316,16 +316,18 @@ std::string MeshBase::get_info() const
 {
   std::ostringstream oss;
 
-  oss << " Mesh Information:"                                  << '\n'
-      << "  elem_dimensions()={";
-  {
-    std::set<unsigned char>::const_iterator it =
-      this->elem_dimensions().begin();
-    if (it != this->elem_dimensions().end())
-      oss << *it;
-    for (; it != this->elem_dimensions().end(); ++it)
-      oss << ',' << *it;
-  }
+  oss << " Mesh Information:"                                  << '\n';
+
+  if (!_elem_dims.empty())
+    {
+      oss << "  elem_dimensions()={";
+      std::copy(_elem_dims.begin(),
+                --_elem_dims.end(), // --end() is valid if the set is non-empty
+                std::ostream_iterator<unsigned int>(oss, ", "));
+      oss << cast_int<unsigned int>(*_elem_dims.rbegin());
+      oss << "}\n";
+    }
+
   oss << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
       << "  n_nodes()="           << this->n_nodes()           << '\n'
       << "    n_local_nodes()="   << this->n_local_nodes()     << '\n'
