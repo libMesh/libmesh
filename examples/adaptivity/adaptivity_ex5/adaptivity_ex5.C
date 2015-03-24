@@ -133,6 +133,8 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "--enable-xdr");
 #elif !defined(LIBMESH_ENABLE_PERIODIC)
   libmesh_example_requires(false, "--enable-periodic");
+#elif (LIBMESH_DOF_ID_BYTES == 8)
+  libmesh_example_requires(false, "--with-dof-id-bytes=4");
 #else
 
   // Our Trilinos interface does not yet support adaptive transient
