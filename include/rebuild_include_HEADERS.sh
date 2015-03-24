@@ -9,7 +9,8 @@ numerics/laspack_matrix.h \
 numerics/laspack_vector.h \
 solvers/laspack_linear_solver.h \
 parallel/parallel_conversion_utils.h \
-parallel/parallel_hilbert.h"
+parallel/parallel_hilbert.h \
+partitioning/parmetis_helper.h"
 
 echo "# Do not edit - automatically generated from $0" > include_HEADERS
 
