@@ -77,7 +77,7 @@ int main (int argc, char** argv)
 
   const Real young_modulus = infile("Young_modulus", 1.0);
   const Real poisson_ratio = infile("poisson_ratio", 0.3);
-  const Real forcing_magnitude = infile("forcing_magnitude", 0.001);
+  const Real initial_forcing_magnitude = infile("initial_forcing_magnitude", 0.001);
 
   const Real nonlinear_abs_tol = infile("nonlinear_abs_tol", 1.e-8);
   const Real nonlinear_rel_tol = infile("nonlinear_rel_tol", 1.e-8);
@@ -86,7 +86,7 @@ int main (int argc, char** argv)
   const Real contact_proximity_tol = infile("contact_proximity_tol",0.1);
 
   const unsigned int n_solves = infile("n_solves", 10);
-  const Real force_scaling = infile("force_scaling", 5.0);
+  const Real force_increment = infile("force_increment", 0.001);
 
   Mesh mesh(init.comm());
   mesh.read("systems_of_equations_ex8.exo");
@@ -129,7 +129,7 @@ int main (int argc, char** argv)
 
   equation_systems.parameters.set<Real>("young_modulus") = young_modulus;
   equation_systems.parameters.set<Real>("poisson_ratio") = poisson_ratio;
-  equation_systems.parameters.set<Real>("forcing_magnitude") = forcing_magnitude;
+  equation_systems.parameters.set<Real>("forcing_magnitude") = initial_forcing_magnitude;
 
   // Attach Dirichlet boundary conditions
   std::set<boundary_id_type> clamped_boundaries;
@@ -155,15 +155,9 @@ int main (int argc, char** argv)
   // where solve n gives a good starting guess for solve n+1.
   // This "continuation" approach is helpful for solving for
   // large values of "forcing_magnitude".
-  // Set n_solves and force_scaling in nonlinear_elasticity.in.
   for(unsigned int count=0; count<n_solves; count++)
   {
-    Real previous_forcing_magnitude =
-      equation_systems.parameters.get<Real>("forcing_magnitude");
-    equation_systems.parameters.set<Real>("forcing_magnitude") =
-      previous_forcing_magnitude*force_scaling;
-
-    libMesh::out << "Performing solve " << count << ", forcing_magnitude: "
+    libMesh::out << "Performing solve " << (count+1) << ", forcing_magnitude: "
       << equation_systems.parameters.get<Real>("forcing_magnitude") 
       << ", contact_penalty: " << contact_penalty << std::endl;
 
@@ -188,6 +182,14 @@ int main (int argc, char** argv)
     ExodusII_IO (mesh).write_equation_systems(
       filename.str(),
       equation_systems);
+
+    {
+      // Increment the forcing magnitude
+      Real previous_forcing =
+        equation_systems.parameters.get<Real>("forcing_magnitude");
+      equation_systems.parameters.set<Real>("forcing_magnitude") =
+        previous_forcing + force_increment;
+    }
   }
 
   return 0;
