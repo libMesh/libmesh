@@ -563,60 +563,20 @@ void System::project_vector (NumericVector<Number>& new_vector,
 {
   START_LOG ("project_vector()", "System");
 
-  Threads::parallel_for
-    (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-                     this->get_mesh().active_local_elements_end() ),
-     ProjectSolution(*this, f, g,
-                     this->get_equation_systems().parameters,
-                     new_vector)
-     );
+  libmesh_assert(f);
 
-  // Also, load values into the SCALAR dofs
-  // Note: We assume that all SCALAR dofs are on the
-  // processor with highest ID
-  if(this->processor_id() == (this->n_processors()-1))
+  WrappedFunctor<Number> f_fem(*f);
+
+  if (g)
     {
-      // We get different scalars as different
-      // components from a new-style f functor.
-      DenseVector<Number> fout(this->n_components());
-      bool filled_fout = false;
+      WrappedFunctor<Gradient> g_fem(*g);
 
-      const DofMap& dof_map = this->get_dof_map();
-      for (unsigned int var=0; var<this->n_vars(); var++)
-        if(this->variable(var).type().family == SCALAR)
-          {
-            if (!filled_fout)
-              {
-                (*f) (Point(), this->time, fout);
-                filled_fout = true;
-              }
-
-            std::vector<dof_id_type> SCALAR_indices;
-            dof_map.SCALAR_dof_indices (SCALAR_indices, var);
-            const unsigned int n_SCALAR_dofs =
-              cast_int<unsigned int>(SCALAR_indices.size());
-
-            for (unsigned int i=0; i<n_SCALAR_dofs; i++)
-              {
-                const dof_id_type global_index = SCALAR_indices[i];
-                const unsigned int component_index =
-                  this->variable_scalar_number(var,i);
-                new_vector.set(global_index, fout(component_index));
-              }
-          }
+      this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint);
     }
+  else
+    this->project_vector(new_vector, &f_fem, NULL, is_adjoint);
 
-  new_vector.close();
-
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  if (is_adjoint == -1)
-    this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
-  else if (is_adjoint >= 0)
-    this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
-                                                            is_adjoint);
-#endif
-
-  STOP_LOG("project_vector()", "System");
+  STOP_LOG ("project_vector()", "System");
 }
 
 
