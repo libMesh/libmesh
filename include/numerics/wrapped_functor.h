@@ -50,7 +50,11 @@ public:
     : _func(func.clone())
   { }
 
-  virtual AutoPtr<FEMFunctionBase<Output> > clone () const;
+  virtual AutoPtr<FEMFunctionBase<Output> > clone () const
+  {
+    return AutoPtr<FEMFunctionBase<Output> >
+      (new WrappedFunctor<Output> (*_func));
+  }
 
   /**
    * @returns the scalar value of variable varnum at coordinate \p p
