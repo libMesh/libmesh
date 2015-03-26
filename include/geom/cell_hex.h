@@ -43,6 +43,18 @@ public:
   Hex(const unsigned int nn, Elem* p, Node** nodelinkdata);
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
+
+  /**
    * @returns 6
    */
   unsigned int n_sides() const { return 6; }
@@ -147,6 +159,17 @@ protected:
    * Vector that names the child vertex index for each second order node.
    */
   static const unsigned short int _second_order_vertex_child_index[27];
+
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[27][3];
+
+  /**
+   * Lookup table from child id, child node id to "possible node
+   * location" (a simple dictionary-index in a 5x5x5 grid)
+   */
+  static const int _child_node_lookup[8][27];
 };
 
 

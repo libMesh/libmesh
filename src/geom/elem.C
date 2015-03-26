@@ -1714,6 +1714,240 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor_in,
   return min_p_level;
 }
 
+
+
+unsigned int Elem::as_parent_node (unsigned int child,
+                                   unsigned int child_node) const
+{
+  libmesh_assert_less(child, this->n_children());
+
+  // Cached return values, indexed first by embedding_matrix version,
+  // then by child number, then by child node number.
+  std::vector<std::vector<std::vector<signed char> > > &
+    cached_parent_indices = this->_get_parent_indices_cache();
+
+  unsigned int em_vers = this->embedding_matrix_version();
+  if (em_vers >= cached_parent_indices.size())
+    cached_parent_indices.resize(em_vers+1);
+
+  if (child >= cached_parent_indices[em_vers].size())
+    {
+      const unsigned int nn = this->n_nodes();
+
+      cached_parent_indices[em_vers].resize(this->n_children());
+
+      for (unsigned int c = 0; c != this->n_children(); ++c)
+        {
+          const unsigned int ncn = this->n_nodes_in_child(c);
+          cached_parent_indices[em_vers][c].resize(ncn);
+          for (unsigned int cn = 0; cn != ncn; ++cn)
+            {
+              for (unsigned int n = 0; n != nn; ++n)
+                {
+                  const float em_val = this->embedding_matrix
+                    (c, cn, n);
+                  if (em_val == 1)
+                    {
+                      cached_parent_indices[em_vers][c][cn] = n;
+                      break;
+                    }
+
+                  if (em_val != 0)
+                    {
+                      cached_parent_indices[em_vers][c][cn] =
+                        -1;
+                      break;
+                    }
+
+                  // We should never see an all-zero embedding matrix
+                  // row
+                  libmesh_assert_not_equal_to (n+1, nn);
+                }
+            }
+        }
+    }
+
+  const signed char cache_val =
+    cached_parent_indices[em_vers][child][child_node];
+  if (cache_val == -1)
+    return libMesh::invalid_uint;
+
+  return cached_parent_indices[em_vers][child][child_node];
+}
+
+
+
+const std::vector<std::pair<unsigned char, unsigned char> >&
+Elem::parent_bracketing_nodes(unsigned int child,
+                              unsigned int child_node) const
+{
+  // Indexed first by embedding matrix type, then by child id, then by
+  // child node, then by bracketing pair
+  std::vector<std::vector<std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > > > > &
+    cached_bracketing_nodes = this->_get_bracketing_node_cache();
+
+  const unsigned int em_vers = this->embedding_matrix_version();
+
+  if (cached_bracketing_nodes.size() <= em_vers)
+    cached_bracketing_nodes.resize(em_vers+1);
+
+  const unsigned int nc = this->n_children();
+
+  // If we haven't cached the bracketing nodes corresponding to this
+  // embedding matrix yet, let's do so now.
+  if (cached_bracketing_nodes[em_vers].size() < nc)
+    {
+      cached_bracketing_nodes[em_vers].resize(nc);
+
+      const unsigned int nn = this->n_nodes();
+
+      // We have to examine each child
+      for (unsigned int c = 0; c != nc; ++c)
+        {
+          const unsigned int ncn = this->n_nodes_in_child(c);
+
+          cached_bracketing_nodes[em_vers][c].resize(ncn);
+
+          // We have to examine each node in that child
+          for (unsigned int n = 0; n != ncn; ++n)
+            {
+              // If this child node isn't a vertex, we need to
+              // find bracketing nodes on the child.
+              if (!this->is_vertex_on_child(c, n))
+                {
+                  // Use the embedding matrix to find the child node
+                  // location in parent master element space
+                  Point bracketed_pt;
+
+                  for (unsigned int pn = 0; pn != nn; ++pn)
+                    {
+                      const float em_val =
+                        this->embedding_matrix(c,n,pn);
+
+                      libmesh_assert_not_equal_to (em_val, 1);
+                      if (em_val != 0.)
+                        bracketed_pt.add_scaled(this->master_point(pn), em_val);
+                    }
+
+                  // Check each pair of nodes on the child which are
+                  // also both parent nodes
+                  for (unsigned int n1 = 0; n1 != ncn; ++n1)
+                    {
+                      if (n1 == n)
+                        continue;
+
+                      unsigned int parent_n1 =
+                        this->as_parent_node(c,n1);
+
+                      if (parent_n1 == libMesh::invalid_uint)
+                        continue;
+
+                      Point p1 = this->master_point(parent_n1);
+
+                      for (unsigned int n2 = n1+1; n2 < nn; ++n2)
+                        {
+                          if (n2 == n)
+                            continue;
+
+                          unsigned int parent_n2 =
+                            this->as_parent_node(c,n2);
+
+                          if (parent_n2 == libMesh::invalid_uint)
+                            continue;
+
+                          Point p2 = this->master_point(parent_n2);
+
+                          Point pmid = (p1 + p2)/2;
+
+                          if (pmid == bracketed_pt)
+                            {
+                              cached_bracketing_nodes[em_vers][c][n].push_back
+                                (std::make_pair(parent_n1,parent_n2));
+                              break;
+                            }
+                          else
+                            libmesh_assert(!pmid.absolute_fuzzy_equals(bracketed_pt));
+                        }
+                    }
+                }
+              // If this child node is a parent node, we need to
+              // find bracketing nodes on the parent.
+              else
+                {
+                  unsigned int parent_node = this->as_parent_node(c,n);
+
+                  Point bracketed_pt;
+                  
+                  // If we're not a parent node, use the embedding
+                  // matrix to find the child node location in parent
+                  // master element space
+                  if (parent_node == libMesh::invalid_uint)
+                    {
+                      for (unsigned int pn = 0; pn != nn; ++pn)
+                        {
+                          const float em_val =
+                            this->embedding_matrix(c,n,pn);
+
+                          libmesh_assert_not_equal_to (em_val, 1);
+                          if (em_val != 0.)
+                            bracketed_pt.add_scaled(this->master_point(pn), em_val);
+                        }
+                    }
+                  // If we're a parent node then we need no arithmetic
+                  else
+                    bracketed_pt = this->master_point(parent_node);
+
+                  for (unsigned int n1 = 0; n1 != nn; ++n1)
+                    {
+                      if (n1 == parent_node)
+                        continue;
+
+                      Point p1 = this->master_point(n1);
+
+                      for (unsigned int n2 = n1+1; n2 < nn; ++n2)
+                        {
+                          if (n2 == parent_node)
+                            continue;
+
+                          Point pmid = (p1 + this->master_point(n2))/2;
+
+                          if (pmid == bracketed_pt)
+                            {
+                              cached_bracketing_nodes[em_vers][c][n].push_back
+                                (std::make_pair(n1,n2));
+                              break;
+                            }
+                          else
+                            libmesh_assert(!pmid.absolute_fuzzy_equals(bracketed_pt));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+  return cached_bracketing_nodes[em_vers][child][child_node];
+}
+
+
+const std::vector<std::pair<dof_id_type, dof_id_type> >
+Elem::bracketing_nodes(unsigned int child,
+                       unsigned int child_node) const
+{
+  std::vector<std::pair<dof_id_type, dof_id_type> > returnval;
+
+  const std::vector<std::pair<unsigned char, unsigned char> > & pbc =
+    this->parent_bracketing_nodes(child,child_node);
+
+  for (unsigned int i = 0; i != pbc.size(); ++i)
+    returnval.push_back
+      (std::make_pair
+        (this->node(pbc[i].first),
+         this->node(pbc[i].second)));
+
+  return returnval;
+}
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 

@@ -62,6 +62,16 @@ public:
     Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(0,i,0);
+  }
+
+  /**
    * @returns 1
    */
   unsigned int n_sub_elem() const { return 1; }
@@ -143,7 +153,10 @@ protected:
                           const unsigned int) const
   { libmesh_not_implemented(); return 0.; }
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
+
 };
 
 

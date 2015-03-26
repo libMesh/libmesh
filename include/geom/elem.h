@@ -123,6 +123,12 @@ public:
   Point & point (const unsigned int i);
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  virtual Point master_point (const unsigned int i) const = 0;
+
+  /**
    * @returns the global id number of local \p Node \p i.
    */
   dof_id_type node (const unsigned int i) const;
@@ -423,6 +429,14 @@ public:
   virtual unsigned int n_nodes () const = 0;
 
   /**
+   * @returns the number of nodes the given child of this element
+   * contains.  Except in odd cases like pyramid refinement this will
+   * be the same as the number of nodes in the parent element.
+   */
+  virtual unsigned int n_nodes_in_child (unsigned int /*c*/) const
+  { return this->n_nodes(); }
+
+  /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of sides on the element.
    */
@@ -478,6 +492,18 @@ public:
    * @returns true iff the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const = 0;
+
+  /**
+   * @returns true iff the specified child has a vertex at the
+   * specified (child-local) node number.
+   * Except in odd cases like pyramid refinement the child will have
+   * the same local structure as the parent element.
+   * same as the parent element.
+   */
+  virtual unsigned int is_vertex_on_child (unsigned int /*c*/,
+                                           unsigned int i) const
+  { return this->is_vertex(i); }
+
 
   /**
    * @returns true iff the specified (local) node number is an edge.
@@ -1149,14 +1175,49 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
+   * Returns the local node id on the parent which corresponds to 
+   * node n of child c, or returns invalid_uint if no such parent node
+   * exists.
+   */
+  virtual unsigned int as_parent_node (unsigned int c,
+                                       unsigned int n) const;
+
+  /**
+   * Returns all the pairs of nodes (indexed by local node id) which
+   * should bracket node n of child c.
+   */
+  virtual
+  const std::vector<std::pair<unsigned char, unsigned char> >&
+  parent_bracketing_nodes(unsigned int c,
+                          unsigned int n) const;
+
+  /**
+   * Returns all the pairs of nodes (indexed by global node id) which
+   * should bracket node n of child c.
+   */
+  virtual
+  const std::vector<std::pair<dof_id_type, dof_id_type> >
+  bracketing_nodes(unsigned int c,
+                   unsigned int n) const;
+
+
+  /**
    * Matrix that transforms the parents nodes into the children's
    * nodes
    */
-  virtual float embedding_matrix (const unsigned int i,
-                                  const unsigned int j,
-                                  const unsigned int k) const = 0;
+  virtual float embedding_matrix (const unsigned int child_num,
+                                  const unsigned int child_node_num,
+                                  const unsigned int parent_node_num) const = 0;
 
-#endif
+  /**
+   * Some element types may use a different embedding matrix for
+   * different elements.  But we may want to cache data based on that
+   * matrix.  So we return a "version number" that can be used to
+   * identify which matrix is in use.
+   */
+  virtual unsigned int embedding_matrix_version () const { return 0; }
+
+#endif // LIBMESH_ENABLE_AMR
 
 
 protected:
@@ -1190,9 +1251,41 @@ protected:
                                   dof_id_type n1,
                                   dof_id_type n2,
                                   dof_id_type n3);
-  //-------------------------------------------------------
 
 
+#ifdef LIBMESH_ENABLE_AMR
+
+  /**
+   * Elem subclasses which don't do their own bracketing node
+   * calculations will need to supply a static cache, since the
+   * default calculation is slow.
+   */
+  virtual 
+  std::vector<std::vector<std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > > > > &
+    _get_bracketing_node_cache() const
+  {
+    static std::vector<std::vector<std::vector<std::vector<
+             std::pair<unsigned char, unsigned char> > > > > c;
+    libmesh_error();
+    return c;
+  }
+
+  /**
+   * Elem subclasses which don't do their own child-to-parent node
+   * calculations will need to supply a static cache, since the
+   * default calculation is slow.
+   */
+  virtual
+  std::vector<std::vector<std::vector<signed char> > > &
+  _get_parent_indices_cache() const
+  {
+    static std::vector<std::vector<std::vector<signed char> > > c;
+    libmesh_error();
+    return c;
+  }
+
+#endif // LIBMESH_ENABLE_AMR
 
 public:
 
@@ -2180,6 +2273,28 @@ variant_filter_iterator<Elem::Predicate,
 
 
 } // namespace libMesh
+
+
+// Helper function for default caches in Elem subclases
+
+#define LIBMESH_ENABLE_TOPOLOGY_CACHES \
+  virtual \
+  std::vector<std::vector<std::vector<std::vector< \
+    std::pair<unsigned char, unsigned char> > > > > & \
+    _get_bracketing_node_cache() const \
+  { \
+    static std::vector<std::vector<std::vector<std::vector< \
+             std::pair<unsigned char, unsigned char> > > > > c; \
+    return c; \
+  } \
+ \
+  virtual \
+  std::vector<std::vector<std::vector<signed char> > > & \
+  _get_parent_indices_cache() const \
+  { \
+    static std::vector<std::vector<std::vector<signed char> > > c; \
+    return c; \
+  }
 
 
 #endif // LIBMESH_ELEM_H

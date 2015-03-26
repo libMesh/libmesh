@@ -73,6 +73,9 @@ public:
    */
   static const Elem & create ();
 
+  virtual Point master_point (const unsigned int /*i*/) const
+  { libmesh_not_implemented(); return Point(); }
+
   virtual const Point & point (const unsigned int i) const
   { libmesh_not_implemented(); return Elem::point(i); }
 
@@ -182,7 +185,10 @@ public:
                                   const unsigned int) const
   { libmesh_not_implemented(); return 0.; }
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
+
 
 protected:
 

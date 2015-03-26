@@ -43,6 +43,18 @@ public:
   Tet  (const unsigned int nn, Elem* p, Node** nodelinkdata);
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
+
+  /**
    * @returns 4
    */
   unsigned int n_sides() const { return 4; }
@@ -124,12 +136,37 @@ public:
    */
   void select_diagonal (const Diagonal diag) const;
 
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+
+  /**
+   * Tetrahedral elements permute the embedding matrix depending on which
+   * interior diagonal is used to subdivide into child elements.
+   * But we want to cache topology data based on that matrix.  So we return a
+   * "version number" based on the diagonal selection.
+   */
+  virtual unsigned int embedding_matrix_version () const {
+    this->choose_diagonal();
+    return this->diagonal_selection();
+  }
+
+#endif // LIBMESH_ENABLE_AMR
+
+
+
 protected:
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[10][3];
 
   /**
    * Called by descendant classes with appropriate data to determine

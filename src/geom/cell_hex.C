@@ -24,8 +24,47 @@
 #include "libmesh/cell_hex8.h"
 #include "libmesh/face_quad4.h"
 
+
+
 namespace libMesh
 {
+
+
+
+// ------------------------------------------------------------
+// Hex class static member initializations
+
+
+// We need to require C++11...
+const Real Hex::_master_points[27][3] =
+  {
+    {-1, -1, -1},
+    {1, -1, -1},
+    {1, 1, -1},
+    {-1, 1, -1},
+    {-1, -1, 1},
+    {1, -1, 1},
+    {1, 1, 1},
+    {-1, 1, 1},
+    {0, -1, -1},
+    {1, 0, -1},
+    {0, 1, -1},
+    {-1, 0, -1},
+    {-1, -1, 0},
+    {1, -1, 0},
+    {1, 1, 0},
+    {-1, 1, 0},
+    {0, -1, 1},
+    {1, 0, 1},
+    {0, 1, 1},
+    {-1, 0, 1},
+    {0, 0, -1},
+    {0, -1, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {-1, 0, 0},
+    {0, 0, 1}
+  };
 
 
 
@@ -489,5 +528,48 @@ const unsigned short int Hex::_second_order_adjacent_vertices[12][2] =
     { 6,  7}, // vertices adjacent to node 18
     { 4,  7}  // vertices adjacent to node 19
   };
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+// We number 125 "possible node locations" for a 2x2x2 refinement of
+// hexes with up to 3x3x3 nodes each
+const int Hex::_child_node_lookup[8][27] =
+  {
+    // node lookup for child 0 (near node 0)
+    { 0, 2, 12, 10,  50, 52, 62, 60,  1, 7, 11, 5,  25, 27, 37, 35,
+      51, 57, 61, 55,  6,  26, 32, 36, 30,  56,  31},
+
+    // node lookup for child 1 (near node 1)
+    { 2, 4, 14, 12,  52, 54, 64, 62,  3, 9, 13, 7,  27, 29, 39, 37,
+      53, 59, 63, 57,  8,  28, 34, 38, 32,  58,  33},
+
+    // node lookup for child 2 (near node 3)
+    { 10, 12, 22, 20,  60, 62, 72, 70,  11, 17, 21, 15,  35, 37, 47, 45,
+      61, 67, 71, 65,  16,  36, 42, 46, 40,  66,  41},
+
+    // node lookup for child 3 (near node 2)
+    { 12, 14, 24, 22,  62, 64, 74, 72,  13, 19, 23, 17,  37, 39, 49, 47,
+      63, 69, 73, 67,  18,  38, 44, 48, 42,  68,  43},
+
+    // node lookup for child 4 (near node 4)
+    { 50, 52, 62, 60,  100, 102, 112, 110,  51, 57, 61, 55,  75, 77, 87, 85,
+      101, 107, 111, 105,  56,  76, 82, 86, 80,  106,  81},
+
+    // node lookup for child 5 (near node 5)
+    { 52, 54, 64, 62,  102, 104, 114, 112,  53, 59, 63, 57,  77, 79, 89, 87,
+      103, 109, 113, 107,  58,  78, 84, 88, 82,  108,  93},
+
+    // node lookup for child 6 (near node 7)
+    { 60, 62, 72, 70,  110, 112, 122, 120,  61, 67, 71, 65,  85, 87, 97, 95,
+      111, 117, 121, 115,  66,  86, 92, 96, 90,  116,  91},
+
+    // node lookup for child 7 (near node 6)
+    { 62, 64, 74, 72,  112, 114, 124, 122,  63, 69, 73, 67,  87, 89, 99, 97,
+      113, 119, 123, 117,  68,  88, 94, 98, 92,  118,  103}
+  };
+
+#endif // LIBMESH_ENABLE_AMR
+       
 
 } // namespace libMesh

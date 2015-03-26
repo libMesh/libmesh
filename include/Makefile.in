@@ -893,6 +893,7 @@ include_HEADERS = \
         utils/statistics.h \
         utils/string_to_enum.h \
         utils/timestamp.h \
+        utils/topology_map.h \
         utils/tree.h \
         utils/tree_base.h \
         utils/tree_node.h \
