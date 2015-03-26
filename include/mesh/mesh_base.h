@@ -766,26 +766,26 @@ public:
   /**
    * Iterate over elements of a given level.
    */
-  virtual element_iterator level_elements_begin (const unsigned int level) = 0;
-  virtual element_iterator level_elements_end (const unsigned int level) = 0;
-  virtual const_element_iterator level_elements_begin (const unsigned int level) const = 0;
-  virtual const_element_iterator level_elements_end (const unsigned int level) const = 0;
+  virtual element_iterator level_elements_begin (unsigned int level) = 0;
+  virtual element_iterator level_elements_end (unsigned int level) = 0;
+  virtual const_element_iterator level_elements_begin (unsigned int level) const = 0;
+  virtual const_element_iterator level_elements_end (unsigned int level) const = 0;
 
   /**
    * Iterate over all elements with a specified processor id.
    */
-  virtual element_iterator pid_elements_begin (const processor_id_type proc_id) = 0;
-  virtual element_iterator pid_elements_end (const processor_id_type proc_id) = 0;
-  virtual const_element_iterator pid_elements_begin (const processor_id_type proc_id) const = 0;
-  virtual const_element_iterator pid_elements_end (const processor_id_type proc_id) const = 0;
+  virtual element_iterator pid_elements_begin (processor_id_type proc_id) = 0;
+  virtual element_iterator pid_elements_end (processor_id_type proc_id) = 0;
+  virtual const_element_iterator pid_elements_begin (processor_id_type proc_id) const = 0;
+  virtual const_element_iterator pid_elements_end (processor_id_type proc_id) const = 0;
 
   /**
    * Iterate over all elements with a specified geometric type.
    */
-  virtual element_iterator type_elements_begin (const ElemType type) = 0;
-  virtual element_iterator type_elements_end (const ElemType type) = 0;
-  virtual const_element_iterator type_elements_begin (const ElemType type) const = 0;
-  virtual const_element_iterator type_elements_end (const ElemType type) const = 0;
+  virtual element_iterator type_elements_begin (ElemType type) = 0;
+  virtual element_iterator type_elements_end (ElemType type) = 0;
+  virtual const_element_iterator type_elements_begin (ElemType type) const = 0;
+  virtual const_element_iterator type_elements_end (ElemType type) const = 0;
 
   /**
    * Iterate over unpartitioned elements in the Mesh.
@@ -810,40 +810,40 @@ public:
   virtual const_element_iterator local_elements_begin () const = 0;
   virtual const_element_iterator local_elements_end () const = 0;
 
-  virtual element_iterator active_type_elements_begin (const ElemType type) = 0;
-  virtual element_iterator active_type_elements_end (const ElemType type) = 0;
-  virtual const_element_iterator active_type_elements_begin (const ElemType type) const = 0;
-  virtual const_element_iterator active_type_elements_end (const ElemType type) const = 0;
+  virtual element_iterator active_type_elements_begin (ElemType type) = 0;
+  virtual element_iterator active_type_elements_end (ElemType type) = 0;
+  virtual const_element_iterator active_type_elements_begin (ElemType type) const = 0;
+  virtual const_element_iterator active_type_elements_end (ElemType type) const = 0;
 
-  virtual element_iterator active_pid_elements_begin (const processor_id_type proc_id) = 0;
-  virtual element_iterator active_pid_elements_end (const processor_id_type proc_id) = 0;
-  virtual const_element_iterator active_pid_elements_begin (const processor_id_type proc_id) const = 0;
-  virtual const_element_iterator active_pid_elements_end (const processor_id_type proc_id) const = 0;
+  virtual element_iterator active_pid_elements_begin (processor_id_type proc_id) = 0;
+  virtual element_iterator active_pid_elements_end (processor_id_type proc_id) = 0;
+  virtual const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const = 0;
+  virtual const_element_iterator active_pid_elements_end (processor_id_type proc_id) const = 0;
 
-  virtual element_iterator active_subdomain_elements_begin (const subdomain_id_type subdomain_id) = 0;
-  virtual element_iterator active_subdomain_elements_end (const subdomain_id_type subdomain_id) = 0;
-  virtual const_element_iterator active_subdomain_elements_begin (const subdomain_id_type subdomain_id) const = 0;
-  virtual const_element_iterator active_subdomain_elements_end (const subdomain_id_type subdomain_id) const = 0;
+  virtual element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) = 0;
+  virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) = 0;
+  virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const = 0;
+  virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const = 0;
 
-  virtual element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) = 0;
-  virtual element_iterator active_local_subdomain_elements_end (const subdomain_id_type subdomain_id) = 0;
-  virtual const_element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) const = 0;
-  virtual const_element_iterator active_local_subdomain_elements_end (const subdomain_id_type subdomain_id) const = 0;
+  virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) = 0;
+  virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) = 0;
+  virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const = 0;
+  virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const = 0;
 
-  virtual element_iterator local_level_elements_begin (const unsigned int level) = 0;
-  virtual element_iterator local_level_elements_end (const unsigned int level) = 0;
-  virtual const_element_iterator local_level_elements_begin (const unsigned int level) const = 0;
-  virtual const_element_iterator local_level_elements_end (const unsigned int level) const = 0;
+  virtual element_iterator local_level_elements_begin (unsigned int level) = 0;
+  virtual element_iterator local_level_elements_end (unsigned int level) = 0;
+  virtual const_element_iterator local_level_elements_begin (unsigned int level) const = 0;
+  virtual const_element_iterator local_level_elements_end (unsigned int level) const = 0;
 
-  virtual element_iterator local_not_level_elements_begin (const unsigned int level) = 0;
-  virtual element_iterator local_not_level_elements_end (const unsigned int level) = 0;
-  virtual const_element_iterator local_not_level_elements_begin (const unsigned int level) const = 0;
-  virtual const_element_iterator local_not_level_elements_end (const unsigned int level) const = 0;
+  virtual element_iterator local_not_level_elements_begin (unsigned int level) = 0;
+  virtual element_iterator local_not_level_elements_end (unsigned int level) = 0;
+  virtual const_element_iterator local_not_level_elements_begin (unsigned int level) const = 0;
+  virtual const_element_iterator local_not_level_elements_end (unsigned int level) const = 0;
 
-  virtual element_iterator not_level_elements_begin (const unsigned int level) = 0;
-  virtual element_iterator not_level_elements_end (const unsigned int level) = 0;
-  virtual const_element_iterator not_level_elements_begin (const unsigned int level) const = 0;
-  virtual const_element_iterator not_level_elements_end (const unsigned int level) const = 0;
+  virtual element_iterator not_level_elements_begin (unsigned int level) = 0;
+  virtual element_iterator not_level_elements_end (unsigned int level) = 0;
+  virtual const_element_iterator not_level_elements_begin (unsigned int level) const = 0;
+  virtual const_element_iterator not_level_elements_end (unsigned int level) const = 0;
 
   virtual element_iterator active_local_elements_begin () = 0;
   virtual element_iterator active_local_elements_end () = 0;
@@ -906,18 +906,18 @@ public:
   /**
    * Iterate over nodes with processor_id() == proc_id
    */
-  virtual node_iterator pid_nodes_begin (const processor_id_type proc_id) = 0;
-  virtual node_iterator pid_nodes_end (const processor_id_type proc_id) = 0;
-  virtual const_node_iterator pid_nodes_begin (const processor_id_type proc_id) const = 0;
-  virtual const_node_iterator pid_nodes_end (const processor_id_type proc_id) const = 0;
+  virtual node_iterator pid_nodes_begin (processor_id_type proc_id) = 0;
+  virtual node_iterator pid_nodes_end (processor_id_type proc_id) = 0;
+  virtual const_node_iterator pid_nodes_begin (processor_id_type proc_id) const = 0;
+  virtual const_node_iterator pid_nodes_end (processor_id_type proc_id) const = 0;
 
   /**
    * Iterate over nodes for which BoundaryInfo::has_boundary_id(node, bndry_id) returns true.
    */
-  virtual node_iterator bid_nodes_begin (const boundary_id_type bndry_id) = 0;
-  virtual node_iterator bid_nodes_end (const boundary_id_type bndry_id) = 0;
-  virtual const_node_iterator bid_nodes_begin (const boundary_id_type bndry_id) const = 0;
-  virtual const_node_iterator bid_nodes_end (const boundary_id_type bndry_id) const = 0;
+  virtual node_iterator bid_nodes_begin (boundary_id_type bndry_id) = 0;
+  virtual node_iterator bid_nodes_end (boundary_id_type bndry_id) = 0;
+  virtual const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const = 0;
+  virtual const_node_iterator bid_nodes_end (boundary_id_type bndry_id) const = 0;
 
   /**
    * Iterate over nodes for which BoundaryInfo::n_boundary_ids(node) > 0.
