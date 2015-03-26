@@ -22,6 +22,7 @@
 #include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
+#include "libmesh/boundary_info.h"
 
 // C++ includes
 #include <cstddef>
@@ -167,6 +168,32 @@ struct pid : predicate<T>
 protected:
   virtual predicate<T>* clone() const { return new pid<T>(*this); }
   const processor_id_type _pid;
+};
+
+
+
+// The bid predicate returns true if has_boundary_id(node, id) returns true.
+template <typename T>
+struct bid : predicate<T>
+{
+  // Constructor
+  bid(const boundary_id_type bid,
+      const BoundaryInfo& bndry_info) :
+    _bid(bid),
+    _bndry_info(bndry_info)
+  {}
+  virtual ~bid() {}
+
+  // op()
+  virtual bool operator()(const T& it) const
+  {
+    return _bndry_info.has_boundary_id(*it, _bid);
+  }
+
+protected:
+  virtual predicate<T>* clone() const { return new bid<T>(*this); }
+  const boundary_id_type _bid;
+  const BoundaryInfo & _bndry_info;
 };
 
 

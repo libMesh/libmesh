@@ -378,30 +378,28 @@ public:
    */
   node_iterator nodes_begin();
   node_iterator nodes_end();
-
   node_iterator active_nodes_begin();
   node_iterator active_nodes_end();
-
   node_iterator local_nodes_begin  ();
   node_iterator local_nodes_end    ();
-
   node_iterator pid_nodes_begin (const processor_id_type proc_id);
   node_iterator pid_nodes_end   (const processor_id_type proc_id);
+  node_iterator bid_nodes_begin (const boundary_id_type bndry_id);
+  node_iterator bid_nodes_end   (const boundary_id_type bndry_id);
 
   /**
    * const Node iterator accessor functions.
    */
   const_node_iterator nodes_begin() const;
   const_node_iterator nodes_end()   const;
-
   const_node_iterator active_nodes_begin() const;
   const_node_iterator active_nodes_end()   const;
-
   const_node_iterator local_nodes_begin  () const;
   const_node_iterator local_nodes_end    () const;
-
   const_node_iterator pid_nodes_begin (const processor_id_type proc_id) const;
   const_node_iterator pid_nodes_end   (const processor_id_type proc_id) const;
+  const_node_iterator bid_nodes_begin (const boundary_id_type bndry_id) const;
+  const_node_iterator bid_nodes_end   (const boundary_id_type bndry_id) const;
 
 protected:
 

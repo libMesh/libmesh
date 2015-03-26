@@ -27,6 +27,9 @@
 namespace libMesh
 {
 
+// Forward declarations
+class BoundaryInfo;
+
 /**
  * This namespace defines several multi_predicates which are used by
  * the element and node iterators.  These classes are not in general
@@ -368,6 +371,19 @@ struct PID : abstract_multi_predicate<T>
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new pid<T>(proc_id));
+  }
+};
+
+
+
+// Instantiation for the BID abstract_multi_predicate
+template <typename T>
+struct BID : abstract_multi_predicate<T>
+{
+  BID(const boundary_id_type bndry_id, const BoundaryInfo& bndry_info)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new bid<T>(bndry_id, bndry_info));
   }
 };
 

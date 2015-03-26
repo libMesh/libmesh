@@ -839,6 +839,8 @@ public:
   virtual node_iterator local_nodes_end    () = 0;
   virtual node_iterator pid_nodes_begin    (const processor_id_type proc_id) = 0;
   virtual node_iterator pid_nodes_end      (const processor_id_type proc_id) = 0;
+  virtual node_iterator bid_nodes_begin    (const boundary_id_type bndry_id) = 0;
+  virtual node_iterator bid_nodes_end      (const boundary_id_type bndry_id) = 0;
 
 
   /**
@@ -852,6 +854,8 @@ public:
   virtual const_node_iterator local_nodes_end    () const = 0;
   virtual const_node_iterator pid_nodes_begin    (const processor_id_type proc_id) const = 0;
   virtual const_node_iterator pid_nodes_end      (const processor_id_type proc_id) const = 0;
+  virtual const_node_iterator bid_nodes_begin    (const boundary_id_type bndry_id) const = 0;
+  virtual const_node_iterator bid_nodes_end      (const boundary_id_type bndry_id) const = 0;
 
 
   /**
