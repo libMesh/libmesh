@@ -102,6 +102,7 @@ INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
 INT_TYPE(int,MPI_INT);
 INT_TYPE(unsigned int,MPI_UNSIGNED);
 INT_TYPE(long,MPI_LONG);
+INT_TYPE(long long,MPI_LONG_LONG_INT);
 INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
 INT_TYPE(unsigned long long,MPI_LONG_LONG_INT);
 FLOAT_TYPE(float,MPI_FLOAT);

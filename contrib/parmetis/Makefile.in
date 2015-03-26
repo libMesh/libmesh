@@ -771,9 +771,9 @@ vtkversion = @vtkversion@
 pkg_cppflags = -DLIBMESH_IS_COMPILING_PARMETIS \
 	-I$(top_srcdir)/contrib/metis/GKlib \
 	-I$(top_srcdir)/contrib/metis/include -I$(srcdir)/include \
-	-I$(srcdir)/libparmetis -I$(top_builddir)/include \
-	$(libmesh_optional_INCLUDES) # for a PETSc-provided MPI, if \
-	required
+	-I$(srcdir)/libparmetis -I$(top_srcdir)/contrib/metis/libmetis \
+	-I$(top_builddir)/include $(libmesh_optional_INCLUDES) # for a \
+	PETSc-provided MPI, if required
 pkg_sources = \
 	include/parmetis.h \
 	libparmetis/akwayfm.c \

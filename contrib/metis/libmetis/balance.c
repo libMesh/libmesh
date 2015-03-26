@@ -20,7 +20,13 @@ void Balance2Way(ctrl_t *ctrl, graph_t *graph, real_t *ntpwgts)
 
   if (graph->ncon == 1) {
     /* return right away if the balance is OK */
-    if (iabs(ntpwgts[0]*graph->tvwgt[0]-graph->pwgts[0]) < 3*graph->tvwgt[0]/graph->nvtxs)
+    /**
+     * [JWP]: the explicit idx_t cast is to silence the clang compiler that warns
+     * we are calling the integer abs function on a floating-point type (ntpwgts
+     * is an array of real_t).  The original intent and result of the computation
+     * is preserved with this explicit cast.
+     */
+    if (iabs((idx_t)(ntpwgts[0]*graph->tvwgt[0]-graph->pwgts[0])) < 3*graph->tvwgt[0]/graph->nvtxs)
       return;
 
     if (graph->nbnd > 0)

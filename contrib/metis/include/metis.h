@@ -14,6 +14,23 @@
 * A set of defines that can be modified by the user
 *****************************************************************************/
 
+/**
+ * We want the size of METIS's index and real types to match
+ * dof_id_type and Real, respectively, in libmesh, therefore, we must
+ * include libmesh_config.h.
+ *
+ * Remarks:
+ * 1.) We can't only do this when LIBMESH_IS_COMPILING_METIS, since
+ *     the sizes must be set correctly when e.g. metis_partitioner.C
+ *     includes "metis.h".
+ * 2.) This solution still isn't perfect since libmesh uses *unsigned*
+ *     index types while METIS uses signed index types.  So it is
+ *     still possible for libmesh to pass an ID to METIS that gets
+ *     wrapped to a negative number, but at least in this approach the
+ *     size of the datatypes will match...
+ */
+#include "libmesh/libmesh_config.h"
+
 /*--------------------------------------------------------------------------
  Specifies the width of the elementary data type that will hold information
  about vertices and their adjacency lists.
@@ -30,7 +47,11 @@
  GCC does provides these definitions in stdint.h, but it may require some
  modifications on other architectures.
 --------------------------------------------------------------------------*/
-#define IDXTYPEWIDTH 32
+#if LIBMESH_DOF_ID_BYTES == 8
+#  define IDXTYPEWIDTH 64
+#else
+#  define IDXTYPEWIDTH 32
+#endif
 
 
 /*--------------------------------------------------------------------------
@@ -40,8 +61,11 @@
    32 : single precission floating point (float)
    64 : double precission floating point (double)
 --------------------------------------------------------------------------*/
-#define REALTYPEWIDTH 32
-
+#if defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
+#  define REALTYPEWIDTH 64
+#else
+#  define REALTYPEWIDTH 32
+#endif
 
 
 /****************************************************************************
