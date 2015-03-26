@@ -829,33 +829,44 @@ public:
 
 
   /**
-   * non-const Node iterator accessor functions.
+   * Iterate over all the nodes in the Mesh.
    */
-  virtual node_iterator nodes_begin        () = 0;
-  virtual node_iterator nodes_end          () = 0;
-  virtual node_iterator active_nodes_begin () = 0;
-  virtual node_iterator active_nodes_end   () = 0;
-  virtual node_iterator local_nodes_begin  () = 0;
-  virtual node_iterator local_nodes_end    () = 0;
-  virtual node_iterator pid_nodes_begin    (const processor_id_type proc_id) = 0;
-  virtual node_iterator pid_nodes_end      (const processor_id_type proc_id) = 0;
-  virtual node_iterator bid_nodes_begin    (const boundary_id_type bndry_id) = 0;
-  virtual node_iterator bid_nodes_end      (const boundary_id_type bndry_id) = 0;
-
+  virtual node_iterator nodes_begin () = 0;
+  virtual node_iterator nodes_end () = 0;
+  virtual const_node_iterator nodes_begin () const = 0;
+  virtual const_node_iterator nodes_end () const = 0;
 
   /**
-   * const Node iterator accessor functions.
+   * Iterate over only the active nodes in the Mesh.
    */
-  virtual const_node_iterator nodes_begin        () const = 0;
-  virtual const_node_iterator nodes_end          () const = 0;
+  virtual node_iterator active_nodes_begin () = 0;
+  virtual node_iterator active_nodes_end () = 0;
   virtual const_node_iterator active_nodes_begin () const = 0;
-  virtual const_node_iterator active_nodes_end   () const = 0;
-  virtual const_node_iterator local_nodes_begin  () const = 0;
-  virtual const_node_iterator local_nodes_end    () const = 0;
-  virtual const_node_iterator pid_nodes_begin    (const processor_id_type proc_id) const = 0;
-  virtual const_node_iterator pid_nodes_end      (const processor_id_type proc_id) const = 0;
-  virtual const_node_iterator bid_nodes_begin    (const boundary_id_type bndry_id) const = 0;
-  virtual const_node_iterator bid_nodes_end      (const boundary_id_type bndry_id) const = 0;
+  virtual const_node_iterator active_nodes_end () const = 0;
+
+  /**
+   * Iterate over local nodes (nodes whose processor_id() matches the current processor).
+   */
+  virtual node_iterator local_nodes_begin () = 0;
+  virtual node_iterator local_nodes_end () = 0;
+  virtual const_node_iterator local_nodes_begin () const = 0;
+  virtual const_node_iterator local_nodes_end () const = 0;
+
+  /**
+   * Iterate over nodes with processor_id() == proc_id
+   */
+  virtual node_iterator pid_nodes_begin (const processor_id_type proc_id) = 0;
+  virtual node_iterator pid_nodes_end (const processor_id_type proc_id) = 0;
+  virtual const_node_iterator pid_nodes_begin (const processor_id_type proc_id) const = 0;
+  virtual const_node_iterator pid_nodes_end (const processor_id_type proc_id) const = 0;
+
+  /**
+   * Iterate over nodes for which BoundaryInfo::has_boundary_id(node, bndry_id) returns true.
+   */
+  virtual node_iterator bid_nodes_begin (const boundary_id_type bndry_id) = 0;
+  virtual node_iterator bid_nodes_end (const boundary_id_type bndry_id) = 0;
+  virtual const_node_iterator bid_nodes_begin (const boundary_id_type bndry_id) const = 0;
+  virtual const_node_iterator bid_nodes_end (const boundary_id_type bndry_id) const = 0;
 
   /**
    * Iterate over nodes for which BoundaryInfo::n_boundary_ids(node) > 0.
