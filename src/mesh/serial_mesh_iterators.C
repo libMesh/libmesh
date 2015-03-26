@@ -1057,6 +1057,16 @@ SerialMesh::bid_nodes_begin (const boundary_id_type bndry_id)
 
 
 
+// bnd nodes begin() accessor
+SerialMesh::node_iterator
+SerialMesh::bnd_nodes_begin ()
+{
+  Predicates::BND<node_iterator_imp> p(this->get_boundary_info());
+  return node_iterator(_nodes.begin(), _nodes.end(), p);
+}
+
+
+
 // default const nodes begin() accessor
 SerialMesh::const_node_iterator
 SerialMesh::nodes_begin () const
@@ -1102,6 +1112,16 @@ SerialMesh::const_node_iterator
 SerialMesh::bid_nodes_begin (const boundary_id_type bndry_id) const
 {
   Predicates::BID<const_node_iterator_imp> p(bndry_id, this->get_boundary_info());
+  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+}
+
+
+
+// bnd const nodes begin() accessor
+SerialMesh::const_node_iterator
+SerialMesh::bnd_nodes_begin () const
+{
+  Predicates::BND<const_node_iterator_imp> p(this->get_boundary_info());
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
 }
 
@@ -1157,6 +1177,16 @@ SerialMesh::bid_nodes_end (const boundary_id_type bndry_id)
 
 
 
+// bnd nodes end() accessor
+SerialMesh::node_iterator
+SerialMesh::bnd_nodes_end ()
+{
+  Predicates::BND<node_iterator_imp> p(this->get_boundary_info());
+  return node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+
 // default const nodes end() accessor
 SerialMesh::const_node_iterator
 SerialMesh::nodes_end () const
@@ -1202,6 +1232,16 @@ SerialMesh::const_node_iterator
 SerialMesh::bid_nodes_end (const boundary_id_type bndry_id) const
 {
   Predicates::BID<const_node_iterator_imp> p(bndry_id, this->get_boundary_info());
+  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+
+// bnd const nodes end() accessor
+SerialMesh::const_node_iterator
+SerialMesh::bnd_nodes_end () const
+{
+  Predicates::BND<const_node_iterator_imp> p(this->get_boundary_info());
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
 }
 

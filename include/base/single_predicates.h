@@ -198,6 +198,29 @@ protected:
 
 
 
+// The bnd predicate returns true if n_boundary_ids(node) > 0.
+template <typename T>
+struct bnd : predicate<T>
+{
+  // Constructor
+  bnd(const BoundaryInfo& bndry_info) :
+    _bndry_info(bndry_info)
+  {}
+  virtual ~bnd() {}
+
+  // op()
+  virtual bool operator()(const T& it) const
+  {
+    return (_bndry_info.n_boundary_ids(*it) > 0);
+  }
+
+protected:
+  virtual predicate<T>* clone() const { return new bnd<T>(*this); }
+  const BoundaryInfo & _bndry_info;
+};
+
+
+
 // The semilocal_pid predicate returns true if the element
 // pointed to is semilocal to (has nodes shared with an element of) a
 // given processor id.

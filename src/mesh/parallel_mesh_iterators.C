@@ -1056,6 +1056,16 @@ ParallelMesh::bid_nodes_begin (const boundary_id_type bndry_id)
 
 
 
+// bnd nodes begin() accessor
+ParallelMesh::node_iterator
+ParallelMesh::bnd_nodes_begin ()
+{
+  Predicates::BND<node_iterator_imp> p(this->get_boundary_info());
+  return node_iterator(_nodes.begin(), _nodes.end(), p);
+}
+
+
+
 // default const nodes begin() accessor
 ParallelMesh::const_node_iterator
 ParallelMesh::nodes_begin () const
@@ -1101,6 +1111,16 @@ ParallelMesh::const_node_iterator
 ParallelMesh::bid_nodes_begin (const boundary_id_type bndry_id) const
 {
   Predicates::BID<const_node_iterator_imp> p(bndry_id, this->get_boundary_info());
+  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+}
+
+
+
+// bnd const nodes begin() accessor
+ParallelMesh::const_node_iterator
+ParallelMesh::bnd_nodes_begin () const
+{
+  Predicates::BND<const_node_iterator_imp> p(this->get_boundary_info());
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
 }
 
@@ -1156,6 +1176,16 @@ ParallelMesh::bid_nodes_end (const boundary_id_type bndry_id)
 
 
 
+// bnd nodes end() accessor
+ParallelMesh::node_iterator
+ParallelMesh::bnd_nodes_end ()
+{
+  Predicates::BND<node_iterator_imp> p(this->get_boundary_info());
+  return node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+
 // default const nodes end() accessor
 ParallelMesh::const_node_iterator
 ParallelMesh::nodes_end () const
@@ -1201,6 +1231,16 @@ ParallelMesh::const_node_iterator
 ParallelMesh::bid_nodes_end (const boundary_id_type bndry_id) const
 {
   Predicates::BID<const_node_iterator_imp> p(bndry_id, this->get_boundary_info());
+  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+}
+
+
+
+// bnd const nodes end() accessor
+ParallelMesh::const_node_iterator
+ParallelMesh::bnd_nodes_end () const
+{
+  Predicates::BND<const_node_iterator_imp> p(this->get_boundary_info());
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
 }
 

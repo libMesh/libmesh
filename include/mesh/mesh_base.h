@@ -857,6 +857,13 @@ public:
   virtual const_node_iterator bid_nodes_begin    (const boundary_id_type bndry_id) const = 0;
   virtual const_node_iterator bid_nodes_end      (const boundary_id_type bndry_id) const = 0;
 
+  /**
+   * Iterate over nodes for which BoundaryInfo::n_boundary_ids(node) > 0.
+   */
+  virtual node_iterator bnd_nodes_begin () = 0;
+  virtual node_iterator bnd_nodes_end () = 0;
+  virtual const_node_iterator bnd_nodes_begin () const = 0;
+  virtual const_node_iterator bnd_nodes_end () const = 0;
 
   /**
    * Return a writeable reference to the whole subdomain name map

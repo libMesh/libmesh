@@ -389,6 +389,19 @@ struct BID : abstract_multi_predicate<T>
 
 
 
+// Instantiation for the BND abstract_multi_predicate
+template <typename T>
+struct BND : abstract_multi_predicate<T>
+{
+  BND(const BoundaryInfo& bndry_info)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new bnd<T>(bndry_info));
+  }
+};
+
+
+
 // Instantiation for the NotPID abstract_multi_predicate
 template <typename T>
 struct NotPID : abstract_multi_predicate<T>
