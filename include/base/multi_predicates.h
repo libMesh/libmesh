@@ -27,6 +27,9 @@
 namespace libMesh
 {
 
+// Forward declarations
+class BoundaryInfo;
+
 /**
  * This namespace defines several multi_predicates which are used by
  * the element and node iterators.  These classes are not in general
@@ -233,7 +236,7 @@ template <typename T>
 struct Local : abstract_multi_predicate<T>
 {
   // Constructor, pushes back two single predicates
-  Local(const processor_id_type my_pid)
+  Local(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new pid<T>(my_pid));
@@ -247,7 +250,7 @@ template <typename T>
 struct SemiLocal : abstract_multi_predicate<T>
 {
   // Constructor, pushes back two single predicates
-  SemiLocal(const processor_id_type my_pid)
+  SemiLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new not_subactive<T>);
@@ -262,7 +265,7 @@ template <typename T>
 struct FaceLocal : abstract_multi_predicate<T>
 {
   // Constructor, pushes back two single predicates
-  FaceLocal(const processor_id_type my_pid)
+  FaceLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new not_subactive<T>);
@@ -277,7 +280,7 @@ template <typename T>
 struct NotLocal : abstract_multi_predicate<T>
 {
   // Constructor, pushes back two single predicates
-  NotLocal(const processor_id_type my_pid)
+  NotLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new not_pid<T>(my_pid));
@@ -291,7 +294,7 @@ template <typename T>
 struct ActiveNotLocal : abstract_multi_predicate<T>
 {
   // Constructor, pushes back two single predicates
-  ActiveNotLocal(const processor_id_type my_pid)
+  ActiveNotLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new active<T>);
@@ -305,7 +308,7 @@ struct ActiveNotLocal : abstract_multi_predicate<T>
 template <typename T>
 struct Type : abstract_multi_predicate<T>
 {
-  Type(const ElemType type)
+  Type(ElemType type)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new elem_type<T>(type));
@@ -318,7 +321,7 @@ struct Type : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveType : abstract_multi_predicate<T>
 {
-  ActiveType(const ElemType type)
+  ActiveType(ElemType type)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new active<T>);
@@ -332,7 +335,7 @@ struct ActiveType : abstract_multi_predicate<T>
 template <typename T>
 struct ActivePID : abstract_multi_predicate<T>
 {
-  ActivePID(const processor_id_type proc_id)
+  ActivePID(processor_id_type proc_id)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new active<T>);
@@ -348,7 +351,7 @@ struct ActivePID : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveLocal : abstract_multi_predicate<T>
 {
-  ActiveLocal(const processor_id_type my_pid)
+  ActiveLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new active<T>);
@@ -364,10 +367,36 @@ struct ActiveLocal : abstract_multi_predicate<T>
 template <typename T>
 struct PID : abstract_multi_predicate<T>
 {
-  PID(const processor_id_type proc_id)
+  PID(processor_id_type proc_id)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new pid<T>(proc_id));
+  }
+};
+
+
+
+// Instantiation for the BID abstract_multi_predicate
+template <typename T>
+struct BID : abstract_multi_predicate<T>
+{
+  BID(boundary_id_type bndry_id, const BoundaryInfo& bndry_info)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new bid<T>(bndry_id, bndry_info));
+  }
+};
+
+
+
+// Instantiation for the BND abstract_multi_predicate
+template <typename T>
+struct BND : abstract_multi_predicate<T>
+{
+  BND(const BoundaryInfo& bndry_info)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new bnd<T>(bndry_info));
   }
 };
 
@@ -377,7 +406,7 @@ struct PID : abstract_multi_predicate<T>
 template <typename T>
 struct NotPID : abstract_multi_predicate<T>
 {
-  NotPID(const processor_id_type proc_id)
+  NotPID(processor_id_type proc_id)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new not_pid<T>(proc_id));
@@ -391,7 +420,7 @@ struct NotPID : abstract_multi_predicate<T>
 template <typename T>
 struct Level : abstract_multi_predicate<T>
 {
-  Level(const unsigned int l)
+  Level(unsigned int l)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new level<T>(l));
@@ -405,7 +434,7 @@ struct Level : abstract_multi_predicate<T>
 template <typename T>
 struct NotLevel : abstract_multi_predicate<T>
 {
-  NotLevel(const unsigned int l)
+  NotLevel(unsigned int l)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new not_level<T>(l));
@@ -419,8 +448,8 @@ struct NotLevel : abstract_multi_predicate<T>
 template <typename T>
 struct LocalLevel : abstract_multi_predicate<T>
 {
-  LocalLevel(const processor_id_type my_pid,
-             const unsigned int l)
+  LocalLevel(processor_id_type my_pid,
+             unsigned int l)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new pid<T>(my_pid));
@@ -435,8 +464,8 @@ struct LocalLevel : abstract_multi_predicate<T>
 template <typename T>
 struct LocalNotLevel : abstract_multi_predicate<T>
 {
-  LocalNotLevel(const processor_id_type my_pid,
-                const unsigned int l)
+  LocalNotLevel(processor_id_type my_pid,
+                unsigned int l)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new pid<T>(my_pid));
@@ -476,8 +505,8 @@ struct BoundarySide : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveLocalSubdomain : abstract_multi_predicate<T>
 {
-  ActiveLocalSubdomain(const processor_id_type my_pid,
-                       const subdomain_id_type subdomain_id)
+  ActiveLocalSubdomain(processor_id_type my_pid,
+                       subdomain_id_type subdomain_id)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new active<T>);
@@ -492,7 +521,7 @@ struct ActiveLocalSubdomain : abstract_multi_predicate<T>
 template <typename T>
 struct ActiveSubdomain : abstract_multi_predicate<T>
 {
-  ActiveSubdomain(const subdomain_id_type subdomain_id)
+  ActiveSubdomain(subdomain_id_type subdomain_id)
   {
     this->_predicates.push_back(new not_null<T>);
     this->_predicates.push_back(new active<T>);

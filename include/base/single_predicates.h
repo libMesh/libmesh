@@ -22,6 +22,7 @@
 #include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
+#include "libmesh/boundary_info.h"
 
 // C++ includes
 #include <cstddef>
@@ -158,7 +159,7 @@ template <typename T>
 struct pid : predicate<T>
 {
   // Constructor
-  pid(const processor_id_type p) : _pid(p) {}
+  pid(processor_id_type p) : _pid(p) {}
   virtual ~pid() {}
 
   // op()
@@ -171,6 +172,55 @@ protected:
 
 
 
+// The bid predicate returns true if has_boundary_id(node, id) returns true.
+template <typename T>
+struct bid : predicate<T>
+{
+  // Constructor
+  bid(boundary_id_type bid,
+      const BoundaryInfo& bndry_info) :
+    _bid(bid),
+    _bndry_info(bndry_info)
+  {}
+  virtual ~bid() {}
+
+  // op()
+  virtual bool operator()(const T& it) const
+  {
+    return _bndry_info.has_boundary_id(*it, _bid);
+  }
+
+protected:
+  virtual predicate<T>* clone() const { return new bid<T>(*this); }
+  const boundary_id_type _bid;
+  const BoundaryInfo & _bndry_info;
+};
+
+
+
+// The bnd predicate returns true if n_boundary_ids(node) > 0.
+template <typename T>
+struct bnd : predicate<T>
+{
+  // Constructor
+  bnd(const BoundaryInfo& bndry_info) :
+    _bndry_info(bndry_info)
+  {}
+  virtual ~bnd() {}
+
+  // op()
+  virtual bool operator()(const T& it) const
+  {
+    return (_bndry_info.n_boundary_ids(*it) > 0);
+  }
+
+protected:
+  virtual predicate<T>* clone() const { return new bnd<T>(*this); }
+  const BoundaryInfo & _bndry_info;
+};
+
+
+
 // The semilocal_pid predicate returns true if the element
 // pointed to is semilocal to (has nodes shared with an element of) a
 // given processor id.
@@ -178,7 +228,7 @@ template <typename T>
 struct semilocal_pid : predicate<T>
 {
   // Constructor
-  semilocal_pid(const processor_id_type p) : _pid(p) {}
+  semilocal_pid(processor_id_type p) : _pid(p) {}
   virtual ~semilocal_pid() {}
 
   // op()
@@ -198,7 +248,7 @@ template <typename T>
 struct facelocal_pid : predicate<T>
 {
   // Constructor
-  facelocal_pid(const processor_id_type p) : _pid(p) {}
+  facelocal_pid(processor_id_type p) : _pid(p) {}
   virtual ~facelocal_pid() {}
 
   // op()
@@ -224,7 +274,7 @@ protected:
 template <typename T>
 struct not_pid : pid<T>
 {
-  not_pid(const processor_id_type p) : pid<T>(p) {}
+  not_pid(processor_id_type p) : pid<T>(p) {}
 
   virtual bool operator()(const T& it) const { return !pid<T>::operator()(it); }
 
@@ -240,7 +290,7 @@ template <typename T>
 struct elem_type : predicate<T>
 {
   // Constructor
-  elem_type (const ElemType t) : _elem_type(t) {}
+  elem_type (ElemType t) : _elem_type(t) {}
   virtual ~elem_type() {}
 
   virtual bool operator()(const T& it) const { return (*it)->type() == _elem_type; }
@@ -260,7 +310,7 @@ template <typename T>
 struct level : predicate<T>
 {
   // Constructor
-  level (const unsigned int l) : _level(l) {}
+  level (unsigned int l) : _level(l) {}
   virtual ~level() {}
 
   virtual bool operator()(const T& it) const { return (*it)->level() == _level; }
@@ -278,7 +328,7 @@ template <typename T>
 struct not_level : level<T>
 {
   // Constructor
-  not_level(const unsigned int l) : level<T>(l) {}
+  not_level(unsigned int l) : level<T>(l) {}
 
   virtual bool operator()(const T& it) const { return !level<T>::operator()(it); }
 
@@ -328,7 +378,7 @@ template <typename T>
 struct subdomain : predicate<T>
 {
   // Constructor
-  subdomain(const subdomain_id_type sid) : _subdomain(sid) {}
+  subdomain(subdomain_id_type sid) : _subdomain(sid) {}
   virtual ~subdomain() {}
 
   // op()

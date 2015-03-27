@@ -260,38 +260,38 @@ public:
   element_iterator active_not_local_elements_begin ();
   element_iterator active_not_local_elements_end   ();
 
-  element_iterator level_elements_begin (const unsigned int level);
-  element_iterator level_elements_end   (const unsigned int level);
+  element_iterator level_elements_begin (unsigned int level);
+  element_iterator level_elements_end   (unsigned int level);
 
-  element_iterator not_level_elements_begin (const unsigned int level);
-  element_iterator not_level_elements_end   (const unsigned int level);
+  element_iterator not_level_elements_begin (unsigned int level);
+  element_iterator not_level_elements_end   (unsigned int level);
 
-  element_iterator local_level_elements_begin (const unsigned int level);
-  element_iterator local_level_elements_end   (const unsigned int level);
+  element_iterator local_level_elements_begin (unsigned int level);
+  element_iterator local_level_elements_end   (unsigned int level);
 
-  element_iterator local_not_level_elements_begin (const unsigned int level);
-  element_iterator local_not_level_elements_end   (const unsigned int level);
+  element_iterator local_not_level_elements_begin (unsigned int level);
+  element_iterator local_not_level_elements_end   (unsigned int level);
 
-  element_iterator pid_elements_begin (const processor_id_type proc_id);
-  element_iterator pid_elements_end   (const processor_id_type proc_id);
+  element_iterator pid_elements_begin (processor_id_type proc_id);
+  element_iterator pid_elements_end   (processor_id_type proc_id);
 
-  element_iterator type_elements_begin (const ElemType type);
-  element_iterator type_elements_end   (const ElemType type);
+  element_iterator type_elements_begin (ElemType type);
+  element_iterator type_elements_end   (ElemType type);
 
-  element_iterator active_type_elements_begin (const ElemType type);
-  element_iterator active_type_elements_end   (const ElemType type);
+  element_iterator active_type_elements_begin (ElemType type);
+  element_iterator active_type_elements_end   (ElemType type);
 
-  element_iterator active_pid_elements_begin (const processor_id_type proc_id);
-  element_iterator active_pid_elements_end   (const processor_id_type proc_id);
+  element_iterator active_pid_elements_begin (processor_id_type proc_id);
+  element_iterator active_pid_elements_end   (processor_id_type proc_id);
 
   element_iterator unpartitioned_elements_begin ();
   element_iterator unpartitioned_elements_end ();
 
-  element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id);
-  element_iterator active_local_subdomain_elements_end   (const subdomain_id_type subdomain_id);
+  element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id);
+  element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id);
 
-  element_iterator active_subdomain_elements_begin (const subdomain_id_type subdomain_id);
-  element_iterator active_subdomain_elements_end   (const subdomain_id_type subdomain_id);
+  element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id);
+  element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id);
 
   /**
    * const Elem iterator accessor functions.
@@ -335,38 +335,38 @@ public:
   const_element_iterator active_not_local_elements_begin () const;
   const_element_iterator active_not_local_elements_end   () const;
 
-  const_element_iterator level_elements_begin (const unsigned int level) const;
-  const_element_iterator level_elements_end   (const unsigned int level) const;
+  const_element_iterator level_elements_begin (unsigned int level) const;
+  const_element_iterator level_elements_end   (unsigned int level) const;
 
-  const_element_iterator not_level_elements_begin (const unsigned int level) const;
-  const_element_iterator not_level_elements_end   (const unsigned int level) const;
+  const_element_iterator not_level_elements_begin (unsigned int level) const;
+  const_element_iterator not_level_elements_end   (unsigned int level) const;
 
-  const_element_iterator local_level_elements_begin (const unsigned int level) const;
-  const_element_iterator local_level_elements_end   (const unsigned int level) const;
+  const_element_iterator local_level_elements_begin (unsigned int level) const;
+  const_element_iterator local_level_elements_end   (unsigned int level) const;
 
-  const_element_iterator local_not_level_elements_begin (const unsigned int level) const;
-  const_element_iterator local_not_level_elements_end   (const unsigned int level) const;
+  const_element_iterator local_not_level_elements_begin (unsigned int level) const;
+  const_element_iterator local_not_level_elements_end   (unsigned int level) const;
 
-  const_element_iterator pid_elements_begin (const processor_id_type proc_id) const;
-  const_element_iterator pid_elements_end   (const processor_id_type proc_id) const;
+  const_element_iterator pid_elements_begin (processor_id_type proc_id) const;
+  const_element_iterator pid_elements_end   (processor_id_type proc_id) const;
 
-  const_element_iterator type_elements_begin (const ElemType type) const;
-  const_element_iterator type_elements_end   (const ElemType type) const;
+  const_element_iterator type_elements_begin (ElemType type) const;
+  const_element_iterator type_elements_end   (ElemType type) const;
 
-  const_element_iterator active_type_elements_begin (const ElemType type) const;
-  const_element_iterator active_type_elements_end   (const ElemType type) const;
+  const_element_iterator active_type_elements_begin (ElemType type) const;
+  const_element_iterator active_type_elements_end   (ElemType type) const;
 
-  const_element_iterator active_pid_elements_begin (const processor_id_type proc_id) const;
-  const_element_iterator active_pid_elements_end   (const processor_id_type proc_id) const;
+  const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const;
+  const_element_iterator active_pid_elements_end   (processor_id_type proc_id) const;
 
   const_element_iterator unpartitioned_elements_begin () const;
   const_element_iterator unpartitioned_elements_end () const;
 
-  const_element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) const;
-  const_element_iterator active_local_subdomain_elements_end   (const subdomain_id_type subdomain_id) const;
+  const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
+  const_element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
 
-  const_element_iterator active_subdomain_elements_begin (const subdomain_id_type subdomain_id) const;
-  const_element_iterator active_subdomain_elements_end   (const subdomain_id_type subdomain_id) const;
+  const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
+  const_element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
 
 
 
@@ -378,30 +378,32 @@ public:
    */
   node_iterator nodes_begin();
   node_iterator nodes_end();
-
   node_iterator active_nodes_begin();
   node_iterator active_nodes_end();
-
   node_iterator local_nodes_begin  ();
   node_iterator local_nodes_end    ();
-
-  node_iterator pid_nodes_begin (const processor_id_type proc_id);
-  node_iterator pid_nodes_end   (const processor_id_type proc_id);
+  node_iterator pid_nodes_begin (processor_id_type proc_id);
+  node_iterator pid_nodes_end   (processor_id_type proc_id);
+  node_iterator bid_nodes_begin (boundary_id_type bndry_id);
+  node_iterator bid_nodes_end   (boundary_id_type bndry_id);
+  node_iterator bnd_nodes_begin ();
+  node_iterator bnd_nodes_end ();
 
   /**
    * const Node iterator accessor functions.
    */
   const_node_iterator nodes_begin() const;
   const_node_iterator nodes_end()   const;
-
   const_node_iterator active_nodes_begin() const;
   const_node_iterator active_nodes_end()   const;
-
   const_node_iterator local_nodes_begin  () const;
   const_node_iterator local_nodes_end    () const;
-
-  const_node_iterator pid_nodes_begin (const processor_id_type proc_id) const;
-  const_node_iterator pid_nodes_end   (const processor_id_type proc_id) const;
+  const_node_iterator pid_nodes_begin (processor_id_type proc_id) const;
+  const_node_iterator pid_nodes_end   (processor_id_type proc_id) const;
+  const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const;
+  const_node_iterator bid_nodes_end   (boundary_id_type bndry_id) const;
+  const_node_iterator bnd_nodes_begin () const;
+  const_node_iterator bnd_nodes_end () const;
 
 protected:
 
