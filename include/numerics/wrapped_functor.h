@@ -36,7 +36,7 @@ namespace libMesh
  */
 
 // ------------------------------------------------------------
-// WrappedFunction class definition
+// WrappedFunctor class definition
 template <typename Output=Number>
 class WrappedFunctor : public FEMFunctionBase<Output>
 {
