@@ -30,16 +30,22 @@ cat <<EOF > Makefile.am
 # include the magic script!
 EXTRA_DIST = rebuild_makefile.sh
 
-BUILT_SOURCES = $built_sources
-
-DISTCLEANFILES = \$(BUILT_SOURCES)
-
 EOF
 
+echo -n "BUILT_SOURCES =" >> Makefile.am
+for built_src in $built_sources ; do
+    echo " \\" >> Makefile.am
+    echo -n "        "$built_src >> Makefile.am
+done
+
+echo >> Makefile.am
+echo >> Makefile.am
+echo "DISTCLEANFILES = \$(BUILT_SOURCES)" >> Makefile.am
 
 
 # handle contrib directly
 cat <<EOF >> Makefile.am
+
 #
 # contrib rules
 if LIBMESH_ENABLE_FPARSER
