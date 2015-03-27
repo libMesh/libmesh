@@ -1427,16 +1427,16 @@ void ProjectVector::operator()(const ConstElemRange &range) const
         continue;
 
       // Get FE objects of the appropriate type
-      AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));
-      AutoPtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));
+      UniquePtr<FEBase> fe (FEBase::build(dim, base_fe_type));
+      UniquePtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));
 
       // Create FE objects with potentially different p_level
       FEType fe_type, temp_fe_type;
 
       // Prepare variables for non-Lagrange projection
-      AutoPtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
-      AutoPtr<QBase> qedgerule (base_fe_type.default_quadrature_rule(1));
-      AutoPtr<QBase> qsiderule (base_fe_type.default_quadrature_rule(dim-1));
+      UniquePtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
+      UniquePtr<QBase> qedgerule (base_fe_type.default_quadrature_rule(1));
+      UniquePtr<QBase> qsiderule (base_fe_type.default_quadrature_rule(dim-1));
       std::vector<Point> coarse_qpoints;
 
       // The values of the shape functions at the quadrature
