@@ -33,7 +33,8 @@
 namespace libMesh
 {
 
-FEMContext::FEMContext (const System &sys)
+FEMContext::FEMContext (const System &sys,
+                        int variable_number)
   : DiffContext(sys),
     _mesh_sys(NULL),
     _mesh_x_var(0),
@@ -44,6 +45,7 @@ FEMContext::FEMContext (const System &sys)
     _elem(NULL),
     _dim(sys.get_mesh().mesh_dimension()),
     _elem_dim(0), /* This will be reset in set_elem(). */
+    _elem_dims(sys.get_mesh().elem_dimensions()),
     _element_qrule(4,NULL),
     _side_qrule(4,NULL),
     _edge_qrule(NULL)
@@ -55,17 +57,24 @@ FEMContext::FEMContext (const System &sys)
   _element_fe_var.resize(4);
   _side_fe_var.resize(4);
 
+  // We're allocating structures for either all variables or a single
+  // variable.
+  const unsigned int nv = sys.n_vars();
+  const unsigned int first_var = (variable_number == -1) ?
+                                 0 : variable_number;
+  const unsigned int end_var = (variable_number == -1) ?
+                               nv : variable_number+1;
+
+  libmesh_assert_not_equal_to (first_var, end_var);
+
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
 
-  unsigned int nv = sys.n_vars();
-
-  libmesh_assert (nv);
-  FEType hardest_fe_type = sys.variable_type(0);
+  FEType hardest_fe_type = sys.variable_type(first_var);
 
   bool have_scalar = false;
 
-  for (unsigned int i=0; i != nv; ++i)
+  for (unsigned int i=first_var; i != end_var; ++i)
     {
       FEType fe_type = sys.variable_type(i);
 
@@ -81,13 +90,12 @@ FEMContext::FEMContext (const System &sys)
         have_scalar = true;
     }
 
-  std::set<unsigned char> elem_dims( sys.get_mesh().elem_dimensions() );
   if(have_scalar)
     // SCALAR FEs have dimension 0 by assumption
-    elem_dims.insert(0);
+    _elem_dims.insert(0);
 
-  for( std::set<unsigned char>::const_iterator dim_it = elem_dims.begin();
-       dim_it != elem_dims.end(); ++dim_it )
+  for( std::set<unsigned char>::const_iterator dim_it = _elem_dims.begin();
+       dim_it != _elem_dims.end(); ++dim_it )
     {
       const unsigned char dim = *dim_it;
 
@@ -107,7 +115,7 @@ FEMContext::FEMContext (const System &sys)
         _edge_fe_var.resize(nv);
 
 
-      for (unsigned int i=0; i != nv; ++i)
+      for (unsigned int i=first_var; i != end_var; ++i)
         {
           FEType fe_type = sys.variable_type(i);
 
