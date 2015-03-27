@@ -29,7 +29,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/multi_predicates.h"
-#include "libmesh/partitioner.h" // AutoPtr needs a real declaration
+#include "libmesh/partitioner.h" // UniquePtr needs a real declaration
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/parallel_object.h"
@@ -97,7 +97,7 @@ public:
   /**
    * Virtual "copy constructor"
    */
-  virtual AutoPtr<MeshBase> clone() const = 0;
+  virtual UniquePtr<MeshBase> clone() const = 0;
 
   /**
    * Destructor.
@@ -107,7 +107,7 @@ public:
   /**
    * A partitioner to use at each prepare_for_use()
    */
-  virtual AutoPtr<Partitioner> &partitioner() { return _partitioner; }
+  virtual UniquePtr<Partitioner> &partitioner() { return _partitioner; }
 
   /**
    * The information about boundary ids on the mesh
@@ -690,7 +690,7 @@ public:
    * non-parallel_only code unless the master has already been
    * constructed.
    */
-  AutoPtr<PointLocatorBase> sub_point_locator () const;
+  UniquePtr<PointLocatorBase> sub_point_locator () const;
 
   /**
    * Releases the current \p PointLocator object.
@@ -863,6 +863,13 @@ public:
   { return _block_id_to_name; }
 
 
+  /**
+   * Search the mesh and cache the different dimenions of the elements
+   * present in the mesh.  This is done in prepare_for_use(), but can
+   * be done manually by other classes after major mesh modifications.
+   */
+  void cache_elem_dims();
+
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,
@@ -872,7 +879,7 @@ public:
    * Direct access to this class will be removed in future libMesh
    * versions.  Use the \p get_boundary_info() accessor instead.
    */
-  AutoPtr<BoundaryInfo> boundary_info;
+  UniquePtr<BoundaryInfo> boundary_info;
 
 
 protected:
@@ -890,12 +897,6 @@ protected:
    */
   unsigned int& set_n_partitions ()
   { return _n_parts; }
-
-  /**
-   * Search the mesh and cache the different dimenions of the elements
-   * present in the mesh.
-   */
-  void cache_elem_dims();
 
   /**
    * The number of partitions the mesh has.  This is set by
@@ -920,7 +921,7 @@ protected:
    * this needs to be mutable.  Since the PointLocatorBase::build() member is used,
    * and it operates on a constant reference to the mesh, this is OK.
    */
-  mutable AutoPtr<PointLocatorBase> _point_locator;
+  mutable UniquePtr<PointLocatorBase> _point_locator;
 
   /**
    * A partitioner to use at each prepare_for_use().
@@ -928,7 +929,7 @@ protected:
    * This will be built in the constructor of each derived class, but
    * can be replaced by the user through the partitioner() accessor.
    */
-  AutoPtr<Partitioner> _partitioner;
+  UniquePtr<Partitioner> _partitioner;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   /**

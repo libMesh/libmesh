@@ -67,6 +67,8 @@ target_triplet = @target@
 @LIBMESH_ENABLE_NETCDF_V3_TRUE@am__append_10 = netcdf.h
 @LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_11 = netcdf.h
 @LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_12 = netcdf.h
+@LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@am__append_13 = unique_ptr.hpp
+@LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@am__append_14 = unique_ptr.hpp
 subdir = include/libmesh
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -86,6 +88,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/feexcept.m4 $(top_srcdir)/m4/fparser.m4 \
 	$(top_srcdir)/m4/glpk.m4 $(top_srcdir)/m4/gmv.m4 \
 	$(top_srcdir)/m4/gz.m4 $(top_srcdir)/m4/hdf5.m4 \
+	$(top_srcdir)/m4/hinnant_unique_ptr.m4 \
 	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
@@ -371,6 +374,7 @@ dvidir = @dvidir@
 enabledefaultcommworld = @enabledefaultcommworld@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
+enableuniqueptr = @enableuniqueptr@
 enablewarnings = @enablewarnings@
 exec_prefix = @exec_prefix@
 gitquery = @gitquery@
@@ -509,9 +513,10 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	parallel_sort.h threads.h threads_allocators.h \
 	centroid_partitioner.h hilbert_sfc_partitioner.h \
 	linear_partitioner.h metis_csr_graph.h metis_partitioner.h \
-	morton_sfc_partitioner.h parmetis_partitioner.h partitioner.h \
-	sfc_partitioner.h diff_physics.h diff_qoi.h fem_physics.h \
-	quadrature.h quadrature_clough.h quadrature_composite.h \
+	morton_sfc_partitioner.h parmetis_helper.h \
+	parmetis_partitioner.h partitioner.h sfc_partitioner.h \
+	diff_physics.h diff_qoi.h fem_physics.h quadrature.h \
+	quadrature_clough.h quadrature_composite.h \
 	quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
 	quadrature_jacobi.h quadrature_monomial.h quadrature_rules.h \
@@ -556,14 +561,15 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	parameters.h perf_log.h perfmon.h plt_loader.h \
 	point_locator_base.h point_locator_list.h point_locator_tree.h \
 	pool_allocator.h restore_warnings.h statistics.h \
-	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
-	utility.h vectormap.h xdr_cxx.h \
+	string_to_enum.h timestamp.h topology_map.h tree.h tree_base.h \
+	tree_node.h utility.h vectormap.h xdr_cxx.h \
 	parallel_communicator_specializations $(am__append_1) \
 	$(am__append_3) $(am__append_5) $(am__append_7) \
-	$(am__append_9) $(am__append_11) libmesh_config.h
+	$(am__append_9) $(am__append_11) $(am__append_13) \
+	libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
-	$(am__append_12) libmesh_config.h
+	$(am__append_12) $(am__append_14) libmesh_config.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -787,6 +793,9 @@ uninstall-am:
 
 @LIBMESH_ENABLE_NETCDF_V4_TRUE@netcdf.h: $(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
 @LIBMESH_ENABLE_NETCDF_V4_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+@LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@unique_ptr.hpp: $(top_srcdir)/contrib/unique_ptr/unique_ptr.hpp
+@LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 #
 # libmesh_config.h rule
@@ -1578,6 +1587,9 @@ metis_partitioner.h: $(top_srcdir)/include/partitioning/metis_partitioner.h
 morton_sfc_partitioner.h: $(top_srcdir)/include/partitioning/morton_sfc_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+parmetis_helper.h: $(top_srcdir)/include/partitioning/parmetis_helper.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 parmetis_partitioner.h: $(top_srcdir)/include/partitioning/parmetis_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1960,6 +1972,9 @@ string_to_enum.h: $(top_srcdir)/include/utils/string_to_enum.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 timestamp.h: $(top_srcdir)/include/utils/timestamp.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+topology_map.h: $(top_srcdir)/include/utils/topology_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tree.h: $(top_srcdir)/include/utils/tree.h

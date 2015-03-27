@@ -118,16 +118,16 @@ public:
 
   /**
    * Builds a QUAD4 built coincident with face i.
-   * The \p AutoPtr<Elem> handles the memory aspect.
+   * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  AutoPtr<Elem> build_side (const unsigned int i,
-                            bool proxy) const;
+  UniquePtr<Elem> build_side (const unsigned int i,
+                              bool proxy) const;
 
   /**
    * Builds a EDGE2 built coincident with edge i.
-   * The \p AutoPtr<Elem> handles the memory aspect.
+   * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  AutoPtr<Elem> build_edge (const unsigned int i) const;
+  UniquePtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
@@ -177,7 +177,10 @@ protected:
    */
   static const float _embedding_matrix[8][8][8];
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
+
 
 };
 

@@ -170,7 +170,7 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector& parameters_in)
 
       this->rhs->close();
 
-      AutoPtr<NumericVector<Number> > R_minus = this->rhs->clone();
+      UniquePtr<NumericVector<Number> > R_minus = this->rhs->clone();
 
       // The contribution at a single time step would be [f(z;p+dp) - <partialu/partialt, z>(p+dp) - <g(u),z>(p+dp)] * dt
       // But since we compute the residual already scaled by dt, there is no need for the * dt
@@ -182,7 +182,7 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector& parameters_in)
 
       this->rhs->close();
 
-      AutoPtr<NumericVector<Number> > R_plus = this->rhs->clone();
+      UniquePtr<NumericVector<Number> > R_plus = this->rhs->clone();
 
       R_plus_dp += -R_plus->dot(this->get_adjoint_solution(0));
 

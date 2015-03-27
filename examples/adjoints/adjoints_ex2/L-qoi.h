@@ -27,8 +27,8 @@ public:
 
   virtual void element_qoi (DiffContext &context, const QoISet & qois);
 
-  virtual AutoPtr<DifferentiableQoI> clone( ) {
-    return AutoPtr<DifferentiableQoI> ( new LaplaceQoI(*this) );
+  virtual UniquePtr<DifferentiableQoI> clone( ) {
+    return UniquePtr<DifferentiableQoI> ( new LaplaceQoI(*this) );
   }
 
 };

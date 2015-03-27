@@ -167,8 +167,8 @@ public:
    * ``deep'' as necessary to allow independent destruction and
    * simultaneous evaluations of the copies in different threads.
    */
-  virtual AutoPtr<FEMFunctionBase<Output> > clone () const {
-    return AutoPtr<FEMFunctionBase<Output> >
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const {
+    return UniquePtr<FEMFunctionBase<Output> >
       (new ParsedFEMFunction
        (_sys, _expression, &_additional_vars, &_initial_vals));
   }

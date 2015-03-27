@@ -597,7 +597,7 @@ void UNVIO::groups_in (std::istream& in_file)
             // this algorithm...
             for (unsigned short sn=0; sn<elem->n_sides(); sn++)
               {
-                AutoPtr<Elem> side (elem->build_side(sn));
+                UniquePtr<Elem> side (elem->build_side(sn));
 
                 // Build up a node_ids vector, which is the key
                 std::vector<dof_id_type> node_ids(side->n_nodes());

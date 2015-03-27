@@ -77,6 +77,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/feexcept.m4 $(top_srcdir)/m4/fparser.m4 \
 	$(top_srcdir)/m4/glpk.m4 $(top_srcdir)/m4/gmv.m4 \
 	$(top_srcdir)/m4/gz.m4 $(top_srcdir)/m4/hdf5.m4 \
+	$(top_srcdir)/m4/hinnant_unique_ptr.m4 \
 	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
@@ -712,6 +713,7 @@ dvidir = @dvidir@
 enabledefaultcommworld = @enabledefaultcommworld@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
+enableuniqueptr = @enableuniqueptr@
 enablewarnings = @enablewarnings@
 exec_prefix = @exec_prefix@
 gitquery = @gitquery@
@@ -769,9 +771,9 @@ vtkversion = @vtkversion@
 pkg_cppflags = -DLIBMESH_IS_COMPILING_PARMETIS \
 	-I$(top_srcdir)/contrib/metis/GKlib \
 	-I$(top_srcdir)/contrib/metis/include -I$(srcdir)/include \
-	-I$(srcdir)/libparmetis -I$(top_builddir)/include \
-	$(libmesh_optional_INCLUDES) # for a PETSc-provided MPI, if \
-	required
+	-I$(srcdir)/libparmetis -I$(top_srcdir)/contrib/metis/libmetis \
+	-I$(top_builddir)/include $(libmesh_optional_INCLUDES) # for a \
+	PETSc-provided MPI, if required
 pkg_sources = \
 	include/parmetis.h \
 	libparmetis/akwayfm.c \

@@ -52,67 +52,19 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       for (unsigned int c=0; c<this->n_children(); c++)
         {
           _children[c] = Elem::build(this->type(), this).release();
-          _children[c]->set_refinement_flag(Elem::JUST_REFINED);
-          _children[c]->set_p_level(parent_p_level);
-          _children[c]->set_p_refinement_flag(this->p_refinement_flag());
-        }
-
-      // Compute new nodal locations
-      // and asssign nodes to children
-      // Make these static.  It is unlikely the
-      // sizes will change from call to call, so having these
-      // static should save on reallocations
-      std::vector<std::vector<Point> >        p    (this->n_children());
-      std::vector<std::vector<Node*> >        nodes(this->n_children());
-
-
-      // compute new nodal locations
-      for (unsigned int c=0; c<this->n_children(); c++)
-        {
           Elem *current_child = this->child(c);
-          p[c].resize    (current_child->n_nodes());
-          nodes[c].resize(current_child->n_nodes());
+
+          current_child->set_refinement_flag(Elem::JUST_REFINED);
+          current_child->set_p_level(parent_p_level);
+          current_child->set_p_refinement_flag(this->p_refinement_flag());
 
           for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
             {
-              // zero entries
-              p[c][nc].zero();
-              nodes[c][nc] = NULL;
-
-              for (unsigned int n=0; n<this->n_nodes(); n++)
-                {
-                  // The value from the embedding matrix
-                  const float em_val = this->embedding_matrix(c,nc,n);
-
-                  if (em_val != 0.)
-                    {
-                      p[c][nc].add_scaled (this->point(n), em_val);
-
-                      // We may have found the node, in which case we
-                      // won't need to look it up later.
-                      if (em_val == 1.)
-                        nodes[c][nc] = this->get_node(n);
-                    }
-                }
-            }
-
-          // assign nodes to children & add them to the mesh
-          const Real pointtol = this->hmin() * TOLERANCE;
-          for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
-            {
-              if (nodes[c][nc] != NULL)
-                {
-                  current_child->set_node(nc) = nodes[c][nc];
-                }
-              else
-                {
-                  current_child->set_node(nc) =
-                    mesh_refinement.add_point(p[c][nc],
-                                              current_child->processor_id(),
-                                              pointtol);
-                  current_child->get_node(nc)->set_n_systems
-                    (this->n_systems());
-                }
+              Node *node =
+                mesh_refinement.add_node(*this, c, nc,
+                                         current_child->processor_id());
+              node->set_n_systems (this->n_systems());
+              current_child->set_node(nc) = node;
             }
 
           mesh_refinement.add_elem (current_child);

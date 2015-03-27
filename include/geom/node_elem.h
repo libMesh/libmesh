@@ -49,6 +49,17 @@ public:
     Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data, _nodelinks_data) {}
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_equal_to (i, 0);
+    return Point(0,0,0);
+  }
+
+
+  /**
    * @returns 0, the dimensionality of the object.
    */
   unsigned int dim () const { return 0; }
@@ -93,20 +104,20 @@ public:
   /**
    * The \p Elem::side() member makes no sense for nodes.
    */
-  AutoPtr<Elem> side (const unsigned int) const
-  { libmesh_not_implemented(); AutoPtr<Elem> ap(NULL); return ap; }
+  UniquePtr<Elem> side (const unsigned int) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
    * The \p Elem::build_side() member makes no sense for nodes.
    */
-  AutoPtr<Elem> build_side (const unsigned int, bool) const
-  { libmesh_not_implemented(); AutoPtr<Elem> ap(NULL); return ap; }
+  UniquePtr<Elem> build_side (const unsigned int, bool) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
    * The \p Elem::build_edge() member makes no sense for nodes.
    */
-  AutoPtr<Elem> build_edge (const unsigned int) const
-  { libmesh_not_implemented(); AutoPtr<Elem> ap(NULL); return ap; }
+  UniquePtr<Elem> build_edge (const unsigned int) const
+  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
    * @returns 1
@@ -214,7 +225,9 @@ protected:
                                      const unsigned int) const
   { libmesh_not_implemented(); return 0; }
 
-#endif
+LIBMESH_ENABLE_TOPOLOGY_CACHES
+
+#endif // LIBMESH_ENABLE_AMR
 
 };
 

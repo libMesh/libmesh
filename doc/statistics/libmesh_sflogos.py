@@ -204,3 +204,7 @@ fig.suptitle('SFLogo Pages/Month (in Thousands)')
 
 # Save as PDF
 plt.savefig('libmesh_sflogos.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

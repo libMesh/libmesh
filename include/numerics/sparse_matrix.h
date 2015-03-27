@@ -96,7 +96,7 @@ public:
    * Builds a \p SparseMatrix<T> using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<SparseMatrix<T> >
+  static UniquePtr<SparseMatrix<T> >
   build(const Parallel::Communicator &comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 

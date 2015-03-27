@@ -131,7 +131,7 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 
 // Full specialization for Real datatypes
 template <typename T>
-AutoPtr<SparseMatrix<T> >
+UniquePtr<SparseMatrix<T> >
 SparseMatrix<T>::build(const Parallel::Communicator &comm,
                        const SolverPackage solver_package)
 {
@@ -139,48 +139,35 @@ SparseMatrix<T>::build(const Parallel::Communicator &comm,
   switch (solver_package)
     {
 
-
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      {
-        AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>(comm));
-        return ap;
-      }
+      return UniquePtr<SparseMatrix<T> >(new LaspackMatrix<T>(comm));
 #endif
 
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      {
-        AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>(comm));
-        return ap;
-      }
+      return UniquePtr<SparseMatrix<T> >(new PetscMatrix<T>(comm));
 #endif
 
 
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
-      {
-        AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>(comm));
-        return ap;
-      }
+      return UniquePtr<SparseMatrix<T> >(new EpetraMatrix<T>(comm));
 #endif
 
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      {
-        AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>(comm));
-        return ap;
-      }
+      return UniquePtr<SparseMatrix<T> >(new EigenSparseMatrix<T>(comm));
 #endif
 
     default:
       libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
     }
 
-  AutoPtr<SparseMatrix<T> > ap(NULL);
-  return ap;
+  libmesh_error_msg("We'll never get here!");
+  return UniquePtr<SparseMatrix<T> >();
 }
 
 

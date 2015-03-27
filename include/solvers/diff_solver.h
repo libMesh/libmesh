@@ -84,7 +84,7 @@ public:
    * Factory.  Requires a reference to the system
    * to be solved.  Returns a NewtonSolver by default
    */
-  static AutoPtr<DiffSolver> build(sys_type& s);
+  static UniquePtr<DiffSolver> build(sys_type& s);
 
   /**
    * Destructor.
@@ -281,7 +281,7 @@ public:
   /**
    * Pointer to functor which is called right after each linear solve
    */
-  AutoPtr<LinearSolutionMonitor> linear_solution_monitor;
+  UniquePtr<LinearSolutionMonitor> linear_solution_monitor;
 
 protected:
 

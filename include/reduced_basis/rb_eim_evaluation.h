@@ -142,7 +142,7 @@ public:
    * The default implementation builds an RBEIMTheta object, possibly
    * override in subclasses if we need more specialized behavior.
    */
-  virtual AutoPtr<RBTheta> build_eim_theta(unsigned int index);
+  virtual UniquePtr<RBTheta> build_eim_theta(unsigned int index);
 
   /**
    * Write out all the data to text files in order to segregate the

@@ -65,7 +65,7 @@ public:
       _parameters = &sys.get_equation_systems().parameters;
   }
 
-  virtual AutoPtr<FunctionBase<Output> > clone () const;
+  virtual UniquePtr<FunctionBase<Output> > clone () const;
 
   /**
    * @returns the scalar value of variable varnum at coordinate \p p
@@ -126,10 +126,10 @@ Output WrappedFunction<Output>::operator() (const Point& p,
 
 template <typename Output>
 inline
-AutoPtr<FunctionBase<Output> >
+UniquePtr<FunctionBase<Output> >
 WrappedFunction<Output>::clone () const
 {
-  return AutoPtr<FunctionBase<Output> >
+  return UniquePtr<FunctionBase<Output> >
     (new WrappedFunction<Output>
      (_sys, _fptr, _parameters, _varnum));
 }

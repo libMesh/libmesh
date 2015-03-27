@@ -102,8 +102,8 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
-                                   bool proxy) const
+UniquePtr<Elem> InfHex8::build_side (const unsigned int i,
+                                     bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -113,19 +113,15 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
         {
           // base
         case 0:
-          {
-            AutoPtr<Elem> ap(new Side<Quad4,InfHex8>(this,i));
-            return ap;
-          }
+          return UniquePtr<Elem>(new Side<Quad4,InfHex8>(this,i));
+
           // ifem sides
         case 1:
         case 2:
         case 3:
         case 4:
-          {
-            AutoPtr<Elem> ap(new Side<InfQuad4,InfHex8>(this,i));
-            return ap;
-          }
+          return UniquePtr<Elem>(new Side<InfQuad4,InfHex8>(this,i));
+
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
@@ -134,14 +130,14 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
   else
     {
       // Create NULL pointer to be initialized, returned later.
-      AutoPtr<Elem> face(NULL);
+      Elem* face = NULL;
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
         {
         case 0: // the base face
           {
-            face.reset(new Quad4);
+            face = new Quad4;
 
             // Only here, the face element's normal points inward
             face->set_node(0) = this->get_node(0);
@@ -154,7 +150,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 
         case 1:  // connecting to another infinite element
           {
-            face.reset(new InfQuad4);
+            face = new InfQuad4;
 
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(1);
@@ -166,7 +162,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 
         case 2:  // connecting to another infinite element
           {
-            face.reset(new InfQuad4);
+            face = new InfQuad4;
 
             face->set_node(0) = this->get_node(1);
             face->set_node(1) = this->get_node(2);
@@ -178,7 +174,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 
         case 3:  // connecting to another infinite element
           {
-            face.reset(new InfQuad4);
+            face = new InfQuad4;
 
             face->set_node(0) = this->get_node(2);
             face->set_node(1) = this->get_node(3);
@@ -190,7 +186,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 
         case 4:  // connecting to another infinite element
           {
-            face.reset(new InfQuad4);
+            face = new InfQuad4;
 
             face->set_node(0) = this->get_node(3);
             face->set_node(1) = this->get_node(0);
@@ -205,23 +201,22 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
         }
 
       face->subdomain_id() = this->subdomain_id();
-      return face;
+      return UniquePtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return UniquePtr<Elem>();
 }
 
 
-AutoPtr<Elem> InfHex8::build_edge (const unsigned int i) const
+UniquePtr<Elem> InfHex8::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
   if (i < 4) // base edges
-    return AutoPtr<Elem>(new SideEdge<Edge2,InfHex8>(this,i));
+    return UniquePtr<Elem>(new SideEdge<Edge2,InfHex8>(this,i));
   // infinite edges
-  return AutoPtr<Elem>(new SideEdge<InfEdge2,InfHex8>(this,i));
+  return UniquePtr<Elem>(new SideEdge<InfEdge2,InfHex8>(this,i));
 }
 
 bool InfHex8::contains_point (const Point& p, Real tol) const

@@ -35,9 +35,9 @@ namespace libMesh
 {
 
 template <>
-AutoPtr<RBEvaluation> DerivedRBConstruction<RBConstruction>::build_rb_evaluation(const Parallel::Communicator &comm_in)
+UniquePtr<RBEvaluation> DerivedRBConstruction<RBConstruction>::build_rb_evaluation(const Parallel::Communicator &comm_in)
 {
-  return AutoPtr<RBEvaluation>
+  return UniquePtr<RBEvaluation>
     ( new DerivedRBEvaluation<RBEvaluation>(comm_in) );
 }
 

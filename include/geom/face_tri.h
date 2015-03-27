@@ -65,6 +65,18 @@ public:
     Face(nn, Tri::n_sides(), p, _elemlinks_data, nodelinkdata) {}
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
+
+  /**
    * @returns 3.  All tri-derivatives are guaranteed to have at
    * least 3 nodes.
    */
@@ -108,7 +120,7 @@ public:
    * @returns a primitive (2-noded) edge for
    * edge i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
   /**
    * Based on the quality metric q specified by the user,
@@ -130,6 +142,11 @@ protected:
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[4+(LIBMESH_DIM>2)];
+
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[6][3];
 };
 
 // ------------------------------------------------------------

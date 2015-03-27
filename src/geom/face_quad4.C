@@ -124,20 +124,17 @@ bool Quad4::has_affine_map() const
 
 
 
-AutoPtr<Elem> Quad4::build_side (const unsigned int i,
-                                 bool proxy) const
+UniquePtr<Elem> Quad4::build_side (const unsigned int i,
+                                   bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    {
-      AutoPtr<Elem> ap(new Side<Edge2,Quad4>(this,i));
-      return ap;
-    }
+    return UniquePtr<Elem>(new Side<Edge2,Quad4>(this,i));
 
   else
     {
-      AutoPtr<Elem> edge(new Edge2);
+      Elem * edge = new Edge2;
       edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
@@ -146,38 +143,35 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
           {
             edge->set_node(0) = this->get_node(0);
             edge->set_node(1) = this->get_node(1);
-
-            return edge;
+            break;
           }
         case 1:
           {
             edge->set_node(0) = this->get_node(1);
             edge->set_node(1) = this->get_node(2);
-
-            return edge;
+            break;
           }
         case 2:
           {
             edge->set_node(0) = this->get_node(2);
             edge->set_node(1) = this->get_node(3);
-
-            return edge;
+            break;
           }
         case 3:
           {
             edge->set_node(0) = this->get_node(3);
             edge->set_node(1) = this->get_node(0);
-
-            return edge;
+            break;
           }
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+
+      return UniquePtr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return UniquePtr<Elem>();
 }
 
 

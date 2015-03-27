@@ -408,6 +408,14 @@ data = [
     '2015-Mar-12', 107, 19,
     '2015-Mar-13', 124, 28,
     '2015-Mar-14', 17,  12,
+    '2015-Mar-15', 42,  12,
+    '2015-Mar-16', 111, 24,
+    '2015-Mar-17', 180, 24,
+    '2015-Mar-18', 83,  27,
+    '2015-Mar-19', 96,  19,
+    '2015-Mar-20', 106, 21,
+    '2015-Mar-21', 31,  14,
+    '2015-Mar-22', 58,  11,
     ]
 
 # Github now tracks the total number of clones and unique cloners
@@ -636,6 +644,14 @@ clone_data = [
     '2015-Mar-12', 15, 13,
     '2015-Mar-13', 15, 12,
     '2015-Mar-14', 10, 9,
+    '2015-Mar-15', 3,  2,
+    '2015-Mar-16', 11, 9,
+    '2015-Mar-17', 16, 13,
+    '2015-Mar-18', 8,  7,
+    '2015-Mar-19', 13, 11,
+    '2015-Mar-20', 9,  8,
+    '2015-Mar-21', 3,  3,
+    '2015-Mar-22', 2,  1,
     ]
 
 # Extract the dates from the data array
@@ -661,11 +677,11 @@ week_views = []
 week_visitors = []
 x_axis = []
 for i in range(0, len(week_indexes)-1):
-    start = week_indexes[i]
-    stop = week_indexes[i+1]
-    week_views.append(sum(n_views[start:stop]));
-    week_visitors.append(np.mean(n_visitors[start:stop]));
-    x_axis.append(date_nums[week_indexes[i]])
+  start = week_indexes[i]
+  stop = week_indexes[i+1]
+  week_views.append(sum(n_views[start:stop]));
+  week_visitors.append(np.mean(n_visitors[start:stop]));
+  x_axis.append(date_nums[week_indexes[i]])
 
 # Get a reference to the figure
 fig = plt.figure()
@@ -714,32 +730,37 @@ month_intervals = ['2014-Feb-17',
                    '2014-Oct-17',
                    '2014-Nov-17',
                    '2014-Dec-17',
-                   '2015-Jan-17']
+                   '2015-Jan-17',
+                   '2015-Feb-17',
+                   '2015-Mar-17']
 
 # Find the indexes of each date
 month_indexes = []
 for date in month_intervals:
-    month_indexes.append(date_strings.index(date))
+  month_indexes.append(date_strings.index(date))
 
 # Get total views and average unique viewers for each month
 month_views = [];
 month_visitors = [];
 x_axis = []
 for i in range(0, len(month_indexes)-1):
-    start = month_indexes[i]
-    stop = month_indexes[i+1]
-    month_views.append(sum(n_views[start:stop]));
-    month_visitors.append(np.mean(n_visitors[start:stop]));
-    x_axis.append(date_nums[month_indexes[i]])
+  start = month_indexes[i]
+  stop = month_indexes[i+1]
+  month_views.append(sum(n_views[start:stop]));
+  month_visitors.append(np.mean(n_visitors[start:stop]));
+  x_axis.append(date_nums[month_indexes[i]])
 
 # 111 is equivalent to Matlab's subplot(1,1,1) command
 ax1 = fig.add_subplot(111)
 ax1.plot(x_axis, month_views, 'bo-')
 ax1.set_ylabel('Monthly page views (blue circles)')
 
-# Choose the number of labels to create, then use linspace to create them and convert them to ints
-n_labels = 6
-x_axis_ticks = np.linspace(0, len(x_axis)-1, n_labels).astype(int)
+# For an odd number of months, include a middle tick mark, otherwise just
+# label the endpoints.
+n_months = len(x_axis)
+x_axis_ticks = [0, len(x_axis)-1]
+if n_months % 2 != 0:
+  x_axis_ticks.insert(1, n_months/2)
 
 # Set tick labels and positions
 ax1.set_xticks([x_axis[i] for i in x_axis_ticks])
@@ -752,3 +773,7 @@ ax2.set_ylabel('Avg. Daily Unique Visitors (green squares)')
 
 # Save as PDF
 plt.savefig('monthly_github_traffic.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

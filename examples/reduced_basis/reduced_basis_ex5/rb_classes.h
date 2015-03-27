@@ -134,7 +134,7 @@ public:
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  AutoPtr<DirichletBoundary> dirichlet_bc;
+  UniquePtr<DirichletBoundary> dirichlet_bc;
 
 };
 

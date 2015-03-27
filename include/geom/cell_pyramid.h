@@ -44,6 +44,18 @@ public:
   Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata);
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
+
+  /**
    * @returns 5.  All pyramid-derivatives are guaranteed to have at
    * least 5 nodes.
    */
@@ -98,7 +110,7 @@ public:
    * @returns a primitive triangle or quad for
    * face i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
 
 protected:
@@ -108,6 +120,10 @@ protected:
    */
   Elem* _elemlinks_data[6+(LIBMESH_DIM>3)];
 
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[14][3];
 
 #ifdef LIBMESH_ENABLE_AMR
 

@@ -54,8 +54,8 @@ public:
   typedef std::list<std::pair<Real, std::map<std::string, NumericVector<Number>*> > >::iterator stored_solutions_iterator;
 
   // Definition of the clone function needed for the setter function
-  virtual AutoPtr<SolutionHistory > clone() const {
-    return AutoPtr<SolutionHistory >
+  virtual UniquePtr<SolutionHistory > clone() const {
+    return UniquePtr<SolutionHistory >
       (new MemorySolutionHistory(_system));}
 
 private:

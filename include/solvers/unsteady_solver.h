@@ -127,7 +127,7 @@ public:
   /**
    * Serial vector of _system.get_vector("_old_nonlinear_solution")
    */
-  AutoPtr<NumericVector<Number> > old_local_nonlinear_solution;
+  UniquePtr<NumericVector<Number> > old_local_nonlinear_solution;
 
   /**
    * Computes the size of ||u^{n+1} - u^{n}|| in some norm.

@@ -123,6 +123,12 @@ public:
   Point & point (const unsigned int i);
 
   /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  virtual Point master_point (const unsigned int i) const = 0;
+
+  /**
    * @returns the global id number of local \p Node \p i.
    */
   dof_id_type node (const unsigned int i) const;
@@ -423,6 +429,14 @@ public:
   virtual unsigned int n_nodes () const = 0;
 
   /**
+   * @returns the number of nodes the given child of this element
+   * contains.  Except in odd cases like pyramid refinement this will
+   * be the same as the number of nodes in the parent element.
+   */
+  virtual unsigned int n_nodes_in_child (unsigned int /*c*/) const
+  { return this->n_nodes(); }
+
+  /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of sides on the element.
    */
@@ -478,6 +492,18 @@ public:
    * @returns true iff the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const = 0;
+
+  /**
+   * @returns true iff the specified child has a vertex at the
+   * specified (child-local) node number.
+   * Except in odd cases like pyramid refinement the child will have
+   * the same local structure as the parent element.
+   * same as the parent element.
+   */
+  virtual unsigned int is_vertex_on_child (unsigned int /*c*/,
+                                           unsigned int i) const
+  { return this->is_vertex(i); }
+
 
   /**
    * @returns true iff the specified (local) node number is an edge.
@@ -544,7 +570,7 @@ public:
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual AutoPtr<Elem> side (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> side (const unsigned int i) const = 0;
 
   /**
    * Creates an element coincident with side \p i. The element returned is
@@ -552,7 +578,7 @@ public:
    * build_side(0) on a 20-noded hex will build a 8-noded quadrilateral
    * coincident with face 0 and pass back the pointer.
    *
-   * A \p AutoPtr<Elem> is returned to prevent a memory leak.
+   * A \p UniquePtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    *
    * The second argument, which is true by default, specifies that a
@@ -562,18 +588,18 @@ public:
    * If you really need a full-ordered, non-proxy side object, call
    * this function with proxy=false.
    */
-  virtual AutoPtr<Elem> build_side (const unsigned int i,
-                                    bool proxy=true) const = 0;
+  virtual UniquePtr<Elem> build_side (const unsigned int i,
+                                      bool proxy=true) const = 0;
 
   /**
    * Creates an element coincident with edge \p i. The element returned is
    * full-ordered.  For example, calling build_edge(0) on a 20-noded hex will
    * build a 3-noded edge coincident with edge 0 and pass back the pointer.
    *
-   * A \p AutoPtr<Elem> is returned to prevent a memory leak.
+   * A \p UniquePtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    */
-  virtual AutoPtr<Elem> build_edge (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> build_edge (const unsigned int i) const = 0;
 
   /**
    * @returns the default approximation order for this element type.
@@ -1141,22 +1167,57 @@ public:
   /**
    * Build an element of type \p type.  Since this method
    * allocates memory the new \p Elem is returned in a
-   * \p AutoPtr<>
+   * \p UniquePtr<>
    */
-  static AutoPtr<Elem> build (const ElemType type,
-                              Elem* p=NULL);
+  static UniquePtr<Elem> build (const ElemType type,
+                                Elem* p=NULL);
 
 #ifdef LIBMESH_ENABLE_AMR
+
+  /**
+   * Returns the local node id on the parent which corresponds to 
+   * node n of child c, or returns invalid_uint if no such parent node
+   * exists.
+   */
+  virtual unsigned int as_parent_node (unsigned int c,
+                                       unsigned int n) const;
+
+  /**
+   * Returns all the pairs of nodes (indexed by local node id) which
+   * should bracket node n of child c.
+   */
+  virtual
+  const std::vector<std::pair<unsigned char, unsigned char> >&
+  parent_bracketing_nodes(unsigned int c,
+                          unsigned int n) const;
+
+  /**
+   * Returns all the pairs of nodes (indexed by global node id) which
+   * should bracket node n of child c.
+   */
+  virtual
+  const std::vector<std::pair<dof_id_type, dof_id_type> >
+  bracketing_nodes(unsigned int c,
+                   unsigned int n) const;
+
 
   /**
    * Matrix that transforms the parents nodes into the children's
    * nodes
    */
-  virtual float embedding_matrix (const unsigned int i,
-                                  const unsigned int j,
-                                  const unsigned int k) const = 0;
+  virtual float embedding_matrix (const unsigned int child_num,
+                                  const unsigned int child_node_num,
+                                  const unsigned int parent_node_num) const = 0;
 
-#endif
+  /**
+   * Some element types may use a different embedding matrix for
+   * different elements.  But we may want to cache data based on that
+   * matrix.  So we return a "version number" that can be used to
+   * identify which matrix is in use.
+   */
+  virtual unsigned int embedding_matrix_version () const { return 0; }
+
+#endif // LIBMESH_ENABLE_AMR
 
 
 protected:
@@ -1190,9 +1251,41 @@ protected:
                                   dof_id_type n1,
                                   dof_id_type n2,
                                   dof_id_type n3);
-  //-------------------------------------------------------
 
 
+#ifdef LIBMESH_ENABLE_AMR
+
+  /**
+   * Elem subclasses which don't do their own bracketing node
+   * calculations will need to supply a static cache, since the
+   * default calculation is slow.
+   */
+  virtual 
+  std::vector<std::vector<std::vector<std::vector<
+    std::pair<unsigned char, unsigned char> > > > > &
+    _get_bracketing_node_cache() const
+  {
+    static std::vector<std::vector<std::vector<std::vector<
+             std::pair<unsigned char, unsigned char> > > > > c;
+    libmesh_error();
+    return c;
+  }
+
+  /**
+   * Elem subclasses which don't do their own child-to-parent node
+   * calculations will need to supply a static cache, since the
+   * default calculation is slow.
+   */
+  virtual
+  std::vector<std::vector<std::vector<signed char> > > &
+  _get_parent_indices_cache() const
+  {
+    static std::vector<std::vector<std::vector<signed char> > > c;
+    libmesh_error();
+    return c;
+  }
+
+#endif // LIBMESH_ENABLE_AMR
 
 public:
 
@@ -2071,7 +2164,7 @@ public:
   // unary op*
   Elem*& operator*() const
   {
-    // Set the AutoPtr
+    // Set the UniquePtr
     this->_update_side_ptr();
 
     // Return a reference to _side_ptr
@@ -2108,22 +2201,22 @@ private:
   // This has to be called before dereferencing.
   void _update_side_ptr() const
   {
-    // Construct new side, store in AutoPtr
+    // Construct new side, store in UniquePtr
     this->_side = this->_parent->build_side(this->_side_number);
 
     // Also set our internal naked pointer.  Memory is still owned
-    // by the AutoPtr.
+    // by the UniquePtr.
     this->_side_ptr = _side.get();
   }
 
-  // AutoPtr to the actual side, handles memory management for
+  // UniquePtr to the actual side, handles memory management for
   // the sides which are created during the course of iteration.
-  mutable AutoPtr<Elem> _side;
+  mutable UniquePtr<Elem> _side;
 
   // Raw pointer needed to facilitate passing back to the user a
   // reference to a non-temporary raw pointer in order to conform to
   // the variant_filter_iterator interface.  It points to the same
-  // thing the AutoPtr "_side" above holds.  What happens if the user
+  // thing the UniquePtr "_side" above holds.  What happens if the user
   // calls delete on the pointer passed back?  Well, this is an issue
   // which is not addressed by the iterators in libMesh.  Basically it
   // is a bad idea to ever call delete on an iterator from the library.
@@ -2180,6 +2273,28 @@ variant_filter_iterator<Elem::Predicate,
 
 
 } // namespace libMesh
+
+
+// Helper function for default caches in Elem subclases
+
+#define LIBMESH_ENABLE_TOPOLOGY_CACHES \
+  virtual \
+  std::vector<std::vector<std::vector<std::vector< \
+    std::pair<unsigned char, unsigned char> > > > > & \
+    _get_bracketing_node_cache() const \
+  { \
+    static std::vector<std::vector<std::vector<std::vector< \
+             std::pair<unsigned char, unsigned char> > > > > c; \
+    return c; \
+  } \
+ \
+  virtual \
+  std::vector<std::vector<std::vector<signed char> > > & \
+  _get_parent_indices_cache() const \
+  { \
+    static std::vector<std::vector<std::vector<signed char> > > c; \
+    return c; \
+  }
 
 
 #endif // LIBMESH_ELEM_H

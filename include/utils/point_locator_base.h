@@ -71,12 +71,12 @@ public:
   /**
    * Builds an PointLocator for the mesh \p mesh.
    * Optionally takes a master PointLocator to save memory.
-   * An \p AutoPtr<PointLocatorBase> is returned to prevent memory leak.
+   * An \p UniquePtr<PointLocatorBase> is returned to prevent memory leak.
    * This way the user need not remember to delete the object.
    */
-  static AutoPtr<PointLocatorBase> build (PointLocatorType t,
-                                          const MeshBase& mesh,
-                                          const PointLocatorBase* master = NULL);
+  static UniquePtr<PointLocatorBase> build (PointLocatorType t,
+                                            const MeshBase& mesh,
+                                            const PointLocatorBase* master = NULL);
 
   /**
    * Clears the \p PointLocator.

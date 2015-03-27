@@ -21,8 +21,31 @@
 #include "libmesh/face_quad.h"
 #include "libmesh/edge_edge2.h"
 
+
+
 namespace libMesh
 {
+
+
+
+// ------------------------------------------------------------
+// Quad class static member initializations
+
+
+// We need to require C++11...
+const Real Quad::_master_points[9][3] =
+  {
+    {-1, -1},
+    {1, -1},
+    {1, 1},
+    {-1, 1},
+    {0, -1},
+    {1, 0},
+    {0, 1},
+    {-1, 0},
+    {0, 0}
+  };
+
 
 
 // ------------------------------------------------------------
@@ -63,7 +86,7 @@ dof_id_type Quad::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Quad::side (const unsigned int i) const
+UniquePtr<Elem> Quad::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -75,41 +98,31 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
       {
         edge->set_node(0) = this->get_node(0);
         edge->set_node(1) = this->get_node(1);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     case 1:
       {
         edge->set_node(0) = this->get_node(1);
         edge->set_node(1) = this->get_node(2);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     case 2:
       {
         edge->set_node(0) = this->get_node(2);
         edge->set_node(1) = this->get_node(3);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     case 3:
       {
         edge->set_node(0) = this->get_node(3);
         edge->set_node(1) = this->get_node(0);
-
-        AutoPtr<Elem> ap_edge(edge);
-        return ap_edge;
+        break;
       }
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap_edge(edge);
-  return ap_edge;
+  return UniquePtr<Elem>(edge);
 }
 
 
@@ -314,4 +327,28 @@ const unsigned short int Quad::_second_order_vertex_child_index[9] =
     2            // Interior
   };
 
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+// We number 25 "possible node locations" for a 2x2 refinement of
+// quads with up to 3x3 nodes each
+const int Quad::_child_node_lookup[4][9] =
+  {
+    // node lookup for child 0 (near node 0)
+    { 0, 2, 12, 10,  1, 7, 11, 5,  6},
+
+    // node lookup for child 1 (near node 1)
+    { 2, 4, 14, 12,  3, 9, 13, 7,  8},
+
+    // node lookup for child 2 (near node 3)
+    { 10, 12, 22, 20,  11, 17, 21, 15,  16},
+
+    // node lookup for child 3 (near node 2)
+    { 12, 14, 24, 22,  13, 19, 23, 17,  18}
+  };
+
+
+#endif
+ 
 } // namespace libMesh

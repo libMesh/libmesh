@@ -126,20 +126,17 @@ bool Tet4::is_node_on_side(const unsigned int n,
   return false;
 }
 
-AutoPtr<Elem> Tet4::build_side (const unsigned int i,
-                                bool proxy) const
+UniquePtr<Elem> Tet4::build_side (const unsigned int i,
+                                  bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    {
-      AutoPtr<Elem> ap(new Side<Tri3,Tet4>(this,i));
-      return ap;
-    }
+    return UniquePtr<Elem>(new Side<Tri3,Tet4>(this,i));
 
   else
     {
-      AutoPtr<Elem> face(new Tri3);
+      Elem* face = new Tri3;
       face->subdomain_id() = this->subdomain_id();
 
       switch (i)
@@ -149,49 +146,46 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(2);
             face->set_node(2) = this->get_node(1);
-
-            return face;
+            break;
           }
         case 1:
           {
             face->set_node(0) = this->get_node(0);
             face->set_node(1) = this->get_node(1);
             face->set_node(2) = this->get_node(3);
-
-            return face;
+            break;
           }
         case 2:
           {
             face->set_node(0) = this->get_node(1);
             face->set_node(1) = this->get_node(2);
             face->set_node(2) = this->get_node(3);
-
-            return face;
+            break;
           }
         case 3:
           {
             face->set_node(0) = this->get_node(2);
             face->set_node(1) = this->get_node(0);
             face->set_node(2) = this->get_node(3);
-
-            return face;
+            break;
           }
         default:
           libmesh_error_msg("Invalid side i = " << i);
         }
+
+      return UniquePtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return UniquePtr<Elem>();
 }
 
 
-AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
+UniquePtr<Elem> Tet4::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return AutoPtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
+  return UniquePtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
 }
 
 

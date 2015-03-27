@@ -289,10 +289,10 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
             (fe_type.order + elem->p_level());
 
           // Finite element object for use in this patch
-          AutoPtr<FEBase> fe (FEBase::build (dim, fe_type));
+          UniquePtr<FEBase> fe (FEBase::build (dim, fe_type));
 
           // Build an appropriate Gaussian quadrature rule
-          AutoPtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
+          UniquePtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
 
           // Tell the finite element about the quadrature rule.
           fe->attach_quadrature_rule (qrule.get());

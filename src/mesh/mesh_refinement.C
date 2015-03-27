@@ -98,32 +98,68 @@ void MeshRefinement::clear ()
 
 
 
-Node* MeshRefinement::add_point (const Point& p,
-                                 const processor_id_type proc_id,
-                                 const Real tol)
+Node* MeshRefinement::add_node(const Elem& parent,
+                               unsigned int child,
+                               unsigned int node,
+                               processor_id_type proc_id)
 {
-  START_LOG("add_point()", "MeshRefinement");
+  START_LOG("add_node()", "MeshRefinement");
 
-  // Return the node if it already exists
-  Node *node = _new_nodes_map.find(p, tol);
-  if (node)
+  unsigned int parent_n = parent.as_parent_node(child, node);
+
+  if (parent_n != libMesh::invalid_uint)
     {
-      STOP_LOG("add_point()", "MeshRefinement");
-      return node;
+      STOP_LOG("add_node()", "MeshRefinement");
+      return parent.get_node(parent_n);
     }
 
-  // Add the node, with a default id and the requested
-  // processor_id
-  node = _mesh.add_point (p, DofObject::invalid_id, proc_id);
+  const std::vector<std::pair<dof_id_type, dof_id_type> >
+    bracketing_nodes = parent.bracketing_nodes(child, node);
 
-  libmesh_assert(node);
+  // If we're not a parent node, we *must* be bracketed by at least
+  // one pair of parent nodes
+  libmesh_assert(bracketing_nodes.size());
+
+  const dof_id_type new_node_id =
+    _new_nodes_map.find(bracketing_nodes);
+
+  // Return the node if it already exists
+  if (new_node_id != DofObject::invalid_id)
+    {
+      STOP_LOG("add_node()", "MeshRefinement");
+      return _mesh.node_ptr(new_node_id);
+    }
+
+  // Otherwise we need to add a new node, with a default id and the
+  // requested processor_id.  Figure out where to add the point:
+
+  Point p; // defaults to 0,0,0
+
+  for (unsigned int n=0; n != parent.n_nodes(); ++n)
+    {
+      // The value from the embedding matrix
+      const float em_val = parent.embedding_matrix(child,node,n);
+
+      if (em_val != 0.)
+        {
+          p.add_scaled (parent.point(n), em_val);
+
+          // If we'd already found the node we shouldn't be here
+          libmesh_assert_not_equal_to (em_val, 1);
+        }
+    }
+
+  Node* new_node = _mesh.add_point (p, DofObject::invalid_id, proc_id);
+
+  libmesh_assert(new_node);
 
   // Add the node to the map.
-  _new_nodes_map.insert(*node);
+  _new_nodes_map.add_node(*new_node, bracketing_nodes);
+
+  STOP_LOG("add_node()", "MeshRefinement");
 
   // Return the address of the new node
-  STOP_LOG("add_point()", "MeshRefinement");
-  return node;
+  return new_node;
 }
 
 
@@ -309,7 +345,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  AutoPtr<PointLocatorBase> point_locator;
+  UniquePtr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
@@ -962,7 +998,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  AutoPtr<PointLocatorBase> point_locator;
+  UniquePtr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
@@ -1311,7 +1347,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  AutoPtr<PointLocatorBase> point_locator;
+  UniquePtr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =

@@ -124,7 +124,7 @@ public:
    * who subclass FEMContext will need to also reimplement this method to build
    * it.
    */
-  virtual AutoPtr<DiffContext> build_context();
+  virtual UniquePtr<DiffContext> build_context();
 
   /*
    * Prepares the result of a build_context() call for use.

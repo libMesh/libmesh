@@ -52,6 +52,18 @@ public:
    */
   InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata);
 
+  /**
+   * @returns the \p Point associated with local \p Node \p i,
+   * in master element rather than physical coordinates.
+   */
+  Point master_point (const unsigned int i) const
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
+
   //   /**
   //    * @returns 4 for the base \p s=0 and 2 for side faces.
   //    */
@@ -110,7 +122,7 @@ public:
    * @returns a primitive (3-noded) tri or (4-noded) infquad for
    * face i.
    */
-  AutoPtr<Elem> side (const unsigned int i) const;
+  UniquePtr<Elem> side (const unsigned int i) const;
 
 
 protected:
@@ -119,6 +131,11 @@ protected:
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[12][3];
 };
 
 

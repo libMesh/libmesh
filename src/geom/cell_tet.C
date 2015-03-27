@@ -29,6 +29,28 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
+// Tet class static member initializations
+
+
+// We need to require C++11...
+const Real Tet::_master_points[10][3] =
+  {
+    {0, 0, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {0, 0, 1},
+    {0.5, 0, 0},
+    {0.5, 0.5, 0},
+    {0, 0.5, 0},
+    {0, 0, 0.5},
+    {0.5, 0, 0.5},
+    {0, 0.5, 0.5}
+  };
+
+
+
+
+// ------------------------------------------------------------
 // Tet class member functions
 dof_id_type Tet::key (const unsigned int s) const
 {
@@ -70,11 +92,9 @@ dof_id_type Tet::key (const unsigned int s) const
 
 
 
-AutoPtr<Elem> Tet::side (const unsigned int i) const
+UniquePtr<Elem> Tet::side (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_sides());
-
-
 
   Elem* face = new Tri3;
 
@@ -85,44 +105,34 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(2);
         face->set_node(2) = this->get_node(1);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 1:
       {
         face->set_node(0) = this->get_node(0);
         face->set_node(1) = this->get_node(1);
         face->set_node(2) = this->get_node(3);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 2:
       {
         face->set_node(0) = this->get_node(1);
         face->set_node(1) = this->get_node(2);
         face->set_node(2) = this->get_node(3);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     case 3:
       {
         face->set_node(0) = this->get_node(2);
         face->set_node(1) = this->get_node(0);
         face->set_node(2) = this->get_node(3);
-
-        AutoPtr<Elem> ap_face(face);
-        return ap_face;
+        break;
       }
     default:
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap_face(face);
-  return ap_face;
+  return UniquePtr<Elem>(face);
 }
 
 

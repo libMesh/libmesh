@@ -113,14 +113,14 @@ public:
   /**
    * Creates a vector which has the same type, size and partitioning
    * as this vector, but whose data is all zero.  Returns it in an \p
-   * AutoPtr.
+   * UniquePtr.
    */
-  virtual AutoPtr<NumericVector<T> > zero_clone () const;
+  virtual UniquePtr<NumericVector<T> > zero_clone () const;
 
   /**
-   * Creates a copy of this vector and returns it in an \p AutoPtr.
+   * Creates a copy of this vector and returns it in an \p UniquePtr.
    */
-  AutoPtr<NumericVector<T> > clone () const;
+  UniquePtr<NumericVector<T> > clone () const;
 
   /**
    * Change the dimension of the vector to \p N. The reserved memory for
@@ -662,30 +662,23 @@ void DistributedVector<T>::zero ()
 
 template <typename T>
 inline
-AutoPtr<NumericVector<T> > DistributedVector<T>::zero_clone () const
+UniquePtr<NumericVector<T> > DistributedVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector
-    (new DistributedVector<T>(this->comm()));
-
+  NumericVector<T>* cloned_vector = new DistributedVector<T>(this->comm());
   cloned_vector->init(*this);
-
-  return cloned_vector;
+  return UniquePtr<NumericVector<T> >(cloned_vector);
 }
 
 
 
 template <typename T>
 inline
-AutoPtr<NumericVector<T> > DistributedVector<T>::clone () const
+UniquePtr<NumericVector<T> > DistributedVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector
-    (new DistributedVector<T>(this->comm()));
-
+  NumericVector<T>* cloned_vector = new DistributedVector<T>(this->comm());
   cloned_vector->init(*this, true);
-
   *cloned_vector = *this;
-
-  return cloned_vector;
+  return UniquePtr<NumericVector<T> >(cloned_vector);
 }
 
 

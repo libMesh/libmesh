@@ -87,7 +87,7 @@ void run_timestepping(EquationSystems& systems, GetPot& args)
 
   SolidSystem& solid_system = systems.get_system<SolidSystem>("solid");
 
-  AutoPtr<VTKIO> io = AutoPtr<VTKIO>(new VTKIO(systems.get_mesh()));
+  UniquePtr<VTKIO> io = UniquePtr<VTKIO>(new VTKIO(systems.get_mesh()));
 
   Real duration = args("duration", 1.0);
 

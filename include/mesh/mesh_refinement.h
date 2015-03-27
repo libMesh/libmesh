@@ -29,7 +29,7 @@
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
-#include "libmesh/location_maps.h"
+#include "libmesh/topology_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/parallel_object.h"
@@ -298,15 +298,16 @@ public:
   bool test_unflagged (bool libmesh_assert_yes = false);
 
   /**
-   * Add point \p p to the mesh. The function returns a pointer to
-   * the new node.
-   * The processor_id is assigned to the new node (only if no existing
-   * node is found.  The tolerance \p tol tells the method how far away
-   * from p to search for existing nodes.
+   * Add a node to the mesh.  The node should be node n of child c of
+   * parent Elem parent.  The function returns a pointer to a suitable
+   * existing node, or creates a new node and returns a pointer to it
+   * if necessary.
+   * The processor_id is assigned to any newly created node.
    */
-  Node* add_point (const Point& p,
-                   const processor_id_type proc_id,
-                   const Real tol);
+  Node* add_node (const Elem& parent,
+                  unsigned int child,
+                  unsigned int node,
+                  processor_id_type proc_id);
 
   /**
    * Adds the element \p elem to the mesh.
@@ -658,7 +659,7 @@ private:
   /**
    * Data structure that holds the new nodes information.
    */
-  LocationMap<Node> _new_nodes_map;
+  TopologyMap _new_nodes_map;
 
   /**
    * Reference to the mesh.

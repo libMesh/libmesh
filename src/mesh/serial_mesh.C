@@ -126,7 +126,7 @@ SerialMesh::SerialMesh (const Parallel::Communicator &comm_in,
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = AutoPtr<Partitioner>(new MetisPartitioner());
+  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
 }
 
 
@@ -140,7 +140,7 @@ SerialMesh::SerialMesh (unsigned char d) :
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = AutoPtr<Partitioner>(new MetisPartitioner());
+  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
 }
 #endif
 
@@ -886,7 +886,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
               {
                 // We need to find an element that contains boundary nodes in order
                 // to update hmin.
-                AutoPtr<PointLocatorBase> my_locator = mesh_array[i]->sub_point_locator();
+                UniquePtr<PointLocatorBase> my_locator = mesh_array[i]->sub_point_locator();
 
                 std::vector<numeric_index_type> node_id_list;
                 std::vector<boundary_id_type> bc_id_list;
@@ -928,7 +928,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
                       if (std::count(bc_ids.begin(), bc_ids.end(), id_array[i]))
                         {
-                          AutoPtr<Elem> side (el->build_side(side_id));
+                          UniquePtr<Elem> side (el->build_side(side_id));
                           for (unsigned int node_id=0; node_id<side->n_nodes(); ++node_id)
                             set_array[i]->insert( side->node(node_id) );
 
@@ -968,7 +968,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
                               if (std::count(edge_bc_ids.begin(), edge_bc_ids.end(), id_array[i]))
                                 {
-                                  AutoPtr<Elem> edge (el->build_edge(edge_id));
+                                  UniquePtr<Elem> edge (el->build_edge(edge_id));
                                   for (unsigned int node_id=0; node_id<edge->n_nodes(); ++node_id)
                                     set_array[i]->insert( edge->node(node_id) );
 
@@ -1362,7 +1362,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                           if(bounds.first != bounds.second)
                             {
                               // Get the side for this element
-                              const AutoPtr<Elem> my_side(el->side(s));
+                              const UniquePtr<Elem> my_side(el->side(s));
 
                               // Look at all the entries with an equivalent key
                               while (bounds.first != bounds.second)
@@ -1372,7 +1372,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
-                                  const AutoPtr<Elem> their_side(neighbor->side(ns));
+                                  const UniquePtr<Elem> their_side(neighbor->side(ns));
                                   //libmesh_assert(my_side.get());
                                   //libmesh_assert(their_side.get());
 

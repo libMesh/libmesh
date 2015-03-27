@@ -54,8 +54,8 @@ public:
     return soln( x, y, z )(component_in);
   }
 
-  virtual AutoPtr<FunctionBase<Number> > clone() const
-  { return AutoPtr<FunctionBase<Number> > (new SolutionFunction(_u_var)); }
+  virtual UniquePtr<FunctionBase<Number> > clone() const
+  { return UniquePtr<FunctionBase<Number> > (new SolutionFunction(_u_var)); }
 
 private:
 
@@ -91,8 +91,8 @@ public:
     return soln.grad( x, y, z ).row(component_in);
   }
 
-  virtual AutoPtr<FunctionBase<Gradient> > clone() const
-  { return AutoPtr<FunctionBase<Gradient> > (new SolutionGradient(_u_var)); }
+  virtual UniquePtr<FunctionBase<Gradient> > clone() const
+  { return UniquePtr<FunctionBase<Gradient> > (new SolutionGradient(_u_var)); }
 
 private:
 

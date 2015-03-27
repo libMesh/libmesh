@@ -124,7 +124,7 @@ void UnstructuredMesh::copy_nodes_and_elements
         //Build a new element
         Elem *newparent = old->parent() ?
           this->elem(old->parent()->id()) : NULL;
-        AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
+        UniquePtr<Elem> ap = Elem::build(old->type(), newparent);
         Elem * el = ap.release();
 
         el->subdomain_id() = old->subdomain_id();
@@ -285,7 +285,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 if (bounds.first != bounds.second)
                   {
                     // Get the side for this element
-                    const AutoPtr<Elem> my_side(element->side(ms));
+                    const UniquePtr<Elem> my_side(element->side(ms));
 
                     // Look at all the entries with an equivalent key
                     while (bounds.first != bounds.second)
@@ -295,7 +295,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
                         // Get the side for the neighboring element
                         const unsigned int ns = bounds.first->second.second;
-                        const AutoPtr<Elem> their_side(neighbor->side(ns));
+                        const UniquePtr<Elem> their_side(neighbor->side(ns));
                         //libmesh_assert(my_side.get());
                         //libmesh_assert(their_side.get());
 

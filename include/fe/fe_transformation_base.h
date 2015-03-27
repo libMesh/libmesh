@@ -48,7 +48,7 @@ public:
   /**
    * Builds an FETransformation object based on the finite element type
    */
-  static AutoPtr<FETransformationBase<OutputShape> > build( const FEType& type );
+  static UniquePtr<FETransformationBase<OutputShape> > build( const FEType& type );
 
   /**
    * Evaluates shape functions in physical coordinates based on proper

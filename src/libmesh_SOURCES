@@ -414,6 +414,7 @@ libmesh_SOURCES =  \
         src/utils/statistics.C \
         src/utils/string_to_enum.C \
         src/utils/timestamp.C \
+        src/utils/topology_map.C \
         src/utils/tree.C \
         src/utils/tree_node.C \
         src/utils/utility.C \

@@ -102,6 +102,7 @@ INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
 INT_TYPE(int,MPI_INT);
 INT_TYPE(unsigned int,MPI_UNSIGNED);
 INT_TYPE(long,MPI_LONG);
+INT_TYPE(long long,MPI_LONG_LONG_INT);
 INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
 INT_TYPE(unsigned long long,MPI_LONG_LONG_INT);
 FLOAT_TYPE(float,MPI_FLOAT);
@@ -674,7 +675,7 @@ inline Request::Request (const Request &other) :
   post_wait_work(other.post_wait_work)
 {
   if (other._prior_request.get())
-    _prior_request = AutoPtr<Request>
+    _prior_request = UniquePtr<Request>
       (new Request(*other._prior_request.get()));
 
   // operator= should behave like a shared pointer
@@ -712,7 +713,7 @@ inline Request& Request::operator = (const Request &other)
   post_wait_work = other.post_wait_work;
 
   if (other._prior_request.get())
-    _prior_request = AutoPtr<Request>
+    _prior_request = UniquePtr<Request>
       (new Request(*other._prior_request.get()));
 
   // operator= should behave like a shared pointer
@@ -806,8 +807,12 @@ inline void Request::add_prior_request(const Request& req)
   libmesh_assert(!req._prior_request.get());
 
   Request *new_prior_req = new Request(req);
-  new_prior_req->_prior_request = this->_prior_request;
-  this->_prior_request = AutoPtr<Request>(new_prior_req);
+
+  // new_prior_req takes ownership of our existing _prior_request
+  new_prior_req->_prior_request.reset(this->_prior_request.release());
+
+  // Our _prior_request now manages the new resource we just set up
+  this->_prior_request.reset(new_prior_req);
 }
 
 inline void Request::add_post_wait_work(PostWaitWork* work)

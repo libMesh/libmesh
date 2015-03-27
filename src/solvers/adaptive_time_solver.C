@@ -26,8 +26,9 @@ namespace libMesh
 
 AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
   : UnsteadySolver(s),
-    core_time_solver(NULL),
-    target_tolerance(1.e-3), upper_tolerance(0.0),
+    core_time_solver(),
+    target_tolerance(1.e-3),
+    upper_tolerance(0.0),
     max_deltat(0.),
     min_deltat(0.),
     max_growth(0.),
@@ -65,10 +66,10 @@ void AdaptiveTimeSolver::init()
   // As an UnsteadySolver, we have an old_local_nonlinear_solution, but it
   // isn't pointing to the right place - fix it
   //
-  // This leaves us with two AutoPtrs holding the same pointer - dangerous
+  // This leaves us with two UniquePtrs holding the same pointer - dangerous
   // for future use.  Replace with shared_ptr?
   old_local_nonlinear_solution =
-    AutoPtr<NumericVector<Number> >(core_time_solver->old_local_nonlinear_solution.get());
+    UniquePtr<NumericVector<Number> >(core_time_solver->old_local_nonlinear_solution.get());
 }
 
 
@@ -138,14 +139,14 @@ bool AdaptiveTimeSolver::nonlocal_residual (bool request_jacobian,
 
 
 
-AutoPtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
+UniquePtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 {
   return core_time_solver->diff_solver();
 }
 
 
 
-AutoPtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
+UniquePtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
 {
   return core_time_solver->linear_solver();
 }

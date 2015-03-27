@@ -16,6 +16,14 @@ with libmesh:
    need to figure out which dependency generation flag it uses that
    skips system headers.
 
+.) Repeat the previous step, adding the appropriate -std=c++0x flag
+   for your compiler, to determine the subset of required headers in this
+   compilation mode as well!
+
+.) Repeat the previous two steps, while removing the "-MM -MF foo.d"
+   part.  This will ensure that the test_boost.cc file actually gets
+   compiled into an executable for the compiler in question.
+
 .) Inspect the contents of the foo.d dependency file. It should contain all
    the headers from the boost distro that are required to build the subset of
    boost used by libmesh.
@@ -27,21 +35,33 @@ with libmesh:
    git rm -r contrib/boost/include/boost
    git ci -a -m"Updating boost."
 
-.) Copy all the required boost header filenames (with relative paths)
-   into the script below on the 'files=' line, and then run the script
-   to actually copy files out of the boost distribution and into libmesh's
-   contrib/boost/include/boost directory.
+.) Copy all the required boost header filenames (with relative paths,
+   omitting everything up to and including the final "boost/"
+   directory, and without the line continuation characters) into the
+   boost_copy.sh script in this directory on the 'files='
+   line, and then run the script to actually copy files out of the
+   boost distribution and into libmesh's contrib/boost/include/boost
+   directory.
 
-.) Commit the new headers, squash with the previous removal patch.
-   git add contrib/boost/include/boost
+.) When adding new Boost features or generating dependencies for a new
+   compiler, carefully inspect the files which are modified and added
+   by boost_copy.sh.  Make sure that any local boost patches by
+   libmesh are not overwritten in the process.  Delete trailing
+   whitespace (find . -name "*.hpp" | xargs perl -pli -e 's/\s+$//')
+   from modified files to avoid spurious diffs.
+
+.) Revert the local changes made to boost_copy.sh. Commit the new
+   headers, squash with the previous removal patch.
+   git add include/boost
    git ci --amend
 
 .) Update contrib/boost/include/Makefile.am with the list of files
-   from foo.d as well.  Commit Makefile.am.  You can get a list of
-   candidate files to install by doing:
+   from foo.d as well.  Commit Makefile.am.  Currently there are only
+   .hpp and .ipp files that need to be installed, and you can get a
+   list of all of these by doing:
 
    cd $LIBMESH_ROOT/contrib/boost/include
-   find . -name "*.hpp"
+   find . -name "*.hpp" -or -name "*.ipp"
 
 .) Run boostrap in the top level of the libmesh source distribution to
    regenerate Makefile.in.  Commit Makefile.in.

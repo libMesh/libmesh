@@ -142,20 +142,17 @@ bool Hex20::has_affine_map() const
 
 
 
-AutoPtr<Elem> Hex20::build_side (const unsigned int i,
-                                 bool proxy ) const
+UniquePtr<Elem> Hex20::build_side (const unsigned int i,
+                                   bool proxy ) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    {
-      AutoPtr<Elem> ap(new Side<Quad8,Hex20>(this,i));
-      return ap;
-    }
+    return UniquePtr<Elem>(new Side<Quad8,Hex20>(this,i));
 
   else
     {
-      AutoPtr<Elem> face(new Quad8);
+      Elem* face = new Quad8;
       face->subdomain_id() = this->subdomain_id();
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
@@ -171,8 +168,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
             face->set_node(5) = this->get_node(10);
             face->set_node(6) = this->get_node(9);
             face->set_node(7) = this->get_node(8);
-
-            return face;
+            break;
           }
         case 1:  // the face at y = 0
           {
@@ -184,8 +180,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
             face->set_node(5) = this->get_node(13);
             face->set_node(6) = this->get_node(16);
             face->set_node(7) = this->get_node(12);
-
-            return face;
+            break;
           }
         case 2:  // the face at x=1
           {
@@ -197,8 +192,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
             face->set_node(5) = this->get_node(14);
             face->set_node(6) = this->get_node(17);
             face->set_node(7) = this->get_node(13);
-
-            return face;
+            break;
           }
         case 3: // the face at y=1
           {
@@ -210,8 +204,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
             face->set_node(5) = this->get_node(15);
             face->set_node(6) = this->get_node(18);
             face->set_node(7) = this->get_node(14);
-
-            return face;
+            break;
           }
         case 4: // the face at x=0
           {
@@ -223,8 +216,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
             face->set_node(5) = this->get_node(12);
             face->set_node(6) = this->get_node(19);
             face->set_node(7) = this->get_node(15);
-
-            return face;
+            break;
           }
         case 5: // the face at z=1
           {
@@ -236,27 +228,26 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
             face->set_node(5) = this->get_node(17);
             face->set_node(6) = this->get_node(18);
             face->set_node(7) = this->get_node(19);
-
-            return face;
+            break;
           }
         default:
           libmesh_error_msg("Unsupported side i = " << i);
         }
+
+      return UniquePtr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<Elem> ap(NULL);
-  return ap;
+  return UniquePtr<Elem>();
 }
 
 
 
-AutoPtr<Elem> Hex20::build_edge (const unsigned int i) const
+UniquePtr<Elem> Hex20::build_edge (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_edges());
 
-  AutoPtr<Elem> ap(new SideEdge<Edge3,Hex20>(this,i));
-  return ap;
+  return UniquePtr<Elem>(new SideEdge<Edge3,Hex20>(this,i));
 }
 
 

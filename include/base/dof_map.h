@@ -1113,7 +1113,7 @@ private:
   /**
    * Builds a sparsity pattern
    */
-  AutoPtr<SparsityPattern::Build> build_sparsity(const MeshBase& mesh) const;
+  UniquePtr<SparsityPattern::Build> build_sparsity(const MeshBase& mesh) const;
 
   /**
    * Invalidates all active DofObject dofs for this system
@@ -1321,7 +1321,7 @@ private:
    * The sparsity pattern of the global matrix, kept around if it
    * might be needed by future additions of the same type of matrix.
    */
-  AutoPtr<SparsityPattern::Build> _sp;
+  UniquePtr<SparsityPattern::Build> _sp;
 
   /**
    * The number of on-processor nonzeros in my portion of the

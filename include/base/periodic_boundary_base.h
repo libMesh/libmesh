@@ -85,7 +85,7 @@ public:
    * DofMap interface instead.  The simplest way to implement a clone
    * function like this is in terms of a copy constructor, see periodic_boundary.h.
    */
-  virtual AutoPtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const = 0;
+  virtual UniquePtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const = 0;
 
   void set_variable(unsigned int var);
 

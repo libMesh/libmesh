@@ -348,9 +348,9 @@ void assemble_poisson(EquationSystems& es,
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p AutoPtr<FEBase>.  This can be thought
+  // store the object as an \p UniquePtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
@@ -360,7 +360,7 @@ void assemble_poisson(EquationSystems& es,
 
   // Declare a special finite element object for
   // boundary integration.
-  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
   // Boundary integration requires one quadraure rule,
   // with dimensionality one less than the dimensionality

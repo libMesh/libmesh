@@ -31,7 +31,7 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
-
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 
@@ -39,7 +39,6 @@ namespace libMesh
 {
 
 // forward declarations
-template <typename T> class AutoPtr;
 template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
 template <typename T> class NumericVector;
@@ -71,9 +70,9 @@ public:
    * Builds an \p EigenSolver using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<EigenSolver<T> > build(const Parallel::Communicator &comm_in
-                                        LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
-                                        const SolverPackage solver_package = SLEPC_SOLVERS);
+  static UniquePtr<EigenSolver<T> > build(const Parallel::Communicator &comm_in
+                                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
+                                          const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
    * @returns true if the data structures are

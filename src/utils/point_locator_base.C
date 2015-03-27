@@ -61,43 +61,30 @@ bool PointLocatorBase::initialized () const
 
 
 
-AutoPtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
-                                                   const MeshBase& mesh,
-                                                   const PointLocatorBase* master)
+UniquePtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
+                                                     const MeshBase& mesh,
+                                                     const PointLocatorBase* master)
 {
   switch (t)
     {
     case TREE:
-      {
-        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
-        return ap;
-      }
+      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
 
     case TREE_ELEMENTS:
-      {
-        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
-        return ap;
-      }
+      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
 
     case TREE_LOCAL_ELEMENTS:
-      {
-        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
-        return ap;
-      }
+      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
 
     case LIST:
-      {
-        AutoPtr<PointLocatorBase> ap(new PointLocatorList(mesh, master));
-        return ap;
-      }
+      return UniquePtr<PointLocatorBase>(new PointLocatorList(mesh, master));
 
     default:
       libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);
     }
 
   libmesh_error_msg("We'll never get here!");
-  AutoPtr<PointLocatorBase> ap(NULL);
-  return ap;
+  return UniquePtr<PointLocatorBase>();
 }
 
 void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)

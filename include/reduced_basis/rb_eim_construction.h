@@ -163,7 +163,7 @@ public:
    * This is pure virtual, override in subclasses to specify the appropriate
    * ElemAssembly object.
    */
-  virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
+  virtual UniquePtr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -261,7 +261,7 @@ private:
    * We also need an extra vector in which we can store a ghosted
    * copy of the vector that we wish to use MeshFunction on.
    */
-  AutoPtr< NumericVector<Number> > _ghosted_meshfunction_vector;
+  UniquePtr< NumericVector<Number> > _ghosted_meshfunction_vector;
 
   /**
    * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion,

@@ -460,7 +460,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                   {
                     // Build a temporary element of the right type, so we know how
                     // connectivity entries will be on the line for this element.
-                    AutoPtr<Elem> temp_elem = Elem::build(etypes[idx]);
+                    UniquePtr<Elem> temp_elem = Elem::build(etypes[idx]);
 
                     // A pointer to the element which will eventually be added to the mesh.
                     Elem* elem;

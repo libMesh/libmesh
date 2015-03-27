@@ -120,14 +120,14 @@ public:
 
   /**
    * Builds a specific finite element type.  A \p
-   * AutoPtr<FEGenericBase> is returned to prevent a memory leak. This
+   * UniquePtr<FEGenericBase> is returned to prevent a memory leak. This
    * way the user need not remember to delete the object.
    *
    * The build call will fail if the OutputType of this class is not
    * compatible with the output required for the requested \p type
    */
-  static AutoPtr<FEGenericBase> build (const unsigned int dim,
-                                       const FEType& type);
+  static UniquePtr<FEGenericBase> build (const unsigned int dim,
+                                         const FEType& type);
 
   /**
    * Convenient typedefs for gradients of output, hessians of output,
@@ -148,14 +148,14 @@ public:
 
   /**
    * Builds a specific infinite element type.  A \p
-   * AutoPtr<FEGenericBase> is returned to prevent a memory leak. This
+   * UniquePtr<FEGenericBase> is returned to prevent a memory leak. This
    * way the user need not remember to delete the object.
    *
    * The build call will fail if the OutputShape of this class is not
    * compatible with the output required for the requested \p type
    */
-  static AutoPtr<FEGenericBase> build_InfFE (const unsigned int dim,
-                                             const FEType& type);
+  static UniquePtr<FEGenericBase> build_InfFE (const unsigned int dim,
+                                               const FEType& type);
 
 #endif
 
@@ -487,7 +487,7 @@ protected:
    * Object that handles computing shape function values, gradients, etc
    * in the physical domain.
    */
-  AutoPtr<FETransformationBase<OutputType> > _fe_trans;
+  UniquePtr<FETransformationBase<OutputType> > _fe_trans;
 
   /**
    * Shape function values.

@@ -104,14 +104,14 @@ void IRBinCoordinates(ctrl_t *ctrl, graph_t *graph, idx_t ndims, real_t *xyz,
 
     for (i=0; i<nbins; i++)
       emarkers[i] = gmin + (gmax-gmin)*i/nbins;
-    emarkers[nbins] = gmax*(1.0+2.0*REAL_EPSILON);
+    emarkers[nbins] = gmax*(1.0+copysign(1.0,gmax)*2.0*REAL_EPSILON);
 
     /* get into a iterative backet boundary refinement */
     for (l=0; l<5; l++) {
       /* determine bucket counts */
       iset(nbins, 0, lcounts);
       for (j=0, i=0; i<nvtxs;) {
-        if (cand[i].key < emarkers[j+1]) {
+        if (cand[i].key <= emarkers[j+1]) {
           lcounts[j]++;
           i++;
         }
@@ -152,13 +152,13 @@ void IRBinCoordinates(ctrl_t *ctrl, graph_t *graph, idx_t ndims, real_t *xyz,
         }
       }
       nemarkers[0]     = gmin;
-      nemarkers[nbins] = gmax*(1.0+2.0*REAL_EPSILON);
+      nemarkers[nbins] = gmax*(1.0+copysign(1.0,gmax)*2.0*REAL_EPSILON);
       rcopy(nbins+1, nemarkers, emarkers);
     }
 
     /* assign the coordinate to the appropriate bin */
     for (j=0, i=0; i<nvtxs;) {
-      if (cand[i].key < emarkers[j+1]) {
+      if (cand[i].key <= emarkers[j+1]) {
         bxyz[cand[i].val*ndims+k] = j;
         i++;
       }
@@ -218,7 +218,7 @@ void RBBinCoordinates(ctrl_t *ctrl, graph_t *graph, idx_t ndims, real_t *xyz,
 
     emarkers[0] = gmin;
     emarkers[1] = gsum/gnvtxs;
-    emarkers[2] = gmax*(1.0+2.0*REAL_EPSILON);
+    emarkers[2] = gmax*(1.0+(gmax < 0 ? -1. : 1.)*2.0*REAL_EPSILON);
     cnbins = 2;
 
     /* get into a iterative backet boundary refinement */
@@ -227,7 +227,7 @@ void RBBinCoordinates(ctrl_t *ctrl, graph_t *graph, idx_t ndims, real_t *xyz,
       iset(cnbins, 0, lcounts);
       rset(cnbins, 0, lsums);
       for (j=0, i=0; i<nvtxs;) {
-        if (cand[i].key < emarkers[j+1]) {
+        if (cand[i].key <= emarkers[j+1]) {
           lcounts[j]++;
           lsums[j] += cand[i].key;
           i++;
@@ -272,12 +272,12 @@ void RBBinCoordinates(ctrl_t *ctrl, graph_t *graph, idx_t ndims, real_t *xyz,
       
       rsorti(cnbins, nemarkers);
       rcopy(cnbins, nemarkers, emarkers);
-      emarkers[cnbins] = gmax*(1.0+2.0*REAL_EPSILON);
+      emarkers[cnbins] = gmax*(1.0+(gmax < 0 ? -1. : 1.)*2.0*REAL_EPSILON);
     }
 
     /* assign the coordinate to the appropriate bin */
     for (j=0, i=0; i<nvtxs;) {
-      if (cand[i].key < emarkers[j+1]) {
+      if (cand[i].key <= emarkers[j+1]) {
         bxyz[cand[i].val*ndims+k] = j;
         i++;
       }

@@ -131,16 +131,16 @@ public:
 
   /**
    * Builds a \p TRI6 built coincident with face i.
-   * The \p AutoPtr<Elem> handles the memory aspect.
+   * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  AutoPtr<Elem> build_side (const unsigned int i,
-                            bool proxy) const;
+  UniquePtr<Elem> build_side (const unsigned int i,
+                              bool proxy) const;
 
   /**
    * Builds a \p EDGE3 built coincident with edge i.
-   * The \p AutoPtr<Elem> handles the memory aspect.
+   * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  AutoPtr<Elem> build_edge (const unsigned int i) const;
+  UniquePtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
@@ -208,9 +208,9 @@ protected:
    */
   static const float _embedding_matrix[8][10][10];
 
+LIBMESH_ENABLE_TOPOLOGY_CACHES
 
-#endif
-
+#endif // LIBMESH_ENABLE_AMR
 
 private:
 

@@ -74,7 +74,7 @@ public:
   /**
    * Returns a new deep copy of the function.
    */
-  virtual AutoPtr<FunctionBase<Number> > clone () const;
+  virtual UniquePtr<FunctionBase<Number> > clone () const;
 
   /**
    * @returns the value at point \p p and time
@@ -142,10 +142,10 @@ void MeshlessInterpolationFunction::clear ()
 
 
 inline
-AutoPtr<FunctionBase<Number> >
+UniquePtr<FunctionBase<Number> >
 MeshlessInterpolationFunction::clone () const
 {
-  return AutoPtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
+  return UniquePtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
 }
 
 

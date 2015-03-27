@@ -152,17 +152,17 @@ protected:
   std::vector<Elem const*> _inside_elem;
   std::vector<Elem const*> _outside_elem;
 
-  AutoPtr<SerialMesh> _inside_mesh_2D;
-  AutoPtr<SerialMesh> _outside_mesh_2D;
-  AutoPtr<SerialMesh> _inside_mesh_3D;
-  AutoPtr<SerialMesh> _outside_mesh_3D;
+  UniquePtr<SerialMesh> _inside_mesh_2D;
+  UniquePtr<SerialMesh> _outside_mesh_2D;
+  UniquePtr<SerialMesh> _inside_mesh_3D;
+  UniquePtr<SerialMesh> _outside_mesh_3D;
 
   Parallel::Communicator _comm_self; // defaults to MPI_COMM_SELF
 
-  AutoPtr<TriangleInterface>   _triangle_inside;
-  AutoPtr<TriangleInterface>   _triangle_outside;
-  AutoPtr<TetGenMeshInterface> _tetgen_inside;
-  AutoPtr<TetGenMeshInterface> _tetgen_outside;
+  UniquePtr<TriangleInterface>   _triangle_inside;
+  UniquePtr<TriangleInterface>   _triangle_outside;
+  UniquePtr<TetGenMeshInterface> _tetgen_inside;
+  UniquePtr<TetGenMeshInterface> _tetgen_outside;
 
   std::vector<Point> _intersection_pts;
 };

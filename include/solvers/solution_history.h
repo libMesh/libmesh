@@ -45,9 +45,9 @@ public:
   // Function to retrieve a solution, pure virtual
   virtual void retrieve() = 0;
 
-  // Cloning function for an AutoPtr, pure virtual, used in the
+  // Cloning function for an UniquePtr, pure virtual, used in the
   // setter function in time_solver.C
-  virtual AutoPtr<SolutionHistory > clone() const = 0;
+  virtual UniquePtr<SolutionHistory > clone() const = 0;
 
   // Turn on overwrite_previously_stored to overwrite any
   // already-saved data encountered during subsequent store() calls

@@ -32,15 +32,13 @@
 namespace libMesh
 {
 
-
+// Forward declarations
+class ParmetisHelper;
 
 /**
  * The \p ParmetisPartitioner uses the Parmetis graph partitioner
  * to partition the elements.
  */
-
-// ------------------------------------------------------------
-// ParmetisPartitioner class definition
 class ParmetisPartitioner : public Partitioner
 {
 public:
@@ -48,16 +46,20 @@ public:
   /**
    * Constructor.
    */
-  ParmetisPartitioner () {}
+  ParmetisPartitioner ();
+
+  /**
+   * Destructor.
+   */
+  ~ParmetisPartitioner ();
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p AutoPtr.
+   * an \p UniquePtr.
    */
-  virtual AutoPtr<Partitioner> clone () const {
-    AutoPtr<Partitioner> cloned_partitioner
-      (new ParmetisPartitioner());
-    return cloned_partitioner;
+  virtual UniquePtr<Partitioner> clone () const
+  {
+    return UniquePtr<Partitioner>(new ParmetisPartitioner());
   }
 
 
@@ -112,23 +114,10 @@ private:
   vectormap<dof_id_type, dof_id_type> _global_index_by_pid_map;
 
   /**
-   * Data structures used by ParMETIS to describe the connectivity graph
-   * of the mesh.  Consult the ParMETIS documentation.
+   * Pointer to the Parmetis-specific data structures.  Lets us avoid
+   * including parmetis.h here.
    */
-  std::vector<int>    _vtxdist;
-  std::vector<int>    _xadj;
-  std::vector<int>    _adjncy;
-  std::vector<int>    _part;
-  std::vector<float>  _tpwgts;
-  std::vector<float>  _ubvec;
-  std::vector<int>    _options;
-  std::vector<int>    _vwgt;
-
-  int _wgtflag;
-  int _ncon;
-  int _numflag;
-  int _nparts;
-  int _edgecut;
+  ParmetisHelper* _pmetis;
 
 #endif
 };

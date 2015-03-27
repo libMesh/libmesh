@@ -401,7 +401,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
             for (unsigned int s=0; s<elem->n_sides(); s++)
               if (elem->neighbor(s) == NULL)
                 {
-                  AutoPtr<Elem> side(elem->build_side(s));
+                  UniquePtr<Elem> side(elem->build_side(s));
 
                   for (unsigned int n=0; n<side->n_vertices(); n++)
                     my_interface_node_set.insert (side->node(n));
@@ -704,14 +704,8 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
                                        &mesh,
                                        mesh_inserter_iterator<Elem>(mesh));
 
-  // Make sure mesh dimension is consistent
-  // We need to set a default first because other processors mesh_dimension is empty.
-  unsigned char mesh_dimension = 1;
-  if(mesh.processor_id() == 0)
-    mesh_dimension = mesh.mesh_dimension();
-
-  mesh.comm().broadcast(mesh_dimension);
-  mesh.set_mesh_dimension(mesh_dimension);
+  // Make sure mesh_dimension and elem_dimensions are consistent.
+  mesh.cache_elem_dims();
 
   // Broadcast all of the named entity information
   mesh.comm().broadcast(mesh.set_subdomain_name_map());

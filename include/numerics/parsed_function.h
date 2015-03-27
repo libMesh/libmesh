@@ -248,8 +248,8 @@ public:
   }
 
 
-  virtual AutoPtr<FunctionBase<Output> > clone() const {
-    return AutoPtr<FunctionBase<Output> >
+  virtual UniquePtr<FunctionBase<Output> > clone() const {
+    return UniquePtr<FunctionBase<Output> >
       (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
   }
 
@@ -373,8 +373,8 @@ public:
   virtual void init() {}
   virtual void clear() {}
   virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
-  virtual AutoPtr<FunctionBase<Output> > clone() const {
-    return AutoPtr<FunctionBase<Output> >
+  virtual UniquePtr<FunctionBase<Output> > clone() const {
+    return UniquePtr<FunctionBase<Output> >
       (new ParsedFunction<Output>(""));
   }
 private:

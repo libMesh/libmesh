@@ -308,7 +308,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
     * Get into the FM loop
     *******************************************************/
     mptr[0] = nmind = nbad = 0;
-    mindiff = abs(pwgts[0]-pwgts[1]);
+    mindiff = iabs(pwgts[0]-pwgts[1]);
     for (nswaps=0; nswaps<nvtxs; nswaps++) {
       if ((higain = rpqGetTop(queue)) == -1) 
         break;
@@ -333,7 +333,7 @@ void FM_2WayNodeRefine1SidedP(ctrl_t *ctrl, graph_t *graph,
 
       pwgts[2] -= (vwgt[higain]-rinfo[higain].edegrees[from]);
 
-      newdiff = abs(pwgts[to]+vwgt[higain] - (pwgts[from]-rinfo[higain].edegrees[from]));
+      newdiff = iabs(pwgts[to]+vwgt[higain] - (pwgts[from]-rinfo[higain].edegrees[from]));
       if (pwgts[2] < mincut || (pwgts[2] == mincut && newdiff < mindiff)) {
         mincut      = pwgts[2];
         mincutorder = nswaps;
@@ -537,7 +537,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
     * Get into the FM loop
     *******************************************************/
     mptr[0] = nmind = 0;
-    mindiff = abs(pwgts[0]-pwgts[1]);
+    mindiff = iabs(pwgts[0]-pwgts[1]);
     to = (pwgts[0] < pwgts[1] ? 0 : 1);
     for (nswaps=0; nswaps<nvtxs; nswaps++) {
       u[0] = rpqSeeTopVal(queues[0]);  
@@ -580,7 +580,7 @@ void FM_2WayNodeRefine2SidedP(ctrl_t *ctrl, graph_t *graph,
 
       pwgts[2] -= (vwgt[higain]-rinfo[higain].edegrees[other]);
 
-      newdiff = abs(pwgts[to]+vwgt[higain] - (pwgts[other]-rinfo[higain].edegrees[other]));
+      newdiff = iabs(pwgts[to]+vwgt[higain] - (pwgts[other]-rinfo[higain].edegrees[other]));
       if (pwgts[2] < mincut || (pwgts[2] == mincut && newdiff < mindiff)) {
         mincut      = pwgts[2];
         mincutorder = nswaps;

@@ -141,3 +141,7 @@ plt.xlim(date_nums[0], date_nums[-1]+30);
 
 # Save as PDF
 plt.savefig('libmesh_svn.pdf')
+
+# Local Variables:
+# python-indent: 2
+# End:

@@ -66,7 +66,7 @@ public:
   /**
    * build_side and build_edge are identical for faces
    */
-  AutoPtr<Elem> build_edge (const unsigned int i) const
+  UniquePtr<Elem> build_edge (const unsigned int i) const
   { return build_side(i); }
 
   /*

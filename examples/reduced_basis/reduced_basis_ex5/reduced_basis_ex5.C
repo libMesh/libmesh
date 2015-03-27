@@ -320,7 +320,7 @@ void compute_stresses(EquationSystems& es)
 
   const DofMap& dof_map = system.get_dof_map();
   FEType fe_type = dof_map.variable_type(u_var);
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
