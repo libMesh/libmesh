@@ -404,6 +404,33 @@ void PetscMatrix<T>::init ()
 }
 
 
+template <typename T>
+void PetscMatrix<T>::update_preallocation_and_zero ()
+{
+  libmesh_assert(this->_dof_map);
+  libmesh_assert(this->initialized());
+
+  const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
+  const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
+
+  PetscErrorCode ierr = 0;
+
+  {
+    ierr = MatSeqAIJSetPreallocation (_mat,
+                                      0,
+                                      numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]));
+    LIBMESH_CHKERRABORT(ierr);
+    ierr = MatMPIAIJSetPreallocation (_mat,
+                                      0,
+                                      numeric_petsc_cast(n_nz.empty() ? NULL : &n_nz[0]),
+                                      0,
+                                      numeric_petsc_cast(n_oz.empty() ? NULL : &n_oz[0]));
+    LIBMESH_CHKERRABORT(ierr);
+  }
+
+  this->zero();
+}
+
 
 template <typename T>
 void PetscMatrix<T>::zero ()

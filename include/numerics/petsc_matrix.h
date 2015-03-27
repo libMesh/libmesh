@@ -157,6 +157,13 @@ public:
   void init ();
 
   /**
+   * Update the sparsity pattern based on \p dof_map, and set the matrix
+   * to zero. This is useful in cases where the sparsity pattern changes
+   * during a computation.
+   */
+  void update_preallocation_and_zero();
+
+  /**
    * Release all memory and return
    * to a state just like after
    * having called the default
