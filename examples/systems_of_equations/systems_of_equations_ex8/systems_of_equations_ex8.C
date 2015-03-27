@@ -58,6 +58,7 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/petsc_macro.h"
 
 // Local includes
 #include "linear_elasticity_with_contact.h"
@@ -70,6 +71,12 @@ int main (int argc, char** argv)
 
   // This example requires the PETSc nonlinear solvers
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+
+  // This example requires PETSc >= 3.3.0 since it uses
+  // PetscMatrix::update_preallocation_and_zero().
+#if PETSC_VERSION_LESS_THAN(3,3,0)
+  libmesh_example_requires(false, "PETSc >= 3.3.0");
+#endif
 
   GetPot infile("systems_of_equations_ex8.in");
   const std::string approx_order = infile("approx_order", "FIRST");

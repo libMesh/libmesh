@@ -30,7 +30,11 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
+#if !PETSC_VERSION_LESS_THAN(3,3,0)
+#include "libmesh/ignore_warnings.h"
 #include "petsc-private/matimpl.h"
+#include "libmesh/restore_warnings.h"
+#endif
 
 // For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earier.
 // For example:
@@ -416,16 +420,19 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
   PetscErrorCode ierr = 0;
 
   {
+#if !PETSC_VERSION_LESS_THAN(3,3,0)
     ierr = (*_mat->ops->destroy)(_mat);
     LIBMESH_CHKERRABORT(ierr);
     _mat->ops->destroy = NULL;
     _mat->preallocated = PETSC_FALSE;
     _mat->assembled    = PETSC_FALSE;
-   _mat->assembled = PETSC_FALSE;
     _mat->was_assembled = PETSC_FALSE;
     ++_mat->nonzerostate;
     ierr = PetscObjectStateIncrease((PetscObject)_mat);
     LIBMESH_CHKERRABORT(ierr);
+#else
+    libmesh_error_msg("PetscMatrix::update_preallocation_and_zero() requires PETSc 3.3.0 or greater to work correctly.");
+#endif
 
     ierr = MatSetType(_mat,MATAIJ);
     LIBMESH_CHKERRABORT(ierr);
