@@ -27362,6 +27362,205 @@ fi
 
   fi
 
+# Determine which of std::hash, std::tr1::hash, or __gnu_cxx::hash is available
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash" >&5
+$as_echo_n "checking whether the compiler supports std::hash... " >&6; }
+if ${ac_cv_cxx_hash+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <functional>
+int
+main ()
+{
+
+  std::hash<int> m;
+  std::size_t hashed = m(12345);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_hash=yes
+else
+  ac_cv_cxx_hash=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_hash" >&5
+$as_echo "$ac_cv_cxx_hash" >&6; }
+if test "$ac_cv_cxx_hash" = yes; then
+
+$as_echo "#define HAVE_STD_HASH 1" >>confdefs.h
+
+
+$as_echo "#define BEST_HASH std::hash" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_HASH <functional>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::tr1::hash" >&5
+$as_echo_n "checking whether the compiler supports std::tr1::hash... " >&6; }
+if ${ac_cv_cxx_tr1_hash+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <tr1/functional>
+int
+main ()
+{
+
+  std::tr1::hash<int> m;
+  std::size_t hashed = m(12345);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_tr1_hash=yes
+else
+  ac_cv_cxx_tr1_hash=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_tr1_hash" >&5
+$as_echo "$ac_cv_cxx_tr1_hash" >&6; }
+if test "$ac_cv_cxx_tr1_hash" = yes; then
+
+$as_echo "#define HAVE_TR1_HASH 1" >>confdefs.h
+
+
+$as_echo "#define BEST_HASH std::tr1::hash" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_HASH <tr1/functional>" >>confdefs.h
+
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
+
+$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
+
+  fi
+
+else
+  false
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports __gnu_cxx::hash" >&5
+$as_echo_n "checking whether the compiler supports __gnu_cxx::hash... " >&6; }
+if ${ac_cv_cxx_ext_hash+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ext/hash_set>
+int
+main ()
+{
+
+  __gnu_cxx::hash<int> m;
+  std::size_t hashed = m(12345);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_cxx_ext_hash=yes
+else
+  ac_cv_cxx_ext_hash=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_ext_hash" >&5
+$as_echo "$ac_cv_cxx_ext_hash" >&6; }
+if test "$ac_cv_cxx_ext_hash" = yes; then
+
+$as_echo "#define HAVE_EXT_HASH 1" >>confdefs.h
+
+
+$as_echo "#define BEST_HASH __gnu_cxx::hash" >>confdefs.h
+
+
+$as_echo "#define INCLUDE_HASH <ext/hash_set>" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS namespace __gnu_cxx {template<typename T> struct hash<T*>{size_t operator()(const T* p)const{return hash<size_t>()(reinterpret_cast<size_t>(p));}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_specializations=yes
+
+else
+  false
+
+fi
+
+fi
+
+fi
+
+
+
 for ac_header in dlfcn.h
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "dlfcn.h" "ac_cv_header_dlfcn_h" "$ac_includes_default"

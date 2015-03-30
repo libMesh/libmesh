@@ -1,5 +1,8 @@
 /* include/libmesh_config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* definition of the final detected hash type */
+#undef BEST_HASH
+
 /* definition of the final detected unordered_map type */
 #undef BEST_UNORDERED_MAP
 
@@ -235,6 +238,9 @@
 /* Flag indicating whether the library will be compiled with Exodus support */
 #undef HAVE_EXODUS_API
 
+/* define if the compiler supports __gnu_cxx::hash */
+#undef HAVE_EXT_HASH
+
 /* define if the compiler supports __gnu_cxx::hash_map */
 #undef HAVE_EXT_HASH_MAP
 
@@ -392,6 +398,9 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
+/* define if the compiler supports std::hash */
+#undef HAVE_STD_HASH
+
 /* define if the compiler supports std::thread */
 #undef HAVE_STD_THREAD
 
@@ -446,6 +455,9 @@
    solver collection */
 #undef HAVE_TPETRA
 
+/* define if the compiler supports std::tr1::hash */
+#undef HAVE_TR1_HASH
+
 /* define if the compiler supports std::tr1::unordered_map */
 #undef HAVE_TR1_UNORDERED_MAP
 
@@ -480,6 +492,9 @@
 
 /* Define to 1 if you have the <zlib.h> header file. */
 #undef HAVE_ZLIB_H
+
+/* header file for the final detected hash type */
+#undef INCLUDE_HASH
 
 /* header file for the final detected unordered_map type */
 #undef INCLUDE_UNORDERED_MAP
