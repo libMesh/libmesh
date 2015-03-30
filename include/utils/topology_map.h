@@ -27,6 +27,7 @@
 
 // C++ Includes   -----------------------------------
 #include LIBMESH_INCLUDE_UNORDERED_MAP
+#include LIBMESH_INCLUDE_HASH
 #include <vector>
 
 namespace libMesh
@@ -45,7 +46,7 @@ public:
     {
       // recommendation from
       // http://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes
-      return 3 * std::hash<T1>()(x.first) + std::hash<T2>()(x.second);
+      return 3 * LIBMESH_BEST_HASH<T1>()(x.first) + LIBMESH_BEST_HASH<T2>()(x.second);
     }
 };
 
