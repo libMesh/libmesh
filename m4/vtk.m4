@@ -127,12 +127,21 @@ AC_DEFUN([CONFIGURE_VTK],
          old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
 
-         if (test $vtkmajor -gt 5); then
+         dnl VTK 5.x
+         if (test $vtkmajor -eq 5); then
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
+
+         dnl VTK 6.1.x
+         elif (test $vtkmajor -eq 6 -a $vtkminor -eq 1); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                    -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                    -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
-         else
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
+
+         dnl VTK 6.2.x and above
+         else # elif (test $vtkmajor -eq 6 -a $vtkminor -eq 2); then
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
          fi
 
          if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
@@ -167,7 +176,13 @@ AC_DEFUN([CONFIGURE_VTK],
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
                              ])
            ],
-           [enablevtk=yes], [enablevtk=no])
+           [enablevtk=yes],
+           [
+             enablevtk=no
+             dnl Print an informative message if linking failed, otherwise the user will just see:
+             dnl "Configuring library without VTK support"
+             AC_MSG_RESULT(<<< Linking a test program against the VTK libraries failed >>>)
+           ])
 
          dnl Check for VTK 5.x libraries
          else
