@@ -33921,12 +33921,18 @@ _ACEOF
                   old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
 
-         if (test $vtkmajor -gt 5); then
+                  if (test $vtkmajor -eq 5); then
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
+
+                  elif (test $vtkmajor -eq 6 -a $vtkminor -eq 1); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                    -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                    -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
-         else
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
+
+                  else # elif (test $vtkmajor -eq 6 -a $vtkminor -eq 2); then
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
+                                   -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
          fi
 
          if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
@@ -33968,7 +33974,11 @@ _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   enablevtk=yes
 else
-  enablevtk=no
+
+             enablevtk=no
+                                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Linking a test program against the VTK libraries failed >>>" >&5
+$as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; }
+
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
