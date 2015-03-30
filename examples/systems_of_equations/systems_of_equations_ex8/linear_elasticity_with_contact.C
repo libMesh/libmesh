@@ -198,43 +198,32 @@ void LinearElasticityWithContact::move_mesh(
           const unsigned int var = _sys.variable_number(uvw_names[index]);
           const FEType& fe_type = _sys.get_dof_map().variable_type(var);
 
-          {
-            FEComputeData data (_sys.get_equation_systems(), reference_point);
+          FEComputeData data (_sys.get_equation_systems(), reference_point);
 
-            FEInterface::compute_data(
-              elem->dim(),
-              fe_type,
-              elem,
-              data);
+          FEInterface::compute_data(elem->dim(),
+                                    fe_type,
+                                    elem,
+                                    data);
 
-            std::vector<dof_id_type> dof_indices_var;
-            _sys.get_dof_map().dof_indices (orig_elem, dof_indices_var, var);
+          std::vector<dof_id_type> dof_indices_var;
+          _sys.get_dof_map().dof_indices (orig_elem, dof_indices_var, var);
 
-            // interpolate the solution
+          for (unsigned int i=0; i<dof_indices_var.size(); i++)
             {
-              Number value = 0.;
+              Number value = (*localized_input_solution)(dof_indices_var[i]) * data.shape[i];
 
-              for (unsigned int i=0; i<dof_indices_var.size(); i++)
-              {
-                value += (*localized_input_solution)(dof_indices_var[i]) * data.shape[i];
-              }
-
-              uvw(index) = value;
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+              // We explicitly store the real part in uvw
+              uvw(index) += value.real();
+#else
+              uvw(index) += value;
+#endif
             }
-          }
         }
 
-        Point original_point;
-        original_point(0) = (*node)(0);
-        original_point(1) = (*node)(1);
-        original_point(2) = (*node)(2);
-        Point new_point = original_point + uvw;
-
-        (*node)(0) = new_point(0);
-        (*node)(1) = new_point(1);
-        (*node)(2) = new_point(2);
+        // Update the node's location
+        *node += uvw;
       }
-
     }
   }
 }
