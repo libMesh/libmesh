@@ -30,7 +30,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
+#if !PETSC_VERSION_LESS_THAN(3,5,0)
 #include "libmesh/ignore_warnings.h"
 #include "petsc-private/matimpl.h"
 #include "libmesh/restore_warnings.h"
@@ -420,7 +420,7 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
   PetscErrorCode ierr = 0;
 
   {
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
+#if !PETSC_VERSION_LESS_THAN(3,5,0)
     ierr = (*_mat->ops->destroy)(_mat);
     LIBMESH_CHKERRABORT(ierr);
     _mat->ops->destroy = NULL;
