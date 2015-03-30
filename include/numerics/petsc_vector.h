@@ -929,14 +929,8 @@ void PetscVector<T>::init (const NumericVector<T>& other,
   this->_type = v._type;
 
   // We want to have a valid Vec, even if it's initially of size zero
-
-//  if (v.size() != 0)
-//    {
-      PetscErrorCode ierr = 0;
-
-      ierr = VecDuplicate (v._vec, &this->_vec);
-      LIBMESH_CHKERRABORT(ierr);
-//    }
+  PetscErrorCode ierr = VecDuplicate (v._vec, &this->_vec);
+  LIBMESH_CHKERRABORT(ierr);
 
   if (fast == false)
     this->zero ();

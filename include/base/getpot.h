@@ -2175,11 +2175,11 @@ GetPot::have_section(const std::string& section_name) const
 
   bool found_section = false;
 
-  /* Check if section_name ends with a "/". If not, append it for the search since
-     the section names are stored with a "/" at the end.*/
+  // Check if section_name ends with a "/". If not, append it for the search since
+  // the section names are stored with a "/" at the end.
   if( (*it) != slash )
-    /* We need to use a linear search because we can't sort section_list
-     without violating some assumptions. See libMesh #481 for more discussion. */
+    // We need to use a linear search because we can't sort section_list
+    // without violating some assumptions. See libMesh #481 for more discussion.
     found_section = ( std::find(section_list.begin(), section_list.end(), section_name+slash) != section_list.end() );
   else
     found_section = ( std::find(section_list.begin(), section_list.end(), section_name) != section_list.end() );

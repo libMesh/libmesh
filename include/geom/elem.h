@@ -1261,12 +1261,11 @@ protected:
    * default calculation is slow.
    */
   virtual
-  std::vector<std::vector<std::vector<std::vector<
-    std::pair<unsigned char, unsigned char> > > > > &
-    _get_bracketing_node_cache() const
+  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > &
+  _get_bracketing_node_cache() const
   {
     static std::vector<std::vector<std::vector<std::vector<
-             std::pair<unsigned char, unsigned char> > > > > c;
+      std::pair<unsigned char, unsigned char> > > > > c;
     libmesh_error();
     return c;
   }
@@ -2277,23 +2276,22 @@ variant_filter_iterator<Elem::Predicate,
 
 // Helper function for default caches in Elem subclases
 
-#define LIBMESH_ENABLE_TOPOLOGY_CACHES \
-  virtual \
-  std::vector<std::vector<std::vector<std::vector< \
-    std::pair<unsigned char, unsigned char> > > > > & \
-    _get_bracketing_node_cache() const \
-  { \
-    static std::vector<std::vector<std::vector<std::vector< \
-             std::pair<unsigned char, unsigned char> > > > > c; \
-    return c; \
-  } \
- \
-  virtual \
-  std::vector<std::vector<std::vector<signed char> > > & \
-  _get_parent_indices_cache() const \
-  { \
-    static std::vector<std::vector<std::vector<signed char> > > c; \
-    return c; \
+#define LIBMESH_ENABLE_TOPOLOGY_CACHES                                  \
+  virtual                                                               \
+  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > & \
+  _get_bracketing_node_cache() const                                    \
+  {                                                                     \
+    static std::vector<std::vector<std::vector<std::vector<             \
+      std::pair<unsigned char, unsigned char> > > > > c;                \
+    return c;                                                           \
+  }                                                                     \
+                                                                        \
+  virtual                                                               \
+  std::vector<std::vector<std::vector<signed char> > > &                \
+  _get_parent_indices_cache() const                                     \
+  {                                                                     \
+    static std::vector<std::vector<std::vector<signed char> > > c;      \
+    return c;                                                           \
   }
 
 

@@ -11,15 +11,14 @@
 #include <petscdm.h>
 #include "libmesh/nonlinear_implicit_system.h"
 
-/*
-  Any functional implementation of the DMlibMesh API must compose the following functions with the DM object.
-  (See PETSc documentation on PetscObjectComposeFunction(), a polymorphism mechanism.)
-  The following functions are called in PetscNonlinear Solver (others can be called by users):
-    DMlibMeshSetSystem(), DMlibMeshGetSystem()
-
-  Any implementation needs to register its creation routine, DMCreate_libMesh, with PETSc using DMRegister().
-*/
-
+/**
+ * Any functional implementation of the DMlibMesh API must compose the following functions with the DM object.
+ * (See PETSc documentation on PetscObjectComposeFunction(), a polymorphism mechanism.)
+ * The following functions are called in PetscNonlinear Solver (others can be called by users):
+ * DMlibMeshSetSystem(), DMlibMeshGetSystem()
+ *
+ * Any implementation needs to register its creation routine, DMCreate_libMesh, with PETSc using DMRegister().
+ */
 PETSC_EXTERN PetscErrorCode DMlibMeshSetSystem(DM,libMesh::NonlinearImplicitSystem&);
 PETSC_EXTERN PetscErrorCode DMlibMeshGetSystem(DM,libMesh::NonlinearImplicitSystem*&);
 
