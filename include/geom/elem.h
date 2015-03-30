@@ -1175,7 +1175,7 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
-   * Returns the local node id on the parent which corresponds to 
+   * Returns the local node id on the parent which corresponds to
    * node n of child c, or returns invalid_uint if no such parent node
    * exists.
    */
@@ -1260,7 +1260,7 @@ protected:
    * calculations will need to supply a static cache, since the
    * default calculation is slow.
    */
-  virtual 
+  virtual
   std::vector<std::vector<std::vector<std::vector<
     std::pair<unsigned char, unsigned char> > > > > &
     _get_bracketing_node_cache() const

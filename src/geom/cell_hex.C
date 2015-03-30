@@ -570,6 +570,6 @@ const int Hex::_child_node_lookup[8][27] =
   };
 
 #endif // LIBMESH_ENABLE_AMR
-       
+
 
 } // namespace libMesh

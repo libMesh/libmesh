@@ -71,7 +71,7 @@ class TopologyMap
 #else
 #define MYHASH
 #endif
-    
+
   typedef
     LIBMESH_BEST_UNORDERED_MAP<std::pair<dof_id_type, dof_id_type>,
                                dof_id_type MYHASH> map_type;

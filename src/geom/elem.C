@@ -1878,7 +1878,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
                   unsigned int parent_node = this->as_parent_node(c,n);
 
                   Point bracketed_pt;
-                  
+
                   // If we're not a parent node, use the embedding
                   // matrix to find the child node location in parent
                   // master element space
