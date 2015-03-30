@@ -24,8 +24,8 @@ for header_with_path in $noinst_blacklist ; do
     echo " \\" >> include_HEADERS
     echo -n "        "$header_with_path >> include_HEADERS
 done
-echo " " >> include_HEADERS
-echo " " >> include_HEADERS
+echo >> include_HEADERS
+echo >> include_HEADERS
 
 
 
