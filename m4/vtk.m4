@@ -167,7 +167,13 @@ AC_DEFUN([CONFIGURE_VTK],
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
                              ])
            ],
-           [enablevtk=yes], [enablevtk=no])
+           [enablevtk=yes],
+           [
+             enablevtk=no
+             dnl Print an informative message if linking failed, otherwise the user will just see:
+             dnl "Configuring library without VTK support"
+             AC_MSG_RESULT(<<< Linking a test program against the VTK libraries failed >>>)
+           ])
 
          dnl Check for VTK 5.x libraries
          else
