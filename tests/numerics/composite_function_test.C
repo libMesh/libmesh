@@ -48,7 +48,7 @@ private:
     index_sets[3][4] = 7;
 
     CompositeFunction<Real> composite_outer;
-  
+
     {
       CompositeFunction<Real> composite_inner;
       composite_inner.attach_subfunction

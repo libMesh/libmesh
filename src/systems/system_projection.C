@@ -79,7 +79,7 @@ public:
 
 
 /**
- * This action class can be used with a GenericProjector to set 
+ * This action class can be used with a GenericProjector to set
  * projection values (which must be of type Val) as coefficients of
  * the given NumericVector.
  */
