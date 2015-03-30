@@ -130,7 +130,7 @@ example_dbg_OBJECTS = $(am_example_dbg_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-am__v_lt_1 =
+am__v_lt_1 = 
 example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -207,11 +207,11 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 =
+am__v_GEN_1 = 
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 =
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -225,7 +225,7 @@ LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXX = $(am__v_CXX_@AM_V@)
 am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
 am__v_CXX_0 = @echo "  CXX     " $@;
-am__v_CXX_1 =
+am__v_CXX_1 = 
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -233,7 +233,7 @@ CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
-am__v_CXXLD_1 =
+am__v_CXXLD_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -243,7 +243,7 @@ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 =
+am__v_CC_1 = 
 CCLD = $(CC)
 LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -251,7 +251,7 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 =
+am__v_CCLD_1 = 
 SOURCES = $(example_dbg_SOURCES) $(example_devel_SOURCES) \
 	$(example_oprof_SOURCES) $(example_opt_SOURCES) \
 	$(example_prof_SOURCES)
@@ -728,19 +728,19 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-example-dbg$(EXEEXT): $(example_dbg_OBJECTS) $(example_dbg_DEPENDENCIES) $(EXTRA_example_dbg_DEPENDENCIES)
+example-dbg$(EXEEXT): $(example_dbg_OBJECTS) $(example_dbg_DEPENDENCIES) $(EXTRA_example_dbg_DEPENDENCIES) 
 	@rm -f example-dbg$(EXEEXT)
 	$(AM_V_CXXLD)$(example_dbg_LINK) $(example_dbg_OBJECTS) $(example_dbg_LDADD) $(LIBS)
-example-devel$(EXEEXT): $(example_devel_OBJECTS) $(example_devel_DEPENDENCIES) $(EXTRA_example_devel_DEPENDENCIES)
+example-devel$(EXEEXT): $(example_devel_OBJECTS) $(example_devel_DEPENDENCIES) $(EXTRA_example_devel_DEPENDENCIES) 
 	@rm -f example-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(example_devel_LINK) $(example_devel_OBJECTS) $(example_devel_LDADD) $(LIBS)
-example-oprof$(EXEEXT): $(example_oprof_OBJECTS) $(example_oprof_DEPENDENCIES) $(EXTRA_example_oprof_DEPENDENCIES)
+example-oprof$(EXEEXT): $(example_oprof_OBJECTS) $(example_oprof_DEPENDENCIES) $(EXTRA_example_oprof_DEPENDENCIES) 
 	@rm -f example-oprof$(EXEEXT)
 	$(AM_V_CXXLD)$(example_oprof_LINK) $(example_oprof_OBJECTS) $(example_oprof_LDADD) $(LIBS)
-example-opt$(EXEEXT): $(example_opt_OBJECTS) $(example_opt_DEPENDENCIES) $(EXTRA_example_opt_DEPENDENCIES)
+example-opt$(EXEEXT): $(example_opt_OBJECTS) $(example_opt_DEPENDENCIES) $(EXTRA_example_opt_DEPENDENCIES) 
 	@rm -f example-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(example_opt_LINK) $(example_opt_OBJECTS) $(example_opt_LDADD) $(LIBS)
-example-prof$(EXEEXT): $(example_prof_OBJECTS) $(example_prof_DEPENDENCIES) $(EXTRA_example_prof_DEPENDENCIES)
+example-prof$(EXEEXT): $(example_prof_OBJECTS) $(example_prof_DEPENDENCIES) $(EXTRA_example_prof_DEPENDENCIES) 
 	@rm -f example-prof$(EXEEXT)
 	$(AM_V_CXXLD)$(example_prof_LINK) $(example_prof_OBJECTS) $(example_prof_LDADD) $(LIBS)
 
