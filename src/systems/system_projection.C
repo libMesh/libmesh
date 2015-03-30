@@ -97,28 +97,27 @@ public:
   void insert(const FEMContext &c,
               unsigned int var_num,
               const DenseVector<Val> &Ue)
+  {
+    const numeric_index_type
+      first = target_vector.first_local_index(),
+      last  = target_vector.last_local_index();
+
+    const std::vector<dof_id_type> & dof_indices =
+      c.get_dof_indices(var_num);
+
+    unsigned int size = Ue.size();
+
+    libmesh_assert_equal_to(size, dof_indices.size());
+
+    // Lock the new vector since it is shared among threads.
     {
-      const numeric_index_type
-        first = target_vector.first_local_index(),
-        last  = target_vector.last_local_index();
+      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-      const std::vector<dof_id_type> & dof_indices =
-        c.get_dof_indices(var_num);
-
-      unsigned int size = Ue.size();
-
-      libmesh_assert_equal_to(size, dof_indices.size());
-
-      // Lock the new vector since it is shared among threads.
-      {
-        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-
-        for (unsigned int i = 0; i != size; ++i)
-          if ((dof_indices[i] >= first) &&
-              (dof_indices[i] <  last))
-            target_vector.set(dof_indices[i], Ue(i));
-      }
+      for (unsigned int i = 0; i != size; ++i)
+        if ((dof_indices[i] >= first) && (dof_indices[i] <  last))
+          target_vector.set(dof_indices[i], Ue(i));
     }
+  }
 };
 
 
@@ -554,12 +553,9 @@ void System::project_vector (NumericVector<Number>& new_vector,
   for (unsigned int i=0; i != n_variables; ++i)
     vars[i] = i;
 
-  Threads::parallel_for
-    (active_local_range,
-     GenericProjector<FEMFunctionBase<Number>,
-                      FEMFunctionBase<Gradient>,
-                      Number, VectorSetAction<Number> >
-       (*this, *f, g, setter, vars));
+  // Use a typedef to make the calling sequence for parallel_for() a bit more readable
+  typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
+  Threads::parallel_for(active_local_range, FEMProjector(*this, *f, g, setter, vars));
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
@@ -756,8 +752,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
       const std::set<unsigned char>& elem_dims =
         context.elem_dimensions();
 
-      for( std::set<unsigned char>::const_iterator dim_it =
-           elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it )
+      for (std::set<unsigned char>::const_iterator dim_it =
+             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
         {
           const unsigned char dim = *dim_it;
 
@@ -801,7 +797,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
   // Iterate over all the elements in the range
   for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end();
-++elem_it)
+       ++elem_it)
     {
       const Elem* elem = *elem_it;
 

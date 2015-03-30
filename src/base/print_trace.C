@@ -131,19 +131,23 @@ bool gdb_backtrace(std::ostream &out_stream)
 
       int exit_status = 1;
 
-      try {
-        std::string gdb_command =
-          libMesh::command_line_value("gdb",std::string(LIBMESH_GDB_COMMAND));
+      try
+        {
+          std::string gdb_command =
+            libMesh::command_line_value("gdb",std::string(LIBMESH_GDB_COMMAND));
 
-        std::ostringstream command;
-        command << gdb_command << " -p " << this_pid <<
-                   " -batch -ex bt 2>/dev/null 1>" << temp_file;
-        exit_status = std::system(command.str().c_str());
-      }
+          std::ostringstream command;
+          command << gdb_command
+                  << " -p "
+                  << this_pid
+                  << " -batch -ex bt 2>/dev/null 1>"
+                  << temp_file;
+          exit_status = std::system(command.str().c_str());
+        }
       catch (...)
-      {
-        std::cerr << "Unable to run gdb" << std::endl;
-      }
+        {
+          std::cerr << "Unable to run gdb" << std::endl;
+        }
 
       // If we can open the temp_file, the file is not empty, and the
       // exit status from the system call is 0, we'll assume that gdb

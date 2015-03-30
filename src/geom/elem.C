@@ -1941,10 +1941,7 @@ Elem::bracketing_nodes(unsigned int child,
     this->parent_bracketing_nodes(child,child_node);
 
   for (unsigned int i = 0; i != pbc.size(); ++i)
-    returnval.push_back
-      (std::make_pair
-        (this->node(pbc[i].first),
-         this->node(pbc[i].second)));
+    returnval.push_back(std::make_pair(this->node(pbc[i].first), this->node(pbc[i].second)));
 
   return returnval;
 }

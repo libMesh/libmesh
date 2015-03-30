@@ -516,8 +516,8 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
       std::vector<dof_id_type> graph_row; // build this emtpy
       graph_row.swap(graph[r]); // this will deallocate at the end of scope
       _pmetis->adjncy.insert(_pmetis->adjncy.end(),
-                     graph_row.begin(),
-                     graph_row.end());
+                             graph_row.begin(),
+                             graph_row.end());
     }
 
   // The end of the adjacency array for the last elem

@@ -529,9 +529,9 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 #if !PETSC_RELEASE_LESS_THAN(3,3,0)
       // Register the reference implementation of DMlibMesh
 #if PETSC_RELEASE_LESS_THAN(3,4,0)
-  ierr = DMRegister(DMLIBMESH, PETSC_NULL, "DMCreate_libMesh", DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+      ierr = DMRegister(DMLIBMESH, PETSC_NULL, "DMCreate_libMesh", DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
 #else
-  ierr = DMRegister(DMLIBMESH, DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+      ierr = DMRegister(DMLIBMESH, DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
 #endif
 
 #endif

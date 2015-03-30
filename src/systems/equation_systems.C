@@ -213,7 +213,7 @@ void EquationSystems::reinit ()
         // Who's been adding zero-var systems anyway, outside of my
         // unit tests? - RHS
         // if(!sys.n_vars())
-          // continue;
+        // continue;
 
         sys.get_dof_map().distribute_dofs(_mesh);
 

@@ -54,9 +54,7 @@ void TopologyMap::init(MeshBase& mesh)
 
 
 void TopologyMap::add_node(const Node& mid_node,
-                           const std::vector<
-                             std::pair<dof_id_type, dof_id_type> >&
-                             bracketing_nodes)
+                           const std::vector<std::pair<dof_id_type, dof_id_type> >& bracketing_nodes)
 {
   const dof_id_type mid_node_id = mid_node.id();
 
@@ -83,9 +81,7 @@ void TopologyMap::add_node(const Node& mid_node,
 }
 
 
-dof_id_type TopologyMap::find(const std::vector<
-                                std::pair<dof_id_type, dof_id_type> >&
-                                bracketing_nodes) const
+dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_type> >& bracketing_nodes) const
 {
   dof_id_type new_node_id = DofObject::invalid_id;
 
@@ -96,7 +92,7 @@ dof_id_type TopologyMap::find(const std::vector<
       const dof_id_type upper_id = std::max(bracketing_nodes[i].first,
                                             bracketing_nodes[i].second);
 
-// If we're debugging let's make sure our map is consistent
+      // If we're debugging let's make sure our map is consistent
 #ifndef NDEBUG
       if (new_node_id != DofObject::invalid_id)
         {
@@ -109,7 +105,7 @@ dof_id_type TopologyMap::find(const std::vector<
 
       new_node_id = this->find(lower_id, upper_id);
 
-// If we're not debugging we can quit as soon as we find a node
+      // If we're not debugging we can quit as soon as we find a node
 #ifdef NDEBUG
       if (new_node_id != DofObject::invalid_id)
         break;
@@ -141,8 +137,9 @@ dof_id_type TopologyMap::find(dof_id_type bracket_node1,
 void TopologyMap::fill(const MeshBase& mesh)
 {
   // Populate the nodes map
-  MeshBase::const_element_iterator it = mesh.elements_begin(),
-                                  end = mesh.elements_end();
+  MeshBase::const_element_iterator
+    it = mesh.elements_begin(),
+    end = mesh.elements_end();
   for (; it != end; ++it)
     {
       const Elem* elem = *it;

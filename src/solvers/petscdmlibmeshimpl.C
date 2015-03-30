@@ -819,11 +819,13 @@ static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void *ctx)
 
 #undef __FUNCT__
 #define __FUNCT__ "DMlibMeshJacobian"
+static PetscErrorCode DMlibMeshJacobian(
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc, MatStructure *msflag)
+                                        DM dm, Vec x, Mat jac, Mat pc, MatStructure *msflag
 #else
-static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
+                                        DM dm, Vec x, Mat jac, Mat pc
 #endif
+                                        )
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
@@ -888,11 +890,13 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 #if !PETSC_RELEASE_LESS_THAN(3,3,1)
 #undef  __FUNCT__
 #define __FUNCT__ "SNESJacobian_DMlibMesh"
+static PetscErrorCode SNESJacobian_DMlibMesh(
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-static PetscErrorCode SNESJacobian_DMlibMesh(SNES,Vec x,Mat *jac,Mat *pc, MatStructure* flag, void* ctx)
+                                             SNES, Vec x, Mat *jac, Mat *pc, MatStructure* flag, void* ctx
 #else
-static PetscErrorCode SNESJacobian_DMlibMesh(SNES,Vec x,Mat jac,Mat pc, void* ctx)
+                                             SNES, Vec x, Mat jac, Mat pc, void* ctx
 #endif
+                                             )
 {
   DM dm = (DM)ctx;
   PetscErrorCode ierr;

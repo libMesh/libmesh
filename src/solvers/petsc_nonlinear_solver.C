@@ -159,13 +159,14 @@ extern "C"
 
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
+  PetscErrorCode
+  __libmesh_petsc_snes_jacobian(
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
-  PetscErrorCode
-  __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
+                                SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx
 #else
-  PetscErrorCode
-  __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void *ctx)
+                                SNES snes, Vec x, Mat jac, Mat pc, void *ctx
 #endif
+                                )
   {
     START_LOG("jacobian()", "PetscNonlinearSolver");
 

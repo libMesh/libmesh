@@ -291,8 +291,8 @@ void add_element_system
     {
       // Heterogeneous and homogeneous constraints are the same on the
       // matrix
-        _sys.get_dof_map().constrain_element_matrix
-          (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
+      _sys.get_dof_map().constrain_element_matrix
+        (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
     }
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
