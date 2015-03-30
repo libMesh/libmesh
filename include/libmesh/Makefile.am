@@ -245,6 +245,7 @@ BUILT_SOURCES = \
         type_vector.h \
         vector_value.h \
         wrapped_function.h \
+        wrapped_functor.h \
         zero_function.h \
         parallel.h \
         parallel_algebra.h \
@@ -1212,6 +1213,9 @@ vector_value.h: $(top_srcdir)/include/numerics/vector_value.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 wrapped_function.h: $(top_srcdir)/include/numerics/wrapped_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+wrapped_functor.h: $(top_srcdir)/include/numerics/wrapped_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h
