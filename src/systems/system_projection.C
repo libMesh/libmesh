@@ -742,8 +742,6 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
     {
       const unsigned int var = variables[v];
 
-      const Variable& variable = dof_map.variable(var);
-
       // FIXME: Need to generalize this to vector-valued elements. [PB]
       FEBase* fe = NULL;
       FEBase* side_fe = NULL;
