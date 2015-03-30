@@ -23,7 +23,8 @@
 
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_common.h"
-#include "libmesh/parameter_pointer.h"
+#include "libmesh/parameter_accessor.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ Includes   -----------------------------------
 #include <vector>
@@ -85,11 +86,20 @@ public:
   std::size_t size() const { return _params.size(); }
 
   /**
-   * Sets the number of parameters to be used.  This method is for
-   * resizing a ParameterVector that acts as a proxy to other
-   * parameter values
+   * Sets the number of parameters to be used.  If the new size is
+   * larger than the old, empty ParameterPointer accessors fill the
+   * new entries.
    */
   void resize(unsigned int s);
+
+  /**
+   * Adds an additional parameter accessor to the end of the vector.
+   *
+   * We will free this accessor when we are finished with it; we
+   * request that it be passed to us as a UniquePtr to reflect that
+   * fact in the API.
+   */
+  void push_back(UniquePtr<ParameterAccessor<Number> > new_accessor);
 
   /**
    * Sets the number of parameters to be used.  This method is for
@@ -145,17 +155,6 @@ private:
 // ParameterVector inline methods
 
 inline
-ParameterVector::ParameterVector(const std::vector<Number *> &params)
-  : _is_shallow_copy(false)
-{
-  _params.reserve(params.size());
-
-  for (unsigned int i=0; i != params.size(); ++i)
-    _params.push_back(new ParameterPointer<Number>(params[i]));
-}
-
-
-inline
 ParameterVector::~ParameterVector()
 {
   this->clear();
@@ -172,6 +171,15 @@ ParameterVector::clear()
 
   _params.clear();
   _my_data.clear();
+}
+
+
+
+inline
+void ParameterVector::push_back(UniquePtr<ParameterAccessor<Number> > new_accessor)
+{
+  libmesh_assert(new_accessor.get());
+  _params.push_back(new_accessor.release());
 }
 
 
