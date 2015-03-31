@@ -41,6 +41,11 @@ class ParameterMultiPointer : public ParameterAccessor<T>
 {
 public:
   /**
+   * Constructor: no parameters attached yet
+   */
+  ParameterMultiPointer() {}
+
+  /**
    * Constructor: take the first raw pointer to the parameter
    */
   ParameterMultiPointer(T * param_ptr) : _ptrs(1, param_ptr) {}
