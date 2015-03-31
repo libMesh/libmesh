@@ -116,9 +116,10 @@ AC_DEFUN([CONFIGURE_PETSC],
           AC_DEFINE(HAVE_MPI, 1,
     	        [Flag indicating whether or not MPI is available])
           MPI_IMPL="petsc_snooped"
-  	AC_MSG_RESULT(<<< Configuring library with MPI from PETSC config >>>)
+          AC_MSG_RESULT(<<< Configuring library with MPI from PETSC config >>>)
         else
-  	AC_MSG_RESULT(<<< Warning: configuring in serial - no MPI in PETSC config >>>)
+          AC_MSG_RESULT(<<< PETSc did not define MPIEXEC.  Will try configuring MPI now... >>>)
+          ACX_MPI
         fi
 
         # Print informative message about the version of PETSc we detected
