@@ -74,8 +74,8 @@ int main (int argc, char** argv)
 
   // This example requires PETSc >= 3.3.0 since it uses
   // PetscMatrix::update_preallocation_and_zero().
-#if PETSC_VERSION_LESS_THAN(3,3,0)
-  libmesh_example_requires(false, "PETSc >= 3.3.0");
+#if PETSC_VERSION_LESS_THAN(3,5,0)
+  libmesh_example_requires(false, "PETSc >= 3.5.0");
 #endif
 
   GetPot infile("systems_of_equations_ex8.in");
