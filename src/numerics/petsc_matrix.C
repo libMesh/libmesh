@@ -431,7 +431,7 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
     ierr = PetscObjectStateIncrease((PetscObject)_mat);
     LIBMESH_CHKERRABORT(ierr);
 #else
-    libmesh_error_msg("PetscMatrix::update_preallocation_and_zero() requires PETSc 3.3.0 or greater to work correctly.");
+    libmesh_error_msg("PetscMatrix::update_preallocation_and_zero() requires PETSc 3.5.0 or greater to work correctly.");
 #endif
 
     ierr = MatSetType(_mat,MATAIJ);
