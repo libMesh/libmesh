@@ -1,161 +1,161 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_HP_COARSENTEST_H
-#define LIBMESH_HP_COARSENTEST_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/hp_selector.h"
-#include "libmesh/id_types.h"
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#include "libmesh/fe.h"         // MipsPro requires fe.h and quadrature.h in order to
-#include "libmesh/quadrature.h" //  delete UniquePtrs<> upon destruction
+#ponies
+#ponies
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class Elem;
-class Point;
-class System;
-template <typename T> class TensorValue;
-template <typename T> class VectorValue;
-typedef VectorValue<Real> RealVectorValue;
-typedef TensorValue<Real> RealTensorValue;
-typedef RealVectorValue RealGradient;
-typedef RealTensorValue RealTensor;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 /**
- * This class uses the error estimate given by different types of
- * derefinement (h coarsening or p reduction) to choose between h
- * refining and p elevation.
- * Currently we assume that a set of elements has already been flagged
- * for h refinement, and we may want to change some of those elements
- * to be flagged for p refinement.
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  *
- * This code is currently experimental and will not produce optimal
- * hp meshes without significant improvement.
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner, 2006.
+ * @ponies.
  */
-class HPCoarsenTest : public HPSelector
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  HPCoarsenTest() : p_weight(1.0)
+  ponies)
   {
-    libmesh_experimental();
+    ponies();
   }
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~HPCoarsenTest() {}
+  ponies() {}
 
 
   /**
-   * This pure virtual function must be redefined
-   * in derived classes to take a mesh flagged for h
-   * refinement and potentially change the desired
-   * refinement type.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void select_refinement (System& system);
+  ponies);
 
   /**
-   * Because the coarsening test seems to always choose p refinement, we're
-   * providing an option to make h refinement more likely
+   * ponies
+   * ponies
    */
-  Real p_weight;
+  ponies;
 
-protected:
+ponies:
   /**
-   * The helper function which adds individual fine element data to
-   * the coarse element projection
+   * ponies
+   * ponies
    */
-  void add_projection(const System&, const Elem*, unsigned int var);
-
-  /**
-   * The coarse element on which a solution projection is cached
-   */
-  const Elem *coarse;
+  ponies);
 
   /**
-   * Global DOF indices for fine elements
+   * ponies
    */
-  std::vector<dof_id_type> dof_indices;
+  ponies;
 
   /**
-   * The finite element objects for fine and coarse elements
+   * ponies
    */
-  UniquePtr<FEBase> fe, fe_coarse;
+  ponies;
 
   /**
-   * The shape functions and their derivatives
+   * ponies
    */
-  const std::vector<std::vector<Real> > *phi, *phi_coarse;
-  const std::vector<std::vector<RealGradient> > *dphi, *dphi_coarse;
-  const std::vector<std::vector<RealTensor> > *d2phi, *d2phi_coarse;
+  ponies;
 
   /**
-   * Mapping jacobians
+   * ponies
    */
-  const std::vector<Real> *JxW;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Quadrature locations
+   * ponies
    */
-  const std::vector<Point> *xyz_values;
-  std::vector<Point> coarse_qpoints;
+  ponies;
 
   /**
-   * The quadrature rule for the fine element
+   * ponies
    */
-  UniquePtr<QBase> qrule;
+  ponies;
+  ponies;
 
   /**
-   * Linear system for projections
+   * ponies
    */
-  DenseMatrix<Number> Ke;
-  DenseVector<Number> Fe;
+  ponies;
+
   /**
-   * Coefficients for projected coarse and projected
-   * p-derefined solutions
+   * ponies
    */
-  DenseVector<Number> Uc;
-  DenseVector<Number> Up;
+  ponies;
+  ponies;
+  /**
+   * ponies
+   * ponies
+   */
+  ponies;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-#endif // LIBMESH_HP_COARSENTEST_H
+#ponies

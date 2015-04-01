@@ -1,118 +1,118 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_QUADRATURE_COMPOSITE_H
-#define LIBMESH_QUADRATURE_COMPOSITE_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
+#ponies)
 
-// Local includes
-#include "libmesh/quadrature.h"
-#include "libmesh/elem_cutter.h"
-#include "libmesh/fe_base.h"
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 /**
- * This class implements generic composite quadrature rules.
- * Composite quadrature rules are constructed from any of the
- * supported rules by breaking an element into subelements and
- * applying the base rule on each subelement.  This class uses the
- * ElemCutter, which is only available if libmesh is configured with
- * --disable-strict-lgpl.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * --ponies.
  */
 
 // ------------------------------------------------------------
-// QComposite class definition
-template <class QSubCell>
-class QComposite : public QSubCell
+// ponies
+ponies>
+ponies
 {
-public:
+ponies:
 
   /**
-   * Import base class data into namespace scope.
+   * ponies.
    */
-  using QSubCell::_dim;
-  using QSubCell::_points;
-  using QSubCell::_weights;
-  using QSubCell::init;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Constructor.  Declares the order of the quadrature rule.
+   * ponies.
    */
-  QComposite (const unsigned int _dim,
-              const Order _order=INVALID_ORDER);
+  ponies,
+              ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~QComposite();
+  ~ponies();
 
   /**
-   * @returns \p QCOMPOSITE
+   * @ponies
    */
-  QuadratureType type() const { return QCOMPOSITE; }
+  ponies; }
 
   /**
-   * Initializes the data structures for a specific, potentially cut
-   * element.  The array \p vertex_distance_func contains vertex
-   * values of a signed distance function that cuts the element.  This
-   * interface is indended to be extended by derived classes that can
-   * cut the element into subelements, for example, and constuct a
-   * composite quadrature rule for the cut element.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void init (const Elem &elem,
-                     const std::vector<Real> &vertex_distance_func,
-                     unsigned int p_level=0);
+  ponies,
+                     ponies,
+                     ponies);
 
-private:
+ponies:
 
   /**
    *
    */
-  void add_subelem_values (const std::vector<Elem const*> &subelem);
+  ponies);
 
   /**
-   * Subcell quadrature object.
+   * ponies.
    */
-  QSubCell _q_subcell;
+  ponies;
 
   /**
-   * ElemCutter object.
+   * ponies.
    */
-  ElemCutter _elem_cutter;
+  ponies;
 
   /**
-   * Lagrange FE to use for subcell mapping.
+   * ponies.
    */
-  UniquePtr<FEBase> _lagrange_fe;
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_HAVE_TETGEN
-#endif // LIBMESH_QUADRATURE_COMPOSITE_H
+#ponies
+#ponies

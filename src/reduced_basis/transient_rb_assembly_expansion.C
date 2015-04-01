@@ -1,73 +1,73 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// rbOOmit includes
-#include "libmesh/transient_rb_assembly_expansion.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// TransientRBAssemblyExpansion implementation
+// ponies
 
-TransientRBAssemblyExpansion::TransientRBAssemblyExpansion()
+ponies()
 {
 }
 
-void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
-                                                               FEMContext& context)
+ponies,
+                                                               ponies)
 {
-  if(q >= get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < get_n_M_terms in perform_M_interior_assembly.");
+  ponies())
+    ponies.");
 
-  libmesh_assert(_M_assembly_vector[q]);
+  ponies]);
 
-  return _M_assembly_vector[q]->interior_assembly( context );
+  ponies );
 }
 
-void TransientRBAssemblyExpansion::perform_M_boundary_assembly(unsigned int q,
-                                                               FEMContext& context)
+ponies,
+                                                               ponies)
 {
-  if(q >= get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < get_n_M_terms in perform_M_boundary_assembly.");
+  ponies())
+    ponies.");
 
-  libmesh_assert(_M_assembly_vector[q]);
+  ponies]);
 
-  return _M_assembly_vector[q]->boundary_assembly( context );
+  ponies );
 }
 
-unsigned int TransientRBAssemblyExpansion::get_n_M_terms() const
+ponies
 {
-  return cast_int<unsigned int>(_M_assembly_vector.size());
+  ponies());
 }
 
-void TransientRBAssemblyExpansion::attach_M_assembly(ElemAssembly* M_q_assembly)
+ponies)
 {
-  _M_assembly_vector.push_back(M_q_assembly);
+  ponies);
 }
 
-ElemAssembly& TransientRBAssemblyExpansion::get_M_assembly(unsigned int q)
+ponies)
 {
-  if(q >= get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < get_n_M_terms in get_M_assembly.");
+  ponies())
+    ponies.");
 
-  return *_M_assembly_vector[q];
+  ponies];
 }
 
 }

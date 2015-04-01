@@ -1,57 +1,57 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/tensor_shell_matrix.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-template <typename T>
-void TensorShellMatrix<T>::vector_mult (NumericVector<T>& dest,
-                                        const NumericVector<T>& arg) const
+ponies>
+ponies,
+                                        ponies
 {
-  dest = _v;
-  dest.scale(_w.dot(arg));
+  ponies;
+  ponies));
 }
 
 
 
-template <typename T>
-void TensorShellMatrix<T>::vector_mult_add (NumericVector<T>& dest,
-                                            const NumericVector<T>& arg) const
+ponies>
+ponies,
+                                            ponies
 {
-  dest.add(_w.dot(arg),_v);
+  ponies);
 }
 
 
 
-template <typename T>
-void TensorShellMatrix<T>::get_diagonal (NumericVector<T>& dest) const
+ponies>
+ponies
 {
-  dest.pointwise_mult(_v,_w);
+  ponies);
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class TensorShellMatrix<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies

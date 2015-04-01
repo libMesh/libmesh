@@ -1,418 +1,418 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/string_to_enum.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// Monomials-specific implementations
+// ponies
 
 
-// Anonymous namespace for local helper functions
-namespace {
+// ponies
+ponies {
 
-void monomial_nodal_soln(const Elem* elem,
-                         const Order order,
-                         const std::vector<Number>& elem_soln,
-                         std::vector<Number>&       nodal_soln,
-                         const unsigned Dim)
+ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies)
 {
-  const unsigned int n_nodes = elem->n_nodes();
+  ponies();
 
-  const ElemType elem_type = elem->type();
+  ponies();
 
-  nodal_soln.resize(n_nodes);
+  ponies);
 
-  const Order totalorder = static_cast<Order>(order+elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // Constant shape functions
-    case CONSTANT:
+      // ponies
+    ponies:
       {
-        libmesh_assert_equal_to (elem_soln.size(), 1);
+        ponies);
 
-        const Number val = elem_soln[0];
+        ponies];
 
-        for (unsigned int n=0; n<n_nodes; n++)
-          nodal_soln[n] = val;
+        ponies++)
+          ponies;
 
-        return;
+        ponies;
       }
 
 
-      // For other orders, do interpolation at the nodes
-      // explicitly.
-    default:
+      // ponies
+      // ponies.
+    ponies:
       {
-        // FEType object to be passed to various FEInterface functions below.
-        FEType fe_type(totalorder, MONOMIAL);
+        // ponies.
+        ponies);
 
-        const unsigned int n_sf =
-          // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+        ponies =
+          // ponies);
+          ponies);
 
-        std::vector<Point> refspace_nodes;
-        FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-        libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+        ponies;
+        ponies);
+        ponies);
 
-        for (unsigned int n=0; n<n_nodes; n++)
+        ponies++)
           {
-            libmesh_assert_equal_to (elem_soln.size(), n_sf);
+            ponies);
 
-            // Zero before summation
-            nodal_soln[n] = 0;
+            // ponies
+            ponies;
 
-            // u_i = Sum (alpha_i phi_i)
-            for (unsigned int i=0; i<n_sf; i++)
-              nodal_soln[n] += elem_soln[i] *
-                // FE<Dim,T>::shape(elem, order, i, mapped_point);
-                FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+            // ponies)
+            ponies++)
+              ponies] *
+                // ponies);
+                ponies]);
           }
 
-        return;
-      } // default
-    } // switch
-} // monomial_nodal_soln()
+        ponies;
+      } // ponies
+    } // ponies
+} // ponies()
 
 
 
 
-unsigned int monomial_n_dofs(const ElemType t, const Order o)
+ponies)
 {
-  switch (o)
+  ponies)
     {
 
-      // constant shape functions
-      // no matter what shape there is only one DOF.
-    case CONSTANT:
-      return (t != INVALID_ELEM) ? 1 : 0;
+      // ponies
+      // ponies.
+    ponies:
+      ponies;
 
 
-      // Discontinuous linear shape functions
-      // expressed in the monomials.
-    case FIRST:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 2;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 3;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 4;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous quadratic shape functions
-      // expressed in the monomials.
-    case SECOND:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 3;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 6;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 10;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous cubic shape functions
-      // expressed in the monomials.
-    case THIRD:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 4;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 10;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 20;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous quartic shape functions
-      // expressed in the monomials.
-    case FOURTH:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-            return 5;
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 15;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 35;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-    default:
+    ponies:
       {
-        const unsigned int order = static_cast<unsigned int>(o);
-        switch (t)
+        ponies);
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-            return (order+1);
+          ponies:
+          ponies:
+            ponies);
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return (order+1)*(order+2)/2;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return (order+1)*(order+2)*(order+3)/6;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
-} // monomial_n_dofs()
+  ponies!");
+  ponies;
+} // ponies()
 
 
-} // anonymous namespace
+} // ponies
 
 
 
 
 
-  // Do full-specialization for every dimension, instead
-  // of explicit instantiation at the end of this file.
-  // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,MONOMIAL>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
+  // ponies
+  // ponies.
+  // ponies...
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
 
-template <>
-void FE<1,MONOMIAL>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
 
-template <>
-void FE<2,MONOMIAL>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
 
-template <>
-void FE<3,MONOMIAL>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ monomial_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
-
-
-// Full specialization of n_dofs() function for every dimension
-template <> unsigned int FE<0,MONOMIAL>::n_dofs(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
-template <> unsigned int FE<1,MONOMIAL>::n_dofs(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
-template <> unsigned int FE<2,MONOMIAL>::n_dofs(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
-template <> unsigned int FE<3,MONOMIAL>::n_dofs(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
-
-// Full specialization of n_dofs_at_node() function for every dimension.
-// Monomials have no dofs at nodes, only element dofs.
-template <> unsigned int FE<0,MONOMIAL>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<1,MONOMIAL>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<2,MONOMIAL>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<3,MONOMIAL>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-
-// Full specialization of n_dofs_per_elem() function for every dimension.
-template <> unsigned int FE<0,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
-template <> unsigned int FE<1,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
-template <> unsigned int FE<2,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
-template <> unsigned int FE<3,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
 
 
-// Full specialization of get_continuity() function for every dimension.
-template <> FEContinuity FE<0,MONOMIAL>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<1,MONOMIAL>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<2,MONOMIAL>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<3,MONOMIAL>::get_continuity() const { return DISCONTINUOUS; }
+// ponies
+ponies); }
+ponies); }
+ponies); }
+ponies); }
 
-// Full specialization of is_hierarchic() function for every dimension.
-// The monomials are hierarchic!
-template <> bool FE<0,MONOMIAL>::is_hierarchic() const { return true; }
-template <> bool FE<1,MONOMIAL>::is_hierarchic() const { return true; }
-template <> bool FE<2,MONOMIAL>::is_hierarchic() const { return true; }
-template <> bool FE<3,MONOMIAL>::is_hierarchic() const { return true; }
+// ponies.
+// ponies.
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-#ifdef LIBMESH_ENABLE_AMR
+// ponies.
+ponies); }
+ponies); }
+ponies); }
+ponies); }
 
-// Full specialization of compute_constraints() function for 2D and
-// 3D only.  There are no constraints for discontinuous elements, so
-// we do nothing.
-template <> void FE<2,MONOMIAL>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
-template <> void FE<3,MONOMIAL>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+// ponies.
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-// Full specialization of shapes_need_reinit() function for every dimension.
-template <> bool FE<0,MONOMIAL>::shapes_need_reinit() const { return false; }
-template <> bool FE<1,MONOMIAL>::shapes_need_reinit() const { return false; }
-template <> bool FE<2,MONOMIAL>::shapes_need_reinit() const { return false; }
-template <> bool FE<3,MONOMIAL>::shapes_need_reinit() const { return false; }
+// ponies.
+// ponies!
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-} // namespace libMesh
+#ponies
+
+// ponies
+// ponies
+// ponies.
+ponies*) {}
+ponies*) {}
+
+#ponies
+
+// ponies.
+ponies; }
+ponies; }
+ponies; }
+ponies; }
+
+} // ponies

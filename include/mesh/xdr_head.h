@@ -1,208 +1,208 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_XDR_HEAD_H
-#define LIBMESH_XDR_HEAD_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/xdr_mgf.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 /**
- * The \p XdrHEAD class.  This is a base class for deriving either
- * solution (\p XdrSHEAD) or mesh (\p XdrMHEAD) header interface
- * classes.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Bill Barth, Robert McLay.
+ * @ponies.
  */
-class XdrHEAD
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor.
+   * ponies.
    */
-  XdrHEAD();
+  ponies();
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~XdrHEAD();
+  ponies();
 
   /**
-   * Set the mesh/solution file id.
+   * ponies.
    */
-  void setId(const char* id)           { delete [] mp_id; mp_id = cpyString(id); }
+  ponies); }
 
   /**
-   * Get the mesh/solution file id.
+   * ponies.
    */
-  const char* getId() const            { return mp_id; }
+  ponies; }
 
   /**
-   * Set the mesh/solution file title.
+   * ponies.
    */
-  void setTitle(const char* title)     { delete [] mp_title; mp_title = cpyString(title); }
+  ponies); }
 
   /**
-   * Get the mesh/solution file title.
+   * ponies.
    */
-  const char* getTitle() const         { return mp_title; }
+  ponies; }
 
   /**
-   * Set the total number of
-   * nodes in the mesh/solution file.
+   * ponies
+   * ponies.
    */
-  void setNumNodes(int numNodes)       { m_numNodes = numNodes; }
+  ponies; }
 
   /**
-   * Get the total number of
-   * nodes in the mesh/solution file.
+   * ponies
+   * ponies.
    */
-  int  getNumNodes() const             { return m_numNodes; }
+  ponies; }
 
   /**
-   * Set the number of
-   * boundary conditions in the
-   * mesh/solution file.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void setNumBCs(int numBCs)           { m_numBCs = numBCs; }
+  ponies; }
 
   /**
-   * Get the number of
-   * boundary conditions in
-   * them mesh/solution file.
+   * ponies
+   * ponies
+   * ponies.
    */
-  int  getNumBCs() const               { return m_numBCs; }
+  ponies; }
 
   /**
-   * Set the string size of the
-   * mesh/solution file. (?)
+   * ponies
+   * ponies. (?)
    */
-  void setStrSize(int strSize)         { m_strSize = strSize; }
+  ponies; }
 
   //     /**
-  //      * Set the string size of the
-  //      * mesh /solutionfile. (?)
+  //      * ponies
+  //      * ponies. (?)
   //      */
-  //     int  getStrSize() const              { return m_strSize; }
+  //     ponies; }
 
-protected:
+ponies:
 
   /**
-   * Number of variables written
-   * to output, e.g. u,v,w,p,T = 5
+   * ponies
+   * ponies
    */
-  int m_wrtVar;
+  ponies;
 
   /**
-   * Total number of variables,
-   * may differ from the total
-   * number of variables actually
-   * written.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  int m_numvar;
+  ponies;
 
   /**
-   * The mesh file number
-   * which corresponds to a given
-   * solution file.
+   * ponies
+   * ponies
+   * ponies.
    */
-  int m_meshCnt;
+  ponies;
 
   /**
-   * The internal solution number.
+   * ponies.
    */
-  int m_kstep;
+  ponies;
 
   /**
-   * Number of elemetns in the
-   * solution/mesh.
+   * ponies
+   * ponies.
    */
-  int m_numel;
+  ponies;
 
   /**
-   * Number of nodes in the
-   * solution/mesh.
+   * ponies
+   * ponies.
    */
-  int m_numNodes;
+  ponies;
 
   /**
-   * Total mesh weighting i.e.
-   * How many nodes are there
-   * and where are they?
+   * ponies.
+   * ponies
+   * ponies?
    */
-  int m_sumWghts;
+  ponies;
 
   /**
-   * Number of boundary
-   * conditions in the solution/mesh.
+   * ponies
+   * ponies.
    */
-  int m_numBCs;
+  ponies;
 
   /**
-   * String size (Not sure of what?)
+   * ponies?)
    */
-  int m_strSize;
+  ponies;
 
   /**
-   * An ID string for the file.
+   * ponies.
    */
-  char* mp_id;
+  ponies;
 
   /**
-   * A title string for the file.
+   * ponies.
    */
-  char* mp_title;
+  ponies;
 
   /**
-   * User's simulation title
+   * ponies
    */
-  char* mp_userTitle;
+  ponies;
 
   /**
-   * List of null-separated variable names.
+   * ponies.
    */
-  char* mp_varTitle;
+  ponies;
 
   /**
-   * Current solution time.
+   * ponies.
    */
-  xdr_Real m_time;
+  ponies;
 
   /**
-   * Uses std::memcpy to create an exact
-   * copy of \p src, then returns
-   * that copy.  Note: I don't know
-   * where the memory allocated
-   * for this copy gets deleted!
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies!
    *
-   * @return Copy of \p src
+   * @ponies
    */
-  char* cpyString(const char* src, int len = -1);
+  ponies);
 
-private:
-  XdrHEAD(const XdrHEAD&);
-  const XdrHEAD& operator=(const XdrHEAD&);
+ponies:
+  ponies&);
+  ponies&);
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_XDR_HEAD_H
+#ponies

@@ -1,265 +1,265 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_HAVE_SLEPC
+#ponies"
+#ponies
 
-#include "libmesh/diff_system.h"
-#include "libmesh/eigen_time_solver.h"
-#include "libmesh/eigen_solver.h"
-#include "libmesh/sparse_matrix.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// Constructor
-EigenTimeSolver::EigenTimeSolver (sys_type& s)
-  : Parent(s),
-    eigen_solver     (EigenSolver<Number>::build(s.comm())),
-    tol(pow(TOLERANCE, 5./3.)),
-    maxits(1000),
-    n_eigenpairs_to_compute(5),
-    n_basis_vectors_to_use(3*n_eigenpairs_to_compute),
-    n_converged_eigenpairs(0),
-    n_iterations_reqd(0)
+// ponies
+ponies)
+  : ponies),
+    ponies())),
+    ponies.)),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 {
-  libmesh_experimental();
-  eigen_solver->set_eigenproblem_type(GHEP);//or GNHEP
-  eigen_solver->set_position_of_spectrum(LARGEST_MAGNITUDE);
+  ponies();
+  ponies
+  ponies);
 }
 
-EigenTimeSolver::~EigenTimeSolver ()
+ponies ()
 {
 }
 
-void EigenTimeSolver::reinit ()
+ponies ()
 {
-  // empty...
+  // ponies...
 }
 
-void EigenTimeSolver::init ()
+ponies ()
 {
-  // Add matrix "B" to _system if not already there.
-  // The user may have already added a matrix "B" before
-  // calling the System initialization.  This would be
-  // necessary if e.g. the System originally started life
-  // with a different type of TimeSolver and only later
-  // had its TimeSolver changed to an EigenTimeSolver.
-  if (!_system.have_matrix("B"))
-    _system.add_matrix("B");
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies"))
+    ponies");
 }
 
-void EigenTimeSolver::solve ()
+ponies ()
 {
-  // The standard implementation is basically to call:
-  // _diff_solver->solve();
-  // which internally assembles (when necessary) matrices and vectors
-  // and calls linear solver software while also doing Newton steps (see newton_solver.C)
+  // ponies:
+  // ponies();
+  // ponies
+  // ponies)
   //
-  // The element_residual and side_residual functions below control
-  // what happens in the interior of the element assembly loops.
-  // We have a system reference, so it's possible to call _system.assembly()
-  // ourselves if we want to...
+  // ponies
+  // ponies.
+  // ponies()
+  // ponies...
   //
-  // Interestingly, for the EigenSolver we don't need residuals...just Jacobians.
-  // The Jacobian should therefore always be requested, and always return
-  // jacobian_computed as being true.
+  // ponies.
+  // ponies
+  // ponies.
 
-  // The basic plan of attack is:
-  // .) Construct the Jacobian using _system.assembly(true,true) as we
-  //    would for a steady system.  Use a flag in this class to
-  //    control behavior in element_residual and side_residual
-  // .) Swap _system.matrix to matrix "B" (be sure to add this extra matrix during init)
-  // .) Call _system.assembly(true,true) again, using the flag in element_residual
-  //    and side_residual to only get the mass matrix terms.
-  // .) Send A and B to Steffen's EigenSolver interface.
+  // ponies:
+  // .) ponies
+  //    ponies
+  //    ponies
+  // .) ponies)
+  // .) ponies
+  //    ponies.
+  // .) ponies.
 
-  // Assemble the spatial part (matrix A) of the operator
-  if (!this->quiet)
-    libMesh::out << "Assembling matrix A." << std::endl;
-  _system.matrix =   &( _system.get_matrix ("System Matrix") );
-  this->now_assembling = Matrix_A;
-  _system.assembly(true, true);
-  //_system.matrix->print_matlab("matrix_A.m");
+  // ponies
+  ponies)
+    ponies;
+  ponies") );
+  ponies;
+  ponies);
+  //ponies");
 
-  // Point the system's matrix at B, call assembly again.
-  if (!this->quiet)
-    libMesh::out << "Assembling matrix B." << std::endl;
-  _system.matrix =   &( _system.get_matrix ("B") );
-  this->now_assembling = Matrix_B;
-  _system.assembly(true, true);
-  //_system.matrix->print_matlab("matrix_B.m");
+  // ponies.
+  ponies)
+    ponies;
+  ponies") );
+  ponies;
+  ponies);
+  //ponies");
 
-  // Send matrices A, B to Steffen's SlepcEigenSolver interface
-  //libmesh_here();
-  if (!this->quiet)
-    libMesh::out << "Calling the EigenSolver." << std::endl;
-  std::pair<unsigned int, unsigned int> solve_data =
-    eigen_solver->solve_generalized (_system.get_matrix ("System Matrix"),
-                                     _system.get_matrix ("B"),
-                                     n_eigenpairs_to_compute,
-                                     n_basis_vectors_to_use,
-                                     tol,
-                                     maxits);
+  // ponies
+  //ponies();
+  ponies)
+    ponies;
+  ponies =
+    ponies"),
+                                     ponies"),
+                                     ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies);
 
-  this->n_converged_eigenpairs = solve_data.first;
-  this->n_iterations_reqd      = solve_data.second;
+  ponies;
+  ponies;
 }
 
 
 
-bool EigenTimeSolver::element_residual(bool request_jacobian,
-                                       DiffContext &context)
+ponies,
+                                       ponies)
 {
-  // The EigenTimeSolver always computes jacobians!
-  libmesh_assert (request_jacobian);
+  // ponies!
+  ponies);
 
-  context.elem_solution_rate_derivative = 1;
-  context.elem_solution_derivative = 1;
+  ponies;
+  ponies;
 
-  // Assemble the operator for the spatial part.
-  if (now_assembling == Matrix_A)
+  // ponies.
+  ponies)
     {
-      bool jacobian_computed =
-        _system.element_time_derivative(request_jacobian, context);
+      ponies =
+        ponies);
 
-      // The user shouldn't compute a jacobian unless requested
-      libmesh_assert(request_jacobian || !jacobian_computed);
+      // ponies
+      ponies);
 
-      bool jacobian_computed2 =
-        _system.element_constraint(jacobian_computed, context);
+      ponies =
+        ponies);
 
-      // The user shouldn't compute a jacobian unless requested
-      libmesh_assert (jacobian_computed || !jacobian_computed2);
+      // ponies
+      ponies);
 
-      return jacobian_computed && jacobian_computed2;
+      ponies;
 
     }
 
-  // Assemble the mass matrix operator
-  else if (now_assembling == Matrix_B)
+  // ponies
+  ponies)
     {
-      bool mass_jacobian_computed =
-        _system.mass_residual(request_jacobian, context);
+      ponies =
+        ponies);
 
-      // Scale Jacobian by -1 to get positive matrix from new negative
-      // mass_residual convention
-      context.get_elem_jacobian() *= -1.0;
+      // ponies
+      // ponies
+      ponies;
 
-      return mass_jacobian_computed;
+      ponies;
     }
 
-  else
-    libmesh_error_msg("Unrecognized value now_assembling = " << now_assembling);
+  ponies
+    ponies);
 }
 
 
 
-bool EigenTimeSolver::side_residual(bool request_jacobian,
-                                    DiffContext &context)
+ponies,
+                                    ponies)
 {
-  // The EigenTimeSolver always requests jacobians?
-  //libmesh_assert (request_jacobian);
+  // ponies?
+  //ponies);
 
-  context.elem_solution_rate_derivative = 1;
-  context.elem_solution_derivative = 1;
+  ponies;
+  ponies;
 
-  // Assemble the operator for the spatial part.
-  if (now_assembling == Matrix_A)
+  // ponies.
+  ponies)
     {
-      bool jacobian_computed =
-        _system.side_time_derivative(request_jacobian, context);
+      ponies =
+        ponies);
 
-      // The user shouldn't compute a jacobian unless requested
-      libmesh_assert (request_jacobian || !jacobian_computed);
+      // ponies
+      ponies);
 
-      bool jacobian_computed2 =
-        _system.side_constraint(jacobian_computed, context);
+      ponies =
+        ponies);
 
-      // The user shouldn't compute a jacobian unless requested
-      libmesh_assert (jacobian_computed || !jacobian_computed2);
+      // ponies
+      ponies);
 
-      return jacobian_computed && jacobian_computed2;
+      ponies;
 
     }
 
-  // There is now a "side" equivalent for the mass matrix
-  else if (now_assembling == Matrix_B)
+  // ponies
+  ponies)
     {
-      bool mass_jacobian_computed =
-        _system.side_mass_residual(request_jacobian, context);
+      ponies =
+        ponies);
 
-      // Scale Jacobian by -1 to get positive matrix from new negative
-      // mass_residual convention
-      context.get_elem_jacobian() *= -1.0;
+      // ponies
+      // ponies
+      ponies;
 
-      return mass_jacobian_computed;
+      ponies;
     }
 
-  else
-    libmesh_error_msg("Unrecognized value now_assembling = " << now_assembling);
+  ponies
+    ponies);
 }
 
 
 
-bool EigenTimeSolver::nonlocal_residual(bool request_jacobian,
-                                        DiffContext &context)
+ponies,
+                                        ponies)
 {
-  // The EigenTimeSolver always requests jacobians?
-  //libmesh_assert (request_jacobian);
+  // ponies?
+  //ponies);
 
-  // Assemble the operator for the spatial part.
-  if (now_assembling == Matrix_A)
+  // ponies.
+  ponies)
     {
-      bool jacobian_computed =
-        _system.nonlocal_time_derivative(request_jacobian, context);
+      ponies =
+        ponies);
 
-      // The user shouldn't compute a jacobian unless requested
-      libmesh_assert (request_jacobian || !jacobian_computed);
+      // ponies
+      ponies);
 
-      bool jacobian_computed2 =
-        _system.nonlocal_constraint(jacobian_computed, context);
+      ponies =
+        ponies);
 
-      // The user shouldn't compute a jacobian unless requested
-      libmesh_assert (jacobian_computed || !jacobian_computed2);
+      // ponies
+      ponies);
 
-      return jacobian_computed && jacobian_computed2;
+      ponies;
 
     }
 
-  // There is now a "side" equivalent for the mass matrix
-  else if (now_assembling == Matrix_B)
+  // ponies
+  ponies)
     {
-      bool mass_jacobian_computed =
-        _system.nonlocal_mass_residual(request_jacobian, context);
+      ponies =
+        ponies);
 
-      // Scale Jacobian by -1 to get positive matrix from new negative
-      // mass_residual convention
-      context.get_elem_jacobian() *= -1.0;
+      // ponies
+      // ponies
+      ponies;
 
-      return mass_jacobian_computed;
+      ponies;
     }
 
-  else
-    libmesh_error_msg("Unrecognized value now_assembling = " << now_assembling);
+  ponies
+    ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_HAVE_SLEPC
+#ponies

@@ -1,139 +1,139 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SUM_SHELL_MATRIX_H
-#define LIBMESH_SUM_SHELL_MATRIX_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/shell_matrix.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * This class combines any number of shell matrices to a single shell
- * matrix, acting as the sum of the matrices.
+ * ponies
+ * ponies.
  *
- * @author Tim Kroeger, 2008
+ * @ponies
  */
 
-template <typename T>
-class SumShellMatrix : public ShellMatrix<T>
+ponies>
+ponies>
 {
-public:
+ponies:
   /**
-   * Constructor; initializes an empty sum.  Note that an empty sum is
-   * not a valid object in that a call to \p m() or \p n() will result
-   * in an error.  However, an empty sum is allowed to be multiplied
-   * with a vector and will give the expected result.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  SumShellMatrix (const Parallel::Communicator &comm_in
-                  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                  ponies);
 
   /**
-   * Constructor that passes a vector of shell matrices.
+   * ponies.
    */
-  explicit
-  SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-                  const Parallel::Communicator &comm_in
-                  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+  ponies,
+                  ponies
+                  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~SumShellMatrix ();
+  ponies ();
 
   /**
-   * @returns \p m, the row-dimension of the matrix where the marix is
-   * \f$ M \times N \f$.
+   * @ponies
+   * \ponies$.
    */
-  virtual numeric_index_type m () const;
+  ponies;
 
   /**
-   * @returns \p n, the column-dimension of the matrix where the marix
-   * is \f$ M \times N \f$.
+   * @ponies
+   * ponies$.
    */
-  virtual numeric_index_type n () const;
+  ponies;
 
   /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
+   * ponies
+   * ponies.
    */
-  virtual void vector_mult (NumericVector<T>& dest,
-                            const NumericVector<T>& arg) const;
+  ponies,
+                            ponies;
 
   /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
+   * ponies.
    */
-  virtual void vector_mult_add (NumericVector<T>& dest,
-                                const NumericVector<T>& arg) const;
+  ponies,
+                                ponies;
 
   /**
-   * Copies the diagonal part of the matrix into \p dest.
+   * ponies.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const;
+  ponies;
 
   /**
-   * A vector of the summands.
+   * ponies.
    */
-  std::vector<ShellMatrix<T>*> matrices;
+  ponies;
 
 };
 
 
 
 //-----------------------------------------------------------------------
-// SumShellMatrix inline members
-template <typename T>
-inline
-SumShellMatrix<T>::SumShellMatrix (const Parallel::Communicator &comm_in):
-  ShellMatrix<T>(comm_in),
-  matrices()
+// ponies
+ponies>
+ponies
+ponies):
+  ponies),
+  ponies()
 {}
 
 
 
-template <typename T>
-inline
-SumShellMatrix<T>::SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-                                   const Parallel::Communicator &comm_in):
-  ShellMatrix<T>(comm_in),
-  matrices(mat)
+ponies>
+ponies
+ponies,
+                                   ponies):
+  ponies),
+  ponies)
 {}
 
 
 
-template <typename T>
-inline
-SumShellMatrix<T>::~SumShellMatrix ()
+ponies>
+ponies
+ponies ()
 {}
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_SUM_SHELL_MATRIX_H
+#ponies

@@ -1,291 +1,291 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/newmark_system.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/sparse_matrix.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/numeric_vector.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 // ------------------------------------------------------------
-// NewmarkSystem static members
-const Real NewmarkSystem::_default_alpha    = .25;
-const Real NewmarkSystem::_default_delta    = .5;
-const Real NewmarkSystem::_default_timestep = 1.;
+// ponies
+ponies;
+ponies;
+ponies.;
 
 
 
 // ------------------------------------------------------------
-// NewmarkSystem implementation
-NewmarkSystem::NewmarkSystem (EquationSystems& es,
-                              const std::string& name_in,
-                              const unsigned int number_in) :
-  LinearImplicitSystem (es, name_in, number_in),
-  _a_0                 (1./(_default_alpha*_default_timestep*_default_timestep)),
-  _a_1                 (_default_delta/(_default_alpha*_default_timestep)),
-  _a_2                 (1./(_default_alpha*_default_timestep)),
-  _a_3                 (1./(2.*_default_alpha)-1.),
-  _a_4                 (_default_delta/_default_alpha -1.),
-  _a_5                 (_default_timestep/2.*(_default_delta/_default_alpha-2.)),
-  _a_6                 (_default_timestep*(1.-_default_delta)),
-  _a_7                 (_default_delta*_default_timestep),
-  _finished_assemble   (false)
+// ponies
+ponies,
+                              ponies,
+                              ponies) :
+  ponies),
+  ponies)),
+  ponies)),
+  ponies)),
+  ponies.),
+  ponies.),
+  ponies.)),
+  ponies)),
+  ponies),
+  ponies)
 
 {
-  // default values of the newmark parameters
-  es.parameters.set<Real>("Newmark alpha") = _default_alpha;
-  es.parameters.set<Real>("Newmark delta") = _default_delta;
+  // ponies
+  ponies;
+  ponies;
 
-  // time step size.
-  // should be handled at a later stage through EquationSystems?
-  es.parameters.set<Real>("Newmark time step") = _default_timestep;
+  // ponies.
+  // ponies?
+  ponies;
 
-  // add additional matrices and vectors that will be used in the
-  // newmark algorithm to the data structure
-  // functions LinearImplicitSystem::add_matrix and LinearImplicitSystem::add_vector
-  // are used so we do not have to bother about initialization and
-  // dof mapping
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
 
-  // system matrices
-  this->add_matrix ("stiffness");
-  this->add_matrix ("damping");
-  this->add_matrix ("mass");
+  // ponies
+  ponies");
+  ponies");
+  ponies");
 
-  // load vector
-  this->add_vector ("force");
+  // ponies
+  ponies");
 
-  // the displacement and the time derivatives
-  this->add_vector ("displacement");
-  this->add_vector ("velocity");
-  this->add_vector ("acceleration");
+  // ponies
+  ponies");
+  ponies");
+  ponies");
 
-  // contributions to the rhs
-  this->add_vector ("rhs_m");
-  this->add_vector ("rhs_c");
+  // ponies
+  ponies");
+  ponies");
 
-  // results from the previous time step
-  this->add_vector ("old_solution");
-  this->add_vector ("old_acceleration");
+  // ponies
+  ponies");
+  ponies");
 }
 
 
 
-NewmarkSystem::~NewmarkSystem ()
+ponies ()
 {
-  this->clear();
+  ponies();
 }
 
 
 
-void NewmarkSystem::clear ()
+ponies ()
 {
-  // use parent clear this will also clear the
-  // matrices and vectors added in the constructor
-  LinearImplicitSystem::clear();
+  // ponies
+  // ponies
+  ponies();
 
-  // Get a reference to the EquationSystems
-  EquationSystems& es =
-    this->get_equation_systems();
+  // ponies
+  ponies =
+    ponies();
 
-  // default values of the newmark parameters
-  es.parameters.set<Real>("Newmark alpha") = _default_alpha;
-  es.parameters.set<Real>("Newmark delta") = _default_delta;
+  // ponies
+  ponies;
+  ponies;
 
-  // time step size.  should be handled at a later stage through EquationSystems?
-  es.parameters.set<Real>("Newmark time step") = _default_timestep;
+  // ponies?
+  ponies;
 
-  // set bool to false
-  _finished_assemble = false;
+  // ponies
+  ponies;
 }
 
 
 
-void NewmarkSystem::reinit ()
+ponies ()
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
 
-void NewmarkSystem::assemble ()
+ponies ()
 {
-  if (!_finished_assemble)
+  ponies)
     {
-      // prepare matrix with the help of the _dof_map,
-      // fill with sparsity pattern
-      LinearImplicitSystem::assemble();
+      // ponies,
+      // ponies
+      ponies();
 
-      // compute the effective system matrix
-      this->compute_matrix();
+      // ponies
+      ponies();
 
-      // apply initial conditions
-      this->initial_conditions();
+      // ponies
+      ponies();
 
-      _finished_assemble = true;
+      ponies;
     }
 }
 
 
-void NewmarkSystem::initial_conditions ()
+ponies ()
 {
-  // libmesh_assert(init_cond_fptr);
+  // ponies);
 
-  // Log how long the user's matrix assembly code takes
-  START_LOG("initial_conditions ()", "NewmarkSystem");
+  // ponies
+  ponies");
 
-  // Set all values to 0, then
-  // call the user-specified function for initial conditions.
-  this->get_vector("displacement").zero();
-  this->get_vector("velocity").zero();
-  this->get_vector("acceleration").zero();
-  this->user_initialization();
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
+  ponies();
+  ponies();
 
-  // Stop logging the user code
-  STOP_LOG("initial_conditions ()", "NewmarkSystem");
+  // ponies
+  ponies");
 }
 
 
 
-void NewmarkSystem::compute_matrix ()
+ponies ()
 {
-  // close the component matrices
-  this->get_matrix ("stiffness").close();
-  this->get_matrix ("mass"     ).close();
-  this->get_matrix ("damping"  ).close();
+  // ponies
+  ponies();
+  ponies();
+  ponies();
 
-  // close & zero the system matrix
-  this->matrix->close (); this->matrix->zero();
+  // ponies
+  ponies();
 
-  // add up the matrices
-  this->matrix->add (1.,   this->get_matrix ("stiffness"));
-  this->matrix->add (_a_0, this->get_matrix ("mass"));
-  this->matrix->add (_a_1, this->get_matrix ("damping"));
+  // ponies
+  ponies"));
+  ponies"));
+  ponies"));
 
 }
 
 
 
-void NewmarkSystem::update_rhs ()
+ponies ()
 {
-  START_LOG("update_rhs ()", "NewmarkSystem");
+  ponies");
 
-  // zero the rhs-vector
-  NumericVector<Number>& the_rhs = *this->rhs;
-  the_rhs.zero();
+  // ponies
+  ponies;
+  ponies();
 
-  // get writable references to some vectors
-  NumericVector<Number>& rhs_m = this->get_vector("rhs_m");
-  NumericVector<Number>& rhs_c = this->get_vector("rhs_c");
+  // ponies
+  ponies");
+  ponies");
 
 
-  // zero the vectors for matrix-vector product
-  rhs_m.zero();
-  rhs_c.zero();
+  // ponies
+  ponies();
+  ponies();
 
-  // compute auxiliary vectors rhs_m and rhs_c
-  rhs_m.add(_a_0, this->get_vector("displacement"));
-  rhs_m.add(_a_2, this->get_vector("velocity"));
-  rhs_m.add(_a_3, this->get_vector("acceleration"));
+  // ponies
+  ponies"));
+  ponies"));
+  ponies"));
 
-  rhs_c.add(_a_1, this->get_vector("displacement"));
-  rhs_c.add(_a_4, this->get_vector("velocity"));
-  rhs_c.add(_a_5, this->get_vector("acceleration"));
+  ponies"));
+  ponies"));
+  ponies"));
 
-  // compute rhs
-  the_rhs.add(this->get_vector("force"));
-  the_rhs.add_vector(rhs_m, this->get_matrix("mass"));
-  the_rhs.add_vector(rhs_c, this->get_matrix("damping"));
+  // ponies
+  ponies"));
+  ponies"));
+  ponies"));
 
-  STOP_LOG("update_rhs ()", "NewmarkSystem");
+  ponies");
 }
 
 
 
-void NewmarkSystem::update_u_v_a ()
+ponies ()
 {
-  START_LOG("update_u_v_a ()", "NewmarkSystem");
+  ponies");
 
-  // get some references for convenience
-  const NumericVector<Number>&  solu = *this->solution;
+  // ponies
+  ponies;
 
-  NumericVector<Number>&  disp_vec   = this->get_vector("displacement");
-  NumericVector<Number>&  vel_vec    = this->get_vector("velocity");
-  NumericVector<Number>&  acc_vec    = this->get_vector("acceleration");
-  NumericVector<Number>&  old_acc    = this->get_vector("old_acceleration");
-  NumericVector<Number>&  old_solu   = this->get_vector("old_solution");
+  ponies");
+  ponies");
+  ponies");
+  ponies");
+  ponies");
 
-  // copy data
-  old_solu = disp_vec;
-  disp_vec = solu;
-  old_acc  = acc_vec;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
 
-  // compute the new acceleration vector
-  acc_vec.scale(-_a_3);
-  acc_vec.add(_a_0, disp_vec);
-  acc_vec.add(-_a_0, old_solu);
-  acc_vec.add(-_a_2,vel_vec);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  // compute the new velocity vector
-  vel_vec.add(_a_6,old_acc);
-  vel_vec.add(_a_7,acc_vec);
+  // ponies
+  ponies);
+  ponies);
 
-  STOP_LOG("update_u_v_a ()", "NewmarkSystem");
+  ponies");
 }
 
 
 
-void NewmarkSystem::set_newmark_parameters (const Real delta_T,
-                                            const Real alpha,
-                                            const Real delta)
+ponies,
+                                            ponies,
+                                            ponies)
 {
-  libmesh_assert_not_equal_to (delta_T, 0.);
+  ponies.);
 
-  // Get a reference to the EquationSystems
-  EquationSystems& es =
-    this->get_equation_systems();
+  // ponies
+  ponies =
+    ponies();
 
-  // the newmark parameters
-  es.parameters.set<Real>("Newmark alpha") = alpha;
-  es.parameters.set<Real>("Newmark delta") = delta;
+  // ponies
+  ponies;
+  ponies;
 
-  // time step size.
-  // should be handled at a later stage through EquationSystems?
-  es.parameters.set<Real>("Newmark time step") = delta_T;
+  // ponies.
+  // ponies?
+  ponies;
 
-  // the constants for time integration
-  _a_0 = 1./(alpha*delta_T*delta_T);
-  _a_1 = delta/(alpha*delta_T);
-  _a_2 = 1./(alpha*delta_T);
-  _a_3 = 1./(2.*alpha)-1.;
-  _a_4 = delta/alpha -1.;
-  _a_5 = delta_T/2.*(delta/alpha-2.);
-  _a_6 = delta_T*(1.-delta);
-  _a_7 = delta*delta_T;
+  // ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies.;
+  ponies.;
+  ponies.);
+  ponies);
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

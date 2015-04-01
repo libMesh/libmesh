@@ -1,69 +1,69 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_MESH_TRIANGLE_HOLES_H
-#define LIBMESH_MESH_TRIANGLE_HOLES_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#ponies
 
-// Local includes
-#include "libmesh/mesh_triangle_interface.h"
-#include "libmesh/point.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * An abstract class for defining a 2-dimensional hole.  We assume that
- * the connectivity of the hole is implicit in the numbering of the points,
- * i.e. node 0 is connected to node 1, node 1 is connected to node 2, etc,
- * and the last node "wraps around" to connect back to node 0.
+ * ponies
+ * ponies,
+ * ponies,
+ * ponies.
  */
-class TriangleInterface::Hole
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor
+   * ponies
    */
-  Hole() {}
+  ponies() {}
 
   /**
-   * Destructor
+   * ponies
    */
-  virtual ~Hole() {}
+  ponies() {}
 
   /**
-   * The number of geometric points which define the hole.
+   * ponies.
    */
-  virtual unsigned int n_points() const = 0;
+  ponies;
 
   /**
-   * Return the nth point defining the hole.
+   * ponies.
    */
-  virtual Point point(const unsigned int n) const = 0;
+  ponies;
 
   /**
-   * Return an (arbitrary) point which lies inside the hole.
+   * ponies.
    */
-  virtual Point inside() const = 0;
+  ponies;
 };
 
 
@@ -71,85 +71,85 @@ public:
 
 
 /**
- * A concrete instantiation of the Hole class that describes polygonal
- * (triangular, square, pentagonal, ...) holes.
+ * ponies
+ * (ponies.
  */
-class TriangleInterface::PolygonHole : public TriangleInterface::Hole
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor specifying the center, radius, and number of
-   * points which comprise the hole.  The points will all lie
-   * on a circle of radius r.
+   * ponies
+   * ponies
+   * ponies.
    */
-  PolygonHole(const Point& center, Real radius, unsigned int n_points);
+  ponies);
 
-  virtual unsigned int n_points() const;
+  ponies;
 
-  virtual Point point(const unsigned int n) const;
+  ponies;
 
-  virtual Point inside() const;
+  ponies;
 
-private:
+ponies:
   /**
-   * (x,y) location of the center of the hole
+   * (ponies
    */
-  Point _center;
-
-  /**
-   * circular hole radius
-   */
-  Real _radius;
+  ponies;
 
   /**
-   * number of points used to describe the hole.  The actual
-   * points can be generated knowing the center and radius.
-   * For example, n_points=3 would generate a triangular hole.
+   * ponies
    */
-  unsigned int _n_points;
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   * ponies.
+   */
+  ponies;
 };
 
 
 
 
 /**
- * Another concrete instantiation of the hole, this one should
- * be sufficiently general for most non-polygonal purposes.  The user
- * supplies, at the time of construction, a reference to a vector
- * of Points which defines the hole (in order of connectivity) and
- * an arbitrary Point which lies inside the hole.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-class TriangleInterface::ArbitraryHole : public TriangleInterface::Hole
+ponies
 {
-public:
+ponies:
   /**
-   * The constructor requires a point which lies in the interior of the hole
-   * and a reference to a vector of Points defining the hole.
+   * ponies
+   * ponies.
    */
-  ArbitraryHole(const Point& center,
-                const std::vector<Point>& points);
+  ponies,
+                ponies);
 
-  virtual unsigned int n_points() const;
+  ponies;
 
-  virtual Point point(const unsigned int n) const;
+  ponies;
 
-  virtual Point inside() const;
+  ponies;
 
-private:
+ponies:
   /**
-   * arbitrary (x,y) location inside the hole
+   * ponies
    */
-  Point _center;
+  ponies;
 
   /**
-   * Reference to the vector of points which makes up
-   * the hole.
+   * ponies
+   * ponies.
    */
-  const std::vector<Point>& _points;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_HAVE_TRIANGLE
+#ponies
 
-#endif // LIBMESH_MESH_TRIANGLE_HOLES_H
+#ponies

@@ -1,124 +1,124 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/quadrature_trap.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 
-void QTrap::init_3D(const ElemType type_in,
-                    unsigned int)
+ponies,
+                    ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
   //-----------------------------------------------------------------------
-  // 3D quadrature rules
-  switch (type_in)
+  // ponies
+  ponies)
     {
       //---------------------------------------------
-      // Hex quadrature rules
-    case HEX8:
-    case HEX20:
-    case HEX27:
+      // ponies
+    ponies:
+    ponies:
+    ponies:
       {
-        // We compute the 3D quadrature rule as a tensor
-        // product of the 1D quadrature rule.
-        QTrap q1D(1);
-        q1D.init(EDGE2);
+        // ponies
+        // ponies.
+        ponies);
+        ponies);
 
-        tensor_product_hex( q1D );
+        ponies );
 
-        return;
+        ponies;
       }
 
 
 
       //---------------------------------------------
-      // Tetrahedral quadrature rules
-    case TET4:
-    case TET10:
+      // ponies
+    ponies:
+    ponies:
       {
-        _points.resize(4);
-        _weights.resize(4);
+        ponies);
+        ponies);
 
-        _points[0](0) = 0.;
-        _points[0](1) = 0.;
-        _points[0](2) = 0.;
+        ponies.;
+        ponies.;
+        ponies.;
 
-        _points[1](0) = 1.;
-        _points[1](1) = 0.;
-        _points[1](2) = 0.;
+        ponies.;
+        ponies.;
+        ponies.;
 
-        _points[2](0) = 0.;
-        _points[2](1) = 1.;
-        _points[2](2) = 0.;
+        ponies.;
+        ponies.;
+        ponies.;
 
-        _points[3](0) = 0.;
-        _points[3](1) = 0.;
-        _points[3](2) = 1.;
+        ponies.;
+        ponies.;
+        ponies.;
 
 
 
-        _weights[0] = .0416666666666666666666666666666666666666666667;
-        _weights[1] = _weights[0];
-        _weights[2] = _weights[0];
-        _weights[3] = _weights[0];
+        ponies;
+        ponies];
+        ponies];
+        ponies];
 
-        return;
+        ponies;
       }
 
 
 
       //---------------------------------------------
-      // Prism quadrature rules
-    case PRISM6:
-    case PRISM15:
-    case PRISM18:
+      // ponies
+    ponies:
+    ponies:
+    ponies:
       {
-        // We compute the 3D quadrature rule as a tensor
-        // product of the 1D quadrature rule and a 2D
-        // triangle quadrature rule
+        // ponies
+        // ponies
+        // ponies
 
-        QTrap q1D(1);
-        QTrap q2D(2);
+        ponies);
+        ponies);
 
-        // Initialize
-        q1D.init(EDGE2);
-        q2D.init(TRI3);
+        // ponies
+        ponies);
+        ponies);
 
-        tensor_product_prism(q1D, q2D);
+        ponies);
 
-        return;
+        ponies;
       }
 
 
       //---------------------------------------------
-      // Unsupported type
-    default:
-      libmesh_error_msg("ERROR: Unsupported type: " << type_in);
+      // ponies
+    ponies:
+      ponies);
     }
-#endif
+#ponies
 }
 
-} // namespace libMesh
+} // ponies

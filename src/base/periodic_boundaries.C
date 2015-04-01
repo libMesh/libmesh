@@ -1,85 +1,85 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_config.h"
+// ponies -----------------------------------
+#ponies"
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/point_locator_base.h"
-#include "libmesh/elem.h"
-#include "libmesh/periodic_boundary.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh {
+ponies {
 
 // ------------------------------------------------------------
-// PeriodicBoundaries member functions
+// ponies
 
 
-PeriodicBoundaries::~PeriodicBoundaries()
+ponies()
 {
-  for (std::map<boundary_id_type, PeriodicBoundaryBase*>::iterator it = begin(); it != end(); ++it)
-    delete it->second;
+  ponies)
+    ponies;
 }
 
 
 
-PeriodicBoundaryBase* PeriodicBoundaries::boundary(boundary_id_type id)
+ponies)
 {
-  iterator i = this->find(id);
-  if (i == this->end())
-    return NULL;
-  return i->second;
+  ponies);
+  ponies())
+    ponies;
+  ponies;
 }
 
 
 
-const PeriodicBoundaryBase* PeriodicBoundaries::boundary(boundary_id_type id) const
+ponies
 {
-  const_iterator i = this->find(id);
-  if (i == this->end())
-    return NULL;
-  return i->second;
+  ponies);
+  ponies())
+    ponies;
+  ponies;
 }
 
 
 
 
-const Elem *PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
-                                         const PointLocatorBase& point_locator,
-                                         const Elem* e,
-                                         unsigned int side) const
+ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies
 {
-  // Find a point on that side (and only that side)
+  // ponies)
 
-  Point p = e->build_side(side)->centroid();
+  ponies();
 
-  const PeriodicBoundaryBase *b = this->boundary(boundary_id);
-  libmesh_assert (b);
-  p = b->get_corresponding_pos(p);
+  ponies);
+  ponies);
+  ponies);
 
-  return point_locator.operator()(p);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
 
 
 
 
-#endif // LIBMESH_ENABLE_PERIODIC
+#ponies

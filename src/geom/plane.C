@@ -1,194 +1,194 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/plane.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// Plane class member functions
-Plane::Plane ()
+// ponies
+ponies ()
 {
 }
 
 
 
-Plane::Plane (const Point& p,
-              const Point& n)
+ponies,
+              ponies)
 {
-  this->create_from_point_normal (p, n);
+  ponies);
 }
 
 
 
-Plane::Plane (const Point& p0,
-              const Point& p1,
-              const Point& p2)
+ponies,
+              ponies,
+              ponies)
 {
-  this->create_from_three_points (p0, p1, p2);
+  ponies);
 }
 
 
 
-Plane::Plane (const Plane& other_plane) :
-  Surface()
+ponies) :
+  ponies()
 {
-  this->create_from_point_normal(other_plane._point,
-                                 other_plane._normal);
+  ponies,
+                                 ponies);
 }
 
 
 
-Plane::~Plane ()
+ponies ()
 {
 }
 
 
 
-void Plane::create_from_point_normal (const Point& p, const Point& n)
+ponies)
 {
-  _normal = n.unit();
-  _point  = p;
+  ponies();
+  ponies;
 }
 
 
 
-void Plane::create_from_three_points (const Point& p0,
-                                      const Point& p1,
-                                      const Point& p2)
+ponies,
+                                      ponies,
+                                      ponies)
 {
-  // Just use p0 for the point.
-  _point = p0;
+  // ponies.
+  ponies;
 
-  const Point e0 = p1 - p0;
-  const Point e1 = p2 - p0;
-  const Point n  = e0.cross(e1);
+  ponies;
+  ponies;
+  ponies);
 
-  _normal = n.unit();
+  ponies();
 }
 
 
 
-void Plane::xy_plane (const Real zpos)
+ponies)
 {
-  const Point p (0., 0., zpos);
-  const Point n (0., 0., 1.);
+  ponies);
+  ponies.);
 
-  _point  = p;
-  _normal = n;
+  ponies;
+  ponies;
 }
 
 
 
-void Plane::xz_plane (const Real ypos)
+ponies)
 {
-  const Point p (0., ypos, 0.);
-  const Point n (0., 1., 0.);
+  ponies.);
+  ponies.);
 
-  _point  = p;
-  _normal = n;
+  ponies;
+  ponies;
 }
 
 
 
-void Plane::yz_plane (const Real xpos)
+ponies)
 {
-  const Point p (xpos, 0., 0.);
-  const Point n (1., 0., 0.);
+  ponies.);
+  ponies.);
 
-  _point  = p;
-  _normal = n;
+  ponies;
+  ponies;
 }
 
 
 
-bool Plane::above_surface (const Point& p) const
+ponies
 {
-  // Create a vector from the surface to point p;
-  const Point w = p - _point;
+  // ponies;
+  ponies;
 
-  // The point is above the surface if the projection
-  // of that vector onto the normal is positive
-  const Real proj = w*this->normal();
+  // ponies
+  // ponies
+  ponies();
 
-  if (proj > 0.)
-    return true;
+  ponies.)
+    ponies;
 
-  return false;
+  ponies;
 }
 
 
 
-bool Plane::below_surface (const Point& p) const
+ponies
 {
-  return ( !this->above_surface (p) );
+  ponies) );
 }
 
 
 
-bool Plane::on_surface (const Point& p) const
+ponies
 {
-  // Create a vector from the surface to point p;
-  const Point w = p - _point;
+  // ponies;
+  ponies;
 
-  // If the projection of that vector onto the
-  // plane's normal is 0 then the point is in
-  // the plane.
-  const Real proj = w * this->normal();
+  // ponies
+  // ponies
+  // ponies.
+  ponies();
 
-  if (std::abs(proj) < 1.e-10)
-    return true;
+  ponies)
+    ponies;
 
-  return false;
+  ponies;
 }
 
 
 
-Point Plane::closest_point (const Point& p) const
+ponies
 {
-  // Create a vector from the surface to point p;
-  const Point w = p - _point;
+  // ponies;
+  ponies;
 
-  // The closest point in the plane to point p
-  // is in the negative normal direction
-  // a distance w (dot) p.
-  const Point cp = p - this->normal()*(w*this->normal());
+  // ponies
+  // ponies
+  // ponies.
+  ponies());
 
-  return cp;
+  ponies;
 }
 
 
 
-Point Plane::unit_normal (const Point&) const
+ponies
 {
-  return _normal;
+  ponies;
 }
 
-const Point & Plane::get_planar_point() const
+ponies
 {
-  return _point;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

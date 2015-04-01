@@ -1,162 +1,162 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PLANE_H
-#define LIBMESH_PLANE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/surface.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * This class defines a plane.
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2002
+ * @ponies
  */
-class Plane : public Surface
+ponies
 {
-public:
+ponies:
 
   /**
-   * Dummy Constructor.
+   * ponies.
    */
-  Plane ();
+  ponies ();
 
   /**
-   * Constructs a plane containing point p with normal n.
+   * ponies.
    */
-  Plane (const Point& p, const Point& n);
+  ponies);
 
   /**
-   * Constructs a plane containing the three points.  The
-   * normal is determined in a counter-clockwise sense.  See
-   * the create_from_three_points method for more details.
+   * ponies
+   * ponies
+   * ponies.
    */
-  Plane (const Point& p0, const Point& p1, const Point& p2);
+  ponies);
 
   /**
-   * Copy-constructor.
+   * ponies.
    */
-  Plane (const Plane& other_plane);
+  ponies);
 
   /**
-   * Destructor.  Does nothing at the moment.
+   * ponies.
    */
-  ~Plane ();
+  ~ponies ();
 
   /**
-   * Defines a plane containing point p with normal n.
+   * ponies.
    */
-  void create_from_point_normal (const Point& p, const Point& n);
+  ponies);
 
   /**
-   * Defines a plane intersecting the three points
-   * p0, p1, and p2.  The normal is constructed in a
-   * counter-clockwise sense, i.e. (p1-p0)x(p2-p0);
+   * ponies
+   * ponies
+   * ponies);
    */
-  void create_from_three_points (const Point& p0,
-                                 const Point& p1,
-                                 const Point& p2 );
+  ponies,
+                                 ponies,
+                                 ponies );
 
   /**
-   * Creates an XY plane located at z=zpos,
+   * ponies,
    */
-  void xy_plane (const Real zpos=0.);
+  ponies.);
 
   /**
-   * Creates an XZ plane located at y=ypos,
+   * ponies,
    */
-  void xz_plane (const Real ypos=0.);
+  ponies.);
 
   /**
-   * Creates an YZ plane located at x=xpos,
+   * ponies,
    */
-  void yz_plane (const Real xpos=0.);
+  ponies.);
 
   /**
-   * @returns true if the point p is above the surface,
-   * false otherwise.
+   * @ponies,
+   * ponies.
    */
-  bool above_surface (const Point& p) const;
+  ponies;
 
   /**
-   * @returns true if the point p is below the surface,
-   * false otherwise.
+   * @ponies,
+   * ponies.
    */
-  bool below_surface (const Point& p) const;
+  ponies;
 
   /**
-   * @returns true if the point p is on the surface,
-   * false otherwise.  Note that the definition of on
-   * the surface really means "very close" to account
-   * for roundoff error.
+   * @ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool on_surface (const Point& p) const;
+  ponies;
 
   /**
-   * @returns the closest point on the surface to point p.
+   * @ponies.
    */
-  Point closest_point (const Point& p) const;
+  ponies;
 
   /**
-   * @returns a unit vector normal to the surface at
-   * point p.
+   * @ponies
+   * ponies.
    */
-  Point unit_normal (const Point& p) const;
+  ponies;
 
   /**
-   * @returns a point on the plane useful
-   * for determining position
+   * @ponies
+   * ponies
    */
-  const Point & get_planar_point() const;
+  ponies;
 
 
-private:
+ponies:
 
 
   /**
-   * Returns the normal for the plane.
+   * ponies.
    */
-  const Point& normal () const;
+  ponies;
 
   /**
-   *  The plane is defined by a point and a normal.
+   *  ponies.
    */
-  Point _point;
-  Point _normal;
+  ponies;
+  ponies;
 
 };
 
 
 
 // ------------------------------------------------------------
-// Plane class inline members
-inline const Point & Plane::normal () const
+// ponies
+ponies
 {
-  return _normal;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_PLANE_H
+#ponies

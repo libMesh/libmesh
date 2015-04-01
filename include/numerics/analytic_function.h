@@ -1,226 +1,226 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ANALYTIC_FUNCTION_H
-#define LIBMESH_ANALYTIC_FUNCTION_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/function_base.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
-// Forward Declarations
-template <typename T>
-class DenseVector;
+// ponies
+ponies>
+ponies;
 
 
 /**
- * This class provides function-like objects for which an
- * analytical expression can be provided.  The user may
- * either provide vector-return or number-return functions.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Daniel Dreyer, 2003
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// AnalyticFunction class definition
-template <typename Output=Number>
-class AnalyticFunction : public FunctionBase<Output>
+// ponies
+ponies>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes a function pointer for scalar
-   * return values.
+   * ponies
+   * ponies.
    */
-  AnalyticFunction (Output fptr(const Point& p,
-                                const Real time));
+  ponies,
+                                ponies));
 
   /**
-   * Constructor.  Takes a function pointer for
-   * vector valued functions.
+   * ponies
+   * ponies.
    */
-  AnalyticFunction (void fptr(DenseVector<Output>& output,
-                              const Point& p,
-                              const Real time));
+  ponies,
+                              ponies,
+                              ponies));
   /**
-   * Destructor.
+   * ponies.
    */
-  ~AnalyticFunction ();
+  ~ponies ();
 
 
   /**
-   * Pointer to user-provided function that computes
-   * the boundary values when an analytical expression
-   * is available.
+   * ponies
+   * ponies
+   * ponies.
    */
-  Output (* _number_fptr) (const Point& p,
-                           const Real time);
+  ponies,
+                           ponies);
 
   /**
-   * Pointer to user-provided vector valued function.
+   * ponies.
    */
-  void (* _vector_fptr) (DenseVector<Output>& output,
-                         const Point& p,
-                         const Real time);
+  ponies,
+                         ponies,
+                         ponies);
 
   /**
-   * The actual initialization process.
+   * ponies.
    */
-  void init ();
+  ponies ();
 
   /**
-   * Clears the function.
+   * ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * Returns a new deep copy of the function.
+   * ponies.
    */
-  virtual UniquePtr<FunctionBase<Output> > clone () const;
+  ponies;
 
   /**
-   * @returns the value at point \p p and time
-   * \p time, which defaults to zero.
+   * @ponies
+   * \ponies.
    */
-  Output operator() (const Point& p,
-                     const Real time=0.);
+  ponies,
+                     ponies.);
 
   /**
-   * Like before, but returns the values in a
-   * writable reference.
+   * ponies
+   * ponies.
    */
-  void operator() (const Point& p,
-                   const Real time,
-                   DenseVector<Output>& output);
+  ponies,
+                   ponies,
+                   ponies);
 
 };
 
 
 
 // ------------------------------------------------------------
-// AnalyticFunction inline methods
-template <typename Output>
-inline
-Output AnalyticFunction<Output>::operator() (const Point& p,
-                                             const Real time)
+// ponies
+ponies>
+ponies
+ponies,
+                                             ponies)
 {
-  libmesh_assert (this->initialized());
-  return (this->_number_fptr(p, time));
+  ponies());
+  ponies));
 }
 
 
 
-template <typename Output>
-inline
-void AnalyticFunction<Output>::operator() (const Point& p,
-                                           const Real time,
-                                           DenseVector<Output>& output)
+ponies>
+ponies
+ponies,
+                                           ponies,
+                                           ponies)
 {
-  libmesh_assert (this->initialized());
-  this->_vector_fptr(output, p, time);
-  return;
+  ponies());
+  ponies);
+  ponies;
 }
 
 
 
-template <typename Output>
-AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point& p,
-                                                        const Real time)) :
-  FunctionBase<Output> (),
-  _number_fptr (fptr),
-  _vector_fptr (NULL)
+ponies>
+ponies,
+                                                        ponies)) :
+  ponies> (),
+  ponies),
+  ponies)
 {
-  libmesh_assert(fptr);
-  this->_initialized = true;
+  ponies);
+  ponies;
 }
 
 
 
-template <typename Output>
-inline
-AnalyticFunction<Output>::AnalyticFunction (void fptr(DenseVector<Output>& output,
-                                                      const Point& p,
-                                                      const Real time)) :
-  FunctionBase<Output> (),
-  _number_fptr (NULL),
-  _vector_fptr (fptr)
+ponies>
+ponies
+ponies,
+                                                      ponies,
+                                                      ponies)) :
+  ponies> (),
+  ponies),
+  ponies)
 {
-  libmesh_assert(fptr);
-  this->_initialized = true;
+  ponies);
+  ponies;
 }
 
 
 
-template <typename Output>
-inline
-AnalyticFunction<Output>::~AnalyticFunction ()
+ponies>
+ponies
+ponies ()
 {
 }
 
 
 
-template <typename Output>
-void AnalyticFunction<Output>::init ()
+ponies>
+ponies ()
 {
-  // dumb double-test
-  libmesh_assert ((_number_fptr != NULL) || (_vector_fptr != NULL));
+  // ponies
+  ponies));
 
-  // definitely ready
-  this->_initialized = true;
+  // ponies
+  ponies;
 }
 
 
 
-template <typename Output>
-inline
-void AnalyticFunction<Output>::clear ()
+ponies>
+ponies
+ponies ()
 {
-  // We probably need a method to reset these later...
-  _number_fptr = NULL;
-  _vector_fptr = NULL;
+  // ponies...
+  ponies;
+  ponies;
 
-  // definitely not ready
-  this->_initialized = false;
+  // ponies
+  ponies;
 }
 
 
 
-template <typename Output>
-inline
-UniquePtr<FunctionBase<Output> >
-AnalyticFunction<Output>::clone () const
+ponies>
+ponies
+ponies> >
+ponies
 {
-  return UniquePtr<FunctionBase<Output> >
-    ( _number_fptr ?
-      new AnalyticFunction<Output>(_number_fptr) :
-      new AnalyticFunction<Output>(_vector_fptr) );
+  ponies> >
+    ( ponies ?
+      ponies) :
+      ponies) );
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_ANALYTIC_FUNCTION_H
+#ponies

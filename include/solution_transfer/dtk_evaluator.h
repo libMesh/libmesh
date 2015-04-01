@@ -1,69 +1,69 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef DTKEVALUATOR_H
-#define DTKEVALUATOR_H
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_DTK
+#ponies
+#ponies
 
-#include "libmesh/equation_systems.h"
-#include "libmesh/mesh.h"
-#include "libmesh/system.h"
 
-#include <DTK_MeshContainer.hpp>
-#include <DTK_FieldEvaluator.hpp>
-#include <DTK_FieldContainer.hpp>
+#ponies"
 
-#include <Teuchos_RCP.hpp>
-#include <Teuchos_ArrayRCP.hpp>
+#ponies
 
-#include <string>
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh {
+#ponies>
+#ponies>
+#ponies>
 
-class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
+#ponies>
+#ponies>
+
+#ponies>
+
+ponies {
+
+ponies> >
 {
-public:
-  typedef DataTransferKit::MeshContainer<int>      MeshContainerType;
-  typedef DataTransferKit::FieldContainer<Number>     FieldContainerType;
+ponies:
+  ponies;
+  ponies;
 
-  DTKEvaluator(System & in_sys, std::string var_name);
+  ponies);
 
-  FieldContainerType evaluate( const Teuchos::ArrayRCP<int>& elements,
-                               const Teuchos::ArrayRCP<double>& coords );
+  ponies,
+                               ponies );
 
-protected:
-  System & sys;
-  NumericVector<Number> & current_local_solution;
-  EquationSystems & es;
-  MeshBase & mesh;
-  unsigned int dim;
-  DofMap & dof_map;
-  unsigned int var_num;
-  const FEType& fe_type;
+ponies:
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#ponies
 
-#endif // #define DTKEVALUATOR_H
+#ponies

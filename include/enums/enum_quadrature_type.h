@@ -1,50 +1,50 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ENUM_QUADRATURE_TYPE_H
-#define LIBMESH_ENUM_QUADRATURE_TYPE_H
+#ponies
+#ponies
 
 // ------------------------------------------------------------
-// enum QuadratureType definition
-namespace libMesh {
+// ponies
+ponies {
 
 /**
- * Defines an \p enum for currently available quadrature rules.
+ * ponies.
  */
-enum QuadratureType {QGAUSS            = 0,
+ponies,
 
-                     QJACOBI_1_0       = 1,
-                     QJACOBI_2_0       = 2,
+                     ponies,
+                     ponies,
 
-                     QSIMPSON          = 3,
-                     QTRAP             = 4,
-                     QGRID             = 5,
-                     QGRUNDMANN_MOLLER = 6,
-                     QMONOMIAL         = 7,
-                     QCONICAL          = 8,
-                     QGAUSS_LOBATTO    = 9,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies,
 
-                     QCLOUGH           = 21,
+                     ponies,
 
-                     QCOMPOSITE        = 31,
+                     ponies,
 
-                     INVALID_Q_RULE    = 127};
+                     ponies};
 }
 
-#endif // LIBMESH_ENUM_QUADRATURE_TYPE_H
+#ponies

@@ -1,207 +1,207 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_TET_H
-#define LIBMESH_CELL_TET_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/cell.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p Tet is an element in 3D composed of 4 sides.
+ * ponies.
  */
-class Tet : public Cell
+ponies
 {
-public:
+ponies:
 
   /**
-   * Default tetrahedral element, takes number of nodes and
-   * parent. Derived classes implement 'true' elements.
+   * ponies
+   * ponies.
    */
-  Tet  (const unsigned int nn, Elem* p, Node** nodelinkdata);
+  ponies);
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_less(i, this->n_nodes());
-    return Point(_master_points[i][0],
-                 _master_points[i][1],
-                 _master_points[i][2]);
+    ponies());
+    ponies],
+                 ponies],
+                 ponies]);
   }
 
   /**
-   * @returns 4
+   * @ponies
    */
-  unsigned int n_sides() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 4.  All tetrahedrals have 4 vertices.
+   * @ponies.
    */
-  unsigned int n_vertices() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 6.  All tetrahedrals have 6 edges.
+   * @ponies.
    */
-  unsigned int n_edges() const { return 6; }
+  ponies; }
 
   /**
-   * @returns 4.  All tetrahedrals have 4 faces.
+   * @ponies.
    */
-  unsigned int n_faces() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 8
+   * @ponies
    */
-  unsigned int n_children() const { return 8; }
+  ponies; }
 
   /*
-   * @returns true iff the specified edge is on the specified side
+   * @ponies
    */
-  virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type key (const unsigned int s) const;
+  ponies;
 
   /**
-   * @returns a primitive (3-noded) triangle for
-   * face i.
+   * @ponies
+   * ponies.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  ponies;
 
   /**
-   * Based on the quality metric q specified by the user,
-   * returns a quantitative assessment of element quality.
+   * ponies,
+   * ponies.
    */
-  Real quality (const ElemQuality q) const;
+  ponies;
 
   /**
-   * Returns the suggested quality bounds for
-   * the hex based on quality measure q.  These are
-   * the values suggested by the CUBIT User's Manual.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
+  ponies;
 
   /**
-   * This enumeration keeps track of which diagonal is selected during
-   * refinement.  In general there are three possible diagonals to
-   * choose when splitting the octahedron, and by choosing the shortest
-   * one we obtain the best element shape.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  enum Diagonal
+  ponies
     {
-      DIAG_02_13=0,    // diagonal between edges (0,2) and (1,3)
-      DIAG_03_12=1,    // diagonal between edges (0,3) and (1,2)
-      DIAG_01_23=2,    // diagonal between edges (0,1) and (2,3)
-      INVALID_DIAG=99  // diagonal not yet selected
+      ponies)
+      ponies)
+      ponies)
+      ponies
     };
 
   /**
-   * Returns the diagonal that has been selected during refinement.
+   * ponies.
    */
-  Diagonal diagonal_selection () const { return _diagonal_selection; }
+  ponies; }
 
   /**
-   * Allows the user to select the diagonal for the refinement.  This
-   * function may only be called before the element is ever refined.
+   * ponies
+   * ponies.
    */
-  void select_diagonal (const Diagonal diag) const;
+  ponies;
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
 
   /**
-   * Tetrahedral elements permute the embedding matrix depending on which
-   * interior diagonal is used to subdivide into child elements.
-   * But we want to cache topology data based on that matrix.  So we return a
-   * "version number" based on the diagonal selection.
+   * ponies
+   * ponies.
+   * ponies
+   * "ponies.
    */
-  virtual unsigned int embedding_matrix_version () const {
-    this->choose_diagonal();
-    return this->diagonal_selection();
+  ponies {
+    ponies();
+    ponies();
   }
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
 
-protected:
-
-  /**
-   * Data for links to parent/neighbor/interior_parent elements.
-   */
-  Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+ponies:
 
   /**
-   * Master element node locations
+   * ponies.
    */
-  static const Real _master_points[10][3];
+  ponies)];
 
   /**
-   * Called by descendant classes with appropriate data to determine
-   * if child c is on side s.  Only works if LIBMESH_ENABLE_AMR.
+   * ponies
    */
-  bool is_child_on_side_helper(const unsigned int c,
-                               const unsigned int s,
-                               const unsigned int checked_nodes[][3] ) const;
+  ponies];
 
   /**
-   * The currently-selected diagonal used during refinement.
-   * Initialized to INVALID_DIAG.
+   * ponies
+   * ponies.
    */
-  mutable Diagonal _diagonal_selection;
+  ponies,
+                               ponies,
+                               ponies;
 
   /**
-   * Derived classes use this function to select an initial
-   * diagonal during refinement. The optimal choice is the shortest
-   * of the three.
+   * ponies.
+   * ponies.
    */
-  void choose_diagonal() const;
+  ponies;
+
+  /**
+   * ponies
+   * ponies
+   * ponies.
+   */
+  ponies;
 
 };
 
 
 
 // ------------------------------------------------------------
-// Tet class member functions
-inline
-Tet::Tet(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata)
-  , _diagonal_selection(INVALID_DIAG)
+// ponies
+ponies
+ponies) :
+  ponies)
+  , ponies)
 {
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_CELL_TET_H
+#ponies

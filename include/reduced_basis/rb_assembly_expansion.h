@@ -1,196 +1,196 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_ASSEMBLY_EXPANSION_H
-#define LIBMESH_RB_ASSEMBLY_EXPANSION_H
+#ponies
+#ponies
 
-// libMesh includes
-#include "libmesh/elem_assembly.h"
-#include "libmesh/reference_counted_object.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class stores the set of ElemAssembly functor objects that define
- * the "parameter-independent expansion" of a PDE.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// RBAssemblyExpansion class definition
-class RBAssemblyExpansion : public ReferenceCountedObject<RBAssemblyExpansion>
+// ponies
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  RBAssemblyExpansion();
+  ponies();
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBAssemblyExpansion() {}
+  ponies() {}
 
   /**
-   * Perform the specified A interior assembly.
+   * ponies.
    */
-  void perform_A_interior_assembly(unsigned int q,
-                                   FEMContext& context);
+  ponies,
+                                   ponies);
 
   /**
-   * Perform the specified A boundary assembly.
+   * ponies.
    */
-  void perform_A_boundary_assembly(unsigned int q,
-                                   FEMContext& context);
+  ponies,
+                                   ponies);
 
   /**
-   * Perform the specified F interior assembly.
+   * ponies.
    */
-  void perform_F_interior_assembly(unsigned int q,
-                                   FEMContext& context);
+  ponies,
+                                   ponies);
 
   /**
-   * Perform the specified F boundary assembly.
+   * ponies.
    */
-  void perform_F_boundary_assembly(unsigned int q,
-                                   FEMContext& context);
+  ponies,
+                                   ponies);
 
   /**
-   * Perform the specified output assembly.
+   * ponies.
    */
-  void perform_output_interior_assembly(unsigned int output_index,
-                                        unsigned int q_l,
-                                        FEMContext& context);
+  ponies,
+                                        ponies,
+                                        ponies);
 
   /**
-   * Perform the specified output assembly.
+   * ponies.
    */
-  void perform_output_boundary_assembly(unsigned int output_index,
-                                        unsigned int q_l,
-                                        FEMContext& context);
+  ponies,
+                                        ponies,
+                                        ponies);
 
   /**
-   * Get Q_a, the number of terms in the affine
-   * expansion for the bilinear form.
+   * ponies
+   * ponies.
    */
-  unsigned int get_n_A_terms() const;
+  ponies;
 
   /**
-   * Get Q_f, the number of terms in the affine
-   * expansion for the right-hand side.
+   * ponies
+   * ponies.
    */
-  unsigned int get_n_F_terms() const;
+  ponies;
 
   /**
-   * Get n_outputs, the number output functionals.
+   * ponies.
    */
-  unsigned int get_n_outputs() const;
+  ponies;
 
   /**
-   * Get the number of affine terms associated with the specified output.
+   * ponies.
    */
-  unsigned int get_n_output_terms(unsigned int output_index) const;
+  ponies;
 
   /**
-   * Attach ElemAssembly object for the left-hand side
-   * (both interior and boundary assembly).
+   * ponies
+   * (ponies).
    */
-  void attach_A_assembly(ElemAssembly* Aq_assembly);
+  ponies);
 
   /**
-   * Attach multiple ElemAssembly objects for the left-hand side
-   * (both interior and boundary assembly).
+   * ponies
+   * (ponies).
    */
-  void attach_multiple_A_assembly(std::vector<ElemAssembly*> Aq_assembly);
+  ponies);
 
   /**
-   * Attach ElemAssembly object for the right-hand side
-   * (both interior and boundary assembly).
+   * ponies
+   * (ponies).
    */
-  void attach_F_assembly(ElemAssembly* Fq_assembly);
+  ponies);
 
   /**
-   * Attach multiple ElemAssembly objects for the right-hand side
-   * (both interior and boundary assembly).
+   * ponies
+   * (ponies).
    */
-  void attach_multiple_F_assembly(std::vector<ElemAssembly*> Fq_assembly);
+  ponies);
 
   /**
-   * Attach ElemAssembly object for an output
-   * (both interior and boundary assembly).
-   * In this case we pass in vector arguments to allow for Q_l > 1.
+   * ponies
+   * (ponies).
+   * ponies.
    */
-  virtual void attach_output_assembly(std::vector<ElemAssembly*> output_assembly);
+  ponies);
 
   /**
-   * Attach ElemAssembly object for an output
-   * (both interior and boundary assembly).
-   * This function provides simpler syntax in the case that Q_l = 1; we
-   * do not need to use a vector in this case.
+   * ponies
+   * (ponies).
+   * ponies
+   * ponies.
    */
-  virtual void attach_output_assembly(ElemAssembly* output_assembly);
+  ponies);
 
   /**
-   * Return a reference to the specified A_assembly object.
+   * ponies.
    */
-  ElemAssembly& get_A_assembly(unsigned int q);
+  ponies);
 
   /**
-   * Return a reference to the specified F_assembly object.
+   * ponies.
    */
-  ElemAssembly& get_F_assembly(unsigned int q);
+  ponies);
 
   /**
-   * Return a reference to the specified output assembly object.
+   * ponies.
    */
-  ElemAssembly& get_output_assembly(unsigned int output_index, unsigned int q_l);
+  ponies);
 
-private:
-
-  /**
-   * Vectors storing the function pointers to the assembly
-   * routines for the affine operators, both interior and boundary
-   * assembly.
-   */
-  std::vector<ElemAssembly*> _A_assembly_vector;
+ponies:
 
   /**
-   * Vector storing the function pointers to the assembly
-   * routines for the rhs affine vectors.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<ElemAssembly*> _F_assembly_vector;
+  ponies;
 
   /**
-   * Vector storing the function pointers to the assembly
-   * routines for the outputs. Element interior part.
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector<ElemAssembly*> > _output_assembly_vector;
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_RB_ASSEMBLY_EXPANSION_H
+#ponies

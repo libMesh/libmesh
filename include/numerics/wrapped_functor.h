@@ -1,104 +1,104 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_WRAPPED_FUNCTOR_H
-#define LIBMESH_WRAPPED_FUNCTOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/fem_function_base.h"
-#include "libmesh/function_base.h"
-#include "libmesh/point.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * This class provides a wrapper with which to evaluate a
- * (libMesh-style) function pointer in a FunctionBase-compatible
- * interface.
+ * ponies
+ * (ponies
+ * ponies.
  *
- * @author Roy Stogner, 2015
+ * @ponies
  */
 
 
 // ------------------------------------------------------------
-// WrappedFunctor class definition
-template <typename Output=Number>
-class WrappedFunctor : public FEMFunctionBase<Output>
+// ponies
+ponies>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor to wrap FunctionBase functors in a FEMFunctionBase
-   * compatible shim
+   * ponies
+   * ponies
    */
-  WrappedFunctor (const FunctionBase<Output>& func)
-    : _func(func.clone())
+  ponies)
+    : ponies())
   { }
 
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
+  ponies
   {
-    return UniquePtr<FEMFunctionBase<Output> >
-      (new WrappedFunctor<Output> (*_func));
+    ponies> >
+      (ponies));
   }
 
   /**
-   * @returns the scalar value of variable varnum at coordinate \p p
-   * and time \p time.
+   * @ponies
+   * ponies.
    */
-  virtual Output operator() (const FEMContext&,
-                             const Point& p,
-                             const Real time = 0.)
-  { return _func->operator()(p, time); }
+  ponies&,
+                             ponies,
+                             ponies.)
+  { ponies); }
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of all system variables at the
-   * coordinate \p p and for time \p time.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void operator() (const FEMContext&,
-                           const Point& p,
-                           const Real time,
-                           DenseVector<Output>& output)
-  { _func->operator() (p, time, output); }
+  ponies&,
+                           ponies,
+                           ponies,
+                           ponies)
+  { ponies); }
 
   /**
-   * @returns the vector component \p i at coordinate
-   * \p p and time \p time.
+   * @ponies
+   * \ponies.
    */
-  virtual Output component (const FEMContext&,
-                            unsigned int i,
-                            const Point& p,
-                            Real time=0.)
-  { return _func->component(i, p, time); }
+  ponies&,
+                            ponies,
+                            ponies,
+                            ponies.)
+  { ponies); }
 
-protected:
+ponies:
 
-  UniquePtr<FunctionBase<Output> > _func;
+  ponies;
 };
 
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_WRAPPED_FUNCTOR_H
+#ponies

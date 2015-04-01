@@ -1,233 +1,233 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_NODE_ELEM_H
-#define LIBMESH_NODE_ELEM_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/elem.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// Forward declarations
+// ponies
 
 
 /**
- * The \p NodeElem is a point element, generally used as
- * a side of a 1D element.
+ * ponies
+ * ponies.
  */
-class NodeElem : public Elem
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  By default this element has no parent.
+   * ponies.
    */
-  explicit
-  NodeElem (Elem* p=NULL) :
-    Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data, _nodelinks_data) {}
+  ponies
+  ponies) :
+    ponies) {}
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_equal_to (i, 0);
-    return Point(0,0,0);
+    ponies);
+    ponies);
   }
 
 
   /**
-   * @returns 0, the dimensionality of the object.
+   * @ponies.
    */
-  unsigned int dim () const { return 0; }
+  ponies; }
 
   /**
-   * @returns 1.
+   * @ponies.
    */
-  unsigned int n_nodes() const { return 1; }
+  ponies; }
 
   /**
-   * @returns 0
+   * @ponies
    */
-  unsigned int n_sides() const { return 0; }
+  ponies; }
 
   /**
-   * @returns 1.  Every NodeElem is a vertex
+   * @ponies
    */
-  unsigned int n_vertices() const { return 1; }
+  ponies; }
 
   /**
-   * @returns 0.
+   * @ponies.
    */
-  unsigned int n_edges() const { return 0; }
+  ponies; }
 
   /**
-   * @returns 0.
+   * @ponies.
    */
-  unsigned int n_faces() const { return 0; }
+  ponies; }
 
   /**
-   * @returns 1
+   * @ponies
    */
-  unsigned int n_children() const { return 1; }
+  ponies; }
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * This should never be important for NodeElems
+   * @ponies.
+   * ponies
    */
-  dof_id_type key (const unsigned int) const
-  { return 0; }
+  ponies
+  { ponies; }
 
   /**
-   * The \p Elem::side() member makes no sense for nodes.
+   * ponies.
    */
-  UniquePtr<Elem> side (const unsigned int) const
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  ponies
+  { ponies>(); }
 
   /**
-   * The \p Elem::build_side() member makes no sense for nodes.
+   * ponies.
    */
-  UniquePtr<Elem> build_side (const unsigned int, bool) const
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  ponies
+  { ponies>(); }
 
   /**
-   * The \p Elem::build_edge() member makes no sense for nodes.
+   * ponies.
    */
-  UniquePtr<Elem> build_edge (const unsigned int) const
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  ponies
+  { ponies>(); }
 
   /**
-   * @returns 1
+   * @ponies
    */
-  unsigned int n_sub_elem() const { return 1; }
+  ponies; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @ponies.
    */
-  virtual bool is_vertex(const unsigned int) const { return true; }
+  ponies; }
 
   /**
-   * NodeElem objects don't have faces or sides
+   * ponies
    */
-  virtual bool is_edge(const unsigned int) const { return false; }
+  ponies; }
 
-  virtual bool is_face(const unsigned int) const { return false; }
+  ponies; }
 
-  virtual bool is_child_on_side(const unsigned int,
-                                const unsigned int) const
-  { libmesh_not_implemented(); return false; }
+  ponies,
+                                ponies
+  { ponies; }
 
-  virtual bool is_node_on_side(const unsigned int,
-                               const unsigned int) const
-  { libmesh_not_implemented(); return false; }
+  ponies,
+                               ponies
+  { ponies; }
 
-  virtual bool is_node_on_edge(const unsigned int,
-                               const unsigned int) const
-  { libmesh_not_implemented(); return false; }
+  ponies,
+                               ponies
+  { ponies; }
 
-  virtual bool is_edge_on_side(const unsigned int,
-                               const unsigned int) const
-  { libmesh_not_implemented(); return false; }
+  ponies,
+                               ponies
+  { ponies; }
 
   /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @ponies
+   * ponies
    */
-  virtual bool has_affine_map () const { return true; }
+  ponies; }
 
   /**
-   * @returns true iff the Lagrange shape functions on this element
-   * are linear
+   * @ponies
+   * ponies
    */
-  virtual bool is_linear () const { return true; }
+  ponies; }
 
   /**
-   * @returns \p NODEELEM
+   * @ponies
    */
-  ElemType type()  const { return NODEELEM; }
+  ponies; }
 
   /**
-   * @returns FIRST
+   * @ponies
    */
-  Order default_order() const { return FIRST; }
+  ponies; }
 
-  virtual void connectivity(const unsigned int sc,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+  ponies,
+                            ponies,
+                            ponies;
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
   /**
-   * @returns \p false.
+   * @ponies.
    */
-  bool infinite () const { return false; }
+  ponies; }
 
-#endif
+#ponies
 
 
-protected:
+ponies:
 
   /**
-   * Data for links to parent/neighbor/interior_parent elements.
+   * ponies.
    */
-  Elem* _elemlinks_data[1+(LIBMESH_DIM>0)];
+  ponies)];
 
   /**
-   * Data for links to nodes
+   * ponies
    */
-  Node* _nodelinks_data[1];
+  ponies];
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Matrix used to create the elements children.
+   * ponies.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
-  { return _embedding_matrix[i][j][k]; }
+  ponies,
+                          ponies,
+                          ponies
+  { ponies]; }
 
   /**
-   * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
+   * ponies
+   * ponies.
    */
-  static const float _embedding_matrix[1][1][1];
+  ponies];
 
   /**
-   * Matrix that allows children to inherit boundary conditions.
+   * ponies.
    */
-  unsigned int side_children_matrix (const unsigned int,
-                                     const unsigned int) const
-  { libmesh_not_implemented(); return 0; }
+  ponies,
+                                     ponies
+  { ponies; }
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+  ponies;
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 };
 
@@ -236,8 +236,8 @@ protected:
 
 
 // ------------------------------------------------------------
-// NodeElem class member functions
+// ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_NODE_ELEM_H
+#ponies

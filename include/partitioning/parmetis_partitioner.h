@@ -1,130 +1,130 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PARMETIS_PARTITIONER_H
-#define LIBMESH_PARMETIS_PARTITIONER_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/id_types.h"
-#include "libmesh/partitioner.h"
-#include "libmesh/vectormap.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <cstddef>
-#include <vector>
+// ponies   -----------------------------------
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class ParmetisHelper;
+// ponies
+ponies;
 
 /**
- * The \p ParmetisPartitioner uses the Parmetis graph partitioner
- * to partition the elements.
+ * ponies
+ * ponies.
  */
-class ParmetisPartitioner : public Partitioner
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  ParmetisPartitioner ();
+  ponies ();
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~ParmetisPartitioner ();
+  ~ponies ();
 
   /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<Partitioner> clone () const
+  ponies
   {
-    return UniquePtr<Partitioner>(new ParmetisPartitioner());
+    ponies());
   }
 
 
-protected:
+ponies:
 
   /**
-   * Parmetis can handle dynamically repartitioning a mesh such
-   * that the redistribution costs are minimized.  This method
-   * takes a previously partitioned domain (which may have
-   * then been adaptively refined) and repartitions it.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void _do_repartition (MeshBase& mesh,
-                                const unsigned int n);
+  ponies,
+                                ponies);
 
   /**
-   * Partition the \p MeshBase into \p n subdomains.
+   * ponies.
    */
-  virtual void _do_partition (MeshBase& mesh,
-                              const unsigned int n);
+  ponies,
+                              ponies);
 
-private:
+ponies:
 
-  // These methods & data only need to be available if the
-  // ParMETIS library is available.
-#ifdef LIBMESH_HAVE_PARMETIS
+  // ponies
+  // ponies.
+#ponies
 
   /**
-   * Initialize data structures.
+   * ponies.
    */
-  void initialize (const MeshBase& mesh, const unsigned int n_sbdmns);
+  ponies);
 
   /**
-   * Build the graph.
+   * ponies.
    */
-  void build_graph (const MeshBase& mesh);
+  ponies);
 
   /**
-   * Assign the computed partitioning to the mesh.
+   * ponies.
    */
-  void assign_partitioning (MeshBase& mesh);
+  ponies);
 
   /**
-   * The number of active elements on each processor.  Note that
-   * ParMETIS requires that each processor have some active elements,
-   * it will abort if any processor passes a NULL _part array.
+   * ponies
+   * ponies,
+   * ponies.
    */
-  std::vector<dof_id_type> _n_active_elem_on_proc;
+  ponies;
 
   /**
-   * Maps active element ids into a contiguous range, as needed by ParMETIS.
+   * ponies.
    */
-  vectormap<dof_id_type, dof_id_type> _global_index_by_pid_map;
+  ponies;
 
   /**
-   * Pointer to the Parmetis-specific data structures.  Lets us avoid
-   * including parmetis.h here.
+   * ponies
+   * ponies.
    */
-  ParmetisHelper* _pmetis;
+  ponies;
 
-#endif
+#ponies
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_PARMETIS_PARTITIONER_H
+#ponies

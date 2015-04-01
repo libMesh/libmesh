@@ -1,1316 +1,1316 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
-template <>
-Real FE<3,MONOMIAL>::shape(const ElemType,
-                           const Order libmesh_dbg_var(order),
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies),
+                           ponies,
+                           ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
-  const Real xi   = p(0);
-  const Real eta  = p(1);
-  const Real zeta = p(2);
+  ponies);
+  ponies);
+  ponies);
 
-  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-                       (static_cast<unsigned int>(order)+2)*
-                       (static_cast<unsigned int>(order)+3)/6);
+  ponies)*
+                       (ponies)*
+                       (ponies);
 
-  // monomials. since they are hierarchic we only need one case block.
-  switch (i)
+  // ponies.
+  ponies)
     {
-      // constant
-    case 0:
-      return 1.;
+      // ponies
+    ponies:
+      ponies.;
 
-      // linears
-    case 1:
-      return xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 2:
-      return eta;
+    ponies:
+      ponies;
 
-    case 3:
-      return zeta;
+    ponies:
+      ponies;
 
-      // quadratics
-    case 4:
-      return xi*xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 5:
-      return xi*eta;
+    ponies:
+      ponies;
 
-    case 6:
-      return eta*eta;
+    ponies:
+      ponies;
 
-    case 7:
-      return xi*zeta;
+    ponies:
+      ponies;
 
-    case 8:
-      return zeta*eta;
+    ponies:
+      ponies;
 
-    case 9:
-      return zeta*zeta;
+    ponies:
+      ponies;
 
-      // cubics
-    case 10:
-      return xi*xi*xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 11:
-      return xi*xi*eta;
+    ponies:
+      ponies;
 
-    case 12:
-      return xi*eta*eta;
+    ponies:
+      ponies;
 
-    case 13:
-      return eta*eta*eta;
+    ponies:
+      ponies;
 
-    case 14:
-      return xi*xi*zeta;
+    ponies:
+      ponies;
 
-    case 15:
-      return xi*eta*zeta;
+    ponies:
+      ponies;
 
-    case 16:
-      return eta*eta*zeta;
+    ponies:
+      ponies;
 
-    case 17:
-      return xi*zeta*zeta;
+    ponies:
+      ponies;
 
-    case 18:
-      return eta*zeta*zeta;
+    ponies:
+      ponies;
 
-    case 19:
-      return zeta*zeta*zeta;
+    ponies:
+      ponies;
 
-      // quartics
-    case 20:
-      return xi*xi*xi*xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 21:
-      return xi*xi*xi*eta;
+    ponies:
+      ponies;
 
-    case 22:
-      return xi*xi*eta*eta;
+    ponies:
+      ponies;
 
-    case 23:
-      return xi*eta*eta*eta;
+    ponies:
+      ponies;
 
-    case 24:
-      return eta*eta*eta*eta;
+    ponies:
+      ponies;
 
-    case 25:
-      return xi*xi*xi*zeta;
+    ponies:
+      ponies;
 
-    case 26:
-      return xi*xi*eta*zeta;
+    ponies:
+      ponies;
 
-    case 27:
-      return xi*eta*eta*zeta;
+    ponies:
+      ponies;
 
-    case 28:
-      return eta*eta*eta*zeta;
+    ponies:
+      ponies;
 
-    case 29:
-      return xi*xi*zeta*zeta;
+    ponies:
+      ponies;
 
-    case 30:
-      return xi*eta*zeta*zeta;
+    ponies:
+      ponies;
 
-    case 31:
-      return eta*eta*zeta*zeta;
+    ponies:
+      ponies;
 
-    case 32:
-      return xi*zeta*zeta*zeta;
+    ponies:
+      ponies;
 
-    case 33:
-      return eta*zeta*zeta*zeta;
+    ponies:
+      ponies;
 
-    case 34:
-      return zeta*zeta*zeta*zeta;
+    ponies:
+      ponies;
 
-    default:
-      unsigned int o = 0;
-      for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-      unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-      unsigned int block=o, nz = 0;
-      for (; block < i2; block += (o-nz+1)) { nz++; }
-      const unsigned int nx = block - i2;
-      const unsigned int ny = o - nx - nz;
-      Real val = 1.;
-      for (unsigned int index=0; index != nx; index++)
-        val *= xi;
-      for (unsigned int index=0; index != ny; index++)
-        val *= eta;
-      for (unsigned int index=0; index != nz; index++)
-        val *= zeta;
-      return val;
+    ponies:
+      ponies;
+      ponies++) { }
+      ponies);
+      ponies;
+      ponies++; }
+      ponies;
+      ponies;
+      ponies.;
+      ponies++)
+        ponies;
+      ponies++)
+        ponies;
+      ponies++)
+        ponies;
+      ponies;
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,MONOMIAL>::shape(const Elem* elem,
-                           const Order order,
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape functions
-  return FE<3,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  // ponies
+  ponies);
 }
 
 
 
-template <>
-Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
-                                 const Order libmesh_dbg_var(order),
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies),
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
-  libmesh_assert_less (j, 3);
+  ponies);
 
-  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-                       (static_cast<unsigned int>(order)+2)*
-                       (static_cast<unsigned int>(order)+3)/6);
+  ponies)*
+                       (ponies)*
+                       (ponies);
 
 
-  const Real xi   = p(0);
-  const Real eta  = p(1);
-  const Real zeta = p(2);
+  ponies);
+  ponies);
+  ponies);
 
-  // monomials. since they are hierarchic we only need one case block.
-  switch (j)
+  // ponies.
+  ponies)
     {
-      // d()/dxi
-    case 0:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linear
-          case 1:
-            return 1.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 2:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 3:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 2.*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 5:
-            return eta;
+          ponies:
+            ponies;
 
-          case 6:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 7:
-            return zeta;
+          ponies:
+            ponies;
 
-          case 8:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 3.*xi*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 11:
-            return 2.*xi*eta;
+          ponies:
+            ponies;
 
-          case 12:
-            return eta*eta;
+          ponies:
+            ponies;
 
-          case 13:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 14:
-            return 2.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 15:
-            return eta*zeta;
+          ponies:
+            ponies;
 
-          case 16:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 17:
-            return zeta*zeta;
+          ponies:
+            ponies;
 
-          case 18:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 19:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 4.*xi*xi*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 21:
-            return 3.*xi*xi*eta;
+          ponies:
+            ponies;
 
-          case 22:
-            return 2.*xi*eta*eta;
+          ponies:
+            ponies;
 
-          case 23:
-            return eta*eta*eta;
+          ponies:
+            ponies;
 
-          case 24:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 25:
-            return 3.*xi*xi*zeta;
+          ponies:
+            ponies;
 
-          case 26:
-            return 2.*xi*eta*zeta;
+          ponies:
+            ponies;
 
-          case 27:
-            return eta*eta*zeta;
+          ponies:
+            ponies;
 
-          case 28:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 29:
-            return 2.*xi*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 30:
-            return eta*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 31:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 32:
-            return zeta*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 33:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 34:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx;
-            for (unsigned int index=1; index < nx; index++)
-              val *= xi;
-            for (unsigned int index=0; index != ny; index++)
-              val *= eta;
-            for (unsigned int index=0; index != nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d()/deta
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linear
-          case 1:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 2:
-            return 1.;
+          ponies:
+            ponies.;
 
-          case 3:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 5:
-            return xi;
+          ponies:
+            ponies;
 
-          case 6:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-          case 7:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 8:
-            return zeta;
+          ponies:
+            ponies;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return xi*xi;
+          ponies:
+            ponies;
 
-          case 12:
-            return 2.*xi*eta;
+          ponies:
+            ponies;
 
-          case 13:
-            return 3.*eta*eta;
+          ponies:
+            ponies;
 
-          case 14:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 15:
-            return xi*zeta;
+          ponies:
+            ponies;
 
-          case 16:
-            return 2.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 17:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 18:
-            return zeta*zeta;
+          ponies:
+            ponies;
 
-          case 19:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 21:
-            return xi*xi*xi;
+          ponies:
+            ponies;
 
-          case 22:
-            return 2.*xi*xi*eta;
+          ponies:
+            ponies;
 
-          case 23:
-            return 3.*xi*eta*eta;
+          ponies:
+            ponies;
 
-          case 24:
-            return 4.*eta*eta*eta;
+          ponies:
+            ponies;
 
-          case 25:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 26:
-            return xi*xi*zeta;
+          ponies:
+            ponies;
 
-          case 27:
-            return 2.*xi*eta*zeta;
+          ponies:
+            ponies;
 
-          case 28:
-            return 3.*eta*eta*zeta;
+          ponies:
+            ponies;
 
-          case 29:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 30:
-            return xi*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 31:
-            return 2.*eta*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 32:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 33:
-            return zeta*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 34:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = ny;
-            for (unsigned int index=0; index != nx; index++)
-              val *= xi;
-            for (unsigned int index=1; index < ny; index++)
-              val *= eta;
-            for (unsigned int index=0; index != nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d()/dzeta
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linear
-          case 1:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 2:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 3:
-            return 1.;
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 5:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 6:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 7:
-            return xi;
+          ponies:
+            ponies;
 
-          case 8:
-            return eta;
+          ponies:
+            ponies;
 
-          case 9:
-            return 2.*zeta;
+          ponies:
+            ponies;
 
-            // cubic
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 12:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 13:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 14:
-            return xi*xi;
+          ponies:
+            ponies;
 
-          case 15:
-            return xi*eta;
+          ponies:
+            ponies;
 
-          case 16:
-            return eta*eta;
+          ponies:
+            ponies;
 
-          case 17:
-            return 2.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 18:
-            return 2.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 19:
-            return 3.*zeta*zeta;
+          ponies:
+            ponies;
 
-            // quartics
-          case 20:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 21:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 22:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 23:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 24:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 25:
-            return xi*xi*xi;
+          ponies:
+            ponies;
 
-          case 26:
-            return xi*xi*eta;
+          ponies:
+            ponies;
 
-          case 27:
-            return xi*eta*eta;
+          ponies:
+            ponies;
 
-          case 28:
-            return eta*eta*eta;
+          ponies:
+            ponies;
 
-          case 29:
-            return 2.*xi*xi*zeta;
+          ponies:
+            ponies;
 
-          case 30:
-            return 2.*xi*eta*zeta;
+          ponies:
+            ponies;
 
-          case 31:
-            return 2.*eta*eta*zeta;
+          ponies:
+            ponies;
 
-          case 32:
-            return 3.*xi*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 33:
-            return 3.*eta*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 34:
-            return 4.*zeta*zeta*zeta;
+          ponies:
+            ponies;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nz;
-            for (unsigned int index=0; index != nx; index++)
-              val *= xi;
-            for (unsigned int index=0; index != ny; index++)
-              val *= eta;
-            for (unsigned int index=1; index < nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid shape function derivative j = " << j);
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,MONOMIAL>::shape_deriv(const Elem* elem,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape function derivatives
-  return FE<3,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
 
 
-template <>
-Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
-                                        const Order libmesh_dbg_var(order),
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies),
+                                        ponies,
+                                        ponies,
+                                        ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
-  libmesh_assert_less (j, 6);
+  ponies);
 
-  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-                       (static_cast<unsigned int>(order)+2)*
-                       (static_cast<unsigned int>(order)+3)/6);
+  ponies)*
+                       (ponies)*
+                       (ponies);
 
-  const Real xi   = p(0);
-  const Real eta  = p(1);
-  const Real zeta = p(2);
+  ponies);
+  ponies);
+  ponies);
 
-  // monomials. since they are hierarchic we only need one case block.
-  switch (j)
+  // ponies.
+  ponies)
     {
-      // d^2()/dxi^2
-    case 0:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 2.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 5:
-          case 6:
-          case 7:
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 6.*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 11:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-          case 12:
-          case 13:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 14:
-            return 2.*zeta;
+          ponies:
+            ponies;
 
-          case 15:
-          case 16:
-          case 17:
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 12.*xi*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 21:
-            return 6.*xi*eta;
+          ponies:
+            ponies;
 
-          case 22:
-            return 2.*eta*eta;
+          ponies:
+            ponies;
 
-          case 23:
-          case 24:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 25:
-            return 6.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 26:
-            return 2.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 27:
-          case 28:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 29:
-            return 2.*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 30:
-          case 31:
-          case 32:
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx * (nx - 1);
-            for (unsigned int index=2; index < nx; index++)
-              val *= xi;
-            for (unsigned int index=0; index != ny; index++)
-              val *= eta;
-            for (unsigned int index=0; index != nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d^2()/dxideta
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 5:
-            return 1.;
+          ponies:
+            ponies.;
 
-          case 6:
-          case 7:
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return 2.*xi;
+          ponies:
+            ponies;
 
-          case 12:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-          case 13:
-          case 14:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 15:
-            return zeta;
+          ponies:
+            ponies;
 
-          case 16:
-          case 17:
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 21:
-            return 3.*xi*xi;
+          ponies:
+            ponies;
 
-          case 22:
-            return 4.*xi*eta;
+          ponies:
+            ponies;
 
-          case 23:
-            return 3.*eta*eta;
+          ponies:
+            ponies;
 
-          case 24:
-          case 25:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 26:
-            return 2.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 27:
-            return 2.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 28:
-          case 29:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 30:
-            return zeta*zeta;
+          ponies:
+            ponies;
 
-          case 31:
-          case 32:
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx * ny;
-            for (unsigned int index=1; index < nx; index++)
-              val *= xi;
-            for (unsigned int index=1; index < ny; index++)
-              val *= eta;
-            for (unsigned int index=0; index != nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d^2()/deta^2
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-          case 5:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 6:
-            return 2.;
+          ponies:
+            ponies.;
 
-          case 7:
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-          case 11:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 12:
-            return 2.*xi;
-          case 13:
-            return 6.*eta;
+          ponies:
+            ponies;
+          ponies:
+            ponies;
 
-          case 14:
-          case 15:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 16:
-            return 2.*zeta;
+          ponies:
+            ponies;
 
-          case 17:
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-          case 21:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 22:
-            return 2.*xi*xi;
+          ponies:
+            ponies;
 
-          case 23:
-            return 6.*xi*eta;
+          ponies:
+            ponies;
 
-          case 24:
-            return 12.*eta*eta;
+          ponies:
+            ponies;
 
-          case 25:
-          case 26:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 27:
-            return 2.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 28:
-            return 6.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 29:
-          case 30:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 31:
-            return 2.*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 32:
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = ny * (ny - 1);
-            for (unsigned int index=0; index != nx; index++)
-              val *= xi;
-            for (unsigned int index=2; index < ny; index++)
-              val *= eta;
-            for (unsigned int index=0; index != nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d^2()/dxidzeta
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-          case 5:
-          case 6:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 7:
-            return 1.;
+          ponies:
+            ponies.;
 
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-          case 11:
-          case 12:
-          case 13:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 14:
-            return 2.*xi;
+          ponies:
+            ponies;
 
-          case 15:
-            return eta;
+          ponies:
+            ponies;
 
-          case 16:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 17:
-            return 2.*zeta;
+          ponies:
+            ponies;
 
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-          case 21:
-          case 22:
-          case 23:
-          case 24:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 25:
-            return 3.*xi*xi;
+          ponies:
+            ponies;
 
-          case 26:
-            return 2.*xi*eta;
+          ponies:
+            ponies;
 
-          case 27:
-            return eta*eta;
+          ponies:
+            ponies;
 
-          case 28:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 29:
-            return 4.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 30:
-            return 2.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 31:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 32:
-            return 3.*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx * nz;
-            for (unsigned int index=1; index < nx; index++)
-              val *= xi;
-            for (unsigned int index=0; index != ny; index++)
-              val *= eta;
-            for (unsigned int index=1; index < nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-      // d^2()/detadzeta
-    case 4:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-          case 5:
-          case 6:
-          case 7:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 8:
-            return 1.;
+          ponies:
+            ponies.;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-          case 11:
-          case 12:
-          case 13:
-          case 14:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 15:
-            return xi;
+          ponies:
+            ponies;
 
-          case 16:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-          case 17:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 18:
-            return 2.*zeta;
+          ponies:
+            ponies;
 
-          case 19:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-          case 21:
-          case 22:
-          case 23:
-          case 24:
-          case 25:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 26:
-            return xi*xi;
+          ponies:
+            ponies;
 
-          case 27:
-            return 2.*xi*eta;
+          ponies:
+            ponies;
 
-          case 28:
-            return 3.*eta*eta;
+          ponies:
+            ponies;
 
-          case 29:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 30:
-            return 2.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 31:
-            return 4.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 32:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 33:
-            return 3.*zeta*zeta;
+          ponies:
+            ponies;
 
-          case 34:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = ny * nz;
-            for (unsigned int index=0; index != nx; index++)
-              val *= xi;
-            for (unsigned int index=1; index < ny; index++)
-              val *= eta;
-            for (unsigned int index=1; index < nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d^2()/dzeta^2
-    case 5:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-          case 5:
-          case 6:
-          case 7:
-          case 8:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 9:
-            return 2.;
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-          case 11:
-          case 12:
-          case 13:
-          case 14:
-          case 15:
-          case 16:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 17:
-            return 2.*xi;
+          ponies:
+            ponies;
 
-          case 18:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-          case 19:
-            return 6.*zeta;
+          ponies:
+            ponies;
 
-            // quartics
-          case 20:
-          case 21:
-          case 22:
-          case 23:
-          case 24:
-          case 25:
-          case 26:
-          case 27:
-          case 28:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 29:
-            return 2.*xi*xi;
+          ponies:
+            ponies;
 
-          case 30:
-            return 2.*xi*eta;
+          ponies:
+            ponies;
 
-          case 31:
-            return 2.*eta*eta;
+          ponies:
+            ponies;
 
-          case 32:
-            return 6.*xi*zeta;
+          ponies:
+            ponies;
 
-          case 33:
-            return 6.*eta*zeta;
+          ponies:
+            ponies;
 
-          case 34:
-            return 12.*zeta*zeta;
+          ponies:
+            ponies;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nz * (nz - 1);
-            for (unsigned int index=0; index != nx; index++)
-              val *= xi;
-            for (unsigned int index=0; index != ny; index++)
-              val *= eta;
-            for (unsigned int index=2; index < nz; index++)
-              val *= zeta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid j = " << j);
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,MONOMIAL>::shape_second_deriv(const Elem* elem,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape function derivatives
-  return FE<3,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

@@ -1,564 +1,564 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/string_to_enum.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// XYZ-specific implementations
+// ponies
 
-// Anonymous namespace for local helper functions
-namespace {
+// ponies
+ponies {
 
-void xyz_nodal_soln(const Elem* elem,
-                    const Order order,
-                    const std::vector<Number>& elem_soln,
-                    std::vector<Number>&       nodal_soln,
-                    unsigned Dim)
+ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies)
 {
-  const unsigned int n_nodes = elem->n_nodes();
+  ponies();
 
-  const ElemType elem_type = elem->type();
+  ponies();
 
-  nodal_soln.resize(n_nodes);
+  ponies);
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // Constant shape functions
-    case CONSTANT:
+      // ponies
+    ponies:
       {
-        libmesh_assert_equal_to (elem_soln.size(), 1);
+        ponies);
 
-        const Number val = elem_soln[0];
+        ponies];
 
-        for (unsigned int n=0; n<n_nodes; n++)
-          nodal_soln[n] = val;
+        ponies++)
+          ponies;
 
-        return;
+        ponies;
       }
 
 
-      // For other orders do interpolation at the nodes
-      // explicitly.
-    default:
+      // ponies
+      // ponies.
+    ponies:
       {
-        // FEType object to be passed to various FEInterface functions below.
-        FEType fe_type(totalorder, XYZ);
+        // ponies.
+        ponies);
 
-        const unsigned int n_sf =
-          // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+        ponies =
+          // ponies);
+          ponies);
 
-        for (unsigned int n=0; n<n_nodes; n++)
+        ponies++)
           {
-            libmesh_assert_equal_to (elem_soln.size(), n_sf);
+            ponies);
 
-            // Zero before summation
-            nodal_soln[n] = 0;
+            // ponies
+            ponies;
 
-            // u_i = Sum (alpha_i phi_i)
-            for (unsigned int i=0; i<n_sf; i++)
-              nodal_soln[n] += elem_soln[i] *
-                // FE<Dim,T>::shape(elem, order, i, elem->point(n));
-                FEInterface::shape(Dim, fe_type, elem, i, elem->point(n));
+            // ponies)
+            ponies++)
+              ponies] *
+                // ponies));
+                ponies));
           }
 
-        return;
-      } // default
-    } // switch
-} // xyz_nodal_soln()
+        ponies;
+      } // ponies
+    } // ponies
+} // ponies()
 
 
 
 
 
-unsigned int xyz_n_dofs(const ElemType t, const Order o)
+ponies)
 {
-  switch (o)
+  ponies)
     {
 
-      // constant shape functions
-      // no matter what shape there is only one DOF.
-    case CONSTANT:
-      return (t != INVALID_ELEM) ? 1 : 0;
+      // ponies
+      // ponies.
+    ponies:
+      ponies;
 
 
-      // Discontinuous linear shape functions
-      // expressed in the XYZ monomials.
-    case FIRST:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 2;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 3;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 4;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous quadratic shape functions
-      // expressed in the XYZ monomials.
-    case SECOND:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 3;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 6;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 10;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous cubic shape functions
-      // expressed in the XYZ monomials.
-    case THIRD:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 4;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 10;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 20;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous quartic shape functions
-      // expressed in the XYZ monomials.
-    case FOURTH:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-            return 5;
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 15;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 35;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-    default:
+    ponies:
       {
-        const unsigned int order = static_cast<unsigned int>(o);
-        switch (t)
+        ponies);
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-            return (order+1);
+          ponies:
+          ponies:
+            ponies);
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return (order+1)*(order+2)/2;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return (order+1)*(order+2)*(order+3)/6;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
-unsigned int xyz_n_dofs_per_elem(const ElemType t,
-                                 const Order o)
+ponies,
+                                 ponies)
 {
-  switch (o)
+  ponies)
     {
-      // constant shape functions always have 1 DOF per element
-    case CONSTANT:
-      return (t != INVALID_ELEM) ? 1 : 0;
+      // ponies
+    ponies:
+      ponies;
 
 
-      // Discontinuous linear shape functions
-      // expressed in the XYZ monomials.
-    case FIRST:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-            // 1D linears have 2 DOFs per element
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 2;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-            // 2D linears have 3 DOFs per element
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 3;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-            // 3D linears have 4 DOFs per element
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 4;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous quadratic shape functions
-      // expressed in the XYZ monomials.
-    case SECOND:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-            // 1D quadratics have 3 DOFs per element
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 3;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-            // 2D quadratics have 6 DOFs per element
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 6;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-            // 3D quadratics have 10 DOFs per element
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 10;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous cubic shape functions
-      // expressed in the XYZ monomials.
-    case THIRD:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 4;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 10;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 20;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // Discontinuous quartic shape functions
-      // expressed in the XYZ monomials.
-    case FOURTH:
+      // ponies
+      // ponies.
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 5;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 15;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 35;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
-    default:
+    ponies:
       {
-        const unsigned int order = static_cast<unsigned int>(o);
-        switch (t)
+        ponies);
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-            return (order+1);
+          ponies:
+          ponies:
+            ponies);
 
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return (order+1)*(order+2)/2;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return (order+1)*(order+2)*(order+3)/6;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
-      return 0;
+      ponies;
     }
 }
 
 
-} // anonymous namespace
+} // ponies
 
 
 
@@ -566,387 +566,387 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
 
 
 
-template <unsigned int Dim>
-void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
-                                      const Elem* libmesh_dbg_var(elem))
+ponies>
+ponies,
+                                      ponies))
 {
-  libmesh_assert(elem);
-  this->calculations_started = true;
+  ponies);
+  ponies;
 
-  // If the user forgot to request anything, we'll be safe and
-  // calculate everything:
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi)
-    this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = true;
-#else
-  if (!this->calculate_phi && !this->calculate_dphi)
-    this->calculate_phi = this->calculate_dphi = true;
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // ponies
+  // ponies:
+#ponies
+  ponies)
+    ponies;
+#ponies
+  ponies)
+    ponies;
+#ponies
 
-  // Start logging the shape function initialization
-  START_LOG("init_shape_functions()", "FE");
+  // ponies
+  ponies");
 
 
-  // The number of quadrature points.
-  const std::size_t n_qp = qp.size();
+  // ponies.
+  ponies();
 
-  // Number of shape functions in the finite element approximation
-  // space.
-  const unsigned int n_approx_shape_functions =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+  // ponies
+  // ponies.
+  ponies =
+    ponies(),
+                            ponies());
 
-  // resize the vectors to hold current data
-  // Phi are the shape functions used for the FE approximation
+  // ponies
+  // ponies
   {
-    // (note: GCC 3.4.0 requires the use of this-> here)
-    if (this->calculate_phi)
-      this->phi.resize     (n_approx_shape_functions);
-    if (this->calculate_dphi)
+    // (ponies)
+    ponies)
+      ponies);
+    ponies)
       {
-        this->dphi.resize    (n_approx_shape_functions);
-        this->dphidx.resize  (n_approx_shape_functions);
-        this->dphidy.resize  (n_approx_shape_functions);
-        this->dphidz.resize  (n_approx_shape_functions);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
       }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    if (this->calculate_d2phi)
+#ponies
+    ponies)
       {
-        this->d2phi.resize     (n_approx_shape_functions);
-        this->d2phidx2.resize  (n_approx_shape_functions);
-        this->d2phidxdy.resize (n_approx_shape_functions);
-        this->d2phidxdz.resize (n_approx_shape_functions);
-        this->d2phidy2.resize  (n_approx_shape_functions);
-        this->d2phidydz.resize (n_approx_shape_functions);
-        this->d2phidz2.resize  (n_approx_shape_functions);
-        this->d2phidxi2.resize (n_approx_shape_functions);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
       }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-    for (unsigned int i=0; i<n_approx_shape_functions; i++)
+    ponies++)
       {
-        if (this->calculate_phi)
-          this->phi[i].resize           (n_qp);
-        if (this->calculate_dphi)
+        ponies)
+          ponies);
+        ponies)
           {
-            this->dphi[i].resize        (n_qp);
-            this->dphidx[i].resize      (n_qp);
-            this->dphidy[i].resize      (n_qp);
-            this->dphidz[i].resize      (n_qp);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
           }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (this->calculate_d2phi)
+#ponies
+        ponies)
           {
-            this->d2phi[i].resize       (n_qp);
-            this->d2phidx2[i].resize    (n_qp);
-            this->d2phidxdy[i].resize   (n_qp);
-            this->d2phidxdz[i].resize   (n_qp);
-            this->d2phidy2[i].resize    (n_qp);
-            this->d2phidydz[i].resize   (n_qp);
-            this->d2phidz2[i].resize    (n_qp);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
           }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
       }
   }
 
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
   //------------------------------------------------------------
-  // Initialize the data fields, which should only be used for infinite
-  // elements, to some sensible values, so that using a FE with the
-  // variational formulation of an InfFE, correct element matrices are
-  // returned
+  // ponies
+  // ponies
+  // ponies
+  // ponies
 
   {
-    this->weight.resize  (n_qp);
-    this->dweight.resize (n_qp);
-    this->dphase.resize  (n_qp);
+    ponies);
+    ponies);
+    ponies);
 
-    for (unsigned int p=0; p<n_qp; p++)
+    ponies++)
       {
-        this->weight[p] = 1.;
-        this->dweight[p].zero();
-        this->dphase[p].zero();
+        ponies.;
+        ponies();
+        ponies();
       }
 
   }
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  // Stop logging the shape function initialization
-  STOP_LOG("init_shape_functions()", "FE");
+  // ponies
+  ponies");
 }
 
 
 
 
-template <unsigned int Dim>
-void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Point>&)
+ponies>
+ponies>&)
 {
-  libmesh_assert(elem);
+  ponies);
 
   //-------------------------------------------------------------------------
-  // Compute the shape function values (and derivatives)
-  // at the Quadrature points.  Note that the actual values
-  // have already been computed via init_shape_functions
+  // ponies)
+  // ponies
+  // ponies
 
-  // Start logging the shape function computation
-  START_LOG("compute_shape_functions()", "FE");
+  // ponies
+  ponies");
 
-  const std::vector<Point>& xyz_qp = this->get_xyz();
+  ponies();
 
-  // Compute the value of the derivative shape function i at quadrature point p
-  switch (this->dim)
+  // ponies
+  ponies)
     {
 
-    case 1:
+    ponies:
       {
-        if (this->calculate_phi)
-          for (unsigned int i=0; i<this->phi.size(); i++)
-            for (unsigned int p=0; p<this->phi[i].size(); p++)
-              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
-        if (this->calculate_dphi)
-          for (unsigned int i=0; i<this->dphi.size(); i++)
-            for (unsigned int p=0; p<this->dphi[i].size(); p++)
+        ponies)
+          ponies++)
+            ponies++)
+              ponies]);
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->dphi[i][p](0) =
-                  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-                this->dphi[i][p](1) = this->dphidy[i][p] = 0.;
-                this->dphi[i][p](2) = this->dphidz[i][p] = 0.;
+                ponies.;
+                ponies.;
               }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (this->calculate_d2phi)
-          for (unsigned int i=0; i<this->d2phi.size(); i++)
-            for (unsigned int p=0; p<this->d2phi[i].size(); p++)
+#ponies
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->d2phi[i][p](0,0) =
-                  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-#if LIBMESH_DIM>1
-                this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
-                  this->d2phi[i][p](1,0) = 0.;
-                this->d2phi[i][p](1,1) = this->d2phidy2[i][p] = 0.;
-#if LIBMESH_DIM>2
-                this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
-                  this->d2phi[i][p](2,0) = 0.;
-                this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
-                  this->d2phi[i][p](2,1) = 0.;
-                this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = 0.;
-#endif
-#endif
+#ponies
+                ponies] =
+                  ponies.;
+                ponies.;
+#ponies
+                ponies] =
+                  ponies.;
+                ponies] =
+                  ponies.;
+                ponies.;
+#ponies
+#ponies
               }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-        // All done
-        break;
+        // ponies
+        ponies;
       }
 
-    case 2:
+    ponies:
       {
-        if (this->calculate_phi)
-          for (unsigned int i=0; i<this->phi.size(); i++)
-            for (unsigned int p=0; p<this->phi[i].size(); p++)
-              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
-        if (this->calculate_dphi)
-          for (unsigned int i=0; i<this->dphi.size(); i++)
-            for (unsigned int p=0; p<this->dphi[i].size(); p++)
+        ponies)
+          ponies++)
+            ponies++)
+              ponies]);
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->dphi[i][p](0) =
-                  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-                this->dphi[i][p](1) =
-                  this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-#if LIBMESH_DIM == 3
-                this->dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
-#endif
-                  this->dphidz[i][p] = 0.;
+#ponies
+                ponies
+#ponies
+                  ponies.;
               }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (this->calculate_d2phi)
-          for (unsigned int i=0; i<this->d2phi.size(); i++)
-            for (unsigned int p=0; p<this->d2phi[i].size(); p++)
+#ponies
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->d2phi[i][p](0,0) =
-                  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-                this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
-                  this->d2phi[i][p](1,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
-                this->d2phi[i][p](1,1) =
-                  this->d2phidy2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 2, xyz_qp[p]);
-#if LIBMESH_DIM>2
-                this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
-                  this->d2phi[i][p](2,0) = 0.;
-                this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
-                  this->d2phi[i][p](2,1) = 0.;
-                this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = 0.;
-#endif
+                ponies] =
+                  ponies]);
+                ponies) =
+                  ponies]);
+#ponies
+                ponies] =
+                  ponies.;
+                ponies] =
+                  ponies.;
+                ponies.;
+#ponies
               }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-        // All done
-        break;
+        // ponies
+        ponies;
       }
 
-    case 3:
+    ponies:
       {
-        if (this->calculate_phi)
-          for (unsigned int i=0; i<this->phi.size(); i++)
-            for (unsigned int p=0; p<this->phi[i].size(); p++)
-              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
+        ponies)
+          ponies++)
+            ponies++)
+              ponies]);
 
-        if (this->calculate_dphi)
-          for (unsigned int i=0; i<this->dphi.size(); i++)
-            for (unsigned int p=0; p<this->dphi[i].size(); p++)
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->dphi[i][p](0) =
-                  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-                this->dphi[i][p](1) =
-                  this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-                this->dphi[i][p](2) =
-                  this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 2, xyz_qp[p]);
+                ponies) =
+                  ponies]);
               }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (this->calculate_d2phi)
-          for (unsigned int i=0; i<this->d2phi.size(); i++)
-            for (unsigned int p=0; p<this->d2phi[i].size(); p++)
+#ponies
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->d2phi[i][p](0,0) =
-                  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+                ponies) =
+                  ponies]);
 
-                this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
-                  this->d2phi[i][p](1,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
-                this->d2phi[i][p](1,1) =
-                  this->d2phidy2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 2, xyz_qp[p]);
-                this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
-                  this->d2phi[i][p](2,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 3, xyz_qp[p]);
-                this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
-                  this->d2phi[i][p](2,1) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 4, xyz_qp[p]);
-                this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 5, xyz_qp[p]);
+                ponies] =
+                  ponies]);
+                ponies) =
+                  ponies]);
+                ponies] =
+                  ponies]);
+                ponies] =
+                  ponies]);
+                ponies]);
               }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-        // All done
-        break;
+        // ponies
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("ERROR: Invalid dimension " << this->dim);
+    ponies:
+      ponies);
     }
 
-  // Stop logging the shape function computation
-  STOP_LOG("compute_shape_functions()", "FE");
+  // ponies
+  ponies");
 }
 
 
 
 
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this file.
-// This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,XYZ>::nodal_soln(const Elem* elem,
-                           const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
+// ponies
+// ponies.
+// ponies...
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
+{ ponies); }
 
-template <>
-void FE<1,XYZ>::nodal_soln(const Elem* elem,
-                           const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
+{ ponies); }
 
-template <>
-void FE<2,XYZ>::nodal_soln(const Elem* elem,
-                           const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
+{ ponies); }
 
-template <>
-void FE<3,XYZ>::nodal_soln(const Elem* elem,
-                           const Order order,
-                           const std::vector<Number>& elem_soln,
-                           std::vector<Number>& nodal_soln)
-{ xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
-
-
-
-// Full specialization of n_dofs() function for every dimension
-template <> unsigned int FE<0,XYZ>::n_dofs(const ElemType t, const Order o) { return xyz_n_dofs(t, o); }
-template <> unsigned int FE<1,XYZ>::n_dofs(const ElemType t, const Order o) { return xyz_n_dofs(t, o); }
-template <> unsigned int FE<2,XYZ>::n_dofs(const ElemType t, const Order o) { return xyz_n_dofs(t, o); }
-template <> unsigned int FE<3,XYZ>::n_dofs(const ElemType t, const Order o) { return xyz_n_dofs(t, o); }
-
-// Full specialization of n_dofs_at_node() function for every dimension.
-// XYZ FEMs have no dofs at nodes, only element dofs.
-template <> unsigned int FE<0,XYZ>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<1,XYZ>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<2,XYZ>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<3,XYZ>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-
-// Full specialization of n_dofs_per_elem() function for every dimension.
-template <> unsigned int FE<0,XYZ>::n_dofs_per_elem(const ElemType t, const Order o) { return xyz_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<1,XYZ>::n_dofs_per_elem(const ElemType t, const Order o) { return xyz_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<2,XYZ>::n_dofs_per_elem(const ElemType t, const Order o) { return xyz_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<3,XYZ>::n_dofs_per_elem(const ElemType t, const Order o) { return xyz_n_dofs_per_elem(t, o); }
-
-// Full specialization of get_continuity() function for every dimension.
-template <> FEContinuity FE<0,XYZ>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<1,XYZ>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<2,XYZ>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<3,XYZ>::get_continuity() const { return DISCONTINUOUS; }
-
-// Full specialization of is_hierarchic() function for every dimension.
-// The XYZ shape functions are hierarchic!
-template <> bool FE<0,XYZ>::is_hierarchic() const { return true; }
-template <> bool FE<1,XYZ>::is_hierarchic() const { return true; }
-template <> bool FE<2,XYZ>::is_hierarchic() const { return true; }
-template <> bool FE<3,XYZ>::is_hierarchic() const { return true; }
-
-#ifdef LIBMESH_ENABLE_AMR
-
-// Full specialization of compute_constraints() function for 2D and
-// 3D only.  There are no constraints for discontinuous elements, so
-// we do nothing.
-template <> void FE<2,XYZ>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
-template <> void FE<3,XYZ>::compute_constraints (DofConstraints &, DofMap &, const unsigned int, const Elem*) {}
-
-#endif // #ifdef LIBMESH_ENABLE_AMR
-
-// Full specialization of shapes_need_reinit() function for every dimension.
-template <> bool FE<0,XYZ>::shapes_need_reinit() const { return true; }
-template <> bool FE<1,XYZ>::shapes_need_reinit() const { return true; }
-template <> bool FE<2,XYZ>::shapes_need_reinit() const { return true; }
-template <> bool FE<3,XYZ>::shapes_need_reinit() const { return true; }
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
+{ ponies); }
 
 
-// Explicit instantiations for non-static FEXYZ member functions.
-// These non-static member functions map more naturally to explicit
-// instantiations than the functions above:
+
+// ponies
+ponies); }
+ponies); }
+ponies); }
+ponies); }
+
+// ponies.
+// ponies.
+ponies; }
+ponies; }
+ponies; }
+ponies; }
+
+// ponies.
+ponies); }
+ponies); }
+ponies); }
+ponies); }
+
+// ponies.
+ponies; }
+ponies; }
+ponies; }
+ponies; }
+
+// ponies.
+// ponies!
+ponies; }
+ponies; }
+ponies; }
+ponies; }
+
+#ponies
+
+// ponies
+// ponies
+// ponies.
+ponies*) {}
+ponies*) {}
+
+#ponies
+
+// ponies.
+ponies; }
+ponies; }
+ponies; }
+ponies; }
+
+
+// ponies.
+// ponies
+// ponies:
 //
-// 1.)  Since they are member functions, they rely on
-// private/protected member data, and therefore do not work well
-// with the "anonymous function call" model we've used above for
-// the specializations.
+// ponies
+// ponies
+// ponies
+// ponies.
 //
-// 2.) There is (IMHO) less chance of the linker calling the
-// wrong version of one of these member functions, since there is
-// only one FEXYZ.
-template void  FEXYZ<0>::init_shape_functions(const std::vector<Point>&, const Elem*);
-template void  FEXYZ<1>::init_shape_functions(const std::vector<Point>&, const Elem*);
-template void  FEXYZ<2>::init_shape_functions(const std::vector<Point>&, const Elem*);
-template void  FEXYZ<3>::init_shape_functions(const std::vector<Point>&, const Elem*);
+// ponies
+// ponies
+// ponies.
+ponies*);
+ponies*);
+ponies*);
+ponies*);
 
-template void  FEXYZ<0>::compute_shape_functions(const Elem*,const std::vector<Point>&);
-template void  FEXYZ<1>::compute_shape_functions(const Elem*,const std::vector<Point>&);
-template void  FEXYZ<2>::compute_shape_functions(const Elem*,const std::vector<Point>&);
-template void  FEXYZ<3>::compute_shape_functions(const Elem*,const std::vector<Point>&);
+ponies>&);
+ponies>&);
+ponies>&);
+ponies>&);
 
-} // namespace libMesh
+} // ponies

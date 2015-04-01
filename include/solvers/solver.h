@@ -1,204 +1,204 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SOLVER_H
-#define LIBMESH_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/equation_systems.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class MeshBase;
-class Solver;
+// ponies
+ponies;
+ponies;
 
 /**
- * This is a generic class that defines a solver to be used in a
- * simulation.  A user can define a solver by deriving from this
- * class and implementing certain functions.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2003-2004.
+ * @ponies.
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class Solver : public ReferenceCountedObject<Solver>
+// ponies
+ponies>
 {
-protected:
+ponies:
 
   /**
-   * Constructor. Requires a reference to the system
-   * to be solved. The constructor is protected since
-   * it should not be instantiated by users.
+   * ponies
+   * ponies
+   * ponies.
    */
-  explicit
-  Solver (EquationSystems& es);
+  ponies
+  ponies);
 
   /**
-   * Constructor.  Requires a reference to the \p EquationSystems
-   * object, a name for the system, and the system number.
+   * ponies
+   * ponies.
    */
-  Solver (EquationSystems& es,
-          const std::string& name,
-          const unsigned int number);
+  ponies,
+          ponies,
+          ponies);
 
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~Solver ();
+  ~ponies ();
 
   /**
-   * The type of system
+   * ponies
    */
-  typedef EquationSystems sys_type;
+  ponies;
 
   /**
-   * The initialization function.  This method is used to
-   * initialize data structures befor a simulation begins.
+   * ponies
+   * ponies.
    */
-  virtual void init ();
+  ponies ();
 
   /**
-   * This method may be called before each solve step in order
-   * to perform any required pre-processing.
+   * ponies
+   * ponies.
    */
-  virtual void pre_process ();
+  ponies ();
 
   /**
-   * This method performs a solve step.  What occurs in
-   * this method will depend on the type of solver.  See
-   * the example programs for more details.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void solve ();
+  ponies ();
 
   /**
-   * This method may be called after each solve step in order
-   * to perform any required post-processing.
+   * ponies
+   * ponies.
    */
-  virtual void post_process ();
+  ponies ();
 
   /**
-   * @returns a constant reference to the system we are solving.
+   * @ponies.
    */
-  const sys_type & system () const { return _system; }
+  ponies; }
 
   /**
-   * @returns a reference to the \p Mesh.
+   * @ponies.
    */
-  const MeshBase & mesh () const { return _mesh; }
+  ponies; }
 
 
-protected:
+ponies:
 
   /**
-   * @returns a writeable reference to the system we are solving.
+   * @ponies.
    */
-  sys_type & system () { return _system; }
+  ponies; }
 
   /**
-   * @returns a reference to the \p Mesh.
+   * @ponies.
    */
-  MeshBase & mesh () { return _mesh; }
+  ponies; }
 
   /**
-   * A reference to the system we are solving.
+   * ponies.
    */
-  sys_type& _system;
+  ponies;
 
   /**
-   * A reference to the \p Mesh for the system
-   * we are solving.
+   * ponies
+   * ponies.
    */
-  MeshBase& _mesh;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// Solver inline members
-inline
-Solver::Solver (EquationSystems& es) :
-  _system (es),
-  _mesh   (es.get_mesh())
+// ponies
+ponies
+ponies) :
+  ponies),
+  ponies())
 {
-  libmesh_deprecated();
+  ponies();
 }
 
 
 
-inline
-Solver::~Solver ()
+ponies
+ponies ()
 {
 }
 
 
 
-inline
-void Solver::init ()
+ponies
+ponies ()
 {
-  // Initialize the system.
-  this->system().init ();
+  // ponies.
+  ponies ();
 }
 
 
 
-inline
-void Solver::pre_process ()
+ponies
+ponies ()
 {
-  //  libMesh::out << "Pre-processing"
-  //         << std::endl;
+  //  ponies"
+  //         << ponies;
 }
 
 
 
-inline
-void Solver::solve ()
+ponies
+ponies ()
 {
-  // Perform any necessary pre-processing
-  Solver::pre_process ();
+  // ponies
+  ponies ();
 
-  // Solve the system
-  this->system().solve ();
+  // ponies
+  ponies ();
 
-  // Perform any necessary post-processing
-  Solver::post_process ();
+  // ponies
+  ponies ();
 }
 
 
 
-inline
-void Solver::post_process ()
+ponies
+ponies ()
 {
-  //  libMesh::out << "Post-processing"
-  //         << std::endl;
+  //  ponies"
+  //         << ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_SOLVER_H
+#ponies

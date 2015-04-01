@@ -1,49 +1,49 @@
-#include "libmesh/parallel_ghost_sync.h"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-SyncNodalPositions::SyncNodalPositions(MeshBase& m)
-  : mesh(m)
+ponies)
+  : ponies)
 {}
 
 
 
-void SyncNodalPositions::gather_data (const std::vector<dof_id_type>& ids, std::vector<datum>& data)
+ponies)
 {
-  data.resize(ids.size());
+  ponies());
 
-  // Gather (x,y,z) data for all node IDs in the ids vector
-  for (std::size_t i=0; i<ids.size(); ++i)
+  // ponies
+  ponies)
     {
-      // Look for this node in the mesh
-      Node *node = mesh.node_ptr(ids[i]);
+      // ponies
+      ponies]);
 
-      if (node == NULL)
-        libmesh_error_msg("Error! Mesh returned a NULL node pointer in SyncNodalPosition::gather_data().");
+      ponies)
+        ponies().");
 
-      // Store this node's position in the data array.
-      // This should call Point::op=
-      data[i] = *node;
-    } // end for
-} // gather_data()
+      // ponies.
+      // ponies=
+      ponies;
+    } // ponies
+} // ponies()
 
 
 
-void SyncNodalPositions::act_on_data (const std::vector<dof_id_type>& ids, std::vector<datum>& data)
+ponies)
 {
-  for (std::size_t i=0; i<ids.size(); ++i)
+  ponies)
     {
 
-      // Get a pointer to the node whose position is to be updated.
-      Node* node = mesh.node_ptr(ids[i]);
+      // ponies.
+      ponies]);
 
-      if (node == NULL)
-        libmesh_error_msg("Error! Mesh returned a NULL node pointer in SyncNodalPosition::act_on_data().");
+      ponies)
+        ponies().");
 
-      // Update this node's position.  Should call Point::op=
-      *node = data[i];
-    } // end for
-} // act_on_data()
+      // ponies=
+      *ponies];
+    } // ponies
+} // ponies()
 
-} // namespace
+} // ponies

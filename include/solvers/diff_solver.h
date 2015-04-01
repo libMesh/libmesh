@@ -1,329 +1,329 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DIFF_SOLVER_H
-#define LIBMESH_DIFF_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/parallel_object.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class ImplicitSystem;
-template <typename T> class NumericVector;
+// ponies
+ponies;
+ponies;
 
 /**
- * Functor for use as callback in solve of nonlinear solver.
+ * ponies.
  */
-class LinearSolutionMonitor {
-public:
-  virtual void operator() (const NumericVector<Number>& delta_u, const double &norm_delta_u,
-                           const NumericVector<Number>& u, const double &norm_u,
-                           const NumericVector<Number>& res, const double &norm_res,
-                           const unsigned int iteration) = 0;
-  virtual ~LinearSolutionMonitor();
+ponies {
+ponies:
+  ponies,
+                           ponies,
+                           ponies,
+                           ponies;
+  ponies();
 };
 
-inline LinearSolutionMonitor::~LinearSolutionMonitor() {}
+ponies() {}
 
 /**
- * This is a generic class that defines a solver to handle
- * ImplicitSystem classes, including NonlinearImplicitSystem and
- * DifferentiableSystem   A user can define a solver by
- * deriving from this class and implementing certain functions.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2006-2010
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class DiffSolver : public ReferenceCountedObject<DiffSolver>,
-                   public ParallelObject
+// ponies
+ponies>,
+                   ponies
 {
-public:
+ponies:
   /**
-   * The type of system
+   * ponies
    */
-  typedef ImplicitSystem sys_type;
+  ponies;
 
   /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
+   * ponies
+   * ponies.
    */
-  DiffSolver (sys_type& s);
+  ponies);
 
   /**
-   * Factory.  Requires a reference to the system
-   * to be solved.  Returns a NewtonSolver by default
+   * ponies
+   * ponies
    */
-  static UniquePtr<DiffSolver> build(sys_type& s);
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~DiffSolver () {}
+  ponies () {}
 
   /**
-   * The initialization function.  This method is used to
-   * initialize internal data structures before a simulation begins.
+   * ponies
+   * ponies.
    */
-  virtual void init ();
+  ponies ();
 
   /**
-   * The reinitialization function.  This method is used after
-   * changes in the mesh.
+   * ponies
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * This method performs a solve.  What occurs in
-   * this method will depend on the type of solver.  See
-   * the subclasses for more details.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual unsigned int solve () = 0;
+  ponies;
 
   /**
-   * @returns the number of "outer" (e.g. quasi-Newton) iterations
-   * required by the last solve.
+   * @ponies
+   * ponies.
    */
-  unsigned int total_outer_iterations() { return _outer_iterations; }
+  ponies; }
 
   /**
-   * @returns the number of "inner" (e.g. Krylov) iterations
-   * required by the last solve.
+   * @ponies
+   * ponies.
    */
-  unsigned int total_inner_iterations() { return _inner_iterations; }
+  ponies; }
 
   /**
-   * @returns the value of the SolveResult from the last solve.
+   * @ponies.
    */
-  unsigned int solve_result() { return _solve_result; }
+  ponies; }
 
   /**
-   * @returns a constant reference to the system we are solving.
+   * @ponies.
    */
-  const sys_type & system () const { return _system; }
+  ponies; }
 
   /**
-   * @returns a writeable reference to the system we are solving.
+   * @ponies.
    */
-  sys_type & system () { return _system; }
+  ponies; }
 
   /**
-   * Each linear solver step should exit after \p max_linear_iterations
-   * is exceeded.
+   * ponies
+   * ponies.
    */
-  unsigned int max_linear_iterations;
+  ponies;
 
   /**
-   * The DiffSolver should exit in failure if \p max_nonlinear_iterations
-   * is exceeded and \p continue_after_max_iterations is false, or should
-   * end the nonlinear solve if \p max_nonlinear_iterations is exceeded and \p
-   * continue_after_max_iterations is true.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned int max_nonlinear_iterations;
+  ponies;
 
   /**
-   * The DiffSolver should not print anything to libMesh::out
-   * unless quiet is set to false; default is true.
+   * ponies
+   * ponies.
    */
-  bool quiet;
+  ponies;
 
   /**
-   * The DiffSolver may print a lot more to libMesh::out
-   * if verbose is set to true; default is false.
+   * ponies
+   * ponies.
    */
-  bool verbose;
+  ponies;
 
   /**
-   * Defaults to true, telling the DiffSolver to continue rather than exit when
-   * a solve has reached its maximum number of nonlinear iterations.
+   * ponies
+   * ponies.
    */
-  bool continue_after_max_iterations;
+  ponies;
 
   /**
-   * Defaults to false, telling the DiffSolver to throw an error when
-   * the backtracking scheme fails to find a descent direction.
+   * ponies
+   * ponies.
    */
-  bool continue_after_backtrack_failure;
+  ponies;
 
   /**
-   * The DiffSolver should exit after the residual is
-   * reduced to either less than absolute_residual_tolerance
-   * or less than relative_residual_tolerance times the
-   * initial residual.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users should increase any of these tolerances that they want to use for a
-   * stopping condition.
+   * ponies
+   * ponies.
    */
-  Real absolute_residual_tolerance;
-  Real relative_residual_tolerance;
+  ponies;
+  ponies;
 
   /**
-   * The DiffSolver should exit after the full nonlinear step norm is
-   * reduced to either less than absolute_step_tolerance
-   * or less than relative_step_tolerance times the largest
-   * nonlinear solution which has been seen so far.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users should increase any of these tolerances that they want to use for a
-   * stopping condition.
+   * ponies
+   * ponies.
    */
-  Real absolute_step_tolerance;
-  Real relative_step_tolerance;
+  ponies;
+  ponies;
 
   /**
-   * Any required linear solves will at first be done with this tolerance;
-   * the DiffSolver may tighten the tolerance for later solves.
+   * ponies;
+   * ponies.
    */
-  Real initial_linear_tolerance;
+  ponies;
 
   /**
-   * The tolerance for linear solves is kept above this minimum
+   * ponies
    */
-  Real minimum_linear_tolerance;
+  ponies;
 
   /**
-   * Enumeration return type for the solve() function.  Multiple SolveResults
-   * may be combined (OR'd) in the single return.  To test which ones are present,
-   * just AND the return value with any of the SolveResult flags defined below.
+   * ponies
+   * ponies,
+   * ponies.
    */
-  enum SolveResult {
+  ponies {
     /**
-     * A default or invalid solve result.  This usually means
-     * no solve has occurred yet.
+     * ponies
+     * ponies.
      */
-    INVALID_SOLVE_RESULT = 0,
+    ponies,
 
     /**
-     * The solver converged but no
-     * particular reason is specified.
+     * ponies
+     * ponies.
      */
-    CONVERGED_NO_REASON = 1,
+    ponies,
 
     /**
-     * The DiffSolver achieved the desired
-     * absolute residual tolerance.
+     * ponies
+     * ponies.
      */
-    CONVERGED_ABSOLUTE_RESIDUAL = 2,
+    ponies,
 
     /**
-     * The DiffSolver achieved the desired
-     * relative residual tolerance.
+     * ponies
+     * ponies.
      */
-    CONVERGED_RELATIVE_RESIDUAL = 4,
+    ponies,
 
     /**
-     * The DiffSolver achieved the desired
-     * absolute step size tolerance.
+     * ponies
+     * ponies.
      */
-    CONVERGED_ABSOLUTE_STEP = 8,
+    ponies,
 
     /**
-     * The DiffSolver achieved the desired
-     * relative step size tolerance.
+     * ponies
+     * ponies.
      */
-    CONVERGED_RELATIVE_STEP = 16,
+    ponies,
 
     /**
-     * The DiffSolver diverged but no
-     * particular reason is specified.
+     * ponies
+     * ponies.
      */
-    DIVERGED_NO_REASON = 32,
+    ponies,
 
     /**
-     * The DiffSolver reached the maximum allowed
-     * number of nonlinear iterations before satisfying
-     * any convergence tests.
+     * ponies
+     * ponies
+     * ponies.
      */
-    DIVERGED_MAX_NONLINEAR_ITERATIONS = 64,
+    ponies,
 
     /**
-     * The DiffSolver failed to find a descent direction
-     * by backtracking (See newton_solver.C)
+     * ponies
+     * ponies)
      */
-    DIVERGED_BACKTRACKING_FAILURE = 128,
+    ponies,
 
     /**
-     * The linear solver used by the DiffSolver failed to
-     * find a solution.
+     * ponies
+     * ponies.
      */
-    DIVERGED_LINEAR_SOLVER_FAILURE = 256
+    ponies
   };
 
   /**
-   * Pointer to functor which is called right after each linear solve
+   * ponies
    */
-  UniquePtr<LinearSolutionMonitor> linear_solution_monitor;
+  ponies;
 
-protected:
-
-  /**
-   * The largest solution norm which the DiffSolver has yet seen will be stored
-   * here, to be used for stopping criteria based on relative_step_tolerance
-   */
-  Real max_solution_norm;
+ponies:
 
   /**
-   * The largest nonlinear residual which the DiffSolver has yet seen will be
-   * stored here, to be used for stopping criteria based on
-   * relative_residual_tolerance
+   * ponies
+   * ponies
    */
-  Real max_residual_norm;
+  ponies;
 
   /**
-   * The number of outer iterations used by the last solve
+   * ponies
+   * ponies
+   * ponies
    */
-  unsigned int _outer_iterations;
+  ponies;
 
   /**
-   * The number of inner iterations used by the last solve
+   * ponies
    */
-  unsigned int _inner_iterations;
+  ponies;
 
   /**
-   * A reference to the system we are solving.
+   * ponies
    */
-  sys_type& _system;
+  ponies;
 
   /**
-   * Initialized to zero.  solve_result is typically set internally in
-   * the solve() function before it returns.  When non-zero,
-   * solve_result tells the result of the latest solve.  See enum
-   * definition for description.
+   * ponies.
    */
-  unsigned int _solve_result;
+  ponies;
+
+  /**
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_DIFF_SOLVER_H
+#ponies

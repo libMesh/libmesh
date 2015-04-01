@@ -1,140 +1,140 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-#include "libmesh/inf_fe.h"
-#include "libmesh/quadrature_gauss.h"
-#include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
+// ponies
+#ponies"
+#ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// InfFE class members
+// ponies
 
 
 
-// Constructor
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
-  FEBase       (Dim, fet),
+// ponies
+ponies>
+ponies) :
+  ponies),
 
-  _n_total_approx_sf (0),
-  _n_total_qp        (0),
+  ponies),
+  ponies),
 
-  base_qrule   (NULL),
-  radial_qrule (NULL),
-  base_elem    (NULL),
-  base_fe      (NULL),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
 
-  // initialize the current_fe_type to all the same
-  // values as \p fet (since the FE families and coordinate
-  // map type should @e not change), but use an invalid order
-  // for the radial part (since this is the only order
-  // that may change!).
-  // the data structures like \p phi etc are not initialized
-  // through the constructor, but throught reinit()
-  current_fe_type ( FEType(fet.order,
-                           fet.family,
-                           INVALID_ORDER,
-                           fet.radial_family,
-                           fet.inf_map) )
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies!).
+  // ponies
+  // ponies()
+  ponies,
+                           ponies,
+                           ponies,
+                           ponies,
+                           ponies) )
 
 {
-  // Sanity checks
-  libmesh_assert_equal_to (T_radial, fe_type.radial_family);
-  libmesh_assert_equal_to (T_map, fe_type.inf_map);
+  // ponies
+  ponies);
+  ponies);
 
-  // build the base_fe object, handle the UniquePtr
-  if (Dim != 1)
+  // ponies
+  ponies)
     {
-      UniquePtr<FEBase> ap_fb(FEBase::build(Dim-1, fet));
-      base_fe = ap_fb.release();
+      ponies));
+      ponies();
     }
 }
 
 
 
 
-// Destructor
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-InfFE<Dim,T_radial,T_map>::~InfFE ()
+// ponies
+ponies>
+ponies ()
 {
-  // delete pointers, if necessary
-  delete base_qrule;
-  base_qrule = NULL;
+  // ponies
+  ponies;
+  ponies;
 
-  delete radial_qrule;
-  radial_qrule = NULL;
+  ponies;
+  ponies;
 
-  delete base_elem;
-  base_elem = NULL;
+  ponies;
+  ponies;
 
-  delete base_fe;
-  base_fe = NULL;
+  ponies;
+  ponies;
 }
 
 
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase* q)
+ponies>
+ponies)
 {
-  libmesh_assert(q);
-  libmesh_assert(base_fe);
+  ponies);
+  ponies);
 
-  const Order base_int_order   = q->get_order();
-  const Order radial_int_order = static_cast<Order>(2 * (static_cast<unsigned int>(fe_type.radial_order) + 1) +2);
-  const unsigned int qrule_dim = q->get_dim();
+  ponies();
+  ponies);
+  ponies();
 
-  if (Dim != 1)
+  ponies)
     {
-      // build a Dim-1 quadrature rule of the type that we received
-      UniquePtr<QBase> apq( QBase::build(q->type(), qrule_dim-1, base_int_order) );
-      base_qrule = apq.release();
-      base_fe->attach_quadrature_rule(base_qrule);
+      // ponies
+      ponies) );
+      ponies();
+      ponies);
     }
 
-  // in radial direction, always use Gauss quadrature
-  radial_qrule = new QGauss(1, radial_int_order);
+  // ponies
+  ponies);
 
-  // currently not used. But maybe helpful to store the QBase*
-  // with which we initialized our own quadrature rules
-  qrule = q;
+  // ponies*
+  // ponies
+  ponies;
 }
 
 
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
-void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
+ponies>
+ponies)
 {
-  if (base_elem != NULL)
-    delete base_elem;
-  base_elem = Base::build_elem(inf_elem);
+  ponies)
+    ponies;
+  ponies);
 }
 
 
@@ -142,132 +142,132 @@ void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
-                                       const std::vector<Point>* const pts,
-                                       const std::vector<Real>* const weights)
+ponies>
+ponies,
+                                       ponies,
+                                       ponies)
 {
-  libmesh_assert(base_fe);
-  libmesh_assert(base_fe->qrule);
-  libmesh_assert_equal_to (base_fe->qrule, base_qrule);
-  libmesh_assert(radial_qrule);
-  libmesh_assert(inf_elem);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  if (pts == NULL)
+  ponies)
     {
-      bool init_shape_functions_required = false;
+      ponies;
 
       // -----------------------------------------------------------------
-      // init the radial data fields only when the radial order changes
-      if (current_fe_type.radial_order != fe_type.radial_order)
+      // ponies
+      ponies)
         {
-          current_fe_type.radial_order = fe_type.radial_order;
+          ponies;
 
-          // Watch out: this call to QBase->init() only works for
-          // current_fe_type = const!   To allow variable Order,
-          // the init() of QBase has to be modified...
-          radial_qrule->init(EDGE2);
+          // ponies
+          // ponies,
+          // ponies...
+          ponies);
 
-          // initialize the radial shape functions
-          this->init_radial_shape_functions(inf_elem);
+          // ponies
+          ponies);
 
-          init_shape_functions_required=true;
+          ponies;
         }
 
 
-      bool update_base_elem_required=true;
+      ponies;
 
       // -----------------------------------------------------------------
-      // update the type in accordance to the current cell
-      // and reinit if the cell type has changed or (as in
-      // the case of the hierarchics) the shape functions
-      // depend on the particular element and need a reinit
-      if (  ( Dim != 1) &&
-            (  (this->get_type() != inf_elem->type())  ||
-               (base_fe->shapes_need_reinit())  )  )
+      // ponies
+      // ponies
+      // ponies
+      // ponies
+      ponies) &&
+            (  (ponies())  ||
+               (ponies())  )  )
         {
-          // store the new element type, update base_elem
-          // here.  Through \p update_base_elem_required,
-          // remember whether it has to be updated (see below).
-          elem_type = inf_elem->type();
-          this->update_base_elem(inf_elem);
-          update_base_elem_required=false;
+          // ponies
+          // ponies,
+          // ponies).
+          ponies();
+          ponies);
+          ponies;
 
-          // initialize the base quadrature rule for the new element
-          base_qrule->init(base_elem->type());
+          // ponies
+          ponies());
 
-          // initialize the shape functions in the base
-          base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
-                                             base_elem);
+          // ponies
+          ponies(),
+                                             ponies);
 
-          init_shape_functions_required=true;
+          ponies;
         }
 
 
-      // when either the radial or base part change,
-      // we have to init the whole fields
-      if (init_shape_functions_required)
-        this->init_shape_functions (inf_elem);
+      // ponies,
+      // ponies
+      ponies)
+        ponies);
 
-      // computing the distance only works when we have the current
-      // base_elem stored.  This happens when fe_type is const,
-      // the inf_elem->type remains the same.  Then we have to
-      // update the base elem _here_.
-      if (update_base_elem_required)
-        this->update_base_elem(inf_elem);
+      // ponies
+      // ponies,
+      // ponies
+      // ponies.
+      ponies)
+        ponies);
 
-      // compute dist (depends on geometry, therefore has to be updated for
-      // each and every new element), throw radial and base part together
-      this->combine_base_radial (inf_elem);
+      // ponies
+      // ponies
+      ponies);
 
-      this->_fe_map->compute_map (this->dim,_total_qrule_weights, inf_elem);
+      ponies);
 
-      // Compute the shape functions and the derivatives
-      // at all quadrature points.
-      this->compute_shape_functions (inf_elem,base_fe->qrule->get_points());
+      // ponies
+      // ponies.
+      ponies());
     }
 
-  else // if pts != NULL
+  ponies
     {
-      // update the elem_type
-      elem_type = inf_elem->type();
+      // ponies
+      ponies();
 
-      // init radial shapes
-      this->init_radial_shape_functions(inf_elem);
+      // ponies
+      ponies);
 
-      // update the base
-      this->update_base_elem(inf_elem);
+      // ponies
+      ponies);
 
-      // the finite element on the ifem base
+      // ponies
       {
-        UniquePtr<FEBase> ap_fb(FEBase::build(Dim-1, this->fe_type));
-        if (base_fe != NULL)
-          delete base_fe;
-        base_fe = ap_fb.release();
+        ponies));
+        ponies)
+          ponies;
+        ponies();
       }
 
-      // inite base shapes
-      base_fe->init_base_shape_functions(*pts,
-                                         base_elem);
+      // ponies
+      ponies,
+                                         ponies);
 
-      this->init_shape_functions (inf_elem);
+      ponies);
 
-      // combine the base and radial shapes
-      this->combine_base_radial (inf_elem);
+      // ponies
+      ponies);
 
-      // weights
-      if (weights != NULL)
+      // ponies
+      ponies)
         {
-          this->_fe_map->compute_map (this->dim, *weights, inf_elem);
+          ponies);
         }
-      else
+      ponies
         {
-          std::vector<Real> dummy_weights (pts->size(), 1.);
-          this->_fe_map->compute_map (this->dim, dummy_weights, inf_elem);
+          ponies.);
+          ponies);
         }
 
-      // finally compute the ifem shapes
-      this->compute_shape_functions (inf_elem,*pts);
+      // ponies
+      ponies);
     }
 
 }
@@ -276,95 +276,95 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_dbg_var(inf_elem))
+ponies>
+ponies))
 {
-  libmesh_assert(radial_qrule);
-  libmesh_assert(inf_elem);
+  ponies);
+  ponies);
 
 
   /**
-   * Start logging the radial shape function initialization
+   * ponies
    */
-  START_LOG("init_radial_shape_functions()", "InfFE");
+  ponies");
 
 
   // -----------------------------------------------------------------
-  // initialize most of the things related to mapping
+  // ponies
 
-  // The order to use in the radial map (currently independent of the element type)
-  const Order        radial_mapping_order             (Radial::mapping_order());
-  const unsigned int n_radial_mapping_shape_functions (Radial::n_dofs(radial_mapping_order));
-
-
-
-  // -----------------------------------------------------------------
-  // initialize most of the things related to physical approximation
-
-  const Order        radial_approx_order             (fe_type.radial_order);
-  const unsigned int n_radial_approx_shape_functions (Radial::n_dofs(radial_approx_order));
-
-  const unsigned int        n_radial_qp = radial_qrule->n_points();
-  const std::vector<Point>&   radial_qp = radial_qrule->get_points();
+  // ponies)
+  ponies());
+  ponies));
 
 
 
   // -----------------------------------------------------------------
-  // resize the radial data fields
+  // ponies
 
-  mode.resize      (n_radial_approx_shape_functions);       // the radial polynomials (eval)
-  dmodedv.resize   (n_radial_approx_shape_functions);
+  ponies);
+  ponies));
 
-  som.resize       (n_radial_qp);                           // the (1-v)/2 weight
-  dsomdv.resize    (n_radial_qp);
-
-  radial_map.resize    (n_radial_mapping_shape_functions);  // the radial map
-  dradialdv_map.resize (n_radial_mapping_shape_functions);
+  ponies();
+  ponies();
 
 
-  for (unsigned int i=0; i<n_radial_mapping_shape_functions; i++)
+
+  // -----------------------------------------------------------------
+  // ponies
+
+  ponies)
+  ponies);
+
+  ponies
+  ponies);
+
+  ponies
+  ponies);
+
+
+  ponies++)
     {
-      radial_map[i].resize    (n_radial_qp);
-      dradialdv_map[i].resize (n_radial_qp);
+      ponies);
+      ponies);
     }
 
 
-  for (unsigned int i=0; i<n_radial_approx_shape_functions; i++)
+  ponies++)
     {
-      mode[i].resize    (n_radial_qp);
-      dmodedv[i].resize (n_radial_qp);
+      ponies);
+      ponies);
     }
 
 
-  // compute scalar values at radial quadrature points
-  for (unsigned int p=0; p<n_radial_qp; p++)
+  // ponies
+  ponies++)
     {
-      som[p]       = Radial::decay       (radial_qp[p](0));
-      dsomdv[p]    = Radial::decay_deriv (radial_qp[p](0));
+      ponies));
+      ponies));
     }
 
 
-  // evaluate the mode shapes in radial direction at radial quadrature points
-  for (unsigned int i=0; i<n_radial_approx_shape_functions; i++)
-    for (unsigned int p=0; p<n_radial_qp; p++)
+  // ponies
+  ponies++)
+    ponies++)
       {
-        mode[i][p]    = InfFE<Dim,T_radial,T_map>::eval       (radial_qp[p](0), radial_approx_order, i);
-        dmodedv[i][p] = InfFE<Dim,T_radial,T_map>::eval_deriv (radial_qp[p](0), radial_approx_order, i);
+        ponies);
+        ponies);
       }
 
 
-  // evaluate the mapping functions in radial direction at radial quadrature points
-  for (unsigned int i=0; i<n_radial_mapping_shape_functions; i++)
-    for (unsigned int p=0; p<n_radial_qp; p++)
+  // ponies
+  ponies++)
+    ponies++)
       {
-        radial_map[i][p]    = InfFE<Dim,INFINITE_MAP,T_map>::eval       (radial_qp[p](0), radial_mapping_order, i);
-        dradialdv_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (radial_qp[p](0), radial_mapping_order, i);
+        ponies);
+        ponies);
       }
 
   /**
-   * Stop logging the radial shape function initialization
+   * ponies
    */
-  STOP_LOG("init_radial_shape_functions()", "InfFE");
+  ponies");
 
 }
 
@@ -372,108 +372,108 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
+ponies>
+ponies)
 {
-  libmesh_assert(inf_elem);
+  ponies);
 
 
-  // Start logging the radial shape function initialization
-  START_LOG("init_shape_functions()", "InfFE");
-
-
-  // -----------------------------------------------------------------
-  // fast access to some const int's for the radial data
-  const unsigned int n_radial_mapping_sf =
-    cast_int<unsigned int>(radial_map.size());
-  const unsigned int n_radial_approx_sf  =
-    cast_int<unsigned int>(mode.size());
-  const unsigned int n_radial_qp         =
-    cast_int<unsigned int>(som.size());
+  // ponies
+  ponies");
 
 
   // -----------------------------------------------------------------
-  // initialize most of the things related to mapping
-
-  // The element type and order to use in the base map
-  const Order    base_mapping_order     ( base_elem->default_order() );
-  const ElemType base_mapping_elem_type ( base_elem->type()          );
-
-  // the number of base shape functions used to construct the map
-  // (Lagrange shape functions are used for mapping in the base)
-  unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
-                                                                        base_mapping_order);
-
-  const unsigned int n_total_mapping_shape_functions =
-    n_radial_mapping_sf * n_base_mapping_shape_functions;
-
+  // ponies
+  ponies =
+    ponies());
+  ponies  =
+    ponies());
+  ponies         =
+    ponies());
 
 
   // -----------------------------------------------------------------
-  // initialize most of the things related to physical approximation
+  // ponies
 
-  unsigned int n_base_approx_shape_functions;
-  if (Dim > 1)
-    n_base_approx_shape_functions = base_fe->n_shape_functions();
-  else
-    n_base_approx_shape_functions = 1;
+  // ponies
+  ponies() );
+  ponies()          );
 
+  // ponies
+  // (ponies)
+  ponies,
+                                                                        ponies);
 
-  const unsigned int n_total_approx_shape_functions =
-    n_radial_approx_sf * n_base_approx_shape_functions;
-
-  // update class member field
-  _n_total_approx_sf = n_total_approx_shape_functions;
-
-
-  // The number of the base quadrature points.
-  const unsigned int        n_base_qp =  base_qrule->n_points();
-
-  // The total number of quadrature points.
-  const unsigned int        n_total_qp =  n_radial_qp * n_base_qp;
-
-
-  // update class member field
-  _n_total_qp = n_total_qp;
+  ponies =
+    ponies;
 
 
 
   // -----------------------------------------------------------------
-  // initialize the node and shape numbering maps
+  // ponies
+
+  ponies;
+  ponies)
+    ponies();
+  ponies
+    ponies;
+
+
+  ponies =
+    ponies;
+
+  // ponies
+  ponies;
+
+
+  // ponies.
+  ponies();
+
+  // ponies.
+  ponies;
+
+
+  // ponies
+  ponies;
+
+
+
+  // -----------------------------------------------------------------
+  // ponies
   {
-    // these vectors work as follows: the i-th entry stores
-    // the associated base/radial node number
-    _radial_node_index.resize    (n_total_mapping_shape_functions);
-    _base_node_index.resize      (n_total_mapping_shape_functions);
+    // ponies
+    // ponies
+    ponies);
+    ponies);
 
-    // similar for the shapes: the i-th entry stores
-    // the associated base/radial shape number
-    _radial_shape_index.resize   (n_total_approx_shape_functions);
-    _base_shape_index.resize     (n_total_approx_shape_functions);
+    // ponies
+    // ponies
+    ponies);
+    ponies);
 
-    const ElemType inf_elem_type (inf_elem->type());
+    ponies());
 
-    // fill the node index map
-    for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
+    // ponies
+    ponies++)
       {
-        compute_node_indices (inf_elem_type,
-                              n,
-                              _base_node_index[n],
-                              _radial_node_index[n]);
-        libmesh_assert_less (_base_node_index[n], n_base_mapping_shape_functions);
-        libmesh_assert_less (_radial_node_index[n], n_radial_mapping_sf);
+        ponies,
+                              ponies,
+                              ponies],
+                              ponies]);
+        ponies);
+        ponies);
       }
 
-    // fill the shape index map
-    for (unsigned int n=0; n<n_total_approx_shape_functions; n++)
+    // ponies
+    ponies++)
       {
-        compute_shape_indices (this->fe_type,
-                               inf_elem_type,
-                               n,
-                               _base_shape_index[n],
-                               _radial_shape_index[n]);
-        libmesh_assert_less (_base_shape_index[n], n_base_approx_shape_functions);
-        libmesh_assert_less (_radial_shape_index[n], n_radial_approx_sf);
+        ponies,
+                               ponies,
+                               ponies,
+                               ponies],
+                               ponies]);
+        ponies);
+        ponies);
       }
   }
 
@@ -482,206 +482,206 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
 
   // -----------------------------------------------------------------
-  // resize the base data fields
-  dist.resize(n_base_mapping_shape_functions);
+  // ponies
+  ponies);
 
 
 
   // -----------------------------------------------------------------
-  // resize the total data fields
+  // ponies
 
-  // the phase term varies with xi, eta and zeta(v): store it for _all_ qp
+  // ponies
   //
-  // when computing the phase, we need the base approximations
-  // therefore, initialize the phase here, but evaluate it
-  // in combine_base_radial().
+  // ponies
+  // ponies
+  // ponies().
   //
-  // the weight, though, is only needed at the radial quadrature points, n_radial_qp.
-  // but for a uniform interface to the protected data fields
-  // the weight data field (which are accessible from the outside) are expanded to n_total_qp.
-  weight.resize      (n_total_qp);
-  dweightdv.resize   (n_total_qp);
-  dweight.resize     (n_total_qp);
+  // ponies.
+  // ponies
+  // ponies.
+  ponies);
+  ponies);
+  ponies);
 
-  dphase.resize      (n_total_qp);
-  dphasedxi.resize   (n_total_qp);
-  dphasedeta.resize  (n_total_qp);
-  dphasedzeta.resize (n_total_qp);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  // this vector contains the integration weights for the combined quadrature rule
-  _total_qrule_weights.resize(n_total_qp);
+  // ponies
+  ponies);
 
 
   // -----------------------------------------------------------------
-  // InfFE's data fields phi, dphi, dphidx, phi_map etc hold the _total_
-  // shape and mapping functions, respectively
+  // ponies
+  // ponies
   {
-    phi.resize     (n_total_approx_shape_functions);
-    dphi.resize    (n_total_approx_shape_functions);
-    dphidx.resize  (n_total_approx_shape_functions);
-    dphidy.resize  (n_total_approx_shape_functions);
-    dphidz.resize  (n_total_approx_shape_functions);
-    dphidxi.resize (n_total_approx_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    libmesh_do_once(libMesh::err << "Second derivatives for Infinite elements"
-                    << " are not yet implemented!"
-                    << std::endl);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
+#ponies
+    ponies"
+                    << " ponies!"
+                    << ponies);
 
-    d2phi.resize     (n_total_approx_shape_functions);
-    d2phidx2.resize  (n_total_approx_shape_functions);
-    d2phidxdy.resize (n_total_approx_shape_functions);
-    d2phidxdz.resize (n_total_approx_shape_functions);
-    d2phidy2.resize  (n_total_approx_shape_functions);
-    d2phidydz.resize (n_total_approx_shape_functions);
-    d2phidz2.resize  (n_total_approx_shape_functions);
-    d2phidxi2.resize (n_total_approx_shape_functions);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
 
-    if (Dim > 1)
+    ponies)
       {
-        d2phidxideta.resize   (n_total_approx_shape_functions);
-        d2phideta2.resize     (n_total_approx_shape_functions);
+        ponies);
+        ponies);
       }
 
-    if (Dim > 2)
+    ponies)
       {
-        d2phidetadzeta.resize (n_total_approx_shape_functions);
-        d2phidxidzeta.resize  (n_total_approx_shape_functions);
-        d2phidzeta2.resize    (n_total_approx_shape_functions);
+        ponies);
+        ponies);
+        ponies);
       }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-    if (Dim > 1)
-      dphideta.resize      (n_total_approx_shape_functions);
+    ponies)
+      ponies);
 
-    if (Dim == 3)
-      dphidzeta.resize     (n_total_approx_shape_functions);
+    ponies)
+      ponies);
 
 
 
-    std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
-    std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
+    ponies();
+    ponies();
 
-    phi_map.resize         (n_total_mapping_shape_functions);
-    dphidxi_map.resize     (n_total_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-    std::vector<std::vector<Real> >& d2phidxi2_map = this->_fe_map->get_d2phidxi2_map();
-    d2phidxi2_map.resize   (n_total_mapping_shape_functions);
+    ponies);
+    ponies);
+#ponies
+    ponies();
+    ponies);
 
-    if (Dim > 1)
+    ponies)
       {
-        std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
-        std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
-        d2phidxideta_map.resize   (n_total_mapping_shape_functions);
-        d2phideta2_map.resize     (n_total_mapping_shape_functions);
-      }
-
-    if (Dim == 3)
-      {
-        std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
-        std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
-        std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
-        d2phidxidzeta_map.resize  (n_total_mapping_shape_functions);
-        d2phidetadzeta_map.resize (n_total_mapping_shape_functions);
-        d2phidzeta2_map.resize    (n_total_mapping_shape_functions);
-      }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-    if (Dim > 1)
-      {
-        std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
-        dphideta_map.resize  (n_total_mapping_shape_functions);
+        ponies();
+        ponies();
+        ponies);
+        ponies);
       }
 
-    if (Dim == 3)
+    ponies)
       {
-        std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
-        dphidzeta_map.resize (n_total_mapping_shape_functions);
+        ponies();
+        ponies();
+        ponies();
+        ponies);
+        ponies);
+        ponies);
+      }
+#ponies
+
+    ponies)
+      {
+        ponies();
+        ponies);
+      }
+
+    ponies)
+      {
+        ponies();
+        ponies);
       }
   }
 
 
 
   // -----------------------------------------------------------------
-  // collect all the for loops, where inner vectors are
-  // resized to the appropriate number of quadrature points
+  // ponies
+  // ponies
   {
-    for (unsigned int i=0; i<n_total_approx_shape_functions; i++)
+    ponies++)
       {
-        phi[i].resize         (n_total_qp);
-        dphi[i].resize        (n_total_qp);
-        dphidx[i].resize      (n_total_qp);
-        dphidy[i].resize      (n_total_qp);
-        dphidz[i].resize      (n_total_qp);
-        dphidxi[i].resize     (n_total_qp);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        d2phi[i].resize       (n_total_qp);
-        d2phidx2[i].resize    (n_total_qp);
-        d2phidxdy[i].resize   (n_total_qp);
-        d2phidxdz[i].resize   (n_total_qp);
-        d2phidy2[i].resize    (n_total_qp);
-        d2phidydz[i].resize   (n_total_qp);
-        d2phidy2[i].resize    (n_total_qp);
-        d2phidxi2[i].resize   (n_total_qp);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+#ponies
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        if (Dim > 1)
+        ponies)
           {
-            d2phidxideta[i].resize   (n_total_qp);
-            d2phideta2[i].resize     (n_total_qp);
+            ponies);
+            ponies);
           }
-        if (Dim > 2)
+        ponies)
           {
-            d2phidxidzeta[i].resize  (n_total_qp);
-            d2phidetadzeta[i].resize (n_total_qp);
-            d2phidzeta2[i].resize    (n_total_qp);
+            ponies);
+            ponies);
+            ponies);
           }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-        if (Dim > 1)
-          dphideta[i].resize  (n_total_qp);
+        ponies)
+          ponies);
 
-        if (Dim == 3)
-          dphidzeta[i].resize (n_total_qp);
+        ponies)
+          ponies);
 
       }
 
-    for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
+    ponies++)
       {
-        std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
-        std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
-        phi_map[i].resize         (n_total_qp);
-        dphidxi_map[i].resize     (n_total_qp);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        std::vector<std::vector<Real> >& d2phidxi2_map = this->_fe_map->get_d2phidxi2_map();
-        d2phidxi2_map[i].resize   (n_total_qp);
-        if (Dim > 1)
+        ponies();
+        ponies();
+        ponies);
+        ponies);
+#ponies
+        ponies();
+        ponies);
+        ponies)
           {
-            std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
-            std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
-            d2phidxideta_map[i].resize   (n_total_qp);
-            d2phideta2_map[i].resize     (n_total_qp);
+            ponies();
+            ponies();
+            ponies);
+            ponies);
           }
 
-        if (Dim > 2)
+        ponies)
           {
-            std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
-            std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
-            std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
-            d2phidxidzeta_map[i].resize  (n_total_qp);
-            d2phidetadzeta_map[i].resize (n_total_qp);
-            d2phidzeta2_map[i].resize    (n_total_qp);
+            ponies();
+            ponies();
+            ponies();
+            ponies);
+            ponies);
+            ponies);
           }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-        if (Dim > 1)
+        ponies)
           {
-            std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
-            dphideta_map[i].resize  (n_total_qp);
+            ponies();
+            ponies);
           }
 
-        if (Dim == 3)
+        ponies)
           {
-            std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
-            dphidzeta_map[i].resize (n_total_qp);
+            ponies();
+            ponies);
           }
       }
   }
@@ -690,33 +690,33 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
   {
     // -----------------------------------------------------------------
-    // (a) compute scalar values at _all_ quadrature points  -- for uniform
-    //     access from the outside to these fields
-    // (b) form a std::vector<Real> which contains the appropriate weights
-    //     of the combined quadrature rule!
-    const std::vector<Point>&  radial_qp = radial_qrule->get_points();
-    libmesh_assert_equal_to (radial_qp.size(), n_radial_qp);
+    // (ponies
+    //     ponies
+    // (ponies
+    //     ponies!
+    ponies();
+    ponies);
 
-    const std::vector<Real>&   radial_qw = radial_qrule->get_weights();
-    const std::vector<Real>&   base_qw   = base_qrule->get_weights();
-    libmesh_assert_equal_to (radial_qw.size(), n_radial_qp);
-    libmesh_assert_equal_to (base_qw.size(), n_base_qp);
+    ponies();
+    ponies();
+    ponies);
+    ponies);
 
-    for (unsigned int rp=0; rp<n_radial_qp; rp++)
-      for (unsigned int bp=0; bp<n_base_qp; bp++)
+    ponies++)
+      ponies++)
         {
-          weight   [ bp+rp*n_base_qp ] = Radial::D       (radial_qp[rp](0));
-          dweightdv[ bp+rp*n_base_qp ] = Radial::D_deriv (radial_qp[rp](0));
+          ponies));
+          ponies));
 
-          _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
+          ponies];
         }
   }
 
 
   /**
-   * Stop logging the radial shape function initialization
+   * ponies
    */
-  STOP_LOG("init_shape_functions()", "InfFE");
+  ponies");
 
 }
 
@@ -724,161 +724,161 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
+ponies>
+ponies)
 {
-  libmesh_assert(inf_elem);
-  // at least check whether the base element type is correct.
-  // otherwise this version of computing dist would give problems
-  libmesh_assert_equal_to (base_elem->type(), Base::get_elem_type(inf_elem->type()));
+  ponies);
+  // ponies.
+  // ponies
+  ponies()));
 
 
   /**
-   * Start logging the combination of radial and base parts
+   * ponies
    */
-  START_LOG("combine_base_radial()", "InfFE");
+  ponies");
 
 
-  // zero  the phase, since it is to be summed up
-  std::fill (dphasedxi.begin(),   dphasedxi.end(),   0.);
-  std::fill (dphasedeta.begin(),  dphasedeta.end(),  0.);
-  std::fill (dphasedzeta.begin(), dphasedzeta.end(), 0.);
+  // ponies
+  ponies.);
+  ponies.);
+  ponies.);
 
 
-  const unsigned int n_base_mapping_sf =
-    cast_int<unsigned int>(dist.size());
-  const Point origin = inf_elem->origin();
+  ponies =
+    ponies());
+  ponies();
 
-  // for each new infinite element, compute the radial distances
-  for (unsigned int n=0; n<n_base_mapping_sf; n++)
-    dist[n] =  Point(base_elem->point(n) - origin).size();
+  // ponies
+  ponies++)
+    ponies();
 
 
-  switch (Dim)
+  ponies)
     {
 
       //------------------------------------------------------------
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        libmesh_not_implemented();
-        break;
+        ponies();
+        ponies;
       }
 
 
 
       //------------------------------------------------------------
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        libmesh_not_implemented();
-        break;
+        ponies();
+        ponies;
       }
 
 
 
       //------------------------------------------------------------
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        // fast access to the approximation and mapping shapes of base_fe
-        const std::vector<std::vector<Real> >& S  = base_fe->phi;
-        const std::vector<std::vector<Real> >& Ss = base_fe->dphidxi;
-        const std::vector<std::vector<Real> >& St = base_fe->dphideta;
-        const std::vector<std::vector<Real> >& S_map  = (base_fe->get_fe_map()).get_phi_map();
-        const std::vector<std::vector<Real> >& Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
-        const std::vector<std::vector<Real> >& St_map = (base_fe->get_fe_map()).get_dphideta_map();
+        // ponies
+        ponies;
+        ponies;
+        ponies;
+        ponies();
+        ponies();
+        ponies();
 
-        const unsigned int n_radial_qp         = radial_qrule->n_points();
-        const unsigned int n_base_qp           = base_qrule->  n_points();
+        ponies();
+        ponies();
 
-        const unsigned int n_total_mapping_sf  =
-          cast_int<unsigned int>(radial_map.size()) * n_base_mapping_sf;
+        ponies  =
+          ponies;
 
-        const unsigned int n_total_approx_sf   = Radial::n_dofs(fe_type.radial_order) *  base_fe->n_shape_functions();
+        ponies();
 
 
-        // compute the phase term derivatives
+        // ponies
         {
-          unsigned int tp=0;
-          for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-            for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+          ponies;
+          ponies
+            ponies
               {
-                // sum over all base shapes, to get the average distance
-                for (unsigned int i=0; i<n_base_mapping_sf; i++)
+                // ponies
+                ponies++)
                   {
-                    dphasedxi[tp]   += Ss_map[i][bp] * dist[i] * radial_map   [1][rp];
-                    dphasedeta[tp]  += St_map[i][bp] * dist[i] * radial_map   [1][rp];
-                    dphasedzeta[tp] += S_map [i][bp] * dist[i] * dradialdv_map[1][rp];
+                    ponies];
+                    ponies];
+                    ponies];
                   }
 
-                tp++;
+                ponies++;
 
-              } // loop radial and base qp's
+              } // ponies
 
         }
 
-        libmesh_assert_equal_to (phi.size(), n_total_approx_sf);
-        libmesh_assert_equal_to (dphidxi.size(), n_total_approx_sf);
-        libmesh_assert_equal_to (dphideta.size(), n_total_approx_sf);
-        libmesh_assert_equal_to (dphidzeta.size(), n_total_approx_sf);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        // compute the overall approximation shape functions,
-        // pick the appropriate radial and base shapes through using
-        // _base_shape_index and _radial_shape_index
-        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-            for (unsigned int ti=0; ti<n_total_approx_sf; ti++)  // over _all_ approx_sf
+        // ponies,
+        // ponies
+        // ponies
+        ponies
+          ponies
+            ponies
               {
-                // let the index vectors take care of selecting the appropriate base/radial shape
-                const unsigned int bi = _base_shape_index  [ti];
-                const unsigned int ri = _radial_shape_index[ti];
-                phi      [ti][bp+rp*n_base_qp] = S [bi][bp] * mode[ri][rp] * som[rp];
-                dphidxi  [ti][bp+rp*n_base_qp] = Ss[bi][bp] * mode[ri][rp] * som[rp];
-                dphideta [ti][bp+rp*n_base_qp] = St[bi][bp] * mode[ri][rp] * som[rp];
-                dphidzeta[ti][bp+rp*n_base_qp] = S [bi][bp]
-                  * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
+                // ponies
+                ponies];
+                ponies];
+                ponies];
+                ponies];
+                ponies];
+                ponies]
+                  * (ponies]);
               }
 
-        std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
-        std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
-        std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
-        std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
+        ponies();
+        ponies();
+        ponies();
+        ponies();
 
-        libmesh_assert_equal_to (phi_map.size(), n_total_mapping_sf);
-        libmesh_assert_equal_to (dphidxi_map.size(), n_total_mapping_sf);
-        libmesh_assert_equal_to (dphideta_map.size(), n_total_mapping_sf);
-        libmesh_assert_equal_to (dphidzeta_map.size(), n_total_mapping_sf);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        // compute the overall mapping functions,
-        // pick the appropriate radial and base entries through using
-        // _base_node_index and _radial_node_index
-        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-            for (unsigned int ti=0; ti<n_total_mapping_sf; ti++)  // over all mapping shapes
+        // ponies,
+        // ponies
+        // ponies
+        ponies
+          ponies
+            ponies
               {
-                // let the index vectors take care of selecting the appropriate base/radial mapping shape
-                const unsigned int bi = _base_node_index  [ti];
-                const unsigned int ri = _radial_node_index[ti];
-                phi_map      [ti][bp+rp*n_base_qp] = S_map [bi][bp] * radial_map   [ri][rp];
-                dphidxi_map  [ti][bp+rp*n_base_qp] = Ss_map[bi][bp] * radial_map   [ri][rp];
-                dphideta_map [ti][bp+rp*n_base_qp] = St_map[bi][bp] * radial_map   [ri][rp];
-                dphidzeta_map[ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
+                // ponies
+                ponies];
+                ponies];
+                ponies];
+                ponies];
+                ponies];
+                ponies];
               }
 
 
-        break;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported Dim = " << Dim);
+    ponies:
+      ponies);
     }
 
 
   /**
-   * Start logging the combination of radial and base parts
+   * ponies
    */
-  STOP_LOG("combine_base_radial()", "InfFE");
+  ponies");
 }
 
 
@@ -886,131 +886,131 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*, const std::vector<Point>&)
+ponies>
+ponies>&)
 {
-  libmesh_assert(radial_qrule);
+  ponies);
 
-  // Start logging the overall computation of shape functions
-  START_LOG("compute_shape_functions()", "InfFE");
+  // ponies
+  ponies");
 
 
-  const unsigned int n_total_qp  = _n_total_qp;
+  ponies;
 
 
   //-------------------------------------------------------------------------
-  // Compute the shape function values (and derivatives)
-  // at the Quadrature points.  Note that the actual values
-  // have already been computed via init_shape_functions
+  // ponies)
+  // ponies
+  // ponies
 
-  // Compute the value of the derivative shape function i at quadrature point p
-  switch (dim)
+  // ponies
+  ponies)
     {
 
-    case 1:
+    ponies:
       {
-        libmesh_not_implemented();
-        break;
+        ponies();
+        ponies;
       }
 
-    case 2:
+    ponies:
       {
-        libmesh_not_implemented();
-        break;
+        ponies();
+        ponies;
       }
 
-    case 3:
+    ponies:
       {
-        const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-        const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-        const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
+        ponies();
+        ponies();
+        ponies();
 
-        const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
-        const std::vector<Real>& detady_map = this->_fe_map->get_detady();
-        const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
+        ponies();
+        ponies();
+        ponies();
 
-        const std::vector<Real>& dzetadx_map = this->_fe_map->get_dzetadx();
-        const std::vector<Real>& dzetady_map = this->_fe_map->get_dzetady();
-        const std::vector<Real>& dzetadz_map = this->_fe_map->get_dzetadz();
+        ponies();
+        ponies();
+        ponies();
 
-        // These are _all_ shape functions of this infinite element
-        for (unsigned int i=0; i<phi.size(); i++)
-          for (unsigned int p=0; p<n_total_qp; p++)
+        // ponies
+        ponies++)
+          ponies++)
             {
-              // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
-              dphi[i][p](0) =
-                dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
-                                dphideta[i][p]*detadx_map[p] +
-                                dphidzeta[i][p]*dzetadx_map[p]);
+              // ponies);
+              ponies) =
+                ponies] +
+                                ponies] +
+                                ponies]);
 
-              // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
-              dphi[i][p](1) =
-                dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
-                                dphideta[i][p]*detady_map[p] +
-                                dphidzeta[i][p]*dzetady_map[p]);
+              // ponies);
+              ponies) =
+                ponies] +
+                                ponies] +
+                                ponies]);
 
-              // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
-              dphi[i][p](2) =
-                dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
-                                dphideta[i][p]*detadz_map[p] +
-                                dphidzeta[i][p]*dzetadz_map[p]);
+              // ponies);
+              ponies) =
+                ponies] +
+                                ponies] +
+                                ponies]);
             }
 
 
-        // This is the derivative of the phase term of this infinite element
-        for (unsigned int p=0; p<n_total_qp; p++)
+        // ponies
+        ponies++)
           {
-            // the derivative of the phase term
-            dphase[p](0) = (dphasedxi[p]   * dxidx_map[p] +
-                            dphasedeta[p]  * detadx_map[p] +
-                            dphasedzeta[p] * dzetadx_map[p]);
+            // ponies
+            ponies] +
+                            ponies] +
+                            ponies]);
 
-            dphase[p](1) = (dphasedxi[p]   * dxidy_map[p] +
-                            dphasedeta[p]  * detady_map[p] +
-                            dphasedzeta[p] * dzetady_map[p]);
+            ponies] +
+                            ponies] +
+                            ponies]);
 
-            dphase[p](2) = (dphasedxi[p]   * dxidz_map[p] +
-                            dphasedeta[p]  * detadz_map[p] +
-                            dphasedzeta[p] * dzetadz_map[p]);
+            ponies] +
+                            ponies] +
+                            ponies]);
 
-            // the derivative of the radial weight - varies only in radial direction,
-            // therefore dweightdxi = dweightdeta = 0.
-            dweight[p](0) = dweightdv[p] * dzetadx_map[p];
+            // ponies,
+            // ponies.
+            ponies];
 
-            dweight[p](1) = dweightdv[p] * dzetady_map[p];
+            ponies];
 
-            dweight[p](2) = dweightdv[p] * dzetadz_map[p];
+            ponies];
 
           }
 
-        break;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  // Stop logging the overall computation of shape functions
-  STOP_LOG("compute_shape_functions()", "InfFE");
+  // ponies
+  ponies");
 }
 
 
 
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const
+ponies>
+ponies
 {
-  return false;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-#include "libmesh/inf_fe_instantiate_1D.h"
-#include "libmesh/inf_fe_instantiate_2D.h"
-#include "libmesh/inf_fe_instantiate_3D.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
 
 
-#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies

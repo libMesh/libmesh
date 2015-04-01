@@ -1,713 +1,713 @@
-// Copyright (C) 2002-2007  Benjamin S. Kirk
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PLT_LOADER_H
-#define LIBMESH_PLT_LOADER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <string>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * This class will read a binary \p .plt file.  These types of files
- * are for use with Amtec's <a href="http://www.tecplot.com">Tecplot</a>
- * visualization package.
+ * ponies
+ * ponies>
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2004.
+ * @ponies.
  */
-class PltLoader
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Initializes data.
+   * ponies.
    */
-  PltLoader  (const bool v=false);
+  ponies);
 
   /**
-   * Constructor.  Reads the file specified by \p name.
+   * ponies.
    */
-  PltLoader  (const std::string& name, const bool v=false);
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~PltLoader ();
+  ~ponies ();
 
   /**
-   * Clear all data and return to a pristine state.
+   * ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * Returns the verbosity.
+   * ponies.
    */
-  bool verbose () const { return _verbose; }
+  ponies; }
 
   /**
-   * Reads the .plt file specified by \p name.
+   * ponies.
    */
-  void read (const std::string& name);
+  ponies);
 
   /**
-   * Writes an ASCII Tecplot file.  The optional parameter \p version
-   * specifies the version format to write.
+   * ponies
+   * ponies.
    */
-  void write_dat (const std::string& name,
-                  const unsigned int version=10) const;
+  ponies,
+                  ponies;
 
-  // BSK - this functionality requires FORTRAN subrouitine calls,
-  //       and there is no need to "dirty up" \p libMesh with FORTRAN
-  //       just to enable these methods.
+  // ponies,
+  //       ponies
+  //       ponies.
   //   /**
-  //    * Writes a plot3d files.  The grid will be in basename.g and
-  //    * the solution will be in basename.q.  It is assumed that the
-  //    * first three variables from the .plt file are the (x,y,z)
-  //    * locations of the grid points.  The optional parameter \p reverse
-  //    * specifies if the output file will have reversed byte ordering.
+  //    * ponies
+  //    * ponies
+  //    * ponies)
+  //    * ponies
+  //    * ponies.
   //    */
-  //   void write_plot3d (const std::string& basename,
-  //      const bool reverse=false,
-  //      const bool gridonly=false) const;
+  //   ponies,
+  //      ponies,
+  //      ponies;
 
   //   /**
-  //    * Writes a Cart3D .tri component file.  The number of components
-  //    * will be the number of zones in the .plt file.
+  //    * ponies
+  //    * ponies.
   //    */
-  //   void write_tri (const std::string& name,
-  //   const bool reverse=false,
-  //   const bool gridonly=false) const;
+  //   ponies,
+  //   ponies,
+  //   ponies;
 
 
 
   //--------------------------------------------------------------
-  // Data access
+  // ponies
 
 
 
   /**
-   * Enum defining the zone type in the Tecplot binary file,
-   * for use with the old .plt format.
+   * ponies,
+   * ponies.
    */
-  enum OldZoneType { BLOCK=0,
-                     POINT,
-                     FEBLOCK,
-                     FEPOINT };
+  ponies,
+                     ponies,
+                     ponies,
+                     ponies };
 
   /**
-   * Enum defining the zone type in the Tecplot binary file,
-   * for use with the new .plt format.
+   * ponies,
+   * ponies.
    */
-  enum NewZoneType { ORDERED=0,
-                     FELINESEG,
-                     FETRIANGLE,
-                     FEQUADRILATERAL,
-                     FETETRAHEDRON,
-                     FEBRICK };
+  ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies };
 
   /**
-   * Enum defining the data type of each variable.
+   * ponies.
    */
-  enum DataType { FLOAT=1,
-                  DOUBLE,
-                  LONGINT,
-                  SHORTINT,
-                  BYTE,
-                  BIT};
+  ponies,
+                  ponies,
+                  ponies,
+                  ponies,
+                  ponies,
+                  ponies};
 
   /**
-   * Enum defining the finite element types
+   * ponies
    */
-  enum FEType { TRI=0,
-                QUAD,
-                TET,
-                HEX };
+  ponies,
+                ponies,
+                ponies,
+                ponies };
 
 
 
   //--------------------------------------------------------------
-  // Public Data Access
+  // ponies
 
 
 
   /**
-   * @returns the Tecplot version number string.  This identifies the
-   * version of Tecplot (or preplot) that wrote the binary file.  Currently,
-   * PltLoader understands versions "#!TDV7X " and "#!TDV1XX"
+   * @ponies
+   * ponies,
+   * ponies"
    */
-  const std::string & version () const { return _version; }
+  ponies; }
 
   /**
-   * @returns \p true if the binary type of the file is different than the
-   * machine that is reading it.  If this is the case we must perform an
-   * endian-swap on all input data.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  bool is_foreign () const { return _is_foreign; }
+  ponies; }
 
   /**
-   * @returns the data set title
+   * @ponies
    */
-  const std::string & title () const { return _title; }
+  ponies; }
 
   /**
-   * @returns the number of variables in the data set.
+   * @ponies.
    */
-  unsigned int n_vars () const { return _n_vars; }
+  ponies; }
 
   /**
-   * @returns the name of variable \p v.
+   * @ponies.
    */
-  const std::string & var_name (const unsigned int v) const;
+  ponies;
 
   /**
-   * @returns the type of variable \p v
+   * @ponies
    */
-  unsigned int var_type (const unsigned int v) const;
+  ponies;
 
   /**
-   * @returns the number of zones.
+   * @ponies.
    */
-  unsigned int n_zones () const { return _n_zones; }
+  ponies; }
 
   /**
-   * @returns the type of zone \p z
+   * @ponies
    */
-  unsigned int zone_type (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns the name of zone \p z.
+   * @ponies.
    */
-  const std::string & zone_name (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns the data packing flag for zone \p z.
+   * @ponies.
    */
-  unsigned int zone_pack (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns \p imax for zone \p z.
+   * @ponies.
    */
-  unsigned int imax (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns \p jmax for zone \p z.
+   * @ponies.
    */
-  unsigned int jmax (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns \p kmax for zone \p z.
+   * @ponies.
    */
-  unsigned int kmax (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns the number of nodes in the mesh (for unstructured meshes).
+   * @ponies).
    */
-  unsigned int n_nodes (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns the number of elements in the mesh (for unstructured meshes).
+   * @ponies).
    */
-  unsigned int n_elem (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns the element type for the \p zth zone (for unstructured meshes).
+   * @ponies).
    */
-  FEType elem_type (const unsigned int z) const;
+  ponies;
 
   /**
-   * @returns a reference to the data read from the file
+   * @ponies
    */
-  const std::vector<std::vector<std::vector<float> > > & get_data () const;
+  ponies;
 
   /**
-   * Enum defining the number of nodes for each element type.
+   * ponies.
    */
-  static const unsigned int NNodes[4];
+  ponies];
 
 
-private:
+ponies:
 
 
   /**
-   * Read the header of the binary file.
+   * ponies.
    */
-  void read_header (std::istream& in);
+  ponies);
 
   /**
-   * Read data from the binary file.
+   * ponies.
    */
-  void read_data (std::istream& in);
+  ponies);
 
   /**
-   * Read data for the zth zone in BLOCK structured format.
+   * ponies.
    */
-  void read_block_data (std::istream& in, const unsigned int zn);
+  ponies);
 
   /**
-   * Read data for the zth zone in POINT structured format.
+   * ponies.
    */
-  void read_point_data (std::istream& in, const unsigned int zn);
+  ponies);
 
   /**
-   * Read data for the zth zone in FEBLOCK unstructured format.
+   * ponies.
    */
-  void read_feblock_data (std::istream& in, const unsigned int zn);
+  ponies);
 
   /**
-   * Read data for the zth zone in FEPOINT unstructured format.
+   * ponies.
    */
-  void read_fepoint_data (std::istream& in, const unsigned int zn);
+  ponies);
 
 
   //--------------------------------------------------------------
-  // Private Data Access
+  // ponies
 
 
 
   /**
-   * @returns the Tecplot version number string.
+   * @ponies.
    */
-  std::string & version () { return _version; }
+  ponies; }
 
   /**
-   * @returns \p true if the binary type of the file is different than the
-   * machine that is reading it.  If this is the case we must perform an
-   * endian-swap on all input data.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  bool & is_foreign () { return _is_foreign; }
+  ponies; }
 
   /**
-   * @returns the data set title
+   * @ponies
    */
-  std::string & title () { return _title; }
+  ponies; }
 
   /**
-   * @returns the number of variables in the data set.
+   * @ponies.
    */
-  void set_n_vars (const unsigned int nv);
+  ponies);
 
   /**
-   * @returns the name of variable \p v.
+   * @ponies.
    */
-  std::string & var_name (const unsigned int v);
+  ponies);
 
   /**
-   * @returns the type of variable \p v
+   * @ponies
    */
-  unsigned int & var_type (const unsigned int v);
+  ponies);
 
   /**
-   * @returns the number of zones.
+   * @ponies.
    */
-  void set_n_zones (const unsigned int nz);
+  ponies);
 
   /**
-   * @returns the type of zone \p z
+   * @ponies
    */
-  unsigned int & zone_type (const unsigned int z);
+  ponies);
 
   /**
-   * @returns the name of zone \p z.
+   * @ponies.
    */
-  std::string & zone_name (const unsigned int z);
+  ponies);
 
   /**
-   * @returns the data pack flag for zone \p z.
+   * @ponies.
    */
-  unsigned int & zone_pack (const unsigned int z);
+  ponies);
 
   /**
-   * @returns \p imax for zone \p z.
+   * @ponies.
    */
-  unsigned int & imax (const unsigned int z);
+  ponies);
 
   /**
-   * @returns \p jmax for zone \p z.
+   * @ponies.
    */
-  unsigned int & jmax (const unsigned int z);
+  ponies);
 
   /**
-   * @returns \p kmax for zone \p z.
+   * @ponies.
    */
-  unsigned int & kmax (const unsigned int z);
+  ponies);
 
 
   //--------------------------------------------------------------
-  // Private Data
+  // ponies
 
 
   /**
-   * Verbosity
+   * ponies
    */
-  const bool _verbose;
+  ponies;
 
   /**
-   * The Tecplot Version number string.
+   * ponies.
    */
-  std::string _version;
+  ponies;
 
   /**
-   * Is the data foreign?
+   * ponies?
    */
-  bool _is_foreign;
+  ponies;
 
   /**
-   * The Tecplot data set title.
+   * ponies.
    */
-  std::string _title;
+  ponies;
 
   /**
-   * The number of variables in the data set.
+   * ponies.
    */
-  unsigned int _n_vars;
+  ponies;
 
   /**
-   * The name for each variable.
+   * ponies.
    */
-  std::vector<std::string> _var_names;
+  ponies;
 
   /**
-   * The type of each variable.  Must be one of the
-   * enumerated \p DataType types.
+   * ponies
+   * ponies.
    */
-  std::vector<unsigned int> _var_types;
+  ponies;
 
   /**
-   * The number of zones.
+   * ponies.
    */
-  unsigned int _n_zones;
+  ponies;
 
   /**
-   * The type of each zone.
+   * ponies.
    */
-  std::vector<unsigned int> _zone_types;
+  ponies;
 
   /**
-   * The name of each zone.
+   * ponies.
    */
-  std::vector<std::string> _zone_names;
+  ponies;
 
   /**
-   * The data packing for each zone (new version only)
+   * ponies)
    */
-  std::vector<unsigned int> _zone_pack;
+  ponies;
 
   /**
-   * The (imax,jmax,kmax) value for each zone.
+   * ponies.
    */
-  std::vector<unsigned int> _imax;
-  std::vector<unsigned int> _jmax;
-  std::vector<unsigned int> _kmax;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Vector to hold the data.
+   * ponies.
    */
-  std::vector<std::vector<std::vector<float> > >  _data;
+  ponies;
 
   /**
-   * Vectors to hold the connectivity for each zone
-   * (only for unstructured files).
+   * ponies
+   * (ponies).
    */
-  std::vector<std::vector<int> > _conn;
+  ponies;
 
   /**
-   * Scratch data & relevant sizes.
+   * ponies.
    */
-  mutable char buf[512];
+  ponies];
 };
 
 
 
 //---------------------------------------------------------
-// PltLoader inline members
-inline
-PltLoader::PltLoader (const bool v) :
-  _verbose      (v),
-  _is_foreign   (false),
-  _n_vars       (0),
-  _n_zones      (0)
+// ponies
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-inline
-PltLoader::PltLoader (const std::string& name, const bool v) :
-  _verbose      (v),
-  _is_foreign   (false),
-  _n_vars       (0),
-  _n_zones      (0)
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  this->read (name);
+  ponies);
 }
 
 
 
-inline
-PltLoader::~PltLoader()
+ponies
+ponies()
 {
 }
 
 
 
-inline
-const std::string & PltLoader::var_name (const unsigned int v) const
+ponies
+ponies
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_names.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_names.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _var_names[v];
+  ponies];
 }
 
 
 
-inline
-std::string & PltLoader::var_name (const unsigned int v)
+ponies
+ponies)
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_names.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_names.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _var_names[v];
+  ponies];
 }
 
 
 
-inline
-unsigned int PltLoader::var_type (const unsigned int v) const
+ponies
+ponies
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_types.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_types.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _var_types[v];
+  ponies];
 }
 
 
 
-inline
-unsigned int & PltLoader::var_type (const unsigned int v)
+ponies
+ponies)
 {
-  libmesh_assert_less (v, this->n_vars());
-  libmesh_assert_less (v, _var_types.size());
-  libmesh_assert_equal_to (this->n_vars(), _var_types.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _var_types[v];
+  ponies];
 }
 
 
 
-inline
-unsigned int PltLoader::zone_type (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_types.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_types.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _zone_types[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int & PltLoader::zone_type (const unsigned int z)
+ponies
+ponies)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_types.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_types.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _zone_types[z];
+  ponies];
 }
 
 
 
-inline
-const std::string & PltLoader::zone_name (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_names.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_names.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _zone_names[z];
+  ponies];
 }
 
 
 
-inline
-std::string & PltLoader::zone_name (const unsigned int z)
+ponies
+ponies)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_names.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_names.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _zone_names[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int PltLoader::zone_pack (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_pack.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_pack.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _zone_pack[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int & PltLoader::zone_pack (const unsigned int z)
+ponies
+ponies)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_less (z, _zone_pack.size());
-  libmesh_assert_equal_to (this->n_zones(), _zone_pack.size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _zone_pack[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int PltLoader::imax (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_imax.size(), this->n_zones());
+  ponies());
+  ponies());
 
-  return _imax[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int & PltLoader::imax (const unsigned int z)
+ponies
+ponies)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_imax.size(), this->n_zones());
+  ponies());
+  ponies());
 
-  return _imax[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int PltLoader::jmax (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_jmax.size(), this->n_zones());
+  ponies());
+  ponies());
 
-  return _jmax[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int & PltLoader::jmax (const unsigned int z)
+ponies
+ponies)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_jmax.size(), this->n_zones());
+  ponies());
+  ponies());
 
-  return _jmax[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int PltLoader::kmax (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_kmax.size(), this->n_zones());
+  ponies());
+  ponies());
 
-  return _kmax[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int & PltLoader::kmax (const unsigned int z)
+ponies
+ponies)
 {
-  libmesh_assert_less (z, this->n_zones());
-  libmesh_assert_equal_to (_kmax.size(), this->n_zones());
+  ponies());
+  ponies());
 
-  return _kmax[z];
+  ponies];
 }
 
 
 
-inline
-unsigned int PltLoader::n_nodes (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
+  ponies());
 
-  // Only for unstructured zones!
-  libmesh_assert_greater (this->zone_type(z), 1);
+  // ponies!
+  ponies);
 
-  return this->imax(z);
+  ponies);
 }
 
 
 
-inline
-unsigned int PltLoader::n_elem (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
+  ponies());
 
-  // Only for unstructured zones!
-  libmesh_assert_greater (this->zone_type(z), 1);
+  // ponies!
+  ponies);
 
-  return this->jmax(z);
+  ponies);
 }
 
 
 
-inline
-PltLoader::FEType PltLoader::elem_type (const unsigned int z) const
+ponies
+ponies
 {
-  libmesh_assert_less (z, this->n_zones());
+  ponies());
 
-  // Only for unstructured zones!
-  libmesh_assert_greater (this->zone_type(z), 1);
+  // ponies!
+  ponies);
 
-  return static_cast<FEType>(this->kmax(z));
+  ponies));
 }
 
 
-inline
-const std::vector<std::vector<std::vector<float> > > &
-PltLoader::get_data () const
+ponies
+ponies> > > &
+ponies
 {
-  return _data;
+  ponies;
 }
 
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_PLT_LOADER_H
+#ponies

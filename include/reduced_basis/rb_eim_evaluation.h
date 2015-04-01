@@ -1,262 +1,262 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_EIM_EVALUATION_H
-#define LIBMESH_RB_EIM_EVALUATION_H
+#ponies
+#ponies
 
-// libMesh includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/point.h"
-#include "libmesh/rb_evaluation.h"
-#include "libmesh/elem.h"
-#include "libmesh/serial_mesh.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-class RBParameters;
-class RBParametrizedFunction;
+ponies;
+ponies;
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * RBEIMEvaluation extends RBEvaluation to
- * encapsulate the code and data required
- * to perform "online" evaluations for
- * EIM approximations.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// RBEIMEvaluation class definition
+// ponies
 
-class RBEIMEvaluation : public RBEvaluation
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  RBEIMEvaluation (const libMesh::Parallel::Communicator &comm_in
-                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                   ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBEIMEvaluation ();
+  ponies ();
 
   /**
-   * The type of the parent.
+   * ponies.
    */
-  typedef RBEvaluation Parent;
+  ponies;
 
   /**
-   * Clear this object.
+   * ponies.
    */
-  virtual void clear();
+  ponies();
 
   /**
-   * Resize the data structures for storing data associated
-   * with this object.
+   * ponies
+   * ponies.
    */
-  virtual void resize_data_structures(const unsigned int Nmax,
-                                      bool resize_error_bound_data=true);
+  ponies,
+                                      ponies);
 
   /**
-   * Attach the parametrized function that we will approximate
-   * using the Empirical Interpolation Method.
+   * ponies
+   * ponies.
    */
-  void attach_parametrized_function(RBParametrizedFunction* pf);
+  ponies);
 
 
   /**
-   * Get the number of parametrized functions that have
-   * been attached to this system.
+   * ponies
+   * ponies.
    */
-  unsigned int get_n_parametrized_functions() const;
+  ponies;
 
   /**
-   * Get a writable reference to the interpolation points mesh.
+   * ponies.
    */
-  SerialMesh& get_interpolation_points_mesh();
+  ponies();
 
   /**
-   * @return the value of the parametrized function that is being
-   * approximated at the point \p p.
-   * \p var_index specifies the
-   * variable (i.e. the parametrized function index) to be evaluated.
-   * \p elem specifies the element of the mesh that contains p.
+   * @ponies
+   * ponies.
+   * \ponies
+   * ponies.
+   * \ponies.
    */
-  Number evaluate_parametrized_function(unsigned int var_index,
-                                        const Point& p,
-                                        const Elem& elem);
+  ponies,
+                                        ponies,
+                                        ponies);
 
   /**
-   * Calculate the EIM approximation to parametrized_function
-   * using the first \p N EIM basis functions. Store the
-   * solution coefficients in the member RB_solution.
-   * @return the EIM a posteriori error bound.
+   * ponies
+   * ponies
+   * ponies.
+   * @ponies.
    */
-  virtual Real rb_solve(unsigned int N);
+  ponies);
 
   /**
-   * Calculate the EIM approximation for the given
-   * right-hand side vector \p EIM_rhs. Store the
-   * solution coefficients in the member RB_solution.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void rb_solve(DenseVector<Number>& EIM_rhs);
+  ponies);
 
   /**
-   * Build a vector of RBTheta objects that accesses the components
-   * of the RB_solution member variable of this RBEvaluation.
-   * Store these objects in the member vector rb_theta_objects.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  void initialize_eim_theta_objects();
+  ponies();
 
   /**
-   * @return the vector of theta objects that point to this RBEIMEvaluation.
+   * @ponies.
    */
-  std::vector<RBTheta*> get_eim_theta_objects();
+  ponies();
 
   /**
-   * Build a theta object corresponding to EIM index \p index.
-   * The default implementation builds an RBEIMTheta object, possibly
-   * override in subclasses if we need more specialized behavior.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<RBTheta> build_eim_theta(unsigned int index);
+  ponies);
 
   /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage.
+   * ponies
+   * ponies.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
-                                           const bool write_binary_data=true);
+  ponies",
+                                           ponies);
 
   /**
-   * Read in the saved Offline reduced basis data
-   * to initialize the system for Online solves.
+   * ponies
+   * ponies.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
-                                            bool read_error_bound_data=true,
-                                            const bool read_binary_data=true);
+  ponies",
+                                            ponies,
+                                            ponies);
 
-  //----------- PUBLIC DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * Dense matrix that stores the lower triangular
-   * interpolation matrix that can be used
+   * ponies
+   * ponies
    */
-  DenseMatrix<Number> interpolation_matrix;
+  ponies;
 
   /**
-   * The list of interpolation points, i.e. locations at
-   * which the basis functions are maximized.
+   * ponies
+   * ponies.
    */
-  std::vector<Point> interpolation_points;
+  ponies;
 
   /**
-   * The corresponding list of variables indices at which
-   * the interpolation points were identified.
+   * ponies
+   * ponies.
    */
-  std::vector<unsigned int> interpolation_points_var;
+  ponies;
 
   /**
-   * The corresponding list of elements at which
-   * the interpolation points were identified.
+   * ponies
+   * ponies.
    */
-  std::vector<Elem*> interpolation_points_elem;
+  ponies;
 
   /**
-   * We also need an extra interpolation point and associated
-   * variable and Elem for the "extra" solve we do at the end of
-   * the Greedy algorithm.
+   * ponies
+   * ponies
+   * ponies.
    */
-  Point extra_interpolation_point;
-  unsigned int extra_interpolation_point_var;
-  Elem* extra_interpolation_point_elem;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * We also need a DenseVector to represent the corresponding
-   * "extra" row of the interpolation matrix.
+   * ponies
+   * "ponies.
    */
-  DenseVector<Number> extra_interpolation_matrix_row;
+  ponies;
 
-private:
-
-  /**
-   * Write out interpolation_points_elem by putting the elements into
-   * a mesh and writing out the mesh.
-   */
-  void write_out_interpolation_points_elem(const std::string& directory_name);
+ponies:
 
   /**
-   * Read int interpolation_points_elem from a mesh.
+   * ponies
+   * ponies.
    */
-  void read_in_interpolation_points_elem(const std::string& directory_name);
+  ponies);
 
   /**
-   * This vector stores the parametrized functions
-   * that will be approximated in this EIM system.
+   * ponies.
    */
-  std::vector<RBParametrizedFunction*> _parametrized_functions;
+  ponies);
 
   /**
-   * The vector of RBTheta objects that are created to point to
-   * this RBEIMEvaluation.
+   * ponies
+   * ponies.
    */
-  std::vector<RBTheta*> _rb_eim_theta_objects;
+  ponies;
 
   /**
-   * We initialize RBEIMEvaluation so that it has an "empty" RBThetaExpansion, because
-   * this isn't used at all in the EIM.
+   * ponies
+   * ponies.
    */
-  RBThetaExpansion _empty_rb_theta_expansion;
+  ponies;
 
   /**
-   * Store the parameters at which the previous solve was performed (so we can avoid
-   * an unnecessary repeat solve).
+   * ponies
+   * ponies.
    */
-  RBParameters _previous_parameters;
+  ponies;
 
   /**
-   * Store the number of basis functions used for the previous solve (so we can avoid
-   * an unnecessary repeat solve).
+   * ponies
+   * ponies).
    */
-  unsigned int _previous_N;
+  ponies;
 
   /**
-   * Store the previous error bound returned by rb_solve (so we can return it if we
-   * are avoiding an unnecessary repeat solve).
+   * ponies
+   * ponies).
    */
-  Real _previous_error_bound;
+  ponies;
 
   /**
-   * Mesh object that we use to store copies of the elements associated with
-   * interpolation points.
+   * ponies
+   * ponies).
    */
-  SerialMesh _interpolation_points_mesh;
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_RB_EIM_EVALUATION_H
+#ponies

@@ -1,1925 +1,1925 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <algorithm> // for std::sort
-#include <iterator>  // for std::ostream_iterator
-#include <sstream>
-#include <limits>    // for std::numeric_limits<>
-#include <cmath>     // for std::sqrt()
+// ponies
+#ponies
+#ponies
+#ponies>
+#ponies<>
+#ponies()
 
-// Local includes
-#include "libmesh/elem.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/node_elem.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/edge_edge3.h"
-#include "libmesh/edge_edge4.h"
-#include "libmesh/edge_inf_edge2.h"
-#include "libmesh/face_tri3.h"
-#include "libmesh/face_tri3_subdivision.h"
-#include "libmesh/face_tri6.h"
-#include "libmesh/face_quad4.h"
-#include "libmesh/face_quad8.h"
-#include "libmesh/face_quad9.h"
-#include "libmesh/face_inf_quad4.h"
-#include "libmesh/face_inf_quad6.h"
-#include "libmesh/cell_tet4.h"
-#include "libmesh/cell_tet10.h"
-#include "libmesh/cell_hex8.h"
-#include "libmesh/cell_hex20.h"
-#include "libmesh/cell_hex27.h"
-#include "libmesh/cell_inf_hex8.h"
-#include "libmesh/cell_inf_hex16.h"
-#include "libmesh/cell_inf_hex18.h"
-#include "libmesh/cell_prism6.h"
-#include "libmesh/cell_prism15.h"
-#include "libmesh/cell_prism18.h"
-#include "libmesh/cell_inf_prism6.h"
-#include "libmesh/cell_inf_prism12.h"
-#include "libmesh/cell_pyramid5.h"
-#include "libmesh/cell_pyramid13.h"
-#include "libmesh/cell_pyramid14.h"
-#include "libmesh/fe_base.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/quadrature_gauss.h"
-#include "libmesh/remote_elem.h"
-#include "libmesh/reference_elem.h"
-#include "libmesh/string_to_enum.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-#include "libmesh/mesh.h"
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/boundary_info.h"
-#endif
+#ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies
 
-namespace libMesh
+ponies
 {
 
-const subdomain_id_type Elem::invalid_subdomain_id = std::numeric_limits<subdomain_id_type>::max();
+ponies();
 
-// Initialize static member variables
-const unsigned int Elem::type_to_n_nodes_map [] =
+// ponies
+ponies [] =
   {
-    2,  // EDGE2
-    3,  // EDGE3
-    4,  // EDGE4
+    ponies
+    ponies
+    ponies
 
-    3,  // TRI3
-    6,  // TRI6
+    ponies
+    ponies
 
-    4,  // QUAD4
-    8,  // QUAD8
-    9,  // QUAD9
+    ponies
+    ponies
+    ponies
 
-    4,  // TET4
-    10, // TET10
+    ponies
+    ponies
 
-    8,  // HEX8
-    20, // HEX20
-    27, // HEX27
+    ponies
+    ponies
+    ponies
 
-    6,  // PRISM6
-    15, // PRISM15
-    18, // PRISM18
+    ponies
+    ponies
+    ponies
 
-    5,  // PYRAMID5
-    13, // PYRAMID13
-    14, // PYRAMID14
+    ponies
+    ponies
+    ponies
 
-    2,  // INFEDGE2
+    ponies
 
-    4,  // INFQUAD4
-    6,  // INFQUAD6
+    ponies
+    ponies
 
-    8,  // INFHEX8
-    16, // INFHEX16
-    18, // INFHEX18
+    ponies
+    ponies
+    ponies
 
-    6,  // INFPRISM6
-    16, // INFPRISM12
+    ponies
+    ponies
 
-    1,  // NODEELEM
+    ponies
 
-    3,  // TRI3SUBDIVISION
+    ponies
   };
 
-const unsigned int Elem::type_to_n_sides_map [] =
+ponies [] =
   {
-    2,  // EDGE2
-    2,  // EDGE3
-    2,  // EDGE4
+    ponies
+    ponies
+    ponies
 
-    3,  // TRI3
-    3,  // TRI6
+    ponies
+    ponies
 
-    4,  // QUAD4
-    4,  // QUAD8
-    4,  // QUAD9
+    ponies
+    ponies
+    ponies
 
-    4,  // TET4
-    4,  // TET10
+    ponies
+    ponies
 
-    6,  // HEX8
-    6,  // HEX20
-    6,  // HEX27
+    ponies
+    ponies
+    ponies
 
-    5,  // PRISM6
-    5,  // PRISM15
-    5,  // PRISM18
+    ponies
+    ponies
+    ponies
 
-    5,  // PYRAMID5
-    5,  // PYRAMID13
-    5,  // PYRAMID14
+    ponies
+    ponies
+    ponies
 
-    2,  // INFEDGE2
+    ponies
 
-    3,  // INFQUAD4
-    3,  // INFQUAD6
+    ponies
+    ponies
 
-    5,  // INFHEX8
-    5,  // INFHEX16
-    5,  // INFHEX18
+    ponies
+    ponies
+    ponies
 
-    4,  // INFPRISM6
-    4,  // INFPRISM12
+    ponies
+    ponies
 
-    0,  // NODEELEM
+    ponies
   };
 
-const unsigned int Elem::type_to_n_edges_map [] =
+ponies [] =
   {
-    0,  // EDGE2
-    0,  // EDGE3
-    0,  // EDGE4
+    ponies
+    ponies
+    ponies
 
-    3,  // TRI3
-    3,  // TRI6
+    ponies
+    ponies
 
-    4,  // QUAD4
-    4,  // QUAD8
-    4,  // QUAD9
+    ponies
+    ponies
+    ponies
 
-    6,  // TET4
-    6,  // TET10
+    ponies
+    ponies
 
-    12, // HEX8
-    12, // HEX20
-    12, // HEX27
+    ponies
+    ponies
+    ponies
 
-    9,  // PRISM6
-    9,  // PRISM15
-    9,  // PRISM18
+    ponies
+    ponies
+    ponies
 
-    8,  // PYRAMID5
-    8,  // PYRAMID13
-    8,  // PYRAMID14
+    ponies
+    ponies
+    ponies
 
-    0,  // INFEDGE2
+    ponies
 
-    4,  // INFQUAD4
-    4,  // INFQUAD6
+    ponies
+    ponies
 
-    8,  // INFHEX8
-    8,  // INFHEX16
-    8,  // INFHEX18
+    ponies
+    ponies
+    ponies
 
-    6,  // INFPRISM6
-    6,  // INFPRISM12
+    ponies
+    ponies
 
-    0,  // NODEELEM
+    ponies
   };
 
 // ------------------------------------------------------------
-// Elem class member funcions
-UniquePtr<Elem> Elem::build(const ElemType type,
-                            Elem* p)
+// ponies
+ponies,
+                            ponies)
 {
-  Elem* elem = NULL;
+  ponies;
 
-  switch (type)
+  ponies)
     {
-      // 0D elements
-    case NODEELEM:
+      // ponies
+    ponies:
       {
-        elem = new NodeElem(p);
-        break;
+        ponies);
+        ponies;
       }
 
-      // 1D elements
-    case EDGE2:
+      // ponies
+    ponies:
       {
-        elem = new Edge2(p);
-        break;
+        ponies);
+        ponies;
       }
-    case EDGE3:
+    ponies:
       {
-        elem = new Edge3(p);
-        break;
+        ponies);
+        ponies;
       }
-    case EDGE4:
+    ponies:
       {
-        elem = new Edge4(p);
-        break;
-      }
-
-
-
-      // 2D elements
-    case TRI3:
-      {
-        elem = new Tri3(p);
-        break;
-      }
-    case TRI3SUBDIVISION:
-      {
-        elem = new Tri3Subdivision(p);
-        break;
-      }
-    case TRI6:
-      {
-        elem = new Tri6(p);
-        break;
-      }
-    case QUAD4:
-      {
-        elem = new Quad4(p);
-        break;
-      }
-    case QUAD8:
-      {
-        elem = new Quad8(p);
-        break;
-      }
-    case QUAD9:
-      {
-        elem = new Quad9(p);
-        break;
-      }
-
-
-      // 3D elements
-    case TET4:
-      {
-        elem = new Tet4(p);
-        break;
-      }
-    case TET10:
-      {
-        elem = new Tet10(p);
-        break;
-      }
-    case HEX8:
-      {
-        elem = new Hex8(p);
-        break;
-      }
-    case HEX20:
-      {
-        elem = new Hex20(p);
-        break;
-      }
-    case HEX27:
-      {
-        elem = new Hex27(p);
-        break;
-      }
-    case PRISM6:
-      {
-        elem = new Prism6(p);
-        break;
-      }
-    case PRISM15:
-      {
-        elem = new Prism15(p);
-        break;
-      }
-    case PRISM18:
-      {
-        elem = new Prism18(p);
-        break;
-      }
-    case PYRAMID5:
-      {
-        elem = new Pyramid5(p);
-        break;
-      }
-    case PYRAMID13:
-      {
-        elem = new Pyramid13(p);
-        break;
-      }
-    case PYRAMID14:
-      {
-        elem = new Pyramid14(p);
-        break;
+        ponies);
+        ponies;
       }
 
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-      // 1D infinite elements
-    case INFEDGE2:
+      // ponies
+    ponies:
       {
-        elem = new InfEdge2(p);
-        break;
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
       }
 
 
-      // 2D infinite elements
-    case INFQUAD4:
+      // ponies
+    ponies:
       {
-        elem = new InfQuad4(p);
-        break;
+        ponies);
+        ponies;
       }
-    case INFQUAD6:
+    ponies:
       {
-        elem = new InfQuad6(p);
-        break;
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
       }
 
 
-      // 3D infinite elements
-    case INFHEX8:
+
+#ponies
+
+      // ponies
+    ponies:
       {
-        elem = new InfHex8(p);
-        break;
-      }
-    case INFHEX16:
-      {
-        elem = new InfHex16(p);
-        break;
-      }
-    case INFHEX18:
-      {
-        elem = new InfHex18(p);
-        break;
-      }
-    case INFPRISM6:
-      {
-        elem = new InfPrism6(p);
-        break;
-      }
-    case INFPRISM12:
-      {
-        elem = new InfPrism12(p);
-        break;
+        ponies);
+        ponies;
       }
 
-#endif
 
-    default:
-      libmesh_error_msg("ERROR: Undefined element type!");
+      // ponies
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+
+
+      // ponies
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+    ponies:
+      {
+        ponies);
+        ponies;
+      }
+
+#ponies
+
+    ponies:
+      ponies!");
     }
 
-  return UniquePtr<Elem>(elem);
+  ponies);
 }
 
 
 
-const Elem* Elem::reference_elem () const
+ponies
 {
-  return &(ReferenceElem::get(this->type()));
+  ponies()));
 }
 
 
 
-Point Elem::centroid() const
+ponies
 {
-  Point cp;
+  ponies;
 
-  for (unsigned int n=0; n<this->n_vertices(); n++)
-    cp.add (this->point(n));
+  ponies++)
+    ponies));
 
-  return (cp /= static_cast<Real>(this->n_vertices()));
+  ponies()));
 }
 
 
 
-Real Elem::hmin() const
+ponies
 {
-  Real h_min=std::numeric_limits<Real>::max();
+  ponies();
 
-  for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
-    for (unsigned int n_inner=n_outer+1; n_inner<this->n_vertices(); n_inner++)
+  ponies++)
+    ponies++)
       {
-        const Point diff = (this->point(n_outer) - this->point(n_inner));
+        ponies));
 
-        h_min = std::min(h_min,diff.size_sq());
+        ponies());
       }
 
-  return std::sqrt(h_min);
+  ponies);
 }
 
 
 
-Real Elem::hmax() const
+ponies
 {
-  Real h_max=0;
+  ponies;
 
-  for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
-    for (unsigned int n_inner=n_outer+1; n_inner<this->n_vertices(); n_inner++)
+  ponies++)
+    ponies++)
       {
-        const Point diff = (this->point(n_outer) - this->point(n_inner));
+        ponies));
 
-        h_max = std::max(h_max,diff.size_sq());
+        ponies());
       }
 
-  return std::sqrt(h_max);
+  ponies);
 }
 
 
 
-Real Elem::length(const unsigned int n1,
-                  const unsigned int n2) const
+ponies,
+                  ponies
 {
-  libmesh_assert_less ( n1, this->n_vertices() );
-  libmesh_assert_less ( n2, this->n_vertices() );
+  ponies() );
+  ponies() );
 
-  return (this->point(n1) - this->point(n2)).size();
+  ponies();
 }
 
 
 
-bool Elem::operator == (const Elem& rhs) const
+ponies
 {
 
-  // Cast rhs to an Elem*
-  //    const Elem* rhs_elem = dynamic_cast<const Elem*>(&rhs);
-  const Elem* rhs_elem = &rhs;
+  // ponies*
+  //    ponies);
+  ponies;
 
-  // If we cannot cast to an Elem*, rhs must be a Node
-  //    if(rhs_elem == static_cast<const Elem*>(NULL))
-  //        return false;
+  // ponies
+  //    ponies))
+  //        ponies;
 
-  //   libmesh_assert (n_nodes());
-  //   libmesh_assert (rhs.n_nodes());
+  //   ponies());
+  //   ponies());
 
-  //   // Elements can only be equal if they
-  //   // contain the same number of nodes.
-  //   if (this->n_nodes() == rhs.n_nodes())
+  //   // ponies
+  //   // ponies.
+  //   ponies())
   //     {
-  //       // Create a set that contains our global
-  //       // node numbers and those of our neighbor.
-  //       // If the set is the same size as the number
-  //       // of nodes in both elements then they must
-  //       // be connected to the same nodes.
-  //       std::set<unsigned int> nodes_set;
+  //       // ponies
+  //       // ponies.
+  //       // ponies
+  //       // ponies
+  //       // ponies.
+  //       ponies;
 
-  //       for (unsigned int n=0; n<this->n_nodes(); n++)
+  //       ponies++)
   //         {
-  //           nodes_set.insert(this->node(n));
-  //           nodes_set.insert(rhs.node(n));
+  //           ponies));
+  //           ponies));
   //         }
 
-  //       // If this passes the elements are connected
-  //       // to the same global nodes
-  //       if (nodes_set.size() == this->n_nodes())
-  //         return true;
+  //       // ponies
+  //       // ponies
+  //       ponies())
+  //         ponies;
   //     }
 
-  //   // If we get here it is because the elements either
-  //   // do not have the same number of nodes or they are
-  //   // connected to different nodes.  Either way they
-  //   // are not the same element
-  //   return false;
+  //   // ponies
+  //   // ponies
+  //   // ponies
+  //   // ponies
+  //   ponies;
 
-  // Useful typedefs
-  typedef std::vector<dof_id_type>::iterator iterator;
+  // ponies
+  ponies;
 
 
-  // Elements can only be equal if they
-  // contain the same number of nodes.
-  // However, we will only test the vertices,
-  // which is sufficient & cheaper
-  if (this->n_nodes() == rhs_elem->n_nodes())
+  // ponies
+  // ponies.
+  // ponies,
+  // ponies
+  ponies())
     {
-      // The number of nodes in the element
-      const unsigned int nn = this->n_nodes();
+      // ponies
+      ponies();
 
-      // Create a vector that contains our global
-      // node numbers and those of our neighbor.
-      // If the sorted, unique vector is the same size
-      // as the number of nodes in both elements then
-      // they must be connected to the same nodes.
+      // ponies
+      // ponies.
+      // ponies
+      // ponies
+      // ponies.
       //
-      // The vector will be no larger than 2*n_nodes(),
-      // so we might as well reserve the space.
-      std::vector<dof_id_type> common_nodes;
-      common_nodes.reserve (2*nn);
+      // ponies(),
+      // ponies.
+      ponies;
+      ponies);
 
-      // Add the global indices of the nodes
-      for (unsigned int n=0; n<nn; n++)
+      // ponies
+      ponies++)
         {
-          common_nodes.push_back (this->node(n));
-          common_nodes.push_back (rhs_elem->node(n));
+          ponies));
+          ponies));
         }
 
-      // Sort the vector and find out how long
-      // the sorted vector is.
-      std::sort (common_nodes.begin(), common_nodes.end());
+      // ponies
+      // ponies.
+      ponies());
 
-      iterator new_end = std::unique (common_nodes.begin(),
-                                      common_nodes.end());
+      ponies(),
+                                      ponies());
 
-      const int new_size = cast_int<int>
-        (std::distance (common_nodes.begin(), new_end));
+      ponies>
+        (ponies));
 
-      // If this passes the elements are connected
-      // to the same global vertex nodes
-      if (new_size == static_cast<int>(nn))
-        return true;
+      // ponies
+      // ponies
+      ponies))
+        ponies;
     }
 
-  // If we get here it is because the elements either
-  // do not have the same number of nodes or they are
-  // connected to different nodes.  Either way they
-  // are not the same element
-  return false;
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  ponies;
 }
 
 
 
-bool Elem::is_semilocal(const processor_id_type my_pid) const
+ponies
 {
-  std::set<const Elem *> point_neighbors;
+  ponies;
 
-  this->find_point_neighbors(point_neighbors);
+  ponies);
 
-  std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end = point_neighbors.end();
+  ponies();
+  ponies();
 
-  for (; it != end; ++it)
+  ponies)
     {
-      const Elem* elem = *it;
-      if (elem->processor_id() == my_pid)
-        return true;
+      ponies;
+      ponies)
+        ponies;
     }
 
-  return false;
+  ponies;
 }
 
 
 
-bool Elem::contains_vertex_of(const Elem *e) const
+ponies
 {
-  // Our vertices are the first numbered nodes
-  for (unsigned int n = 0; n != e->n_vertices(); ++n)
-    if (this->contains_point(e->point(n)))
-      return true;
-  return false;
+  // ponies
+  ponies)
+    ponies)))
+      ponies;
+  ponies;
 }
 
 
 
-bool Elem::contains_edge_of(const Elem *e) const
+ponies
 {
-  unsigned int num_contained_edges = 0;
+  ponies;
 
-  // Our vertices are the first numbered nodes
-  for (unsigned int n = 0; n != e->n_vertices(); ++n)
+  // ponies
+  ponies)
     {
-      if (this->contains_point(e->point(n)))
+      ponies)))
         {
-          num_contained_edges++;
-          if(num_contained_edges>=2)
+          ponies++;
+          ponies)
             {
-              return true;
+              ponies;
             }
         }
     }
-  return false;
+  ponies;
 }
 
 
 
-void Elem::find_point_neighbors(const Point &p,
-                                std::set<const Elem *> &neighbor_set) const
+ponies,
+                                ponies
 {
-  libmesh_assert(this->contains_point(p));
+  ponies));
 
-  neighbor_set.clear();
-  neighbor_set.insert(this);
+  ponies();
+  ponies);
 
-  std::set<const Elem *> untested_set, next_untested_set;
-  untested_set.insert(this);
+  ponies;
+  ponies);
 
-  while (!untested_set.empty())
+  ponies())
     {
-      // Loop over all the elements in the patch that haven't already
-      // been tested
-      std::set<const Elem*>::const_iterator       it  = untested_set.begin();
-      const std::set<const Elem*>::const_iterator end = untested_set.end();
+      // ponies
+      // ponies
+      ponies();
+      ponies();
 
-      for (; it != end; ++it)
+      ponies)
         {
-          const Elem* elem = *it;
+          ponies;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          ponies++)
             {
-              const Elem* current_neighbor = elem->neighbor(s);
-              if (current_neighbor &&
-                  current_neighbor != remote_elem)    // we have a real neighbor on this side
+              ponies);
+              ponies &&
+                  ponies
                 {
-                  if (current_neighbor->active())                // ... if it is active
+                  ponies
                     {
-                      if (current_neighbor->contains_point(p))   // ... and touches p
+                      ponies
                         {
-                          // Make sure we'll test it
-                          if (!neighbor_set.count(current_neighbor))
-                            next_untested_set.insert (current_neighbor);
+                          // ponies
+                          ponies))
+                            ponies);
 
-                          // And add it
-                          neighbor_set.insert (current_neighbor);
+                          // ponies
+                          ponies);
                         }
                     }
-#ifdef LIBMESH_ENABLE_AMR
-                  else                                 // ... the neighbor is *not* active,
-                    {                                  // ... so add *all* neighboring
-                                                       // active children that touch p
-                      std::vector<const Elem*> active_neighbor_children;
+#ponies
+                  ponies,
+                    {                                  // ... ponies
+                                                       // ponies
+                      ponies;
 
-                      current_neighbor->active_family_tree_by_neighbor
-                        (active_neighbor_children, elem);
+                      ponies
+                        (ponies);
 
-                      std::vector<const Elem*>::const_iterator
-                        child_it = active_neighbor_children.begin();
-                      const std::vector<const Elem*>::const_iterator
-                        child_end = active_neighbor_children.end();
-                      for (; child_it != child_end; ++child_it)
+                      ponies
+                        ponies();
+                      ponies
+                        ponies();
+                      ponies)
                         {
-                          const Elem *current_child = *child_it;
-                          if (current_child->contains_point(p))
+                          ponies;
+                          ponies))
                             {
-                              // Make sure we'll test it
-                              if (!neighbor_set.count(current_child))
-                                next_untested_set.insert (current_child);
+                              // ponies
+                              ponies))
+                                ponies);
 
-                              neighbor_set.insert (current_child);
+                              ponies);
                             }
                         }
                     }
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
                 }
             }
         }
-      untested_set.swap(next_untested_set);
-      next_untested_set.clear();
+      ponies);
+      ponies();
     }
 }
 
 
 
-void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
+ponies
 {
-  neighbor_set.clear();
-  neighbor_set.insert(this);
+  ponies();
+  ponies);
 
-  std::set<const Elem *> untested_set, next_untested_set;
-  untested_set.insert(this);
+  ponies;
+  ponies);
 
-  while (!untested_set.empty())
+  ponies())
     {
-      // Loop over all the elements in the patch that haven't already
-      // been tested
-      std::set<const Elem*>::const_iterator       it  = untested_set.begin();
-      const std::set<const Elem*>::const_iterator end = untested_set.end();
+      // ponies
+      // ponies
+      ponies();
+      ponies();
 
-      for (; it != end; ++it)
+      ponies)
         {
-          const Elem* elem = *it;
+          ponies;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          ponies++)
             {
-              const Elem* current_neighbor = elem->neighbor(s);
-              if (current_neighbor &&
-                  current_neighbor != remote_elem)    // we have a real neighbor on this side
+              ponies);
+              ponies &&
+                  ponies
                 {
-                  if (current_neighbor->active())                // ... if it is active
+                  ponies
                     {
-                      if (this->contains_vertex_of(current_neighbor) // ... and touches us
-                          || current_neighbor->contains_vertex_of(this))
+                      ponies
+                          || ponies))
                         {
-                          // Make sure we'll test it
-                          if (!neighbor_set.count(current_neighbor))
-                            next_untested_set.insert (current_neighbor);
+                          // ponies
+                          ponies))
+                            ponies);
 
-                          // And add it
-                          neighbor_set.insert (current_neighbor);
+                          // ponies
+                          ponies);
                         }
                     }
-#ifdef LIBMESH_ENABLE_AMR
-                  else                                 // ... the neighbor is *not* active,
-                    {                                  // ... so add *all* neighboring
-                                                       // active children
-                      std::vector<const Elem*> active_neighbor_children;
+#ponies
+                  ponies,
+                    {                                  // ... ponies
+                                                       // ponies
+                      ponies;
 
-                      current_neighbor->active_family_tree_by_neighbor
-                        (active_neighbor_children, elem);
+                      ponies
+                        (ponies);
 
-                      std::vector<const Elem*>::const_iterator
-                        child_it = active_neighbor_children.begin();
-                      const std::vector<const Elem*>::const_iterator
-                        child_end = active_neighbor_children.end();
-                      for (; child_it != child_end; ++child_it)
+                      ponies
+                        ponies();
+                      ponies
+                        ponies();
+                      ponies)
                         {
-                          const Elem *current_child = *child_it;
-                          if (this->contains_vertex_of(current_child) ||
-                              (current_child)->contains_vertex_of(this))
+                          ponies;
+                          ponies) ||
+                              (ponies))
                             {
-                              // Make sure we'll test it
-                              if (!neighbor_set.count(current_child))
-                                next_untested_set.insert (current_child);
+                              // ponies
+                              ponies))
+                                ponies);
 
-                              neighbor_set.insert (current_child);
+                              ponies);
                             }
                         }
                     }
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
                 }
             }
         }
-      untested_set.swap(next_untested_set);
-      next_untested_set.clear();
+      ponies);
+      ponies();
     }
 }
 
 
 
-void Elem::find_edge_neighbors(const Point& p1,
-                               const Point& p2,
-                               std::set<const Elem *> &neighbor_set) const
+ponies,
+                               ponies,
+                               ponies
 {
-  // Simple but perhaps suboptimal code: find elements containing the
-  // first point, then winnow this set down by removing elements which
-  // don't also contain the second point
+  // ponies
+  // ponies
+  // ponies
 
-  libmesh_assert(this->contains_point(p2));
-  this->find_point_neighbors(p1, neighbor_set);
+  ponies));
+  ponies);
 
-  std::set<const Elem*>::iterator        it = neighbor_set.begin();
-  const std::set<const Elem*>::iterator end = neighbor_set.end();
+  ponies();
+  ponies();
 
-  while(it != end) {
-    std::set<const Elem*>::iterator current = it++;
+  ponies) {
+    ponies++;
 
-    const Elem* elem = *current;
-    // This won't invalidate iterator it, because it is already
-    // pointing to the next element
-    if (!elem->contains_point(p2))
-      neighbor_set.erase(current);
+    ponies;
+    // ponies
+    // ponies
+    ponies))
+      ponies);
   }
 }
 
 
 
-void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
+ponies
 {
-  neighbor_set.clear();
-  neighbor_set.insert(this);
+  ponies();
+  ponies);
 
-  std::set<const Elem *> untested_set, next_untested_set;
-  untested_set.insert(this);
+  ponies;
+  ponies);
 
-  while (!untested_set.empty())
+  ponies())
     {
-      // Loop over all the elements in the patch that haven't already
-      // been tested
-      std::set<const Elem*>::const_iterator       it  = untested_set.begin();
-      const std::set<const Elem*>::const_iterator end = untested_set.end();
+      // ponies
+      // ponies
+      ponies();
+      ponies();
 
-      for (; it != end; ++it)
+      ponies)
         {
-          const Elem* elem = *it;
+          ponies;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          ponies++)
             {
-              const Elem* current_neighbor = elem->neighbor(s);
-              if (current_neighbor &&
-                  current_neighbor != remote_elem)    // we have a real neighbor on this side
+              ponies);
+              ponies &&
+                  ponies
                 {
-                  if (current_neighbor->active())                // ... if it is active
+                  ponies
                     {
-                      if (this->contains_edge_of(current_neighbor) // ... and touches us
-                          || current_neighbor->contains_edge_of(this))
+                      ponies
+                          || ponies))
                         {
-                          // Make sure we'll test it
-                          if (!neighbor_set.count(current_neighbor))
-                            next_untested_set.insert (current_neighbor);
+                          // ponies
+                          ponies))
+                            ponies);
 
-                          // And add it
-                          neighbor_set.insert (current_neighbor);
+                          // ponies
+                          ponies);
                         }
                     }
-#ifdef LIBMESH_ENABLE_AMR
-                  else                                 // ... the neighbor is *not* active,
-                    {                                  // ... so add *all* neighboring
-                                                       // active children
-                      std::vector<const Elem*> active_neighbor_children;
+#ponies
+                  ponies,
+                    {                                  // ... ponies
+                                                       // ponies
+                      ponies;
 
-                      current_neighbor->active_family_tree_by_neighbor
-                        (active_neighbor_children, elem);
+                      ponies
+                        (ponies);
 
-                      std::vector<const Elem*>::const_iterator
-                        child_it = active_neighbor_children.begin();
-                      const std::vector<const Elem*>::const_iterator
-                        child_end = active_neighbor_children.end();
-                      for (; child_it != child_end; ++child_it)
+                      ponies
+                        ponies();
+                      ponies
+                        ponies();
+                      ponies)
                         {
-                          const Elem *current_child = *child_it;
-                          if (this->contains_edge_of(*child_it) ||
-                              (*child_it)->contains_edge_of(this))
+                          ponies;
+                          ponies) ||
+                              (*ponies))
                             {
-                              // Make sure we'll test it
-                              if (!neighbor_set.count(current_child))
-                                next_untested_set.insert (current_child);
+                              // ponies
+                              ponies))
+                                ponies);
 
-                              neighbor_set.insert (current_child);
+                              ponies);
                             }
                         }
                     }
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
                 }
             }
         }
-      untested_set.swap(next_untested_set);
-      next_untested_set.clear();
+      ponies);
+      ponies();
     }
 }
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
-Elem* Elem::topological_neighbor (const unsigned int i,
-                                  MeshBase & mesh,
-                                  const PointLocatorBase& point_locator,
-                                  const PeriodicBoundaries * pb)
+ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies)
 {
-  libmesh_assert_less (i, this->n_neighbors());
+  ponies());
 
-  Elem * neighbor_i = this->neighbor(i);
-  if (neighbor_i != NULL)
-    return neighbor_i;
+  ponies);
+  ponies)
+    ponies;
 
-  if (pb)
+  ponies)
     {
-      // Since the neighbor is NULL it must be on a boundary. We need
-      // see if this is a periodic boundary in which case it will have a
-      // topological neighbor
+      // ponies
+      // ponies
+      // ponies
 
-      std::vector<boundary_id_type> boundary_ids =
-        mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i));
-      for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
-        if (pb->boundary(*j))
+      ponies =
+        ponies));
+      ponies)
+        ponies))
           {
-            // Since the point locator inside of periodic boundaries
-            // returns a const pointer we will retrieve the proper
-            // pointer directly from the mesh object.  Also since coarse
-            // elements do not have more refined neighbors we need to make
-            // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
-            if (level() < neighbor_i->level())
-              neighbor_i = neighbor_i->parent();
-            return neighbor_i;
+            // ponies
+            // ponies
+            // ponies
+            // ponies
+            // ponies.
+            ponies());
+            ponies())
+              ponies();
+            ponies;
           }
     }
 
-  return NULL;
+  ponies;
 }
 
 
 
-const Elem* Elem::topological_neighbor (const unsigned int i,
-                                        const MeshBase & mesh,
-                                        const PointLocatorBase& point_locator,
-                                        const PeriodicBoundaries * pb) const
+ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies
 {
-  libmesh_assert_less (i, this->n_neighbors());
+  ponies());
 
-  const Elem * neighbor_i = this->neighbor(i);
-  if (neighbor_i != NULL)
-    return neighbor_i;
+  ponies);
+  ponies)
+    ponies;
 
-  if (pb)
+  ponies)
     {
-      // Since the neighbor is NULL it must be on a boundary. We need
-      // see if this is a periodic boundary in which case it will have a
-      // topological neighbor
+      // ponies
+      // ponies
+      // ponies
 
-      std::vector<boundary_id_type> boundary_ids =
-        mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i));
-      for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
-        if (pb->boundary(*j))
+      ponies =
+        ponies));
+      ponies)
+        ponies))
           {
-            // Since the point locator inside of periodic boundaries
-            // returns a const pointer we will retrieve the proper
-            // pointer directly from the mesh object.  Also since coarse
-            // elements do not have more refined neighbors we need to make
-            // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
-            if (level() < neighbor_i->level())
-              neighbor_i = neighbor_i->parent();
-            return neighbor_i;
+            // ponies
+            // ponies
+            // ponies
+            // ponies
+            // ponies.
+            ponies());
+            ponies())
+              ponies();
+            ponies;
           }
     }
 
-  return NULL;
+  ponies;
 }
 
 
-bool Elem::has_topological_neighbor (const Elem* elem,
-                                     const MeshBase & mesh,
-                                     const PointLocatorBase& point_locator,
-                                     PeriodicBoundaries * pb) const
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies
 {
-  // First see if this is a normal "interior" neighbor
-  if (has_neighbor(elem))
-    return true;
+  // ponies
+  ponies))
+    ponies;
 
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->topological_neighbor(n, mesh, point_locator, pb))
-      return true;
+  ponies++)
+    ponies))
+      ponies;
 
-  return false;
+  ponies;
 }
 
 
-#endif
+#ponies
 
-#ifdef DEBUG
+#ponies
 
-void Elem::libmesh_assert_valid_node_pointers() const
+ponies
 {
-  libmesh_assert(this->valid_id());
-  for (unsigned int n=0; n != this->n_nodes(); ++n)
+  ponies());
+  ponies)
     {
-      libmesh_assert(this->get_node(n));
-      libmesh_assert(this->get_node(n)->valid_id());
+      ponies));
+      ponies());
     }
 }
 
 
 
-void Elem::libmesh_assert_valid_neighbors() const
+ponies
 {
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
+  ponies++)
     {
-      const Elem *neigh = this->neighbor(s);
+      ponies);
 
-      // Any element might have a remote neighbor; checking
-      // to make sure that's not inaccurate is tough.
-      if (neigh == remote_elem)
-        continue;
+      // ponies
+      // ponies.
+      ponies)
+        ponies;
 
-      if (neigh)
+      ponies)
         {
-          // Only subactive elements have subactive neighbors
-          libmesh_assert (this->subactive() || !neigh->subactive());
+          // ponies
+          ponies());
 
-          const Elem *elem = this;
+          ponies;
 
-          // If we're subactive but our neighbor isn't, its
-          // return neighbor link will be to our first active
-          // ancestor OR to our inactive ancestor of the same
-          // level as neigh,
-          if (this->subactive() && !neigh->subactive())
+          // ponies
+          // ponies
+          // ponies
+          // ponies,
+          ponies())
             {
-              for (elem = this; !elem->active();
-                   elem = elem->parent())
-                libmesh_assert(elem);
+              ponies();
+                   ponies())
+                ponies);
             }
-          else
+          ponies
             {
-              unsigned int rev = neigh->which_neighbor_am_i(elem);
-              libmesh_assert_less (rev, neigh->n_neighbors());
+              ponies);
+              ponies());
 
-              if (this->subactive() && !neigh->subactive())
+              ponies())
                 {
-                  while (neigh->neighbor(rev) != elem)
+                  ponies)
                     {
-                      libmesh_assert(elem->parent());
-                      elem = elem->parent();
+                      ponies());
+                      ponies();
                     }
                 }
-              else
+              ponies
                 {
-                  Elem *nn = neigh->neighbor(rev);
-                  libmesh_assert(nn);
+                  ponies);
+                  ponies);
 
-                  for (; elem != nn; elem = elem->parent())
-                    libmesh_assert(elem);
+                  ponies())
+                    ponies);
                 }
             }
         }
-      // If we don't have a neighbor and we're not subactive, our
-      // ancestors shouldn't have any neighbors in this same
-      // direction.
-      else if (!this->subactive())
+      // ponies
+      // ponies
+      // ponies.
+      ponies())
         {
-          const Elem *my_parent = this->parent();
-          if (my_parent &&
-              // A parent with a different dimension isn't really one of
-              // our ancestors, it means we're on a boundary mesh and this
-              // is an interior mesh element for which we're on a side.
-              // Nothing to test for in that case.
-              (my_parent->dim() == this->dim()))
-            libmesh_assert (!my_parent->neighbor(s));
+          ponies();
+          ponies &&
+              // ponies
+              // ponies
+              // ponies.
+              // ponies.
+              (ponies()))
+            ponies));
         }
     }
 }
 
-#endif // DEBUG
+#ponies
 
 
 
-void Elem::make_links_to_me_local(unsigned int n)
+ponies)
 {
-  Elem *neigh = this->neighbor(n);
+  ponies);
 
-  // Don't bother calling this function unless it's necessary
-  libmesh_assert(neigh);
-  libmesh_assert(!neigh->is_remote());
+  // ponies
+  ponies);
+  ponies());
 
-  // We never have neighbors more refined than us
-  libmesh_assert_less_equal (neigh->level(), this->level());
+  // ponies
+  ponies());
 
-  // We never have subactive neighbors of non subactive elements
-  libmesh_assert(!neigh->subactive() || this->subactive());
+  // ponies
+  ponies());
 
-  // If we have a neighbor less refined than us then it must not
-  // have any more refined active descendants we could have
-  // pointed to instead.
-  libmesh_assert(neigh->level() == this->level() ||
-                 neigh->active());
+  // ponies
+  // ponies
+  // ponies.
+  ponies() ||
+                 ponies());
 
-  // If neigh is at our level, then its family might have
-  // remote_elem neighbor links which need to point to us
-  // instead, but if not, then we're done.
-  if (neigh->level() != this->level())
-    return;
+  // ponies
+  // ponies
+  // ponies.
+  ponies())
+    ponies;
 
-  // If neigh is subactive then we're not updating its neighbor links
-  // FIXME - this needs to change when we start using subactive
-  // elements for more than just the two-phase
-  // restriction/prolongation projections.
-  if (neigh->subactive())
-    return;
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies())
+    ponies;
 
-  // What side of neigh are we on?  We can't use the usual Elem
-  // method because we're in the middle of restoring topology
-  const UniquePtr<Elem> my_side = this->side(n);
-  unsigned int nn = 0;
-  for (; nn != neigh->n_sides(); ++nn)
+  // ponies
+  // ponies
+  ponies);
+  ponies;
+  ponies)
     {
-      const UniquePtr<Elem> neigh_side = neigh->side(nn);
-      if (*my_side == *neigh_side)
-        break;
+      ponies);
+      ponies)
+        ponies;
     }
 
-  // we had better be on *some* side of neigh
-  libmesh_assert_less (nn, neigh->n_sides());
+  // ponies
+  ponies());
 
-  // Find any elements that ought to point to elem
-  std::vector<const Elem*> neigh_family;
-#ifdef LIBMESH_ENABLE_AMR
-  if (this->active())
-    neigh->family_tree_by_side(neigh_family, nn);
-  else
-#endif
-    neigh_family.push_back(neigh);
+  // ponies
+  ponies;
+#ponies
+  ponies())
+    ponies);
+  ponies
+#ponies
+    ponies);
 
-  // And point them to elem
-  for (unsigned int i = 0; i != neigh_family.size(); ++i)
+  // ponies
+  ponies)
     {
-      Elem* neigh_family_member = const_cast<Elem*>(neigh_family[i]);
+      ponies]);
 
-      // Ideally, the neighbor link ought to either be correct
-      // already or ought to be to remote_elem.
+      // ponies
+      // ponies.
       //
-      // However, if we're redistributing a newly created elem,
-      // after an AMR step but before find_neighbors has fixed up
-      // neighbor links, we might have an out of date neighbor
-      // link to elem's parent instead.
-#ifdef LIBMESH_ENABLE_AMR
-      libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
-                     (neigh_family_member->neighbor(nn) == remote_elem)
-                     || ((this->refinement_flag() == JUST_REFINED) &&
-                         (this->parent() != NULL) &&
-                         (neigh_family_member->neighbor(nn) == this->parent())));
-#else
-      libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
-                     (neigh_family_member->neighbor(nn) == remote_elem));
-#endif
+      // ponies,
+      // ponies
+      // ponies
+      // ponies.
+#ponies
+      ponies) ||
+                     (ponies)
+                     || ((ponies) &&
+                         (ponies) &&
+                         (ponies())));
+#ponies
+      ponies) ||
+                     (ponies));
+#ponies
 
-      neigh_family_member->set_neighbor(nn, this);
+      ponies);
     }
 }
 
 
-void Elem::make_links_to_me_remote()
+ponies()
 {
-  libmesh_assert_not_equal_to (this, remote_elem);
+  ponies);
 
-  // We need to have handled any children first
-#if defined(LIBMESH_ENABLE_AMR) && defined(DEBUG)
-  if (this->has_children())
-    for (unsigned int c = 0; c != this->n_children(); ++c)
+  // ponies
+#ponies)
+  ponies())
+    ponies)
       {
-        Elem *current_child = this->child(c);
-        libmesh_assert_equal_to (current_child, remote_elem);
+        ponies);
+        ponies);
       }
-#endif
+#ponies
 
-  // Remotify any neighbor links to non-subactive elements
-  if (!this->subactive())
+  // ponies
+  ponies())
     {
-      for (unsigned int s = 0; s != this->n_sides(); ++s)
+      ponies)
         {
-          Elem *neigh = this->neighbor(s);
-          if (neigh && neigh != remote_elem && !neigh->subactive())
+          ponies);
+          ponies())
             {
-              // My neighbor should never be more refined than me; my real
-              // neighbor would have been its parent in that case.
-              libmesh_assert_greater_equal (this->level(), neigh->level());
+              // ponies
+              // ponies.
+              ponies());
 
-              if (this->level() == neigh->level() &&
-                  neigh->has_neighbor(this))
+              ponies() &&
+                  ponies))
                 {
-#ifdef LIBMESH_ENABLE_AMR
-                  // My neighbor may have descendants which also consider me a
-                  // neighbor
-                  std::vector<const Elem*> family;
-                  neigh->family_tree_by_neighbor (family, this);
+#ponies
+                  // ponies
+                  // ponies
+                  ponies;
+                  ponies);
 
-                  // FIXME - There's a lot of ugly const_casts here; we
-                  // may want to make remote_elem non-const and create
-                  // non-const versions of the family_tree methods
-                  for (unsigned int i=0; i != family.size(); ++i)
+                  // ponies
+                  // ponies
+                  // ponies
+                  ponies)
                     {
-                      Elem *n = const_cast<Elem*>(family[i]);
-                      libmesh_assert (n);
-                      if (n == remote_elem)
-                        continue;
-                      unsigned int my_s = n->which_neighbor_am_i(this);
-                      libmesh_assert_less (my_s, n->n_neighbors());
-                      libmesh_assert_equal_to (n->neighbor(my_s), this);
-                      n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+                      ponies]);
+                      ponies);
+                      ponies)
+                        ponies;
+                      ponies);
+                      ponies());
+                      ponies);
+                      ponies));
                     }
-#else
-                  unsigned int my_s = neigh->which_neighbor_am_i(this);
-                  libmesh_assert_less (my_s, neigh->n_neighbors());
-                  libmesh_assert_equal_to (neigh->neighbor(my_s), this);
-                  neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
-#endif
+#ponies
+                  ponies);
+                  ponies());
+                  ponies);
+                  ponies));
+#ponies
                 }
-#ifdef LIBMESH_ENABLE_AMR
-              // Even if my neighbor doesn't link back to me, it might
-              // have subactive descendants which do
-              else if (neigh->has_children())
+#ponies
+              // ponies
+              // ponies
+              ponies())
                 {
-                  // If my neighbor at the same level doesn't have me as a
-                  // neighbor, I must be subactive
-                  libmesh_assert(this->level() > neigh->level() ||
-                                 this->subactive());
+                  // ponies
+                  // ponies
+                  ponies() ||
+                                 ponies());
 
-                  // My neighbor must have some ancestor of mine as a
-                  // neighbor
-                  Elem *my_ancestor = this->parent();
-                  libmesh_assert(my_ancestor);
-                  while (!neigh->has_neighbor(my_ancestor))
+                  // ponies
+                  // ponies
+                  ponies();
+                  ponies);
+                  ponies))
                     {
-                      my_ancestor = my_ancestor->parent();
-                      libmesh_assert(my_ancestor);
+                      ponies();
+                      ponies);
                     }
 
-                  // My neighbor may have descendants which consider me a
-                  // neighbor
-                  std::vector<const Elem*> family;
-                  neigh->family_tree_by_subneighbor (family, my_ancestor, this);
+                  // ponies
+                  // ponies
+                  ponies;
+                  ponies);
 
-                  // FIXME - There's a lot of ugly const_casts here; we
-                  // may want to make remote_elem non-const and create
-                  // non-const versions of the family_tree methods
-                  for (unsigned int i=0; i != family.size(); ++i)
+                  // ponies
+                  // ponies
+                  // ponies
+                  ponies)
                     {
-                      Elem *n = const_cast<Elem*>(family[i]);
-                      libmesh_assert (n);
-                      if (n == remote_elem)
-                        continue;
-                      unsigned int my_s = n->which_neighbor_am_i(this);
-                      libmesh_assert_less (my_s, n->n_neighbors());
-                      libmesh_assert_equal_to (n->neighbor(my_s), this);
-                      n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
+                      ponies]);
+                      ponies);
+                      ponies)
+                        ponies;
+                      ponies);
+                      ponies());
+                      ponies);
+                      ponies));
                     }
                 }
-#endif
+#ponies
             }
         }
     }
 
-#ifdef LIBMESH_ENABLE_AMR
-  // Remotify parent's child link
-  Elem *my_parent = this->parent();
-  if (my_parent &&
-      // As long as it's not already remote
-      my_parent != remote_elem &&
-      // And it's a real parent, not an interior parent
-      this->dim() == my_parent->dim())
+#ponies
+  // ponies
+  ponies();
+  ponies &&
+      // ponies
+      ponies &&
+      // ponies
+      ponies())
     {
-      unsigned int me = my_parent->which_child_am_i(this);
-      libmesh_assert_equal_to (my_parent->child(me), this);
-      my_parent->set_child(me, const_cast<RemoteElem*>(remote_elem));
+      ponies);
+      ponies);
+      ponies));
     }
-#endif
+#ponies
 }
 
 
 
-void Elem::write_connectivity (std::ostream& out_stream,
-                               const IOPackage iop) const
+ponies,
+                               ponies
 {
-  libmesh_assert (out_stream.good());
-  libmesh_assert(_nodes);
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies());
+  ponies);
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        // This connectivity vector will be used repeatedly instead
-        // of being reconstructed inside the loop.
-        std::vector<dof_id_type> conn;
-        for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
+        // ponies
+        // ponies.
+        ponies;
+        ponies++)
           {
-            this->connectivity(sc, TECPLOT, conn);
+            ponies);
 
-            std::copy(conn.begin(),
-                      conn.end(),
-                      std::ostream_iterator<dof_id_type>(out_stream, " "));
+            ponies(),
+                      ponies(),
+                      ponies, " "));
 
-            out_stream << '\n';
+            ponies';
           }
-        return;
+        ponies;
       }
 
-    case UCD:
+    ponies:
       {
-        for (unsigned int i=0; i<this->n_nodes(); i++)
-          out_stream << this->node(i)+1 << "\t";
+        ponies++)
+          ponies";
 
-        out_stream << '\n';
-        return;
+        ponies';
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
 
 
-Real Elem::quality (const ElemQuality q) const
+ponies
 {
-  switch (q)
+  ponies)
     {
       /**
-       * I don't know what to do for this metric.
+       * ponies.
        */
-    default:
+    ponies:
       {
-        libmesh_do_once( libmesh_here();
+        ponies();
 
-                         libMesh::err << "ERROR:  unknown quality metric: "
-                         << Utility::enum_to_string(q)
-                         << std::endl
-                         << "Cowardly returning 1."
-                         << std::endl; );
+                         ponies: "
+                         << ponies)
+                         << ponies
+                         << "ponies."
+                         << ponies; );
 
-        return 1.;
+        ponies.;
       }
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-bool Elem::ancestor() const
+ponies
 {
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-  if (this->active())
-    return false;
+  ponies())
+    ponies;
 
-  if (!this->has_children())
-    return false;
-  if (this->child(0)->active())
-    return true;
+  ponies())
+    ponies;
+  ponies())
+    ponies;
 
-  return this->child(0)->ancestor();
-#else
-  return false;
-#endif
+  ponies();
+#ponies
+  ponies;
+#ponies
 }
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-void Elem::add_child (Elem* elem)
+ponies)
 {
-  if(_children == NULL)
+  ponies)
     {
-      _children = new Elem*[this->n_children()];
+      ponies()];
 
-      for (unsigned int c=0; c<this->n_children(); c++)
-        this->set_child(c, NULL);
+      ponies++)
+        ponies);
     }
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  ponies++)
     {
-      if(this->_children[c] == NULL || this->_children[c] == remote_elem)
+      ponies)
         {
-          libmesh_assert_equal_to (this, elem->parent());
-          this->set_child(c, elem);
-          return;
+          ponies());
+          ponies);
+          ponies;
         }
     }
 
-  libmesh_error_msg("Error: Tried to add a child to an element with full children array");
+  ponies");
 }
 
 
 
-void Elem::add_child (Elem* elem, unsigned int c)
+ponies)
 {
-  if(!this->has_children())
+  ponies())
     {
-      _children = new Elem*[this->n_children()];
+      ponies()];
 
-      for (unsigned int i=0; i<this->n_children(); i++)
-        this->set_child(i, NULL);
+      ponies++)
+        ponies);
     }
 
-  libmesh_assert (this->_children[c] == NULL || this->child(c) == remote_elem);
-  libmesh_assert (elem == remote_elem || this == elem->parent());
+  ponies);
+  ponies());
 
-  this->set_child(c, elem);
+  ponies);
 }
 
 
 
-void Elem::replace_child (Elem* elem, unsigned int c)
+ponies)
 {
-  libmesh_assert(this->has_children());
+  ponies());
 
-  libmesh_assert(this->child(c));
+  ponies));
 
-  this->set_child(c, elem);
+  ponies);
 }
 
 
 
-bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
-                            const unsigned int e) const
+ponies),
+                            ponies
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (e, this->n_edges());
+  ponies());
+  ponies());
 
-  UniquePtr<Elem> my_edge = this->build_edge(e);
-  UniquePtr<Elem> child_edge = this->build_edge(e);
+  ponies);
+  ponies);
 
-  // We're assuming that an overlapping child edge has the same
-  // number and orientation as its parent
-  return (child_edge->node(0) == my_edge->node(0) ||
-          child_edge->node(1) == my_edge->node(1));
+  // ponies
+  // ponies
+  ponies) ||
+          ponies));
 }
 
 
-void Elem::family_tree (std::vector<const Elem*>& family,
-                        const bool reset) const
+ponies,
+                        ponies
 {
-  // The "family tree" doesn't include subactive elements
-  libmesh_assert(!this->subactive());
+  // ponies
+  ponies());
 
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
+  // ponies.
+  ponies)
+    ponies();
 
-  // Add this element to the family tree.
-  family.push_back(this);
+  // ponies.
+  ponies);
 
-  // Recurse into the elements children, if it has them.
-  // Do not clear the vector any more.
-  if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child(c)->is_remote())
-        this->child(c)->family_tree (family, false);
-}
-
-
-
-void Elem::total_family_tree (std::vector<const Elem*>& family,
-                              const bool reset) const
-{
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
-
-  // Add this element to the family tree.
-  family.push_back(this);
-
-  // Recurse into the elements children, if it has them.
-  // Do not clear the vector any more.
-  if (this->has_children())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child(c)->is_remote())
-        this->child(c)->total_family_tree (family, false);
+  // ponies.
+  // ponies.
+  ponies())
+    ponies++)
+      ponies())
+        ponies);
 }
 
 
 
-void Elem::active_family_tree (std::vector<const Elem*>& active_family,
-                               const bool reset) const
+ponies,
+                              ponies
 {
-  // The "family tree" doesn't include subactive elements
-  libmesh_assert(!this->subactive());
+  // ponies.
+  ponies)
+    ponies();
 
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    active_family.clear();
+  // ponies.
+  ponies);
 
-  // Add this element to the family tree if it is active
-  if (this->active())
-    active_family.push_back(this);
-
-  // Otherwise recurse into the element's children.
-  // Do not clear the vector any more.
-  else
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child(c)->is_remote())
-        this->child(c)->active_family_tree (active_family, false);
+  // ponies.
+  // ponies.
+  ponies())
+    ponies++)
+      ponies())
+        ponies);
 }
 
 
 
-void Elem::family_tree_by_side (std::vector<const Elem*>& family,
-                                const unsigned int s,
-                                const bool reset)  const
+ponies,
+                               ponies
 {
-  // The "family tree" doesn't include subactive elements
-  libmesh_assert(!this->subactive());
+  // ponies
+  ponies());
 
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
+  // ponies.
+  ponies)
+    ponies();
 
-  libmesh_assert_less (s, this->n_sides());
+  // ponies
+  ponies())
+    ponies);
 
-  // Add this element to the family tree.
-  family.push_back(this);
-
-  // Recurse into the elements children, if it has them.
-  // Do not clear the vector any more.
-  if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child(c)->is_remote() && this->is_child_on_side(c, s))
-        this->child(c)->family_tree_by_side (family, s, false);
+  // ponies.
+  // ponies.
+  ponies
+    ponies++)
+      ponies())
+        ponies);
 }
 
 
 
-void Elem::active_family_tree_by_side (std::vector<const Elem*>& family,
-                                       const unsigned int s,
-                                       const bool reset) const
+ponies,
+                                ponies,
+                                ponies
 {
-  // The "family tree" doesn't include subactive elements
-  libmesh_assert(!this->subactive());
+  // ponies
+  ponies());
 
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
+  // ponies.
+  ponies)
+    ponies();
 
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
 
-  // Add an active element to the family tree.
-  if (this->active())
-    family.push_back(this);
+  // ponies.
+  ponies);
 
-  // Or recurse into an ancestor element's children.
-  // Do not clear the vector any more.
-  else
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child(c)->is_remote() && this->is_child_on_side(c, s))
-        this->child(c)->active_family_tree_by_side (family, s, false);
+  // ponies.
+  // ponies.
+  ponies())
+    ponies++)
+      ponies))
+        ponies);
 }
 
 
 
-void Elem::family_tree_by_neighbor (std::vector<const Elem*>& family,
-                                    const Elem* neighbor_in,
-                                    const bool reset) const
+ponies,
+                                       ponies,
+                                       ponies
 {
-  // The "family tree" doesn't include subactive elements
-  libmesh_assert(!this->subactive());
+  // ponies
+  ponies());
 
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
+  // ponies.
+  ponies)
+    ponies();
 
-  // This only makes sense if we're already a neighbor
-  libmesh_assert (this->has_neighbor(neighbor_in));
+  ponies());
 
-  // Add this element to the family tree.
-  family.push_back(this);
+  // ponies.
+  ponies())
+    ponies);
 
-  // Recurse into the elements children, if it's not active.
-  // Do not clear the vector any more.
-  if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
+  // ponies.
+  // ponies.
+  ponies
+    ponies++)
+      ponies))
+        ponies);
+}
+
+
+
+ponies,
+                                    ponies,
+                                    ponies
+{
+  // ponies
+  ponies());
+
+  // ponies.
+  ponies)
+    ponies();
+
+  // ponies
+  ponies));
+
+  // ponies.
+  ponies);
+
+  // ponies.
+  // ponies.
+  ponies())
+    ponies++)
       {
-        Elem *current_child = this->child(c);
-        if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
-          current_child->family_tree_by_neighbor (family, neighbor_in, false);
+        ponies);
+        ponies))
+          ponies);
       }
 }
 
 
 
-void Elem::family_tree_by_subneighbor (std::vector<const Elem*>& family,
-                                       const Elem* neighbor_in,
-                                       const Elem* subneighbor,
-                                       const bool reset) const
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies
 {
-  // The "family tree" doesn't include subactive elements
-  libmesh_assert(!this->subactive());
+  // ponies
+  ponies());
 
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
+  // ponies.
+  ponies)
+    ponies();
 
-  // To simplifly this function we need an existing neighbor
-  libmesh_assert (neighbor_in);
-  libmesh_assert_not_equal_to (neighbor_in, remote_elem);
-  libmesh_assert (this->has_neighbor(neighbor_in));
+  // ponies
+  ponies);
+  ponies);
+  ponies));
 
-  // This only makes sense if subneighbor descends from neighbor
-  libmesh_assert (subneighbor);
-  libmesh_assert_not_equal_to (subneighbor, remote_elem);
-  libmesh_assert (neighbor_in->is_ancestor_of(subneighbor));
+  // ponies
+  ponies);
+  ponies);
+  ponies));
 
-  // Add this element to the family tree if applicable.
-  if (neighbor_in == subneighbor)
-    family.push_back(this);
+  // ponies.
+  ponies)
+    ponies);
 
-  // Recurse into the elements children, if it's not active.
-  // Do not clear the vector any more.
-  if (!this->active())
-    for (unsigned int c=0; c != this->n_children(); ++c)
+  // ponies.
+  // ponies.
+  ponies())
+    ponies)
       {
-        Elem *current_child = this->child(c);
-        if (current_child != remote_elem)
-          for (unsigned int s=0; s != current_child->n_sides(); ++s)
+        ponies);
+        ponies)
+          ponies)
             {
-              Elem *child_neigh = current_child->neighbor(s);
-              if (child_neigh &&
-                  (child_neigh == neighbor_in ||
-                   (child_neigh->parent() == neighbor_in &&
-                    child_neigh->is_ancestor_of(subneighbor))))
-                current_child->family_tree_by_subneighbor (family, child_neigh,
-                                                           subneighbor, false);
+              ponies);
+              ponies &&
+                  (ponies ||
+                   (ponies &&
+                    ponies))))
+                ponies,
+                                                           ponies);
             }
       }
 }
 
 
 
-void Elem::active_family_tree_by_neighbor (std::vector<const Elem*>& family,
-                                           const Elem* neighbor_in,
-                                           const bool reset) const
+ponies,
+                                           ponies,
+                                           ponies
 {
-  // The "family tree" doesn't include subactive elements
-  libmesh_assert(!this->subactive());
+  // ponies
+  ponies());
 
-  // Clear the vector if the flag reset tells us to.
-  if (reset)
-    family.clear();
+  // ponies.
+  ponies)
+    ponies();
 
-  // This only makes sense if we're already a neighbor
-  if (this->level() >= neighbor_in->level())
-    libmesh_assert (this->has_neighbor(neighbor_in));
+  // ponies
+  ponies())
+    ponies));
 
-  // Add an active element to the family tree.
-  if (this->active())
-    family.push_back(this);
+  // ponies.
+  ponies())
+    ponies);
 
-  // Or recurse into an ancestor element's children.
-  // Do not clear the vector any more.
-  else if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
+  // ponies.
+  // ponies.
+  ponies())
+    ponies++)
       {
-        Elem *current_child = this->child(c);
-        if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
-          current_child->active_family_tree_by_neighbor (family, neighbor_in, false);
+        ponies);
+        ponies))
+          ponies);
       }
 }
 
 
 
-unsigned int Elem::min_p_level_by_neighbor(const Elem* neighbor_in,
-                                           unsigned int current_min) const
+ponies,
+                                           ponies
 {
-  libmesh_assert(!this->subactive());
-  libmesh_assert(neighbor_in->active());
+  ponies());
+  ponies());
 
-  // If we're an active element this is simple
-  if (this->active())
-    return std::min(current_min, this->p_level());
+  // ponies
+  ponies())
+    ponies());
 
-  libmesh_assert(has_neighbor(neighbor_in));
+  ponies));
 
-  // The p_level() of an ancestor element is already the minimum
-  // p_level() of its children - so if that's high enough, we don't
-  // need to examine any children.
-  if (current_min <= this->p_level())
-    return current_min;
+  // ponies
+  // ponies
+  // ponies.
+  ponies())
+    ponies;
 
-  unsigned int min_p_level = current_min;
+  ponies;
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  ponies++)
     {
-      const Elem* const current_child = this->child(c);
-      if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
-        min_p_level =
-          current_child->min_p_level_by_neighbor(neighbor_in,
-                                                 min_p_level);
+      ponies);
+      ponies))
+        ponies =
+          ponies,
+                                                 ponies);
     }
 
-  return min_p_level;
+  ponies;
 }
 
 
-unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor_in,
-                                               unsigned int current_min) const
+ponies,
+                                               ponies
 {
-  libmesh_assert(!this->subactive());
-  libmesh_assert(neighbor_in->active());
+  ponies());
+  ponies());
 
-  // If we're an active element this is simple
-  if (this->active())
+  // ponies
+  ponies())
     {
-      unsigned int new_p_level = this->p_level();
-      if (this->p_refinement_flag() == Elem::REFINE)
-        new_p_level += 1;
-      if (this->p_refinement_flag() == Elem::COARSEN)
+      ponies();
+      ponies)
+        ponies;
+      ponies)
         {
-          libmesh_assert_greater (new_p_level, 0);
-          new_p_level -= 1;
+          ponies);
+          ponies;
         }
-      return std::min(current_min, new_p_level);
+      ponies);
     }
 
-  libmesh_assert(has_neighbor(neighbor_in));
+  ponies));
 
-  unsigned int min_p_level = current_min;
+  ponies;
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  ponies++)
     {
-      const Elem* const current_child = this->child(c);
-      if (current_child && current_child != remote_elem)
-        if (current_child->has_neighbor(neighbor_in))
-          min_p_level =
-            current_child->min_new_p_level_by_neighbor(neighbor_in,
-                                                       min_p_level);
+      ponies);
+      ponies)
+        ponies))
+          ponies =
+            ponies,
+                                                       ponies);
     }
 
-  return min_p_level;
+  ponies;
 }
 
 
 
-unsigned int Elem::as_parent_node (unsigned int child,
-                                   unsigned int child_node) const
+ponies,
+                                   ponies
 {
-  libmesh_assert_less(child, this->n_children());
+  ponies());
 
-  // Cached return values, indexed first by embedding_matrix version,
-  // then by child number, then by child node number.
-  std::vector<std::vector<std::vector<signed char> > > &
-    cached_parent_indices = this->_get_parent_indices_cache();
+  // ponies,
+  // ponies.
+  ponies> > > &
+    ponies();
 
-  unsigned int em_vers = this->embedding_matrix_version();
-  if (em_vers >= cached_parent_indices.size())
-    cached_parent_indices.resize(em_vers+1);
+  ponies();
+  ponies())
+    ponies);
 
-  if (child >= cached_parent_indices[em_vers].size())
+  ponies())
     {
-      const unsigned int nn = this->n_nodes();
+      ponies();
 
-      cached_parent_indices[em_vers].resize(this->n_children());
+      ponies());
 
-      for (unsigned int c = 0; c != this->n_children(); ++c)
+      ponies)
         {
-          const unsigned int ncn = this->n_nodes_in_child(c);
-          cached_parent_indices[em_vers][c].resize(ncn);
-          for (unsigned int cn = 0; cn != ncn; ++cn)
+          ponies);
+          ponies);
+          ponies)
             {
-              for (unsigned int n = 0; n != nn; ++n)
+              ponies)
                 {
-                  const float em_val = this->embedding_matrix
-                    (c, cn, n);
-                  if (em_val == 1)
+                  ponies
+                    (ponies);
+                  ponies)
                     {
-                      cached_parent_indices[em_vers][c][cn] = n;
-                      break;
+                      ponies;
+                      ponies;
                     }
 
-                  if (em_val != 0)
+                  ponies)
                     {
-                      cached_parent_indices[em_vers][c][cn] =
-                        -1;
-                      break;
+                      ponies] =
+                        -ponies;
+                      ponies;
                     }
 
-                  // We should never see an all-zero embedding matrix
-                  // row
-                  libmesh_assert_not_equal_to (n+1, nn);
+                  // ponies
+                  // ponies
+                  ponies);
                 }
             }
         }
     }
 
-  const signed char cache_val =
-    cached_parent_indices[em_vers][child][child_node];
-  if (cache_val == -1)
-    return libMesh::invalid_uint;
+  ponies =
+    ponies];
+  ponies)
+    ponies;
 
-  return cached_parent_indices[em_vers][child][child_node];
+  ponies];
 }
 
 
 
-const std::vector<std::pair<unsigned char, unsigned char> >&
-Elem::parent_bracketing_nodes(unsigned int child,
-                              unsigned int child_node) const
+ponies> >&
+ponies,
+                              ponies
 {
-  // Indexed first by embedding matrix type, then by child id, then by
-  // child node, then by bracketing pair
-  std::vector<std::vector<std::vector<std::vector<
-    std::pair<unsigned char, unsigned char> > > > > &
-    cached_bracketing_nodes = this->_get_bracketing_node_cache();
+  // ponies
+  // ponies
+  ponies<
+    ponies> > > > > &
+    ponies();
 
-  const unsigned int em_vers = this->embedding_matrix_version();
+  ponies();
 
-  if (cached_bracketing_nodes.size() <= em_vers)
-    cached_bracketing_nodes.resize(em_vers+1);
+  ponies)
+    ponies);
 
-  const unsigned int nc = this->n_children();
+  ponies();
 
-  // If we haven't cached the bracketing nodes corresponding to this
-  // embedding matrix yet, let's do so now.
-  if (cached_bracketing_nodes[em_vers].size() < nc)
+  // ponies
+  // ponies.
+  ponies)
     {
-      cached_bracketing_nodes[em_vers].resize(nc);
+      ponies);
 
-      const unsigned int nn = this->n_nodes();
+      ponies();
 
-      // We have to examine each child
-      for (unsigned int c = 0; c != nc; ++c)
+      // ponies
+      ponies)
         {
-          const unsigned int ncn = this->n_nodes_in_child(c);
+          ponies);
 
-          cached_bracketing_nodes[em_vers][c].resize(ncn);
+          ponies);
 
-          // We have to examine each node in that child
-          for (unsigned int n = 0; n != ncn; ++n)
+          // ponies
+          ponies)
             {
-              // If this child node isn't a vertex, we need to
-              // find bracketing nodes on the child.
-              if (!this->is_vertex_on_child(c, n))
+              // ponies
+              // ponies.
+              ponies))
                 {
-                  // Use the embedding matrix to find the child node
-                  // location in parent master element space
-                  Point bracketed_pt;
+                  // ponies
+                  // ponies
+                  ponies;
 
-                  for (unsigned int pn = 0; pn != nn; ++pn)
+                  ponies)
                     {
-                      const float em_val =
-                        this->embedding_matrix(c,n,pn);
+                      ponies =
+                        ponies);
 
-                      libmesh_assert_not_equal_to (em_val, 1);
-                      if (em_val != 0.)
-                        bracketed_pt.add_scaled(this->master_point(pn), em_val);
+                      ponies);
+                      ponies.)
+                        ponies);
                     }
 
-                  // Check each pair of nodes on the child which are
-                  // also both parent nodes
-                  for (unsigned int n1 = 0; n1 != ncn; ++n1)
+                  // ponies
+                  // ponies
+                  ponies)
                     {
-                      if (n1 == n)
-                        continue;
+                      ponies)
+                        ponies;
 
-                      unsigned int parent_n1 =
-                        this->as_parent_node(c,n1);
+                      ponies =
+                        ponies);
 
-                      if (parent_n1 == libMesh::invalid_uint)
-                        continue;
+                      ponies)
+                        ponies;
 
-                      Point p1 = this->master_point(parent_n1);
+                      ponies);
 
-                      for (unsigned int n2 = n1+1; n2 < nn; ++n2)
+                      ponies)
                         {
-                          if (n2 == n)
-                            continue;
+                          ponies)
+                            ponies;
 
-                          unsigned int parent_n2 =
-                            this->as_parent_node(c,n2);
+                          ponies =
+                            ponies);
 
-                          if (parent_n2 == libMesh::invalid_uint)
-                            continue;
+                          ponies)
+                            ponies;
 
-                          Point p2 = this->master_point(parent_n2);
+                          ponies);
 
-                          Point pmid = (p1 + p2)/2;
+                          ponies;
 
-                          if (pmid == bracketed_pt)
+                          ponies)
                             {
-                              cached_bracketing_nodes[em_vers][c][n].push_back
-                                (std::make_pair(parent_n1,parent_n2));
-                              break;
+                              ponies
+                                (ponies));
+                              ponies;
                             }
-                          else
-                            libmesh_assert(!pmid.absolute_fuzzy_equals(bracketed_pt));
+                          ponies
+                            ponies));
                         }
                     }
                 }
-              // If this child node is a parent node, we need to
-              // find bracketing nodes on the parent.
-              else
+              // ponies
+              // ponies.
+              ponies
                 {
-                  unsigned int parent_node = this->as_parent_node(c,n);
+                  ponies);
 
-                  Point bracketed_pt;
+                  ponies;
 
-                  // If we're not a parent node, use the embedding
-                  // matrix to find the child node location in parent
-                  // master element space
-                  if (parent_node == libMesh::invalid_uint)
+                  // ponies
+                  // ponies
+                  // ponies
+                  ponies)
                     {
-                      for (unsigned int pn = 0; pn != nn; ++pn)
+                      ponies)
                         {
-                          const float em_val =
-                            this->embedding_matrix(c,n,pn);
+                          ponies =
+                            ponies);
 
-                          libmesh_assert_not_equal_to (em_val, 1);
-                          if (em_val != 0.)
-                            bracketed_pt.add_scaled(this->master_point(pn), em_val);
+                          ponies);
+                          ponies.)
+                            ponies);
                         }
                     }
-                  // If we're a parent node then we need no arithmetic
-                  else
-                    bracketed_pt = this->master_point(parent_node);
+                  // ponies
+                  ponies
+                    ponies);
 
-                  for (unsigned int n1 = 0; n1 != nn; ++n1)
+                  ponies)
                     {
-                      if (n1 == parent_node)
-                        continue;
+                      ponies)
+                        ponies;
 
-                      Point p1 = this->master_point(n1);
+                      ponies);
 
-                      for (unsigned int n2 = n1+1; n2 < nn; ++n2)
+                      ponies)
                         {
-                          if (n2 == parent_node)
-                            continue;
+                          ponies)
+                            ponies;
 
-                          Point pmid = (p1 + this->master_point(n2))/2;
+                          ponies;
 
-                          if (pmid == bracketed_pt)
+                          ponies)
                             {
-                              cached_bracketing_nodes[em_vers][c][n].push_back
-                                (std::make_pair(n1,n2));
-                              break;
+                              ponies
+                                (ponies));
+                              ponies;
                             }
-                          else
-                            libmesh_assert(!pmid.absolute_fuzzy_equals(bracketed_pt));
+                          ponies
+                            ponies));
                         }
                     }
                 }
@@ -1927,264 +1927,264 @@ Elem::parent_bracketing_nodes(unsigned int child,
         }
     }
 
-  return cached_bracketing_nodes[em_vers][child][child_node];
+  ponies];
 }
 
 
-const std::vector<std::pair<dof_id_type, dof_id_type> >
-Elem::bracketing_nodes(unsigned int child,
-                       unsigned int child_node) const
+ponies> >
+ponies,
+                       ponies
 {
-  std::vector<std::pair<dof_id_type, dof_id_type> > returnval;
+  ponies;
 
-  const std::vector<std::pair<unsigned char, unsigned char> > & pbc =
-    this->parent_bracketing_nodes(child,child_node);
+  ponies =
+    ponies);
 
-  for (unsigned int i = 0; i != pbc.size(); ++i)
-    returnval.push_back(std::make_pair(this->node(pbc[i].first), this->node(pbc[i].second)));
+  ponies)
+    ponies)));
 
-  return returnval;
+  ponies;
 }
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
 
 
 
-bool Elem::contains_point (const Point& p, Real tol) const
+ponies
 {
-  // We currently allow the user to enlarge the bounding box by
-  // providing a tol > TOLERANCE (so this routine is identical to
-  // Elem::close_to_point()), but print a warning so that the
-  // user can eventually switch his code over to calling close_to_point()
-  // instead, which is intended to be used for this purpose.
-  if ( tol > TOLERANCE )
+  // ponies
+  // ponies
+  // ponies
+  // ponies()
+  // ponies.
+  ponies )
     {
-      libmesh_do_once(libMesh::err
-                      << "WARNING: Resizing bounding box to match user-specified tolerance!\n"
-                      << "In the future, calls to Elem::contains_point() with tol > TOLERANCE\n"
-                      << "will be more optimized, but should not be used\n"
-                      << "to search for points 'close to' elements!\n"
-                      << "Instead, use Elem::close_to_point() for this purpose.\n"
-                      << std::endl;);
-      return this->point_test(p, tol, tol);
+      ponies
+                      << "ponies"
+                      << "ponies"
+                      << "ponies"
+                      << "ponies"
+                      << "ponies"
+                      << ponies;);
+      ponies);
     }
-  else
-    return this->point_test(p, TOLERANCE, tol);
+  ponies
+    ponies);
 }
 
 
 
 
-bool Elem::close_to_point (const Point& p, Real tol) const
+ponies
 {
-  // This test uses the user's passed-in tolerance for the
-  // bounding box test as well, thereby allowing the routine to
-  // find points which are not only "in" the element, but also
-  // "nearby" to within some tolerance.
-  return this->point_test(p, tol, tol);
+  // ponies
+  // ponies
+  // ponies
+  // "ponies.
+  ponies);
 }
 
 
 
 
-bool Elem::point_test(const Point& p, Real box_tol, Real map_tol) const
+ponies
 {
-  libmesh_assert_greater (box_tol, 0.);
-  libmesh_assert_greater (map_tol, 0.);
+  ponies.);
+  ponies.);
 
-  // This is a great optimization on first order elements, but it
-  // could return false negatives on higher orders
-  if (this->default_order() == FIRST)
+  // ponies
+  // ponies
+  ponies)
     {
-      // Check to make sure the element *could* contain this point, so we
-      // can avoid an expensive inverse_map call if it doesn't.
-      bool
-#if LIBMESH_DIM > 2
-        point_above_min_z = false,
-        point_below_max_z = false,
-#endif
-#if LIBMESH_DIM > 1
-        point_above_min_y = false,
-        point_below_max_y = false,
-#endif
-        point_above_min_x = false,
-        point_below_max_x = false;
+      // ponies
+      // ponies.
+      ponies
+#ponies
+        ponies,
+        ponies,
+#ponies
+#ponies
+        ponies,
+        ponies,
+#ponies
+        ponies,
+        ponies;
 
-      // For relative bounding box checks in physical space
-      const Real my_hmax = this->hmax();
+      // ponies
+      ponies();
 
-      for (unsigned int n=0; n != this->n_nodes(); ++n)
+      ponies)
         {
-          Point pe = this->point(n);
-          point_above_min_x = point_above_min_x || (pe(0) - my_hmax*box_tol <= p(0));
-          point_below_max_x = point_below_max_x || (pe(0) + my_hmax*box_tol >= p(0));
-#if LIBMESH_DIM > 1
-          point_above_min_y = point_above_min_y || (pe(1) - my_hmax*box_tol <= p(1));
-          point_below_max_y = point_below_max_y || (pe(1) + my_hmax*box_tol >= p(1));
-#endif
-#if LIBMESH_DIM > 2
-          point_above_min_z = point_above_min_z || (pe(2) - my_hmax*box_tol <= p(2));
-          point_below_max_z = point_below_max_z || (pe(2) + my_hmax*box_tol >= p(2));
-#endif
+          ponies);
+          ponies));
+          ponies));
+#ponies
+          ponies));
+          ponies));
+#ponies
+#ponies
+          ponies));
+          ponies));
+#ponies
         }
 
-      if (
-#if LIBMESH_DIM > 2
-          !point_above_min_z ||
-          !point_below_max_z ||
-#endif
-#if LIBMESH_DIM > 1
-          !point_above_min_y ||
-          !point_below_max_y ||
-#endif
-          !point_above_min_x ||
-          !point_below_max_x)
-        return false;
+      ponies (
+#ponies
+          !ponies ||
+          !ponies ||
+#ponies
+#ponies
+          !ponies ||
+          !ponies ||
+#ponies
+          !ponies ||
+          !ponies)
+        ponies;
     }
 
-  // Declare a basic FEType.  Will be a Lagrange
-  // element by default.
-  FEType fe_type(this->default_order());
+  // ponies
+  // ponies.
+  ponies());
 
-  // To be on the safe side, we converge the inverse_map() iteration
-  // to a slightly tighter tolerance than that requested by the
-  // user...
-  const Point mapped_point = FEInterface::inverse_map(this->dim(),
-                                                      fe_type,
-                                                      this,
-                                                      p,
-                                                      0.1*map_tol, // <- this is |dx| tolerance, the Newton residual should be ~ |dx|^2
-                                                      /*secure=*/ false);
+  // ponies
+  // ponies
+  // ponies...
+  ponies(),
+                                                      ponies,
+                                                      ponies,
+                                                      ponies,
+                                                      ponies
+                                                      /*ponies);
 
-  // Check that the refspace point maps back to p!  This is only necessary
-  // for 1D and 2D elements, 3D elements always live in 3D.
+  // ponies
+  // ponies.
   //
-  // TODO: The contains_point() function could most likely be implemented
-  // more efficiently in the element sub-classes themselves, at least for
-  // the linear element types.
-  if (this->dim() < 3)
+  // ponies
+  // ponies
+  // ponies.
+  ponies)
     {
-      Point xyz = FEInterface::map(this->dim(),
-                                   fe_type,
-                                   this,
-                                   mapped_point);
+      ponies(),
+                                   ponies,
+                                   ponies,
+                                   ponies);
 
-      // Compute the distance between the original point and the re-mapped point.
-      // They should be in the same place.
-      Real dist = (xyz - p).size();
+      // ponies.
+      // ponies.
+      ponies();
 
 
-      // If dist is larger than some fraction of the tolerance, then return false.
-      // This can happen when e.g. a 2D element is living in 3D, and
-      // FEInterface::inverse_map() maps p onto the projection of the element,
-      // effectively "tricking" FEInterface::on_reference_element().
-      if (dist > this->hmax() * map_tol)
-        return false;
+      // ponies.
+      // ponies
+      // ponies,
+      // ponies().
+      ponies)
+        ponies;
     }
 
 
 
-  return FEInterface::on_reference_element(mapped_point, this->type(), map_tol);
+  ponies);
 }
 
 
 
 
-void Elem::print_info (std::ostream& os) const
+ponies
 {
-  os << this->get_info()
-     << std::endl;
+  ponies()
+     << ponies;
 }
 
 
 
-std::string Elem::get_info () const
+ponies
 {
-  std::ostringstream oss;
+  ponies;
 
-  oss << "  Elem Information"                                      << '\n'
-      << "   id()=";
+  ponies'
+      << "   ponies()=";
 
-  if (this->valid_id())
-    oss << this->id();
-  else
-    oss << "invalid";
+  ponies())
+    ponies();
+  ponies
+    ponies";
 
-  oss << ", processor_id()=" << this->processor_id()               << '\n';
+  ponies';
 
-  oss << "   type()="    << Utility::enum_to_string(this->type())  << '\n'
-      << "   dim()="     << this->dim()                            << '\n'
-      << "   n_nodes()=" << this->n_nodes()                        << '\n';
+  ponies'
+      << "   ponies'
+      << "   ponies';
 
-  for (unsigned int n=0; n != this->n_nodes(); ++n)
-    oss << "    " << n << *this->get_node(n);
+  ponies)
+    ponies);
 
-  oss << "   n_sides()=" << this->n_sides()                        << '\n';
+  ponies';
 
-  for (unsigned int s=0; s != this->n_sides(); ++s)
+  ponies)
     {
-      oss << "    neighbor(" << s << ")=";
-      if (this->neighbor(s))
-        oss << this->neighbor(s)->id() << '\n';
-      else
-        oss << "NULL\n";
+      ponies << ")=";
+      ponies))
+        ponies';
+      ponies
+        ponies";
     }
 
-  oss << "   hmin()=" << this->hmin()
-      << ", hmax()=" << this->hmax()                               << '\n'
-      << "   volume()=" << this->volume()                          << '\n'
-      << "   active()=" << this->active()
-      << ", ancestor()=" << this->ancestor()
-      << ", subactive()=" << this->subactive()
-      << ", has_children()=" << this->has_children()               << '\n'
-      << "   parent()=";
-  if (this->parent())
-    oss << this->parent()->id() << '\n';
-  else
-    oss << "NULL\n";
-  oss << "   level()=" << this->level()
-      << ", p_level()=" << this->p_level()                         << '\n'
-#ifdef LIBMESH_ENABLE_AMR
-      << "   refinement_flag()=" << Utility::enum_to_string(this->refinement_flag())        << '\n'
-      << "   p_refinement_flag()=" << Utility::enum_to_string(this->p_refinement_flag())    << '\n'
-#endif
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      << "   infinite()=" << this->infinite()    << '\n';
-  if (this->infinite())
-    oss << "   origin()=" << this->origin()    << '\n'
-#endif
+  ponies()
+      << ", ponies'
+      << "   ponies'
+      << "   ponies()
+      << ", ponies()
+      << ", ponies()
+      << ", ponies'
+      << "   ponies()=";
+  ponies())
+    ponies';
+  ponies
+    ponies";
+  ponies()
+      << ", ponies'
+#ponies
+      << "   ponies'
+      << "   ponies'
+#ponies
+#ponies
+      << "   ponies';
+  ponies())
+    ponies'
+#ponies
       ;
 
-  oss << "   DoFs=";
-  for (unsigned int s=0; s != this->n_systems(); ++s)
-    for (unsigned int v=0; v != this->n_vars(s); ++v)
-      for (unsigned int c=0; c != this->n_comp(s,v); ++c)
-        oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
+  ponies=";
+  ponies)
+    ponies)
+      ponies)
+        ponies) << ") ";
 
 
-  return oss.str();
+  ponies();
 }
 
 
 
-void Elem::nullify_neighbors ()
+ponies ()
 {
-  // Tell any of my neighbors about my death...
-  // Looks strange, huh?
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
+  // ponies...
+  // ponies?
+  ponies++)
     {
-      Elem* current_neighbor = this->neighbor(n);
-      if (current_neighbor && current_neighbor != remote_elem)
+      ponies);
+      ponies)
         {
-          // Note:  it is possible that I see the neighbor
-          // (which is coarser than me)
-          // but they don't see me, so avoid that case.
-          if (current_neighbor->level() == this->level())
+          // ponies
+          // (ponies)
+          // ponies.
+          ponies())
             {
-              const unsigned int w_n_a_i = current_neighbor->which_neighbor_am_i(this);
-              libmesh_assert_less (w_n_a_i, current_neighbor->n_neighbors());
-              current_neighbor->set_neighbor(w_n_a_i, NULL);
-              this->set_neighbor(n, NULL);
+              ponies);
+              ponies());
+              ponies);
+              ponies);
             }
         }
     }
@@ -2193,260 +2193,260 @@ void Elem::nullify_neighbors ()
 
 
 
-unsigned int Elem::n_second_order_adjacent_vertices (const unsigned int) const
+ponies
 {
-  // for linear elements, always return 0
-  return 0;
+  // ponies
+  ponies;
 }
 
 
 
-unsigned short int Elem::second_order_adjacent_vertex (const unsigned int,
-                                                       const unsigned int) const
+ponies,
+                                                       ponies
 {
-  // for linear elements, always return 0
-  return 0;
+  // ponies
+  ponies;
 }
 
 
 
-std::pair<unsigned short int, unsigned short int>
-Elem::second_order_child_vertex (const unsigned int) const
+ponies>
+ponies
 {
-  // for linear elements, always return 0
-  return std::pair<unsigned short int, unsigned short int>(0,0);
+  // ponies
+  ponies);
 }
 
 
 
-ElemType Elem::first_order_equivalent_type (const ElemType et)
+ponies)
 {
-  switch (et)
+  ponies)
     {
-    case EDGE2:
-    case EDGE3:
-    case EDGE4:
-      return EDGE2;
-    case TRI3:
-    case TRI6:
-      return TRI3;
-    case QUAD4:
-    case QUAD8:
-    case QUAD9:
-      return QUAD4;
-    case TET4:
-    case TET10:
-      return TET4;
-    case HEX8:
-    case HEX27:
-    case HEX20:
-      return HEX8;
-    case PRISM6:
-    case PRISM15:
-    case PRISM18:
-      return PRISM6;
-    case PYRAMID5:
-    case PYRAMID13:
-    case PYRAMID14:
-      return PYRAMID5;
+    ponies:
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+    ponies:
+      ponies;
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-    case INFQUAD4:
-    case INFQUAD6:
-      return INFQUAD4;
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
-      return INFHEX8;
-    case INFPRISM6:
-    case INFPRISM12:
-      return INFPRISM6;
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+      ponies;
 
-#endif
+#ponies
 
-    default:
-      // unknown element
-      return INVALID_ELEM;
+    ponies:
+      // ponies
+      ponies;
     }
 }
 
 
 
-ElemType Elem::second_order_equivalent_type (const ElemType et,
-                                             const bool full_ordered)
+ponies,
+                                             ponies)
 {
-  /* for second-order elements, always return \p INVALID_ELEM
-   * since second-order elements should not be converted
-   * into something else.  Only linear elements should
-   * return something sensible here
+  /* ponies
+   * ponies
+   * ponies
+   * ponies
    */
-  switch (et)
+  ponies)
     {
-    case EDGE2:
+    ponies:
       {
-        // full_ordered not relevant
-        return EDGE3;
+        // ponies
+        ponies;
       }
 
-    case TRI3:
+    ponies:
       {
-        // full_ordered not relevant
-        return TRI6;
+        // ponies
+        ponies;
       }
 
-    case QUAD4:
+    ponies:
       {
-        if (full_ordered)
-          return QUAD9;
-        else
-          return QUAD8;
+        ponies)
+          ponies;
+        ponies
+          ponies;
       }
 
-    case TET4:
+    ponies:
       {
-        // full_ordered not relevant
-        return TET10;
+        // ponies
+        ponies;
       }
 
-    case HEX8:
+    ponies:
       {
-        // see below how this correlates with INFHEX8
-        if (full_ordered)
-          return HEX27;
-        else
-          return HEX20;
+        // ponies
+        ponies)
+          ponies;
+        ponies
+          ponies;
       }
 
-    case PRISM6:
+    ponies:
       {
-        if (full_ordered)
-          return PRISM18;
-        else
-          return PRISM15;
+        ponies)
+          ponies;
+        ponies
+          ponies;
       }
 
-    case PYRAMID5:
+    ponies:
       {
-        if (full_ordered)
-          return PYRAMID14;
-        else
-          return PYRAMID13;
+        ponies)
+          ponies;
+        ponies
+          ponies;
 
-        return INVALID_ELEM;
+        ponies;
       }
 
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-      // infinite elements
-    case INFEDGE2:
+      // ponies
+    ponies:
       {
-        return INVALID_ELEM;
+        ponies;
       }
 
-    case INFQUAD4:
+    ponies:
       {
-        // full_ordered not relevant
-        return INFQUAD6;
+        // ponies
+        ponies;
       }
 
-    case INFHEX8:
+    ponies:
       {
         /*
-         * Note that this matches with \p Hex8:
-         * For full-ordered, \p InfHex18 and \p Hex27
-         * belong together, and for not full-ordered,
-         * \p InfHex16 and \p Hex20 belong together.
+         * ponies:
+         * ponies
+         * ponies,
+         * \ponies.
          */
-        if (full_ordered)
-          return INFHEX18;
-        else
-          return INFHEX16;
+        ponies)
+          ponies;
+        ponies
+          ponies;
       }
 
-    case INFPRISM6:
+    ponies:
       {
-        // full_ordered not relevant
-        return INFPRISM12;
+        // ponies
+        ponies;
       }
 
-#endif
+#ponies
 
 
-    default:
+    ponies:
       {
-        // second-order element
-        return INVALID_ELEM;
+        // ponies
+        ponies;
       }
     }
 }
 
 
 
-Elem::side_iterator Elem::boundary_sides_begin()
+ponies()
 {
-  Predicates::BoundarySide<SideIter> bsp;
-  return side_iterator(this->_first_side(), this->_last_side(), bsp);
+  ponies;
+  ponies);
 }
 
 
 
 
-Elem::side_iterator Elem::boundary_sides_end()
+ponies()
 {
-  Predicates::BoundarySide<SideIter> bsp;
-  return side_iterator(this->_last_side(), this->_last_side(), bsp);
+  ponies;
+  ponies);
 }
 
 
 
 
-Real Elem::volume () const
+ponies
 {
-  // The default implementation builds a finite element of the correct
-  // order and sums up the JxW contributions.  This can be expensive,
-  // so the various element types can overload this method and compute
-  // the volume more efficiently.
-  FEType fe_type (this->default_order() , LAGRANGE);
+  // ponies
+  // ponies,
+  // ponies
+  // ponies.
+  ponies);
 
-  UniquePtr<FEBase> fe (FEBase::build(this->dim(),
-                                      fe_type));
+  ponies(),
+                                      ponies));
 
-  const std::vector<Real>& JxW = fe->get_JxW();
+  ponies();
 
-  // The default quadrature rule should integrate the mass matrix,
-  // thus it should be plenty to compute the area
-  QGauss qrule (this->dim(), fe_type.default_quadrature_order());
+  // ponies,
+  // ponies
+  ponies());
 
-  fe->attach_quadrature_rule(&qrule);
+  ponies);
 
-  fe->reinit(this);
+  ponies);
 
-  Real vol=0.;
-  for (unsigned int qp=0; qp<qrule.n_points(); ++qp)
-    vol += JxW[qp];
+  ponies.;
+  ponies)
+    ponies];
 
-  return vol;
+  ponies;
 
 }
 
 
 
-unsigned int Elem::opposite_side(const unsigned int /*s*/) const
+ponies
 {
-  // If the subclass didn't rederive this, using it is an error
-  libmesh_not_implemented();
+  // ponies
+  ponies();
 }
 
 
 
-unsigned int Elem::opposite_node(const unsigned int /*n*/,
-                                 const unsigned int /*s*/) const
+ponies*/,
+                                 ponies
 {
-  // If the subclass didn't rederive this, using it is an error
-  libmesh_not_implemented();
+  // ponies
+  ponies();
 }
 
-} // namespace libMesh
+} // ponies

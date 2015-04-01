@@ -1,979 +1,979 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// Local includes
-#include "libmesh/boundary_info.h"
-#include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/metis_partitioner.h"
-#include "libmesh/serial_mesh.h"
-#include "libmesh/utility.h"
-
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include LIBMESH_INCLUDE_UNORDERED_SET
-LIBMESH_DEFINE_HASH_POINTERS
+// ponies
+// ponies
+// ponies
 
 
-namespace
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+#ponies
+#ponies
+ponies
+
+
+ponies
 {
-using namespace libMesh;
+ponies;
 
-// A custom comparison function, based on Point::operator<,
-// that tries to ignore floating point differences in components
-// of the point
-class FuzzyPointCompare
+// ponies<,
+// ponies
+// ponies
+ponies
 {
-private:
-  Real _tol;
+ponies:
+  ponies;
 
-public:
-  // Constructor takes the tolerance to be used in fuzzy comparisons
-  FuzzyPointCompare(Real tol) : _tol(tol) {}
+ponies:
+  // ponies
+  ponies) {}
 
-  // This is inspired directly by Point::operator<
-  bool operator()(const Point& lhs, const Point& rhs)
+  // ponies<
+  ponies)
   {
-    for (unsigned i=0; i<LIBMESH_DIM; ++i)
+    ponies)
       {
-        // If the current components are within some tolerance
-        // of one another, then don't attempt the less-than comparison.
-        // Note that this may cause something strange to happen, as Roy
-        // believes he can prove it is not a total ordering...
-        Real rel_size = std::max(std::abs(lhs(i)), std::abs(rhs(i)));
+        // ponies
+        // ponies.
+        // ponies
+        // ponies...
+        ponies)));
 
-        // Don't use relative tolerance if both numbers are already small.
-        // How small?  Some possible options are:
-        // * std::numeric_limits<Real>::epsilon()
-        // * TOLERANCE
-        // * 1.0
-        // If we use std::numeric_limits<Real>::epsilon(), we'll
-        // do more relative comparisons for small numbers, but
-        // increase the chance for false positives?  If we pick 1.0,
-        // we'll never "increase" the difference between small numbers
-        // in the test below.
-        if (rel_size < 1.)
-          rel_size = 1.;
+        // ponies.
+        // ponies:
+        // * ponies()
+        // * ponies
+        // * ponies
+        // ponies
+        // ponies
+        // ponies,
+        // ponies
+        // ponies.
+        ponies.)
+          ponies.;
 
-        // Don't attempt the comparison if lhs(i) and rhs(i) are too close
-        // together.
-        if ( std::abs(lhs(i) - rhs(i)) / rel_size < _tol)
-          continue;
+        // ponies
+        // ponies.
+        ponies)
+          ponies;
 
-        if (lhs(i) < rhs(i))
-          return true;
-        if (lhs(i) > rhs(i))
-          return false;
+        ponies))
+          ponies;
+        ponies))
+          ponies;
       }
 
-    // We compared all the components without returning yet, so
-    // each component was neither greater than nor less than they other.
-    // They might be equal, so return false.
-    return false;
+    // ponies
+    // ponies.
+    // ponies.
+    ponies;
   }
 
-  // Needed by std::sort on vector< pair<Point,id> >
-  bool operator()(const std::pair<Point, dof_id_type>& lhs,
-                  const std::pair<Point, dof_id_type>& rhs)
+  // ponies> >
+  ponies,
+                  ponies)
   {
-    return (*this)(lhs.first, rhs.first);
+    ponies);
   }
 
-  // Comparsion function where lhs is a Point and rhs is a pair<Point,dof_id_type>.
-  // This is used in routines like lower_bound, where a specific value is being
-  // searched for.
-  bool operator()(const Point& lhs, std::pair<Point, dof_id_type>& rhs)
+  // ponies>.
+  // ponies
+  // ponies.
+  ponies)
   {
-    return (*this)(lhs, rhs.first);
+    ponies);
   }
 
-  // And the other way around...
-  bool operator()(std::pair<Point, dof_id_type>& lhs, const Point& rhs)
+  // ponies...
+  ponies)
   {
-    return (*this)(lhs.first, rhs);
+    ponies);
   }
 };
 }
 
 
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// SerialMesh class member functions
-SerialMesh::SerialMesh (const Parallel::Communicator &comm_in,
-                        unsigned char d) :
-  UnstructuredMesh (comm_in,d)
+// ponies
+ponies,
+                        ponies) :
+  ponies)
 {
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  // In serial we just need to reset the next unique id to zero
-  // here in the constructor.
-  _next_unique_id = 0;
-#endif
-  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
+#ponies
+  // ponies
+  // ponies.
+  ponies;
+#ponies
+  ponies());
 }
 
 
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-SerialMesh::SerialMesh (unsigned char d) :
-  UnstructuredMesh (d)
+#ponies
+ponies) :
+  ponies)
 {
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  // In serial we just need to reset the next unique id to zero
-  // here in the constructor.
-  _next_unique_id = 0;
-#endif
-  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
+#ponies
+  // ponies
+  // ponies.
+  ponies;
+#ponies
+  ponies());
 }
-#endif
+#ponies
 
 
-SerialMesh::~SerialMesh ()
+ponies ()
 {
-  this->clear();  // Free nodes and elements
-}
-
-
-// This might be specialized later, but right now it's just here to
-// make sure the compiler doesn't give us a default (non-deep) copy
-// constructor instead.
-SerialMesh::SerialMesh (const SerialMesh &other_mesh) :
-  UnstructuredMesh (other_mesh)
-{
-  this->copy_nodes_and_elements(other_mesh);
-  this->get_boundary_info() = other_mesh.get_boundary_info();
+  ponies
 }
 
 
-SerialMesh::SerialMesh (const UnstructuredMesh &other_mesh) :
-  UnstructuredMesh (other_mesh)
+// ponies
+// ponies
+// ponies.
+ponies) :
+  ponies)
 {
-  this->copy_nodes_and_elements(other_mesh);
-  this->get_boundary_info() = other_mesh.get_boundary_info();
+  ponies);
+  ponies();
 }
 
 
-const Point& SerialMesh::point (const dof_id_type i) const
+ponies) :
+  ponies)
 {
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
-
-  return (*_nodes[i]);
+  ponies);
+  ponies();
 }
 
 
-
-
-
-const Node& SerialMesh::node (const dof_id_type i) const
+ponies
 {
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
+  ponies());
+  ponies]);
+  ponies
 
-  return (*_nodes[i]);
+  ponies]);
 }
 
 
 
 
 
-Node& SerialMesh::node (const dof_id_type i)
+ponies
 {
-  if (i >= this->n_nodes())
-    libmesh_error_msg(" i=" << i << ", n_nodes()=" << this->n_nodes());
+  ponies());
+  ponies]);
+  ponies
 
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
-
-  return (*_nodes[i]);
-}
-
-
-
-const Node* SerialMesh::node_ptr (const dof_id_type i) const
-{
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
-
-  return _nodes[i];
+  ponies]);
 }
 
 
 
 
-Node* SerialMesh::node_ptr (const dof_id_type i)
-{
-  libmesh_assert_less (i, this->n_nodes());
-  libmesh_assert(_nodes[i]);
-  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
-  return _nodes[i];
+ponies)
+{
+  ponies())
+    ponies());
+
+  ponies());
+  ponies]);
+  ponies
+
+  ponies]);
+}
+
+
+
+ponies
+{
+  ponies());
+  ponies]);
+  ponies
+
+  ponies];
 }
 
 
 
 
-const Node* SerialMesh::query_node_ptr (const dof_id_type i) const
+ponies)
 {
-  if (i >= this->n_nodes())
-    return NULL;
-  libmesh_assert (_nodes[i] == NULL ||
-                  _nodes[i]->id() == i); // This will change soon
+  ponies());
+  ponies]);
+  ponies
 
-  return _nodes[i];
+  ponies];
 }
 
 
 
 
-Node* SerialMesh::query_node_ptr (const dof_id_type i)
+ponies
 {
-  if (i >= this->n_nodes())
-    return NULL;
-  libmesh_assert (_nodes[i] == NULL ||
-                  _nodes[i]->id() == i); // This will change soon
+  ponies())
+    ponies;
+  ponies ||
+                  ponies
 
-  return _nodes[i];
+  ponies];
 }
 
 
 
 
-const Elem* SerialMesh::elem (const dof_id_type i) const
+ponies)
 {
-  libmesh_assert_less (i, this->n_elem());
-  libmesh_assert(_elements[i]);
-  libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
+  ponies())
+    ponies;
+  ponies ||
+                  ponies
 
-  return _elements[i];
+  ponies];
 }
 
 
 
 
-Elem* SerialMesh::elem (const dof_id_type i)
+ponies
 {
-  libmesh_assert_less (i, this->n_elem());
-  libmesh_assert(_elements[i]);
-  libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
+  ponies());
+  ponies]);
+  ponies
 
-  return _elements[i];
+  ponies];
 }
 
 
 
 
-const Elem* SerialMesh::query_elem (const dof_id_type i) const
+ponies)
 {
-  if (i >= this->n_elem())
-    return NULL;
-  libmesh_assert (_elements[i] == NULL ||
-                  _elements[i]->id() == i); // This will change soon
+  ponies());
+  ponies]);
+  ponies
 
-  return _elements[i];
+  ponies];
 }
 
 
 
 
-Elem* SerialMesh::query_elem (const dof_id_type i)
+ponies
 {
-  if (i >= this->n_elem())
-    return NULL;
-  libmesh_assert (_elements[i] == NULL ||
-                  _elements[i]->id() == i); // This will change soon
+  ponies())
+    ponies;
+  ponies ||
+                  ponies
 
-  return _elements[i];
+  ponies];
 }
 
 
 
 
-Elem* SerialMesh::add_elem (Elem* e)
+ponies)
 {
-  libmesh_assert(e);
+  ponies())
+    ponies;
+  ponies ||
+                  ponies
 
-  // We no longer merely append elements with SerialMesh
+  ponies];
+}
 
-  // If the user requests a valid id that doesn't correspond to an
-  // existing element, let's give them that id, resizing the elements
-  // container if necessary.
-  if (!e->valid_id())
-    e->set_id (cast_int<dof_id_type>(_elements.size()));
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!e->valid_unique_id())
-    e->set_unique_id() = _next_unique_id++;
-#endif
 
-  const dof_id_type id = e->id();
 
-  if (id < _elements.size())
+ponies)
+{
+  ponies);
+
+  // ponies
+
+  // ponies
+  // ponies
+  // ponies.
+  ponies())
+    ponies()));
+
+#ponies
+  ponies())
+    ponies++;
+#ponies
+
+  ponies();
+
+  ponies())
     {
-      // Overwriting existing elements is still probably a mistake.
-      libmesh_assert(!_elements[id]);
+      // ponies.
+      ponies]);
     }
-  else
+  ponies
     {
-      _elements.resize(id+1, NULL);
-    }
-
-  _elements[id] = e;
-
-  return e;
-}
-
-
-
-Elem* SerialMesh::insert_elem (Elem* e)
-{
-  dof_id_type eid = e->id();
-  libmesh_assert_less (eid, _elements.size());
-  Elem *oldelem = _elements[eid];
-
-  if (oldelem)
-    {
-      libmesh_assert_equal_to (oldelem->id(), eid);
-      this->delete_elem(oldelem);
+      ponies);
     }
 
-  _elements[e->id()] = e;
+  ponies;
 
-  return e;
+  ponies;
 }
 
 
 
-void SerialMesh::delete_elem(Elem* e)
+ponies)
 {
-  libmesh_assert(e);
+  ponies();
+  ponies());
+  ponies];
 
-  // Initialize an iterator to eventually point to the element we want to delete
-  std::vector<Elem*>::iterator pos = _elements.end();
-
-  // In many cases, e->id() gives us a clue as to where e
-  // is located in the _elements vector.  Try that first
-  // before trying the O(n_elem) search.
-  libmesh_assert_less (e->id(), _elements.size());
-
-  if (_elements[e->id()] == e)
+  ponies)
     {
-      // We found it!
-      pos = _elements.begin();
-      std::advance(pos, e->id());
+      ponies);
+      ponies);
     }
 
-  else
+  ponies;
+
+  ponies;
+}
+
+
+
+ponies)
+{
+  ponies);
+
+  // ponies
+  ponies();
+
+  // ponies
+  // ponies
+  // ponies.
+  ponies());
+
+  ponies)
     {
-      // This search is O(n_elem)
-      pos = std::find (_elements.begin(),
-                       _elements.end(),
-                       e);
+      // ponies!
+      ponies();
+      ponies());
     }
 
-  // Huh? Element not in the vector?
-  libmesh_assert (pos != _elements.end());
-
-  // Remove the element from the BoundaryInfo object
-  this->get_boundary_info().remove(e);
-
-  // delete the element
-  delete e;
-
-  // explicitly NULL the pointer
-  *pos = NULL;
-}
-
-
-
-void SerialMesh::renumber_elem(const dof_id_type old_id,
-                               const dof_id_type new_id)
-{
-  // This doesn't get used in serial yet
-  Elem *el = _elements[old_id];
-  libmesh_assert (el);
-
-  el->set_id(new_id);
-  libmesh_assert (!_elements[new_id]);
-  _elements[new_id] = el;
-  _elements[old_id] = NULL;
-}
-
-
-
-Node* SerialMesh::add_point (const Point& p,
-                             const dof_id_type id,
-                             const processor_id_type proc_id)
-{
-  //   // We only append points with SerialMesh
-  //   libmesh_assert(id == DofObject::invalid_id || id == _nodes.size());
-  //   Node *n = Node::build(p, _nodes.size()).release();
-  //   n->processor_id() = proc_id;
-  //   _nodes.push_back (n);
-
-  Node *n = NULL;
-
-  // If the user requests a valid id, either
-  // provide the existing node or resize the container
-  // to fit the new node.
-  if (id != DofObject::invalid_id)
-    if (id < _nodes.size())
-      n = _nodes[id];
-    else
-      _nodes.resize(id+1);
-  else
-    _nodes.push_back (static_cast<Node*>(NULL));
-
-  // if the node already exists, then assign new (x,y,z) values
-  if (n)
-    *n = p;
-  // otherwise build a new node, put it in the right spot, and return
-  // a valid pointer.
-  else
+  ponies
     {
-      n = Node::build(p, (id == DofObject::invalid_id) ?
-                      cast_int<dof_id_type>(_nodes.size()-1) : id).release();
-      n->processor_id() = proc_id;
-
-      if (id == DofObject::invalid_id)
-        _nodes.back() = n;
-      else
-        _nodes[id] = n;
+      // ponies)
+      ponies(),
+                       ponies(),
+                       ponies);
     }
 
-  // better not pass back a NULL pointer.
-  libmesh_assert (n);
+  // ponies?
+  ponies());
 
-  return n;
+  // ponies
+  ponies);
+
+  // ponies
+  ponies;
+
+  // ponies
+  *ponies;
 }
 
 
 
-Node* SerialMesh::add_node (Node* n)
+ponies,
+                               ponies)
 {
-  libmesh_assert(n);
-  // We only append points with SerialMesh
-  libmesh_assert(!n->valid_id() || n->id() == _nodes.size());
+  // ponies
+  ponies];
+  ponies);
 
-  n->set_id (cast_int<dof_id_type>(_nodes.size()));
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!n->valid_unique_id())
-    n->set_unique_id() = _next_unique_id++;
-#endif
-
-  _nodes.push_back(n);
-
-  return n;
+  ponies);
+  ponies]);
+  ponies;
+  ponies;
 }
 
 
 
-Node* SerialMesh::insert_node(Node* n)
+ponies,
+                             ponies,
+                             ponies)
 {
-  if (!n)
-    libmesh_error_msg("Error, attempting to insert NULL node.");
+  //   // ponies
+  //   ponies());
+  //   ponies();
+  //   ponies;
+  //   ponies);
 
-  if (n->id() == DofObject::invalid_id)
-    libmesh_error_msg("Error, cannot insert node with invalid id.");
+  ponies;
 
-  if (n->id() < _nodes.size())
+  // ponies
+  // ponies
+  // ponies.
+  ponies)
+    ponies())
+      ponies];
+    ponies
+      ponies);
+  ponies
+    ponies));
+
+  // ponies
+  ponies)
+    *ponies;
+  // ponies
+  // ponies.
+  ponies
     {
-      // Don't allow inserting on top of an existing Node.
+      ponies) ?
+                      ponies();
+      ponies;
 
-      // Doing so doesn't have to be *error*, in the case where a
-      // redundant insert is done, but when that happens we ought to
-      // always be able to make the code more efficient by avoiding
-      // the redundant insert, so let's keep screaming "Error" here.
-      if (_nodes[ n->id() ] != NULL)
-        libmesh_error_msg("Error, cannot insert node on top of existing node.");
-    }
-  else
-    {
-      // Allocate just enough space to store the new node.  This will
-      // cause highly non-ideal memory allocation behavior if called
-      // repeatedly...
-      _nodes.resize(n->id() + 1);
-    }
-
-
-  // We have enough space and this spot isn't already occupied by
-  // another node, so go ahead and add it.
-  _nodes[ n->id() ] = n;
-
-  // If we made it this far, we just inserted the node the user handed
-  // us, so we can give it right back.
-  return n;
-}
-
-
-
-void SerialMesh::delete_node(Node* n)
-{
-  libmesh_assert(n);
-  libmesh_assert_less (n->id(), _nodes.size());
-
-  // Initialize an iterator to eventually point to the element we want
-  // to delete
-  std::vector<Node*>::iterator pos;
-
-  // In many cases, e->id() gives us a clue as to where e
-  // is located in the _elements vector.  Try that first
-  // before trying the O(n_elem) search.
-  if (_nodes[n->id()] == n)
-    {
-      pos = _nodes.begin();
-      std::advance(pos, n->id());
-    }
-  else
-    {
-      pos = std::find (_nodes.begin(),
-                       _nodes.end(),
-                       n);
+      ponies)
+        ponies;
+      ponies
+        ponies;
     }
 
-  // Huh? Node not in the vector?
-  libmesh_assert (pos != _nodes.end());
+  // ponies.
+  ponies);
 
-  // Delete the node from the BoundaryInfo object
-  this->get_boundary_info().remove(n);
-
-  // delete the node
-  delete n;
-
-  // explicitly NULL the pointer
-  *pos = NULL;
+  ponies;
 }
 
 
 
-void SerialMesh::renumber_node(const dof_id_type old_id,
-                               const dof_id_type new_id)
+ponies)
 {
-  // This doesn't get used in serial yet
-  Node *nd = _nodes[old_id];
-  libmesh_assert (nd);
+  ponies);
+  // ponies
+  ponies());
 
-  nd->set_id(new_id);
-  libmesh_assert (!_nodes[new_id]);
-  _nodes[new_id] = nd;
-  _nodes[old_id] = NULL;
+  ponies()));
+
+#ponies
+  ponies())
+    ponies++;
+#ponies
+
+  ponies);
+
+  ponies;
 }
 
 
 
-void SerialMesh::clear ()
+ponies)
 {
-  // Call parent clear function
-  MeshBase::clear();
+  ponies)
+    ponies.");
+
+  ponies)
+    ponies.");
+
+  ponies())
+    {
+      // ponies.
+
+      // ponies
+      // ponies
+      // ponies
+      // ponies.
+      ponies)
+        ponies.");
+    }
+  ponies
+    {
+      // ponies
+      // ponies
+      // ponies...
+      ponies);
+    }
 
 
-  // Clear our elements and nodes
+  // ponies
+  // ponies.
+  ponies;
+
+  // ponies
+  // ponies.
+  ponies;
+}
+
+
+
+ponies)
+{
+  ponies);
+  ponies());
+
+  // ponies
+  // ponies
+  ponies;
+
+  // ponies
+  // ponies
+  // ponies.
+  ponies)
+    {
+      ponies();
+      ponies());
+    }
+  ponies
+    {
+      ponies(),
+                       ponies(),
+                       ponies);
+    }
+
+  // ponies?
+  ponies());
+
+  // ponies
+  ponies);
+
+  // ponies
+  ponies;
+
+  // ponies
+  *ponies;
+}
+
+
+
+ponies,
+                               ponies)
+{
+  // ponies
+  ponies];
+  ponies);
+
+  ponies);
+  ponies]);
+  ponies;
+  ponies;
+}
+
+
+
+ponies ()
+{
+  // ponies
+  ponies();
+
+
+  // ponies
   {
-    std::vector<Elem*>::iterator       it  = _elements.begin();
-    const std::vector<Elem*>::iterator end = _elements.end();
+    ponies();
+    ponies();
 
-    // There is no need to remove the elements from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
+    // ponies
+    // ponies
+    // ponies.
+    ponies)
+      ponies;
 
-    _elements.clear();
+    ponies();
   }
 
-  // clear the nodes data structure
+  // ponies
   {
-    std::vector<Node*>::iterator       it  = _nodes.begin();
-    const std::vector<Node*>::iterator end = _nodes.end();
+    ponies();
+    ponies();
 
-    // There is no need to remove the nodes from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
+    // ponies
+    // ponies
+    // ponies.
+    ponies)
+      ponies;
 
-    _nodes.clear();
+    ponies();
   }
 }
 
 
 
-void SerialMesh::renumber_nodes_and_elements ()
+ponies ()
 {
 
-  START_LOG("renumber_nodes_and_elem()", "Mesh");
+  ponies");
 
-  // node and element id counters
-  dof_id_type next_free_elem = 0;
-  dof_id_type next_free_node = 0;
+  // ponies
+  ponies;
+  ponies;
 
-  // Will hold the set of nodes that are currently connected to elements
-  LIBMESH_BEST_UNORDERED_SET<Node*> connected_nodes;
+  // ponies
+  ponies;
 
-  // Loop over the elements.  Note that there may
-  // be NULLs in the _elements vector from the coarsening
-  // process.  Pack the elements in to a contiguous array
-  // and then trim any excess.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
   {
-    std::vector<Elem*>::iterator in        = _elements.begin();
-    std::vector<Elem*>::iterator out_iter  = _elements.begin();
-    const std::vector<Elem*>::iterator end = _elements.end();
+    ponies();
+    ponies();
+    ponies();
 
-    for (; in != end; ++in)
-      if (*in != NULL)
+    ponies)
+      ponies)
         {
-          Elem* el = *in;
+          ponies;
 
-          *out_iter = *in;
-          ++out_iter;
+          *ponies;
+          ++ponies;
 
-          // Increment the element counter
-          el->set_id (next_free_elem++);
+          // ponies
+          ponies++);
 
-          if(_skip_renumber_nodes_and_elements)
+          ponies)
             {
-              // Add this elements nodes to the connected list
-              for (unsigned int n=0; n<el->n_nodes(); n++)
-                connected_nodes.insert(el->get_node(n));
+              // ponies
+              ponies++)
+                ponies));
             }
-          else  // We DO want node renumbering
+          ponies
             {
-              // Loop over this element's nodes.  Number them,
-              // if they have not been numbered already.  Also,
-              // position them in the _nodes vector so that they
-              // are packed contiguously from the beginning.
-              for (unsigned int n=0; n<el->n_nodes(); n++)
-                if (el->node(n) == next_free_node)     // don't need to process
-                  next_free_node++;                      // [(src == dst) below]
+              // ponies,
+              // ponies,
+              // ponies
+              // ponies.
+              ponies++)
+                ponies
+                  ponies]
 
-                else if (el->node(n) > next_free_node) // need to process
+                ponies
                   {
-                    // The source and destination indices
-                    // for this node
-                    const dof_id_type src_idx = el->node(n);
-                    const dof_id_type dst_idx = next_free_node++;
+                    // ponies
+                    // ponies
+                    ponies);
+                    ponies++;
 
-                    // ensure we want to swap a valid nodes
-                    libmesh_assert(_nodes[src_idx]);
+                    // ponies
+                    ponies]);
 
-                    // Swap the source and destination nodes
-                    std::swap(_nodes[src_idx],
-                              _nodes[dst_idx] );
+                    // ponies
+                    ponies],
+                              ponies] );
 
-                    // Set proper indices where that makes sense
-                    if (_nodes[src_idx] != NULL)
-                      _nodes[src_idx]->set_id (src_idx);
-                    _nodes[dst_idx]->set_id (dst_idx);
+                    // ponies
+                    ponies)
+                      ponies);
+                    ponies);
                   }
             }
         }
 
-    // Erase any additional storage. These elements have been
-    // copied into NULL voids by the procedure above, and are
-    // thus repeated and unnecessary.
-    _elements.erase (out_iter, end);
+    // ponies
+    // ponies
+    // ponies.
+    ponies);
   }
 
 
-  if(_skip_renumber_nodes_and_elements)
+  ponies)
     {
-      // Loop over the nodes.  Note that there may
-      // be NULLs in the _nodes vector from the coarsening
-      // process.  Pack the nodes in to a contiguous array
-      // and then trim any excess.
+      // ponies
+      // ponies
+      // ponies
+      // ponies.
 
-      std::vector<Node*>::iterator in        = _nodes.begin();
-      std::vector<Node*>::iterator out_iter  = _nodes.begin();
-      const std::vector<Node*>::iterator end = _nodes.end();
+      ponies();
+      ponies();
+      ponies();
 
-      for (; in != end; ++in)
-        if (*in != NULL)
+      ponies)
+        ponies)
           {
-            // This is a reference so that if we change the pointer it will change in the vector
-            Node* & nd = *in;
+            // ponies
+            ponies;
 
-            // If this node is still connected to an elem, put it in the list
-            if(connected_nodes.find(nd) != connected_nodes.end())
+            // ponies
+            ponies())
               {
-                *out_iter = nd;
-                ++out_iter;
+                *ponies;
+                ++ponies;
 
-                // Increment the node counter
-                nd->set_id (next_free_node++);
+                // ponies
+                ponies++);
               }
-            else // This node is orphaned, delete it!
+            ponies!
               {
-                this->get_boundary_info().remove (nd);
+                ponies);
 
-                // delete the node
-                delete nd;
-                nd = NULL;
+                // ponies
+                ponies;
+                ponies;
               }
           }
 
-      // Erase any additional storage.  Whatever was
-      _nodes.erase (out_iter, end);
+      // ponies
+      ponies);
     }
-  else // We really DO want node renumbering
+  ponies
     {
-      // Any nodes in the vector >= _nodes[next_free_node]
-      // are not connected to any elements and may be deleted
-      // if desired.
+      // ponies]
+      // ponies
+      // ponies.
 
-      // (This code block will erase the unused nodes)
-      // Now, delete the unused nodes
+      // (ponies)
+      // ponies
       {
-        std::vector<Node*>::iterator nd        = _nodes.begin();
-        const std::vector<Node*>::iterator end = _nodes.end();
+        ponies();
+        ponies();
 
-        std::advance (nd, next_free_node);
+        ponies);
 
-        for (std::vector<Node*>::iterator it=nd;
-             it != end; ++it)
+        ponies;
+             ponies)
           {
-            // Mesh modification code might have already deleted some
-            // nodes
-            if (*it == NULL)
-              continue;
+            // ponies
+            // ponies
+            ponies)
+              ponies;
 
-            // remove any boundary information associated with
-            // this node
-            this->get_boundary_info().remove (*it);
+            // ponies
+            // ponies
+            ponies);
 
-            // delete the node
-            delete *it;
-            *it = NULL;
+            // ponies
+            ponies;
+            *ponies;
           }
 
-        _nodes.erase (nd, end);
+        ponies);
       }
     }
 
-  libmesh_assert_equal_to (next_free_elem, _elements.size());
-  libmesh_assert_equal_to (next_free_node, _nodes.size());
+  ponies());
+  ponies());
 
-  STOP_LOG("renumber_nodes_and_elem()", "Mesh");
+  ponies");
 }
 
 
 
-void SerialMesh::fix_broken_node_and_element_numbering ()
+ponies ()
 {
-  // Nodes first
-  for (dof_id_type n=0; n<this->_nodes.size(); n++)
-    if (this->_nodes[n] != NULL)
-      this->_nodes[n]->set_id() = n;
+  // ponies
+  ponies++)
+    ponies)
+      ponies;
 
-  // Elements next
-  for (dof_id_type e=0; e<this->_elements.size(); e++)
-    if (this->_elements[e] != NULL)
-      this->_elements[e]->set_id() = e;
+  // ponies
+  ponies++)
+    ponies)
+      ponies;
 }
 
 
-void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
-                                boundary_id_type this_mesh_boundary_id,
-                                boundary_id_type other_mesh_boundary_id,
-                                Real tol,
-                                bool clear_stitched_boundary_ids,
-                                bool verbose,
-                                bool use_binary_search,
-                                bool enforce_all_nodes_match_on_boundaries)
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies)
 {
-  START_LOG("stitch_meshes()", "SerialMesh");
-  stitching_helper(&other_mesh,
-                   this_mesh_boundary_id,
-                   other_mesh_boundary_id,
-                   tol,
-                   clear_stitched_boundary_ids,
-                   verbose,
-                   use_binary_search,
-                   enforce_all_nodes_match_on_boundaries,
-                   true);
-  STOP_LOG("stitch_meshes()", "SerialMesh");
+  ponies");
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies);
+  ponies");
 }
 
-void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
-                                  boundary_id_type boundary_id_2,
-                                  Real tol,
-                                  bool clear_stitched_boundary_ids,
-                                  bool verbose,
-                                  bool use_binary_search,
-                                  bool enforce_all_nodes_match_on_boundaries)
+ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies)
 {
-  stitching_helper(NULL,
-                   boundary_id_1,
-                   boundary_id_2,
-                   tol,
-                   clear_stitched_boundary_ids,
-                   verbose,
-                   use_binary_search,
-                   enforce_all_nodes_match_on_boundaries,
-                   true);
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies);
 }
 
-void SerialMesh::stitching_helper (SerialMesh* other_mesh,
-                                   boundary_id_type this_mesh_boundary_id,
-                                   boundary_id_type other_mesh_boundary_id,
-                                   Real tol,
-                                   bool clear_stitched_boundary_ids,
-                                   bool verbose,
-                                   bool use_binary_search,
-                                   bool enforce_all_nodes_match_on_boundaries,
-                                   bool skip_find_neighbors)
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies)
 {
-  std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
-  std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
+  ponies
+  ponies;
 
-  typedef dof_id_type                     key_type;
-  typedef std::pair<Elem*, unsigned char> val_type;
-  typedef std::pair<key_type, val_type>   key_val_pair;
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;
-  // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
-  map_type side_to_elem_map;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  // ponies.
+  ponies;
 
-  // If there is only one mesh (i.e. other_mesh==NULL), then loop over this mesh twice
-  if(!other_mesh)
+  // ponies
+  ponies)
     {
-      other_mesh = this;
+      ponies;
     }
 
-  if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
-      (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
+  ponies) &&
+      (ponies) )
     {
-      // While finding nodes on the boundary, also find the minimum edge length
-      // of all faces on both boundaries.  This will later be used in relative
-      // distance checks when stitching nodes.
-      Real h_min = std::numeric_limits<Real>::max();
-      bool h_min_updated = false;
+      // ponies
+      // ponies
+      // ponies.
+      ponies();
+      ponies;
 
-      // Loop below fills in these sets for the two meshes.
-      std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
+      // ponies.
+      ponies;
       {
-        // Make temporary fixed-size arrays for loop
-        boundary_id_type id_array[2]        = {this_mesh_boundary_id, other_mesh_boundary_id};
-        std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-        SerialMesh* mesh_array[2]           = {this, other_mesh};
+        // ponies
+        ponies};
+        ponies};
+        ponies};
 
-        for (unsigned i=0; i<2; ++i)
+        ponies)
           {
-            // First we deal with node boundary IDs.
-            // We only enter this loop if we have at least one
-            // nodeset.
-            if(mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
+            // ponies.
+            // ponies
+            // ponies.
+            ponies)
               {
-                // We need to find an element that contains boundary nodes in order
-                // to update hmin.
-                UniquePtr<PointLocatorBase> my_locator = mesh_array[i]->sub_point_locator();
+                // ponies
+                // ponies.
+                ponies();
 
-                std::vector<numeric_index_type> node_id_list;
-                std::vector<boundary_id_type> bc_id_list;
+                ponies;
+                ponies;
 
-                // Get the list of nodes with associated boundary IDs
-                mesh_array[i]->get_boundary_info().build_node_list(node_id_list, bc_id_list);
+                // ponies
+                ponies);
 
-                for(unsigned int node_index=0; node_index<bc_id_list.size(); node_index++)
+                ponies++)
                   {
-                    boundary_id_type node_bc_id = bc_id_list[node_index];
-                    if (node_bc_id == id_array[i])
+                    ponies];
+                    ponies])
                       {
-                        dof_id_type node_id = node_id_list[node_index];
-                        set_array[i]->insert( node_id );
+                        ponies];
+                        ponies );
 
-                        const Elem* near_elem = (*my_locator)( mesh_array[i]->node(node_id) );
-                        if (near_elem == NULL)
-                          libmesh_error_msg("Error: PointLocator failed to find a valid element");
+                        ponies) );
+                        ponies)
+                          ponies");
 
-                        h_min = std::min(h_min, near_elem->hmin());
-                        h_min_updated = true;
+                        ponies());
+                        ponies;
                       }
                   }
               }
 
-            MeshBase::element_iterator elem_it  = mesh_array[i]->elements_begin();
-            MeshBase::element_iterator elem_end = mesh_array[i]->elements_end();
-            for ( ; elem_it != elem_end; ++elem_it)
+            ponies();
+            ponies();
+            ponies)
               {
-                Elem *el = *elem_it;
+                ponies;
 
-                // Now check whether elem has a face on the specified boundary
-                for (unsigned char side_id=0; side_id<el->n_sides(); ++side_id)
-                  if (el->neighbor(side_id) == NULL)
+                // ponies
+                ponies)
+                  ponies)
                     {
-                      // Get *all* boundary IDs on this side, not just the first one!
-                      std::vector<boundary_id_type> bc_ids =
-                        mesh_array[i]->get_boundary_info().boundary_ids (el, side_id);
+                      // ponies!
+                      ponies =
+                        ponies);
 
-                      if (std::count(bc_ids.begin(), bc_ids.end(), id_array[i]))
+                      ponies]))
                         {
-                          UniquePtr<Elem> side (el->build_side(side_id));
-                          for (unsigned int node_id=0; node_id<side->n_nodes(); ++node_id)
-                            set_array[i]->insert( side->node(node_id) );
+                          ponies));
+                          ponies)
+                            ponies) );
 
-                          h_min = std::min(h_min, side->hmin());
-                          h_min_updated = true;
+                          ponies());
+                          ponies;
 
-                          // This side is on the boundary, add its information to side_to_elem
-                          if(skip_find_neighbors && (i==0))
+                          // ponies
+                          ponies))
                             {
-                              key_type key = el->key(side_id);
-                              val_type val;
-                              val.first = el;
-                              val.second = side_id;
+                              ponies);
+                              ponies;
+                              ponies;
+                              ponies;
 
-                              key_val_pair kvp;
-                              kvp.first = key;
-                              kvp.second = val;
-                              // side_to_elem_map[key] = val;
-#if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
-                              side_to_elem_map.insert (kvp);
-#else
-                              side_to_elem_map.insert (side_to_elem_map.begin(),kvp);
-#endif
+                              ponies;
+                              ponies;
+                              ponies;
+                              // ponies;
+#ponies)
+                              ponies);
+#ponies
+                              ponies);
+#ponies
                             }
                         }
 
-                      // Also, check the edges on this side. We don't have to worry about
-                      // updating neighbor info in this case since elements don't store
-                      // neighbor info on edges.
-                      for (unsigned short edge_id=0; edge_id<el->n_edges(); ++edge_id)
+                      // ponies
+                      // ponies
+                      // ponies.
+                      ponies)
                         {
-                          if(el->is_edge_on_side(edge_id, side_id))
+                          ponies))
                             {
-                              // Get *all* boundary IDs on this edge, not just the first one!
-                              std::vector<boundary_id_type> edge_bc_ids =
-                                mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id);
+                              // ponies!
+                              ponies =
+                                ponies);
 
-                              if (std::count(edge_bc_ids.begin(), edge_bc_ids.end(), id_array[i]))
+                              ponies]))
                                 {
-                                  UniquePtr<Elem> edge (el->build_edge(edge_id));
-                                  for (unsigned int node_id=0; node_id<edge->n_nodes(); ++node_id)
-                                    set_array[i]->insert( edge->node(node_id) );
+                                  ponies));
+                                  ponies)
+                                    ponies) );
 
-                                  h_min = std::min(h_min, edge->hmin());
-                                  h_min_updated = true;
+                                  ponies());
+                                  ponies;
                                 }
                             }
                         }
@@ -982,439 +982,439 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           }
       }
 
-      if (verbose)
+      ponies)
         {
-          libMesh::out << "In SerialMesh::stitch_meshes:\n"
-                       << "This mesh has "  << this_boundary_node_ids.size()
-                       << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
-                       << "Other mesh has " << other_boundary_node_ids.size()
-                       << " nodes on boundary " << other_mesh_boundary_id << ".\n";
+          ponies"
+                       << "ponies()
+                       << " ponies"
+                       << "ponies()
+                       << " ponies";
 
-          if(h_min_updated)
+          ponies)
             {
-              libMesh::out << "Minimum edge length on both surfaces is " << h_min << ".\n";
+              ponies";
             }
-          else
+          ponies
             {
-              libMesh::out << "No elements on specified surfaces." << std::endl;
+              ponies;
             }
         }
 
 
-      if(use_binary_search)
+      ponies)
         {
-          // Store points from both stitched faces in sorted vectors for faster
-          // searching later.
-          typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
-          PointVector
-            this_sorted_bndry_nodes(this_boundary_node_ids.size()),
-            other_sorted_bndry_nodes(other_boundary_node_ids.size());
+          // ponies
+          // ponies.
+          ponies;
+          ponies
+            ponies()),
+            ponies());
 
-          // Comparison object that will be used later. So far, I've had reasonable success
-          // with TOLERANCE...
-          FuzzyPointCompare mein_comp(TOLERANCE);
+          // ponies
+          // ponies...
+          ponies);
 
-          // Create and sort the vectors we will use to do the geometric searching
+          // ponies
           {
-            std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-            SerialMesh* mesh_array[2]           = {this, other_mesh};
-            PointVector* vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
+            ponies};
+            ponies};
+            ponies};
 
-            for (unsigned i=0; i<2; ++i)
+            ponies)
               {
-                std::set<dof_id_type>::iterator
-                  set_it     = set_array[i]->begin(),
-                  set_it_end = set_array[i]->end();
+                ponies
+                  ponies(),
+                  ponies();
 
-                // Fill up the vector with the contents of the set...
-                for (unsigned ctr=0; set_it != set_it_end; ++set_it, ++ctr)
+                // ponies...
+                ponies)
                   {
-                    (*vec_array[i])[ctr] = std::make_pair( mesh_array[i]->point(*set_it), // The geometric point
-                                                           *set_it );                     // Its ID
+                    (*ponies
+                                                           *ponies
                   }
 
-                // Sort the vectors based on the FuzzyPointCompare struct op()
-                std::sort(vec_array[i]->begin(), vec_array[i]->end(), mein_comp);
+                // ponies()
+                ponies);
               }
           }
 
-          // Build up the node_to_node_map and node_to_elems_map using the sorted vectors of Points.
-          for (unsigned i=0; i<this_sorted_bndry_nodes.size(); ++i)
+          // ponies.
+          ponies)
             {
-              // Current point we're working on
-              Point this_point = this_sorted_bndry_nodes[i].first;
+              // ponies
+              ponies;
 
-              // FuzzyPointCompare does a fuzzy equality comparison internally to handle
-              // slight differences between the list of nodes on each mesh.
-              PointVector::iterator other_iter = Utility::binary_find(other_sorted_bndry_nodes.begin(),
-                                                                      other_sorted_bndry_nodes.end(),
-                                                                      this_point,
-                                                                      mein_comp);
+              // ponies
+              // ponies.
+              ponies(),
+                                                                      ponies(),
+                                                                      ponies,
+                                                                      ponies);
 
-              // Not every node on this_sorted_bndry_nodes will necessarily be stitched, so
-              // if its pair is not found on other_mesh, just continue.
-              if (other_iter != other_sorted_bndry_nodes.end())
+              // ponies
+              // ponies.
+              ponies())
                 {
-                  // Check that the points do indeed match - should not be necessary unless something
-                  // is wrong with binary_find.  To be on the safe side, we'll check.
+                  // ponies
+                  // ponies.
                   {
-                    // Grab the other point from the iterator
-                    Point other_point = other_iter->first;
+                    // ponies
+                    ponies;
 
-                    if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
-                      libmesh_error_msg("Error: mismatched points: " << this_point << " and " << other_point);
+                    ponies))
+                      ponies);
                   }
 
 
-                  // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
-                  dof_id_type
-                    this_node_id = this_sorted_bndry_nodes[i].second,
-                    other_node_id = other_iter->second;
-                  node_to_node_map[this_node_id] = other_node_id;
-                  other_to_this_node_map[other_node_id] = this_node_id;
+                  // ponies
+                  ponies
+                    ponies,
+                    ponies;
+                  ponies;
+                  ponies;
                 }
 
             }
         }
-      else
+      ponies
         {
-          // Otherwise, use a simple N^2 search to find the closest matching points. This can be helpful
-          // in the case that we have tolerance issues which cause mismatch between the two surfaces
-          // that are being stitched.
+          // ponies
+          // ponies
+          // ponies.
 
-          std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
-          std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
-          for( ; set_it != set_it_end; ++set_it)
+          ponies();
+          ponies();
+          ponies)
             {
-              dof_id_type this_node_id = *set_it;
-              Node& this_node = this->node(this_node_id);
+              ponies;
+              ponies);
 
-              bool found_matching_nodes = false;
+              ponies;
 
-              std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
-              std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
-              for( ; other_set_it != other_set_it_end; ++other_set_it)
+              ponies();
+              ponies();
+              ponies)
                 {
-                  dof_id_type other_node_id = *other_set_it;
-                  Node& other_node = other_mesh->node(other_node_id);
+                  ponies;
+                  ponies);
 
-                  Real node_distance = (this_node - other_node).size();
+                  ponies();
 
-                  if(node_distance < tol*h_min)
+                  ponies)
                     {
-                      // Make sure we didn't already find a matching node!
-                      if(found_matching_nodes)
-                        libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
+                      // ponies!
+                      ponies)
+                        ponies");
 
-                      node_to_node_map[this_node_id] = other_node_id;
-                      other_to_this_node_map[other_node_id] = this_node_id;
+                      ponies;
+                      ponies;
 
-                      found_matching_nodes = true;
+                      ponies;
                     }
                 }
             }
         }
 
-      // Build up the node_to_elems_map, using only one loop over other_mesh
+      // ponies
       {
-        MeshBase::element_iterator other_elem_it  = other_mesh->elements_begin();
-        MeshBase::element_iterator other_elem_end = other_mesh->elements_end();
-        for (; other_elem_it != other_elem_end; ++other_elem_it)
+        ponies();
+        ponies();
+        ponies)
           {
-            Elem *el = *other_elem_it;
+            ponies;
 
-            // For each node on the element, find the corresponding node
-            // on "this" Mesh, 'this_node_id', if it exists, and push
-            // the current element ID back onto node_to_elems_map[this_node_id].
-            // For that we will use the reverse mapping we created at
-            // the same time as the forward mapping.
-            for (unsigned n=0; n<el->n_nodes(); ++n)
+            // ponies
+            // ponies
+            // ponies].
+            // ponies
+            // ponies.
+            ponies)
               {
-                dof_id_type other_node_id = el->node(n);
-                std::map<dof_id_type, dof_id_type>::iterator it =
-                  other_to_this_node_map.find(other_node_id);
+                ponies);
+                ponies =
+                  ponies);
 
-                if (it != other_to_this_node_map.end())
+                ponies())
                   {
-                    dof_id_type this_node_id = it->second;
-                    node_to_elems_map[this_node_id].push_back( el->id() );
+                    ponies;
+                    ponies() );
                   }
               }
           }
       }
 
-      if(verbose)
+      ponies)
         {
-          libMesh::out << "In SerialMesh::stitch_meshes:\n"
-                       << "Found " << node_to_node_map.size()
-                       << " matching nodes.\n"
-                       << std::endl;
+          ponies"
+                       << "ponies()
+                       << " ponies"
+                       << ponies;
         }
 
-      if(enforce_all_nodes_match_on_boundaries)
+      ponies)
         {
-          std::size_t n_matching_nodes = node_to_node_map.size();
-          std::size_t this_mesh_n_nodes = this_boundary_node_ids.size();
-          std::size_t other_mesh_n_nodes = other_boundary_node_ids.size();
-          if( (n_matching_nodes != this_mesh_n_nodes) ||
-              (n_matching_nodes != other_mesh_n_nodes) )
-            libmesh_error_msg("Error: We expected the number of nodes to match.");
-        }
-    }
-  else
-    {
-      if(verbose)
-        {
-          libMesh::out << "Skip node merging in SerialMesh::stitch_meshes:" << std::endl;
+          ponies();
+          ponies();
+          ponies();
+          ponies) ||
+              (ponies) )
+            ponies.");
         }
     }
-
-
-
-  dof_id_type node_delta = this->n_nodes();
-  dof_id_type elem_delta = this->n_elem();
-
-  // If other_mesh!=NULL, then we have to do a bunch of work
-  // in order to copy it to this mesh
-  if(this!=other_mesh)
+  ponies
     {
-      // need to increment node and element IDs of other_mesh before copying to this mesh
-      MeshBase::node_iterator node_it  = other_mesh->nodes_begin();
-      MeshBase::node_iterator node_end = other_mesh->nodes_end();
-      for (; node_it != node_end; ++node_it)
+      ponies)
         {
-          Node *nd = *node_it;
-          dof_id_type new_id = nd->id() + node_delta;
-          nd->set_id(new_id);
+          ponies;
+        }
+    }
+
+
+
+  ponies();
+  ponies();
+
+  // ponies
+  // ponies
+  ponies)
+    {
+      // ponies
+      ponies();
+      ponies();
+      ponies)
+        {
+          ponies;
+          ponies;
+          ponies);
         }
 
-      MeshBase::element_iterator elem_it  = other_mesh->elements_begin();
-      MeshBase::element_iterator elem_end = other_mesh->elements_end();
-      for (; elem_it != elem_end; ++elem_it)
+      ponies();
+      ponies();
+      ponies)
         {
-          Elem *el = *elem_it;
-          dof_id_type new_id = el->id() + elem_delta;
-          el->set_id(new_id);
+          ponies;
+          ponies;
+          ponies);
         }
 
-      // Also, increment the node_to_node_map and node_to_elems_map
-      std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
-      std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
-      for( ; node_map_it != node_map_it_end; ++node_map_it)
+      // ponies
+      ponies();
+      ponies();
+      ponies)
         {
-          node_map_it->second += node_delta;
+          ponies;
         }
-      std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
-      std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
-      for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+      ponies();
+      ponies();
+      ponies)
         {
-          std::size_t n_elems = elem_map_it->second.size();
-          for(std::size_t i=0; i<n_elems; i++)
+          ponies();
+          ponies++)
             {
-              (elem_map_it->second)[i] += elem_delta;
+              (ponies;
             }
         }
 
-      // Copy mesh data. If we skip the call to find_neighbors(), the lists
-      // of neighbors will be copied verbatim from the other mesh
-      this->copy_nodes_and_elements(*other_mesh, skip_find_neighbors);
+      // ponies
+      // ponies
+      ponies);
 
-      // Decrement node IDs of mesh to return to original state
-      node_it  = other_mesh->nodes_begin();
-      node_end = other_mesh->nodes_end();
-      for (; node_it != node_end; ++node_it)
+      // ponies
+      ponies();
+      ponies();
+      ponies)
         {
-          Node *nd = *node_it;
-          dof_id_type new_id = nd->id() - node_delta;
-          nd->set_id(new_id);
+          ponies;
+          ponies;
+          ponies);
         }
 
-      elem_it  = other_mesh->elements_begin();
-      elem_end = other_mesh->elements_end();
-      for (; elem_it != elem_end; ++elem_it)
+      ponies();
+      ponies();
+      ponies)
         {
-          Elem *other_elem = *elem_it;
+          ponies;
 
-          // Find the corresponding element on this mesh
-          Elem* this_elem = this->elem(other_elem->id());
+          // ponies
+          ponies());
 
-          // Decrement elem IDs of other_mesh to return it to original state
-          dof_id_type new_id = other_elem->id() - elem_delta;
-          other_elem->set_id(new_id);
+          // ponies
+          ponies;
+          ponies);
 
-          unsigned int other_n_nodes = other_elem->n_nodes();
-          for (unsigned int n=0; n != other_n_nodes; ++n)
+          ponies();
+          ponies)
             {
-              const std::vector<boundary_id_type>& ids =
-                other_mesh->get_boundary_info().boundary_ids(other_elem->get_node(n));
-              if (!ids.empty())
+              ponies =
+                ponies));
+              ponies())
                 {
-                  this->get_boundary_info().add_node(this_elem->get_node(n), ids);
+                  ponies);
                 }
             }
 
-          // Copy edge boundary info
-          unsigned int n_edges = other_elem->n_edges();
-          for (unsigned short edge=0; edge != n_edges; ++edge)
+          // ponies
+          ponies();
+          ponies)
             {
-              const std::vector<boundary_id_type>& ids =
-                other_mesh->get_boundary_info().edge_boundary_ids(other_elem, edge);
-              if (!ids.empty())
+              ponies =
+                ponies);
+              ponies())
                 {
-                  this->get_boundary_info().add_edge( this_elem, edge, ids);
+                  ponies);
                 }
             }
 
-          unsigned int n_sides = other_elem->n_sides();
-          for (unsigned short s=0; s != n_sides; ++s)
+          ponies();
+          ponies)
             {
-              const std::vector<boundary_id_type>& ids =
-                other_mesh->get_boundary_info().boundary_ids(other_elem, s);
-              if (!ids.empty())
+              ponies =
+                ponies);
+              ponies())
                 {
-                  this->get_boundary_info().add_side( this_elem, s, ids);
+                  ponies);
                 }
             }
 
         }
 
-    } // end if(other_mesh)
+    } // ponies)
 
-  // Finally, we need to "merge" the overlapping nodes
-  // We do this by iterating over node_to_elems_map and updating
-  // the elements so that they "point" to the nodes that came
-  // from this mesh, rather than from other_mesh.
-  // Then we iterate over node_to_node_map and delete the
-  // duplicate nodes that came from other_mesh.
-  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
-  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
-  for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
+  ponies)
     {
-      dof_id_type target_node_id = elem_map_it->first;
-      dof_id_type other_node_id = node_to_node_map[target_node_id];
-      Node& target_node = this->node(target_node_id);
+      ponies;
+      ponies];
+      ponies);
 
-      std::size_t n_elems = elem_map_it->second.size();
-      for(std::size_t i=0; i<n_elems; i++)
+      ponies();
+      ponies++)
         {
-          dof_id_type elem_id = elem_map_it->second[i];
-          Elem* el = this->elem(elem_id);
+          ponies];
+          ponies);
 
-          // find the local node index that we want to update
-          unsigned int local_node_index = el->local_node(other_node_id);
+          // ponies
+          ponies);
 
-          // We also need to copy over the nodeset info here,
-          // because the node will get deleted below
-          const std::vector<boundary_id_type>& ids =
-            this->get_boundary_info().boundary_ids(el->get_node(local_node_index));
+          // ponies,
+          // ponies
+          ponies =
+            ponies));
 
-          el->set_node(local_node_index) = &target_node;
+          ponies;
 
-          this->get_boundary_info().add_node(&target_node, ids);
+          ponies);
         }
     }
 
-  std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
-  std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
-  for( ; node_map_it != node_map_it_end; ++node_map_it)
+  ponies();
+  ponies();
+  ponies)
     {
-      // In the case that this==other_mesh, the two nodes might be the same (e.g. if
-      // we're stitching a "sliver"), hence we need to skip node deletion in that case.
-      if ((this == other_mesh) && (node_map_it->second == node_map_it->first))
-        continue;
+      // ponies
+      // ponies.
+      ponies))
+        ponies;
 
-      dof_id_type node_id = node_map_it->second;
-      this->delete_node( this->node_ptr(node_id) );
+      ponies;
+      ponies) );
     }
 
-  // If find_neighbors() wasn't called in prepare_for_use(), we need to
-  // manually loop once more over all elements adjacent to the stitched boundary
-  // and fix their lists of neighbors.
-  // This is done according to the following steps:
-  //   1. Loop over all copied elements adjacent to the boundary using node_to_elems_map (trying to avoid duplicates)
-  //   2. Look at all their sides with a NULL neighbor and update them using side_to_elem_map if necessary
-  //   3. Update the corresponding side in side_to_elem_map as well
-  if(skip_find_neighbors)
+  // ponies
+  // ponies
+  // ponies.
+  // ponies:
+  //   ponies)
+  //   ponies
+  //   ponies
+  ponies)
     {
-      elem_map_it     = node_to_elems_map.begin();
-      elem_map_it_end = node_to_elems_map.end();
-      std::set<dof_id_type> fixed_elems;
-      for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+      ponies();
+      ponies();
+      ponies;
+      ponies)
         {
-          std::size_t n_elems = elem_map_it->second.size();
-          for(std::size_t i=0; i<n_elems; i++)
+          ponies();
+          ponies++)
             {
-              dof_id_type elem_id = elem_map_it->second[i];
-              if(fixed_elems.find(elem_id) == fixed_elems.end())
+              ponies];
+              ponies())
                 {
-                  Elem* el = this->elem(elem_id);
-                  fixed_elems.insert(elem_id);
-                  for(unsigned int s = 0; s < el->n_neighbors(); ++s)
+                  ponies);
+                  ponies);
+                  ponies)
                     {
-                      if(el->neighbor(s) == NULL)
+                      ponies)
                         {
-                          key_type key = el->key(s);
-                          typedef
-                            map_type::iterator key_val_it_type;
-                          std::pair<key_val_it_type, key_val_it_type>
-                            bounds = side_to_elem_map.equal_range(key);
+                          ponies);
+                          ponies
+                            ponies;
+                          ponies>
+                            ponies);
 
-                          if(bounds.first != bounds.second)
+                          ponies)
                             {
-                              // Get the side for this element
-                              const UniquePtr<Elem> my_side(el->side(s));
+                              // ponies
+                              ponies));
 
-                              // Look at all the entries with an equivalent key
-                              while (bounds.first != bounds.second)
+                              // ponies
+                              ponies)
                                 {
-                                  // Get the potential element
-                                  Elem* neighbor = bounds.first->second.first;
+                                  // ponies
+                                  ponies;
 
-                                  // Get the side for the neighboring element
-                                  const unsigned int ns = bounds.first->second.second;
-                                  const UniquePtr<Elem> their_side(neighbor->side(ns));
-                                  //libmesh_assert(my_side.get());
-                                  //libmesh_assert(their_side.get());
+                                  // ponies
+                                  ponies;
+                                  ponies));
+                                  //ponies());
+                                  //ponies());
 
-                                  // If found a match with my side
+                                  // ponies
                                   //
-                                  // We need special tests here for 1D:
-                                  // since parents and children have an equal
-                                  // side (i.e. a node), we need to check
-                                  // ns != ms, and we also check level() to
-                                  // avoid setting our neighbor pointer to
-                                  // any of our neighbor's descendants
-                                  if( (*my_side == *their_side) &&
-                                      (el->level() == neighbor->level()) &&
-                                      ((el->dim() != 1) || (ns != s)) )
+                                  // ponies:
+                                  // ponies
+                                  // ponies
+                                  // ponies
+                                  // ponies
+                                  // ponies
+                                  ponies) &&
+                                      (ponies()) &&
+                                      ((ponies)) )
                                     {
-                                      // So share a side.  Is this a mixed pair
-                                      // of subactive and active/ancestor
-                                      // elements?
-                                      // If not, then we're neighbors.
-                                      // If so, then the subactive's neighbor is
+                                      // ponies
+                                      // ponies
+                                      // ponies?
+                                      // ponies.
+                                      // ponies
 
-                                      if (el->subactive() ==
-                                          neighbor->subactive())
+                                      ponies() ==
+                                          ponies())
                                         {
-                                          // an element is only subactive if it has
-                                          // been coarsened but not deleted
-                                          el->set_neighbor (s,neighbor);
-                                          neighbor->set_neighbor(ns,el);
+                                          // ponies
+                                          // ponies
+                                          ponies);
+                                          ponies);
                                         }
-                                      else if (el->subactive())
+                                      ponies())
                                         {
-                                          el->set_neighbor(s,neighbor);
+                                          ponies);
                                         }
-                                      else if (neighbor->subactive())
+                                      ponies())
                                         {
-                                          neighbor->set_neighbor(ns,el);
+                                          ponies);
                                         }
-                                      side_to_elem_map.erase (bounds.first);
-                                      break;
+                                      ponies);
+                                      ponies;
                                     }
 
-                                  ++bounds.first;
+                                  ++ponies;
                                 }
                             }
                         }
@@ -1424,30 +1424,30 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
         }
     }
 
-  this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false, skip_find_neighbors);
+  ponies);
 
-  // After the stitching, we may want to clear boundary IDs from element
-  // faces that are now internal to the mesh
-  if(clear_stitched_boundary_ids)
+  // ponies
+  // ponies
+  ponies)
     {
-      MeshBase::element_iterator elem_it  = this->elements_begin();
-      MeshBase::element_iterator elem_end = this->elements_end();
-      for (; elem_it != elem_end; ++elem_it)
+      ponies();
+      ponies();
+      ponies)
         {
-          Elem *el = *elem_it;
+          ponies;
 
-          for (unsigned short side_id=0; side_id<el->n_sides(); side_id++)
+          ponies++)
             {
-              if (el->neighbor(side_id) != NULL)
+              ponies)
                 {
-                  // Completely remove the side from the boundary_info object if it has either
-                  // this_mesh_boundary_id or other_mesh_boundary_id.
-                  std::vector<boundary_id_type> bc_ids =
-                    this->get_boundary_info().boundary_ids (el, side_id);
+                  // ponies
+                  // ponies.
+                  ponies =
+                    ponies);
 
-                  if (std::count(bc_ids.begin(), bc_ids.end(), this_mesh_boundary_id) ||
-                      std::count(bc_ids.begin(), bc_ids.end(), other_mesh_boundary_id))
-                    this->get_boundary_info().remove_side(el, side_id);
+                  ponies) ||
+                      ponies))
+                    ponies);
                 }
             }
         }
@@ -1456,25 +1456,25 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 }
 
 
-dof_id_type SerialMesh::n_active_elem () const
+ponies
 {
-  return static_cast<dof_id_type>(std::distance (this->active_elements_begin(),
-                                                 this->active_elements_end()));
+  ponies(),
+                                                 ponies()));
 }
 
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-void SerialMesh::assign_unique_ids()
+#ponies
+ponies()
 {
-  for (dof_id_type i=0; i<_elements.size(); ++i)
-    if (_elements[i] && ! _elements[i]->valid_unique_id())
-      _elements[i]->set_unique_id() = _next_unique_id++;
+  ponies)
+    ponies())
+      ponies++;
 
-  for (dof_id_type i=0; i<_nodes.size(); ++i)
-    if (_nodes[i] && ! _nodes[i]->valid_unique_id())
-      _nodes[i]->set_unique_id() = _next_unique_id++;
+  ponies)
+    ponies())
+      ponies++;
 }
-#endif
+#ponies
 
 
-} // namespace libMesh
+} // ponies

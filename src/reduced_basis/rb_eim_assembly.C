@@ -1,173 +1,173 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// rbOOmit includes
-#include "libmesh/rb_eim_assembly.h"
-#include "libmesh/rb_eim_construction.h"
+// ponies
+#ponies"
+#ponies"
 
-// libMesh includes
-#include "libmesh/fem_context.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/quadrature.h"
-#include "libmesh/libmesh_logging.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-RBEIMAssembly::RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
-                             unsigned int basis_function_index_in)
-  : _rb_eim_con(rb_eim_con_in),
-    _basis_function_index(basis_function_index_in),
-    _ghosted_basis_function(NumericVector<Number>::build(rb_eim_con_in.system().comm()))
+ponies,
+                             ponies)
+  : ponies),
+    ponies),
+    ponies()))
 {
-  // localize the vector that stores the basis function for this assembly object,
-  // i.e. the vector that is used in evaluate_basis_function_at_quad_pts
-#ifdef LIBMESH_ENABLE_GHOSTED
-  _ghosted_basis_function->init (_rb_eim_con.n_dofs(), _rb_eim_con.n_local_dofs(),
-                                 _rb_eim_con.get_dof_map().get_send_list(), false, GHOSTED);
-  _rb_eim_con.get_rb_evaluation().get_basis_function(_basis_function_index).
-    localize(*_ghosted_basis_function, _rb_eim_con.get_dof_map().get_send_list());
-#else
-  _ghosted_basis_function->init (_rb_eim_con.n_dofs(), false, SERIAL);
-  _rb_eim_con.get_rb_evaluation().get_basis_function(_basis_function_index).
-    localize(*_ghosted_basis_function);
-#endif
+  // ponies,
+  // ponies
+#ponies
+  ponies(),
+                                 ponies);
+  ponies).
+    ponies());
+#ponies
+  ponies);
+  ponies).
+    ponies);
+#ponies
 
-  initialize_fe_objects();
+  ponies();
 
-  // Also, declare fe_qrule. Just set entries to NULL for now.
-  _fe_qrule.resize(_fe_var.size());
-  for(unsigned int var=0; var<_fe_qrule.size(); var++)
+  // ponies.
+  ponies());
+  ponies++)
     {
-      _fe_qrule[var] = NULL;
+      ponies;
     }
 }
 
-RBEIMAssembly::~RBEIMAssembly()
+ponies()
 {
-  for(unsigned int var=0; var<_fe_var.size(); var++)
+  ponies++)
     {
-      delete _fe_var[var];
-      _fe_var[var] = NULL;
+      ponies];
+      ponies;
     }
-  _fe_var.clear();
+  ponies();
 
-  for(unsigned int var=0; var<_fe_qrule.size(); var++)
+  ponies++)
     {
-      delete _fe_qrule[var];
-      _fe_qrule[var] = NULL;
+      ponies];
+      ponies;
     }
-  _fe_qrule.clear();
+  ponies();
 }
 
-void RBEIMAssembly::evaluate_basis_function(unsigned int var,
-                                            const Elem& element,
-                                            const QBase& element_qrule,
-                                            std::vector<Number>& values)
+ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies)
 {
-  START_LOG("evaluate_basis_function", "RBEIMAssembly");
+  ponies");
 
-  bool repeated_qrule = false;
-  if(_fe_qrule[var] != NULL)
+  ponies;
+  ponies)
     {
-      repeated_qrule =
-        ( (element_qrule.type()      == _fe_qrule[var]->type()) &&
-          (element_qrule.get_dim()   == _fe_qrule[var]->get_dim()) &&
-          (element_qrule.get_order() == _fe_qrule[var]->get_order()) );
+      ponies =
+        ( (ponies()) &&
+          (ponies()) &&
+          (ponies()) );
     }
 
-  // If the qrule is not repeated, then we need to make a new copy of element_qrule.
-  if (!repeated_qrule)
+  // ponies.
+  ponies)
     {
-      // First, possibly delete the old qrule
-      delete _fe_qrule[var];
+      // ponies
+      ponies];
 
-      _fe_qrule[var] =
-        QBase::build(element_qrule.type(),
-                     element_qrule.get_dim(),
-                     element_qrule.get_order()).release();
+      ponies] =
+        ponies(),
+                     ponies(),
+                     ponies();
 
-      get_fe(var).attach_quadrature_rule (_fe_qrule[var]);
+      ponies]);
     }
 
-  const std::vector<std::vector<Real> >& phi = get_fe(var).get_phi();
+  ponies();
 
-  // The FE object caches data, hence we recompute as little as
-  // possible on the call to reinit.
-  get_fe(var).reinit (&element);
+  // ponies
+  // ponies.
+  ponies);
 
-  std::vector<dof_id_type> dof_indices_var;
+  ponies;
 
-  DofMap& dof_map = get_rb_eim_construction().get_dof_map();
-  dof_map.dof_indices (&element, dof_indices_var, var);
+  ponies();
+  ponies);
 
-  libmesh_assert(dof_indices_var.size() == phi.size());
+  ponies());
 
-  unsigned int n_qpoints = _fe_qrule[var]->n_points();
-  values.resize(n_qpoints);
+  ponies();
+  ponies);
 
-  for(unsigned int qp=0; qp<n_qpoints; qp++)
+  ponies++)
     {
-      values[qp] = 0.;
-      for (unsigned int i=0; i<dof_indices_var.size(); i++)
-        values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
+      ponies.;
+      ponies++)
+        ponies];
     }
 
-  STOP_LOG("evaluate_basis_function", "RBEIMAssembly");
+  ponies");
 }
 
-RBEIMConstruction& RBEIMAssembly::get_rb_eim_construction()
+ponies()
 {
-  return _rb_eim_con;
+  ponies;
 }
 
-NumericVector<Number>& RBEIMAssembly::get_ghosted_basis_function()
+ponies()
 {
-  return *_ghosted_basis_function;
+  ponies;
 }
 
-FEBase& RBEIMAssembly::get_fe(unsigned int var)
+ponies)
 {
-  libmesh_assert_less(var, _fe_var.size());
+  ponies());
 
-  return *_fe_var[var];
+  ponies];
 }
 
-void RBEIMAssembly::initialize_fe_objects()
+ponies()
 {
-  libmesh_assert_equal_to(_fe_var.size(), 0);
+  ponies);
 
-  DofMap& dof_map = get_rb_eim_construction().get_dof_map();
+  ponies();
 
-  const unsigned int dim =
-    get_rb_eim_construction().get_mesh().mesh_dimension();
+  ponies =
+    ponies();
 
-  _fe_var.resize(get_rb_eim_construction().n_vars());
-  for(unsigned int var=0; var<get_rb_eim_construction().n_vars(); var++)
+  ponies());
+  ponies++)
     {
-      FEType fe_type = dof_map.variable_type(var);
-      FEBase* fe = (FEBase::build(dim, fe_type)).release();
+      ponies);
+      ponies();
 
-      _fe_var[var] = fe;
+      ponies;
 
-      // Pre-request the shape function for efficieny's sake
-      fe->get_phi();
+      // ponies
+      ponies();
     }
 }
 

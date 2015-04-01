@@ -1,64 +1,64 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_HAVE_SLEPC
+#ponies"
+#ponies
 
-// C++ includes
+// ponies
 
-// Local Includes
-#include "libmesh/eigen_solver.h"
-#include "libmesh/slepc_eigen_solver.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 //------------------------------------------------------------------
-// EigenSolver members
-template <typename T>
-UniquePtr<EigenSolver<T> >
-EigenSolver<T>::build(const Parallel::Communicator &comm,
-                      const SolverPackage solver_package)
+// ponies
+ponies>
+ponies> >
+ponies,
+                      ponies)
 {
-  // Build the appropriate solver
-  switch (solver_package)
+  // ponies
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_SLEPC
-    case SLEPC_SOLVERS:
-      return UniquePtr<EigenSolver<T> >(new SlepcEigenSolver<T>(comm));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
-    default:
-      libmesh_error_msg("ERROR:  Unrecognized eigen solver package: " << solver_package);
+    ponies:
+      ponies);
     }
 
-  return UniquePtr<EigenSolver<T> >();
+  ponies> >();
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class EigenSolver<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_HAVE_SLEPC
+#ponies

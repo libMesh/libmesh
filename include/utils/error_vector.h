@@ -1,170 +1,170 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ERROR_VECTOR_H
-#define LIBMESH_ERROR_VECTOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/statistics.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Now defined in libmesh_common.h:
-// typedef float ErrorVectorReal;
+// ponies:
+// ponies;
 
-// Forward Declarations
-class MeshBase;
-class Mesh;
+// ponies
+ponies;
+ponies;
 
 /**
- * The \p ErrorVector is a specialization of the
- * \p StatisticsVector for error data computed on a finite element
- * mesh.  In general, when computing the error on a mesh only the
- * active elements are considered, but the \p ErrorVector is sized
- * according to the total number of elements in the mesh.  The
- * \p ErrorVector is thus padded with zeros for all the inactive
- * elements, and this must be taken into account when calculating
- * the statistics.  Since the error is a positive quantity this class
- * assumes it contains positive data (i.e. min_val >= 0.).
+ * ponies
+ * \ponies
+ * ponies
+ * ponies
+ * ponies
+ * \ponies
+ * ponies
+ * ponies
+ * ponies.).
  *
- * @author Benjamin S. Kirk, 2003.
+ * @ponies.
  */
-class ErrorVector : public StatisticsVector<ErrorVectorReal>
+ponies>
 {
 
-public:
+ponies:
 
   /**
-   * ErrorVector constructor; sets initial length to \p i.
+   * ponies.
    *
-   * If mesh is not null, MeshBase::elem() and Elem::is_active() will
-   * be used to distinguish active and inactive elements.  If mesh is null,
-   * ErrorVector will assume that all 0.0 error values correspond to inactive
-   * elements and all non-zero error values correspond to active elements.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    */
-  ErrorVector(dof_id_type i=0, MeshBase *mesh = NULL) : StatisticsVector<ErrorVectorReal> (i), _mesh(mesh) {}
+  ponies) {}
 
   /**
-   * ErrorVector constructor; sets initial length to \p i and initial values to \p val.
+   * ponies.
    *
-   * If mesh is not null, MeshBase::elem() and Elem::is_active() will
-   * be used to distinguish active and inactive elements.  If mesh is null,
-   * ErrorVector will assume that all 0.0 error values correspond to inactive
-   * elements and all non-zero error values correspond to active elements.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    */
-  ErrorVector(dof_id_type i, ErrorVectorReal val) :
-    StatisticsVector<ErrorVectorReal> (i,val) {}
+  ponies) :
+    ponies) {}
 
   /**
-   * Returns the minimum nonzero value in the data set.
+   * ponies.
    */
-  virtual ErrorVectorReal minimum() const;
+  ponies;
 
   /**
-   * Returns the mean value of the data set. Ignores
-   * zero values.
+   * ponies
+   * ponies.
    */
-  virtual Real mean() const;
+  ponies;
 
   /**
-   * Returns the median (e.g. the middle)
-   * value of the data set, ignoring inactive elements.
-   * This function modifies the
-   * original data by sorting, so it
-   * can't be called on const objects.
-   * Source: GNU Scientific Library
+   * ponies)
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
    */
-  virtual Real median();
+  ponies();
 
   /**
-   * A const version of the median funtion.
-   * Requires twice the memory of original
-   * data set but does not change the original.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual Real median() const;
+  ponies;
 
   /**
-   * Computes the variance of the data set
-   * ignoring inactive elements.
-   * Uses a recurrence relation to prevent
-   * data overflow for large sums.
-   * Note: The variance is equal to the
-   * standard deviation squared.  The variance
-   * is normalized by N in this case.
-   * Source: GNU Scientific Library
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
    */
-  virtual Real variance() const
-  { return this->variance(this->mean()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Computes the variance of the data set
-   * ignoring inactive elements.
-   * where the \p mean is provided. This is useful
-   * for efficiency when you have already calculated
-   * the mean. Uses a recurrence relation to prevent
-   * data overflow for large sums.
-   * Note: The variance is equal to the
-   * standard deviation squared.
-   * Source: GNU Scientific Library
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
    */
-  virtual Real variance(const Real mean) const;
+  ponies;
 
   /**
-   * Returns a vector of dof_id_types which correspond
-   * to the indices of every member of the data set
-   * below the cutoff value cut ignoring inactive elements.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual std::vector<dof_id_type> cut_below(Real cut) const;
+  ponies;
 
   /**
-   * Returns a vector of dof_id_types which correspond
-   * to the indices of every member of the data set
-   * above the cutoff value cut ignoring inactive elements.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual std::vector<dof_id_type> cut_above(Real cut) const;
+  ponies;
 
   /**
-   * Plots a data file, of a type determined by looking at
-   * the file extension in \p filename, of the error values on
-   * the active elements of \p mesh.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void plot_error(const std::string &filename,
-                  const MeshBase& mesh) const;
+  ponies,
+                  ponies;
 
-protected:
+ponies:
   /**
-   * Utility function to decide whether element i is active
+   * ponies
    */
-  bool is_active_elem (dof_id_type i) const;
+  ponies;
 
   /**
-   * Pointer to the mesh, which may be used to decide which
-   * elements are active
+   * ponies
+   * ponies
    */
-  MeshBase *_mesh;
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_ERROR_VECTOR_H
+#ponies

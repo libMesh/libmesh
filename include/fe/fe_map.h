@@ -1,750 +1,750 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_FE_MAP_H
-#define LIBMESH_FE_MAP_H
+#ponies
+#ponies
 
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/point.h"
-#include "libmesh/vector_value.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/node.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// forward declarations
-class Elem;
+// ponies
+ponies;
 
-class FEMap
+ponies
 {
-public:
+ponies:
 
-  FEMap();
-  virtual ~FEMap(){}
+  ponies();
+  ponies(){}
 
-  static UniquePtr<FEMap> build(FEType fe_type);
+  ponies);
 
-  template<unsigned int Dim>
-  void init_reference_to_physical_map(const std::vector<Point>& qp,
-                                      const Elem* elem);
+  ponies>
+  ponies,
+                                      ponies);
 
   /**
-   * Compute the jacobian and some other additional
-   * data fields at the single point with index p.
-   * Takes the integration weights as input, along
-   * with a pointer to the element and a list of
-   * points that contribute to the element.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void compute_single_point_map(const unsigned int dim,
-                                const std::vector<Real>& qw,
-                                const Elem* elem,
-                                unsigned int p,
-                                const std::vector<Node*>& elem_nodes);
+  ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies);
 
   /**
-   * Compute the jacobian and some other additional
-   * data fields. Takes the integration weights
-   * as input, along with a pointer to the element.
-   * The element is assumed to have a constant Jacobian
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
    */
-  virtual void compute_affine_map(const unsigned int dim,
-                                  const std::vector<Real>& qw,
-                                  const Elem* elem);
+  ponies,
+                                  ponies,
+                                  ponies);
 
   /**
-   * Assign a fake jacobian and some other additional data fields.
-   * Takes the integration weights as input.  For use on non-element
-   * evaluations.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void compute_null_map(const unsigned int dim,
-                                const std::vector<Real>& qw);
+  ponies,
+                                ponies);
 
 
   /**
-   * Compute the jacobian and some other additional
-   * data fields. Takes the integration weights
-   * as input, along with a pointer to the element.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void compute_map(const unsigned int dim,
-                           const std::vector<Real>& qw,
-                           const Elem* elem);
+  ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * Same as compute_map, but for a side.  Useful for boundary integration.
+   * ponies.
    */
-  virtual void compute_face_map(int dim,
-                                const std::vector<Real>& qw,
-                                const Elem* side);
+  ponies,
+                                ponies,
+                                ponies);
 
   /**
-   * Same as before, but for an edge.  Useful for some projections.
+   * ponies.
    */
-  void compute_edge_map(int dim,
-                        const std::vector<Real>& qw,
-                        const Elem* side);
+  ponies,
+                        ponies,
+                        ponies);
 
   /**
-   * Initalizes the reference to physical element map for a side.
-   * This is used for boundary integration.
+   * ponies.
+   * ponies.
    */
-  template< unsigned int Dim>
-  void init_face_shape_functions(const std::vector<Point>& qp,
-                                 const Elem* side);
+  ponies>
+  ponies,
+                                 ponies);
 
   /**
-   * Same as before, but for an edge. This is used for some projection
-   * operators.
+   * ponies
+   * ponies.
    */
-  template< unsigned int Dim>
-  void init_edge_shape_functions(const std::vector<Point>& qp,
-                                 const Elem* edge);
+  ponies>
+  ponies,
+                                 ponies);
 
   /**
-   * @returns the \p xyz spatial locations of the quadrature
-   * points on the element.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Point>& get_xyz() const
-  { return xyz; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the element Jacobian for each quadrature point.
+   * @ponies.
    */
-  const std::vector<Real>& get_jacobian() const
-  { return jac; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the element Jacobian times the quadrature weight for
-   * each quadrature point.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_JxW() const
-  { return JxW; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the element tangents in xi-direction at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<RealGradient>& get_dxyzdxi() const
-  { return dxyzdxi_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the element tangents in eta-direction at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<RealGradient>& get_dxyzdeta() const
-  { return dxyzdeta_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the element tangents in zeta-direction at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<RealGradient>& get_dxyzdzeta() const
-  { return dxyzdzeta_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the second partial derivatives in xi.
+   * @ponies.
    */
-  const std::vector<RealGradient>& get_d2xyzdxi2() const
-  { return d2xyzdxi2_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the second partial derivatives in eta.
+   * @ponies.
    */
-  const std::vector<RealGradient>& get_d2xyzdeta2() const
-  { return d2xyzdeta2_map; }
+  ponies
+  { ponies; }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * @returns the second partial derivatives in zeta.
+   * @ponies.
    */
-  const std::vector<RealGradient>& get_d2xyzdzeta2() const
-  { return d2xyzdzeta2_map; }
+  ponies
+  { ponies; }
 
-#endif
+#ponies
 
   /**
-   * @returns the second partial derivatives in xi-eta.
+   * @ponies.
    */
-  const std::vector<RealGradient>& get_d2xyzdxideta() const
-  { return d2xyzdxideta_map; }
+  ponies
+  { ponies; }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * @returns the second partial derivatives in xi-zeta.
+   * @ponies.
    */
-  const std::vector<RealGradient>& get_d2xyzdxidzeta() const
-  { return d2xyzdxidzeta_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the second partial derivatives in eta-zeta.
+   * @ponies.
    */
-  const std::vector<RealGradient>& get_d2xyzdetadzeta() const
-  { return d2xyzdetadzeta_map; }
+  ponies
+  { ponies; }
 
-#endif
+#ponies
 
   /**
-   * @returns the dxi/dx entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_dxidx() const
-  { return dxidx_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the dxi/dy entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_dxidy() const
-  { return dxidy_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the dxi/dz entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_dxidz() const
-  { return dxidz_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the deta/dx entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_detadx() const
-  { return detadx_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the deta/dy entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_detady() const
-  { return detady_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the deta/dz entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_detadz() const
-  { return detadz_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the dzeta/dx entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_dzetadx() const
-  { return dzetadx_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the dzeta/dy entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_dzetady() const
-  { return dzetady_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the dzeta/dz entry in the transformation
-   * matrix from physical to local coordinates.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Real>& get_dzetadz() const
-  { return dzetadz_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the reference to physical map for the side/edge
+   * @ponies
    */
-  const std::vector<std::vector<Real> >& get_psi() const
-  { return psi_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the reference to physical map for the element
+   * @ponies
    */
-  const std::vector<std::vector<Real> >& get_phi_map() const
-  { return phi_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative
+   * @ponies
    */
-  const std::vector<std::vector<Real> >& get_dphidxi_map() const
-  { return dphidxi_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative
+   * @ponies
    */
-  const std::vector<std::vector<Real> >& get_dphideta_map() const
-  { return dphideta_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative
+   * @ponies
    */
-  const std::vector<std::vector<Real> >& get_dphidzeta_map() const
-  { return dphidzeta_map; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the tangent vectors for face integration.
+   * @ponies.
    */
-  const std::vector<std::vector<Point> >& get_tangents() const
-  { return tangents; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the normal vectors for face integration.
+   * @ponies.
    */
-  const std::vector<Point>& get_normals() const
-  { return normals; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the curvatures for use in face integration.
+   * @ponies.
    */
-  const std::vector<Real>& get_curvatures() const
-  { return curvatures;}
+  ponies
+  { ponies;}
 
   /**
-   * Prints the Jacobian times the weight for each quadrature point.
+   * ponies.
    */
-  void print_JxW(std::ostream& os) const;
+  ponies;
 
   /**
-   * Prints the spatial location of each quadrature point
-   * (on the physical element).
+   * ponies
+   * (ponies).
    */
-  void print_xyz(std::ostream& os) const;
+  ponies;
 
-  /* FIXME: PB: The public functions below break encapsulation! I'm not happy
-     about it, but I don't have time to redo the infinite element routines.
-     These are needed in inf_fe_boundary.C and inf_fe.C. A proper implementation
-     would subclass this class and hide all the radial function business. */
+  /* ponies
+     ponies.
+     ponies
+     ponies. */
   /**
-   * @returns the reference to physical map for the side/edge
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_psi()
-  { return psi_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative for the side/edge
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_dpsidxi()
-  { return dpsidxi_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative for the side/edge
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_dpsideta()
-  { return dpsideta_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative for the side/edge
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2psidxi2()
-  { return d2psidxi2_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative for the side/edge
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2psidxideta()
-  { return d2psidxideta_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative for the side/edge
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2psideta2()
-  { return d2psideta2_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map for the element
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_phi_map()
-  { return phi_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_dphidxi_map()
-  { return dphidxi_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_dphideta_map()
-  { return dphideta_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_dphidzeta_map()
-  { return dphidzeta_map; }
+  ponies()
+  { ponies; }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
   /**
-   * @returns the reference to physical map 2nd derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2phidxi2_map()
-  { return d2phidxi2_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2phidxideta_map()
-  { return d2phidxideta_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2phidxidzeta_map()
-  { return d2phidxidzeta_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2phideta2_map()
-  { return d2phideta2_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2phidetadzeta_map()
-  { return d2phidetadzeta_map; }
+  ponies()
+  { ponies; }
 
   /**
-   * @returns the reference to physical map 2nd derivative
+   * @ponies
    */
-  std::vector<std::vector<Real> >& get_d2phidzeta2_map()
-  { return d2phidzeta2_map; }
-#endif
+  ponies()
+  { ponies; }
+#ponies
 
-  /* FIXME: PB: This function breaks encapsulation! Needed in FE<>::reinit and
-     InfFE<>::reinit. Not sure yet if the algorithm can be redone to avoid this. */
+  /* ponies
+     ponies. */
   /**
-   * @returns writable reference to the element Jacobian times
-   * the quadrature weight for each quadrature point.
+   * @ponies
+   * ponies.
    */
-  std::vector<Real>& get_JxW()
-  { return JxW; }
+  ponies()
+  { ponies; }
 
-protected:
+ponies:
 
   /**
-   * A utility function for use by compute_*_map
+   * ponies
    */
-  void resize_quadrature_map_vectors(const unsigned int dim, unsigned int n_qp);
+  ponies);
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydxi_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydxi_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydxi_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydeta_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydeta_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydeta_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydzeta_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydzeta_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); }
+  ponies); }
 
   /**
-   * Used in \p FEMap::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydzeta_map.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); }
+  ponies); }
 
   /**
-   * The spatial locations of the quadrature points
+   * ponies
    */
-  std::vector<Point> xyz;
+  ponies;
 
   /**
-   * Vector of parital derivatives:
-   * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi)
+   * ponies:
+   * ponies)
    */
-  std::vector<RealGradient> dxyzdxi_map;
+  ponies;
 
   /**
-   * Vector of parital derivatives:
-   * d(x)/d(eta), d(y)/d(eta), d(z)/d(eta)
+   * ponies:
+   * ponies)
    */
-  std::vector<RealGradient> dxyzdeta_map;
+  ponies;
 
   /**
-   * Vector of parital derivatives:
-   * d(x)/d(zeta), d(y)/d(zeta), d(z)/d(zeta)
+   * ponies:
+   * ponies)
    */
-  std::vector<RealGradient> dxyzdzeta_map;
+  ponies;
 
   /**
-   * Vector of second partial derivatives in xi:
-   * d^2(x)/d(xi)^2, d^2(y)/d(xi)^2, d^2(z)/d(xi)^2
+   * ponies:
+   * ponies
    */
-  std::vector<RealGradient> d2xyzdxi2_map;
+  ponies;
 
   /**
-   * Vector of mixed second partial derivatives in xi-eta:
-   * d^2(x)/d(xi)d(eta) d^2(y)/d(xi)d(eta) d^2(z)/d(xi)d(eta)
+   * ponies:
+   * ponies)
    */
-  std::vector<RealGradient> d2xyzdxideta_map;
+  ponies;
 
   /**
-   * Vector of second partial derivatives in eta:
-   * d^2(x)/d(eta)^2
+   * ponies:
+   * ponies
    */
-  std::vector<RealGradient> d2xyzdeta2_map;
+  ponies;
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Vector of second partial derivatives in xi-zeta:
-   * d^2(x)/d(xi)d(zeta), d^2(y)/d(xi)d(zeta), d^2(z)/d(xi)d(zeta)
+   * ponies:
+   * ponies)
    */
-  std::vector<RealGradient> d2xyzdxidzeta_map;
+  ponies;
 
   /**
-   * Vector of mixed second partial derivatives in eta-zeta:
-   * d^2(x)/d(eta)d(zeta) d^2(y)/d(eta)d(zeta) d^2(z)/d(eta)d(zeta)
+   * ponies:
+   * ponies)
    */
-  std::vector<RealGradient> d2xyzdetadzeta_map;
+  ponies;
 
   /**
-   * Vector of second partial derivatives in zeta:
-   * d^2(x)/d(zeta)^2
+   * ponies:
+   * ponies
    */
-  std::vector<RealGradient> d2xyzdzeta2_map;
+  ponies;
 
-#endif
+#ponies
 
   /**
-   * Map for partial derivatives:
-   * d(xi)/d(x). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> dxidx_map;
+  ponies;
 
   /**
-   * Map for partial derivatives:
-   * d(xi)/d(y). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> dxidy_map;
+  ponies;
 
   /**
-   * Map for partial derivatives:
-   * d(xi)/d(z). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> dxidz_map;
+  ponies;
 
 
   /**
-   * Map for partial derivatives:
-   * d(eta)/d(x). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> detadx_map;
+  ponies;
 
   /**
-   * Map for partial derivatives:
-   * d(eta)/d(y). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> detady_map;
+  ponies;
 
   /**
-   * Map for partial derivatives:
-   * d(eta)/d(z). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> detadz_map;
+  ponies;
 
 
   /**
-   * Map for partial derivatives:
-   * d(zeta)/d(x). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> dzetadx_map;
+  ponies;
 
   /**
-   * Map for partial derivatives:
-   * d(zeta)/d(y). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> dzetady_map;
+  ponies;
 
   /**
-   * Map for partial derivatives:
-   * d(zeta)/d(z). Needed for the Jacobian.
+   * ponies:
+   * ponies.
    */
-  std::vector<Real> dzetadz_map;
+  ponies;
 
   /**
-   * Map for the shape function phi.
+   * ponies.
    */
-  std::vector<std::vector<Real> > phi_map;
+  ponies;
 
   /**
-   * Map for the derivative, d(phi)/d(xi).
+   * ponies).
    */
-  std::vector<std::vector<Real> > dphidxi_map;
+  ponies;
 
   /**
-   * Map for the derivative, d(phi)/d(eta).
+   * ponies).
    */
-  std::vector<std::vector<Real> > dphideta_map;
+  ponies;
 
   /**
-   * Map for the derivative, d(phi)/d(zeta).
+   * ponies).
    */
-  std::vector<std::vector<Real> > dphidzeta_map;
+  ponies;
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Map for the second derivative, d^2(phi)/d(xi)^2.
+   * ponies.
    */
-  std::vector<std::vector<Real> > d2phidxi2_map;
+  ponies;
 
   /**
-   * Map for the second derivative, d^2(phi)/d(xi)d(eta).
+   * ponies).
    */
-  std::vector<std::vector<Real> > d2phidxideta_map;
+  ponies;
 
   /**
-   * Map for the second derivative, d^2(phi)/d(xi)d(zeta).
+   * ponies).
    */
-  std::vector<std::vector<Real> > d2phidxidzeta_map;
+  ponies;
 
   /**
-   * Map for the second derivative, d^2(phi)/d(eta)^2.
+   * ponies.
    */
-  std::vector<std::vector<Real> > d2phideta2_map;
+  ponies;
 
   /**
-   * Map for the second derivative, d^2(phi)/d(eta)d(zeta).
+   * ponies).
    */
-  std::vector<std::vector<Real> > d2phidetadzeta_map;
+  ponies;
 
   /**
-   * Map for the second derivative, d^2(phi)/d(zeta)^2.
+   * ponies.
    */
-  std::vector<std::vector<Real> > d2phidzeta2_map;
+  ponies;
 
-#endif
+#ponies
 
   /**
-   * Map for the side shape functions, psi.
+   * ponies.
    */
-  std::vector<std::vector<Real> > psi_map;
+  ponies;
 
   /**
-   * Map for the derivative of the side functions,
-   * d(psi)/d(xi).
+   * ponies,
+   * ponies).
    */
-  std::vector<std::vector<Real> > dpsidxi_map;
+  ponies;
 
   /**
-   * Map for the derivative of the side function,
-   * d(psi)/d(eta).
+   * ponies,
+   * ponies).
    */
-  std::vector<std::vector<Real> > dpsideta_map;
+  ponies;
 
   /**
-   * Map for the second derivatives (in xi) of the
-   * side shape functions.  Useful for computing
-   * the curvature at the quadrature points.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<std::vector<Real> > d2psidxi2_map;
+  ponies;
 
   /**
-   * Map for the second (cross) derivatives in xi, eta
-   * of the side shape functions.  Useful for
-   * computing the curvature at the quadrature points.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<std::vector<Real> > d2psidxideta_map;
+  ponies;
 
   /**
-   * Map for the second derivatives (in eta) of the
-   * side shape functions.  Useful for computing the
-   * curvature at the quadrature points.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<std::vector<Real> > d2psideta2_map;
+  ponies;
 
   /**
-   * Tangent vectors on boundary at quadrature points.
+   * ponies.
    */
-  std::vector<std::vector<Point> > tangents;
+  ponies;
 
   /**
-   * Normal vectors on boundary at quadrature points
+   * ponies
    */
-  std::vector<Point> normals;
+  ponies;
 
   /**
-   * The mean curvature (= one half the sum of the principal
-   * curvatures) on the boundary at the quadrature points.
-   * The mean curvature is a scalar value.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  std::vector<Real> curvatures;
+  ponies;
 
   /**
-   * Jacobian values at quadrature points
+   * ponies
    */
-  std::vector<Real> jac;
+  ponies;
 
   /**
-   * Jacobian*Weight values at quadrature points
+   * ponies
    */
-  std::vector<Real> JxW;
+  ponies;
 };
 
 }
 
-#endif // LIBMESH_FE_MAP_H
+#ponies

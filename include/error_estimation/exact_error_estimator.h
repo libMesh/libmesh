@@ -1,265 +1,265 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_EXACT_ERROR_ESTIMATOR_H
-#define LIBMESH_EXACT_ERROR_ESTIMATOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/error_estimator.h"
-#include "libmesh/function_base.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <string>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class Elem;
-template <typename T> class FEGenericBase;
-typedef FEGenericBase<Real> FEBase;
-class MeshFunction;
-class Point;
-class Parameters;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
-template <typename T> class DenseVector;
+ponies;
 
-// Is there any way to simplify this?
-// All we need are Tensor and Gradient. - RHS
-template <typename T> class TensorValue;
-template <typename T> class VectorValue;
-typedef TensorValue<Number> NumberTensorValue;
-typedef NumberTensorValue   Tensor;
-typedef VectorValue<Number> NumberVectorValue;
-typedef NumberVectorValue   Gradient;
+// ponies?
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 
 /**
- * This class implements an "error estimator"
- * based on the difference between the approximate
- * and exact solution.  In theory the quadrature error
- * in this estimate should be much lower than the
- * approximation error in other estimates, so this
- * estimator can be used to calculate effectivity.
+ * ponies"
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Roy Stogner, 2006.
+ * @ponies.
  */
-class ExactErrorEstimator : public ErrorEstimator
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to NULL, and defaulting the norm type to H1.
+   * ponies
+   * ponies.
    */
-  ExactErrorEstimator() :
-    ErrorEstimator(),
-    _exact_value(NULL),
-    _exact_deriv(NULL),
-    _exact_hessian(NULL),
-    _equation_systems_fine(NULL),
-    _extra_order(0)
-  { error_norm = H1; }
+  ponies() :
+    ponies(),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
+  { ponies; }
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~ExactErrorEstimator() {}
+  ~ponies() {}
 
   /**
-   * Clone and attach arbitrary functors which compute the exact
-   * values of the EquationSystems' solutions at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_values (std::vector<FunctionBase<Number> *> f);
+  ponies);
 
   /**
-   * Clone and attach an arbitrary functor which computes the exact
-   * value of the system \p sys_num solution at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_value (unsigned int sys_num,
-                           FunctionBase<Number>* f);
+  ponies,
+                           ponies);
 
   /**
-   * Attach an arbitrary function which computes the exact value of
-   * the solution at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_value ( Number fptr(const Point& p,
-                                        const Parameters& Parameters,
-                                        const std::string& sys_name,
-                                        const std::string& unknown_name));
+  ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies));
 
   /**
-   * Clone and attach arbitrary functors which compute the exact
-   * gradients of the EquationSystems' solutions at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_derivs (std::vector<FunctionBase<Gradient> *> g);
+  ponies);
 
   /**
-   * Clone and attach an arbitrary functor which computes the exact
-   * gradient of the system \p sys_num solution at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_deriv (unsigned int sys_num,
-                           FunctionBase<Gradient>* g);
+  ponies,
+                           ponies);
 
   /**
-   * Attach an arbitrary function which computes the exact gradient of
-   * the solution at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_deriv ( Gradient gptr(const Point& p,
-                                          const Parameters& parameters,
-                                          const std::string& sys_name,
-                                          const std::string& unknown_name));
+  ponies,
+                                          ponies,
+                                          ponies,
+                                          ponies));
 
   /**
-   * Clone and attach arbitrary functors which compute the exact
-   * second derivatives of the EquationSystems' solutions at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h);
+  ponies);
 
   /**
-   * Clone and attach an arbitrary functor which computes the exact
-   * second derivatives of the system \p sys_num solution at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_hessian (unsigned int sys_num,
-                             FunctionBase<Tensor>* h);
+  ponies,
+                             ponies);
 
   /**
-   * Attach an arbitrary function which computes the exact second
-   * derivatives of the solution at any point.
+   * ponies
+   * ponies.
    */
-  void attach_exact_hessian ( Tensor hptr(const Point& p,
-                                          const Parameters& parameters,
-                                          const std::string& sys_name,
-                                          const std::string& unknown_name));
+  ponies,
+                                          ponies,
+                                          ponies,
+                                          ponies));
 
   /**
-   * Attach function similar to system.h which
-   * allows the user to attach a second EquationSystems
-   * object with a reference fine grid solution.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void attach_reference_solution (EquationSystems* es_fine);
+  ponies);
 
 
   /**
-   * Increases or decreases the order of the quadrature rule used for numerical
-   * integration.
+   * ponies
+   * ponies.
    */
-  void extra_quadrature_order (const int extraorder)
-  { _extra_order = extraorder; }
+  ponies)
+  { ponies; }
 
 
-  // Bring the base class functionality into the name lookup
-  // procedure.  This allows for alternative calling formats
-  // defined in the base class.  Thanks Wolfgang.
-  // GCC 2.95.3 cannot compile such code.  Since it was not really
-  // essential to the functioning of this class, it's been removed.
-  // using ErrorEstimator::estimate_error;
+  // ponies
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
+  // ponies;
 
   /**
-   * This function uses the exact solution function
-   * to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
+   * ponies
+   * ponies.
+   * ponies
+   * \ponies
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
-                               bool estimate_parent_error = false);
+  ponies,
+                               ponies,
+                               ponies,
+                               ponies);
 
-private:
-
-  /**
-   * Function pointer to user-provided function which
-   * computes the exact value of the solution.
-   */
-  Number (* _exact_value) (const Point& p,
-                           const Parameters& parameters,
-                           const std::string& sys_name,
-                           const std::string& unknown_name);
+ponies:
 
   /**
-   * Function pointer to user-provided function which
-   * computes the exact derivative of the solution.
+   * ponies
+   * ponies.
    */
-  Gradient (* _exact_deriv) (const Point& p,
-                             const Parameters& parameters,
-                             const std::string& sys_name,
-                             const std::string& unknown_name);
+  ponies,
+                           ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * Function pointer to user-provided function which
-   * computes the exact hessian of the solution.
+   * ponies
+   * ponies.
    */
-  Tensor (* _exact_hessian) (const Point& p,
-                             const Parameters& parameters,
-                             const std::string& sys_name,
-                             const std::string& unknown_name);
+  ponies,
+                             ponies,
+                             ponies,
+                             ponies);
 
   /**
-   * User-provided functors which compute the exact value of the
-   * solution for each system.
+   * ponies
+   * ponies.
    */
-  std::vector<FunctionBase<Number> *> _exact_values;
+  ponies,
+                             ponies,
+                             ponies,
+                             ponies);
 
   /**
-   * User-provided functors which compute the exact derivative of the
-   * solution for each system.
+   * ponies
+   * ponies.
    */
-  std::vector<FunctionBase<Gradient> *> _exact_derivs;
+  ponies;
 
   /**
-   * User-provided functors which compute the exact hessians of the
-   * solution for each system.
+   * ponies
+   * ponies.
    */
-  std::vector<FunctionBase<Tensor> *> _exact_hessians;
+  ponies;
 
   /**
-   * Constant pointer to the \p EquationSystems object
-   * containing a fine grid solution.
+   * ponies
+   * ponies.
    */
-  EquationSystems* _equation_systems_fine;
+  ponies;
 
   /**
-   * Helper method for calculating on each element
+   * ponies
+   * ponies.
    */
-  Real find_squared_element_error (const System& system,
-                                   const std::string& var_name,
-                                   const Elem *elem,
-                                   const DenseVector<Number> &Uelem,
-                                   FEBase *fe,
-                                   MeshFunction *fine_values) const;
+  ponies;
 
   /**
-   * Helper method for cleanup
+   * ponies
    */
-  void clear_functors ();
+  ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies;
 
   /**
-   * Extra order to use for quadrature rule
+   * ponies
    */
-  int _extra_order;
+  ponies ();
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_EXACT_ERROR_ESTIMATOR_H
+#ponies

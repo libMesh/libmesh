@@ -1,65 +1,65 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#ponies
 
-// Local includes
-#include "libmesh/mesh_triangle_wrapper.h"
-#include "libmesh/unstructured_mesh.h"
-#include "libmesh/point.h"
-#include "libmesh/face_tri3.h"
-#include "libmesh/face_tri6.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-void TriangleWrapper::init(TriangleWrapper::triangulateio& t)
+ponies)
 {
-  t.pointlist                    = static_cast<REAL*>(NULL);
-  t.pointattributelist           = static_cast<REAL*>(NULL);
-  t.pointmarkerlist              = static_cast<int* >(NULL);
-  t.numberofpoints               = 0 ;
-  t.numberofpointattributes      = 0 ;
+  ponies);
+  ponies);
+  ponies);
+  ponies ;
+  ponies ;
 
-  t.trianglelist                 = static_cast<int* >(NULL);
-  t.triangleattributelist        = static_cast<REAL*>(NULL);
-  t.trianglearealist             = static_cast<REAL*>(NULL);
-  t.neighborlist                 = static_cast<int* >(NULL);
-  t.numberoftriangles            = 0;
-  t.numberofcorners              = 0;
-  t.numberoftriangleattributes   = 0;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies;
+  ponies;
+  ponies;
 
-  t.segmentlist                  = static_cast<int* >(NULL);
-  t.segmentmarkerlist            = static_cast<int* >(NULL);
-  t.numberofsegments             = 0;
+  ponies);
+  ponies);
+  ponies;
 
-  t.holelist                     = static_cast<REAL*>(NULL);
-  t.numberofholes                = 0;
+  ponies);
+  ponies;
 
-  t.regionlist                   = static_cast<REAL*>(NULL);
-  t.numberofregions              = 0;
+  ponies);
+  ponies;
 
-  t.edgelist                     = static_cast<int* >(NULL);
-  t.edgemarkerlist               = static_cast<int* >(NULL);
-  t.normlist                     = static_cast<REAL*>(NULL);
-  t.numberofedges                = 0;
+  ponies);
+  ponies);
+  ponies);
+  ponies;
 }
 
 
@@ -67,31 +67,31 @@ void TriangleWrapper::init(TriangleWrapper::triangulateio& t)
 
 
 
-void TriangleWrapper::destroy(TriangleWrapper::triangulateio& t, TriangleWrapper::IO_Type io_type)
+ponies)
 {
-  std::free (t.pointlist            );
-  std::free (t.pointattributelist   );
-  std::free (t.pointmarkerlist      );
-  std::free (t.trianglelist         );
-  std::free (t.triangleattributelist);
-  std::free (t.trianglearealist     );
-  std::free (t.neighborlist         );
-  std::free (t.segmentlist          );
-  std::free (t.segmentmarkerlist    );
+  ponies            );
+  ponies   );
+  ponies      );
+  ponies         );
+  ponies);
+  ponies     );
+  ponies         );
+  ponies          );
+  ponies    );
 
-  // Only attempt to free these when t was used as an input struct!
-  if (io_type==INPUT)
+  // ponies!
+  ponies)
     {
-      std::free (t.holelist  );
-      std::free (t.regionlist);
+      ponies  );
+      ponies);
     }
 
-  std::free (t.edgelist      );
-  std::free (t.edgemarkerlist);
-  std::free (t.normlist      );
+  ponies      );
+  ponies);
+  ponies      );
 
-  // Reset
-  // TriangleWrapper::init(t);
+  // ponies
+  // ponies);
 }
 
 
@@ -99,73 +99,73 @@ void TriangleWrapper::destroy(TriangleWrapper::triangulateio& t, TriangleWrapper
 
 
 
-void TriangleWrapper::copy_tri_to_mesh(const triangulateio& triangle_data_input,
-                                       UnstructuredMesh& mesh_output,
-                                       const ElemType type)
+ponies,
+                                       ponies,
+                                       ponies)
 {
-  // Transfer the information into the LibMesh mesh.
-  mesh_output.clear();
+  // ponies.
+  ponies();
 
-  // Make sure the new Mesh will be 2D
-  mesh_output.set_mesh_dimension(2);
+  // ponies
+  ponies);
 
-  // Node information
-  for (int i=0, c=0; c<triangle_data_input.numberofpoints; i+=2, ++c)
+  // ponies
+  ponies)
     {
-      // Specify ID when adding point, otherwise, if this is ParallelMesh,
-      // it might add points with a non-sequential numbering...
-      mesh_output.add_point( Point(triangle_data_input.pointlist[i],
-                                   triangle_data_input.pointlist[i+1]),
-                             /*id=*/c);
+      // ponies,
+      // ponies...
+      ponies],
+                                   ponies]),
+                             /*ponies);
     }
 
-  // Element information
-  for (int i=0; i<triangle_data_input.numberoftriangles; ++i)
+  // ponies
+  ponies)
     {
-      switch (type)
+      ponies)
         {
-        case TRI3:
+        ponies:
           {
-            Elem* elem = mesh_output.add_elem (new Tri3);
+            ponies);
 
-            for (unsigned int n=0; n<3; ++n)
-              elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
+            ponies)
+              ponies]);
 
-            break;
+            ponies;
           }
 
-        case TRI6:
+        ponies:
           {
-            Elem* elem = mesh_output.add_elem (new Tri6);
+            ponies);
 
-            // Triangle number TRI6 nodes in a different way to libMesh
-            elem->set_node(0) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]);
-            elem->set_node(1) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 1]);
-            elem->set_node(2) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 2]);
-            elem->set_node(3) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 5]);
-            elem->set_node(4) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 3]);
-            elem->set_node(5) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 4]);
+            // ponies
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
 
-            break;
+            ponies;
           }
 
-        default:
-          libmesh_error_msg("ERROR: Unrecognized triangular element type.");
+        ponies:
+          ponies.");
         }
     }
 
-  // Note: If the input mesh was a parallel one, calling
-  // prepare_for_use() now will re-parallelize it by a call to
-  // delete_remote_elements()... We do not actually want to
-  // reparallelize it here though: the triangulate() function may
-  // still do some Mesh smoothing.  The main thing needed (for
-  // smoothing) is the neighbor information, so let's just find
-  // neighbors...
-  //mesh_output.prepare_for_use(/*skip_renumber =*/false);
-  mesh_output.find_neighbors();
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies...
+  //ponies);
+  ponies();
 }
 
 
 }
 
-#endif // LIBMESH_HAVE_TRIANGLE
+#ponies

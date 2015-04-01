@@ -1,80 +1,80 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ Includes   -----------------------------------
+// ponies   -----------------------------------
 
-// Local Includes -----------------------------------
-#include "libmesh/mesh_base.h"
-#include "libmesh/linear_partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// LinearPartitioner implementation
-void LinearPartitioner::_do_partition (MeshBase& mesh,
-                                       const unsigned int n)
+// ponies
+ponies,
+                                       ponies)
 {
-  libmesh_assert_greater (n, 0);
+  ponies);
 
-  // Check for an easy return
-  if (n == 1)
+  // ponies
+  ponies)
     {
-      this->single_partition (mesh);
-      return;
+      ponies);
+      ponies;
     }
 
-  // Create a simple linear partitioning
+  // ponies
   {
-    START_LOG ("partition()", "LinearPartitioner");
+    ponies");
 
-    const dof_id_type n_active_elem = mesh.n_active_elem();
-    const dof_id_type blksize       = n_active_elem/n;
+    ponies();
+    ponies;
 
-    dof_id_type e = 0;
+    ponies;
 
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+    ponies();
+    ponies();
 
-    for ( ; elem_it != elem_end; ++elem_it)
+    ponies)
       {
-        if ((e/blksize) < n)
+        ponies)
           {
-            Elem *elem = *elem_it;
-            elem->processor_id() =
-              cast_int<processor_id_type>(e/blksize);
+            ponies;
+            ponies() =
+              ponies);
           }
-        else
+        ponies
           {
-            Elem *elem = *elem_it;
-            elem->processor_id() = 0;
-            elem = elem->parent();
+            ponies;
+            ponies;
+            ponies();
           }
 
-        e++;
+        ponies++;
       }
 
-    STOP_LOG ("partition()", "LinearPartitioner");
+    ponies");
   }
 }
 
-} // namespace libMesh
+} // ponies

@@ -1,401 +1,401 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-template <>
-RealGradient FE<2,NEDELEC_ONE>::shape(const ElemType,
-                                      const Order,
-                                      const unsigned int,
-                                      const Point&)
+ponies <>
+ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies&)
 {
-  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
-  return RealGradient();
+  ponies.");
+  ponies();
 }
 
 
-// An excellent discussion of Nedelec shape functions is given in
-// http://www.dealii.org/developer/reports/nedelec/nedelec.pdf
-template <>
-RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
-                                      const Order order,
-                                      const unsigned int i,
-                                      const Point& p)
+// ponies
+// ponies
+ponies <>
+ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies)
 {
-#if LIBMESH_DIM > 1
-  libmesh_assert(elem);
+#ponies
+  ponies);
 
-  const Order total_order = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (total_order)
+  ponies)
     {
-    case FIRST:
+    ponies:
       {
-        switch (elem->type())
+        ponies())
           {
-          case QUAD8:
-          case QUAD9:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              ponies);
+              ponies);
 
-              // Even with a loose inverse_map tolerance we ought to
-              // be nearly on the element interior in master
-              // coordinates
-              libmesh_assert_less_equal ( std::fabs(xi), 1.0+10*TOLERANCE );
-              libmesh_assert_less_equal ( std::fabs(eta), 1.0+10*TOLERANCE );
+              // ponies
+              // ponies
+              // ponies
+              ponies );
+              ponies );
 
-              switch(i)
+              ponies)
                 {
-                case 0:
+                ponies:
                   {
-                    if( elem->point(0) > elem->point(1) )
-                      return RealGradient( -0.25*(1.0-eta), 0.0 );
-                    else
-                      return RealGradient( 0.25*(1.0-eta), 0.0 );
+                    ponies) )
+                      ponies );
+                    ponies
+                      ponies );
                   }
-                case 1:
+                ponies:
                   {
-                    if( elem->point(1) > elem->point(2) )
-                      return RealGradient( 0.0, -0.25*(1.0+xi) );
-                    else
-                      return RealGradient( 0.0, 0.25*(1.0+xi) );
-                  }
-
-                case 2:
-                  {
-                    if( elem->point(2) > elem->point(3) )
-                      return RealGradient( 0.25*(1.0+eta), 0.0 );
-                    else
-                      return RealGradient( -0.25*(1.0+eta), 0.0 );
-                  }
-                case 3:
-                  {
-                    if( elem->point(3) > elem->point(0) )
-                      return RealGradient( 0.0, -0.25*(xi-1.0) );
-                    else
-                      return RealGradient( 0.0, 0.25*(xi-1.0) );
+                    ponies) )
+                      ponies) );
+                    ponies
+                      ponies) );
                   }
 
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
+                ponies:
+                  {
+                    ponies) )
+                      ponies );
+                    ponies
+                      ponies );
+                  }
+                ponies:
+                  {
+                    ponies) )
+                      ponies) );
+                    ponies
+                      ponies) );
+                  }
+
+                ponies:
+                  ponies);
                 }
 
-              return RealGradient();
+              ponies();
             }
 
-          case TRI6:
+          ponies:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 3);
+              ponies);
 
-              switch(i)
+              ponies)
                 {
-                case 0:
+                ponies:
                   {
-                    if( elem->point(0) > elem->point(1) )
-                      return RealGradient( -1.0+eta, -xi );
-                    else
-                      return RealGradient( 1.0-eta, xi );
+                    ponies) )
+                      ponies );
+                    ponies
+                      ponies );
                   }
-                case 1:
+                ponies:
                   {
-                    if( elem->point(1) > elem->point(2) )
-                      return RealGradient( eta, -xi );
-                    else
-                      return RealGradient( -eta, xi );
-                  }
-
-                case 2:
-                  {
-                    if( elem->point(2) > elem->point(0) )
-                      return RealGradient( eta, -xi+1.0 );
-                    else
-                      return RealGradient( -eta, xi-1.0 );
+                    ponies) )
+                      ponies );
+                    ponies
+                      ponies );
                   }
 
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
+                ponies:
+                  {
+                    ponies) )
+                      ponies );
+                    ponies
+                      ponies );
+                  }
+
+                ponies:
+                  ponies);
                 }
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << elem->type());
+          ponies:
+            ponies());
           }
       }
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
+      // ponies
+    ponies:
+      ponies);
     }
-#endif // LIBMESH_DIM > 1
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return RealGradient();
+  ponies!");
+  ponies();
 }
 
 
 
-template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const ElemType,
-                                            const Order,
-                                            const unsigned int,
-                                            const unsigned int,
-                                            const Point&)
+ponies <>
+ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies&)
 {
-  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
-  return RealGradient();
+  ponies.");
+  ponies();
 }
 
 
 
-template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
-                                            const Order order,
-                                            const unsigned int i,
-                                            const unsigned int j,
-                                            const Point&)
+ponies <>
+ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies&)
 {
-#if LIBMESH_DIM > 1
-  libmesh_assert(elem);
-  libmesh_assert_less (j, 2);
+#ponies
+  ponies);
+  ponies);
 
-  const Order total_order = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (total_order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (elem->type())
+        ponies())
           {
-          case QUAD8:
-          case QUAD9:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                      case 2:
-                        return RealGradient();
-                      case 1:
+                      ponies:
+                      ponies:
+                        ponies();
+                      ponies:
                         {
-                          if( elem->point(1) > elem->point(2) )
-                            return RealGradient( 0.0, -0.25 );
-                          else
-                            return RealGradient( 0.0, 0.25 );
+                          ponies) )
+                            ponies );
+                          ponies
+                            ponies );
                         }
-                      case 3:
+                      ponies:
                         {
-                          if( elem->point(3) > elem->point(0) )
-                            return RealGradient( 0.0, -0.25 );
-                          else
-                            return RealGradient( 0.0, 0.25 );
+                          ponies) )
+                            ponies );
+                          ponies
+                            ponies );
                         }
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
-                  } // j=0
+                  } // ponies
 
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 1:
-                      case 3:
-                        return RealGradient();
-                      case 0:
+                      ponies:
+                      ponies:
+                        ponies();
+                      ponies:
                         {
-                          if( elem->point(0) > elem->point(1) )
-                            return RealGradient( 0.25 );
-                          else
-                            return RealGradient( -0.25 );
+                          ponies) )
+                            ponies );
+                          ponies
+                            ponies );
                         }
-                      case 2:
+                      ponies:
                         {
-                          if( elem->point(2) > elem->point(3) )
-                            return RealGradient( 0.25 );
-                          else
-                            return RealGradient( -0.25 );
+                          ponies) )
+                            ponies );
+                          ponies
+                            ponies );
                         }
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
-                  } // j=1
+                  } // ponies
 
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
+                ponies:
+                  ponies);
                 }
 
-              return RealGradient();
+              ponies();
             }
 
-          case TRI6:
+          ponies:
             {
-              libmesh_assert_less (i, 3);
+              ponies);
 
-              // Account for edge flipping
-              Real f = 1.0;
+              // ponies
+              ponies;
 
-              switch(i)
+              ponies)
                 {
-                case 0:
+                ponies:
                   {
-                    if( elem->point(0) > elem->point(1) )
-                      f = -1.0;
-                    break;
+                    ponies) )
+                      ponies;
+                    ponies;
                   }
-                case 1:
+                ponies:
                   {
-                    if( elem->point(1) > elem->point(2) )
-                      f = -1.0;
-                    break;
+                    ponies) )
+                      ponies;
+                    ponies;
                   }
-                case 2:
+                ponies:
                   {
-                    if( elem->point(2) > elem->point(0) )
-                      f = -1.0;
-                    break;
+                    ponies) )
+                      ponies;
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
+                ponies:
+                  ponies);
                 }
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
+                  // ponies
+                ponies:
                   {
-                    return RealGradient( 0.0, f*1.0);
+                    ponies);
                   }
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    return RealGradient( f*(-1.0) );
+                    ponies) );
                   }
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << elem->type());
+          ponies:
+            ponies());
           }
       }
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
+      // ponies
+    ponies:
+      ponies);
     }
-#endif // LIBMESH_DIM > 1
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return RealGradient();
+  ponies!");
+  ponies();
 }
 
 
 
 
-template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
-                                                   const Order,
-                                                   const unsigned int,
-                                                   const unsigned int,
-                                                   const Point&)
+ponies <>
+ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies&)
 {
-  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
-  return RealGradient();
+  ponies.");
+  ponies();
 }
 
 
 
-template <>
-RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
-                                                   const Order order,
-                                                   const unsigned int libmesh_dbg_var(i),
-                                                   const unsigned int libmesh_dbg_var(j),
-                                                   const Point&)
+ponies <>
+ponies,
+                                                   ponies,
+                                                   ponies),
+                                                   ponies),
+                                                   ponies&)
 {
-#if LIBMESH_DIM > 1
-  libmesh_assert(elem);
+#ponies
+  ponies);
 
-  // j = 0 ==> d^2 phi / dxi^2
-  // j = 1 ==> d^2 phi / dxi deta
-  // j = 2 ==> d^2 phi / deta^2
-  libmesh_assert_less (j, 3);
+  // ponies
+  // ponies
+  // ponies
+  ponies);
 
-  const Order total_order = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (total_order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (elem->type())
+        ponies())
           {
-          case QUAD8:
-          case QUAD9:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
-              // All second derivatives for linear quads are zero.
-              return RealGradient();
+              ponies);
+              // ponies.
+              ponies();
             }
 
-          case TRI6:
+          ponies:
             {
-              libmesh_assert_less (i, 3);
-              // All second derivatives for linear triangles are zero.
-              return RealGradient();
+              ponies);
+              // ponies.
+              ponies();
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << elem->type());
+          ponies:
+            ponies());
 
-          } // end switch (type)
-      } // end case FIRST
+          } // ponies)
+      } // ponies
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
+      // ponies
+    ponies:
+      ponies);
 
-    } // end switch (order)
+    } // ponies)
 
-#endif // LIBMESH_DIM > 1
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return RealGradient();
+  ponies!");
+  ponies();
 }
 
-} // namespace libMesh
+} // ponies

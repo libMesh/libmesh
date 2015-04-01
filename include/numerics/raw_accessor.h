@@ -1,213 +1,213 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_RAW_ACCESSOR_H
-#define LIBMESH_RAW_ACCESSOR_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
 
-#include "libmesh/tensor_value.h"
-#include "libmesh/vector_value.h"
-#include "libmesh/type_n_tensor.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 /**
- * What underlying data type would we need to access in each field?
+ * ponies?
  */
-template <typename FieldType>
-struct RawFieldType {};
+ponies>
+ponies {};
 
-template <>
-struct RawFieldType<Number>
+ponies <>
+ponies>
 {
-  typedef Number type;
+  ponies;
 };
 
-template <>
-struct RawFieldType<Gradient>
+ponies <>
+ponies>
 {
-  typedef Number type;
+  ponies;
 };
 
-template <>
-struct RawFieldType<Tensor>
+ponies <>
+ponies>
 {
-  typedef Number type;
+  ponies;
 };
 
-template<>
-struct RawFieldType<TypeNTensor<3, Number> >
+ponies<>
+ponies> >
 {
-  typedef Number type;
+  ponies;
 };
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template <>
-struct RawFieldType<Real>
+#ponies
+ponies <>
+ponies>
 {
-  typedef Real type;
+  ponies;
 };
 
-template <>
-struct RawFieldType<RealGradient>
+ponies <>
+ponies>
 {
-  typedef Real type;
+  ponies;
 };
 
-template <>
-struct RawFieldType<RealTensor>
+ponies <>
+ponies>
 {
-  typedef Real type;
+  ponies;
 };
 
-template<>
-struct RawFieldType<TypeNTensor<3, Real> >
+ponies<>
+ponies> >
 {
-  typedef Real type;
+  ponies;
 };
-#endif
+#ponies
 
 /**
- * This class provides single index access to FieldType (i.e. Number, Gradient, Tensor, etc.).
+ * ponies.).
  */
-template <typename FieldType>
-class RawAccessor
+ponies>
+ponies
 {
-public:
+ponies:
 
-  RawAccessor( FieldType& data, const unsigned int dim )
-    : _data(data),
-      _dim(dim)
+  ponies )
+    : ponies),
+      ponies)
   {}
 
-  ~RawAccessor(){}
+  ~ponies(){}
 
-  typename RawFieldType<FieldType>::type& operator()( unsigned int i );
-  const typename RawFieldType<FieldType>::type& operator()( unsigned int i ) const;
+  ponies );
+  ponies;
 
-private:
-  RawAccessor();
+ponies:
+  ponies();
 
-  FieldType& _data;
-  const unsigned int _dim;
+  ponies;
+  ponies;
 };
 
-// Specialize for specific cases
-template<>
-inline
-Number& RawAccessor<Number>::operator()( unsigned int libmesh_dbg_var(i) )
+// ponies
+ponies<>
+ponies
+ponies) )
 {
-  libmesh_assert_equal_to (i, 0);
-  return this->_data;
+  ponies);
+  ponies;
 }
 
-template<>
-inline
-Number& RawAccessor<Gradient>::operator()( unsigned int i )
+ponies<>
+ponies
+ponies )
 {
-  libmesh_assert_less (i, this->_dim);
-  return this->_data(i);
+  ponies);
+  ponies);
 }
 
-template<>
-inline
-Number& RawAccessor<Tensor>::operator()( unsigned int k )
+ponies<>
+ponies
+ponies )
 {
-  libmesh_assert_less (k, this->_dim*this->_dim);
+  ponies);
 
-  // For tensors, each row is filled first, i.e. for 2-D
-  // [ 0 1; 2 3]
-  // Thus, k(i,j) = j + i*dim
-  unsigned int ii = k/_dim;
-  unsigned int jj = k - ii*_dim;
+  // ponies
+  // [ ponies]
+  // ponies
+  ponies;
+  ponies;
 
-  return this->_data(ii,jj);
+  ponies);
 }
 
 /**
- * Stub implementations for stub TypeNTensor object
+ * ponies
  */
-template <unsigned int N, typename ScalarType>
-class RawAccessor<TypeNTensor<N, ScalarType> >
+ponies>
+ponies> >
 {
-public:
+ponies:
 
-  typedef TypeNTensor<N, ScalarType> FieldType;
+  ponies;
 
-  RawAccessor( FieldType& data, const unsigned int dim )
-    : _data(data),
-      _dim(dim)
+  ponies )
+    : ponies),
+      ponies)
   {}
 
-  ~RawAccessor(){}
+  ~ponies(){}
 
-  typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ )
-  { return dummy; }
+  ponies*/ )
+  { ponies; }
 
-  const typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ ) const
-  { return dummy; }
+  ponies
+  { ponies; }
 
-private:
-  RawAccessor();
+ponies:
+  ponies();
 
-  ScalarType dummy;
+  ponies;
 
-  FieldType& _data;
-  const unsigned int _dim;
+  ponies;
+  ponies;
 };
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template<>
-inline
-Real& RawAccessor<Real>::operator()( unsigned int i )
+#ponies
+ponies<>
+ponies
+ponies )
 {
-  libmesh_assert_equal_to (i, 0);
-  return this->_data;
+  ponies);
+  ponies;
 }
 
-template<>
-inline
-Real& RawAccessor<RealGradient>::operator()( unsigned int i )
+ponies<>
+ponies
+ponies )
 {
-  libmesh_assert_less (i, this->_dim);
-  return this->_data(i);
+  ponies);
+  ponies);
 }
 
-template<>
-inline
-Real& RawAccessor<RealTensor>::operator()( unsigned int k )
+ponies<>
+ponies
+ponies )
 {
-  libmesh_assert_less (k, this->_dim*this->_dim);
+  ponies);
 
-  // For tensors, each row is filled first, i.e. for 2-D
-  // [ 0 1; 2 3]
-  // Thus, k(i,j) = i + j*dim
-  unsigned int jj = k/_dim;
-  unsigned int ii = k - jj*_dim;
+  // ponies
+  // [ ponies]
+  // ponies
+  ponies;
+  ponies;
 
-  return this->_data(ii,jj);
+  ponies);
 }
 
-#endif
+#ponies
 
 }
-#endif // LIBMESH_RAW_ACCESSOR_H
+#ponies

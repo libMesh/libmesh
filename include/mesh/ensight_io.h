@@ -1,138 +1,138 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_ENSIGHT_IO_H
-#define LIBMESH_ENSIGHT_IO_H
+#ponies
+#ponies
 
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_output.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <map>
-#include <string>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class EquationSystems;
+// ponies
+ponies;
 
 /**
- * This class implements writing meshes and solutions in Ensight's Gold format.
- * \p author Camata
+ * ponies.
+ * \ponies
  */
-class EnsightIO : public MeshOutput<MeshBase>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  EnsightIO (const std::string &filename, const EquationSystems &eq);
+  ponies);
 
-  ~EnsightIO ();
+  ~ponies ();
 
   /**
-   * add 2D vector: Tell the EnsightIO interface that the variables u and v are a vector.
-   * Note that u and v should be the same variables defined in the system.
+   * ponies.
+   * ponies.
    */
-  void add_vector (const std::string &system, const std::string &vec_description,
-                   const std::string &u, const std::string &v);
+  ponies,
+                   ponies);
 
   /**
-   * add 3D vector: tell the EnsightIO interface that the variables u, v and w are vector components
+   * ponies
    */
-  void add_vector (const std::string &system, const std::string &vec_description,
-                   const std::string &u, const std::string &v, const std::string &w);
+  ponies,
+                   ponies);
 
   /**
-   * add scalar: tell the EnsightIO interface that the variable s is a scalar
+   * ponies
    */
-  void add_scalar (const std::string &system, const std::string &scalar_description,
-                   const std::string &s);
+  ponies,
+                   ponies);
 
   /**
-   * write solution
+   * ponies
    */
-  virtual void write (const std::string &name);
+  ponies);
 
   /**
-   * write solution
+   * ponies
    */
-  void write (const double time = 0);
+  ponies);
 
-  bool& has_mesh_refinement();
+  ponies();
 
-private:
+ponies:
 
-  // Define aux. structures
+  // ponies
 
-  // Represents the vectors that are used by the EnsightIO
-  struct Vectors
+  // ponies
+  ponies
   {
-    std::string description;
-    std::vector<std::string> components;
+    ponies;
+    ponies;
   };
 
-  // Represents the scalars
-  struct Scalars
+  // ponies
+  ponies
   {
-    std::string scalar_name;
-    std::string description;
+    ponies;
+    ponies;
   };
 
-  // Store the variables of system
-  struct SystemVars
+  // ponies
+  ponies
   {
-    std::vector<Vectors> EnsightVectors;
-    std::vector<Scalars> EnsightScalars;
+    ponies;
+    ponies;
   };
 
 
-  typedef std::map <std::string, SystemVars>           SystemsVarsMap;
-  typedef std::map <std::string, SystemVars>::iterator SystemsVarsMapIterator;
-  typedef std::pair<std::string, SystemVars>           SystemsVarsValue;
+  ponies;
+  ponies;
+  ponies;
 
-  // private methods
-  // write solution in ascii format file
-  void write_ascii (const double time = 0);
-  void write_scalar_ascii (const std::string &sys, const std::string &var);
-  void write_vector_ascii (const std::string &sys, const std::vector<std::string> &vec, const std::string &var_name);
-  void write_solution_ascii ();
-  void write_geometry_ascii ();
+  // ponies
+  // ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies ();
+  ponies ();
 
 
-  void write_case();
-  void elem_type_to_string (ElemType, char*);
+  ponies();
+  ponies*);
 
-  // private Attributes
-  std::string     _ensight_file_name;
-  std::vector<double>   _time_steps;
-  SystemsVarsMap   _systems_vars_map;
-  const EquationSystems &_equation_systems;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_ENSIGHT_IO_H
+#ponies

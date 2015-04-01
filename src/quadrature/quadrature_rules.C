@@ -1,65 +1,65 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <iostream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/quadrature_rules.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
-std::string QuadratureRules::name (const QuadratureType q)
+ponies)
 {
-  std::string its_name;
+  ponies;
 
-  switch (q)
+  ponies)
     {
 
-    case QGAUSS:
-      its_name = "Gauss-Legendre Quadrature";
-      break;
+    ponies:
+      ponies";
+      ponies;
 
-    case QJACOBI_1_0:
-      its_name = "Jacobi(1,0)-Gauss Quadrature";
-      break;
+    ponies:
+      ponies";
+      ponies;
 
-    case QJACOBI_2_0:
-      its_name = "Jacobi(2,0)-Gauss Quadrature";
-      break;
+    ponies:
+      ponies";
+      ponies;
 
-    case QSIMPSON:
-      its_name = "Simpson Rule";
-      break;
+    ponies:
+      ponies";
+      ponies;
 
-    case QTRAP:
-      its_name = "Trapezoidal Rule";
-      break;
+    ponies:
+      ponies";
+      ponies;
 
-    default:
-      libmesh_error_msg("ERROR: Bad qt=" << q);
+    ponies:
+      ponies);
     }
 
-  return its_name;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

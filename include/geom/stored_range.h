@@ -1,280 +1,280 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_STORED_RANGE_H
-#define LIBMESH_STORED_RANGE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/threads.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * The \p StoredRange class defined a contiguous, divisible set of objects
- * This class is used primarily as the argument to function objects.  The
- * range can then be subdivided into a number of "tasks" which can be executed
- * in parallel.  This concept is central to the Threading Building Blocks
- * template library which can optionally be used by \p libMesh to implement
- * shared-memory parallelism.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * The implementation takes a user-provided object range and packs it into
- * a contiguous vector which can then be subdivided efficiently.  A first-cut
- * implementation using raw element iterators incurred simply too much overhead
- * by using the predicated iterators, specifically operations such as advancing
- * such iterators has a cost proportional to the amount the iterator is advanced.
- * Hence in this implementation the user-provided range is packed into a vector.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ * ponies.
  *
- * \author Benjamin S. Kirk, 2008.
+ * \ponies.
  */
-template <typename iterator_type, typename object_type>
-class StoredRange
+ponies>
+ponies
 {
-public:
+ponies:
   /**
-   * Allows an \p StoredRange to behave like an STL container.
+   * ponies.
    */
-  typedef typename std::vector<object_type>::const_iterator const_iterator;
+  ponies;
 
   /**
-   * Constructor. Optionally takes the \p grainsize parameter, which is the
-   * smallest chunk the range may be broken into for parallel
-   * execution.
+   * ponies
+   * ponies
+   * ponies.
    */
-  StoredRange (const unsigned int new_grainsize = 1000) :
-    _end(),
-    _begin(),
-    _last(),
-    _first(),
-    _grainsize(new_grainsize),
-    _objs()
+  ponies) :
+    ponies(),
+    ponies(),
+    ponies(),
+    ponies(),
+    ponies),
+    ponies()
   {}
 
   /**
-   * Constructor.  Takes the beginning and end of the range.
-   * Optionally takes the \p grainsize parameter, which is the
-   * smallest chunk the range may be broken into for parallel
-   * execution.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  StoredRange (const iterator_type &first,
-               const iterator_type &last,
-               const unsigned int new_grainsize = 1000) :
-    _end(),
-    _begin(),
-    _last(),
-    _first(),
-    _grainsize(new_grainsize),
-    _objs()
+  ponies,
+               ponies,
+               ponies) :
+    ponies(),
+    ponies(),
+    ponies(),
+    ponies(),
+    ponies),
+    ponies()
   {
-    this->reset(first, last);
+    ponies);
   }
 
   /**
-   * Copy constructor.  The \p StoredRange can be copied into
-   * subranges for parallel execution.  In this way the
-   * initial \p StoredRange can be thought of as the root of
-   * a binary tree.  The root element is the only element
-   * which interacts with the user.  It takes a specified
-   * range of objects and packs it into a contiguous vector
-   * which can be split efficiently. However, there is no need
-   * for the child ranges to contain this vector, so long as
-   * the parent outlives the children.  So we implement
-   * the copy constructor to specifically omit the \p _objs
-   * vector.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  StoredRange (const StoredRange<iterator_type,object_type> &er):
-    _end(er._end),
-    _begin(er._begin),
-    _last(er._last),
-    _first(er._first),
-    _grainsize(er._grainsize),
-    _objs()
+  ponies):
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies()
   {
-    // specifically, do *not* copy the vector
+    // ponies
   }
 
   /**
-   * NOTE: When using pthreads this constructor is MANDATORY!!!
+   * ponies!!!
    *
-   * Copy constructor.  The \p StoredRange can be copied into
-   * subranges for parallel execution.  In this way the
-   * initial \p StoredRange can be thought of as the root of
-   * a binary tree.  The root element is the only element
-   * which interacts with the user.  It takes a specified
-   * range of objects and packs it into a contiguous vector
-   * which can be split efficiently. However, there is no need
-   * for the child ranges to contain this vector, so long as
-   * the parent outlives the children.  So we implement
-   * the copy constructor to specifically omit the \p _objs
-   * vector. This version allows you to set the beginning and
-   * ending of this new range to be different from that of the
-   * one we're copying.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  StoredRange (const StoredRange<iterator_type,object_type> &er,
-               const const_iterator &begin_range,
-               const const_iterator &end_range):
-    _end(end_range),
-    _begin(begin_range),
-    _last(0), // Initialize these in a moment
-    _first(0),
-    _grainsize(er._grainsize),
-    _objs()
+  ponies,
+               ponies,
+               ponies):
+    ponies),
+    ponies),
+    ponies
+    ponies),
+    ponies),
+    ponies()
   {
-    // specifically, do *not* copy the vector
+    // ponies
 
-    _first = std::distance(er._begin, _begin);
-    _last = _first + std::distance(_begin, _end);
+    ponies);
+    ponies);
   }
 
   /**
-   * Splits the range \p r.  The first half
-   * of the range is left in place, the second
-   * half of the range is placed in *this.
+   * ponies
+   * ponies
+   * ponies.
    */
-  StoredRange (StoredRange<iterator_type,object_type> &r, Threads::split ) :
-    _end(r._end),
-    _begin(r._begin),
-    _last(r._last),
-    _first(r._first),
-    _grainsize(r._grainsize),
-    _objs()
+  ponies ) :
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies()
   {
-    const_iterator
-      beginning = r._begin,
-      ending    = r._end,
-      middle    = beginning + std::distance(beginning, ending)/2u;
+    ponies
+      ponies,
+      ponies,
+      ponies;
 
-    r._end = _begin = middle;
+    ponies;
 
-    std::size_t
-      first = r._first,
-      last  = r._last,
-      half  = first + (last-first)/2u;
+    ponies
+      ponies,
+      ponies,
+      ponies;
 
-    r._last = _first = half;
+    ponies;
   }
 
   /**
-   * Resets the \p StoredRange to contain [first,last).  Returns
-   * a reference to itself for convenience, so functions
-   * expecting a StoredRange<> can be passed e.g. foo.reset(begin,end).
+   * ponies
+   * ponies
+   * ponies).
    */
-  StoredRange<iterator_type, object_type> &
-  reset (const iterator_type &first,
-         const iterator_type &last)
+  ponies> &
+  ponies,
+         ponies)
   {
-    _objs.clear();
+    ponies();
 
-    for (iterator_type it=first; it!=last; ++it)
-      _objs.push_back(*it);
+    ponies)
+      ponies);
 
-    _begin = _objs.begin();
-    _end   = _objs.end();
+    ponies();
+    ponies();
 
-    _first = 0;
-    _last  = _objs.size();
+    ponies;
+    ponies();
 
-    return *this;
+    ponies;
   }
 
   /**
-   * Resets the range to the last specified range.  This method only exists
-   * for efficiency -- it is more efficient to set the range to its previous
-   * value without rebuilding the underlying vector.  Returns
-   * a reference to itself for convenience, so functions
-   * expecting a StoredRange<> can be passed e.g. foo.reset().
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies().
    */
-  StoredRange<iterator_type, object_type> & reset ()
+  ponies ()
   {
-    _begin = _objs.begin();
-    _end   = _objs.end();
+    ponies();
+    ponies();
 
-    _first = 0;
-    _last  = _objs.size();
+    ponies;
+    ponies();
 
-    return *this;
+    ponies;
   }
 
   /**
-   * Beginning of the range.
+   * ponies.
    */
-  const_iterator begin () const { return _begin; }
+  ponies; }
 
   /**
-   * End of the range.
+   * ponies.
    */
-  const_iterator end () const { return _end; }
+  ponies; }
 
   /**
-   * Index in the stored vector of the first object.
+   * ponies.
    */
-  std::size_t first_idx () const { return _first; }
+  ponies; }
 
   /**
-   * Index in the stored vector of the last object.
+   * ponies.
    */
-  std::size_t last_idx () const { return _last; }
+  ponies; }
 
   /**
-   * The grain size for the range.  The range will be subdivided into
-   * subranges not to exceed the grain size.
+   * ponies
+   * ponies.
    */
-  std::size_t grainsize () const {return _grainsize;}
+  ponies;}
 
   /**
-   * Set the grain size.
+   * ponies.
    */
-  void grainsize (const unsigned int &gs) {_grainsize = gs;}
+  ponies;}
 
   /**
-   * \return the size of the range.
+   * \ponies.
    */
-  std::size_t size () const { return std::distance(_begin, _end); }
+  ponies); }
 
   //------------------------------------------------------------------------
-  // Methods that implement Range concept
+  // ponies
   //------------------------------------------------------------------------
 
   /**
-   * Returns true if the range is empty.
+   * ponies.
    */
-  bool empty() const { return (_begin == _end); }
+  ponies); }
 
   /**
-   * Returns true if the range can be subdivided.
+   * ponies.
    */
-  bool is_divisible() const { return this->grainsize() < static_cast<unsigned int>(std::distance(_begin, _end)); }
+  ponies)); }
 
-private:
+ponies:
 
-  const_iterator _end;
-  const_iterator _begin;
-  std::size_t _last;
-  std::size_t _first;
-  std::size_t _grainsize;
-  std::vector<object_type> _objs;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_STORED_RANGE_H
+#ponies

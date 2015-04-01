@@ -1,144 +1,144 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_SPARSE_SHELL_MATRIX_H
-#define LIBMESH_SPARSE_SHELL_MATRIX_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/shell_matrix.h"
-#include "libmesh/sparse_matrix.h"
 
-namespace libMesh
+#ponies
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 /**
- * This class allows to use any SparseMatrix object as a shell matrix.
+ * ponies.
  *
- * @author Tim Kroeger, 2008
+ * @ponies
  */
 
-template <typename T>
-class SparseShellMatrix : public ShellMatrix<T>
+ponies>
+ponies>
 {
-public:
+ponies:
   /**
-   * Constructor; takes references to the sparse matrix.  The sparse
-   * matrix itself has to be stored elsewhere.
+   * ponies
+   * ponies.
    */
-  explicit
-  SparseShellMatrix (const SparseMatrix<T>& new_m);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~SparseShellMatrix ();
+  ponies ();
 
   /**
-   * @returns \p m, the row-dimension of the matrix where the marix is
-   * \f$ M \times N \f$.
+   * @ponies
+   * \ponies$.
    */
-  virtual numeric_index_type m () const;
+  ponies;
 
   /**
-   * @returns \p n, the column-dimension of the matrix where the marix
-   * is \f$ M \times N \f$.
+   * @ponies
+   * ponies$.
    */
-  virtual numeric_index_type n () const;
+  ponies;
 
   /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
+   * ponies
+   * ponies.
    */
-  virtual void vector_mult (NumericVector<T>& dest,
-                            const NumericVector<T>& arg) const;
+  ponies,
+                            ponies;
 
   /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
+   * ponies.
    */
-  virtual void vector_mult_add (NumericVector<T>& dest,
-                                const NumericVector<T>& arg) const;
+  ponies,
+                                ponies;
 
   /**
-   * Copies the diagonal part of the matrix into \p dest.
+   * ponies.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const;
+  ponies;
 
-protected:
+ponies:
   /**
-   * The sparse matrix.
+   * ponies.
    */
-  const SparseMatrix<T>& _m;
+  ponies;
 
 };
 
 
 
 //-----------------------------------------------------------------------
-// SparseShellMatrix inline members
-template <typename T>
-inline
-SparseShellMatrix<T>::SparseShellMatrix (const SparseMatrix<T>& new_m):
-  ShellMatrix<T>(new_m.comm()),
-  _m(new_m)
+// ponies
+ponies>
+ponies
+ponies):
+  ponies()),
+  ponies)
 {}
 
 
 
-template <typename T>
-inline
-SparseShellMatrix<T>::~SparseShellMatrix ()
+ponies>
+ponies
+ponies ()
 {}
 
 
 
-template <typename T>
-inline
-numeric_index_type SparseShellMatrix<T>::m () const
+ponies>
+ponies
+ponies
 {
-  return _m.m();
+  ponies();
 }
 
 
 
-template <typename T>
-inline
-numeric_index_type SparseShellMatrix<T>::n () const
+ponies>
+ponies
+ponies
 {
-  return _m.n();
+  ponies();
 }
 
 
 
-template <typename T>
-inline
-void SparseShellMatrix<T>::get_diagonal(NumericVector<T>& dest) const
+ponies>
+ponies
+ponies
 {
-  _m.get_diagonal(dest);
+  ponies);
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_SPARSE_SHELL_MATRIX_H
+#ponies

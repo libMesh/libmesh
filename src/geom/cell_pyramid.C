@@ -1,204 +1,204 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/cell_pyramid.h"
-#include "libmesh/cell_pyramid5.h"
-#include "libmesh/face_tri3.h"
-#include "libmesh/face_quad4.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// Pyramid class static member initializations
+// ponies
 
 
-// We need to require C++11...
-const Real Pyramid::_master_points[14][3] =
+// ponies...
+ponies] =
   {
-    {-1, -1, 0},
-    {1, -1, 0},
-    {1, 1, 0},
-    {-1, 1, 0},
-    {0, 0, 1},
-    {0, -1, 0},
-    {1, 0, 0},
-    {0, 1, 0},
-    {-1, 0, 0},
-    {0, -0.5, 0.5},
-    {0.5, 0, 0.5},
-    {0, 0.5, 0.5},
-    {-0.5, 0, 0.5}
+    {-ponies},
+    {ponies},
+    {ponies},
+    {-ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {-ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {-ponies}
   };
 
 
 
 
 // ------------------------------------------------------------
-// Pyramid class member functions
-dof_id_type Pyramid::key (const unsigned int s) const
+// ponies
+ponies
 {
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
 
-  switch (s)
+  ponies)
     {
-    case 0:  // triangular face 1
+    ponies
 
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(4));
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    case 1:  // triangular face 2
+    ponies
 
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(4));
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    case 2:  // triangular face 3
+    ponies
 
-      return
-        this->compute_key (this->node(2),
-                           this->node(3),
-                           this->node(4));
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    case 3:  // triangular face 4
+    ponies
 
-      return
-        this->compute_key (this->node(3),
-                           this->node(0),
-                           this->node(4));
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    case 4:  // the quad face at z=0
+    ponies
 
-      return
-        this->compute_key (this->node(0),
-                           this->node(3),
-                           this->node(2),
-                           this->node(1));
+      ponies
+        ponies),
+                           ponies),
+                           ponies),
+                           ponies));
 
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
-UniquePtr<Elem> Pyramid::side (const unsigned int i) const
+ponies
 {
-  libmesh_assert_less (i, this->n_sides());
+  ponies());
 
-  // To be returned wrapped in an UniquePtr
-  Elem* face = NULL;
+  // ponies
+  ponies;
 
-  switch (i)
+  ponies)
     {
-    case 0:  // triangular face 1
+    ponies
       {
-        face = new Tri3;
+        ponies;
 
-        face->set_node(0) = this->get_node(0);
-        face->set_node(1) = this->get_node(1);
-        face->set_node(2) = this->get_node(4);
+        ponies);
+        ponies);
+        ponies);
 
-        break;
+        ponies;
       }
-    case 1:  // triangular face 2
+    ponies
       {
-        face = new Tri3;
+        ponies;
 
-        face->set_node(0) = this->get_node(1);
-        face->set_node(1) = this->get_node(2);
-        face->set_node(2) = this->get_node(4);
+        ponies);
+        ponies);
+        ponies);
 
-        break;
+        ponies;
       }
-    case 2:  // triangular face 3
+    ponies
       {
-        face = new Tri3;
+        ponies;
 
-        face->set_node(0) = this->get_node(2);
-        face->set_node(1) = this->get_node(3);
-        face->set_node(2) = this->get_node(4);
+        ponies);
+        ponies);
+        ponies);
 
-        break;
+        ponies;
       }
-    case 3:  // triangular face 4
+    ponies
       {
-        face = new Tri3;
+        ponies;
 
-        face->set_node(0) = this->get_node(3);
-        face->set_node(1) = this->get_node(0);
-        face->set_node(2) = this->get_node(4);
+        ponies);
+        ponies);
+        ponies);
 
-        break;
+        ponies;
       }
-    case 4:  // the quad face at z=0
+    ponies
       {
-        face = new Quad4;
+        ponies;
 
-        face->set_node(0) = this->get_node(0);
-        face->set_node(1) = this->get_node(3);
-        face->set_node(2) = this->get_node(2);
-        face->set_node(3) = this->get_node(1);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        break;
+        ponies;
       }
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
+    ponies:
+      ponies);
     }
 
-  return UniquePtr<Elem>(face);
+  ponies);
 }
 
 
 
-bool Pyramid::is_child_on_side(const unsigned int c,
-                               const unsigned int s) const
+ponies,
+                               ponies
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
+  ponies());
 
-  for (unsigned int i = 0; i != 4; ++i)
-    if (Pyramid5::side_nodes_map[s][i] == c)
-      return true;
-  return false;
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
 
 
-bool Pyramid::is_edge_on_side(const unsigned int e,
-                              const unsigned int s) const
+ponies,
+                              ponies
 {
-  libmesh_assert_less (e, this->n_edges());
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
+  ponies());
 
-  return (is_node_on_side(Pyramid5::edge_nodes_map[e][0],s) &&
-          is_node_on_side(Pyramid5::edge_nodes_map[e][1],s));
+  ponies) &&
+          ponies));
 }
 
 
 
-} // namespace libMesh
+} // ponies

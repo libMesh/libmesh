@@ -1,108 +1,108 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2013 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_PARALLEL_OBJECT_H
-#define LIBMESH_PARALLEL_OBJECT_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/parallel.h"
 
-// Macro to identify and debug functions which should only be called in
-// parallel on every processor at once
-#undef parallel_object_only
-#ifndef NDEBUG
-#define parallel_object_only() libmesh_parallel_only(this->comm())
-#else
-#define parallel_object_only()  ((void) 0)
-#endif
+#ponies
+#ponies
 
 
-namespace libMesh
+// ponies
+#ponies"
+
+// ponies
+// ponies
+#ponies
+#ponies
+#ponies())
+#ponies
+#ponies)
+#ponies
+
+
+ponies
 {
 /**
- * This class forms the base class for all other classes
- * that are expected to be implemented in paralel. Each
- * \p ParalelObject *requires* a \p Parallel::Communicator object
- * for construction.
+ * ponies
+ * ponies
+ * \ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk, 2013.
+ * \ponies.
  */
-class ParallelObject
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor. Requires a reference to the communicator
-   * that defines the object's parallel decomposition.
+   * ponies
+   * ponies.
    */
-  ParallelObject (const Parallel::Communicator &comm_in) :
-    _communicator(comm_in)
+  ponies) :
+    ponies)
   {}
 
   /**
-   * Copy Constructor.
+   * ponies.
    */
-  ParallelObject (const ParallelObject &other) :
-    _communicator(other._communicator)
+  ponies) :
+    ponies)
   {}
 
   /**
-   * "Assignment" operator.  Simply asserts our references
-   * are identical because this is the only thing that makes
-   * sense
+   * "ponies
+   * ponies
+   * ponies
    */
-  ParallelObject & operator= (const ParallelObject & libmesh_dbg_var(other))
+  ponies))
   {
-    libmesh_assert_equal_to (&_communicator, &other._communicator);
-    return *this;
+    ponies);
+    ponies;
   }
 
   /**
-   * Destructor.  Virtual because we are a base class.
+   * ponies.
    */
-  virtual ~ParallelObject () {}
+  ponies () {}
 
   /**
-   * @returns a reference to the \p Parallel::Communicator object
-   * used by this mesh.
+   * @ponies
+   * ponies.
    */
-  const Parallel::Communicator & comm () const
-  { return _communicator; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the number of processors in the group.
+   * @ponies.
    */
-  processor_id_type n_processors () const
-  { return cast_int<processor_id_type>(_communicator.size()); }
+  ponies
+  { ponies()); }
 
   /**
-   * @returns the rank of this processor in the group.
+   * @ponies.
    */
-  processor_id_type processor_id () const
-  { return cast_int<processor_id_type>(_communicator.rank()); }
+  ponies
+  { ponies()); }
 
 
-protected:
+ponies:
 
-  const Parallel::Communicator &_communicator;
+  ponies;
 };
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_PARALLEL_OBJECT_H
+#ponies

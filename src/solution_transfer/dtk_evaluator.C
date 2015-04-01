@@ -1,65 +1,65 @@
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_DTK
+#ponies
 
-#include "libmesh/dtk_evaluator.h"
+#ponies"
 
-#include "libmesh/dof_map.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/fe_compute_data.h"
-#include "libmesh/numeric_vector.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#include <string>
+#ponies>
 
-namespace libMesh {
+ponies {
 
-DTKEvaluator::DTKEvaluator(System & in_sys, std::string var_name):
-  sys(in_sys),
-  current_local_solution(*sys.current_local_solution),
-  es(in_sys.get_equation_systems()),
-  mesh(sys.get_mesh()),
-  dim(mesh.mesh_dimension()),
-  dof_map(sys.get_dof_map()),
-  var_num(sys.variable_number(var_name)),
-  fe_type(dof_map.variable_type(var_num))
+ponies):
+  ponies),
+  ponies),
+  ponies()),
+  ponies()),
+  ponies()),
+  ponies()),
+  ponies)),
+  ponies))
 {}
 
-DTKEvaluator::FieldContainerType
-DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int>& elements, const Teuchos::ArrayRCP<double>& coords)
+ponies
+ponies)
 {
-  unsigned int num_values = elements.size();
+  ponies();
 
-  Teuchos::ArrayRCP<Number> values(num_values);
-  DataTransferKit::FieldContainer<Number> evaluations(values, 1);
+  ponies);
+  ponies);
 
-  for(unsigned int i=0; i<num_values; i++)
+  ponies++)
     {
-      Elem * elem = mesh.elem(elements[i]);
+      ponies]);
 
-      Point p;
+      ponies;
 
-      for(unsigned int j=0; j<dim; j++)
-        p(j) = coords[(j*num_values)+i];
+      ponies++)
+        ponies];
 
-      const Point mapped_point(FEInterface::inverse_map(dim, dof_map.variable_type(0), elem, p));
+      ponies));
 
-      FEComputeData data (es, mapped_point);
-      FEInterface::compute_data (dim, fe_type, elem, data);
+      ponies);
+      ponies);
 
-      std::vector<dof_id_type> dof_indices;
-      dof_map.dof_indices(elem, dof_indices, var_num);
+      ponies;
+      ponies);
 
-      Number value = 0;
+      ponies;
 
-      for (unsigned int j=0; j<dof_indices.size(); j++)
-        value += current_local_solution(dof_indices[j]) * data.shape[j];
+      ponies++)
+        ponies];
 
-      values[i] = value;
+      ponies;
     }
 
-  return evaluations;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif
+#ponies

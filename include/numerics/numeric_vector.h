@@ -1,956 +1,956 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_NUMERIC_VECTOR_H
-#define LIBMESH_NUMERIC_VECTOR_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/enum_parallel_type.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/id_types.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/parallel_object.h"
-#include "libmesh/dense_subvector.h"
-#include "libmesh/dense_vector.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <set>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// forward declarations
-template <typename T> class NumericVector;
-template <typename T> class DenseVector;
-template <typename T> class DenseSubVector;
-template <typename T> class SparseMatrix;
-template <typename T> class ShellMatrix;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 /**
- * Numeric vector. Provides a uniform interface
- * to vector storage schemes for different linear
- * algebra libraries.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2003
+ * @ponies
  */
-template <typename T>
-class NumericVector : public ReferenceCountedObject<NumericVector<T> >,
-                      public ParallelObject
+ponies>
+ponies> >,
+                      ponies
 {
-public:
+ponies:
 
   /**
-   *  Dummy-Constructor. Dimension=0
+   *  ponies
    */
-  explicit
-  NumericVector (const Parallel::Communicator &comm_in,
-                 const ParallelType ptype = AUTOMATIC);
+  ponies
+  ponies,
+                 ponies);
 
   /**
-   * Constructor. Set dimension to \p n and initialize all elements with zero.
+   * ponies.
    */
-  explicit
-  NumericVector (const Parallel::Communicator &comm_in,
-                 const numeric_index_type n,
-                 const ParallelType ptype = AUTOMATIC);
+  ponies
+  ponies,
+                 ponies,
+                 ponies);
 
   /**
-   * Constructor. Set local dimension to \p n_local, the global dimension
-   * to \p n, and initialize all elements with zero.
+   * ponies
+   * ponies.
    */
-  NumericVector (const Parallel::Communicator &comm_in,
-                 const numeric_index_type n,
-                 const numeric_index_type n_local,
-                 const ParallelType ptype = AUTOMATIC);
+  ponies,
+                 ponies,
+                 ponies,
+                 ponies);
 
   /**
-   * Constructor. Set local dimension to \p n_local, the global
-   * dimension to \p n, but additionally reserve memory for the
-   * indices specified by the \p ghost argument.
+   * ponies
+   * ponies
+   * ponies.
    */
-  NumericVector (const Parallel::Communicator &comm_in,
-                 const numeric_index_type N,
-                 const numeric_index_type n_local,
-                 const std::vector<numeric_index_type>& ghost,
-                 const ParallelType ptype = AUTOMATIC);
+  ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies);
 
-public:
+ponies:
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * ponies
+   * ponies.
    */
-  virtual ~NumericVector ();
+  ponies ();
 
   /**
-   * Builds a \p NumericVector on the processors in communicator
-   * \p comm using the linear solver package specified by
-   * \p solver_package
+   * ponies
+   * \ponies
+   * \ponies
    */
-  static UniquePtr<NumericVector<T> >
-  build(const Parallel::Communicator &comm,
-        const SolverPackage solver_package = libMesh::default_solver_package());
+  ponies> >
+  ponies,
+        ponies());
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
+#ponies
   /**
-   * Builds a \p NumericVector on the processors in communicator
-   * CommWorld using the linear solver package specified by \p
-   * solver_package.  Deprecated.
+   * ponies
+   * ponies
+   * ponies.
    */
-  static UniquePtr<NumericVector<T> >
-  build(const SolverPackage solver_package = libMesh::default_solver_package());
-#endif
+  ponies> >
+  ponies());
+#ponies
 
   /**
-   * @returns true if the vector has been initialized,
-   * false otherwise.
+   * @ponies,
+   * ponies.
    */
-  virtual bool initialized() const { return _is_initialized; }
+  ponies; }
 
   /**
-   * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   * @ponies.
    */
-  ParallelType type() const { return _type; }
+  ponies; }
 
   /**
-   * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   * @ponies.
    */
-  ParallelType & type() { return _type; }
+  ponies; }
 
   /**
-   * @returns true if the vector is closed and ready for
-   * computation, false otherwise.
+   * @ponies
+   * ponies.
    */
-  virtual bool closed() const { return _is_closed; }
+  ponies; }
 
   /**
-   * Call the assemble functions
+   * ponies
    */
-  virtual void close () = 0;
+  ponies;
 
   /**
-   * @returns the \p NumericVector<T> to a pristine state.
+   * @ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
-   * faster.
+   * ponies
+   * ponies.
    */
-  virtual void zero () = 0;
+  ponies;
 
   /**
-   * Creates a vector which has the same type, size and partitioning
-   * as this vector, but whose data is all zero.  Returns it in an \p
-   * UniquePtr.
-   * This must be overloaded in the derived classes.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies.
    */
-  virtual UniquePtr<NumericVector<T> > zero_clone () const = 0;
+  ponies;
 
   /**
-   * Creates a copy of this vector and returns it in an \p UniquePtr.
-   * This must be overloaded in the derived classes.
+   * ponies.
+   * ponies.
    */
-  virtual UniquePtr<NumericVector<T> > clone () const = 0;
+  ponies;
 
   /**
-   * Change the dimension of the vector to \p N. The reserved memory for
-   * this vector remains unchanged if possible, to make things faster, but
-   * this may waste some memory, so take this in the back of your head.
-   * However, if \p N==0 all memory is freed, i.e. if you want to resize
-   * the vector and release the memory not needed, you have to first call
-   * \p init(0) and then \p init(N). This cited behaviour is analogous
-   * to that of the STL containers.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * \ponies
+   * ponies.
    *
-   * On \p fast==false, the vector is filled by
-   * zeros.
+   * ponies
+   * ponies.
    */
 
-  virtual void init (const numeric_index_type,
-                     const numeric_index_type,
-                     const bool = false,
-                     const ParallelType = AUTOMATIC) = 0;
+  ponies,
+                     ponies,
+                     ponies,
+                     ponies;
 
   /**
-   * call init with n_local = N,
+   * ponies,
    */
-  virtual void init (const numeric_index_type,
-                     const bool = false,
-                     const ParallelType = AUTOMATIC) = 0;
+  ponies,
+                     ponies,
+                     ponies;
 
   /**
-   * Create a vector that holds tha local indices plus those specified
-   * in the \p ghost argument.
+   * ponies
+   * ponies.
    */
-  virtual void init (const numeric_index_type /*N*/,
-                     const numeric_index_type /*n_local*/,
-                     const std::vector<numeric_index_type>& /*ghost*/,
-                     const bool /*fast*/ = false,
-                     const ParallelType = AUTOMATIC) = 0;
+  ponies*/,
+                     ponies*/,
+                     ponies*/,
+                     ponies,
+                     ponies;
 
   /**
-   * Creates a vector that has the same dimension and storage type as
-   * \p other, including ghost dofs.
+   * ponies
+   * \ponies.
    */
-  virtual void init (const NumericVector<T>& other,
-                     const bool fast = false) = 0;
+  ponies,
+                     ponies;
 
   /**
-   * \f$U(0-N) = s\f$: fill all components.
+   * \ponies.
    */
-  virtual NumericVector<T> & operator= (const T s) = 0;
+  ponies;
 
   /**
-   *  \f$U = V\f$: copy all components.
+   *  \ponies.
    */
-  virtual NumericVector<T> & operator= (const NumericVector<T> &V) = 0;
+  ponies;
 
   /**
-   *  \f$U = V\f$: copy all components.
+   *  \ponies.
    */
-  virtual NumericVector<T> & operator= (const std::vector<T> &v) = 0;
+  ponies;
 
   /**
-   * @returns the minimum element in the vector.
-   * In case of complex numbers, this returns the minimum
-   * Real part.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  virtual Real min () const = 0;
+  ponies;
 
   /**
-   * @returns the maximum element in the vector.
-   * In case of complex numbers, this returns the maximum
-   * Real part.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  virtual Real max () const = 0;
+  ponies;
 
   /**
-   * returns the sum of the elements in a vector
+   * ponies
    */
-  virtual T sum() const = 0;
+  ponies;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
-   * the sum of the absolute values.
+   * @ponies.
+   * ponies.
    */
-  virtual Real l1_norm () const = 0;
+  ponies;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
-   * the square root of the sum of the
-   * squares of the elements.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  virtual Real l2_norm () const = 0;
+  ponies;
 
   /**
-   * @returns the maximum absolute value of the
-   * elements of this vector, which is the
-   * \f$l_\infty\f$-norm of a vector.
+   * @ponies
+   * ponies
+   * \ponies.
    */
-  virtual Real linfty_norm () const = 0;
+  ponies;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
-   * the sum of the absolute values for the specified
-   * entries in the vector.
+   * @ponies.
+   * ponies
+   * ponies.
    *
-   * Note that the indices must necessary live on this
-   * processor.
+   * ponies
+   * ponies.
    */
-  virtual Real subset_l1_norm (const std::set<numeric_index_type> & indices) const;
+  ponies;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
-   * the square root of the sum of the
-   * squares of the elements for the specified entries
-   * in the vector.
+   * @ponies.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Note that the indices must necessary live on this
-   * processor.
+   * ponies
+   * ponies.
    */
-  virtual Real subset_l2_norm (const std::set<numeric_index_type> & indices) const;
+  ponies;
 
   /**
-   * @returns the maximum absolute value of the
-   * specified entries of this vector, which is the
-   * \f$l_\infty\f$-norm of a vector.
+   * @ponies
+   * ponies
+   * \ponies.
    *
-   * Note that the indices must necessary live on this
-   * processor.
+   * ponies
+   * ponies.
    */
-  virtual Real subset_linfty_norm (const std::set<numeric_index_type> & indices) const;
+  ponies;
 
   /**
-   * @returns dimension of the vector. This
-   * function was formerly called \p n(), but
-   * was renamed to get the \p NumericVector<T> class
-   * closer to the C++ standard library's
-   * \p std::vector container.
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  virtual numeric_index_type size () const = 0;
+  ponies;
 
   /**
-   * @returns the local size of the vector
-   * (index_stop-index_start).
-   * In ghost cell mode, this does *not* include the ghost cells.
+   * @ponies
+   * (ponies).
+   * ponies.
    */
-  virtual numeric_index_type local_size() const = 0;
+  ponies;
 
   /**
-   * @returns the index of the first vector element
-   * actually stored on this processor.  Hint: the
-   * minimum for this index is \p 0.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  virtual numeric_index_type first_local_index() const = 0;
+  ponies;
 
   /**
-   * @returns the index+1 of the last vector element
-   * actually stored on this processor.  Hint: the
-   * maximum for this index is \p size().
+   * @ponies
+   * ponies
+   * ponies().
    */
-  virtual numeric_index_type last_local_index() const = 0;
+  ponies;
 
   /**
-   * Access components, returns \p U(i).
+   * ponies).
    */
-  virtual T operator() (const numeric_index_type i) const = 0;
+  ponies;
 
   /**
-   * @returns the element \p U(i)
+   * @ponies)
    */
-  virtual T el(const numeric_index_type i) const { return (*this)(i); }
+  ponies); }
 
   /**
-   * Access multiple components at once.  \p values will *not* be
-   * reallocated; it should already have enough space.  The default
-   * implementation calls \p operator() for each index, but some
-   * implementations may supply faster methods here.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void get(const std::vector<numeric_index_type>& index, T* values) const;
+  ponies;
 
   /**
-   * Access multiple components at once.  \p values will be resized,
-   * if necessary, and filled.  The default implementation calls \p
-   * operator() for each index, but some implementations may supply
-   * faster methods here.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  void get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const;
+  ponies;
 
   /**
-   * Addition operator.
-   * Fast equivalent to \p U.add(1, V).
+   * ponies.
+   * ponies).
    */
-  virtual NumericVector<T> & operator += (const NumericVector<T> &V) = 0;
+  ponies;
 
   /**
-   * Subtraction operator.
-   * Fast equivalent to \p U.add(-1, V).
+   * ponies.
+   * ponies).
    */
-  virtual NumericVector<T> & operator -= (const NumericVector<T> &V) = 0;
+  ponies;
 
   /**
-   * Multiplication operator.
-   * Equivalent to \p U.scale(a)
+   * ponies.
+   * ponies)
    */
-  NumericVector<T> & operator *= (const T a) { this->scale(a); return *this; }
+  ponies; }
 
   /**
-   * Division operator.
-   * Equivalent to \p U.scale(1./a)
+   * ponies.
+   * ponies)
    */
-  NumericVector<T> & operator /= (const T a) { this->scale(1./a); return *this; }
+  ponies; }
 
   /**
-   * Pointwise Division operator. ie divide every entry in this vector by the entry in v
+   * ponies
    */
-  virtual NumericVector<T> & operator /= (NumericVector<T> & /*v*/) = 0;
+  ponies;
 
   /**
-   * Replace each entry v_i of this vector by its reciprocal, 1/v_i.
+   * ponies.
    */
-  virtual void reciprocal() = 0;
+  ponies;
 
   /**
-   * Replace each entry v_i = real(v_i) + imag(v_i)
-   * of this vector by its complex conjugate, real(v_i) - imag(v_i)
+   * ponies)
+   * ponies)
    */
-  virtual void conjugate() = 0;
+  ponies;
 
   /**
-   * v(i) = value
+   * ponies
    */
-  virtual void set (const numeric_index_type i, const T value) = 0;
+  ponies;
 
   /**
-   * v(i) += value
+   * ponies
    */
-  virtual void add (const numeric_index_type i, const T value) = 0;
+  ponies;
 
   /**
-   * \f$U(0-LIBMESH_DIM)+=s\f$.
-   * Addition of \p s to all components. Note
-   * that \p s is a scalar and not a vector.
+   * \ponies$.
+   * ponies
+   * ponies.
    */
-  virtual void add (const T s) = 0;
+  ponies;
 
   /**
-   * \f$U+=V\f$:
-   * Simple vector addition, equal to the
-   * \p operator +=.
+   * \ponies$:
+   * ponies
+   * \ponies +=.
    */
-  virtual void add (const NumericVector<T>& V) = 0;
+  ponies;
 
   /**
-   * \f$U+=a*V\f$.
-   * Simple vector addition, equal to the
-   * \p operator +=.
+   * \ponies$.
+   * ponies
+   * \ponies +=.
    */
-  virtual void add (const T a, const NumericVector<T>& v) = 0;
+  ponies;
 
   /**
-   * \f$ U+=v \f$ where v is a pointer and each \p dof_indices[i]
-   * specifies where to add value \p v[i]
+   * \ponies]
+   * ponies]
    *
-   * This should be overridden in subclasses for efficiency
+   * ponies
    */
-  virtual void add_vector (const T* v,
-                           const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                           ponies);
 
   /**
-   * \f$ U+=v \f$ where v is a std::vector and each \p dof_indices[i]
-   * specifies where to add value \p v[i]
+   * \ponies]
+   * ponies]
    */
-  void add_vector (const std::vector<T>& v,
-                   const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                   ponies);
 
   /**
-   * \f$ U+=v \f$ where v is a NumericVector and each \p dof_indices[i]
-   * specifies where to add value \p v(i)
+   * \ponies]
+   * ponies)
    */
-  virtual void add_vector (const NumericVector<T>& V,
-                           const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                           ponies);
 
   /**
-   * \f$ U+=v \f$ where v is a DenseVector and each \p dof_indices[i]
-   * specifies where to add value \p v(i)
+   * \ponies]
+   * ponies)
    */
-  void add_vector (const DenseVector<T>& V,
-                   const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                   ponies);
 
   /**
-   * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
-   * and a \p NumericVector \p V to \p this, where \p this=U.
+   * \ponies
+   * ponies.
    */
-  virtual void add_vector (const NumericVector<T>&,
-                           const SparseMatrix<T>&) = 0;
+  ponies>&,
+                           ponies;
 
   /**
-   * \f$U+=A*V\f$, add the product of a \p ShellMatrix \p A
-   * and a \p NumericVector \p V to \p this, where \p this=U.
+   * \ponies
+   * ponies.
    */
-  void add_vector (const NumericVector<T>& v,
-                   const ShellMatrix<T>& a);
+  ponies,
+                   ponies);
 
   /**
-   * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
-   * and a \p NumericVector \p V to \p this, where \p this=U.
+   * \ponies
+   * ponies.
    */
-  virtual void add_vector_transpose (const NumericVector<T>&,
-                                     const SparseMatrix<T>&) = 0;
+  ponies>&,
+                                     ponies;
 
   /**
-   * \f$ U=v \f$ where v is a \p T[] or T*
-   * and you want to specify WHERE to insert it
+   * \ponies*
+   * ponies
    */
-  virtual void insert (const T* v,
-                       const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                       ponies);
 
   /**
-   * \f$ U=v \f$ where v is a \p std::vector<T>
-   * and you want to specify WHERE to insert it
+   * \ponies>
+   * ponies
    */
-  void insert (const std::vector<T>& v,
-               const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+               ponies);
 
   /**
-   * \f$U=V\f$, where U and V are type
-   * NumericVector<T> and you
-   * want to specify WHERE to insert
-   * the NumericVector<T> V
+   * \ponies
+   * ponies
+   * ponies
+   * ponies
    */
-  virtual void insert (const NumericVector<T>& V,
-                       const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                       ponies);
 
   /**
-   * \f$ U=V \f$ where U and V are type
-   * DenseVector<T> and you
-   * want to specify WHERE to insert
-   * the DenseVector<T> V
+   * \ponies
+   * ponies
+   * ponies
+   * ponies
    */
-  void insert (const DenseVector<T>& V,
-               const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+               ponies);
 
   /**
-   * \f$ U=V \f$ where V is a
-   * DenseSubVector<T> and you
-   * want to specify WHERE to insert it
+   * \ponies
+   * ponies
+   * ponies
    */
-  void insert (const DenseSubVector<T>& V,
-               const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+               ponies);
 
   /**
-   * Scale each element of the
-   * vector by the given factor.
+   * ponies
+   * ponies.
    */
-  virtual void scale (const T factor) = 0;
+  ponies;
 
   /**
-   * v = abs(v)... that is, each entry in v is replaced
-   * by its absolute value.
+   * ponies
+   * ponies.
    */
-  virtual void abs() = 0;
+  ponies;
 
   /**
-   * Computes the dot product, p = U.V
+   * ponies
    */
-  virtual T dot(const NumericVector<T>&) const = 0;
+  ponies;
 
   /**
-   * Creates a copy of the global vector in the
-   * local vector \p v_local.
+   * ponies
+   * ponies.
    */
-  virtual void localize (std::vector<T>& v_local) const = 0;
+  ponies;
 
   /**
-   * Same, but fills a \p NumericVector<T> instead of
-   * a \p std::vector.
+   * ponies
+   * ponies.
    */
-  virtual void localize (NumericVector<T>& v_local) const = 0;
+  ponies;
 
   /**
-   * Creates a local vector \p v_local containing
-   * only information relevant to this processor, as
-   * defined by the \p send_list.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void localize (NumericVector<T>& v_local,
-                         const std::vector<numeric_index_type>& send_list) const = 0;
+  ponies,
+                         ponies;
 
   /**
-   * Updates a local vector with selected values from neighboring
-   * processors, as defined by \p send_list.
+   * ponies
+   * ponies.
    */
-  virtual void localize (const numeric_index_type first_local_idx,
-                         const numeric_index_type last_local_idx,
-                         const std::vector<numeric_index_type>& send_list) = 0;
+  ponies,
+                         ponies,
+                         ponies;
 
   /**
-   * Creates a local copy of the global vector in
-   * \p v_local only on processor \p proc_id.  By
-   * default the data is sent to processor 0.  This method
-   * is useful for outputting data from one processor.
+   * ponies
+   * \ponies
+   * ponies
+   * ponies.
    */
-  virtual void localize_to_one (std::vector<T>& v_local,
-                                const processor_id_type proc_id=0) const = 0;
+  ponies,
+                                ponies;
 
   /**
-   * @returns \p -1 when \p this is equivalent to \p other_vector,
-   * up to the given \p threshold.  When differences occur,
-   * the return value contains the first index \p i where
-   * the difference \p (a[i]-b[i]) exceeded the threshold.  When
-   * no threshold is given, the \p libMesh \p TOLERANCE
-   * is used.
+   * @ponies,
+   * ponies,
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual int compare (const NumericVector<T> &other_vector,
-                       const Real threshold = TOLERANCE) const;
+  ponies,
+                       ponies;
 
   /**
-   * @returns \p -1 when \p this is equivalent to \p other_vector,
-   * up to the given local relative \p threshold.  When differences
-   * occur, the return value contains the first index where
-   * the difference \p (a[i]-b[i])/max(a[i],b[i]) exceeded the
-   * threshold.  When no threshold is given, the \p libMesh
-   * \p TOLERANCE is used.
+   * @ponies,
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  virtual int local_relative_compare (const NumericVector<T> &other_vector,
-                                      const Real threshold = TOLERANCE) const;
+  ponies,
+                                      ponies;
 
   /**
-   * @returns \p -1 when \p this is equivalent to \p other_vector,
-   * up to the given local relative \p threshold.  When differences
-   * occur, the return value contains the first index where
-   * the difference \p (a[i]-b[i])/max_j(a[j],b[j]) exceeded the
-   * threshold.  When no threshold is given, the \p libMesh
-   * \p TOLERANCE is used.
+   * @ponies,
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  virtual int global_relative_compare (const NumericVector<T> &other_vector,
-                                       const Real threshold = TOLERANCE) const;
+  ponies,
+                                       ponies;
 
   /**
-   * Computes the pointwise (i.e. component-wise) product of \p vec1
-   * and \p vec2 and stores the result in \p *this.
+   * ponies
+   * ponies.
    */
-  virtual void pointwise_mult (const NumericVector<T>& vec1,
-                               const NumericVector<T>& vec2) = 0;
+  ponies,
+                               ponies;
 
   /**
-   * Prints the local contents of the vector, by default to
-   * libMesh::out
+   * ponies
+   * ponies
    */
-  virtual void print(std::ostream& os=libMesh::out) const;
+  ponies;
 
   /**
-   * Prints the global contents of the vector, by default to
-   * libMesh::out
+   * ponies
+   * ponies
    */
-  virtual void print_global(std::ostream& os=libMesh::out) const;
+  ponies;
 
   /**
-   * Same as above but allows you to use stream syntax.
+   * ponies.
    */
-  friend std::ostream& operator << (std::ostream& os, const NumericVector<T>& v)
+  ponies)
   {
-    v.print_global(os);
-    return os;
+    ponies);
+    ponies;
   }
 
   /**
-   * Print the contents of the matrix in Matlab's
-   * sparse matrix format. Optionally prints the
-   * matrix to the file named \p name.  If \p name
-   * is not specified it is dumped to the screen.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void print_matlab(const std::string& /*name*/ = "") const
+  ponies
   {
-    libmesh_not_implemented();
+    ponies();
   }
 
   /**
-   * Creates the subvector "subvector" from the indices in the
-   * "rows" array.  Similar to the create_submatrix routine for
-   * the SparseMatrix class, it is currently only implemented for
-   * PetscVectors.
+   * ponies
+   * "ponies
+   * ponies
+   * ponies.
    */
-  virtual void create_subvector(NumericVector<T>& ,
-                                const std::vector<numeric_index_type>& ) const
+  ponies>& ,
+                                ponies
   {
-    libmesh_not_implemented();
+    ponies();
   }
 
   /**
-   * Exchanges the values/sizes of two vectors.  There should be
-   * enough indirection in subclasses to make this an O(1) header-swap
-   * operation.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void swap (NumericVector<T> &v);
+  ponies);
 
-protected:
-
-  /**
-   * Flag to see if the Numeric
-   * assemble routines have been called yet
-   */
-  bool _is_closed;
+ponies:
 
   /**
-   * Flag to tell if init
-   * has been called yet
+   * ponies
+   * ponies
    */
-  bool _is_initialized;
+  ponies;
 
   /**
-   * Type of vector
+   * ponies
+   * ponies
    */
-  ParallelType _type;
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
 
-/*----------------------- Inline functions ----------------------------------*/
+/*----------------------- ponies ----------------------------------*/
 
 
 
-template <typename T>
-inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-                                 const ParallelType ptype) :
-  ParallelObject(comm_in),
-  _is_closed(false),
-  _is_initialized(false),
-  _type(ptype)
+ponies>
+ponies
+ponies,
+                                 ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <typename T>
-inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-                                 const numeric_index_type /*n*/,
-                                 const ParallelType ptype) :
-  ParallelObject(comm_in),
-  _is_closed(false),
-  _is_initialized(false),
-  _type(ptype)
+ponies>
+ponies
+ponies,
+                                 ponies*/,
+                                 ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  libmesh_not_implemented(); // Abstract base class!
-  // init(n, n, false, ptype);
+  ponies!
+  // ponies);
 }
 
 
 
-template <typename T>
-inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-                                 const numeric_index_type /*n*/,
-                                 const numeric_index_type /*n_local*/,
-                                 const ParallelType ptype) :
-  ParallelObject(comm_in),
-  _is_closed(false),
-  _is_initialized(false),
-  _type(ptype)
+ponies>
+ponies
+ponies,
+                                 ponies*/,
+                                 ponies*/,
+                                 ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  libmesh_not_implemented(); // Abstract base class!
-  // init(n, n_local, false, ptype);
+  ponies!
+  // ponies);
 }
 
 
 
-template <typename T>
-inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-                                 const numeric_index_type /*n*/,
-                                 const numeric_index_type /*n_local*/,
-                                 const std::vector<numeric_index_type>& /*ghost*/,
-                                 const ParallelType ptype) :
-  ParallelObject(comm_in),
-  _is_closed(false),
-  _is_initialized(false),
-  _type(ptype)
+ponies>
+ponies
+ponies,
+                                 ponies*/,
+                                 ponies*/,
+                                 ponies*/,
+                                 ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  libmesh_not_implemented(); // Abstract base class!
-  // init(n, n_local, ghost, false, ptype);
+  ponies!
+  // ponies);
 }
 
 
 
-template <typename T>
-inline
-NumericVector<T>::~NumericVector ()
+ponies>
+ponies
+ponies ()
 {
-  clear ();
+  ponies ();
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::clear ()
+ponies>
+ponies
+ponies ()
 {
-  _is_closed      = false;
-  _is_initialized = false;
+  ponies;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::get(const std::vector<numeric_index_type>& index, T* values) const
+ponies>
+ponies
+ponies
 {
-  const std::size_t num = index.size();
-  for(std::size_t i=0; i<num; i++)
+  ponies();
+  ponies++)
     {
-      values[i] = (*this)(index[i]);
+      ponies]);
     }
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
+ponies>
+ponies
+ponies
 {
-  const std::size_t num = index.size();
-  values.resize(num);
-  if (!num)
-    return;
+  ponies();
+  ponies);
+  ponies)
+    ponies;
 
-  this->get(index, &values[0]);
+  ponies]);
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::add_vector(const std::vector<T>& v,
-                                  const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies
+ponies,
+                                  ponies)
 {
-  libmesh_assert(v.size() == dof_indices.size());
-  if (!v.empty())
-    this->add_vector(&v[0], dof_indices);
+  ponies());
+  ponies())
+    ponies);
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::add_vector(const DenseVector<T>& v,
-                                  const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies
+ponies,
+                                  ponies)
 {
-  libmesh_assert(v.size() == dof_indices.size());
-  if (!v.empty())
-    this->add_vector(&v(0), dof_indices);
+  ponies());
+  ponies())
+    ponies);
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::insert(const std::vector<T>& v,
-                              const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies
+ponies,
+                              ponies)
 {
-  libmesh_assert(v.size() == dof_indices.size());
-  if (!v.empty())
-    this->insert(&v[0], dof_indices);
+  ponies());
+  ponies())
+    ponies);
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::insert(const DenseVector<T>& v,
-                              const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies
+ponies,
+                              ponies)
 {
-  libmesh_assert(v.size() == dof_indices.size());
-  if (!v.empty())
-    this->insert(&v(0), dof_indices);
+  ponies());
+  ponies())
+    ponies);
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::insert(const DenseSubVector<T>& v,
-                              const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies
+ponies,
+                              ponies)
 {
-  libmesh_assert(v.size() == dof_indices.size());
-  if (!v.empty())
-    this->insert(&v(0), dof_indices);
+  ponies());
+  ponies())
+    ponies);
 }
 
 
 
-// Full specialization of the print() member for complex
-// variables.  This must precede the non-specialized
-// version, at least according to icc v7.1
-template <>
-inline
-void NumericVector<Complex>::print(std::ostream& os) const
+// ponies
+// ponies
+// ponies
+ponies <>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
-  os << "Size\tglobal =  " << this->size()
-     << "\t\tlocal =  " << this->local_size() << std::endl;
+  ponies());
+  ponies()
+     << "\ponies;
 
-  // std::complex<>::operator<<() is defined, but use this form
-  os << "#\tReal part\t\tImaginary part" << std::endl;
-  for (numeric_index_type i=this->first_local_index(); i<this->last_local_index(); i++)
-    os << i << "\t"
-       << (*this)(i).real() << "\t\t"
-       << (*this)(i).imag() << std::endl;
+  // ponies
+  ponies;
+  ponies++)
+    ponies"
+       << (*ponies"
+       << (*ponies;
 }
 
 
 
-template <typename T>
-inline
-void NumericVector<T>::print(std::ostream& os) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
-  os << "Size\tglobal =  " << this->size()
-     << "\t\tlocal =  " << this->local_size() << std::endl;
+  ponies());
+  ponies()
+     << "\ponies;
 
-  os << "#\tValue" << std::endl;
-  for (numeric_index_type i=this->first_local_index(); i<this->last_local_index(); i++)
-    os << i << "\t" << (*this)(i) << std::endl;
+  ponies;
+  ponies++)
+    ponies;
 }
 
 
 
-template <>
-inline
-void NumericVector<Complex>::print_global(std::ostream& os) const
+ponies <>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  std::vector<Complex> v(this->size());
-  this->localize(v);
+  ponies());
+  ponies);
 
-  // Right now we only want one copy of the output
-  if (this->processor_id())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  os << "Size\tglobal =  " << this->size() << std::endl;
-  os << "#\tReal part\t\tImaginary part" << std::endl;
-  for (numeric_index_type i=0; i!=v.size(); i++)
-    os << i << "\t"
-       << v[i].real() << "\t\t"
-       << v[i].imag() << std::endl;
+  ponies;
+  ponies;
+  ponies++)
+    ponies"
+       << ponies"
+       << ponies;
 }
 
 
-template <typename T>
-inline
-void NumericVector<T>::print_global(std::ostream& os) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  std::vector<T> v(this->size());
-  this->localize(v);
+  ponies());
+  ponies);
 
-  // Right now we only want one copy of the output
-  if (this->processor_id())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  os << "Size\tglobal =  " << this->size() << std::endl;
-  os << "#\tValue" << std::endl;
-  for (numeric_index_type i=0; i!=v.size(); i++)
-    os << i << "\t" << v[i] << std::endl;
+  ponies;
+  ponies;
+  ponies++)
+    ponies;
 }
 
 
 
-template <typename T>
-inline
-void  NumericVector<T>::swap (NumericVector<T> &v)
+ponies>
+ponies
+ponies)
 {
-  std::swap(_is_closed, v._is_closed);
-  std::swap(_is_initialized, v._is_initialized);
-  std::swap(_type, v._type);
+  ponies);
+  ponies);
+  ponies);
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif  // LIBMESH_NUMERIC_VECTOR_H
+#ponies

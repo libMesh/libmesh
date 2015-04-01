@@ -1,135 +1,135 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
-#include <fstream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/off_io.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/face_tri3.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// OFFIO class members
+// ponies
 
-void OFFIO::read(const std::string& name)
+ponies)
 {
-  std::ifstream in (name.c_str());
+  ponies());
 
-  read_stream(in);
+  ponies);
 }
 
 
 
-void OFFIO::read_stream(std::istream& in)
+ponies)
 {
-  // This is a serial-only process for now;
-  // the Mesh should be read on processor 0 and
-  // broadcast later
-  libmesh_assert_equal_to (this->mesh().processor_id(), 0);
+  // ponies;
+  // ponies
+  // ponies
+  ponies);
 
-  // Get a reference to the mesh
-  MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
+  // ponies
+  ponies();
 
-  // Clear any existing mesh data
-  the_mesh.clear();
+  // ponies
+  ponies();
 
-  // Check the input buffer
-  libmesh_assert (in.good());
+  // ponies
+  ponies());
 
-  unsigned int nn, ne, nf;
+  ponies;
 
-  std::string label;
+  ponies;
 
-  // Read the first string.  It should say "OFF"
-  in >> label;
+  // ponies"
+  ponies;
 
-  libmesh_assert_equal_to (label, "OFF");
+  ponies");
 
-  // read the number of nodes, faces, and edges
-  in >> nn >> nf >> ne;
+  // ponies
+  ponies;
 
 
-  Real x=0., y=0., z=0.;
+  ponies.;
 
-  // Read the nodes
-  for (unsigned int n=0; n<nn; n++)
+  // ponies
+  ponies++)
     {
-      libmesh_assert (in.good());
+      ponies());
 
-      in >> x
-         >> y
-         >> z;
+      ponies
+         >> ponies
+         >> ponies;
 
-      the_mesh.add_point ( Point(x,y,z), n );
+      ponies );
     }
 
-  unsigned int nv, nid;
+  ponies;
 
-  // Read the elements
-  for (unsigned int e=0; e<nf; e++)
+  // ponies
+  ponies++)
     {
-      libmesh_assert (in.good());
+      ponies());
 
-      // The number of vertices in the element
-      in >> nv;
+      // ponies
+      ponies;
 
-      libmesh_assert(nv == 2 || nv == 3);
-      if (e == 0)
+      ponies);
+      ponies)
         {
-          the_mesh.set_mesh_dimension(cast_int<unsigned char>(nv-1));
-          if (nv == 3)
+          ponies));
+          ponies)
             {
-#if LIBMESH_DIM < 2
-              libmesh_error_msg("Cannot open dimension 2 mesh file when configured without 2D support.");
-#endif
+#ponies
+              ponies.");
+#ponies
             }
         }
 
-      Elem* elem;
-      switch (nv)
+      ponies;
+      ponies)
         {
-        case 2:
-          elem = new Edge2;
-          break;
+        ponies:
+          ponies;
+          ponies;
 
-        case 3:
-          elem = new Tri3;
-          break;
+        ponies:
+          ponies;
+          ponies;
 
-        default:
-          libmesh_error_msg("Unsupported nv = " << nv);
+        ponies:
+          ponies);
         }
 
-      elem->set_id(e);
-      the_mesh.add_elem (elem);
+      ponies);
+      ponies);
 
-      for (unsigned int i=0; i<nv; i++)
+      ponies++)
         {
-          in >> nid;
-          elem->set_node(i) = the_mesh.node_ptr(nid);
+          ponies;
+          ponies);
         }
     }
 }
 
-} // namespace libMesh
+} // ponies

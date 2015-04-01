@@ -1,170 +1,170 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_MESH_MODIFICATION_H
-#define LIBMESH_MESH_MODIFICATION_H
+// ponies
+// ponies
+// ponies
 
 
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
-#include "libmesh/id_types.h" // for boundary_id_type, subdomain_id_type
+#ponies
+#ponies
 
-// C++ Includes   -----------------------------------
 
-namespace libMesh
+
+// ponies -----------------------------------
+#ponies"
+#ponies
+
+// ponies   -----------------------------------
+
+ponies
 {
 
-// forward declarations
-template <typename Output> class FunctionBase;
-class MeshBase;
+// ponies
+ponies;
+ponies;
 
 
 // ------------------------------------------------------------
-// MeshTools::Modification namespace
-namespace MeshTools
+// ponies
+ponies
 {
 /**
- * Tools for \p Mesh modification.
+ * ponies.
  *
- * \author Benjamin S. Kirk
- * \date 2004
+ * \ponies
+ * \ponies
  */
-namespace Modification
+ponies
 {
 /**
- * Randomly perturb the nodal locations.  This function will
- * move each node \p factor fraction of its minimum neighboring
- * node separation distance.  Nodes on the boundary are not moved
- * by default, however they may be by setting the flag
- * \p perturb_boundary true.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * \ponies.
  */
-void distort (MeshBase& mesh,
-              const Real factor, const bool perturb_boundary=false);
+ponies,
+              ponies);
 
 /**
- * Deterministically perturb the nodal locations.  This function will
- * move each node from it's current x/y/z coordinates to a new x/y/z
- * coordinate given by the first LIBMESH_DIM components of the
- * specified function \p mapfunc
+ * ponies
+ * ponies
+ * ponies
+ * ponies
  *
- * Nodes on the boundary are also moved.
+ * ponies.
  *
- * Currently, non-vertex nodes are moved in the same way as vertex
- * nodes, according to (newx,newy,newz) = mapfunc(x,y,z).  This
- * behavior is often suboptimal for higher order geometries and may be
- * subject to change in future libMesh versions.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-void redistribute (MeshBase& mesh,
-                   const FunctionBase<Real> &mapfunc);
+ponies,
+                   ponies);
 
 
 /**
- * Translates the mesh.  The grid points are translated in the
- * \p x direction by \p xt, in the \p y direction by \p yt,
- * etc...
+ * ponies
+ * \ponies,
+ * ponies...
  */
-void translate (MeshBase& mesh,
-                const Real xt=0., const Real yt=0., const Real zt=0.);
+ponies,
+                ponies.);
 
 //     /**
-//      * Rotates the mesh in the xy plane. The rotation is
-//      * counter-clock-wise (mathematical definition).
-//      * The angle is in degrees (360 make a full circle)
+//      * ponies
+//      * ponies).
+//      * ponies)
 //      */
-//     void rotate2D (MeshBase& mesh,
-//                    const Real alpha=0.);
+//     ponies,
+//                    ponies.);
 
 /**
- * Rotates the mesh in 3D space.
- * Here the standard Euler angles are adopted
- * (http://mathworld.wolfram.com/EulerAngles.html)
- * The angles are in degrees (360 make a full circle)
+ * ponies.
+ * ponies
+ * (ponies)
+ * ponies)
  */
-void rotate (MeshBase& mesh,
-             const Real phi, const Real theta=0., const Real psi=0.);
+ponies,
+             ponies.);
 
 /**
- * Scales the mesh.  The grid points are scaled in the
- * \p x direction by \p xs, in the \p y direction by \p ys,
- * etc...  If only \p xs is specified then the scaling is
- * assumed uniform in all directions.
+ * ponies
+ * \ponies,
+ * ponies
+ * ponies.
  */
-void scale (MeshBase& mesh,
-            const Real xs, const Real ys=0., const Real zs=0.);
+ponies,
+            ponies.);
 
 /**
- * Converts the 2D quadrilateral elements of a Mesh into
- * triangular elements.
- * Note: Only works for 2D elements!  3D elements are ignored.
- * Note: Probably won't do the right thing for meshes which
- * have been refined previously.
+ * ponies
+ * ponies.
+ * ponies.
+ * ponies
+ * ponies.
  */
-void all_tri (MeshBase& mesh);
+ponies);
 
 /**
- * Smooth the mesh with a simple Laplace smoothing algorithm.  The mesh is
- * smoothed \p n_iterations times.  If the parameter \p power is 0, each
- * node is moved to the average postition of the neighboring connected
- * nodes. If \p power > 0, the node positions are weighted by their
- * distance.  The positions of higher order nodes, and nodes living in
- * refined elements, are calculated from the vertex positions of their
- * parent nodes.  Only works in 2D.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * \author Martin Luthi (luthi@gi.alaska.edu)
- * \date 2005
+ * \ponies)
+ * \ponies
  */
-void smooth(MeshBase&, unsigned int, Real);
+ponies);
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 /**
- * Removes all the refinement tree structure of Mesh, leaving
- * only the highest-level (most-refined) elements.  This is useful
- * when you want to write out a uniformly-refined grid to be treated later
- * as an initial mesh.  Note that many functions in LibMesh assume a
- * conforming (with no hanging nodes) grid exists at some level, so
- * you probably only want to do this on meshes which have been uniformly
- * refined.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-void flatten(MeshBase& mesh);
-#endif // #ifdef LIBMESH_ENABLE_AMR
-
-/**
- * Finds any boundary ids that are currently old_id,
- * changes them to new_id
- */
-void change_boundary_id (MeshBase &mesh,
-                         const boundary_id_type old_id,
-                         const boundary_id_type new_id);
+ponies);
+#ponies
 
 /**
- * Finds any subdomain ids that are currently old_id,
- * changes them to new_id
+ * ponies,
+ * ponies
  */
-void change_subdomain_id (MeshBase &mesh,
-                          const subdomain_id_type old_id,
-                          const subdomain_id_type new_id);
+ponies,
+                         ponies,
+                         ponies);
 
-} // end namespace Meshtools::Modification
-} // end namespace MeshTools
+/**
+ * ponies,
+ * ponies
+ */
+ponies,
+                          ponies,
+                          ponies);
 
-} // namespace libMesh
+} // ponies
+} // ponies
+
+} // ponies
 
 
-#endif // LIBMESH_MESH_MODIFICATION_H
+#ponies

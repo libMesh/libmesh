@@ -1,640 +1,640 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_EQUATION_SYSTEMS_H
-#define LIBMESH_EQUATION_SYSTEMS_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/parameters.h"
-#include "libmesh/system.h"
-#include "libmesh/enum_xdr_mode.h"
-#include "libmesh/parallel_object.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// HP aCC needs these for some reason
-#ifdef __HP_aCC
-# include "libmesh/frequency_system.h"
-# include "libmesh/transient_system.h"
-# include "libmesh/newmark_system.h"
-# include "libmesh/steady_system.h"
-#endif
+// ponies
+#ponies
+# ponies"
+# ponies"
+# ponies"
+# ponies"
+#ponies
 
-// C++ includes
-#include <cstddef>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class MeshData;
-class Elem;
-class MeshBase;
+// ponies
+ponies;
+ponies;
+ponies;
 
 /**
- * This is the \p EquationSystems class.  It is in charge
- * of handling all the various equation systems defined
- * for a \p MeshBase.  It may have multiple systems, which may
- * be active or inactive, so that at different solution
- * stages only a sub-set may be solved for.  Also, through
- * the templated access, @e different types of systems
- * may be handled.  Also other features, like flags,
- * parameters, I/O etc are provided.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies,
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2002-2007
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// EquationSystems class definition
-class EquationSystems : public ReferenceCountedObject<EquationSystems>,
-                        public ParallelObject
+// ponies
+ponies>,
+                        ponies
 
 {
-public:
+ponies:
 
   /**
-   * Define enumeration to set properties in EquationSystems::read()
+   * ponies()
    */
-  enum ReadFlags { READ_HEADER           = 1,
-                   READ_DATA             = 2,
-                   READ_ADDITIONAL_DATA  = 4,
-                   READ_LEGACY_FORMAT    = 8,
-                   TRY_READ_IFEMS        = 16,
-                   READ_BASIC_ONLY       = 32 };
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies };
 
   /**
-   * Define enumeration to set properties in EquationSystems::write()
+   * ponies()
    */
-  enum WriteFlags { WRITE_DATA             = 1,
-                    WRITE_ADDITIONAL_DATA  = 2,
-                    WRITE_PARALLEL_FILES   = 4,
-                    WRITE_SERIAL_FILES     = 8 };
+  ponies,
+                    ponies,
+                    ponies,
+                    ponies };
 
   /**
-   * Constructor.
+   * ponies.
    */
-  EquationSystems (MeshBase& mesh, MeshData* mesh_data=NULL);
+  ponies);
 
   /**
-   * Destructor.  Should be virtual, since the user may want to derive
-   * subclasses of EquationSystems.
+   * ponies
+   * ponies.
    */
-  virtual ~EquationSystems ();
+  ponies ();
 
   /**
-   * Returns tha data structure to a pristine state.
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Initialize all the systems
+   * ponies
    */
-  virtual void init ();
+  ponies ();
 
   /**
-   * Reinitialize all the systems
+   * ponies
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * Updates local values for all the systems
+   * ponies
    */
-  void update ();
+  ponies ();
 
   /**
-   * @returns the number of equation systems.
+   * @ponies.
    */
-  unsigned int n_systems() const;
+  ponies;
 
   /**
-   * @returns true if the system named \p name exists within
-   * this EquationSystems object.
+   * @ponies
+   * ponies.
    */
-  bool has_system (const std::string& name) const;
+  ponies;
 
   /**
-   * @returns a constant reference to the system named \p name.
-   * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
-   * is an example of how the method might be used
+   * @ponies.
+   * ponies,
+   * ponies");
+   * ponies
    */
-  template <typename T_sys>
-  const T_sys & get_system (const std::string& name) const;
+  ponies>
+  ponies;
 
   /**
-   * @returns a writeable referene to the system named \p name.
-   * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> ("sys");
-   * is an example of how the method might be used
+   * @ponies.
+   * ponies,
+   * ponies");
+   * ponies
    */
-  template <typename T_sys>
-  T_sys & get_system (const std::string& name);
+  ponies>
+  ponies);
 
   /**
-   * @returns a constant reference to system number \p num.
-   * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
-   * is an example of how the method might be used
+   * @ponies.
+   * ponies,
+   * ponies);
+   * ponies
    */
-  template <typename T_sys>
-  const T_sys & get_system (const unsigned int num) const;
+  ponies>
+  ponies;
 
   /**
-   * @returns a writeable referene to the system number \p num.
-   * The template argument defines the return type.  For example,
-   * const SteadySystem& sys = eq.get_system<SteadySystem> (0);
-   * is an example of how the method might be used
+   * @ponies.
+   * ponies,
+   * ponies);
+   * ponies
    */
-  template <typename T_sys>
-  T_sys & get_system (const unsigned int num);
+  ponies>
+  ponies);
 
   /**
-   * @returns a constant reference to the system named \p name.
+   * @ponies.
    */
-  const System & get_system (const std::string& name) const;
+  ponies;
 
   /**
-   * @returns a writeable referene to the system named \p name.
+   * @ponies.
    */
-  System & get_system (const std::string& name);
+  ponies);
 
   /**
-   * @returns a constant reference to system number \p num.
+   * @ponies.
    */
-  const System & get_system (const unsigned int num) const;
+  ponies;
 
   /**
-   * @returns a writeable referene to the system number \p num.
+   * @ponies.
    */
-  System & get_system (const unsigned int num);
+  ponies);
 
   /**
-   * Add the system of type \p system_type named \p name to the
-   * systems array.
+   * ponies
+   * ponies.
    */
-  virtual System & add_system (const std::string& system_type,
-                               const std::string& name);
+  ponies,
+                               ponies);
 
   /**
-   * Add the system named \p name to the systems array.
+   * ponies.
    */
-  template <typename T_sys>
-  T_sys & add_system (const std::string& name);
+  ponies>
+  ponies);
 
   /**
-   * Remove the system named \p name from the systems array.
-   * This function is now deprecated - write the
-   * libmesh-devel mailing list if you need it reimplemented.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void delete_system (const std::string& name);
+  ponies);
 
   /**
-   * @returns the total number of variables in all
-   * systems.
+   * @ponies
+   * ponies.
    */
-  unsigned int n_vars () const;
+  ponies;
 
   /**
-   * @returns the total number of degrees of freedom
-   * in all systems.
+   * @ponies
+   * ponies.
    */
-  std::size_t n_dofs () const;
+  ponies;
 
   /**
-   * Returns the number of active degrees of freedom
-   * for the EquationSystems object.
+   * ponies
+   * ponies.
    */
-  std::size_t n_active_dofs() const;
+  ponies;
 
   /**
-   * Call \p solve on all the individual equation systems.
+   * ponies.
    *
-   * By default this function solves each equation system once,
-   * in the order they were added.  For more sophisticated decoupled
-   * problems the user may with to override this behavior in a derived
-   * class.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void solve ();
+  ponies ();
 
   /**
-   * Call \p adjoint_solve on all the individual equation systems.
+   * ponies.
    *
-   * By default this function solves each system's adjoint once,
-   * in the reverse order from that in which they were added.  For
-   * more sophisticated decoupled problems the user may with to
-   * override this behavior in a derived class.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void adjoint_solve (const QoISet& qoi_indices = QoISet());
+  ponies());
 
   /**
-   * Call \p sensitivity_solve on all the individual equation systems.
+   * ponies.
    *
-   * By default this function solves each sensitivity system once,
-   * in the order in which in which they were added.  For
-   * more sophisticated decoupled problems the user may with to
-   * override this behavior in a derived class.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void sensitivity_solve (const ParameterVector& parameters);
+  ponies);
 
   /**
-   * Fill the input vector \p var_names with the names
-   * of the variables for each system. If \p type is passed,
-   * only variables of the specified type will be populated.
-   * If systems_names!=NULL, only include names from the
-   * specified systems.
+   * ponies
+   * ponies,
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void build_variable_names (std::vector<std::string>& var_names,
-                             const FEType *type=NULL,
-                             const std::set<std::string>* system_names=NULL) const;
+  ponies,
+                             ponies,
+                             ponies;
 
   /**
-   * Fill the input vector \p soln with the solution values for the
-   * system named \p name.  Note that the input
-   * vector \p soln will only be assembled on processor 0, so this
-   * method is only applicable to outputting plot files from processor 0.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void build_solution_vector (std::vector<Number>& soln,
-                              const std::string& system_name,
-                              const std::string& variable_name = "all_vars") const;
+  ponies,
+                              ponies,
+                              ponies;
 
   /**
-   * Fill the input vector \p soln with solution values.  The
-   * entries will be in variable-major format (corresponding to
-   * the names from \p build_variable_names()).
-   * If systems_names!=NULL, only include data from the
-   * specified systems.
+   * ponies
+   * ponies
+   * ponies()).
+   * ponies
+   * ponies.
    */
-  void build_solution_vector (std::vector<Number>& soln,
-                              const std::set<std::string>* system_names=NULL) const;
+  ponies,
+                              ponies;
 
   /**
-   * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
-   * is populated, only the variables corresponding to those names will
-   * be retrieved.  This can be used to filter which variables are retrieved.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void get_solution( std::vector<Number> & soln,
-                     std::vector<std::string> & names) const;
+  ponies,
+                     ponies;
 
   /**
-   * Fill the input vector \p soln with solution values.  The
-   * entries will be in variable-major format (corresponding to
-   * the names from \p build_variable_names()).
-   * If systems_names!=NULL, only include data from the
-   * specified systems.
+   * ponies
+   * ponies
+   * ponies()).
+   * ponies
+   * ponies.
    */
-  void build_discontinuous_solution_vector (std::vector<Number>& soln,
-                                            const std::set<std::string>* system_names=NULL) const;
+  ponies,
+                                            ponies;
 
   /**
-   * Read & initialize the systems from disk using the XDR data format.
-   * This format allows for machine-independent binary output.
+   * ponies.
+   * ponies.
    *
-   * Set which sections of the file to read by bitwise OR'ing the
-   * EquationSystems::ReadFlags enumeration together. For example, to
-   * read all sections of the file, set read_flags to:
-   * (READ_HEADER | READ_DATA | READ_ADDITIONAL_DATA)
+   * ponies
+   * ponies
+   * ponies:
+   * (ponies)
    *
-   * Note that the equation system can be defined without initializing
-   * the data vectors to any solution values.  This can be done
-   * by omitting READ_DATA in the read_flags parameter.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * If XdrMODE is omitted, it will be inferred as READ for filenames
-   * containing .xda or as DECODE for filenames containing .xdr
+   * ponies
+   * ponies
    *
-   * @param partition_agnostic If true then the mesh and degrees of freedom
-   * will be temporarily renumbered in a partition agnostic way so that
-   * files written using "n" mpi processes can be re-read on "m" mpi
-   * processes.  Note that this renumbering is not compatible with meshes
-   * that have two nodes in exactly the same position!
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies!
    */
-  template <typename InValType>
-  void read (const std::string& name,
-             const XdrMODE,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA),
-             bool partition_agnostic = true);
+  ponies>
+  ponies,
+             ponies,
+             ponies),
+             ponies);
 
-  void read (const std::string& name,
-             const XdrMODE mode,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA),
-             bool partition_agnostic = true)
-  { read<Number>(name, mode, read_flags, partition_agnostic); }
+  ponies,
+             ponies,
+             ponies),
+             ponies)
+  { ponies); }
 
-  template <typename InValType>
-  void read (const std::string& name,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA),
-             bool partition_agnostic = true);
+  ponies>
+  ponies,
+             ponies),
+             ponies);
 
-  void read (const std::string& name,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA),
-             bool partition_agnostic = true)
-  { read<Number>(name, read_flags, partition_agnostic); }
+  ponies,
+             ponies),
+             ponies)
+  { ponies); }
 
 
   /**
-   * Write the systems to disk using the XDR data format.
-   * This format allows for machine-independent binary output.
+   * ponies.
+   * ponies.
    *
-   * Set the writing properties using the EquationSystems::WriteFlags
-   * enumeration. Set which sections to write out by bitwise OR'ing
-   * the enumeration values. Write everything by setting write_flags to:
-   * (WRITE_DATA | WRITE_ADDITIONAL_DATA)
+   * ponies
+   * ponies
+   * ponies:
+   * (ponies)
    *
-   * Note that the solution data can be omitted by calling
-   * this routine with WRITE_DATA omitted in the write_flags argument.
+   * ponies
+   * ponies.
    *
-   * If XdrMODE is omitted, it will be inferred as WRITE for filenames
-   * containing .xda or as ENCODE for filenames containing .xdr
+   * ponies
+   * ponies
    *
-   * @param partition_agnostic If true then the mesh and degrees of freedom
-   * will be temporarily renumbered in a partition agnostic way so that
-   * files written using "n" mpi processes can be re-read on "m" mpi
-   * processes.  Note that this renumbering is not compatible with meshes
-   * that have two nodes in exactly the same position!
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies!
    */
-  void write (const std::string& name,
-              const XdrMODE,
-              const unsigned int write_flags=(WRITE_DATA),
-              bool partition_agnostic = true) const;
+  ponies,
+              ponies,
+              ponies),
+              ponies;
 
-  void write (const std::string& name,
-              const unsigned int write_flags=(WRITE_DATA),
-              bool partition_agnostic = true) const;
+  ponies,
+              ponies),
+              ponies;
 
   /**
-   * @returns \p true when this equation system contains
-   * identical data, up to the given threshold.  Delegates
-   * most of the comparisons to perform to the responsible
-   * systems
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
    */
-  virtual bool compare (const EquationSystems& other_es,
-                        const Real threshold,
-                        const bool verbose) const;
+  ponies,
+                        ponies,
+                        ponies;
 
   /**
-   * @returns a string containing information about the
-   * systems, flags, and parameters.
+   * @ponies
+   * ponies.
    */
-  virtual std::string get_info() const;
+  ponies;
 
   /**
-   * Prints information about the equation systems, by default to
-   * libMesh::out.
+   * ponies
+   * ponies.
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  ponies;
 
   /**
-   * Same as above, but allows you to also use stream syntax.
+   * ponies.
    */
-  friend std::ostream& operator << (std::ostream& os, const EquationSystems& es);
+  ponies);
 
   /**
-   * @returns a constant reference to the mesh
+   * @ponies
    */
-  const MeshBase & get_mesh() const;
+  ponies;
 
   /**
-   * @returns a reference to the mesh
+   * @ponies
    */
-  MeshBase & get_mesh();
+  ponies();
 
   /**
-   * @returns true when the _mesh_data pointer is not NULL.
-   * This is needed because get_mesh_data will fail if it is NULL
+   * @ponies.
+   * ponies
    */
-  bool has_mesh_data() const;
+  ponies;
 
   /**
-   * @returns a constant reference to the mesh_data
+   * @ponies
    */
-  const MeshData & get_mesh_data() const;
+  ponies;
 
   /**
-   * @returns a reference to the mesh_data
+   * @ponies
    */
-  MeshData & get_mesh_data();
+  ponies();
 
   /**
-   * Serializes a distributed mesh and its associated
-   * degree of freedom numbering for all systems
+   * ponies
+   * ponies
    **/
-  void allgather ();
+  ponies ();
 
 
   /**
-   * Data structure holding arbitrary parameters.
+   * ponies.
    */
-  Parameters parameters;
+  ponies;
 
 
-protected:
+ponies:
 
 
   /**
-   * The mesh data structure
+   * ponies
    */
-  MeshBase& _mesh;
+  ponies;
 
   /**
-   * A pointer to the MeshData object you would like to use.
-   * Can be NULL.
+   * ponies.
+   * ponies.
    */
-  MeshData* _mesh_data;
+  ponies;
 
   /**
-   * Data structure holding the systems.
+   * ponies.
    */
-  std::map<std::string, System*> _systems;
+  ponies;
 
   /**
-   * Typedef for system iterators
+   * ponies
    */
-  typedef std::map<std::string, System*>::iterator       system_iterator;
+  ponies;
 
   /**
-   * Typedef for constatnt system iterators
+   * ponies
    */
-  typedef std::map<std::string, System*>::const_iterator const_system_iterator;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Actual read implementation.  This can be called repeatedly
-   * inside a try-catch block in an attempt to read broken files.
+   * ponies
+   * ponies.
    *
-   * @param partition_agnostic If true then the mesh and degrees of freedom
-   * will be temporarily renumbered in a partition agnostic way so that
-   * files written using "n" mpi processes can be re-read on "m" mpi
-   * processes.  Note that this renumbering is not compatible with meshes
-   * that have two nodes in exactly the same position!
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies!
    */
-  template <typename InValType>
-  void _read_impl (const std::string& name,
-                   const XdrMODE,
-                   const unsigned int read_flags,
-                   bool partition_agnostic = true);
+  ponies>
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies);
 
   /**
-   * This function is used in the implementation of add_system,
-   * it loops over the nodes and elements of the Mesh, adding the
-   * system to each one.  The main reason to separate this part
-   * is to avoid coupling this header file to mesh.h, and elem.h.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  void _add_system_to_nodes_and_elems();
+  ponies();
 };
 
 
 
 // ------------------------------------------------------------
-// EquationSystems inline methods
-inline
-const MeshBase & EquationSystems::get_mesh () const
+// ponies
+ponies
+ponies
 {
-  return _mesh;
+  ponies;
 }
 
 
 
-inline
-MeshBase & EquationSystems::get_mesh ()
+ponies
+ponies ()
 {
-  return _mesh;
+  ponies;
 }
 
 
-inline
-const MeshData & EquationSystems::get_mesh_data () const
+ponies
+ponies
 {
-  libmesh_assert(_mesh_data);
-  return *_mesh_data;
+  ponies);
+  ponies;
 }
 
 
-inline
-MeshData & EquationSystems::get_mesh_data ()
+ponies
+ponies ()
 {
-  libmesh_assert(_mesh_data);
-  return *_mesh_data;
+  ponies);
+  ponies;
 }
 
-inline
-bool EquationSystems::has_mesh_data () const
+ponies
+ponies
 {
-  return (_mesh_data!=NULL);
-}
-
-
-inline
-unsigned int EquationSystems::n_systems () const
-{
-  return cast_int<unsigned int>(_systems.size());
+  ponies);
 }
 
 
-
-
-template <typename T_sys>
-inline
-T_sys & EquationSystems::add_system (const std::string& name)
+ponies
+ponies
 {
-  T_sys* ptr = NULL;
+  ponies());
+}
 
-  if (!_systems.count(name))
+
+
+
+ponies>
+ponies
+ponies)
+{
+  ponies;
+
+  ponies))
     {
-      ptr = new T_sys(*this, name, this->n_systems());
+      ponies());
 
-      _systems.insert (std::make_pair(name, ptr));
+      ponies));
 
-      // Tell all the \p DofObject entities to add a system.
-      this->_add_system_to_nodes_and_elems();
+      // ponies.
+      ponies();
     }
-  else
+  ponies
     {
-      // We now allow redundant add_system calls, to make it
-      // easier to load data from files for user-derived system
-      // subclasses
-      ptr = &(this->get_system<T_sys>(name));
+      // ponies
+      // ponies
+      // ponies
+      ponies));
     }
 
-  // Return a dynamically casted reference to the newly added System.
-  return *ptr;
+  // ponies.
+  ponies;
 }
 
 
 
-inline
-bool EquationSystems::has_system (const std::string& name) const
+ponies
+ponies
 {
-  if (_systems.find(name) == _systems.end())
-    return false;
-  return true;
+  ponies())
+    ponies;
+  ponies;
 }
 
 
 
 
-template <typename T_sys>
-inline
-const T_sys & EquationSystems::get_system (const unsigned int num) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_less (num, this->n_systems());
+  ponies());
 
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
-    if (pos->second->number() == num)
-      break;
+  ponies)
+    ponies)
+      ponies;
 
-  // Check for errors
-  if (pos == end)
-    libmesh_error_msg("ERROR: no system number " << num << " found!");
+  // ponies
+  ponies)
+    ponies!");
 
-  // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  // ponies
+  ponies);
 }
 
 
 
 
-template <typename T_sys>
-inline
-T_sys & EquationSystems::get_system (const unsigned int num)
+ponies>
+ponies
+ponies)
 {
-  libmesh_assert_less (num, this->n_systems());
+  ponies());
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
-    if (pos->second->number() == num)
-      break;
+  ponies)
+    ponies)
+      ponies;
 
-  // Check for errors
-  if (pos == end)
-    libmesh_error_msg("ERROR: no system number " << num << " found!");
+  // ponies
+  ponies)
+    ponies!");
 
-  // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  // ponies
+  ponies);
 }
 
 
@@ -642,18 +642,18 @@ T_sys & EquationSystems::get_system (const unsigned int num)
 
 
 
-template <typename T_sys>
-inline
-const T_sys & EquationSystems::get_system (const std::string& name) const
+ponies>
+ponies
+ponies
 {
-  const_system_iterator pos = _systems.find(name);
+  ponies);
 
-  // Check for errors
-  if (pos == _systems.end())
-    libmesh_error_msg("ERROR: no system named \"" << name << "\" found!");
+  // ponies
+  ponies())
+    ponies!");
 
-  // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  // ponies
+  ponies);
 }
 
 
@@ -661,18 +661,18 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
 
 
 
-template <typename T_sys>
-inline
-T_sys & EquationSystems::get_system (const std::string& name)
+ponies>
+ponies
+ponies)
 {
-  system_iterator pos = _systems.find(name);
+  ponies);
 
-  // Check for errors
-  if (pos == _systems.end())
-    libmesh_error_msg("ERROR: no system named " << name << " found!");
+  // ponies
+  ponies())
+    ponies!");
 
-  // Attempt dynamic cast
-  return *cast_ptr<T_sys*>(pos->second);
+  // ponies
+  ponies);
 }
 
 
@@ -681,38 +681,38 @@ T_sys & EquationSystems::get_system (const std::string& name)
 
 
 
-inline
-const System & EquationSystems::get_system (const std::string& name) const
+ponies
+ponies
 {
-  return this->get_system<System>(name);
+  ponies);
 }
 
 
 
-inline
-System & EquationSystems::get_system (const std::string& name)
+ponies
+ponies)
 {
-  return this->get_system<System>(name);
+  ponies);
 }
 
 
 
-inline
-const System & EquationSystems::get_system (const unsigned int num) const
+ponies
+ponies
 {
-  return this->get_system<System>(num);
+  ponies);
 }
 
 
 
-inline
-System & EquationSystems::get_system (const unsigned int num)
+ponies
+ponies)
 {
-  return this->get_system<System>(num);
+  ponies);
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_EQUATION_SYSTEMS_H
+#ponies

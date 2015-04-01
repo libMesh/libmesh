@@ -1,79 +1,79 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_ELEM_ASSEMBLY_H
-#define LIBMESH_ELEM_ASSEMBLY_H
+#ponies
+#ponies
 
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/system.h"
-#include "libmesh/node.h"
+#ponies"
+#ponies"
+#ponies"
 
 
-namespace libMesh
+ponies
 {
 
-class FEMContext;
+ponies;
 
 /**
- * ElemAssembly provides a per-element (interior and boundary) assembly
- * functionality.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
-class ElemAssembly : public ReferenceCountedObject<ElemAssembly>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  ElemAssembly () {}
+  ponies () {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~ElemAssembly () {}
+  ponies () {}
 
   /**
-   * Perform the element interior assembly.
+   * ponies.
    */
-  virtual void interior_assembly(FEMContext& ) { }
+  ponies& ) { }
 
   /**
-   * Perform the element boundary assembly.
+   * ponies.
    */
-  virtual void boundary_assembly(FEMContext& ) { }
+  ponies& ) { }
 
   /**
-   * Get values to add to the RHS vector based on \p node.
-   * This allows one to impose point loads, for example.
+   * ponies.
+   * ponies.
    */
-  virtual void
-  get_nodal_rhs_values(std::map<numeric_index_type, Number>& values,
-                       const System& ,
-                       const Node& )
+  ponies
+  ponies,
+                       ponies& ,
+                       ponies& )
   {
-    // By default, just clear the values map
-    values.clear();
+    // ponies
+    ponies();
   }
 
 };
 
 }
 
-#endif // LIBMESH_ELEM_ASSEMBLY_H
+#ponies

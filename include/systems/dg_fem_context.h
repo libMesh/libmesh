@@ -1,308 +1,308 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_DG_FEM_CONTEXT_H
-#define LIBMESH_DG_FEM_CONTEXT_H
-
-// Local Includes
-#include "libmesh/fem_context.h"
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+#ponies
+#ponies
+
+// ponies
+#ponies"
+
+
+ponies
 {
 
 /**
- * This class extends FEMContext in order to provide extra data
- * required to perform local element residual and Jacobian assembly
- * in the case of a discontinuous Galerkin (DG) discretization.
+ * ponies
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// DGFEMContext class definition
+// ponies
 
-class DGFEMContext : public FEMContext
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Allocates some but fills no data structures.
+   * ponies.
    */
-  explicit
-  DGFEMContext (const System &sys);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~DGFEMContext ();
+  ponies ();
 
   /**
-   * Override side_fe_reinit to set a boolean flag so that by
-   * default DG terms are assumed to be inactive. DG terms are
-   * only active if neighbor_side_fe_reinit is called.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void side_fe_reinit ();
+  ponies ();
 
   /**
-   * Initialize neighbor side data needed to assemble DG terms.
-   * The neighbor element is determined by the current value of
-   * get_neighbor().
+   * ponies.
+   * ponies
+   * ponies().
    */
-  void neighbor_side_fe_reinit ();
+  ponies ();
 
   /**
-   * Accessor for neighbor dof indices
+   * ponies
    */
-  const std::vector<dof_id_type>& get_neighbor_dof_indices() const
-  { return _neighbor_dof_indices; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for element dof indices of a particular variable corresponding
-   * to the index argument.
+   * ponies
+   * ponies.
    */
-  const std::vector<dof_id_type>& get_neighbor_dof_indices( unsigned int var ) const
-  { return _neighbor_dof_indices_var[var]; }
+  ponies
+  { ponies]; }
 
   /**
-   * Const accessor for neighbor residual.
+   * ponies.
    */
-  const DenseVector<Number>& get_neighbor_residual() const
-  { return _neighbor_residual; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for neighbor residual.
+   * ponies.
    */
-  DenseVector<Number>& get_neighbor_residual()
-  { return _neighbor_residual; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for neighbor residual of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  const DenseSubVector<Number>& get_neighbor_residual( unsigned int var ) const
-  { return *(_neighbor_subresiduals[var]); }
+  ponies
+  { ponies]); }
 
   /**
-   * Non-const accessor for neighbor residual of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  DenseSubVector<Number>& get_neighbor_residual( unsigned int var )
-  { return *(_neighbor_subresiduals[var]); }
+  ponies )
+  { ponies]); }
 
   /**
-   * Const accessor for element-element Jacobian.
+   * ponies.
    */
-  const DenseMatrix<Number>& get_elem_elem_jacobian() const
-  { return _elem_elem_jacobian; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element-element Jacobian.
+   * ponies.
    */
-  DenseMatrix<Number>& get_elem_elem_jacobian()
-  { return _elem_elem_jacobian; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for element-element Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  const DenseSubMatrix<Number>& get_elem_elem_jacobian( unsigned int var1, unsigned int var2 ) const
-  { return *(_elem_elem_subjacobians[var1][var2]); }
+  ponies
+  { ponies]); }
 
   /**
-   * Non-const accessor for element-element Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  DenseSubMatrix<Number>& get_elem_elem_jacobian( unsigned int var1, unsigned int var2 )
-  { return *(_elem_elem_subjacobians[var1][var2]); }
+  ponies )
+  { ponies]); }
 
   /**
-   * Const accessor for element-neighbor Jacobian.
+   * ponies.
    */
-  const DenseMatrix<Number>& get_elem_neighbor_jacobian() const
-  { return _elem_neighbor_jacobian; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element -neighborJacobian.
+   * ponies.
    */
-  DenseMatrix<Number>& get_elem_neighbor_jacobian()
-  { return _elem_neighbor_jacobian; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for element-neighbor Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  const DenseSubMatrix<Number>& get_elem_neighbor_jacobian( unsigned int var1, unsigned int var2 ) const
-  { return *(_elem_neighbor_subjacobians[var1][var2]); }
+  ponies
+  { ponies]); }
 
   /**
-   * Non-const accessor for element-neighbor Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  DenseSubMatrix<Number>& get_elem_neighbor_jacobian( unsigned int var1, unsigned int var2 )
-  { return *(_elem_neighbor_subjacobians[var1][var2]); }
+  ponies )
+  { ponies]); }
 
   /**
-   * Const accessor for element-neighbor Jacobian.
+   * ponies.
    */
-  const DenseMatrix<Number>& get_neighbor_elem_jacobian() const
-  { return _neighbor_elem_jacobian; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element Jacobian.
+   * ponies.
    */
-  DenseMatrix<Number>& get_neighbor_elem_jacobian()
-  { return _neighbor_elem_jacobian; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for neighbor-element Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  const DenseSubMatrix<Number>& get_neighbor_elem_jacobian( unsigned int var1, unsigned int var2 ) const
-  { return *(_neighbor_elem_subjacobians[var1][var2]); }
+  ponies
+  { ponies]); }
 
   /**
-   * Non-const accessor for neighbor-element Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  DenseSubMatrix<Number>& get_neighbor_elem_jacobian( unsigned int var1, unsigned int var2 )
-  { return *(_neighbor_elem_subjacobians[var1][var2]); }
+  ponies )
+  { ponies]); }
 
   /**
-   * Const accessor for element-neighbor Jacobian.
+   * ponies.
    */
-  const DenseMatrix<Number>& get_neighbor_neighbor_jacobian() const
-  { return _neighbor_neighbor_jacobian; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element Jacobian.
+   * ponies.
    */
-  DenseMatrix<Number>& get_neighbor_neighbor_jacobian()
-  { return _neighbor_neighbor_jacobian; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for neighbor-neighbor Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  const DenseSubMatrix<Number>& get_neighbor_neighbor_jacobian( unsigned int var1, unsigned int var2 ) const
-  { return *(_neighbor_neighbor_subjacobians[var1][var2]); }
+  ponies
+  { ponies]); }
 
   /**
-   * Non-const accessor for neighbor-neighbor Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  DenseSubMatrix<Number>& get_neighbor_neighbor_jacobian( unsigned int var1, unsigned int var2 )
-  { return *(_neighbor_neighbor_subjacobians[var1][var2]); }
+  ponies )
+  { ponies]); }
 
   /**
-   * Set the neighbor element which we will use to assemble DG terms.
-   * Note that we do not assume that this element is get_elem().neighbor(side)
-   * because we also need to be able to handle the special case of DG terms on
-   * "cracks" in a mesh to model certain types of interface conditions. In this
-   * case, we need to be able to specify the neighbor element manually.
-   * Also, this should give us more flexibility to handle non-conforming meshes.
+   * ponies.
+   * ponies)
+   * ponies
+   * "ponies
+   * ponies.
+   * ponies.
    */
-  void set_neighbor(const Elem& neighbor)
-  { _neighbor = &neighbor; }
+  ponies)
+  { ponies; }
 
   /**
-   * Accessor for current neighbor Elem object for assembling DG terms.
+   * ponies.
    */
-  const Elem& get_neighbor() const
-  { return *_neighbor; }
+  ponies
+  { ponies; }
 
   /**
-   * Are the DG terms active, i.e. have they been assembled?
+   * ponies?
    */
-  bool dg_terms_are_active() const
-  { return _dg_terms_active; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for neighbor edge/face (2D/3D) finite element object for variable var.
+   * ponies.
    */
-  template<typename OutputShape>
-  void get_neighbor_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+  ponies>
+  ponies;
 
-private:
-
-  /**
-   * Current neighbor element for assembling DG terms.
-   */
-  const Elem *_neighbor;
+ponies:
 
   /**
-   * Residual vector of the neighbor component.
+   * ponies.
    */
-  DenseVector<Number> _neighbor_residual;
+  ponies;
 
   /**
-   * The DG Jacobian terms.
-   * Trial and test functions come from either element or neighbor.
+   * ponies.
    */
-  DenseMatrix<Number> _elem_elem_jacobian;
-  DenseMatrix<Number> _elem_neighbor_jacobian;
-  DenseMatrix<Number> _neighbor_elem_jacobian;
-  DenseMatrix<Number> _neighbor_neighbor_jacobian;
+  ponies;
 
   /**
-   * Element residual subvectors and Jacobian submatrices
+   * ponies.
+   * ponies.
    */
-  std::vector<DenseSubVector<Number> *> _neighbor_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_elem_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_neighbor_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _neighbor_elem_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _neighbor_neighbor_subjacobians;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Global Degree of freedom index lists for the neighbor element
+   * ponies
    */
-  std::vector<dof_id_type> _neighbor_dof_indices;
-  std::vector<std::vector<dof_id_type> > _neighbor_dof_indices_var;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Finite element objects for each variable's
-   * sides on the neighbor element.
-   * We do not need FE objects for neighbor element
-   * interior since we just need to handle DG interface
-   * terms here.
+   * ponies
    */
-  std::map<FEType, FEAbstract *> _neighbor_side_fe;
+  ponies;
+  ponies;
 
   /**
-   * Pointers to the same finite element objects on the neighbor element,
-   * but indexed by variable number
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<FEAbstract *> _neighbor_side_fe_var;
+  ponies;
 
   /**
-   * Boolean flag to indicate whether or not the DG terms have been
-   * assembled and should be used in the global matrix assembly.
+   * ponies,
+   * ponies
    */
-  bool _dg_terms_active;
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
 };
 
-template<typename OutputShape>
-inline
-void DGFEMContext::get_neighbor_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_less ( var, _neighbor_side_fe_var.size() );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( _neighbor_side_fe_var[var] );
+  ponies() );
+  ponies] );
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FEM_CONTEXT_H
+#ponies

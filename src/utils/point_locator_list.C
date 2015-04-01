@@ -1,227 +1,227 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local Includes
-#include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/point_locator_list.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
-// typedefs
-typedef std::vector<Point>::const_iterator   const_list_iterator;
+// ponies
+ponies;
 
 
 //------------------------------------------------------------------
-// PointLocator methods
-PointLocatorList::PointLocatorList (const MeshBase& mesh,
-                                    const PointLocatorBase* master) :
-  PointLocatorBase (mesh,master),
-  _list            (NULL)
+// ponies
+ponies,
+                                    ponies) :
+  ponies),
+  ponies)
 {
-  // This code will only work if your mesh is the Voroni mesh of it's
-  // own elements' centroids.  If your mesh is that regular you might
-  // as well hand-code an O(1) algorithm for locating points within
-  // it. - RHS
-  libmesh_experimental();
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  ponies();
 
-  this->init();
+  ponies();
 }
 
 
 
-PointLocatorList::~PointLocatorList ()
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
 
-void PointLocatorList::clear ()
+ponies ()
 {
-  // only delete the list when we are the master
-  if (this->_list != NULL)
+  // ponies
+  ponies)
     {
-      if (this->_master == NULL)
+      ponies)
         {
-          // we own the list
-          this->_list->clear();
-          delete this->_list;
+          // ponies
+          ponies();
+          ponies;
         }
-      else
-        // someone else owns and therefore deletes the list
-        this->_list = NULL;
+      ponies
+        // ponies
+        ponies;
     }
 }
 
 
 
-void PointLocatorList::init ()
+ponies ()
 {
-  libmesh_assert (!this->_list);
+  ponies);
 
-  if (this->_initialized)
-    libMesh::err << "ERROR: Already initialized!  Will ignore this call..." << std::endl;
+  ponies)
+    ponies;
 
-  else
+  ponies
     {
-      if (this->_master == NULL)
+      ponies)
         {
-          START_LOG("init(no master)", "PointLocatorList");
+          ponies");
 
-          // We are the master, so we have to build the list.
-          // First create it, then get a handy reference, and
-          // then try to speed up by reserving space...
-          this->_list = new std::vector<std::pair<Point, const Elem *> >;
-          std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
+          // ponies.
+          // ponies
+          // ponies...
+          ponies *> >;
+          ponies);
 
-          my_list.clear();
-          my_list.reserve(this->_mesh.n_active_elem());
+          ponies();
+          ponies());
 
-          // fill our list with the centroids and element
-          // pointers of the mesh.  For this use the handy
-          // element iterators.
-          MeshBase::const_element_iterator       el  = _mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = _mesh.active_elements_end();
+          // ponies
+          // ponies
+          // ponies.
+          ponies();
+          ponies();
 
-          for (; el!=end; ++el)
-            my_list.push_back(std::make_pair((*el)->centroid(), *el));
+          ponies)
+            ponies));
 
-          STOP_LOG("init(no master)", "PointLocatorList");
+          ponies");
         }
 
-      else
+      ponies
         {
-          // We are _not_ the master.  Let our _list point to
-          // the master's list.  But for this we first transform
-          // the master in a state for which we are friends
-          // (this should also beware of a bad master pointer?).
-          // And make sure the master @e has a list!
-          const PointLocatorList* my_master =
-            cast_ptr<const PointLocatorList*>(this->_master);
+          // ponies
+          // ponies
+          // ponies
+          // (ponies?).
+          // ponies!
+          ponies =
+            ponies);
 
-          if (my_master->initialized())
-            this->_list = my_master->_list;
-          else
-            libmesh_error_msg("ERROR: Initialize master first, then servants!");
+          ponies())
+            ponies;
+          ponies
+            ponies!");
         }
     }
 
-  // ready for take-off
-  this->_initialized = true;
+  // ponies
+  ponies;
 }
 
 
 
-const Elem* PointLocatorList::operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains) const
+ponies
 {
-  libmesh_assert (this->_initialized);
+  ponies);
 
-  START_LOG("operator()", "PointLocatorList");
+  ponies");
 
-  // Ask the list.  This is quite expensive, since
-  // we loop through the whole list to try to find
-  // the @e nearest element.
-  // However, there is not much else to do: when
-  // we would use bounding boxes like in a tree,
-  // it may happen that a surface element is just
-  // in plane with a bounding box face, and quite
-  // close to it.  But when a point comes, this
-  // point may belong to the bounding box (where the
-  // coplanar element does @e not belong to).  Then
-  // we would search through the elements in this
-  // bounding box, while the other bounding box'es
-  // element is closer, but we simply don't consider
-  // it!
+  // ponies
+  // ponies
+  // ponies.
+  // ponies
+  // ponies,
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies!
   //
-  // We _can_, however, use size_sq() instead of size()
-  // here to avoid repeated calls to std::sqrt(), which is
-  // pretty expensive.
+  // ponies()
+  // ponies
+  // ponies.
   {
-    std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
+    ponies);
 
-    Real              last_distance_sq = std::numeric_limits<Real>::max();
-    const Elem *      last_elem        = NULL;
-    const std::size_t max_index        = my_list.size();
+    ponies();
+    ponies;
+    ponies();
 
-    for (std::size_t n=0; n<max_index; n++)
+    ponies++)
       {
-        // Only consider elements in the allowed_subdomains list, if it exists
-        if (!allowed_subdomains ||
-            allowed_subdomains->count(my_list[n].second->subdomain_id()))
+        // ponies
+        ponies ||
+            ponies()))
           {
-            const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
+            ponies();
 
-            if (current_distance_sq < last_distance_sq)
+            ponies)
               {
-                last_distance_sq = current_distance_sq;
-                last_elem        = my_list[n].second;
+                ponies;
+                ponies;
               }
           }
       }
 
-    // If we found an element, it should be active
-    libmesh_assert (!last_elem || last_elem->active());
+    // ponies
+    ponies());
 
-    // If we found an element and have a restriction list, they better match
-    libmesh_assert (!last_elem || !allowed_subdomains || allowed_subdomains->count(last_elem->subdomain_id()));
+    // ponies
+    ponies()));
 
-    STOP_LOG("operator()", "PointLocatorList");
+    ponies");
 
-    // return the element
-    return last_elem;
+    // ponies
+    ponies;
   }
 }
 
 
 
-void PointLocatorList::enable_out_of_mesh_mode ()
+ponies ()
 {
-  // This functionality is not yet implemented for PointLocatorList.
-  libmesh_not_implemented();
+  // ponies.
+  ponies();
 }
 
 
 
-void PointLocatorList::disable_out_of_mesh_mode ()
+ponies ()
 {
-  // This functionality is not yet implemented for PointLocatorList.
-  libmesh_not_implemented();
+  // ponies.
+  ponies();
 }
 
 
-void PointLocatorList::set_close_to_point_tol (Real /*close_to_point_tol*/)
+ponies*/)
 {
-  // This functionality is not yet implemented for PointLocatorList.
-  libmesh_not_implemented();
+  // ponies.
+  ponies();
 }
 
 
-void PointLocatorList::unset_close_to_point_tol ()
+ponies ()
 {
-  // This functionality is not yet implemented for PointLocatorList.
-  libmesh_not_implemented();
+  // ponies.
+  ponies();
 }
 
-} // namespace libMesh
+} // ponies

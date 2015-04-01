@@ -1,180 +1,180 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_EDGE_EDGE4_H
-#define LIBMESH_EDGE_EDGE4_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/edge.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * The \p Edge4 is an element in 1D composed of 4 nodes. It is numbered
- * like this:
+ * ponies
+ * ponies:
  *
- * \verbatim
- *  EGDE4: o----o----o----o
- *         0    2    3    1
- * \endverbatim
+ * \ponies
+ *  ponies
+ *         ponies
+ * \ponies
  */
-class Edge4 : public Edge
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor. By default this element has no parent.
+   * ponies.
    */
-  explicit
-  Edge4 (Elem* p=NULL) :
-    Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
+  ponies
+  ponies) :
+    ponies) {}
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_less(i, this->n_nodes());
-    if (i < 2)
-      return Point(2.0f*i-1,0,0);
-    return Point((Real(2)*i-5)/3,0,0);
+    ponies());
+    ponies)
+      ponies);
+    ponies);
   }
 
   /**
-   * @returns 4
+   * @ponies
    */
-  unsigned int n_nodes() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 2
+   * @ponies
    */
-  unsigned int n_sub_elem() const { return 2; }
+  ponies; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @ponies.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @ponies.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @ponies.
    */
-  virtual bool is_face(const unsigned int i) const;
+  ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge (i.e. "returns true" in 1D)
+   * @ponies
+   * ponies)
    */
-  virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @ponies
+   * ponies
    */
-  virtual bool has_affine_map () const;
+  ponies;
 
   /**
-   * @returns \p EDGE4
+   * @ponies
    */
-  ElemType type()  const { return EDGE4; }
+  ponies; }
 
   /**
-   * @returns THIRD
+   * @ponies
    */
-  Order default_order() const { return THIRD; }
+  ponies; }
 
-  virtual void connectivity(const unsigned int sc,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
-
-  /**
-   */
-  unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-  { libmesh_not_implemented(); return 0;  }
+  ponies,
+                            ponies,
+                            ponies;
 
   /**
    */
-  unsigned short int second_order_adjacent_vertex (const unsigned int,
-                                                   const unsigned int) const
-  { libmesh_not_implemented(); return 0; }
-
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  ponies
+  { ponies;  }
 
   /**
-   * @returns \p false.  This is a finite element.
    */
-  bool infinite () const { return false; }
+  ponies,
+                                                   ponies
+  { ponies; }
 
-#endif
 
-
-protected:
+#ponies
 
   /**
-   * Data for links to nodes
+   * @ponies.
    */
-  Node* _nodelinks_data[4];
+  ponies; }
+
+#ponies
 
 
-
-#ifdef LIBMESH_ENABLE_AMR
+ponies:
 
   /**
-   * Matrix used to create the elements children.
+   * ponies
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
-  { return _embedding_matrix[i][j][k]; }
+  ponies];
+
+
+
+#ponies
 
   /**
-   * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
+   * ponies.
    */
-  static const float _embedding_matrix[2][4][4];
+  ponies,
+                          ponies,
+                          ponies
+  { ponies]; }
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies];
 
-#endif // LIBMESH_ENABLE_AMR
+  ponies;
+
+#ponies
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_EDGE_EDGE4_H
+#ponies

@@ -1,66 +1,66 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ENUM_NORM_TYPE_H
-#define LIBMESH_ENUM_NORM_TYPE_H
+#ponies
+#ponies
 
 // ------------------------------------------------------------
-// enum FEMNormType definition
-namespace libMesh {
+// ponies
+ponies {
 
 /**
- * \enum libMesh::FEMNormType defines an \p enum for norms
- * defined on vectors of finite element coefficients
+ * \ponies
+ * ponies
  */
-// Hilbert norms and seminorms in FE space
-enum FEMNormType {L2              = 0,
-                  H1              = 1,
-                  H2              = 2,
-                  HCURL           = 3,
-                  HDIV            = 4,
+// ponies
+ponies,
+                  ponies,
+                  ponies,
+                  ponies,
+                  ponies,
 
-                  L1              = 5,
-                  L_INF           = 6,
+                  ponies,
+                  ponies,
 
-                  H1_SEMINORM     = 10,
+                  ponies,
 
-                  H2_SEMINORM     = 11,
+                  ponies,
 
-                  HCURL_SEMINORM  = 12,
+                  ponies,
 
-                  HDIV_SEMINORM   = 13,
+                  ponies,
 
-                  W1_INF_SEMINORM = 15,
-                  W2_INF_SEMINORM = 16,
+                  ponies,
+                  ponies,
 
-                  // discrete norms on coefficient vectors
-                  DISCRETE_L1     = 20,
-                  DISCRETE_L2     = 21,
-                  DISCRETE_L_INF  = 22,
+                  // ponies
+                  ponies,
+                  ponies,
+                  ponies,
 
-                  // Seminorms based on only individual gradient
-                  // directional components
-                  H1_X_SEMINORM    = 31,
-                  H1_Y_SEMINORM    = 32,
-                  H1_Z_SEMINORM    = 33,
+                  // ponies
+                  // ponies
+                  ponies,
+                  ponies,
+                  ponies,
 
-                  INVALID_NORM    = 42};
+                  ponies};
 }
 
-#endif // LIBMESH_ENUM_NORM_TYPE_H
+#ponies

@@ -1,681 +1,681 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <fstream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/libmesh_config.h"
-#include "libmesh/vtk_io.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/edge_edge3.h"
-#include "libmesh/face_tri3.h"
-#include "libmesh/face_tri6.h"
-#include "libmesh/face_quad4.h"
-#include "libmesh/face_quad8.h"
-#include "libmesh/face_quad9.h"
-#include "libmesh/cell_tet4.h"
-#include "libmesh/cell_tet10.h"
-#include "libmesh/cell_prism6.h"
-#include "libmesh/cell_prism15.h"
-#include "libmesh/cell_prism18.h"
-#include "libmesh/cell_pyramid5.h"
-#include "libmesh/cell_hex8.h"
-#include "libmesh/cell_hex20.h"
-#include "libmesh/cell_hex27.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/system.h"
-#include "libmesh/mesh_data.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_HAVE_VTK
+#ponies
 
-// Tell VTK not to use old header files
-#define VTK_LEGACY_REMOVE
+// ponies
+#ponies
 
-// I get a lot of "warning: extra ';' inside a class [-Wextra-semi]" from clang
-// on VTK header files.
-#include "libmesh/ignore_warnings.h"
+// ponies
+// ponies.
+#ponies"
 
-#include "vtkXMLUnstructuredGridReader.h"
-#include "vtkXMLUnstructuredGridWriter.h"
-#include "vtkXMLPUnstructuredGridWriter.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkGenericGeometryFilter.h"
-#include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkConfigure.h"
-#include "vtkDoubleArray.h"
-#include "vtkPointData.h"
-#include "vtkPoints.h"
-#include "vtkSmartPointer.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#include "libmesh/restore_warnings.h"
+#ponies"
 
-// A convenient macro for comparing VTK versions.  Returns 1 if the
-// current VTK version is < major.minor.subminor and zero otherwise.
+// ponies
+// ponies.
 //
-// It relies on the VTK version numbers detected during configure.  Note that if
-// LIBMESH_HAVE_VTK is not defined, none of the LIBMESH_DETECTED_VTK_VERSION_* variables will
-// be defined either.
-#define VTK_VERSION_LESS_THAN(major,minor,subminor)                     \
-  ((LIBMESH_DETECTED_VTK_VERSION_MAJOR < (major) ||                     \
-    (LIBMESH_DETECTED_VTK_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_VTK_VERSION_MINOR < (minor) || \
-                                                       (LIBMESH_DETECTED_VTK_VERSION_MINOR == (minor) && \
-                                                        LIBMESH_DETECTED_VTK_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
+// ponies
+// ponies
+// ponies.
+#ponies)                     \
+  ((ponies) ||                     \
+    (ponies) || \
+                                                       (ponies) && \
+                                                        ponies)
 
 
 
 
-#endif //LIBMESH_HAVE_VTK
+#ponies
 
-namespace libMesh
+ponies
 {
 
-#ifdef LIBMESH_HAVE_VTK
-vtkIdType VTKIO::get_elem_type(ElemType type)
+#ponies
+ponies)
 {
-  vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
+  ponies
 
-  switch(type)
+  ponies)
     {
-    case EDGE2:
-      celltype = VTK_LINE;
-      break;
-    case EDGE3:
-      celltype = VTK_QUADRATIC_EDGE;
-      break;// 1
-    case TRI3:
-    case TRI3SUBDIVISION:
-      celltype = VTK_TRIANGLE;
-      break;// 3
-    case TRI6:
-      celltype = VTK_QUADRATIC_TRIANGLE;
-      break;// 4
-    case QUAD4:
-      celltype = VTK_QUAD;
-      break;// 5
-    case QUAD8:
-      celltype = VTK_QUADRATIC_QUAD;
-      break;// 6
-    case TET4:
-      celltype = VTK_TETRA;
-      break;// 8
-    case TET10:
-      celltype = VTK_QUADRATIC_TETRA;
-      break;// 9
-    case HEX8:
-      celltype = VTK_HEXAHEDRON;
-      break;// 10
-    case HEX20:
-      celltype = VTK_QUADRATIC_HEXAHEDRON;
-      break;// 12
-    case HEX27:
-      celltype = VTK_TRIQUADRATIC_HEXAHEDRON;
-      break;
-    case PRISM6:
-      celltype = VTK_WEDGE;
-      break;// 13
-    case PRISM15:
-      celltype = VTK_QUADRATIC_WEDGE;
-      break;// 14
-    case PRISM18:
-      celltype = VTK_BIQUADRATIC_QUADRATIC_WEDGE;
-      break;// 15
-    case PYRAMID5:
-      celltype = VTK_PYRAMID;
-      break;// 16
-#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-    case QUAD9:
-      celltype = VTK_BIQUADRATIC_QUAD;
-      break;
-#else
-    case QUAD9:
-#endif
-    case EDGE4:
-    case INFEDGE2:
-    case INFQUAD4:
-    case INFQUAD6:
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
-    case INFPRISM6:
-    case INFPRISM12:
-    case NODEELEM:
-    case INVALID_ELEM:
-    default:
-      libmesh_error_msg("Element type " << type << " not implemented.");
+    ponies:
+      ponies;
+      ponies;
+    ponies:
+      ponies;
+      ponies
+    ponies:
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies;
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+    ponies:
+      ponies;
+      ponies
+#ponies)
+    ponies:
+      ponies;
+      ponies;
+#ponies
+    ponies:
+#ponies
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+      ponies.");
     }
-  return celltype;
+  ponies;
 }
 
 
 
-void VTKIO::nodes_to_vtk()
+ponies()
 {
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  ponies();
 
-  // containers for points and coordinates of points
-  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-  vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
-  pcoords->SetNumberOfComponents(LIBMESH_DIM);
-  points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
+  // ponies
+  ponies();
+  ponies();
+  ponies);
+  ponies
 
-  unsigned int local_node_counter = 0;
+  ponies;
 
-  MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
-  MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (; nd != nd_end; nd++, ++local_node_counter)
+  ponies();
+  ponies();
+  ponies)
     {
-      Node* node = (*nd);
+      ponies);
 
-      double pnt[LIBMESH_DIM];
-      for (unsigned int i=0; i<LIBMESH_DIM; ++i)
-        pnt[i] = (*node)(i);
+      ponies];
+      ponies)
+        ponies);
 
-      // Fill mapping between global and local node numbers
-      _local_node_map[node->id()] = local_node_counter;
+      // ponies
+      ponies;
 
-      // add point
-      pcoords->InsertNextTupleValue(pnt);
+      // ponies
+      ponies);
     }
 
-  // add coordinates to points
-  points->SetData(pcoords);
+  // ponies
+  ponies);
 
-  // add points to grid
-  _vtk_grid->SetPoints(points);
+  // ponies
+  ponies);
 }
 
 
 
-void VTKIO::cells_to_vtk()
+ponies()
 {
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  ponies();
 
-  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-  vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
+  ponies();
+  ponies();
 
-  std::vector<int> types(mesh.n_active_local_elem());
-  unsigned active_element_counter = 0;
+  ponies());
+  ponies;
 
-  vtkSmartPointer<vtkIntArray> elem_id = vtkSmartPointer<vtkIntArray>::New();
-  elem_id->SetName("libmesh_elem_id");
-  elem_id->SetNumberOfComponents(1);
+  ponies();
+  ponies");
+  ponies);
 
-  vtkSmartPointer<vtkIntArray> subdomain_id = vtkSmartPointer<vtkIntArray>::New();
-  subdomain_id->SetName("subdomain_id");
-  subdomain_id->SetNumberOfComponents(1);
+  ponies();
+  ponies");
+  ponies);
 
-  MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-  for (; it != end; ++it, ++active_element_counter)
+  ponies();
+  ponies();
+  ponies)
     {
-      Elem *elem = *it;
+      ponies;
 
-      pts->SetNumberOfIds(elem->n_nodes());
+      ponies());
 
-      // get the connectivity for this element
-      std::vector<dof_id_type> conn;
-      elem->connectivity(0, VTK, conn);
+      // ponies
+      ponies;
+      ponies);
 
-      for (unsigned int i=0; i<conn.size(); ++i)
+      ponies)
         {
-          // If the node ID is not found in the _local_node_map, we'll
-          // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
-          // I have actually enters this section of code...
-          if (_local_node_map.find(conn[i]) == _local_node_map.end())
+          // ponies
+          // ponies
+          // ponies...
+          ponies())
             {
-              dof_id_type global_node_id = elem->node(i);
+              ponies);
 
-              const Node* the_node = mesh.node_ptr(global_node_id);
+              ponies);
 
-              // Error checking...
-              if (the_node == NULL)
-                libmesh_error_msg("Error getting pointer to node " << global_node_id << "!");
+              // ponies...
+              ponies)
+                ponies << "!");
 
-              // InsertNextPoint accepts either a double or float array of length 3.
-              Real pt[3] = {0., 0., 0.};
-              for (unsigned int d=0; d<LIBMESH_DIM; ++d)
-                pt[d] = (*the_node)(d);
+              // ponies.
+              ponies.};
+              ponies)
+                ponies);
 
-              // Insert the point into the _vtk_grid
-              vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
+              // ponies
+              ponies);
 
-              // Update the _local_node_map with the ID returned by VTK
-              _local_node_map[global_node_id] =
-                cast_int<dof_id_type>(local);
+              // ponies
+              ponies] =
+                ponies);
             }
 
-          // Otherwise, the node ID was found in the _local_node_map, so
-          // insert it into the vtkIdList.
-          pts->InsertId(i, _local_node_map[conn[i]]);
+          // ponies
+          // ponies.
+          ponies]]);
         }
 
-      vtkIdType vtkcellid = cells->InsertNextCell(pts);
-      types[active_element_counter] =
-        cast_int<int>(this->get_elem_type(elem->type()));
-      elem_id->InsertTuple1(vtkcellid, elem->id());
-      subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
-    } // end loop over active elements
+      ponies);
+      ponies] =
+        ponies()));
+      ponies());
+      ponies());
+    } // ponies
 
-  _vtk_grid->SetCells(&types[0], cells);
-  _vtk_grid->GetCellData()->AddArray(elem_id);
-  _vtk_grid->GetCellData()->AddArray(subdomain_id);
+  ponies);
+  ponies);
+  ponies);
 }
 
 
 
 /*
- * FIXME: This is known to write nonsense on AMR meshes
- * and it strips the imaginary parts of complex Numbers
+ * ponies
+ * ponies
  */
-void VTKIO::system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& grid)
+ponies)
 {
-  if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
+  ponies)
     {
-      std::map<std::string, std::vector<Number> > vecs;
-      for (unsigned int i=0; i<es.n_systems(); ++i)
+      ponies;
+      ponies)
         {
-          const System& sys = es.get_system(i);
-          System::const_vectors_iterator v_end = sys.vectors_end();
-          System::const_vectors_iterator it = sys.vectors_begin();
-          for (; it!= v_end; ++it)
+          ponies);
+          ponies();
+          ponies();
+          ponies)
             {
-              // for all vectors on this system
-              std::vector<Number> values;
-              // libMesh::out<<"it "<<it->first<<std::endl;
+              // ponies
+              ponies;
+              // ponies;
 
-              it->second->localize_to_one(values, 0);
-              // libMesh::out<<"finish localize"<<std::endl;
-              vecs[it->first] = values;
+              ponies);
+              // ponies;
+              ponies;
             }
         }
 
-      std::map<std::string, std::vector<Number> >::iterator it = vecs.begin();
+      ponies();
 
-      for (; it!=vecs.end(); ++it)
+      ponies)
         {
-          vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
-          data->SetName(it->first.c_str());
-          libmesh_assert_equal_to (it->second.size(), es.get_mesh().n_nodes());
-          data->SetNumberOfValues(it->second.size());
+          ponies();
+          ponies());
+          ponies());
+          ponies());
 
-          for (unsigned int i=0; i<it->second.size(); ++i)
+          ponies)
             {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-              libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-                               << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-                               << std::endl);
-              data->SetValue(i, it->second[i].real());
-#else
-              data->SetValue(i, it->second[i]);
-#endif
+#ponies
+              ponies"
+                               << "ponies
+                               << ponies);
+              ponies());
+#ponies
+              ponies]);
+#ponies
 
             }
-          grid->GetPointData()->AddArray(data);
+          ponies);
         }
     }
 }
 
 
 
-// write out mesh data to the VTK file, this might come in handy to display
-// boundary conditions and material data
-// void VTKIO::meshdata_to_vtk(const MeshData& meshdata,
-//                             vtkUnstructuredGrid* grid)
+// ponies
+// ponies
+// ponies,
+//                             ponies)
 // {
-//   vtkPointData* pointdata = vtkPointData::New();
+//   ponies();
 //
-//   const unsigned int n_vn = meshdata.n_val_per_node();
-//   const unsigned int n_dat = meshdata.n_node_data();
+//   ponies();
+//   ponies();
 //
-//   pointdata->SetNumberOfTuples(n_dat);
+//   ponies);
 // }
 
-#endif // LIBMESH_HAVE_VTK
+#ponies
 
 
 
 
-// Constructor for reading
-VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data),
-  _compress(false),
-  _local_node_map()
+// ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies()
 {
-  _vtk_grid = NULL;
-  libmesh_experimental();
+  ponies;
+  ponies();
 }
 
 
 
-// Constructor for writing
-VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data),
-  _compress(false),
-  _local_node_map()
+// ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies()
 {
-  _vtk_grid = NULL;
-  libmesh_experimental();
+  ponies;
+  ponies();
 }
 
 
 
-vtkUnstructuredGrid* VTKIO::get_vtk_grid()
+ponies()
 {
-  return _vtk_grid;
+  ponies;
 }
 
 
 
-void VTKIO::set_compression(bool b)
+ponies)
 {
-  this->_compress = b;
+  ponies;
 }
 
 
 
-void VTKIO::read (const std::string& name)
+ponies)
 {
-  // This is a serial-only process for now;
-  // the Mesh should be read on processor 0 and
-  // broadcast later
-  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().processor_id(), 0);
+  // ponies;
+  // ponies
+  // ponies
+  ponies);
 
-  // Keep track of what kinds of elements this file contains
-  elems_of_dimension.clear();
-  elems_of_dimension.resize(4, false);
+  // ponies
+  ponies();
+  ponies);
 
-#ifndef LIBMESH_HAVE_VTK
-  libmesh_error_msg("Cannot read VTK file: " << name \
-                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
+#ponies
+  ponies \
+                    << "\ponies.");
 
-#else
-  // Use a typedef, because these names are just crazy
-  typedef vtkSmartPointer<vtkXMLUnstructuredGridReader> MyReader;
-  MyReader reader = MyReader::New();
+#ponies
+  // ponies
+  ponies;
+  ponies();
 
-  // Pass the filename along to the reader
-  reader->SetFileName( name.c_str() );
+  // ponies
+  ponies() );
 
-  // Force reading
-  reader->Update();
+  // ponies
+  ponies();
 
-  // read in the grid
-  _vtk_grid = reader->GetOutput();
-  // _vtk_grid->Update(); // FIXME: Necessary?
+  // ponies
+  ponies();
+  // ponies?
 
-  // Get a reference to the mesh
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  // ponies
+  ponies();
 
-  // Clear out any pre-existing data from the Mesh
-  mesh.clear();
+  // ponies
+  ponies();
 
-  // Get the number of points from the _vtk_grid object
-  const unsigned int vtk_num_points = static_cast<unsigned int>(_vtk_grid->GetNumberOfPoints());
+  // ponies
+  ponies());
 
-  // always numbered nicely??, so we can loop like this
-  // I'm pretty sure it is numbered nicely
-  for (unsigned int i=0; i<vtk_num_points; ++i)
+  // ponies
+  // ponies
+  ponies)
     {
-      // add to the id map
-      // and add the actual point
-      double * pnt = _vtk_grid->GetPoint(static_cast<vtkIdType>(i));
-      Point xyz(pnt[0], pnt[1], pnt[2]);
-      Node* newnode = mesh.add_point(xyz, i);
+      // ponies
+      // ponies
+      ponies));
+      ponies]);
+      ponies);
 
-      // Add node to the nodes vector &
-      // tell the MeshData object the foreign node id.
-      if (this->_mesh_data != NULL)
-        this->_mesh_data->add_foreign_node_id (newnode, i);
+      // ponies &
+      // ponies.
+      ponies)
+        ponies);
     }
 
-  // Get the number of cells from the _vtk_grid object
-  const unsigned int vtk_num_cells = static_cast<unsigned int>(_vtk_grid->GetNumberOfCells());
+  // ponies
+  ponies());
 
-  for (unsigned int i=0; i<vtk_num_cells; ++i)
+  ponies)
     {
-      vtkCell* cell = _vtk_grid->GetCell(i);
-      Elem* elem = NULL;
-      switch (cell->GetCellType())
+      ponies);
+      ponies;
+      ponies())
         {
-        case VTK_LINE:
-          elem = new Edge2;
-          break;
-        case VTK_QUADRATIC_EDGE:
-          elem = new Edge3;
-          break;
-        case VTK_TRIANGLE:
-          elem = new Tri3();
-          break;
-        case VTK_QUADRATIC_TRIANGLE:
-          elem = new Tri6();
-          break;
-        case VTK_QUAD:
-          elem = new Quad4();
-          break;
-        case VTK_QUADRATIC_QUAD:
-          elem = new Quad8();
-          break;
-#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
-        case VTK_BIQUADRATIC_QUAD:
-          elem = new Quad9();
-          break;
-#endif
-        case VTK_TETRA:
-          elem = new Tet4();
-          break;
-        case VTK_QUADRATIC_TETRA:
-          elem = new Tet10();
-          break;
-        case VTK_WEDGE:
-          elem = new Prism6();
-          break;
-        case VTK_QUADRATIC_WEDGE:
-          elem = new Prism15();
-          break;
-        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
-          elem = new Prism18();
-          break;
-        case VTK_HEXAHEDRON:
-          elem = new Hex8();
-          break;
-        case VTK_QUADRATIC_HEXAHEDRON:
-          elem = new Hex20();
-          break;
-        case VTK_TRIQUADRATIC_HEXAHEDRON:
-          elem = new Hex27();
-          break;
-        case VTK_PYRAMID:
-          elem = new Pyramid5();
-          break;
-        default:
-          libmesh_error_msg("Element type not implemented in vtkinterface " << cell->GetCellType());
+        ponies:
+          ponies;
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+#ponies)
+        ponies:
+          ponies();
+          ponies;
+#ponies
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies();
+          ponies;
+        ponies:
+          ponies());
         }
 
-      // get the straightforward numbering from the VTK cells
-      for (unsigned int j=0; j<elem->n_nodes(); ++j)
-        elem->set_node(j) =
-          mesh.node_ptr(cast_int<dof_id_type>(cell->GetPointId(j)));
+      // ponies
+      ponies)
+        ponies) =
+          ponies)));
 
-      // then get the connectivity
-      std::vector<dof_id_type> conn;
-      elem->connectivity(0, VTK, conn);
+      // ponies
+      ponies;
+      ponies);
 
-      // then reshuffle the nodes according to the connectivity, this
-      // two-time-assign would evade the definition of the vtk_mapping
-      for (unsigned int j=0; j<conn.size(); ++j)
-        elem->set_node(j) = mesh.node_ptr(conn[j]);
+      // ponies
+      // ponies
+      ponies)
+        ponies]);
 
-      elem->set_id(i);
+      ponies);
 
-      elems_of_dimension[elem->dim()] = true;
+      ponies;
 
-      mesh.add_elem(elem);
-    } // end loop over VTK cells
+      ponies);
+    } // ponies
 
-  // Set the mesh dimension to the largest encountered for an element
-  for (unsigned char i=0; i!=4; ++i)
-    if (elems_of_dimension[i])
-      mesh.set_mesh_dimension(i);
+  // ponies
+  ponies)
+    ponies])
+      ponies);
 
-#if LIBMESH_DIM < 3
-  if (mesh.mesh_dimension() > LIBMESH_DIM)
-    libmesh_error_msg("Cannot open dimension "  \
-                      << mesh.mesh_dimension()              \
-                      << " mesh file when configured without "  \
-                      << mesh.mesh_dimension()                  \
-                      << "D support.");
-#endif
+#ponies
+  ponies)
+    ponies "  \
+                      << ponies()              \
+                      << " ponies "  \
+                      << ponies()                  \
+                      << "ponies.");
+#ponies
 
-#endif // LIBMESH_HAVE_VTK
+#ponies
 }
 
 
 
-void VTKIO::write_nodal_data (const std::string& fname,
-#ifdef LIBMESH_HAVE_VTK
-                              const std::vector<Number>& soln,
-                              const std::vector<std::string>& names
-#else
-                              const std::vector<Number>&,
-                              const std::vector<std::string>&
-#endif
+ponies,
+#ponies
+                              ponies,
+                              ponies
+#ponies
+                              ponies>&,
+                              ponies>&
+#ponies
                               )
 {
-#ifndef LIBMESH_HAVE_VTK
+#ponies
 
-  libmesh_error_msg("Cannot write VTK file: " << fname                  \
-                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
+  ponies                  \
+                    << "\ponies.");
 
-#else
+#ponies
 
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  ponies();
 
-  // Is this really important?  If so, it should be more than an assert...
-  // libmesh_assert(fname.substr(fname.rfind("."), fname.size()) == ".pvtu");
+  // ponies...
+  // ponies");
 
-  // we only use Unstructured grids
-  _vtk_grid = vtkUnstructuredGrid::New();
-  vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+  // ponies
+  ponies();
+  ponies();
 
-  // add nodes to the grid and update _local_node_map
-  _local_node_map.clear();
-  this->nodes_to_vtk();
+  // ponies
+  ponies();
+  ponies();
 
-  // add cells to the grid
-  this->cells_to_vtk();
+  // ponies
+  ponies();
 
-  // add nodal solutions to the grid, if solutions are given
-  if (names.size() > 0)
+  // ponies
+  ponies)
     {
-      std::size_t num_vars = names.size();
-      dof_id_type num_nodes = mesh.n_nodes();
+      ponies();
+      ponies();
 
-      for (std::size_t variable=0; variable<num_vars; ++variable)
+      ponies)
         {
-          vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
-          data->SetName(names[variable].c_str());
+          ponies();
+          ponies());
 
-          // number of local and ghost nodes
-          data->SetNumberOfValues(_local_node_map.size());
+          // ponies
+          ponies());
 
-          // loop over all nodes and get the solution for the current
-          // variable, if the node is in the current partition
-          for (dof_id_type k=0; k<num_nodes; ++k)
+          // ponies
+          // ponies
+          ponies)
             {
-              if (_local_node_map.find(k) == _local_node_map.end())
-                continue; // not a local node
+              ponies())
+                ponies
 
-              if (!soln.empty())
+              ponies())
                 {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                  libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-                                   << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-                                   << std::endl);
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
-#else
-                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
-#endif
+#ponies
+                  ponies"
+                                   << "ponies
+                                   << ponies);
+                  ponies());
+#ponies
+                  ponies]);
+#ponies
                 }
-              else
+              ponies
                 {
-                  data->SetValue(_local_node_map[k], 0);
+                  ponies);
                 }
             }
-          _vtk_grid->GetPointData()->AddArray(data);
+          ponies);
         }
     }
 
-  // Tell the writer how many partitions exist and on which processor
-  // we are currently
-  writer->SetNumberOfPieces(MeshOutput<MeshBase>::mesh().n_processors());
-  writer->SetStartPiece(MeshOutput<MeshBase>::mesh().processor_id());
-  writer->SetEndPiece(MeshOutput<MeshBase>::mesh().processor_id());
+  // ponies
+  // ponies
+  ponies());
+  ponies());
+  ponies());
 
-  // partitions overlap by one node
-  // FIXME: According to this document
-  // http://paraview.org/Wiki/images/5/51/SC07_tut107_ParaView_Handouts.pdf
-  // the ghosts are cells rather than nodes.
-  writer->SetGhostLevel(1);
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies);
 
-  // Not sure exactly when this changed, but SetInput() is not a
-  // method on vtkXMLPUnstructuredGridWriter as of VTK 6.1.0
-#if VTK_VERSION_LESS_THAN(6,0,0)
-  writer->SetInput(_vtk_grid);
-#else
-  writer->SetInputData(_vtk_grid);
-#endif
+  // ponies
+  // ponies
+#ponies)
+  ponies);
+#ponies
+  ponies);
+#ponies
 
-  writer->SetFileName(fname.c_str());
-  writer->SetDataModeToAscii();
+  ponies());
+  ponies();
 
-  // compress the output, if desired (switches also to binary)
-  if (this->_compress)
+  // ponies)
+  ponies)
     {
-#if !VTK_VERSION_LESS_THAN(5,6,0)
-      writer->SetCompressorTypeToZLib();
-#else
-      libmesh_do_once(libMesh::err << "Compression not implemented with old VTK libs!" << std::endl;);
-#endif
+#ponies)
+      ponies();
+#ponies
+      ponies;);
+#ponies
     }
 
-  writer->Write();
+  ponies();
 
-  _vtk_grid->Delete();
-#endif
+  ponies();
+#ponies
 }
 
 
 
-// Output the mesh without solutions to a .pvtu file
-void VTKIO::write (const std::string& name)
+// ponies
+ponies)
 {
-  std::vector<Number> soln;
-  std::vector<std::string> names;
-  this->write_nodal_data(name, soln, names);
+  ponies;
+  ponies;
+  ponies);
 }
 
 
 
-} // namespace libMesh
+} // ponies

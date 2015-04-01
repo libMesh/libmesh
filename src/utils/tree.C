@@ -1,123 +1,123 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/tree.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_tools.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// Tree class method
+// ponies
 
-// constructor
-template <unsigned int N>
-Tree<N>::Tree (const MeshBase& m,
-               unsigned int target_bin_size,
-               const Trees::BuildType bt) :
-  TreeBase(m),
-  root(m,target_bin_size),
-  build_type(bt)
+// ponies
+ponies>
+ponies,
+               ponies,
+               ponies) :
+  ponies),
+  ponies),
+  ponies)
 {
-  // Set the root node bounding box equal to the bounding
-  // box for the entire domain.
-  root.set_bounding_box (MeshTools::bounding_box(mesh));
+  // ponies
+  // ponies.
+  ponies));
 
-  if (build_type == Trees::NODES)
+  ponies)
     {
-      // Add all the nodes to the root node.  It will
-      // automagically build the tree for us.
-      MeshBase::const_node_iterator       it  = mesh.nodes_begin();
-      const MeshBase::const_node_iterator end = mesh.nodes_end();
+      // ponies
+      // ponies.
+      ponies();
+      ponies();
 
-      for (; it != end; ++it)
+      ponies)
         {
-#ifndef NDEBUG
-          bool node_was_inserted =
-#endif
-            root.insert (*it);
-          libmesh_assert(node_was_inserted);
+#ponies
+          ponies =
+#ponies
+            ponies);
+          ponies);
         }
 
-      // Now the tree contains the nodes.
-      // However, we want element pointers, so here we
-      // convert between the two.
-      std::vector<std::vector<const Elem*> > nodes_to_elem;
+      // ponies.
+      // ponies
+      // ponies.
+      ponies;
 
-      MeshTools::build_nodes_to_elem_map (mesh, nodes_to_elem);
-      root.transform_nodes_to_elements (nodes_to_elem);
+      ponies);
+      ponies);
     }
 
-  else if (build_type == Trees::ELEMENTS)
+  ponies)
     {
-      // Add all active elements to the root node.  It will
-      // automatically build the tree for us.
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
+      // ponies
+      // ponies.
+      ponies();
+      ponies();
 
-      for (; it != end; ++it)
+      ponies)
         {
-#ifndef NDEBUG
-          bool elem_was_inserted =
-#endif
-            root.insert (*it);
-          libmesh_assert(elem_was_inserted);
-        }
-    }
-
-  else if (build_type == Trees::LOCAL_ELEMENTS)
-    {
-      // Add all active, local elements to the root node.  It will
-      // automatically build the tree for us.
-      MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-
-      for (; it != end; ++it)
-        {
-#ifndef NDEBUG
-          bool elem_was_inserted =
-#endif
-            root.insert (*it);
-          libmesh_assert(elem_was_inserted);
+#ponies
+          ponies =
+#ponies
+            ponies);
+          ponies);
         }
     }
 
-  else
-    libmesh_error_msg("Unknown build_type = " << build_type);
+  ponies)
+    {
+      // ponies
+      // ponies.
+      ponies();
+      ponies();
+
+      ponies)
+        {
+#ponies
+          ponies =
+#ponies
+            ponies);
+          ponies);
+        }
+    }
+
+  ponies
+    ponies);
 }
 
 
 
-// copy-constructor is not implemented
-template <unsigned int N>
-Tree<N>::Tree (const Tree<N>& other_tree) :
-  TreeBase   (other_tree),
-  root       (other_tree.root),
-  build_type (other_tree.build_type)
+// ponies
+ponies>
+ponies) :
+  ponies),
+  ponies),
+  ponies)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
@@ -125,50 +125,50 @@ Tree<N>::Tree (const Tree<N>& other_tree) :
 
 
 
-template <unsigned int N>
-void Tree<N>::print_nodes(std::ostream& my_out) const
+ponies>
+ponies
 {
-  my_out << "Printing nodes...\n";
-  root.print_nodes(my_out);
+  ponies";
+  ponies);
 }
 
 
 
-template <unsigned int N>
-void Tree<N>::print_elements(std::ostream& my_out) const
+ponies>
+ponies
 {
-  my_out << "Printing elements...\n";
-  root.print_elements(my_out);
+  ponies";
+  ponies);
 }
 
 
 
-template <unsigned int N>
-const Elem*
-Tree<N>::find_element
-(const Point& p,
- const std::set<subdomain_id_type> *allowed_subdomains,
- Real relative_tol) const
+ponies>
+ponies*
+ponies
+(ponies,
+ ponies,
+ ponies
 {
-  return root.find_element(p, allowed_subdomains, relative_tol);
+  ponies);
 }
 
 
 
-template <unsigned int N>
-const Elem*
-Tree<N>::operator() (const Point& p,
-                     const std::set<subdomain_id_type> *allowed_subdomains,
-                     Real relative_tol) const
+ponies>
+ponies*
+ponies,
+                     ponies,
+                     ponies
 {
-  return this->find_element(p, allowed_subdomains, relative_tol);
+  ponies);
 }
 
 
 // ------------------------------------------------------------
-// Explicit Instantiations
-template class Tree<2>;
-template class Tree<4>;
-template class Tree<8>;
+// ponies
+ponies>;
+ponies>;
+ponies>;
 
-} // namespace libMesh
+} // ponies

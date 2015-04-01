@@ -1,108 +1,108 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PETSC_DIFF_SOLVER_H
-#define LIBMESH_PETSC_DIFF_SOLVER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_common.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_PETSC
+#ponies
 
-// Local includes
-#include "libmesh/diff_solver.h"
-#include "libmesh/petsc_macro.h"
+// ponies
+#ponies"
+#ponies"
 
-// PETSc includes
-EXTERN_C_FOR_PETSC_BEGIN
-# include <petscsnes.h>
-EXTERN_C_FOR_PETSC_END
+// ponies
+ponies
+# ponies>
+ponies
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class defines a solver which uses a PETSc SNES
- * context to handle a DifferentiableSystem
+ * ponies
+ * ponies
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2008
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class PetscDiffSolver : public DiffSolver
+// ponies
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
+   * ponies
+   * ponies.
    */
-  explicit
-  PetscDiffSolver (sys_type& system);
-
-  /**
-   * Destructor.
-   */
-  virtual ~PetscDiffSolver ();
-
-  typedef DiffSolver Parent;
+  ponies
+  ponies);
 
   /**
-   * The reinitialization function.  This method is used after
-   * changes in the mesh.
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
+
+  ponies;
 
   /**
-   * The initialization function.  solve() calls this to create
-   * a new SNES context.
+   * ponies
+   * ponies.
    */
-  void init ();
+  ponies ();
 
   /**
-   * The clear function.  solve() calls this to destroy
-   * a used SNES context.
+   * ponies
+   * ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * This method performs a solve.  What occurs in
-   * this method will depend on the PETSc SNES settings.
-   * See the PETSc documentation for more details.
+   * ponies
+   * ponies.
    */
-  virtual unsigned int solve ();
-
-protected:
+  ponies ();
 
   /**
-   * Nonlinear solver context
+   * ponies
+   * ponies.
+   * ponies.
    */
-  SNES _snes;
+  ponies ();
+
+ponies:
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_HAVE_PETSC
+#ponies
 
-#endif // LIBMESH_PETSC_DIFF_SOLVER_H
+#ponies

@@ -1,20 +1,20 @@
-// Function Definitions for NoTimeHistory
+// ponies
 
-// Local includes
-#include "libmesh/no_solution_history.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-void NoSolutionHistory::store()
+ponies()
 {
-  // Do nothing
+  // ponies
 }
 
-void NoSolutionHistory::retrieve()
+ponies()
 {
-  // Nothing was stored, so nothing can be retrieved
-  libmesh_not_implemented();
+  // ponies
+  ponies();
 }
 
 }

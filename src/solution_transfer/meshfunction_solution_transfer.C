@@ -1,77 +1,77 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#include "libmesh/meshfunction_solution_transfer.h"
+#ponies"
 
-#include "libmesh/system.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/mesh_function.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh {
+ponies {
 
-MeshFunctionSolutionTransfer::MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator &comm_in) :
-  SolutionTransfer(comm_in)
+ponies) :
+  ponies)
 {}
 
-MeshFunctionSolutionTransfer::~MeshFunctionSolutionTransfer()
+ponies()
 {}
 
-void
-MeshFunctionSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
+ponies
+ponies)
 {
-  // This only works when transferring to a Lagrange variable
-  libmesh_assert(to_var.type().family == LAGRANGE);
+  // ponies
+  ponies);
 
-  unsigned int to_var_num = to_var.number();
+  ponies();
 
-  System * from_sys = from_var.system();
-  System * to_sys = to_var.system();
+  ponies();
+  ponies();
 
-  // Only works with a serialized mesh to transfer from!
-  libmesh_assert(from_sys->get_mesh().is_serial());
+  // ponies!
+  ponies());
 
-  unsigned int to_sys_num = to_sys->number();
+  ponies();
 
-  EquationSystems & from_es = from_sys->get_equation_systems();
+  ponies();
 
-  //Create a serialized version of the solution vector
-  NumericVector<Number> * serialized_solution = NumericVector<Number>::build(from_sys->get_mesh().comm()).release();
-  serialized_solution->init(from_sys->n_dofs(), false, SERIAL);
+  //ponies
+  ponies();
+  ponies);
 
-  // Need to pull down a full copy of this vector on every processor so we can get values in parallel
-  from_sys->solution->localize(*serialized_solution);
+  // ponies
+  ponies);
 
-  MeshFunction from_func(from_es, *serialized_solution, from_sys->get_dof_map(), to_var_num);
-  from_func.init();
+  ponies);
+  ponies();
 
-  MeshBase::const_node_iterator nd     = to_sys->get_mesh().local_nodes_begin();
-  MeshBase::const_node_iterator nd_end = to_sys->get_mesh().local_nodes_end();
+  ponies();
+  ponies();
 
-  // Now loop over the nodes of the 'To' mesh setting values for each variable.
-  for(;nd != nd_end; ++nd)
-    // 0 is for the value component
-    to_sys->solution->set((*nd)->dof_number(to_sys_num, to_var_num, 0), from_func(**nd));
+  // ponies.
+  ponies)
+    // ponies
+    ponies));
 
-  to_sys->solution->close();
-  to_sys->update();
+  ponies();
+  ponies();
 
-  delete serialized_solution;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

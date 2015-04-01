@@ -1,161 +1,161 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_PRISM_H
-#define LIBMESH_CELL_PRISM_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/cell.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p Prism is an element in 3D with 5 sides.
+ * ponies.
  */
-class Prism : public Cell
+ponies
 {
-public:
+ponies:
 
   /**
-   * Default prismatic element, takes number of nodes and
-   * parent. Derived classes implement 'true' elements.
+   * ponies
+   * ponies.
    */
-  Prism(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  ponies);
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_less(i, this->n_nodes());
-    return Point(_master_points[i][0],
-                 _master_points[i][1],
-                 _master_points[i][2]);
+    ponies());
+    ponies],
+                 ponies],
+                 ponies]);
   }
 
   /**
-   * @returns 6.  All prism-derivatives are guaranteed to have at
-   * least 6 nodes.
+   * @ponies
+   * ponies.
    */
-  unsigned int n_nodes() const { return 6; }
+  ponies; }
 
   /**
-   * @returns 5
+   * @ponies
    */
-  unsigned int n_sides() const { return 5; }
+  ponies; }
 
   /**
-   * @returns 6.  All prisms have 6 vertices.
+   * @ponies.
    */
-  unsigned int n_vertices() const { return 6; }
+  ponies; }
 
   /**
-   * @returns 9.  All prisms have 9 edges.
+   * @ponies.
    */
-  unsigned int n_edges() const { return 9; }
+  ponies; }
 
   /**
-   * @returns 5.  All prisms have 5 faces.
+   * @ponies.
    */
-  unsigned int n_faces() const { return 5; }
+  ponies; }
 
   /**
-   * @returns 8
+   * @ponies
    */
-  unsigned int n_children() const { return 8; }
+  ponies; }
 
   /*
-   * @returns true iff the specified child is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+  ponies,
+                                ponies;
 
   /*
-   * @returns true iff the specified edge is on the specified side
+   * @ponies
    */
-  virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type key (const unsigned int s) const;
+  ponies;
 
   /**
-   * @returns a primitive triangle or quad for
-   * face i.
+   * @ponies
+   * ponies.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  ponies;
 
 
 
-protected:
+ponies:
 
   /**
-   * Data for links to parent/neighbor/interior_parent elements.
+   * ponies.
    */
-  Elem* _elemlinks_data[6+(LIBMESH_DIM>3)];
+  ponies)];
 
 
 
   /**
-   * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes.  for the first
-   * 9 second-order nodes, this matrix is identical for
-   * \p Prism15 and \p Prism18, therefore store it here.
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  static const unsigned short int _second_order_adjacent_vertices[9][2];
+  ponies];
 
   /**
-   * Vector that names a child sharing each second order node.
+   * ponies.
    */
-  static const unsigned short int _second_order_vertex_child_number[18];
+  ponies];
 
   /**
-   * Vector that names the child vertex index for each second order node.
+   * ponies.
    */
-  static const unsigned short int _second_order_vertex_child_index[18];
+  ponies];
 
   /**
-   * Master element node locations
+   * ponies
    */
-  static const Real _master_points[18][3];
+  ponies];
 };
 
 
 
 // ------------------------------------------------------------
-// Prism class member functions
-inline
-Prism::Prism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Prism::n_sides(), p, _elemlinks_data, nodelinkdata)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_CELL_PRISM_H
+#ponies

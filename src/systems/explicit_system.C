@@ -1,144 +1,144 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/explicit_system.h"
-#include "libmesh/numeric_vector.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// ExplicitSystem implementation
-ExplicitSystem::ExplicitSystem (EquationSystems& es,
-                                const std::string& name_in,
-                                const unsigned int number_in) :
-  Parent (es, name_in, number_in),
-  rhs(NULL)
+// ponies
+ponies,
+                                ponies,
+                                ponies) :
+  ponies),
+  ponies)
 
 {
-  //rhs = &(this->add_vector ("RHS Vector"));
+  //ponies"));
 }
 
 
 
-ExplicitSystem::~ExplicitSystem ()
+ponies ()
 {
-  // clear data
-  this->clear();
+  // ponies
+  ponies();
 }
 
 
 
-void ExplicitSystem::clear ()
+ponies ()
 {
-  // Clear the parent data
-  Parent::clear();
+  // ponies
+  ponies();
 
-  // NULL-out the vector.  Note that
-  // System::clear() actually deleted it.
-  rhs = NULL;
+  // ponies
+  // ponies.
+  ponies;
 }
 
 
 
-void ExplicitSystem::init_data ()
+ponies ()
 {
-  // Add the system RHS.
-  // (We must do this before initializing the System data,
-  //  then we lose the opportunity to add vectors).
-  this->add_system_rhs ();
+  // ponies.
+  // (ponies,
+  //  ponies).
+  ponies ();
 
-  // initialize parent data
-  Parent::init_data();
+  // ponies
+  ponies();
 }
 
 
 
-void ExplicitSystem::reinit ()
+ponies ()
 {
-  // initialize parent data
-  Parent::reinit();
+  // ponies
+  ponies();
 
-  // not necessary, handled by the parent!
-  // Resize the RHS conformal to the current mesh
-  //rhs->init (this->n_dofs(), this->n_local_dofs());
+  // ponies!
+  // ponies
+  //ponies());
 }
 
 
 
-void ExplicitSystem::assemble_qoi (const QoISet& qoi_indices)
+ponies)
 {
-  // The user quantity of interest assembly gets to expect to
-  // accumulate on initially zero values
-  for (unsigned int i=0; i != qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      qoi[i] = 0;
+  // ponies
+  // ponies
+  ponies)
+    ponies))
+      ponies;
 
-  Parent::assemble_qoi (qoi_indices);
+  ponies);
 }
 
 
 
-void ExplicitSystem::assemble_qoi_derivative (const QoISet& qoi_indices,
-                                              bool include_liftfunc,
-                                              bool apply_constraints)
+ponies,
+                                              ponies,
+                                              ponies)
 {
-  // The user quantity of interest derivative assembly gets to expect
-  // to accumulate on initially zero vectors
-  for (unsigned int i=0; i != qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      this->add_adjoint_rhs(i).zero();
+  // ponies
+  // ponies
+  ponies)
+    ponies))
+      ponies();
 
-  Parent::assemble_qoi_derivative (qoi_indices, include_liftfunc,
-                                   apply_constraints);
+  ponies,
+                                   ponies);
 }
 
 
 
-void ExplicitSystem::solve ()
+ponies ()
 {
-  // Assemble the linear system
-  this->assemble ();
+  // ponies
+  ponies ();
 
-  // Update the system after the solve
-  this->update();
+  // ponies
+  ponies();
 }
 
 
 
-void ExplicitSystem::add_system_rhs ()
+ponies ()
 {
-  // Possible that we cleared the _vectors but
-  // forgot to NULL-out the rhs?
-  if (this->n_vectors() == 0) rhs = NULL;
+  // ponies
+  // ponies?
+  ponies;
 
 
-  // Only need to add the rhs if it isn't there
-  // already!
-  if (rhs == NULL)
-    rhs = &(this->add_vector ("RHS Vector", false));
+  // ponies
+  // ponies!
+  ponies)
+    ponies));
 
-  libmesh_assert(rhs);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

@@ -1,139 +1,139 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TREE_H
-#define LIBMESH_TREE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/tree_node.h"
-#include "libmesh/tree_base.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class MeshBase;
+// ponies
+ponies;
 
 /**
- * This class defines a tree that may be used for fast point
- * location in space.
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2002
+ * @ponies
  */
-template <unsigned int N>
-class Tree : public TreeBase
+ponies>
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor. Requires a mesh and the target bin size. Optionally takes the build method.
+   * ponies.
    */
-  Tree (const MeshBase& m,
-        unsigned int target_bin_size,
-        Trees::BuildType bt=Trees::NODES);
+  ponies,
+        ponies,
+        ponies);
 
   /**
-   * Copy-constructor.  Not currently implemented.
+   * ponies.
    */
-  Tree (const Tree<N>& other_tree);
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~Tree() {}
+  ~ponies() {}
 
   /**
-   * Prints the nodes.
+   * ponies.
    */
-  void print_nodes(std::ostream& my_out=libMesh::out) const;
+  ponies;
 
   /**
-   * Prints the nodes.
+   * ponies.
    */
-  void print_elements(std::ostream& my_out=libMesh::out) const;
+  ponies;
 
   /**
-   * @returns the number of active bins.
+   * @ponies.
    */
-  unsigned int n_active_bins() const { return root.n_active_bins(); }
+  ponies(); }
 
   /**
-   * @returns a pointer to the element containing point p,
-   * optionally restricted to a set of allowed subdomains,
-   * optionally using a non-zero relative tolerance for searches.
+   * @ponies,
+   * ponies,
+   * ponies.
    */
-  const Elem* find_element(const Point& p,
-                           const std::set<subdomain_id_type>
-                           *allowed_subdomains = NULL,
-                           Real relative_tol = TOLERANCE) const;
+  ponies,
+                           ponies>
+                           *ponies,
+                           ponies;
 
   /**
-   * @returns a pointer to the element containing point p,
-   * optionally restricted to a set of allowed subdomains,
-   * optionally using a non-zero relative tolerance for searches.
+   * @ponies,
+   * ponies,
+   * ponies.
    */
-  const Elem* operator() (const Point& p,
-                          const std::set<subdomain_id_type>
-                          *allowed_subdomains = NULL,
-                          Real relative_tol = TOLERANCE) const;
+  ponies,
+                          ponies>
+                          *ponies,
+                          ponies;
 
-private:
+ponies:
   /**
-   * The tree root.
+   * ponies.
    */
-  TreeNode<N> root;
+  ponies;
 
   /**
-   * How the tree is built.
+   * ponies.
    */
-  const Trees::BuildType build_type;
+  ponies;
 };
 
 
 
 /**
- * For convenience we define QuadTrees and OctTrees
- * explicitly.
+ * ponies
+ * ponies.
  */
-namespace Trees
+ponies
 {
 /**
- * A BinaryTree is a tree appropriate
- * for 1D meshes.
+ * ponies
+ * ponies.
  */
-typedef Tree<2> BinaryTree;
+ponies;
 
 /**
- * A QuadTree is a tree appropriate
- * for 2D meshes.
+ * ponies
+ * ponies.
  */
-typedef Tree<4> QuadTree;
+ponies;
 
 /**
- * An OctTree is a tree appropriate
- * for 3D meshes.
+ * ponies
+ * ponies.
  */
-typedef Tree<8> OctTree;
+ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TREE_H
+#ponies

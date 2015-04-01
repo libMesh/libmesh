@@ -1,124 +1,124 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_GNUPLOT_IO_H
-#define LIBMESH_GNUPLOT_IO_H
-
-// Local includes
-#include "libmesh/mesh_output.h"
-
-// C++ includes
-#include <cstddef>
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+#ponies
+#ponies
+
+// ponies
+#ponies"
+
+// ponies
+#ponies>
+
+
+ponies
 {
 
-// forward declaration
-class MeshBase;
+// ponies
+ponies;
 
 /**
- * This class implements writing meshes using GNUplot, designed for use only
- * with 1D meshes.
+ * ponies
+ * ponies.
  *
- * @author David Knezevic, 2005
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// GnuPlotIO class definition
-class GnuPlotIO : public MeshOutput<MeshBase>
+// ponies
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Define enumerations to set plotting properties on construction
+   * ponies
    */
-  enum PlottingProperties { GRID_ON    = 1,
-                            PNG_OUTPUT = 2};
+  ponies,
+                            ponies};
 
   /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * To set the properties, we input a bitwise OR of the
-   * GnuPlotIO::PlottingProperties enumerations,
-   * e.g. GnuPlotIO::GRID_ON | GnuPlotIO::PNG_OUTPUT
+   * ponies.
+   * ponies
+   * ponies,
+   * ponies
    */
-  explicit
-  GnuPlotIO (const MeshBase&,
-             const std::string& = std::string("FE 1D Solution"),
-             int properties=0);
+  ponies
+  ponies&,
+             ponies"),
+             ponies);
 
   /**
-   * Write the mesh to the specified file.
+   * ponies.
    */
-  virtual void write(const std::string&);
+  ponies&);
 
   /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
+   * ponies
+   * ponies.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&);
+  ponies&,
+                                 ponies>&,
+                                 ponies>&);
 
   /**
-   * Set title of plot
+   * ponies
    */
-  void set_title(const std::string& title) { _title = title; }
+  ponies; }
 
   /**
-   * Turn grid on or off.
+   * ponies.
    */
-  void use_grid(bool grid) { _grid = grid; }
+  ponies; }
 
 
   /**
-   * Write output to a .png file using gnuplot
+   * ponies
    */
-  void set_png_output(bool png_output) { _png_output = png_output; }
+  ponies; }
 
   /**
-   * GNUplot automatically adjusts the x and y-axes of 2D plots
-   * to "zoom in" on the data.  You can set this string to force
-   * GNUplot to maintain a fixed set of axes.
-   * Example: axes_limits = "[0:1] [0:1]" would force x and y
-   * to be plotted on the range 0<=x<=1 and 0<=y<=1 regardless
-   * of where the data lie.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::string axes_limits;
+  ponies;
 
-private:
+ponies:
   /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are optionally
-   * provided.  This will write an ASCII file.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void write_solution (const std::string&,
-                       const std::vector<Number>* = NULL,
-                       const std::vector<std::string>* = NULL);
+  ponies&,
+                       ponies,
+                       ponies);
 
-  std::string _title;
+  ponies;
 
-  bool _grid;
-  bool _png_output;
+  ponies;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_GNUPLOT_IO_H
+#ponies

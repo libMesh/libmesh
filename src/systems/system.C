@@ -1,1381 +1,1381 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
-#include <sstream>   // for std::ostringstream
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/dof_map.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/parameter_vector.h"
-#include "libmesh/point.h"              // For point_value
-#include "libmesh/point_locator_base.h" // For point_value
-#include "libmesh/qoi_set.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/system.h"
-#include "libmesh/system_norm.h"
-#include "libmesh/utility.h"
 
-// includes for calculate_norm, point_*
-#include "libmesh/fe_base.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_algebra.h"
-#include "libmesh/quadrature.h"
-#include "libmesh/tensor_value.h"
-#include "libmesh/vector_value.h"
-#include "libmesh/tensor_tools.h"
+// ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies
+#ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies*
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 // ------------------------------------------------------------
-// System implementation
-System::System (EquationSystems& es,
-                const std::string& name_in,
-                const unsigned int number_in) :
+// ponies
+ponies,
+                ponies,
+                ponies) :
 
-  ParallelObject                    (es),
-  assemble_before_solve             (true),
-  use_fixed_solution                (false),
-  extra_quadrature_order            (0),
-  solution                          (NumericVector<Number>::build(this->comm())),
-  current_local_solution            (NumericVector<Number>::build(this->comm())),
-  time                              (0.),
-  qoi                               (0),
-  _init_system_function             (NULL),
-  _init_system_object               (NULL),
-  _assemble_system_function         (NULL),
-  _assemble_system_object           (NULL),
-  _constrain_system_function        (NULL),
-  _constrain_system_object          (NULL),
-  _qoi_evaluate_function            (NULL),
-  _qoi_evaluate_object              (NULL),
-  _qoi_evaluate_derivative_function (NULL),
-  _qoi_evaluate_derivative_object   (NULL),
-  _dof_map                          (new DofMap(number_in, *this)),
-  _equation_systems                 (es),
-  _mesh                             (es.get_mesh()),
-  _sys_name                         (name_in),
-  _sys_number                       (number_in),
-  _active                           (true),
-  _solution_projection              (true),
-  _basic_system_only                (false),
-  _is_initialized                   (false),
-  _identify_variable_groups         (true),
-  _additional_data_written          (false),
-  adjoint_already_solved            (false)
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies())),
+  ponies())),
+  ponies.),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)),
+  ponies),
+  ponies()),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-// No copy construction of System objects!
-System::System (const System& other) :
-  ReferenceCountedObject<System>(),
-  ParallelObject(other),
-  _equation_systems(other._equation_systems),
-  _mesh(other._mesh),
-  _sys_number(other._sys_number)
+// ponies!
+ponies) :
+  ponies>(),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
 
-System& System::operator= (const System&)
+ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
-System::~System ()
+ponies ()
 {
-  // Null-out the function pointers.  Since this
-  // class is getting destructed it is pointless,
-  // but a good habit.
-  _init_system_function =
-    _assemble_system_function =
-    _constrain_system_function =  NULL;
+  // ponies
+  // ponies,
+  // ponies.
+  ponies =
+    ponies =
+    ponies;
 
-  _qoi_evaluate_function = NULL;
-  _qoi_evaluate_derivative_function =  NULL;
+  ponies;
+  ponies;
 
-  // NULL-out user-provided objects.
-  _init_system_object             = NULL;
-  _assemble_system_object         = NULL;
-  _constrain_system_object        = NULL;
-  _qoi_evaluate_object            = NULL;
-  _qoi_evaluate_derivative_object = NULL;
+  // ponies.
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  // Clear data
-  this->clear ();
+  // ponies
+  ponies ();
 
-  libmesh_exceptionless_assert (!libMesh::closed());
-}
-
-
-
-dof_id_type System::n_dofs() const
-{
-  return _dof_map->n_dofs();
+  ponies());
 }
 
 
 
-dof_id_type System::n_constrained_dofs() const
+ponies
 {
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-
-  return _dof_map->n_constrained_dofs();
-
-#else
-
-  return 0;
-
-#endif
+  ponies();
 }
 
 
 
-dof_id_type System::n_local_constrained_dofs() const
+ponies
 {
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
-  return _dof_map->n_local_constrained_dofs();
+  ponies();
 
-#else
+#ponies
 
-  return 0;
+  ponies;
 
-#endif
+#ponies
 }
 
 
 
-dof_id_type System::n_local_dofs() const
+ponies
 {
-  return _dof_map->n_dofs_on_processor (this->processor_id());
+#ponies
+
+  ponies();
+
+#ponies
+
+  ponies;
+
+#ponies
 }
 
 
 
-Number System::current_solution (const dof_id_type global_dof_number) const
+ponies
 {
-  // Check the sizes
-  libmesh_assert_less (global_dof_number, _dof_map->n_dofs());
-  libmesh_assert_less (global_dof_number, current_local_solution->size());
-
-  return (*current_local_solution)(global_dof_number);
+  ponies());
 }
 
 
 
-void System::clear ()
+ponies
 {
-  _variables.clear();
+  // ponies
+  ponies());
+  ponies());
 
-  _variable_numbers.clear();
+  ponies);
+}
 
-  _dof_map->clear ();
 
-  solution->clear ();
 
-  current_local_solution->clear ();
+ponies ()
+{
+  ponies();
 
-  // clear any user-added vectors
+  ponies();
+
+  ponies ();
+
+  ponies ();
+
+  ponies ();
+
+  // ponies
   {
-    for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
+    ponies)
       {
-        pos->second->clear ();
-        delete pos->second;
-        pos->second = NULL;
+        ponies ();
+        ponies;
+        ponies;
       }
 
-    _vectors.clear();
-    _vector_projections.clear();
-    _vector_is_adjoint.clear();
-    _vector_types.clear();
-    _is_initialized = false;
+    ponies();
+    ponies();
+    ponies();
+    ponies();
+    ponies;
   }
 
 }
 
 
 
-void System::init ()
+ponies ()
 {
-  // First initialize any required data:
-  // either only the basic System data
-  if (_basic_system_only)
-    System::init_data();
-  // or all the derived class' data too
-  else
-    this->init_data();
+  // ponies:
+  // ponies
+  ponies)
+    ponies();
+  // ponies
+  ponies
+    ponies();
 
-  // If no variables have been added to this system
-  // don't do anything
-  if(!this->n_vars())
-    return;
+  // ponies
+  // ponies
+  ponies())
+    ponies;
 
-  // Then call the user-provided intialization function
-  this->user_initialization();
+  // ponies
+  ponies();
 }
 
 
 
-void System::init_data ()
+ponies ()
 {
-  MeshBase &mesh = this->get_mesh();
+  ponies();
 
-  // Add all variable groups to our underlying DofMap
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
-    _dof_map->add_variable_group(this->variable_group(vg));
+  // ponies
+  ponies++)
+    ponies));
 
-  // Distribute the degrees of freedom on the mesh
-  _dof_map->distribute_dofs (mesh);
+  // ponies
+  ponies);
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
-  // Recreate any hanging node constraints
-  _dof_map->create_dof_constraints(mesh);
+  // ponies
+  ponies);
 
-  // Apply any user-defined constraints
-  this->user_constrain();
+  // ponies
+  ponies();
 
-  // Expand any recursive constraints
-  _dof_map->process_constraints(mesh);
+  // ponies
+  ponies);
 
-#endif
+#ponies
 
-  // And clean up the send_list before we first use it
-  _dof_map->prepare_send_list();
+  // ponies
+  ponies();
 
-  // Resize the solution conformal to the current mesh
-  solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
+  // ponies
+  ponies);
 
-  // Resize the current_local_solution for the current mesh
-#ifdef LIBMESH_ENABLE_GHOSTED
-  current_local_solution->init (this->n_dofs(), this->n_local_dofs(),
-                                _dof_map->get_send_list(), false,
-                                GHOSTED);
-#else
-  current_local_solution->init (this->n_dofs(), false, SERIAL);
-#endif
+  // ponies
+#ponies
+  ponies(),
+                                ponies,
+                                ponies);
+#ponies
+  ponies);
+#ponies
 
-  // from now on, adding additional vectors or variables can't be done
-  // without immediately initializing them
-  _is_initialized = true;
+  // ponies
+  // ponies
+  ponies;
 
-  // initialize & zero other vectors, if necessary
-  for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
+  // ponies
+  ponies)
     {
-      ParallelType type = _vector_types[pos->first];
+      ponies];
 
-      if (type == GHOSTED)
+      ponies)
         {
-#ifdef LIBMESH_ENABLE_GHOSTED
-          pos->second->init (this->n_dofs(), this->n_local_dofs(),
-                             _dof_map->get_send_list(), false,
-                             GHOSTED);
-#else
-          libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
-#endif
+#ponies
+          ponies(),
+                             ponies,
+                             ponies);
+#ponies
+          ponies.");
+#ponies
         }
-      else if (type == SERIAL)
+      ponies)
         {
-          pos->second->init (this->n_dofs(), false, type);
+          ponies);
         }
-      else
+      ponies
         {
-          libmesh_assert_equal_to(type, PARALLEL);
-          pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+          ponies);
+          ponies);
         }
     }
 }
 
 
 
-void System::restrict_vectors ()
+ponies ()
 {
-#ifdef LIBMESH_ENABLE_AMR
-  // Restrict the _vectors on the coarsened cells
-  for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
+#ponies
+  // ponies
+  ponies)
     {
-      NumericVector<Number>* v = pos->second;
+      ponies;
 
-      if (_vector_projections[pos->first])
+      ponies])
         {
-          this->project_vector (*v, this->vector_is_adjoint(pos->first));
+          ponies));
         }
-      else
+      ponies
         {
-          ParallelType type = _vector_types[pos->first];
+          ponies];
 
-          if(type == GHOSTED)
+          ponies)
             {
-#ifdef LIBMESH_ENABLE_GHOSTED
-              pos->second->init (this->n_dofs(), this->n_local_dofs(),
-                                 _dof_map->get_send_list(), false,
-                                 GHOSTED);
-#else
-              libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
-#endif
+#ponies
+              ponies(),
+                                 ponies,
+                                 ponies);
+#ponies
+              ponies.");
+#ponies
             }
-          else
-            pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+          ponies
+            ponies);
         }
     }
 
-  const std::vector<dof_id_type>& send_list = _dof_map->get_send_list ();
+  ponies ();
 
-  // Restrict the solution on the coarsened cells
-  if (_solution_projection)
-    this->project_vector (*solution);
+  // ponies
+  ponies)
+    ponies);
 
-#ifdef LIBMESH_ENABLE_GHOSTED
-  current_local_solution->init(this->n_dofs(),
-                               this->n_local_dofs(), send_list,
-                               false, GHOSTED);
-#else
-  current_local_solution->init(this->n_dofs());
-#endif
+#ponies
+  ponies(),
+                               ponies,
+                               ponies);
+#ponies
+  ponies());
+#ponies
 
-  if (_solution_projection)
-    solution->localize (*current_local_solution, send_list);
+  ponies)
+    ponies);
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 }
 
 
 
-void System::prolong_vectors ()
+ponies ()
 {
-#ifdef LIBMESH_ENABLE_AMR
-  // Currently project_vector handles both restriction and prolongation
-  this->restrict_vectors();
-#endif
+#ponies
+  // ponies
+  ponies();
+#ponies
 }
 
 
 
-void System::reinit ()
+ponies ()
 {
-  //If no variables have been added to this system
-  //don't do anything
-  if(!this->n_vars())
-    return;
+  //ponies
+  //ponies
+  ponies())
+    ponies;
 
-  // Constraints get handled in EquationSystems::reinit now
-  //  _dof_map->create_dof_constraints(this->get_mesh());
+  // ponies
+  //  ponies());
 
-  // Update the solution based on the projected
-  // current_local_solution.
-  solution->init (this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
+  // ponies
+  // ponies.
+  ponies);
 
-  libmesh_assert_equal_to (solution->size(), current_local_solution->size());
-  // Not true with ghosted vectors
-  // libmesh_assert_equal_to (solution->size(), current_local_solution->local_size());
+  ponies());
+  // ponies
+  // ponies());
 
-  const dof_id_type first_local_dof = solution->first_local_index();
-  const dof_id_type local_size      = solution->local_size();
+  ponies();
+  ponies();
 
-  for (dof_id_type i=0; i<local_size; i++)
-    solution->set(i+first_local_dof,
-                  (*current_local_solution)(i+first_local_dof));
+  ponies++)
+    ponies,
+                  (*ponies));
 
-  solution->close();
+  ponies();
 }
 
 
-void System::reinit_constraints()
+ponies()
 {
-  get_dof_map().create_dof_constraints(_mesh, this->time);
-  user_constrain();
-  get_dof_map().process_constraints(_mesh);
-  get_dof_map().prepare_send_list();
+  ponies);
+  ponies();
+  ponies);
+  ponies();
 }
 
 
-void System::update ()
+ponies ()
 {
-  libmesh_assert(solution->closed());
+  ponies());
 
-  const std::vector<dof_id_type>& send_list = _dof_map->get_send_list ();
+  ponies ();
 
-  // Check sizes
-  libmesh_assert_equal_to (current_local_solution->size(), solution->size());
-  // More processors than elements => empty send_list
-  //  libmesh_assert (!send_list.empty());
-  libmesh_assert_less_equal (send_list.size(), solution->size());
+  // ponies
+  ponies());
+  // ponies
+  //  ponies());
+  ponies());
 
-  // Create current_local_solution from solution.  This will
-  // put a local copy of solution into current_local_solution.
-  // Only the necessary values (specified by the send_list)
-  // are copied to minimize communication
-  solution->localize (*current_local_solution, send_list);
-}
-
-
-
-void System::re_update ()
-{
-  parallel_object_only();
-
-  // If this system is empty... don't do anything!
-  if(!this->n_vars())
-    return;
-
-  const std::vector<dof_id_type>& send_list = this->get_dof_map().get_send_list ();
-
-  // Check sizes
-  libmesh_assert_equal_to (current_local_solution->size(), solution->size());
-  // Not true with ghosted vectors
-  // libmesh_assert_equal_to (current_local_solution->local_size(), solution->size());
-  // libmesh_assert (!send_list.empty());
-  libmesh_assert_less_equal (send_list.size(), solution->size());
-
-  // Create current_local_solution from solution.  This will
-  // put a local copy of solution into current_local_solution.
-  solution->localize (*current_local_solution, send_list);
+  // ponies
+  // ponies.
+  // ponies)
+  // ponies
+  ponies);
 }
 
 
 
-void System::restrict_solve_to (const SystemSubset* subset,
-                                const SubsetSolveMode /*subset_solve_mode*/)
+ponies ()
 {
-  if(subset!=NULL)
+  ponies();
+
+  // ponies!
+  ponies())
+    ponies;
+
+  ponies ();
+
+  // ponies
+  ponies());
+  // ponies
+  // ponies());
+  // ponies());
+  ponies());
+
+  // ponies
+  // ponies.
+  ponies);
+}
+
+
+
+ponies,
+                                ponies*/)
+{
+  ponies)
     {
-      libmesh_not_implemented();
+      ponies();
     }
 }
 
 
 
-void System::assemble ()
+ponies ()
 {
-  // Log how long the user's assembly code takes
-  START_LOG("assemble()", "System");
+  // ponies
+  ponies");
 
-  // Call the user-specified assembly function
-  this->user_assembly();
+  // ponies
+  ponies();
 
-  // Stop logging the user code
-  STOP_LOG("assemble()", "System");
+  // ponies
+  ponies");
 }
 
 
 
-void System::assemble_qoi (const QoISet& qoi_indices)
+ponies)
 {
-  // Log how long the user's assembly code takes
-  START_LOG("assemble_qoi()", "System");
+  // ponies
+  ponies");
 
-  // Call the user-specified quantity of interest function
-  this->user_QOI(qoi_indices);
+  // ponies
+  ponies);
 
-  // Stop logging the user code
-  STOP_LOG("assemble_qoi()", "System");
+  // ponies
+  ponies");
 }
 
 
 
-void System::assemble_qoi_derivative(const QoISet& qoi_indices,
-                                     bool include_liftfunc,
-                                     bool apply_constraints)
+ponies,
+                                     ponies,
+                                     ponies)
 {
-  // Log how long the user's assembly code takes
-  START_LOG("assemble_qoi_derivative()", "System");
+  // ponies
+  ponies");
 
-  // Call the user-specified quantity of interest function
-  this->user_QOI_derivative(qoi_indices, include_liftfunc,
-                            apply_constraints);
+  // ponies
+  ponies,
+                            ponies);
 
-  // Stop logging the user code
-  STOP_LOG("assemble_qoi_derivative()", "System");
+  // ponies
+  ponies");
 }
 
 
 
-void System::qoi_parameter_sensitivity
-(const QoISet& qoi_indices,
- const ParameterVector& parameters,
- SensitivityData& sensitivities)
+ponies
+(ponies,
+ ponies,
+ ponies)
 {
-  // Forward sensitivities are more efficient for Nq > Np
-  if (qoi_indices.size(*this) > parameters.size())
-    forward_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
-  // Adjoint sensitivities are more efficient for Np > Nq,
-  // and an adjoint may be more reusable than a forward
-  // solution sensitivity in the Np == Nq case.
-  else
-    adjoint_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
+  // ponies
+  ponies())
+    ponies);
+  // ponies,
+  // ponies
+  // ponies.
+  ponies
+    ponies);
 }
 
 
 
-bool System::compare (const System& other_system,
-                      const Real threshold,
-                      const bool verbose) const
+ponies,
+                      ponies,
+                      ponies
 {
-  // we do not care for matrices, but for vectors
-  libmesh_assert (_is_initialized);
-  libmesh_assert (other_system._is_initialized);
+  // ponies
+  ponies);
+  ponies);
 
-  if (verbose)
+  ponies)
     {
-      libMesh::out << "  Systems \"" << _sys_name << "\"" << std::endl;
-      libMesh::out << "   comparing matrices not supported." << std::endl;
-      libMesh::out << "   comparing names...";
+      ponies;
+      ponies;
+      ponies...";
     }
 
-  // compare the name: 0 means identical
-  const int name_result = _sys_name.compare(other_system.name());
-  if (verbose)
+  // ponies
+  ponies());
+  ponies)
     {
-      if (name_result == 0)
-        libMesh::out << " identical." << std::endl;
-      else
-        libMesh::out << "  names not identical." << std::endl;
-      libMesh::out << "   comparing solution vector...";
-    }
-
-
-  // compare the solution: -1 means identical
-  const int solu_result = solution->compare (*other_system.solution.get(),
-                                             threshold);
-
-  if (verbose)
-    {
-      if (solu_result == -1)
-        libMesh::out << " identical up to threshold." << std::endl;
-      else
-        libMesh::out << "  first difference occured at index = "
-                     << solu_result << "." << std::endl;
+      ponies)
+        ponies;
+      ponies
+        ponies;
+      ponies...";
     }
 
 
-  // safety check, whether we handle at least the same number
-  // of vectors
-  std::vector<int> ov_result;
+  // ponies
+  ponies(),
+                                             ponies);
 
-  if (this->n_vectors() != other_system.n_vectors())
+  ponies)
     {
-      if (verbose)
+      ponies)
+        ponies;
+      ponies
+        ponies = "
+                     << ponies;
+    }
+
+
+  // ponies
+  // ponies
+  ponies;
+
+  ponies())
+    {
+      ponies)
         {
-          libMesh::out << "   Fatal difference. This system handles "
-                       << this->n_vectors() << " add'l vectors," << std::endl
-                       << "   while the other system handles "
-                       << other_system.n_vectors()
-                       << " add'l vectors." << std::endl
-                       << "   Aborting comparison." << std::endl;
+          ponies "
+                       << ponies
+                       << "   ponies "
+                       << ponies()
+                       << " ponies
+                       << "   ponies;
         }
-      return false;
+      ponies;
     }
-  else if (this->n_vectors() == 0)
+  ponies)
     {
-      // there are no additional vectors...
-      ov_result.clear ();
+      // ponies...
+      ponies ();
     }
-  else
+  ponies
     {
-      // compare other vectors
-      for (const_vectors_iterator pos = _vectors.begin();
-           pos != _vectors.end(); ++pos)
+      // ponies
+      ponies();
+           ponies)
         {
-          if (verbose)
-            libMesh::out << "   comparing vector \""
-                         << pos->first << "\" ...";
+          ponies)
+            ponies \""
+                         << ponies << "\" ...";
 
-          // assume they have the same name
-          const NumericVector<Number>& other_system_vector =
-            other_system.get_vector(pos->first);
+          // ponies
+          ponies =
+            ponies);
 
-          ov_result.push_back(pos->second->compare (other_system_vector,
-                                                    threshold));
+          ponies,
+                                                    ponies));
 
-          if (verbose)
+          ponies)
             {
-              if (ov_result[ov_result.size()-1] == -1)
-                libMesh::out << " identical up to threshold." << std::endl;
-              else
-                libMesh::out << " first difference occured at" << std::endl
-                             << "   index = " << ov_result[ov_result.size()-1] << "." << std::endl;
+              ponies)
+                ponies;
+              ponies
+                ponies
+                             << "   ponies;
             }
 
         }
 
-    } // finished comparing additional vectors
+    } // ponies
 
 
-  bool overall_result;
+  ponies;
 
-  // sum up the results
-  if ((name_result==0) && (solu_result==-1))
+  // ponies
+  ponies))
     {
-      if (ov_result.size()==0)
-        overall_result = true;
-      else
+      ponies)
+        ponies;
+      ponies
         {
-          bool ov_identical;
-          unsigned int n    = 0;
-          do
+          ponies;
+          ponies;
+          ponies
             {
-              ov_identical = (ov_result[n]==-1);
-              n++;
+              ponies);
+              ponies++;
             }
-          while (ov_identical && n<ov_result.size());
-          overall_result = ov_identical;
+          ponies());
+          ponies;
         }
     }
-  else
-    overall_result = false;
+  ponies
+    ponies;
 
-  if (verbose)
+  ponies)
     {
-      libMesh::out << "   finished comparisons, ";
-      if (overall_result)
-        libMesh::out << "found no differences." << std::endl << std::endl;
-      else
-        libMesh::out << "found differences." << std::endl << std::endl;
+      ponies, ";
+      ponies)
+        ponies;
+      ponies
+        ponies;
     }
 
-  return overall_result;
+  ponies;
 }
 
 
 
-void System::update_global_solution (std::vector<Number>& global_soln) const
+ponies
 {
-  global_soln.resize (solution->size());
+  ponies());
 
-  solution->localize (global_soln);
+  ponies);
 }
 
 
 
-void System::update_global_solution (std::vector<Number>& global_soln,
-                                     const processor_id_type dest_proc) const
+ponies,
+                                     ponies
 {
-  global_soln.resize        (solution->size());
+  ponies());
 
-  solution->localize_to_one (global_soln, dest_proc);
+  ponies);
 }
 
 
 
-NumericVector<Number> & System::add_vector (const std::string& vec_name,
-                                            const bool projections,
-                                            const ParallelType type)
+ponies,
+                                            ponies,
+                                            ponies)
 {
-  // Return the vector if it is already there.
-  if (this->have_vector(vec_name))
-    return *(_vectors[vec_name]);
+  // ponies.
+  ponies))
+    ponies]);
 
-  // Otherwise build the vector
-  NumericVector<Number>* buf = NumericVector<Number>::build(this->comm()).release();
-  _vectors.insert (std::make_pair (vec_name, buf));
-  _vector_projections.insert (std::make_pair (vec_name, projections));
+  // ponies
+  ponies();
+  ponies));
+  ponies));
 
-  _vector_types.insert (std::make_pair (vec_name, type));
+  ponies));
 
-  // Vectors are primal by default
-  _vector_is_adjoint.insert (std::make_pair (vec_name, -1));
+  // ponies
+  ponies));
 
-  // Initialize it if necessary
-  if (_is_initialized)
+  // ponies
+  ponies)
     {
-      if(type == GHOSTED)
+      ponies)
         {
-#ifdef LIBMESH_ENABLE_GHOSTED
-          buf->init (this->n_dofs(), this->n_local_dofs(),
-                     _dof_map->get_send_list(), false,
-                     GHOSTED);
-#else
-          libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
-#endif
+#ponies
+          ponies(),
+                     ponies,
+                     ponies);
+#ponies
+          ponies.");
+#ponies
         }
-      else
-        buf->init (this->n_dofs(), this->n_local_dofs(), false, type);
+      ponies
+        ponies);
     }
 
-  return *buf;
+  ponies;
 }
 
-void System::remove_vector (const std::string& vec_name)
+ponies)
 {
-  //Return if the vector does not exist
-  if ( !(this->have_vector(vec_name)) )
-    return;
+  //ponies
+  ponies)) )
+    ponies;
 
-  _vectors[vec_name]->clear();
-  delete _vectors[vec_name];
-  _vectors[vec_name] = NULL;
+  ponies();
+  ponies];
+  ponies;
 
-  _vectors.erase(vec_name);
-  _vector_projections.erase(vec_name);
-  _vector_is_adjoint.erase(vec_name);
-  _vector_types.erase(vec_name);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 }
 
-const NumericVector<Number> * System::request_vector (const std::string& vec_name) const
+ponies
 {
-  const_vectors_iterator pos = _vectors.find(vec_name);
+  ponies);
 
-  if (pos == _vectors.end())
-    return NULL;
+  ponies())
+    ponies;
 
-  return pos->second;
-}
-
-
-
-NumericVector<Number> * System::request_vector (const std::string& vec_name)
-{
-  vectors_iterator pos = _vectors.find(vec_name);
-
-  if (pos == _vectors.end())
-    return NULL;
-
-  return pos->second;
+  ponies;
 }
 
 
 
-const NumericVector<Number> * System::request_vector (const unsigned int vec_num) const
+ponies)
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  ponies);
+
+  ponies())
+    ponies;
+
+  ponies;
+}
+
+
+
+ponies
+{
+  ponies();
+  ponies();
+  ponies;
+  ponies))
     {
-      num++;
-      ++v;
+      ponies++;
+      ++ponies;
     }
-  if (v==v_end)
-    return NULL;
-  return v->second;
+  ponies)
+    ponies;
+  ponies;
 }
 
 
 
-NumericVector<Number> * System::request_vector (const unsigned int vec_num)
+ponies)
 {
-  vectors_iterator v = vectors_begin();
-  vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  ponies();
+  ponies();
+  ponies;
+  ponies))
     {
-      num++;
-      ++v;
+      ponies++;
+      ++ponies;
     }
-  if (v==v_end)
-    return NULL;
-  return v->second;
+  ponies)
+    ponies;
+  ponies;
 }
 
 
 
-const NumericVector<Number> & System::get_vector (const std::string& vec_name) const
+ponies
 {
-  // Make sure the vector exists
-  const_vectors_iterator pos = _vectors.find(vec_name);
+  // ponies
+  ponies);
 
-  if (pos == _vectors.end())
-    libmesh_error_msg("ERROR: vector " << vec_name << " does not exist in this system!");
+  ponies())
+    ponies!");
 
-  return *(pos->second);
+  ponies);
 }
 
 
 
-NumericVector<Number> & System::get_vector (const std::string& vec_name)
+ponies)
 {
-  // Make sure the vector exists
-  vectors_iterator pos = _vectors.find(vec_name);
+  // ponies
+  ponies);
 
-  if (pos == _vectors.end())
-    libmesh_error_msg("ERROR: vector " << vec_name << " does not exist in this system!");
+  ponies())
+    ponies!");
 
-  return *(pos->second);
+  ponies);
 }
 
 
 
-const NumericVector<Number> & System::get_vector (const unsigned int vec_num) const
+ponies
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  ponies();
+  ponies();
+  ponies;
+  ponies))
     {
-      num++;
-      ++v;
+      ponies++;
+      ++ponies;
     }
-  libmesh_assert (v != v_end);
-  return *(v->second);
+  ponies);
+  ponies);
 }
 
 
 
-NumericVector<Number> & System::get_vector (const unsigned int vec_num)
+ponies)
 {
-  vectors_iterator v = vectors_begin();
-  vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  ponies();
+  ponies();
+  ponies;
+  ponies))
     {
-      num++;
-      ++v;
+      ponies++;
+      ++ponies;
     }
-  libmesh_assert (v != v_end);
-  return *(v->second);
+  ponies);
+  ponies);
 }
 
 
 
-const std::string& System::vector_name (const unsigned int vec_num) const
+ponies
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
-  unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  ponies();
+  ponies();
+  ponies;
+  ponies))
     {
-      num++;
-      ++v;
+      ponies++;
+      ++ponies;
     }
-  libmesh_assert (v != v_end);
-  return v->first;
+  ponies);
+  ponies;
 }
 
-const std::string & System::vector_name (const NumericVector<Number> & vec_reference) const
+ponies
 {
-  const_vectors_iterator v = vectors_begin();
-  const_vectors_iterator v_end = vectors_end();
+  ponies();
+  ponies();
 
-  for(; v != v_end; ++v)
+  ponies)
     {
-      // Check if the current vector is the one whose name we want
-      if(&vec_reference == v->second)
-        break; // exit loop if it is
+      // ponies
+      ponies)
+        ponies
     }
 
-  // Before returning, make sure we didnt loop till the end and not find any match
-  libmesh_assert (v != v_end);
+  // ponies
+  ponies);
 
-  // Return the string associated with the current vector
-  return v->first;
+  // ponies
+  ponies;
 }
 
 
 
-void System::set_vector_preservation (const std::string &vec_name,
-                                      bool preserve)
+ponies,
+                                      ponies)
 {
-  _vector_projections[vec_name] = preserve;
+  ponies;
 }
 
 
 
-bool System::vector_preservation (const std::string &vec_name) const
+ponies
 {
-  if (_vector_projections.find(vec_name) == _vector_projections.end())
-    return false;
+  ponies())
+    ponies;
 
-  return _vector_projections.find(vec_name)->second;
+  ponies;
 }
 
 
 
-void System::set_vector_as_adjoint (const std::string &vec_name,
-                                    int qoi_num)
+ponies,
+                                    ponies)
 {
-  // We reserve -1 for vectors which get primal constraints, -2 for
-  // vectors which get no constraints
-  libmesh_assert_greater_equal(qoi_num, -2);
-  _vector_is_adjoint[vec_name] = qoi_num;
+  // ponies
+  // ponies
+  ponies);
+  ponies;
 }
 
 
 
-int System::vector_is_adjoint (const std::string &vec_name) const
+ponies
 {
-  libmesh_assert(_vector_is_adjoint.find(vec_name) !=
-                 _vector_is_adjoint.end());
+  ponies) !=
+                 ponies());
 
-  return _vector_is_adjoint.find(vec_name)->second;
+  ponies;
 }
 
 
 
-NumericVector<Number> & System::add_sensitivity_solution (unsigned int i)
+ponies)
 {
-  std::ostringstream sensitivity_name;
-  sensitivity_name << "sensitivity_solution" << i;
+  ponies;
+  ponies;
 
-  return this->add_vector(sensitivity_name.str());
+  ponies());
 }
 
 
 
-NumericVector<Number> & System::get_sensitivity_solution (unsigned int i)
+ponies)
 {
-  std::ostringstream sensitivity_name;
-  sensitivity_name << "sensitivity_solution" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(sensitivity_name.str());
+  ponies());
 }
 
 
 
-const NumericVector<Number> & System::get_sensitivity_solution (unsigned int i) const
+ponies
 {
-  std::ostringstream sensitivity_name;
-  sensitivity_name << "sensitivity_solution" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(sensitivity_name.str());
+  ponies());
 }
 
 
 
-NumericVector<Number> & System::add_weighted_sensitivity_solution ()
+ponies ()
 {
-  return this->add_vector("weighted_sensitivity_solution");
+  ponies");
 }
 
 
 
-NumericVector<Number> & System::get_weighted_sensitivity_solution ()
+ponies ()
 {
-  return this->get_vector("weighted_sensitivity_solution");
+  ponies");
 }
 
 
 
-const NumericVector<Number> & System::get_weighted_sensitivity_solution () const
+ponies
 {
-  return this->get_vector("weighted_sensitivity_solution");
+  ponies");
 }
 
 
 
-NumericVector<Number> & System::add_adjoint_solution (unsigned int i)
+ponies)
 {
-  std::ostringstream adjoint_name;
-  adjoint_name << "adjoint_solution" << i;
+  ponies;
+  ponies;
 
-  NumericVector<Number> &returnval = this->add_vector(adjoint_name.str());
-  this->set_vector_as_adjoint(adjoint_name.str(), i);
-  return returnval;
+  ponies());
+  ponies);
+  ponies;
 }
 
 
 
-NumericVector<Number> & System::get_adjoint_solution (unsigned int i)
+ponies)
 {
-  std::ostringstream adjoint_name;
-  adjoint_name << "adjoint_solution" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(adjoint_name.str());
+  ponies());
 }
 
 
 
-const NumericVector<Number> & System::get_adjoint_solution (unsigned int i) const
+ponies
 {
-  std::ostringstream adjoint_name;
-  adjoint_name << "adjoint_solution" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(adjoint_name.str());
+  ponies());
 }
 
 
 
-NumericVector<Number> & System::add_weighted_sensitivity_adjoint_solution (unsigned int i)
+ponies)
 {
-  std::ostringstream adjoint_name;
-  adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
+  ponies;
+  ponies;
 
-  NumericVector<Number> &returnval = this->add_vector(adjoint_name.str());
-  this->set_vector_as_adjoint(adjoint_name.str(), i);
-  return returnval;
+  ponies());
+  ponies);
+  ponies;
 }
 
 
 
-NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution (unsigned int i)
+ponies)
 {
-  std::ostringstream adjoint_name;
-  adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(adjoint_name.str());
+  ponies());
 }
 
 
 
-const NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution (unsigned int i) const
+ponies
 {
-  std::ostringstream adjoint_name;
-  adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(adjoint_name.str());
+  ponies());
 }
 
 
 
-NumericVector<Number> & System::add_adjoint_rhs (unsigned int i)
+ponies)
 {
-  std::ostringstream adjoint_rhs_name;
-  adjoint_rhs_name << "adjoint_rhs" << i;
+  ponies;
+  ponies;
 
-  return this->add_vector(adjoint_rhs_name.str(), false);
+  ponies);
 }
 
 
 
-NumericVector<Number> & System::get_adjoint_rhs (unsigned int i)
+ponies)
 {
-  std::ostringstream adjoint_rhs_name;
-  adjoint_rhs_name << "adjoint_rhs" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(adjoint_rhs_name.str());
+  ponies());
 }
 
 
 
-const NumericVector<Number> & System::get_adjoint_rhs (unsigned int i) const
+ponies
 {
-  std::ostringstream adjoint_rhs_name;
-  adjoint_rhs_name << "adjoint_rhs" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(adjoint_rhs_name.str());
+  ponies());
 }
 
 
 
-NumericVector<Number> & System::add_sensitivity_rhs (unsigned int i)
+ponies)
 {
-  std::ostringstream sensitivity_rhs_name;
-  sensitivity_rhs_name << "sensitivity_rhs" << i;
+  ponies;
+  ponies;
 
-  return this->add_vector(sensitivity_rhs_name.str(), false);
+  ponies);
 }
 
 
 
-NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i)
+ponies)
 {
-  std::ostringstream sensitivity_rhs_name;
-  sensitivity_rhs_name << "sensitivity_rhs" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(sensitivity_rhs_name.str());
+  ponies());
 }
 
 
 
-const NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i) const
+ponies
 {
-  std::ostringstream sensitivity_rhs_name;
-  sensitivity_rhs_name << "sensitivity_rhs" << i;
+  ponies;
+  ponies;
 
-  return this->get_vector(sensitivity_rhs_name.str());
+  ponies());
 }
 
 
 
-unsigned int System::add_variable (const std::string& var,
-                                   const FEType& type,
-                                   const std::set<subdomain_id_type> * const active_subdomains)
+ponies,
+                                   ponies,
+                                   ponies)
 {
-  libmesh_assert(!this->is_initialized());
+  ponies());
 
-  // Make sure the variable isn't there already
-  // or if it is, that it's the type we want
-  for (unsigned int v=0; v<this->n_vars(); v++)
-    if (this->variable_name(v) == var)
+  // ponies
+  // ponies
+  ponies++)
+    ponies)
       {
-        if (this->variable_type(v) == type)
-          return _variables[v].number();
+        ponies)
+          ponies();
 
-        libmesh_error_msg("ERROR: incompatible variable " << var << " has already been added for this system!");
+        ponies!");
       }
 
-  // Optimize for VariableGroups here - if the user is adding multiple
-  // variables of the same FEType and subdomain restriction, catch
-  // that here and add them as members of the same VariableGroup.
+  // ponies
+  // ponies
+  // ponies.
   //
-  // start by setting this flag to whatever the user has requested
-  // and then consider the conditions which should negate it.
-  bool should_be_in_vg = this->identify_variable_groups();
+  // ponies
+  // ponies.
+  ponies();
 
-  // No variable groups, nothing to add to
-  if (!this->n_variable_groups())
-    should_be_in_vg = false;
+  // ponies
+  ponies())
+    ponies;
 
-  else
+  ponies
     {
-      VariableGroup &vg(_variable_groups.back());
+      ponies());
 
-      // get a pointer to their subdomain restriction, if any.
-      const std::set<subdomain_id_type> * const
-        their_active_subdomains (vg.implicitly_active() ?
-                                 NULL : &vg.active_subdomains());
+      // ponies.
+      ponies
+        ponies() ?
+                                 ponies());
 
-      // Different types?
-      if (vg.type() != type)
-        should_be_in_vg = false;
+      // ponies?
+      ponies)
+        ponies;
 
-      // they are restricted, we aren't?
-      if (their_active_subdomains && !active_subdomains)
-        should_be_in_vg = false;
+      // ponies?
+      ponies)
+        ponies;
 
-      // they aren't restriced, we are?
-      if (!their_active_subdomains && active_subdomains)
-        should_be_in_vg = false;
+      // ponies?
+      ponies)
+        ponies;
 
-      if (their_active_subdomains && active_subdomains)
-        // restricted to different sets?
-        if (*their_active_subdomains != *active_subdomains)
-          should_be_in_vg = false;
+      ponies)
+        // ponies?
+        ponies)
+          ponies;
 
-      // OK, after all that, append the variable to the vg if none of the conditions
-      // were violated
-      if (should_be_in_vg)
+      // ponies
+      // ponies
+      ponies)
         {
-          const unsigned short curr_n_vars = cast_int<unsigned short>
-            (this->n_vars());
+          ponies>
+            (ponies());
 
-          vg.append (var);
+          ponies);
 
-          _variables.push_back(vg(vg.n_variables()-1));
-          _variable_numbers[var] = curr_n_vars;
-          return curr_n_vars;
+          ponies));
+          ponies;
+          ponies;
         }
     }
 
-  // otherwise, fall back to adding a single variable group
-  return this->add_variables (std::vector<std::string>(1, var),
-                              type,
-                              active_subdomains);
+  // ponies
+  ponies),
+                              ponies,
+                              ponies);
 }
 
 
 
-unsigned int System::add_variable (const std::string& var,
-                                   const Order order,
-                                   const FEFamily family,
-                                   const std::set<subdomain_id_type> * const active_subdomains)
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies)
 {
-  return this->add_variable(var,
-                            FEType(order, family),
-                            active_subdomains);
+  ponies,
+                            ponies),
+                            ponies);
 }
 
 
 
-unsigned int System::add_variables (const std::vector<std::string> &vars,
-                                    const FEType& type,
-                                    const std::set<subdomain_id_type> * const active_subdomains)
+ponies,
+                                    ponies,
+                                    ponies)
 {
-  libmesh_assert(!this->is_initialized());
+  ponies());
 
-  // Make sure the variable isn't there already
-  // or if it is, that it's the type we want
-  for (unsigned int ov=0; ov<vars.size(); ov++)
-    for (unsigned int v=0; v<this->n_vars(); v++)
-      if (this->variable_name(v) == vars[ov])
+  // ponies
+  // ponies
+  ponies++)
+    ponies++)
+      ponies])
         {
-          if (this->variable_type(v) == type)
-            return _variables[v].number();
+          ponies)
+            ponies();
 
-          libmesh_error_msg("ERROR: incompatible variable " << vars[ov] << " has already been added for this system!");
+          ponies!");
         }
 
-  const unsigned short curr_n_vars = cast_int<unsigned short>
-    (this->n_vars());
+  ponies>
+    (ponies());
 
-  const unsigned int next_first_component = this->n_components();
+  ponies();
 
-  // Add the variable group to the list
-  _variable_groups.push_back((active_subdomains == NULL) ?
-                             VariableGroup(this, vars, curr_n_vars,
-                                           next_first_component, type) :
-                             VariableGroup(this, vars, curr_n_vars,
-                                           next_first_component, type, *active_subdomains));
+  // ponies
+  ponies) ?
+                             ponies,
+                                           ponies) :
+                             ponies,
+                                           ponies));
 
-  const VariableGroup &vg (_variable_groups.back());
+  ponies());
 
-  // Add each component of the group individually
-  for (unsigned short v=0; v<vars.size(); v++)
+  // ponies
+  ponies++)
     {
-      _variables.push_back (vg(v));
-      _variable_numbers[vars[v]] = cast_int<unsigned short>
-        (curr_n_vars+v);
+      ponies));
+      ponies>
+        (ponies);
     }
 
-  libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());
+  ponies());
 
-  // BSK - Defer this now to System::init_data() so we can detect
-  // VariableGroups 12/28/2012
-  // // Add the variable group to the _dof_map
-  // _dof_map->add_variable_group (vg);
+  // ponies
+  // ponies
+  // // ponies
+  // ponies);
 
-  // Return the number of the new variable
-  return cast_int<unsigned int>(curr_n_vars+vars.size()-1);
+  // ponies
+  ponies);
 }
 
 
 
-unsigned int System::add_variables (const std::vector<std::string> &vars,
-                                    const Order order,
-                                    const FEFamily family,
-                                    const std::set<subdomain_id_type> * const active_subdomains)
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
 {
-  return this->add_variables(vars,
-                             FEType(order, family),
-                             active_subdomains);
+  ponies,
+                             ponies),
+                             ponies);
 }
 
 
 
-bool System::has_variable (const std::string& var) const
+ponies
 {
-  return _variable_numbers.count(var);
+  ponies);
 }
 
 
 
-unsigned short int System::variable_number (const std::string& var) const
+ponies
 {
-  // Make sure the variable exists
-  std::map<std::string, unsigned short int>::const_iterator
-    pos = _variable_numbers.find(var);
+  // ponies
+  ponies
+    ponies);
 
-  if (pos == _variable_numbers.end())
-    libmesh_error_msg("ERROR: variable " << var << " does not exist in this system!");
+  ponies())
+    ponies!");
 
-  libmesh_assert_equal_to (_variables[pos->second].name(), var);
+  ponies);
 
-  return pos->second;
+  ponies;
 }
 
 
-void System::get_all_variable_numbers(std::vector<unsigned int>& all_variable_numbers) const
+ponies
 {
-  all_variable_numbers.resize(n_vars());
+  ponies());
 
-  // Make sure the variable exists
-  std::map<std::string, unsigned short int>::const_iterator
-    it = _variable_numbers.begin();
-  std::map<std::string, unsigned short int>::const_iterator
-    it_end = _variable_numbers.end();
+  // ponies
+  ponies
+    ponies();
+  ponies
+    ponies();
 
-  unsigned int count = 0;
-  for( ; it != it_end; ++it)
+  ponies;
+  ponies)
     {
-      all_variable_numbers[count] = it->second;
-      count++;
+      ponies;
+      ponies++;
     }
 }
 
 
-void System::local_dof_indices(const unsigned int var,
-                               std::set<dof_id_type> & var_indices) const
+ponies,
+                               ponies
 {
-  // Make sure the set is clear
-  var_indices.clear();
+  // ponies
+  ponies();
 
-  std::vector<dof_id_type> dof_indices;
+  ponies;
 
-  // Begin the loop over the elements
-  MeshBase::const_element_iterator       el     =
-    this->get_mesh().active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    this->get_mesh().active_local_elements_end();
+  // ponies
+  ponies     =
+    ponies();
+  ponies =
+    ponies();
 
-  const dof_id_type
-    first_local = this->get_dof_map().first_dof(),
-    end_local   = this->get_dof_map().end_dof();
+  ponies
+    ponies(),
+    ponies();
 
-  for ( ; el != end_el; ++el)
+  ponies)
     {
-      const Elem* elem = *el;
-      this->get_dof_map().dof_indices (elem, dof_indices, var);
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<dof_indices.size(); i++)
+      ponies++)
         {
-          dof_id_type dof = dof_indices[i];
+          ponies];
 
-          //If the dof is owned by the local processor
-          if(first_local <= dof && dof < end_local)
-            var_indices.insert(dof_indices[i]);
+          //ponies
+          ponies)
+            ponies]);
         }
     }
 }
 
 
 
-void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) const
+ponies
 {
-  /* Make sure the call makes sense.  */
-  libmesh_assert_less (var_num, this->n_vars());
+  /* ponies.  */
+  ponies());
 
-  /* Get a reference to the mesh.  */
-  const MeshBase& mesh = this->get_mesh();
+  /* ponies.  */
+  ponies();
 
-  /* Check which system we are.  */
-  const unsigned int sys_num = this->number();
+  /* ponies.  */
+  ponies();
 
-  /* Loop over nodes.  */
+  /* ponies.  */
   {
-    MeshBase::const_node_iterator it = mesh.local_nodes_begin();
-    const MeshBase::const_node_iterator end_it = mesh.local_nodes_end();
-    for ( ; it != end_it; ++it)
+    ponies();
+    ponies();
+    ponies)
       {
-        const Node* node = *it;
-        unsigned int n_comp = node->n_comp(sys_num,var_num);
-        for(unsigned int i=0; i<n_comp; i++)
+        ponies;
+        ponies);
+        ponies++)
           {
-            const dof_id_type index = node->dof_number(sys_num,var_num,i);
-            v.set(index,0.0);
+            ponies);
+            ponies);
           }
       }
   }
 
-  /* Loop over elements.  */
+  /* ponies.  */
   {
-    MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_it = mesh.active_local_elements_end();
-    for ( ; it != end_it; ++it)
+    ponies();
+    ponies();
+    ponies)
       {
-        const Elem* elem = *it;
-        unsigned int n_comp = elem->n_comp(sys_num,var_num);
-        for(unsigned int i=0; i<n_comp; i++)
+        ponies;
+        ponies);
+        ponies++)
           {
-            const dof_id_type index = elem->dof_number(sys_num,var_num,i);
-            v.set(index,0.0);
+            ponies);
+            ponies);
           }
       }
   }
@@ -1383,921 +1383,921 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
 
 
 
-Real System::discrete_var_norm(const NumericVector<Number>& v,
-                               unsigned int var,
-                               FEMNormType norm_type) const
+ponies,
+                               ponies,
+                               ponies
 {
-  std::set<dof_id_type> var_indices;
-  local_dof_indices(var, var_indices);
+  ponies;
+  ponies);
 
-  if(norm_type == DISCRETE_L1)
-    return v.subset_l1_norm(var_indices);
-  if(norm_type == DISCRETE_L2)
-    return v.subset_l2_norm(var_indices);
-  if(norm_type == DISCRETE_L_INF)
-    return v.subset_linfty_norm(var_indices);
-  else
-    libmesh_error_msg("Invalid norm_type = " << norm_type);
+  ponies)
+    ponies);
+  ponies)
+    ponies);
+  ponies)
+    ponies);
+  ponies
+    ponies);
 }
 
 
 
-Real System::calculate_norm(const NumericVector<Number>& v,
-                            unsigned int var,
-                            FEMNormType norm_type) const
+ponies,
+                            ponies,
+                            ponies
 {
-  //short circuit to save time
-  if(norm_type == DISCRETE_L1 ||
-     norm_type == DISCRETE_L2 ||
-     norm_type == DISCRETE_L_INF)
-    return discrete_var_norm(v,var,norm_type);
+  //ponies
+  ponies ||
+     ponies ||
+     ponies)
+    ponies);
 
-  // Not a discrete norm
-  std::vector<FEMNormType> norms(this->n_vars(), L2);
-  std::vector<Real> weights(this->n_vars(), 0.0);
-  norms[var] = norm_type;
-  weights[var] = 1.0;
-  Real val = this->calculate_norm(v, SystemNorm(norms, weights));
-  return val;
+  // ponies
+  ponies);
+  ponies);
+  ponies;
+  ponies;
+  ponies));
+  ponies;
 }
 
 
 
-Real System::calculate_norm(const NumericVector<Number>& v,
-                            const SystemNorm &norm) const
+ponies,
+                            ponies
 {
-  // This function must be run on all processors at once
-  parallel_object_only();
+  // ponies
+  ponies();
 
-  START_LOG ("calculate_norm()", "System");
+  ponies");
 
-  // Zero the norm before summation
-  Real v_norm = 0.;
+  // ponies
+  ponies.;
 
-  if (norm.is_discrete())
+  ponies())
     {
-      STOP_LOG ("calculate_norm()", "System");
-      //Check to see if all weights are 1.0 and all types are equal
-      FEMNormType norm_type0 = norm.type(0);
-      unsigned int check_var = 0;
-      for (; check_var != this->n_vars(); ++check_var)
-        if((norm.weight(check_var) != 1.0) || (norm.type(check_var) != norm_type0))
-          break;
+      ponies");
+      //ponies
+      ponies);
+      ponies;
+      ponies)
+        ponies))
+          ponies;
 
-      //All weights were 1.0 so just do the full vector discrete norm
-      if(check_var == this->n_vars())
+      //ponies
+      ponies())
         {
-          if(norm_type0 == DISCRETE_L1)
-            return v.l1_norm();
-          if(norm_type0 == DISCRETE_L2)
-            return v.l2_norm();
-          if(norm_type0 == DISCRETE_L_INF)
-            return v.linfty_norm();
-          else
-            libmesh_error_msg("Invalid norm_type0 = " << norm_type0);
+          ponies)
+            ponies();
+          ponies)
+            ponies();
+          ponies)
+            ponies();
+          ponies
+            ponies);
         }
 
-      for (unsigned int var=0; var != this->n_vars(); ++var)
+      ponies)
         {
-          // Skip any variables we don't need to integrate
-          if (norm.weight(var) == 0.0)
-            continue;
+          // ponies
+          ponies)
+            ponies;
 
-          v_norm += norm.weight(var) * discrete_var_norm(v, var, norm.type(var));
+          ponies));
         }
 
-      return v_norm;
+      ponies;
     }
 
-  // Localize the potentially parallel vector
-  UniquePtr<NumericVector<Number> > local_v = NumericVector<Number>::build(this->comm());
-  local_v->init(v.size(), true, SERIAL);
-  v.localize (*local_v, _dof_map->get_send_list());
+  // ponies
+  ponies());
+  ponies);
+  ponies());
 
-  unsigned int dim = this->get_mesh().mesh_dimension();
+  ponies();
 
-  // I'm not sure how best to mix Hilbert norms on some variables (for
-  // which we'll want to square then sum then square root) with norms
-  // like L_inf (for which we'll just want to take an absolute value
-  // and then sum).
-  bool using_hilbert_norm = true,
-    using_nonhilbert_norm = true;
+  // ponies
+  // ponies
+  // ponies
+  // ponies).
+  ponies,
+    ponies;
 
-  // Loop over all variables
-  for (unsigned int var=0; var != this->n_vars(); ++var)
+  // ponies
+  ponies)
     {
-      // Skip any variables we don't need to integrate
-      Real norm_weight_sq = norm.weight_sq(var);
-      if (norm_weight_sq == 0.0)
-        continue;
-      Real norm_weight = norm.weight(var);
+      // ponies
+      ponies);
+      ponies)
+        ponies;
+      ponies);
 
-      // Check for unimplemented norms (rather than just returning 0).
-      FEMNormType norm_type = norm.type(var);
-      if((norm_type==H1) ||
-         (norm_type==H2) ||
-         (norm_type==L2) ||
-         (norm_type==H1_SEMINORM) ||
-         (norm_type==H2_SEMINORM))
+      // ponies).
+      ponies);
+      ponies) ||
+         (ponies) ||
+         (ponies) ||
+         (ponies) ||
+         (ponies))
         {
-          if (!using_hilbert_norm)
-            libmesh_not_implemented();
-          using_nonhilbert_norm = false;
+          ponies)
+            ponies();
+          ponies;
         }
-      else if ((norm_type==L1) ||
-               (norm_type==L_INF) ||
-               (norm_type==W1_INF_SEMINORM) ||
-               (norm_type==W2_INF_SEMINORM))
+      ponies) ||
+               (ponies) ||
+               (ponies) ||
+               (ponies))
         {
-          if (!using_nonhilbert_norm)
-            libmesh_not_implemented();
-          using_hilbert_norm = false;
+          ponies)
+            ponies();
+          ponies;
         }
-      else
-        libmesh_not_implemented();
+      ponies
+        ponies();
 
-      const FEType& fe_type = this->get_dof_map().variable_type(var);
-      UniquePtr<QBase> qrule =
-        fe_type.default_quadrature_rule (dim);
-      UniquePtr<FEBase> fe
-        (FEBase::build(dim, fe_type));
-      fe->attach_quadrature_rule (qrule.get());
+      ponies);
+      ponies =
+        ponies);
+      ponies
+        (ponies));
+      ponies());
 
-      const std::vector<Real>&               JxW = fe->get_JxW();
-      const std::vector<std::vector<Real> >* phi = NULL;
-      if (norm_type == H1 ||
-          norm_type == H2 ||
-          norm_type == L2 ||
-          norm_type == L1 ||
-          norm_type == L_INF)
-        phi = &(fe->get_phi());
+      ponies();
+      ponies;
+      ponies ||
+          ponies ||
+          ponies ||
+          ponies ||
+          ponies)
+        ponies());
 
-      const std::vector<std::vector<RealGradient> >* dphi = NULL;
-      if (norm_type == H1 ||
-          norm_type == H2 ||
-          norm_type == H1_SEMINORM ||
-          norm_type == W1_INF_SEMINORM)
-        dphi = &(fe->get_dphi());
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      const std::vector<std::vector<RealTensor> >*   d2phi = NULL;
-      if (norm_type == H2 ||
-          norm_type == H2_SEMINORM ||
-          norm_type == W2_INF_SEMINORM)
-        d2phi = &(fe->get_d2phi());
-#endif
+      ponies;
+      ponies ||
+          ponies ||
+          ponies ||
+          ponies)
+        ponies());
+#ponies
+      ponies;
+      ponies ||
+          ponies ||
+          ponies)
+        ponies());
+#ponies
 
-      std::vector<dof_id_type> dof_indices;
+      ponies;
 
-      // Begin the loop over the elements
-      MeshBase::const_element_iterator       el     =
-        this->get_mesh().active_local_elements_begin();
-      const MeshBase::const_element_iterator end_el =
-        this->get_mesh().active_local_elements_end();
+      // ponies
+      ponies     =
+        ponies();
+      ponies =
+        ponies();
 
-      for ( ; el != end_el; ++el)
+      ponies)
         {
-          const Elem* elem = *el;
+          ponies;
 
-          fe->reinit (elem);
+          ponies);
 
-          this->get_dof_map().dof_indices (elem, dof_indices, var);
+          ponies);
 
-          const unsigned int n_qp = qrule->n_points();
+          ponies();
 
-          const unsigned int n_sf = cast_int<unsigned int>
-            (dof_indices.size());
+          ponies>
+            (ponies());
 
-          // Begin the loop over the Quadrature points.
-          for (unsigned int qp=0; qp<n_qp; qp++)
+          // ponies.
+          ponies++)
             {
-              if (norm_type == L1)
+              ponies)
                 {
-                  Number u_h = 0.;
-                  for (unsigned int i=0; i != n_sf; ++i)
-                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-                  v_norm += norm_weight *
-                    JxW[qp] * std::abs(u_h);
+                  ponies.;
+                  ponies)
+                    ponies]);
+                  ponies *
+                    ponies);
                 }
 
-              if (norm_type == L_INF)
+              ponies)
                 {
-                  Number u_h = 0.;
-                  for (unsigned int i=0; i != n_sf; ++i)
-                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-                  v_norm = std::max(v_norm, norm_weight * std::abs(u_h));
+                  ponies.;
+                  ponies)
+                    ponies]);
+                  ponies));
                 }
 
-              if (norm_type == H1 ||
-                  norm_type == H2 ||
-                  norm_type == L2)
+              ponies ||
+                  ponies ||
+                  ponies)
                 {
-                  Number u_h = 0.;
-                  for (unsigned int i=0; i != n_sf; ++i)
-                    u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-                  v_norm += norm_weight_sq *
-                    JxW[qp] * TensorTools::norm_sq(u_h);
+                  ponies.;
+                  ponies)
+                    ponies]);
+                  ponies *
+                    ponies);
                 }
 
-              if (norm_type == H1 ||
-                  norm_type == H2 ||
-                  norm_type == H1_SEMINORM)
+              ponies ||
+                  ponies ||
+                  ponies)
                 {
-                  Gradient grad_u_h;
-                  for (unsigned int i=0; i != n_sf; ++i)
-                    grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += norm_weight_sq *
-                    JxW[qp] * grad_u_h.size_sq();
+                  ponies;
+                  ponies)
+                    ponies]));
+                  ponies *
+                    ponies();
                 }
 
-              if (norm_type == W1_INF_SEMINORM)
+              ponies)
                 {
-                  Gradient grad_u_h;
-                  for (unsigned int i=0; i != n_sf; ++i)
-                    grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm = std::max(v_norm, norm_weight * grad_u_h.size());
+                  ponies;
+                  ponies)
+                    ponies]));
+                  ponies());
                 }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              if (norm_type == H2 ||
-                  norm_type == H2_SEMINORM)
+#ponies
+              ponies ||
+                  ponies)
                 {
-                  Tensor hess_u_h;
-                  for (unsigned int i=0; i != n_sf; ++i)
-                    hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm += norm_weight_sq *
-                    JxW[qp] * hess_u_h.size_sq();
+                  ponies;
+                  ponies)
+                    ponies]));
+                  ponies *
+                    ponies();
                 }
 
-              if (norm_type == W2_INF_SEMINORM)
+              ponies)
                 {
-                  Tensor hess_u_h;
-                  for (unsigned int i=0; i != n_sf; ++i)
-                    hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-                  v_norm = std::max(v_norm, norm_weight * hess_u_h.size());
+                  ponies;
+                  ponies)
+                    ponies]));
+                  ponies());
                 }
-#endif
+#ponies
             }
         }
     }
 
-  if (using_hilbert_norm)
+  ponies)
     {
-      this->comm().sum(v_norm);
-      v_norm = std::sqrt(v_norm);
+      ponies);
+      ponies);
     }
-  else
+  ponies
     {
-      this->comm().max(v_norm);
+      ponies);
     }
 
-  STOP_LOG ("calculate_norm()", "System");
+  ponies");
 
-  return v_norm;
+  ponies;
 }
 
 
 
-std::string System::get_info() const
+ponies
 {
-  std::ostringstream oss;
+  ponies;
 
 
-  const std::string& sys_name = this->name();
+  ponies();
 
-  oss << "   System #"  << this->number() << ", \"" << sys_name << "\"\n"
-      << "    Type \""  << this->system_type() << "\"\n"
-      << "    Variables=";
+  ponies"
+      << "    ponies"
+      << "    ponies=";
 
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  ponies++)
     {
-      const VariableGroup &vg_description (this->variable_group(vg));
+      ponies));
 
-      if (vg_description.n_variables() > 1) oss << "{ ";
-      for (unsigned int vn=0; vn<vg_description.n_variables(); vn++)
-        oss << "\"" << vg_description.name(vn) << "\" ";
-      if (vg_description.n_variables() > 1) oss << "} ";
+      ponies << "{ ";
+      ponies++)
+        ponies) << "\" ";
+      ponies << "} ";
     }
 
-  oss << '\n';
+  ponies';
 
-  oss << "    Finite Element Types=";
-#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
-    oss << "\""
-        << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
+  ponies=";
+#ponies
+  ponies++)
+    ponies << "\""
+        << ponies)
         << "\" ";
-#else
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+#ponies
+  ponies++)
     {
-      oss << "\""
-          << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
+      ponies << "\""
+          << ponies)
           << "\", \""
-          << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().radial_family)
+          << ponies)
           << "\" ";
     }
 
-  oss << '\n' << "    Infinite Element Mapping=";
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
-    oss << "\""
-        << Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_group(vg).type().inf_map)
+  ponies=";
+  ponies++)
+    ponies << "\""
+        << ponies)
         << "\" ";
-#endif
+#ponies
 
-  oss << '\n';
+  ponies';
 
-  oss << "    Approximation Orders=";
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+  ponies=";
+  ponies++)
     {
-#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      oss << "\""
-          << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
+#ponies
+      ponies << "\""
+          << ponies)
           << "\" ";
-#else
-      oss << "\""
-          << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
+#ponies
+      ponies << "\""
+          << ponies)
           << "\", \""
-          << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().radial_order)
+          << ponies)
           << "\" ";
-#endif
+#ponies
     }
 
-  oss << '\n';
+  ponies';
 
-  oss << "    n_dofs()="             << this->n_dofs()             << '\n';
-  oss << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  oss << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
-  oss << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
-#endif
+  ponies';
+  ponies';
+#ponies
+  ponies';
+  ponies';
+#ponies
 
-  oss << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
-  oss << "    " << "n_matrices()="  << this->n_matrices()  << '\n';
-  //   oss << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
+  ponies';
+  ponies';
+  //   ponies';
 
-  oss << this->get_dof_map().get_info();
+  ponies();
 
-  return oss.str();
+  ponies();
 }
 
 
 
-void System::attach_init_function (void fptr(EquationSystems& es,
-                                             const std::string& name))
+ponies,
+                                             ponies))
 {
-  libmesh_assert(fptr);
+  ponies);
 
-  if (_init_system_object != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both initialization function and object!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _init_system_object = NULL;
+      ponies;
     }
 
-  _init_system_function = fptr;
+  ponies;
 }
 
 
 
-void System::attach_init_object (System::Initialization& init_in)
+ponies)
 {
-  if (_init_system_function != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both initialization object and function!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _init_system_function = NULL;
+      ponies;
     }
 
-  _init_system_object = &init_in;
+  ponies;
 }
 
 
 
-void System::attach_assemble_function (void fptr(EquationSystems& es,
-                                                 const std::string& name))
+ponies,
+                                                 ponies))
 {
-  libmesh_assert(fptr);
+  ponies);
 
-  if (_assemble_system_object != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both assembly function and object!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _assemble_system_object = NULL;
+      ponies;
     }
 
-  _assemble_system_function = fptr;
+  ponies;
 }
 
 
 
-void System::attach_assemble_object (System::Assembly& assemble_in)
+ponies)
 {
-  if (_assemble_system_function != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _assemble_system_function = NULL;
+      ponies;
     }
 
-  _assemble_system_object = &assemble_in;
+  ponies;
 }
 
 
 
-void System::attach_constraint_function(void fptr(EquationSystems& es,
-                                                  const std::string& name))
+ponies,
+                                                  ponies))
 {
-  libmesh_assert(fptr);
+  ponies);
 
-  if (_constrain_system_object != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both constraint function and object!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _constrain_system_object = NULL;
+      ponies;
     }
 
-  _constrain_system_function = fptr;
+  ponies;
 }
 
 
 
-void System::attach_constraint_object (System::Constraint& constrain)
+ponies)
 {
-  if (_constrain_system_function != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both constraint object and function!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _constrain_system_function = NULL;
+      ponies;
     }
 
-  _constrain_system_object = &constrain;
+  ponies;
 }
 
 
 
-void System::attach_QOI_function(void fptr(EquationSystems&,
-                                           const std::string&,
-                                           const QoISet&))
+ponies&,
+                                           ponies&,
+                                           ponies&))
 {
-  libmesh_assert(fptr);
+  ponies);
 
-  if (_qoi_evaluate_object != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI function and object!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _qoi_evaluate_object = NULL;
+      ponies;
     }
 
-  _qoi_evaluate_function = fptr;
+  ponies;
 }
 
 
 
-void System::attach_QOI_object (QOI& qoi_in)
+ponies)
 {
-  if (_qoi_evaluate_function != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI object and function!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _qoi_evaluate_function = NULL;
+      ponies;
     }
 
-  _qoi_evaluate_object = &qoi_in;
+  ponies;
 }
 
 
 
-void System::attach_QOI_derivative(void fptr(EquationSystems&, const std::string&,
-                                             const QoISet&, bool, bool))
+ponies&,
+                                             ponies))
 {
-  libmesh_assert(fptr);
+  ponies);
 
-  if (_qoi_evaluate_derivative_object != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI derivative function and object!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _qoi_evaluate_derivative_object = NULL;
+      ponies;
     }
 
-  _qoi_evaluate_derivative_function = fptr;
+  ponies;
 }
 
 
 
-void System::attach_QOI_derivative_object (QOIDerivative& qoi_derivative)
+ponies)
 {
-  if (_qoi_evaluate_derivative_function != NULL)
+  ponies)
     {
-      libmesh_here();
-      libMesh::out << "WARNING:  Cannot specify both QOI derivative object and function!"
-                   << std::endl;
+      ponies();
+      ponies!"
+                   << ponies;
 
-      _qoi_evaluate_derivative_function = NULL;
+      ponies;
     }
 
-  _qoi_evaluate_derivative_object = &qoi_derivative;
+  ponies;
 }
 
 
 
-void System::user_initialization ()
+ponies ()
 {
-  // Call the user-provided intialization function,
-  // if it was provided
-  if (_init_system_function != NULL)
-    this->_init_system_function (_equation_systems, this->name());
+  // ponies,
+  // ponies
+  ponies)
+    ponies());
 
-  // ...or the user-provided initialization object.
-  else if (_init_system_object != NULL)
-    this->_init_system_object->initialize();
+  // ...ponies.
+  ponies)
+    ponies();
 }
 
 
 
-void System::user_assembly ()
+ponies ()
 {
-  // Call the user-provided assembly function,
-  // if it was provided
-  if (_assemble_system_function != NULL)
-    this->_assemble_system_function (_equation_systems, this->name());
+  // ponies,
+  // ponies
+  ponies)
+    ponies());
 
-  // ...or the user-provided assembly object.
-  else if (_assemble_system_object != NULL)
-    this->_assemble_system_object->assemble();
+  // ...ponies.
+  ponies)
+    ponies();
 }
 
 
 
-void System::user_constrain ()
+ponies ()
 {
-  // Call the user-provided constraint function,
-  // if it was provided
-  if (_constrain_system_function!= NULL)
-    this->_constrain_system_function(_equation_systems, this->name());
+  // ponies,
+  // ponies
+  ponies)
+    ponies());
 
-  // ...or the user-provided constraint object.
-  else if (_constrain_system_object != NULL)
-    this->_constrain_system_object->constrain();
+  // ...ponies.
+  ponies)
+    ponies();
 }
 
 
 
-void System::user_QOI (const QoISet& qoi_indices)
+ponies)
 {
-  // Call the user-provided quantity of interest function,
-  // if it was provided
-  if (_qoi_evaluate_function != NULL)
-    this->_qoi_evaluate_function(_equation_systems, this->name(), qoi_indices);
+  // ponies,
+  // ponies
+  ponies)
+    ponies);
 
-  // ...or the user-provided QOI function object.
-  else if (_qoi_evaluate_object != NULL)
-    this->_qoi_evaluate_object->qoi(qoi_indices);
+  // ...ponies.
+  ponies)
+    ponies);
 }
 
 
 
-void System::user_QOI_derivative(const QoISet& qoi_indices,
-                                 bool include_liftfunc,
-                                 bool apply_constraints)
+ponies,
+                                 ponies,
+                                 ponies)
 {
-  // Call the user-provided quantity of interest derivative,
-  // if it was provided
-  if (_qoi_evaluate_derivative_function != NULL)
-    this->_qoi_evaluate_derivative_function
-      (_equation_systems, this->name(), qoi_indices, include_liftfunc,
-       apply_constraints);
+  // ponies,
+  // ponies
+  ponies)
+    ponies
+      (ponies,
+       ponies);
 
-  // ...or the user-provided QOI derivative function object.
-  else if (_qoi_evaluate_derivative_object != NULL)
-    this->_qoi_evaluate_derivative_object->qoi_derivative
-      (qoi_indices, include_liftfunc, apply_constraints);
+  // ...ponies.
+  ponies)
+    ponies
+      (ponies);
 }
 
 
 
-Number System::point_value(unsigned int var, const Point &p, const bool insist_on_success) const
+ponies
 {
-  // This function must be called on every processor; there's no
-  // telling where in the partition p falls.
-  parallel_object_only();
+  // ponies
+  // ponies.
+  ponies();
 
-  // And every processor had better agree about which point we're
-  // looking for
-#ifndef NDEBUG
-  this->comm().verify(p);
-#endif // NDEBUG
+  // ponies
+  // ponies
+#ponies
+  ponies);
+#ponies
 
-  // Get a reference to the mesh object associated with the system object that calls this function
-  const MeshBase &mesh = this->get_mesh();
+  // ponies
+  ponies();
 
-  // Use an existing PointLocator or create a new one
-  UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
-  PointLocatorBase& locator = *locator_ptr;
+  // ponies
+  ponies();
+  ponies;
 
-  if (!insist_on_success)
-    locator.enable_out_of_mesh_mode();
+  ponies)
+    ponies();
 
-  // Get a pointer to the element that contains P
-  const Elem *e = locator(p);
+  // ponies
+  ponies);
 
-  Number u = 0;
+  ponies;
 
-  if (e && e->processor_id() == this->processor_id())
-    u = point_value(var, p, *e);
+  ponies())
+    ponies);
 
-  // If I have an element containing p, then let's let everyone know
-  processor_id_type lowest_owner =
-    (e && (e->processor_id() == this->processor_id())) ?
-    this->processor_id() : this->n_processors();
-  this->comm().min(lowest_owner);
+  // ponies
+  ponies =
+    (ponies())) ?
+    ponies();
+  ponies);
 
-  // Everybody should get their value from a processor that was able
-  // to compute it.
-  // If nobody admits owning the point, we have a problem.
-  if (lowest_owner != this->n_processors())
-    this->comm().broadcast(u, lowest_owner);
-  else
-    libmesh_assert(!insist_on_success);
+  // ponies
+  // ponies.
+  // ponies.
+  ponies())
+    ponies);
+  ponies
+    ponies);
 
-  return u;
+  ponies;
 }
 
-Number System::point_value(unsigned int var, const Point &p, const Elem &e) const
+ponies
 {
-  libmesh_assert_equal_to (e.processor_id(), this->processor_id());
+  ponies());
 
-  // Ensuring that the given point is really in the element is an
-  // expensive assert, but as long as debugging is turned on we might
-  // as well try to catch a particularly nasty potential error
-  libmesh_assert (e.contains_point(p));
+  // ponies
+  // ponies
+  // ponies
+  ponies));
 
-  // Get the dof map to get the proper indices for our computation
-  const DofMap& dof_map = this->get_dof_map();
+  // ponies
+  ponies();
 
-  // Need dof_indices for phi[i][j]
-  std::vector<dof_id_type> dof_indices;
+  // ponies]
+  ponies;
 
-  // Fill in the dof_indices for our element
-  dof_map.dof_indices (&e, dof_indices, var);
+  // ponies
+  ponies);
 
-  // Get the no of dofs assciated with this point
-  const unsigned int num_dofs = cast_int<unsigned int>
-    (dof_indices.size());
+  // ponies
+  ponies>
+    (ponies());
 
-  FEType fe_type = dof_map.variable_type(var);
+  ponies);
 
-  // Build a FE so we can calculate u(p)
-  UniquePtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+  // ponies)
+  ponies));
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-  // Build a vector of point co-ordinates to send to reinit
-  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
+  // ponies
+  // ponies
+  ponies));
 
-  // Get the shape function values
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  // ponies
+  ponies();
 
-  // Reinitialize the element and compute the shape function values at coor
-  fe->reinit (&e, &coor);
+  // ponies
+  ponies);
 
-  // Get ready to accumulate a value
-  Number u = 0;
+  // ponies
+  ponies;
 
-  for (unsigned int l=0; l<num_dofs; l++)
+  ponies++)
     {
-      u += phi[l][0]*this->current_solution (dof_indices[l]);
+      ponies]);
     }
 
-  return u;
+  ponies;
 }
 
 
 
-Gradient System::point_gradient(unsigned int var, const Point &p, const bool insist_on_success) const
+ponies
 {
-  // This function must be called on every processor; there's no
-  // telling where in the partition p falls.
-  parallel_object_only();
+  // ponies
+  // ponies.
+  ponies();
 
-  // And every processor had better agree about which point we're
-  // looking for
-#ifndef NDEBUG
-  this->comm().verify(p);
-#endif // NDEBUG
+  // ponies
+  // ponies
+#ponies
+  ponies);
+#ponies
 
-  // Get a reference to the mesh object associated with the system object that calls this function
-  const MeshBase &mesh = this->get_mesh();
+  // ponies
+  ponies();
 
-  // Use an existing PointLocator or create a new one
-  UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
-  PointLocatorBase& locator = *locator_ptr;
+  // ponies
+  ponies();
+  ponies;
 
-  if (!insist_on_success)
-    locator.enable_out_of_mesh_mode();
+  ponies)
+    ponies();
 
-  // Get a pointer to the element that contains P
-  const Elem *e = locator(p);
+  // ponies
+  ponies);
 
-  Gradient grad_u;
+  ponies;
 
-  if (e && e->processor_id() == this->processor_id())
-    grad_u = point_gradient(var, p, *e);
+  ponies())
+    ponies);
 
-  // If I have an element containing p, then let's let everyone know
-  processor_id_type lowest_owner =
-    (e && (e->processor_id() == this->processor_id())) ?
-    this->processor_id() : this->n_processors();
-  this->comm().min(lowest_owner);
+  // ponies
+  ponies =
+    (ponies())) ?
+    ponies();
+  ponies);
 
-  // Everybody should get their value from a processor that was able
-  // to compute it.
-  // If nobody admits owning the point, we may have a problem.
-  if (lowest_owner != this->n_processors())
-    this->comm().broadcast(grad_u, lowest_owner);
-  else
-    libmesh_assert(!insist_on_success);
+  // ponies
+  // ponies.
+  // ponies.
+  ponies())
+    ponies);
+  ponies
+    ponies);
 
-  return grad_u;
+  ponies;
 }
 
 
-Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e) const
+ponies
 {
-  libmesh_assert_equal_to (e.processor_id(), this->processor_id());
+  ponies());
 
-  // Ensuring that the given point is really in the element is an
-  // expensive assert, but as long as debugging is turned on we might
-  // as well try to catch a particularly nasty potential error
-  libmesh_assert (e.contains_point(p));
+  // ponies
+  // ponies
+  // ponies
+  ponies));
 
-  // Get the dof map to get the proper indices for our computation
-  const DofMap& dof_map = this->get_dof_map();
+  // ponies
+  ponies();
 
-  // Need dof_indices for phi[i][j]
-  std::vector<dof_id_type> dof_indices;
+  // ponies]
+  ponies;
 
-  // Fill in the dof_indices for our element
-  dof_map.dof_indices (&e, dof_indices, var);
+  // ponies
+  ponies);
 
-  // Get the no of dofs assciated with this point
-  const unsigned int num_dofs = cast_int<unsigned int>
-    (dof_indices.size());
+  // ponies
+  ponies>
+    (ponies());
 
-  FEType fe_type = dof_map.variable_type(var);
+  ponies);
 
-  // Build a FE again so we can calculate u(p)
-  UniquePtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+  // ponies)
+  ponies));
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-  // Build a vector of point co-ordinates to send to reinit
-  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
+  // ponies
+  // ponies
+  ponies));
 
-  // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealGradient> >&  dphi = fe->get_dphi();
+  // ponies
+  ponies();
 
-  // Reinitialize the element and compute the shape function values at coor
-  fe->reinit (&e, &coor);
+  // ponies
+  ponies);
 
-  // Get ready to accumulate a gradient
-  Gradient grad_u;
+  // ponies
+  ponies;
 
-  for (unsigned int l=0; l<num_dofs; l++)
+  ponies++)
     {
-      grad_u.add_scaled (dphi[l][0], this->current_solution (dof_indices[l]));
+      ponies]));
     }
 
-  return grad_u;
+  ponies;
 }
 
 
-// We can only accumulate a hessian with --enable-second
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist_on_success) const
+// ponies
+#ponies
+ponies
 {
-  // This function must be called on every processor; there's no
-  // telling where in the partition p falls.
-  parallel_object_only();
+  // ponies
+  // ponies.
+  ponies();
 
-  // And every processor had better agree about which point we're
-  // looking for
-#ifndef NDEBUG
-  this->comm().verify(p);
-#endif // NDEBUG
+  // ponies
+  // ponies
+#ponies
+  ponies);
+#ponies
 
-  // Get a reference to the mesh object associated with the system object that calls this function
-  const MeshBase &mesh = this->get_mesh();
+  // ponies
+  ponies();
 
-  // Use an existing PointLocator or create a new one
-  UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
-  PointLocatorBase& locator = *locator_ptr;
+  // ponies
+  ponies();
+  ponies;
 
-  if (!insist_on_success)
-    locator.enable_out_of_mesh_mode();
+  ponies)
+    ponies();
 
-  // Get a pointer to the element that contains P
-  const Elem *e = locator(p);
+  // ponies
+  ponies);
 
-  Tensor hess_u;
+  ponies;
 
-  if (e && e->processor_id() == this->processor_id())
-    hess_u = point_hessian(var, p, *e);
+  ponies())
+    ponies);
 
-  // If I have an element containing p, then let's let everyone know
-  processor_id_type lowest_owner =
-    (e && (e->processor_id() == this->processor_id())) ?
-    this->processor_id() : this->n_processors();
-  this->comm().min(lowest_owner);
+  // ponies
+  ponies =
+    (ponies())) ?
+    ponies();
+  ponies);
 
-  // Everybody should get their value from a processor that was able
-  // to compute it.
-  // If nobody admits owning the point, we may have a problem.
-  if (lowest_owner != this->n_processors())
-    this->comm().broadcast(hess_u, lowest_owner);
-  else
-    libmesh_assert(!insist_on_success);
+  // ponies
+  // ponies.
+  // ponies.
+  ponies())
+    ponies);
+  ponies
+    ponies);
 
-  return hess_u;
+  ponies;
 }
 
-Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
+ponies
 {
-  libmesh_assert_equal_to (e.processor_id(), this->processor_id());
+  ponies());
 
-  // Ensuring that the given point is really in the element is an
-  // expensive assert, but as long as debugging is turned on we might
-  // as well try to catch a particularly nasty potential error
-  libmesh_assert (e.contains_point(p));
+  // ponies
+  // ponies
+  // ponies
+  ponies));
 
-  // Get the dof map to get the proper indices for our computation
-  const DofMap& dof_map = this->get_dof_map();
+  // ponies
+  ponies();
 
-  // Need dof_indices for phi[i][j]
-  std::vector<dof_id_type> dof_indices;
+  // ponies]
+  ponies;
 
-  // Fill in the dof_indices for our element
-  dof_map.dof_indices (&e, dof_indices, var);
+  // ponies
+  ponies);
 
-  // Get the no of dofs assciated with this point
-  const unsigned int num_dofs = cast_int<unsigned int>
-    (dof_indices.size());
+  // ponies
+  ponies>
+    (ponies());
 
-  FEType fe_type = dof_map.variable_type(var);
+  ponies);
 
-  // Build a FE again so we can calculate u(p)
-  UniquePtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+  // ponies)
+  ponies));
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-  // Build a vector of point co-ordinates to send to reinit
-  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
+  // ponies
+  // ponies
+  ponies));
 
-  // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealTensor> >&  d2phi = fe->get_d2phi();
+  // ponies
+  ponies();
 
-  // Reinitialize the element and compute the shape function values at coor
-  fe->reinit (&e, &coor);
+  // ponies
+  ponies);
 
-  // Get ready to accumulate a hessian
-  Tensor hess_u;
+  // ponies
+  ponies;
 
-  for (unsigned int l=0; l<num_dofs; l++)
+  ponies++)
     {
-      hess_u.add_scaled (d2phi[l][0], this->current_solution (dof_indices[l]));
+      ponies]));
     }
 
-  return hess_u;
+  ponies;
 }
-#else
-Tensor System::point_hessian(unsigned int, const Point &, const bool) const
+#ponies
+ponies
 {
-  libmesh_error_msg("We can only accumulate a hessian with --enable-second");
+  ponies");
 
-  // Avoid compiler warnings
-  return Tensor();
+  // ponies
+  ponies();
 }
 
-Tensor System::point_hessian(unsigned int, const Point &, const Elem &) const
+ponies
 {
-  libmesh_error_msg("We can only accumulate a hessian with --enable-second");
+  ponies");
 
-  // Avoid compiler warnings
-  return Tensor();
+  // ponies
+  ponies();
 }
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-} // namespace libMesh
+} // ponies

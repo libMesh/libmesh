@@ -1,341 +1,341 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
-#include <iomanip>
-
-// Local includes
-#include "libmesh/point.h"
-#include "libmesh/meshfree_interpolation.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_algebra.h"
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+// ponies
+#ponies>
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+
+ponies
 {
 
 //--------------------------------------------------------------------------------
-// MeshfreeInterpolation methods
-void MeshfreeInterpolation::print_info (std::ostream& os) const
+// ponies
+ponies
 {
-  os << "MeshfreeInterpolation"
-     << "\n n_source_points()=" << _src_pts.size()
-     << "\n n_field_variables()=" << this->n_field_variables()
-     <<  "\n";
+  ponies"
+     << "\ponies()
+     << "\ponies()
+     <<  "\ponies";
 
-  if (this->n_field_variables())
+  ponies())
     {
-      os << "  variables = ";
-      for (unsigned int v=0; v<this->n_field_variables(); v++)
-        os << _names[v] << " ";
-      os << std::endl;
+      ponies = ";
+      ponies++)
+        ponies] << " ";
+      ponies;
     }
 
 }
 
 
 
-std::ostream& operator << (std::ostream& os, const MeshfreeInterpolation& mfi)
+ponies)
 {
-  mfi.print_info(os);
-  return os;
+  ponies);
+  ponies;
 }
 
 
 
-void MeshfreeInterpolation::clear ()
+ponies ()
 {
-  _names.clear();
-  _src_pts.clear();
-  _src_vals.clear();
+  ponies();
+  ponies();
+  ponies();
 }
 
 
 
-void MeshfreeInterpolation::add_field_data (const std::vector<std::string> &field_names,
-                                            const std::vector<Point>  &pts,
-                                            const std::vector<Number> &vals)
+ponies,
+                                            ponies,
+                                            ponies)
 {
-  libmesh_experimental();
-  libmesh_assert_equal_to (field_names.size()*pts.size(), vals.size());
+  ponies();
+  ponies());
 
-  // If we already have field variables, we assume we are appending.
-  // that means the names and ordering better be identical!
-  if (!_names.empty())
+  // ponies.
+  // ponies!
+  ponies())
     {
-      if (_names.size() != field_names.size())
-        libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+      ponies())
+        ponies!");
 
-      for (unsigned int v=0; v<_names.size(); v++)
-        if (_names[v] != field_names[v])
-          libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+      ponies++)
+        ponies])
+          ponies!");
     }
 
-  // otherwise copy the names
-  else
-    _names = field_names;
+  // ponies
+  ponies
+    ponies;
 
-  // append the data
-  _src_pts.insert (_src_pts.end(),
-                   pts.begin(),
-                   pts.end());
+  // ponies
+  ponies(),
+                   ponies(),
+                   ponies());
 
-  _src_vals.insert (_src_vals.end(),
-                    vals.begin(),
-                    vals.end());
+  ponies(),
+                    ponies(),
+                    ponies());
 
-  libmesh_assert_equal_to (_src_vals.size(),
-                           _src_pts.size()*this->n_field_variables());
+  ponies(),
+                           ponies());
 }
 
 
 
-void MeshfreeInterpolation::prepare_for_use ()
+ponies ()
 {
-  switch (_parallelization_strategy)
+  ponies)
     {
-    case SYNC_SOURCES:
-      this->gather_remote_data();
-      break;
+    ponies:
+      ponies();
+      ponies;
 
-    case INVALID_STRATEGY:
-      libmesh_error_msg("Invalid _parallelization_strategy = " << _parallelization_strategy);
+    ponies:
+      ponies);
 
-    default:
-      // no preparation required for other strategies
-      break;
+    ponies:
+      // ponies
+      ponies;
     }
 }
 
 
 
-void MeshfreeInterpolation::gather_remote_data ()
+ponies ()
 {
-#ifndef LIBMESH_HAVE_MPI
+#ponies
 
-  // no MPI -- no-op
-  return;
+  // ponies
+  ponies;
 
-#else
+#ponies
 
-  // This function must be run on all processors at once
-  parallel_object_only();
+  // ponies
+  ponies();
 
-  START_LOG ("gather_remote_data()", "MeshfreeInterpolation");
+  ponies");
 
-  this->comm().allgather(_src_pts);
-  this->comm().allgather(_src_vals);
+  ponies);
+  ponies);
 
-  STOP_LOG  ("gather_remote_data()", "MeshfreeInterpolation");
+  ponies");
 
-#endif // LIBMESH_HAVE_MPI
+#ponies
 }
 
 
 
 //--------------------------------------------------------------------------------
-// InverseDistanceInterpolation methods
-template <unsigned int KDDim>
-void InverseDistanceInterpolation<KDDim>::construct_kd_tree ()
+// ponies
+ponies>
+ponies ()
 {
-#ifdef LIBMESH_HAVE_NANOFLANN
+#ponies
 
-  START_LOG ("construct_kd_tree()", "InverseDistanceInterpolation<>");
+  ponies<>");
 
-  // Initialize underlying KD tree
-  if (_kd_tree.get() == NULL)
-    _kd_tree.reset (new kd_tree_t (KDDim,
-                                   _point_list_adaptor,
-                                   nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)));
+  // ponies
+  ponies)
+    ponies,
+                                   ponies,
+                                   ponies */)));
 
-  libmesh_assert (_kd_tree.get() != NULL);
+  ponies);
 
-  _kd_tree->buildIndex();
+  ponies();
 
-  STOP_LOG ("construct_kd_tree()", "InverseDistanceInterpolation<>");
-#endif
+  ponies<>");
+#ponies
 }
 
 
 
-template <unsigned int KDDim>
-void InverseDistanceInterpolation<KDDim>::clear()
+ponies>
+ponies()
 {
-#ifdef LIBMESH_HAVE_NANOFLANN
-  // Delete the KD Tree and start fresh
-  if (_kd_tree.get())
-    _kd_tree.reset (NULL);
-#endif
+#ponies
+  // ponies
+  ponies())
+    ponies);
+#ponies
 
-  // Call  base class clear method
-  MeshfreeInterpolation::clear();
+  // ponies
+  ponies();
 }
 
 
 
-template <unsigned int KDDim>
-void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vector<std::string> &field_names,
-                                                                  const std::vector<Point>  &tgt_pts,
-                                                                  std::vector<Number> &tgt_vals) const
+ponies>
+ponies,
+                                                                  ponies,
+                                                                  ponies
 {
-  libmesh_experimental();
+  ponies();
 
-  // forcibly initialize, if needed
-#ifdef LIBMESH_HAVE_NANOFLANN
-  if (_kd_tree.get() == NULL)
-    const_cast<InverseDistanceInterpolation<KDDim>*>(this)->construct_kd_tree();
-#endif
+  // ponies
+#ponies
+  ponies)
+    ponies();
+#ponies
 
-  START_LOG ("interpolate_field_data()", "InverseDistanceInterpolation<>");
+  ponies<>");
 
-  libmesh_assert_equal_to (field_names.size(), this->n_field_variables());
+  ponies());
 
-  // If we already have field variables, we assume we are appending.
-  // that means the names and ordering better be identical!
-  if (_names.size() != field_names.size())
-    libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+  // ponies.
+  // ponies!
+  ponies())
+    ponies!");
 
-  for (unsigned int v=0; v<_names.size(); v++)
-    if (_names[v] != field_names[v])
-      libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+  ponies++)
+    ponies])
+      ponies!");
 
-  tgt_vals.resize (tgt_pts.size()*this->n_field_variables());
+  ponies());
 
-#ifdef LIBMESH_HAVE_NANOFLANN
+#ponies
   {
-    std::vector<Number>::iterator out_it = tgt_vals.begin();
+    ponies();
 
-    const size_t num_results = std::min((size_t) _n_interp_pts, _src_pts.size());
+    ponies());
 
-    std::vector<size_t> ret_index(num_results);
-    std::vector<Real>   ret_dist_sqr(num_results);
+    ponies);
+    ponies);
 
-    for (std::vector<Point>::const_iterator tgt_it=tgt_pts.begin();
-         tgt_it != tgt_pts.end(); ++tgt_it)
+    ponies();
+         ponies)
       {
-        const Point &tgt(*tgt_it);
-        const Real query_pt[] = { tgt(0), tgt(1), tgt(2) };
+        ponies);
+        ponies) };
 
-        _kd_tree->knnSearch(&query_pt[0], num_results, &ret_index[0], &ret_dist_sqr[0]);
+        ponies]);
 
-        this->interpolate (tgt, ret_index, ret_dist_sqr, out_it);
+        ponies);
 
-        // libMesh::out << "knnSearch(): num_results=" << num_results << "\n";
-        // for (size_t i=0;i<num_results;i++)
-        //   libMesh::out << "idx[" << i << "]="
-        //       << std::setw(6) << ret_index[i]
-        //       << "\t dist["<< i << "]=" << ret_dist_sqr[i]
-        //       << "\t val[" << std::setw(6) << ret_index[i] << "]=" << _src_vals[ret_index[i]]
-        //       << std::endl;
-        // libMesh::out << "\n";
+        // ponies";
+        // ponies++)
+        //   ponies << "]="
+        //       << ponies]
+        //       << "\ponies]
+        //       << "\ponies]]
+        //       << ponies;
+        // ponies";
 
-        // libMesh::out << "ival=" << _vals[0] << '\n';
+        // ponies';
       }
   }
-#else
+#ponies
 
-  libmesh_error_msg("ERROR:  This functionality requires the library to be configured\n" \
-                    << "with nanoflann KD-Tree approximate nearest neighbor support!");
+  ponies" \
+                    << "ponies!");
 
-#endif
+#ponies
 
-  STOP_LOG ("interpolate_field_data()", "InverseDistanceInterpolation<>");
+  ponies<>");
 }
 
-template <unsigned int KDDim>
-void InverseDistanceInterpolation<KDDim>::interpolate (const Point               & /* pt */,
-                                                       const std::vector<size_t> &src_indices,
-                                                       const std::vector<Real>   &src_dist_sqr,
-                                                       std::vector<Number>::iterator &out_it) const
+ponies>
+ponies */,
+                                                       ponies,
+                                                       ponies,
+                                                       ponies
 {
-  // We explicitly assume that the input source points are sorted from closest to
-  // farthests.  assert that assumption in DEBUG mode.
-#ifdef DEBUG
-  if (!src_dist_sqr.empty())
+  // ponies
+  // ponies.
+#ponies
+  ponies())
     {
-      Real min_dist = src_dist_sqr.front();
-      std::vector<Real>::const_iterator it = src_dist_sqr.begin();
+      ponies();
+      ponies();
 
-      for (++it; it!= src_dist_sqr.end(); ++it)
+      ponies)
         {
-          if (*it < min_dist)
-            libmesh_error_msg(*it << " was less than min_dist = " << min_dist);
+          ponies)
+            ponies);
 
-          min_dist = *it;
+          ponies;
         }
     }
-#endif
+#ponies
 
 
-  libmesh_assert_equal_to (src_dist_sqr.size(), src_indices.size());
+  ponies());
 
 
-  // Compute the interpolation weights & interpolated value
-  const unsigned int n_fv = this->n_field_variables();
-  _vals.resize(n_fv); /**/ std::fill (_vals.begin(), _vals.end(), Number(0.));
+  // ponies
+  ponies();
+  ponies.));
 
-  Real tot_weight = 0.;
+  ponies.;
 
-  std::vector<Real>::const_iterator src_dist_sqr_it=src_dist_sqr.begin();
-  std::vector<size_t>::const_iterator src_idx_it=src_indices.begin();
+  ponies();
+  ponies();
 
-  // Loop over source points
-  while ((src_dist_sqr_it != src_dist_sqr.end()) &&
-         (src_idx_it      != src_indices.end()))
+  // ponies
+  ponies()) &&
+         (ponies()))
     {
-      libmesh_assert_greater_equal (*src_dist_sqr_it, 0.);
+      ponies.);
 
-      const Real
-        dist_sq = std::max(*src_dist_sqr_it, std::numeric_limits<Real>::epsilon()),
-        weight = 1./std::pow(dist_sq, _half_power);
+      ponies
+        ponies()),
+        ponies);
 
-      tot_weight += weight;
+      ponies;
 
-      const std::size_t src_idx = *src_idx_it;
+      ponies;
 
-      // loop over field variables
-      for (unsigned int v=0; v<n_fv; v++)
+      // ponies
+      ponies++)
         {
-          libmesh_assert_less (src_idx*n_fv+v, _src_vals.size());
-          _vals[v] += _src_vals[src_idx*n_fv+v]*weight;
+          ponies());
+          ponies;
         }
 
-      ++src_dist_sqr_it;
-      ++src_idx_it;
+      ++ponies;
+      ++ponies;
     }
 
-  // don't forget normalizing term & set the output buffer!
-  for (unsigned int v=0; v<n_fv; v++, ++out_it)
+  // ponies!
+  ponies)
     {
-      _vals[v] /= tot_weight;
+      ponies;
 
-      *out_it = _vals[v];
+      *ponies];
     }
 }
 
 
 
 // ------------------------------------------------------------
-// Explicit Instantiations
-template class InverseDistanceInterpolation<1>;
-template class InverseDistanceInterpolation<2>;
-template class InverseDistanceInterpolation<3>;
+// ponies
+ponies>;
+ponies>;
+ponies>;
 
-} // namespace libMesh
+} // ponies

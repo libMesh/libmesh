@@ -1,78 +1,78 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
+// ponies
 
-// Local Includes
-#include "libmesh/elem.h"
-#include "libmesh/hp_singular.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/system.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-namespace libMesh
+ponies
 {
 
 //-----------------------------------------------------------------
-// HPSingularity implementations
+// ponies
 
 
-void HPSingularity::select_refinement (System &system)
+ponies)
 {
-  START_LOG("select_refinement()", "HPSingularity");
+  ponies");
 
-  // The current mesh
-  MeshBase& mesh = system.get_mesh();
+  // ponies
+  ponies();
 
-  MeshBase::element_iterator       elem_it  =
-    mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end =
-    mesh.active_local_elements_end();
+  ponies  =
+    ponies();
+  ponies =
+    ponies();
 
-  for (; elem_it != elem_end; ++elem_it)
+  ponies)
     {
-      Elem* elem = *elem_it;
+      ponies;
 
-      // We're only checking elements that are already flagged for h
-      // refinement
-      if (elem->refinement_flag() != Elem::REFINE)
-        continue;
+      // ponies
+      // ponies
+      ponies)
+        ponies;
 
-      elem->set_p_refinement_flag(Elem::REFINE);
-      elem->set_refinement_flag(Elem::DO_NOTHING);
+      ponies);
+      ponies);
 
-      for (std::list<Point>::iterator ppoint =
-             singular_points.begin();
-           ppoint != singular_points.end(); ++ppoint)
+      ponies =
+             ponies();
+           ponies)
         {
-          if (elem->contains_point(*ppoint))
+          ponies))
             {
-              elem->set_p_refinement_flag(Elem::DO_NOTHING);
-              elem->set_refinement_flag(Elem::REFINE);
-              break;
+              ponies);
+              ponies);
+              ponies;
             }
         }
     }
 
-  STOP_LOG("select_refinement()", "HPSingularity");
+  ponies");
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies

@@ -1,144 +1,144 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ Includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for sqrt
+// ponies
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/libmesh.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// Dense Matrix member functions
+// ponies
 
-template<typename T>
-void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
+ponies>
+ponies)
 {
-  if (this->use_blas_lapack)
-    this->_multiply_blas(M2, LEFT_MULTIPLY);
-  else
+  ponies)
+    ponies);
+  ponies
     {
-      // (*this) <- M2 * (*this)
-      // Where:
-      // (*this) = (m x n),
-      // M2      = (m x p),
-      // M3      = (p x n)
+      // (*ponies)
+      // ponies:
+      // (*ponies),
+      // ponies),
+      // ponies)
 
-      // M3 is a copy of *this before it gets resize()d
-      DenseMatrix<T> M3(*this);
+      // ponies
+      ponies);
 
-      // Resize *this so that the result can fit
-      this->resize (M2.m(), M3.n());
+      // ponies
+      ponies());
 
-      // Call the multiply function in the base class
-      this->multiply(*this, M2, M3);
+      // ponies
+      ponies);
     }
 }
 
 
 
-template<typename T>
-template<typename T2>
-void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T2>& M2)
+ponies>
+ponies>
+ponies)
 {
-  // (*this) <- M2 * (*this)
-  // Where:
-  // (*this) = (m x n),
-  // M2      = (m x p),
-  // M3      = (p x n)
+  // (*ponies)
+  // ponies:
+  // (*ponies),
+  // ponies),
+  // ponies)
 
-  // M3 is a copy of *this before it gets resize()d
-  DenseMatrix<T> M3(*this);
+  // ponies
+  ponies);
 
-  // Resize *this so that the result can fit
-  this->resize (M2.m(), M3.n());
+  // ponies
+  ponies());
 
-  // Call the multiply function in the base class
-  this->multiply(*this, M2, M3);
+  // ponies
+  ponies);
 }
 
 
 
-template<typename T>
-void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
+ponies>
+ponies)
 {
-  if (this->use_blas_lapack)
-    this->_multiply_blas(A, LEFT_MULTIPLY_TRANSPOSE);
-  else
+  ponies)
+    ponies);
+  ponies
     {
-      //Check to see if we are doing (A^T)*A
-      if (this == &A)
+      //ponies
+      ponies)
         {
-          //libmesh_here();
-          DenseMatrix<T> B(*this);
+          //ponies();
+          ponies);
 
-          // Simple but inefficient way
-          // return this->left_multiply_transpose(B);
+          // ponies
+          // ponies);
 
-          // More efficient, but more code way
-          // If A is mxn, the result will be a square matrix of Size n x n.
-          const unsigned int n_rows = A.m();
-          const unsigned int n_cols = A.n();
+          // ponies
+          // ponies.
+          ponies();
+          ponies();
 
-          // resize() *this and also zero out all entries.
-          this->resize(n_cols,n_cols);
+          // ponies.
+          ponies);
 
-          // Compute the lower-triangular part
-          for (unsigned int i=0; i<n_cols; ++i)
-            for (unsigned int j=0; j<=i; ++j)
-              for (unsigned int k=0; k<n_rows; ++k) // inner products are over n_rows
-                (*this)(i,j) += B(k,i)*B(k,j);
+          // ponies
+          ponies)
+            ponies)
+              ponies
+                (*ponies);
 
-          // Copy lower-triangular part into upper-triangular part
-          for (unsigned int i=0; i<n_cols; ++i)
-            for (unsigned int j=i+1; j<n_cols; ++j)
-              (*this)(i,j) = (*this)(j,i);
+          // ponies
+          ponies)
+            ponies)
+              (*ponies);
         }
 
-      else
+      ponies
         {
-          DenseMatrix<T> B(*this);
+          ponies);
 
-          this->resize (A.n(), B.n());
+          ponies());
 
-          libmesh_assert_equal_to (A.m(), B.m());
-          libmesh_assert_equal_to (this->m(), A.n());
-          libmesh_assert_equal_to (this->n(), B.n());
+          ponies());
+          ponies());
+          ponies());
 
-          const unsigned int m_s = A.n();
-          const unsigned int p_s = A.m();
-          const unsigned int n_s = this->n();
+          ponies();
+          ponies();
+          ponies();
 
-          // Do it this way because there is a
-          // decent chance (at least for constraint matrices)
-          // that A.transpose(i,k) = 0.
-          for (unsigned int i=0; i<m_s; i++)
-            for (unsigned int k=0; k<p_s; k++)
-              if (A.transpose(i,k) != 0.)
-                for (unsigned int j=0; j<n_s; j++)
-                  (*this)(i,j) += A.transpose(i,k)*B(k,j);
+          // ponies
+          // ponies)
+          // ponies.
+          ponies++)
+            ponies++)
+              ponies.)
+                ponies++)
+                  (*ponies);
         }
     }
 
@@ -146,495 +146,495 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 
 
 
-template<typename T>
-template<typename T2>
-void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T2>& A)
+ponies>
+ponies>
+ponies)
 {
-  //Check to see if we are doing (A^T)*A
-  if (this == &A)
+  //ponies
+  ponies)
     {
-      //libmesh_here();
-      DenseMatrix<T> B(*this);
+      //ponies();
+      ponies);
 
-      // Simple but inefficient way
-      // return this->left_multiply_transpose(B);
+      // ponies
+      // ponies);
 
-      // More efficient, but more code way
-      // If A is mxn, the result will be a square matrix of Size n x n.
-      const unsigned int n_rows = A.m();
-      const unsigned int n_cols = A.n();
+      // ponies
+      // ponies.
+      ponies();
+      ponies();
 
-      // resize() *this and also zero out all entries.
-      this->resize(n_cols,n_cols);
+      // ponies.
+      ponies);
 
-      // Compute the lower-triangular part
-      for (unsigned int i=0; i<n_cols; ++i)
-        for (unsigned int j=0; j<=i; ++j)
-          for (unsigned int k=0; k<n_rows; ++k) // inner products are over n_rows
-            (*this)(i,j) += B(k,i)*B(k,j);
+      // ponies
+      ponies)
+        ponies)
+          ponies
+            (*ponies);
 
-      // Copy lower-triangular part into upper-triangular part
-      for (unsigned int i=0; i<n_cols; ++i)
-        for (unsigned int j=i+1; j<n_cols; ++j)
-          (*this)(i,j) = (*this)(j,i);
+      // ponies
+      ponies)
+        ponies)
+          (*ponies);
     }
 
-  else
+  ponies
     {
-      DenseMatrix<T> B(*this);
+      ponies);
 
-      this->resize (A.n(), B.n());
+      ponies());
 
-      libmesh_assert_equal_to (A.m(), B.m());
-      libmesh_assert_equal_to (this->m(), A.n());
-      libmesh_assert_equal_to (this->n(), B.n());
+      ponies());
+      ponies());
+      ponies());
 
-      const unsigned int m_s = A.n();
-      const unsigned int p_s = A.m();
-      const unsigned int n_s = this->n();
+      ponies();
+      ponies();
+      ponies();
 
-      // Do it this way because there is a
-      // decent chance (at least for constraint matrices)
-      // that A.transpose(i,k) = 0.
-      for (unsigned int i=0; i<m_s; i++)
-        for (unsigned int k=0; k<p_s; k++)
-          if (A.transpose(i,k) != 0.)
-            for (unsigned int j=0; j<n_s; j++)
-              (*this)(i,j) += A.transpose(i,k)*B(k,j);
-    }
-}
-
-
-
-template<typename T>
-void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
-{
-  if (this->use_blas_lapack)
-    this->_multiply_blas(M3, RIGHT_MULTIPLY);
-  else
-    {
-      // (*this) <- M3 * (*this)
-      // Where:
-      // (*this) = (m x n),
-      // M2      = (m x p),
-      // M3      = (p x n)
-
-      // M2 is a copy of *this before it gets resize()d
-      DenseMatrix<T> M2(*this);
-
-      // Resize *this so that the result can fit
-      this->resize (M2.m(), M3.n());
-
-      this->multiply(*this, M2, M3);
+      // ponies
+      // ponies)
+      // ponies.
+      ponies++)
+        ponies++)
+          ponies.)
+            ponies++)
+              (*ponies);
     }
 }
 
 
 
-template<typename T>
-template<typename T2>
-void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T2>& M3)
+ponies>
+ponies)
 {
-  // (*this) <- M3 * (*this)
-  // Where:
-  // (*this) = (m x n),
-  // M2      = (m x p),
-  // M3      = (p x n)
+  ponies)
+    ponies);
+  ponies
+    {
+      // (*ponies)
+      // ponies:
+      // (*ponies),
+      // ponies),
+      // ponies)
 
-  // M2 is a copy of *this before it gets resize()d
-  DenseMatrix<T> M2(*this);
+      // ponies
+      ponies);
 
-  // Resize *this so that the result can fit
-  this->resize (M2.m(), M3.n());
+      // ponies
+      ponies());
 
-  this->multiply(*this, M2, M3);
+      ponies);
+    }
+}
+
+
+
+ponies>
+ponies>
+ponies)
+{
+  // (*ponies)
+  // ponies:
+  // (*ponies),
+  // ponies),
+  // ponies)
+
+  // ponies
+  ponies);
+
+  // ponies
+  ponies());
+
+  ponies);
 }
 
 
 
 
-template<typename T>
-void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
+ponies>
+ponies)
 {
-  if (this->use_blas_lapack)
-    this->_multiply_blas(B, RIGHT_MULTIPLY_TRANSPOSE);
-  else
+  ponies)
+    ponies);
+  ponies
     {
-      //Check to see if we are doing B*(B^T)
-      if (this == &B)
+      //ponies)
+      ponies)
         {
-          //libmesh_here();
-          DenseMatrix<T> A(*this);
+          //ponies();
+          ponies);
 
-          // Simple but inefficient way
-          // return this->right_multiply_transpose(A);
+          // ponies
+          // ponies);
 
-          // More efficient, more code
-          // If B is mxn, the result will be a square matrix of Size m x m.
-          const unsigned int n_rows = B.m();
-          const unsigned int n_cols = B.n();
+          // ponies
+          // ponies.
+          ponies();
+          ponies();
 
-          // resize() *this and also zero out all entries.
-          this->resize(n_rows,n_rows);
+          // ponies.
+          ponies);
 
-          // Compute the lower-triangular part
-          for (unsigned int i=0; i<n_rows; ++i)
-            for (unsigned int j=0; j<=i; ++j)
-              for (unsigned int k=0; k<n_cols; ++k) // inner products are over n_cols
-                (*this)(i,j) += A(i,k)*A(j,k);
+          // ponies
+          ponies)
+            ponies)
+              ponies
+                (*ponies);
 
-          // Copy lower-triangular part into upper-triangular part
-          for (unsigned int i=0; i<n_rows; ++i)
-            for (unsigned int j=i+1; j<n_rows; ++j)
-              (*this)(i,j) = (*this)(j,i);
+          // ponies
+          ponies)
+            ponies)
+              (*ponies);
         }
 
-      else
+      ponies
         {
-          DenseMatrix<T> A(*this);
+          ponies);
 
-          this->resize (A.m(), B.m());
+          ponies());
 
-          libmesh_assert_equal_to (A.n(), B.n());
-          libmesh_assert_equal_to (this->m(), A.m());
-          libmesh_assert_equal_to (this->n(), B.m());
+          ponies());
+          ponies());
+          ponies());
 
-          const unsigned int m_s = A.m();
-          const unsigned int p_s = A.n();
-          const unsigned int n_s = this->n();
+          ponies();
+          ponies();
+          ponies();
 
-          // Do it this way because there is a
-          // decent chance (at least for constraint matrices)
-          // that B.transpose(k,j) = 0.
-          for (unsigned int j=0; j<n_s; j++)
-            for (unsigned int k=0; k<p_s; k++)
-              if (B.transpose(k,j) != 0.)
-                for (unsigned int i=0; i<m_s; i++)
-                  (*this)(i,j) += A(i,k)*B.transpose(k,j);
+          // ponies
+          // ponies)
+          // ponies.
+          ponies++)
+            ponies++)
+              ponies.)
+                ponies++)
+                  (*ponies);
         }
     }
 }
 
 
 
-template<typename T>
-template<typename T2>
-void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T2>& B)
+ponies>
+ponies>
+ponies)
 {
-  //Check to see if we are doing B*(B^T)
-  if (this == &B)
+  //ponies)
+  ponies)
     {
-      //libmesh_here();
-      DenseMatrix<T> A(*this);
+      //ponies();
+      ponies);
 
-      // Simple but inefficient way
-      // return this->right_multiply_transpose(A);
+      // ponies
+      // ponies);
 
-      // More efficient, more code
-      // If B is mxn, the result will be a square matrix of Size m x m.
-      const unsigned int n_rows = B.m();
-      const unsigned int n_cols = B.n();
+      // ponies
+      // ponies.
+      ponies();
+      ponies();
 
-      // resize() *this and also zero out all entries.
-      this->resize(n_rows,n_rows);
+      // ponies.
+      ponies);
 
-      // Compute the lower-triangular part
-      for (unsigned int i=0; i<n_rows; ++i)
-        for (unsigned int j=0; j<=i; ++j)
-          for (unsigned int k=0; k<n_cols; ++k) // inner products are over n_cols
-            (*this)(i,j) += A(i,k)*A(j,k);
+      // ponies
+      ponies)
+        ponies)
+          ponies
+            (*ponies);
 
-      // Copy lower-triangular part into upper-triangular part
-      for (unsigned int i=0; i<n_rows; ++i)
-        for (unsigned int j=i+1; j<n_rows; ++j)
-          (*this)(i,j) = (*this)(j,i);
+      // ponies
+      ponies)
+        ponies)
+          (*ponies);
     }
 
-  else
+  ponies
     {
-      DenseMatrix<T> A(*this);
+      ponies);
 
-      this->resize (A.m(), B.m());
+      ponies());
 
-      libmesh_assert_equal_to (A.n(), B.n());
-      libmesh_assert_equal_to (this->m(), A.m());
-      libmesh_assert_equal_to (this->n(), B.m());
+      ponies());
+      ponies());
+      ponies());
 
-      const unsigned int m_s = A.m();
-      const unsigned int p_s = A.n();
-      const unsigned int n_s = this->n();
+      ponies();
+      ponies();
+      ponies();
 
-      // Do it this way because there is a
-      // decent chance (at least for constraint matrices)
-      // that B.transpose(k,j) = 0.
-      for (unsigned int j=0; j<n_s; j++)
-        for (unsigned int k=0; k<p_s; k++)
-          if (B.transpose(k,j) != 0.)
-            for (unsigned int i=0; i<m_s; i++)
-              (*this)(i,j) += A(i,k)*B.transpose(k,j);
-    }
-}
-
-
-
-
-template<typename T>
-void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
-                                  const DenseVector<T>& arg) const
-{
-  // Make sure the input sizes are compatible
-  libmesh_assert_equal_to (this->n(), arg.size());
-
-  // Resize and clear dest.
-  // Note: DenseVector::resize() also zeros the vector.
-  dest.resize(this->m());
-
-  // Short-circuit if the matrix is empty
-  if(this->m() == 0 || this->n() == 0)
-    return;
-
-  if (this->use_blas_lapack)
-    this->_matvec_blas(1., 0., dest, arg);
-  else
-    {
-      const unsigned int n_rows = this->m();
-      const unsigned int n_cols = this->n();
-
-      for(unsigned int i=0; i<n_rows; i++)
-        for(unsigned int j=0; j<n_cols; j++)
-          dest(i) += (*this)(i,j)*arg(j);
+      // ponies
+      // ponies)
+      // ponies.
+      ponies++)
+        ponies++)
+          ponies.)
+            ponies++)
+              (*ponies);
     }
 }
 
 
 
-template<typename T>
-template<typename T2>
-void DenseMatrix<T>::vector_mult (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-                                  const DenseVector<T2>& arg) const
+
+ponies>
+ponies,
+                                  ponies
 {
-  // Make sure the input sizes are compatible
-  libmesh_assert_equal_to (this->n(), arg.size());
+  // ponies
+  ponies());
 
-  // Resize and clear dest.
-  // Note: DenseVector::resize() also zeros the vector.
-  dest.resize(this->m());
+  // ponies.
+  // ponies.
+  ponies());
 
-  // Short-circuit if the matrix is empty
-  if(this->m() == 0 || this->n() == 0)
-    return;
+  // ponies
+  ponies)
+    ponies;
 
-  const unsigned int n_rows = this->m();
-  const unsigned int n_cols = this->n();
-
-  for(unsigned int i=0; i<n_rows; i++)
-    for(unsigned int j=0; j<n_cols; j++)
-      dest(i) += (*this)(i,j)*arg(j);
-}
-
-
-
-template<typename T>
-void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
-                                            const DenseVector<T>& arg) const
-{
-  // Make sure the input sizes are compatible
-  libmesh_assert_equal_to (this->m(), arg.size());
-
-  // Resize and clear dest.
-  // Note: DenseVector::resize() also zeros the vector.
-  dest.resize(this->n());
-
-  // Short-circuit if the matrix is empty
-  if(this->m() == 0)
-    return;
-
-  if (this->use_blas_lapack)
+  ponies)
+    ponies);
+  ponies
     {
-      this->_matvec_blas(1., 0., dest, arg, /*trans=*/true);
-    }
-  else
-    {
-      const unsigned int n_rows = this->m();
-      const unsigned int n_cols = this->n();
+      ponies();
+      ponies();
 
-      // WORKS
-      // for(unsigned int j=0; j<n_cols; j++)
-      //   for(unsigned int i=0; i<n_rows; i++)
-      //     dest(j) += (*this)(i,j)*arg(i);
-
-      // ALSO WORKS, (i,j) just swapped
-      for(unsigned int i=0; i<n_cols; i++)
-        for(unsigned int j=0; j<n_rows; j++)
-          dest(i) += (*this)(j,i)*arg(j);
+      ponies++)
+        ponies++)
+          ponies);
     }
 }
 
 
 
-template<typename T>
-template<typename T2>
-void DenseMatrix<T>::vector_mult_transpose (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-                                            const DenseVector<T2>& arg) const
+ponies>
+ponies>
+ponies,
+                                  ponies
 {
-  // Make sure the input sizes are compatible
-  libmesh_assert_equal_to (this->m(), arg.size());
+  // ponies
+  ponies());
 
-  // Resize and clear dest.
-  // Note: DenseVector::resize() also zeros the vector.
-  dest.resize(this->n());
+  // ponies.
+  // ponies.
+  ponies());
 
-  // Short-circuit if the matrix is empty
-  if(this->m() == 0)
-    return;
+  // ponies
+  ponies)
+    ponies;
 
-  const unsigned int n_rows = this->m();
-  const unsigned int n_cols = this->n();
+  ponies();
+  ponies();
 
-  // WORKS
-  // for(unsigned int j=0; j<n_cols; j++)
-  //   for(unsigned int i=0; i<n_rows; i++)
-  //     dest(j) += (*this)(i,j)*arg(i);
-
-  // ALSO WORKS, (i,j) just swapped
-  for(unsigned int i=0; i<n_cols; i++)
-    for(unsigned int j=0; j<n_rows; j++)
-      dest(i) += (*this)(j,i)*arg(j);
+  ponies++)
+    ponies++)
+      ponies);
 }
 
 
 
-template<typename T>
-void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
-                                      const T factor,
-                                      const DenseVector<T>& arg) const
+ponies>
+ponies,
+                                            ponies
 {
-  // Short-circuit if the matrix is empty
-  if(this->m() == 0)
+  // ponies
+  ponies());
+
+  // ponies.
+  // ponies.
+  ponies());
+
+  // ponies
+  ponies)
+    ponies;
+
+  ponies)
     {
-      dest.resize(0);
-      return;
+      ponies);
+    }
+  ponies
+    {
+      ponies();
+      ponies();
+
+      // ponies
+      // ponies++)
+      //   ponies++)
+      //     ponies);
+
+      // ponies
+      ponies++)
+        ponies++)
+          ponies);
+    }
+}
+
+
+
+ponies>
+ponies>
+ponies,
+                                            ponies
+{
+  // ponies
+  ponies());
+
+  // ponies.
+  // ponies.
+  ponies());
+
+  // ponies
+  ponies)
+    ponies;
+
+  ponies();
+  ponies();
+
+  // ponies
+  // ponies++)
+  //   ponies++)
+  //     ponies);
+
+  // ponies
+  ponies++)
+    ponies++)
+      ponies);
+}
+
+
+
+ponies>
+ponies,
+                                      ponies,
+                                      ponies
+{
+  // ponies
+  ponies)
+    {
+      ponies);
+      ponies;
     }
 
-  if (this->use_blas_lapack)
-    this->_matvec_blas(factor, 1., dest, arg);
-  else
+  ponies)
+    ponies);
+  ponies
     {
-      DenseVector<T> temp(arg.size());
-      this->vector_mult(temp, arg);
-      dest.add(factor, temp);
+      ponies());
+      ponies);
+      ponies);
     }
 }
 
 
 
-template<typename T>
-template<typename T2, typename T3>
-void DenseMatrix<T>::vector_mult_add (DenseVector<typename CompareTypes<T, typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
-                                      const T2 factor,
-                                      const DenseVector<T3>& arg) const
+ponies>
+ponies>
+ponies,
+                                      ponies,
+                                      ponies
 {
-  // Short-circuit if the matrix is empty
-  if (this->m() == 0)
+  // ponies
+  ponies)
     {
-      dest.resize(0);
-      return;
+      ponies);
+      ponies;
     }
 
-  DenseVector<typename CompareTypes<T,T3>::supertype>
-    temp(arg.size());
-  this->vector_mult(temp, arg);
-  dest.add(factor, temp);
+  ponies>
+    ponies());
+  ponies);
+  ponies);
 }
 
 
 
-template<typename T>
-void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m,
-                                              unsigned int sub_n,
-                                              DenseMatrix<T>& dest) const
+ponies>
+ponies,
+                                              ponies,
+                                              ponies
 {
-  libmesh_assert( (sub_m <= this->m()) && (sub_n <= this->n()) );
+  ponies()) );
 
-  dest.resize(sub_m, sub_n);
-  for(unsigned int i=0; i<sub_m; i++)
-    for(unsigned int j=0; j<sub_n; j++)
-      dest(i,j) = (*this)(i,j);
+  ponies);
+  ponies++)
+    ponies++)
+      ponies);
 }
 
 
 
-template<typename T>
-void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m, DenseMatrix<T>& dest) const
+ponies>
+ponies
 {
-  get_principal_submatrix(sub_m, sub_m, dest);
+  ponies);
 }
 
 
 
-template<typename T>
-void DenseMatrix<T>::get_transpose (DenseMatrix<T>& dest) const
+ponies>
+ponies
 {
-  dest.resize(this->n(), this->m());
+  ponies());
 
-  for (unsigned int i=0; i<dest.m(); i++)
-    for (unsigned int j=0; j<dest.n(); j++)
-      dest(i,j) = (*this)(j,i);
+  ponies++)
+    ponies++)
+      ponies);
 }
 
 
 
 
-template<typename T>
-void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
-                               DenseVector<T>& x)
+ponies>
+ponies,
+                               ponies)
 {
-  // Check to be sure that the matrix is square before attempting
-  // an LU-solve.  In general, one can compute the LU factorization of
-  // a non-square matrix, but:
+  // ponies
+  // ponies
+  // ponies:
   //
-  // Overdetermined systems (m>n) have a solution only if enough of
-  // the equations are linearly-dependent.
+  // ponies
+  // ponies.
   //
-  // Underdetermined systems (m<n) typically have infinitely many
-  // solutions.
+  // ponies
+  // ponies.
   //
-  // We don't want to deal with either of these ambiguous cases here...
-  libmesh_assert_equal_to (this->m(), this->n());
+  // ponies...
+  ponies());
 
-  switch(this->_decomposition_type)
+  ponies)
     {
-    case NONE:
+    ponies:
       {
-        if (this->use_blas_lapack)
-          this->_lu_decompose_lapack();
-        else
-          this->_lu_decompose ();
-        break;
+        ponies)
+          ponies();
+        ponies
+          ponies ();
+        ponies;
       }
 
-    case LU_BLAS_LAPACK:
+    ponies:
       {
-        // Already factored, just need to call back_substitute.
-        if (this->use_blas_lapack)
-          break;
+        // ponies.
+        ponies)
+          ponies;
       }
 
-    case LU:
+    ponies:
       {
-        // Already factored, just need to call back_substitute.
-        if ( !(this->use_blas_lapack) )
-          break;
+        // ponies.
+        ponies) )
+          ponies;
       }
 
-    default:
-      libmesh_error_msg("Error! This matrix already has a different decomposition...");
+    ponies:
+      ponies...");
     }
 
-  if (this->use_blas_lapack)
-    this->_lu_back_substitute_lapack (b, x);
-  else
-    this->_lu_back_substitute (b, x);
+  ponies)
+    ponies);
+  ponies
+    ponies);
 }
 
 
@@ -642,47 +642,47 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
 
 
 
-template<typename T>
-void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
-                                          DenseVector<T>& x ) const
+ponies>
+ponies,
+                                          ponies
 {
-  const unsigned int
-    n_cols = this->n();
+  ponies
+    ponies();
 
-  libmesh_assert_equal_to (this->m(), n_cols);
-  libmesh_assert_equal_to (this->m(), b.size());
+  ponies);
+  ponies());
 
-  x.resize (n_cols);
+  ponies);
 
-  // A convenient reference to *this
-  const DenseMatrix<T>& A = *this;
+  // ponies
+  ponies;
 
-  // Temporary vector storage.  We use this instead of
-  // modifying the RHS.
-  DenseVector<T> z = b;
+  // ponies
+  // ponies.
+  ponies;
 
-  // Lower-triangular "top to bottom" solve step, taking into account pivots
-  for (unsigned int i=0; i<n_cols; ++i)
+  // ponies
+  ponies)
     {
-      // Swap
-      if (_pivots[i] != static_cast<int>(i))
-        std::swap( z(i), z(_pivots[i]) );
+      // ponies
+      ponies))
+        ponies]) );
 
-      x(i) = z(i);
+      ponies);
 
-      for (unsigned int j=0; j<i; ++j)
-        x(i) -= A(i,j)*x(j);
+      ponies)
+        ponies);
 
-      x(i) /= A(i,i);
+      ponies);
     }
 
-  // Upper-triangular "bottom to top" solve step
-  const unsigned int last_row = n_cols-1;
+  // ponies
+  ponies;
 
-  for (int i=last_row; i>=0; --i)
+  ponies)
     {
-      for (int j=i+1; j<static_cast<int>(n_cols); ++j)
-        x(i) -= A(i,j)*x(j);
+      ponies)
+        ponies);
     }
 }
 
@@ -693,287 +693,287 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
 
 
 
-template<typename T>
-void DenseMatrix<T>::_lu_decompose ()
+ponies>
+ponies ()
 {
-  // If this function was called, there better not be any
-  // previous decomposition of the matrix.
-  libmesh_assert_equal_to (this->_decomposition_type, NONE);
+  // ponies
+  // ponies.
+  ponies);
 
-  // Get the matrix size and make sure it is square
-  const unsigned int
-    n_rows = this->m();
+  // ponies
+  ponies
+    ponies();
 
-  // A convenient reference to *this
-  DenseMatrix<T>& A = *this;
+  // ponies
+  ponies;
 
-  _pivots.resize(n_rows);
+  ponies);
 
-  for (unsigned int i=0; i<n_rows; ++i)
+  ponies)
     {
-      // Find the pivot row by searching down the i'th column
-      _pivots[i] = i;
+      // ponies
+      ponies;
 
-      // std::abs(complex) must return a Real!
-      Real the_max = std::abs( A(i,i) );
-      for (unsigned int j=i+1; j<n_rows; ++j)
+      // ponies!
+      ponies) );
+      ponies)
         {
-          Real candidate_max = std::abs( A(j,i) );
-          if (the_max < candidate_max)
+          ponies) );
+          ponies)
             {
-              the_max = candidate_max;
-              _pivots[i] = j;
+              ponies;
+              ponies;
             }
         }
 
-      // libMesh::out << "the_max=" << the_max << " found at row " << _pivots[i] << std::endl;
+      // ponies;
 
-      // If the max was found in a different row, interchange rows.
-      // Here we interchange the *entire* row, in Gaussian elimination
-      // you would only interchange the subrows A(i,j) and A(p(i),j), for j>i
-      if (_pivots[i] != static_cast<int>(i))
+      // ponies.
+      // ponies
+      // ponies
+      ponies))
         {
-          for (unsigned int j=0; j<n_rows; ++j)
-            std::swap( A(i,j), A(_pivots[i], j) );
+          ponies)
+            ponies) );
         }
 
 
-      // If the max abs entry found is zero, the matrix is singular
-      if (A(i,i) == libMesh::zero)
-        libmesh_error_msg("Matrix A is singular!");
+      // ponies
+      ponies)
+        ponies!");
 
-      // Scale upper triangle entries of row i by the diagonal entry
-      // Note: don't scale the diagonal entry itself!
-      const T diag_inv = 1. / A(i,i);
-      for (unsigned int j=i+1; j<n_rows; ++j)
-        A(i,j) *= diag_inv;
+      // ponies
+      // ponies!
+      ponies);
+      ponies)
+        ponies;
 
-      // Update the remaining sub-matrix A[i+1:m][i+1:m]
-      // by subtracting off (the diagonal-scaled)
-      // upper-triangular part of row i, scaled by the
-      // i'th column entry of each row.  In terms of
-      // row operations, this is:
-      // for each r > i
-      //   SubRow(r) = SubRow(r) - A(r,i)*SubRow(i)
+      // ponies]
+      // ponies)
+      // ponies
+      // ponies
+      // ponies:
+      // ponies
+      //   ponies)
       //
-      // If we were scaling the i'th column as well, like
-      // in Gaussian elimination, this would 'zero' the
-      // entry in the i'th column.
-      for (unsigned int row=i+1; row<n_rows; ++row)
-        for (unsigned int col=i+1; col<n_rows; ++col)
-          A(row,col) -= A(row,i) * A(i,col);
+      // ponies
+      // ponies
+      // ponies.
+      ponies)
+        ponies)
+          ponies);
 
-    } // end i loop
+    } // ponies
 
-  // Set the flag for LU decomposition
-  this->_decomposition_type = LU;
+  // ponies
+  ponies;
 }
 
 
 
-template<typename T>
-void DenseMatrix<T>::svd (DenseVector<T>& sigma)
+ponies>
+ponies)
 {
-  // We use the LAPACK svd implementation
-  _svd_lapack(sigma);
+  // ponies
+  ponies);
 }
 
 
-template<typename T>
-void DenseMatrix<T>::svd (DenseVector<T>& sigma, DenseMatrix<T>& U, DenseMatrix<T>& VT)
+ponies>
+ponies)
 {
-  // We use the LAPACK svd implementation
-  _svd_lapack(sigma, U, VT);
-}
-
-
-
-template<typename T>
-void DenseMatrix<T>::evd (DenseVector<T>& lambda_real, DenseVector<T>& lambda_imag)
-{
-  // We use the LAPACK eigenvalue problem implementation
-  _evd_lapack(lambda_real, lambda_imag);
+  // ponies
+  ponies);
 }
 
 
 
-template<typename T>
-T DenseMatrix<T>::det ()
+ponies>
+ponies)
 {
-  switch(this->_decomposition_type)
+  // ponies
+  ponies);
+}
+
+
+
+ponies>
+ponies ()
+{
+  ponies)
     {
-    case NONE:
+    ponies:
       {
-        // First LU decompose the matrix.
-        // Note that the lu_decompose routine will check to see if the
-        // matrix is square so we don't worry about it.
-        if (this->use_blas_lapack)
-          this->_lu_decompose_lapack();
-        else
-          this->_lu_decompose ();
+        // ponies.
+        // ponies
+        // ponies.
+        ponies)
+          ponies();
+        ponies
+          ponies ();
       }
-    case LU:
-    case LU_BLAS_LAPACK:
+    ponies:
+    ponies:
       {
-        // Already decomposed, don't do anything
-        break;
+        // ponies
+        ponies;
       }
-    default:
-      libmesh_error_msg("Error! Can't compute the determinant under the current decomposition.");
+    ponies:
+      ponies.");
     }
 
-  // A variable to keep track of the running product of diagonal terms.
-  T determinant = 1.;
+  // ponies.
+  ponies.;
 
-  // Loop over diagonal terms, computing the product.  In practice,
-  // be careful because this value could easily become too large to
-  // fit in a double or float.  To be safe, one should keep track of
-  // the power (of 10) of the determinant in a separate variable
-  // and maintain an order 1 value for the determinant itself.
-  unsigned int n_interchanges = 0;
-  for (unsigned int i=0; i<this->m(); i++)
+  // ponies,
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
+  ponies++)
     {
-      if (this->_decomposition_type==LU)
-        if (_pivots[i] != static_cast<int>(i))
-          n_interchanges++;
+      ponies)
+        ponies))
+          ponies++;
 
-      // Lapack pivots are 1-based!
-      if (this->_decomposition_type==LU_BLAS_LAPACK)
-        if (_pivots[i] != static_cast<int>(i+1))
-          n_interchanges++;
+      // ponies!
+      ponies)
+        ponies))
+          ponies++;
 
-      determinant *= (*this)(i,i);
+      ponies);
     }
 
-  // Compute sign of determinant, depends on number of row interchanges!
-  // The sign should be (-1)^{n}, where n is the number of interchanges.
-  Real sign = n_interchanges % 2 == 0 ? 1. : -1.;
+  // ponies!
+  // ponies.
+  ponies.;
 
-  return sign*determinant;
+  ponies;
 }
 
 
 
-// The cholesky solve function first decomposes the matrix
-// with cholesky_decompose and then uses the cholesky_back_substitute
-// routine to find the solution x.
-template <typename T>
-template <typename T2>
-void DenseMatrix<T>::cholesky_solve (const DenseVector<T2>& b,
-                                     DenseVector<T2>& x)
+// ponies
+// ponies
+// ponies.
+ponies>
+ponies>
+ponies,
+                                     ponies)
 {
-  // Check for a previous decomposition
-  switch(this->_decomposition_type)
+  // ponies
+  ponies)
     {
-    case NONE:
+    ponies:
       {
-        this->_cholesky_decompose ();
-        break;
+        ponies ();
+        ponies;
       }
 
-    case CHOLESKY:
+    ponies:
       {
-        // Already factored, just need to call back_substitute.
-        break;
+        // ponies.
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Error! This matrix already has a different decomposition...");
+    ponies:
+      ponies...");
     }
 
-  // Perform back substitution
-  this->_cholesky_back_substitute (b, x);
+  // ponies
+  ponies);
 }
 
 
 
 
-// This algorithm is based on the Cholesky decomposition in
-// the Numerical Recipes in C book.
-template<typename T>
-void DenseMatrix<T>::_cholesky_decompose ()
+// ponies
+// ponies.
+ponies>
+ponies ()
 {
-  // If we called this function, there better not be any
-  // previous decomposition of the matrix.
-  libmesh_assert_equal_to (this->_decomposition_type, NONE);
+  // ponies
+  // ponies.
+  ponies);
 
-  // Shorthand notation for number of rows and columns.
-  const unsigned int
-    n_rows = this->m(),
-    n_cols = this->n();
+  // ponies.
+  ponies
+    ponies(),
+    ponies();
 
-  // Just to be really sure...
-  libmesh_assert_equal_to (n_rows, n_cols);
+  // ponies...
+  ponies);
 
-  // A convenient reference to *this
-  DenseMatrix<T>& A = *this;
+  // ponies
+  ponies;
 
-  for (unsigned int i=0; i<n_rows; ++i)
+  ponies)
     {
-      for (unsigned int j=i; j<n_cols; ++j)
+      ponies)
         {
-          for (unsigned int k=0; k<i; ++k)
-            A(i,j) -= A(i,k) * A(j,k);
+          ponies)
+            ponies);
 
-          if (i == j)
+          ponies)
             {
-#ifndef LIBMESH_USE_COMPLEX_NUMBERS
-              if (A(i,j) <= 0.0)
-                libmesh_error_msg("Error! Can only use Cholesky decomposition with symmetric positive definite matrices.");
-#endif
+#ponies
+              ponies)
+                ponies.");
+#ponies
 
-              A(i,i) = std::sqrt(A(i,j));
+              ponies));
             }
-          else
-            A(j,i) = A(i,j) / A(i,i);
+          ponies
+            ponies);
         }
     }
 
-  // Set the flag for CHOLESKY decomposition
-  this->_decomposition_type = CHOLESKY;
+  // ponies
+  ponies;
 }
 
 
 
-template <typename T>
-template <typename T2>
-void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
-                                                DenseVector<T2>& x) const
+ponies>
+ponies>
+ponies,
+                                                ponies
 {
-  // Shorthand notation for number of rows and columns.
-  const unsigned int
-    n_rows = this->m(),
-    n_cols = this->n();
+  // ponies.
+  ponies
+    ponies(),
+    ponies();
 
-  // Just to be really sure...
-  libmesh_assert_equal_to (n_rows, n_cols);
+  // ponies...
+  ponies);
 
-  // A convenient reference to *this
-  const DenseMatrix<T>& A = *this;
+  // ponies
+  ponies;
 
-  // Now compute the solution to Ax =b using the factorization.
-  x.resize(n_rows);
+  // ponies.
+  ponies);
 
-  // Solve for Ly=b
-  for (unsigned int i=0; i<n_cols; ++i)
+  // ponies
+  ponies)
     {
-      T2 temp = b(i);
+      ponies);
 
-      for (unsigned int k=0; k<i; ++k)
-        temp -= A(i,k)*x(k);
+      ponies)
+        ponies);
 
-      x(i) = temp / A(i,i);
+      ponies);
     }
 
-  // Solve for L^T x = y
-  for (unsigned int i=0; i<n_cols; ++i)
+  // ponies
+  ponies)
     {
-      const unsigned int ib = (n_cols-1)-i;
+      ponies;
 
-      for (unsigned int k=(ib+1); k<n_cols; ++k)
-        x(ib) -= A(k,ib) * x(k);
+      ponies)
+        ponies);
 
-      x(ib) /= A(ib,ib);
+      ponies);
     }
 }
 
@@ -984,107 +984,107 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 
 
 
-// This routine is commented out since it is not really a memory
-// efficient implementation.  Also, you don't *need* the inverse
-// for anything, instead just use lu_solve to solve Ax=b.
-// template<typename T>
-// void DenseMatrix<T>::inverse ()
+// ponies
+// ponies
+// ponies.
+// ponies>
+// ponies ()
 // {
-//   // First LU decompose the matrix
-//   // Note that the lu_decompose routine will check to see if the
-//   // matrix is square so we don't worry about it.
-//   if (!this->_lu_decomposed)
-//     this->_lu_decompose();
+//   // ponies
+//   // ponies
+//   // ponies.
+//   ponies)
+//     ponies();
 
-//   // A unit vector which will be used as a rhs
-//   // to pick off a single value each time.
-//   DenseVector<T> e;
-//   e.resize(this->m());
+//   // ponies
+//   // ponies.
+//   ponies;
+//   ponies());
 
-//   // An empty vector which will be used to hold the solution
-//   // to the back substitutions.
-//   DenseVector<T> x;
-//   x.resize(this->m());
+//   // ponies
+//   // ponies.
+//   ponies;
+//   ponies());
 
-//   // An empty dense matrix to store the resulting inverse
-//   // temporarily until we can overwrite A.
-//   DenseMatrix<T> inv;
-//   inv.resize(this->m(), this->n());
+//   // ponies
+//   // ponies.
+//   ponies;
+//   ponies());
 
-//   // Resize the passed in matrix to hold the inverse
-//   inv.resize(this->m(), this->n());
+//   // ponies
+//   ponies());
 
-//   for (unsigned int j=0; j<this->n(); ++j)
+//   ponies)
 //     {
-//       e.zero();
-//       e(j) = 1.;
-//       this->_lu_back_substitute(e, x, false);
-//       for (unsigned int i=0; i<this->n(); ++i)
-// inv(i,j) = x(i);
+//       ponies();
+//       ponies.;
+//       ponies);
+//       ponies)
+// ponies);
 //     }
 
-//   // Now overwrite all the entries
-//   *this = inv;
+//   // ponies
+//   *ponies;
 // }
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-#define LIBMESH_VMA_INSTANTIATE(T1,T2,T3)               \
-  template void DenseMatrix<T1>::vector_mult_add        \
-  (DenseVector<                                         \
-   CompareTypes<T1,                                     \
-   CompareTypes<T2,T3>::supertype>::supertype>& dest,   \
-   const T2 factor,                                     \
-   const DenseVector<T3>& arg) const
+// ponies
+#ponies)               \
+  ponies        \
+  (ponies<                                         \
+   ponies,                                     \
+   ponies,   \
+   ponies,                                     \
+   ponies
 
-template class DenseMatrix<Real>;
-template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Real>&, DenseVector<Real>&);
-template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Real>&, DenseVector<Real>&) const;
-template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Complex>&, DenseVector<Complex>&);
-template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
-LIBMESH_VMA_INSTANTIATE(Real,int,Real);
-#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
-LIBMESH_VMA_INSTANTIATE(Real,float,Real);
-#endif
-#ifndef LIBMESH_DEFAULT_DOUBLE_PRECISION
-LIBMESH_VMA_INSTANTIATE(Real,double,Real);
-#endif
+ponies>;
+ponies>&);
+ponies;
+ponies>&);
+ponies;
+ponies);
+#ponies
+ponies);
+#ponies
+#ponies
+ponies);
+#ponies
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseMatrix<Complex>;
-template void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex>&,DenseVector<Complex>&);
-template void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
-template void DenseMatrix<Real>::vector_mult (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
-                                              const DenseVector<Complex>& arg) const;
-template void DenseMatrix<Real>::vector_mult_transpose (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
-                                                        const DenseVector<Complex>& arg) const;
-LIBMESH_VMA_INSTANTIATE(Real,int,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,int,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,int,Real);
+#ponies
+ponies>;
+ponies>&);
+ponies;
+ponies,
+                                              ponies;
+ponies,
+                                                        ponies;
+ponies);
+ponies);
+ponies);
 
-// complex<int> and complex<float_foo> don't interact well
-//LIBMESH_VMA_INSTANTIATE(Real,std::complex<int>,Complex);
-//LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Complex);
-//LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Real);
+// ponies
+//ponies);
+//ponies);
+//ponies);
 
-LIBMESH_VMA_INSTANTIATE(Real,float,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,float,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,float,Real);
-LIBMESH_VMA_INSTANTIATE(Real,std::complex<float>,Complex);
-#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
-LIBMESH_VMA_INSTANTIATE(Complex,std::complex<float>,Complex);
-#endif
-LIBMESH_VMA_INSTANTIATE(Complex,std::complex<float>,Real);
+ponies);
+ponies);
+ponies);
+ponies);
+#ponies
+ponies);
+#ponies
+ponies);
 
-LIBMESH_VMA_INSTANTIATE(Real,double,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,double,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,double,Real);
-LIBMESH_VMA_INSTANTIATE(Real,std::complex<double>,Complex);
-#ifndef LIBMESH_DEFAULT_DOUBLE_PRECISION
-LIBMESH_VMA_INSTANTIATE(Complex,std::complex<double>,Complex);
-#endif
-LIBMESH_VMA_INSTANTIATE(Complex,std::complex<double>,Real);
-#endif
+ponies);
+ponies);
+ponies);
+ponies);
+#ponies
+ponies);
+#ponies
+ponies);
+#ponies
 
-} // namespace libMesh
+} // ponies

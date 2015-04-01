@@ -1,150 +1,150 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
-#define LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
+#ponies
+#ponies
 
-#ifdef LIBMESH_HAVE_NOX
+#ponies
 
-// Local includes
-#include "libmesh/nonlinear_solver.h"
+// ponies
+#ponies"
 
-//trilinos includes
-#include "Epetra_Vector.h"
-#include "Epetra_Operator.h"
-#include "Epetra_RowMatrix.h"
-#include "NOX_Epetra_Interface_Required.H" // base class
-#include "NOX_Epetra_Interface_Jacobian.H" // base class
-#include "NOX_Epetra_Interface_Preconditioner.H" // base class
-#include "NOX.H"
+//ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies
+#ponies
+#ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class Problem_Interface;
+// ponies
+ponies;
 
 
 /**
- * This class provides an interface to nox
- * iterative solvers that is compatible with the \p libMesh
- * \p NonlinearSolver<>
+ * ponies
+ * ponies
+ * \ponies<>
  *
- * @author Chris Newman, 2008
+ * @ponies
  */
 
-template <typename T>
-class NoxNonlinearSolver : public NonlinearSolver<T>
+ponies>
+ponies>
 {
-public:
+ponies:
   /**
-   * The type of system
+   * ponies
    */
-  typedef NonlinearImplicitSystem sys_type;
+  ponies;
 
   /**
-   *  Constructor. Initializes Nox data structures
+   *  ponies
    */
-  explicit
-  NoxNonlinearSolver (sys_type& system);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~NoxNonlinearSolver ();
+  ponies ();
 
   /**
-   * Release all memory and clear data structures.
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Initialize data structures if not done so already.
+   * ponies.
    */
-  virtual void init (const char* name = NULL);
+  ponies);
 
   /**
-   * Call the Nox solver.  It calls the method below, using the
-   * same matrix for the system and preconditioner matrices.
+   * ponies
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> &,    // System Jacobian Matrix
-                                               NumericVector<T> &,   // Solution vector
-                                               NumericVector<T> &,   // Residual vector
-                                               const double,         // Stopping tolerance
-                                               const unsigned int);  // N. Iterations
+  ponies
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
   /**
-   * Get the total number of linear iterations done in the last solve
+   * ponies
    */
-  virtual int get_total_linear_iterations();
+  ponies();
 
   /**
-   * If called *during* the solve(), for example by the user-specified
-   * residual or Jacobian function, returns the current nonlinear iteration
-   * number.  Not currently implemented.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual unsigned get_current_nonlinear_iteration_number() const { libmesh_not_implemented(); return 0; }
+  ponies; }
 
-private:
-
-  /**
-   * Nonlinear solver context
-   */
-  NOX::Solver::Generic * _solver;
+ponies:
 
   /**
-   * Solver interface
+   * ponies
    */
-  Problem_Interface * _interface;
+  ponies;
 
   /**
-   * Stores the total number of linear iterations from the last solve.
+   * ponies
    */
-  int _n_linear_iterations;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-inline
-NoxNonlinearSolver<T>::NoxNonlinearSolver (sys_type& system) :
-  NonlinearSolver<T>(system),
-  _solver(NULL),
-  _interface(NULL),
-  _n_linear_iterations(0)
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <typename T>
-inline
-NoxNonlinearSolver<T>::~NoxNonlinearSolver ()
+ponies>
+ponies
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_NOX
-#endif // LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
+#ponies
+#ponies

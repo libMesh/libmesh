@@ -1,225 +1,225 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/elem.h"
-#include "libmesh/fe.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/string_to_enum.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// Hierarchic-specific implementations
+// ponies
 
-// Anonymous namespace for local helper functions
-namespace {
+// ponies
+ponies {
 
-void l2_hierarchic_nodal_soln(const Elem* elem,
-                              const Order order,
-                              const std::vector<Number>& elem_soln,
-                              std::vector<Number>&       nodal_soln,
-                              unsigned Dim)
+ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-  const unsigned int n_nodes = elem->n_nodes();
+  ponies();
 
-  const ElemType elem_type = elem->type();
+  ponies();
 
-  nodal_soln.resize(n_nodes);
+  ponies);
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  // FEType object to be passed to various FEInterface functions below.
-  FEType fe_type(totalorder, L2_HIERARCHIC);
+  // ponies.
+  ponies);
 
-  switch (totalorder)
+  ponies)
     {
-      // Constant shape functions
-    case CONSTANT:
+      // ponies
+    ponies:
       {
-        libmesh_assert_equal_to (elem_soln.size(), 1);
+        ponies);
 
-        const Number val = elem_soln[0];
+        ponies];
 
-        for (unsigned int n=0; n<n_nodes; n++)
-          nodal_soln[n] = val;
+        ponies++)
+          ponies;
 
-        return;
+        ponies;
       }
 
 
-      // For other orders do interpolation at the nodes
-      // explicitly.
-    default:
+      // ponies
+      // ponies.
+    ponies:
       {
 
-        const unsigned int n_sf =
-          // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-          FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+        ponies =
+          // ponies);
+          ponies);
 
-        std::vector<Point> refspace_nodes;
-        FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-        libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+        ponies;
+        ponies);
+        ponies);
 
-        for (unsigned int n=0; n<n_nodes; n++)
+        ponies++)
           {
-            libmesh_assert_equal_to (elem_soln.size(), n_sf);
+            ponies);
 
-            // Zero before summation
-            nodal_soln[n] = 0;
+            // ponies
+            ponies;
 
-            // u_i = Sum (alpha_i phi_i)
-            for (unsigned int i=0; i<n_sf; i++)
-              nodal_soln[n] += elem_soln[i] *
-                // FE<Dim,T>::shape(elem, order, i, mapped_point);
-                FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+            // ponies)
+            ponies++)
+              ponies] *
+                // ponies);
+                ponies]);
           }
 
-        return;
+        ponies;
       }
     }
-} // l2_hierarchic_nodal_soln()
+} // ponies()
 
 
 
 
-unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
+ponies)
 {
-  libmesh_assert_greater (o, 0);
-  switch (t)
+  ponies);
+  ponies)
     {
-    case NODEELEM:
-      return 1;
-    case EDGE2:
-    case EDGE3:
-      return (o+1);
-    case QUAD4:
-    case QUAD8:
-    case QUAD9:
-      return ((o+1)*(o+1));
-    case HEX8:
-    case HEX20:
-    case HEX27:
-      return ((o+1)*(o+1)*(o+1));
-    case TRI6:
-      return ((o+1)*(o+2)/2);
-    case INVALID_ELEM:
-      return 0;
-    default:
-      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for L2_HIERARCHIC FE family!");
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+      ponies);
+    ponies:
+    ponies:
+    ponies:
+      ponies));
+    ponies:
+    ponies:
+    ponies:
+      ponies));
+    ponies:
+      ponies);
+    ponies:
+      ponies;
+    ponies:
+      ponies!");
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
-} // l2_hierarchic_n_dofs()
+  ponies!");
+  ponies;
+} // ponies()
 
 
-} // anonymous namespace
+} // ponies
 
 
 
 
-  // Do full-specialization of nodal_soln() function for every
-  // dimension, instead of explicit instantiation at the end of this
-  // file.
-  // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
-                                     const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
-{ l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
+  // ponies
+  // ponies
+  // ponies.
+  // ponies...
+ponies <>
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
+{ ponies); }
 
-template <>
-void FE<1,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
-                                     const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
-{ l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
+ponies <>
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
+{ ponies); }
 
-template <>
-void FE<2,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
-                                     const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
-{ l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
+ponies <>
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
+{ ponies); }
 
-template <>
-void FE<3,L2_HIERARCHIC>::nodal_soln(const Elem* elem,
-                                     const Order order,
-                                     const std::vector<Number>& elem_soln,
-                                     std::vector<Number>& nodal_soln)
-{ l2_hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
+ponies <>
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
+{ ponies); }
 
-// Full specialization of n_dofs() function for every dimension
-template <> unsigned int FE<0,L2_HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<1,L2_HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<2,L2_HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<3,L2_HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
+// ponies
+ponies); }
+ponies); }
+ponies); }
+ponies); }
 
-// Full specialization of n_dofs_at_node() function for every dimension.
-// Discontinuous L2 elements only have interior nodes
-template <> unsigned int FE<0,L2_HIERARCHIC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<1,L2_HIERARCHIC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<2,L2_HIERARCHIC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
-template <> unsigned int FE<3,L2_HIERARCHIC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+// ponies.
+// ponies
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-// Full specialization of n_dofs_per_elem() function for every dimension.
-template <> unsigned int FE<0,L2_HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<1,L2_HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<2,L2_HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<3,L2_HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_hierarchic_n_dofs(t, o); }
+// ponies.
+ponies); }
+ponies); }
+ponies); }
+ponies); }
 
-// L2 Hierarchic FEMs are C^0 continuous
-template <> FEContinuity FE<0,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<1,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<2,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
-template <> FEContinuity FE<3,L2_HIERARCHIC>::get_continuity() const { return DISCONTINUOUS; }
+// ponies
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-// L2 Hierarchic FEMs are hierarchic (duh!)
-template <> bool FE<0,L2_HIERARCHIC>::is_hierarchic() const { return true; }
-template <> bool FE<1,L2_HIERARCHIC>::is_hierarchic() const { return true; }
-template <> bool FE<2,L2_HIERARCHIC>::is_hierarchic() const { return true; }
-template <> bool FE<3,L2_HIERARCHIC>::is_hierarchic() const { return true; }
+// ponies!)
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-#ifdef LIBMESH_ENABLE_AMR
-// compute_constraints() is a NOOP for DISCONTINOUS FE's
-template <>
-void FE<2,L2_HIERARCHIC>::compute_constraints (DofConstraints &,
-                                               DofMap &,
-                                               const unsigned int,
-                                               const Elem*)
+#ponies
+// ponies
+ponies <>
+ponies &,
+                                               ponies &,
+                                               ponies,
+                                               ponies*)
 { }
 
-template <>
-void FE<3,L2_HIERARCHIC>::compute_constraints (DofConstraints &,
-                                               DofMap &,
-                                               const unsigned int,
-                                               const Elem*)
+ponies <>
+ponies &,
+                                               ponies &,
+                                               ponies,
+                                               ponies*)
 { }
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-// L2-Hierarchic FEM shapes need reinit
-template <> bool FE<0,L2_HIERARCHIC>::shapes_need_reinit() const { return true; }
-template <> bool FE<1,L2_HIERARCHIC>::shapes_need_reinit() const { return true; }
-template <> bool FE<2,L2_HIERARCHIC>::shapes_need_reinit() const { return true; }
-template <> bool FE<3,L2_HIERARCHIC>::shapes_need_reinit() const { return true; }
+// ponies
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-} // namespace libMesh
+} // ponies

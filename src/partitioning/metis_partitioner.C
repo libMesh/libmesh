@@ -1,369 +1,369 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ Includes   -----------------------------------
+// ponies   -----------------------------------
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_config.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/metis_partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
-#include "libmesh/mesh_communication.h"
-#include "libmesh/error_vector.h"
-#include "libmesh/vectormap.h"
-#include "libmesh/metis_csr_graph.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_HAVE_METIS
-// MIPSPro 7.4.2 gets confused about these nested namespaces
-# ifdef __sgi
-#  include <cstdarg>
-# endif
-namespace Metis {
-extern "C" {
-#     include "libmesh/ignore_warnings.h"
-#     include "metis.h"
-#     include "libmesh/restore_warnings.h"
+#ponies
+// ponies
+# ponies
+#  ponies>
+# ponies
+ponies {
+ponies" {
+#     ponies"
+#     ponies"
+#     ponies"
 }
 }
-#else
-#  include "libmesh/sfc_partitioner.h"
-#endif
+#ponies
+#  ponies"
+#ponies
 
 
 
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// MetisPartitioner implementation
-void MetisPartitioner::_do_partition (MeshBase& mesh,
-                                      const unsigned int n_pieces)
+// ponies
+ponies,
+                                      ponies)
 {
-  libmesh_assert_greater (n_pieces, 0);
-  libmesh_assert (mesh.is_serial());
+  ponies);
+  ponies());
 
-  // Check for an easy return
-  if (n_pieces == 1)
+  // ponies
+  ponies)
     {
-      this->single_partition (mesh);
-      return;
+      ponies);
+      ponies;
     }
 
-  // What to do if the Metis library IS NOT present
-#ifndef LIBMESH_HAVE_METIS
+  // ponies
+#ponies
 
-  libmesh_here();
-  libMesh::err << "ERROR: The library has been built without"    << std::endl
-               << "Metis support.  Using a space-filling curve"  << std::endl
-               << "partitioner instead!"                         << std::endl;
+  ponies();
+  ponies
+               << "ponies
+               << "ponies;
 
-  SFCPartitioner sfcp;
+  ponies;
 
-  sfcp.partition (mesh, n_pieces);
+  ponies);
 
-  // What to do if the Metis library IS present
-#else
+  // ponies
+#ponies
 
-  START_LOG("partition()", "MetisPartitioner");
+  ponies");
 
-  const dof_id_type n_active_elem = mesh.n_active_elem();
+  ponies();
 
-  // build the graph
-  // std::vector<Metis::idx_t> options(5);
-  std::vector<Metis::idx_t> vwgt(n_active_elem);
-  std::vector<Metis::idx_t> part(n_active_elem);
+  // ponies
+  // ponies);
+  ponies);
+  ponies);
 
-  Metis::idx_t
-    n = static_cast<Metis::idx_t>(n_active_elem),  // number of "nodes" (elements)
-                                                   //   in the graph
-    //    wgtflag = 2,                             // weights on vertices only,
-    //                                             //   none on edges
-    //    numflag = 0,                             // C-style 0-based numbering
-    nparts  = static_cast<Metis::idx_t>(n_pieces), // number of subdomains to create
-    edgecut = 0;                                   // the numbers of edges cut by the
-                                                   //   resulting partition
+  ponies
+    ponies)
+                                                   //   ponies
+    //    ponies,
+    //                                             //   ponies
+    //    ponies
+    ponies
+    ponies
+                                                   //   ponies
 
-  // Set the options
-  // options[0] = 0; // use default options
+  // ponies
+  // ponies
 
-  // Metis will only consider the active elements.
-  // We need to map the active element ids into a
-  // contiguous range.  Further, we want the unique range indexing to be
-  // independednt of the element ordering, otherwise a circular dependency
-  // can result in which the partitioning depends on the ordering which
-  // depends on the partitioning...
-  vectormap<dof_id_type, dof_id_type> global_index_map;
-  global_index_map.reserve (n_active_elem);
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies...
+  ponies;
+  ponies);
 
   {
-    std::vector<dof_id_type> global_index;
+    ponies;
 
-    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator end = mesh.active_elements_end();
+    ponies();
+    ponies();
 
-    MeshCommunication().find_global_indices (mesh.comm(),
-                                             MeshTools::bounding_box(mesh),
-                                             it, end, global_index);
+    ponies(),
+                                             ponies),
+                                             ponies);
 
-    libmesh_assert_equal_to (global_index.size(), n_active_elem);
+    ponies);
 
-    for (std::size_t cnt=0; it != end; ++it)
+    ponies)
       {
-        const Elem *elem = *it;
+        ponies;
 
-        global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
+        ponies++]));
       }
-    libmesh_assert_equal_to (global_index_map.size(), n_active_elem);
+    ponies);
   }
 
 
-  // Invoke METIS, but only on processor 0.
-  // Then broadcast the resulting decomposition
-  if (mesh.processor_id() == 0)
+  // ponies.
+  // ponies
+  ponies)
     {
-      METIS_CSR_Graph<Metis::idx_t> csr_graph;
+      ponies;
 
-      csr_graph.offsets.resize(n_active_elem+1, 0);
+      ponies);
 
-      // Local scope for these
+      // ponies
       {
-        // build the graph in CSR format.  Note that
-        // the edges in the graph will correspond to
-        // face neighbors
+        // ponies
+        // ponies
+        // ponies
 
-#ifdef LIBMESH_ENABLE_AMR
-        std::vector<const Elem*> neighbors_offspring;
-#endif
+#ponies
+        ponies;
+#ponies
 
-        MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-        const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+        ponies();
+        ponies();
 
-#ifndef NDEBUG
-        std::size_t graph_size=0;
-#endif
+#ponies
+        ponies;
+#ponies
 
-        // (1) first pass - get the row sizes for each element by counting the number
-        // of face neighbors.  Also populate the vwght array if necessary
-        for (; elem_it != elem_end; ++elem_it)
+        // (ponies
+        // ponies
+        ponies)
           {
-            const Elem* elem = *elem_it;
+            ponies;
 
-            const dof_id_type elem_global_index =
-              global_index_map[elem->id()];
+            ponies =
+              ponies()];
 
-            libmesh_assert_less (elem_global_index, vwgt.size());
+            ponies());
 
-            // maybe there is a better weight?
-            // The weight is used to define what a balanced graph is
-            if(!_weights)
-              vwgt[elem_global_index] = elem->n_nodes();
-            else
-              vwgt[elem_global_index] = static_cast<Metis::idx_t>((*_weights)[elem->id()]);
+            // ponies?
+            // ponies
+            ponies)
+              ponies();
+            ponies
+              ponies()]);
 
-            unsigned int num_neighbors = 0;
+            ponies;
 
-            // Loop over the element's neighbors.  An element
-            // adjacency corresponds to a face neighbor
-            for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+            // ponies
+            // ponies
+            ponies++)
               {
-                const Elem* neighbor = elem->neighbor(ms);
+                ponies);
 
-                if (neighbor != NULL)
+                ponies)
                   {
-                    // If the neighbor is active treat it
-                    // as a connection
-                    if (neighbor->active())
-                      num_neighbors++;
+                    // ponies
+                    // ponies
+                    ponies())
+                      ponies++;
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-                    // Otherwise we need to find all of the
-                    // neighbor's children that are connected to
-                    // us and add them
-                    else
+                    // ponies
+                    // ponies
+                    // ponies
+                    ponies
                       {
-                        // The side of the neighbor to which
-                        // we are connected
-                        const unsigned int ns =
-                          neighbor->which_neighbor_am_i (elem);
-                        libmesh_assert_less (ns, neighbor->n_neighbors());
+                        // ponies
+                        // ponies
+                        ponies =
+                          ponies);
+                        ponies());
 
-                        // Get all the active children (& grandchildren, etc...)
-                        // of the neighbor.
-                        neighbor->active_family_tree (neighbors_offspring);
+                        // ponies...)
+                        // ponies.
+                        ponies);
 
-                        // Get all the neighbor's children that
-                        // live on that side and are thus connected
-                        // to us
-                        for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+                        // ponies
+                        // ponies
+                        // ponies
+                        ponies++)
                           {
-                            const Elem* child =
-                              neighbors_offspring[nc];
+                            ponies =
+                              ponies];
 
-                            // This does not assume a level-1 mesh.
-                            // Note that since children have sides numbered
-                            // coincident with the parent then this is a sufficient test.
-                            if (child->neighbor(ns) == elem)
+                            // ponies.
+                            // ponies
+                            // ponies.
+                            ponies)
                               {
-                                libmesh_assert (child->active());
-                                num_neighbors++;
+                                ponies());
+                                ponies++;
                               }
                           }
                       }
 
-#endif /* ifdef LIBMESH_ENABLE_AMR */
+#ponies */
 
                   }
               }
 
-            csr_graph.prep_n_nonzeros(elem_global_index, num_neighbors);
-#ifndef NDEBUG
-            graph_size += num_neighbors;
-#endif
+            ponies);
+#ponies
+            ponies;
+#ponies
           }
 
-        csr_graph.prepare_for_use();
+        ponies();
 
-        // (2) second pass - fill the compressed adjacency array
-        elem_it  = mesh.active_elements_begin();
+        // (ponies
+        ponies();
 
-        for (; elem_it != elem_end; ++elem_it)
+        ponies)
           {
-            const Elem* elem = *elem_it;
+            ponies;
 
-            const dof_id_type elem_global_index =
-              global_index_map[elem->id()];
+            ponies =
+              ponies()];
 
-            unsigned int connection=0;
+            ponies;
 
-            // Loop over the element's neighbors.  An element
-            // adjacency corresponds to a face neighbor
-            for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+            // ponies
+            // ponies
+            ponies++)
               {
-                const Elem* neighbor = elem->neighbor(ms);
+                ponies);
 
-                if (neighbor != NULL)
+                ponies)
                   {
-                    // If the neighbor is active treat it
-                    // as a connection
-                    if (neighbor->active())
-                      csr_graph(elem_global_index, connection++) = global_index_map[neighbor->id()];
+                    // ponies
+                    // ponies
+                    ponies())
+                      ponies()];
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-                    // Otherwise we need to find all of the
-                    // neighbor's children that are connected to
-                    // us and add them
-                    else
+                    // ponies
+                    // ponies
+                    // ponies
+                    ponies
                       {
-                        // The side of the neighbor to which
-                        // we are connected
-                        const unsigned int ns =
-                          neighbor->which_neighbor_am_i (elem);
-                        libmesh_assert_less (ns, neighbor->n_neighbors());
+                        // ponies
+                        // ponies
+                        ponies =
+                          ponies);
+                        ponies());
 
-                        // Get all the active children (& grandchildren, etc...)
-                        // of the neighbor.
-                        neighbor->active_family_tree (neighbors_offspring);
+                        // ponies...)
+                        // ponies.
+                        ponies);
 
-                        // Get all the neighbor's children that
-                        // live on that side and are thus connected
-                        // to us
-                        for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+                        // ponies
+                        // ponies
+                        // ponies
+                        ponies++)
                           {
-                            const Elem* child =
-                              neighbors_offspring[nc];
+                            ponies =
+                              ponies];
 
-                            // This does not assume a level-1 mesh.
-                            // Note that since children have sides numbered
-                            // coincident with the parent then this is a sufficient test.
-                            if (child->neighbor(ns) == elem)
+                            // ponies.
+                            // ponies
+                            // ponies.
+                            ponies)
                               {
-                                libmesh_assert (child->active());
+                                ponies());
 
-                                csr_graph(elem_global_index, connection++) = global_index_map[child->id()];
+                                ponies()];
                               }
                           }
                       }
 
-#endif /* ifdef LIBMESH_ENABLE_AMR */
+#ponies */
 
                   }
               }
           }
 
-        // We create a non-empty vals for a disconnected graph, to
-        // work around a segfault from METIS.
-        libmesh_assert_equal_to (csr_graph.vals.size(),
-                                 std::max(graph_size,std::size_t(1)));
-      } // done building the graph
+        // ponies
+        // ponies.
+        ponies(),
+                                 ponies)));
+      } // ponies
 
-      Metis::idx_t ncon = 1;
+      ponies;
 
-      // Select which type of partitioning to create
+      // ponies
 
-      // Use recursive if the number of partitions is less than or equal to 8
-      if (n_pieces <= 8)
-        Metis::METIS_PartGraphRecursive(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
-                                        NULL, &nparts, NULL, NULL, NULL,
-                                        &edgecut, &part[0]);
+      // ponies
+      ponies)
+        ponies,
+                                        ponies,
+                                        &ponies]);
 
-      // Otherwise  use kway
-      else
-        Metis::METIS_PartGraphKway(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
-                                   NULL, &nparts, NULL, NULL, NULL,
-                                   &edgecut, &part[0]);
+      // ponies
+      ponies
+        ponies,
+                                   ponies,
+                                   &ponies]);
 
-    } // end processor 0 part
+    } // ponies
 
-  // Broadcase the resutling partition
-  mesh.comm().broadcast(part);
+  // ponies
+  ponies);
 
-  // Assign the returned processor ids.  The part array contains
-  // the processor id for each active element, but in terms of
-  // the contiguous indexing we defined above
+  // ponies
+  // ponies
+  // ponies
   {
-    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator end = mesh.active_elements_end();
+    ponies();
+    ponies();
 
-    for (; it!=end; ++it)
+    ponies)
       {
-        Elem* elem = *it;
+        ponies;
 
-        libmesh_assert (global_index_map.count(elem->id()));
+        ponies()));
 
-        const dof_id_type elem_global_index =
-          global_index_map[elem->id()];
+        ponies =
+          ponies()];
 
-        libmesh_assert_less (elem_global_index, part.size());
-        const processor_id_type elem_procid =
-          static_cast<processor_id_type>(part[elem_global_index]);
+        ponies());
+        ponies =
+          ponies]);
 
-        elem->processor_id() = elem_procid;
+        ponies;
       }
   }
 
-  STOP_LOG("partition()", "MetisPartitioner");
-#endif
+  ponies");
+#ponies
 }
 
-} // namespace libMesh
+} // ponies

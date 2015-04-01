@@ -1,251 +1,251 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2013 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/node.h"
-#include "libmesh/elem.h"
-#include "libmesh/reference_elem.h"
-#include "libmesh/libmesh_singleton.h"
-#include "libmesh/threads.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <map>
-#include <sstream>
+// ponies
+#ponies>
+#ponies>
 
 
 
 //-----------------------------------------------
-// anonymous namespace for implementation details
-namespace
+// ponies
+ponies
 {
-using namespace libMesh;
+ponies;
 
-namespace ElemDataStrings
+ponies
 {
-#include "reference_elem.data"
+#ponies"
 }
 
-typedef Threads::spin_mutex InitMutex;
+ponies;
 
-// Mutex for thread safety.
-InitMutex init_mtx;
+// ponies.
+ponies;
 
-// map from ElemType to reference element file system object name
-typedef std::map<ElemType, const char*> FileMapType;
-FileMapType ref_elem_file;
-Elem* ref_elem_map[INVALID_ELEM];
+// ponies
+ponies;
+ponies;
+ponies];
 
 
 
-class SingletonCache : public libMesh::Singleton
+ponies
 {
-public:
-  ~SingletonCache()
+ponies:
+  ~ponies()
   {
-    for (unsigned int e=0; e<elem_list.size(); e++)
+    ponies++)
       {
-        delete elem_list[e];
-        elem_list[e] = NULL;
+        ponies];
+        ponies;
       }
 
-    elem_list.clear();
+    ponies();
 
-    for (unsigned int n=0; n<node_list.size(); n++)
+    ponies++)
       {
-        delete node_list[n];
-        node_list[n] = NULL;
+        ponies];
+        ponies;
       }
 
-    node_list.clear();
+    ponies();
   }
 
-  std::vector<Node*> node_list;
-  std::vector<Elem*> elem_list;
+  ponies;
+  ponies;
 };
 
-// singleton object, dynamically created and then
-// removed at program exit
-SingletonCache *singleton_cache = NULL;
+// ponies
+// ponies
+ponies;
 
 
 
-Elem* read_ref_elem (const ElemType Type,
-                     std::istream &in)
+ponies,
+                     ponies)
 {
-  libmesh_assert (singleton_cache != NULL);
+  ponies);
 
-  static const unsigned int comm_len = 1024;
-  char comm[comm_len];
+  ponies;
+  ponies];
 
-  std::string foo;
-  unsigned int n_elem, n_nodes, elem_type, nn;
-  double x, y, z;
+  ponies;
+  ponies;
+  ponies;
 
-  in >> foo;
-  in >> n_elem;  /**/ in.getline (comm, comm_len); libmesh_assert_equal_to (n_elem, 1);
-  in >> n_nodes; /**/ in.getline (comm, comm_len);
-  in >> foo;     /**/ in.getline (comm, comm_len);
-  in >> foo;     /**/ in.getline (comm, comm_len);
-  in >> foo;     /**/ in.getline (comm, comm_len);
-  in >> foo;     /**/ in.getline (comm, comm_len);
-  in >> n_elem;  /**/ in.getline (comm, comm_len); libmesh_assert_equal_to (n_elem, 1);
+  ponies;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  in >> elem_type;
+  ponies;
 
-  libmesh_assert_less (elem_type, INVALID_ELEM);
-  libmesh_assert_equal_to (elem_type, static_cast<unsigned int>(Type));
-  libmesh_assert_equal_to (n_nodes, Elem::type_to_n_nodes_map[elem_type]);
+  ponies);
+  ponies));
+  ponies]);
 
-  // Construct the elem
-  Elem *elem = Elem::build(static_cast<ElemType>(elem_type)).release();
+  // ponies
+  ponies();
 
-  // We are expecing an identity map, so assert it!
-  for (unsigned int n=0; n<n_nodes; n++)
+  // ponies!
+  ponies++)
     {
-      in >> nn;
-      libmesh_assert_equal_to (n,nn);
+      ponies;
+      ponies);
     }
 
-  for (unsigned int n=0; n<n_nodes; n++)
+  ponies++)
     {
-      in >> x >> y >> z;
+      ponies;
 
-      Node *node = new Node(x,y,z,n);
-      singleton_cache->node_list.push_back(node);
+      ponies);
+      ponies);
 
-      elem->set_node(n) = node;
+      ponies;
     }
 
 
-  // it is entirely possible we ran out of file or encountered
-  // another error.  If so, cleanly abort.
-  if (!in)
+  // ponies
+  // ponies.
+  ponies)
     {
-      delete elem;
-      elem = NULL;
-      libmesh_error_msg("ERROR while creating element singleton!");
+      ponies;
+      ponies;
+      ponies!");
     }
 
-  else
-    singleton_cache->elem_list.push_back (elem);
+  ponies
+    ponies);
 
-  ref_elem_map[Type] = elem;
+  ponies;
 
-  return elem;
+  ponies;
 }
 
 
 
-void init_ref_elem_table()
+ponies()
 {
-  // ouside mutex - if this pointer is set, we can trust it.
-  if (singleton_cache != NULL) return;
+  // ponies.
+  ponies;
 
-  // playing with fire here - lock before touching shared
-  // data structures
-  InitMutex::scoped_lock lock(init_mtx);
+  // ponies
+  // ponies
+  ponies);
 
-  // inside mutex - pointer may have changed while waiting
-  // for the lock to acquire, check it again.
-  if (singleton_cache != NULL) return;
+  // ponies
+  // ponies.
+  ponies;
 
-  // OK, if we get here we have the lock and we are not
-  // initialized.  populate singleton.
-  singleton_cache = new SingletonCache;
+  // ponies
+  // ponies.
+  ponies;
 
-  // initialize the reference file table
+  // ponies
   {
-    ref_elem_file.clear();
+    ponies();
 
-    // // 1D elements
-    ref_elem_file[EDGE2]    = ElemDataStrings::one_edge;
-    ref_elem_file[EDGE3]    = ElemDataStrings::one_edge3;
-    ref_elem_file[EDGE4]    = ElemDataStrings::one_edge4;
+    // // ponies
+    ponies;
+    ponies;
+    ponies;
 
-    // 2D elements
-    ref_elem_file[TRI3]     = ElemDataStrings::one_tri;
-    ref_elem_file[TRI6]     = ElemDataStrings::one_tri6;
+    // ponies
+    ponies;
+    ponies;
 
-    ref_elem_file[QUAD4]    = ElemDataStrings::one_quad;
-    ref_elem_file[QUAD8]    = ElemDataStrings::one_quad8;
-    ref_elem_file[QUAD9]    = ElemDataStrings::one_quad9;
+    ponies;
+    ponies;
+    ponies;
 
-    // 3D elements
-    ref_elem_file[HEX8]     = ElemDataStrings::one_hex;
-    ref_elem_file[HEX20]    = ElemDataStrings::one_hex20;
-    ref_elem_file[HEX27]    = ElemDataStrings::one_hex27;
+    // ponies
+    ponies;
+    ponies;
+    ponies;
 
-    ref_elem_file[TET4]     = ElemDataStrings::one_tet;
-    ref_elem_file[TET10]    = ElemDataStrings::one_tet10;
+    ponies;
+    ponies;
 
-    ref_elem_file[PRISM6]   = ElemDataStrings::one_prism;
-    ref_elem_file[PRISM15]  = ElemDataStrings::one_prism15;
-    ref_elem_file[PRISM18]  = ElemDataStrings::one_prism18;
+    ponies;
+    ponies;
+    ponies;
 
-    ref_elem_file[PYRAMID5] = ElemDataStrings::one_pyramid;
-    ref_elem_file[PYRAMID13] = ElemDataStrings::one_pyramid13;
-    ref_elem_file[PYRAMID14] = ElemDataStrings::one_pyramid14;
+    ponies;
+    ponies;
+    ponies;
   }
 
-  // Read'em
-  for (FileMapType::const_iterator it=ref_elem_file.begin();
-       it != ref_elem_file.end(); ++it)
+  // ponies
+  ponies();
+       ponies)
     {
-      std::istringstream stream(it->second);
+      ponies);
 
-      read_ref_elem(it->first,
-                    stream);
+      ponies,
+                    ponies);
     }
 }
 
 
-// no reason to do this at startup -
-// data structures will get initialized *if*
-// ReferenceElem::get() is ever called.
-// // Class to setup singleton data
-// class ReferenceElemSetup : public Singleton::Setup
+// ponies -
+// ponies*
+// ponies.
+// // ponies
+// ponies
 // {
-//   void setup ()
+//   ponies ()
 //   {
-//     init_ref_elem_table();
+//     ponies();
 //   }
-// } reference_elem_setup;
+// } ponies;
 
-} // anonymous namespace
+} // ponies
 
 
 
 //----------------------------------------------------------------------------
-// external API Implementation
-namespace libMesh
+// ponies
+ponies
 {
-namespace ReferenceElem
+ponies
 {
-const Elem & get (const ElemType Type)
+ponies)
 {
-  libmesh_assert_less (Type, INVALID_ELEM);
+  ponies);
 
-  init_ref_elem_table();
+  ponies();
 
-  libmesh_assert (ref_elem_map[Type] != NULL);
+  ponies);
 
-  return *ref_elem_map[Type];
+  ponies];
 }
-} // namespace ReferenceElem
-} // namespace libMesh
+} // ponies
+} // ponies

@@ -1,1468 +1,1468 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
-template <>
-Real FE<3,L2_LAGRANGE>::shape(const ElemType type,
-                              const Order order,
-                              const unsigned int i,
-                              const Point& p)
+ponies <>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
 
-  switch (order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // trilinear hexahedral shape functions
-          case HEX8:
-          case HEX20:
-          case HEX27:
+            // ponies
+          ponies:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 8);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              //                                0  1  2  3  4  5  6  7
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              return (FE<1,L2_LAGRANGE>::shape(EDGE2, FIRST, i0[i], xi)*
-                      FE<1,L2_LAGRANGE>::shape(EDGE2, FIRST, i1[i], eta)*
-                      FE<1,L2_LAGRANGE>::shape(EDGE2, FIRST, i2[i], zeta));
+              ponies)*
+                      ponies)*
+                      ponies));
             }
 
-            // linear tetrahedral shape functions
-          case TET4:
-          case TET10:
+            // ponies
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              // ponies
+              ponies);
+              ponies);
+              ponies);
+              ponies;
 
-              switch(i)
+              ponies)
                 {
-                case 0:
-                  return zeta0;
+                ponies:
+                  ponies;
 
-                case 1:
-                  return zeta1;
+                ponies:
+                  ponies;
 
-                case 2:
-                  return zeta2;
+                ponies:
+                  ponies;
 
-                case 3:
-                  return zeta3;
+                ponies:
+                  ponies;
 
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-            // linear prism shape functions
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
+            // ponies
+          ponies:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 6);
+              ponies);
 
-              // Compute prism shape functions as a tensor-product
-              // of a triangle and an edge
+              // ponies
+              // ponies
 
-              Point p2d(p(0),p(1));
-              Point p1d(p(2));
+              ponies));
+              ponies));
 
-              //                                0  1  2  3  4  5
-              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
-              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2};
+              //                                ponies
+              ponies};
+              ponies};
 
-              return (FE<2,L2_LAGRANGE>::shape(TRI3,  FIRST, i1[i], p2d)*
-                      FE<1,L2_LAGRANGE>::shape(EDGE2, FIRST, i0[i], p1d));
+              ponies)*
+                      ponies));
             }
 
-            // linear pyramid shape functions
-          case PYRAMID5:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 5);
+              ponies);
 
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-              const Real eps  = 1.e-35;
+              ponies);
+              ponies);
+              ponies);
+              ponies;
 
-              switch(i)
+              ponies)
                 {
-                case 0:
-                  return .25*(zeta + xi - 1.)*(zeta + eta - 1.)/((1. - zeta) + eps);
+                ponies:
+                  ponies);
 
-                case 1:
-                  return .25*(zeta - xi - 1.)*(zeta + eta - 1.)/((1. - zeta) + eps);
+                ponies:
+                  ponies);
 
-                case 2:
-                  return .25*(zeta - xi - 1.)*(zeta - eta - 1.)/((1. - zeta) + eps);
+                ponies:
+                  ponies);
 
-                case 3:
-                  return .25*(zeta + xi - 1.)*(zeta - eta - 1.)/((1. - zeta) + eps);
+                ponies:
+                  ponies);
 
-                case 4:
-                  return zeta;
+                ponies:
+                  ponies;
 
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            // serendipity hexahedral quadratic shape functions
-          case HEX20:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 20);
+              ponies);
 
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              ponies);
+              ponies);
+              ponies);
 
-              // these functions are defined for (x,y,z) in [0,1]^3
-              // so transform the locations
-              const Real x = .5*(xi   + 1.);
-              const Real y = .5*(eta  + 1.);
-              const Real z = .5*(zeta + 1.);
+              // ponies
+              // ponies
+              ponies.);
+              ponies.);
+              ponies.);
 
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return (1. - x)*(1. - y)*(1. - z)*(1. - 2.*x - 2.*y - 2.*z);
+                ponies:
+                  ponies);
 
-                case 1:
-                  return x*(1. - y)*(1. - z)*(2.*x - 2.*y - 2.*z - 1.);
+                ponies:
+                  ponies.);
 
-                case 2:
-                  return x*y*(1. - z)*(2.*x + 2.*y - 2.*z - 3.);
+                ponies:
+                  ponies.);
 
-                case 3:
-                  return (1. - x)*y*(1. - z)*(2.*y - 2.*x - 2.*z - 1.);
+                ponies:
+                  ponies.);
 
-                case 4:
-                  return (1. - x)*(1. - y)*z*(2.*z - 2.*x - 2.*y - 1.);
+                ponies:
+                  ponies.);
 
-                case 5:
-                  return x*(1. - y)*z*(2.*x - 2.*y + 2.*z - 3.);
+                ponies:
+                  ponies.);
 
-                case 6:
-                  return x*y*z*(2.*x + 2.*y + 2.*z - 5.);
+                ponies:
+                  ponies.);
 
-                case 7:
-                  return (1. - x)*y*z*(2.*y - 2.*x + 2.*z - 3.);
+                ponies:
+                  ponies.);
 
-                case 8:
-                  return 4.*x*(1. - x)*(1. - y)*(1. - z);
+                ponies:
+                  ponies);
 
-                case 9:
-                  return 4.*x*y*(1. - y)*(1. - z);
+                ponies:
+                  ponies);
 
-                case 10:
-                  return 4.*x*(1. - x)*y*(1. - z);
+                ponies:
+                  ponies);
 
-                case 11:
-                  return 4.*(1. - x)*y*(1. - y)*(1. - z);
+                ponies:
+                  ponies);
 
-                case 12:
-                  return 4.*(1. - x)*(1. - y)*z*(1. - z);
+                ponies:
+                  ponies);
 
-                case 13:
-                  return 4.*x*(1. - y)*z*(1. - z);
+                ponies:
+                  ponies);
 
-                case 14:
-                  return 4.*x*y*z*(1. - z);
+                ponies:
+                  ponies);
 
-                case 15:
-                  return 4.*(1. - x)*y*z*(1. - z);
+                ponies:
+                  ponies);
 
-                case 16:
-                  return 4.*x*(1. - x)*(1. - y)*z;
+                ponies:
+                  ponies;
 
-                case 17:
-                  return 4.*x*y*(1. - y)*z;
+                ponies:
+                  ponies;
 
-                case 18:
-                  return 4.*x*(1. - x)*y*z;
+                ponies:
+                  ponies;
 
-                case 19:
-                  return 4.*(1. - x)*y*(1. - y)*z;
+                ponies:
+                  ponies;
 
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-            // triquadraic hexahedral shape funcions
-          case HEX27:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 27);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              return (FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i0[i], xi)*
-                      FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i1[i], eta)*
-                      FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i2[i], zeta));
+              ponies)*
+                      ponies)*
+                      ponies));
             }
 
-            // quadratic tetrahedral shape functions
-          case TET10:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 10);
+              ponies);
 
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              // ponies
+              ponies);
+              ponies);
+              ponies);
+              ponies;
 
-              switch(i)
+              ponies)
                 {
-                case 0:
-                  return zeta0*(2.*zeta0 - 1.);
+                ponies:
+                  ponies.);
 
-                case 1:
-                  return zeta1*(2.*zeta1 - 1.);
+                ponies:
+                  ponies.);
 
-                case 2:
-                  return zeta2*(2.*zeta2 - 1.);
+                ponies:
+                  ponies.);
 
-                case 3:
-                  return zeta3*(2.*zeta3 - 1.);
+                ponies:
+                  ponies.);
 
-                case 4:
-                  return 4.*zeta0*zeta1;
+                ponies:
+                  ponies;
 
-                case 5:
-                  return 4.*zeta1*zeta2;
+                ponies:
+                  ponies;
 
-                case 6:
-                  return 4.*zeta2*zeta0;
+                ponies:
+                  ponies;
 
-                case 7:
-                  return 4.*zeta0*zeta3;
+                ponies:
+                  ponies;
 
-                case 8:
-                  return 4.*zeta1*zeta3;
+                ponies:
+                  ponies;
 
-                case 9:
-                  return 4.*zeta2*zeta3;
+                ponies:
+                  ponies;
 
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-            // quadradic prism shape functions
-          case PRISM18:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 18);
+              ponies);
 
-              // Compute prism shape functions as a tensor-product
-              // of a triangle and an edge
+              // ponies
+              // ponies
 
-              Point p2d(p(0),p(1));
-              Point p1d(p(2));
+              ponies));
+              ponies));
 
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};
-              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5};
+              //                                ponies
+              ponies};
+              ponies};
 
-              return (FE<2,L2_LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
-                      FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+              ponies)*
+                      ponies));
             }
 
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
+      // ponies
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,L2_LAGRANGE>::shape(const Elem* elem,
-                              const Order order,
-                              const unsigned int i,
-                              const Point& p)
+ponies <>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape functions
-  return FE<3,L2_LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  // ponies
+  ponies);
 }
 
 
 
 
-template <>
-Real FE<3,L2_LAGRANGE>::shape_deriv(const ElemType type,
-                                    const Order order,
-                                    const unsigned int i,
-                                    const unsigned int j,
-                                    const Point& p)
+ponies <>
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
-  libmesh_assert_less (j, 3);
+  ponies);
 
-  switch (order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // trilinear hexahedral shape functions
-          case HEX8:
-          case HEX20:
-          case HEX27:
+            // ponies
+          ponies:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 8);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+              ponies};
+              ponies};
+              ponies};
 
-              switch(j)
+              ponies)
                 {
-                case 0:
-                  return (FE<1,L2_LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE2, FIRST, i1[i], eta)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE2, FIRST, i2[i], zeta));
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                case 1:
-                  return (FE<1,L2_LAGRANGE>::shape      (EDGE2, FIRST, i0[i], xi)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[i], 0, eta)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE2, FIRST, i2[i], zeta));
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                case 2:
-                  return (FE<1,L2_LAGRANGE>::shape      (EDGE2, FIRST, i0[i], xi)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE2, FIRST, i1[i], eta)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE2, FIRST, i2[i], 0, zeta));
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // linear tetrahedral shape functions
-          case TET4:
-          case TET10:
+            // ponies
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real dzeta0dxi = -1.;
-              const Real dzeta1dxi =  1.;
-              const Real dzeta2dxi =  0.;
-              const Real dzeta3dxi =  0.;
+              // ponies
+              ponies.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta =  0.;
-              const Real dzeta2deta =  1.;
-              const Real dzeta3deta =  0.;
+              ponies.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              const Real dzeta0dzeta = -1.;
-              const Real dzeta1dzeta =  0.;
-              const Real dzeta2dzeta =  0.;
-              const Real dzeta3dzeta =  1.;
+              ponies.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return dzeta0dxi;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return dzeta3dxi;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return dzeta0deta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return dzeta3deta;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d()/dzeta
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return dzeta0dzeta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return dzeta1dzeta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return dzeta2dzeta;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return dzeta3dzeta;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // linear prism shape functions
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
+            // ponies
+          ponies:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 6);
+              ponies);
 
-              // Compute prism shape functions as a tensor-product
-              // of a triangle and an edge
+              // ponies
+              // ponies
 
-              Point p2d(p(0),p(1));
-              Point p1d(p(2));
+              ponies));
+              ponies));
 
-              //                                0  1  2  3  4  5
-              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
-              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2};
+              //                                ponies
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
-                  return (FE<2,L2_LAGRANGE>::shape_deriv(TRI3,  FIRST, i1[i], 0, p2d)*
-                          FE<1,L2_LAGRANGE>::shape(EDGE2, FIRST, i0[i], p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d()/deta
-                case 1:
-                  return (FE<2,L2_LAGRANGE>::shape_deriv(TRI3,  FIRST, i1[i], 1, p2d)*
-                          FE<1,L2_LAGRANGE>::shape(EDGE2, FIRST, i0[i], p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d()/dzeta
-                case 2:
-                  return (FE<2,L2_LAGRANGE>::shape(TRI3,  FIRST, i1[i], p2d)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // linear pyramid shape functions
-          case PYRAMID5:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 5);
+              ponies);
 
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-              const Real eps  = 1.e-35;
+              ponies);
+              ponies);
+              ponies);
+              ponies;
 
-              switch (j)
+              ponies)
                 {
-                  // d/dxi
-                case 0:
-                  switch(i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
-                      return  .25*(zeta + eta - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 1:
-                      return -.25*(zeta + eta - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 2:
-                      return -.25*(zeta - eta - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 3:
-                      return  .25*(zeta - eta - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 4:
-                      return 0;
+                    ponies:
+                      ponies;
 
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
+                    ponies:
+                      ponies);
                     }
 
 
-                  // d/deta
-                case 1:
-                  switch(i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
-                      return  .25*(zeta + xi - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 1:
-                      return  .25*(zeta - xi - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 2:
-                      return -.25*(zeta - xi - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 3:
-                      return -.25*(zeta + xi - 1.)/((1. - zeta) + eps);
+                    ponies:
+                      ponies);
 
-                    case 4:
-                      return 0;
+                    ponies:
+                      ponies;
 
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
+                    ponies:
+                      ponies);
                     }
 
 
-                  // d/dzeta
-                case 2:
-                  switch(i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
+                    ponies:
                       {
-                        const Real a=1.;
-                        const Real b=1.;
+                        ponies.;
+                        ponies.;
 
-                        return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-                                     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-                                    ((1. - zeta)*(1. - zeta) + eps));
+                        ponies.) +
+                                     (ponies.)))/
+                                    ((ponies));
                       }
 
-                    case 1:
+                    ponies:
                       {
-                        const Real a=-1.;
-                        const Real b=1.;
+                        ponies.;
+                        ponies.;
 
-                        return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-                                     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-                                    ((1. - zeta)*(1. - zeta) + eps));
+                        ponies.) +
+                                     (ponies.)))/
+                                    ((ponies));
                       }
 
-                    case 2:
+                    ponies:
                       {
-                        const Real a=-1.;
-                        const Real b=-1.;
+                        ponies.;
+                        ponies.;
 
-                        return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-                                     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-                                    ((1. - zeta)*(1. - zeta) + eps));
+                        ponies.) +
+                                     (ponies.)))/
+                                    ((ponies));
                       }
 
-                    case 3:
+                    ponies:
                       {
-                        const Real a=1.;
-                        const Real b=-1.;
+                        ponies.;
+                        ponies.;
 
-                        return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-                                     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-                                    ((1. - zeta)*(1. - zeta) + eps));
+                        ponies.) +
+                                     (ponies.)))/
+                                    ((ponies));
                       }
 
-                    case 4:
-                      return 1.;
+                    ponies:
+                      ponies.;
 
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
+                    ponies:
+                      ponies);
                     }
 
 
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            // serendipity hexahedral quadratic shape functions
-          case HEX20:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 20);
+              ponies);
 
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              ponies);
+              ponies);
+              ponies);
 
-              // these functions are defined for (x,y,z) in [0,1]^3
-              // so transform the locations
-              const Real x = .5*(xi   + 1.);
-              const Real y = .5*(eta  + 1.);
-              const Real z = .5*(zeta + 1.);
+              // ponies
+              // ponies
+              ponies.);
+              ponies.);
+              ponies.);
 
-              // and don't forget the chain rule!
+              // ponies!
 
-              switch (j)
+              ponies)
                 {
 
-                  // d/dx*dx/dxi
-                case 0:
-                  switch (i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
-                      return .5*(1. - y)*(1. - z)*((1. - x)*(-2.) +
-                                                   (-1.)*(1. - 2.*x - 2.*y - 2.*z));
+                    ponies:
+                      ponies.) +
+                                                   (-ponies));
 
-                    case 1:
-                      return .5*(1. - y)*(1. - z)*(x*(2.) +
-                                                   (1.)*(2.*x - 2.*y - 2.*z - 1.));
+                    ponies:
+                      ponies.) +
+                                                   (ponies.));
 
-                    case 2:
-                      return .5*y*(1. - z)*(x*(2.) +
-                                            (1.)*(2.*x + 2.*y - 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                            (ponies.));
 
-                    case 3:
-                      return .5*y*(1. - z)*((1. - x)*(-2.) +
-                                            (-1.)*(2.*y - 2.*x - 2.*z - 1.));
+                    ponies:
+                      ponies.) +
+                                            (-ponies.));
 
-                    case 4:
-                      return .5*(1. - y)*z*((1. - x)*(-2.) +
-                                            (-1.)*(2.*z - 2.*x - 2.*y - 1.));
+                    ponies:
+                      ponies.) +
+                                            (-ponies.));
 
-                    case 5:
-                      return .5*(1. - y)*z*(x*(2.) +
-                                            (1.)*(2.*x - 2.*y + 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                            (ponies.));
 
-                    case 6:
-                      return .5*y*z*(x*(2.) +
-                                     (1.)*(2.*x + 2.*y + 2.*z - 5.));
+                    ponies:
+                      ponies.) +
+                                     (ponies.));
 
-                    case 7:
-                      return .5*y*z*((1. - x)*(-2.) +
-                                     (-1.)*(2.*y - 2.*x + 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                     (-ponies.));
 
-                    case 8:
-                      return 2.*(1. - y)*(1. - z)*(1. - 2.*x);
+                    ponies:
+                      ponies);
 
-                    case 9:
-                      return 2.*y*(1. - y)*(1. - z);
+                    ponies:
+                      ponies);
 
-                    case 10:
-                      return 2.*y*(1. - z)*(1. - 2.*x);
+                    ponies:
+                      ponies);
 
-                    case 11:
-                      return 2.*y*(1. - y)*(1. - z)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 12:
-                      return 2.*(1. - y)*z*(1. - z)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 13:
-                      return 2.*(1. - y)*z*(1. - z);
+                    ponies:
+                      ponies);
 
-                    case 14:
-                      return 2.*y*z*(1. - z);
+                    ponies:
+                      ponies);
 
-                    case 15:
-                      return 2.*y*z*(1. - z)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 16:
-                      return 2.*(1. - y)*z*(1. - 2.*x);
+                    ponies:
+                      ponies);
 
-                    case 17:
-                      return 2.*y*(1. - y)*z;
+                    ponies:
+                      ponies;
 
-                    case 18:
-                      return 2.*y*z*(1. - 2.*x);
+                    ponies:
+                      ponies);
 
-                    case 19:
-                      return 2.*y*(1. - y)*z*(-1.);
+                    ponies:
+                      ponies.);
 
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
+                    ponies:
+                      ponies);
                     }
 
 
-                  // d/dy*dy/deta
-                case 1:
-                  switch (i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
-                      return .5*(1. - x)*(1. - z)*((1. - y)*(-2.) +
-                                                   (-1.)*(1. - 2.*x - 2.*y - 2.*z));
+                    ponies:
+                      ponies.) +
+                                                   (-ponies));
 
-                    case 1:
-                      return .5*x*(1. - z)*((1. - y)*(-2.) +
-                                            (-1.)*(2.*x - 2.*y - 2.*z - 1.));
+                    ponies:
+                      ponies.) +
+                                            (-ponies.));
 
-                    case 2:
-                      return .5*x*(1. - z)*(y*(2.) +
-                                            (1.)*(2.*x + 2.*y - 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                            (ponies.));
 
-                    case 3:
-                      return .5*(1. - x)*(1. - z)*(y*(2.) +
-                                                   (1.)*(2.*y - 2.*x - 2.*z - 1.));
+                    ponies:
+                      ponies.) +
+                                                   (ponies.));
 
-                    case 4:
-                      return .5*(1. - x)*z*((1. - y)*(-2.) +
-                                            (-1.)*(2.*z - 2.*x - 2.*y - 1.));
+                    ponies:
+                      ponies.) +
+                                            (-ponies.));
 
-                    case 5:
-                      return .5*x*z*((1. - y)*(-2.) +
-                                     (-1.)*(2.*x - 2.*y + 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                     (-ponies.));
 
-                    case 6:
-                      return .5*x*z*(y*(2.) +
-                                     (1.)*(2.*x + 2.*y + 2.*z - 5.));
+                    ponies:
+                      ponies.) +
+                                     (ponies.));
 
-                    case 7:
-                      return .5*(1. - x)*z*(y*(2.) +
-                                            (1.)*(2.*y - 2.*x + 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                            (ponies.));
 
-                    case 8:
-                      return 2.*x*(1. - x)*(1. - z)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 9:
-                      return 2.*x*(1. - z)*(1. - 2.*y);
+                    ponies:
+                      ponies);
 
-                    case 10:
-                      return 2.*x*(1. - x)*(1. - z);
+                    ponies:
+                      ponies);
 
-                    case 11:
-                      return 2.*(1. - x)*(1. - z)*(1. - 2.*y);
+                    ponies:
+                      ponies);
 
-                    case 12:
-                      return 2.*(1. - x)*z*(1. - z)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 13:
-                      return 2.*x*z*(1. - z)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 14:
-                      return 2.*x*z*(1. - z);
+                    ponies:
+                      ponies);
 
-                    case 15:
-                      return 2.*(1. - x)*z*(1. - z);
+                    ponies:
+                      ponies);
 
-                    case 16:
-                      return 2.*x*(1. - x)*z*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 17:
-                      return 2.*x*z*(1. - 2.*y);
+                    ponies:
+                      ponies);
 
-                    case 18:
-                      return 2.*x*(1. - x)*z;
+                    ponies:
+                      ponies;
 
-                    case 19:
-                      return 2.*(1. - x)*z*(1. - 2.*y);
+                    ponies:
+                      ponies);
 
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
+                    ponies:
+                      ponies);
                     }
 
 
-                  // d/dz*dz/dzeta
-                case 2:
-                  switch (i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
-                      return .5*(1. - x)*(1. - y)*((1. - z)*(-2.) +
-                                                   (-1.)*(1. - 2.*x - 2.*y - 2.*z));
+                    ponies:
+                      ponies.) +
+                                                   (-ponies));
 
-                    case 1:
-                      return .5*x*(1. - y)*((1. - z)*(-2.) +
-                                            (-1.)*(2.*x - 2.*y - 2.*z - 1.));
+                    ponies:
+                      ponies.) +
+                                            (-ponies.));
 
-                    case 2:
-                      return .5*x*y*((1. - z)*(-2.) +
-                                     (-1.)*(2.*x + 2.*y - 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                     (-ponies.));
 
-                    case 3:
-                      return .5*(1. - x)*y*((1. - z)*(-2.) +
-                                            (-1.)*(2.*y - 2.*x - 2.*z - 1.));
+                    ponies:
+                      ponies.) +
+                                            (-ponies.));
 
-                    case 4:
-                      return .5*(1. - x)*(1. - y)*(z*(2.) +
-                                                   (1.)*(2.*z - 2.*x - 2.*y - 1.));
+                    ponies:
+                      ponies.) +
+                                                   (ponies.));
 
-                    case 5:
-                      return .5*x*(1. - y)*(z*(2.) +
-                                            (1.)*(2.*x - 2.*y + 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                            (ponies.));
 
-                    case 6:
-                      return .5*x*y*(z*(2.) +
-                                     (1.)*(2.*x + 2.*y + 2.*z - 5.));
+                    ponies:
+                      ponies.) +
+                                     (ponies.));
 
-                    case 7:
-                      return .5*(1. - x)*y*(z*(2.) +
-                                            (1.)*(2.*y - 2.*x + 2.*z - 3.));
+                    ponies:
+                      ponies.) +
+                                            (ponies.));
 
-                    case 8:
-                      return 2.*x*(1. - x)*(1. - y)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 9:
-                      return 2.*x*y*(1. - y)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 10:
-                      return 2.*x*(1. - x)*y*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 11:
-                      return 2.*(1. - x)*y*(1. - y)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 12:
-                      return 2.*(1. - x)*(1. - y)*(1. - 2.*z);
+                    ponies:
+                      ponies);
 
-                    case 13:
-                      return 2.*x*(1. - y)*(1. - 2.*z);
+                    ponies:
+                      ponies);
 
-                    case 14:
-                      return 2.*x*y*(1. - 2.*z);
+                    ponies:
+                      ponies);
 
-                    case 15:
-                      return 2.*(1. - x)*y*(1. - 2.*z);
+                    ponies:
+                      ponies);
 
-                    case 16:
-                      return 2.*x*(1. - x)*(1. - y);
+                    ponies:
+                      ponies);
 
-                    case 17:
-                      return 2.*x*y*(1. - y);
+                    ponies:
+                      ponies);
 
-                    case 18:
-                      return 2.*x*(1. - x)*y;
+                    ponies:
+                      ponies;
 
-                    case 19:
-                      return 2.*(1. - x)*y*(1. - y);
+                    ponies:
+                      ponies);
 
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
+                    ponies:
+                      ponies);
                     }
 
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // triquadraic hexahedral shape funcions
-          case HEX27:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 27);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              switch(j)
+              ponies)
                 {
-                case 0:
-                  return (FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                case 1:
-                  return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                case 2:
-                  return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // quadratic tetrahedral shape functions
-          case TET10:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 10);
+              ponies);
 
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              // ponies
+              ponies);
+              ponies);
+              ponies);
+              ponies;
 
-              const Real dzeta0dxi = -1.;
-              const Real dzeta1dxi =  1.;
-              const Real dzeta2dxi =  0.;
-              const Real dzeta3dxi =  0.;
+              ponies.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta =  0.;
-              const Real dzeta2deta =  1.;
-              const Real dzeta3deta =  0.;
+              ponies.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              const Real dzeta0dzeta = -1.;
-              const Real dzeta1dzeta =  0.;
-              const Real dzeta2dzeta =  0.;
-              const Real dzeta3dzeta =  1.;
+              ponies.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0dxi;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3dxi;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 4.*(zeta0*dzeta1dxi + dzeta0dxi*zeta1);
+                      ponies:
+                        ponies);
 
-                      case 5:
-                        return 4.*(zeta1*dzeta2dxi + dzeta1dxi*zeta2);
+                      ponies:
+                        ponies);
 
-                      case 6:
-                        return 4.*(zeta0*dzeta2dxi + dzeta0dxi*zeta2);
+                      ponies:
+                        ponies);
 
-                      case 7:
-                        return 4.*(zeta0*dzeta3dxi + dzeta0dxi*zeta3);
+                      ponies:
+                        ponies);
 
-                      case 8:
-                        return 4.*(zeta1*dzeta3dxi + dzeta1dxi*zeta3);
+                      ponies:
+                        ponies);
 
-                      case 9:
-                        return 4.*(zeta2*dzeta3dxi + dzeta2dxi*zeta3);
+                      ponies:
+                        ponies);
 
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0deta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3deta;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 4.*(zeta0*dzeta1deta + dzeta0deta*zeta1);
+                      ponies:
+                        ponies);
 
-                      case 5:
-                        return 4.*(zeta1*dzeta2deta + dzeta1deta*zeta2);
+                      ponies:
+                        ponies);
 
-                      case 6:
-                        return 4.*(zeta0*dzeta2deta + dzeta0deta*zeta2);
+                      ponies:
+                        ponies);
 
-                      case 7:
-                        return 4.*(zeta0*dzeta3deta + dzeta0deta*zeta3);
+                      ponies:
+                        ponies);
 
-                      case 8:
-                        return 4.*(zeta1*dzeta3deta + dzeta1deta*zeta3);
+                      ponies:
+                        ponies);
 
-                      case 9:
-                        return 4.*(zeta2*dzeta3deta + dzeta2deta*zeta3);
+                      ponies:
+                        ponies);
 
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d()/dzeta
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0dzeta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1dzeta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2dzeta;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3dzeta;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 4.*(zeta0*dzeta1dzeta + dzeta0dzeta*zeta1);
+                      ponies:
+                        ponies);
 
-                      case 5:
-                        return 4.*(zeta1*dzeta2dzeta + dzeta1dzeta*zeta2);
+                      ponies:
+                        ponies);
 
-                      case 6:
-                        return 4.*(zeta0*dzeta2dzeta + dzeta0dzeta*zeta2);
+                      ponies:
+                        ponies);
 
-                      case 7:
-                        return 4.*(zeta0*dzeta3dzeta + dzeta0dzeta*zeta3);
+                      ponies:
+                        ponies);
 
-                      case 8:
-                        return 4.*(zeta1*dzeta3dzeta + dzeta1dzeta*zeta3);
+                      ponies:
+                        ponies);
 
-                      case 9:
-                        return 4.*(zeta2*dzeta3dzeta + dzeta2dzeta*zeta3);
+                      ponies:
+                        ponies);
 
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
 
 
-            // quadradic prism shape functions
-          case PRISM18:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 18);
+              ponies);
 
-              // Compute prism shape functions as a tensor-product
-              // of a triangle and an edge
+              // ponies
+              // ponies
 
-              Point p2d(p(0),p(1));
-              Point p1d(p(2));
+              ponies));
+              ponies));
 
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};
-              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5};
+              //                                ponies
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
-                  return (FE<2,L2_LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 0, p2d)*
-                          FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d()/deta
-                case 1:
-                  return (FE<2,L2_LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 1, p2d)*
-                          FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d()/dzeta
-                case 2:
-                  return (FE<2,L2_LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
+      // ponies
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,L2_LAGRANGE>::shape_deriv(const Elem* elem,
-                                    const Order order,
-                                    const unsigned int i,
-                                    const unsigned int j,
-                                    const Point& p)
+ponies <>
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape function derivatives
-  return FE<3,L2_LAGRANGE>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
 
 
-template <>
-Real FE<3,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
-                                           const Order order,
-                                           const unsigned int i,
-                                           const unsigned int j,
-                                           const Point& p)
+ponies <>
+ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
-  libmesh_assert_less (j, 6);
+  ponies);
 
-  switch (order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        return 0.;
+        ponies.;
       }
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            // serendipity hexahedral quadratic shape functions
-          case HEX20:
+            // ponies
+          ponies:
             {
-              static bool warning_given_HEX20 = false;
+              ponies;
 
-              if (!warning_given_HEX20)
-                libMesh::err << "Second derivatives for 3D Lagrangian HEX20"
-                             << " elements are not yet implemented!"
-                             << std::endl;
-              warning_given_HEX20 = true;
+              ponies)
+                ponies"
+                             << " ponies!"
+                             << ponies;
+              ponies;
             }
 
-            // triquadraic hexahedral shape funcions
-          case HEX27:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 27);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              switch(j)
+              ponies)
                 {
-                  // d^2()/dxi^2
-                case 0:
-                  return (FE<1,L2_LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d^2()/dxideta
-                case 1:
-                  return (FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d^2()/deta^2
-                case 2:
-                  return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
-                          FE<1,L2_LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i1[i], 0, eta)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d^2()/dxidzeta
-                case 3:
-                  return (FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d^2()/detadzeta
-                case 4:
-                  return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d^2()/dzeta^2
-                case 5:
-                  return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
-                          FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
-                          FE<1,L2_LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i2[i], 0, zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // quadratic tetrahedral shape functions
-          case TET10:
+            // ponies
+          ponies:
             {
-              // The area coordinates are the same as used for the
-              // shape() and shape_deriv() functions.
-              // const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-              // const Real zeta1 = p(0);
-              // const Real zeta2 = p(1);
-              // const Real zeta3 = p(2);
-              static const Real dzetadxi[4][3] =
+              // ponies
+              // ponies.
+              // ponies;
+              // ponies);
+              // ponies);
+              // ponies);
+              ponies] =
                 {
-                  {-1., -1., -1.},
-                  {1.,   0.,  0.},
-                  {0.,   1.,  0.},
-                  {0.,   0.,  1.}
+                  {-ponies.},
+                  {ponies.},
+                  {ponies.},
+                  {ponies.}
                 };
 
-              // Convert from j -> (j,k) indices for independent variable
-              // (0=xi, 1=eta, 2=zeta)
-              static const unsigned short int independent_var_indices[6][2] =
+              // ponies
+              // (ponies)
+              ponies] =
                 {
-                  {0, 0}, // d^2 phi / dxi^2
-                  {0, 1}, // d^2 phi / dxi deta
-                  {1, 1}, // d^2 phi / deta^2
-                  {0, 2}, // d^2 phi / dxi dzeta
-                  {1, 2}, // d^2 phi / deta dzeta
-                  {2, 2}  // d^2 phi / dzeta^2
+                  {ponies
+                  {ponies
+                  {ponies
+                  {ponies
+                  {ponies
+                  {ponies
                 };
 
-              // Convert from i -> zeta indices.  Each quadratic shape
-              // function for the Tet10 depends on up to two of the zeta
-              // area coordinate functions (see the shape() function above).
-              // This table just tells which two area coords it uses.
-              static const unsigned short int zeta_indices[10][2] =
+              // ponies
+              // ponies
+              // ponies).
+              // ponies.
+              ponies] =
                 {
-                  {0, 0},
-                  {1, 1},
-                  {2, 2},
-                  {3, 3},
-                  {0, 1},
-                  {1, 2},
-                  {2, 0},
-                  {0, 3},
-                  {1, 3},
-                  {2, 3},
+                  {ponies},
+                  {ponies},
+                  {ponies},
+                  {ponies},
+                  {ponies},
+                  {ponies},
+                  {ponies},
+                  {ponies},
+                  {ponies},
+                  {ponies},
                 };
 
-              // Look up the independent variable indices for this value of j.
-              const unsigned int my_j = independent_var_indices[j][0];
-              const unsigned int my_k = independent_var_indices[j][1];
+              // ponies.
+              ponies];
+              ponies];
 
-              if (i<4)
+              ponies)
                 {
-                  return 4.*dzetadxi[i][my_j]*dzetadxi[i][my_k];
+                  ponies];
                 }
 
-              else if (i<10)
+              ponies)
                 {
-                  const unsigned short int my_m = zeta_indices[i][0];
-                  const unsigned short int my_n = zeta_indices[i][1];
+                  ponies];
+                  ponies];
 
-                  return 4.*(dzetadxi[my_n][my_j]*dzetadxi[my_m][my_k] +
-                             dzetadxi[my_m][my_j]*dzetadxi[my_n][my_k] );
+                  ponies] +
+                             ponies] );
                 }
-              else
-                libmesh_error_msg("Invalid shape function index " << i);
+              ponies
+                ponies);
             }
 
 
-            // quadradic prism shape functions
-          case PRISM18:
+            // ponies
+          ponies:
             {
-              libmesh_assert_less (i, 18);
+              ponies);
 
-              // Compute prism shape functions as a tensor-product
-              // of a triangle and an edge
+              // ponies
+              // ponies
 
-              Point p2d(p(0),p(1));
-              Point p1d(p(2));
+              ponies));
+              ponies));
 
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 1, 2, 2, 2};
-              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 3, 4, 5};
+              //                                ponies
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d^2()/dxi^2
-                case 0:
-                  return (FE<2,L2_LAGRANGE>::shape_second_deriv(TRI6, SECOND, i1[i], 0, p2d)*
-                          FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2()/dxideta
-                case 1:
-                  return (FE<2,L2_LAGRANGE>::shape_second_deriv(TRI6, SECOND, i1[i], 1, p2d)*
-                          FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2()/deta^2
-                case 2:
-                  return (FE<2,L2_LAGRANGE>::shape_second_deriv(TRI6, SECOND, i1[i], 2, p2d)*
-                          FE<1,L2_LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2()/dxidzeta
-                case 3:
-                  return (FE<2,L2_LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 0, p2d)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2()/detadzeta
-                case 4:
-                  return (FE<2,L2_LAGRANGE>::shape_deriv(TRI6,  SECOND, i1[i], 1, p2d)*
-                          FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2()/dzeta^2
-                case 5:
-                  return (FE<2,L2_LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
-                          FE<1,L2_LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, p1d));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
 
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
+      // ponies
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,L2_LAGRANGE>::shape_second_deriv(const Elem* elem,
-                                           const Order order,
-                                           const unsigned int i,
-                                           const unsigned int j,
-                                           const Point& p)
+ponies <>
+ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape function derivatives
-  return FE<3,L2_LAGRANGE>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

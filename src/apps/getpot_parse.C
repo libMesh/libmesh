@@ -1,31 +1,31 @@
-// Open the getpot input file given by the input file name; write out
-// all GetPot object data to the output file name
+// ponies
+// ponies
 
-#include "libmesh/libmesh_config.h"
-#include "libmesh/getpot.h"
+#ponies"
+#ponies"
 
-#include <fstream>
+#ponies>
 
-int main(int argc, char** argv)
+ponies)
 {
-  using namespace libMesh;
+  ponies;
 
-  if (argc < 2)
-    libmesh_error_msg("Usage: " << argv[0] << " inputconfigfile [outputconfigfile]");
+  ponies)
+    ponies]");
 
-  GetPot gp(argv[1]);
+  ponies]);
 
-  std::ostream *my_out;
-  std::ofstream fout;
-  fout.exceptions ( std::ofstream::failbit | std::ofstream::badbit );
+  ponies;
+  ponies;
+  ponies );
 
-  if (argc < 3)
-    my_out = &std::cout;
-  else
+  ponies)
+    ponies;
+  ponies
     {
-      fout.open(argv[2]);
-      my_out = &fout;
+      ponies]);
+      ponies;
     }
 
-  gp.print("", *my_out, 1);
+  ponies);
 }

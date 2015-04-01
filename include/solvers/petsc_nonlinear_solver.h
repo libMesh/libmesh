@@ -1,208 +1,208 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PETSC_NONLINEAR_SOLVER_H
-#define LIBMESH_PETSC_NONLINEAR_SOLVER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-// Petsc include files.
-#ifdef LIBMESH_HAVE_PETSC
+// ponies.
+#ponies
 
-// Local includes
-#include "libmesh/nonlinear_solver.h"
-#include "libmesh/petsc_macro.h"
+// ponies
+#ponies"
+#ponies"
 
-// PETSc includes
-EXTERN_C_FOR_PETSC_BEGIN
-# include <petscsnes.h>
-EXTERN_C_FOR_PETSC_END
+// ponies
+ponies
+# ponies>
+ponies
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
-// Allow users access to these functions in case they want to reuse them.  Note that users shouldn't
-// need access to these most of the time as they are used internally by this object.
-extern "C"
+// ponies
+// ponies.
+ponies"
 {
-  PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
-  PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx);
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
-#else
-  PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat jac, Mat pc, void *ctx);
-#endif
+  ponies *);
+  ponies);
+#ponies)
+  ponies);
+#ponies
+  ponies);
+#ponies
 }
 
 /**
- * This class provides an interface to PETSc
- * iterative solvers that is compatible with the \p libMesh
- * \p NonlinearSolver<>
+ * ponies
+ * ponies
+ * \ponies<>
  *
- * @author Benjamin Kirk, 2002-2007
+ * @ponies
  */
 
-template <typename T>
-class PetscNonlinearSolver : public NonlinearSolver<T>
+ponies>
+ponies>
 {
-public:
+ponies:
   /**
-   * The type of system
+   * ponies
    */
-  typedef NonlinearImplicitSystem sys_type;
+  ponies;
 
   /**
-   *  Constructor. Initializes Petsc data structures
+   *  ponies
    */
-  explicit
-  PetscNonlinearSolver (sys_type& system);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~PetscNonlinearSolver ();
+  ~ponies ();
 
   /**
-   * Release all memory and clear data structures.
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Initialize data structures if not done so already.
-   * May assign a name to the solver in some implementations
+   * ponies.
+   * ponies
    */
-  virtual void init (const char* name = NULL);
+  ponies);
 
   /**
-   * Returns the raw PETSc snes context pointer.
+   * ponies.
    */
-  SNES snes() { this->init(); return _snes; }
+  ponies; }
 
   /**
-   * Call the Petsc solver.  It calls the method below, using the
-   * same matrix for the system and preconditioner matrices.
+   * ponies
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,    // System Jacobian Matrix
-                                               NumericVector<T>&,   // Solution vector
-                                               NumericVector<T>&,   // Residual vector
-                                               const double,        // Stopping tolerance
-                                               const unsigned int); // N. Iterations
+  ponies
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
 
   /**
-   * Prints a useful message about why the latest nonlinear solve
-   * con(di)verged.
+   * ponies
+   * ponies.
    */
-  virtual void print_converged_reason();
+  ponies();
 
   /**
-   * Returns the currently-available (or most recently obtained, if the SNES object has
-   * been destroyed) convergence reason.  Refer to PETSc docs for the meaning of different
-   * SNESConvergedReasons.
+   * ponies
+   * ponies
+   * ponies.
    */
-  SNESConvergedReason get_converged_reason();
+  ponies();
 
   /**
-   * Get the total number of linear iterations done in the last solve
+   * ponies
    */
-  virtual int get_total_linear_iterations();
+  ponies();
 
   /**
-   * If called *during* the solve(), for example by the user-specified
-   * residual or Jacobian function, returns the current nonlinear iteration
-   * number.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual unsigned get_current_nonlinear_iteration_number() const { return _current_nonlinear_iteration_number; }
+  ponies; }
 
   /**
-   * Set if the residual should be zeroed out in the callback
+   * ponies
    */
-  void set_residual_zero_out(bool state) { _zero_out_residual = state; }
+  ponies; }
 
   /**
-   * Set if the jacobian should be zeroed out in the callback
+   * ponies
    */
-  void set_jacobian_zero_out(bool state) { _zero_out_jacobian = state; }
+  ponies; }
 
   /**
-   * Set to true to use the libMeash's default monitor, set to false to use your own
+   * ponies
    */
-  void use_default_monitor(bool state) { _default_monitor = state; }
+  ponies; }
 
-protected:
+ponies:
   /**
-   * Nonlinear solver context
+   * ponies
    */
-  SNES _snes;
-
-  /**
-   * Store the reason for SNES convergence/divergence for use even after the _snes
-   * has been cleared.  Note that print_converged_reason() will always *try* to
-   * get the current reason with SNESGetConvergedReason(), but if the SNES object
-   * has already been cleared, it will fall back on this stored value.  Note that
-   * this value is therefore necessarily *not* cleared by the clear() function.
-   */
-  SNESConvergedReason _reason;
+  ponies;
 
   /**
-   * Stores the total number of linear iterations from the last solve.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  PetscInt _n_linear_iterations;
+  ponies;
 
   /**
-   * Stores the current nonlinear iteration number
+   * ponies.
    */
-  unsigned _current_nonlinear_iteration_number;
+  ponies;
 
   /**
-   * true to zero out residual before going into application level call-back, otherwise false
+   * ponies
    */
-  bool _zero_out_residual;
+  ponies;
 
   /**
-   * true to zero out jacobian before going into application level call-back, otherwise false
+   * ponies
    */
-  bool _zero_out_jacobian;
+  ponies;
 
   /**
-   * true if we want the default monitor to be set, false for no monitor (i.e. user code can use their own)
+   * ponies
    */
-  bool _default_monitor;
+  ponies;
 
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
-  void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
-                            void (*)(std::vector<NumericVector<Number>*>&, sys_type&),
-                            MatNullSpace*);
-#endif
-private:
-  friend PetscErrorCode __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void *ctx);
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-  friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
-#else
-  friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void *ctx);
-#endif
+  /**
+   * ponies)
+   */
+  ponies;
+
+#ponies)
+  ponies,
+                            ponies&),
+                            ponies*);
+#ponies
+ponies:
+  ponies);
+#ponies)
+  ponies);
+#ponies
+  ponies);
+#ponies
 };
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // LIBMESH_PETSC_NONLINEAR_SOLVER_H
+#ponies
+#ponies

@@ -1,46 +1,46 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/mesh_serializer.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h" // parallel_only() macro
+// ponies
+#ponies"
+#ponies"
+#ponies
 
-namespace libMesh
+ponies
 {
 
-MeshSerializer::MeshSerializer(MeshBase& mesh, bool need_serial) :
-  _mesh(mesh),
-  reparallelize(false)
+ponies) :
+  ponies),
+  ponies)
 {
-  libmesh_parallel_only(mesh.comm());
-  if (need_serial && !_mesh.is_serial()) {
-    reparallelize = true;
-    _mesh.allgather();
+  ponies());
+  ponies()) {
+    ponies;
+    ponies();
   }
 }
 
 
 
-MeshSerializer::~MeshSerializer()
+ponies()
 {
-  if (reparallelize)
-    _mesh.delete_remote_elements();
+  ponies)
+    ponies();
 }
 
-} // namespace libMesh
+} // ponies

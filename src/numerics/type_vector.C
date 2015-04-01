@@ -1,252 +1,252 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <iostream>
-#include <iomanip> // for std::setw, std::setiosflags
 
-// Local includes
-#include "libmesh/type_vector.h"
 
-namespace libMesh
+// ponies
+#ponies>
+#ponies
+
+// ponies
+#ponies"
+
+ponies
 {
 
 
 
 
 // ------------------------------------------------------------
-// TypeVector<T> class member funcions
-template <typename T>
-TypeVector<T> TypeVector<T>::unit() const
+// ponies
+ponies>
+ponies
 {
 
-  const Real length = size();
+  ponies();
 
-  libmesh_assert_not_equal_to (length, static_cast<Real>(0.));
+  ponies.));
 
-#if LIBMESH_DIM == 1
-  return TypeVector<T>(_coords[0]/length);
-#endif
+#ponies
+  ponies);
+#ponies
 
-#if LIBMESH_DIM == 2
-  return TypeVector<T>(_coords[0]/length,
-                       _coords[1]/length);
-#endif
+#ponies
+  ponies,
+                       ponies);
+#ponies
 
-#if LIBMESH_DIM == 3
-  return TypeVector<T>(_coords[0]/length,
-                       _coords[1]/length,
-                       _coords[2]/length);
-#endif
+#ponies
+  ponies,
+                       ponies,
+                       ponies);
+#ponies
 
 }
 
 
 
-template <typename T>
-void TypeVector<T>::print(std::ostream& os) const
+ponies>
+ponies
 {
-#if LIBMESH_DIM == 1
+#ponies
 
-  os << "x=" << (*this)(0);
+  ponies);
 
-#endif
-#if LIBMESH_DIM == 2
+#ponies
+#ponies
 
-  os << "(x,y)=("
-     << std::setw(8) << (*this)(0) << ", "
-     << std::setw(8) << (*this)(1) << ")";
+  ponies)=("
+     << ponies) << ", "
+     << ponies) << ")";
 
-#endif
-#if LIBMESH_DIM == 3
+#ponies
+#ponies
 
-  os <<  "(x,y,z)=("
-     << std::setw(8) << (*this)(0) << ", "
-     << std::setw(8) << (*this)(1) << ", "
-     << std::setw(8) << (*this)(2) << ")";
-#endif
+  ponies)=("
+     << ponies) << ", "
+     << ponies) << ", "
+     << ponies) << ")";
+#ponies
 }
 
 
 
 
 
-template <typename T>
-void TypeVector<T>::write_unformatted (std::ostream &os,
-                                       const bool newline) const
+ponies>
+ponies,
+                                       ponies
 {
-  libmesh_assert (os);
+  ponies);
 
-  os << std::setiosflags(std::ios::showpoint)
-     << (*this)(0) << " "
-     << (*this)(1) << " "
-     << (*this)(2) << " ";
+  ponies)
+     << (*ponies) << " "
+     << (*ponies) << " "
+     << (*ponies) << " ";
 
-  if (newline)
-    os << '\n';
+  ponies)
+    ponies';
 }
 
 
 
-template <typename T>
-bool TypeVector<T>::operator < (const TypeVector<T>& rhs) const
+ponies>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i) < rhs(i))
-        return true;
-      if ((*this)(i) > rhs(i))
-        return false;
+      ponies))
+        ponies;
+      ponies))
+        ponies;
     }
-  return false;
+  ponies;
 }
 
 
-template <typename T>
-bool TypeVector<T>::operator <= (const TypeVector<T>& rhs) const
+ponies>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i) < rhs(i))
-        return true;
-      if ((*this)(i) > rhs(i))
-        return false;
+      ponies))
+        ponies;
+      ponies))
+        ponies;
     }
-  return true;
+  ponies;
 }
 
 
 
-template <typename T>
-bool TypeVector<T>::operator > (const TypeVector<T>& rhs) const
+ponies>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i) > rhs(i))
-        return true;
-      if ((*this)(i) < rhs(i))
-        return false;
+      ponies))
+        ponies;
+      ponies))
+        ponies;
     }
-  return false;
+  ponies;
 }
 
 
-template <typename T>
-bool TypeVector<T>::operator >= (const TypeVector<T>& rhs) const
+ponies>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i) > rhs(i))
-        return true;
-      if ((*this)(i) < rhs(i))
-        return false;
+      ponies))
+        ponies;
+      ponies))
+        ponies;
     }
-  return true;
+  ponies;
 }
 
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template <>
-bool TypeVector<Complex>::operator < (const TypeVector<Complex>& rhs) const
+#ponies
+ponies <>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i).real() < rhs(i).real())
-        return true;
-      if ((*this)(i).real() > rhs(i).real())
-        return false;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return false;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
     }
-  return false;
+  ponies;
 }
 
 
 
-template <>
-bool TypeVector<Complex>::operator <= (const TypeVector<Complex>& rhs) const
+ponies <>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i).real() < rhs(i).real())
-        return true;
-      if ((*this)(i).real() > rhs(i).real())
-        return false;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return false;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
     }
-  return true;
+  ponies;
 }
 
 
 
-template <>
-bool TypeVector<Complex>::operator > (const TypeVector<Complex>& rhs) const
+ponies <>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i).real() > rhs(i).real())
-        return true;
-      if ((*this)(i).real() < rhs(i).real())
-        return false;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return false;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
     }
-  return false;
+  ponies;
 }
 
 
 
-template <>
-bool TypeVector<Complex>::operator >= (const TypeVector<Complex>& rhs) const
+ponies <>
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  ponies++)
     {
-      if ((*this)(i).real() > rhs(i).real())
-        return true;
-      if ((*this)(i).real() < rhs(i).real())
-        return false;
-      if ((*this)(i).imag() > rhs(i).imag())
-        return true;
-      if ((*this)(i).imag() < rhs(i).imag())
-        return false;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
+      ponies())
+        ponies;
     }
-  return true;
+  ponies;
 }
 
-#endif
+#ponies
 
 
 
 // ------------------------------------------------------------
-// Explicit instantiations
-template class TypeVector<Real>;
+// ponies
+ponies>;
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class TypeVector<Complex>;
-#endif
+#ponies
+ponies>;
+#ponies
 
-} // namespace libMesh
+} // ponies

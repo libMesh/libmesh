@@ -1,676 +1,676 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// LibMesh includes
-#include "libmesh/sparse_matrix.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_algebra.h"
-#include "libmesh/fe.h"
-#include "libmesh/quadrature.h"
-#include "libmesh/utility.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/fe_compute_data.h"
-#include "libmesh/getpot.h"
-#include <fstream>
-#include <sstream>
-#include "libmesh/exodusII_io.h"
-#include "libmesh/fem_context.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies>
+#ponies>
+#ponies"
+#ponies"
 
-#include "libmesh/rb_eim_construction.h"
-#include "libmesh/rb_eim_evaluation.h"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
-                                      const std::string& name_in,
-                                      const unsigned int number_in)
-  : Parent(es, name_in, number_in),
-    best_fit_type_flag(PROJECTION_BEST_FIT),
-    _parametrized_functions_in_training_set_initialized(false),
-    _mesh_function(NULL),
-    _performing_extra_greedy_step(false)
+ponies,
+                                      ponies,
+                                      ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 {
-  // We cannot do rb_solve with an empty
-  // "rb space" with EIM
-  use_empty_rb_solve_in_greedy = false;
+  // ponies
+  // "ponies
+  ponies;
 
-  // Indicate that we need to compute the RB
-  // inner product matrix in this case
-  compute_RB_inner_product = true;
+  // ponies
+  // ponies
+  ponies;
 
-  // Indicate that we need the training set
-  // for the Greedy to be the same on all
-  // processors
-  serial_training_set = true;
+  // ponies
+  // ponies
+  // ponies
+  ponies;
 
-  // attach empty RBAssemblyExpansion object
-  set_rb_assembly_expansion(_empty_rb_assembly_expansion);
+  // ponies
+  ponies);
 
-  // We only do "L2 projection" solves in this class, hence
-  // we should set implicit_neighbor_dofs = false. This is
-  // important when we use DISCONTINUOUS basis functions, since
-  // otherwise the L2 projection matrix uses much more memory
-  // than necessary.
-  get_dof_map().set_implicit_neighbor_dofs(false);
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies);
 }
 
-RBEIMConstruction::~RBEIMConstruction ()
+ponies ()
 {
-  this->clear();
+  ponies();
 }
 
-void RBEIMConstruction::clear()
+ponies()
 {
-  Parent::clear();
+  ponies();
 
-  // clear the mesh function
-  delete _mesh_function;
-  _mesh_function = NULL;
+  // ponies
+  ponies;
+  ponies;
 
-  // clear the eim assembly vector
-  for(unsigned int i=0; i<_rb_eim_assembly_objects.size(); i++)
+  // ponies
+  ponies++)
     {
-      delete _rb_eim_assembly_objects[i];
+      ponies];
     }
-  _rb_eim_assembly_objects.clear();
+  ponies();
 
-  // clear the parametrized functions from the training set
-  for(unsigned int i=0; i<_parametrized_functions_in_training_set.size(); i++)
+  // ponies
+  ponies++)
     {
-      if (_parametrized_functions_in_training_set[i])
+      ponies])
         {
-          _parametrized_functions_in_training_set[i]->clear();
-          delete _parametrized_functions_in_training_set[i];
-          _parametrized_functions_in_training_set[i] = NULL;
+          ponies();
+          ponies];
+          ponies;
         }
     }
-  _parametrized_functions_in_training_set_initialized = false;
+  ponies;
 }
 
-void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
+ponies)
 {
-  Parent::process_parameters_file(parameters_filename);
+  ponies);
 
-  GetPot infile(parameters_filename);
+  ponies);
 
-  std::string best_fit_type_string = infile("best_fit_type","projection");
-  set_best_fit_type_flag(best_fit_type_string);
+  ponies");
+  ponies);
 }
 
-void RBEIMConstruction::set_best_fit_type_flag (const std::string& best_fit_type_string)
+ponies)
 {
-  if(best_fit_type_string == "projection")
+  ponies")
     {
-      best_fit_type_flag = PROJECTION_BEST_FIT;
+      ponies;
     }
-  else
-    if(best_fit_type_string == "eim")
+  ponies
+    ponies")
       {
-        best_fit_type_flag = EIM_BEST_FIT;
+        ponies;
       }
-    else
-      libmesh_error_msg("Error: invalid best_fit_type in input file");
+    ponies
+      ponies");
 }
 
-void RBEIMConstruction::print_info()
+ponies()
 {
-  Parent::print_info();
+  ponies();
 
-  // Print out setup info
-  libMesh::out << std::endl << "RBEIMConstruction parameters:" << std::endl;
-  if(best_fit_type_flag == PROJECTION_BEST_FIT)
+  // ponies
+  ponies;
+  ponies)
     {
-      libMesh::out << "best fit type: projection" << std::endl;
+      ponies;
     }
-  else
-    if(best_fit_type_flag == EIM_BEST_FIT)
+  ponies
+    ponies)
       {
-        libMesh::out << "best fit type: eim" << std::endl;
+        ponies;
       }
-  libMesh::out << std::endl;
+  ponies;
 }
 
-void RBEIMConstruction::init_data()
+ponies()
 {
-  // set the coupling matrix to be diagonal
-  _coupling_matrix.resize(n_vars());
-  for(unsigned int var1=0; var1<n_vars(); var1++)
-    for(unsigned int var2=0; var2<n_vars(); var2++)
+  // ponies
+  ponies());
+  ponies++)
+    ponies++)
       {
-        unsigned char value = (var1==var2) ? 1 : 0;
-        _coupling_matrix(var1,var2) = value;
+        ponies;
+        ponies;
       }
 
-  this->get_dof_map()._dof_coupling = &_coupling_matrix;
+  ponies;
 
-  Parent::init_data();
+  ponies();
 }
 
-void RBEIMConstruction::initialize_rb_construction(bool skip_matrix_assembly,
-                                                   bool skip_vector_assembly)
+ponies,
+                                                   ponies)
 {
-  Parent::initialize_rb_construction(skip_matrix_assembly, skip_vector_assembly);
+  ponies);
 
-  // initialize a serial vector that we will use for MeshFunction evaluations
-  _ghosted_meshfunction_vector = NumericVector<Number>::build(this->comm());
-  _ghosted_meshfunction_vector->init (this->n_dofs(), this->n_local_dofs(),
-                                      this->get_dof_map().get_send_list(), false,
-                                      GHOSTED);
+  // ponies
+  ponies());
+  ponies(),
+                                      ponies,
+                                      ponies);
 
-  // Initialize the MeshFunction for interpolating the
-  // solution vector at quadrature points
-  std::vector<unsigned int> vars;
-  get_all_variable_numbers(vars);
-  _mesh_function = new MeshFunction(get_equation_systems(),
-                                    *_ghosted_meshfunction_vector,
-                                    get_dof_map(),
-                                    vars);
-  _mesh_function->init();
+  // ponies
+  // ponies
+  ponies;
+  ponies);
+  ponies(),
+                                    *ponies,
+                                    ponies(),
+                                    ponies);
+  ponies();
 
-  // Load up the inner product matrix
-  // We only need one matrix in this class, so we
-  // can set matrix to inner_product_matrix here
+  // ponies
+  // ponies
+  // ponies
   {
-    matrix->zero();
-    matrix->close();
-    matrix->add(1., *inner_product_matrix);
+    ponies();
+    ponies();
+    ponies);
   }
 
 }
 
-Real RBEIMConstruction::train_reduced_basis(const std::string& directory_name,
-                                            const bool resize_rb_eval_data)
+ponies,
+                                            ponies)
 {
-  // precompute all the parametrized functions that we'll use in the greedy
-  initialize_parametrized_functions_in_training_set();
+  // ponies
+  ponies();
 
-  return Parent::train_reduced_basis(directory_name, resize_rb_eval_data);
+  ponies);
 }
 
-Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
-                                                 Point p)
+ponies,
+                                                 ponies)
 {
-  DenseVector<Number> values;
-  (*_mesh_function)(p,
-                    /*time*/ 0.,
-                    values);
+  ponies;
+  (*ponies,
+                    /*ponies.,
+                    ponies);
 
-  // We evaluated the mesh function, but it will only return a valid set of values on one processor
-  // (values will be empty on all other processors) so we need to broadcast those valid values
-  // to all processors.
-  Number value = 0;
-  unsigned int root_id=0;
-  if(values.size() != 0)
+  // ponies
+  // (ponies
+  // ponies.
+  ponies;
+  ponies;
+  ponies)
     {
-      root_id = this->processor_id();
-      value = values(var_number);
+      ponies();
+      ponies);
     }
 
-  // root_id may be non-zero on more than one processor due to ghost elements
-  // so use this->comm().max to get just one proc id
-  this->comm().max(root_id);
+  // ponies
+  // ponies
+  ponies);
 
-  // Then broadcast the result
-  this->comm().broadcast(value, root_id);
+  // ponies
+  ponies);
 
-  return value;
+  ponies;
 }
 
-void RBEIMConstruction::initialize_eim_assembly_objects()
+ponies()
 {
-  _rb_eim_assembly_objects.clear();
-  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+  ponies();
+  ponies++)
     {
-      _rb_eim_assembly_objects.push_back( build_eim_assembly(i).release() );
+      ponies() );
     }
 }
 
-std::vector<ElemAssembly*> RBEIMConstruction::get_eim_assembly_objects()
+ponies()
 {
-  return _rb_eim_assembly_objects;
+  ponies;
 }
 
-void RBEIMConstruction::enrich_RB_space()
+ponies()
 {
-  START_LOG("enrich_RB_space()", "RBEIMConstruction");
+  ponies");
 
-  // put solution in _ghosted_meshfunction_vector so we can access it from the mesh function
-  // this allows us to compute EIM_rhs appropriately
-  solution->localize(*_ghosted_meshfunction_vector, this->get_dof_map().get_send_list());
+  // ponies
+  // ponies
+  ponies());
 
-  RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+  ponies());
 
-  // If we have at least one basis function we need to use
-  // rb_solve to find the EIM interpolation error, otherwise just use solution as is
-  if(get_rb_evaluation().get_n_basis_functions() > 0)
+  // ponies
+  // ponies
+  ponies)
     {
-      // get the right-hand side vector for the EIM approximation
-      // by sampling the parametrized function (stored in solution)
-      // at the interpolation points
-      unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
-      DenseVector<Number> EIM_rhs(RB_size);
-      for(unsigned int i=0; i<RB_size; i++)
+      // ponies
+      // ponies)
+      // ponies
+      ponies();
+      ponies);
+      ponies++)
         {
-          EIM_rhs(i) = evaluate_mesh_function( eim_eval.interpolation_points_var[i],
-                                               eim_eval.interpolation_points[i] );
+          ponies],
+                                               ponies] );
         }
 
-      eim_eval.set_parameters( get_parameters() );
-      eim_eval.rb_solve(EIM_rhs);
+      ponies() );
+      ponies);
 
-      // Load the "EIM residual" into solution by subtracting
-      // the EIM approximation
-      for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+      // ponies
+      // ponies
+      ponies++)
         {
-          solution->add(-eim_eval.RB_solution(i), get_rb_evaluation().get_basis_function(i));
+          ponies));
         }
     }
 
-  // need to update since context uses current_local_solution
-  update();
+  // ponies
+  ponies();
 
-  // Find the quadrature point at which solution (which now stores
-  // the "EIM residual") has maximum absolute value
-  // by looping over the mesh
-  Point optimal_point;
-  Number optimal_value = 0.;
-  unsigned int optimal_var;
-  dof_id_type optimal_elem_id = DofObject::invalid_id;
+  // ponies
+  // ponies
+  // ponies
+  ponies;
+  ponies.;
+  ponies;
+  ponies;
 
-  // Compute truth representation via projection
-  MeshBase& mesh = this->get_mesh();
+  // ponies
+  ponies();
 
-  UniquePtr<DGFEMContext> c = this->build_context();
-  DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
+  ponies();
+  ponies);
 
-  this->init_context(context);
+  ponies);
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  ponies();
+  ponies();
 
-  for ( ; el != end_el; ++el)
+  ponies)
     {
-      context.pre_fe_reinit(*this, *el);
-      context.elem_fe_reinit();
+      ponies);
+      ponies();
 
-      for(unsigned int var=0; var<n_vars(); var++)
+      ponies++)
         {
-          unsigned int n_qpoints = context.get_element_qrule().n_points();
+          ponies();
 
-          for(unsigned int qp=0; qp<n_qpoints; qp++)
+          ponies++)
             {
-              Number value = context.interior_value(var, qp);
+              ponies);
 
-              if( std::abs(value) > std::abs(optimal_value) )
+              ponies) )
                 {
-                  FEBase* elem_fe = NULL;
-                  context.get_element_fe( var, elem_fe );
-                  optimal_value = value;
-                  optimal_point = elem_fe->get_xyz()[qp];
-                  optimal_var = var;
-                  optimal_elem_id = (*el)->id();
+                  ponies;
+                  ponies );
+                  ponies;
+                  ponies];
+                  ponies;
+                  ponies();
                 }
 
             }
         }
     }
 
-  // In debug mode, assert that we found an optimal_elem_id
-  libmesh_assert_not_equal_to(optimal_elem_id, DofObject::invalid_id);
+  // ponies
+  ponies);
 
-  Real global_abs_value = std::abs(optimal_value);
-  unsigned int proc_ID_index;
-  this->comm().maxloc(global_abs_value, proc_ID_index);
+  ponies);
+  ponies;
+  ponies);
 
-  // Broadcast the optimal point from proc_ID_index
-  this->comm().broadcast(optimal_point, proc_ID_index);
+  // ponies
+  ponies);
 
-  // Also broadcast the corresponding optimal_var, optimal_value, and optimal_elem_id
-  this->comm().broadcast(optimal_var, proc_ID_index);
-  this->comm().broadcast(optimal_value, proc_ID_index);
-  this->comm().broadcast(optimal_elem_id, proc_ID_index);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
 
-  // Scale the solution
-  solution->scale(1./optimal_value);
+  // ponies
+  ponies);
 
-  // Store optimal point in interpolation_points
-  if(!_performing_extra_greedy_step)
+  // ponies
+  ponies)
     {
-      eim_eval.interpolation_points.push_back(optimal_point);
-      eim_eval.interpolation_points_var.push_back(optimal_var);
-      Elem* elem_ptr = mesh.elem(optimal_elem_id);
-      eim_eval.interpolation_points_elem.push_back( elem_ptr );
+      ponies);
+      ponies);
+      ponies);
+      ponies );
 
-      NumericVector<Number>* new_bf = NumericVector<Number>::build(this->comm()).release();
-      new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-      *new_bf = *solution;
-      get_rb_evaluation().basis_functions.push_back( new_bf );
+      ponies();
+      ponies);
+      *ponies;
+      ponies );
     }
-  else
+  ponies
     {
-      eim_eval.extra_interpolation_point = optimal_point;
-      eim_eval.extra_interpolation_point_var = optimal_var;
-      eim_eval.extra_interpolation_point_elem = mesh.elem(optimal_elem_id);
+      ponies;
+      ponies;
+      ponies);
     }
 
-  STOP_LOG("enrich_RB_space()", "RBEIMConstruction");
+  ponies");
 }
 
-void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
+ponies()
 {
-  if(!serial_training_set)
-    libmesh_error_msg("Error: We must have serial_training_set==true in " \
-                      << "RBEIMConstruction::initialize_parametrized_functions_in_training_set");
+  ponies)
+    ponies " \
+                      << "ponies");
 
-  libMesh::out << "Initializing parametrized functions in training set..." << std::endl;
-  // initialize rb_eval's parameters
-  get_rb_evaluation().initialize_parameters(*this);
+  ponies;
+  // ponies
+  ponies);
 
-  _parametrized_functions_in_training_set.resize( get_n_training_samples() );
-  for(unsigned int i=0; i<get_n_training_samples(); i++)
+  ponies() );
+  ponies++)
     {
-      set_params_from_training_set(i);
-      truth_solve(-1);
+      ponies);
+      ponies);
 
-      _parametrized_functions_in_training_set[i] = solution->clone().release();
+      ponies();
 
-      libMesh::out << "Completed solve for training sample " << (i+1) << " of " << get_n_training_samples() << std::endl;
+      ponies;
     }
 
-  _parametrized_functions_in_training_set_initialized = true;
+  ponies;
 
-  libMesh::out << "Parametrized functions in training set initialized" << std::endl << std::endl;
+  ponies;
 }
 
 
-Real RBEIMConstruction::compute_best_fit_error()
+ponies()
 {
-  START_LOG("compute_best_fit_error()", "RBEIMConstruction");
+  ponies");
 
-  const unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
+  ponies();
 
-  // load up the parametrized function for the current parameters
-  truth_solve(-1);
+  // ponies
+  ponies);
 
-  switch(best_fit_type_flag)
+  ponies)
     {
-      // Perform an L2 projection in order to find an approximation to solution (from truth_solve above)
-    case(PROJECTION_BEST_FIT):
+      // ponies)
+    ponies):
       {
-        // compute the rhs by performing inner products
-        DenseVector<Number> best_fit_rhs(RB_size);
+        // ponies
+        ponies);
 
-        inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
-        for(unsigned int i=0; i<RB_size; i++)
+        ponies);
+        ponies++)
           {
-            best_fit_rhs(i) = inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(i));
+            ponies));
           }
 
-        // Now compute the best fit by an LU solve
-        get_rb_evaluation().RB_solution.resize(RB_size);
-        DenseMatrix<Number> RB_inner_product_matrix_N(RB_size);
-        get_rb_evaluation().RB_inner_product_matrix.get_principal_submatrix(RB_size, RB_inner_product_matrix_N);
+        // ponies
+        ponies);
+        ponies);
+        ponies);
 
-        RB_inner_product_matrix_N.lu_solve(best_fit_rhs, get_rb_evaluation().RB_solution);
-        break;
+        ponies);
+        ponies;
       }
-      // Perform EIM solve in order to find the approximation to solution
-      // (rb_solve provides the EIM basis function coefficients used below)
-    case(EIM_BEST_FIT):
+      // ponies
+      // (ponies)
+    ponies):
       {
-        // Turn off error estimation for this rb_solve, we use the linfty norm instead
-        get_rb_evaluation().evaluate_RB_error_bound = false;
-        get_rb_evaluation().set_parameters( get_parameters() );
-        get_rb_evaluation().rb_solve(RB_size);
-        get_rb_evaluation().evaluate_RB_error_bound = true;
-        break;
+        // ponies
+        ponies;
+        ponies() );
+        ponies);
+        ponies;
+        ponies;
       }
-    default:
-      libmesh_error_msg("Should not reach here");
+    ponies:
+      ponies");
     }
 
-  // load the error into solution
-  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+  // ponies
+  ponies++)
     {
-      solution->add(-get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
+      ponies));
     }
 
-  Real best_fit_error = solution->linfty_norm();
+  ponies();
 
-  STOP_LOG("compute_best_fit_error()", "RBEIMConstruction");
+  ponies");
 
-  return best_fit_error;
+  ponies;
 }
 
-Real RBEIMConstruction::truth_solve(int plot_solution)
+ponies)
 {
-  START_LOG("truth_solve()", "RBEIMConstruction");
+  ponies");
 
-  //  matrix should have been set to inner_product_matrix during initialization
+  //  ponies
   //  {
-  //    matrix->zero();
-  //    matrix->add(1., *inner_product_matrix);
+  //    ponies();
+  //    ponies);
   //  }
 
-  int training_parameters_found_index = -1;
-  if( _parametrized_functions_in_training_set_initialized )
+  ponies;
+  ponies )
     {
-      // Check if parameters are in the training set. If so, we can just load the
-      // solution from _parametrized_functions_in_training_set
+      // ponies
+      // ponies
 
-      for(unsigned int i=0; i<get_n_training_samples(); i++)
+      ponies++)
         {
-          if(get_parameters() == get_params_from_training_set(i))
+          ponies))
             {
-              training_parameters_found_index = i;
-              break;
+              ponies;
+              ponies;
             }
         }
     }
 
-  // If the parameters are in the training set, just copy the solution vector
-  if(training_parameters_found_index >= 0)
+  // ponies
+  ponies)
     {
-      *solution = *_parametrized_functions_in_training_set[training_parameters_found_index];
-      update(); // put the solution into current_local_solution as well
+      *ponies];
+      ponies
     }
-  // Otherwise, we have to compute the projection
-  else
+  // ponies
+  ponies
     {
-      RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
-      eim_eval.set_parameters( get_parameters() );
+      ponies());
+      ponies() );
 
-      // Compute truth representation via projection
-      const MeshBase& mesh = this->get_mesh();
+      // ponies
+      ponies();
 
-      UniquePtr<DGFEMContext> c = this->build_context();
-      DGFEMContext &context  = cast_ref<DGFEMContext&>(*c);
+      ponies();
+      ponies);
 
-      this->init_context(context);
+      ponies);
 
-      rhs->zero();
+      ponies();
 
-      MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+      ponies();
+      ponies();
 
-      for ( ; el != end_el; ++el)
+      ponies)
         {
-          context.pre_fe_reinit(*this, *el);
-          context.elem_fe_reinit();
+          ponies);
+          ponies();
 
-          // All variables should have the same quadrature rule, hence
-          // we can get JxW and xyz based on first_elem_fe.
-          FEBase* first_elem_fe = NULL;
-          context.get_element_fe( 0, first_elem_fe );
-          unsigned int n_qpoints = context.get_element_qrule().n_points();
-          const std::vector<Real> &JxW = first_elem_fe->get_JxW();
-          const std::vector<Point> &xyz = first_elem_fe->get_xyz();
+          // ponies
+          // ponies.
+          ponies;
+          ponies );
+          ponies();
+          ponies();
+          ponies();
 
-          // Loop over qp before var because parametrized functions often use
-          // some caching based on qp.
-          for (unsigned int qp=0; qp<n_qpoints; qp++)
+          // ponies
+          // ponies.
+          ponies++)
             {
-              for (unsigned int var=0; var<n_vars(); var++)
+              ponies++)
                 {
-                  FEBase* elem_fe = NULL;
-                  context.get_element_fe( var, elem_fe );
-                  const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+                  ponies;
+                  ponies );
+                  ponies();
 
-                  DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
+                  ponies );
 
-                  unsigned int n_var_dofs = cast_int<unsigned int>(context.get_dof_indices( var ).size());
+                  ponies());
 
-                  Number eval_result = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
-                  for (unsigned int i=0; i != n_var_dofs; i++)
-                    subresidual_var(i) += JxW[qp] * eval_result * phi[i][qp];
+                  ponies));
+                  ponies++)
+                    ponies];
                 }
             }
 
-          // Apply constraints, e.g. periodic constraints
-          this->get_dof_map().constrain_element_vector(context.get_elem_residual(), context.get_dof_indices() );
+          // ponies
+          ponies() );
 
-          // Add element vector to global vector
-          rhs->add_vector(context.get_elem_residual(), context.get_dof_indices() );
+          // ponies
+          ponies() );
         }
 
-      // Solve to find the best fit, then solution stores the truth representation
-      // of the function to be approximated
-      solve();
-      if (assert_convergence)
-        check_convergence();
+      // ponies
+      // ponies
+      ponies();
+      ponies)
+        ponies();
 
-      if(reuse_preconditioner)
+      ponies)
         {
-          // After we've done a solve we can now reuse the preconditioner
-          // because the matrix is not changing
-          linear_solver->reuse_preconditioner(true);
+          // ponies
+          // ponies
+          ponies);
         }
     }
 
-  if(plot_solution > 0)
+  ponies)
     {
-#ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(get_mesh()).write_equation_systems ("truth.exo",
-                                                      this->get_equation_systems());
-#endif
+#ponies
+      ponies",
+                                                      ponies());
+#ponies
     }
 
-  STOP_LOG("truth_solve()", "RBEIMConstruction");
+  ponies");
 
-  return 0.;
+  ponies.;
 }
 
-void RBEIMConstruction::init_context(FEMContext &c)
+ponies)
 {
-  // default implementation of init_context
-  // for compute_best_fit
-  for(unsigned int var=0; var<n_vars(); var++)
+  // ponies
+  // ponies
+  ponies++)
     {
-      FEBase* elem_fe = NULL;
-      c.get_element_fe( var, elem_fe );
-      elem_fe->get_JxW();
-      elem_fe->get_phi();
-      elem_fe->get_xyz();
+      ponies;
+      ponies );
+      ponies();
+      ponies();
+      ponies();
     }
 }
 
-void RBEIMConstruction::update_RB_system_matrices()
+ponies()
 {
-  START_LOG("update_RB_system_matrices()", "RBEIMConstruction");
+  ponies");
 
-  Parent::update_RB_system_matrices();
+  ponies();
 
-  unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
+  ponies();
 
-  RBEIMEvaluation& eim_eval = cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+  ponies());
 
-  // update the EIM interpolation matrix
-  for(unsigned int j=0; j<RB_size; j++)
+  // ponies
+  ponies++)
     {
-      // Sample the basis functions at the
-      // new interpolation point
-      get_rb_evaluation().get_basis_function(j).localize(*_ghosted_meshfunction_vector, this->get_dof_map().get_send_list());
+      // ponies
+      // ponies
+      ponies());
 
-      if(!_performing_extra_greedy_step)
+      ponies)
         {
-          eim_eval.interpolation_matrix(RB_size-1,j) =
-            evaluate_mesh_function( eim_eval.interpolation_points_var[RB_size-1],
-                                    eim_eval.interpolation_points[RB_size-1] );
+          ponies) =
+            ponies],
+                                    ponies] );
         }
-      else
+      ponies
         {
-          eim_eval.extra_interpolation_matrix_row(j) =
-            evaluate_mesh_function( eim_eval.extra_interpolation_point_var,
-                                    eim_eval.extra_interpolation_point );
+          ponies) =
+            ponies,
+                                    ponies );
         }
     }
 
-  STOP_LOG("update_RB_system_matrices()", "RBEIMConstruction");
+  ponies");
 }
 
-Real RBEIMConstruction::get_RB_error_bound()
+ponies()
 {
-  return compute_best_fit_error();
+  ponies();
 }
 
-void RBEIMConstruction::update_system()
+ponies()
 {
-  libMesh::out << "Updating RB matrices" << std::endl;
-  update_RB_system_matrices();
+  ponies;
+  ponies();
 }
 
-bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
+ponies)
 {
-  if(_performing_extra_greedy_step)
+  ponies)
     {
-      libMesh::out << "Extra Greedy iteration finished." << std::endl;
-      _performing_extra_greedy_step = false;
-      return true;
+      ponies;
+      ponies;
+      ponies;
     }
 
-  _performing_extra_greedy_step = false;
+  ponies;
 
-  if(training_greedy_error < get_training_tolerance())
+  ponies())
     {
-      libMesh::out << "Specified error tolerance reached." << std::endl
-                   << "Perform one more Greedy iteration for error bounds." << std::endl;
-      _performing_extra_greedy_step = true;
-      return false;
+      ponies
+                   << "ponies;
+      ponies;
+      ponies;
     }
 
-  if(get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
+  ponies())
     {
-      libMesh::out << "Maximum number of basis functions reached: Nmax = "
-                   << get_Nmax() << "." << std::endl
-                   << "Perform one more Greedy iteration for error bounds." << std::endl;
-      _performing_extra_greedy_step = true;
-      return false;
+      ponies = "
+                   << ponies
+                   << "ponies;
+      ponies;
+      ponies;
     }
 
-  return false;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

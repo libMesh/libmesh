@@ -1,266 +1,266 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/coupling_matrix.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/elem.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/fe.h"
-#include "libmesh/gmv_io.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/linear_implicit_system.h"
-#include "libmesh/mesh.h"
-#include "libmesh/mesh_refinement.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/quadrature_gauss.h"
-#include "libmesh/sparse_matrix.h"
-
-
-using namespace libMesh;
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
 
-void assemble(EquationSystems& es,
-              const std::string& system_name);
+ponies;
 
 
+ponies,
+              ponies);
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
-int main (int argc, char** argv)
+
+
+#ponies
+ponies)
 {
-  LibMeshInit init(argc, argv);
+  ponies);
 
-  if (argc < 4)
-    libMesh::out << "Usage: ./prog -d DIM filename" << std::endl;
+  ponies)
+    ponies;
 
-  // Variables to get us started
-  const unsigned int dim = atoi(argv[2]);
+  // ponies
+  ponies]);
 
-  std::string meshname  (argv[3]);
+  ponies]);
 
-  // declare a mesh...
-  Mesh mesh(init.comm(), dim);
+  // ponies...
+  ponies);
 
-  // Read a mesh
-  mesh.read(meshname);
+  // ponies
+  ponies);
 
-  GMVIO(mesh).write ("out_0.gmv");
+  ponies");
 
-  mesh.elem(0)->set_refinement_flag (Elem::REFINE);
+  ponies);
 
-  MeshRefinement mesh_refinement (mesh);
+  ponies);
 
-  mesh_refinement.refine_and_coarsen_elements ();
-  mesh_refinement.uniformly_refine (2);
+  ponies ();
+  ponies);
 
-  mesh.print_info();
-
-
-  // Set up the equation system(s)
-  EquationSystems es (mesh);
-
-  LinearImplicitSystem& primary =
-    es.add_system<LinearImplicitSystem>("primary");
-
-  primary.add_variable ("U", FIRST);
-  primary.add_variable ("V", FIRST);
-
-  primary.get_dof_map()._dof_coupling->resize(2);
-  (*primary.get_dof_map()._dof_coupling)(0,0) = 1;
-  (*primary.get_dof_map()._dof_coupling)(1,1) = 1;
-
-  primary.attach_assemble_function(assemble);
-
-  es.init ();
-
-  es.print_info ();
-  primary.get_dof_map().print_dof_constraints ();
-
-  // call the solver.
-  primary.solve ();
-
-  GMVIO(mesh).write_equation_systems ("out_1.gmv",
-                                      es);
+  ponies();
 
 
+  // ponies)
+  ponies);
 
-  // Refine uniformly
-  mesh_refinement.uniformly_refine (1);
-  es.reinit ();
+  ponies =
+    ponies");
 
-  // Write out the projected solution
-  GMVIO(mesh).write_equation_systems ("out_2.gmv",
-                                      es);
+  ponies);
+  ponies);
 
-  // Solve again. Output the refined solution
-  primary.solve ();
-  GMVIO(mesh).write_equation_systems ("out_3.gmv",
-                                      es);
+  ponies);
+  (*ponies;
+  (*ponies;
 
-  return 0;
+  ponies);
+
+  ponies ();
+
+  ponies ();
+  ponies ();
+
+  // ponies.
+  ponies ();
+
+  ponies",
+                                      ponies);
+
+
+
+  // ponies
+  ponies);
+  ponies ();
+
+  // ponies
+  ponies",
+                                      ponies);
+
+  // ponies
+  ponies ();
+  ponies",
+                                      ponies);
+
+  ponies;
 }
-#else
-int main (int, char**)
+#ponies
+ponies**)
 {
-  return 1;
+  ponies;
 }
-#endif // ENABLE_AMR
+#ponies
 
 
 
 
 
 
-void assemble(EquationSystems& es,
-              const std::string& libmesh_dbg_var(system_name))
+ponies,
+              ponies))
 {
-  libmesh_assert_equal_to (system_name, "primary");
+  ponies");
 
-  const MeshBase& mesh   = es.get_mesh();
-  const unsigned int dim = mesh.mesh_dimension();
+  ponies();
+  ponies();
 
-  // Also use a 3x3x3 quadrature rule (3D).  Then tell the FE
-  // about the geometry of the problem and the quadrature rule
-  FEType fe_type (FIRST);
+  // ponies
+  // ponies
+  ponies);
 
-  UniquePtr<FEBase> fe(FEBase::build(dim, fe_type));
-  QGauss qrule(dim, FIFTH);
+  ponies));
+  ponies);
 
-  fe->attach_quadrature_rule (&qrule);
+  ponies);
 
-  UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_type));
-  QGauss qface(dim-1, FIFTH);
+  ponies));
+  ponies);
 
-  fe_face->attach_quadrature_rule(&qface);
+  ponies);
 
-  LinearImplicitSystem& system =
-    es.get_system<LinearImplicitSystem>("primary");
+  ponies =
+    ponies");
 
 
-  // These are references to cell-specific data
-  const std::vector<Real>& JxW_face                   = fe_face->get_JxW();
-  const std::vector<Real>& JxW                        = fe->get_JxW();
-  const std::vector<Point>& q_point                   = fe->get_xyz();
-  const std::vector<std::vector<Real> >& phi          = fe->get_phi();
-  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  // ponies
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
 
-  std::vector<unsigned int> dof_indices_U;
-  std::vector<unsigned int> dof_indices_V;
-  const DofMap& dof_map = system.get_dof_map();
+  ponies;
+  ponies;
+  ponies();
 
-  DenseMatrix<Number> Kuu;
-  DenseMatrix<Number> Kvv;
-  DenseVector<Number> Fu;
-  DenseVector<Number> Fv;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  Real vol=0., area=0.;
+  ponies.;
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  ponies();
+  ponies();
 
-  for (; el != end_el; ++el)
+  ponies)
     {
-      const Elem* elem = *el;
+      ponies;
 
-      // recompute the element-specific data for the current element
-      fe->reinit (elem);
+      // ponies
+      ponies);
 
 
-      //fe->print_info();
+      //ponies();
 
-      dof_map.dof_indices(elem, dof_indices_U, 0);
-      dof_map.dof_indices(elem, dof_indices_V, 1);
+      ponies);
+      ponies);
 
-      // zero the element matrix and vector
-      Kuu.resize (phi.size(),
-                  phi.size());
+      // ponies
+      ponies(),
+                  ponies());
 
-      Kvv.resize (phi.size(),
-                  phi.size());
+      ponies(),
+                  ponies());
 
-      Fu.resize (phi.size());
-      Fv.resize (phi.size());
+      ponies());
+      ponies());
 
-      // standard stuff...  like in code 1.
-      for (unsigned int gp=0; gp<qrule.n_points(); gp++)
+      // ponies.
+      ponies++)
         {
-          for (unsigned int i=0; i<phi.size(); ++i)
+          ponies)
             {
-              // this is tricky.  ig is the _global_ dof index corresponding
-              // to the _global_ vertex number elem->node(i).  Note that
-              // in general these numbers will not be the same (except for
-              // the case of one unknown per node on one subdomain) so
-              // we need to go through the dof_map
+              // ponies
+              // ponies
+              // ponies
+              // ponies
+              // ponies
 
-              const Real f = q_point[gp]*q_point[gp];
-              //    const Real f = (q_point[gp](0) +
-              //    q_point[gp](1) +
-              //    q_point[gp](2));
+              ponies];
+              //    ponies) +
+              //    ponies) +
+              //    ponies));
 
-              // add jac*weight*f*phi to the RHS in position ig
+              // ponies
 
-              Fu(i) += JxW[gp]*f*phi[i][gp];
-              Fv(i) += JxW[gp]*f*phi[i][gp];
+              ponies];
+              ponies];
 
-              for (unsigned int j=0; j<phi.size(); ++j)
+              ponies)
                 {
 
-                  Kuu(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]));
+                  ponies]));
 
-                  Kvv(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]) +
-                                       1.*((dphi[i][gp])*(dphi[j][gp])));
+                  ponies]) +
+                                       ponies])));
                 };
             };
-          vol += JxW[gp];
+          ponies];
         };
 
 
-      // You can't compute "area" (perimeter) if you are in 2D
-      if (dim == 3)
+      // ponies
+      ponies)
         {
-          for (unsigned int side=0; side<elem->n_sides(); side++)
-            if (elem->neighbor(side) == NULL)
+          ponies++)
+            ponies)
               {
-                fe_face->reinit (elem, side);
+                ponies);
 
-                //fe_face->print_info();
+                //ponies();
 
-                for (unsigned int gp=0; gp<JxW_face.size(); gp++)
-                  area += JxW_face[gp];
+                ponies++)
+                  ponies];
               }
         }
 
-      // Constrain the DOF indices.
-      dof_map.constrain_element_matrix_and_vector(Kuu, Fu, dof_indices_U);
-      dof_map.constrain_element_matrix_and_vector(Kvv, Fv, dof_indices_V);
+      // ponies.
+      ponies);
+      ponies);
 
 
-      system.rhs->add_vector(Fu, dof_indices_U);
-      system.rhs->add_vector(Fv, dof_indices_V);
+      ponies);
+      ponies);
 
-      system.matrix->add_matrix(Kuu, dof_indices_U);
-      system.matrix->add_matrix(Kvv, dof_indices_V);
+      ponies);
+      ponies);
     }
 
-  libMesh::out << "Vol="  << vol << std::endl;
+  ponies;
 
-  if (dim == 3)
-    libMesh::out << "Area=" << area << std::endl;
+  ponies)
+    ponies;
 }

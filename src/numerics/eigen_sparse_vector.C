@@ -1,455 +1,455 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
-#include <algorithm> // for std::min
-#include <limits>
-
-// Local Includes
-#include "libmesh/dense_subvector.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/eigen_sparse_vector.h"
-#include "libmesh/eigen_sparse_matrix.h"
+// ponies
+// ponies
+// ponies
 
 
-#ifdef LIBMESH_HAVE_EIGEN
 
-namespace libMesh
+// ponies
+#ponies
+#ponies>
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+
+#ponies
+
+ponies
 {
 
-template <typename T>
-T EigenSparseVector<T>::sum () const
+ponies>
+ponies
 {
-  libmesh_assert (this->closed());
-  libmesh_assert (this->initialized());
+  ponies());
+  ponies());
 
-  return _vec.sum();
+  ponies();
 }
 
 
 
-template <typename T>
-Real EigenSparseVector<T>::l1_norm () const
+ponies>
+ponies
 {
-  libmesh_assert (this->closed());
-  libmesh_assert (this->initialized());
+  ponies());
+  ponies());
 
-  return _vec.lpNorm<1>();
+  ponies>();
 }
 
 
 
-template <typename T>
-Real EigenSparseVector<T>::l2_norm () const
+ponies>
+ponies
 {
-  libmesh_assert (this->closed());
-  libmesh_assert (this->initialized());
+  ponies());
+  ponies());
 
-  return _vec.lpNorm<2>();
+  ponies>();
 }
 
 
 
-template <typename T>
-Real EigenSparseVector<T>::linfty_norm () const
+ponies>
+ponies
 {
-  libmesh_assert (this->closed());
-  libmesh_assert (this->initialized());
+  ponies());
+  ponies());
 
-  return _vec.lpNorm<Eigen::Infinity>();
+  ponies>();
 }
 
 
 
-template <typename T>
-NumericVector<T>& EigenSparseVector<T>::operator += (const NumericVector<T>& v_in)
+ponies>
+ponies)
 {
-  libmesh_assert (this->closed());
+  ponies());
 
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
+  ponies);
 
-  _vec += v._vec;
+  ponies;
 
-  return *this;
-}
-
-
-
-
-template <typename T>
-NumericVector<T>& EigenSparseVector<T>::operator -= (const NumericVector<T>& v_in)
-{
-  libmesh_assert (this->closed());
-
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
-
-  _vec -= v._vec;
-
-  return *this;
-}
-
-
-
-template <typename T>
-NumericVector<T> & EigenSparseVector<T>::operator /= (NumericVector<T> & v_in)
-{
-  libmesh_assert (this->closed());
-  libmesh_assert_equal_to(size(), v_in.size());
-
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
-
-  _vec = _vec.cwiseQuotient(v._vec);
-
-  return *this;
+  ponies;
 }
 
 
 
 
-template <typename T>
-void EigenSparseVector<T>::reciprocal()
+ponies>
+ponies)
 {
-#ifndef NDEBUG
-  const numeric_index_type n = this->size();
+  ponies());
 
-  for (numeric_index_type i=0; i<n; i++)
-    // Don't divide by zero!
-    libmesh_assert_not_equal_to ((*this)(i), T(0));
-#endif
+  ponies);
 
-  _vec = _vec.cwiseInverse();
+  ponies;
+
+  ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::conjugate()
+ponies>
+ponies)
 {
-  _vec = _vec.conjugate();
-}
+  ponies());
+  ponies());
 
+  ponies);
 
+  ponies);
 
-template <typename T>
-void EigenSparseVector<T>::add (const T v)
-{
-  _vec += EigenSV::Constant(this->size(), v);
-
-#ifndef NDEBUG
-  this->_is_closed = false;
-#endif
+  ponies;
 }
 
 
 
 
-template <typename T>
-void EigenSparseVector<T>::add (const NumericVector<T>& v_in)
+ponies>
+ponies()
 {
-  libmesh_assert (this->initialized());
+#ponies
+  ponies();
 
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
+  ponies++)
+    // ponies!
+    ponies));
+#ponies
 
-  _vec += v._vec;
+  ponies();
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::add (const T a, const NumericVector<T>& v_in)
+ponies>
+ponies()
 {
-  libmesh_assert (this->initialized());
-
-  const EigenSparseVector<T>& v = cast_ref<const EigenSparseVector<T>&>(v_in);
-
-  _vec += v._vec*a;
+  ponies();
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
-                                       const SparseMatrix<T>  &mat_in)
+ponies>
+ponies)
 {
-  // Make sure the data passed in are really in Eigen types
-  const EigenSparseVector<T>* e_vec = cast_ptr<const EigenSparseVector<T>*>(&vec_in);
-  const EigenSparseMatrix<T>* mat = cast_ptr<const EigenSparseMatrix<T>*>(&mat_in);
+  ponies);
 
-  libmesh_assert(e_vec);
-  libmesh_assert(mat);
-
-  _vec += mat->_mat*e_vec->_vec;
+#ponies
+  ponies;
+#ponies
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::add_vector_transpose (const NumericVector<T> &vec_in,
-                                                 const SparseMatrix<T>  &mat_in)
+
+ponies>
+ponies)
 {
-  // Make sure the data passed in are really in Eigen types
-  const EigenSparseVector<T>* e_vec = cast_ptr<const EigenSparseVector<T>*>(&vec_in);
-  const EigenSparseMatrix<T>* mat = cast_ptr<const EigenSparseMatrix<T>*>(&mat_in);
+  ponies());
 
-  libmesh_assert(e_vec);
-  libmesh_assert(mat);
+  ponies);
 
-  _vec += mat->_mat.transpose()*e_vec->_vec;
+  ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::scale (const T factor)
+ponies>
+ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  _vec *= factor;
+  ponies);
+
+  ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::abs()
+ponies>
+ponies,
+                                       ponies)
 {
-  libmesh_assert (this->initialized());
+  // ponies
+  ponies);
+  ponies);
 
-  const numeric_index_type n = this->size();
+  ponies);
+  ponies);
 
-  for (numeric_index_type i=0; i!=n; ++i)
-    this->set(i,std::abs((*this)(i)));
+  ponies;
 }
 
 
 
-template <typename T>
-T EigenSparseVector<T>::dot (const NumericVector<T>& V) const
+ponies>
+ponies,
+                                                 ponies)
 {
-  libmesh_assert (this->initialized());
+  // ponies
+  ponies);
+  ponies);
 
-  // Make sure the NumericVector passed in is really a EigenSparseVector
-  const EigenSparseVector<T>* v = cast_ptr<const EigenSparseVector<T>*>(&V);
-  libmesh_assert(v);
+  ponies);
+  ponies);
 
-  return _vec.dot(v->_vec);
+  ponies;
 }
 
 
 
-template <typename T>
-NumericVector<T>&
-EigenSparseVector<T>::operator = (const T s)
+ponies>
+ponies)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (this->closed());
+  ponies());
 
-  _vec.fill(s);
-
-  return *this;
+  ponies;
 }
 
 
 
-template <typename T>
-NumericVector<T>&
-EigenSparseVector<T>::operator = (const NumericVector<T>& v_in)
+ponies>
+ponies()
 {
-  // Make sure the NumericVector passed in is really a EigenSparseVector
-  const EigenSparseVector<T>* v =
-    cast_ptr<const EigenSparseVector<T>*>(&v_in);
+  ponies());
 
-  libmesh_assert(v);
+  ponies();
 
-  *this = *v;
-
-  return *this;
+  ponies)
+    ponies)));
 }
 
 
 
-template <typename T>
-EigenSparseVector<T>&
-EigenSparseVector<T>::operator = (const EigenSparseVector<T>& v)
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (v.closed());
-  libmesh_assert_equal_to (this->size(), v.size());
+  ponies());
 
-  _vec = v._vec;
+  // ponies
+  ponies);
+  ponies);
 
-#ifndef NDEBUG
-  this->_is_closed = true;
-#endif
-
-  return *this;
+  ponies);
 }
 
 
 
-template <typename T>
-NumericVector<T>&
-EigenSparseVector<T>::operator = (const std::vector<T>& v)
+ponies>
+ponies>&
+ponies)
+{
+  ponies());
+  ponies());
+
+  ponies);
+
+  ponies;
+}
+
+
+
+ponies>
+ponies>&
+ponies)
+{
+  // ponies
+  ponies =
+    ponies);
+
+  ponies);
+
+  *ponies;
+
+  ponies;
+}
+
+
+
+ponies>
+ponies>&
+ponies)
+{
+  ponies());
+  ponies());
+  ponies());
+
+  ponies;
+
+#ponies
+  ponies;
+#ponies
+
+  ponies;
+}
+
+
+
+ponies>
+ponies>&
+ponies)
 {
   /**
-   * Case 1:  The vector is the same size of
-   * The global vector.  Only add the local components.
+   * ponies
+   * ponies.
    */
-  if (this->size() == v.size())
-    for (numeric_index_type i=0; i<v.size(); i++)
-      this->set (i, v[i]);
+  ponies())
+    ponies++)
+      ponies]);
 
-  else
-    libmesh_error_msg("this->size() = " << this->size() << " must be equal to v.size() = " << v.size());
+  ponies
+    ponies());
 
-  return *this;
+  ponies;
 }
 
 
-template <typename T>
-void EigenSparseVector<T>::localize (NumericVector<T>& v_local_in) const
+ponies>
+ponies
 {
-  // Make sure the NumericVector passed in is really a EigenSparseVector
-  EigenSparseVector<T>* v_local =
-    cast_ptr<EigenSparseVector<T>*>(&v_local_in);
+  // ponies
+  ponies =
+    ponies);
 
-  libmesh_assert(v_local);
+  ponies);
 
-  *v_local = *this;
-}
-
-
-
-template <typename T>
-void EigenSparseVector<T>::localize (NumericVector<T>& v_local_in,
-                                     const std::vector<numeric_index_type>& libmesh_dbg_var(send_list)) const
-{
-  // Make sure the NumericVector passed in is really a EigenSparseVector
-  EigenSparseVector<T>* v_local =
-    cast_ptr<EigenSparseVector<T>*>(&v_local_in);
-
-  libmesh_assert(v_local);
-  libmesh_assert_less_equal (send_list.size(), v_local->size());
-
-  *v_local = *this;
+  *ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::localize (const numeric_index_type libmesh_dbg_var(first_local_idx),
-                                     const numeric_index_type libmesh_dbg_var(last_local_idx),
-                                     const std::vector<numeric_index_type>& libmesh_dbg_var(send_list))
+ponies>
+ponies,
+                                     ponies
 {
-  libmesh_assert_equal_to (first_local_idx, 0);
-  libmesh_assert_equal_to (last_local_idx+1, this->size());
+  // ponies
+  ponies =
+    ponies);
 
-  libmesh_assert_less_equal (send_list.size(), this->size());
+  ponies);
+  ponies());
 
-#ifndef NDEBUG
-  this->_is_closed = true;
-#endif
+  *ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::localize (std::vector<T>& v_local) const
-
+ponies>
+ponies),
+                                     ponies),
+                                     ponies))
 {
-  v_local.resize(this->size());
+  ponies);
+  ponies());
 
-  for (numeric_index_type i=0; i<v_local.size(); i++)
-    v_local[i] = (*this)(i);
+  ponies());
+
+#ponies
+  ponies;
+#ponies
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::localize_to_one (std::vector<T>& v_local,
-                                            const processor_id_type libmesh_dbg_var(pid)) const
-{
-  libmesh_assert_equal_to (pid, 0);
+ponies>
+ponies
 
-  this->localize (v_local);
+{
+  ponies());
+
+  ponies++)
+    ponies);
 }
 
 
 
-template <typename T>
-void EigenSparseVector<T>::pointwise_mult (const NumericVector<T>& /*vec1*/,
-                                           const NumericVector<T>& /*vec2*/)
+ponies>
+ponies,
+                                            ponies
 {
-  libmesh_not_implemented();
+  ponies);
+
+  ponies);
 }
 
 
 
-template <typename T>
-Real EigenSparseVector<T>::max() const
+ponies>
+ponies*/,
+                                           ponies*/)
 {
-  libmesh_assert (this->initialized());
-  if (!this->size())
-    return -std::numeric_limits<Real>::max();
-
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  Real the_max = libmesh_real((*this)(0));
-
-  const numeric_index_type n = this->size();
-
-  for (numeric_index_type i=1; i<n; i++)
-    the_max = std::max (the_max, libmesh_real((*this)(i)));
-
-  return the_max;
-#else
-  return libmesh_real(_vec.maxCoeff());
-#endif
+  ponies();
 }
 
 
 
-template <typename T>
-Real EigenSparseVector<T>::min () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
-  if (!this->size())
-    return std::numeric_limits<Real>::max();
+  ponies());
+  ponies())
+    ponies();
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  Real the_min = libmesh_real((*this)(0));
+#ponies
+  ponies));
 
-  const numeric_index_type n = this->size();
+  ponies();
 
-  for (numeric_index_type i=1; i<n; i++)
-    the_min = std::min (the_min, libmesh_real((*this)(i)));
+  ponies++)
+    ponies)));
 
-  return the_min;
-#else
-  return libmesh_real(_vec.minCoeff());
-#endif
+  ponies;
+#ponies
+  ponies());
+#ponies
+}
+
+
+
+ponies>
+ponies
+{
+  ponies());
+  ponies())
+    ponies();
+
+#ponies
+  ponies));
+
+  ponies();
+
+  ponies++)
+    ponies)));
+
+  ponies;
+#ponies
+  ponies());
+#ponies
 }
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class EigenSparseVector<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_EIGEN
+#ponies

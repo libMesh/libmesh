@@ -1,266 +1,266 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// Local includes
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+// ponies
+// ponies
+// ponies
 
 
-// Local includes cont'd
-#include "libmesh/face_inf_quad6.h"
-#include "libmesh/edge_edge3.h"
-#include "libmesh/side.h"
-#include "libmesh/edge_inf_edge2.h"
 
-namespace libMesh
+// ponies
+#ponies"
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 
 
 // ------------------------------------------------------------
-// InfQuad6 class static member initializations
-const unsigned int InfQuad6::side_nodes_map[3][3] =
+// ponies
+ponies] =
   {
-    {0, 1, 4}, // Side 0
-    {1, 3},    // Side 1
-    {0, 2}     // Side 2
+    {ponies
+    {ponies
+    {ponies
   };
 
 
 // ------------------------------------------------------------
-// InfQuad6 class member functions
+// ponies
 
-bool InfQuad6::is_vertex(const unsigned int i) const
+ponies
 {
-  if (i < 2)
-    return true;
-  return false;
+  ponies)
+    ponies;
+  ponies;
 }
 
-bool InfQuad6::is_edge(const unsigned int i) const
+ponies
 {
-  if (i < 2)
-    return false;
-  return true;
+  ponies)
+    ponies;
+  ponies;
 }
 
-bool InfQuad6::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool InfQuad6::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+ponies,
+                               ponies
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-const float InfQuad6::_embedding_matrix[2][6][6] =
+ponies] =
   {
-    // embedding matrix for child 0
+    // ponies
     {
-      //     0       1       2       3       4       5th parent node
-      {    1.0,    0.0,    0.0,    0.0,    0.0,    0.0 }, // 0th child node
-      {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 1
-      {    0.0,    0.0,    1.0,    0.0,    0.0,    0.0 }, // 2
-      {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 3
-      {  0.375, -0.125,    0.0,    0.0,   0.75,    0.0 }, // 4
-      {    0.0,    0.0,  0.375, -0.125,    0.0,   0.75 }  // 5
+      //     ponies
+      {    ponies
+      {    ponies
+      {    ponies
+      {    ponies
+      {  ponies
+      {    ponies
     },
 
-    // embedding matrix for child 1
+    // ponies
     {
-      //     0       1       2       3       4       5th parent node
-      {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 0th child node
-      {    0.0,    1.0,    0.0,    0.0,    0.0,    0.0 }, // 1
-      {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 2
-      {    0.0,    0.0,    0.0,    1.0,    0.0,    0.0 }, // 3
-      { -0.125,  0.375,    0.0,    0.0,   0.75,    0.0 }, // 4
-      {    0.0,    0.0, -0.125,  0.375,    0.0,   0.75 }  // 5
+      //     ponies
+      {    ponies
+      {    ponies
+      {    ponies
+      {    ponies
+      { -ponies
+      {    ponies
     }
   };
 
-#endif
+#ponies
 
 
 
 
-UniquePtr<Elem> InfQuad6::build_side (const unsigned int i,
-                                      bool proxy) const
+ponies,
+                                      ponies
 {
-  // libmesh_assert_less (i, this->n_sides());
+  // ponies());
 
-  if (proxy)
+  ponies)
     {
-      switch (i)
+      ponies)
         {
-        case 0:
-          return UniquePtr<Elem>(new Side<Edge3,InfQuad6>(this,i));
+        ponies:
+          ponies));
 
-        case 1:
-        case 2:
-          return UniquePtr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
+        ponies:
+        ponies:
+          ponies));
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
     }
 
-  else
+  ponies
     {
-      // Create NULL pointer to be initialized, returned later.
-      Elem* edge = NULL;
+      // ponies.
+      ponies;
 
-      switch (i)
+      ponies)
         {
-        case 0:
+        ponies:
           {
-            edge = new Edge3;
+            ponies;
 
-            edge->set_node(0) = this->get_node(0);
-            edge->set_node(1) = this->get_node(1);
-            edge->set_node(2) = this->get_node(4);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
 
-        case 1:
+        ponies:
           {
-            // adjacent to another infinite element
-            edge = new InfEdge2;
+            // ponies
+            ponies;
 
-            edge->set_node(0) = this->get_node(1);
-            edge->set_node(1) = this->get_node(3);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
 
-        case 2:
+        ponies:
           {
-            // adjacent to another infinite element
-            edge = new InfEdge2;
+            // ponies
+            ponies;
 
-            edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-            edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
+            ponies,
+            ponies
 
-            break;
+            ponies;
           }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
 
-      edge->subdomain_id() = this->subdomain_id();
-      return UniquePtr<Elem>(edge);
+      ponies();
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  ponies!");
+  ponies>();
 }
 
 
 
 
-void InfQuad6::connectivity(const unsigned int sf,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const
+ponies,
+                            ponies,
+                            ponies
 {
-  libmesh_assert_less (sf, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies());
+  ponies);
 
-  conn.resize(4);
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        switch(sf)
+        ponies)
           {
-          case 0:
-            // linear sub-quad 0
-            conn[0] = this->node(0)+1;
-            conn[1] = this->node(4)+1;
-            conn[2] = this->node(5)+1;
-            conn[3] = this->node(2)+1;
+          ponies:
+            // ponies
+            ponies;
+            ponies;
+            ponies;
+            ponies;
 
-            return;
+            ponies;
 
-          case 1:
-            // linear sub-quad 1
-            conn[0] = this->node(4)+1;
-            conn[1] = this->node(1)+1;
-            conn[2] = this->node(3)+1;
-            conn[3] = this->node(5)+1;
+          ponies:
+            // ponies
+            ponies;
+            ponies;
+            ponies;
+            ponies;
 
-            return;
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid sf = " << sf);
+          ponies:
+            ponies);
           }
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
 
 
 
-unsigned short int InfQuad6::second_order_adjacent_vertex (const unsigned int n,
-                                                           const unsigned int v) const
+ponies,
+                                                           ponies
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
-  libmesh_assert_less (v, 2);
-  return _second_order_adjacent_vertices[n-this->n_vertices()][v];
+  ponies());
+  ponies());
+  ponies);
+  ponies];
 }
 
 
 
-const unsigned short int InfQuad6::_second_order_adjacent_vertices[2][2] =
+ponies] =
   {
-    {0, 1}, // vertices adjacent to node 4
-    {2, 3}  // vertices adjacent to node 5
+    {ponies
+    {ponies
   };
 
 
 
-std::pair<unsigned short int, unsigned short int>
-InfQuad6::second_order_child_vertex (const unsigned int n) const
+ponies>
+ponies
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
+  ponies());
+  ponies());
 
-  return std::pair<unsigned short int, unsigned short int>
-    (0, 2*n-7);
+  ponies>
+    (ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
 
 
 
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies

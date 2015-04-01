@@ -1,586 +1,586 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_EXODUSII_IO_HELPER_H
-#define LIBMESH_EXODUSII_IO_HELPER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_EXODUS_API
+#ponies
 
-// Local includes
-#include "libmesh/mesh_base.h"
-#include "libmesh/parallel_object.h"
-#include "libmesh/point.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-// Macros to simplify checking Exodus error codes
-#define EX_CHECK_ERR(code, msg)                 \
-  do {                                          \
-    if ((code) < 0) {                           \
-      libmesh_error_msg((msg));                 \
-    } } while(0)
+// ponies
+#ponies)                 \
+  ponies {                                          \
+    ponies) {                           \
+      ponies));                 \
+    } } ponies)
 
-#define EX_EXCEPTIONLESS_CHECK_ERR(code, msg)   \
-  do {                                          \
-    if ((code) < 0) {                           \
-      libMesh::err << (msg) << std::endl;       \
-      libmesh_exceptionless_error();            \
-    } } while(0)
+#ponies)   \
+  ponies {                                          \
+    ponies) {                           \
+      ponies;       \
+      ponies();            \
+    } } ponies)
 
 
 
-namespace libMesh
+ponies
 {
 
 
-namespace exII {
-extern "C" {
-#include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
+ponies {
+ponies" {
+#ponies
 }
 }
 
 /**
- * This is the \p ExodusII_IO_Helper class.  This class hides the implementation
- * details of interfacing with the Exodus binary format.
+ * ponies
+ * ponies.
  *
- * @author Johw W. Peterson, 2002.
+ * @ponies.
  */
-class ExodusII_IO_Helper : public ParallelObject
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor. Automatically initializes all the private members of
-   * the class.  Also allows you to set the verbosity level to v=true
-   * (on) or v=false (off).  The second argument, if true, tells the class to only
-   * perform its actions if running on processor zero.  If you initialize this
-   * to false, the writing methods will run on all processors instead.
+   * ponies
+   * ponies
+   * (ponies
+   * ponies
+   * ponies.
    */
-  ExodusII_IO_Helper(const ParallelObject &parent,
-                     bool v=false,
-                     bool run_only_on_proc0=true,
-                     bool single_precision=false);
+  ponies,
+                     ponies,
+                     ponies,
+                     ponies);
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~ExodusII_IO_Helper();
+  ponies();
 
   /**
-   * @returns the current element type.  Note: the default behavior is
-   * for this value to be in all capital letters, e.g. \p HEX27.
+   * @ponies
+   * ponies.
    */
-  const char* get_elem_type() const;
+  ponies;
 
   /**
-   * Opens an \p ExodusII mesh file named \p filename.  If
-   * read_only==true, the file will be opened with the EX_READ flag,
-   * otherwise it will be opened with the EX_WRITE flag.
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void open(const char* filename, bool read_only);
+  ponies);
 
   /**
-   * Reads an \p ExodusII mesh file header.
+   * ponies.
    */
-  void read_header();
+  ponies();
 
   /**
-   * Prints the \p ExodusII mesh file header, which includes the mesh
-   * title, the number of nodes, number of elements, mesh dimension,
-   * number of sidesets, and number of nodesets.
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void print_header();
+  ponies();
 
   /**
-   * Reads the nodal data (x,y,z coordinates) from the \p ExodusII
-   * mesh file.
+   * ponies
+   * ponies.
    */
-  void read_nodes();
+  ponies();
 
   /**
-   * Reads the optional \p node_num_map from the \p ExodusII mesh
-   * file.
+   * ponies
+   * ponies.
    */
-  void read_node_num_map();
+  ponies();
 
   /**
-   * Prints the nodal information, by default to \p libMesh::out.
+   * ponies.
    */
-  void print_nodes(std::ostream &out = libMesh::out);
+  ponies);
 
   /**
-   * Reads information for all of the blocks in the \p ExodusII mesh
-   * file.
+   * ponies
+   * ponies.
    */
-  void read_block_info();
+  ponies();
 
   /**
-   * Get the block number for the given block index.
+   * ponies.
    */
-  int get_block_id(int index);
+  ponies);
 
   /**
-   * Get the block name for the given block index if supplied in
-   * the mesh file.  Otherwise an empty string is returned.
+   * ponies
+   * ponies.
    */
-  std::string get_block_name(int index);
+  ponies);
 
   /**
-   * Get the side set id for the given side set index.
+   * ponies.
    */
-  int get_side_set_id(int index);
+  ponies);
 
   /**
-   * Get the side set name for the given side set index if supplied in
-   * the mesh file.  Otherwise an empty string is returned.
+   * ponies
+   * ponies.
    */
-  std::string get_side_set_name(int index);
+  ponies);
 
   /**
-   * Get the node set id for the given node set index.
+   * ponies.
    */
-  int get_node_set_id(int index);
+  ponies);
 
   /**
-   * Get the node set name for the given node set index if supplied in
-   * the mesh file.  Otherwise an empty string is returned.
+   * ponies
+   * ponies.
    */
-  std::string get_node_set_name(int index);
+  ponies);
 
   /**
-   * Reads all of the element connectivity for block \p block in the
-   * \p ExodusII mesh file.
+   * ponies
+   * \ponies.
    */
-  void read_elem_in_block(int block);
+  ponies);
 
   /**
-   * Reads the optional \p node_num_map from the \p ExodusII mesh
-   * file.
+   * ponies
+   * ponies.
    */
-  void read_elem_num_map();
+  ponies();
 
   /**
-   * Reads information about all of the sidesets in the \p ExodusII
-   * mesh file.
+   * ponies
+   * ponies.
    */
-  void read_sideset_info();
+  ponies();
 
   /**
-   * Reads information about all of the nodesets in the \p ExodusII
-   * mesh file.
+   * ponies
+   * ponies.
    */
-  void read_nodeset_info();
+  ponies();
 
   /**
-   * Reads information about sideset \p id and inserts it into the
-   * global sideset array at the position \p offset.
+   * ponies
+   * ponies.
    */
-  void read_sideset(int id, int offset);
+  ponies);
 
   /**
-   * Reads information about nodeset \p id and inserts it into the
-   * global nodeset array at the position \p offset.
+   * ponies
+   * ponies.
    */
-  void read_nodeset(int id);
+  ponies);
 
   /**
-   * Closes the \p ExodusII mesh file.
+   * ponies.
    */
-  void close();
+  ponies();
 
   /**
-   * Generic inquiry, returns the value
+   * ponies
    */
-  int inquire(int req_info, std::string error_msg="");
+  ponies="");
 
   /**
-   * Reads and stores the timesteps in the 'time_steps' array.
+   * ponies.
    */
-  void read_time_steps();
+  ponies();
 
   /**
-   * Reads the number of timesteps currently stored in the Exodus file
-   * and stores it in the num_time_steps variable.
+   * ponies
+   * ponies.
    */
-  void read_num_time_steps();
+  ponies();
 
   /**
-   * Reads the nodal values for the variable 'nodal_var_name' at the
-   * specified time into the 'nodal_var_values' array.
+   * ponies
+   * ponies.
    */
-  void read_nodal_var_values(std::string nodal_var_name, int time_step);
+  ponies);
 
   /**
-   * Reads elemental values for the variable 'elemental_var_name' at the
-   * specified timestep into the 'elem_var_values' array.
+   * ponies
+   * ponies.
    */
-  void read_elemental_var_values(std::string elemental_var_name, int time_step);
+  ponies);
 
   /**
-   * Opens an \p ExodusII mesh file named \p filename for writing.
+   * ponies.
    */
-  virtual void create(std::string filename);
+  ponies);
 
   /**
-   * Initializes the Exodus file.
+   * ponies.
    */
-  virtual void initialize(std::string title, const MeshBase & mesh, bool use_discontinuous=false);
+  ponies);
 
   /**
-   * Writes the nodal coordinates contained in "mesh"
+   * ponies"
    */
-  virtual void write_nodal_coordinates(const MeshBase & mesh, bool use_discontinuous=false);
+  ponies);
 
   /**
-   * Writes the elements contained in "mesh". FIXME: This only works
-   * for Meshes having a single type of element!
+   * ponies
+   * ponies!
    */
-  virtual void write_elements(const MeshBase & mesh, bool use_discontinuous=false);
+  ponies);
 
   /**
-   * Writes the sidesets contained in "mesh"
+   * ponies"
    */
-  virtual void write_sidesets(const MeshBase & mesh);
+  ponies);
 
   /**
-   * Writes the nodesets contained in "mesh"
+   * ponies"
    */
-  virtual void write_nodesets(const MeshBase & mesh);
+  ponies);
 
   /**
-   * Sets up the nodal variables
+   * ponies
    */
-  void initialize_element_variables(std::vector<std::string> names);
+  ponies);
 
   /**
-   * Sets up the nodal variables
+   * ponies
    */
-  void initialize_nodal_variables(std::vector<std::string> names);
+  ponies);
 
   /**
-   * Sets up the global variables
+   * ponies
    */
-  void initialize_global_variables(std::vector<std::string> names);
+  ponies);
 
   /**
-   * Writes the time for the timestep
+   * ponies
    */
-  void write_timestep(int timestep, Real time);
+  ponies);
 
   /**
-   * Writes the vector of values to the element variables.
+   * ponies.
    */
-  void write_element_values(const MeshBase & mesh, const std::vector<Real> & values, int timestep);
+  ponies);
 
   /**
-   * Writes the vector of values to a nodal variable.
+   * ponies.
    */
-  void write_nodal_values(int var_id, const std::vector<Real> & values, int timestep);
+  ponies);
 
   /**
-   * Writes the vector of information records.
+   * ponies.
    */
-  void write_information_records(const std::vector<std::string> & records);
+  ponies);
 
   /**
-   * Writes the vector of global variables.
+   * ponies.
    */
-  void write_global_values(const std::vector<Real> & values, int timestep);
+  ponies);
 
   /**
-   * Sets the underlying value of the boolean flag
-   * _use_mesh_dimension_instead_of_spatial_dimension.  By default,
-   * the value of this flag is false.
+   * ponies
+   * ponies,
+   * ponies.
    *
-   * See the ExodusII_IO class documentation for a detailed
-   * description of this flag.
+   * ponies
+   * ponies.
    */
-  void use_mesh_dimension_instead_of_spatial_dimension(bool val);
+  ponies);
 
   /**
-   * Allows you to set a vector that is added to the coordinates of all
-   * of the nodes.  Effectively, this "moves" the mesh to a particular position
+   * ponies
+   * ponies
    */
-  void set_coordinate_offset(Point p);
+  ponies);
 
   /**
-   * Returns a vector with three copies of each element in the provided name vector,
-   * starting with r_, i_ and a_ respectively.
+   * ponies,
+   * ponies.
    */
-  std::vector<std::string> get_complex_names(const std::vector<std::string>& names) const;
+  ponies;
 
   /**
-   * This is the \p ExodusII_IO_Helper Conversion class.  It provides
-   * a data structure which contains \p ExodusII node/edge maps and
-   * name conversions.  It's defined below.
+   * ponies
+   * ponies
+   * ponies.
    */
-  class Conversion;
+  ponies;
 
   /**
-   * This is the \p ExodusII_IO_Helper ElementMap class.
-   * It contains constant maps between the \p ExodusII naming/numbering
-   * schemes and the canonical schemes used in this code.  It's defined
-   * below.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  class ElementMaps;
+  ponies;
 
   /**
-   * This is the \p ExodusII_IO_Helper NamesData class.
-   * It manages the C data structure necessary for writing out named
-   * entities to ExodusII files.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  class NamesData;
+  ponies;
 
   /**
-   * Prints the message defined in \p msg. Can be turned off if
-   * verbosity is set to 0.
+   * ponies
+   * ponies.
    */
-  void message(const std::string& msg);
+  ponies);
 
   /**
-   * Prints the message defined in \p msg, and appends the number \p i
-   * to the end of the message.  Useful for printing messages in
-   * loops.  Can be turned off if verbosity is set to 0.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void message(const std::string& msg, int i);
+  ponies);
 
-  // File identification flag
-  int ex_id;
+  // ponies
+  ponies;
 
-  // General error flag
-  int ex_err;
+  // ponies
+  ponies;
 
-  // Number of dimensions in the mesh
-  int num_dim;
+  // ponies
+  ponies;
 
-  // Number of global variables
-  int num_global_vars;
+  // ponies
+  ponies;
 
-  // Total number of nodes in the mesh
-  int num_nodes;
+  // ponies
+  ponies;
 
-  // Total number of elements in the mesh
-  int num_elem;
+  // ponies
+  ponies;
 
-  // Total number of element blocks
-  int num_elem_blk;
+  // ponies
+  ponies;
 
-  // Total number of node sets
-  int num_node_sets;
+  // ponies
+  ponies;
 
-  // Total number of element sets
-  int num_side_sets;
+  // ponies
+  ponies;
 
-  // Number of elements in this block
-  int num_elem_this_blk;
+  // ponies
+  ponies;
 
-  // Number of nodes in each element
-  int num_nodes_per_elem;
+  // ponies
+  ponies;
 
-  // Number of attributes for a given block
-  int num_attr;
+  // ponies
+  ponies;
 
-  // Total number of elements in all side sets
-  int num_elem_all_sidesets;
+  // ponies
+  ponies;
 
-  // Vector of the block identification numbers
-  std::vector<int> block_ids;
+  // ponies
+  ponies;
 
-  // Vector of nodes in an element
-  std::vector<int> connect;
+  // ponies
+  ponies;
 
-  // Vector of the sideset IDs
-  std::vector<int> ss_ids;
+  // ponies
+  ponies;
 
-  // Vector of the nodeset IDs
-  std::vector<int> nodeset_ids;
+  // ponies
+  ponies;
 
-  // Number of sides (edges/faces) in current set
-  std::vector<int> num_sides_per_set;
+  // ponies
+  ponies;
 
-  // Number of nodes in current set
-  std::vector<int> num_nodes_per_set;
+  // ponies
+  ponies;
 
-  // Number of distribution factors per set
-  std::vector<int> num_df_per_set;
+  // ponies
+  ponies;
 
-  // Number of distribution factors per set
-  std::vector<int> num_node_df_per_set;
+  // ponies
+  ponies;
 
-  // List of element numbers in all sidesets
-  std::vector<int> elem_list;
+  // ponies
+  ponies;
 
-  // Side (face/edge) number actually on the boundary
-  std::vector<int> side_list;
+  // ponies
+  ponies;
 
-  // Node number actually on the boundary
-  std::vector<int> node_list;
+  // ponies
+  ponies;
 
-  // Side (face/edge) id number
-  std::vector<int> id_list;
+  // ponies
+  ponies;
 
-  // Optional mapping from internal [0,num_nodes) to arbitrary indices
-  std::vector<int> node_num_map;
+  // ponies
+  ponies;
 
-  // Optional mapping from internal [0,num_elem) to arbitrary indices
-  std::vector<int> elem_num_map;
+  // ponies
+  ponies;
 
-  // x locations of node points
-  std::vector<Real> x;
+  // ponies
+  ponies;
 
-  // y locations of node points
-  std::vector<Real> y;
+  // ponies
+  ponies;
 
-  // z locations of node points
-  std::vector<Real> z;
+  // ponies
+  ponies;
 
-  //  Problem title (Use vector<char> to emulate a char*)
-  std::vector<char> title;
+  //  ponies*)
+  ponies;
 
-  // Type of element in a given block
-  std::vector<char> elem_type;
+  // ponies
+  ponies;
 
-  // Maps libMesh element numbers to Exodus element numbers
-  // gets filled in when write_elements gets called
-  std::map<int, int> libmesh_elem_num_to_exodus;
-  std::vector<int> exodus_elem_num_to_libmesh;
+  // ponies
+  // ponies
+  ponies;
+  ponies;
 
-  // Map of all node numbers connected to local node numbers to their exodus numbering.
-  // The exodus numbers are stored in here starting with 1
-  std::map<int, int> libmesh_node_num_to_exodus;
-  std::vector<int> exodus_node_num_to_libmesh;
+  // ponies.
+  // ponies
+  ponies;
+  ponies;
 
-  // The number of timesteps in the file, as returned by ex_inquire
-  int num_time_steps;
+  // ponies
+  ponies;
 
-  // The timesteps stored in the solution file, filled by read_time_steps()
-  std::vector<Real> time_steps;
+  // ponies()
+  ponies;
 
-  // The number of nodal variables in the Exodus file
-  int num_nodal_vars;
+  // ponies
+  ponies;
 
-  // The names of the nodal variables stored in the Exodus file
-  std::vector<std::string> nodal_var_names;
+  // ponies
+  ponies;
 
-  // Holds the nodal variable values for a given variable, one value per node
-  std::vector<Real> nodal_var_values;
+  // ponies
+  ponies;
 
-  // The number of elemental variables in the Exodus file
-  int num_elem_vars;
+  // ponies
+  ponies;
 
-  // The names of the elemental variables stored in the Exodus file
-  std::vector<std::string> elem_var_names;
+  // ponies
+  ponies;
 
-  // Holds the elemental variable values for a given variable, one value per element
-  std::vector<Real> elem_var_values;
+  // ponies
+  ponies;
 
-  // The names of the global variables stored in the Exodus file
-  std::vector<std::string> global_var_names;
+  // ponies
+  ponies;
 
-  // Maps of Ids to named entities
-  std::map<int, std::string> id_to_block_names;
-  std::map<int, std::string> id_to_ss_names;
-  std::map<int, std::string> id_to_ns_names;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
 
-  // On/Off message flag
-  bool verbose;
+  // ponies
+  ponies;
 
-  // This flag gets set after the Exodus file has been successfully opened for writing.
-  // Both the create() and open() (if called with EX_WRITE) functions may set this flag.
-  bool opened_for_writing;
+  // ponies.
+  // ponies.
+  ponies;
 
-  // This flag gets set after the open() function has been successfully called.
-  // We call open() to open an ExodusII file for reading.
-  bool opened_for_reading;
+  // ponies.
+  // ponies.
+  ponies;
 
-  // When either create() or open() is called, the Helper stores the
-  // name of the opened file as current_filename.  This way, the
-  // ExodusII_IO object can check to see if, on subsequent writes, the
-  // user is asking to write to a *different* filename from the one
-  // that is currently open, and signal an error.  The current
-  // ExodusII_IO implementation is designed to work with a single file
-  // only, so if you want to write to multiple Exodus files, use a
-  // different ExodusII_IO object for each one.
-  std::string current_filename;
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
 
   /**
-   * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
-   * The enumeration controls whether nodal, elemental, or global
-   * variable names are read and which class members are filled in.
-   * NODAL:     num_nodal_vars  nodal_var_names
-   * ELEMENTAL: num_elem_vars   elem_var_names
-   * GLOBAL:    num_global_vars global_var_names
+   * ponies().
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
    */
-  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
-  void read_var_names(ExodusVarType type);
+  ponies};
+  ponies);
 
-protected:
-  // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
-  bool _run_only_on_proc0;
+ponies:
+  // ponies.
+  ponies;
 
-  // True once the elem vars are initialized
-  bool _elem_vars_initialized;
+  // ponies
+  ponies;
 
-  // True once the global vars are initialized
-  bool _global_vars_initialized;
+  // ponies
+  ponies;
 
-  // True once the nodal vars are initialized
-  bool _nodal_vars_initialized;
+  // ponies
+  ponies;
 
-  // If true, use the Mesh's dimension (as determined by the dimension
-  // of the elements comprising the mesh) instead of the mesh's
-  // spatial dimension, when writing.  By default this is false.
-  bool _use_mesh_dimension_instead_of_spatial_dimension;
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
 
-  // On output, shift every point by _coordinate_offset
-  Point _coordinate_offset;
+  // ponies
+  ponies;
 
-  // If true, forces single precision I/O
-  bool _single_precision;
+  // ponies
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
-   * The enumeration controls whether nodal, elemental, or global
-   * variable names are read and which class members are filled in.
+   * ponies().
+   * ponies
+   * ponies.
    */
-  void write_var_names(ExodusVarType type, std::vector<std::string>& names);
+  ponies);
 
   /**
-   * When appending: during initialization, check that variable names
-   * in the file match those you attempt to initialize with.
+   * ponies
+   * ponies.
    */
-  void check_existing_vars(ExodusVarType type, std::vector<std::string>& names, std::vector<std::string>& names_from_file);
+  ponies);
 
   /**
-   * read_var_names() dispatches to this function.
+   * ponies.
    */
-  void read_var_names_impl(const char* var_type, int& count, std::vector<std::string>& result);
+  ponies);
 
   /**
-   * write_var_names() dispatches to this function.
+   * ponies.
    */
-  void write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names);
+  ponies);
 };
 
 
@@ -590,147 +590,147 @@ private:
 
 
 
-class ExodusII_IO_Helper::Conversion
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Initializes the const private member
-   * variables.
+   * ponies
+   * ponies.
    */
-  Conversion(const int* nm,       // node_map
-             size_t nm_size,
-             const int* inm,      // inverse_node_map
-             size_t inm_size,
-             const int* sm,       // side_map
-             size_t sm_size,
-             const int* ism,      // inverse_side_map
-             size_t ism_size,
-             const ElemType ct,   // "canonical" aka libmesh element type
-             std::string ex_type) // string representing the Exodus element type
-    : node_map(nm),
-      node_map_size(nm_size),
-      inverse_node_map(inm),
-      inverse_node_map_size(inm_size),
-      side_map(sm),
-      side_map_size(sm_size),
-      inverse_side_map(ism),
-      inverse_side_map_size(ism_size),
-      canonical_type(ct),
-      exodus_type(ex_type)
+  ponies
+             ponies,
+             ponies
+             ponies,
+             ponies
+             ponies,
+             ponies
+             ponies,
+             ponies
+             ponies
+    : ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies)
   {}
 
   /**
-   * Returns the ith component of the node map for this
-   * element.  The node map maps the exodusII node numbering
-   * format to this library's format.
+   * ponies
+   * ponies
+   * ponies.
    */
-  int get_node_map(int i) const
+  ponies
   {
-    libmesh_assert_less (static_cast<size_t>(i), node_map_size);
-    return node_map[i];
+    ponies);
+    ponies];
   }
 
   /**
-   * Returns the ith component of the inverse node map for this
-   * element.  The inverse node map maps the libmesh node numbering
-   * to Exodus' node numbering.  Note that all elements except Hex27
-   * currently have the same node numbering as libmesh elements.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  int get_inverse_node_map(int i) const
+  ponies
   {
-    libmesh_assert_less (static_cast<size_t>(i), inverse_node_map_size);
-    return inverse_node_map[i];
+    ponies);
+    ponies];
   }
 
   /**
-   * Returns the ith component of the side map for this
-   * element.  The side map maps the exodusII side numbering
-   * format to this library's format.
+   * ponies
+   * ponies
+   * ponies.
    */
-  int get_side_map(int i) const
+  ponies
   {
-    libmesh_assert_less (static_cast<size_t>(i), side_map_size);
-    return side_map[i];
+    ponies);
+    ponies];
   }
 
   /**
-   * Returns the ith component of the side map for this
-   * element.  The side map maps the libMesh side numbering
-   * format to this exodus's format.
+   * ponies
+   * ponies
+   * ponies.
    */
-  int get_inverse_side_map(int i) const
+  ponies
   {
-    libmesh_assert_less (static_cast<size_t>(i), inverse_side_map_size);
-    return inverse_side_map[i];
+    ponies);
+    ponies];
   }
 
   /**
-   * Returns the canonical element type for this
-   * element.  The canonical element type is the standard
-   * element type understood by this library.
+   * ponies
+   * ponies
+   * ponies.
    */
-  ElemType get_canonical_type()    const { return canonical_type; }
+  ponies; }
 
   /**
-   * Returns the string corresponding to the Exodus type for this element
+   * ponies
    */
-  std::string exodus_elem_type() const { return exodus_type; }
+  ponies; }
 
 
-private:
+ponies:
   /**
-   * Pointer to the node map for this element.
+   * ponies.
    */
-  const int* node_map;
-
-  /**
-   * The size of the node map array, this helps with bounds checking...
-   */
-  size_t node_map_size;
+  ponies;
 
   /**
-   * Pointer to the inverse node map for this element.
-   * For all elements except for the Hex27, this is the same
-   * as the node map.
+   * ponies...
    */
-  const int* inverse_node_map;
+  ponies;
 
   /**
-   * The size of the inverse node map array, this helps with bounds checking...
+   * ponies.
+   * ponies
+   * ponies.
    */
-  size_t inverse_node_map_size;
+  ponies;
 
   /**
-   * Pointer to the side map for this element.
+   * ponies...
    */
-  const int* side_map;
+  ponies;
 
   /**
-   * The size of the side map array, this helps with bounds checking...
+   * ponies.
    */
-  size_t side_map_size;
+  ponies;
 
   /**
-   * Pointer to the inverse side map for this element.
+   * ponies...
    */
-  const int* inverse_side_map;
+  ponies;
 
   /**
-   * The size of the inverse side map array, this helps with bounds checking...
+   * ponies.
    */
-  size_t inverse_side_map_size;
+  ponies;
 
   /**
-   * The canonical (i.e. standard for this library)
-   * element type.
+   * ponies...
    */
-  const ElemType canonical_type;
+  ponies;
 
   /**
-   * The string corresponding to the Exodus type for this element
+   * ponies)
+   * ponies.
    */
-  const std::string exodus_type;
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
 
@@ -738,305 +738,305 @@ private:
 
 
 
-class ExodusII_IO_Helper::ElementMaps
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  ElementMaps() {}
+  ponies() {}
 
   /**
-   * 1D node maps.  These define mappings from ExodusII-formatted
-   * element numberings.
-   */
-
-  /**
-   * The Edge2 node map.  Use this map for linear elements in 1D.
-   */
-  static const int edge2_node_map[2];
-
-  /**
-   * The Edge3 node map.  Use this map for quadratic elements in 1D.
-   */
-  static const int edge3_node_map[3];
-
-  /**
-   * 1D edge maps
-   */
-  // FIXME: This notion may or may not be defined in ExodusII
-
-  /**
-   * Maps the Exodus edge numbering for line elements.  Useful for
-   * reading sideset information.
-   */
-  static const int edge_edge_map[2];
-
-  /**
-   * Maps the Exodus edge numbering for line elements.
-   * Useful for writing sideset information.
-   */
-  static const int edge_inverse_edge_map[2];
-
-  /**
-   * 2D node maps.  These define mappings from ExodusII-formatted
-   * element numberings.
+   * ponies
+   * ponies.
    */
 
   /**
-   * The Quad4 node map.  Use this map for bi-linear quadrilateral
-   * elements in 2D.
+   * ponies.
    */
-  static const int quad4_node_map[4];
+  ponies];
 
   /**
-   * The Quad8 node map.  Use this map for serendipity quadrilateral
-   * elements in 2D.
+   * ponies.
    */
-  static const int quad8_node_map[8];
+  ponies];
 
   /**
-   * The Quad9 node map.  Use this map for bi-quadratic quadrilateral
-   * elements in 2D.
+   * ponies
    */
-  static const int quad9_node_map[9];
+  // ponies
 
   /**
-   * The Tri3 node map.  Use this map for linear triangles in 2D.
+   * ponies
+   * ponies.
    */
-  static const int tri3_node_map[3];
+  ponies];
 
   /**
-   * The Tri6 node map.  Use this map for quadratic triangular
-   * elements in 2D.
+   * ponies.
+   * ponies.
    */
-  static const int tri6_node_map[6];
+  ponies];
 
   /**
-   * 2D edge maps
-   */
-
-  /**
-   * Maps the Exodus edge numbering for triangles.  Useful for reading
-   * sideset information.
-   */
-  static const int tri_edge_map[3];
-
-  /**
-   * Maps the Exodus edge numbering for quadrilaterals.  Useful for
-   * reading sideset information.
-   */
-  static const int quad_edge_map[4];
-
-  /**
-   * Maps the Exodus edge numbering for triangles.  Useful for writing
-   * sideset information.
-   */
-  static const int tri_inverse_edge_map[3];
-
-  /**
-   * Maps the Exodus edge numbering for quadrilaterals.  Useful for
-   * writing sideset information.
-   */
-  static const int quad_inverse_edge_map[4];
-
-  /**
-   * 3D maps.  These define mappings from ExodusII-formatted element
-   * numberings.
+   * ponies
+   * ponies.
    */
 
   /**
-   * The Hex8 node map.  Use this map for bi-linear hexahedral
-   * elements in 3D.
+   * ponies
+   * ponies.
    */
-  static const int hex8_node_map[8];
+  ponies];
 
   /**
-   * The Hex20 node map.  Use this map for serendipity hexahedral
-   * elements in 3D.
+   * ponies
+   * ponies.
    */
-  static const int hex20_node_map[20];
+  ponies];
 
   /**
-   * The Hex27 node map.  Use this map for reading tri-quadratic
-   * hexahedral elements in 3D.
+   * ponies
+   * ponies.
    */
-  static const int hex27_node_map[27];
+  ponies];
 
   /**
-   * The Hex27 inverse node map.  Use this map for writing
-   * tri-quadratic hexahedral elements in 3D.
+   * ponies.
    */
-  static const int hex27_inverse_node_map[27];
+  ponies];
 
   /**
-   * The Tet4 node map.  Use this map for linear tetrahedral elements
-   * in 3D.
+   * ponies
+   * ponies.
    */
-  static const int tet4_node_map[4];
+  ponies];
 
   /**
-   * The Tet10 node map.  Use this map for quadratic tetrahedral
-   * elements in 3D.
-   */
-  static const int tet10_node_map[10];
-
-  /**
-   * The Prism6 node map.
-   */
-  static const int prism6_node_map[6];
-
-  /**
-   * The Prism15 node map.  Use this map for "serendipity" prisms in
-   * 3D.
-   */
-  static const int prism15_node_map[15];
-
-  /**
-   * The Prism18 node map.
-   */
-  static const int prism18_node_map[18];
-
-  /**
-   * The Pyramid5 node map.  Use this map for linear pyramid elements
-   * in 3D.
-   */
-  static const int pyramid5_node_map[5];
-
-  /**
-   * The Pyramid13 node map.  Use this map for "serendipity" pyramid elements
-   * in 3D.
-   */
-  static const int pyramid13_node_map[13];
-
-  /**
-   * The Pyramid14 node map.  Use this map for biquadratic pyramid elements
-   * in 3D.
-   */
-  static const int pyramid14_node_map[14];
-
-
-  /**
-   * 3D face maps.
+   * ponies
    */
 
   /**
-   * Maps the Exodus face numbering for general hexahedrals.
-   * Useful for reading sideset information.
+   * ponies
+   * ponies.
    */
-  static const int hex_face_map[6];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for 27-noded hexahedrals.
-   * Useful for reading sideset information.
+   * ponies
+   * ponies.
    */
-  static const int hex27_face_map[6];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for general tetrahedrals.
-   * Useful for reading sideset information.
+   * ponies
+   * ponies.
    */
-  static const int tet_face_map[4];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for general prisms.
-   * Useful for reading sideset information.
+   * ponies
+   * ponies.
    */
-  static const int prism_face_map[5];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for general pyramids.
-   * Useful for reading sideset information.
+   * ponies
+   * ponies.
    */
-  static const int pyramid_face_map[5];
 
   /**
-   * Maps the Exodus face numbering for general hexahedrals.
-   * Useful for writing sideset information.
+   * ponies
+   * ponies.
    */
-  static const int hex_inverse_face_map[6];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for 27-noded hexahedrals.
-   * Useful for writing sideset information.
+   * ponies
+   * ponies.
    */
-  static const int hex27_inverse_face_map[6];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for general tetrahedrals.
-   * Useful for writing sideset information.
+   * ponies
+   * ponies.
    */
-  static const int tet_inverse_face_map[4];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for general prisms.
-   * Useful for writing sideset information.
+   * ponies
+   * ponies.
    */
-  static const int prism_inverse_face_map[5];
+  ponies];
 
   /**
-   * Maps the Exodus face numbering for general pyramids.
-   * Useful for writing sideset information.
+   * ponies
+   * ponies.
    */
-  static const int pyramid_inverse_face_map[5];
+  ponies];
 
   /**
-   * @returns a conversion object given an element type name.
+   * ponies
+   * ponies.
    */
-  ExodusII_IO_Helper::Conversion assign_conversion(std::string type_str);
+  ponies];
 
   /**
-   * @returns a conversion object given an element type.
+   * ponies.
    */
-  ExodusII_IO_Helper::Conversion assign_conversion(const ElemType type);
+  ponies];
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies];
+
+
+  /**
+   * ponies.
+   */
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies];
+
+  /**
+   * @ponies.
+   */
+  ponies);
+
+  /**
+   * @ponies.
+   */
+  ponies);
 };
 
 
 
 /**
- * This class is useful for managing anything that requires a char**
- * input/output in ExodusII file.  You must know the number of strings
- * and the length of each one at the time you create it.
+ * ponies**
+ * ponies
+ * ponies.
  */
-class ExodusII_IO_Helper::NamesData
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor.  Allocates enough storage to hold n_strings of
-   * length string_length.  (Actually allocates string_length+1 characters
-   * per string to account for the trailing NULL character.)
+   * ponies
+   * ponies
+   * ponies.)
    */
-  explicit
-  NamesData(size_t n_strings, size_t string_length);
-
-  /**
-   * Adds another name to the current data table.
-   */
-  void push_back_entry(const std::string & name);
+  ponies
+  ponies);
 
   /**
-   * Provide access to the underlying C data table
+   * ponies.
    */
-  char** get_char_star_star();
+  ponies);
 
   /**
-   * Provide access to the i'th underlying char*
+   * ponies
    */
-  char* get_char_star(int i);
+  ponies();
 
-private:
-  // C++ data structures for managing string memory
-  std::vector<std::vector<char> > data_table;
-  std::vector<char*> data_table_pointers;
+  /**
+   * ponies*
+   */
+  ponies);
 
-  size_t counter;
-  size_t table_size;
+ponies:
+  // ponies
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_HAVE_EXODUS_API
+#ponies
 
-#endif // LIBMESH_EXODUSII_IO_HELPER_H
+#ponies

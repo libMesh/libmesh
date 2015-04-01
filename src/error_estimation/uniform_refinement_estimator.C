@@ -1,724 +1,724 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
-#include <algorithm> // for std::fill
-#include <sstream>
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>    // for sqrt
+// ponies
+#ponies
+#ponies>
+#ponies
+#ponies
 
 
-// Local Includes
-#include "libmesh/dof_map.h"
-#include "libmesh/elem.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/error_vector.h"
-#include "libmesh/fe.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_refinement.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/quadrature.h"
-#include "libmesh/system.h"
-#include "libmesh/uniform_refinement_estimator.h"
-#include "libmesh/partitioner.h"
-#include "libmesh/tensor_tools.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-namespace libMesh
+ponies
 {
 
 //-----------------------------------------------------------------
-// ErrorEstimator implementations
-void UniformRefinementEstimator::estimate_error (const System& _system,
-                                                 ErrorVector& error_per_cell,
-                                                 const NumericVector<Number>* solution_vector,
-                                                 bool estimate_parent_error)
+// ponies
+ponies,
+                                                 ponies,
+                                                 ponies,
+                                                 ponies)
 {
-  START_LOG("estimate_error()", "UniformRefinementEstimator");
-  std::map<const System*, const NumericVector<Number>* > solution_vectors;
-  solution_vectors[&_system] = solution_vector;
-  this->_estimate_error (NULL, &_system, &error_per_cell, NULL, NULL,
-                         &solution_vectors, estimate_parent_error);
-  STOP_LOG("estimate_error()", "UniformRefinementEstimator");
+  ponies");
+  ponies;
+  ponies;
+  ponies,
+                         &ponies);
+  ponies");
 }
 
-void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
-                                                  ErrorVector& error_per_cell,
-                                                  const std::map<const System*, SystemNorm>& error_norms,
-                                                  const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
-                                                  bool estimate_parent_error)
+ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies)
 {
-  START_LOG("estimate_errors()", "UniformRefinementEstimator");
-  this->_estimate_error (&_es, NULL, &error_per_cell, NULL,
-                         &error_norms, solution_vectors,
-                         estimate_parent_error);
-  STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
+  ponies");
+  ponies,
+                         &ponies,
+                         ponies);
+  ponies");
 }
 
-void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
-                                                  ErrorMap& errors_per_cell,
-                                                  const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
-                                                  bool estimate_parent_error)
+ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies)
 {
-  START_LOG("estimate_errors()", "UniformRefinementEstimator");
-  this->_estimate_error (&_es, NULL, NULL, &errors_per_cell, NULL,
-                         solution_vectors, estimate_parent_error);
-  STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
+  ponies");
+  ponies,
+                         ponies);
+  ponies");
 }
 
-void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
-                                                  const System* _system,
-                                                  ErrorVector* error_per_cell,
-                                                  ErrorMap* errors_per_cell,
-                                                  const std::map<const System*, SystemNorm > *_error_norms,
-                                                  const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
-                                                  bool)
+ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies)
 {
-  // Get a vector of the Systems we're going to work on,
-  // and set up a error_norms map if necessary
-  std::vector<System *> system_list;
-  UniquePtr<std::map<const System*, SystemNorm > > error_norms =
-    UniquePtr<std::map<const System*, SystemNorm > >
-    (new std::map<const System*, SystemNorm>);
+  // ponies,
+  // ponies
+  ponies;
+  ponies =
+    ponies > >
+    (ponies>);
 
-  if (_es)
+  ponies)
     {
-      libmesh_assert(!_system);
-      libmesh_assert(_es->n_systems());
-      _system = &(_es->get_system(0));
-      libmesh_assert_equal_to (&(_system->get_equation_systems()), _es);
+      ponies);
+      ponies());
+      ponies));
+      ponies);
 
-      libmesh_assert(_es->n_systems());
-      for (unsigned int i=0; i != _es->n_systems(); ++i)
-        // We have to break the rules here, because we can't refine a const System
-        system_list.push_back(const_cast<System *>(&(_es->get_system(i))));
+      ponies());
+      ponies)
+        // ponies
+        ponies))));
 
-      // If we're computing one vector, we need to know how to scale
-      // each variable's contributions to it.
-      if (_error_norms)
+      // ponies
+      // ponies.
+      ponies)
         {
-          libmesh_assert(!errors_per_cell);
+          ponies);
         }
-      else
-        // If we're computing many vectors, we just need to know which
-        // variables to skip
+      ponies
+        // ponies
+        // ponies
         {
-          libmesh_assert (errors_per_cell);
+          ponies);
 
-          _error_norms = error_norms.get();
+          ponies();
 
-          for (unsigned int i=0; i!= _es->n_systems(); ++i)
+          ponies)
             {
-              const System &sys = _es->get_system(i);
-              unsigned int n_vars = sys.n_vars();
+              ponies);
+              ponies();
 
-              std::vector<Real> weights(n_vars, 0.0);
-              for (unsigned int v = 0; v != n_vars; ++v)
+              ponies);
+              ponies)
                 {
-                  if (errors_per_cell->find(std::make_pair(&sys, v)) ==
-                      errors_per_cell->end())
-                    continue;
+                  ponies)) ==
+                      ponies())
+                    ponies;
 
-                  weights[v] = 1.0;
+                  ponies;
                 }
-              (*error_norms)[&sys] =
-                SystemNorm(std::vector<FEMNormType>(n_vars, error_norm.type(0)),
-                           weights);
+              (*ponies] =
+                ponies)),
+                           ponies);
             }
         }
     }
-  else
+  ponies
     {
-      libmesh_assert(_system);
-      // We have to break the rules here, because we can't refine a const System
-      system_list.push_back(const_cast<System *>(_system));
+      ponies);
+      // ponies
+      ponies));
 
-      libmesh_assert(!_error_norms);
-      (*error_norms)[_system] = error_norm;
-      _error_norms = error_norms.get();
+      ponies);
+      (*ponies;
+      ponies();
     }
 
-  // An EquationSystems reference will be convenient.
-  // We have to break the rules here, because we can't refine a const System
-  EquationSystems& es =
-    const_cast<EquationSystems &>(_system->get_equation_systems());
+  // ponies.
+  // ponies
+  ponies =
+    ponies());
 
-  // The current mesh
-  MeshBase& mesh = es.get_mesh();
+  // ponies
+  ponies();
 
-  // The dimensionality of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
+  // ponies
+  ponies();
 
-  // Resize the error_per_cell vectors to be
-  // the number of elements, initialize them to 0.
-  if (error_per_cell)
+  // ponies
+  // ponies.
+  ponies)
     {
-      error_per_cell->clear();
-      error_per_cell->resize (mesh.max_elem_id(), 0.);
+      ponies();
+      ponies.);
     }
-  else
+  ponies
     {
-      libmesh_assert(errors_per_cell);
-      for (ErrorMap::iterator i = errors_per_cell->begin();
-           i != errors_per_cell->end(); ++i)
+      ponies);
+      ponies();
+           ponies)
         {
-          ErrorVector *e = i->second;
-          e->clear();
-          e->resize(mesh.max_elem_id(), 0.);
+          ponies;
+          ponies();
+          ponies.);
         }
     }
 
-  // We'll want to back up all coarse grid vectors
-  std::vector<std::map<std::string, NumericVector<Number> *> >
-    coarse_vectors(system_list.size());
-  std::vector<NumericVector<Number> *>
-    coarse_solutions(system_list.size());
-  std::vector<NumericVector<Number> *>
-    coarse_local_solutions(system_list.size());
-  // And make copies of projected solutions
-  std::vector<NumericVector<Number> *>
-    projected_solutions(system_list.size());
+  // ponies
+  ponies> *> >
+    ponies());
+  ponies> *>
+    ponies());
+  ponies> *>
+    ponies());
+  // ponies
+  ponies> *>
+    ponies());
 
-  // And we'll need to temporarily change solution projection settings
-  std::vector<bool> old_projection_settings(system_list.size());
+  // ponies
+  ponies());
 
-  // And it'll be best to avoid any repartitioning
-  UniquePtr<Partitioner> old_partitioner(mesh.partitioner().release());
+  // ponies
+  ponies());
 
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  ponies)
     {
-      System &system = *system_list[i];
+      ponies];
 
-      // Check for valid error_norms
-      libmesh_assert (_error_norms->find(&system) !=
-                      _error_norms->end());
+      // ponies
+      ponies) !=
+                      ponies());
 
-      // Back up the solution vector
-      coarse_solutions[i] = system.solution->clone().release();
-      coarse_local_solutions[i] =
-        system.current_local_solution->clone().release();
+      // ponies
+      ponies();
+      ponies] =
+        ponies();
 
-      // Back up all other coarse grid vectors
-      for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-             system.vectors_end(); ++vec)
+      // ponies
+      ponies !=
+             ponies)
         {
-          // The (string) name of this vector
-          const std::string& var_name = vec->first;
+          // ponies
+          ponies;
 
-          coarse_vectors[i][var_name] = vec->second->clone().release();
+          ponies();
         }
 
-      // Use a non-standard solution vector if necessary
-      if (solution_vectors &&
-          solution_vectors->find(&system) != solution_vectors->end() &&
-          solution_vectors->find(&system)->second &&
-          solution_vectors->find(&system)->second != system.solution.get())
+      // ponies
+      ponies &&
+          ponies() &&
+          ponies &&
+          ponies())
         {
-          NumericVector<Number>* newsol =
-            const_cast<NumericVector<Number>*>
-            (solution_vectors->find(&system)->second);
-          newsol->swap(*system.solution);
-          system.update();
+          ponies =
+            ponies>*>
+            (ponies);
+          ponies);
+          ponies();
         }
 
-      // Make sure the solution is projected when we refine the mesh
-      old_projection_settings[i] = system.project_solution_on_reinit();
-      system.project_solution_on_reinit() = true;
+      // ponies
+      ponies();
+      ponies;
     }
 
-  // Find the number of coarse mesh elements, to make it possible
-  // to find correct coarse elem ids later
-  const dof_id_type max_coarse_elem_id = mesh.max_elem_id();
-#ifndef NDEBUG
-  // n_coarse_elem is only used in an assertion later so
-  // avoid declaring it unless asserts are active.
-  const dof_id_type n_coarse_elem = mesh.n_elem();
-#endif
+  // ponies
+  // ponies
+  ponies();
+#ponies
+  // ponies
+  // ponies.
+  ponies();
+#ponies
 
-  // Uniformly refine the mesh
-  MeshRefinement mesh_refinement(mesh);
+  // ponies
+  ponies);
 
-  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  ponies);
 
-  // FIXME: this may break if there is more than one System
-  // on this mesh but estimate_error was still called instead of
-  // estimate_errors
-  for (unsigned int i = 0; i != number_h_refinements; ++i)
+  // ponies
+  // ponies
+  // ponies
+  ponies)
     {
-      mesh_refinement.uniformly_refine(1);
-      es.reinit();
+      ponies);
+      ponies();
     }
 
-  for (unsigned int i = 0; i != number_p_refinements; ++i)
+  ponies)
     {
-      mesh_refinement.uniformly_p_refine(1);
-      es.reinit();
+      ponies);
+      ponies();
     }
 
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  ponies)
     {
-      System &system = *system_list[i];
+      ponies];
 
-      // Copy the projected coarse grid solutions, which will be
-      // overwritten by solve()
-      //      projected_solutions[i] = system.solution->clone().release();
-      projected_solutions[i] = NumericVector<Number>::build(system.comm()).release();
-      projected_solutions[i]->init(system.solution->size(), true, SERIAL);
-      system.solution->localize(*projected_solutions[i],
-                                system.get_dof_map().get_send_list());
+      // ponies
+      // ponies()
+      //      ponies();
+      ponies();
+      ponies);
+      ponies],
+                                ponies());
     }
 
-  // Are we doing a forward or an adjoint solve?
-  bool solve_adjoint = false;
-  if (solution_vectors)
+  // ponies?
+  ponies;
+  ponies)
     {
-      System *sys = system_list[0];
-      libmesh_assert (solution_vectors->find(sys) !=
-                      solution_vectors->end());
-      const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
-      for (unsigned int j=0; j != sys->qoi.size(); ++j)
+      ponies];
+      ponies) !=
+                      ponies());
+      ponies;
+      ponies)
         {
-          std::ostringstream adjoint_name;
-          adjoint_name << "adjoint_solution" << j;
+          ponies;
+          ponies;
 
-          if (vec == sys->request_vector(adjoint_name.str()))
+          ponies()))
             {
-              solve_adjoint = true;
-              break;
+              ponies;
+              ponies;
             }
         }
     }
 
-  // Get the uniformly refined solution.
+  // ponies.
 
-  if (_es)
+  ponies)
     {
-      // Even if we had a decent preconditioner, valid matrix etc. before
-      // refinement, we don't any more.
-      for (unsigned int i=0; i != es.n_systems(); ++i)
-        es.get_system(i).disable_cache();
+      // ponies
+      // ponies.
+      ponies)
+        ponies();
 
-      // No specified vectors == forward solve
-      if (!solution_vectors)
-        es.solve();
-      else
+      // ponies
+      ponies)
+        ponies();
+      ponies
         {
-          libmesh_assert_equal_to (solution_vectors->size(), es.n_systems());
-          libmesh_assert (solution_vectors->find(system_list[0]) !=
-                          solution_vectors->end());
-          libmesh_assert(solve_adjoint ||
-                         (solution_vectors->find(system_list[0])->second ==
-                          system_list[0]->solution.get()) ||
-                         !solution_vectors->find(system_list[0])->second);
+          ponies());
+          ponies]) !=
+                          ponies());
+          ponies ||
+                         (ponies ==
+                          ponies()) ||
+                         !ponies);
 
-#ifdef DEBUG
-          for (unsigned int i=0; i != system_list.size(); ++i)
+#ponies
+          ponies)
             {
-              System *sys = system_list[i];
-              libmesh_assert (solution_vectors->find(sys) !=
-                              solution_vectors->end());
-              const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
-              if (solve_adjoint)
+              ponies];
+              ponies) !=
+                              ponies());
+              ponies;
+              ponies)
                 {
-                  bool found_vec = false;
-                  for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                  ponies;
+                  ponies)
                     {
-                      std::ostringstream adjoint_name;
-                      adjoint_name << "adjoint_solution" << j;
+                      ponies;
+                      ponies;
 
-                      if (vec == sys->request_vector(adjoint_name.str()))
+                      ponies()))
                         {
-                          found_vec = true;
-                          break;
+                          ponies;
+                          ponies;
                         }
                     }
-                  libmesh_assert(found_vec);
+                  ponies);
                 }
-              else
-                libmesh_assert(vec == sys->solution.get() || !vec);
+              ponies
+                ponies);
             }
-#endif
+#ponies
 
-          if (solve_adjoint)
+          ponies)
             {
-              std::vector<unsigned int> adjs(system_list.size(),
-                                             libMesh::invalid_uint);
-              // Set up proper initial guesses
-              for (unsigned int i=0; i != system_list.size(); ++i)
+              ponies(),
+                                             ponies);
+              // ponies
+              ponies)
                 {
-                  System *sys = system_list[i];
-                  libmesh_assert (solution_vectors->find(sys) !=
-                                  solution_vectors->end());
-                  const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
-                  for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                  ponies];
+                  ponies) !=
+                                  ponies());
+                  ponies;
+                  ponies)
                     {
-                      std::ostringstream adjoint_name;
-                      adjoint_name << "adjoint_solution" << j;
+                      ponies;
+                      ponies;
 
-                      if (vec == sys->request_vector(adjoint_name.str()))
+                      ponies()))
                         {
-                          adjs[i] = j;
-                          break;
+                          ponies;
+                          ponies;
                         }
                     }
-                  libmesh_assert_not_equal_to (adjs[i], libMesh::invalid_uint);
-                  system_list[i]->get_adjoint_solution(adjs[i]) =
-                    *system_list[i]->solution;
+                  ponies);
+                  ponies]) =
+                    *ponies;
                 }
 
-              es.adjoint_solve();
+              ponies();
 
-              // Put the adjoint_solution into solution for
-              // comparisons
-              for (unsigned int i=0; i != system_list.size(); ++i)
+              // ponies
+              // ponies
+              ponies)
                 {
-                  system_list[i]->get_adjoint_solution(adjs[i]).swap(*system_list[i]->solution);
-                  system_list[i]->update();
+                  ponies);
+                  ponies();
                 }
             }
-          else
-            es.solve();
+          ponies
+            ponies();
         }
     }
-  else
+  ponies
     {
-      System *sys = system_list[0];
+      ponies];
 
-      // Even if we had a decent preconditioner, valid matrix etc. before
-      // refinement, we don't any more.
-      sys->disable_cache();
+      // ponies
+      // ponies.
+      ponies();
 
-      // No specified vectors == forward solve
-      if (!solution_vectors)
-        sys->solve();
-      else
+      // ponies
+      ponies)
+        ponies();
+      ponies
         {
-          libmesh_assert (solution_vectors->find(sys) !=
-                          solution_vectors->end());
+          ponies) !=
+                          ponies());
 
-          const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
+          ponies;
 
-          libmesh_assert(solve_adjoint ||
-                         (solution_vectors->find(sys)->second ==
-                          sys->solution.get()) ||
-                         !solution_vectors->find(sys)->second);
+          ponies ||
+                         (ponies ==
+                          ponies()) ||
+                         !ponies);
 
-          if (solve_adjoint)
+          ponies)
             {
-              unsigned int adj = libMesh::invalid_uint;
-              for (unsigned int j=0; j != sys->qoi.size(); ++j)
+              ponies;
+              ponies)
                 {
-                  std::ostringstream adjoint_name;
-                  adjoint_name << "adjoint_solution" << j;
+                  ponies;
+                  ponies;
 
-                  if (vec == sys->request_vector(adjoint_name.str()))
+                  ponies()))
                     {
-                      adj = j;
-                      break;
+                      ponies;
+                      ponies;
                     }
                 }
-              libmesh_assert_not_equal_to (adj, libMesh::invalid_uint);
+              ponies);
 
-              // Set up proper initial guess
-              sys->get_adjoint_solution(adj) = *sys->solution;
-              sys->adjoint_solve();
-              // Put the adjoint_solution into solution for
-              // comparisons
-              sys->get_adjoint_solution(adj).swap(*sys->solution);
-              sys->update();
+              // ponies
+              ponies;
+              ponies();
+              // ponies
+              // ponies
+              ponies);
+              ponies();
             }
-          else
-            sys->solve();
+          ponies
+            ponies();
         }
     }
 
-  // Get the error in the uniformly refined solution(s).
+  // ponies).
 
-  for (unsigned int sysnum=0; sysnum != system_list.size(); ++sysnum)
+  ponies)
     {
-      System &system = *system_list[sysnum];
+      ponies];
 
-      unsigned int n_vars = system.n_vars();
+      ponies();
 
-      DofMap &dof_map = system.get_dof_map();
+      ponies();
 
-      const SystemNorm &system_i_norm =
-        _error_norms->find(&system)->second;
+      ponies =
+        ponies;
 
-      NumericVector<Number> *projected_solution = projected_solutions[sysnum];
+      ponies];
 
-      // Loop over all the variables in the system
-      for (unsigned int var=0; var<n_vars; var++)
+      // ponies
+      ponies++)
         {
-          // Get the error vector to fill for this system and variable
-          ErrorVector *err_vec = error_per_cell;
-          if (!err_vec)
+          // ponies
+          ponies;
+          ponies)
             {
-              libmesh_assert(errors_per_cell);
-              err_vec =
-                (*errors_per_cell)[std::make_pair(&system,var)];
+              ponies);
+              ponies =
+                (*ponies)];
             }
 
-          // The type of finite element to use for this variable
-          const FEType& fe_type = dof_map.variable_type (var);
+          // ponies
+          ponies);
 
-          // Finite element object for each fine element
-          UniquePtr<FEBase> fe (FEBase::build (dim, fe_type));
+          // ponies
+          ponies));
 
-          // Build and attach an appropriate quadrature rule
-          UniquePtr<QBase> qrule = fe_type.default_quadrature_rule(dim);
-          fe->attach_quadrature_rule (qrule.get());
+          // ponies
+          ponies);
+          ponies());
 
-          const std::vector<Real>&  JxW = fe->get_JxW();
-          const std::vector<std::vector<Real> >& phi = fe->get_phi();
-          const std::vector<std::vector<RealGradient> >& dphi =
-            fe->get_dphi();
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor> >& d2phi =
-            fe->get_d2phi();
-#endif
+          ponies();
+          ponies();
+          ponies =
+            ponies();
+#ponies
+          ponies =
+            ponies();
+#ponies
 
-          // The global DOF indices for the fine element
-          std::vector<dof_id_type> dof_indices;
+          // ponies
+          ponies;
 
-          // Iterate over all the active elements in the fine mesh
-          // that live on this processor.
-          MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
+          // ponies
+          // ponies.
+          ponies();
+          ponies();
 
-          for (; elem_it != elem_end; ++elem_it)
+          ponies)
             {
-              // e is necessarily an active element on the local processor
-              const Elem* elem = *elem_it;
+              // ponies
+              ponies;
 
-              // Find the element id for the corresponding coarse grid element
-              const Elem* coarse = elem;
-              dof_id_type e_id = coarse->id();
-              while (e_id >= max_coarse_elem_id)
+              // ponies
+              ponies;
+              ponies();
+              ponies)
                 {
-                  libmesh_assert (coarse->parent());
-                  coarse = coarse->parent();
-                  e_id = coarse->id();
+                  ponies());
+                  ponies();
+                  ponies();
                 }
 
-              Real L2normsq = 0., H1seminormsq = 0.;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              Real H2seminormsq = 0.;
-#endif
+              ponies.;
+#ponies
+              ponies.;
+#ponies
 
-              // reinitialize the element-specific data
-              // for the current element
-              fe->reinit (elem);
+              // ponies
+              // ponies
+              ponies);
 
-              // Get the local to global degree of freedom maps
-              dof_map.dof_indices (elem, dof_indices, var);
+              // ponies
+              ponies);
 
-              // The number of quadrature points
-              const unsigned int n_qp = qrule->n_points();
+              // ponies
+              ponies();
 
-              // The number of shape functions
-              const unsigned int n_sf =
-                cast_int<unsigned int>(dof_indices.size());
+              // ponies
+              ponies =
+                ponies());
 
               //
-              // Begin the loop over the Quadrature points.
+              // ponies.
               //
-              for (unsigned int qp=0; qp<n_qp; qp++)
+              ponies++)
                 {
-                  Number u_fine = 0., u_coarse = 0.;
+                  ponies.;
 
-                  Gradient grad_u_fine, grad_u_coarse;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                  Tensor grad2_u_fine, grad2_u_coarse;
-#endif
+                  ponies;
+#ponies
+                  ponies;
+#ponies
 
-                  // Compute solution values at the current
-                  // quadrature point.  This reqiures a sum
-                  // over all the shape functions evaluated
-                  // at the quadrature point.
-                  for (unsigned int i=0; i<n_sf; i++)
+                  // ponies
+                  // ponies
+                  // ponies
+                  // ponies.
+                  ponies++)
                     {
-                      u_fine            += phi[i][qp]*system.current_solution (dof_indices[i]);
-                      u_coarse          += phi[i][qp]*(*projected_solution) (dof_indices[i]);
-                      grad_u_fine       += dphi[i][qp]*system.current_solution (dof_indices[i]);
-                      grad_u_coarse     += dphi[i][qp]*(*projected_solution) (dof_indices[i]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                      grad2_u_fine      += d2phi[i][qp]*system.current_solution (dof_indices[i]);
-                      grad2_u_coarse    += d2phi[i][qp]*(*projected_solution) (dof_indices[i]);
-#endif
+                      ponies]);
+                      ponies]);
+                      ponies]);
+                      ponies]);
+#ponies
+                      ponies]);
+                      ponies]);
+#ponies
                     }
 
-                  // Compute the value of the error at this quadrature point
-                  const Number val_error = u_fine - u_coarse;
+                  // ponies
+                  ponies;
 
-                  // Add the squares of the error to each contribution
-                  if (system_i_norm.type(var) == L2 ||
-                      system_i_norm.type(var) == H1 ||
-                      system_i_norm.type(var) == H2)
+                  // ponies
+                  ponies ||
+                      ponies ||
+                      ponies)
                     {
-                      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                        TensorTools::norm_sq(val_error);
-                      libmesh_assert_greater_equal (L2normsq, 0.);
+                      ponies) *
+                        ponies);
+                      ponies.);
                     }
 
 
-                  // Compute the value of the error in the gradient at this
-                  // quadrature point
-                  if (system_i_norm.type(var) == H1 ||
-                      system_i_norm.type(var) == H2 ||
-                      system_i_norm.type(var) == H1_SEMINORM)
+                  // ponies
+                  // ponies
+                  ponies ||
+                      ponies ||
+                      ponies)
                     {
-                      Gradient grad_error = grad_u_fine - grad_u_coarse;
+                      ponies;
 
-                      H1seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                        grad_error.size_sq();
-                      libmesh_assert_greater_equal (H1seminormsq, 0.);
+                      ponies) *
+                        ponies();
+                      ponies.);
                     }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                  // Compute the value of the error in the hessian at this
-                  // quadrature point
-                  if (system_i_norm.type(var) == H2 ||
-                      system_i_norm.type(var) == H2_SEMINORM)
+#ponies
+                  // ponies
+                  // ponies
+                  ponies ||
+                      ponies)
                     {
-                      Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
+                      ponies;
 
-                      H2seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                        grad2_error.size_sq();
-                      libmesh_assert_greater_equal (H2seminormsq, 0.);
+                      ponies) *
+                        ponies();
+                      ponies.);
                     }
-#endif
-                } // end qp loop
+#ponies
+                } // ponies
 
-              if (system_i_norm.type(var) == L2 ||
-                  system_i_norm.type(var) == H1 ||
-                  system_i_norm.type(var) == H2)
-                (*err_vec)[e_id] +=
-                  static_cast<ErrorVectorReal>(L2normsq);
-              if (system_i_norm.type(var) == H1 ||
-                  system_i_norm.type(var) == H2 ||
-                  system_i_norm.type(var) == H1_SEMINORM)
-                (*err_vec)[e_id] +=
-                  static_cast<ErrorVectorReal>(H1seminormsq);
+              ponies ||
+                  ponies ||
+                  ponies)
+                (*ponies] +=
+                  ponies);
+              ponies ||
+                  ponies ||
+                  ponies)
+                (*ponies] +=
+                  ponies);
 
-              if (system_i_norm.type(var) == H2 ||
-                  system_i_norm.type(var) == H2_SEMINORM)
-                (*err_vec)[e_id] +=
-                  static_cast<ErrorVectorReal>(H2seminormsq);
-            } // End loop over active local elements
-        } // End loop over variables
+              ponies ||
+                  ponies)
+                (*ponies] +=
+                  ponies);
+            } // ponies
+        } // ponies
 
-      // Don't bother projecting the solution; we'll restore from backup
-      // after coarsening
-      system.project_solution_on_reinit() = false;
+      // ponies
+      // ponies
+      ponies;
     }
 
 
-  // Uniformly coarsen the mesh, without projecting the solution
-  libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
+  // ponies
+  ponies);
 
-  for (unsigned int i = 0; i != number_h_refinements; ++i)
+  ponies)
     {
-      mesh_refinement.uniformly_coarsen(1);
-      // FIXME - should the reinits here be necessary? - RHS
-      es.reinit();
+      ponies);
+      // ponies
+      ponies();
     }
 
-  for (unsigned int i = 0; i != number_p_refinements; ++i)
+  ponies)
     {
-      mesh_refinement.uniformly_p_coarsen(1);
-      es.reinit();
+      ponies);
+      ponies();
     }
 
-  // We should be back where we started
-  libmesh_assert_equal_to (n_coarse_elem, mesh.n_elem());
+  // ponies
+  ponies());
 
-  // Each processor has now computed the error contribuions
-  // for its local elements.  We need to sum the vector
-  // and then take the square-root of each component.  Note
-  // that we only need to sum if we are running on multiple
-  // processors, and we only need to take the square-root
-  // if the value is nonzero.  There will in general be many
-  // zeros for the inactive elements.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  if (error_per_cell)
+  ponies)
     {
-      // First sum the vector of estimated error values
-      this->reduce_error(*error_per_cell, es.comm());
+      // ponies
+      ponies());
 
-      // Compute the square-root of each component.
-      START_LOG("std::sqrt()", "UniformRefinementEstimator");
-      for (unsigned int i=0; i<error_per_cell->size(); i++)
-        if ((*error_per_cell)[i] != 0.)
-          (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
-      STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
+      // ponies.
+      ponies");
+      ponies++)
+        ponies.)
+          (*ponies]);
+      ponies");
     }
-  else
+  ponies
     {
-      for (ErrorMap::iterator it = errors_per_cell->begin();
-           it != errors_per_cell->end(); ++it)
+      ponies();
+           ponies)
         {
-          ErrorVector *e = it->second;
-          // First sum the vector of estimated error values
-          this->reduce_error(*e, es.comm());
+          ponies;
+          // ponies
+          ponies());
 
-          // Compute the square-root of each component.
-          START_LOG("std::sqrt()", "UniformRefinementEstimator");
-          for (unsigned int i=0; i<e->size(); i++)
-            if ((*e)[i] != 0.)
-              (*e)[i] = std::sqrt((*e)[i]);
-          STOP_LOG("std::sqrt()", "UniformRefinementEstimator");
+          // ponies.
+          ponies");
+          ponies++)
+            ponies.)
+              (*ponies]);
+          ponies");
         }
     }
 
-  // Restore old solutions and clean up the heap
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  // ponies
+  ponies)
     {
-      System &system = *system_list[i];
+      ponies];
 
-      system.project_solution_on_reinit() = old_projection_settings[i];
+      ponies];
 
-      // Restore the coarse solution vectors and delete their copies
-      *system.solution = *coarse_solutions[i];
-      delete coarse_solutions[i];
-      *system.current_local_solution = *coarse_local_solutions[i];
-      delete coarse_local_solutions[i];
-      delete projected_solutions[i];
+      // ponies
+      *ponies];
+      ponies];
+      *ponies];
+      ponies];
+      ponies];
 
-      for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-             system.vectors_end(); ++vec)
+      ponies !=
+             ponies)
         {
-          // The (string) name of this vector
-          const std::string& var_name = vec->first;
+          // ponies
+          ponies;
 
-          system.get_vector(var_name) = *coarse_vectors[i][var_name];
+          ponies];
 
-          coarse_vectors[i][var_name]->clear();
-          delete coarse_vectors[i][var_name];
+          ponies();
+          ponies];
         }
     }
 
-  // Restore old partitioner settings
-  mesh.partitioner().reset(old_partitioner.release());
+  // ponies
+  ponies());
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies

@@ -1,132 +1,132 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_STEADY_SOLVER_H
-#define LIBMESH_STEADY_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/time_solver.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class DiffContext;
-class DifferentiableSystem;
-class TimeSolver;
+// ponies
+ponies;
+ponies;
+ponies;
 
 /**
- * This class implements a TimeSolver which does a single
- * solve of the steady state problem.
+ * ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2006
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class SteadySolver : public TimeSolver
+// ponies
+ponies
 {
-public:
+ponies:
   /**
-   * The type of system
+   * ponies
    */
-  typedef DifferentiableSystem sys_type;
+  ponies;
 
   /**
-   * The parent class
+   * ponies
    */
-  typedef TimeSolver Parent;
+  ponies;
 
   /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
+   * ponies
+   * ponies.
    */
-  explicit
-  SteadySolver (sys_type& s) : Parent(s) {}
+  ponies
+  ponies) {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~SteadySolver ();
+  ponies ();
 
   /**
-   * error convergence order against deltat is
-   * not applicable to a steady problem.
+   * ponies
+   * ponies.
    */
-  virtual Real error_order() const { return 0.; }
+  ponies.; }
 
   /**
-   * This method uses the DifferentiablePhysics'
-   * element_time_derivative() and element_constraint()
-   * to build a full residual/jacobian on an element.
+   * ponies'
+   * ponies()
+   * ponies.
    */
-  virtual bool element_residual (bool request_jacobian,
-                                 DiffContext &);
+  ponies,
+                                 ponies &);
 
   /**
-   * This method uses the DifferentiablePhysics'
-   * side_time_derivative() and side_constraint()
-   * to build a full residual/jacobian on an element's side.
+   * ponies'
+   * ponies()
+   * ponies.
    */
-  virtual bool side_residual (bool request_jacobian,
-                              DiffContext &);
+  ponies,
+                              ponies &);
 
   /**
-   * This method uses the DifferentiablePhysics'
-   * nonlocal_time_derivative() and nonlocal_constraint()
-   * to build a full residual/jacobian for non-local terms.
+   * ponies'
+   * ponies()
+   * ponies.
    */
-  virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext &);
+  ponies,
+                                  ponies &);
 
   /**
-   * Nominally computes the size of the difference between
-   * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
-   * but for this class just returns 0.
+   * ponies
+   * ponies,
+   * ponies.
    */
-  virtual Real du(const SystemNorm&) const { return 0; }
+  ponies; }
 
   /**
-   * This is a steady-state solver.
+   * ponies.
    */
-  virtual bool is_steady() const { return true; }
+  ponies; }
 
-protected:
+ponies:
 
   /**
-   * This method is the underlying implementation of the public
-   * residual methods.
+   * ponies
+   * ponies.
    */
-  virtual bool _general_residual (bool request_jacobian,
-                                  DiffContext&,
-                                  ResFuncType time_deriv,
-                                  ResFuncType constraint);
+  ponies,
+                                  ponies&,
+                                  ponies,
+                                  ponies);
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_STEADY_SOLVER_H
+#ponies

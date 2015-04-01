@@ -1,202 +1,202 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
-template <>
-Real FE<1,MONOMIAL>::shape(const ElemType,
-                           const Order libmesh_dbg_var(order),
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies),
+                           ponies,
+                           ponies)
 {
-  const Real xi = p(0);
+  ponies);
 
-  libmesh_assert_less_equal (i, static_cast<unsigned int>(order));
+  ponies));
 
-  // monomials. since they are hierarchic we only need one case block.
-  switch (i)
+  // ponies.
+  ponies)
     {
-    case 0:
-      return 1.;
+    ponies:
+      ponies.;
 
-    case 1:
-      return xi;
+    ponies:
+      ponies;
 
-    case 2:
-      return xi*xi;
+    ponies:
+      ponies;
 
-    case 3:
-      return xi*xi*xi;
+    ponies:
+      ponies;
 
-    case 4:
-      return xi*xi*xi*xi;
+    ponies:
+      ponies;
 
-    default:
-      Real val = 1.;
-      for (unsigned int index = 0; index != i; ++index)
-        val *= xi;
-      return val;
+    ponies:
+      ponies.;
+      ponies)
+        ponies;
+      ponies;
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,MONOMIAL>::shape(const Elem* elem,
-                           const Order order,
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  return FE<1,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  ponies);
 }
 
 
 
-template <>
-Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
-                                 const Order libmesh_dbg_var(order),
-                                 const unsigned int i,
-                                 const unsigned int libmesh_dbg_var(j),
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies),
+                                 ponies,
+                                 ponies),
+                                 ponies)
 {
-  // only d()/dxi in 1D!
+  // ponies!
 
-  libmesh_assert_equal_to (j, 0);
+  ponies);
 
-  const Real xi = p(0);
+  ponies);
 
-  libmesh_assert_less_equal (i, static_cast<unsigned int>(order));
+  ponies));
 
-  // monomials. since they are hierarchic we only need one case block.
-  switch (i)
+  // ponies.
+  ponies)
     {
-    case 0:
-      return 0.;
+    ponies:
+      ponies.;
 
-    case 1:
-      return 1.;
+    ponies:
+      ponies.;
 
-    case 2:
-      return 2.*xi;
+    ponies:
+      ponies;
 
-    case 3:
-      return 3.*xi*xi;
+    ponies:
+      ponies;
 
-    case 4:
-      return 4.*xi*xi*xi;
+    ponies:
+      ponies;
 
-    default:
-      Real val = i;
-      for (unsigned int index = 1; index != i; ++index)
-        val *= xi;
-      return val;
+    ponies:
+      ponies;
+      ponies)
+        ponies;
+      ponies;
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,MONOMIAL>::shape_deriv(const Elem* elem,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  return FE<1,MONOMIAL>::shape_deriv(elem->type(),
-                                     static_cast<Order>(order + elem->p_level()), i, j, p);
+  ponies(),
+                                     ponies);
 }
 
 
 
-template <>
-Real FE<1,MONOMIAL>::shape_second_deriv(const ElemType,
-                                        const Order libmesh_dbg_var(order),
-                                        const unsigned int i,
-                                        const unsigned int libmesh_dbg_var(j),
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies),
+                                        ponies,
+                                        ponies),
+                                        ponies)
 {
-  // only d()/dxi in 1D!
+  // ponies!
 
-  libmesh_assert_equal_to (j, 0);
+  ponies);
 
-  const Real xi = p(0);
+  ponies);
 
-  libmesh_assert_less_equal (i, static_cast<unsigned int>(order));
+  ponies));
 
-  switch (i)
+  ponies)
     {
-    case 0:
-    case 1:
-      return 0.;
+    ponies:
+    ponies:
+      ponies.;
 
-    case 2:
-      return 2.;
+    ponies:
+      ponies.;
 
-    case 3:
-      return 6.*xi;
+    ponies:
+      ponies;
 
-    case 4:
-      return 12.*xi*xi;
+    ponies:
+      ponies;
 
-    default:
-      Real val = 2.;
-      for (unsigned int index = 2; index != i; ++index)
-        val *= (index+1) * xi;
-      return val;
+    ponies:
+      ponies.;
+      ponies)
+        ponies;
+      ponies;
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,MONOMIAL>::shape_second_deriv(const Elem* elem,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  return FE<1,MONOMIAL>::shape_second_deriv(elem->type(),
-                                            static_cast<Order>(order + elem->p_level()), i, j, p);
+  ponies(),
+                                            ponies);
 }
 
-} // namespace libMesh
+} // ponies

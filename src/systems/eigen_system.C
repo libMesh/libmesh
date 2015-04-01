@@ -1,277 +1,277 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-// Currently, the EigenSystem should only be available
-// if SLEPc support is enabled.
-#if defined(LIBMESH_HAVE_SLEPC)
+// ponies
+// ponies.
+#ponies)
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/eigen_system.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/sparse_matrix.h"
-#include "libmesh/eigen_solver.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/mesh_base.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// EigenSystem implementation
-EigenSystem::EigenSystem (EquationSystems& es,
-                          const std::string& name_in,
-                          const unsigned int number_in
+// ponies
+ponies,
+                          ponies,
+                          ponies
                           ) :
-  Parent           (es, name_in, number_in),
-  matrix_A         (NULL),
-  matrix_B         (NULL),
-  eigen_solver     (EigenSolver<Number>::build(es.comm())),
-  _n_converged_eigenpairs (0),
-  _n_iterations           (0),
-  _is_generalized_eigenproblem (false),
-  _eigen_problem_type (NHEP)
+  ponies),
+  ponies),
+  ponies),
+  ponies())),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-EigenSystem::~EigenSystem ()
+ponies ()
 {
-  // clear data
-  this->clear();
+  // ponies
+  ponies();
 }
 
 
 
-void EigenSystem::clear ()
+ponies ()
 {
-  // Clear the parent data
-  Parent::clear();
+  // ponies
+  ponies();
 
-  // delete the matricies
-  delete matrix_A;
-  delete matrix_B;
+  // ponies
+  ponies;
+  ponies;
 
-  // NULL-out the matricies.
-  matrix_A = NULL;
-  matrix_B = NULL;
+  // ponies.
+  ponies;
+  ponies;
 
-  // clear the solver
-  eigen_solver->clear();
+  // ponies
+  ponies();
 
 }
 
 
-void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
+ponies)
 {
-  _eigen_problem_type = ept;
+  ponies;
 
-  eigen_solver->set_eigenproblem_type(ept);
+  ponies);
 
-  // libMesh::out << "The Problem type is set to be: " << std::endl;
+  // ponies;
 
-  switch (_eigen_problem_type)
+  ponies)
     {
-    case HEP:
-      // libMesh::out << "Hermitian" << std::endl;
-      break;
+    ponies:
+      // ponies;
+      ponies;
 
-    case NHEP:
-      // libMesh::out << "Non-Hermitian" << std::endl;
-      break;
+    ponies:
+      // ponies;
+      ponies;
 
-    case GHEP:
-      // libMesh::out << "Gerneralized Hermitian" << std::endl;
-      break;
+    ponies:
+      // ponies;
+      ponies;
 
-    case GNHEP:
-      // libMesh::out << "Generalized Non-Hermitian" << std::endl;
-      break;
+    ponies:
+      // ponies;
+      ponies;
 
-    case GHIEP:
-      // libMesh::out << "Generalized indefinite Hermitian" << std::endl;
-      break;
+    ponies:
+      // ponies;
+      ponies;
 
-    default:
-      // libMesh::out << "not properly specified" << std::endl;
-      libmesh_error_msg("Unrecognized _eigen_problem_type = " << _eigen_problem_type);
+    ponies:
+      // ponies;
+      ponies);
     }
 }
 
 
 
 
-void EigenSystem::init_data ()
+ponies ()
 {
-  // initialize parent data
-  Parent::init_data();
+  // ponies
+  ponies();
 
-  // define the type of eigenproblem
-  if (_eigen_problem_type == GNHEP ||
-      _eigen_problem_type == GHEP  ||
-      _eigen_problem_type == GHIEP)
-    _is_generalized_eigenproblem = true;
+  // ponies
+  ponies ||
+      ponies  ||
+      ponies)
+    ponies;
 
-  // build the system matrix
-  matrix_A = SparseMatrix<Number>::build(this->comm()).release();
+  // ponies
+  ponies();
 
-  this->init_matrices();
+  ponies();
 }
 
 
 
-void EigenSystem::init_matrices ()
+ponies ()
 {
-  DofMap& dof_map = this->get_dof_map();
+  ponies();
 
-  dof_map.attach_matrix(*matrix_A);
+  ponies);
 
-  // build matrix_B only in case of a
-  // generalized problem
-  if (_is_generalized_eigenproblem)
+  // ponies
+  // ponies
+  ponies)
     {
-      matrix_B = SparseMatrix<Number>::build(this->comm()).release();
-      dof_map.attach_matrix(*matrix_B);
+      ponies();
+      ponies);
     }
 
-  dof_map.compute_sparsity(this->get_mesh());
+  ponies());
 
-  // initialize and zero system matrix
-  matrix_A->init();
-  matrix_A->zero();
+  // ponies
+  ponies();
+  ponies();
 
-  // eventually initialize and zero system matrix_B
-  if (_is_generalized_eigenproblem)
+  // ponies
+  ponies)
     {
-      matrix_B->init();
-      matrix_B->zero();
-    }
-}
-
-
-
-void EigenSystem::reinit ()
-{
-  // initialize parent data
-  Parent::reinit();
-
-  // Clear the matrices
-  matrix_A->clear();
-
-  if (_is_generalized_eigenproblem)
-    matrix_B->clear();
-
-  DofMap& dof_map = this->get_dof_map();
-
-  // Clear the sparsity pattern
-  dof_map.clear_sparsity();
-
-  // Compute the sparsity pattern for the current
-  // mesh and DOF distribution.  This also updates
-  // both matrices, \p DofMap now knows them
-  dof_map.compute_sparsity(this->get_mesh());
-
-  matrix_A->init();
-  matrix_A->zero();
-
-  if (_is_generalized_eigenproblem)
-    {
-      matrix_B->init();
-      matrix_B->zero();
+      ponies();
+      ponies();
     }
 }
 
 
 
-void EigenSystem::solve ()
+ponies ()
+{
+  // ponies
+  ponies();
+
+  // ponies
+  ponies();
+
+  ponies)
+    ponies();
+
+  ponies();
+
+  // ponies
+  ponies();
+
+  // ponies
+  // ponies
+  // ponies
+  ponies());
+
+  ponies();
+  ponies();
+
+  ponies)
+    {
+      ponies();
+      ponies();
+    }
+}
+
+
+
+ponies ()
 {
 
-  // A reference to the EquationSystems
-  EquationSystems& es = this->get_equation_systems();
+  // ponies
+  ponies();
 
-  // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+  // ponies
+  ponies"));
+  ponies"));
 
-  if (this->assemble_before_solve)
-    // Assemble the linear system
-    this->assemble ();
+  ponies)
+    // ponies
+    ponies ();
 
-  // Get the tolerance for the solver and the maximum
-  // number of iterations. Here, we simply adopt the linear solver
-  // specific parameters.
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
+  // ponies
+  // ponies
+  // ponies.
+  ponies            =
+    ponies");
 
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+  ponies =
+    ponies");
 
-  const unsigned int nev    =
-    es.parameters.get<unsigned int>("eigenpairs");
+  ponies    =
+    ponies");
 
-  const unsigned int ncv    =
-    es.parameters.get<unsigned int>("basis vectors");
+  ponies    =
+    ponies");
 
-  std::pair<unsigned int, unsigned int> solve_data;
+  ponies;
 
-  // call the solver depending on the type of eigenproblem
-  if (_is_generalized_eigenproblem)
+  // ponies
+  ponies)
     {
-      //in case of a generalized eigenproblem
-      solve_data = eigen_solver->solve_generalized (*matrix_A,*matrix_B, nev, ncv, tol, maxits);
+      //ponies
+      ponies);
 
     }
 
-  else
+  ponies
     {
-      libmesh_assert (!matrix_B);
+      ponies);
 
-      //in case of a standard eigenproblem
-      solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);
+      //ponies
+      ponies);
 
     }
 
-  this->_n_converged_eigenpairs = solve_data.first;
-  this->_n_iterations           = solve_data.second;
+  ponies;
+  ponies;
 
 }
 
 
-void EigenSystem::assemble ()
+ponies ()
 {
 
-  // Assemble the linear system
-  Parent::assemble ();
+  // ponies
+  ponies ();
 
 }
 
 
-std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i)
+ponies)
 {
-  // call the eigen_solver get_eigenpair method
-  return eigen_solver->get_eigenpair (i, *solution);
+  // ponies
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_HAVE_SLEPC
+#ponies

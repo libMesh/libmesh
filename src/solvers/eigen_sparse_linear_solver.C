@@ -1,259 +1,259 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#include "libmesh/libmesh_common.h"
-
-#ifdef LIBMESH_HAVE_EIGEN
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
 
-// Local Includes
-#include "libmesh/eigen_sparse_linear_solver.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/string_to_enum.h"
+#ponies"
 
-namespace libMesh
+#ponies
+
+
+// ponies
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-void EigenSparseLinearSolver<T>::clear ()
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies ()
 {
-  if (this->initialized())
+  ponies())
     {
-      this->_is_initialized = false;
+      ponies;
 
-      this->_solver_type         = BICGSTAB;
-      this->_preconditioner_type = ILU_PRECOND;
+      ponies;
+      ponies;
     }
 }
 
 
 
-template <typename T>
-void EigenSparseLinearSolver<T>::init (const char* /*name*/)
+ponies>
+ponies*/)
 {
-  // Initialize the data structures if not done so already.
-  if (!this->initialized())
+  // ponies.
+  ponies())
     {
-      this->_is_initialized = true;
+      ponies;
     }
 }
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
-                                   NumericVector<T> &solution_in,
-                                   NumericVector<T> &rhs_in,
-                                   const double tol,
-                                   const unsigned int m_its)
+ponies>
+ponies>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies)
 {
-  START_LOG("solve()", "EigenSparseLinearSolver");
-  this->init ();
+  ponies");
+  ponies ();
 
-  // Make sure the data passed in are really Eigen types
-  EigenSparseMatrix<T>& matrix   = cast_ref<EigenSparseMatrix<T>&>(matrix_in);
-  EigenSparseVector<T>& solution = cast_ref<EigenSparseVector<T>&>(solution_in);
-  EigenSparseVector<T>& rhs      = cast_ref<EigenSparseVector<T>&>(rhs_in);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
 
-  // Close the matrix and vectors in case this wasn't already done.
-  matrix.close();
-  solution.close();
-  rhs.close();
+  // ponies.
+  ponies();
+  ponies();
+  ponies();
 
-  std::pair<unsigned int, Real> retval(0,0.);
+  ponies.);
 
-  // Solve the linear system
-  switch (this->_solver_type)
+  // ponies
+  ponies)
     {
-      // Conjugate-Gradient
-    case CG:
+      // ponies
+    ponies:
       {
-        Eigen::ConjugateGradient<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(m_its);
-        solver.setTolerance(tol);
-        solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
-        libMesh::out << "estimated error: " << solver.error() << std::endl;
-        retval = std::make_pair(solver.iterations(), solver.error());
-        break;
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies;
+        ponies;
+        ponies());
+        ponies;
       }
 
-      // Bi-Conjugate Gradient Stabilized
-    case BICGSTAB:
+      // ponies
+    ponies:
       {
-        Eigen::BiCGSTAB<EigenSM> solver (matrix._mat);
-        solver.setMaxIterations(m_its);
-        solver.setTolerance(tol);
-        solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
-        libMesh::out << "estimated error: " << solver.error() << std::endl;
-        retval = std::make_pair(solver.iterations(), solver.error());
-        break;
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies;
+        ponies;
+        ponies());
+        ponies;
       }
 
-      //   // Generalized Minimum Residual
-      // case GMRES:
+      //   // ponies
+      // ponies:
       //   {
-      // libmesh_not_implemented();
-      // break;
+      // ponies();
+      // ponies;
       //   }
 
-      // Unknown solver, use BICGSTAB
-    default:
+      // ponies
+    ponies:
       {
-        libMesh::err << "ERROR:  Unsupported Eigen Solver: "
-                     << Utility::enum_to_string(this->_solver_type) << std::endl
-                     << "Continuing with BICGSTAB" << std::endl;
+        ponies: "
+                     << ponies
+                     << "ponies;
 
-        this->_solver_type = BICGSTAB;
+        ponies;
 
-        STOP_LOG("solve()", "EigenSparseLinearSolver");
+        ponies");
 
-        return this->solve (matrix,
-                            solution,
-                            rhs,
-                            tol,
-                            m_its);
+        ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies);
       }
     }
 
-  STOP_LOG("solve()", "EigenSparseLinearSolver");
-  return retval;
+  ponies");
+  ponies;
 }
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
-                                           NumericVector<T> &solution_in,
-                                           NumericVector<T> &rhs_in,
-                                           const double tol,
-                                           const unsigned int m_its)
+ponies>
+ponies>
+ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies)
 {
 
-  START_LOG("adjoint_solve()", "EigenSparseLinearSolver");
+  ponies");
 
-  libmesh_experimental();
-  EigenSparseMatrix<T> mat_trans(this->comm());
-  matrix_in.get_transpose(mat_trans);
+  ponies();
+  ponies());
+  ponies);
 
-  std::pair<unsigned int, Real> retval = this->solve (mat_trans,
-                                                      solution_in,
-                                                      rhs_in,
-                                                      tol,
-                                                      m_its);
+  ponies,
+                                                      ponies,
+                                                      ponies,
+                                                      ponies,
+                                                      ponies);
 
-  STOP_LOG("adjoint_solve()", "EigenSparseLinearSolver");
+  ponies");
 
-  return retval;
+  ponies;
 }
 
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-                                   NumericVector<T>& /*solution_in*/,
-                                   NumericVector<T>& /*rhs_in*/,
-                                   const double /*tol*/,
-                                   const unsigned int /*m_its*/)
+ponies>
+ponies>
+ponies*/,
+                                   ponies*/,
+                                   ponies*/,
+                                   ponies*/,
+                                   ponies*/)
 {
-  libmesh_not_implemented();
-  return std::make_pair(0,0.0);
+  ponies();
+  ponies);
 }
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-                                   const SparseMatrix<T>& /*precond_matrix*/,
-                                   NumericVector<T>& /*solution_in*/,
-                                   NumericVector<T>& /*rhs_in*/,
-                                   const double /*tol*/,
-                                   const unsigned int /*m_its*/)
+ponies>
+ponies>
+ponies*/,
+                                   ponies*/,
+                                   ponies*/,
+                                   ponies*/,
+                                   ponies*/,
+                                   ponies*/)
 {
-  libmesh_not_implemented();
-  return std::make_pair(0,0.0);
+  ponies();
+  ponies);
 }
 
 
 
-template <typename T>
-void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
+ponies>
+ponies ()
 {
-  libmesh_not_implemented();
+  ponies();
 
-  // switch (this->_preconditioner_type)
+  // ponies)
   //   {
-  //   case IDENTITY_PRECOND:
-  //     _precond_type = NULL; return;
+  //   ponies:
+  //     ponies;
 
-  //   case ILU_PRECOND:
-  //     _precond_type = ILUPrecond; return;
+  //   ponies:
+  //     ponies;
 
-  //   case JACOBI_PRECOND:
-  //     _precond_type = JacobiPrecond; return;
+  //   ponies:
+  //     ponies;
 
-  //   case SSOR_PRECOND:
-  //     _precond_type = SSORPrecond; return;
+  //   ponies:
+  //     ponies;
 
 
-  //   default:
-  //     libMesh::err << "ERROR:  Unsupported LASPACK Preconditioner: "
-  //     << this->_preconditioner_type << std::endl
-  //     << "Continuing with ILU"      << std::endl;
-  //     this->_preconditioner_type = ILU_PRECOND;
-  //     this->set_laspack_preconditioner_type();
+  //   ponies:
+  //     ponies: "
+  //     << ponies
+  //     << "ponies;
+  //     ponies;
+  //     ponies();
   //   }
 }
 
 
 
-template <typename T>
-void EigenSparseLinearSolver<T>::print_converged_reason() const
+ponies>
+ponies
 {
-  libMesh::out << "print_converged_reason() is currently only supported"
-               << "with Petsc 2.3.1 and later." << std::endl;
+  ponies"
+               << "ponies;
 }
 
 
 
-template <typename T>
-LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
+ponies>
+ponies
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class EigenSparseLinearSolver<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_EIGEN
+#ponies

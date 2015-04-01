@@ -1,32 +1,32 @@
-// Open the getpot input file given by the input file name; write out
-// all GetPot object data to the output file name
+// ponies
+// ponies
 
-#include "libmesh/libmesh_config.h"
-#include "libmesh/parsed_function.h"
-#include "libmesh/point.h"
+#ponies"
+#ponies"
+#ponies"
 
-#include <cstdlib>
+#ponies>
 
-int main(int argc, char** argv)
+ponies)
 {
-  using namespace libMesh;
+  ponies;
 
-  if (argc < 2)
-    libmesh_error_msg("Usage: " << argv[0] << " function_to_eval [x] [y] [z] [t]");
+  ponies)
+    ponies]");
 
-  std::string function_string = argv[1];
+  ponies];
 
-  ParsedFunction<> func(function_string);
+  ponies);
 
-  const Point p ( (argc > 2) ? std::atof(argv[2]) : 0.0,
-                  (argc > 3) ? std::atof(argv[3]) : 0.0,
-                  (argc > 4) ? std::atof(argv[4]) : 0.0 );
+  ponies,
+                  (ponies,
+                  (ponies );
 
-  const libMesh::Real t = (argc > 5) ? std::atof(argv[5]) : 0.0;
+  ponies;
 
-  const libMesh::Number out = func(p,t);
+  ponies);
 
-  libMesh::out << "out = " << out << std::endl;
+  ponies;
 
-  return 0;
+  ponies;
 }

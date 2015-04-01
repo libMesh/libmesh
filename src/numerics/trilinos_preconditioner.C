@@ -1,252 +1,252 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/libmesh_common.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ponies
 
-// C++ includes
+// ponies
 
-// Local Includes
-#include "libmesh/trilinos_preconditioner.h"
-#include "libmesh/trilinos_epetra_matrix.h"
-#include "libmesh/trilinos_epetra_vector.h"
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#include "Ifpack.h"
-#include "Ifpack_DiagPreconditioner.h"
-#include "Ifpack_AdditiveSchwarz.h"
-#include "Ifpack_ILU.h"
-#include "Ifpack_ILUT.h"
-#include "Ifpack_IC.h"
-#include "Ifpack_ICT.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_HAVE_ML
-#include "ml_MultiLevelPreconditioner.h"
-#endif
+#ponies
+#ponies"
+#ponies
 
-namespace libMesh
+ponies
 {
 
-template <typename T>
-void TrilinosPreconditioner<T>::apply(const NumericVector<T> & /* x */,
-                                      NumericVector<T> & /* y */ )
+ponies>
+ponies */,
+                                      ponies */ )
 {
 }
 
 
 
 
-template <typename T>
-void TrilinosPreconditioner<T>::init ()
+ponies>
+ponies ()
 {
-  if(!this->_matrix)
-    libmesh_error_msg("ERROR: No matrix set for PetscPreconditioner, but init() called");
+  ponies)
+    ponies");
 
-  // Clear the preconditioner in case it has been created in the past
-  if (!this->_is_initialized)
+  // ponies
+  ponies)
     {
-      EpetraMatrix<T> * matrix = cast_ptr<EpetraMatrix<T>*, SparseMatrix<T> >(this->_matrix);
-      _mat = matrix->mat();
+      ponies);
+      ponies();
     }
 
-  set_preconditioner_type(this->_preconditioner_type);
+  ponies);
 
-  this->_is_initialized = true;
+  ponies;
 }
 
 
-template <typename T>
-void
-TrilinosPreconditioner<T>::set_params(Teuchos::ParameterList & list)
+ponies>
+ponies
+ponies)
 {
-  _param_list = list;
+  ponies;
 }
 
 
-template <typename T>
-void
-TrilinosPreconditioner<T>::compute()
+ponies>
+ponies
+ponies()
 {
-  Ifpack_Preconditioner * ifpack = NULL;
-#ifdef LIBMESH_HAVE_ML
-  ML_Epetra::MultiLevelPreconditioner * ml = NULL;
-#endif
+  ponies;
+#ponies
+  ponies;
+#ponies
 
-  switch (this->_preconditioner_type)
+  ponies)
     {
-      // IFPACK preconditioners
-    case ILU_PRECOND:
-    case SOR_PRECOND:
-      ifpack = dynamic_cast<Ifpack_Preconditioner *>(_prec);
-      ifpack->Compute();
-      break;
+      // ponies
+    ponies:
+    ponies:
+      ponies);
+      ponies();
+      ponies;
 
-#ifdef LIBMESH_HAVE_ML
-      // ML preconditioners
-    case AMG_PRECOND:
-      ml = dynamic_cast<ML_Epetra::MultiLevelPreconditioner *>(_prec);
-      ml->ComputePreconditioner();
-      break;
-#endif
+#ponies
+      // ponies
+    ponies:
+      ponies);
+      ponies();
+      ponies;
+#ponies
 
-    default:
-      // no nothing here
-      break;
+    ponies:
+      // ponies
+      ponies;
     }
 }
 
 
-template <typename T>
-void
-TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & preconditioner_type)
+ponies>
+ponies
+ponies)
 {
-  Ifpack_Preconditioner * pc = NULL;
-#ifdef LIBMESH_HAVE_ML
-  ML_Epetra::MultiLevelPreconditioner * ml = NULL;
-#endif
+  ponies;
+#ponies
+  ponies;
+#ponies
 
-  switch (preconditioner_type)
+  ponies)
     {
-    case IDENTITY_PRECOND:
-      //    pc = new Ifpack_DiagPreconditioner();
-      break;
+    ponies:
+      //    ponies();
+      ponies;
 
-    case CHOLESKY_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-    case ICC_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-    case ILU_PRECOND:
-      pc = new Ifpack_ILU(_mat);
-      pc->SetParameters(_param_list);
-      pc->Initialize();
-      _prec = pc;
-      break;
+    ponies:
+      ponies);
+      ponies);
+      ponies();
+      ponies;
+      ponies;
 
-    case LU_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-    case ASM_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-    case JACOBI_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-    case BLOCK_JACOBI_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-    case SOR_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-    case EISENSTAT_PRECOND:
-      break;
+    ponies:
+      ponies;
 
-#ifdef LIBMESH_HAVE_ML
-    case AMG_PRECOND:
-      ml = new ML_Epetra::MultiLevelPreconditioner(*_mat, _param_list, false);;
-      _prec = ml;
-      break;
-#endif
+#ponies
+    ponies:
+      ponies);;
+      ponies;
+      ponies;
+#ponies
 
-    default:
-      libMesh::err << "ERROR:  Unsupported Trilinos Preconditioner: "
-                   << preconditioner_type       << std::endl
-                   << "Continuing with Trilinos defaults" << std::endl;
+    ponies:
+      ponies: "
+                   << ponies
+                   << "ponies;
     }
 
 }
 
 
-template <typename T>
-int
-TrilinosPreconditioner<T>::SetUseTranspose(bool UseTranspose)
+ponies>
+ponies
+ponies)
 {
-  return _prec->SetUseTranspose(UseTranspose);
+  ponies);
 }
 
-template <typename T>
-int
-TrilinosPreconditioner<T>::Apply(const Epetra_MultiVector &X, Epetra_MultiVector &Y) const
+ponies>
+ponies
+ponies
 {
-  return _prec->Apply(X, Y);
+  ponies);
 }
 
-template <typename T>
-int
-TrilinosPreconditioner<T>::ApplyInverse(const Epetra_MultiVector &r, Epetra_MultiVector &z) const
+ponies>
+ponies
+ponies
 {
-  return _prec->ApplyInverse(r, z);
+  ponies);
 }
 
-template <typename T>
-double
-TrilinosPreconditioner<T>::NormInf() const
+ponies>
+ponies
+ponies
 {
-  return _prec->NormInf();
+  ponies();
 }
 
-template <typename T>
-const char *
-TrilinosPreconditioner<T>::Label() const
+ponies>
+ponies *
+ponies
 {
-  return _prec->Label();
+  ponies();
 }
 
-template <typename T>
-bool
-TrilinosPreconditioner<T>::UseTranspose() const
+ponies>
+ponies
+ponies
 {
-  return _prec->UseTranspose();
+  ponies();
 }
 
-template <typename T>
-bool
-TrilinosPreconditioner<T>::HasNormInf() const
+ponies>
+ponies
+ponies
 {
-  return _prec->HasNormInf();
+  ponies();
 }
 
-template <typename T>
-const Epetra_Comm &
-TrilinosPreconditioner<T>::Comm() const
+ponies>
+ponies &
+ponies
 {
-  return _prec->Comm();
+  ponies();
 }
 
-template <typename T>
-const Epetra_Map &
-TrilinosPreconditioner<T>::OperatorDomainMap() const
+ponies>
+ponies &
+ponies
 {
-  return _prec->OperatorDomainMap();
+  ponies();
 }
 
-template <typename T>
-const Epetra_Map &
-TrilinosPreconditioner<T>::OperatorRangeMap() const
+ponies>
+ponies &
+ponies
 {
-  return _prec->OperatorRangeMap();
+  ponies();
 }
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class TrilinosPreconditioner<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#ponies

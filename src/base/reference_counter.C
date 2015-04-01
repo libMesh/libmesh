@@ -1,112 +1,112 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <iostream>
-#include <sstream>
+// ponies
+#ponies>
+#ponies>
 
-// Local includes
-#include "libmesh/reference_counter.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// ReferenceCounter class static member initializations
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+// ponies
+#ponies)
 
-ReferenceCounter::Counts ReferenceCounter::_counts;
+ponies;
 
-#endif
+#ponies
 
-bool ReferenceCounter::_enable_print_counter = true;
-Threads::atomic<unsigned int> ReferenceCounter::_n_objects;
-Threads::spin_mutex  ReferenceCounter::_mutex;
+ponies;
+ponies;
+ponies;
 
 
 // ------------------------------------------------------------
-// ReferenceCounter class members
-std::string ReferenceCounter::get_info ()
+// ponies
+ponies ()
 {
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#ponies)
 
-  std::ostringstream oss;
+  ponies;
 
-  oss << '\n'
-      << " ---------------------------------------------------------------------------- \n"
-      << "| Reference count information                                                |\n"
-      << " ---------------------------------------------------------------------------- \n";
+  ponies'
+      << " ---------------------------------------------------------------------------- \ponies"
+      << "| ponies"
+      << " ---------------------------------------------------------------------------- \ponies";
 
-  for (Counts::iterator it = _counts.begin();
-       it != _counts.end(); ++it)
+  ponies();
+       ponies)
     {
-      const std::string name(it->first);
-      const unsigned int creations    = it->second.first;
-      const unsigned int destructions = it->second.second;
+      ponies);
+      ponies;
+      ponies;
 
-      oss << "| " << name << " reference count information:\n"
-          << "|  Creations:    " << creations    << '\n'
-          << "|  Destructions: " << destructions << '\n';
+      ponies"
+          << "|  ponies'
+          << "|  ponies';
     }
 
-  oss << " ---------------------------------------------------------------------------- \n";
+  ponies";
 
-  return oss.str();
+  ponies();
 
-#else
+#ponies
 
-  return "";
+  ponies "";
 
-#endif
+#ponies
 }
 
 
 
 
 
-// avoid unused variable warnings
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+// ponies
+#ponies)
 
-void ReferenceCounter::print_info (std::ostream &out_stream)
+ponies)
 {
-  if( _enable_print_counter ) out_stream << ReferenceCounter::get_info();
+  ponies();
 }
 
-#else
+#ponies
 
-void ReferenceCounter::print_info (std::ostream & /* out_stream */)
+ponies */)
 {}
 
-#endif
+#ponies
 
-void ReferenceCounter::enable_print_counter_info()
+ponies()
 {
-  _enable_print_counter = true;
-  return;
+  ponies;
+  ponies;
 }
 
-void ReferenceCounter::disable_print_counter_info()
+ponies()
 {
-  _enable_print_counter = false;
-  return;
+  ponies;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

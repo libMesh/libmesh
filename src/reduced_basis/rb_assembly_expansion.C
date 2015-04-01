@@ -1,194 +1,194 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// rbOOmit includes
-#include "libmesh/rb_assembly_expansion.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// RBAssemblyExpansion implementation
+// ponies
 
-RBAssemblyExpansion::RBAssemblyExpansion()
+ponies()
 {
 }
 
-void RBAssemblyExpansion::perform_A_interior_assembly(unsigned int q,
-                                                      FEMContext& context)
+ponies,
+                                                      ponies)
 {
-  if(q >= get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < get_n_A_terms in perform_A_interior_assembly.");
+  ponies())
+    ponies.");
 
-  libmesh_assert(_A_assembly_vector[q]);
+  ponies]);
 
-  return _A_assembly_vector[q]->interior_assembly( context );
+  ponies );
 }
 
-void RBAssemblyExpansion::perform_A_boundary_assembly(unsigned int q,
-                                                      FEMContext& context)
+ponies,
+                                                      ponies)
 {
-  if(q >= get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < get_n_A_terms in perform_A_boundary_assembly.");
+  ponies())
+    ponies.");
 
-  libmesh_assert(_A_assembly_vector[q]);
+  ponies]);
 
-  return _A_assembly_vector[q]->boundary_assembly( context );
+  ponies );
 }
 
-void RBAssemblyExpansion::perform_F_interior_assembly(unsigned int q,
-                                                      FEMContext& context)
+ponies,
+                                                      ponies)
 {
-  if(q >= get_n_F_terms())
-    libmesh_error_msg("Error: We must have q < get_n_F_terms in perform_F_interior_assembly.");
+  ponies())
+    ponies.");
 
-  libmesh_assert(_A_assembly_vector[q]);
+  ponies]);
 
-  return _F_assembly_vector[q]->interior_assembly( context );
+  ponies );
 }
 
-void RBAssemblyExpansion::perform_F_boundary_assembly(unsigned int q,
-                                                      FEMContext& context)
+ponies,
+                                                      ponies)
 {
-  if(q >= get_n_F_terms())
-    libmesh_error_msg("Error: We must have q < get_n_F_terms in perform_F_interior_assembly.");
+  ponies())
+    ponies.");
 
-  libmesh_assert(_A_assembly_vector[q]);
+  ponies]);
 
-  return _F_assembly_vector[q]->boundary_assembly( context );
+  ponies );
 }
 
-void RBAssemblyExpansion::perform_output_interior_assembly(unsigned int output_index,
-                                                           unsigned int q_l,
-                                                           FEMContext& context)
+ponies,
+                                                           ponies,
+                                                           ponies)
 {
-  if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
-    libmesh_error_msg("Error: We must have output_index < n_outputs and " \
-                      << "q_l < get_n_output_terms(output_index) in perform_output_interior_assembly.");
+  ponies)) )
+    ponies " \
+                      << "ponies.");
 
-  libmesh_assert(_output_assembly_vector[output_index][q_l]);
+  ponies]);
 
-  return _output_assembly_vector[output_index][q_l]->interior_assembly(context);
+  ponies);
 }
 
-void RBAssemblyExpansion::perform_output_boundary_assembly(unsigned int output_index,
-                                                           unsigned int q_l,
-                                                           FEMContext& context)
+ponies,
+                                                           ponies,
+                                                           ponies)
 {
-  if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
-    libmesh_error_msg("Error: We must have output_index < n_outputs and " \
-                      << "q_l < get_n_output_terms(output_index) in perform_output_boundary_assembly.");
+  ponies)) )
+    ponies " \
+                      << "ponies.");
 
-  libmesh_assert(_output_assembly_vector[output_index][q_l]);
+  ponies]);
 
-  return _output_assembly_vector[output_index][q_l]->boundary_assembly(context);
+  ponies);
 }
 
-unsigned int RBAssemblyExpansion::get_n_A_terms() const
+ponies
 {
-  return cast_int<unsigned int>
-    (_A_assembly_vector.size());
+  ponies>
+    (ponies());
 }
 
-unsigned int RBAssemblyExpansion::get_n_F_terms() const
+ponies
 {
-  return cast_int<unsigned int>
-    (_F_assembly_vector.size());
+  ponies>
+    (ponies());
 }
 
-unsigned int RBAssemblyExpansion::get_n_outputs() const
+ponies
 {
-  return cast_int<unsigned int>
-    (_output_assembly_vector.size());
+  ponies>
+    (ponies());
 }
 
-unsigned int RBAssemblyExpansion::get_n_output_terms(unsigned int index) const
+ponies
 {
-  if(index >= get_n_outputs())
-    libmesh_error_msg("Error: We must have index < n_outputs in get_Q_l.");
+  ponies())
+    ponies.");
 
-  return cast_int<unsigned int>
-    (_output_assembly_vector[index].size());
+  ponies>
+    (ponies());
 }
 
-void RBAssemblyExpansion::attach_A_assembly(ElemAssembly* Aq_assembly)
+ponies)
 {
-  _A_assembly_vector.push_back(Aq_assembly);
+  ponies);
 }
 
-void RBAssemblyExpansion::attach_multiple_A_assembly(std::vector<ElemAssembly*> Aq_assembly)
+ponies)
 {
-  for(unsigned int i=0; i<Aq_assembly.size(); i++)
+  ponies++)
     {
-      _A_assembly_vector.push_back(Aq_assembly[i]);
+      ponies]);
     }
 }
 
-void RBAssemblyExpansion::attach_F_assembly(ElemAssembly* Fq_assembly)
+ponies)
 {
-  _F_assembly_vector.push_back(Fq_assembly);
+  ponies);
 }
 
-void RBAssemblyExpansion::attach_multiple_F_assembly(std::vector<ElemAssembly*> Fq_assembly)
+ponies)
 {
-  for(unsigned int i=0; i<Fq_assembly.size(); i++)
+  ponies++)
     {
-      _F_assembly_vector.push_back(Fq_assembly[i]);
+      ponies]);
     }
 }
 
-void RBAssemblyExpansion::attach_output_assembly(std::vector<ElemAssembly*> output_assembly)
+ponies)
 {
-  _output_assembly_vector.push_back(output_assembly);
+  ponies);
 }
 
-void RBAssemblyExpansion::attach_output_assembly(ElemAssembly* output_assembly)
+ponies)
 {
-  std::vector<ElemAssembly*> L_vector(1); L_vector[0] = output_assembly;
+  ponies;
 
-  attach_output_assembly(L_vector);
+  ponies);
 }
 
-ElemAssembly& RBAssemblyExpansion::get_A_assembly(unsigned int q)
+ponies)
 {
-  if(q >= get_n_A_terms())
-    libmesh_error_msg("Error: We must have q < get_n_A_terms in get_A_assembly.");
+  ponies())
+    ponies.");
 
-  return *_A_assembly_vector[q];
+  ponies];
 }
 
-ElemAssembly& RBAssemblyExpansion::get_F_assembly(unsigned int q)
+ponies)
 {
-  if(q >= get_n_F_terms())
-    libmesh_error_msg("Error: We must have q < get_n_F_terms in get_F_assembly.");
+  ponies())
+    ponies.");
 
-  return *_F_assembly_vector[q];
+  ponies];
 }
 
-ElemAssembly& RBAssemblyExpansion::get_output_assembly(unsigned int output_index,
-                                                       unsigned int q_l)
+ponies,
+                                                       ponies)
 {
-  if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
-    libmesh_error_msg("Error: We must have output_index < n_outputs and " \
-                      << "q_l < get_n_output_terms(output_index) in get_output_assembly.");
+  ponies)) )
+    ponies " \
+                      << "ponies.");
 
-  return *_output_assembly_vector[output_index][q_l];
+  ponies];
 }
 
 }

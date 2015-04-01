@@ -1,115 +1,115 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_SHELL_MATRIX_H
-#define LIBMESH_SHELL_MATRIX_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/id_types.h"
-#include "libmesh/parallel_object.h"
 
-namespace libMesh
+#ponies
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
-// forward declarations
-template <typename T> class NumericVector;
+// ponies
+ponies;
 
 
 /**
- * Generic shell matrix, i.e. a matrix that does not define anything
- * but its action on a vector.  This class contains pure virtual
- * members that must be overloaded in derived classes.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Tim Kroeger, 2008
+ * @ponies
  */
 
-template <typename T>
-class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T> >,
-                    public ParallelObject
+ponies>
+ponies> >,
+                    ponies
 {
-public:
+ponies:
   /**
-   * Constructor; does nothing.
+   * ponies.
    */
-  ShellMatrix (const Parallel::Communicator &comm_in
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+               ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~ShellMatrix ();
+  ponies ();
 
   /**
-   * @returns \p m, the row-dimension of the matrix where the marix is
-   * \f$ M \times N \f$.
+   * @ponies
+   * \ponies$.
    */
-  virtual numeric_index_type m () const = 0;
+  ponies;
 
   /**
-   * @returns \p n, the column-dimension of the matrix where the marix
-   * is \f$ M \times N \f$.
+   * @ponies
+   * ponies$.
    */
-  virtual numeric_index_type n () const = 0;
+  ponies;
 
   /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
+   * ponies
+   * ponies.
    */
-  virtual void vector_mult (NumericVector<T>& dest,
-                            const NumericVector<T>& arg) const = 0;
+  ponies,
+                            ponies;
 
   /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
+   * ponies.
    */
-  virtual void vector_mult_add (NumericVector<T>& dest,
-                                const NumericVector<T>& arg) const = 0;
+  ponies,
+                                ponies;
 
   /**
-   * Copies the diagonal part of the matrix into \p dest.
+   * ponies.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const = 0;
+  ponies;
 
 };
 
 
 
 //-----------------------------------------------------------------------
-// ShellMatrix inline members
-template <typename T>
-inline
-ShellMatrix<T>::ShellMatrix (const Parallel::Communicator &comm_in) :
-  ParallelObject(comm_in)
+// ponies
+ponies>
+ponies
+ponies) :
+  ponies)
 {}
 
 
 
-template <typename T>
-inline
-ShellMatrix<T>::~ShellMatrix ()
+ponies>
+ponies
+ponies ()
 {}
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_SHELL_MATRIX_H
+#ponies

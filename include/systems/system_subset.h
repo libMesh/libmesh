@@ -1,101 +1,101 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SYSTEM_SUBSET_H
-#define LIBMESH_SYSTEM_SUBSET_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/reference_counted_object.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class System;
+// ponies
+ponies;
 
 /**
- * This is a base class for classes which represent subsets of the
- * dofs of a \p System.
+ * ponies
+ * ponies.
  *
- * @author Tim Kroeger, 2010.
+ * @ponies.
  */
 
 // ------------------------------------------------------------
-// SystemSubset class definition
-class SystemSubset : public ReferenceCountedObject<SystemSubset>
+// ponies
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  explicit
-  SystemSubset (const System& system);
+  ponies
+  ponies);
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~SystemSubset (void);
+  ponies);
 
   /**
-   * Method that returns the actual set of dofs that the subset
-   * consists of.  The result must contain local dofs on each
-   * processor only and must not contain duplictates.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual const std::vector<unsigned int>& dof_ids(void)const=0;
+  ponies;
 
   /**
-   * Returns the \p System to which we belong.
+   * ponies.
    */
-  const System& get_system(void)const;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * A reference to the \p System we belong to.
+   * ponies.
    */
-  const System& _system;
+  ponies;
 
-private:
+ponies:
   /**
-   * This isn't a copyable object, so let's make sure nobody tries.
+   * ponies.
    *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
+   * ponies
+   * ponies.
    */
-  SystemSubset(const SystemSubset&);
+  ponies&);
 
   /**
-   * This isn't a copyable object, so let's make sure nobody tries.
+   * ponies.
    *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
+   * ponies
+   * ponies.
    */
-  SystemSubset& operator=(const SystemSubset&);
+  ponies&);
 
-}; // class SystemSubset
+}; // ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_SYSTEM_SUBSET_H
+#ponies

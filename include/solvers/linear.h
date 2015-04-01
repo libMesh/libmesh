@@ -1,104 +1,104 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_LINEAR_H
-#define LIBMESH_LINEAR_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/solver.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * This is a generic class that defines a linear to be used in a
- * simulation.  A user can define a linear by deriving from this
- * class and implementing certain functions.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2003-2004.
+ * @ponies.
  */
 
 // ------------------------------------------------------------
-// Linear class definition
+// ponies
 
-template <class T = Solver>
-class Linear : public T
+ponies>
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor. Requires a reference to a system to be solved.
+   * ponies.
    */
-  explicit
-  Linear (EquationSystems& es);
+  ponies
+  ponies);
 
   /**
-   * Constructor.  Requires a referece to the \p EquationSystems object.
+   * ponies.
    */
-  Linear (EquationSystems& es,
-          const std::string& name,
-          const unsigned int number);
+  ponies,
+          ponies,
+          ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~Linear ();
+  ~ponies ();
 };
 
 
 
 // ------------------------------------------------------------
-// Linear inline members
-template <class T>
-inline
-Linear<T>::Linear(EquationSystems& es) :
-  T (es)
+// ponies
+ponies>
+ponies
+ponies) :
+  ponies)
 {
-  libmesh_deprecated();
+  ponies();
 }
 
 
 
-template <class T>
-inline
-Linear<T>::Linear (EquationSystems& es,
-                   const std::string& name,
-                   const unsigned int number) :
-  T (es, name, number)
+ponies>
+ponies
+ponies,
+                   ponies,
+                   ponies) :
+  ponies)
 {
-  libmesh_deprecated();
+  ponies();
 }
 
 
 
-template <class T>
-inline
-Linear<T>::~Linear ()
+ponies>
+ponies
+ponies ()
 {
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_LINEAR_H
+#ponies

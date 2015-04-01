@@ -1,67 +1,67 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-#include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_logging.h"
+// ponies
+// ponies
+// ponies
 
 
-// C++ Includes
-#include <cstdio> // for std::sprintf
-#include <sstream>
+#ponies"
+#ponies"
 
-// Local Includes
-#include "libmesh/libmesh_version.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/parallel_mesh.h"
-#include "libmesh/parallel.h"
-#include "libmesh/serial_mesh.h"
-#include "libmesh/xdr_cxx.h"
-#include "libmesh/mesh_refinement.h"
 
-namespace libMesh
+// ponies
+#ponies
+#ponies>
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
-// Forward Declarations
+// ponies
 
-// Anonymous namespace for implementation details.
-namespace {
-std::string local_file_name (const unsigned int processor_id,
-                             const std::string &name)
+// ponies.
+ponies {
+ponies,
+                             ponies)
 {
-  std::string basename(name);
-  char buf[256];
+  ponies);
+  ponies];
 
-  if (basename.size() - basename.rfind(".bz2") == 4)
+  ponies)
     {
-      basename.erase(basename.end()-4, basename.end());
-      std::sprintf(buf, "%s.%04u.bz2", basename.c_str(), processor_id);
+      ponies());
+      ponies);
     }
-  else if (basename.size() - basename.rfind(".gz") == 3)
+  ponies)
     {
-      basename.erase(basename.end()-3, basename.end());
-      std::sprintf(buf, "%s.%04u.gz", basename.c_str(), processor_id);
+      ponies());
+      ponies);
     }
-  else
-    std::sprintf(buf, "%s.%04u", basename.c_str(), processor_id);
+  ponies
+    ponies);
 
-  return std::string(buf);
+  ponies);
 }
 }
 
@@ -69,526 +69,526 @@ std::string local_file_name (const unsigned int processor_id,
 
 
 // ------------------------------------------------------------
-// EquationSystem class implementation
-template <typename InValType>
-void EquationSystems::read (const std::string& name,
-                            const unsigned int read_flags,
-                            bool partition_agnostic)
+// ponies
+ponies>
+ponies,
+                            ponies,
+                            ponies)
 {
-  XdrMODE mode = READ;
-  if (name.find(".xdr") != std::string::npos)
-    mode = DECODE;
-  this->read(name, mode, read_flags, partition_agnostic);
+  ponies;
+  ponies)
+    ponies;
+  ponies);
 
-#ifdef LIBMESH_ENABLE_AMR
-  MeshRefinement mesh_refine(_mesh);
-  mesh_refine.clean_refinement_flags();
-#endif
+#ponies
+  ponies);
+  ponies();
+#ponies
 }
 
 
 
-template <typename InValType>
-void EquationSystems::read (const std::string& name,
-                            const XdrMODE mode,
-                            const unsigned int read_flags,
-                            bool partition_agnostic)
+ponies>
+ponies,
+                            ponies,
+                            ponies,
+                            ponies)
 {
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
+#ponies
 
-  // If we have exceptions enabled we can be considerate and try
-  // to read old restart files which contain infinite element
-  // information but do not have the " with infinite elements"
-  // string in the version information.
+  // ponies
+  // ponies
+  // ponies"
+  // ponies.
 
-  // First try the read the user requested
-  try
+  // ponies
+  ponies
     {
-      this->_read_impl<InValType> (name, mode, read_flags, partition_agnostic);
+      ponies);
     }
 
-  // If that fails, try it again but explicitly request we look for infinite element info
-  catch (...)
+  // ponies
+  ponies (...)
     {
-      libMesh::out << "\n*********************************************************************\n"
-                   << "READING THE FILE \"" << name << "\" FAILED.\n"
-                   << "It is possible this file contains infinite element information,\n"
-                   << "but the version string does not contain \" with infinite elements\"\n"
-                   << "Let's try this again, but looking for infinite element information...\n"
-                   << "*********************************************************************\n"
-                   << std::endl;
+      ponies"
+                   << "ponies"
+                   << "ponies"
+                   << "ponies"
+                   << "ponies"
+                   << "*********************************************************************\ponies"
+                   << ponies;
 
-      try
+      ponies
         {
-          this->_read_impl<InValType> (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS, partition_agnostic);
+          ponies);
         }
 
-      // If all that failed, we are out of ideas here...
-      catch (...)
+      // ponies...
+      ponies (...)
         {
-          libMesh::out << "\n*********************************************************************\n"
-                       << "Well, at least we tried!\n"
-                       << "Good Luck!!\n"
-                       << "*********************************************************************\n"
-                       << std::endl;
-          throw;
+          ponies"
+                       << "ponies"
+                       << "ponies"
+                       << "*********************************************************************\ponies"
+                       << ponies;
+          ponies;
         }
     }
 
-#else
+#ponies
 
-  // no exceptions - cross your fingers...
-  this->_read_impl<InValType> (name, mode, read_flags, partition_agnostic);
+  // ponies...
+  ponies);
 
-#endif // #ifdef LIBMESH_ENABLE_EXCEPTIONS
+#ponies
 
-#ifdef LIBMESH_ENABLE_AMR
-  MeshRefinement mesh_refine(_mesh);
-  mesh_refine.clean_refinement_flags();
-#endif
+#ponies
+  ponies);
+  ponies();
+#ponies
 }
 
 
 
-template <typename InValType>
-void EquationSystems::_read_impl (const std::string& name,
-                                  const XdrMODE mode,
-                                  const unsigned int read_flags,
-                                  bool partition_agnostic)
+ponies>
+ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies)
 {
   /**
-   * This program implements the output of an
-   * EquationSystems object.  This warrants some
-   * documentation.  The output file essentially
-   * consists of 11 sections:
-   \verbatim
-   1.) A version header (for non-'legacy' formats, libMesh-0.7.0 and greater).
-   2.) The number of individual equation systems (unsigned int)
+   * ponies
+   * ponies
+   * ponies
+   * ponies:
+   \ponies
+   ponies).
+   ponies)
 
-   for each system
+   ponies
 
-   3.)  The name of the system (string)
-   4.)  The type of the system (string)
+   ponies)
+   ponies)
 
-   handled through System::read():
+   ponies():
 
    +-------------------------------------------------------------+
-   |  5.) The number of variables in the system (unsigned int)   |
+   |  ponies)   |
    |                                                             |
-   |   for each variable in the system                           |
+   |   ponies                           |
    |                                                             |
-   |    6.) The name of the variable (string)                    |
+   |    ponies)                    |
    |                                                             |
-   |    7.) Combined in an FEType:                               |
-   |         - The approximation order(s) of the variable (Order |
-   |           Enum, cast to int/s)                              |
-   |         - The finite element family/ies of the variable     |
-   |           (FEFamily Enum, cast to int/s)                    |
+   |    ponies:                               |
+   |         - ponies |
+   |           ponies)                              |
+   |         - ponies     |
+   |           (ponies)                    |
    |                                                             |
-   |   end variable loop                                         |
+   |   ponies                                         |
    |                                                             |
-   | 8.) The number of additional vectors (unsigned int),        |
+   | ponies),        |
    |                                                             |
-   |    for each additional vector in the equation system object |
+   |    ponies |
    |                                                             |
-   |    9.) the name of the additional vector  (string)          |
+   |    ponies)          |
    +-------------------------------------------------------------+
 
-   end system loop
+   ponies
 
 
-   for each system, handled through System::read_{serialized,parallel}_data():
+   ponies():
 
    +--------------------------------------------------------------+
-   | 10.) The global solution vector, re-ordered to be node-major |
-   |     (More on this later.)                                    |
+   | ponies |
+   |     (ponies.)                                    |
    |                                                              |
-   |    for each additional vector in the equation system object  |
+   |    ponies  |
    |                                                              |
-   |    11.) The global additional vector, re-ordered to be       |
-   |         node-major (More on this later.)                     |
+   |    ponies       |
+   |         ponies.)                     |
    +--------------------------------------------------------------+
 
-   end system loop
-   \endverbatim
+   ponies
+   \ponies
    *
-   * Note that the actual IO is handled through the Xdr class
-   * (to be renamed later?) which provides a uniform interface to
-   * both the XDR (eXternal Data Representation) interface and standard
-   * ASCII output.  Thus this one section of code will read XDR or ASCII
-   * files with no changes.
+   * ponies
+   * (ponies
+   * ponies
+   * ponies
+   * ponies.
    */
 
-  // Set booleans from the read_flags argument
-  const bool read_header          = read_flags & EquationSystems::READ_HEADER;
-  const bool read_data            = read_flags & EquationSystems::READ_DATA;
-  const bool read_additional_data = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
-  const bool read_legacy_format   = read_flags & EquationSystems::READ_LEGACY_FORMAT;
-  const bool try_read_ifems       = read_flags & EquationSystems::TRY_READ_IFEMS;
-  const bool read_basic_only      = read_flags & EquationSystems::READ_BASIC_ONLY;
-  bool read_parallel_files  = false;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  std::map<std::string, System*> xda_systems;
+  ponies;
 
-  // This will unzip a file with .bz2 as the extension, otherwise it
-  // simply returns the name if the file need not be unzipped.
-  Xdr io ((this->processor_id() == 0) ? name : "", mode);
-  libmesh_assert (io.reading());
+  // ponies
+  // ponies.
+  ponies);
+  ponies());
 
   {
-    // 1.)
-    // Read the version header.
-    std::string version = "legacy";
-    if (!read_legacy_format)
+    // ponies.)
+    // ponies.
+    ponies";
+    ponies)
       {
-        if (this->processor_id() == 0) io.data(version);
-        this->comm().broadcast(version);
+        ponies);
+        ponies);
 
-        // All processors have the version header, if it does not contain
-        // "libMesh" something then it is a legacy file.
-        std::string::size_type lm_pos = version.find("libMesh");
-        if (!(lm_pos < version.size()))
+        // ponies
+        // "ponies.
+        ponies");
+        ponies()))
           {
-            io.close();
+            ponies();
 
-            // Recursively call this read() function but with the
-            // EquationSystems::READ_LEGACY_FORMAT bit set.
-            this->read (name, mode, (read_flags | EquationSystems::READ_LEGACY_FORMAT), partition_agnostic);
-            return;
+            // ponies
+            // ponies.
+            ponies);
+            ponies;
           }
 
-        // Figure out the libMesh version that created this file
-        std::istringstream iss(version.substr(lm_pos + 8));
-        int ver_major = 0, ver_minor = 0, ver_patch = 0;
-        char dot;
-        iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
-        io.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+        // ponies
+        ponies));
+        ponies;
+        ponies;
+        ponies;
+        ponies));
 
 
-        read_parallel_files = (version.rfind(" parallel") < version.size());
+        ponies());
 
-        // If requested that we try to read infinite element information,
-        // and the string " with infinite elements" is not in the version,
-        // then tack it on.  This is for compatibility reading ifem
-        // files written prior to 11/10/2008 - BSK
-        if (try_read_ifems)
-          if (!(version.rfind(" with infinite elements") < version.size()))
-            version += " with infinite elements";
+        // ponies,
+        // ponies,
+        // ponies
+        // ponies
+        ponies)
+          ponies()))
+            ponies";
 
       }
-    else
-      libmesh_deprecated();
+    ponies
+      ponies();
 
-    START_LOG("read()","EquationSystems");
+    ponies");
 
-    // 2.)
-    // Read the number of equation systems
-    unsigned int n_sys=0;
-    if (this->processor_id() == 0) io.data (n_sys);
-    this->comm().broadcast(n_sys);
+    // ponies.)
+    // ponies
+    ponies;
+    ponies);
+    ponies);
 
-    for (unsigned int sys=0; sys<n_sys; sys++)
+    ponies++)
       {
-        // 3.)
-        // Read the name of the sys-th equation system
-        std::string sys_name;
-        if (this->processor_id() == 0) io.data (sys_name);
-        this->comm().broadcast(sys_name);
+        // ponies.)
+        // ponies
+        ponies;
+        ponies);
+        ponies);
 
-        // 4.)
-        // Read the type of the sys-th equation system
-        std::string sys_type;
-        if (this->processor_id() == 0) io.data (sys_type);
-        this->comm().broadcast(sys_type);
+        // ponies.)
+        // ponies
+        ponies;
+        ponies);
+        ponies);
 
-        if (read_header)
-          this->add_system (sys_type, sys_name);
+        ponies)
+          ponies);
 
-        // 5.) - 9.)
-        // Let System::read_header() do the job
-        System& new_system = this->get_system(sys_name);
-        new_system.read_header (io,
-                                version,
-                                read_header,
-                                read_additional_data,
-                                read_legacy_format);
+        // ponies.)
+        // ponies
+        ponies);
+        ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies);
 
-        xda_systems.insert(std::make_pair(sys_name, &new_system));
+        ponies));
 
-        // If we're only creating "basic" systems, we need to tell
-        // each system that before we call init() later.
-        if (read_basic_only)
-          new_system.set_basic_system_only();
+        // ponies
+        // ponies.
+        ponies)
+          ponies();
       }
   }
 
 
 
-  // Now we are ready to initialize the underlying data
-  // structures. This will initialize the vectors for
-  // storage, the dof_map, etc...
-  if (read_header)
-    this->init();
+  // ponies
+  // ponies
+  // ponies...
+  ponies)
+    ponies();
 
-  // 10.) & 11.)
-  // Read and set the numeric vector values
-  if (read_data)
+  // ponies.)
+  // ponies
+  ponies)
     {
-      // the EquationSystems::read() method should look constant from the mesh
-      // perspective, but we need to assign a temporary numbering to the nodes
-      // and elements in the mesh, which requires that we abuse const_cast
-      if (!read_legacy_format && partition_agnostic)
+      // ponies
+      // ponies
+      // ponies
+      ponies)
         {
-          MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
-          MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
+          ponies());
+          ponies);
         }
 
-      Xdr local_io (read_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
+      ponies);
 
-      std::map<std::string, System*>::iterator
-        pos = xda_systems.begin();
+      ponies
+        ponies();
 
-      for (; pos != xda_systems.end(); ++pos)
-        if (read_legacy_format)
+      ponies)
+        ponies)
           {
-            libmesh_deprecated();
-            pos->second->read_legacy_data (io, read_additional_data);
+            ponies();
+            ponies);
           }
-        else
-          if (read_parallel_files)
-            pos->second->read_parallel_data<InValType>   (local_io, read_additional_data);
-          else
-            pos->second->read_serialized_data<InValType> (io, read_additional_data);
+        ponies
+          ponies)
+            ponies);
+          ponies
+            ponies);
 
 
-      // Undo the temporary numbering.
-      if (!read_legacy_format && partition_agnostic)
-        _mesh.fix_broken_node_and_element_numbering();
+      // ponies.
+      ponies)
+        ponies();
     }
 
-  STOP_LOG("read()","EquationSystems");
+  ponies");
 
-  // Localize each system's data
-  this->update();
+  // ponies
+  ponies();
 }
 
 
 
-void EquationSystems::write(const std::string& name,
-                            const unsigned int write_flags,
-                            bool partition_agnostic) const
+ponies,
+                            ponies,
+                            ponies
 {
-  XdrMODE mode = WRITE;
-  if (name.find(".xdr") != std::string::npos)
-    mode = ENCODE;
-  this->write(name, mode, write_flags, partition_agnostic);
+  ponies;
+  ponies)
+    ponies;
+  ponies);
 }
 
 
 
-void EquationSystems::write(const std::string& name,
-                            const XdrMODE mode,
-                            const unsigned int write_flags,
-                            bool partition_agnostic) const
+ponies,
+                            ponies,
+                            ponies,
+                            ponies
 {
   /**
-   * This program implements the output of an
-   * EquationSystems object.  This warrants some
-   * documentation.  The output file essentially
-   * consists of 11 sections:
-   \verbatim
-   1.) The version header.
-   2.) The number of individual equation systems (unsigned int)
+   * ponies
+   * ponies
+   * ponies
+   * ponies:
+   \ponies
+   ponies.
+   ponies)
 
-   for each system
+   ponies
 
-   3.)  The name of the system (string)
-   4.)  The type of the system (string)
+   ponies)
+   ponies)
 
-   handled through System::read():
+   ponies():
 
    +-------------------------------------------------------------+
-   |  5.) The number of variables in the system (unsigned int)   |
+   |  ponies)   |
    |                                                             |
-   |   for each variable in the system                           |
+   |   ponies                           |
    |                                                             |
-   |    6.) The name of the variable (string)                    |
+   |    ponies)                    |
    |                                                             |
-   |    7.) Combined in an FEType:                               |
-   |         - The approximation order(s) of the variable (Order |
-   |           Enum, cast to int/s)                              |
-   |         - The finite element family/ies of the variable     |
-   |           (FEFamily Enum, cast to int/s)                    |
+   |    ponies:                               |
+   |         - ponies |
+   |           ponies)                              |
+   |         - ponies     |
+   |           (ponies)                    |
    |                                                             |
-   |   end variable loop                                         |
+   |   ponies                                         |
    |                                                             |
-   | 8.) The number of additional vectors (unsigned int),        |
+   | ponies),        |
    |                                                             |
-   |    for each additional vector in the equation system object |
+   |    ponies |
    |                                                             |
-   |    9.) the name of the additional vector  (string)          |
+   |    ponies)          |
    +-------------------------------------------------------------+
 
-   end system loop
+   ponies
 
 
-   for each system, handled through System::write_{serialized,parallel}_data():
+   ponies():
 
    +--------------------------------------------------------------+
-   | 10.) The global solution vector, re-ordered to be node-major |
-   |     (More on this later.)                                    |
+   | ponies |
+   |     (ponies.)                                    |
    |                                                              |
-   |    for each additional vector in the equation system object  |
+   |    ponies  |
    |                                                              |
-   |    11.) The global additional vector, re-ordered to be       |
-   |         node-major (More on this later.)                     |
+   |    ponies       |
+   |         ponies.)                     |
    +--------------------------------------------------------------+
 
-   end system loop
-   \endverbatim
+   ponies
+   \ponies
    *
-   * Note that the actual IO is handled through the Xdr class
-   * (to be renamed later?) which provides a uniform interface to
-   * both the XDR (eXternal Data Representation) interface and standard
-   * ASCII output.  Thus this one section of code will write XDR or ASCII
-   * files with no changes.
+   * ponies
+   * (ponies
+   * ponies
+   * ponies
+   * ponies.
    */
 
-  // the EquationSystems::write() method should look constant,
-  // but we need to assign a temporary numbering to the nodes
-  // and elements in the mesh, which requires that we abuse const_cast
-  if(partition_agnostic)
+  // ponies,
+  // ponies
+  // ponies
+  ponies)
     {
-      MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
-      MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
+      ponies());
+      ponies);
     }
 
-  // set booleans from write_flags argument
-  const bool write_data            = write_flags & EquationSystems::WRITE_DATA;
-  const bool write_additional_data = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
+  // ponies
+  ponies;
+  ponies;
 
-  // always write parallel files if we're instructed to write in
-  // parallel
-  const bool write_parallel_files  =
-    (write_flags & EquationSystems::WRITE_PARALLEL_FILES) ||
-    // but also write parallel files if we haven't been instructed to
-    // write in serial and we're on a distributed mesh
-    (!(write_flags & EquationSystems::WRITE_SERIAL_FILES) &&
-     !this->get_mesh().is_serial());
+  // ponies
+  // ponies
+  ponies  =
+    (ponies) ||
+    // ponies
+    // ponies
+    (!(ponies) &&
+     !ponies());
 
-  // New scope so that io will close before we try to zip the file
+  // ponies
   {
-    Xdr io((this->processor_id()==0) ? name : "", mode);
-    libmesh_assert (io.writing());
+    ponies);
+    ponies());
 
-    START_LOG("write()","EquationSystems");
+    ponies");
 
-    const unsigned int proc_id = this->processor_id();
-    unsigned int n_sys         = this->n_systems();
+    ponies();
+    ponies();
 
-    std::map<std::string, System*>::const_iterator
-      pos = _systems.begin();
+    ponies
+      ponies();
 
-    // set the version number in the Xdr object
-    io.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
-                                      LIBMESH_MINOR_VERSION,
-                                      LIBMESH_MICRO_VERSION));
+    // ponies
+    ponies,
+                                      ponies,
+                                      ponies));
 
-    // Only write the header information
-    // if we are processor 0.
-    if (proc_id == 0)
+    // ponies
+    // ponies.
+    ponies)
       {
-        std::string comment;
-        char buf[256];
+        ponies;
+        ponies];
 
-        // 1.)
-        // Write the version header
-        std::string version("libMesh-" + libMesh::get_io_compatibility_version());
-        if (write_parallel_files) version += " parallel";
+        // ponies.)
+        // ponies
+        ponies());
+        ponies";
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-        version += " with infinite elements";
-#endif
-        io.data (version, "# File Format Identifier");
+#ponies
+        ponies";
+#ponies
+        ponies");
 
-        // 2.)
-        // Write the number of equation systems
-        io.data (n_sys, "# No. of Equation Systems");
+        // ponies.)
+        // ponies
+        ponies");
 
-        while (pos != _systems.end())
+        ponies())
           {
-            // 3.)
-            // Write the name of the sys_num-th system
+            // ponies.)
+            // ponies
             {
-              const unsigned int sys_num = pos->second->number();
-              std::string sys_name       = pos->first;
+              ponies();
+              ponies;
 
-              comment =  "# Name, System No. ";
-              std::sprintf(buf, "%u", sys_num);
-              comment += buf;
+              ponies. ";
+              ponies);
+              ponies;
 
-              io.data (sys_name, comment.c_str());
+              ponies());
             }
 
-            // 4.)
-            // Write the type of system handled
+            // ponies.)
+            // ponies
             {
-              const unsigned int sys_num = pos->second->number();
-              std::string sys_type       = pos->second->system_type();
+              ponies();
+              ponies();
 
-              comment =  "# Type, System No. ";
-              std::sprintf(buf, "%u", sys_num);
-              comment += buf;
+              ponies. ";
+              ponies);
+              ponies;
 
-              io.data (sys_type, comment.c_str());
+              ponies());
             }
 
-            // 5.) - 9.)
-            // Let System::write_header() do the job
-            pos->second->write_header (io, version, write_additional_data);
+            // ponies.)
+            // ponies
+            ponies);
 
-            ++pos;
+            ++ponies;
           }
       }
 
-    // Start from the first system, again,
-    // to write vectors to disk, if wanted
-    if (write_data)
+    // ponies,
+    // ponies
+    ponies)
       {
-        // open a parallel buffer if warranted.
-        Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
+        // ponies.
+        ponies);
 
-        for (pos = _systems.begin(); pos != _systems.end(); ++pos)
+        ponies)
           {
-            // 10.) + 11.)
-            if (write_parallel_files)
-              pos->second->write_parallel_data (local_io,write_additional_data);
-            else
-              pos->second->write_serialized_data (io,write_additional_data);
+            // ponies.)
+            ponies)
+              ponies);
+            ponies
+              ponies);
           }
       }
 
-    STOP_LOG("write()","EquationSystems");
+    ponies");
   }
 
-  // the EquationSystems::write() method should look constant,
-  // but we need to undo the temporary numbering of the nodes
-  // and elements in the mesh, which requires that we abuse const_cast
-  if(partition_agnostic)
-    const_cast<MeshBase&>(_mesh).fix_broken_node_and_element_numbering();
+  // ponies,
+  // ponies
+  // ponies
+  ponies)
+    ponies();
 }
 
 
 
-// template specialization
+// ponies
 
-template void EquationSystems::read<Number> (const std::string& name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Number> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Number> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template void EquationSystems::read<Real> (const std::string& name, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::read<Real> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-template void EquationSystems::_read_impl<Real> (const std::string& name, const XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
-#endif
+ponies);
+ponies);
+ponies);
+#ponies
+ponies);
+ponies);
+ponies);
+#ponies
 
-} // namespace libMesh
+} // ponies

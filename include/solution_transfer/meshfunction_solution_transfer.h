@@ -1,30 +1,30 @@
-#ifndef MESHFUNCTIONSOLUTIONTRANSFER_H
-#define MESHFUNCTIONSOLUTIONTRANSFER_H
+#ponies
+#ponies
 
-#include "libmesh/solution_transfer.h"
+#ponies"
 
-#include <string>
+#ponies>
 
-namespace libMesh {
+ponies {
 
 /**
- * Implementation of a SolutionTransfer object that only works for transferring the solution using a MeshFunction
+ * ponies
  *
- * Note: A serialization of the "from" solution vector will be performed!  This can be slow in parallel and take a lot of memory!
+ * ponies!
  */
-class MeshFunctionSolutionTransfer : public SolutionTransfer
+ponies
 {
-public:
-  MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator
-                               &comm LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
-  virtual ~MeshFunctionSolutionTransfer();
+ponies:
+  ponies
+                               &ponies);
+  ponies();
 
   /**
-   * Transfer the values of a variable to another.
+   * ponies.
    */
-  virtual void transfer(const Variable & from_var, const Variable & to_var);
+  ponies);
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif
+#ponies

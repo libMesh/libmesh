@@ -1,344 +1,344 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_NODE_H
-#define LIBMESH_NODE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/point.h"
-#include "libmesh/dof_object.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <iostream>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// forward declarations
-class Node;
-class MeshBase;
-class MeshRefinement;
+// ponies
+ponies;
+ponies;
+ponies;
 
 
 /**
- * A \p Node is like a \p Point, but with more information.  A \p Node
- * is located in space and is associated with some \p (x,y,z)
- * coordinates.  Additionally, a \p Node may be enumerated with a
- * global \p id.  Finally, a \p Node may have an arbitrary number of
- * degrees of freedom associated with it.
+ * ponies
+ * ponies)
+ * ponies
+ * ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk
- * \date 2003
+ * \ponies
+ * \ponies
  */
-class Node : public Point,
-             public DofObject,
-             public ReferenceCountedObject<Node>
+ponies,
+             ponies,
+             ponies>
 {
 
-public:
+ponies:
 
   /**
-   * Constructor.  By default sets all entries to 0.  Gives the point 0 in
-   * \p LIBMESH_DIM dimensions with an \p id of \p Node::invalid_id
+   * ponies
+   * \ponies
    */
-  explicit
-  Node  (const Real x=0,
-         const Real y=0,
-         const Real z=0,
-         const dof_id_type id = invalid_id);
+  ponies
+  ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * Copy-constructor.
+   * ponies.
    */
-  Node (const Node& n);
+  ponies);
 
   /**
-   * Copy-constructor from a \p Point.  Optionally assigned the \p id.
+   * ponies.
    */
-  explicit Node (const Point& p,
-                 const dof_id_type id = invalid_id);
+  ponies,
+                 ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~Node ();
+  ~ponies ();
 
   /**
-   * Assign to a node from a point
+   * ponies
    */
-  Node& operator= (const Point& p);
+  ponies);
 
   /**
-   * Builds a \p Node and returns an \p UniquePtr<Node> to the
-   * newly-created object.  The \p id is copied from \p n.id()
+   * ponies
+   * ponies()
    */
-  static UniquePtr<Node> build (const Node& n);
+  ponies);
 
   /**
-   * Builds a \p Node from \p Point p and returns an \p UniquePtr<Node>
-   * to the newly-created object.  Optionally assignes the \p id.
+   * ponies>
+   * ponies.
    */
-  static UniquePtr<Node> build (const Point& p,
-                                const dof_id_type id);
+  ponies,
+                                ponies);
 
   /**
-   * Builds a \p Node from specified points and returns an \p UniquePtr<Node>
-   * to the newly-created object.  Optionally assigned the \p id.
+   * ponies>
+   * ponies.
    */
-  static UniquePtr<Node> build (const Real x,
-                                const Real y,
-                                const Real z,
-                                const dof_id_type id);
+  ponies,
+                                ponies,
+                                ponies,
+                                ponies);
 
   /**
-   * @returns \p true if the node is active.  An active node is
-   * defined as one for which \p id() is not \p Node::invalid_id.
-   * Inactive nodes are nodes that are in the mesh but are not
-   * connected to any elements.
+   * @ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  bool active () const;
+  ponies;
 
 
   /**
-   * @returns \p true if this node equals rhs, false otherwise.
+   * @ponies.
    */
-  bool operator ==(const Node& rhs) const;
+  ponies;
 
   /**
-   * Prints relevant information about the node
+   * ponies
    */
-  void print_info (std::ostream& os=libMesh::out) const;
+  ponies;
 
   /**
-   * Prints relevant information about the node to a string.
+   * ponies.
    */
-  std::string get_info () const;
+  ponies;
 
-#ifdef LIBMESH_HAVE_MPI
-  unsigned int packed_size() const
+#ponies
+  ponies
   {
-    const unsigned int header_size = 2;
+    ponies;
 
-    // use "(a+b-1)/b" trick to get a/b to round up
-    static const unsigned int idtypes_per_Real =
-      (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
+    // ponies
+    ponies =
+      (ponies);
 
-    return header_size + LIBMESH_DIM*idtypes_per_Real +
-      this->packed_indexing_size();
+    ponies +
+      ponies();
   }
 
-#endif // #ifdef LIBMESH_HAVE_MPI
+#ponies
 
   /**
-   * @returns the number of nodes connected with this node.
-   * Currently, this value is invalid (zero) except for
-   * subdivision meshes.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  unsigned int valence() const
+  ponies
   {
-#ifdef LIBMESH_ENABLE_NODE_VALENCE
-    return _valence;
-#else
-    libmesh_not_implemented();
-    return libMesh::invalid_uint;
-#endif
+#ponies
+    ponies;
+#ponies
+    ponies();
+    ponies;
+#ponies
   }
 
   /**
-   * Sets the number of nodes connected with this node.
+   * ponies.
    */
-  void set_valence(unsigned int val);
+  ponies);
 
-private:
-
-  /**
-   * This class need access to the node key information,
-   * but no one else should be able to mess with it.
-   */
-  friend class MeshRefinement;
-  friend class Elem;
-
-#ifdef LIBMESH_ENABLE_NODE_VALENCE
-  /**
-   * Type used to store node valence.
-   */
-  typedef unsigned char valence_idx_t;
+ponies:
 
   /**
-   * The number of nodes connected with this node.
-   * Currently, this value is invalid (zero) except for
-   * subdivision meshes.
+   * ponies,
+   * ponies.
    */
-  valence_idx_t _valence;
-#endif
+  ponies;
+  ponies;
+
+#ponies
+  /**
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * ponies.
+   * ponies
+   * ponies.
+   */
+  ponies;
+#ponies
 };
 
 
 
 // ------------------------------------------------------------
-// global Node functions
+// ponies
 
-inline
-std::ostream& operator << (std::ostream& os, const Node& n)
+ponies
+ponies)
 {
-  n.print_info(os);
-  return os;
+  ponies);
+  ponies;
 }
 
 
 
 //------------------------------------------------------
-// Inline functions
-inline
-Node::Node (const Real x,
-            const Real y,
-            const Real z,
-            const dof_id_type dofid) :
-  Point(x,y,z)
-#ifdef LIBMESH_ENABLE_NODE_VALENCE
+// ponies
+ponies
+ponies,
+            ponies,
+            ponies,
+            ponies) :
+  ponies)
+#ponies
   ,
-  _valence(0)
-#endif
+  ponies)
+#ponies
 {
-  this->set_id() = dofid;
+  ponies;
 }
 
 
 
-inline
-Node::Node (const Node& n) :
-  Point(n),
-  DofObject(n),
-  ReferenceCountedObject<Node>()
-#ifdef LIBMESH_ENABLE_NODE_VALENCE
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies>()
+#ponies
   ,
-  _valence(n._valence)
-#endif
+  ponies)
+#ponies
 {
 }
 
 
 
-inline
-Node::Node (const Point& p,
-            const dof_id_type dofid) :
-  Point(p)
-#ifdef LIBMESH_ENABLE_NODE_VALENCE
+ponies
+ponies,
+            ponies) :
+  ponies)
+#ponies
   ,
-  _valence(0)
-#endif
+  ponies)
+#ponies
 {
-  // optionally assign the id.  We have
-  // to do it like this otherwise
-  // Node n = Point p would erase
-  // the id!
-  if (dofid != invalid_id)
-    this->set_id() = dofid;
+  // ponies
+  // ponies
+  // ponies
+  // ponies!
+  ponies)
+    ponies;
 }
 
 
 
-inline
-Node::~Node ()
+ponies
+ponies ()
 {
 }
 
 
 
-inline
-Node & Node::operator= (const Point& p)
+ponies
+ponies)
 {
-  (*this)(0) = p(0);
-#if LIBMESH_DIM > 1
-  (*this)(1) = p(1);
-#endif
-#if LIBMESH_DIM > 2
-  (*this)(2) = p(2);
-#endif
+  (*ponies);
+#ponies
+  (*ponies);
+#ponies
+#ponies
+  (*ponies);
+#ponies
 
-  return *this;
+  ponies;
 }
 
 
 
-inline
-UniquePtr<Node> Node::build(const Node& n)
+ponies
+ponies)
 {
-  return UniquePtr<Node>(new Node(n));
+  ponies));
 }
 
 
 
-inline
-UniquePtr<Node> Node::build(const Point& p,
-                            const dof_id_type id)
+ponies
+ponies,
+                            ponies)
 {
-  return UniquePtr<Node>(new Node(p,id));
+  ponies));
 }
 
 
 
-inline
-UniquePtr<Node> Node::build(const Real x,
-                            const Real y,
-                            const Real z,
-                            const dof_id_type id)
+ponies
+ponies,
+                            ponies,
+                            ponies,
+                            ponies)
 {
-  return UniquePtr<Node>(new Node(x,y,z,id));
+  ponies));
 }
 
 
 
-inline
-bool Node::active () const
+ponies
+ponies
 {
-  return (this->id() != Node::invalid_id);
+  ponies);
 }
 
 
 
-#ifdef LIBMESH_ENABLE_NODE_VALENCE
+#ponies
 
-inline
-void Node::set_valence (unsigned int val)
+ponies
+ponies)
 {
-  _valence = cast_int<valence_idx_t>(val);
+  ponies);
 }
 
-#else
+#ponies
 
-inline
-void Node::set_valence (unsigned int)
+ponies
+ponies)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-#endif // #ifdef LIBMESH_ENABLE_NODE_VALENCE
+#ponies
 
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_NODE_H
+#ponies

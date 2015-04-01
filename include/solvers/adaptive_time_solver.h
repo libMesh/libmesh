@@ -1,220 +1,220 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ADAPTIVE_TIME_SOLVER_H
-#define LIBMESH_ADAPTIVE_TIME_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/system_norm.h"
-#include "libmesh/unsteady_solver.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class System;
+// ponies
+ponies;
 
 /**
- * This class wraps another UnsteadySolver derived class, and compares
- * the results of timestepping with deltat and timestepping with
- * 2*deltat to adjust future timestep lengths.
+ * ponies
+ * ponies
+ * ponies.
  *
- * Currently this class only works on fully coupled Systems
+ * ponies
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2007
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class AdaptiveTimeSolver : public UnsteadySolver
+// ponies
+ponies
 {
-public:
+ponies:
   /**
-   * The parent class
+   * ponies
    */
-  typedef UnsteadySolver Parent;
+  ponies;
 
   /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
+   * ponies
+   * ponies.
    */
-  explicit
-  AdaptiveTimeSolver (sys_type& s);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~AdaptiveTimeSolver ();
+  ponies ();
 
-  virtual void init();
+  ponies();
 
-  virtual void reinit();
+  ponies();
 
-  virtual void solve() = 0;
+  ponies;
 
-  virtual void advance_timestep();
+  ponies();
 
   /**
-   * This method is passed on to the core_time_solver
+   * ponies
    */
-  virtual Real error_order () const;
+  ponies;
 
   /**
-   * This method is passed on to the core_time_solver
+   * ponies
    */
-  virtual bool element_residual (bool get_jacobian,
-                                 DiffContext&);
+  ponies,
+                                 ponies&);
 
   /**
-   * This method is passed on to the core_time_solver
+   * ponies
    */
-  virtual bool side_residual (bool get_jacobian,
-                              DiffContext&);
+  ponies,
+                              ponies&);
 
   /**
-   * This method is passed on to the core_time_solver
+   * ponies
    */
-  virtual bool nonlocal_residual (bool get_jacobian,
-                                  DiffContext&);
+  ponies,
+                                  ponies&);
 
   /**
-   * An implicit linear or nonlinear solver to use at each timestep.
+   * ponies.
    */
-  virtual UniquePtr<DiffSolver> &diff_solver();
+  ponies();
 
   /**
-   * An implicit linear solver to use for adjoint and sensitivity
-   * problems.
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<LinearSolver<Number> > &linear_solver();
+  ponies();
 
   /**
-   * This object is used to take timesteps
+   * ponies
    */
-  UniquePtr<UnsteadySolver> core_time_solver;
+  ponies;
 
   /**
-   * Error calculations are done in this norm, DISCRETE_L2 by default.
+   * ponies.
    */
-  SystemNorm component_norm;
+  ponies;
 
   /**
-   * If component_norms is non-empty, each variable's contribution to the error
-   * of a system will also be scaled by component_scale[var], unless
-   * component_scale is empty in which case all variables will be weighted
-   * equally.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<float> component_scale;
+  ponies;
 
   /**
-   * This tolerance is the target relative error between an exact
-   * time integration and a single time step output, scaled by deltat.
-   * integrator, scaled by deltat.  If the estimated error exceeds or
-   * undershoots the target error tolerance, future timesteps will be
-   * run with deltat shrunk or grown to compensate.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The default value is 1.0e-2; obviously users should select their
-   * own tolerance.
+   * ponies
+   * ponies.
    *
-   * If a *negative* target_tolerance is specified, then its absolute
-   * value is used to scale the estimated error from the first
-   * simulation time step, and this becomes the target tolerance of
-   * all future time steps.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real target_tolerance;
+  ponies;
 
   /**
-   * This tolerance is the maximum relative error between an exact
-   * time integration and a single time step output, scaled by deltat.
-   * If this error tolerance is exceeded by the estimated error of the
-   * current time step, that time step will be repeated with a smaller
-   * deltat.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * If you use the default upper_tolerance=0.0, then the current
-   * time step will not be repeated regardless of estimated error.
+   * ponies
+   * ponies.
    *
-   * If a *negative* upper_tolerance is specified, then its absolute
-   * value is used to scale the estimated error from the first
-   * simulation time step, and this becomes the upper tolerance of
-   * all future time steps.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real upper_tolerance;
+  ponies;
 
   /**
-   * Do not allow the adaptive time solver to select deltat > max_deltat.
-   * If you use the default max_deltat=0.0, then deltat is unlimited.
+   * ponies.
+   * ponies.
    */
-  Real max_deltat;
+  ponies;
 
   /**
-   * Do not allow the adaptive time solver to select deltat < min_deltat.
-   * The default value is 0.0.
+   * ponies.
+   * ponies.
    */
-  Real min_deltat;
+  ponies;
 
   /**
-   * Do not allow the adaptive time solver to select
-   * a new deltat greater than max_growth times the old deltat.
-   * If you use the default max_growth=0.0, then the deltat growth is
-   * unlimited.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  Real max_growth;
+  ponies;
 
   /**
-   * This flag, which is true by default, grows (shrinks) the timestep
-   * based on the expected global accuracy of the timestepping scheme.
-   * Global in this sense means the cumulative final-time accuracy of
-   * the scheme.  For example, the backward Euler scheme's truncation
-   * error is locally of order 2, so that after N timesteps of size
-   * deltat, the result is first-order accurate.  If you set this to
-   * false, you can grow (shrink) your timestep based on the local
-   * accuracy rather than the global accuracy of the core TimeSolver.
-   * Note that by setting this value to false you may fail to achieve
-   * the predicted convergence in time of the underlying method, however
-   * it may be possible to get more fine-grained control over step sizes
-   * as well.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool global_tolerance;
+  ponies;
 
-protected:
-
-  /**
-   * We need to store the value of the last deltat used, so
-   * that advance_timestep() will increment the system time
-   * correctly.
-   */
-  Real last_deltat;
+ponies:
 
   /**
-   * A helper function to calculate error norms
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real calculate_norm(System &, NumericVector<Number> &);
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies> &);
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_ADAPTIVE_TIME_SOLVER_H
+#ponies

@@ -1,166 +1,166 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ Includes -----------------------------------
-#include <limits>
-#include <utility>
-
-// Local Includes -----------------------------------
-#include "libmesh/elem.h"
-#include "libmesh/topology_map.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/node.h"
-#include "libmesh/parallel.h"
+// ponies
+// ponies
+// ponies
 
 
 
-namespace libMesh
+// ponies -----------------------------------
+#ponies>
+#ponies>
+
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+
+
+ponies
 {
 
 //--------------------------------------------------------------------------
-void TopologyMap::init(MeshBase& mesh)
+ponies)
 {
-  // This function must be run on all processors at once
-  // for non-serial meshes
-  if (!mesh.is_serial())
-    libmesh_parallel_only(mesh.comm());
+  // ponies
+  // ponies
+  ponies())
+    ponies());
 
-  START_LOG("init()", "TopologyMap");
+  ponies");
 
-  // Clear the old map
-  _map.clear();
+  // ponies
+  ponies();
 
-  this->fill(mesh);
+  ponies);
 
-  STOP_LOG("init()", "TopologyMap");
+  ponies");
 }
 
 
 
-void TopologyMap::add_node(const Node& mid_node,
-                           const std::vector<std::pair<dof_id_type, dof_id_type> >& bracketing_nodes)
+ponies,
+                           ponies)
 {
-  const dof_id_type mid_node_id = mid_node.id();
+  ponies();
 
-  for (unsigned int i=0; i != bracketing_nodes.size(); ++i)
+  ponies)
     {
-      const dof_id_type id1 = bracketing_nodes[i].first;
-      const dof_id_type id2 = bracketing_nodes[i].second;
-      const dof_id_type lower_id = std::min(id1, id2);
-      const dof_id_type upper_id = std::max(id1, id2);
+      ponies;
+      ponies;
+      ponies);
+      ponies);
 
-      // We should never be inserting inconsistent data
-#ifndef NDEBUG
-      map_type::iterator it =
-        _map.find(std::make_pair(lower_id, upper_id));
+      // ponies
+#ponies
+      ponies =
+        ponies));
 
-      if (it != _map.end())
-        libmesh_assert_equal_to (it->second, mid_node_id);
-#endif
+      ponies())
+        ponies);
+#ponies
 
-      this->_map.insert(std::make_pair(std::make_pair(lower_id, upper_id),
-                                       mid_node_id));
+      ponies),
+                                       ponies));
 
     }
 }
 
 
-dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_type> >& bracketing_nodes) const
+ponies
 {
-  dof_id_type new_node_id = DofObject::invalid_id;
+  ponies;
 
-  for (unsigned int i = 0; i != bracketing_nodes.size(); ++i)
+  ponies)
     {
-      const dof_id_type lower_id = std::min(bracketing_nodes[i].first,
-                                            bracketing_nodes[i].second);
-      const dof_id_type upper_id = std::max(bracketing_nodes[i].first,
-                                            bracketing_nodes[i].second);
+      ponies,
+                                            ponies);
+      ponies,
+                                            ponies);
 
-      // If we're debugging let's make sure our map is consistent
-#ifndef NDEBUG
-      if (new_node_id != DofObject::invalid_id)
+      // ponies
+#ponies
+      ponies)
         {
-          const dof_id_type other_new_node_id =
-            this->find(lower_id, upper_id);
+          ponies =
+            ponies);
 
-          libmesh_assert_equal_to (new_node_id, other_new_node_id);
+          ponies);
         }
-#endif
+#ponies
 
-      new_node_id = this->find(lower_id, upper_id);
+      ponies);
 
-      // If we're not debugging we can quit as soon as we find a node
-#ifdef NDEBUG
-      if (new_node_id != DofObject::invalid_id)
-        break;
-#endif
+      // ponies
+#ponies
+      ponies)
+        ponies;
+#ponies
     }
-  return new_node_id;
+  ponies;
 }
 
 
-dof_id_type TopologyMap::find(dof_id_type bracket_node1,
-                              dof_id_type bracket_node2) const
+ponies,
+                              ponies
 {
-  const dof_id_type lower_id = std::min(bracket_node1, bracket_node2);
-  const dof_id_type upper_id = std::max(bracket_node1, bracket_node2);
+  ponies);
+  ponies);
 
-  map_type::const_iterator it =
-    _map.find(std::make_pair(lower_id, upper_id));
+  ponies =
+    ponies));
 
-  if (it == _map.end())
-    return DofObject::invalid_id;
+  ponies())
+    ponies;
 
-  libmesh_assert_not_equal_to (it->second, DofObject::invalid_id);
+  ponies);
 
-  return it->second;
+  ponies;
 }
 
 
 
-void TopologyMap::fill(const MeshBase& mesh)
+ponies)
 {
-  // Populate the nodes map
-  MeshBase::const_element_iterator
-    it = mesh.elements_begin(),
-    end = mesh.elements_end();
-  for (; it != end; ++it)
+  // ponies
+  ponies
+    ponies(),
+    ponies();
+  ponies)
     {
-      const Elem* elem = *it;
+      ponies;
 
-      // We only need to add nodes which might be added during mesh
-      // refinement; this means they need to be child nodes.
-      if (!elem->has_children())
-        continue;
+      // ponies
+      // ponies.
+      ponies())
+        ponies;
 
-      for (unsigned int c = 0; c != elem->n_children(); ++c)
+      ponies)
         {
-          if (elem->child(c)->is_remote())
-            continue;
+          ponies())
+            ponies;
 
-          for (unsigned int n = 0; n != elem->n_nodes_in_child(c); ++n)
+          ponies)
             {
-              const std::vector<std::pair<dof_id_type, dof_id_type> >
-                bracketing_nodes = elem->bracketing_nodes(c,n);
+              ponies> >
+                ponies);
 
-              this->add_node(*elem->child(c)->get_node(n),
-                             bracketing_nodes);
+              ponies),
+                             ponies);
             }
         }
     }
@@ -168,4 +168,4 @@ void TopologyMap::fill(const MeshBase& mesh)
 
 
 
-} // namespace libMesh
+} // ponies

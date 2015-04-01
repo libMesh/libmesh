@@ -1,89 +1,89 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/derived_rb_construction.h"
-#include "libmesh/derived_rb_evaluation.h"
+#ponies"
+#ponies"
 
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/equation_systems.h"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-template <class Base>
-DerivedRBConstruction<Base>::DerivedRBConstruction (EquationSystems& es,
-                                                    const std::string& name_in,
-                                                    const unsigned int number_in)
-  : Base(es, name_in, number_in)
+ponies>
+ponies,
+                                                    ponies,
+                                                    ponies)
+  : ponies)
 {
-  // We do not want to compute the output dual norms in
-  // a derived system, we just copy them over from the
-  // primary system
-  Base::output_dual_innerprods_computed = true;
+  // ponies
+  // ponies
+  // ponies
+  ponies;
 }
 
-template <class Base>
-std::string DerivedRBConstruction<Base>::system_type () const
+ponies>
+ponies
 {
-  return "DerivedRBConstruction";
+  ponies";
 }
 
-template <class Base>
-Real DerivedRBConstruction<Base>::train_reduced_basis (const std::string& directory_name,
-                                                       const bool resize_rb_eval_data)
+ponies>
+ponies,
+                                                       ponies)
 {
-  Real training_greedy_error = Base::train_reduced_basis(directory_name,
-                                                         resize_rb_eval_data);
+  ponies,
+                                                         ponies);
 
-  generate_residual_terms_wrt_truth();
+  ponies();
 
-  return training_greedy_error;
+  ponies;
 }
 
-template<class Base>
-void DerivedRBConstruction<Base>::set_uber_current_parameters()
+ponies>
+ponies()
 {
-  EquationSystems& es = this->get_equation_systems();
-  RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
+  ponies();
+  ponies);
 
-  uber_system.set_parameters( Base::get_parameters() );
+  ponies() );
 }
 
-template <class Base>
-void DerivedRBConstruction<Base>::load_basis_function(unsigned int i)
+ponies>
+ponies)
 {
-  START_LOG("load_basis_function()", "DerivedRBConstruction");
+  ponies");
 
-  EquationSystems& es = Base::get_equation_systems();
-  RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
+  ponies();
+  ponies);
 
-  DenseVector<Number> bf = get_derived_basis_function(i);
+  ponies);
 
-  for(unsigned int j=0; j<uber_system.get_rb_evaluation().get_n_basis_functions(); j++)
+  ponies++)
     {
-      Base::solution->add(bf(j), uber_system.get_rb_evaluation().get_basis_function(j));
+      ponies));
     }
 
-  STOP_LOG("load_basis_function()", "DerivedRBConstruction");
+  ponies");
 }
 
-// explicit instantiations
-template class DerivedRBConstruction<RBConstruction>;
+// ponies
+ponies>;
 
 }

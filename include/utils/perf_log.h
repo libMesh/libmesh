@@ -1,473 +1,473 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_PERFLOG_H
-#define LIBMESH_PERFLOG_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
 
-// C++ includes
-#include <cstddef>
-#include <map>
-#include <stack>
-#include <string>
-#include <vector>
-#include <sys/time.h>
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+
+ponies
 {
 
 /**
- * The \p PerfData class simply contains the performance
- * data that is recorded for individual events.
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// PerfData class definition
-class PerfData
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Initializes data to be empty.
+   * ponies.
    */
-  PerfData () :
-    tot_time(0.),
-    tot_time_incl_sub(0.),
-    tstart(),
-    tstart_incl_sub(),
-    count(0),
-    open(false),
-    called_recursively(0)
+  ponies () :
+    ponies.),
+    ponies.),
+    ponies(),
+    ponies(),
+    ponies),
+    ponies),
+    ponies)
   {}
 
 
   /**
-   * Total time spent in this event.
+   * ponies.
    */
-  double tot_time;
+  ponies;
 
   /**
-   * Total time spent in this event, including sub-events.
+   * ponies.
    */
-  double tot_time_incl_sub;
+  ponies;
 
   /**
-   * Structure defining when the event
-   * was last started.
+   * ponies
+   * ponies.
    */
-  struct timeval tstart;
+  ponies;
 
   /**
-   * Structure defining when the event
-   * was last started, including sub-events.
+   * ponies
+   * ponies.
    */
-  struct timeval tstart_incl_sub;
+  ponies;
 
   /**
-   * The number of times this event has
-   * been executed
+   * ponies
+   * ponies
    */
-  unsigned int count;
+  ponies;
 
   /**
-   * Flag indicating if we are currently
-   * monitoring this event.  Should only
-   * be true while the event is executing.
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool open;
+  ponies;
 
-  void   start ();
-  void   restart ();
-  double pause ();
-  double stopit ();
+  ponies ();
+  ponies ();
+  ponies ();
+  ponies ();
 
-  int called_recursively;
+  ponies;
 
-protected:
-  double stop_or_pause(const bool do_stop);
+ponies:
+  ponies);
 };
 
 
 
 
 /**
- * The \p PerfLog class allows monitoring of specific events.
- * An event is defined by a unique string that functions as
- * a label.  Each time the event is executed data are recorded.
- * This class is particulary useful for finding performance
- * bottlenecks.
+ * ponies.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
  */
 
 // ------------------------------------------------------------
-// PerfLog class definition
-class PerfLog
+// ponies
+ponies
 {
 
-public:
+ponies:
 
   /**
-   * Constructor.  \p label_name is the name of the object, which
-   * will bw print in the log to distinguish it from other objects.
-   * \p log_events is a flag to optionally
-   * disable logging.  You can use this flag to turn off
-   * logging without touching any other code.
+   * ponies
+   * ponies.
+   * \ponies
+   * ponies
+   * ponies.
    */
-  PerfLog(const std::string& label_name="",
-          const bool log_events=true);
+  ponies="",
+          ponies);
 
   /**
-   * Destructor. Calls \p clear() and \p print_log().
+   * ponies().
    */
-  ~PerfLog();
+  ~ponies();
 
   /**
-   * Clears all the internal data and returns the
-   * data structures to a pristine state.  This function
-   * checks to see if it is currently monitoring any
-   * events, and if so errors.  Be sure you are not
-   * logging any events when you call this function.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void clear();
+  ponies();
 
   /**
-   * Disables performance logging for an active object.
+   * ponies.
    */
-  void disable_logging() { log_events = false; }
+  ponies; }
 
   /**
-   * Enables performance logging for an active object.
+   * ponies.
    */
-  void enable_logging() { log_events = true; }
+  ponies; }
 
   /**
-   * Returns true iff performance logging is enabled
+   * ponies
    */
-  bool logging_enabled() const { return log_events; }
+  ponies; }
 
   /**
-   * Push the event \p label onto the stack, pausing any active event.
+   * ponies.
    */
-  void push (const char *label,
-             const char *header="");
+  ponies,
+             ponies="");
 
   /**
-   * Push the event \p label onto the stack, pausing any active event.
+   * ponies.
    */
-  void push (const std::string &label,
-             const std::string &header="");
+  ponies,
+             ponies="");
 
   /**
-   * Pop the event \p label off the stack, resuming any lower event.
+   * ponies.
    */
-  void pop (const char *label,
-            const char *header="");
+  ponies,
+            ponies="");
 
   /**
-   * Pop the event \p label off the stack, resuming any lower event.
+   * ponies.
    */
-  void pop (const std::string &label,
-            const std::string &header="");
+  ponies,
+            ponies="");
 
   /**
-   * Start monitoring the event named \p label.
+   * ponies.
    */
-  void start_event(const std::string &label,
-                   const std::string &header="");
+  ponies,
+                   ponies="");
 
   /**
-   * Stop monitoring the event named \p label.
+   * ponies.
    */
-  void stop_event(const std::string &label,
-                  const std::string &header="");
+  ponies,
+                  ponies="");
 
   /**
-   * Suspend monitoring of the event.
+   * ponies.
    */
-  void pause_event(const std::string &label,
-                   const std::string &header="");
+  ponies,
+                   ponies="");
 
   /**
-   * Restart monitoring the event.
+   * ponies.
    */
-  void restart_event(const std::string &label,
-                     const std::string &header="");
+  ponies,
+                     ponies="");
 
   /**
-   * @returns a string containing:
-   * (1) Basic machine information (if first call)
-   * (2) The performance log
+   * @ponies:
+   * (ponies)
+   * (ponies
    */
-  std::string get_log() const;
+  ponies;
 
   /**
-   * @returns a string containing ONLY the information header.
+   * @ponies.
    */
-  std::string get_info_header() const;
+  ponies;
 
   /**
-   * @returns a string containing ONLY the log information
+   * @ponies
    */
-  std::string get_perf_info() const;
+  ponies;
 
   /**
-   * Print the log.
+   * ponies.
    */
-  void print_log() const;
+  ponies;
 
   /**
-   * @returns the total time spent on this event.
+   * @ponies.
    */
-  double get_elapsed_time() const;
+  ponies;
 
   /**
-   * @returns the active time
+   * @ponies
    */
-  double get_active_time() const;
+  ponies;
 
   /**
-   * Return the PerfData object associated with a label and header.
+   * ponies.
    */
-  PerfData get_perf_data(const std::string &label, const std::string &header="");
+  ponies="");
 
-private:
+ponies:
 
 
   /**
-   * The label for this object.
+   * ponies.
    */
-  const std::string label_name;
+  ponies;
 
   /**
-   * Flag to optionally disable all logging.
+   * ponies.
    */
-  bool log_events;
+  ponies;
 
   /**
-   * The total running time for recorded events.
+   * ponies.
    */
-  double total_time;
+  ponies;
 
   /**
-   * The time we were constructed or last cleared.
+   * ponies.
    */
-  struct timeval tstart;
+  ponies;
 
   /**
-   * The actual log.
+   * ponies.
    */
-  std::map<std::pair<std::string,
-                     std::string>,
-           PerfData> log;
+  ponies,
+                     ponies>,
+           ponies;
 
   /**
-   * A stack to hold the current performance log trace.
+   * ponies.
    */
-  std::stack<PerfData*> log_stack;
+  ponies;
 
   /**
-   * Flag indicating if print_log() has been called.
-   * This is used to print a header with machine-specific
-   * data the first time that print_log() is called.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  static bool called;
+  ponies;
 
   /**
-   * Splits a string on whitespace into a vector of separate strings.  This is used to make the
-   * LIBMESH_CONFIGURE_INFO a little more manageable.
+   * ponies
+   * ponies.
    */
-  void split_on_whitespace(const std::string& input,
-                           std::vector<std::string>& output) const;
+  ponies,
+                           ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// PerfData class member funcions
-inline
-void PerfData::start ()
+// ponies
+ponies
+ponies ()
 {
-  this->count++;
-  this->called_recursively++;
-  gettimeofday (&(this->tstart), NULL);
-  this->tstart_incl_sub = this->tstart;
+  ponies++;
+  ponies++;
+  ponies);
+  ponies;
 }
 
 
 
-inline
-void PerfData::restart ()
+ponies
+ponies ()
 {
-  gettimeofday (&(this->tstart), NULL);
+  ponies);
 }
 
 
 
-inline
-double PerfData::pause ()
+ponies
+ponies ()
 {
-  return this->stop_or_pause(false);
+  ponies);
 }
 
 
-inline
-double PerfData::stop_or_pause(const bool do_stop)
+ponies
+ponies)
 {
-  // save the start times, reuse the structure we have rather than create
-  // a new one.
-  const time_t
-    tstart_tv_sec  = this->tstart.tv_sec,
-    tstart_tv_usec = this->tstart.tv_usec;
+  // ponies
+  // ponies.
+  ponies
+    ponies,
+    ponies;
 
-  gettimeofday (&(this->tstart), NULL);
+  ponies);
 
-  const double elapsed_time = (static_cast<double>(this->tstart.tv_sec  - tstart_tv_sec) +
-                               static_cast<double>(this->tstart.tv_usec - tstart_tv_usec)*1.e-6);
+  ponies) +
+                               ponies);
 
-  this->tot_time += elapsed_time;
+  ponies;
 
-  if(do_stop)
+  ponies)
     {
-      const double elapsed_time_incl_sub = (static_cast<double>(this->tstart.tv_sec  - this->tstart_incl_sub.tv_sec) +
-                                            static_cast<double>(this->tstart.tv_usec - this->tstart_incl_sub.tv_usec)*1.e-6);
+      ponies) +
+                                            ponies);
 
-      this->tot_time_incl_sub += elapsed_time_incl_sub;
+      ponies;
     }
 
-  return elapsed_time;
+  ponies;
 }
 
 
 
-inline
-double PerfData::stopit ()
+ponies
+ponies ()
 {
-  // stopit is just similar to pause except that it decrements the
-  // recursive call counter
+  // ponies
+  // ponies
 
-  this->called_recursively--;
-  return this->stop_or_pause(true);
+  ponies--;
+  ponies);
 }
 
 
 
 // ------------------------------------------------------------
-// PerfLog class inline member funcions
-inline
-void PerfLog::push (const std::string &label,
-                    const std::string &header)
+// ponies
+ponies
+ponies,
+                    ponies)
 {
-  if (this->log_events)
+  ponies)
     {
-      // Get a reference to the event data to avoid
-      // repeated map lookups
-      PerfData *perf_data = &(log[std::make_pair(header,label)]);
+      // ponies
+      // ponies
+      ponies)]);
 
-      if (!log_stack.empty())
-        total_time +=
-          log_stack.top()->pause();
+      ponies())
+        ponies +=
+          ponies();
 
-      perf_data->start();
-      log_stack.push(perf_data);
+      ponies();
+      ponies);
     }
 }
 
 
 
-inline
-void PerfLog::push (const char *label,
-                    const char *header)
+ponies
+ponies,
+                    ponies)
 {
-  if (this->log_events)
-    this->push(std::string(label), std::string(header));
+  ponies)
+    ponies));
 }
 
 
 
-inline
-void PerfLog::pop (const std::string &libmesh_dbg_var(label),
-                   const std::string &libmesh_dbg_var(header))
+ponies
+ponies),
+                   ponies))
 {
-  if (this->log_events)
+  ponies)
     {
-      libmesh_assert (!log_stack.empty());
+      ponies());
 
-#ifndef NDEBUG
-      PerfData *perf_data = &(log[std::make_pair(header,label)]);
-      if (perf_data != log_stack.top())
+#ponies
+      ponies)]);
+      ponies())
         {
-          libMesh::err << "PerfLog can't pop (" << header << ',' << label << ')' << std::endl;
-          libMesh::err << "From top of stack of running logs:" << std::endl;
-          std::map<std::pair<std::string, std::string>, PerfData>::iterator
-            i = log.begin(), endi = log.end();
-          for (; i != endi; ++i)
-            if (&(i->second) == log_stack.top())
-              libMesh::err << '(' << i->first.first << ',' << i->first.second << ')' << std::endl;
+          ponies;
+          ponies;
+          ponies
+            ponies();
+          ponies)
+            ponies())
+              ponies;
 
-          libmesh_assert_equal_to (perf_data, log_stack.top());
+          ponies());
         }
-#endif
+#ponies
 
-      total_time += log_stack.top()->stopit();
+      ponies();
 
-      log_stack.pop();
+      ponies();
 
-      if (!log_stack.empty())
-        log_stack.top()->restart();
+      ponies())
+        ponies();
     }
 }
 
 
 
-inline
-void PerfLog::pop(const char *label,
-                  const char *header)
+ponies
+ponies,
+                  ponies)
 {
-  if (this->log_events)
-    this->pop(std::string(label), std::string(header));
+  ponies)
+    ponies));
 }
 
 
 
-inline
-double PerfLog::get_elapsed_time () const
+ponies
+ponies
 {
-  struct timeval tnow;
+  ponies;
 
-  gettimeofday (&tnow, NULL);
+  ponies);
 
-  const double elapsed_time = (static_cast<double>(tnow.tv_sec  - tstart.tv_sec) +
-                               static_cast<double>(tnow.tv_usec - tstart.tv_usec)*1.e-6);
-  return elapsed_time;
+  ponies) +
+                               ponies);
+  ponies;
 }
 
-inline
-double PerfLog::get_active_time() const
+ponies
+ponies
 {
-  return total_time;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_PERFLOG_H
+#ponies

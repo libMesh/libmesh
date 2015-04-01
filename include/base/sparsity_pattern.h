@@ -1,187 +1,187 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_SPARSITY_PATTERN_H
-#define LIBMESH_SPARSITY_PATTERN_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/elem_range.h"
-#include "libmesh/threads_allocators.h"
-#include "libmesh/parallel_object.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declaractions
-class MeshBase;
-class DofMap;
-class CouplingMatrix;
+// ponies
+ponies;
+ponies;
+ponies;
 
 // ------------------------------------------------------------
-// Sparsity Pattern
+// ponies
 
 /**
- * This defines the sparsity pattern, or graph, of a sparse matrix.
- * The format is quite simple -- the global indices of the nonzero entries
- * in each row are packed into a vector.  The global indices (i,j) of the
- * nth nonzero entry of row i are given by j = sparsity_pattern[i][n];
+ * ponies.
+ * ponies
+ * ponies
+ * ponies];
  */
-namespace SparsityPattern // use a namespace so member classes can be forward-declared.
+ponies.
 {
-typedef std::vector<dof_id_type, Threads::scalable_allocator<dof_id_type> > Row;
-class Graph : public std::vector<Row> {};
+ponies;
+ponies> {};
 
-class NonlocalGraph : public std::map<dof_id_type, Row> {};
-
-/**
- * Splices the two sorted ranges [begin,middle) and [middle,end)
- * into one sorted range [begin,end).  This method is much like
- * std::inplace_merge except it assumes the intersection
- * of the two sorted ranges is empty and that any element in
- * each range occurs only once in that range.  Additionally,
- * this sort occurs in-place, while std::inplace_merge may
- * use a temporary buffer.
- */
-template<typename BidirectionalIterator>
-static void sort_row (const BidirectionalIterator begin,
-                      BidirectionalIterator       middle,
-                      const BidirectionalIterator end);
+ponies> {};
 
 /**
- * This helper class can be called on multiple threads to compute
- * the sparsity pattern (or graph) of the sparse matrix resulting
- * from the discretization.  This pattern may be used directly by
- * a particular sparse matrix format (e.g. \p LaspackMatrix)
- * or indirectly (e.g. \p PetscMatrix).  In the latter case the
- * number of nonzeros per row of the matrix is needed for efficient
- * preallocation.  In this case it suffices to provide estimate
- * (but bounding) values, and in this case the threaded method can
- * take some short-cuts for efficiency.
+ * ponies)
+ * ponies
+ * ponies
+ * ponies
+ * ponies,
+ * ponies
+ * ponies.
  */
-class Build : public ParallelObject
+ponies>
+ponies,
+                      ponies,
+                      ponies);
+
+/**
+ * ponies
+ * ponies
+ * ponies
+ * ponies)
+ * ponies
+ * ponies
+ * ponies
+ * (ponies
+ * ponies.
+ */
+ponies
 {
-private:
-  const MeshBase &mesh;
-  const DofMap &dof_map;
-  const CouplingMatrix *dof_coupling;
-  const bool implicit_neighbor_dofs;
-  const bool need_full_sparsity_pattern;
+ponies:
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-public:
+ponies:
 
-  SparsityPattern::Graph sparsity_pattern;
-  SparsityPattern::NonlocalGraph nonlocal_pattern;
+  ponies;
+  ponies;
 
-  std::vector<dof_id_type> n_nz;
-  std::vector<dof_id_type> n_oz;
+  ponies;
+  ponies;
 
-  Build (const MeshBase &mesh_in,
-         const DofMap &dof_map_in,
-         const CouplingMatrix *dof_coupling_in,
-         const bool implicit_neighbor_dofs_in,
-         const bool need_full_sparsity_pattern_in);
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
-  Build (Build &other, Threads::split);
+  ponies);
 
-  void operator()(const ConstElemRange &range);
+  ponies);
 
-  void join (const Build &other);
+  ponies);
 
-  void parallel_sync ();
+  ponies ();
 };
 
-#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
+#ponies)
 /**
- * Dummy function that does nothing but can be used to prohibit
- * compiler optimization in some situations where some compilers
- * have optimization bugs.
+ * ponies
+ * ponies
+ * ponies.
  */
-void _dummy_function(void);
-#endif
+ponies);
+#ponies
 
 }
 
 
 
 // ------------------------------------------------------------
-// SparsityPattern inline member functions
-template<typename BidirectionalIterator>
-inline
-void SparsityPattern::sort_row (const BidirectionalIterator begin,
-                                BidirectionalIterator       middle,
-                                const BidirectionalIterator end)
+// ponies
+ponies>
+ponies
+ponies,
+                                ponies,
+                                ponies)
 {
-  if ((begin == middle) || (middle == end)) return;
+  ponies;
 
-  libmesh_assert_greater (std::distance (begin,  middle), 0);
-  libmesh_assert_greater (std::distance (middle, end), 0);
-  libmesh_assert (std::unique (begin,  middle) == middle);
-  libmesh_assert (std::unique (middle, end) == end);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  while (middle != end)
+  ponies)
     {
-      BidirectionalIterator
-        b = middle,
-        a = b-1;
+      ponies
+        ponies,
+        ponies;
 
-      // Bubble-sort the middle value downward
-      while (!(*a < *b)) // *a & *b are less-than comparable, so use <
+      // ponies
+      ponies <
         {
-          std::swap (*a, *b);
+          ponies);
 
-#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-          /* Prohibit optimization at this point since gcc 3.3.5 seems
-             to have a bug.  */
-          SparsityPattern::_dummy_function();
-#endif
+#ponies)
+          /* ponies
+             ponies.  */
+          ponies();
+#ponies
 
-          if (a == begin) break;
+          ponies;
 
-          b=a;
-          --a;
+          ponies;
+          --ponies;
         }
 
-      ++middle;
+      ++ponies;
     }
 
-  // Assure the algorithm worked if we are in DEBUG mode
-#ifdef DEBUG
+  // ponies
+#ponies
   {
-    // SGI STL extension!
-    // libmesh_assert (std::is_sorted(begin,end));
+    // ponies!
+    // ponies));
 
-    BidirectionalIterator
-      prev  = begin,
-      first = begin;
+    ponies
+      ponies,
+      ponies;
 
-    for (++first; first != end; prev=first, ++first)
-      if (*first < *prev)
-        libmesh_assert(false);
+    ponies)
+      ponies)
+        ponies);
   }
-#endif
+#ponies
 
-  // Make sure the two ranges did not contain any common elements
-  libmesh_assert (std::unique (begin, end) == end);
+  // ponies
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_SPARSITY_PATTERN_H
+#ponies

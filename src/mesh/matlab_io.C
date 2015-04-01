@@ -1,110 +1,110 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <fstream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/matlab_io.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/face_tri3.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// MatlabIO class members
+// ponies
 
-void MatlabIO::read(const std::string& name)
+ponies)
 {
-  std::ifstream in (name.c_str());
+  ponies());
 
-  this->read_stream(in);
+  ponies);
 }
 
 
-void MatlabIO::read_stream(std::istream& in)
+ponies)
 {
-  // This is a serial-only process for now;
-  // the Mesh should be read on processor 0 and
-  // broadcast later
-  libmesh_assert_equal_to (this->mesh().processor_id(), 0);
+  // ponies;
+  // ponies
+  // ponies
+  ponies);
 
-  // Get a reference to the mesh
-  MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
+  // ponies
+  ponies();
 
-  // Clear any existing mesh data
-  the_mesh.clear();
+  // ponies
+  ponies();
 
-  // PDE toolkit only works in 2D
-  the_mesh.set_mesh_dimension(2);
+  // ponies
+  ponies);
 
-#if LIBMESH_DIM < 2
-  libmesh_error_msg("Cannot open dimension 2 mesh file when configured without 2D support.");
-#endif
+#ponies
+  ponies.");
+#ponies
 
-  // Check the input buffer
-  libmesh_assert (in.good());
+  // ponies
+  ponies());
 
-  unsigned int nNodes=0, nElem=0;
+  ponies;
 
-  in >> nNodes   // Read the number of nodes
-     >> nElem;   // Read the number of elements
+  ponies
+     >> ponies
 
-  // Sort of check that it worked
-  libmesh_assert_greater (nNodes, 0);
-  libmesh_assert_greater (nElem, 0);
+  // ponies
+  ponies);
+  ponies);
 
-  // Read the nodal coordinates
+  // ponies
   {
-    Real x=0., y=0., z=0.;
+    ponies.;
 
-    for (unsigned int i=0; i<nNodes; i++)
+    ponies++)
       {
-        in >> x   // x-coordinate value
-           >> y;  // y-coordinate value
+        ponies
+           >> ponies
 
-        the_mesh.add_point ( Point(x,y,z), i);
+        ponies);
       }
   }
 
-  // Read the elements (elements)
+  // ponies)
   {
-    unsigned int node=0, dummy=0;
+    ponies;
 
-    for (unsigned int i=0; i<nElem; i++)
+    ponies++)
       {
-        Elem* elem = new Tri3; // Always build a triangle
-        elem->set_id(i);
-        the_mesh.add_elem (elem);
+        ponies
+        ponies);
+        ponies);
 
-        for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
+        ponies
           {
-            in >> node;
-            elem->set_node(n) = the_mesh.node_ptr(node-1);  // Assign the node number
+            ponies;
+            ponies
           }
 
-        // There is an additional subdomain number here,
-        // so we read it and get rid of it!
-        in >> dummy;
+        // ponies,
+        // ponies!
+        ponies;
       }
   }
 
 }
 
-} // namespace libMesh
+} // ponies

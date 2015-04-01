@@ -1,598 +1,598 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/elem.h"
-#include "libmesh/fe.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/fe_macro.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/quadrature.h"
-#include "libmesh/tensor_value.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// FE class members
-template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_shape_functions () const
+// ponies
+ponies>
+ponies
 {
-  return FE<Dim,T>::n_dofs (this->elem_type,
-                            static_cast<Order>(this->fe_type.order + this->_p_level));
+  ponies,
+                            ponies));
 }
 
 
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::attach_quadrature_rule (QBase* q)
+ponies>
+ponies)
 {
-  libmesh_assert(q);
-  this->qrule = q;
-  // make sure we don't cache results from a previous quadrature rule
-  this->elem_type = INVALID_ELEM;
-  return;
+  ponies);
+  ponies;
+  // ponies
+  ponies;
+  ponies;
 }
 
 
-template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_quadrature_points () const
+ponies>
+ponies
 {
-  libmesh_assert(this->qrule);
-  return this->qrule->n_points();
+  ponies);
+  ponies();
 }
 
 
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::dofs_on_side(const Elem* const elem,
-                             const Order o,
-                             unsigned int s,
-                             std::vector<unsigned int>& di)
+ponies>
+ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-  libmesh_assert(elem);
-  libmesh_assert_less (s, elem->n_sides());
+  ponies);
+  ponies());
 
-  di.clear();
-  unsigned int nodenum = 0;
-  const unsigned int n_nodes = elem->n_nodes();
-  for (unsigned int n = 0; n != n_nodes; ++n)
+  ponies();
+  ponies;
+  ponies();
+  ponies)
     {
-      const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-                                                 static_cast<Order>(o + elem->p_level()), n);
-      if (elem->is_node_on_side(n, s))
-        for (unsigned int i = 0; i != n_dofs; ++i)
-          di.push_back(nodenum++);
-      else
-        nodenum += n_dofs;
+      ponies(),
+                                                 ponies);
+      ponies))
+        ponies)
+          ponies++);
+      ponies
+        ponies;
     }
 }
 
 
 
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
-                             const Order o,
-                             unsigned int e,
-                             std::vector<unsigned int>& di)
+ponies>
+ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-  libmesh_assert(elem);
-  libmesh_assert_less (e, elem->n_edges());
+  ponies);
+  ponies());
 
-  di.clear();
-  unsigned int nodenum = 0;
-  const unsigned int n_nodes = elem->n_nodes();
-  for (unsigned int n = 0; n != n_nodes; ++n)
+  ponies();
+  ponies;
+  ponies();
+  ponies)
     {
-      const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-                                                 static_cast<Order>(o + elem->p_level()), n);
-      if (elem->is_node_on_edge(n, e))
-        for (unsigned int i = 0; i != n_dofs; ++i)
-          di.push_back(nodenum++);
-      else
-        nodenum += n_dofs;
+      ponies(),
+                                                 ponies);
+      ponies))
+        ponies)
+          ponies++);
+      ponies
+        ponies;
     }
 }
 
 
 
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::reinit(const Elem* elem,
-                       const std::vector<Point>* const pts,
-                       const std::vector<Real>* const weights)
+ponies>
+ponies,
+                       ponies,
+                       ponies)
 {
-  // We can be called with no element.  If we're evaluating SCALAR
-  // dofs we'll still have work to do.
-  // libmesh_assert(elem);
+  // ponies
+  // ponies.
+  // ponies);
 
-  // Try to avoid calling init_shape_functions
-  // even when shapes_need_reinit
-  bool cached_nodes_still_fit = false;
+  // ponies
+  // ponies
+  ponies;
 
-  // Most of the hard work happens when we have an actual element
-  if (elem)
+  // ponies
+  ponies)
     {
-      // Initialize the shape functions at the user-specified
-      // points
-      if (pts != NULL)
+      // ponies
+      // ponies
+      ponies)
         {
-          // Set the type and p level for this element
-          this->elem_type = elem->type();
-          this->_p_level = elem->p_level();
+          // ponies
+          ponies();
+          ponies();
 
-          // Initialize the shape functions
-          this->_fe_map->template init_reference_to_physical_map<Dim>
-            (*pts, elem);
-          this->init_shape_functions (*pts, elem);
+          // ponies
+          ponies>
+            (*ponies);
+          ponies);
 
-          // The shape functions do not correspond to the qrule
-          this->shapes_on_quadrature = false;
+          // ponies
+          ponies;
         }
 
-      // If there are no user specified points, we use the
-      // quadrature rule
+      // ponies
+      // ponies
 
-      // update the type in accordance to the current cell
-      // and reinit if the cell type has changed or (as in
-      // the case of the hierarchics) the shape functions need
-      // reinit, since they depend on the particular element shape
-      else
+      // ponies
+      // ponies
+      // ponies
+      // ponies
+      ponies
         {
-          libmesh_assert(this->qrule);
-          this->qrule->init(elem->type(), elem->p_level());
+          ponies);
+          ponies());
 
-          if(this->qrule->shapes_need_reinit())
-            this->shapes_on_quadrature = false;
+          ponies())
+            ponies;
 
-          if (this->elem_type != elem->type() ||
-              this->_p_level != elem->p_level() ||
-              !this->shapes_on_quadrature)
+          ponies() ||
+              ponies() ||
+              !ponies)
             {
-              // Set the type and p level for this element
-              this->elem_type = elem->type();
-              this->_p_level = elem->p_level();
-              // Initialize the shape functions
-              this->_fe_map->template init_reference_to_physical_map<Dim>
-                (this->qrule->get_points(), elem);
-              this->init_shape_functions (this->qrule->get_points(), elem);
+              // ponies
+              ponies();
+              ponies();
+              // ponies
+              ponies>
+                (ponies);
+              ponies);
 
-              if (this->shapes_need_reinit())
+              ponies())
                 {
-                  cached_nodes.resize(elem->n_nodes());
-                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                  ponies());
+                  ponies)
                     {
-                      cached_nodes[n] = elem->point(n);
+                      ponies);
                     }
                 }
             }
-          else
+          ponies
             {
-              // libmesh_assert_greater (elem->n_nodes(), 1);
+              // ponies);
 
-              cached_nodes_still_fit = true;
-              if (cached_nodes.size() != elem->n_nodes())
-                cached_nodes_still_fit = false;
-              else
-                for (unsigned int n = 1; n < elem->n_nodes(); ++n)
+              ponies;
+              ponies())
+                ponies;
+              ponies
+                ponies)
                   {
-                    if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals
-                        ((cached_nodes[n] - cached_nodes[0]), 1e-13))
+                    ponies
+                        ((ponies))
                       {
-                        cached_nodes_still_fit = false;
-                        break;
+                        ponies;
+                        ponies;
                       }
                   }
 
-              if (this->shapes_need_reinit() && !cached_nodes_still_fit)
+              ponies)
                 {
-                  this->_fe_map->template init_reference_to_physical_map<Dim>
-                    (this->qrule->get_points(), elem);
-                  this->init_shape_functions (this->qrule->get_points(), elem);
-                  cached_nodes.resize(elem->n_nodes());
-                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
-                    cached_nodes[n] = elem->point(n);
+                  ponies>
+                    (ponies);
+                  ponies);
+                  ponies());
+                  ponies)
+                    ponies);
                 }
             }
 
-          // The shape functions correspond to the qrule
-          this->shapes_on_quadrature = true;
+          // ponies
+          ponies;
         }
     }
-  else // With no defined elem, so mapping or caching to
-       // be done, and our "quadrature rule" is one point for nonlocal
-       // (SCALAR) variables and zero points for local variables.
+  ponies
+       // ponies
+       // (ponies.
     {
-      this->elem_type = INVALID_ELEM;
-      this->_p_level = 0;
+      ponies;
+      ponies;
 
-      if (!pts)
+      ponies)
         {
-          if (T == SCALAR)
+          ponies)
             {
-              this->qrule->get_points() =
-                std::vector<Point>(1,Point(0));
+              ponies() =
+                ponies));
 
-              this->qrule->get_weights() =
-                std::vector<Real>(1,1);
+              ponies() =
+                ponies);
             }
-          else
+          ponies
             {
-              this->qrule->get_points().clear();
-              this->qrule->get_weights().clear();
+              ponies();
+              ponies();
             }
 
-          this->init_shape_functions (this->qrule->get_points(), elem);
+          ponies);
         }
-      else
-        this->init_shape_functions (*pts, elem);
+      ponies
+        ponies);
     }
 
-  // Compute the map for this element.
-  if (pts != NULL)
+  // ponies.
+  ponies)
     {
-      if (weights != NULL)
+      ponies)
         {
-          this->_fe_map->compute_map (this->dim,*weights, elem);
+          ponies);
         }
-      else
+      ponies
         {
-          std::vector<Real> dummy_weights (pts->size(), 1.);
-          this->_fe_map->compute_map (this->dim,dummy_weights, elem);
+          ponies.);
+          ponies);
         }
     }
-  else
+  ponies
     {
-      this->_fe_map->compute_map (this->dim,this->qrule->get_weights(), elem);
+      ponies);
     }
 
-  // Compute the shape functions and the derivatives at all of the
-  // quadrature points.
-  if (!cached_nodes_still_fit)
+  // ponies
+  // ponies.
+  ponies)
     {
-      if (pts != NULL)
-        this->compute_shape_functions (elem,*pts);
-      else
-        this->compute_shape_functions(elem,this->qrule->get_points());
+      ponies)
+        ponies);
+      ponies
+        ponies());
     }
 }
 
 
 
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
-                                     const Elem* elem)
+ponies>
+ponies,
+                                     ponies)
 {
-  // We can be called with no element.  If we're evaluating SCALAR
-  // dofs we'll still have work to do.
-  // libmesh_assert(elem);
+  // ponies
+  // ponies.
+  // ponies);
 
-  this->calculations_started = true;
+  ponies;
 
-  // If the user forgot to request anything, we'll be safe and
-  // calculate everything:
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi
-      && !this->calculate_curl_phi && !this->calculate_div_phi)
+  // ponies
+  // ponies:
+#ponies
+  ponies
+      && !ponies)
     {
-      this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
-      if( FEInterface::field_type(T) == TYPE_VECTOR )
+      ponies;
+      ponies )
         {
-          this->calculate_curl_phi = true;
-          this->calculate_div_phi  = true;
+          ponies;
+          ponies;
         }
     }
-#else
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_curl_phi && !this->calculate_div_phi)
+#ponies
+  ponies)
     {
-      this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
-      if( FEInterface::field_type(T) == TYPE_VECTOR )
+      ponies;
+      ponies )
         {
-          this->calculate_curl_phi = true;
-          this->calculate_div_phi  = true;
+          ponies;
+          ponies;
         }
     }
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-  // Start logging the shape function initialization
-  START_LOG("init_shape_functions()", "FE");
+  // ponies
+  ponies");
 
 
-  // The number of quadrature points.
-  const unsigned int n_qp = cast_int<unsigned int>(qp.size());
+  // ponies.
+  ponies());
 
-  // Number of shape functions in the finite element approximation
-  // space.
-  const unsigned int n_approx_shape_functions =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+  // ponies
+  // ponies.
+  ponies =
+    ponies(),
+                            ponies());
 
-  // resize the vectors to hold current data
-  // Phi are the shape functions used for the FE approximation
-  // Phi_map are the shape functions used for the FE mapping
-  if (this->calculate_phi)
-    this->phi.resize     (n_approx_shape_functions);
+  // ponies
+  // ponies
+  // ponies
+  ponies)
+    ponies);
 
-  if (this->calculate_dphi)
+  ponies)
     {
-      this->dphi.resize    (n_approx_shape_functions);
-      this->dphidx.resize  (n_approx_shape_functions);
-      this->dphidy.resize  (n_approx_shape_functions);
-      this->dphidz.resize  (n_approx_shape_functions);
+      ponies);
+      ponies);
+      ponies);
+      ponies);
     }
 
-  if(this->calculate_dphiref)
+  ponies)
     {
-      if (Dim > 0)
-        this->dphidxi.resize (n_approx_shape_functions);
+      ponies)
+        ponies);
 
-      if (Dim > 1)
-        this->dphideta.resize      (n_approx_shape_functions);
+      ponies)
+        ponies);
 
-      if (Dim > 2)
-        this->dphidzeta.resize     (n_approx_shape_functions);
+      ponies)
+        ponies);
     }
 
-  if( this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
-    this->curl_phi.resize(n_approx_shape_functions);
+  ponies) )
+    ponies);
 
-  if( this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
-    this->div_phi.resize(n_approx_shape_functions);
+  ponies) )
+    ponies);
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (this->calculate_d2phi)
+#ponies
+  ponies)
     {
-      this->d2phi.resize     (n_approx_shape_functions);
-      this->d2phidx2.resize  (n_approx_shape_functions);
-      this->d2phidxdy.resize (n_approx_shape_functions);
-      this->d2phidxdz.resize (n_approx_shape_functions);
-      this->d2phidy2.resize  (n_approx_shape_functions);
-      this->d2phidydz.resize (n_approx_shape_functions);
-      this->d2phidz2.resize  (n_approx_shape_functions);
+      ponies);
+      ponies);
+      ponies);
+      ponies);
+      ponies);
+      ponies);
+      ponies);
 
-      if (Dim > 0)
-        this->d2phidxi2.resize (n_approx_shape_functions);
+      ponies)
+        ponies);
 
-      if (Dim > 1)
+      ponies)
         {
-          this->d2phidxideta.resize (n_approx_shape_functions);
-          this->d2phideta2.resize   (n_approx_shape_functions);
+          ponies);
+          ponies);
         }
-      if (Dim > 2)
+      ponies)
         {
-          this->d2phidxidzeta.resize  (n_approx_shape_functions);
-          this->d2phidetadzeta.resize (n_approx_shape_functions);
-          this->d2phidzeta2.resize    (n_approx_shape_functions);
+          ponies);
+          ponies);
+          ponies);
         }
     }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-  for (unsigned int i=0; i<n_approx_shape_functions; i++)
+  ponies++)
     {
-      if (this->calculate_phi)
-        this->phi[i].resize         (n_qp);
-      if (this->calculate_dphi)
+      ponies)
+        ponies);
+      ponies)
         {
-          this->dphi[i].resize        (n_qp);
-          this->dphidx[i].resize      (n_qp);
-          this->dphidy[i].resize      (n_qp);
-          this->dphidz[i].resize      (n_qp);
+          ponies);
+          ponies);
+          ponies);
+          ponies);
         }
 
-      if(this->calculate_dphiref)
+      ponies)
         {
-          if (Dim > 0)
-            this->dphidxi[i].resize(n_qp);
+          ponies)
+            ponies);
 
-          if (Dim > 1)
-            this->dphideta[i].resize(n_qp);
+          ponies)
+            ponies);
 
-          if (Dim > 2)
-            this->dphidzeta[i].resize(n_qp);
+          ponies)
+            ponies);
         }
 
-      if(this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
-        this->curl_phi[i].resize(n_qp);
+      ponies) )
+        ponies);
 
-      if(this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
-        this->div_phi[i].resize(n_qp);
+      ponies) )
+        ponies);
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      if (this->calculate_d2phi)
+#ponies
+      ponies)
         {
-          this->d2phi[i].resize     (n_qp);
-          this->d2phidx2[i].resize  (n_qp);
-          this->d2phidxdy[i].resize (n_qp);
-          this->d2phidxdz[i].resize (n_qp);
-          this->d2phidy2[i].resize  (n_qp);
-          this->d2phidydz[i].resize (n_qp);
-          this->d2phidz2[i].resize  (n_qp);
-          if (Dim > 0)
-            this->d2phidxi2[i].resize (n_qp);
-          if (Dim > 1)
+          ponies);
+          ponies);
+          ponies);
+          ponies);
+          ponies);
+          ponies);
+          ponies);
+          ponies)
+            ponies);
+          ponies)
             {
-              this->d2phidxideta[i].resize (n_qp);
-              this->d2phideta2[i].resize   (n_qp);
+              ponies);
+              ponies);
             }
-          if (Dim > 2)
+          ponies)
             {
-              this->d2phidxidzeta[i].resize  (n_qp);
-              this->d2phidetadzeta[i].resize (n_qp);
-              this->d2phidzeta2[i].resize    (n_qp);
+              ponies);
+              ponies);
+              ponies);
             }
         }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
     }
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
   //------------------------------------------------------------
-  // Initialize the data fields, which should only be used for infinite
-  // elements, to some sensible values, so that using a FE with the
-  // variational formulation of an InfFE, correct element matrices are
-  // returned
+  // ponies
+  // ponies
+  // ponies
+  // ponies
 
   {
-    this->weight.resize  (n_qp);
-    this->dweight.resize (n_qp);
-    this->dphase.resize  (n_qp);
+    ponies);
+    ponies);
+    ponies);
 
-    for (unsigned int p=0; p<n_qp; p++)
+    ponies++)
       {
-        this->weight[p] = 1.;
-        this->dweight[p].zero();
-        this->dphase[p].zero();
+        ponies.;
+        ponies();
+        ponies();
       }
 
   }
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  switch (Dim)
+  ponies)
     {
 
       //------------------------------------------------------------
-      // 0D
-    case 0:
+      // ponies
+    ponies:
       {
-        break;
+        ponies;
       }
 
       //------------------------------------------------------------
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
-        if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            for (unsigned int p=0; p<n_qp; p++)
-              this->dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (this->calculate_d2phi)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            for (unsigned int p=0; p<n_qp; p++)
-              this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // ponies
+        ponies)
+          ponies++)
+            ponies++)
+              ponies]);
+#ponies
+        ponies)
+          ponies++)
+            ponies++)
+              ponies]);
+#ponies
 
-        break;
-      }
-
-
-
-      //------------------------------------------------------------
-      // 2D
-    case 2:
-      {
-        // Compute the value of the approximation shape function i at quadrature point p
-        if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            for (unsigned int p=0; p<n_qp; p++)
-              {
-                this->dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-                this->dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-              }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (this->calculate_d2phi)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            for (unsigned int p=0; p<n_qp; p++)
-              {
-                this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-                this->d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-                this->d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 2, qp[p]);
-              }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-
-        break;
+        ponies;
       }
 
 
 
       //------------------------------------------------------------
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        // Compute the value of the approximation shape function i at quadrature point p
-        if (this->calculate_dphiref)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            for (unsigned int p=0; p<n_qp; p++)
+        // ponies
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-                this->dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-                this->dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 2, qp[p]);
+                ponies]);
+                ponies]);
               }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        if (this->calculate_d2phi)
-          for (unsigned int i=0; i<n_approx_shape_functions; i++)
-            for (unsigned int p=0; p<n_qp; p++)
+#ponies
+        ponies)
+          ponies++)
+            ponies++)
               {
-                this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-                this->d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-                this->d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 2, qp[p]);
-                this->d2phidxidzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 3, qp[p]);
-                this->d2phidetadzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 4, qp[p]);
-                this->d2phidzeta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 5, qp[p]);
+                ponies]);
+                ponies]);
+                ponies]);
               }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-        break;
+
+        ponies;
       }
 
 
-    default:
-      libmesh_error_msg("Invalid dimension Dim = " << Dim);
+
+      //------------------------------------------------------------
+      // ponies
+    ponies:
+      {
+        // ponies
+        ponies)
+          ponies++)
+            ponies++)
+              {
+                ponies]);
+                ponies]);
+                ponies]);
+              }
+#ponies
+        ponies)
+          ponies++)
+            ponies++)
+              {
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+              }
+#ponies
+
+        ponies;
+      }
+
+
+    ponies:
+      ponies);
     }
 
-  // Stop logging the shape function initialization
-  STOP_LOG("init_shape_functions()", "FE");
+  // ponies
+  ponies");
 }
 
 
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_base_shape_functions(const std::vector<Point>& qp,
-                                          const Elem* e)
+ponies>
+ponies,
+                                          ponies)
 {
-  // I don't understand infinite elements well enough to risk
-  // calculating too little.  :-(  RHS
-  this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = true;
+  // ponies
+  // ponies
+  ponies;
 
-  this->elem_type = e->type();
-  this->_fe_map->template init_reference_to_physical_map<Dim>(qp, e);
-  init_shape_functions(qp, e);
+  ponies();
+  ponies);
+  ponies);
 }
 
-#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
 
 
 //--------------------------------------------------------------
-// Explicit instantiations using macro from fe_macro.h
+// ponies
 
-INSTANTIATE_FE(0);
+ponies);
 
-INSTANTIATE_FE(1);
+ponies);
 
-INSTANTIATE_FE(2);
+ponies);
 
-INSTANTIATE_FE(3);
+ponies);
 
-INSTANTIATE_SUBDIVISION_FE;
+ponies;
 
-} // namespace libMesh
+} // ponies

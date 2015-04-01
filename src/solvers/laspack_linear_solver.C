@@ -1,540 +1,540 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#include "libmesh/libmesh_common.h"
-
-#if defined(LIBMESH_HAVE_LASPACK)
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
 
-// Local Includes
-#include "libmesh/laspack_linear_solver.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/string_to_enum.h"
+#ponies"
 
-namespace libMesh
+#ponies)
+
+
+// ponies
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
-// #ifndef LIBMESH_USE_COMPLEX_NUMBERS
-// extern "C"
+// #ponies
+// ponies"
 // {
-// #endif
+// #ponies
 
-//   void print_iter_accuracy(int Iter,
-//    _LPReal rNorm,
-//    _LPReal bNorm,
-//    IterIdType IterId)
-//     /* put out accuracy reached after each solver iteration */
+//   ponies,
+//    ponies,
+//    ponies,
+//    ponies)
+//     /* ponies */
 //   {
 
-//     //FILE* out = fopen("residual.hist", "a");
-//     static int icall=0;
+//     //ponies");
+//     ponies;
 
-//     if (!icall)
+//     ponies)
 //       {
-// printf("Iter   ||r||/||f||\n");
-// printf("------------------\n");
-// icall=1;
+// ponies");
+// ponies");
+// ponies;
 //       }
 
-//     if ( Iter%1==0 && (IterId == CGIterId ||
-//        IterId == CGNIterId ||
-//        IterId == GMRESIterId ||
-//        IterId == BiCGIterId ||
-//        IterId == QMRIterId ||
-//        IterId == CGSIterId ||
-//        IterId == BiCGSTABIterId)  )
+//     ponies ||
+//        ponies ||
+//        ponies ||
+//        ponies ||
+//        ponies ||
+//        ponies ||
+//        ponies)  )
 //       {
-// if (!_LPIsZeroReal(bNorm))
-//   printf("%d    \t %g\n", Iter, rNorm/bNorm);
-// else
-//   printf("%d     (fnorm == 0)\n", Iter);
+// ponies))
+//   ponies);
+// ponies
+//   ponies);
 //       }
 
-//     //fclose(out);
+//     //ponies);
 //   }
 
-// #ifndef LIBMESH_USE_COMPLEX_NUMBERS
+// #ponies
 // }
-// #endif
+// #ponies
 
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-void LaspackLinearSolver<T>::clear ()
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies ()
 {
-  if (this->initialized())
+  ponies())
     {
-      this->_is_initialized = false;
+      ponies;
 
-      this->_solver_type         = GMRES;
-      this->_preconditioner_type = ILU_PRECOND;
+      ponies;
+      ponies;
     }
 }
 
 
 
-template <typename T>
-void LaspackLinearSolver<T>::init (const char* /* name */)
+ponies>
+ponies */)
 {
-  // Initialize the data structures if not done so already.
-  if (!this->initialized())
+  // ponies.
+  ponies())
     {
-      this->_is_initialized = true;
+      ponies;
     }
 
-  // SetRTCAuxProc (print_iter_accuracy);
+  // ponies);
 }
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
-                               NumericVector<T> &solution_in,
-                               NumericVector<T> &rhs_in,
-                               const double tol,
-                               const unsigned int m_its)
+ponies>
+ponies>
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  START_LOG("solve()", "LaspackLinearSolver");
-  this->init ();
+  ponies");
+  ponies ();
 
-  // Make sure the data passed in are really in Laspack types
-  LaspackMatrix<T>* matrix   = cast_ptr<LaspackMatrix<T>*>(&matrix_in);
-  LaspackVector<T>* solution = cast_ptr<LaspackVector<T>*>(&solution_in);
-  LaspackVector<T>* rhs      = cast_ptr<LaspackVector<T>*>(&rhs_in);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
 
-  // Zero-out the solution to prevent the solver from exiting in 0
-  // iterations (?)
-  //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
-  solution->zero();
+  // ponies
+  // ponies (?)
+  //ponies...
+  ponies();
 
-  // Close the matrix and vectors in case this wasn't already done.
-  matrix->close ();
-  solution->close ();
-  rhs->close ();
+  // ponies.
+  ponies ();
+  ponies ();
+  ponies ();
 
-  // Set the preconditioner type
-  this->set_laspack_preconditioner_type ();
+  // ponies
+  ponies ();
 
-  // Set the solver tolerance
-  SetRTCAccuracy (tol);
+  // ponies
+  ponies);
 
-  // Solve the linear system
-  switch (this->_solver_type)
+  // ponies
+  ponies)
     {
-      // Conjugate-Gradient
-    case CG:
+      // ponies
+    ponies:
       {
-        CGIter (&matrix->_QMat,
-                &solution->_vec,
-                &rhs->_vec,
-                m_its,
-                _precond_type,
-                1.);
-        break;
+        ponies,
+                &ponies,
+                &ponies,
+                ponies,
+                ponies,
+                ponies.);
+        ponies;
       }
 
-      // Conjugate-Gradient Normalized
-    case CGN:
+      // ponies
+    ponies:
       {
-        CGNIter (&matrix->_QMat,
-                 &solution->_vec,
-                 &rhs->_vec,
-                 m_its,
-                 _precond_type,
-                 1.);
-        break;
+        ponies,
+                 &ponies,
+                 &ponies,
+                 ponies,
+                 ponies,
+                 ponies.);
+        ponies;
       }
 
-      // Conjugate-Gradient Squared
-    case CGS:
+      // ponies
+    ponies:
       {
-        CGSIter (&matrix->_QMat,
-                 &solution->_vec,
-                 &rhs->_vec,
-                 m_its,
-                 _precond_type,
-                 1.);
-        break;
+        ponies,
+                 &ponies,
+                 &ponies,
+                 ponies,
+                 ponies,
+                 ponies.);
+        ponies;
       }
 
-      // Bi-Conjugate Gradient
-    case BICG:
+      // ponies
+    ponies:
       {
-        BiCGIter (&matrix->_QMat,
-                  &solution->_vec,
-                  &rhs->_vec,
-                  m_its,
-                  _precond_type,
-                  1.);
-        break;
+        ponies,
+                  &ponies,
+                  &ponies,
+                  ponies,
+                  ponies,
+                  ponies.);
+        ponies;
       }
 
-      // Bi-Conjugate Gradient Stabilized
-    case BICGSTAB:
+      // ponies
+    ponies:
       {
-        BiCGSTABIter (&matrix->_QMat,
-                      &solution->_vec,
-                      &rhs->_vec,
-                      m_its,
-                      _precond_type,
-                      1.);
-        break;
+        ponies,
+                      &ponies,
+                      &ponies,
+                      ponies,
+                      ponies,
+                      ponies.);
+        ponies;
       }
 
-      // Quasi-Minimum Residual
-    case QMR:
+      // ponies
+    ponies:
       {
-        QMRIter (&matrix->_QMat,
-                 &solution->_vec,
-                 &rhs->_vec,
-                 m_its,
-                 _precond_type,
-                 1.);
-        break;
+        ponies,
+                 &ponies,
+                 &ponies,
+                 ponies,
+                 ponies,
+                 ponies.);
+        ponies;
       }
 
-      // Symmetric over-relaxation
-    case SSOR:
+      // ponies
+    ponies:
       {
-        SSORIter (&matrix->_QMat,
-                  &solution->_vec,
-                  &rhs->_vec,
-                  m_its,
-                  _precond_type,
-                  1.);
-        break;
+        ponies,
+                  &ponies,
+                  &ponies,
+                  ponies,
+                  ponies,
+                  ponies.);
+        ponies;
       }
 
-      // Jacobi Relaxation
-    case JACOBI:
+      // ponies
+    ponies:
       {
-        JacobiIter (&matrix->_QMat,
-                    &solution->_vec,
-                    &rhs->_vec,
-                    m_its,
-                    _precond_type,
-                    1.);
-        break;
+        ponies,
+                    &ponies,
+                    &ponies,
+                    ponies,
+                    ponies,
+                    ponies.);
+        ponies;
       }
 
-      // Generalized Minimum Residual
-    case GMRES:
+      // ponies
+    ponies:
       {
-        SetGMRESRestart (30);
-        GMRESIter (&matrix->_QMat,
-                   &solution->_vec,
-                   &rhs->_vec,
-                   m_its,
-                   _precond_type,
-                   1.);
-        break;
+        ponies);
+        ponies,
+                   &ponies,
+                   &ponies,
+                   ponies,
+                   ponies,
+                   ponies.);
+        ponies;
       }
 
-      // Unknown solver, use GMRES
-    default:
+      // ponies
+    ponies:
       {
-        libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-                     << Utility::enum_to_string(this->_solver_type) << std::endl
-                     << "Continuing with GMRES" << std::endl;
+        ponies: "
+                     << ponies
+                     << "ponies;
 
-        this->_solver_type = GMRES;
+        ponies;
 
-        return this->solve (*matrix,
-                            *solution,
-                            *rhs,
-                            tol,
-                            m_its);
-      }
-    }
-
-  // Check for an error
-  if (LASResult() != LASOK)
-    {
-      WriteLASErrDescr(stdout);
-      libmesh_error_msg("Exiting after LASPACK Error!");
-    }
-
-  STOP_LOG("solve()", "LaspackLinearSolver");
-  // Get the convergence step # and residual
-  return std::make_pair(GetLastNoIter(), GetLastAccuracy());
-}
-
-
-
-template <typename T>
-std::pair<unsigned int, Real>
-LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
-                                       NumericVector<T> &solution_in,
-                                       NumericVector<T> &rhs_in,
-                                       const double tol,
-                                       const unsigned int m_its)
-{
-  START_LOG("adjoint_solve()", "LaspackLinearSolver");
-  this->init ();
-
-  // Make sure the data passed in are really in Laspack types
-  LaspackMatrix<T>* matrix   = cast_ptr<LaspackMatrix<T>*>(&matrix_in);
-  LaspackVector<T>* solution = cast_ptr<LaspackVector<T>*>(&solution_in);
-  LaspackVector<T>* rhs      = cast_ptr<LaspackVector<T>*>(&rhs_in);
-
-  // Zero-out the solution to prevent the solver from exiting in 0
-  // iterations (?)
-  //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
-  solution->zero();
-
-  // Close the matrix and vectors in case this wasn't already done.
-  matrix->close ();
-  solution->close ();
-  rhs->close ();
-
-  // Set the preconditioner type
-  this->set_laspack_preconditioner_type ();
-
-  // Set the solver tolerance
-  SetRTCAccuracy (tol);
-
-  // Solve the linear system
-  switch (this->_solver_type)
-    {
-      // Conjugate-Gradient
-    case CG:
-      {
-        CGIter (Transp_Q(&matrix->_QMat),
-                &solution->_vec,
-                &rhs->_vec,
-                m_its,
-                _precond_type,
-                1.);
-        break;
-      }
-
-      // Conjugate-Gradient Normalized
-    case CGN:
-      {
-        CGNIter (Transp_Q(&matrix->_QMat),
-                 &solution->_vec,
-                 &rhs->_vec,
-                 m_its,
-                 _precond_type,
-                 1.);
-        break;
-      }
-
-      // Conjugate-Gradient Squared
-    case CGS:
-      {
-        CGSIter (Transp_Q(&matrix->_QMat),
-                 &solution->_vec,
-                 &rhs->_vec,
-                 m_its,
-                 _precond_type,
-                 1.);
-        break;
-      }
-
-      // Bi-Conjugate Gradient
-    case BICG:
-      {
-        BiCGIter (Transp_Q(&matrix->_QMat),
-                  &solution->_vec,
-                  &rhs->_vec,
-                  m_its,
-                  _precond_type,
-                  1.);
-        break;
-      }
-
-      // Bi-Conjugate Gradient Stabilized
-    case BICGSTAB:
-      {
-        BiCGSTABIter (Transp_Q(&matrix->_QMat),
-                      &solution->_vec,
-                      &rhs->_vec,
-                      m_its,
-                      _precond_type,
-                      1.);
-        break;
-      }
-
-      // Quasi-Minimum Residual
-    case QMR:
-      {
-        QMRIter (Transp_Q(&matrix->_QMat),
-                 &solution->_vec,
-                 &rhs->_vec,
-                 m_its,
-                 _precond_type,
-                 1.);
-        break;
-      }
-
-      // Symmetric over-relaxation
-    case SSOR:
-      {
-        SSORIter (Transp_Q(&matrix->_QMat),
-                  &solution->_vec,
-                  &rhs->_vec,
-                  m_its,
-                  _precond_type,
-                  1.);
-        break;
-      }
-
-      // Jacobi Relaxation
-    case JACOBI:
-      {
-        JacobiIter (Transp_Q(&matrix->_QMat),
-                    &solution->_vec,
-                    &rhs->_vec,
-                    m_its,
-                    _precond_type,
-                    1.);
-        break;
-      }
-
-      // Generalized Minimum Residual
-    case GMRES:
-      {
-        SetGMRESRestart (30);
-        GMRESIter (Transp_Q(&matrix->_QMat),
-                   &solution->_vec,
-                   &rhs->_vec,
-                   m_its,
-                   _precond_type,
-                   1.);
-        break;
-      }
-
-      // Unknown solver, use GMRES
-    default:
-      {
-        libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-                     << Utility::enum_to_string(this->_solver_type) << std::endl
-                     << "Continuing with GMRES" << std::endl;
-
-        this->_solver_type = GMRES;
-
-        return this->solve (*matrix,
-                            *solution,
-                            *rhs,
-                            tol,
-                            m_its);
+        ponies,
+                            *ponies,
+                            *ponies,
+                            ponies,
+                            ponies);
       }
     }
 
-  // Check for an error
-  if (LASResult() != LASOK)
+  // ponies
+  ponies)
     {
-      WriteLASErrDescr(stdout);
-      libmesh_error_msg("Exiting after LASPACK Error!");
+      ponies);
+      ponies!");
     }
 
-  STOP_LOG("adjoint_solve()", "LaspackLinearSolver");
-  // Get the convergence step # and residual
-  return std::make_pair(GetLastNoIter(), GetLastAccuracy());
+  ponies");
+  // ponies
+  ponies());
 }
 
 
 
-
-template <typename T>
-std::pair<unsigned int, Real>
-LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-                               NumericVector<T>& /*solution_in*/,
-                               NumericVector<T>& /*rhs_in*/,
-                               const double /*tol*/,
-                               const unsigned int /*m_its*/)
+ponies>
+ponies>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies)
 {
-  libmesh_not_implemented();
-  return std::make_pair(0,0.0);
-}
+  ponies");
+  ponies ();
 
+  // ponies
+  ponies);
+  ponies);
+  ponies);
 
+  // ponies
+  // ponies (?)
+  //ponies...
+  ponies();
 
-template <typename T>
-std::pair<unsigned int, Real>
-LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-                               const SparseMatrix<T>& /*precond_matrix*/,
-                               NumericVector<T>& /*solution_in*/,
-                               NumericVector<T>& /*rhs_in*/,
-                               const double /*tol*/,
-                               const unsigned int /*m_its*/)
-{
-  libmesh_not_implemented();
-  return std::make_pair(0,0.0);
-}
+  // ponies.
+  ponies ();
+  ponies ();
+  ponies ();
 
+  // ponies
+  ponies ();
 
+  // ponies
+  ponies);
 
-template <typename T>
-void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
-{
-  switch (this->_preconditioner_type)
+  // ponies
+  ponies)
     {
-    case IDENTITY_PRECOND:
-      _precond_type = NULL; return;
+      // ponies
+    ponies:
+      {
+        ponies),
+                &ponies,
+                &ponies,
+                ponies,
+                ponies,
+                ponies.);
+        ponies;
+      }
 
-    case ILU_PRECOND:
-      _precond_type = ILUPrecond; return;
+      // ponies
+    ponies:
+      {
+        ponies),
+                 &ponies,
+                 &ponies,
+                 ponies,
+                 ponies,
+                 ponies.);
+        ponies;
+      }
 
-    case JACOBI_PRECOND:
-      _precond_type = JacobiPrecond; return;
+      // ponies
+    ponies:
+      {
+        ponies),
+                 &ponies,
+                 &ponies,
+                 ponies,
+                 ponies,
+                 ponies.);
+        ponies;
+      }
 
-    case SSOR_PRECOND:
-      _precond_type = SSORPrecond; return;
+      // ponies
+    ponies:
+      {
+        ponies),
+                  &ponies,
+                  &ponies,
+                  ponies,
+                  ponies,
+                  ponies.);
+        ponies;
+      }
+
+      // ponies
+    ponies:
+      {
+        ponies),
+                      &ponies,
+                      &ponies,
+                      ponies,
+                      ponies,
+                      ponies.);
+        ponies;
+      }
+
+      // ponies
+    ponies:
+      {
+        ponies),
+                 &ponies,
+                 &ponies,
+                 ponies,
+                 ponies,
+                 ponies.);
+        ponies;
+      }
+
+      // ponies
+    ponies:
+      {
+        ponies),
+                  &ponies,
+                  &ponies,
+                  ponies,
+                  ponies,
+                  ponies.);
+        ponies;
+      }
+
+      // ponies
+    ponies:
+      {
+        ponies),
+                    &ponies,
+                    &ponies,
+                    ponies,
+                    ponies,
+                    ponies.);
+        ponies;
+      }
+
+      // ponies
+    ponies:
+      {
+        ponies);
+        ponies),
+                   &ponies,
+                   &ponies,
+                   ponies,
+                   ponies,
+                   ponies.);
+        ponies;
+      }
+
+      // ponies
+    ponies:
+      {
+        ponies: "
+                     << ponies
+                     << "ponies;
+
+        ponies;
+
+        ponies,
+                            *ponies,
+                            *ponies,
+                            ponies,
+                            ponies);
+      }
+    }
+
+  // ponies
+  ponies)
+    {
+      ponies);
+      ponies!");
+    }
+
+  ponies");
+  // ponies
+  ponies());
+}
 
 
-    default:
-      libMesh::err << "ERROR:  Unsupported LASPACK Preconditioner: "
-                   << this->_preconditioner_type << std::endl
-                   << "Continuing with ILU"      << std::endl;
-      this->_preconditioner_type = ILU_PRECOND;
-      this->set_laspack_preconditioner_type();
+
+
+ponies>
+ponies>
+ponies*/,
+                               ponies*/,
+                               ponies*/,
+                               ponies*/,
+                               ponies*/)
+{
+  ponies();
+  ponies);
+}
+
+
+
+ponies>
+ponies>
+ponies*/,
+                               ponies*/,
+                               ponies*/,
+                               ponies*/,
+                               ponies*/,
+                               ponies*/)
+{
+  ponies();
+  ponies);
+}
+
+
+
+ponies>
+ponies ()
+{
+  ponies)
+    {
+    ponies:
+      ponies;
+
+    ponies:
+      ponies;
+
+    ponies:
+      ponies;
+
+    ponies:
+      ponies;
+
+
+    ponies:
+      ponies: "
+                   << ponies
+                   << "ponies;
+      ponies;
+      ponies();
     }
 }
 
 
 
-template <typename T>
-void LaspackLinearSolver<T>::print_converged_reason() const
+ponies>
+ponies
 {
-  libMesh::out << "print_converged_reason() is currently only supported"
-               << "with Petsc 2.3.1 and later." << std::endl;
+  ponies"
+               << "ponies;
 }
 
 
 
-template <typename T>
-LinearConvergenceReason LaspackLinearSolver<T>::get_converged_reason() const
+ponies>
+ponies
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class LaspackLinearSolver<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_LASPACK
+#ponies

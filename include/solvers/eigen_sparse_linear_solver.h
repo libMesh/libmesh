@@ -1,189 +1,189 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_EIGEN_SPARSE_LINEAR_SOLVER_H
-#define LIBMESH_EIGEN_SPARSE_LINEAR_SOLVER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_common.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_EIGEN
+#ponies
 
-// Eigen includes
+// ponies
 
-// Local includes
-#include "libmesh/linear_solver.h"
-#include "libmesh/eigen_sparse_vector.h"
-#include "libmesh/eigen_sparse_matrix.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * This class provides an interface to Eigen
- * iterative solvers that is compatible with the \p libMesh
- * \p LinearSolver<>
+ * ponies
+ * ponies
+ * \ponies<>
  *
- * @author Benjamin Kirk, 2013
+ * @ponies
  */
-template <typename T>
-class EigenSparseLinearSolver : public LinearSolver<T>
+ponies>
+ponies>
 {
-public:
+ponies:
   /**
-   *  Constructor. Initializes Eigen data structures
+   *  ponies
    */
-  EigenSparseLinearSolver (const libMesh::Parallel::Communicator &comm_in
-                           LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                           ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~EigenSparseLinearSolver ();
+  ~ponies ();
 
   /**
-   * Release all memory and clear data structures.
+   * ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * Initialize data structures if not done so already.
+   * ponies.
    */
-  void init (const char* name=NULL);
+  ponies);
 
   /**
-   * Call the Eigen solver
+   * ponies
    */
-  std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix,
-         NumericVector<T> &solution,
-         NumericVector<T> &rhs,
-         const double tol,
-         const unsigned int m_its);
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * Call the Eigen solver to solve A^T x = b
+   * ponies
    */
-  std::pair<unsigned int, Real>
-  adjoint_solve (SparseMatrix<T>  &matrix,
-                 NumericVector<T> &solution,
-                 NumericVector<T> &rhs,
-                 const double tol,
-                 const unsigned int m_its);
+  ponies>
+  ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies);
 
   /**
-   * Call the Eigen solver
+   * ponies
    */
-  std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix,
-         SparseMatrix<T>  &pc,
-         NumericVector<T> &solution,
-         NumericVector<T> &rhs,
-         const double tol,
-         const unsigned int m_its);
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * This function solves a system whose matrix is a shell matrix.
+   * ponies.
    */
-  std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
-         const double tol,
-         const unsigned int m_its);
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * This function solves a system whose matrix is a shell matrix, but
-   * a sparse matrix is used as preconditioning matrix, this allowing
-   * other preconditioners than JACOBI.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         const SparseMatrix<T>& precond_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
-         const double tol,
-         const unsigned int m_its);
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
+   * ponies
+   * ponies.
    */
-  virtual void print_converged_reason() const;
+  ponies;
 
   /**
-   * Returns the solver's convergence flag
+   * ponies
    */
-  virtual LinearConvergenceReason get_converged_reason() const;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Tells Eigen to use the user-specified preconditioner stored in
-   * \p _preconditioner_type
+   * ponies
+   * \ponies
    */
-  void set_eigen_preconditioner_type ();
+  ponies ();
 
 };
 
 
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-inline
-EigenSparseLinearSolver<T>::EigenSparseLinearSolver(const libMesh::Parallel::Communicator &comm_in) :
-  LinearSolver<T>(comm_in)
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies
+ponies) :
+  ponies)
 {
-  // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead
-  this->_solver_type = BICGSTAB;
+  // ponies
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-EigenSparseLinearSolver<T>::~EigenSparseLinearSolver ()
+ponies>
+ponies
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
 
-template <typename T>
-inline
-std::pair<unsigned int, Real>
-EigenSparseLinearSolver<T>::solve (SparseMatrix<T>&,
-                                   SparseMatrix<T>&,
-                                   NumericVector<T>&,
-                                   NumericVector<T>&,
-                                   const double,
-                                   const unsigned int)
+ponies>
+ponies
+ponies>
+ponies>&,
+                                   ponies>&,
+                                   ponies>&,
+                                   ponies>&,
+                                   ponies,
+                                   ponies)
 {
-  libmesh_error_msg("ERROR: Eigen does not support a user-supplied preconditioner!");
+  ponies!");
 
-  std::pair<unsigned int, Real> p;
-  return p;
+  ponies;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_HAVE_EIGEN
-#endif // LIBMESH_EIGEN_SPARSE_LINEAR_SOLVER_H
+#ponies
+#ponies

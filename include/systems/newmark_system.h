@@ -1,184 +1,184 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_NEWMARK_SYSTEM_H
-#define LIBMESH_NEWMARK_SYSTEM_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/linear_implicit_system.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
+// ponies
 
 
 /**
- * This class contains a specific system class.
- * It provides an implicit time integration scheme
- * known as the Newmark method.
+ * ponies.
+ * ponies
+ * ponies.
  *
- * In the algorithm implemented here the system is solved for
- * displacements.
- * Curently the Newmark scheme is implemented for constant
- * time step sizes only. This time step is stored in the
- * \p EquationSystems parameter named \p "Newmark \p time \p step".
- * For the case of constant time steps the matrix only has to be
- * assembled once, whereas the rhs has to be updated in each timestep.
- * Default values of the Newmark parameters \p alpha and \p delta
- * used for time integration are provided.
- * For details refer to the examples section.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * \ponies".
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// NewmarkSystem class definition
+// ponies
 
-class NewmarkSystem : public LinearImplicitSystem
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  NewmarkSystem (EquationSystems& es,
-                 const std::string& name,
-                 const unsigned int number);
+  ponies,
+                 ponies,
+                 ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~NewmarkSystem ();
+  ~ponies ();
 
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef NewmarkSystem sys_type;
+  ponies;
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * Assemble the linear system.  Does not
-   * actually call the solver.
+   * ponies
+   * ponies.
    */
-  virtual void assemble ();
+  ponies ();
 
   /**
-   * @returns \p "Newmark".  Helps in identifying
-   * the system type in an equation system file.
+   * @ponies
+   * ponies.
    */
-  virtual std::string system_type () const { return "Newmark"; }
+  ponies"; }
 
 
   //---------------------------------------------------------
-  // These members are specific to the Newmark system
+  // ponies
   //
 
   /**
-   * Apply initial conditions.
+   * ponies.
    */
-  void initial_conditions ();
+  ponies ();
 
   /**
-   * Compute the global matrix by adding up scaled
-   * mass damping and stiffness matrix.
+   * ponies
+   * ponies.
    */
-  void compute_matrix ();
+  ponies ();
 
   /**
-   * Update the rhs.
+   * ponies.
    */
-  void update_rhs ();
+  ponies ();
 
   /**
-   * Update displacement, velocity and acceleration.
+   * ponies.
    */
-  void update_u_v_a ();
+  ponies ();
 
   /**
-   * Set the time step size and the newmark parameter alpha and
-   * delta and calculate the constant parameters used for
-   * time integration.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void set_newmark_parameters (const Real delta_T = _default_timestep,
-                               const Real alpha   = _default_alpha,
-                               const Real delta   = _default_delta);
+  ponies,
+                               ponies,
+                               ponies);
 
-protected:
+ponies:
 
 
-private:
+ponies:
 
   /**
-   * Constants used for the time integration.
+   * ponies.
    */
-  Real _a_0;
-  Real _a_1;
-  Real _a_2;
-  Real _a_3;
-  Real _a_4;
-  Real _a_5;
-  Real _a_6;
-  Real _a_7;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Returns true if the matrix assembly is finished.
+   * ponies.
    */
-  bool _finished_assemble;
+  ponies;
 
   /**
-   * Default Newmark \p alpha
+   * ponies
    */
-  static const Real _default_alpha;
+  ponies;
 
   /**
-   * Default Newmark \p delta
+   * ponies
    */
-  static const Real _default_delta;
+  ponies;
 
   /**
-   * Default Newmark time step
+   * ponies
    */
-  static const Real _default_timestep;
+  ponies;
 
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
 // ------------------------------------------------------------
-// NewmarkSystem inline methods
+// ponies
 
 
 
-#endif // LIBMESH_NEWMARK_SYSTEM_H
+#ponies

@@ -1,126 +1,126 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_EIM_ASSEMBLY_H
-#define LIBMESH_RB_EIM_ASSEMBLY_H
+#ponies
+#ponies
 
-// rbOOmit includes
-#include "libmesh/elem_assembly.h"
+// ponies
+#ponies"
 
-// libMesh includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/point.h"
-#include "libmesh/fe.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-class Elem;
-class RBParameters;
-class RBEIMConstruction;
+ponies;
+ponies;
+ponies;
 
 /**
- * This class provides functionality required to define an assembly
- * object that arises from an "Empirical Interpolation Method" (EIM)
- * approximation.
+ * ponies
+ * ponies)
+ * ponies.
  *
- * @author David J. Knezevic, 2012
+ * @ponies
  */
 
-class RBEIMAssembly : public ElemAssembly
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
-                unsigned int basis_function_index_in);
+  ponies,
+                ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBEIMAssembly();
+  ponies();
 
   /**
-   * Evaluate variable \p var_number of this object's EIM basis function
-   * at the points \p qpoints. Fill \p values with the basis function values.
+   * ponies
+   * ponies.
    */
-  virtual void evaluate_basis_function(unsigned int var,
-                                       const Elem& element,
-                                       const QBase& element_qrule,
-                                       std::vector<Number>& values);
+  ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies);
 
   /**
-   * Get a reference to the RBEIMConstruction object.
+   * ponies.
    */
-  RBEIMConstruction& get_rb_eim_construction();
+  ponies();
 
   /**
-   * Get a reference to the ghosted_basis_function.
+   * ponies.
    */
-  NumericVector<Number>& get_ghosted_basis_function();
+  ponies();
 
   /**
-   * Retrieve the FE object associated with variable \p var.
+   * ponies.
    */
-  FEBase& get_fe(unsigned int var);
+  ponies);
 
-private:
-
-  /**
-   * Initialize the FE objects in _fe_var.
-   */
-  void initialize_fe_objects();
+ponies:
 
   /**
-   * The RBEIMConstruction object that this RBEIMAssembly is based on.
+   * ponies.
    */
-  RBEIMConstruction& _rb_eim_con;
+  ponies();
 
   /**
-   * The EIM basis function index (from rb_eim_eval) for this assembly object.
+   * ponies.
    */
-  unsigned int _basis_function_index;
+  ponies;
 
   /**
-   * The basis function that we sample to evaluate the
-   * empirical interpolation approximation. This will be a GHOSTED
-   * vector to facilitate interpolation in the case of multiple processors.
+   * ponies.
    */
-  UniquePtr< NumericVector<Number> > _ghosted_basis_function;
+  ponies;
 
   /**
-   * We store an FE object for each variable in _rb_eim_con. This is used
-   * in evaluate_basis_function. Note that by storing the FE objects (rather
-   * than recreating them each time) we benefit from caching in fe.reinit().
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector< FEBase* > _fe_var;
+  ponies;
 
   /**
-   * We also store the quadrature rule associated with each FE object.
+   * ponies
+   * ponies
+   * ponies().
    */
-  std::vector< QBase* > _fe_qrule;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_RB_EIM_ASSEMBLY_H
+#ponies

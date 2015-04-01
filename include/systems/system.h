@@ -1,2276 +1,2276 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SYSTEM_H
-#define LIBMESH_SYSTEM_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/elem_range.h"
-#include "libmesh/enum_norm_type.h"
-#include "libmesh/enum_xdr_mode.h"
-#include "libmesh/enum_subset_solve_mode.h"
-#include "libmesh/enum_parallel_type.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/fem_function_base.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/parallel_object.h"
-#include "libmesh/qoi_set.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/system_norm.h" // for implicit conversion
-#include "libmesh/tensor_value.h" // For point_hessian
-#include "libmesh/variable.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies
+#ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <set>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class System;
-class EquationSystems;
-class MeshBase;
-class Xdr;
-class DofMap;
-template <typename Output> class FunctionBase;
-class Parameters;
-class ParameterVector;
-class Point;
-class SensitivityData;
-template <typename T> class NumericVector;
-template <typename T> class VectorValue;
-typedef VectorValue<Number> NumberVectorValue;
-typedef NumberVectorValue Gradient;
-class SystemSubset;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 /**
- * This is the base class for classes which contain
- * information related to any physical process that might be simulated.
- * Such information may range from the actual solution values to
- * algorithmic flags that may be used to control the numerical methods
- * employed.  In general, use an \p EqnSystems<T_sys> object to handle
- * one or more of the children of this class.
- * Note that templating \p EqnSystems relaxes the use of virtual members.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2003-2004.
+ * @ponies.
  */
 
 // ------------------------------------------------------------
-// System class definition
-class System : public ReferenceCountedObject<System>,
-               public ParallelObject
+// ponies
+ponies>,
+               ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  System (EquationSystems& es,
-          const std::string& name,
-          const unsigned int number);
+  ponies,
+          ponies,
+          ponies);
 
   /**
-   * Abstract base class to be used for sysem initialization.
-   * A user class derived from this class may be used to
-   * intialize the system values by attaching an object
-   * with the method \p attach_init_object.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  class Initialization
+  ponies
   {
-  public:
+  ponies:
     /**
-     * Destructor.  Virtual because we will have virtual functions.
+     * ponies.
      */
-    virtual ~Initialization () {}
+    ponies () {}
 
     /**
-     * Initialization function.  This function will be called
-     * to initialize the system values upon creation and must
-     * be provided by the user in a derived class.
+     * ponies
+     * ponies
+     * ponies.
      */
-    virtual void initialize () = 0;
+    ponies;
   };
 
 
 
   /**
-   * Abstract base class to be used for sysem assembly.
-   * A user class derived from this class may be used to
-   * assemble the system by attaching an object
-   * with the method \p attach_assemble_object.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  class Assembly
+  ponies
   {
-  public:
+  ponies:
     /**
-     * Destructor.  Virtual because we will have virtual functions.
+     * ponies.
      */
-    virtual ~Assembly () {}
+    ponies () {}
 
     /**
-     * Assembly function.  This function will be called
-     * to assemble the system prior to a solve and must
-     * be provided by the user in a derived class.
+     * ponies
+     * ponies
+     * ponies.
      */
-    virtual void assemble () = 0;
+    ponies;
   };
 
 
 
   /**
-   * Abstract base class to be used for sysem constraints.
-   * A user class derived from this class may be used to
-   * constrain the system by attaching an object
-   * with the method \p attach_constraint_object.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  class Constraint
+  ponies
   {
-  public:
+  ponies:
     /**
-     * Destructor.  Virtual because we will have virtual functions.
+     * ponies.
      */
-    virtual ~Constraint () {}
+    ponies () {}
 
     /**
-     * Constraint function.  This function will be called
-     * to constrain the system prior to a solve and must
-     * be provided by the user in a derived class.
+     * ponies
+     * ponies
+     * ponies.
      */
-    virtual void constrain () = 0;
+    ponies;
   };
 
 
 
   /**
-   * Abstract base class to be used for quantities of interest.
-   * A user class derived from this class may be used to
-   * compute quantities of interest by attaching an object
-   * with the method \p attach_QOI_object.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  class QOI
+  ponies
   {
-  public:
+  ponies:
     /**
-     * Destructor.  Virtual because we will have virtual functions.
+     * ponies.
      */
-    virtual ~QOI () {}
+    ponies () {}
 
     /**
-     * Quantitiy of interest function.  This function will be called
-     * to compute quantities of interest and must be provided by the
-     * user in a derived class.
+     * ponies
+     * ponies
+     * ponies.
      */
-    virtual void qoi (const QoISet& qoi_indices) = 0;
+    ponies;
   };
 
 
 
   /**
-   * Abstract base class to be used for derivatives of quantities
-   * of interest. A user class derived from this class may be used
-   * to compute quantities of interest by attaching an object
-   * with the method \p attach_QOI_derivative_object.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  class QOIDerivative
+  ponies
   {
-  public:
+  ponies:
     /**
-     * Destructor.  Virtual because we will have virtual functions.
+     * ponies.
      */
-    virtual ~QOIDerivative () {}
+    ponies () {}
 
     /**
-     * Quantitiy of interest derivative function. This function will
-     * be called to compute derivatived of quantities of interest and
-     * must be provided by the user in a derived class.
+     * ponies
+     * ponies
+     * ponies.
      */
-    virtual void qoi_derivative (const QoISet& qoi_indices,
-                                 bool include_liftfunc,
-                                 bool apply_constraints) = 0;
+    ponies,
+                                 ponies,
+                                 ponies;
   };
 
 
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~System ();
+  ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef System sys_type;
+  ponies;
 
   /**
-   * @returns a clever pointer to the system.
+   * @ponies.
    */
-  sys_type & system () { return *this; }
+  ponies; }
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Initializes degrees of freedom on the current mesh.
-   * Sets the
+   * ponies.
+   * ponies
    */
-  void init ();
+  ponies ();
 
   /**
-   * Reinitializes degrees of freedom and other
-   * required data on the current mesh.  Note that the matrix
-   * is not initialized at this time since it may not be required
-   * for all applications. @e Should be overloaded in derived classes.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * Reinitializes the constraints for this system.
+   * ponies.
    */
-  virtual void reinit_constraints ();
+  ponies ();
 
   /**
-   * Returns true iff this system has been initialized.
+   * ponies.
    */
-  bool is_initialized();
+  ponies();
 
   /**
-   * Update the local values to reflect the solution
-   * on neighboring processors.
+   * ponies
+   * ponies.
    */
-  virtual void update ();
+  ponies ();
 
   /**
-   * Prepares \p matrix and \p _dof_map for matrix assembly.
-   * Does not actually assemble anything.  For matrix assembly,
-   * use the \p assemble() in derived classes.
-   * @e Should be overloaded in derived classes.
+   * ponies.
+   * ponies,
+   * ponies.
+   * @ponies.
    */
-  virtual void assemble ();
+  ponies ();
 
   /**
-   * Calls user qoi function.
-   * @e Can be overloaded in derived classes.
+   * ponies.
+   * @ponies.
    */
-  virtual void assemble_qoi
-  (const QoISet &qoi_indices = QoISet());
+  ponies
+  (ponies());
 
   /**
-   * Calls user qoi derivative function.
-   * @e Can be overloaded in derived classes.
+   * ponies.
+   * @ponies.
    */
-  virtual void assemble_qoi_derivative
-  (const QoISet &qoi_indices = QoISet(),
-   bool include_liftfunc = true,
-   bool apply_constraints = true);
+  ponies
+  (ponies(),
+   ponies,
+   ponies);
 
   /**
-   * Calls residual parameter derivative function.
+   * ponies.
    *
-   * Library subclasses use finite differences by default.
+   * ponies.
    *
-   * This should assemble the sensitivity rhs vectors to hold
-   * -(partial R / partial p_i), making them ready to solve
-   * the forward sensitivity equation.
+   * ponies
+   * -(ponies
+   * ponies.
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+  ponies);
 
   /**
-   * After calling this method, any solve will be restricted to the
-   * given subdomain.  To disable this mode, call this method with \p
-   * subset being a \p NULL pointer.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void restrict_solve_to (const SystemSubset* subset,
-                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+  ponies,
+                                  ponies);
 
   /**
-   * Solves the system.  Should be overloaded in derived systems.
+   * ponies.
    */
-  virtual void solve () {}
+  ponies () {}
 
   /**
-   * Solves the sensitivity system, for the provided parameters.
-   * Must be overloaded in derived systems.
+   * ponies.
+   * ponies.
    *
-   * Returns a pair with the total number of linear iterations
-   * performed and the (sum of the) final residual norms
+   * ponies
+   * ponies
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real>
-  sensitivity_solve (const ParameterVector& parameters);
+  ponies>
+  ponies);
 
   /**
-   * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
-   * those parameters p contained within \p parameters weighted by the
-   * values w_p found within \p weights.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Returns a pair with the total number of linear iterations
-   * performed and the (sum of the) final residual norms
+   * ponies
+   * ponies
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real>
-  weighted_sensitivity_solve (const ParameterVector& parameters,
-                              const ParameterVector& weights);
+  ponies>
+  ponies,
+                              ponies);
 
   /**
-   * Solves the adjoint system, for the specified qoi indices, or for
-   * every qoi if \p qoi_indices is NULL.  Must be overloaded in
-   * derived systems.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Returns a pair with the total number of linear iterations
-   * performed and the (sum of the) final residual norms
+   * ponies
+   * ponies
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real>
-  adjoint_solve (const QoISet& qoi_indices = QoISet());
+  ponies>
+  ponies());
 
   /**
-   * Assembles & solves the linear system(s)
-   * (dR/du)^T*z_w = sum(w_p*(d^2q/dudp - d^2R/dudp*z)), for those
-   * parameters p contained within \p parameters, weighted by the
-   * values w_p found within \p weights.
+   * ponies)
+   * (ponies
+   * ponies
+   * ponies.
    *
-   * Assumes that adjoint_solve has already calculated z for each qoi
-   * in \p qoi_indices.
+   * ponies
+   * ponies.
    *
-   * Returns a pair with the total number of linear iterations
-   * performed and the (sum of the) final residual norms
+   * ponies
+   * ponies
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real>
-  weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
-                                      const ParameterVector& weights,
-                                      const QoISet& qoi_indices = QoISet());
+  ponies>
+  ponies,
+                                      ponies,
+                                      ponies());
   /**
-   * Accessor for the adjoint_already_solved boolean
+   * ponies
    */
-  bool is_adjoint_already_solved() const
-  { return adjoint_already_solved;}
+  ponies
+  { ponies;}
 
   /**
-   * Setter for the adjoint_already_solved boolean
+   * ponies
    */
-  void set_adjoint_already_solved(bool setting)
-  { adjoint_already_solved = setting;}
+  ponies)
+  { ponies;}
 
 
   /**
-   * Solves for the derivative of each of the system's quantities of
-   * interest q in \p qoi[qoi_indices] with respect to each parameter
-   * in \p parameters, placing the result for qoi \p i and parameter
-   * \p j into \p sensitivities[i][j].
+   * ponies
+   * ponies
+   * ponies
+   * \ponies].
    *
-   * Note that parameters is a const vector, not a vector-of-const;
-   * parameter values in this vector need to be mutable for finite
-   * differencing to work.
+   * ponies;
+   * ponies
+   * ponies.
    *
-   * Automatically chooses the forward method for problems with more
-   * quantities of interest than parameters, or the adjoint method
-   * otherwise.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * This method is only usable in derived classes which overload
-   * an implementation.
+   * ponies
+   * ponies.
    */
-  virtual void qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                          const ParameterVector& parameters,
-                                          SensitivityData& sensitivities);
+  ponies,
+                                          ponies,
+                                          ponies);
 
   /**
-   * Solves for parameter sensitivities using the adjoint method.
+   * ponies.
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual void adjoint_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
+  ponies,
+                                                  ponies,
+                                                  ponies);
 
   /**
-   * Solves for parameter sensitivities using the forward method.
+   * ponies.
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual void forward_qoi_parameter_sensitivity (const QoISet& qoi_indices,
-                                                  const ParameterVector& parameters,
-                                                  SensitivityData& sensitivities);
+  ponies,
+                                                  ponies,
+                                                  ponies);
 
   /**
-   * For each of the system's quantities of interest q in
-   * \p qoi[qoi_indices], and for a vector of parameters p, the
-   * parameter sensitivity Hessian H_ij is defined as
-   * H_ij = (d^2 q)/(d p_i d p_j)
-   * This Hessian is the output of this method, where for each q_i,
-   * H_jk is stored in \p hessian.second_derivative(i,j,k).
+   * ponies
+   * \ponies
+   * ponies
+   * ponies)
+   * ponies,
+   * ponies).
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual void qoi_parameter_hessian(const QoISet& qoi_indices,
-                                     const ParameterVector& parameters,
-                                     SensitivityData& hessian);
+  ponies,
+                                     ponies,
+                                     ponies);
 
   /**
-   * For each of the system's quantities of interest q in
-   * \p qoi[qoi_indices], and for a vector of parameters p, the
-   * parameter sensitivity Hessian H_ij is defined as
-   * H_ij = (d^2 q)/(d p_i d p_j)
-   * The Hessian-vector product, for a vector v_k in parameter space, is
-   * S_j = H_jk v_k
-   * This product is the output of this method, where for each q_i,
-   * S_j is stored in \p sensitivities[i][j].
+   * ponies
+   * \ponies
+   * ponies
+   * ponies)
+   * ponies
+   * ponies
+   * ponies,
+   * ponies].
    *
-   * This method is only implemented in some derived classes.
+   * ponies.
    */
-  virtual void qoi_parameter_hessian_vector_product(const QoISet& qoi_indices,
-                                                    const ParameterVector& parameters,
-                                                    const ParameterVector& vector,
-                                                    SensitivityData& product);
+  ponies,
+                                                    ponies,
+                                                    ponies,
+                                                    ponies);
 
   /**
-   * @returns \p true when the other system contains
-   * identical data, up to the given threshold.  Outputs
-   * some diagnostic info when \p verbose is set.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  virtual bool compare (const System& other_system,
-                        const Real threshold,
-                        const bool verbose) const;
+  ponies,
+                        ponies,
+                        ponies;
 
   /**
-   * @returns the system name.
+   * @ponies.
    */
-  const std::string & name () const;
+  ponies;
 
   /**
-   * @returns the type of system, helpful in identifying
-   * which system type to use when reading equation system
-   * data from file.  Should be overloaded in derived classes.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  virtual std::string system_type () const { return "Basic"; }
+  ponies"; }
 
   /**
-   * Projects arbitrary functions onto the current solution.
-   * The function value \p f and its gradient \p g are
-   * user-provided cloneable functors.
-   * A gradient \p g is only required/used for projecting onto finite
-   * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void project_solution (FunctionBase<Number> *f,
-                         FunctionBase<Gradient> *g = NULL) const;
+  ponies,
+                         ponies;
 
   /**
-   * Projects arbitrary functions onto the current solution.
-   * The function value \p f and its gradient \p g are
-   * user-provided cloneable functors.
-   * A gradient \p g is only required/used for projecting onto finite
-   * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void project_solution (FEMFunctionBase<Number> *f,
-                         FEMFunctionBase<Gradient> *g = NULL) const;
+  ponies,
+                         ponies;
 
   /**
-   * Projects arbitrary functions onto the current solution.
-   * The function value \p fptr and its gradient \p gptr are
-   * represented by function pointers.
-   * A gradient \p gptr is only required/used for projecting onto
-   * finite element spaces with continuous derivatives.
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void project_solution (Number fptr(const Point& p,
-                                     const Parameters& parameters,
-                                     const std::string& sys_name,
-                                     const std::string& unknown_name),
-                         Gradient gptr(const Point& p,
-                                       const Parameters& parameters,
-                                       const std::string& sys_name,
-                                       const std::string& unknown_name),
-                         const Parameters& parameters) const;
+  ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies),
+                         ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies),
+                         ponies;
 
   /**
-   * Projects arbitrary functions onto a vector of degree of freedom
-   * values for the current system.
-   * The function value \p f and its gradient \p g are
-   * user-provided cloneable functors.
-   * A gradient \p g is only required/used for projecting onto finite
-   * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
+   * ponies
+   * ponies.
    */
-  void project_vector (NumericVector<Number>& new_vector,
-                       FunctionBase<Number> *f,
-                       FunctionBase<Gradient> *g = NULL,
-                       int is_adjoint = -1) const;
+  ponies,
+                       ponies,
+                       ponies,
+                       ponies;
 
   /**
-   * Projects arbitrary functions onto a vector of degree of freedom
-   * values for the current system.
-   * The function value \p f and its gradient \p g are
-   * user-provided cloneable functors.
-   * A gradient \p g is only required/used for projecting onto finite
-   * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
+   * ponies
+   * ponies.
    */
-  void project_vector (NumericVector<Number>& new_vector,
-                       FEMFunctionBase<Number> *f,
-                       FEMFunctionBase<Gradient> *g = NULL,
-                       int is_adjoint = -1) const;
+  ponies,
+                       ponies,
+                       ponies,
+                       ponies;
 
   /**
-   * Projects arbitrary functions onto a vector of degree of freedom
-   * values for the current system.
-   * The function value \p fptr and its gradient \p gptr are
-   * represented by function pointers.
-   * A gradient \p gptr is only required/used for projecting onto
-   * finite element spaces with continuous derivatives.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
+   * ponies
+   * ponies.
    */
-  void project_vector (Number fptr(const Point& p,
-                                   const Parameters& parameters,
-                                   const std::string& sys_name,
-                                   const std::string& unknown_name),
-                       Gradient gptr(const Point& p,
-                                     const Parameters& parameters,
-                                     const std::string& sys_name,
-                                     const std::string& unknown_name),
-                       const Parameters& parameters,
-                       NumericVector<Number>& new_vector,
-                       int is_adjoint = -1) const;
+  ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies),
+                       ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies),
+                       ponies,
+                       ponies,
+                       ponies;
 
   /**
-   * Projects arbitrary boundary functions onto a vector of degree of
-   * freedom values for the current system.
-   * Only degrees of freedom which affect the function's trace on a
-   * boundary in the set \p b are affected.
-   * Only degrees of freedom associated with the variables listed in
-   * the vector \p variables are projected.
-   * The function value \p f and its gradient \p g are
-   * user-provided cloneable functors.
-   * A gradient \p g is only required/used for projecting onto finite
-   * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void boundary_project_solution (const std::set<boundary_id_type> &b,
-                                  const std::vector<unsigned int> &variables,
-                                  FunctionBase<Number> *f,
-                                  FunctionBase<Gradient> *g = NULL);
+  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies);
 
   /**
-   * Projects arbitrary boundary functions onto a vector of degree of
-   * freedom values for the current system.
-   * Only degrees of freedom which affect the function's trace on a
-   * boundary in the set \p b are affected.
-   * Only degrees of freedom associated with the variables listed in
-   * the vector \p variables are projected.
-   * The function value \p fptr and its gradient \p gptr are
-   * represented by function pointers.
-   * A gradient \p gptr is only required/used for projecting onto
-   * finite element spaces with continuous derivatives.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void boundary_project_solution (const std::set<boundary_id_type> &b,
-                                  const std::vector<unsigned int> &variables,
-                                  Number fptr(const Point& p,
-                                              const Parameters& parameters,
-                                              const std::string& sys_name,
-                                              const std::string& unknown_name),
-                                  Gradient gptr(const Point& p,
-                                                const Parameters& parameters,
-                                                const std::string& sys_name,
-                                                const std::string& unknown_name),
-                                  const Parameters& parameters);
+  ponies,
+                                  ponies,
+                                  ponies,
+                                              ponies,
+                                              ponies,
+                                              ponies),
+                                  ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies),
+                                  ponies);
 
   /**
-   * Projects arbitrary boundary functions onto a vector of degree of
-   * freedom values for the current system.
-   * Only degrees of freedom which affect the function's trace on a
-   * boundary in the set \p b are affected.
-   * Only degrees of freedom associated with the variables listed in
-   * the vector \p variables are projected.
-   * The function value \p f and its gradient \p g are
-   * user-provided cloneable functors.
-   * A gradient \p g is only required/used for projecting onto finite
-   * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
+   * ponies
+   * ponies.
    */
-  void boundary_project_vector (const std::set<boundary_id_type> &b,
-                                const std::vector<unsigned int> &variables,
-                                NumericVector<Number>& new_vector,
-                                FunctionBase<Number> *f,
-                                FunctionBase<Gradient> *g = NULL,
-                                int is_adjoint = -1) const;
+  ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies;
 
   /**
-   * Projects arbitrary boundary functions onto a vector of degree of
-   * freedom values for the current system.
-   * Only degrees of freedom which affect the function's trace on a
-   * boundary in the set \p b are affected.
-   * Only degrees of freedom associated with the variables listed in
-   * the vector \p variables are projected.
-   * The function value \p fptr and its gradient \p gptr are
-   * represented by function pointers.
-   * A gradient \p gptr is only required/used for projecting onto
-   * finite element spaces with continuous derivatives.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
+   * ponies
+   * ponies.
    */
-  void boundary_project_vector (const std::set<boundary_id_type> &b,
-                                const std::vector<unsigned int> &variables,
-                                Number fptr(const Point& p,
-                                            const Parameters& parameters,
-                                            const std::string& sys_name,
-                                            const std::string& unknown_name),
-                                Gradient gptr(const Point& p,
-                                              const Parameters& parameters,
-                                              const std::string& sys_name,
-                                              const std::string& unknown_name),
-                                const Parameters& parameters,
-                                NumericVector<Number>& new_vector,
-                                int is_adjoint = -1) const;
+  ponies,
+                                ponies,
+                                ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies),
+                                ponies,
+                                              ponies,
+                                              ponies,
+                                              ponies),
+                                ponies,
+                                ponies,
+                                ponies;
 
   /**
-   * @returns the system number.
+   * @ponies.
    */
-  unsigned int number () const;
+  ponies;
 
   /**
-   * Fill the input vector \p global_soln so that it contains
-   * the global solution on all processors.
-   * Requires communication with all other processors.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  void update_global_solution (std::vector<Number>& global_soln) const;
+  ponies;
 
   /**
-   * Fill the input vector \p global_soln so that it contains
-   * the global solution on processor \p dest_proc.
-   * Requires communication with all other processors.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  void update_global_solution (std::vector<Number>& global_soln,
-                               const processor_id_type dest_proc) const;
+  ponies,
+                               ponies;
 
   /**
-   * @returns a constant reference to this systems's \p _mesh.
+   * @ponies.
    */
-  const MeshBase & get_mesh() const;
+  ponies;
 
   /**
-   * @returns a reference to this systems's \p _mesh.
+   * @ponies.
    */
-  MeshBase & get_mesh();
+  ponies();
 
   /**
-   * @returns a constant reference to this system's \p _dof_map.
+   * @ponies.
    */
-  const DofMap & get_dof_map() const;
+  ponies;
 
   /**
-   * @returns a writeable reference to this system's \p _dof_map.
+   * @ponies.
    */
-  DofMap & get_dof_map();
+  ponies();
 
   /**
-   * @returns a constant reference to this system's parent EquationSystems object.
+   * @ponies.
    */
-  const EquationSystems & get_equation_systems() const { return _equation_systems; }
+  ponies; }
 
   /**
-   * @returns a reference to this system's parent EquationSystems object.
+   * @ponies.
    */
-  EquationSystems & get_equation_systems() { return _equation_systems; }
+  ponies; }
 
   /**
-   * @returns \p true if the system is active, \p false otherwise.
-   * An active system will be solved.
+   * @ponies.
+   * ponies.
    */
-  bool active () const;
+  ponies;
 
   /**
-   * Activates the system.  Only active systems are solved.
+   * ponies.
    */
-  void activate ();
+  ponies ();
 
   /**
-   * Deactivates the system.  Only active systems are solved.
+   * ponies.
    */
-  void deactivate ();
+  ponies ();
 
   /**
-   * Sets the system to be "basic only": i.e. advanced system
-   * components such as ImplicitSystem matrices may not be
-   * initialized.  This is useful for efficiency in certain utility
-   * programs that never use System::solve().  This method must be
-   * called after the System or derived class is created but before it
-   * is initialized; e.g. from within EquationSystems::read()
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies()
    */
-  void set_basic_system_only ();
+  ponies ();
 
   /**
-   * Vector iterator typedefs.
+   * ponies.
    */
-  typedef std::map<std::string, NumericVector<Number>* >::iterator       vectors_iterator;
-  typedef std::map<std::string, NumericVector<Number>* >::const_iterator const_vectors_iterator;
+  ponies;
+  ponies;
 
   /**
-   * Beginning of vectors container
+   * ponies
    */
-  vectors_iterator vectors_begin ();
+  ponies ();
 
   /**
-   * Beginning of vectors container
+   * ponies
    */
-  const_vectors_iterator vectors_begin () const;
+  ponies;
 
   /**
-   * End of vectors container
+   * ponies
    */
-  vectors_iterator vectors_end ();
+  ponies ();
 
   /**
-   * End of vectors container
+   * ponies
    */
-  const_vectors_iterator vectors_end () const;
+  ponies;
 
   /**
-   * Adds the additional vector \p vec_name to this system.  All the
-   * additional vectors are similarly distributed, like the \p
-   * solution, and inititialized to zero.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * By default vectors added by add_vector are projected to changed grids by
-   * reinit().  To zero them instead (more efficient), pass "false" as the
-   * second argument
+   * ponies
+   * ponies
+   * ponies
    */
-  NumericVector<Number> & add_vector (const std::string& vec_name,
-                                      const bool projections=true,
-                                      const ParallelType type = PARALLEL);
+  ponies,
+                                      ponies,
+                                      ponies);
 
   /**
-   * Removes the additional vector \p vec_name from this system
+   * ponies
    */
-  void remove_vector(const std::string& vec_name);
+  ponies);
 
   /**
-   * Tells the System whether or not to project the solution vector onto new
-   * grids when the system is reinitialized.  The solution will be projected
-   * unless project_solution_on_reinit() = false is called.
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool& project_solution_on_reinit (void)
-  { return _solution_projection; }
+  ponies)
+  { ponies; }
 
   /**
-   * @returns \p true if this \p System has a vector associated with the
-   * given name, \p false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool have_vector (const std::string& vec_name) const;
+  ponies;
 
   /**
-   * @returns a const pointer to the vector if this \p System has a
-   * vector associated with the given name, \p NULL otherwise.
+   * @ponies
+   * ponies.
    */
-  const NumericVector<Number> * request_vector (const std::string& vec_name) const;
+  ponies;
 
   /**
-   * @returns a pointer to the vector if this \p System has a
-   * vector associated with the given name, \p NULL otherwise.
+   * @ponies
+   * ponies.
    */
-  NumericVector<Number> * request_vector (const std::string& vec_name);
+  ponies);
 
   /**
-   * @returns a const pointer to this system's @e additional vector
-   * number \p vec_num (where the vectors are counted starting with
-   * 0), or returns \p NULL if the system has no such vector.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  const NumericVector<Number> * request_vector (const unsigned int vec_num) const;
+  ponies;
 
   /**
-   * @returns a writeable pointer to this system's @e additional
-   * vector number \p vec_num (where the vectors are counted starting
-   * with 0), or returns \p NULL if the system has no such vector.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  NumericVector<Number> * request_vector (const unsigned int vec_num);
+  ponies);
 
   /**
-   * @returns a const reference to this system's @e additional vector
-   * named \p vec_name.  Access is only granted when the vector is already
-   * properly initialized.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  const NumericVector<Number> & get_vector (const std::string& vec_name) const;
+  ponies;
 
   /**
-   * @returns a writeable reference to this system's @e additional vector
-   * named \p vec_name.  Access is only granted when the vector is already
-   * properly initialized.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  NumericVector<Number> & get_vector (const std::string& vec_name);
+  ponies);
 
   /**
-   * @returns a const reference to this system's @e additional vector
-   * number \p vec_num (where the vectors are counted starting with
-   * 0).
+   * @ponies
+   * ponies
+   * ponies).
    */
-  const NumericVector<Number> & get_vector (const unsigned int vec_num) const;
+  ponies;
 
   /**
-   * @returns a writeable reference to this system's @e additional
-   * vector number \p vec_num (where the vectors are counted starting
-   * with 0).
+   * @ponies
+   * ponies
+   * ponies).
    */
-  NumericVector<Number> & get_vector (const unsigned int vec_num);
+  ponies);
 
   /**
-   * @returns the name of this system's @e additional vector number \p
-   * vec_num (where the vectors are counted starting with 0).
+   * @ponies
+   * ponies).
    */
-  const std::string & vector_name (const unsigned int vec_num) const;
+  ponies;
 
   /**
-   * @returns the name of a system vector, given a reference to that vector
+   * @ponies
    */
-  const std::string & vector_name (const NumericVector<Number> & vec_reference) const;
+  ponies;
 
   /**
-   * Allows one to set the QoI index controlling whether the vector
-   * identified by vec_name represents a solution from the adjoint
-   * (qoi_num >= 0) or primal (qoi_num == -1) space.  This becomes
-   * significant if those spaces have differing heterogeneous
-   * Dirichlet constraints.
+   * ponies
+   * ponies
+   * (ponies
+   * ponies
+   * ponies.
    *
-   * qoi_num == -2 can be used to indicate a vector which should not
-   * be affected by constraints during projection operations.
+   * ponies
+   * ponies.
    */
-  void set_vector_as_adjoint (const std::string &vec_name, int qoi_num);
+  ponies);
 
   /**
-   * @returns the int describing whether the vector identified by
-   * vec_name represents a solution from an adjoint (non-negative) or
-   * the primal (-1) space.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  int vector_is_adjoint (const std::string &vec_name) const;
+  ponies;
 
   /**
-   * Allows one to set the boolean controlling whether the vector
-   * identified by vec_name should be "preserved": projected to new
-   * meshes, saved, etc.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void set_vector_preservation (const std::string &vec_name, bool preserve);
+  ponies);
 
   /**
-   * @returns the boolean describing whether the vector identified by
-   * vec_name should be "preserved": projected to new meshes, saved,
-   * etc.
+   * @ponies
+   * ponies,
+   * ponies.
    */
-  bool vector_preservation (const std::string &vec_name) const;
+  ponies;
 
   /**
-   * @returns a reference to one of the system's adjoint solution
-   * vectors, by default the one corresponding to the first qoi.
-   * Creates the vector if it doesn't already exist.
+   * @ponies
+   * ponies.
+   * ponies.
    */
-  NumericVector<Number> & add_adjoint_solution(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's adjoint solution
-   * vectors, by default the one corresponding to the first qoi.
+   * @ponies
+   * ponies.
    */
-  NumericVector<Number> & get_adjoint_solution(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's adjoint solution
-   * vectors, by default the one corresponding to the first qoi.
+   * @ponies
+   * ponies.
    */
-  const NumericVector<Number> & get_adjoint_solution(unsigned int i=0) const;
+  ponies;
 
   /**
-   * @returns a reference to one of the system's solution sensitivity
-   * vectors, by default the one corresponding to the first parameter.
-   * Creates the vector if it doesn't already exist.
+   * @ponies
+   * ponies.
+   * ponies.
    */
-  NumericVector<Number> & add_sensitivity_solution(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's solution sensitivity
-   * vectors, by default the one corresponding to the first parameter.
+   * @ponies
+   * ponies.
    */
-  NumericVector<Number> & get_sensitivity_solution(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's solution sensitivity
-   * vectors, by default the one corresponding to the first parameter.
+   * @ponies
+   * ponies.
    */
-  const NumericVector<Number> & get_sensitivity_solution(unsigned int i=0) const;
+  ponies;
 
   /**
-   * @returns a reference to one of the system's weighted sensitivity
-   * adjoint solution vectors, by default the one corresponding to the
-   * first qoi.
-   * Creates the vector if it doesn't already exist.
+   * @ponies
+   * ponies
+   * ponies.
+   * ponies.
    */
-  NumericVector<Number> & add_weighted_sensitivity_adjoint_solution(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's weighted sensitivity
-   * adjoint solution vectors, by default the one corresponding to the
-   * first qoi.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  NumericVector<Number> & get_weighted_sensitivity_adjoint_solution(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's weighted sensitivity
-   * adjoint solution vectors, by default the one corresponding to the
-   * first qoi.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  const NumericVector<Number> & get_weighted_sensitivity_adjoint_solution(unsigned int i=0) const;
+  ponies;
 
   /**
-   * @returns a reference to the solution of the last weighted
-   * sensitivity solve
-   * Creates the vector if it doesn't already exist.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  NumericVector<Number> & add_weighted_sensitivity_solution();
+  ponies();
 
   /**
-   * @returns a reference to the solution of the last weighted
-   * sensitivity solve
+   * @ponies
+   * ponies
    */
-  NumericVector<Number> & get_weighted_sensitivity_solution();
+  ponies();
 
   /**
-   * @returns a reference to the solution of the last weighted
-   * sensitivity solve
+   * @ponies
+   * ponies
    */
-  const NumericVector<Number> & get_weighted_sensitivity_solution() const;
+  ponies;
 
   /**
-   * @returns a reference to one of the system's adjoint rhs
-   * vectors, by default the one corresponding to the first qoi.
-   * Creates the vector if it doesn't already exist.
+   * @ponies
+   * ponies.
+   * ponies.
    */
-  NumericVector<Number> & add_adjoint_rhs(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's adjoint rhs
-   * vectors, by default the one corresponding to the first qoi.
-   * This what the user's QoI derivative code should assemble
-   * when setting up an adjoint problem
+   * @ponies
+   * ponies.
+   * ponies
+   * ponies
    */
-  NumericVector<Number> & get_adjoint_rhs(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's adjoint rhs
-   * vectors, by default the one corresponding to the first qoi.
+   * @ponies
+   * ponies.
    */
-  const NumericVector<Number> & get_adjoint_rhs(unsigned int i=0) const;
+  ponies;
 
   /**
-   * @returns a reference to one of the system's sensitivity rhs
-   * vectors, by default the one corresponding to the first parameter.
-   * Creates the vector if it doesn't already exist.
+   * @ponies
+   * ponies.
+   * ponies.
    */
-  NumericVector<Number> & add_sensitivity_rhs(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's sensitivity rhs
-   * vectors, by default the one corresponding to the first parameter.
-   * By default these vectors are built by the library, using finite
-   * differences, when \p assemble_residual_derivatives() is called.
+   * @ponies
+   * ponies.
+   * ponies
+   * ponies.
    *
-   * When assembled, this vector should hold
-   * -(partial R / partial p_i)
+   * ponies
+   * -(ponies)
    */
-  NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0);
+  ponies);
 
   /**
-   * @returns a reference to one of the system's sensitivity rhs
-   * vectors, by default the one corresponding to the first parameter.
+   * @ponies
+   * ponies.
    */
-  const NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0) const;
+  ponies;
 
   /**
-   * @returns the number of vectors (in addition to the solution)
-   * handled by this system
-   * This is the size of the \p _vectors map
+   * @ponies)
+   * ponies
+   * ponies
    */
-  unsigned int n_vectors () const;
+  ponies;
 
   /**
-   * @returns the number of matrices
-   * handled by this system.
+   * @ponies
+   * ponies.
    *
-   * This will return 0 by default but can be overriden.
+   * ponies.
    */
-  virtual unsigned int n_matrices () const;
+  ponies;
 
   /**
-   * @returns the number of variables in the system
+   * @ponies
    */
-  unsigned int n_vars() const;
+  ponies;
 
   /**
-   * @returns the number of \p VariableGroup variable groups in the system
+   * @ponies
    */
-  unsigned int n_variable_groups() const;
+  ponies;
 
   /**
-   * @returns the total number of scalar components in the system's
-   * variables.  This will equal \p n_vars() in the case of all
-   * scalar-valued variables.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  unsigned int n_components() const;
+  ponies;
 
   /**
-   * @returns the number of degrees of freedom in the system
+   * @ponies
    */
-  dof_id_type n_dofs() const;
+  ponies;
 
   /**
-   * Returns the number of active degrees of freedom
-   * for this System.
+   * ponies
+   * ponies.
    */
-  dof_id_type n_active_dofs() const;
+  ponies;
 
   /**
-   * @returns the total number of constrained degrees of freedom
-   * in the system.
+   * @ponies
+   * ponies.
    */
-  dof_id_type n_constrained_dofs() const;
+  ponies;
 
   /**
-   * @returns the number of constrained degrees of freedom
-   * on this processor.
+   * @ponies
+   * ponies.
    */
-  dof_id_type n_local_constrained_dofs() const;
+  ponies;
 
   /**
-   * @returns the number of degrees of freedom local
-   * to this processor
+   * @ponies
+   * ponies
    */
-  dof_id_type n_local_dofs() const;
+  ponies;
 
   /**
-   * Adds the variable \p var to the list of variables
-   * for this system.  Returns the index number for the new variable.
+   * ponies
+   * ponies.
    */
-  unsigned int add_variable (const std::string& var,
-                             const FEType& type,
-                             const std::set<subdomain_id_type> * const active_subdomains = NULL);
+  ponies,
+                             ponies,
+                             ponies);
 
   /**
-   * Adds the variable \p var to the list of variables
-   * for this system.  Same as before, but assumes \p LAGRANGE
-   * as default value for \p FEType.family.
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned int add_variable (const std::string& var,
-                             const Order order = FIRST,
-                             const FEFamily = LAGRANGE,
-                             const std::set<subdomain_id_type> * const active_subdomains = NULL);
+  ponies,
+                             ponies,
+                             ponies,
+                             ponies);
 
   /**
-   * Adds the variable \p var to the list of variables
-   * for this system.  Returns the index number for the new variable.
+   * ponies
+   * ponies.
    */
-  unsigned int add_variables (const std::vector<std::string> &vars,
-                              const FEType& type,
-                              const std::set<subdomain_id_type> * const active_subdomains = NULL);
+  ponies,
+                              ponies,
+                              ponies);
 
   /**
-   * Adds the variable \p var to the list of variables
-   * for this system.  Same as before, but assumes \p LAGRANGE
-   * as default value for \p FEType.family.
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned int add_variables (const std::vector<std::string> &vars,
-                              const Order order = FIRST,
-                              const FEFamily = LAGRANGE,
-                              const std::set<subdomain_id_type> * const active_subdomains = NULL);
+  ponies,
+                              ponies,
+                              ponies,
+                              ponies);
 
   /**
-   * Return a constant reference to \p Variable \p var.
+   * ponies.
    */
-  const Variable & variable (unsigned int var) const;
+  ponies;
 
   /**
-   * Return a constant reference to \p VariableGroup \p vg.
+   * ponies.
    */
-  const VariableGroup & variable_group (unsigned int vg) const;
+  ponies;
 
   /**
-   * @returns true if a variable named \p var exists in this System
+   * @ponies
    */
-  bool has_variable(const std::string& var) const;
+  ponies;
 
   /**
-   * @returns the name of variable \p i.
+   * @ponies.
    */
-  const std::string & variable_name(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns the variable number assoicated with
-   * the user-specified variable named \p var.
+   * @ponies
+   * ponies.
    */
-  unsigned short int variable_number (const std::string& var) const;
+  ponies;
 
   /**
-   * Fills \p all_variable_numbers with all the variable numbers for the
-   * variables that have been added to this system.
+   * ponies
+   * ponies.
    */
-  void get_all_variable_numbers(std::vector<unsigned int>& all_variable_numbers) const;
+  ponies;
 
   /**
-   * @returns an index, starting from 0 for the first component of the
-   * first variable, and incrementing for each component of each
-   * (potentially vector-valued) variable in the system in order.
-   * For systems with only scalar-valued variables, this will be the
-   * same as \p variable_number(var)
+   * @ponies
+   * ponies
+   * (ponies.
+   * ponies
+   * ponies)
    *
-   * Irony: currently our only non-scalar-valued variable type is
-   * SCALAR.
+   * ponies
+   * ponies.
    */
-  unsigned int variable_scalar_number (const std::string& var,
-                                       unsigned int component) const;
+  ponies,
+                                       ponies;
 
   /**
-   * @returns an index, starting from 0 for the first component of the
-   * first variable, and incrementing for each component of each
-   * (potentially vector-valued) variable in the system in order.
-   * For systems with only scalar-valued variables, this will be the
-   * same as \p var_num
+   * @ponies
+   * ponies
+   * (ponies.
+   * ponies
+   * ponies
    *
-   * Irony: currently our only non-scalar-valued variable type is
-   * SCALAR.
+   * ponies
+   * ponies.
    */
-  unsigned int variable_scalar_number (unsigned int var_num,
-                                       unsigned int component) const;
+  ponies,
+                                       ponies;
 
 
   /**
-   * @returns the finite element type variable number \p i.
+   * @ponies.
    */
-  const FEType & variable_type (const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns the finite element type for variable \p var.
+   * @ponies.
    */
-  const FEType & variable_type (const std::string& var) const;
+  ponies;
 
   /**
-   * @returns \p true when \p VariableGroup structures should be
-   * automatically identified, \p false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool identify_variable_groups () const;
+  ponies;
 
   /**
-   * Toggle automatic \p VariableGroup identification.
+   * ponies.
    */
-  void identify_variable_groups (const bool);
+  ponies);
 
   /**
-   * @returns a norm of variable \p var in the vector \p v, in the specified
-   * norm (e.g. L2, L_INF, H1)
+   * @ponies
+   * ponies)
    */
-  Real calculate_norm(const NumericVector<Number>& v,
-                      unsigned int var,
-                      FEMNormType norm_type) const;
+  ponies,
+                      ponies,
+                      ponies;
 
   /**
-   * @returns a norm of the vector \p v, using \p component_norm and \p
-   * component_scale to choose and weight the norms of each variable.
+   * @ponies
+   * ponies.
    */
-  Real calculate_norm(const NumericVector<Number>& v,
-                      const SystemNorm &norm) const;
+  ponies,
+                      ponies;
 
   /**
-   * Reads the basic data header for this System.
+   * ponies.
    */
-  void read_header (Xdr& io,
-                    const std::string &version,
-                    const bool read_header=true,
-                    const bool read_additional_data=true,
-                    const bool read_legacy_format=false);
+  ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies);
 
   /**
-   * Reads additional data, namely vectors, for this System.
+   * ponies.
    */
-  void read_legacy_data (Xdr& io,
-                         const bool read_additional_data=true);
+  ponies,
+                         ponies);
 
   /**
-   * Reads additional data, namely vectors, for this System.
-   * This method may safely be called on a distributed-memory mesh.
+   * ponies.
+   * ponies.
    */
-  template <typename ValType>
-  void read_serialized_data (Xdr& io,
-                             const bool read_additional_data=true);
+  ponies>
+  ponies,
+                             ponies);
   /**
-   * Non-templated version for backward compatibility.
+   * ponies.
    *
-   * Reads additional data, namely vectors, for this System.
-   * This method may safely be called on a distributed-memory mesh.
+   * ponies.
+   * ponies.
    */
-  void read_serialized_data (Xdr& io,
-                             const bool read_additional_data=true)
-  { read_serialized_data<Number>(io, read_additional_data); }
+  ponies,
+                             ponies)
+  { ponies); }
 
   /**
-   * Read a number of identically distributed vectors.  This method
-   * allows for optimization for the multiple vector case by only communicating
-   * the metadata once.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename InValType>
-  std::size_t read_serialized_vectors (Xdr &io,
-                                       const std::vector<NumericVector<Number>*> &vectors) const;
+  ponies>
+  ponies,
+                                       ponies;
 
   /**
-   * Non-templated version for backward compatibility.
+   * ponies.
    *
-   * Read a number of identically distributed vectors.  This method
-   * allows for optimization for the multiple vector case by only communicating
-   * the metadata once.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::size_t read_serialized_vectors (Xdr &io,
-                                       const std::vector<NumericVector<Number>*> &vectors) const
-  { return read_serialized_vectors<Number>(io, vectors); }
+  ponies,
+                                       ponies
+  { ponies); }
 
   /**
-   * Reads additional data, namely vectors, for this System.
-   * This method may safely be called on a distributed-memory mesh.
-   * This method will read an individual file for each processor in the simulation
-   * where the local solution components for that processor are stored.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  template <typename InValType>
-  void read_parallel_data (Xdr &io,
-                           const bool read_additional_data);
+  ponies>
+  ponies,
+                           ponies);
 
   /**
-   * Non-templated version for backward compatibility.
+   * ponies.
    *
-   * Reads additional data, namely vectors, for this System.
-   * This method may safely be called on a distributed-memory mesh.
-   * This method will read an individual file for each processor in the simulation
-   * where the local solution components for that processor are stored.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void read_parallel_data (Xdr &io,
-                           const bool read_additional_data)
-  { read_parallel_data<Number>(io, read_additional_data); }
+  ponies,
+                           ponies)
+  { ponies); }
 
   /**
-   * Writes the basic data header for this System.
+   * ponies.
    */
-  void write_header (Xdr& io,
-                     const std::string &version,
-                     const bool write_additional_data) const;
+  ponies,
+                     ponies,
+                     ponies;
 
   /**
-   * Writes additional data, namely vectors, for this System.
-   * This method may safely be called on a distributed-memory mesh.
+   * ponies.
+   * ponies.
    */
-  void write_serialized_data (Xdr& io,
-                              const bool write_additional_data = true) const;
+  ponies,
+                              ponies;
 
   /**
-   * Serialize & write a number of identically distributed vectors.  This method
-   * allows for optimization for the multiple vector case by only communicating
-   * the metadata once.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::size_t write_serialized_vectors (Xdr &io,
-                                        const std::vector<const NumericVector<Number>*> &vectors) const;
+  ponies,
+                                        ponies;
 
   /**
-   * Writes additional data, namely vectors, for this System.
-   * This method may safely be called on a distributed-memory mesh.
-   * This method will create an individual file for each processor in the simulation
-   * where the local solution components for that processor will be stored.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void write_parallel_data (Xdr &io,
-                            const bool write_additional_data) const;
+  ponies,
+                            ponies;
 
   /**
-   * @returns a string containing information about the
-   * system.
+   * @ponies
+   * ponies.
    */
-  std::string get_info () const;
+  ponies;
 
   /**
-   * Register a user function to use in initializing the system.
+   * ponies.
    */
-  void attach_init_function (void fptr(EquationSystems& es,
-                                       const std::string& name));
+  ponies,
+                                       ponies));
 
   /**
-   * Register a user class to use to initialize the system.
-   * Note this is exclusive with the \p attach_init_function.
+   * ponies.
+   * ponies.
    */
-  void attach_init_object (Initialization& init);
+  ponies);
 
   /**
-   * Register a user function to use in assembling the system
-   * matrix and RHS.
+   * ponies
+   * ponies.
    */
-  void attach_assemble_function (void fptr(EquationSystems& es,
-                                           const std::string& name));
+  ponies,
+                                           ponies));
 
   /**
-   * Register a user object to use in assembling the system
-   * matrix and RHS.
+   * ponies
+   * ponies.
    */
-  void attach_assemble_object (Assembly& assemble);
+  ponies);
 
   /**
-   * Register a user function for imposing constraints.
+   * ponies.
    */
-  void attach_constraint_function (void fptr(EquationSystems& es,
-                                             const std::string& name));
+  ponies,
+                                             ponies));
 
   /**
-   * Register a user object for imposing constraints.
+   * ponies.
    */
-  void attach_constraint_object (Constraint& constrain);
+  ponies);
 
   /**
-   * Register a user function for evaluating the quantities of interest,
-   * whose values should be placed in \p System::qoi
+   * ponies,
+   * ponies
    */
-  void attach_QOI_function (void fptr(EquationSystems& es,
-                                      const std::string& name,
-                                      const QoISet& qoi_indices));
+  ponies,
+                                      ponies,
+                                      ponies));
 
   /**
-   * Register a user object for evaluating the quantities of interest,
-   * whose values should be placed in \p System::qoi
+   * ponies,
+   * ponies
    */
-  void attach_QOI_object (QOI& qoi);
+  ponies);
 
   /**
-   * Register a user function for evaluating derivatives of a quantity
-   * of interest with respect to test functions, whose values should
-   * be placed in \p System::rhs
+   * ponies
+   * ponies
+   * ponies
    */
-  void attach_QOI_derivative (void fptr(EquationSystems& es,
-                                        const std::string& name,
-                                        const QoISet& qoi_indices,
-                                        bool include_liftfunc,
-                                        bool apply_constraints));
+  ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies));
 
   /**
-   * Register a user object for evaluating derivatives of a quantity
-   * of interest with respect to test functions, whose values should
-   * be placed in \p System::rhs
+   * ponies
+   * ponies
+   * ponies
    */
-  void attach_QOI_derivative_object (QOIDerivative& qoi_derivative);
+  ponies);
 
   /**
-   * Calls user's attached initialization function, or is overloaded by
-   * the user in derived classes.
+   * ponies
+   * ponies.
    */
-  virtual void user_initialization ();
+  ponies ();
 
   /**
-   * Calls user's attached assembly function, or is overloaded by
-   * the user in derived classes.
+   * ponies
+   * ponies.
    */
-  virtual void user_assembly ();
+  ponies ();
 
   /**
-   * Calls user's attached constraint function, or is overloaded by
-   * the user in derived classes.
+   * ponies
+   * ponies.
    */
-  virtual void user_constrain ();
+  ponies ();
 
   /**
-   * Calls user's attached quantity of interest function, or is
-   * overloaded by the user in derived classes.
+   * ponies
+   * ponies.
    */
-  virtual void user_QOI (const QoISet& qoi_indices);
+  ponies);
 
   /**
-   * Calls user's attached quantity of interest derivative function,
-   * or is overloaded by the user in derived classes.
+   * ponies,
+   * ponies.
    */
-  virtual void user_QOI_derivative
-  (const QoISet &qoi_indices = QoISet(),
-   bool include_liftfunc = true,
-   bool apply_constraints = true);
+  ponies
+  (ponies(),
+   ponies,
+   ponies);
 
   /**
-   * Re-update the local values when the mesh has changed.
-   * This method takes the data updated by \p update() and
-   * makes it up-to-date on the current mesh.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void re_update ();
+  ponies ();
 
   /**
-   * Restrict vectors after the mesh has coarsened
+   * ponies
    */
-  virtual void restrict_vectors ();
+  ponies ();
 
   /**
-   * Prolong vectors after the mesh has refined
+   * ponies
    */
-  virtual void prolong_vectors ();
+  ponies ();
 
   /**
-   * Flag which tells the system to whether or not to
-   * call the user assembly function during each call to solve().
-   * By default, every call to solve() begins with a call to the
-   * user assemble, so this flag is true.  (For explicit systems,
-   * "solving" the system occurs during the assembly step, so this
-   * flag is always true for explicit systems.)
+   * ponies
+   * ponies().
+   * ponies
+   * ponies,
+   * "ponies
+   * ponies.)
    *
-   * You will only want to set this to false if you need direct
-   * control over when the system is assembled, and are willing to
-   * track the state of its assembly yourself.  An example of such a
-   * case is an implicit system with multiple right hand sides.  In
-   * this instance, a single assembly would likely be followed with
-   * multiple calls to solve.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The frequency system and Newmark system have their own versions
-   * of this flag, called _finished_assemble, which might be able to
-   * be replaced with this more general concept.
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool assemble_before_solve;
+  ponies;
 
   /**
-   * Avoids use of any cached data that might affect any solve result.  Should
-   * be overloaded in derived systems.
+   * ponies
+   * ponies.
    */
-  virtual void disable_cache ();
+  ponies ();
 
   /**
-   * A boolean to be set to true by systems using elem_fixed_solution,
-   * for optional use by e.g. stabilized methods.
-   * False by default.
+   * ponies,
+   * ponies.
+   * ponies.
    *
-   * Note for FEMSystem users:
-   * Warning: if this variable is set to true, it must be before init_data() is
-   * called.
+   * ponies:
+   * ponies
+   * ponies.
    */
-  bool use_fixed_solution;
+  ponies;
 
   /**
-   * A member int that can be employed to indicate increased or
-   * reduced quadrature order.
+   * ponies
+   * ponies.
    *
-   * Note for FEMSystem users:
-   * By default, when calling the user-defined residual functions, the
-   * FEMSystem will first set up an appropriate
-   * FEType::default_quadrature_rule() object for performing the integration.
-   * This rule will integrate elements of order up to 2*p+1 exactly (where p is
-   * the sum of the base FEType and local p refinement levels), but if
-   * additional (or reduced) quadrature accuracy is desired then this
-   * extra_quadrature_order (default 0) will be added.
+   * ponies:
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  int extra_quadrature_order;
+  ponies;
 
 
   //--------------------------------------------------
-  // The solution and solution access members
+  // ponies
 
   /**
-   * @returns the current solution for the specified global
-   * DOF.
+   * @ponies
+   * ponies.
    */
-  Number current_solution (const dof_id_type global_dof_number) const;
+  ponies;
 
   /**
-   * Data structure to hold solution values.
+   * ponies.
    */
-  UniquePtr<NumericVector<Number> > solution;
+  ponies;
 
   /**
-   * All the values I need to compute my contribution
-   * to the simulation at hand.  Think of this as the
-   * current solution with any ghost values needed from
-   * other processors.  This vector is necessarily larger
-   * than the \p solution vector in the case of a parallel
-   * simulation.  The \p update() member is used to synchronize
-   * the contents of the \p solution and \p current_local_solution
-   * vectors.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  UniquePtr<NumericVector<Number> > current_local_solution;
+  ponies;
 
   /**
-   * For time-dependent problems, this is the time t at the beginning of
-   * the current timestep.
+   * ponies
+   * ponies.
    *
-   * Note for DifferentiableSystem users:
-   * do *not* access this time during an assembly!
-   * Use the DiffContext::time value instead to get correct
-   * results.
+   * ponies:
+   * ponies!
+   * ponies
+   * ponies.
    */
-  Real time;
+  ponies;
 
   /**
-   * Values of the quantities of interest.  This vector needs
-   * to be both resized and filled by the user before any quantity of
-   * interest assembly is done and before any sensitivities are
-   * calculated.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<Number> qoi;
+  ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the physical
-   * point \p p in the mesh, without knowing a priori which element
-   * contains \p p.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Note that this function uses \p MeshBase::sub_point_locator(); users
-   * may or may not want to call \p MeshBase::clear_point_locator()
-   * afterward.  Also, point_locator() is expensive (N log N for
-   * initial construction, log N for evaluations).  Avoid using this
-   * function in any context where you are already looping over
-   * elements.
+   * ponies
+   * ponies()
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Because the element containing \p p may lie on any processor,
-   * this function is parallel-only.
+   * ponies,
+   * ponies.
    *
-   * By default this method expects the point to reside inside the domain
-   * and will abort if no element can be found which contains \p.  The
-   * optional parameter \p insist_on_success can be set to false to allow
-   * the method to return 0 when the point is not located.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Number point_value(unsigned int var, const Point &p,
-                     const bool insist_on_success = true) const;
+  ponies,
+                     ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the physical
-   * point \p p contained in local Elem \p e
+   * ponies
+   * ponies
    *
-   * This version of point_value can be run in serial, but assumes \p e is in
-   * the local mesh partition.
+   * ponies
+   * ponies.
    */
-  Number point_value(unsigned int var, const Point &p, const Elem &e) const;
+  ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the physical
-   * point \p p in the mesh, similarly to point_value.
+   * ponies
+   * ponies.
    */
-  Gradient point_gradient(unsigned int var, const Point &p,
-                          const bool insist_on_success = true) const;
+  ponies,
+                          ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the physical
-   * point \p p in local Elem \p e in the mesh, similarly to point_value.
+   * ponies
+   * ponies.
    */
-  Gradient point_gradient(unsigned int var, const Point &p, const Elem &e) const;
+  ponies;
 
   /**
-   * Returns the second derivative tensor of the solution variable \p var
-   * at the physical point \p p in the mesh, similarly to point_value.
+   * ponies
+   * ponies.
    */
-  Tensor point_hessian(unsigned int var, const Point &p,
-                       const bool insist_on_success = true) const;
+  ponies,
+                       ponies;
 
   /**
-   * Returns the second derivative tensor of the solution variable \p var
-   * at the physical point \p p in local Elem \p e in the mesh, similarly to
-   * point_value.
+   * ponies
+   * ponies
+   * ponies.
    */
-  Tensor point_hessian(unsigned int var, const Point &p, const Elem &e) const;
+  ponies;
 
   /**
-   * Fills the std::set with the degrees of freedom on the local
-   * processor corresponding the the variable number passed in.
+   * ponies
+   * ponies.
    */
-  void local_dof_indices (const unsigned int var,
-                          std::set<dof_id_type> & var_indices) const;
+  ponies,
+                          ponies;
 
   /**
-   * Zeroes all dofs in \p v that correspond to variable number \p
-   * var_num.
+   * ponies
+   * ponies.
    */
-  void zero_variable (NumericVector<Number>& v, unsigned int var_num) const;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Initializes the data for the system.  Note that this is called
-   * before any user-supplied intitialization function so that all
-   * required storage will be available.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void init_data ();
+  ponies ();
 
   /**
-   * Projects the vector defined on the old mesh onto the
-   * new mesh.
+   * ponies
+   * ponies.
    *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
+   * ponies
+   * ponies.
    */
-  void project_vector (NumericVector<Number>&,
-                       int is_adjoint = -1) const;
+  ponies>&,
+                       ponies;
 
   /**
-   * Projects the vector defined on the old mesh onto the
-   * new mesh. The original vector is unchanged and the new vector
-   * is passed through the second argument.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
+   * ponies
+   * ponies.
    */
-  void project_vector (const NumericVector<Number>&,
-                       NumericVector<Number>&,
-                       int is_adjoint = -1) const;
+  ponies>&,
+                       ponies>&,
+                       ponies;
 
-private:
+ponies:
   /**
-   * This isn't a copyable object, so let's make sure nobody tries.
+   * ponies.
    *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
+   * ponies
+   * ponies.
    */
-  System (const System&);
+  ponies&);
 
   /**
-   * This isn't a copyable object, so let's make sure nobody tries.
+   * ponies.
    *
-   * We won't even bother implementing this; we'll just make sure that
-   * the compiler doesn't implement a default.
+   * ponies
+   * ponies.
    */
-  System& operator=(const System&);
+  ponies&);
 
   /**
-   * Finds the discrete norm for the entries in the vector
-   * corresponding to Dofs associated with var.
+   * ponies
+   * ponies.
    */
-  Real discrete_var_norm (const NumericVector<Number>& v,
-                          unsigned int var,
-                          FEMNormType norm_type) const;
+  ponies,
+                          ponies,
+                          ponies;
 
   /**
-   * Reads an input vector from the stream \p io and assigns
-   * the values to a set of \p DofObjects.  This method uses
-   * blocked input and is safe to call on a distributed memory-mesh.
-   * Unless otherwise specified, all variables are read.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies.
    */
-  template <typename iterator_type, typename InValType>
-  std::size_t read_serialized_blocked_dof_objects (const dof_id_type n_objects,
-                                                   const iterator_type begin,
-                                                   const iterator_type end,
-                                                   const InValType dummy,
-                                                   Xdr &io,
-                                                   const std::vector<NumericVector<Number>*> &vecs,
-                                                   const unsigned int var_to_read=libMesh::invalid_uint) const;
+  ponies>
+  ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies;
 
   /**
-   * Reads the SCALAR dofs from the stream \p io and assigns the values
-   * to the appropriate entries of \p vec.
+   * ponies
+   * ponies.
    *
-   * Returns the number of dofs read.
+   * ponies.
    */
-  unsigned int read_SCALAR_dofs (const unsigned int var,
-                                 Xdr &io,
-                                 NumericVector<Number> &vec) const;
+  ponies,
+                                 ponies,
+                                 ponies;
 
   /**
-   * Reads a vector for this System.
-   * This method may safely be called on a distributed-memory mesh.
+   * ponies.
+   * ponies.
    *
-   * Returns the length of the vector read.
+   * ponies.
    */
-  template <typename InValType>
-  numeric_index_type read_serialized_vector (Xdr& io,
-                                             NumericVector<Number> &vec);
+  ponies>
+  ponies,
+                                             ponies);
 
   /**
-   * Non-templated version for backward compatibility.
+   * ponies.
    *
-   * Reads a vector for this System.
-   * This method may safely be called on a distributed-memory mesh.
+   * ponies.
+   * ponies.
    *
-   * Returns the length of the vector read.
+   * ponies.
    */
-  numeric_index_type read_serialized_vector (Xdr& io,
-                                             NumericVector<Number> &vec)
-  { return read_serialized_vector<Number>(io, vec); }
+  ponies,
+                                             ponies)
+  { ponies); }
 
   /**
-   * Writes an output vector to the stream \p io for a set of \p DofObjects.
-   * This method uses blocked output and is safe to call on a distributed memory-mesh.
+   * ponies.
+   * ponies.
    *
-   * Returns the number of values written
+   * ponies
    */
-  template <typename iterator_type>
-  std::size_t write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
-                                                    const dof_id_type n_objects,
-                                                    const iterator_type begin,
-                                                    const iterator_type end,
-                                                    Xdr &io,
-                                                    const unsigned int var_to_write=libMesh::invalid_uint) const;
+  ponies>
+  ponies,
+                                                    ponies,
+                                                    ponies,
+                                                    ponies,
+                                                    ponies,
+                                                    ponies;
 
   /**
-   * Writes the SCALAR dofs associated with var to the stream \p io.
+   * ponies.
    *
-   * Returns the number of values written.
+   * ponies.
    */
-  unsigned int write_SCALAR_dofs (const NumericVector<Number> &vec,
-                                  const unsigned int var,
-                                  Xdr &io) const;
+  ponies,
+                                  ponies,
+                                  ponies;
 
   /**
-   * Writes a vector for this System.
-   * This method may safely be called on a distributed-memory mesh.
+   * ponies.
+   * ponies.
    *
-   * Returns the number of values written.
+   * ponies.
    */
-  dof_id_type write_serialized_vector (Xdr& io,
-                                       const NumericVector<Number> &vec) const;
+  ponies,
+                                       ponies;
 
   /**
-   * Function that initializes the system.
+   * ponies.
    */
-  void (* _init_system_function) (EquationSystems& es,
-                                  const std::string& name);
+  ponies,
+                                  ponies);
 
   /**
-   * Object that initializes the system.
+   * ponies.
    */
-  Initialization * _init_system_object;
+  ponies;
 
   /**
-   * Function that assembles the system.
+   * ponies.
    */
-  void (* _assemble_system_function) (EquationSystems& es,
-                                      const std::string& name);
+  ponies,
+                                      ponies);
 
   /**
-   * Object that assembles the system.
+   * ponies.
    */
-  Assembly * _assemble_system_object;
+  ponies;
 
   /**
-   * Function to impose constraints.
+   * ponies.
    */
-  void (* _constrain_system_function) (EquationSystems& es,
-                                       const std::string& name);
+  ponies,
+                                       ponies);
 
   /**
-   * Object that constrains the system.
+   * ponies.
    */
-  Constraint * _constrain_system_object;
+  ponies;
 
   /**
-   * Function to evaluate quantity of interest
+   * ponies
    */
-  void (* _qoi_evaluate_function) (EquationSystems& es,
-                                   const std::string& name,
-                                   const QoISet& qoi_indices);
+  ponies,
+                                   ponies,
+                                   ponies);
 
   /**
-   * Object to compute quantities of interest.
+   * ponies.
    */
-  QOI *_qoi_evaluate_object;
+  ponies;
 
   /**
-   * Function to evaluate quantity of interest derivative
+   * ponies
    */
-  void (* _qoi_evaluate_derivative_function) (EquationSystems& es,
-                                              const std::string& name,
-                                              const QoISet& qoi_indices,
-                                              bool include_liftfunc,
-                                              bool apply_constraints);
+  ponies,
+                                              ponies,
+                                              ponies,
+                                              ponies,
+                                              ponies);
 
   /**
-   * Object to compute derivatives of quantities of interest.
+   * ponies.
    */
-  QOIDerivative *_qoi_evaluate_derivative_object;
+  ponies;
 
   /**
-   * Data structure describing the relationship between
-   * nodes, variables, etc... and degrees of freedom.
+   * ponies
+   * ponies.
    */
-  UniquePtr<DofMap> _dof_map;
+  ponies;
 
   /**
-   * Constant reference to the \p EquationSystems object
-   * used for the simulation.
+   * ponies
+   * ponies.
    */
-  EquationSystems& _equation_systems;
+  ponies;
 
   /**
-   * Constant reference to the \p mesh data structure used
-   * for the simulation.
+   * ponies
+   * ponies.
    */
-  MeshBase& _mesh;
+  ponies;
 
   /**
-   * A name associated with this system.
+   * ponies.
    */
-  const std::string _sys_name;
+  ponies;
 
   /**
-   * The number associated with this system
+   * ponies
    */
-  const unsigned int _sys_number;
+  ponies;
 
   /**
-   * The \p Variable in this \p System.
+   * ponies.
    */
-  std::vector<Variable> _variables;
+  ponies;
 
   /**
-   * The \p VariableGroup in this \p System.
+   * ponies.
    */
-  std::vector<VariableGroup> _variable_groups;
+  ponies;
 
   /**
-   * The variable numbers corresponding to user-specified
-   * names, useful for name-based lookups.
+   * ponies
+   * ponies.
    */
-  std::map<std::string, unsigned short int> _variable_numbers;
+  ponies;
 
   /**
-   * Flag stating if the system is active or not.
+   * ponies.
    */
-  bool _active;
+  ponies;
 
   /**
-   * Some systems need an arbitrary number of vectors.
-   * This map allows names to be associated with arbitrary
-   * vectors.  All the vectors in this map will be distributed
-   * in the same way as the solution vector.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::map<std::string, NumericVector<Number>* > _vectors;
+  ponies;
 
   /**
-   * Holds true if a vector by that name should be projected
-   * onto a changed grid, false if it should be zeroed.
+   * ponies
+   * ponies.
    */
-  std::map<std::string, bool> _vector_projections;
+  ponies;
 
   /**
-   * Holds non-negative if a vector by that name should be projected
-   * using adjoint constraints/BCs, -1 if primal
+   * ponies
+   * ponies
    */
-  std::map<std::string, int> _vector_is_adjoint;
+  ponies;
 
   /**
-   * Holds the type of a vector
+   * ponies
    */
-  std::map<std::string, ParallelType> _vector_types;
+  ponies;
 
   /**
-   * Holds true if the solution vector should be projected
-   * onto a changed grid, false if it should be zeroed.
-   * This is true by default.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  bool _solution_projection;
+  ponies;
 
   /**
-   * Holds true if the components of more advanced system types (e.g.
-   * system matrices) should not be initialized.
+   * ponies.
+   * ponies.
    */
-  bool _basic_system_only;
+  ponies;
 
   /**
-   * \p true when additional vectors and variables do not require
-   * immediate initialization, \p false otherwise.
+   * \ponies
+   * ponies.
    */
-  bool _is_initialized;
+  ponies;
 
   /**
-   * \p true when \p VariableGroup structures should be automatically
-   * identified, \p false otherwise.  Defaults to \p true.
+   * \ponies
+   * ponies.
    */
-  bool _identify_variable_groups;
+  ponies;
 
   /**
-   * This flag is used only when *reading* in a system from file.
-   * Based on the system header, it keeps track of whether or not
-   * additional vectors were actually written for this file.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  bool _additional_data_written;
+  ponies;
 
   /**
-   * This vector is used only when *reading* in a system from file.
-   * Based on the system header, it keeps track of any index remapping
-   * between variable names in the data file and variable names in the
-   * already-constructed system.  I.e. if we have a system with
-   * variables "A1", "A2", "B1", and "B2", but we read in a data file with
-   * only "A1" and "B1" defined, then we don't want to try and read in
-   * A2 or B2, and we don't want to assign A1 and B1 values to
-   * different dof indices.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<unsigned int> _written_var_indices;
+  ponies;
 
   /**
-   * Has the adjoint problem already been solved?  If the user sets
-   * \p adjoint_already_solved to \p true, we won't waste time solving
-   * it again.
+   * ponies
+   * \ponies
+   * ponies.
    */
-  bool adjoint_already_solved;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// System inline methods
-inline
-const std::string & System::name() const
+// ponies
+ponies
+ponies
 {
-  return _sys_name;
+  ponies;
 }
 
 
 
-inline
-unsigned int System::number() const
+ponies
+ponies
 {
-  return _sys_number;
+  ponies;
 }
 
 
 
-inline
-const MeshBase & System::get_mesh() const
+ponies
+ponies
 {
-  return _mesh;
+  ponies;
 }
 
 
 
-inline
-MeshBase & System::get_mesh()
+ponies
+ponies()
 {
-  return _mesh;
+  ponies;
 }
 
 
 
-inline
-const DofMap & System::get_dof_map() const
+ponies
+ponies
 {
-  return *_dof_map;
+  ponies;
 }
 
 
 
-inline
-DofMap & System::get_dof_map()
+ponies
+ponies()
 {
-  return *_dof_map;
+  ponies;
 }
 
 
 
-inline
-bool System::active() const
+ponies
+ponies
 {
-  return _active;
+  ponies;
 }
 
 
 
-inline
-void System::activate ()
+ponies
+ponies ()
 {
-  _active = true;
+  ponies;
 }
 
 
 
-inline
-void System::deactivate ()
+ponies
+ponies ()
 {
-  _active = false;
+  ponies;
 }
 
 
 
-inline
-bool System::is_initialized ()
+ponies
+ponies ()
 {
-  return _is_initialized;
+  ponies;
 }
 
 
 
-inline
-void System::set_basic_system_only ()
+ponies
+ponies ()
 {
-  _basic_system_only = true;
+  ponies;
 }
 
 
 
-inline
-unsigned int System::n_vars() const
+ponies
+ponies
 {
-  return cast_int<unsigned int>(_variables.size());
+  ponies());
 }
 
 
 
-inline
-unsigned int System::n_variable_groups() const
+ponies
+ponies
 {
-  return cast_int<unsigned int>(_variable_groups.size());
+  ponies());
 }
 
 
 
-inline
-unsigned int System::n_components() const
+ponies
+ponies
 {
-  if (_variables.empty())
-    return 0;
+  ponies())
+    ponies;
 
-  const Variable& last = _variables.back();
-  return last.first_scalar_number() + last.n_components();
+  ponies();
+  ponies();
 }
 
 
 
-inline
-const Variable & System::variable (const unsigned int i) const
+ponies
+ponies
 {
-  libmesh_assert_less (i, _variables.size());
+  ponies());
 
-  return _variables[i];
+  ponies];
 }
 
 
 
-inline
-const VariableGroup & System::variable_group (const unsigned int vg) const
+ponies
+ponies
 {
-  libmesh_assert_less (vg, _variable_groups.size());
+  ponies());
 
-  return _variable_groups[vg];
+  ponies];
 }
 
 
 
-inline
-const std::string & System::variable_name (const unsigned int i) const
+ponies
+ponies
 {
-  libmesh_assert_less (i, _variables.size());
+  ponies());
 
-  return _variables[i].name();
+  ponies();
 }
 
 
 
-inline
-unsigned int
-System::variable_scalar_number (const std::string& var,
-                                unsigned int component) const
+ponies
+ponies
+ponies,
+                                ponies
 {
-  return variable_scalar_number(this->variable_number(var), component);
+  ponies);
 }
 
 
 
-inline
-unsigned int
-System::variable_scalar_number (unsigned int var_num,
-                                unsigned int component) const
+ponies
+ponies
+ponies,
+                                ponies
 {
-  return _variables[var_num].first_scalar_number() + component;
+  ponies;
 }
 
 
 
-inline
-const FEType & System::variable_type (const unsigned int i) const
+ponies
+ponies
 {
-  libmesh_assert_less (i, _variables.size());
+  ponies());
 
-  return _variables[i].type();
+  ponies();
 }
 
 
 
-inline
-const FEType & System::variable_type (const std::string& var) const
+ponies
+ponies
 {
-  return _variables[this->variable_number(var)].type();
+  ponies();
 }
 
 
 
-inline
-bool System::identify_variable_groups () const
+ponies
+ponies
 {
-  return _identify_variable_groups;
+  ponies;
 }
 
 
 
-inline
-void System::identify_variable_groups (const bool ivg)
+ponies
+ponies)
 {
-  _identify_variable_groups = ivg;
+  ponies;
 }
 
 
 
-inline
-dof_id_type System::n_active_dofs() const
+ponies
+ponies
 {
-  return this->n_dofs() - this->n_constrained_dofs();
+  ponies();
 }
 
 
 
-inline
-bool System::have_vector (const std::string& vec_name) const
+ponies
+ponies
 {
-  return (_vectors.count(vec_name));
+  ponies));
 }
 
 
 
-inline
-unsigned int System::n_vectors () const
+ponies
+ponies
 {
-  return cast_int<unsigned int>(_vectors.size());
+  ponies());
 }
 
-inline
-unsigned int System::n_matrices () const
+ponies
+ponies
 {
-  return 0;
+  ponies;
 }
 
-inline
-System::vectors_iterator System::vectors_begin ()
+ponies
+ponies ()
 {
-  return _vectors.begin();
+  ponies();
 }
 
-inline
-System::const_vectors_iterator System::vectors_begin () const
+ponies
+ponies
 {
-  return _vectors.begin();
+  ponies();
 }
 
-inline
-System::vectors_iterator System::vectors_end ()
+ponies
+ponies ()
 {
-  return _vectors.end();
+  ponies();
 }
 
-inline
-System::const_vectors_iterator System::vectors_end () const
+ponies
+ponies
 {
-  return _vectors.end();
+  ponies();
 }
 
-inline
-void System::assemble_residual_derivatives (const ParameterVector&)
+ponies
+ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-void System::disable_cache () { assemble_before_solve = true; }
+ponies
+ponies; }
 
-inline
-std::pair<unsigned int, Real>
-System::sensitivity_solve (const ParameterVector&)
+ponies
+ponies>
+ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-std::pair<unsigned int, Real>
-System::weighted_sensitivity_solve (const ParameterVector&,
-                                    const ParameterVector&)
+ponies
+ponies>
+ponies&,
+                                    ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-std::pair<unsigned int, Real>
-System::adjoint_solve (const QoISet&)
+ponies
+ponies>
+ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-std::pair<unsigned int, Real>
-System::weighted_sensitivity_adjoint_solve (const ParameterVector&,
-                                            const ParameterVector&,
-                                            const QoISet&)
+ponies
+ponies>
+ponies&,
+                                            ponies&,
+                                            ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-void
-System::adjoint_qoi_parameter_sensitivity (const QoISet&,
-                                           const ParameterVector&,
-                                           SensitivityData&)
+ponies
+ponies
+ponies&,
+                                           ponies&,
+                                           ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-void
-System::forward_qoi_parameter_sensitivity (const QoISet&,
-                                           const ParameterVector&,
-                                           SensitivityData&)
+ponies
+ponies
+ponies&,
+                                           ponies&,
+                                           ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-void
-System::qoi_parameter_hessian(const QoISet&,
-                              const ParameterVector&,
-                              SensitivityData&)
+ponies
+ponies
+ponies&,
+                              ponies&,
+                              ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline
-void
-System::qoi_parameter_hessian_vector_product(const QoISet&,
-                                             const ParameterVector&,
-                                             const ParameterVector&,
-                                             SensitivityData&)
+ponies
+ponies
+ponies&,
+                                             ponies&,
+                                             ponies&,
+                                             ponies&)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_SYSTEM_H
+#ponies

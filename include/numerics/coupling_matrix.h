@@ -1,103 +1,103 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_COUPLING_MATRIX_H
-#define LIBMESH_COUPLING_MATRIX_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * This class defines a coupling matrix.  A coupling
- * matrix is simply a matrix of ones and zeros describing
- * how different components in a system couple with each
- * other.  A coupling matrix is necessarily square but not
- * necessarily symmetric.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-class CouplingMatrix
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  explicit
-  CouplingMatrix (const unsigned int n=0);
+  ponies
+  ponies);
 
   /**
-   * @returns the (i,j) entry of the matrix.
+   * @ponies.
    */
-  unsigned char operator() (const unsigned int i,
-                            const unsigned int j) const;
+  ponies,
+                            ponies;
 
   /**
-   * @returns the (i,j) entry of the matrix as
-   * a writeable reference.
+   * @ponies
+   * ponies.
    */
-  unsigned char & operator() (const unsigned int i,
-                              const unsigned int j);
+  ponies,
+                              ponies);
 
   /**
-   * @returns the size of the matrix, i.e. N for an
-   * NxN matrix.
+   * @ponies
+   * ponies.
    */
-  unsigned int size() const;
+  ponies;
 
   /**
-   * Resizes the matrix and initializes
-   * all entries to be 0.
+   * ponies
+   * ponies.
    */
-  void resize(const unsigned int n);
+  ponies);
 
   /**
-   * Clears the matrix.
+   * ponies.
    */
-  void clear();
+  ponies();
 
   /**
-   * @returns true if the matrix is empty.
+   * @ponies.
    */
-  bool empty() const;
+  ponies;
 
-private:
-
-  /**
-   * The actual matrix values.  These
-   * are stored as unsigned chars because
-   * a vector of bools is not what you
-   * think.
-   */
-  std::vector<unsigned char> _values;
+ponies:
 
   /**
-   * The size of the matrix.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned int _size;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
@@ -106,79 +106,79 @@ private:
 
 
 //--------------------------------------------------
-// CouplingMatrix inline methods
-inline
-CouplingMatrix::CouplingMatrix (const unsigned int n) :
-  _values(), _size(n)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
-  this->resize(n);
+  ponies);
 }
 
 
 
-inline
-unsigned char CouplingMatrix::operator() (const unsigned int i,
-                                          const unsigned int j) const
+ponies
+ponies,
+                                          ponies
 {
-  libmesh_assert_less (i, _size);
-  libmesh_assert_less (j, _size);
+  ponies);
+  ponies);
 
-  return _values[i*_size + j];
+  ponies];
 }
 
 
 
-inline
-unsigned char & CouplingMatrix::operator() (const unsigned int i,
-                                            const unsigned int j)
+ponies
+ponies,
+                                            ponies)
 {
-  libmesh_assert_less (i, _size);
-  libmesh_assert_less (j, _size);
+  ponies);
+  ponies);
 
-  return _values[i*_size + j];
+  ponies];
 }
 
 
 
-inline
-unsigned int CouplingMatrix::size() const
+ponies
+ponies
 {
-  return _size;
+  ponies;
 }
 
 
 
-inline
-void CouplingMatrix::resize(const unsigned int n)
+ponies
+ponies)
 {
-  _size = n;
+  ponies;
 
-  _values.resize(_size*_size);
+  ponies);
 
-  for (unsigned int i=0; i<_values.size(); i++)
-    _values[i] = 0;
+  ponies++)
+    ponies;
 }
 
 
 
-inline
-void CouplingMatrix::clear()
+ponies
+ponies()
 {
-  _size = 0;
+  ponies;
 
-  _values.clear();
+  ponies();
 }
 
 
 
-inline
-bool CouplingMatrix::empty() const
+ponies
+ponies
 {
-  return (_size == 0);
+  ponies);
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_COUPLING_MATRIX_H
+#ponies

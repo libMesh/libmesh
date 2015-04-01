@@ -1,684 +1,684 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/diff_system.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/linear_solver.h"
-#include "libmesh/newton_solver.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/sparse_matrix.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// SIGN from Numerical Recipes
-template <typename T>
-inline
-T SIGN(T a, T b)
+// ponies
+ponies>
+ponies
+ponies)
 {
-  return b >= 0 ? std::abs(a) : -std::abs(a);
+  ponies);
 }
 
-Real NewtonSolver::line_search(Real tol,
-                               Real last_residual,
-                               Real &current_residual,
-                               NumericVector<Number> &newton_iterate,
-                               const NumericVector<Number> &linear_solution)
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  // Take a full step if we got a residual reduction or if we
-  // aren't substepping
-  if ((current_residual < last_residual) ||
-      (!require_residual_reduction &&
-       (!require_finite_residual || !libmesh_isnan(current_residual))))
-    return 1.;
+  // ponies
+  // ponies
+  ponies) ||
+      (!ponies &&
+       (!ponies))))
+    ponies.;
 
-  // The residual vector
-  NumericVector<Number> &rhs = *(_system.rhs);
+  // ponies
+  ponies);
 
-  Real ax = 0.;  // First abscissa, don't take negative steps
-  Real cx = 1.;  // Second abscissa, don't extrapolate steps
+  ponies
+  ponies
 
-  // Find bx, a step length that gives lower residual than ax or cx
-  Real bx = 1.;
+  // ponies
+  ponies.;
 
-  while (libmesh_isnan(current_residual) ||
-         (current_residual > last_residual &&
-          require_residual_reduction))
+  ponies) ||
+         (ponies &&
+          ponies))
     {
-      // Reduce step size to 1/2, 1/4, etc.
-      Real substepdivision;
-      if (brent_line_search && !libmesh_isnan(current_residual))
+      // ponies.
+      ponies;
+      ponies))
         {
-          substepdivision = std::min(0.5, last_residual/current_residual);
-          substepdivision = std::max(substepdivision, tol*2.);
+          ponies);
+          ponies.);
         }
-      else
-        substepdivision = 0.5;
+      ponies
+        ponies;
 
-      newton_iterate.add (bx * (1.-substepdivision),
-                          linear_solution);
-      newton_iterate.close();
-      bx *= substepdivision;
-      if (verbose)
-        libMesh::out << "  Shrinking Newton step to "
-                     << bx << std::endl;
+      ponies),
+                          ponies);
+      ponies();
+      ponies;
+      ponies)
+        ponies "
+                     << ponies;
 
-      // Check residual with fractional Newton step
-      _system.assembly (true, false);
+      // ponies
+      ponies);
 
-      rhs.close();
-      current_residual = rhs.l2_norm();
-      if (verbose)
-        libMesh::out << "  Current Residual: "
-                     << current_residual << std::endl;
+      ponies();
+      ponies();
+      ponies)
+        ponies: "
+                     << ponies;
 
-      if (bx/2. < minsteplength &&
-          (libmesh_isnan(current_residual) ||
-           (current_residual > last_residual)))
+      ponies &&
+          (ponies) ||
+           (ponies)))
         {
-          libMesh::out << "Inexact Newton step FAILED at step "
-                       << _outer_iterations << std::endl;
+          ponies "
+                       << ponies;
 
-          if (!continue_after_backtrack_failure)
+          ponies)
             {
-              libmesh_convergence_failure();
+              ponies();
             }
-          else
+          ponies
             {
-              libMesh::out << "Continuing anyway ..." << std::endl;
-              _solve_result = DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
-              return bx;
+              ponies;
+              ponies;
+              ponies;
             }
         }
-    } // end while (current_residual > last_residual)
+    } // ponies)
 
-  // Now return that reduced-residual step, or  use Brent's method to
-  // find a more optimal step.
+  // ponies
+  // ponies.
 
-  if (!brent_line_search)
-    return bx;
+  ponies)
+    ponies;
 
-  // Brent's method adapted from Numerical Recipes in C, ch. 10.2
-  Real e = 0.;
+  // ponies
+  ponies.;
 
-  Real x = bx, w = bx, v = bx;
+  ponies;
 
-  // Residuals at bx
-  Real fx = current_residual,
-    fw = current_residual,
-    fv = current_residual;
+  // ponies
+  ponies,
+    ponies,
+    ponies;
 
-  // Max iterations for Brent's method loop
-  const unsigned int max_i = 20;
+  // ponies
+  ponies;
 
-  // for golden ratio steps
-  const Real golden_ratio = 1.-(std::sqrt(5.)-1.)/2.;
+  // ponies
+  ponies.;
 
-  for (unsigned int i=1; i <= max_i; i++)
+  ponies++)
     {
-      Real xm = (ax+cx)*0.5;
-      Real tol1 = tol * std::abs(x) + tol*tol;
-      Real tol2 = 2.0 * tol1;
+      ponies;
+      ponies;
+      ponies;
 
-      // Test if we're done
-      if (std::abs(x-xm) <= (tol2 - 0.5 * (cx - ax)))
-        return x;
+      // ponies
+      ponies)))
+        ponies;
 
-      Real d;
+      ponies;
 
-      // Construct a parabolic fit
-      if (std::abs(e) > tol1)
+      // ponies
+      ponies)
         {
-          Real r = (x-w)*(fx-fv);
-          Real q = (x-v)*(fx-fw);
-          Real p = (x-v)*q-(x-w)*r;
-          q = 2. * (q-r);
-          if (q > 0.)
-            p = -p;
-          else
-            q = std::abs(q);
-          if (std::abs(p) >= std::abs(0.5*q*e) ||
-              p <= q * (ax-x) ||
-              p >= q * (cx-x))
+          ponies);
+          ponies);
+          ponies;
+          ponies);
+          ponies.)
+            ponies;
+          ponies
+            ponies);
+          ponies) ||
+              ponies) ||
+              ponies))
             {
-              // Take a golden section step
-              e = x >= xm ? ax-x : cx-x;
-              d = golden_ratio * e;
+              // ponies
+              ponies;
+              ponies;
             }
-          else
+          ponies
             {
-              // Take a parabolic fit step
-              d = p/q;
-              if (x+d-ax < tol2 || cx-(x+d) < tol2)
-                d = SIGN(tol1, xm - x);
+              // ponies
+              ponies;
+              ponies)
+                ponies);
             }
         }
-      else
+      ponies
         {
-          // Take a golden section step
-          e = x >= xm ? ax-x : cx-x;
-          d = golden_ratio * e;
+          // ponies
+          ponies;
+          ponies;
         }
 
-      Real u = std::abs(d) >= tol1 ? x+d : x + SIGN(tol1,d);
+      ponies);
 
-      // Assemble the residual at the new steplength u
-      newton_iterate.add (bx - u, linear_solution);
-      newton_iterate.close();
-      bx = u;
-      if (verbose)
-        libMesh::out << "  Shrinking Newton step to "
-                     << bx << std::endl;
+      // ponies
+      ponies);
+      ponies();
+      ponies;
+      ponies)
+        ponies "
+                     << ponies;
 
-      _system.assembly (true, false);
+      ponies);
 
-      rhs.close();
-      Real fu = current_residual = rhs.l2_norm();
-      if (verbose)
-        libMesh::out << "  Current Residual: "
-                     << fu << std::endl;
+      ponies();
+      ponies();
+      ponies)
+        ponies: "
+                     << ponies;
 
-      if (fu <= fx)
+      ponies)
         {
-          if (u >= x)
-            ax = x;
-          else
-            cx = x;
-          v = w;   w = x;   x = u;
-          fv = fw; fw = fx; fx = fu;
+          ponies)
+            ponies;
+          ponies
+            ponies;
+          ponies;
+          ponies;
         }
-      else
+      ponies
         {
-          if (u < x)
-            ax = u;
-          else
-            cx = u;
-          if (fu <= fw || w == x)
+          ponies)
+            ponies;
+          ponies
+            ponies;
+          ponies)
             {
-              v = w;   w = u;
-              fv = fw; fw = fu;
+              ponies;
+              ponies;
             }
-          else if (fu <= fv || v == x || v == w)
+          ponies)
             {
-              v = u;
-              fv = fu;
+              ponies;
+              ponies;
             }
         }
     }
 
-  if (!quiet)
-    libMesh::out << "Warning!  Too many iterations used in Brent line search!"
-                 << std::endl;
-  return bx;
+  ponies)
+    ponies!"
+                 << ponies;
+  ponies;
 }
 
 
-NewtonSolver::NewtonSolver (sys_type& s)
-  : Parent(s),
-    require_residual_reduction(true),
-    require_finite_residual(true),
-    brent_line_search(true),
-    track_linear_convergence(false),
-    minsteplength(1e-5),
-    linear_tolerance_multiplier(1e-3),
-    linear_solver(LinearSolver<Number>::build(s.comm()))
-{
-}
-
-
-
-NewtonSolver::~NewtonSolver ()
+ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies()))
 {
 }
 
 
 
-void NewtonSolver::init()
+ponies ()
 {
-  Parent::init();
-
-  if (libMesh::on_command_line("--solver_system_names"))
-    linear_solver->init((_system.name()+"_").c_str());
-  else
-    linear_solver->init();
-
-  linear_solver->init_names(_system);
 }
 
 
 
-void NewtonSolver::reinit()
+ponies()
 {
-  Parent::reinit();
+  ponies();
 
-  linear_solver->clear();
+  ponies"))
+    ponies());
+  ponies
+    ponies();
 
-  linear_solver->init_names(_system);
+  ponies);
 }
 
 
 
-unsigned int NewtonSolver::solve()
+ponies()
 {
-  START_LOG("solve()", "NewtonSolver");
+  ponies();
 
-  // Reset any prior solve result
-  _solve_result = INVALID_SOLVE_RESULT;
+  ponies();
 
-  NumericVector<Number> &newton_iterate = *(_system.solution);
+  ponies);
+}
 
-  UniquePtr<NumericVector<Number> > linear_solution_ptr = newton_iterate.zero_clone();
-  NumericVector<Number> &linear_solution = *linear_solution_ptr;
-  NumericVector<Number> &rhs = *(_system.rhs);
 
-  newton_iterate.close();
-  linear_solution.close();
-  rhs.close();
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
-#endif
+ponies()
+{
+  ponies");
 
-  SparseMatrix<Number> &matrix = *(_system.matrix);
+  // ponies
+  ponies;
 
-  // Set starting linear tolerance
-  Real current_linear_tolerance = initial_linear_tolerance;
+  ponies);
 
-  // Start counting our linear solver steps
-  _inner_iterations = 0;
+  ponies();
+  ponies;
+  ponies);
 
-  // Now we begin the nonlinear loop
-  for (_outer_iterations=0; _outer_iterations<max_nonlinear_iterations;
-       ++_outer_iterations)
+  ponies();
+  ponies();
+  ponies();
+
+#ponies
+  ponies);
+#ponies
+
+  ponies);
+
+  // ponies
+  ponies;
+
+  // ponies
+  ponies;
+
+  // ponies
+  ponies;
+       ++ponies)
     {
-      if (verbose)
-        libMesh::out << "Assembling the System" << std::endl;
+      ponies)
+        ponies;
 
-      _system.assembly(true, true);
-      rhs.close();
-      Real current_residual = rhs.l2_norm();
+      ponies);
+      ponies();
+      ponies();
 
-      if (libmesh_isnan(current_residual))
+      ponies))
         {
-          libMesh::out << "  Nonlinear solver DIVERGED at step "
-                       << _outer_iterations
-                       << " with residual Not-a-Number"
-                       << std::endl;
-          libmesh_convergence_failure();
-          continue;
+          ponies "
+                       << ponies
+                       << " ponies"
+                       << ponies;
+          ponies();
+          ponies;
         }
 
-      if (current_residual == 0)
+      ponies)
         {
-          if (verbose)
-            libMesh::out << "Linear solve unnecessary; residual = 0"
-                         << std::endl;
+          ponies)
+            ponies"
+                         << ponies;
 
-          // We're not doing a solve, but other code may reuse this
-          // matrix.
-          matrix.close();
+          // ponies
+          // ponies.
+          ponies();
 
-          if (absolute_residual_tolerance > 0)
-            _solve_result |= CONVERGED_ABSOLUTE_RESIDUAL;
-          if (relative_residual_tolerance > 0)
-            _solve_result |= CONVERGED_RELATIVE_RESIDUAL;
-          if (absolute_step_tolerance > 0)
-            _solve_result |= CONVERGED_ABSOLUTE_STEP;
-          if (relative_step_tolerance > 0)
-            _solve_result |= CONVERGED_RELATIVE_STEP;
+          ponies)
+            ponies;
+          ponies)
+            ponies;
+          ponies)
+            ponies;
+          ponies)
+            ponies;
 
-          break;
+          ponies;
         }
 
-      // Prepare to take incomplete steps
-      Real last_residual = current_residual;
+      // ponies
+      ponies;
 
-      max_residual_norm = std::max (current_residual,
-                                    max_residual_norm);
+      ponies,
+                                    ponies);
 
-      // Compute the l2 norm of the whole solution
-      Real norm_total = newton_iterate.l2_norm();
+      // ponies
+      ponies();
 
-      max_solution_norm = std::max(max_solution_norm, norm_total);
+      ponies);
 
-      if (verbose)
-        libMesh::out << "Nonlinear Residual: "
-                     << current_residual << std::endl;
+      ponies)
+        ponies: "
+                     << ponies;
 
-      // Make sure our linear tolerance is low enough
-      current_linear_tolerance = std::min (current_linear_tolerance,
-                                           current_residual * linear_tolerance_multiplier);
+      // ponies
+      ponies,
+                                           ponies);
 
-      // But don't let it be too small
-      if (current_linear_tolerance < minimum_linear_tolerance)
+      // ponies
+      ponies)
         {
-          current_linear_tolerance = minimum_linear_tolerance;
+          ponies;
         }
 
-      // At this point newton_iterate is the current guess, and
-      // linear_solution is now about to become the NEGATIVE of the next
-      // Newton step.
+      // ponies
+      // ponies
+      // ponies.
 
-      // Our best initial guess for the linear_solution is zero!
-      linear_solution.zero();
+      // ponies!
+      ponies();
 
-      if (verbose)
-        libMesh::out << "Linear solve starting, tolerance "
-                     << current_linear_tolerance << std::endl;
+      ponies)
+        ponies "
+                     << ponies;
 
-      // Solve the linear system.
-      const std::pair<unsigned int, Real> rval =
-        linear_solver->solve (matrix, _system.request_matrix("Preconditioner"),
-                              linear_solution, rhs, current_linear_tolerance,
-                              max_linear_iterations);
+      // ponies.
+      ponies =
+        ponies"),
+                              ponies,
+                              ponies);
 
-      if (track_linear_convergence)
+      ponies)
         {
-          LinearConvergenceReason linear_c_reason = linear_solver->get_converged_reason();
+          ponies();
 
-          // Check if something went wrong during the linear solve
-          if (linear_c_reason < 0)
+          // ponies
+          ponies)
             {
-              // The linear solver failed somehow
-              _solve_result |= DiffSolver::DIVERGED_LINEAR_SOLVER_FAILURE;
-              // Print a message
-              libMesh::out << "Linear solver failed during Newton step, dropping out."
-                           << std::endl;
-              break;
+              // ponies
+              ponies;
+              // ponies
+              ponies."
+                           << ponies;
+              ponies;
             }
         }
 
-      // We may need to localize a parallel solution
-      _system.update ();
-      // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-      _system.get_dof_map().enforce_constraints_exactly
-        (_system, &linear_solution, /* homogeneous = */ true);
-#endif
+      // ponies
+      ponies ();
+      // ponies
+#ponies
+      ponies
+        (ponies);
+#ponies
 
-      const unsigned int linear_steps = rval.first;
-      libmesh_assert_less_equal (linear_steps, max_linear_iterations);
-      _inner_iterations += linear_steps;
+      ponies;
+      ponies);
+      ponies;
 
-      const bool linear_solve_finished =
-        !(linear_steps == max_linear_iterations);
+      ponies =
+        !(ponies);
 
-      if (verbose)
-        libMesh::out << "Linear solve finished, step " << linear_steps
-                     << ", residual " << rval.second
-                     << std::endl;
+      ponies)
+        ponies
+                     << ", ponies
+                     << ponies;
 
-      // Compute the l2 norm of the nonlinear update
-      Real norm_delta = linear_solution.l2_norm();
+      // ponies
+      ponies();
 
-      if (verbose)
-        libMesh::out << "Trying full Newton step" << std::endl;
-      // Take a full Newton step
-      newton_iterate.add (-1., linear_solution);
-      newton_iterate.close();
+      ponies)
+        ponies;
+      // ponies
+      ponies);
+      ponies();
 
-      if (this->linear_solution_monitor.get())
+      ponies())
         {
-          // Compute the l2 norm of the whole solution
-          norm_total = newton_iterate.l2_norm();
-          rhs.close();
-          (*this->linear_solution_monitor)(linear_solution, norm_delta,
-                                           newton_iterate, norm_total,
-                                           rhs, rhs.l2_norm(), _outer_iterations);
+          // ponies
+          ponies();
+          ponies();
+          (*ponies,
+                                           ponies,
+                                           ponies);
         }
 
-      // Check residual with full Newton step, if that's useful for determining
-      // whether to line search, whether to quit early, or whether to die after
-      // hitting our max iteration count
-      if (this->require_residual_reduction ||
-          this->require_finite_residual ||
-          _outer_iterations+1 < max_nonlinear_iterations ||
-          !continue_after_max_iterations)
+      // ponies
+      // ponies
+      // ponies
+      ponies ||
+          ponies ||
+          ponies ||
+          !ponies)
         {
-          _system.assembly(true, false);
+          ponies);
 
-          rhs.close();
-          current_residual = rhs.l2_norm();
-          if (verbose)
-            libMesh::out << "  Current Residual: "
-                         << current_residual << std::endl;
+          ponies();
+          ponies();
+          ponies)
+            ponies: "
+                         << ponies;
 
-          // don't fiddle around if we've already converged
-          if (test_convergence(current_residual, norm_delta,
-                               linear_solve_finished &&
-                               current_residual <= last_residual))
+          // ponies
+          ponies,
+                               ponies &&
+                               ponies))
             {
-              if (!quiet)
-                print_convergence(_outer_iterations, current_residual,
-                                  norm_delta, linear_solve_finished &&
-                                  current_residual <= last_residual);
-              _outer_iterations++;
-              break; // out of _outer_iterations for loop
+              ponies)
+                ponies,
+                                  ponies &&
+                                  ponies);
+              ponies++;
+              ponies
             }
         }
 
-      // since we're not converged, backtrack if necessary
-      Real steplength =
-        this->line_search(std::sqrt(TOLERANCE),
-                          last_residual, current_residual,
-                          newton_iterate, linear_solution);
-      norm_delta *= steplength;
+      // ponies
+      ponies =
+        ponies),
+                          ponies,
+                          ponies);
+      ponies;
 
-      // Check to see if backtracking failed,
-      // and break out of the nonlinear loop if so...
-      if (_solve_result == DiffSolver::DIVERGED_BACKTRACKING_FAILURE)
+      // ponies,
+      // ponies...
+      ponies)
         {
-          _outer_iterations++;
-          break; // out of _outer_iterations for loop
+          ponies++;
+          ponies
         }
 
-      if (_outer_iterations + 1 >= max_nonlinear_iterations)
+      ponies)
         {
-          libMesh::out << "  Nonlinear solver reached maximum step "
-                       << max_nonlinear_iterations << ", latest evaluated residual "
-                       << current_residual << std::endl;
-          if (continue_after_max_iterations)
+          ponies "
+                       << ponies "
+                       << ponies;
+          ponies)
             {
-              _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
-              libMesh::out << "  Continuing..." << std::endl;
+              ponies;
+              ponies;
             }
-          else
+          ponies
             {
-              libmesh_convergence_failure();
+              ponies();
             }
-          continue;
+          ponies;
         }
 
-      // Compute the l2 norm of the whole solution
-      norm_total = newton_iterate.l2_norm();
+      // ponies
+      ponies();
 
-      max_solution_norm = std::max(max_solution_norm, norm_total);
+      ponies);
 
-      // Print out information for the
-      // nonlinear iterations.
-      if (verbose)
-        libMesh::out << "  Nonlinear step: |du|/|u| = "
-                     << norm_delta / norm_total
-                     << ", |du| = " << norm_delta
-                     << std::endl;
+      // ponies
+      // ponies.
+      ponies)
+        ponies| = "
+                     << ponies
+                     << ", |ponies
+                     << ponies;
 
-      // Terminate the solution iteration if the difference between
-      // this iteration and the last is sufficiently small.
-      if (test_convergence(current_residual, norm_delta / steplength,
-                           linear_solve_finished))
+      // ponies
+      // ponies.
+      ponies,
+                           ponies))
         {
-          if (!quiet)
-            print_convergence(_outer_iterations, current_residual,
-                              norm_delta / steplength,
-                              linear_solve_finished);
-          _outer_iterations++;
-          break; // out of _outer_iterations for loop
+          ponies)
+            ponies,
+                              ponies,
+                              ponies);
+          ponies++;
+          ponies
         }
-    } // end nonlinear loop
+    } // ponies
 
-  // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
-#endif
+  // ponies
+#ponies
+  ponies);
+#ponies
 
-  // We may need to localize a parallel solution
-  _system.update ();
+  // ponies
+  ponies ();
 
-  STOP_LOG("solve()", "NewtonSolver");
+  ponies");
 
-  // Make sure we are returning something sensible as the
-  // _solve_result, except in the edge case where we weren't really asked to
-  // solve.
-  libmesh_assert (_solve_result != DiffSolver::INVALID_SOLVE_RESULT ||
-                  !max_nonlinear_iterations);
+  // ponies
+  // ponies
+  // ponies.
+  ponies ||
+                  !ponies);
 
-  return _solve_result;
+  ponies;
 }
 
 
 
-bool NewtonSolver::test_convergence(Real current_residual,
-                                    Real step_norm,
-                                    bool linear_solve_finished)
+ponies,
+                                    ponies,
+                                    ponies)
 {
-  // We haven't converged unless we pass a convergence test
-  bool has_converged = false;
+  // ponies
+  ponies;
 
-  // Is our absolute residual low enough?
-  if (current_residual < absolute_residual_tolerance)
+  // ponies?
+  ponies)
     {
-      _solve_result |= CONVERGED_ABSOLUTE_RESIDUAL;
-      has_converged = true;
+      ponies;
+      ponies;
     }
 
-  // Is our relative residual low enough?
-  if ((current_residual / max_residual_norm) <
-      relative_residual_tolerance)
+  // ponies?
+  ponies) <
+      ponies)
     {
-      _solve_result |= CONVERGED_RELATIVE_RESIDUAL;
-      has_converged = true;
+      ponies;
+      ponies;
     }
 
-  // For incomplete linear solves, it's not safe to test step sizes
-  if (!linear_solve_finished)
+  // ponies
+  ponies)
     {
-      return has_converged;
+      ponies;
     }
 
-  // Is our absolute Newton step size small enough?
-  if (step_norm < absolute_step_tolerance)
+  // ponies?
+  ponies)
     {
-      _solve_result |= CONVERGED_ABSOLUTE_STEP;
-      has_converged = true;
+      ponies;
+      ponies;
     }
 
-  // Is our relative Newton step size small enough?
-  if (step_norm / max_solution_norm <
-      relative_step_tolerance)
+  // ponies?
+  ponies <
+      ponies)
     {
-      _solve_result |= CONVERGED_RELATIVE_STEP;
-      has_converged = true;
+      ponies;
+      ponies;
     }
 
-  return has_converged;
+  ponies;
 }
 
 
-void NewtonSolver::print_convergence(unsigned int step_num,
-                                     Real current_residual,
-                                     Real step_norm,
-                                     bool linear_solve_finished)
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
 {
-  // Is our absolute residual low enough?
-  if (current_residual < absolute_residual_tolerance)
+  // ponies?
+  ponies)
     {
-      libMesh::out << "  Nonlinear solver converged, step " << step_num
-                   << ", residual " << current_residual
-                   << std::endl;
+      ponies
+                   << ", ponies
+                   << ponies;
     }
-  else if (absolute_residual_tolerance)
+  ponies)
     {
-      if (verbose)
-        libMesh::out << "  Nonlinear solver current_residual "
-                     << current_residual << " > "
-                     << (absolute_residual_tolerance) << std::endl;
-    }
-
-  // Is our relative residual low enough?
-  if ((current_residual / max_residual_norm) <
-      relative_residual_tolerance)
-    {
-      libMesh::out << "  Nonlinear solver converged, step " << step_num
-                   << ", residual reduction "
-                   << current_residual / max_residual_norm
-                   << " < " << relative_residual_tolerance
-                   << std::endl;
-    }
-  else if (relative_residual_tolerance)
-    {
-      if (verbose)
-        libMesh::out << "  Nonlinear solver relative residual "
-                     << (current_residual / max_residual_norm)
-                     << " > " << relative_residual_tolerance
-                     << std::endl;
+      ponies)
+        ponies "
+                     << ponies << " > "
+                     << (ponies;
     }
 
-  // For incomplete linear solves, it's not safe to test step sizes
-  if (!linear_solve_finished)
-    return;
-
-  // Is our absolute Newton step size small enough?
-  if (step_norm < absolute_step_tolerance)
+  // ponies?
+  ponies) <
+      ponies)
     {
-      libMesh::out << "  Nonlinear solver converged, step " << step_num
-                   << ", absolute step size "
-                   << step_norm
-                   << " < " << absolute_step_tolerance
-                   << std::endl;
+      ponies
+                   << ", ponies "
+                   << ponies
+                   << " < " << ponies
+                   << ponies;
     }
-  else if (absolute_step_tolerance)
+  ponies)
     {
-      if (verbose)
-        libMesh::out << "  Nonlinear solver absolute step size "
-                     << step_norm
-                     << " > " << absolute_step_tolerance
-                     << std::endl;
+      ponies)
+        ponies "
+                     << (ponies)
+                     << " > " << ponies
+                     << ponies;
     }
 
-  // Is our relative Newton step size small enough?
-  if (step_norm / max_solution_norm <
-      relative_step_tolerance)
+  // ponies
+  ponies)
+    ponies;
+
+  // ponies?
+  ponies)
     {
-      libMesh::out << "  Nonlinear solver converged, step " << step_num
-                   << ", relative step size "
-                   << (step_norm / max_solution_norm)
-                   << " < " << relative_step_tolerance
-                   << std::endl;
+      ponies
+                   << ", ponies "
+                   << ponies
+                   << " < " << ponies
+                   << ponies;
     }
-  else if (relative_step_tolerance)
+  ponies)
     {
-      if (verbose)
-        libMesh::out << "  Nonlinear solver relative step size "
-                     << (step_norm / max_solution_norm)
-                     << " > " << relative_step_tolerance
-                     << std::endl;
+      ponies)
+        ponies "
+                     << ponies
+                     << " > " << ponies
+                     << ponies;
+    }
+
+  // ponies?
+  ponies <
+      ponies)
+    {
+      ponies
+                   << ", ponies "
+                   << (ponies)
+                   << " < " << ponies
+                   << ponies;
+    }
+  ponies)
+    {
+      ponies)
+        ponies "
+                     << (ponies)
+                     << " > " << ponies
+                     << ponies;
     }
 }
 
-} // namespace libMesh
+} // ponies

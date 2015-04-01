@@ -1,604 +1,604 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <cstring>
-#include <stdio.h>
-#include <iomanip>
-
-#include "libmesh/dof_map.h"
-#include "libmesh/ensight_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/system.h"
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+
+ponies
 {
 
 
-EnsightIO::EnsightIO (const std::string &filename, const EquationSystems &eq) :
-  MeshOutput<MeshBase> (eq.get_mesh()),
-  _equation_systems(eq)
+ponies) :
+  ponies()),
+  ponies)
 {
 
-  if (_equation_systems.n_processors() == 1)
-    _ensight_file_name = filename;
-  else
+  ponies)
+    ponies;
+  ponies
     {
-      std::stringstream tmp_file;
-      tmp_file << filename << "_rank" << _equation_systems.processor_id();
-      _ensight_file_name = tmp_file.str();
+      ponies;
+      ponies();
+      ponies();
     }
 }
 
 
 
-EnsightIO::~EnsightIO ()
+ponies ()
 {}
 
 
 
-void EnsightIO::add_vector (const std::string &system_name, const std::string &vec_description,
-                            const std::string &u, const std::string &v)
+ponies,
+                            ponies)
 {
-  libmesh_assert (_equation_systems.has_system(system_name));
-  libmesh_assert (_equation_systems.get_system(system_name).has_variable(u));
-  libmesh_assert (_equation_systems.get_system(system_name).has_variable(v));
+  ponies));
+  ponies));
+  ponies));
 
-  Vectors vec;
-  vec.description = vec_description;
-  vec.components.push_back(u);
-  vec.components.push_back(v);
+  ponies;
+  ponies;
+  ponies);
+  ponies);
 
-  _systems_vars_map[system_name].EnsightVectors.push_back(vec);
+  ponies);
 }
 
 
 
-void EnsightIO::add_vector (const std::string &system_name, const std::string &vec_name,
-                            const std::string &u, const std::string &v, const std::string &w)
+ponies,
+                            ponies)
 {
-  libmesh_assert(_equation_systems.has_system(system_name));
-  libmesh_assert(_equation_systems.get_system(system_name).has_variable(u));
-  libmesh_assert(_equation_systems.get_system(system_name).has_variable(v));
-  libmesh_assert(_equation_systems.get_system(system_name).has_variable(w));
+  ponies));
+  ponies));
+  ponies));
+  ponies));
 
-  Vectors vec;
-  vec.description = vec_name;
-  vec.components.push_back(u);
-  vec.components.push_back(v);
-  vec.components.push_back(w);
-  _systems_vars_map[system_name].EnsightVectors.push_back(vec);
+  ponies;
+  ponies;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 }
 
 
 
-void EnsightIO::add_scalar(const std::string &system_name, const std::string &scl_description,
-                           const std::string &s)
+ponies,
+                           ponies)
 {
-  libmesh_assert(_equation_systems.has_system(system_name));
-  libmesh_assert(_equation_systems.get_system(system_name).has_variable(s));
+  ponies));
+  ponies));
 
-  Scalars scl;
-  scl.description = scl_description;
-  scl.scalar_name = s;
+  ponies;
+  ponies;
+  ponies;
 
-  _systems_vars_map[system_name].EnsightScalars.push_back(scl);
+  ponies);
 }
 
 
 
-// This method must be implemented as it is pure virtual in
-// the MeshOutput base class.
-void EnsightIO::write (const std::string &name)
+// ponies
+// ponies.
+ponies)
 {
-  // We may need to gather a ParallelMesh to output it, making that
-  // const qualifier in our constructor a dirty lie
-  MeshSerializer serialize(const_cast<MeshBase&>(this->mesh()), !_is_parallel_format);
+  // ponies
+  // ponies
+  ponies);
 
-  _ensight_file_name = name;
-  this->write();
+  ponies;
+  ponies();
 }
 
 
 
-void EnsightIO::write (const double time)
+ponies)
 {
-  this->write_ascii(time);
-  this->write_case();
+  ponies);
+  ponies();
 }
 
 
 
-void EnsightIO::write_ascii (const double time)
+ponies)
 {
-  _time_steps.push_back(time);
+  ponies);
 
-  this->write_geometry_ascii();
-  this->write_solution_ascii();
+  ponies();
+  ponies();
 }
 
 
 
-void EnsightIO::write_geometry_ascii()
+ponies()
 {
-  std::ostringstream file;
-  file << _ensight_file_name << ".geo";
+  ponies;
+  ponies";
 
-  file << std::setw(3)
-       << std::setprecision(0)
-       << std::setfill('0')
-       << std::right
-       << _time_steps.size()-1;
+  ponies)
+       << ponies)
+       << ponies')
+       << ponies
+       << ponies;
 
-  FILE* fout = fopen(file.str().c_str(),"w");
+  ponies");
 
-  char buffer[80];
+  ponies];
 
-  fprintf(fout,"EnSight Gold Geometry File Format\n");
-  fprintf(fout,"Generated by \n");
-  fprintf(fout,"node id off\n");
-  fprintf(fout,"element id given\n");
-  fprintf(fout,"part\n");
-  fprintf(fout,"%10d\n",1);
-  fprintf(fout,"uns-elements\n");
-  fprintf(fout,"coordinates\n");
+  ponies");
+  ponies");
+  ponies");
+  ponies");
+  ponies");
+  ponies);
+  ponies");
+  ponies");
 
-  // mapping between nodal index and your coordinates
-  std::map<int, Point>                     mesh_nodes_map;
-  typedef std::map <int, Point>::iterator  mesh_nodes_iterator;
-  typedef std::pair<int, Point>            mesh_node_value;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
 
-  // Mapping between global and local indices
-  std::map <int, int>       ensight_node_index;
+  // ponies
+  ponies;
 
-  // Grouping elements of the same type
-  std::map<ElemType, std::vector<const Elem*> >                    ensight_parts_map;
-  typedef std::map<ElemType, std::vector<const Elem*> >::iterator  ensight_parts_iterator;
-  typedef std::pair<ElemType, std::vector<const Elem*> >           ensight_parts_value;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
 
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  ponies();
 
-  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
+  ponies();
+  ponies();
 
-  for ( ; el != end_el ; ++el)
+  ponies)
     {
-      const Elem* elem = *el;
-      ensight_parts_map[elem->type()].push_back(elem);
+      ponies;
+      ponies);
 
-      for (unsigned int i = 0; i < elem->n_nodes(); i++)
-        mesh_nodes_map[elem->node(i)] = elem->point(i);
+      ponies++)
+        ponies);
     }
 
-  // Write number of local points
-  fprintf(fout,"%10d\n",static_cast<int>(mesh_nodes_map.size()));
+  // ponies
+  ponies()));
 
-  mesh_nodes_iterator           no_it = mesh_nodes_map.begin();
-  const mesh_nodes_iterator no_end_it = mesh_nodes_map.end();
+  ponies();
+  ponies();
 
-  // write x
-  for(int i = 1; no_it != no_end_it; ++no_it, i++)
+  // ponies
+  ponies++)
     {
-      const mesh_node_value pn = *no_it;
-      fprintf(fout,"%12.5e\n",static_cast<double>(pn.second(0)));
-      ensight_node_index[pn.first] = i;
+      ponies;
+      ponies)));
+      ponies;
     }
 
-  // write y
-  no_it = mesh_nodes_map.begin();
-  for(; no_it != no_end_it; ++no_it)
+  // ponies
+  ponies();
+  ponies)
     {
-      const mesh_node_value pn = *no_it;
-      fprintf(fout,"%12.5e\n",static_cast<double>(pn.second(1)));
+      ponies;
+      ponies)));
     }
 
-  // write z
-  no_it = mesh_nodes_map.begin();
-  for(; no_it != no_end_it; ++no_it)
+  // ponies
+  ponies();
+  ponies)
     {
-      const mesh_node_value pn = *no_it;
-      fprintf(fout,"%12.5e\n",static_cast<double>(pn.second(2)));
+      ponies;
+      ponies)));
     }
 
-  ensight_parts_iterator            parts_it  =  ensight_parts_map.begin();
-  const ensight_parts_iterator  end_parts_it  =  ensight_parts_map.end();
+  ponies();
+  ponies();
 
-  // Write parts
-  for (; parts_it != end_parts_it; ++parts_it)
+  // ponies
+  ponies)
     {
-      ensight_parts_value kvp = *parts_it;
+      ponies;
 
-      // Write element type
-      elem_type_to_string(kvp.first,buffer);
-      fprintf(fout,"\n%s\n", buffer);
+      // ponies
+      ponies);
+      ponies);
 
-      std::vector<const Elem*> elem_ref  = kvp.second;
+      ponies;
 
-      // Write number of element
-      fprintf(fout,"%10d\n",static_cast<int>(elem_ref.size()));
+      // ponies
+      ponies()));
 
-      // Write element id
-      for (unsigned int i = 0; i < elem_ref.size(); i++)
-        fprintf(fout,"%10lu\n",static_cast<unsigned long>(elem_ref[i]->id()));
+      // ponies
+      ponies++)
+        ponies()));
 
-      // Write connectivity
-      for (unsigned int i = 0; i < elem_ref.size(); i++)
+      // ponies
+      ponies++)
         {
-          for (unsigned int j = 0; j < elem_ref[i]->n_nodes(); j++) {
-            // tests!
-            if(kvp.first == QUAD9 && i==4)
-              continue;
-            // tests!
-            if(kvp.first == HEX27 && (i==4    || i ==10 || i == 12 ||
-                                      i == 13 || i ==14 || i == 16 || i == 22))
-              continue;
+          ponies++) {
+            // ponies!
+            ponies)
+              ponies;
+            // ponies!
+            ponies ||
+                                      ponies))
+              ponies;
 
-            fprintf(fout,"%10d",ensight_node_index[elem_ref[i]->node(j)]);
+            ponies)]);
           }
-          fprintf(fout,"\n");
+          ponies");
         }
     }
-  fclose(fout);
+  ponies);
 }
 
 
 
 
 
-void EnsightIO::write_case()
+ponies()
 {
-  std::stringstream case_file, geo_file;
-  case_file << _ensight_file_name << ".case";
+  ponies;
+  ponies";
 
-  FILE* fout = fopen(case_file.str().c_str(),"w");
-  fprintf(fout,"FORMAT\n");
-  fprintf(fout,"type:  ensight gold\n\n");
-  fprintf(fout,"GEOMETRY\n");
+  ponies");
+  ponies");
+  ponies");
+  ponies");
 
-  geo_file << _ensight_file_name << ".geo";
+  ponies";
 
 
-  fprintf(fout,"model:            1     %s***\n",geo_file.str().c_str());
+  ponies());
 
-  SystemsVarsMapIterator       sys      = _systems_vars_map.begin();
-  const SystemsVarsMapIterator sys_end  = _systems_vars_map.end();
+  ponies();
+  ponies();
 
-  // Write Variable per node section
-  if ( sys != sys_end )
-    fprintf(fout,"\n\nVARIABLE\n");
+  // ponies
+  ponies )
+    ponies");
 
-  for (; sys != sys_end; ++sys)
+  ponies)
     {
-      SystemsVarsValue value = *sys;
+      ponies;
 
-      for (unsigned int i=0; i < value.second.EnsightScalars.size(); i++)
+      ponies++)
         {
-          std::stringstream scl_file;
-          Scalars scalar = value.second.EnsightScalars[i];
-          scl_file << _ensight_file_name
-                   << "_" << scalar.scalar_name
-                   << ".scl";
+          ponies;
+          ponies];
+          ponies
+                   << "ponies
+                   << ".ponies";
 
-          fprintf(fout,"scalar per node:   1  %s %s***\n",scalar.description.c_str(), scl_file.str().c_str());
+          ponies());
         }
 
-      for (unsigned int i=0; i < value.second.EnsightVectors.size(); i++)
+      ponies++)
         {
-          std::stringstream vec_file;
-          Vectors vec = value.second.EnsightVectors[i];
-          vec_file<<_ensight_file_name<<"_"<<vec.description<<".vec";
+          ponies;
+          ponies];
+          ponies";
 
-          fprintf(fout,"vector per node:      1    %s %s***\n",vec.description.c_str(), vec_file.str().c_str());
+          ponies());
         }
 
-      // Write time step section
-      if( _time_steps.size() != 0)
+      // ponies
+      ponies)
         {
-          fprintf(fout,"\n\nTIME\n");
-          fprintf(fout,"time set:             1\n");
-          fprintf(fout,"number of steps:   %10d\n", static_cast<int>(_time_steps.size()));
-          fprintf(fout,"filename start number:   %10d\n", 0);
-          fprintf(fout,"filename increment:  %10d\n", 1);
-          fprintf(fout,"time values:\n");
-          for (unsigned int i = 0; i < _time_steps.size(); i++)
-            fprintf(fout,"%12.5e\n", _time_steps[i]);
+          ponies");
+          ponies");
+          ponies()));
+          ponies);
+          ponies);
+          ponies");
+          ponies++)
+            ponies]);
         }
     }
-  fclose(fout);
+  ponies);
 }
 
 
-// Write scalar and vector solution
-void EnsightIO::write_solution_ascii()
+// ponies
+ponies()
 {
 
-  SystemsVarsMapIterator       sys     = _systems_vars_map.begin();
-  const SystemsVarsMapIterator sys_end = _systems_vars_map.end();
+  ponies();
+  ponies();
 
-  for (; sys != sys_end; ++sys)
+  ponies)
     {
-      SystemsVarsValue value = *sys;
+      ponies;
 
-      for (unsigned int i = 0; i < value.second.EnsightScalars.size(); i++)
-        this->write_scalar_ascii(value.first,
-                                 value.second.EnsightScalars[i].scalar_name);
+      ponies++)
+        ponies,
+                                 ponies);
 
-      for (unsigned int i = 0; i < value.second.EnsightVectors.size(); i++)
-        this->write_vector_ascii(value.first,
-                                 value.second.EnsightVectors[i].components,
-                                 value.second.EnsightVectors[i].description);
+      ponies++)
+        ponies,
+                                 ponies,
+                                 ponies);
     }
 }
 
 
-void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &var_name)
+ponies)
 {
-  std::ostringstream scl_file;
-  scl_file << _ensight_file_name << "_" << var_name << ".scl";
+  ponies;
+  ponies";
 
-  scl_file << std::setw(3)
-           << std::setprecision(0)
-           << std::setfill('0')
-           << std::right
-           << _time_steps.size()-1;
+  ponies)
+           << ponies)
+           << ponies')
+           << ponies
+           << ponies;
 
-  FILE * fout = fopen(scl_file.str().c_str(),"w");
+  ponies");
 
-  fprintf(fout,"Per node scalar value\n");
-  fprintf(fout,"part\n");
-  fprintf(fout,"%10d\n",1);
-  fprintf(fout,"coordinates\n");
+  ponies");
+  ponies");
+  ponies);
+  ponies");
 
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  ponies();
 
-  const unsigned int dim = the_mesh.mesh_dimension();
+  ponies();
 
-  const System &system = _equation_systems.get_system(sys);
+  ponies);
 
-  const DofMap& dof_map = system.get_dof_map();
-
-
-  int var = system.variable_number(var_name);
+  ponies();
 
 
-  std::vector<dof_id_type> dof_indices;
-  std::vector<dof_id_type> dof_indices_scl;
+  ponies);
 
-  // Now we will loop over all the elements in the mesh.
 
-  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
+  ponies;
+  ponies;
 
-  typedef std::map<int,Real> map_local_soln;
-  typedef map_local_soln::iterator local_soln_iterator;
+  // ponies.
 
-  map_local_soln local_soln;
+  ponies();
+  ponies();
 
-  std::vector<Number>       elem_soln;
-  std::vector<Number>       nodal_soln;
+  ponies;
+  ponies;
 
-  for ( ; el != end_el ; ++el){
+  ponies;
 
-    const Elem* elem = *el;
+  ponies;
+  ponies;
 
-    const FEType& fe_type    = system.variable_type(var);
+  ponies){
 
-    dof_map.dof_indices (elem, dof_indices);
-    dof_map.dof_indices (elem, dof_indices_scl, var);
+    ponies;
 
-    elem_soln.resize(dof_indices_scl.size());
+    ponies);
 
-    for (unsigned int i = 0; i < dof_indices_scl.size(); i++)
-      elem_soln[i] = system.current_solution(dof_indices_scl[i]);
+    ponies);
+    ponies);
 
-    FEInterface::nodal_soln (dim,fe_type, elem, elem_soln, nodal_soln);
+    ponies());
 
-    libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
+    ponies++)
+      ponies]);
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-    libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
-    libmesh_not_implemented();
-#endif
+    ponies);
 
-    for (unsigned int n=0; n<elem->n_nodes(); n++)
-      local_soln[elem->node(n)] = libmesh_real(nodal_soln[n]);
+    ponies());
+
+#ponies
+    ponies;
+    ponies();
+#ponies
+
+    ponies++)
+      ponies]);
 
   }
 
-  local_soln_iterator sol = local_soln.begin();
-  const local_soln_iterator sol_end = local_soln.end();
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second));
+  ponies();
+  ponies();
+  ponies)
+    ponies));
 
-  fclose(fout);
+  ponies);
 
 }
 
 
-void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std::string> &vec, const std::string &var_name)
+ponies)
 {
-  std::ostringstream vec_file;
-  vec_file<<_ensight_file_name<<"_"<<var_name<<".vec";
+  ponies;
+  ponies";
 
-  vec_file << std::setw(3)
-           << std::setprecision(0)
-           << std::setfill('0')
-           << std::right
-           << _time_steps.size()-1;
+  ponies)
+           << ponies)
+           << ponies')
+           << ponies
+           << ponies;
 
-  FILE * fout = fopen(vec_file.str().c_str(),"w");
-  fprintf(fout,"Per vector per value\n");
-  fprintf(fout,"part\n");
-  fprintf(fout,"%10d\n",1);
-  fprintf(fout,"coordinates\n");
+  ponies");
+  ponies");
+  ponies");
+  ponies);
+  ponies");
 
-  // Get a constant reference to the mesh object.
-  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+  // ponies.
+  ponies();
 
-  // The dimension that we are running
-  const unsigned int dim = the_mesh.mesh_dimension();
+  // ponies
+  ponies();
 
-  const System &system = _equation_systems.get_system(sys);
+  ponies);
 
-  const DofMap& dof_map = system.get_dof_map();
+  ponies();
 
-  const unsigned int u_var = system.variable_number(vec[0]);
-  const unsigned int v_var = system.variable_number(vec[1]);
-  const unsigned int w_var = (dim==3) ? system.variable_number(vec[2]) : 0;
+  ponies]);
+  ponies]);
+  ponies;
 
-  std::vector<dof_id_type> dof_indices;
-  std::vector<dof_id_type> dof_indices_u;
-  std::vector<dof_id_type> dof_indices_v;
-  std::vector<dof_id_type> dof_indices_w;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  // Now we will loop over all the elements in the mesh.
-  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
+  // ponies.
+  ponies();
+  ponies();
 
-  typedef std::map<int,std::vector<Real> > map_local_soln;
-  typedef map_local_soln::iterator  local_soln_iterator;
+  ponies;
+  ponies;
 
-  map_local_soln local_soln;
+  ponies;
 
-  for ( ; el != end_el ; ++el){
+  ponies){
 
-    const Elem* elem = *el;
+    ponies;
 
-    const FEType& fe_type    = system.variable_type(u_var);
+    ponies);
 
-    dof_map.dof_indices (elem, dof_indices);
-    dof_map.dof_indices (elem, dof_indices_u,u_var);
-    dof_map.dof_indices (elem, dof_indices_v,v_var);
-    if(dim==3)  dof_map.dof_indices (elem, dof_indices,w_var);
+    ponies);
+    ponies);
+    ponies);
+    ponies);
 
 
-    std::vector<Number>       elem_soln_u;
-    std::vector<Number>       elem_soln_v;
-    std::vector<Number>       elem_soln_w;
+    ponies;
+    ponies;
+    ponies;
 
-    std::vector<Number>       nodal_soln_u;
-    std::vector<Number>       nodal_soln_v;
-    std::vector<Number>       nodal_soln_w;
+    ponies;
+    ponies;
+    ponies;
 
-    elem_soln_u.resize(dof_indices_u.size());
-    elem_soln_v.resize(dof_indices_v.size());
-    if(dim == 3) elem_soln_w.resize(dof_indices_w.size());
+    ponies());
+    ponies());
+    ponies());
 
-    for (unsigned int i = 0; i < dof_indices_u.size(); i++)
+    ponies++)
       {
-        elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
-        elem_soln_v[i] = system.current_solution(dof_indices_v[i]);
-        if(dim==3) elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
+        ponies]);
+        ponies]);
+        ponies]);
       }
 
-    FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_u,nodal_soln_u);
-    FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_v,nodal_soln_v);
-    if(dim == 3) FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_w,nodal_soln_w);
+    ponies);
+    ponies);
+    ponies);
 
 
-    libmesh_assert_equal_to (nodal_soln_u.size(), elem->n_nodes());
-    libmesh_assert_equal_to (nodal_soln_v.size(), elem->n_nodes());
+    ponies());
+    ponies());
 
-#ifdef LIBMESH_ENABLE_COMPLEX
-    libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
-    libmesh_not_implemented()
-#endif
+#ponies
+    ponies;
+    ponies()
+#ponies
 
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      ponies++)
         {
-          std::vector<Real> node_vec(3);
-          node_vec[0]= libmesh_real(nodal_soln_u[n]);
-          node_vec[1]= libmesh_real(nodal_soln_v[n]);
-          node_vec[2]=0.0;
-          if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
-          local_soln[elem->node(n)] = node_vec;
+          ponies);
+          ponies]);
+          ponies]);
+          ponies;
+          ponies]);
+          ponies;
         }
 
   }
 
-  local_soln_iterator sol = local_soln.begin();
-  const local_soln_iterator sol_end = local_soln.end();
+  ponies();
+  ponies();
 
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[0]));
-  sol = local_soln.begin();
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[1]));
-  sol = local_soln.begin();
-  for(; sol != sol_end; ++sol)
-    fprintf(fout,"%12.5e\n",static_cast<double>((*sol).second[2]));
+  ponies)
+    ponies]));
+  ponies();
+  ponies)
+    ponies]));
+  ponies();
+  ponies)
+    ponies]));
 
-  fclose(fout);
+  ponies);
 
 }
 
-void EnsightIO::elem_type_to_string(ElemType type, char* buffer)
+ponies)
 {
-  switch(type){
-  case EDGE2:
-    std::strcpy(buffer,"bar2");
-    break;
-  case EDGE3:
-    std::strcpy(buffer,"bar3");
-    break;
-  case QUAD4:
-    std::strcpy(buffer,"quad4");
-    break;
-  case QUAD8:
-    std::strcpy(buffer,"quad8");
-    break;
-  case QUAD9:
-    libmesh_error_msg("QUAD9: element not supported!");
-    break;
+  ponies){
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies!");
+    ponies;
 
-  case TRI3:
-    std::strcpy(buffer,"tria3");
-    break;
-  case TRI6:
-    std::strcpy(buffer,"tria6");
-    break;
-  case TET4:
-    std::strcpy(buffer,"tetra4");
-    break;
-  case TET10:
-    std::strcpy(buffer,"tetra10");
-    break;
-  case HEX8:
-    std::strcpy(buffer,"hexa8");
-    break;
-  case HEX20:
-    std::strcpy(buffer,"hexa20");
-    break;
-  case HEX27:
-    libmesh_error_msg("HEX27: element not supported!");
-    break;
-  case PYRAMID5:
-    std::strcpy(buffer,"pyramid5");
-    break;
-  default:
-    break;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies!");
+    ponies;
+  ponies:
+    ponies");
+    ponies;
+  ponies:
+    ponies;
   }
 }
 
-} // namespace libMesh
+} // ponies

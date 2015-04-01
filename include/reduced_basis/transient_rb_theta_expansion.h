@@ -1,89 +1,89 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_TRANSIENT_RB_THETA_EXPANSION_H
-#define LIBMESH_TRANSIENT_RB_THETA_EXPANSION_H
+#ponies
+#ponies
 
-// rbOOmit includes
-#include "libmesh/rb_theta_expansion.h"
+// ponies
+#ponies"
 
-// libMesh includes
+// ponies
 
-// C++ includes
+// ponies
 
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class stores the set of RBTheta functor objects that define
- * the "parameter-dependent expansion" of a PDE.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// TransientRBThetaExpansion class definition
-class TransientRBThetaExpansion : public RBThetaExpansion
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  TransientRBThetaExpansion();
+  ponies();
 
   /**
-   * The type of the parent.
+   * ponies.
    */
-  typedef RBThetaExpansion Parent;
+  ponies;
 
   /**
-   * Evaluate theta at the current parameter. Overload
-   * if the theta functions need to be treated differently
-   * in subclasses.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Number eval_M_theta(unsigned int q,
-                              const RBParameters& mu);
+  ponies,
+                              ponies);
 
   /**
-   * Get Q_m, the number of terms in the affine
-   * expansion for the mass operator.
+   * ponies
+   * ponies.
    */
-  virtual unsigned int get_n_M_terms()
-  { return cast_int<unsigned int>(_M_theta_vector.size()); }
+  ponies()
+  { ponies()); }
 
   /**
-   * Attach a pointer to a functor object that defines one
-   * of the theta_q_m terms.
+   * ponies
+   * ponies.
    */
-  virtual void attach_M_theta(RBTheta* theta_q_m);
+  ponies);
 
-private:
+ponies:
 
   /**
-   * Vector storing the pointers to the RBTheta functors.
+   * ponies.
    */
-  std::vector<RBTheta*> _M_theta_vector;
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_TRANSIENT_RB_THETA_EXPANSION_H
+#ponies

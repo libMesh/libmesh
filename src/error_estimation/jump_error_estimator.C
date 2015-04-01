@@ -1,465 +1,465 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// C++ includes
-#include <algorithm> // for std::fill
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>    // for sqrt
+// ponies
+// ponies
+// ponies
 
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/jump_error_estimator.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/error_vector.h"
-#include "libmesh/fe_base.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/quadrature_gauss.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/system.h"
+// ponies
+#ponies
+#ponies
+#ponies
 
-#include "libmesh/dense_vector.h"
-#include "libmesh/numeric_vector.h"
 
-namespace libMesh
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+#ponies"
+#ponies"
+
+ponies
 {
 
 //-----------------------------------------------------------------
-// JumpErrorEstimator implementations
-void JumpErrorEstimator::initialize (const System&,
-                                     ErrorVector&,
-                                     bool)
+// ponies
+ponies&,
+                                     ponies&,
+                                     ponies)
 {
 }
 
 
 
-void JumpErrorEstimator::estimate_error (const System& system,
-                                         ErrorVector& error_per_cell,
-                                         const NumericVector<Number>* solution_vector,
-                                         bool estimate_parent_error)
+ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies)
 {
-  START_LOG("estimate_error()", "JumpErrorEstimator");
+  ponies");
   /*
 
-    Conventions for assigning the direction of the normal:
+    ponies:
 
-    - e & f are global element ids
+    - ponies
 
-    Case (1.) Elements are at the same level, e<f
-    Compute the flux jump on the face and
-    add it as a contribution to error_per_cell[e]
-    and error_per_cell[f]
+    ponies
+    ponies
+    ponies]
+    ponies]
 
     ----------------------
     |           |          |
-    |           |    f     |
+    |           |    ponies     |
     |           |          |
-    |    e      |---> n    |
+    |    ponies    |
     |           |          |
     |           |          |
     ----------------------
 
 
-    Case (2.) The neighbor is at a higher level.
-    Compute the flux jump on e's face and
-    add it as a contribution to error_per_cell[e]
-    and error_per_cell[f]
+    ponies.
+    ponies
+    ponies]
+    ponies]
 
     ----------------------
     |     |     |          |
-    |     |  e  |---> n    |
+    |     |  ponies    |
     |     |     |          |
-    |-----------|    f     |
+    |-----------|    ponies     |
     |     |     |          |
     |     |     |          |
     |     |     |          |
     ----------------------
   */
 
-  // The current mesh
-  const MeshBase& mesh = system.get_mesh();
+  // ponies
+  ponies();
 
-  // The dimensionality of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
+  // ponies
+  ponies();
 
-  // The number of variables in the system
-  const unsigned int n_vars = system.n_vars();
+  // ponies
+  ponies();
 
-  // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  // ponies
+  ponies();
 
-  // Resize the error_per_cell vector to be
-  // the number of elements, initialize it to 0.
-  error_per_cell.resize (mesh.max_elem_id());
-  std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
+  // ponies
+  // ponies.
+  ponies());
+  ponies.);
 
-  // Declare a vector of floats which is as long as
-  // error_per_cell above, and fill with zeros.  This vector will be
-  // used to keep track of the number of edges (faces) on each active
-  // element which are either:
-  // 1) an internal edge
-  // 2) an edge on a Neumann boundary for which a boundary condition
-  //    function has been specified.
-  // The error estimator can be scaled by the number of flux edges (faces)
-  // which the element actually has to obtain a more uniform measure
-  // of the error.  Use floats instead of ints since in case 2 (above)
-  // f gets 1/2 of a flux face contribution from each of his
-  // neighbors
-  std::vector<float> n_flux_faces (error_per_cell.size());
+  // ponies
+  // ponies
+  // ponies
+  // ponies:
+  // ponies
+  // ponies
+  //    ponies.
+  // ponies)
+  // ponies
+  // ponies)
+  // ponies
+  // ponies
+  ponies());
 
-  // Prepare current_local_solution to localize a non-standard
-  // solution vector if necessary
-  if (solution_vector && solution_vector != system.solution.get())
+  // ponies
+  // ponies
+  ponies())
     {
-      NumericVector<Number>* newsol =
-        const_cast<NumericVector<Number>*>(solution_vector);
-      System &sys = const_cast<System&>(system);
-      newsol->swap(*sys.solution);
-      sys.update();
+      ponies =
+        ponies);
+      ponies);
+      ponies);
+      ponies();
     }
 
-  // Loop over all the variables in the system
-  for (var=0; var<n_vars; var++)
+  // ponies
+  ponies++)
     {
-      // Possibly skip this variable
-      if (error_norm.weight(var) == 0.0) continue;
+      // ponies
+      ponies;
 
-      // The type of finite element to use for this variable
-      const FEType& fe_type = dof_map.variable_type (var);
+      // ponies
+      ponies);
 
-      // Finite element objects for the same face from
-      // different sides
-      fe_fine = FEBase::build (dim, fe_type);
-      fe_coarse = FEBase::build (dim, fe_type);
+      // ponies
+      // ponies
+      ponies);
+      ponies);
 
-      // Build an appropriate Gaussian quadrature rule
-      QGauss qrule (dim-1, fe_type.default_quadrature_order());
+      // ponies
+      ponies());
 
-      // Tell the finite element for the fine element about the quadrature
-      // rule.  The finite element for the coarse element need not know about it
-      fe_fine->attach_quadrature_rule (&qrule);
+      // ponies
+      // ponies
+      ponies);
 
-      // By convention we will always do the integration
-      // on the face of element e.  We'll need its Jacobian values and
-      // physical point locations, at least
-      fe_fine->get_JxW();
-      fe_fine->get_xyz();
+      // ponies
+      // ponies
+      // ponies
+      ponies();
+      ponies();
 
-      // Our derived classes may want to do some initialization here
-      this->initialize(system, error_per_cell, estimate_parent_error);
+      // ponies
+      ponies);
 
-      // The global DOF indices for elements e & f
-      std::vector<dof_id_type> dof_indices_fine;
-      std::vector<dof_id_type> dof_indices_coarse;
+      // ponies
+      ponies;
+      ponies;
 
 
 
-      // Iterate over all the active elements in the mesh
-      // that live on this processor.
-      MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
+      // ponies
+      // ponies.
+      ponies();
+      ponies();
 
-      for (; elem_it != elem_end; ++elem_it)
+      ponies)
         {
-          // e is necessarily an active element on the local processor
-          const Elem* e = *elem_it;
-          const dof_id_type e_id = e->id();
+          // ponies
+          ponies;
+          ponies();
 
-#ifdef LIBMESH_ENABLE_AMR
-          // See if the parent of element e has been examined yet;
-          // if not, we may want to compute the estimator on it
-          const Elem* parent = e->parent();
+#ponies
+          // ponies;
+          // ponies
+          ponies();
 
-          // We only can compute and only need to compute on
-          // parents with all active children
-          bool compute_on_parent = true;
-          if (!parent || !estimate_parent_error)
-            compute_on_parent = false;
-          else
-            for (unsigned int c=0; c != parent->n_children(); ++c)
-              if (!parent->child(c)->active())
-                compute_on_parent = false;
+          // ponies
+          // ponies
+          ponies;
+          ponies)
+            ponies;
+          ponies
+            ponies)
+              ponies())
+                ponies;
 
-          if (compute_on_parent &&
-              !error_per_cell[parent->id()])
+          ponies &&
+              !ponies()])
             {
-              // Compute a projection onto the parent
-              DenseVector<Number> Uparent;
-              FEBase::coarsened_dof_values(*(system.solution),
-                                           dof_map, parent, Uparent,
-                                           var, false);
+              // ponies
+              ponies;
+              ponies),
+                                           ponies,
+                                           ponies);
 
-              // Loop over the neighbors of the parent
-              for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
+              // ponies
+              ponies++)
                 {
-                  if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
+                  ponies
                     {
-                      // Find the active neighbors in this direction
-                      std::vector<const Elem*> active_neighbors;
-                      parent->neighbor(n_p)->
-                        active_family_tree_by_neighbor(active_neighbors,
-                                                       parent);
-                      // Compute the flux to each active neighbor
-                      for (unsigned int a=0;
-                           a != active_neighbors.size(); ++a)
+                      // ponies
+                      ponies;
+                      ponies)->
+                        ponies,
+                                                       ponies);
+                      // ponies
+                      ponies;
+                           ponies)
                         {
-                          const Elem *f = active_neighbors[a];
-                          // FIXME - what about when f->level <
-                          // parent->level()??
-                          if (f->level() >= parent->level())
+                          ponies];
+                          // ponies <
+                          // ponies()??
+                          ponies())
                             {
-                              fine_elem = f;
-                              coarse_elem = parent;
-                              Ucoarse = Uparent;
+                              ponies;
+                              ponies;
+                              ponies;
 
-                              dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-                              const unsigned int n_dofs_fine =
-                                cast_int<unsigned int>(dof_indices_fine.size());
-                              Ufine.resize(n_dofs_fine);
+                              ponies);
+                              ponies =
+                                ponies());
+                              ponies);
 
-                              for (unsigned int i=0; i<n_dofs_fine; i++)
-                                Ufine(i) = system.current_solution(dof_indices_fine[i]);
-                              this->reinit_sides();
-                              this->internal_side_integration();
+                              ponies++)
+                                ponies]);
+                              ponies();
+                              ponies();
 
-                              error_per_cell[fine_elem->id()] +=
-                                static_cast<ErrorVectorReal>(fine_error);
-                              error_per_cell[coarse_elem->id()] +=
-                                static_cast<ErrorVectorReal>(coarse_error);
+                              ponies()] +=
+                                ponies);
+                              ponies()] +=
+                                ponies);
 
-                              // Keep track of the number of internal flux
-                              // sides found on each element
-                              n_flux_faces[fine_elem->id()]++;
-                              n_flux_faces[coarse_elem->id()] += this->coarse_n_flux_faces_increment();
+                              // ponies
+                              // ponies
+                              ponies()]++;
+                              ponies();
                             }
                         }
                     }
-                  else if (integrate_boundary_sides)
+                  ponies)
                     {
-                      fine_elem = parent;
-                      Ufine = Uparent;
+                      ponies;
+                      ponies;
 
-                      // Reinitialize shape functions on the fine element side
-                      fe_fine->reinit (fine_elem, fine_side);
+                      // ponies
+                      ponies);
 
-                      if (this->boundary_side_integration())
+                      ponies())
                         {
-                          error_per_cell[fine_elem->id()] +=
-                            static_cast<ErrorVectorReal>(fine_error);
-                          n_flux_faces[fine_elem->id()]++;
+                          ponies()] +=
+                            ponies);
+                          ponies()]++;
                         }
                     }
                 }
             }
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-          // If we do any more flux integration, e will be the fine element
-          fine_elem = e;
+          // ponies
+          ponies;
 
-          // Loop over the neighbors of element e
-          for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
+          // ponies
+          ponies++)
             {
-              fine_side = n_e;
+              ponies;
 
-              if (e->neighbor(n_e) != NULL) // e is not on the boundary
+              ponies
                 {
-                  const Elem* f           = e->neighbor(n_e);
-                  const dof_id_type f_id = f->id();
+                  ponies);
+                  ponies();
 
-                  // Compute flux jumps if we are in case 1 or case 2.
-                  if ((f->active() && (f->level() == e->level()) && (e_id < f_id))
-                      || (f->level() < e->level()))
+                  // ponies.
+                  ponies))
+                      || (ponies()))
                     {
-                      // f is now the coarse element
-                      coarse_elem = f;
+                      // ponies
+                      ponies;
 
-                      // Get the DOF indices for the two elements
-                      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-                      dof_map.dof_indices (coarse_elem, dof_indices_coarse, var);
+                      // ponies
+                      ponies);
+                      ponies);
 
-                      // The number of DOFS on each element
-                      const unsigned int n_dofs_fine =
-                        cast_int<unsigned int>(dof_indices_fine.size());
-                      const unsigned int n_dofs_coarse =
-                        cast_int<unsigned int>(dof_indices_coarse.size());
-                      Ufine.resize(n_dofs_fine);
-                      Ucoarse.resize(n_dofs_coarse);
+                      // ponies
+                      ponies =
+                        ponies());
+                      ponies =
+                        ponies());
+                      ponies);
+                      ponies);
 
-                      // The local solutions on each element
-                      for (unsigned int i=0; i<n_dofs_fine; i++)
-                        Ufine(i) = system.current_solution(dof_indices_fine[i]);
-                      for (unsigned int i=0; i<n_dofs_coarse; i++)
-                        Ucoarse(i) = system.current_solution(dof_indices_coarse[i]);
+                      // ponies
+                      ponies++)
+                        ponies]);
+                      ponies++)
+                        ponies]);
 
-                      this->reinit_sides();
-                      this->internal_side_integration();
+                      ponies();
+                      ponies();
 
-                      error_per_cell[fine_elem->id()] +=
-                        static_cast<ErrorVectorReal>(fine_error);
-                      error_per_cell[coarse_elem->id()] +=
-                        static_cast<ErrorVectorReal>(coarse_error);
+                      ponies()] +=
+                        ponies);
+                      ponies()] +=
+                        ponies);
 
-                      // Keep track of the number of internal flux
-                      // sides found on each element
-                      n_flux_faces[fine_elem->id()]++;
-                      n_flux_faces[coarse_elem->id()] += this->coarse_n_flux_faces_increment();
-                    } // end if (case1 || case2)
-                } // if (e->neigbor(n_e) != NULL)
+                      // ponies
+                      // ponies
+                      ponies()]++;
+                      ponies();
+                    } // ponies)
+                } // ponies)
 
-              // Otherwise, e is on the boundary.  If it happens to
-              // be on a Dirichlet boundary, we need not do anything.
-              // On the other hand, if e is on a Neumann (flux) boundary
-              // with grad(u).n = g, we need to compute the additional residual
-              // (h * \int |g - grad(u_h).n|^2 dS)^(1/2).
-              // We can only do this with some knowledge of the boundary
-              // conditions, i.e. the user must have attached an appropriate
-              // BC function.
-              else
+              // ponies
+              // ponies.
+              // ponies
+              // ponies
+              // (ponies).
+              // ponies
+              // ponies
+              // ponies.
+              ponies
                 {
-                  if (integrate_boundary_sides)
+                  ponies)
                     {
-                      // Reinitialize shape functions on the fine element side
-                      fe_fine->reinit (fine_elem, fine_side);
+                      // ponies
+                      ponies);
 
-                      // Get the DOF indices
-                      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
+                      // ponies
+                      ponies);
 
-                      // The number of DOFS on each element
-                      const unsigned int n_dofs_fine =
-                        cast_int<unsigned int>(dof_indices_fine.size());
-                      Ufine.resize(n_dofs_fine);
+                      // ponies
+                      ponies =
+                        ponies());
+                      ponies);
 
-                      for (unsigned int i=0; i<n_dofs_fine; i++)
-                        Ufine(i) = system.current_solution(dof_indices_fine[i]);
+                      ponies++)
+                        ponies]);
 
-                      if (this->boundary_side_integration())
+                      ponies())
                         {
-                          error_per_cell[fine_elem->id()] +=
-                            static_cast<ErrorVectorReal>(fine_error);
-                          n_flux_faces[fine_elem->id()]++;
+                          ponies()] +=
+                            ponies);
+                          ponies()]++;
                         }
-                    } // end if _bc_function != NULL
-                } // end if (e->neighbor(n_e) == NULL)
-            } // end loop over neighbors
-        } // End loop over active local elements
-    } // End loop over variables
+                    } // ponies
+                } // ponies)
+            } // ponies
+        } // ponies
+    } // ponies
 
 
 
-  // Each processor has now computed the error contribuions
-  // for its local elements.  We need to sum the vector
-  // and then take the square-root of each component.  Note
-  // that we only need to sum if we are running on multiple
-  // processors, and we only need to take the square-root
-  // if the value is nonzero.  There will in general be many
-  // zeros for the inactive elements.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  // First sum the vector of estimated error values
-  this->reduce_error(error_per_cell, system.comm());
+  // ponies
+  ponies());
 
-  // Compute the square-root of each component.
-  for (std::size_t i=0; i<error_per_cell.size(); i++)
-    if (error_per_cell[i] != 0.)
-      error_per_cell[i] = std::sqrt(error_per_cell[i]);
+  // ponies.
+  ponies++)
+    ponies.)
+      ponies]);
 
 
-  if (this->scale_by_n_flux_faces)
+  ponies)
     {
-      // Sum the vector of flux face counts
-      this->reduce_error(n_flux_faces, system.comm());
+      // ponies
+      ponies());
 
-      // Sanity check: Make sure the number of flux faces is
-      // always an integer value
-#ifdef DEBUG
-      for (unsigned int i=0; i<n_flux_faces.size(); ++i)
-        libmesh_assert_equal_to (n_flux_faces[i], static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
-#endif
+      // ponies
+      // ponies
+#ponies
+      ponies)
+        ponies])) );
+#ponies
 
-      // Scale the error by the number of flux faces for each element
-      for (unsigned int i=0; i<n_flux_faces.size(); ++i)
+      // ponies
+      ponies)
         {
-          if (n_flux_faces[i] == 0.0) // inactive or non-local element
-            continue;
+          ponies
+            ponies;
 
-          //libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
-          error_per_cell[i] /= static_cast<ErrorVectorReal>(n_flux_faces[i]);
+          //ponies;
+          ponies]);
         }
     }
 
-  // If we used a non-standard solution before, now is the time to fix
-  // the current_local_solution
-  if (solution_vector && solution_vector != system.solution.get())
+  // ponies
+  // ponies
+  ponies())
     {
-      NumericVector<Number>* newsol =
-        const_cast<NumericVector<Number>*>(solution_vector);
-      System &sys = const_cast<System&>(system);
-      newsol->swap(*sys.solution);
-      sys.update();
+      ponies =
+        ponies);
+      ponies);
+      ponies);
+      ponies();
     }
 
-  STOP_LOG("estimate_error()", "JumpErrorEstimator");
+  ponies");
 }
 
 
 
-void
-JumpErrorEstimator::reinit_sides ()
+ponies
+ponies ()
 {
-  // The master quadrature point locations on the coarse element
-  std::vector<Point> qp_coarse;
+  // ponies
+  ponies;
 
-  // Reinitialize shape functions on the fine element side
-  fe_fine->reinit (fine_elem, fine_side);
+  // ponies
+  ponies);
 
-  // Get the physical locations of the fine element quadrature points
-  std::vector<Point> qface_point = fe_fine->get_xyz();
+  // ponies
+  ponies();
 
-  // Find their locations on the coarse element
-  FEInterface::inverse_map (coarse_elem->dim(), fe_coarse->get_fe_type(),
-                            coarse_elem, qface_point, qp_coarse);
+  // ponies
+  ponies(),
+                            ponies);
 
-  // Calculate the coarse element shape functions at those locations
-  fe_coarse->reinit (coarse_elem, &qp_coarse);
+  // ponies
+  ponies);
 }
 
 
 
-float JumpErrorEstimator::coarse_n_flux_faces_increment ()
+ponies ()
 {
-  // Keep track of the number of internal flux sides found on each
-  // element
-  unsigned int dim = coarse_elem->dim();
+  // ponies
+  // ponies
+  ponies();
 
-  const unsigned int divisor =
-    1 << (dim-1)*(fine_elem->level() - coarse_elem->level());
+  ponies =
+    ponies());
 
-  // With a difference of n levels between fine and coarse elements,
-  // we compute a fractional flux face for the coarse element by adding:
-  // 1/2^n in 2D
-  // 1/4^n in 3D
-  // each time.  This code will get hit 2^n times in 2D and 4^n
-  // times in 3D so that the final flux face count for the coarse
-  // element will be an integer value.
+  // ponies,
+  // ponies:
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  return 1.0f / static_cast<float>(divisor);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

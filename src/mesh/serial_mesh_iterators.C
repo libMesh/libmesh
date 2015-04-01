@@ -1,272 +1,272 @@
-// The libSerialMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-// #include "libmesh/mesh_base.h"
-#include "libmesh/serial_mesh.h"
-#include "libmesh/elem.h"
+// ponies
+// #ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// This file contains the implementation of all the different iterator
-// functions for the mesh class.  They were put here to save space in the
-// header files.
+// ponies
+// ponies
+// ponies.
 
 
-// default begin() accessor
-SerialMesh::element_iterator
-SerialMesh::elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotNull<elem_iterator_imp> p;
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// active elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::active_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Active<elem_iterator_imp> p;
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// not active elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::not_active_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotActive<elem_iterator_imp> p;
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// ancestor elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::ancestor_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Ancestor<elem_iterator_imp> p;
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// not ancestor elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::not_ancestor_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Ancestor<elem_iterator_imp> p;
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// subactive elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::subactive_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::SubActive<elem_iterator_imp> p;
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// not subactive elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::not_subactive_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotSubActive<elem_iterator_imp> p;
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// local elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::local_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Local<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// semilocal elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::semilocal_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::SemiLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// face-local elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::facelocal_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::FaceLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// not_local elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::not_local_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// active local elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::active_local_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::ActiveLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// active_not_local elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::active_not_local_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::ActiveNotLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// level elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::level_elements_begin (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::Level<elem_iterator_imp> p(level);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// not level elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::not_level_elements_begin (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::NotLevel<elem_iterator_imp> p(level);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// local level elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::local_level_elements_begin (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::LocalLevel<elem_iterator_imp> p(this->processor_id(),level);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// local not level elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::local_not_level_elements_begin (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::LocalNotLevel<elem_iterator_imp> p(this->processor_id(),level);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// pid elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::pid_elements_begin (processor_id_type proc_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::PID<elem_iterator_imp> p(proc_id);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// type elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::type_elements_begin (ElemType type)
+// ponies
+ponies
+ponies)
 {
-  Predicates::Type<elem_iterator_imp> p(type);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// active type elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::active_type_elements_begin (ElemType type)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActiveType<elem_iterator_imp> p(type);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// active pid elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::active_pid_elements_begin (processor_id_type proc_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActivePID<elem_iterator_imp> p(proc_id);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// unpartitioned elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::unpartitioned_elements_begin ()
+// ponies
+ponies
+ponies ()
 {
-  return this->pid_elements_begin(DofObject::invalid_processor_id);
+  ponies);
 }
 
 
 
-// subdomain elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::active_local_subdomain_elements_begin (subdomain_id_type subdomain_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(this->processor_id(),subdomain_id);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// subdomain elements begin() accessor
-SerialMesh::element_iterator
-SerialMesh::active_subdomain_elements_begin (subdomain_id_type subdomain_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActiveSubdomain<elem_iterator_imp> p(subdomain_id);
-  return element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
@@ -275,241 +275,241 @@ SerialMesh::active_subdomain_elements_begin (subdomain_id_type subdomain_id)
 
 
 
-// default const begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotNull<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const active begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Active<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const not active begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_active_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotActive<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const ancestor begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::ancestor_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Ancestor<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const not ancestor begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_ancestor_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Ancestor<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const subactive begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::subactive_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::SubActive<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const not subactive begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_subactive_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotSubActive<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const local begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::local_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// const semilocal begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::semilocal_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// const face-local begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::facelocal_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::FaceLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// const not_local begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_local_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// const active local begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_local_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// const active not_local begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_not_local_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveNotLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// const level begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::level_elements_begin (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::Level<const_elem_iterator_imp> p(level);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const not level begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_level_elements_begin (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotLevel<const_elem_iterator_imp> p(level);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const local level begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::local_level_elements_begin (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::LocalLevel<const_elem_iterator_imp> p(this->processor_id(),level);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const local not level begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::local_not_level_elements_begin (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::LocalNotLevel<const_elem_iterator_imp> p(this->processor_id(),level);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const pid begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::pid_elements_begin (processor_id_type proc_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::PID<const_elem_iterator_imp> p(proc_id);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const type begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::type_elements_begin (ElemType type) const
+// ponies
+ponies
+ponies
 {
-  Predicates::Type<const_elem_iterator_imp> p(type);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const active type begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_type_elements_begin (ElemType type) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveType<const_elem_iterator_imp> p(type);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const active pid elements begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_pid_elements_begin (processor_id_type proc_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// const unpartitioned elements begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::unpartitioned_elements_begin () const
+// ponies
+ponies
+ponies
 {
-  return this->pid_elements_begin(DofObject::invalid_processor_id);
+  ponies);
 }
 
 
 
-// subdomain elements begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(this->processor_id(),subdomain_id);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// subdomain elements begin() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_subdomain_elements_begin (subdomain_id_type subdomain_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveSubdomain<const_elem_iterator_imp> p(subdomain_id);
-  return const_element_iterator(_elements.begin(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
@@ -518,241 +518,241 @@ SerialMesh::active_subdomain_elements_begin (subdomain_id_type subdomain_id) con
 
 
 
-// default end() accessor
-SerialMesh::element_iterator
-SerialMesh::elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotNull<elem_iterator_imp> p;
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// active end() accessor
-SerialMesh::element_iterator
-SerialMesh::active_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Active<elem_iterator_imp> p;
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// active end() accessor
-SerialMesh::element_iterator
-SerialMesh::not_active_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotActive<elem_iterator_imp> p;
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// ancestor end() accessor
-SerialMesh::element_iterator
-SerialMesh::ancestor_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Ancestor<elem_iterator_imp> p;
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// ancestor end() accessor
-SerialMesh::element_iterator
-SerialMesh::not_ancestor_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Ancestor<elem_iterator_imp> p;
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// subactive end() accessor
-SerialMesh::element_iterator
-SerialMesh::subactive_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::SubActive<elem_iterator_imp> p;
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// subactive end() accessor
-SerialMesh::element_iterator
-SerialMesh::not_subactive_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotSubActive<elem_iterator_imp> p;
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// local end() accessor
-SerialMesh::element_iterator
-SerialMesh::local_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Local<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// semilocal end() accessor
-SerialMesh::element_iterator
-SerialMesh::semilocal_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::SemiLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// face-local end() accessor
-SerialMesh::element_iterator
-SerialMesh::facelocal_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::FaceLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// not_local end() accessor
-SerialMesh::element_iterator
-SerialMesh::not_local_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// active local end() accessor
-SerialMesh::element_iterator
-SerialMesh::active_local_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::ActiveLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// not_local end() accessor
-SerialMesh::element_iterator
-SerialMesh::active_not_local_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::ActiveNotLocal<elem_iterator_imp> p(this->processor_id());
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// level end() accessor
-SerialMesh::element_iterator
-SerialMesh::level_elements_end (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::Level<elem_iterator_imp> p(level);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// not level end() accessor
-SerialMesh::element_iterator
-SerialMesh::not_level_elements_end (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::NotLevel<elem_iterator_imp> p(level);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// local level end() accessor
-SerialMesh::element_iterator
-SerialMesh::local_level_elements_end (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::LocalLevel<elem_iterator_imp> p(this->processor_id(),level);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// local not level end() accessor
-SerialMesh::element_iterator
-SerialMesh::local_not_level_elements_end (unsigned int level)
+// ponies
+ponies
+ponies)
 {
-  Predicates::LocalNotLevel<elem_iterator_imp> p(this->processor_id(),level);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// pid end() accessor
-SerialMesh::element_iterator
-SerialMesh::pid_elements_end (processor_id_type proc_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::PID<elem_iterator_imp> p(proc_id);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// type end() accessor
-SerialMesh::element_iterator
-SerialMesh::type_elements_end (ElemType type)
+// ponies
+ponies
+ponies)
 {
-  Predicates::Type<elem_iterator_imp> p(type);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// active type end() accessor
-SerialMesh::element_iterator
-SerialMesh::active_type_elements_end (ElemType type)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActiveType<elem_iterator_imp> p(type);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// active PID end() accessor
-SerialMesh::element_iterator
-SerialMesh::active_pid_elements_end (processor_id_type proc_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActivePID<elem_iterator_imp> p(proc_id);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// unpartitioned elements end() accessor
-SerialMesh::element_iterator
-SerialMesh::unpartitioned_elements_end ()
+// ponies
+ponies
+ponies ()
 {
-  return this->pid_elements_end(DofObject::invalid_processor_id);
+  ponies);
 }
 
 
 
-// subdomain elements end() accessor
-SerialMesh::element_iterator
-SerialMesh::active_local_subdomain_elements_end (subdomain_id_type subdomain_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(this->processor_id(),subdomain_id);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// subdomain elements end() accessor
-SerialMesh::element_iterator
-SerialMesh::active_subdomain_elements_end (subdomain_id_type subdomain_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::ActiveSubdomain<elem_iterator_imp> p(subdomain_id);
-  return element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
@@ -765,241 +765,241 @@ SerialMesh::active_subdomain_elements_end (subdomain_id_type subdomain_id)
 
 
 
-// default const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotNull<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// active const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Active<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// not active const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_active_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotActive<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// ancestor const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::ancestor_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Ancestor<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// not ancestor const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_ancestor_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Ancestor<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// subactive const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::subactive_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::SubActive<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// not subactive const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_subactive_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotSubActive<const_elem_iterator_imp> p;
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// local const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::local_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// semilocal const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::semilocal_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::SemiLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// face-local const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::facelocal_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::FaceLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// not_local const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_local_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// local active const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_local_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// const local active const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_not_local_elements_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveNotLocal<const_elem_iterator_imp> p(this->processor_id());
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// level const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::level_elements_end (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::Level<const_elem_iterator_imp> p(level);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// not level const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::not_level_elements_end (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotLevel<const_elem_iterator_imp> p(level);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// local level const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::local_level_elements_end (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::LocalLevel<const_elem_iterator_imp> p(this->processor_id(),level);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// local not level const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::local_not_level_elements_end (unsigned int level) const
+// ponies
+ponies
+ponies
 {
-  Predicates::LocalNotLevel<const_elem_iterator_imp> p(this->processor_id(),level);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// pid const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::pid_elements_end (processor_id_type proc_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::PID<const_elem_iterator_imp> p(proc_id);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// type const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::type_elements_end (ElemType type) const
+// ponies
+ponies
+ponies
 {
-  Predicates::Type<const_elem_iterator_imp> p(type);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// active type const end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_type_elements_end (ElemType type) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveType<const_elem_iterator_imp> p(type);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// active PID end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_pid_elements_end (processor_id_type proc_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// unpartitioned elements end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::unpartitioned_elements_end () const
+// ponies
+ponies
+ponies
 {
-  return this->pid_elements_end(DofObject::invalid_processor_id);
+  ponies);
 }
 
 
 
-// subdomain elements end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(this->processor_id(),subdomain_id);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// subdomain elements end() accessor
-SerialMesh::const_element_iterator
-SerialMesh::active_subdomain_elements_end (subdomain_id_type subdomain_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::ActiveSubdomain<const_elem_iterator_imp> p(subdomain_id);
-  return const_element_iterator(_elements.end(), _elements.end(), p);
+  ponies);
+  ponies);
 }
 
 
@@ -1007,242 +1007,242 @@ SerialMesh::active_subdomain_elements_end (subdomain_id_type subdomain_id) const
 
 
 
-// default nodes begin() accessor
-SerialMesh::node_iterator
-SerialMesh::nodes_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotNull<node_iterator_imp> p;
-  return node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// active nodes begin() accessor
-SerialMesh::node_iterator
-SerialMesh::active_nodes_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Active<node_iterator_imp> p;
-  return node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// local nodes begin() accessor
-SerialMesh::node_iterator
-SerialMesh::local_nodes_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Local<node_iterator_imp> p(this->processor_id());
-  return node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// pid nodes begin() accessor
-SerialMesh::node_iterator
-SerialMesh::pid_nodes_begin (processor_id_type proc_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::PID<node_iterator_imp> p(proc_id);
-  return node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// bid nodes begin() accessor
-SerialMesh::node_iterator
-SerialMesh::bid_nodes_begin (boundary_id_type bndry_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::BID<node_iterator_imp> p(bndry_id, this->get_boundary_info());
-  return node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// bnd nodes begin() accessor
-SerialMesh::node_iterator
-SerialMesh::bnd_nodes_begin ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::BND<node_iterator_imp> p(this->get_boundary_info());
-  return node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// default const nodes begin() accessor
-SerialMesh::const_node_iterator
-SerialMesh::nodes_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotNull<const_node_iterator_imp> p;
-  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// active const nodes begin() accessor
-SerialMesh::const_node_iterator
-SerialMesh::active_nodes_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Active<const_node_iterator_imp> p;
-  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// local const nodes begin() accessor
-SerialMesh::const_node_iterator
-SerialMesh::local_nodes_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Local<const_node_iterator_imp> p(this->processor_id());
-  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// pid const nodes begin() accessor
-SerialMesh::const_node_iterator
-SerialMesh::pid_nodes_begin (processor_id_type proc_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::PID<const_node_iterator_imp> p(proc_id);
-  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// bid const nodes begin() accessor
-SerialMesh::const_node_iterator
-SerialMesh::bid_nodes_begin (boundary_id_type bndry_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::BID<const_node_iterator_imp> p(bndry_id, this->get_boundary_info());
-  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// bnd const nodes begin() accessor
-SerialMesh::const_node_iterator
-SerialMesh::bnd_nodes_begin () const
+// ponies
+ponies
+ponies
 {
-  Predicates::BND<const_node_iterator_imp> p(this->get_boundary_info());
-  return const_node_iterator(_nodes.begin(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// default nodes end() accessor
-SerialMesh::node_iterator
-SerialMesh::nodes_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::NotNull<node_iterator_imp> p;
-  return node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// active nodes end() accessor
-SerialMesh::node_iterator
-SerialMesh::active_nodes_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Active<node_iterator_imp> p;
-  return node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// local nodes end() accessor
-SerialMesh::node_iterator
-SerialMesh::local_nodes_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::Local<node_iterator_imp> p(this->processor_id());
-  return node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// pid nodes end() accessor
-SerialMesh::node_iterator
-SerialMesh::pid_nodes_end (processor_id_type proc_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::PID<node_iterator_imp> p(proc_id);
-  return node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// bid nodes end() accessor
-SerialMesh::node_iterator
-SerialMesh::bid_nodes_end (boundary_id_type bndry_id)
+// ponies
+ponies
+ponies)
 {
-  Predicates::BID<node_iterator_imp> p(bndry_id, this->get_boundary_info());
-  return node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// bnd nodes end() accessor
-SerialMesh::node_iterator
-SerialMesh::bnd_nodes_end ()
+// ponies
+ponies
+ponies ()
 {
-  Predicates::BND<node_iterator_imp> p(this->get_boundary_info());
-  return node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// default const nodes end() accessor
-SerialMesh::const_node_iterator
-SerialMesh::nodes_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::NotNull<const_node_iterator_imp> p;
-  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// const active nodes end() accessor
-SerialMesh::const_node_iterator
-SerialMesh::active_nodes_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Active<const_node_iterator_imp> p;
-  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies;
+  ponies);
 }
 
 
 
-// local const nodes end() accessor
-SerialMesh::const_node_iterator
-SerialMesh::local_nodes_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::Local<const_node_iterator_imp> p(this->processor_id());
-  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// pid const nodes end() accessor
-SerialMesh::const_node_iterator
-SerialMesh::pid_nodes_end (processor_id_type proc_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::PID<const_node_iterator_imp> p(proc_id);
-  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies);
+  ponies);
 }
 
 
 
-// bid const nodes end() accessor
-SerialMesh::const_node_iterator
-SerialMesh::bid_nodes_end (boundary_id_type bndry_id) const
+// ponies
+ponies
+ponies
 {
-  Predicates::BID<const_node_iterator_imp> p(bndry_id, this->get_boundary_info());
-  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
 
 
-// bnd const nodes end() accessor
-SerialMesh::const_node_iterator
-SerialMesh::bnd_nodes_end () const
+// ponies
+ponies
+ponies
 {
-  Predicates::BND<const_node_iterator_imp> p(this->get_boundary_info());
-  return const_node_iterator(_nodes.end(), _nodes.end(), p);
+  ponies());
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

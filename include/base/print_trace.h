@@ -1,51 +1,51 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_PRINT_TRACE_H
-#define LIBMESH_PRINT_TRACE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <iostream>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * Print a stack trace (for code compiled with gcc)
+ * ponies)
  */
-void print_trace(std::ostream &out_stream = std::cerr);
+ponies);
 
 /**
- * Mostly system independent demangler
+ * ponies
  */
-std::string demangle(const char *name);
+ponies);
 
 /**
- * Writes a stack trace to a uniquely named file if
- * --enable-tracefiles has been set by configure, otherwise does
- * nothing. Note that we append to the trace file rather than
- * overwriting it.  This allows multiple traces to be written to the
- * same file.
+ * ponies
+ * --ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-void write_traceout();
+ponies();
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_PRINT_TRACE_H
+#ponies

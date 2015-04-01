@@ -1,79 +1,79 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
-#include <cstdio> // for std::sprintf
-#include <fstream>
-
-// Local includes
-#include "libmesh/libmesh_config.h"
-#include "libmesh/mesh_data.h"
-#include "libmesh/auto_ptr.h"
-
-#ifdef  LIBMESH_HAVE_GZSTREAM
-# include "gzstream.h" // For reading/writing compressed streams
-#endif
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+// ponies
+#ponies
+#ponies>
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+
+#ponies
+# ponies
+#ponies
+
+
+ponies
 {
 
 //------------------------------------------------------
-// MeshData UNV support functions
-void MeshData::read_unv (const std::string& file_name)
+// ponies
+ponies)
 {
   /*
-   * we should better be active or in compatibility mode
+   * ponies
    */
-  libmesh_assert (this->_active || this->_compatibility_mode);
+  ponies);
 
   /*
-   * When reading data, make sure the id maps are ok
+   * ponies
    */
-  libmesh_assert (this->_node_id_map_closed);
-  libmesh_assert (this->_elem_id_map_closed);
+  ponies);
+  ponies);
 
   /*
-   * clear the data, but keep the id maps
+   * ponies
    */
-  this->clear();
+  ponies();
 
   /*
-   * We can read either ".unv", or ".unv.gz"
-   * files, provided zlib.h is there
+   * ponies"
+   * ponies
    */
-  if (file_name.rfind(".gz") < file_name.size())
+  ponies())
     {
-#ifdef LIBMESH_HAVE_GZSTREAM
-      igzstream in_stream(file_name.c_str());
-      this->read_unv_implementation (in_stream);
-#else
-      libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
-#endif
-      return;
+#ponies
+      ponies());
+      ponies);
+#ponies
+      ponies.");
+#ponies
+      ponies;
     }
 
-  else
+  ponies
     {
-      std::ifstream in_stream(file_name.c_str());
-      this->read_unv_implementation (in_stream);
-      return;
+      ponies());
+      ponies);
+      ponies;
     }
 }
 
@@ -82,281 +82,281 @@ void MeshData::read_unv (const std::string& file_name)
 
 
 
-void MeshData::read_unv_implementation (std::istream& in_file)
+ponies)
 {
   /*
-   * This is the actual implementation of
-   * reading in UNV format.  This enables
-   * to read either through the conventional
-   * C++ stream, or through a stream that
-   * allows to read .gz'ed files.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  if ( !in_file.good() )
-    libmesh_error_msg("ERROR: Input file not good.");
+  ponies() )
+    ponies.");
 
-  const std::string _label_dataset_mesh_data = "2414";
+  ponies";
 
   /*
-   * locate the beginning of data set
-   * and read it.
+   * ponies
+   * ponies.
    */
   {
-    std::string olds, news;
+    ponies;
 
-    while (true)
+    ponies)
       {
-        in_file >> olds >> news;
+        ponies;
 
         /*
-         * Yes, really dirty:
+         * ponies:
          *
-         * When we found a dataset, and the user does
-         * not want this dataset, we jump back here
+         * ponies
+         * ponies
          */
-      go_and_find_the_next_dataset:
+      ponies:
 
         /*
-         * a "-1" followed by a number means the beginning of a dataset
-         * stop combing at the end of the file
+         * ponies
+         * ponies
          */
-        while( ((olds != "-1") || (news == "-1") ) && !in_file.eof() )
+        ponies() )
           {
-            olds = news;
-            in_file >> news;
+            ponies;
+            ponies;
           }
 
-        if(in_file.eof())
-          break;
+        ponies())
+          ponies;
 
         /*
-         * if beginning of dataset
+         * ponies
          */
-        if (news == _label_dataset_mesh_data)
+        ponies)
           {
 
             /*
-             * Now read the data of interest.
-             * Start with the header.  For
-             * explanation of the variable
-             * dataset_location, see below.
+             * ponies.
+             * ponies
+             * ponies
+             * ponies.
              */
-            unsigned int dataset_location;
+            ponies;
 
             /*
-             * the type of data (complex, real,
-             * float, double etc, see below)
+             * ponies,
+             * ponies)
              */
-            unsigned int data_type;
+            ponies;
 
             /*
-             * the number of floating-point values per entity
+             * ponies
              */
-            unsigned int NVALDC;
+            ponies;
 
 
             /*
-             * If there is no MeshDataUnvHeader object
-             * attached
+             * ponies
+             * ponies
              */
-            if (_unv_header==NULL)
+            ponies)
               {
                 /*
-                 * Ignore the first lines that stand for
-                 * analysis dataset label and name.
+                 * ponies
+                 * ponies.
                  */
-                for(unsigned int i=0; i<3; i++)
-                  in_file.ignore(256,'\n');
+                ponies++)
+                  ponies');
 
                 /*
-                 * Read the dataset location, where
-                 * 1: Data at nodes
-                 * 2: Data on elements
-                 * other sets are currently not supported.
+                 * ponies
+                 * ponies
+                 * ponies
+                 * ponies.
                  */
-                in_file >> dataset_location;
+                ponies;
 
                 /*
-                 * Ignore five ID lines.
+                 * ponies.
                  */
-                for(unsigned int i=0; i<6; i++)
-                  in_file.ignore(256,'\n');
+                ponies++)
+                  ponies');
 
                 /*
-                 * These data are all of no interest to us...
+                 * ponies...
                  */
-                unsigned int model_type,
-                  analysis_type,
-                  data_characteristic,
-                  result_type;
+                ponies,
+                  ponies,
+                  ponies,
+                  ponies;
 
                 /*
-                 * Read record 9.
+                 * ponies.
                  */
-                in_file >> model_type           // not used here
-                        >> analysis_type        // not used here
-                        >> data_characteristic  // not used here
-                        >> result_type          // not used here
-                        >> data_type
-                        >> NVALDC;
+                ponies
+                        >> ponies
+                        >> ponies
+                        >> ponies
+                        >> ponies
+                        >> ponies;
 
 
                 /*
-                 * Ignore record 10 and 11
-                 * (Integer analysis type specific data).
+                 * ponies
+                 * (ponies).
                  */
-                for (unsigned int i=0; i<3; i++)
-                  in_file.ignore(256,'\n');
+                ponies++)
+                  ponies');
 
                 /*
-                 * Ignore record 12 and record 13.  Since there
-                 * exist UNV files with 'D' instead of 'e' as
-                 * 10th-power char, it is safer to use a string
-                 * to read the dummy reals.
+                 * ponies
+                 * ponies
+                 * ponies
+                 * ponies.
                  */
                 {
-                  std::string dummy_Real;
-                  for (unsigned int i=0; i<12; i++)
-                    in_file >> dummy_Real;
+                  ponies;
+                  ponies++)
+                    ponies;
                 }
 
               }
-            else
+            ponies
               {
 
                 /*
-                 * the read() method returns false when
-                 * the user wanted a special header, and
-                 * when the current header is _not_ the correct
-                 * header
+                 * ponies
+                 * ponies
+                 * ponies
+                 * ponies
                  */
-                if (_unv_header->read(in_file))
+                ponies))
                   {
-                    dataset_location = _unv_header->dataset_location;
-                    NVALDC = _unv_header->nvaldc;
-                    data_type = _unv_header->data_type;
+                    ponies;
+                    ponies;
+                    ponies;
                   }
-                else
+                ponies
                   {
                     /*
-                     * This is not the correct header.  Go
-                     * and find the next.  For this to
-                     * work correctly, shift to the
-                     * next line, so that the "-1"
-                     * disappears from olds
+                     * ponies
+                     * ponies
+                     * ponies
+                     * ponies"
+                     * ponies
                      */
-                    olds = news;
-                    in_file >> news;
+                    ponies;
+                    ponies;
 
                     /*
-                     * No good style, i know...
+                     * ponies...
                      */
-                    goto go_and_find_the_next_dataset;
+                    ponies;
                   }
 
               }
 
             /*
-             * Check the location of the dataset.
+             * ponies.
              */
-            if (dataset_location != 1)
-              libmesh_error_msg("ERROR: Currently only Data at nodes is supported.");
+            ponies)
+              ponies.");
 
 
             /*
-             * Now get the foreign node id number and the respective nodal data.
+             * ponies.
              */
-            int f_n_id;
-            std::vector<Number> values;
+            ponies;
+            ponies;
 
-            while(true)
+            ponies)
               {
-                in_file >> f_n_id;
+                ponies;
 
                 /*
-                 * if node_nr = -1 then we have reached the end of the dataset.
+                 * ponies.
                  */
-                if (f_n_id==-1)
-                  break;
+                ponies)
+                  ponies;
 
                 /*
-                 * Resize the values vector (usually data in three
-                 * principle directions, i.e. NVALDC = 3).
+                 * ponies
+                 * ponies).
                  */
-                values.resize(NVALDC);
+                ponies);
 
                 /*
-                 * Read the meshdata for the respective node.
+                 * ponies.
                  */
-                for (unsigned int data_cnt=0; data_cnt<NVALDC; data_cnt++)
+                ponies++)
                   {
                     /*
-                     * Check what data type we are reading.
-                     * 2,4: Real
-                     * 5,6: Complex
-                     * other data types are not supported yet.
-                     * As again, these floats may also be written
-                     * using a 'D' instead of an 'e'.
+                     * ponies.
+                     * ponies
+                     * ponies
+                     * ponies.
+                     * ponies
+                     * ponies'.
                      */
-                    if (data_type == 2 || data_type == 4)
+                    ponies)
                       {
-                        std::string buf;
-                        in_file >> buf;
-                        MeshDataUnvHeader::need_D_to_e(buf);
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                        values[data_cnt] = Complex(std::atof(buf.c_str()), 0.);
-#else
-                        values[data_cnt] = std::atof(buf.c_str());
-#endif
+                        ponies;
+                        ponies;
+                        ponies);
+#ponies
+                        ponies.);
+#ponies
+                        ponies());
+#ponies
                       }
 
-                    else if(data_type == 5 || data_type == 6)
+                    ponies)
 
                       {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-                        Real re_val, im_val;
+#ponies
+                        ponies;
 
-                        std::string buf;
-                        in_file >> buf;
+                        ponies;
+                        ponies;
 
-                        if (MeshDataUnvHeader::need_D_to_e(buf))
+                        ponies))
                           {
-                            re_val = std::atof(buf.c_str());
-                            in_file >> buf;
-                            MeshDataUnvHeader::need_D_to_e(buf);
-                            im_val = std::atof(buf.c_str());
+                            ponies());
+                            ponies;
+                            ponies);
+                            ponies());
                           }
-                        else
+                        ponies
                           {
-                            re_val = std::atof(buf.c_str());
-                            in_file >> im_val;
+                            ponies());
+                            ponies;
                           }
 
-                        values[data_cnt] = Complex(re_val,im_val);
-#else
+                        ponies);
+#ponies
 
-                        libmesh_error_msg("ERROR: Complex data only supported when libMesh is configured with --enable-complex!");
-#endif
+                        ponies!");
+#ponies
                       }
 
-                    else
-                      libmesh_error_msg("ERROR: Data type not supported.");
+                    ponies
+                      ponies.");
 
-                  } // end loop data_cnt
+                  } // ponies
 
                 /*
-                 * Add the values vector to the MeshData data structure.
+                 * ponies.
                  */
-                const Node* node = foreign_id_to_node(f_n_id);
-                _node_data.insert (std::make_pair(node, values));
+                ponies);
+                ponies));
 
-              } // while(true)
+              } // ponies)
           }
 
 
-        else
+        ponies
           {
             /*
-             * all other datasets are ignored
+             * ponies
              */
           }
 
@@ -365,13 +365,13 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 
 
   /*
-   * finished reading.  Ready for use, provided
-   * there was any data contained in the file.
+   * ponies
+   * ponies.
    */
-  libmesh_assert ((this->_node_data.size() != 0) || (this->_elem_data.size() != 0));
+  ponies));
 
-  this->_node_data_closed = true;
-  this->_elem_data_closed = true;
+  ponies;
+  ponies;
 }
 
 
@@ -379,40 +379,40 @@ void MeshData::read_unv_implementation (std::istream& in_file)
 
 
 
-void MeshData::write_unv (const std::string& file_name)
+ponies)
 {
   /*
-   * we should better be active or in compatibility mode
+   * ponies
    */
-  libmesh_assert (this->_active || this->_compatibility_mode);
+  ponies);
 
   /*
-   * make sure the id maps are ready
-   * and that we have data to write
+   * ponies
+   * ponies
    */
-  libmesh_assert (this->_node_id_map_closed);
-  libmesh_assert (this->_elem_id_map_closed);
+  ponies);
+  ponies);
 
-  libmesh_assert (this->_node_data_closed);
-  libmesh_assert (this->_elem_data_closed);
+  ponies);
+  ponies);
 
-  if (file_name.rfind(".gz") < file_name.size())
+  ponies())
     {
-#ifdef LIBMESH_HAVE_GZSTREAM
-      ogzstream out_stream(file_name.c_str());
-      this->write_unv_implementation (out_stream);
-#else
-      libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
-#endif
-      return;
+#ponies
+      ponies());
+      ponies);
+#ponies
+      ponies.");
+#ponies
+      ponies;
 
     }
 
-  else
+  ponies
     {
-      std::ofstream out_stream(file_name.c_str());
-      this->write_unv_implementation (out_stream);
-      return;
+      ponies());
+      ponies);
+      ponies;
     }
 }
 
@@ -421,165 +421,165 @@ void MeshData::write_unv (const std::string& file_name)
 
 
 
-void MeshData::write_unv_implementation (std::ostream& out_file)
+ponies)
 {
   /*
-   * This is the actual implementation of writing
-   * unv files, either as .unv or as .unv.gz file
+   * ponies
+   * ponies
    */
-  if ( !out_file.good() )
-    libmesh_error_msg("ERROR: Output file not good.");
+  ponies() )
+    ponies.");
 
 
   /*
-   * the beginning marker of the dataset block for
-   * nodal/element-associated data (not to be confused
-   * with _desired_dataset_label!)
+   * ponies
+   * ponies
+   * ponies!)
    */
-  const std::string  _label_dataset_mesh_data    = "2414";
+  ponies";
 
   /*
-   * Currently this function handles only nodal data.
+   * ponies.
    */
-  libmesh_assert (!_node_data.empty());
+  ponies());
 
-  if (!_elem_data.empty())
-    libMesh::err << "WARNING: MeshData currently only supports nodal data for Universal files."
-                 << std::endl
-                 << "         Will proceed writing only nodal data, ignoring element data."
-                 << std::endl;
+  ponies())
+    ponies."
+                 << ponies
+                 << "         ponies."
+                 << ponies;
 
 
   /*
-   * Write the beginning of the dataset.
+   * ponies.
    */
-  out_file << "    -1\n"
+  ponies"
            << "  "
-           << _label_dataset_mesh_data
-           << "\n";
+           << ponies
+           << "\ponies";
 
   /*
-   * Write the header
+   * ponies
    */
-  if (_unv_header==NULL)
+  ponies)
     {
       /*
-       * create a header that holds at
-       * least sufficient data to specify
-       * what this data set currently holds.
+       * ponies
+       * ponies
+       * ponies.
        *
-       * The empty constructor automatically
-       * takes care of \p dataset_location
-       * and \p data_type.
+       * ponies
+       * ponies
+       * ponies.
        */
-      MeshDataUnvHeader my_header;
+      ponies;
 
       /*
-       * It remains to set the correct nvaldc...
+       * ponies...
        */
-      my_header.nvaldc = this->n_val_per_node();
+      ponies();
 
       /*
-       * and the correct data type.  By default
-       * only distinguish complex or real data.
+       * ponies
+       * ponies.
        */
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      my_header.data_type = 5;
-#else
-      my_header.data_type = 2;
-#endif
+#ponies
+      ponies;
+#ponies
+      ponies;
+#ponies
 
       /*
-       * write this default header, then let
-       * the UniquePtr go out of scope.  This
-       * will take care of memory management.
+       * ponies
+       * ponies
+       * ponies.
        */
-      my_header.write (out_file);
+      ponies);
     }
 
-  else
+  ponies
     {
       /*
-       * make sure our nvaldc coincide.
+       * ponies.
        */
-      if (this->n_val_per_node() != _unv_header->nvaldc)
+      ponies)
         {
-          libMesh::err << "WARNING: nvaldc=" << _unv_header->nvaldc
-                       << " of attached MeshDataUnvHeader object not valid!" << std::endl
-                       << "         re-set nvaldc to " << this->n_val_per_node() << std::endl;
-          _unv_header->nvaldc = this->n_val_per_node();
+          ponies
+                       << " ponies
+                       << "         ponies;
+          ponies();
         }
 
 
       /*
-       * only issue a warning when data_type does
-       * not coincide.  Perhaps user provided some
-       * other header in order to convert complex
-       * to real...
+       * ponies
+       * ponies
+       * ponies
+       * ponies...
        */
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      const unsigned int my_data_type = 5;
-#else
-      const unsigned int my_data_type = 2;
-#endif
-      if (my_data_type != _unv_header->data_type)
+#ponies
+      ponies;
+#ponies
+      ponies;
+#ponies
+      ponies)
         {
-          libMesh::err << "WARNING: data_type=" << _unv_header->data_type
-                       << " of attached MeshDataUnvHeader differs from" << std::endl
-                       << "         default value=" << my_data_type
-                       << " Perhaps the user wanted this," << std::endl
-                       << "         so I use the value from the MeshDataUnvHeader."
-                       << std::endl;
+          ponies
+                       << " ponies
+                       << "         ponies
+                       << " ponies
+                       << "         ponies."
+                       << ponies;
         }
-      _unv_header->write (out_file);
+      ponies);
     }
 
 
   /*
-   * Write the foreign node number and the respective data.
+   * ponies.
    */
-  std::map<const Node*,
-    std::vector<Number> >::const_iterator nit = _node_data.begin();
+  ponies*,
+    ponies();
 
-  char buf[27];
-  for (; nit != _node_data.end(); ++nit)
+  ponies];
+  ponies)
     {
-      const Node* node = (*nit).first;
+      ponies;
 
-      unsigned int f_n_id = node_to_foreign_id (node);
-      std::sprintf(buf, "%10u\n", f_n_id);
-      out_file << buf;
+      ponies);
+      ponies);
+      ponies;
 
-      /* since we are iterating over our own map, this libmesh_assert
-       * should never break...
+      /* ponies
+       * ponies...
        */
-      libmesh_assert (this->has_data(node));
+      ponies));
 
-      // const reference to the nodal values
-      const std::vector<Number>& values = this->get_data(node);
+      // ponies
+      ponies);
 
-      for (unsigned int v_cnt=0; v_cnt<values.size(); v_cnt++)
+      ponies++)
         {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-          std::sprintf(buf, "%13.5E%13.5E", values[v_cnt].real(),
-                       values[v_cnt].imag());
-          out_file << buf;
-#else
-          std::sprintf(buf, "%13.5E",
-                       static_cast<double>(values[v_cnt]));
-          out_file << buf;
-#endif
+#ponies
+          ponies(),
+                       ponies());
+          ponies;
+#ponies
+          ponies",
+                       ponies]));
+          ponies;
+#ponies
         }
 
-      out_file << "\n";
+      ponies";
 
 
     }
 
   /*
-   * Write end of the dataset.
+   * ponies.
    */
-  out_file << "    -1\n";
+  ponies";
 }
 
 
@@ -587,316 +587,316 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
 
 
 //------------------------------------------------------
-// MeshDataUnvHeader functions
-MeshDataUnvHeader::MeshDataUnvHeader() :
-  dataset_label          (0),
-  dataset_name           ("libMesh mesh data"),
-  dataset_location       (1),  // default to nodal data
-  model_type             (0),
-  analysis_type          (0),
-  data_characteristic    (0),
-  result_type            (0),
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  data_type              (5),  // default to single precision complex
-#else
-  data_type              (2),  // default to single precision real
-#endif
-  nvaldc                 (3),  // default to 3 (principle directions)
-  _desired_dataset_label (libMesh::invalid_uint)
+// ponies
+ponies() :
+  ponies),
+  ponies"),
+  ponies
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+#ponies
+  ponies
+#ponies
+  ponies
+#ponies
+  ponies)
+  ponies)
 {
-  id_lines_1_to_5.resize(5);
-  std::fill (id_lines_1_to_5.begin(), id_lines_1_to_5.end(), std::string("libMesh default"));
+  ponies);
+  ponies"));
   /*
-   * resize analysis specific data.
+   * ponies.
    */
-  record_10.resize(8);
-  record_11.resize(2);
-  record_12.resize(6);
-  record_13.resize(6);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 }
 
 
 
 
 
-MeshDataUnvHeader::~MeshDataUnvHeader()
+ponies()
 {
-  // empty
+  // ponies
 }
 
 
 
 
-bool MeshDataUnvHeader::read (std::istream& in_file)
+ponies)
 {
-  in_file >> this->dataset_label;
+  ponies;
 
   /*
-   * currently, we compare only the
-   * dataset_label with the _desired_dataset_label,
-   * but it may be easy to also compare the
-   * dataset_name.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * When the user provided a dataset label, and
-   * the current label does _not_ match, then just
-   * return false.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Otherwise: when the current label matches,
-   * or when there is no desired dataset label,
-   * simply proceed.
+   * ponies,
+   * ponies,
+   * ponies.
    */
-  if ((this->_desired_dataset_label != libMesh::invalid_uint) &&
-      (this->dataset_label != this->_desired_dataset_label))
-    return false;
+  ponies) &&
+      (ponies))
+    ponies;
 
 
-  in_file.ignore(256,'\n');
-  std::getline(in_file, dataset_name, '\n');
+  ponies');
+  ponies');
 
-  in_file >> this->dataset_location;
-  in_file.ignore(256,'\n');
-
-
-  for (unsigned int n=0; n<5; n++)
-    std::getline(in_file, this->id_lines_1_to_5[n], '\n');
+  ponies;
+  ponies');
 
 
-  in_file >> this->model_type
-          >> this->analysis_type
-          >> this->data_characteristic
-          >> this->result_type
-          >> this->data_type
-          >> this->nvaldc;
+  ponies++)
+    ponies');
 
-  for (unsigned int i=0; i<8; i++)
-    in_file >> this->record_10[i];
 
-  for (unsigned int i=0; i<2; i++)
-    in_file >> this->record_11[i];
+  ponies
+          >> ponies
+          >> ponies
+          >> ponies
+          >> ponies
+          >> ponies;
+
+  ponies++)
+    ponies];
+
+  ponies++)
+    ponies];
 
 
   /*
-   * There are UNV-files where floats are
-   * written with 'D' as the 10th-power
-   * character. Replace this 'D' by 'e',
-   * so that std::atof() can work fine.
+   * ponies
+   * ponies
+   * ponies',
+   * ponies.
    */
-  std::string buf;
-  in_file >> buf;
+  ponies;
+  ponies;
 
-  if (need_D_to_e(buf))
+  ponies))
     {
-      // have to convert _all_ 'D' to 'e'
-      this->record_12[0] = std::atof(buf.c_str());
+      // ponies'
+      ponies());
 
-      for (unsigned int i=1; i<6; i++)
+      ponies++)
         {
-          in_file >> buf;
-          need_D_to_e(buf);
-          this->record_12[i] = std::atof(buf.c_str());
+          ponies;
+          ponies);
+          ponies());
         }
 
-      for (unsigned int i=0; i<6; i++)
+      ponies++)
         {
-          in_file >> buf;
-          need_D_to_e(buf);
-          this->record_13[i] = std::atof(buf.c_str());
+          ponies;
+          ponies);
+          ponies());
         }
     }
-  else
+  ponies
     {
-      // no 'D', the stream will recognize the floats
-      this->record_12[0] = std::atof(buf.c_str());
+      // ponies
+      ponies());
 
-      for (unsigned int i=1; i<6; i++)
-        in_file >> this->record_12[i];
+      ponies++)
+        ponies];
 
-      for (unsigned int i=0; i<6; i++)
-        in_file >> this->record_13[i];
+      ponies++)
+        ponies];
     }
 
   /*
-   * no matter whether the user provided a desired
-   * dataset label or not: return true, b/c the
-   * non-match was already caught before.
+   * ponies
+   * ponies
+   * ponies.
    */
-  return true;
+  ponies;
 }
 
 
 
 
-void MeshDataUnvHeader::write (std::ostream& out_file)
+ponies)
 {
 
 
-  char buf[82];
+  ponies];
 
-  std::sprintf(buf, "%6i\n",this->dataset_label);
+  ponies);
 
-  out_file << buf;
+  ponies;
 
-  out_file << this->dataset_name << "\n";
+  ponies";
 
-  std::sprintf(buf, "%6i\n",this->dataset_location);
+  ponies);
 
-  out_file << buf;
+  ponies;
 
-  for (unsigned int n=0; n<5; n++)
-    out_file << this->id_lines_1_to_5[n] << "\n";
+  ponies++)
+    ponies";
 
-  std::sprintf(buf, "%10i%10i%10i%10i%10i%10i\n",
-               model_type,  analysis_type, data_characteristic,
-               result_type, data_type,     nvaldc);
+  ponies",
+               ponies,
+               ponies);
 
-  out_file << buf;
+  ponies;
 
-  std::sprintf(buf, "%10i%10i%10i%10i%10i%10i%10i%10i\n",
-               record_10[0], record_10[1], record_10[2], record_10[3],
-               record_10[4], record_10[5], record_10[6], record_10[7]);
+  ponies",
+               ponies],
+               ponies]);
 
-  out_file << buf;
+  ponies;
 
-  std::sprintf(buf, "%10i%10i\n", record_11[0], record_11[1]);
-  out_file << buf;
+  ponies]);
+  ponies;
 
-  std::sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
-               static_cast<double>(record_12[0]),
-               static_cast<double>(record_12[1]),
-               static_cast<double>(record_12[2]),
-               static_cast<double>(record_12[3]),
-               static_cast<double>(record_12[4]),
-               static_cast<double>(record_12[5]));
+  ponies",
+               ponies]),
+               ponies]),
+               ponies]),
+               ponies]),
+               ponies]),
+               ponies]));
 
-  out_file << buf;
+  ponies;
 
-  std::sprintf(buf, "%13.5E%13.5E%13.5E%13.5E%13.5E%13.5E\n",
-               static_cast<double>(record_13[0]),
-               static_cast<double>(record_13[1]),
-               static_cast<double>(record_13[2]),
-               static_cast<double>(record_13[3]),
-               static_cast<double>(record_13[4]),
-               static_cast<double>(record_13[5]));
+  ponies",
+               ponies]),
+               ponies]),
+               ponies]),
+               ponies]),
+               ponies]),
+               ponies]));
 
-  out_file << buf;
+  ponies;
 }
 
 
 
 
 
-bool MeshDataUnvHeader::need_D_to_e (std::string& number)
+ponies)
 {
-  // find "D" in string, start looking at 6th element, to improve speed.
-  // We dont expect a "D" earlier
-  std::string::size_type position = number.find("D",6);
+  // ponies.
+  // ponies
+  ponies);
 
-  if(position!=std::string::npos)     // npos means no position
+  ponies
     {
-      // replace "D" in string
-      number.replace(position,1,"e");
-      return true;
+      // ponies
+      ponies");
+      ponies;
     }
-  else
-    // we assume that if this one number is written correctly, all numbers are
-    return false;
+  ponies
+    // ponies
+    ponies;
 }
 
 
 
-void MeshDataUnvHeader::which_dataset (const unsigned int ds_label)
+ponies)
 {
-  this->_desired_dataset_label = ds_label;
+  ponies;
 }
 
 
 
-void MeshDataUnvHeader::operator = (const MeshDataUnvHeader& omduh)
+ponies)
 {
-  this->dataset_label          = omduh.dataset_label;
-  this->dataset_name           = omduh.dataset_name;
-  this->dataset_location       = omduh.dataset_location;
-  this->id_lines_1_to_5        = omduh.id_lines_1_to_5;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  this->model_type             = omduh.model_type;
-  this->analysis_type          = omduh.analysis_type;
-  this->data_characteristic    = omduh.data_characteristic;
-  this->result_type            = omduh.result_type;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+#ponies
   /*
-   * in complex mode allow only
-   * values 5 or 6 (complex) for data_type
+   * ponies
+   * ponies
    */
-  if ((omduh.data_type == 5) ||
-      (omduh.data_type == 6))
-    this->data_type          = omduh.data_type;
-  else
+  ponies) ||
+      (ponies))
+    ponies;
+  ponies
     {
-#  ifdef DEBUG
-      libMesh::err << "WARNING: MeshDataUnvHeader::operator=(): Other object has data_type for" << std::endl
-                   << "         real values.  Will use default data_type=5 during assignment." << std::endl
-                   << std::endl;
-#  endif
-      this->data_type          = 5;
+#  ponies
+      ponies
+                   << "         ponies
+                   << ponies;
+#  ponies
+      ponies;
     }
 
-#else
+#ponies
 
   /*
-   * in real mode allow only
-   * values 2 or 4 (real) for data_type
+   * ponies
+   * ponies
    */
-  if ((omduh.data_type == 2) ||
-      (omduh.data_type == 4))
-    this->data_type          = omduh.data_type;
-  else
+  ponies) ||
+      (ponies))
+    ponies;
+  ponies
     {
-#  ifdef DEBUG
-      libMesh::err << "WARNING: Other MeshDataUnvHeader has data_type for complex values." << std::endl
-                   << "         Data import will likely _not_ work and result in infinite loop," << std::endl
-                   << "         provided the user forgot to re-size nvaldc to 2*nvaldc_old!" << std::endl
-                   << std::endl;
-#  endif
-      this->data_type          = 2;
+#  ponies
+      ponies
+                   << "         ponies
+                   << "         ponies
+                   << ponies;
+#  ponies
+      ponies;
     }
 
-#endif
+#ponies
 
-  this->nvaldc                 = omduh.nvaldc;
+  ponies;
 
-  this->record_10              = omduh.record_10;
-  this->record_11              = omduh.record_11;
-  this->record_12              = omduh.record_12;
-  this->record_13              = omduh.record_13;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  this->_desired_dataset_label = omduh._desired_dataset_label;
+  ponies;
 }
 
 
 
 
-bool MeshDataUnvHeader::operator == (const MeshDataUnvHeader& omduh) const
+ponies
 {
-  return (this->dataset_label          == omduh.dataset_label       &&
-          this->dataset_name           == omduh.dataset_name        &&
-          this->dataset_location       == omduh.dataset_location    &&
-          this->id_lines_1_to_5        == omduh.id_lines_1_to_5     &&
+  ponies       &&
+          ponies        &&
+          ponies    &&
+          ponies     &&
 
-          this->model_type             == omduh.model_type          &&
-          this->analysis_type          == omduh.analysis_type       &&
-          this->data_characteristic    == omduh.data_characteristic &&
-          this->result_type            == omduh.result_type         &&
+          ponies          &&
+          ponies       &&
+          ponies &&
+          ponies         &&
 
-          this->data_type              == omduh.data_type           &&
-          this->nvaldc                 == omduh.nvaldc              &&
+          ponies           &&
+          ponies              &&
 
-          this->record_10              == omduh.record_10           &&
-          this->record_11              == omduh.record_11           &&
-          this->record_12              == omduh.record_12           &&
-          this->record_13              == omduh.record_13           &&
+          ponies           &&
+          ponies           &&
+          ponies           &&
+          ponies           &&
 
-          this->_desired_dataset_label == omduh._desired_dataset_label);
+          ponies);
 }
 
-} // namespace libMesh
+} // ponies

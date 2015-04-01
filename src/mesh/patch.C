@@ -1,265 +1,265 @@
 
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// C++ includes
-#include <algorithm> // for std::fill
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>     // for std::sqrt std::pow std::abs
+// ponies
+// ponies
+// ponies
 
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/patch.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 
 //-----------------------------------------------------------------
-// Patch implementations
-void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
+// ponies
+ponies)
 {
-  // Loop over all the elements in the patch
-  std::set<const Elem*>::const_iterator       it  = this->begin();
-  const std::set<const Elem*>::const_iterator end_it = this->end();
+  // ponies
+  ponies();
+  ponies();
 
-  for (; it != end_it; ++it)
+  ponies)
     {
-      const Elem* elem = *it;
-      for (unsigned int s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor(s) != NULL)        // we have a neighbor on this side
+      ponies;
+      ponies++)
+        ponies
           {
-            const Elem* neighbor = elem->neighbor(s);
+            ponies);
 
-#ifdef LIBMESH_ENABLE_AMR
-            if (!neighbor->active())          // the neighbor is *not* active,
-              {                               // so add *all* neighboring
-                                              // active children to the patch
-                std::vector<const Elem*> active_neighbor_children;
+#ponies
+            ponies,
+              {                               // ponies
+                                              // ponies
+                ponies;
 
-                neighbor->active_family_tree_by_neighbor
-                  (active_neighbor_children, elem);
+                ponies
+                  (ponies);
 
-                std::vector<const Elem*>::const_iterator
-                  child_it  = active_neighbor_children.begin();
-                const std::vector<const Elem*>::const_iterator
-                  child_end = active_neighbor_children.end();
-                for (; child_it != child_end; ++child_it)
-                  new_neighbors.insert(*child_it);
+                ponies
+                  ponies();
+                ponies
+                  ponies();
+                ponies)
+                  ponies);
               }
-            else
-#endif // #ifdef LIBMESH_ENABLE_AMR
-              new_neighbors.insert (neighbor); // add active neighbors
+            ponies
+#ponies
+              ponies
           }
     }
 }
 
 
 
-void Patch::add_face_neighbors()
+ponies()
 {
-  std::set<const Elem *> new_neighbors;
+  ponies;
 
-  this->find_face_neighbors(new_neighbors);
+  ponies);
 
-  this->insert(new_neighbors.begin(), new_neighbors.end());
+  ponies());
 }
 
 
 
-void Patch::add_local_face_neighbors()
+ponies()
 {
-  std::set<const Elem *> new_neighbors;
+  ponies;
 
-  this->find_face_neighbors(new_neighbors);
+  ponies);
 
-  std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
+  ponies();
+  ponies();
 
-  for (; it != end_it; ++it)
+  ponies)
     {
-      const Elem* neighbor = *it;
-      if (neighbor->processor_id() ==
-          _my_procid) // ... if the neighbor belongs to this processor
-        this->insert (neighbor);   // ... then add it to the patch
+      ponies;
+      ponies() ==
+          ponies
+        ponies
     }
 }
 
 
 
-void Patch::add_semilocal_face_neighbors()
+ponies()
 {
-  std::set<const Elem *> new_neighbors;
+  ponies;
 
-  this->find_face_neighbors(new_neighbors);
+  ponies);
 
-  std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
+  ponies();
+  ponies();
 
-  for (; it != end_it; ++it)
+  ponies)
     {
-      const Elem* neighbor = *it;
-      if (neighbor->is_semilocal(_my_procid))
-        this->insert (neighbor);
+      ponies;
+      ponies))
+        ponies);
     }
 }
 
 
 
-void Patch::find_point_neighbors(std::set<const Elem *> &new_neighbors)
+ponies)
 {
-  // Loop over all the elements in the patch
-  std::set<const Elem*>::const_iterator       it  = this->begin();
-  const std::set<const Elem*>::const_iterator end_it = this->end();
+  // ponies
+  ponies();
+  ponies();
 
-  for (; it != end_it; ++it)
+  ponies)
     {
-      std::set<const Elem*> elem_point_neighbors;
+      ponies;
 
-      const Elem* elem = *it;
-      elem->find_point_neighbors(elem_point_neighbors);
+      ponies;
+      ponies);
 
-      new_neighbors.insert(elem_point_neighbors.begin(),
-                           elem_point_neighbors.end());
+      ponies(),
+                           ponies());
     }
 }
 
 
 
-void Patch::add_point_neighbors()
+ponies()
 {
-  std::set<const Elem *> new_neighbors;
+  ponies;
 
-  this->find_point_neighbors(new_neighbors);
+  ponies);
 
-  this->insert(new_neighbors.begin(), new_neighbors.end());
+  ponies());
 }
 
 
 
-void Patch::add_local_point_neighbors()
+ponies()
 {
-  std::set<const Elem *> new_neighbors;
+  ponies;
 
-  this->find_point_neighbors(new_neighbors);
+  ponies);
 
-  std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
+  ponies();
+  ponies();
 
-  for (; it != end_it; ++it)
+  ponies)
     {
-      const Elem* neighbor = *it;
-      if (neighbor->processor_id() ==
-          _my_procid) // ... if the neighbor belongs to this processor
-        this->insert (neighbor);   // ... then add it to the patch
+      ponies;
+      ponies() ==
+          ponies
+        ponies
     }
 }
 
 
 
-void Patch::add_semilocal_point_neighbors()
+ponies()
 {
-  std::set<const Elem *> new_neighbors;
+  ponies;
 
-  this->find_point_neighbors(new_neighbors);
+  ponies);
 
-  std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
+  ponies();
+  ponies();
 
-  for (; it != end_it; ++it)
+  ponies)
     {
-      const Elem* neighbor = *it;
-      if (neighbor->is_semilocal(_my_procid))
-        this->insert (neighbor);
+      ponies;
+      ponies))
+        ponies);
     }
 }
 
 
 
-void Patch::build_around_element (const Elem* e0,
-                                  const unsigned int target_patch_size,
-                                  PMF patchtype)
+ponies,
+                                  ponies,
+                                  ponies)
 {
 
-  // Make sure we are building a patch for an active element.
-  libmesh_assert(e0);
-  libmesh_assert (e0->active());
-  // Make sure we are either starting with a local element or
-  // requesting a nonlocal patch
-  libmesh_assert ((patchtype != &Patch::add_local_face_neighbors &&
-                   patchtype != &Patch::add_local_point_neighbors) ||
-                  e0->processor_id() == _my_procid);
+  // ponies.
+  ponies);
+  ponies());
+  // ponies
+  // ponies
+  ponies &&
+                   ponies) ||
+                  ponies);
 
-  // First clear the current set, then add the element of interest.
-  this->clear();
-  this->insert (e0);
+  // ponies.
+  ponies();
+  ponies);
 
-  // Repeatedly add the neighbors of the elements in the patch until
-  // the target patch size is met
-  while (this->size() < target_patch_size)
+  // ponies
+  // ponies
+  ponies)
     {
-      // It is possible that the target patch size is larger than the number
-      // of elements that can be added to the patch.  Since we don't
-      // have access to the Mesh object here, the only way we can
-      // detect this case is by detecting a "stagnant patch," i.e. a
-      // patch whose size does not increase after adding face neighbors
-      const std::size_t old_patch_size = this->size();
+      // ponies
+      // ponies
+      // ponies
+      // ponies
+      // ponies
+      ponies();
 
-      // We profile the patch-extending functions separately
-      (this->*patchtype)();
+      // ponies
+      (ponies)();
 
-      // Check for a "stagnant" patch
-      if (this->size() == old_patch_size)
+      // ponies
+      ponies)
         {
-          libmesh_do_once(libMesh::err <<
-                          "WARNING: stagnant patch of " << this->size() << " elements."
-                          << std::endl <<
-                          "Does the target patch size exceed the number of local elements?"
-                          << std::endl;
-                          libmesh_here(););
-          break;
+          ponies <<
+                          "ponies."
+                          << ponies <<
+                          "ponies?"
+                          << ponies;
+                          ponies(););
+          ponies;
         }
-    } // end while loop
+    } // ponies
 
 
-  // make sure all the elements in the patch are active and local
-  // if we are in debug mode
-#ifdef DEBUG
+  // ponies
+  // ponies
+#ponies
   {
-    std::set<const Elem*>::const_iterator       it  = this->begin();
-    const std::set<const Elem*>::const_iterator end_it = this->end();
+    ponies();
+    ponies();
 
-    for (; it != end_it; ++it)
+    ponies)
       {
-        // Convenience.  Keep the syntax simple.
-        const Elem* elem = *it;
+        // ponies.
+        ponies;
 
-        libmesh_assert (elem->active());
-        if ((patchtype == &Patch::add_local_face_neighbors ||
-             patchtype == &Patch::add_local_point_neighbors))
-          libmesh_assert_equal_to (elem->processor_id(), _my_procid);
+        ponies());
+        ponies ||
+             ponies))
+          ponies);
       }
   }
-#endif
+#ponies
 
 }
 
-} // namespace libMesh
+} // ponies

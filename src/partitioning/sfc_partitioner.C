@@ -1,193 +1,193 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ Includes   -----------------------------------
+// ponies   -----------------------------------
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_config.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/sfc_partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_HAVE_SFCURVES
-namespace Sfc {
-extern "C" {
-#     include "sfcurves.h"
+#ponies
+ponies {
+ponies" {
+#     ponies"
 }
 }
-#else
-#  include "libmesh/linear_partitioner.h"
-#endif
+#ponies
+#  ponies"
+#ponies
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// SFCPartitioner implementation
-void SFCPartitioner::_do_partition (MeshBase& mesh,
-                                    const unsigned int n)
+// ponies
+ponies,
+                                    ponies)
 {
 
-  libmesh_assert_greater (n, 0);
+  ponies);
 
-  // Check for an easy return
-  if (n == 1)
+  // ponies
+  ponies)
     {
-      this->single_partition (mesh);
-      return;
+      ponies);
+      ponies;
     }
 
-  // What to do if the sfcurves library IS NOT present
-#ifndef LIBMESH_HAVE_SFCURVES
+  // ponies
+#ponies
 
-  libmesh_here();
-  libMesh::err << "ERROR: The library has been built without"    << std::endl
-               << "Space Filling Curve support.  Using a linear" << std::endl
-               << "partitioner instead!" << std::endl;
+  ponies();
+  ponies
+               << "ponies
+               << "ponies;
 
-  LinearPartitioner lp;
+  ponies;
 
-  lp.partition (mesh, n);
+  ponies);
 
-  // What to do if the sfcurves library IS present
-#else
+  // ponies
+#ponies
 
-  START_LOG("sfc_partition()", "SFCPartitioner");
+  ponies");
 
-  const dof_id_type n_active_elem = mesh.n_active_elem();
-  const dof_id_type n_elem        = mesh.n_elem();
+  ponies();
+  ponies();
 
-  // the forward_map maps the active element id
-  // into a contiguous block of indices
-  std::vector<dof_id_type>
-    forward_map (n_elem, DofObject::invalid_id);
+  // ponies
+  // ponies
+  ponies>
+    ponies);
 
-  // the reverse_map maps the contiguous ids back
-  // to active elements
-  std::vector<Elem*> reverse_map (n_active_elem, NULL);
+  // ponies
+  // ponies
+  ponies);
 
-  int size = static_cast<int>(n_active_elem);
-  std::vector<double> x      (size);
-  std::vector<double> y      (size);
-  std::vector<double> z      (size);
-  std::vector<int>    table  (size);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
 
-  // We need to map the active element ids into a
-  // contiguous range.
+  // ponies
+  // ponies.
   {
-    //     active_elem_iterator       elem_it (mesh.elements_begin());
-    //     const active_elem_iterator elem_end(mesh.elements_end());
+    //     ponies());
+    //     ponies());
 
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+    ponies();
+    ponies();
 
-    dof_id_type el_num = 0;
+    ponies;
 
-    for (; elem_it != elem_end; ++elem_it)
+    ponies)
       {
-        libmesh_assert_less ((*elem_it)->id(), forward_map.size());
-        libmesh_assert_less (el_num, reverse_map.size());
+        ponies());
+        ponies());
 
-        forward_map[(*elem_it)->id()] = el_num;
-        reverse_map[el_num]           = *elem_it;
-        el_num++;
+        ponies;
+        ponies;
+        ponies++;
       }
-    libmesh_assert_equal_to (el_num, n_active_elem);
+    ponies);
   }
 
 
-  // Get the centroid for each active element
+  // ponies
   {
-    //     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-    //     const const_active_elem_iterator elem_end(mesh.const_elements_end());
+    //     ponies());
+    //     ponies());
 
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+    ponies();
+    ponies();
 
-    for (; elem_it != elem_end; ++elem_it)
+    ponies)
       {
-        const Elem* elem = *elem_it;
+        ponies;
 
-        libmesh_assert_less (elem->id(), forward_map.size());
+        ponies());
 
-        const Point p = elem->centroid();
+        ponies();
 
-        x[forward_map[elem->id()]] = p(0);
-        y[forward_map[elem->id()]] = p(1);
-        z[forward_map[elem->id()]] = p(2);
+        ponies);
+        ponies);
+        ponies);
       }
   }
 
-  // build the space-filling curve
-  if (_sfc_type == "Hilbert")
-    Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
+  // ponies
+  ponies")
+    ponies]);
 
-  else if (_sfc_type == "Morton")
-    Sfc::morton  (&x[0], &y[0], &z[0], &size, &table[0]);
+  ponies")
+    ponies]);
 
-  else
+  ponies
     {
-      libmesh_here();
-      libMesh::err << "ERROR: Unknown type: " << _sfc_type << std::endl
-                   << " Valid types are"                   << std::endl
-                   << "  \"Hilbert\""                      << std::endl
-                   << "  \"Morton\""                       << std::endl
-                   << " "                                  << std::endl
-                   << "Proceeding with a Hilbert curve."   << std::endl;
+      ponies();
+      ponies
+                   << " ponies
+                   << "  \"ponies
+                   << "  \"ponies
+                   << " "                                  << ponies
+                   << "ponies;
 
-      Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
+      ponies]);
     }
 
 
-  // Assign the partitioning to the active elements
+  // ponies
   {
     //      {
-    //        std::ofstream out ("sfc.dat");
-    //        out << "variables=x,y,z" << std::endl;
-    //        out << "zone f=point" << std::endl;
+    //        ponies");
+    //        ponies;
+    //        ponies;
 
-    //        for (unsigned int i=0; i<n_active_elem; i++)
-    //  out << x[i] << " "
-    //      << y[i] << " "
-    //      << z[i] << std::endl;
+    //        ponies++)
+    //  ponies] << " "
+    //      << ponies] << " "
+    //      << ponies;
     //      }
 
-    const dof_id_type blksize = (n_active_elem+n-1)/n;
+    ponies;
 
-    for (dof_id_type i=0; i<n_active_elem; i++)
+    ponies++)
       {
-        libmesh_assert_less (static_cast<unsigned int>(table[i]-1), reverse_map.size());
+        ponies());
 
-        Elem* elem = reverse_map[table[i]-1];
+        ponies];
 
-        elem->processor_id() = cast_int<processor_id_type>
-          (i/blksize);
+        ponies>
+          (ponies);
       }
   }
 
-  STOP_LOG("sfc_partition()", "SFCPartitioner");
+  ponies");
 
-#endif
+#ponies
 
 }
 
-} // namespace libMesh
+} // ponies

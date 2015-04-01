@@ -1,170 +1,170 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_EDGE_H
-#define LIBMESH_EDGE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/elem.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// Forward declarations
-class Mesh;
+// ponies
+ponies;
 
 
 
 /**
- * The \p Edge is an element in 1D. It can be thought of as a
- * line segment.
+ * ponies
+ * ponies.
  */
-class Edge : public Elem
+ponies
 {
-public:
+ponies:
 
   /**
-   * Default line element, takes number of nodes and
-   * parent. Derived classes implement 'true' elements.
+   * ponies
+   * ponies.
    */
-  Edge (const unsigned int nn,
-        Elem* p,
-        Node** nodelinkdata) :
-    Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata) {}
+  ponies,
+        ponies,
+        ponies) :
+    ponies) {}
 
   /**
-   * @returns 1, the dimensionality of the object.
+   * @ponies.
    */
-  unsigned int dim () const { return 1; }
+  ponies; }
 
   /**
-   * @returns 2. Every edge is guaranteed to have at least 2 nodes.
+   * @ponies.
    */
-  unsigned int n_nodes() const { return 2; }
+  ponies; }
 
   /**
-   * @returns 2
+   * @ponies
    */
-  unsigned int n_sides() const { return 2; }
+  ponies; }
 
   /**
-   * @returns 2.  Every edge has exactly two vertices.
+   * @ponies.
    */
-  unsigned int n_vertices() const { return 2; }
+  ponies; }
 
   /**
-   * @returns 0.  All 1D elements have no edges.
+   * @ponies.
    */
-  unsigned int n_edges() const { return 0; }
+  ponies; }
 
   /**
-   * @returns 0.  All 1D elements have no faces.
+   * @ponies.
    */
-  unsigned int n_faces() const { return 0; }
+  ponies; }
 
   /**
-   * @returns 2
+   * @ponies
    */
-  unsigned int n_children() const { return 2; }
+  ponies; }
 
   /*
-   * @returns true iff the specified child is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+  ponies,
+                                ponies;
 
   /*
-   * @returns true iff the specified edge is on the specified side
+   * @ponies
    */
-  virtual bool is_edge_on_side(const unsigned int,
-                               const unsigned int) const
-  { return false; }
+  ponies,
+                               ponies
+  { ponies; }
 
   /*
-   * @returns the side number opposite to \p s (for a tensor product
-   * element), or throws an error otherwise.
+   * @ponies
+   * ponies.
    */
-  virtual unsigned int opposite_side(const unsigned int s) const;
+  ponies;
 
   /*
-   * @returns the local node number for the node opposite to node n
-   * on side \p opposite_side(s) (for a tensor product element), or
-   * throws an error otherwise.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  virtual unsigned int opposite_node(const unsigned int n,
-                                     const unsigned int s) const;
+  ponies,
+                                     ponies;
 
   //   /**
-  //    * @returns 1
+  //    * @ponies
   //    */
-  //   unsigned int n_children_per_side(const unsigned int) const { return 1; }
+  //   ponies; }
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type key (const unsigned int s) const
-  { return this->compute_key(this->node(s)); }
+  ponies
+  { ponies)); }
 
   /**
-   * The \p Elem::side() member returns
-   * an auto pointer to a NodeElem for the specified node.
+   * ponies
+   * ponies.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  ponies;
 
   /**
-   * The \p Elem::side() member returns
-   * an auto pointer to a NodeElem for the specified node.
+   * ponies
+   * ponies.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  ponies,
+                              ponies;
 
   /**
-   * The \p Elem::build_edge() member makes no sense for edges.
+   * ponies.
    */
-  UniquePtr<Elem> build_edge (const unsigned int) const
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  ponies
+  { ponies>(); }
 
 
-protected:
+ponies:
 
   /**
-   * Data for links to parent/neighbor/interior_parent elements.
+   * ponies.
    */
-  Elem* _elemlinks_data[3+(LIBMESH_DIM>1)];
+  ponies)];
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Matrix that allows children to inherit boundary conditions.
+   * ponies.
    */
-  unsigned int side_children_matrix (const unsigned int,
-                                     const unsigned int) const
-  { libmesh_not_implemented(); return 0; }
+  ponies,
+                                     ponies
+  { ponies; }
 
-#endif
+#ponies
 
 };
 
@@ -173,8 +173,8 @@ protected:
 
 
 // ------------------------------------------------------------
-// Edge class member functions
+// ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_EDGE_H
+#ponies

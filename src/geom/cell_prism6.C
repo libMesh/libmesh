@@ -1,448 +1,448 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/side.h"
-#include "libmesh/cell_prism6.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/face_quad4.h"
-#include "libmesh/face_tri3.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// Prism6 class static member initializations
-const unsigned int Prism6::side_nodes_map[5][4] =
+// ponies
+ponies] =
   {
-    {0, 2, 1, 99}, // Side 0
-    {0, 1, 4,  3}, // Side 1
-    {1, 2, 5,  4}, // Side 2
-    {2, 0, 3,  5}, // Side 3
-    {3, 4, 5, 99}  // Side 4
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
   };
 
-const unsigned int Prism6::side_elems_map[5][4] =
+ponies] =
   {
-    {0, 1, 2, 3}, // Side 0
-    {0, 1, 4, 5}, // Side 1
-    {1, 2, 5, 6}, // Side 2
-    {0, 2, 4, 6}, // Side 3
-    {4, 5, 6, 7}  // Side 4
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
   };
 
-const unsigned int Prism6::edge_nodes_map[9][2] =
+ponies] =
   {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {0, 2}, // Side 2
-    {0, 3}, // Side 3
-    {1, 4}, // Side 4
-    {2, 5}, // Side 5
-    {3, 4}, // Side 6
-    {4, 5}, // Side 7
-    {3, 5}  // Side 8
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
   };
 
 
 // ------------------------------------------------------------
-// Prism6 class member functions
+// ponies
 
-bool Prism6::is_vertex(const unsigned int) const
+ponies
 {
-  return true;
+  ponies;
 }
 
-bool Prism6::is_edge(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Prism6::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Prism6::is_node_on_side(const unsigned int n,
-                             const unsigned int s) const
+ponies,
+                             ponies
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
-bool Prism6::is_node_on_edge(const unsigned int n,
-                             const unsigned int e) const
+ponies,
+                             ponies
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
-}
-
-
-
-bool Prism6::has_affine_map() const
-{
-  // Make sure z edges are affine
-  Point v = this->point(3) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(4) - this->point(1)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(2)))
-    return false;
-  return true;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
 
 
-UniquePtr<Elem> Prism6::build_side (const unsigned int i,
-                                    bool proxy) const
+ponies
 {
-  libmesh_assert_less (i, this->n_sides());
+  // ponies
+  ponies);
+  ponies)) ||
+      !ponies)))
+    ponies;
+  ponies;
+}
 
-  if (proxy)
+
+
+ponies,
+                                    ponies
+{
+  ponies());
+
+  ponies)
     {
-      switch(i)
+      ponies)
         {
-        case 0:
-        case 4:
-          return UniquePtr<Elem>(new Side<Tri3,Prism6>(this,i));
+        ponies:
+        ponies:
+          ponies));
 
-        case 1:
-        case 2:
-        case 3:
-          return UniquePtr<Elem>(new Side<Quad4,Prism6>(this,i));
+        ponies:
+        ponies:
+        ponies:
+          ponies));
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
     }
 
-  else
+  ponies
     {
-      // Create NULL pointer to be initialized, returned later.
-      Elem* face = NULL;
+      // ponies.
+      ponies;
 
-      switch (i)
+      ponies)
         {
-        case 0:  // the triangular face at z=-1
+        ponies
           {
-            face = new Tri3;
+            ponies;
 
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(1);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 1:  // the quad face at y=0
+        ponies
           {
-            face = new Quad4;
+            ponies;
 
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(3);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 2:  // the other quad face
+        ponies
           {
-            face = new Quad4;
+            ponies;
 
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(5);
-            face->set_node(3) = this->get_node(4);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 3: // the quad face at x=0
+        ponies
           {
-            face = new Quad4;
+            ponies;
 
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(3);
-            face->set_node(3) = this->get_node(5);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 4: // the triangular face at z=1
+        ponies
           {
-            face = new Tri3;
+            ponies;
 
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(4);
-            face->set_node(2) = this->get_node(5);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-      return UniquePtr<Elem>(face);
+      ponies();
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  ponies!");
+  ponies>();
 }
 
 
 
-UniquePtr<Elem> Prism6::build_edge (const unsigned int i) const
+ponies
 {
-  libmesh_assert_less (i, this->n_edges());
+  ponies());
 
-  return UniquePtr<Elem>(new SideEdge<Edge2,Prism6>(this,i));
+  ponies));
 }
 
 
 
-void Prism6::connectivity(const unsigned int libmesh_dbg_var(sc),
-                          const IOPackage iop,
-                          std::vector<dof_id_type>& conn) const
+ponies),
+                          ponies,
+                          ponies
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies);
+  ponies());
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        conn.resize(8);
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(2)+1;
-        conn[4] = this->node(3)+1;
-        conn[5] = this->node(4)+1;
-        conn[6] = this->node(5)+1;
-        conn[7] = this->node(5)+1;
-        return;
+        ponies);
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
       }
 
-    case VTK:
+    ponies:
       {
-        conn.resize(6);
-        conn[0] = this->node(0);
-        conn[1] = this->node(2);
-        conn[2] = this->node(1);
-        conn[3] = this->node(3);
-        conn[4] = this->node(5);
-        conn[5] = this->node(4);
-        return;
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-const float Prism6::_embedding_matrix[8][6][6] =
+ponies] =
   {
-    // embedding matrix for child 0
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.5,  0.0,  0.5,  0.0,  0.0,  0.0}, // 2
-      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0}, // 3
-      { .25,  .25,  0.0,  .25,  .25,  0.0}, // 4
-      { .25,  0.0,  .25,  .25,  0.0,  .25}  // 5
+      //  ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { .ponies
+      { .ponies
     },
 
-    // embedding matrix for child 1
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.0,  1.0,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, // 2
-      { .25,  .25,  0.0,  .25,  .25,  0.0}, // 3
-      { 0.0,  0.5,  0.0,  0.0,  0.5,  0.0}, // 4
-      { 0.0,  .25,  .25,  0.0,  .25,  .25}  // 5
+      //  ponies
+      { ponies
+      { ponies
+      { ponies
+      { .ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 2
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { 0.5,  0.0,  0.5,  0.0,  0.0,  0.0}, // 0
-      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.0,  1.0,  0.0,  0.0,  0.0}, // 2
-      { .25,  0.0,  .25,  .25,  0.0,  .25}, // 3
-      { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 4
-      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.5}  // 5
+      //  ponies
+      { ponies
+      { ponies
+      { ponies
+      { .ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 3
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0}, // 1
-      { 0.5,  0.0,  0.5,  0.0,  0.0,  0.0}, // 2
-      { .25,  .25,  0.0,  .25,  .25,  0.0}, // 3
-      { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 4
-      { .25,  0.0,  .25,  .25,  0.0,  .25}  // 5
+      //  ponies
+      { ponies
+      { ponies
+      { ponies
+      { .ponies
+      { ponies
+      { .ponies
     },
 
-    // embedding matrix for child 4
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0}, // 0
-      { .25,  .25,  0.0,  .25,  .25,  0.0}, // 1
-      { .25,  0.0,  .25,  .25,  0.0,  .25}, // 2
-      { 0.0,  0.0,  0.0,  1.0,  0.0,  0.0}, // 3
-      { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 4
-      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.5}  // 5
+      //  ponies
+      { ponies
+      { .ponies
+      { .ponies
+      { ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 5
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { .25,  .25,  0.0,  .25,  .25,  0.0}, // 0
-      { 0.0,  0.5,  0.0,  0.0,  0.5,  0.0}, // 1
-      { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 2
-      { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  1.0,  0.0}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5}  // 5
+      //  ponies
+      { .ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 6
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { .25,  0.0,  .25,  .25,  0.0,  .25}, // 0
-      { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 1
-      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.5}, // 2
-      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.5}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  1.0}  // 5
+      //  ponies
+      { .ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 7
+    // ponies
     {
-      //  0     1     2     3     4     5
-      { .25,  .25,  0.0,  .25,  .25,  0.0}, // 0
-      { 0.0,  .25,  .25,  0.0,  .25,  .25}, // 1
-      { .25,  0.0,  .25,  .25,  0.0,  .25}, // 2
-      { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 4
-      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.5}  // 5
+      //  ponies
+      { .ponies
+      { ponies
+      { .ponies
+      { ponies
+      { ponies
+      { ponies
     }
   };
 
-#endif
+#ponies
 
 
 
-Real Prism6::volume () const
+ponies
 {
-  // The volume of the prism is computed by splitting
-  // it into 2 tetrahedra and 3 pyramids with bilinear bases.
-  // Then the volume formulae for the tetrahedron and pyramid
-  // are applied and summed to obtain the prism's volume.
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
 
-  static const unsigned char sub_pyr[3][4] =
+  ponies] =
     {
-      {0, 1, 4, 3},
-      {1, 2, 5, 4},
-      {0, 3, 5, 2}
+      {ponies},
+      {ponies},
+      {ponies}
     };
 
-  static const unsigned char sub_tet[2][3] =
+  ponies] =
     {
-      {0, 1, 2},
-      {5, 4, 3}
+      {ponies},
+      {ponies}
     };
 
-  // The centroid is a convenient point to use
-  // for the apex of all the pyramids.
-  const Point R = this->centroid();
+  // ponies
+  // ponies.
+  ponies();
 
-  // temporary storage for Nodes which form the base of the
-  // subelements
-  Node* base[4];
+  // ponies
+  // ponies
+  ponies];
 
-  // volume accumulation variable
-  Real vol=0.;
+  // ponies
+  ponies.;
 
-  // Add up the sub-pyramid volumes
-  for (unsigned int n=0; n<3; ++n)
+  // ponies
+  ponies)
     {
-      // Set the nodes of the pyramid base
-      for (unsigned int i=0; i<4; ++i)
-        base[i] = this->_nodes[sub_pyr[n][i]];
+      // ponies
+      ponies)
+        ponies]];
 
-      // Compute diff vectors
-      Point a ( *base[0] - R );
-      Point b ( *base[1] - *base[3] );
-      Point c ( *base[2] - *base[0] );
-      Point d ( *base[3] - *base[0] );
-      Point e ( *base[1] - *base[0] );
+      // ponies
+      ponies );
+      ponies] );
+      ponies] );
+      ponies] );
+      ponies] );
 
-      // Compute pyramid volume
-      Real sub_vol = (1./6.)*(a*(b.cross(c))) + (1./12.)*(c*(d.cross(e)));
+      // ponies
+      ponies)));
 
-      libmesh_assert (sub_vol>0.);
+      ponies.);
 
-      vol += sub_vol;
+      ponies;
     }
 
 
-  // Add up the sub-tet volumes
-  for (unsigned int n=0; n<2; ++n)
+  // ponies
+  ponies)
     {
-      // Set the nodes of the pyramid base
-      for (unsigned int i=0; i<3; ++i)
-        base[i] = this->_nodes[sub_tet[n][i]];
+      // ponies
+      ponies)
+        ponies]];
 
-      // The volume of a tetrahedron is 1/6 the box product formed
-      // by its base and apex vectors
-      Point a ( R - *base[0] );
+      // ponies
+      // ponies
+      ponies] );
 
-      // b is the vector pointing from 0 to 1
-      Point b ( *base[1] - *base[0] );
+      // ponies
+      ponies] );
 
-      // c is the vector pointing from 0 to 2
-      Point c ( *base[2] - *base[0] );
+      // ponies
+      ponies] );
 
-      Real sub_vol =  (1.0 / 6.0) * (a * (b.cross(c)));
+      ponies)));
 
-      libmesh_assert (sub_vol>0.);
+      ponies.);
 
-      vol += sub_vol;
+      ponies;
     }
 
 
-  // Done with all sub-volumes, so return
-  return vol;
+  // ponies
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

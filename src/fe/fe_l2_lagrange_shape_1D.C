@@ -1,326 +1,326 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
-template <>
-Real FE<1,L2_LAGRANGE>::shape(const ElemType,
-                              const Order order,
-                              const unsigned int i,
-                              const Point& p)
+ponies <>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-  const Real xi = p(0);
+  ponies);
 
 
-  switch (order)
+  ponies)
     {
-      // Lagrange linears
-    case FIRST:
+      // ponies
+    ponies:
       {
-        libmesh_assert_less (i, 2);
+        ponies);
 
-        switch (i)
+        ponies)
           {
-          case 0:
-            return .5*(1. - xi);
+          ponies:
+            ponies);
 
-          case 1:
-            return .5*(1. + xi);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
       }
 
 
 
-      // Lagrange quadratics
-    case SECOND:
+      // ponies
+    ponies:
       {
-        libmesh_assert_less (i, 3);
+        ponies);
 
-        switch (i)
+        ponies)
           {
-          case 0:
-            return .5*xi*(xi - 1.);
+          ponies:
+            ponies.);
 
-          case 1:
-            return .5*xi*(xi + 1);
+          ponies:
+            ponies);
 
-          case 2:
-            return (1. - xi*xi);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
       }
 
 
 
-      // Lagrange cubics
-    case THIRD:
+      // ponies
+    ponies:
       {
-        libmesh_assert_less (i, 4);
+        ponies);
 
-        switch (i)
+        ponies)
           {
-          case 0:
-            return 9./16.*(1./9.-xi*xi)*(xi-1.);
+          ponies:
+            ponies.);
 
-          case 1:
-            return -9./16.*(1./9.-xi*xi)*(xi+1.);
+          ponies:
+            ponies.);
 
-          case 2:
-            return 27./16.*(1.-xi*xi)*(1./3.-xi);
+          ponies:
+            ponies);
 
-          case 3:
-            return 27./16.*(1.-xi*xi)*(1./3.+xi);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
       }
 
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,L2_LAGRANGE>::shape(const Elem* elem,
-                              const Order order,
-                              const unsigned int i,
-                              const Point& p)
+ponies <>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  return FE<1,L2_LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  ponies);
 }
 
 
 
-template <>
-Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
-                                    const Order order,
-                                    const unsigned int i,
-                                    const unsigned int libmesh_dbg_var(j),
-                                    const Point& p)
+ponies <>
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies),
+                                    ponies)
 {
-  // only d()/dxi in 1D!
+  // ponies!
 
-  libmesh_assert_equal_to (j, 0);
+  ponies);
 
-  const Real xi = p(0);
+  ponies);
 
 
-  switch (order)
+  ponies)
     {
-      // Lagrange linear shape function derivatives
-    case FIRST:
+      // ponies
+    ponies:
       {
-        libmesh_assert_less (i, 2);
+        ponies);
 
-        switch (i)
+        ponies)
           {
-          case 0:
-            return -.5;
+          ponies:
+            ponies;
 
-          case 1:
-            return .5;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
       }
 
 
-      // Lagrange quadratic shape function derivatives
-    case SECOND:
+      // ponies
+    ponies:
       {
-        libmesh_assert_less (i, 3);
+        ponies);
 
-        switch (i)
+        ponies)
           {
-          case 0:
-            return xi-.5;
+          ponies:
+            ponies;
 
-          case 1:
-            return xi+.5;
+          ponies:
+            ponies;
 
-          case 2:
-            return -2.*xi;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
       }
 
 
-      // Lagrange cubic shape function derivatives
-    case THIRD:
+      // ponies
+    ponies:
       {
-        libmesh_assert_less (i, 4);
+        ponies);
 
-        switch (i)
+        ponies)
           {
-          case 0:
-            return -9./16.*(3.*xi*xi-2.*xi-1./9.);
+          ponies:
+            ponies.);
 
-          case 1:
-            return -9./16.*(-3.*xi*xi-2.*xi+1./9.);
+          ponies:
+            ponies.);
 
-          case 2:
-            return 27./16.*(3.*xi*xi-2./3.*xi-1.);
+          ponies:
+            ponies.);
 
-          case 3:
-            return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
+          ponies:
+            ponies.);
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
       }
 
 
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,L2_LAGRANGE>::shape_deriv(const Elem* elem,
-                                    const Order order,
-                                    const unsigned int i,
-                                    const unsigned int j,
-                                    const Point& p)
+ponies <>
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  return FE<1,L2_LAGRANGE>::shape_deriv(elem->type(),
-                                        static_cast<Order>(order + elem->p_level()), i, j, p);
+  ponies(),
+                                        ponies);
 }
 
 
 
 
-template <>
-Real FE<1,L2_LAGRANGE>::shape_second_deriv(const ElemType,
-                                           const Order order,
-                                           const unsigned int i,
-                                           const unsigned int libmesh_dbg_var(j),
-                                           const Point& p)
+ponies <>
+ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies),
+                                           ponies)
 {
-  // Don't need to switch on j.  1D shape functions
-  // depend on xi only!
+  // ponies
+  // ponies!
 
-  const Real xi = p(0);
-  libmesh_assert_equal_to (j, 0);
+  ponies);
+  ponies);
 
-  switch (order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        // All second derivatives of linears are zero....
-        return 0.;
+        // ponies....
+        ponies.;
       }
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-          case 0:
-            return 1.;
+          ponies:
+            ponies.;
 
-          case 1:
-            return 1.;
+          ponies:
+            ponies.;
 
-          case 2:
-            return -2.;
+          ponies:
+            ponies.;
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
-      } // end case SECOND
+      } // ponies
 
-    case THIRD:
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-          case 0:
-            return -9./16.*(6.*xi-2);
+          ponies:
+            ponies);
 
-          case 1:
-            return -9./16.*(-6*xi-2.);
+          ponies:
+            ponies.);
 
-          case 2:
-            return 27./16.*(6*xi-2./3.);
+          ponies:
+            ponies.);
 
-          case 3:
-            return 27./16.*(-6*xi-2./3.);
+          ponies:
+            ponies.);
 
-          default:
-            libmesh_error_msg("Invalid shape function index i = " << i);
+          ponies:
+            ponies);
           }
-      } // end case THIRD
+      } // ponies
 
 
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
-    } // end switch (order)
+    ponies:
+      ponies);
+    } // ponies)
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,L2_LAGRANGE>::shape_second_deriv(const Elem* elem,
-                                           const Order order,
-                                           const unsigned int i,
-                                           const unsigned int j,
-                                           const Point& p)
+ponies <>
+ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  return FE<1,L2_LAGRANGE>::shape_second_deriv(elem->type(),
-                                               static_cast<Order>(order + elem->p_level()), i, j, p);
+  ponies(),
+                                               ponies);
 }
 
-} // namespace libMesh
+} // ponies

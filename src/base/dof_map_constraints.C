@@ -1,3947 +1,3947 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ Includes -------------------------------------
-#include <set>
-#include <algorithm> // for std::count, std::fill
-#include <sstream>
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>
+// ponies -------------------------------------
+#ponies>
+#ponies
+#ponies>
+#ponies
+#ponies>
 
-// Local Includes -----------------------------------
-#include "libmesh/boundary_info.h" // needed for dirichlet constraints
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/dirichlet_boundaries.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/elem.h"
-#include "libmesh/elem_range.h"
-#include "libmesh/fe_base.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_inserter_iterator.h"
-#include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_algebra.h"
-#include "libmesh/parallel_elem.h"
-#include "libmesh/parallel_node.h"
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/periodic_boundary.h"
-#include "libmesh/periodic_boundary_base.h"
-#include "libmesh/point_locator_base.h"
-#include "libmesh/quadrature.h" // for dirichlet constraints
-#include "libmesh/raw_accessor.h"
-#include "libmesh/sparse_matrix.h" // needed to constrain adjoint rhs
-#include "libmesh/system.h" // needed by enforce_constraints_exactly()
-#include "libmesh/threads.h"
-#include "libmesh/tensor_tools.h"
+// ponies -----------------------------------
+#ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies()
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies
+#ponies"
+#ponies
+#ponies()
+#ponies"
+#ponies"
 
 
-// Anonymous namespace to hold helper classes
-namespace {
+// ponies
+ponies {
 
-using namespace libMesh;
+ponies;
 
-class ComputeConstraints
+ponies
 {
-public:
-  ComputeConstraints (DofConstraints &constraints,
-                      DofMap &dof_map,
-#ifdef LIBMESH_ENABLE_PERIODIC
-                      PeriodicBoundaries &periodic_boundaries,
-#endif
-                      const MeshBase &mesh,
-                      const unsigned int variable_number) :
-    _constraints(constraints),
-    _dof_map(dof_map),
-#ifdef LIBMESH_ENABLE_PERIODIC
-    _periodic_boundaries(periodic_boundaries),
-#endif
-    _mesh(mesh),
-    _variable_number(variable_number)
+ponies:
+  ponies,
+                      ponies,
+#ponies
+                      ponies,
+#ponies
+                      ponies,
+                      ponies) :
+    ponies),
+    ponies),
+#ponies
+    ponies),
+#ponies
+    ponies),
+    ponies)
   {}
 
-  void operator()(const ConstElemRange &range) const
+  ponies
   {
-    const Variable &var_description = _dof_map.variable(_variable_number);
+    ponies);
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-    UniquePtr<PointLocatorBase> point_locator;
-    const bool have_periodic_boundaries =
-      !_periodic_boundaries.empty();
-    if (have_periodic_boundaries && !range.empty())
-      point_locator = _mesh.sub_point_locator();
-#endif
+#ponies
+    ponies;
+    ponies =
+      !ponies();
+    ponies())
+      ponies();
+#ponies
 
-    for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
-      if (var_description.active_on_subdomain((*it)->subdomain_id()))
+    ponies)
+      ponies()))
         {
-#ifdef LIBMESH_ENABLE_AMR
-          FEInterface::compute_constraints (_constraints,
-                                            _dof_map,
-                                            _variable_number,
-                                            *it);
-#endif
-#ifdef LIBMESH_ENABLE_PERIODIC
-          // FIXME: periodic constraints won't work on a non-serial
-          // mesh unless it's kept ghost elements from opposing
-          // boundaries!
-          if (have_periodic_boundaries)
-            FEInterface::compute_periodic_constraints (_constraints,
-                                                       _dof_map,
-                                                       _periodic_boundaries,
-                                                       _mesh,
-                                                       point_locator.get(),
-                                                       _variable_number,
-                                                       *it);
-#endif
+#ponies
+          ponies,
+                                            ponies,
+                                            ponies,
+                                            *ponies);
+#ponies
+#ponies
+          // ponies
+          // ponies
+          // ponies!
+          ponies)
+            ponies,
+                                                       ponies,
+                                                       ponies,
+                                                       ponies,
+                                                       ponies(),
+                                                       ponies,
+                                                       *ponies);
+#ponies
         }
   }
 
-private:
-  DofConstraints &_constraints;
-  DofMap &_dof_map;
-#ifdef LIBMESH_ENABLE_PERIODIC
-  PeriodicBoundaries &_periodic_boundaries;
-#endif
-  const MeshBase &_mesh;
-  const unsigned int _variable_number;
+ponies:
+  ponies;
+  ponies;
+#ponies
+  ponies;
+#ponies
+  ponies;
+  ponies;
 };
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-class ComputeNodeConstraints
+#ponies
+ponies
 {
-public:
-  ComputeNodeConstraints (NodeConstraints &node_constraints,
-                          DofMap &dof_map,
-#ifdef LIBMESH_ENABLE_PERIODIC
-                          PeriodicBoundaries &periodic_boundaries,
-#endif
-                          const MeshBase &mesh) :
-    _node_constraints(node_constraints),
-    _dof_map(dof_map),
-#ifdef LIBMESH_ENABLE_PERIODIC
-    _periodic_boundaries(periodic_boundaries),
-#endif
-    _mesh(mesh)
+ponies:
+  ponies,
+                          ponies,
+#ponies
+                          ponies,
+#ponies
+                          ponies) :
+    ponies),
+    ponies),
+#ponies
+    ponies),
+#ponies
+    ponies)
   {}
 
-  void operator()(const ConstElemRange &range) const
+  ponies
   {
-#ifdef LIBMESH_ENABLE_PERIODIC
-    UniquePtr<PointLocatorBase> point_locator;
-    bool have_periodic_boundaries = !_periodic_boundaries.empty();
-    if (have_periodic_boundaries && !range.empty())
-      point_locator = _mesh.sub_point_locator();
-#endif
+#ponies
+    ponies;
+    ponies();
+    ponies())
+      ponies();
+#ponies
 
-    for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+    ponies)
       {
-#ifdef LIBMESH_ENABLE_AMR
-        FEBase::compute_node_constraints (_node_constraints, *it);
-#endif
-#ifdef LIBMESH_ENABLE_PERIODIC
-        // FIXME: periodic constraints won't work on a non-serial
-        // mesh unless it's kept ghost elements from opposing
-        // boundaries!
-        if (have_periodic_boundaries)
-          FEBase::compute_periodic_node_constraints (_node_constraints,
-                                                     _periodic_boundaries,
-                                                     _mesh,
-                                                     point_locator.get(),
-                                                     *it);
-#endif
+#ponies
+        ponies);
+#ponies
+#ponies
+        // ponies
+        // ponies
+        // ponies!
+        ponies)
+          ponies,
+                                                     ponies,
+                                                     ponies,
+                                                     ponies(),
+                                                     *ponies);
+#ponies
       }
   }
 
-private:
-  NodeConstraints &_node_constraints;
-  DofMap &_dof_map;
-#ifdef LIBMESH_ENABLE_PERIODIC
-  PeriodicBoundaries &_periodic_boundaries;
-#endif
-  const MeshBase &_mesh;
+ponies:
+  ponies;
+  ponies;
+#ponies
+  ponies;
+#ponies
+  ponies;
 };
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
 
-#ifdef LIBMESH_ENABLE_DIRICHLET
+#ponies
 
 /**
- * This functor class hierarchy adds a constraint row to a DofMap
+ * ponies
  */
-class AddConstraint
+ponies
 {
-protected:
-  DofMap                  &dof_map;
+ponies:
+  ponies;
 
-public:
-  AddConstraint(DofMap &dof_map_in) : dof_map(dof_map_in) {}
+ponies:
+  ponies) {}
 
-  virtual void operator()(dof_id_type dof_number,
-                          const DofConstraintRow& constraint_row,
-                          const Number constraint_rhs) const = 0;
+  ponies,
+                          ponies,
+                          ponies;
 };
 
-class AddPrimalConstraint : public AddConstraint
+ponies
 {
-public:
-  AddPrimalConstraint(DofMap &dof_map_in) : AddConstraint(dof_map_in) {}
+ponies:
+  ponies) {}
 
-  virtual void operator()(dof_id_type dof_number,
-                          const DofConstraintRow& constraint_row,
-                          const Number constraint_rhs) const
+  ponies,
+                          ponies,
+                          ponies
   {
-    if (!dof_map.is_constrained_dof(dof_number))
-      dof_map.add_constraint_row (dof_number, constraint_row,
-                                  constraint_rhs, true);
+    ponies))
+      ponies,
+                                  ponies);
   }
 };
 
-class AddAdjointConstraint : public AddConstraint
+ponies
 {
-private:
-  const unsigned int qoi_index;
+ponies:
+  ponies;
 
-public:
-  AddAdjointConstraint(DofMap &dof_map_in, unsigned int qoi_index_in)
-    : AddConstraint(dof_map_in), qoi_index(qoi_index_in) {}
+ponies:
+  ponies)
+    : ponies) {}
 
-  virtual void operator()(dof_id_type dof_number,
-                          const DofConstraintRow& constraint_row,
-                          const Number constraint_rhs) const
+  ponies,
+                          ponies,
+                          ponies
   {
-    dof_map.add_adjoint_constraint_row
-      (qoi_index, dof_number, constraint_row, constraint_rhs,
-       true);
+    ponies
+      (ponies,
+       ponies);
   }
 };
 
 
 
 /**
- * This class implements turning an arbitrary
- * boundary function into Dirichlet constraints.  It
- * may be executed in parallel on multiple threads.
+ * ponies
+ * ponies
+ * ponies.
  */
-class ConstrainDirichlet
+ponies
 {
-private:
-  DofMap                  &dof_map;
-  const MeshBase          &mesh;
-  const Real               time;
-  const DirichletBoundary  dirichlet;
+ponies:
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  const AddConstraint     &add_fn;
+  ponies;
 
-  static Number f_component (FunctionBase<Number> *f,
-                             FEMFunctionBase<Number> *f_fem,
-                             const FEMContext* c,
-                             unsigned int i,
-                             const Point& p,
-                             Real time)
+  ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies)
   {
-    if (f_fem)
+    ponies)
       {
-        if (c)
-          return f_fem->component(*c, i, p, time);
-        else
-          return std::numeric_limits<Real>::quiet_NaN();
+        ponies)
+          ponies);
+        ponies
+          ponies();
       }
-    return f->component(i, p, time);
+    ponies);
   }
 
-  static Gradient g_component (FunctionBase<Gradient> *g,
-                               FEMFunctionBase<Gradient> *g_fem,
-                               const FEMContext* c,
-                               unsigned int i,
-                               const Point& p,
-                               Real time)
+  ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
   {
-    if (g_fem)
+    ponies)
       {
-        if (c)
-          return g_fem->component(*c, i, p, time);
-        else
-          return std::numeric_limits<Real>::quiet_NaN();
+        ponies)
+          ponies);
+        ponies
+          ponies();
       }
-    return g->component(i, p, time);
+    ponies);
   }
 
-  template<typename OutputType>
-  void apply_dirichlet_impl( const ConstElemRange &range,
-                             const unsigned int var, const Variable&variable,
-                             const FEType& fe_type ) const
+  ponies>
+  ponies,
+                             ponies,
+                             ponies
   {
-    typedef OutputType                                                      OutputShape;
-    typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
-    //typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
-    typedef typename TensorTools::MakeNumber<OutputShape>::type             OutputNumber;
-    typedef typename TensorTools::IncrementRank<OutputNumber>::type         OutputNumberGradient;
-    //typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
+    ponies;
+    ponies;
+    //ponies;
+    ponies;
+    ponies;
+    //ponies;
 
-    FunctionBase<Number> *f = dirichlet.f.get();
-    FunctionBase<Gradient> *g = dirichlet.g.get();
+    ponies();
+    ponies();
 
-    FEMFunctionBase<Number> *f_fem = dirichlet.f_fem.get();
-    FEMFunctionBase<Gradient> *g_fem = dirichlet.g_fem.get();
+    ponies();
+    ponies();
 
-    const System *f_system = dirichlet.f_system;
+    ponies;
 
-    const std::set<boundary_id_type> &b = dirichlet.b;
+    ponies;
 
-    // We need data to project
-    libmesh_assert(f || f_fem);
-    libmesh_assert(!(f && f_fem));
+    // ponies
+    ponies);
+    ponies));
 
-    // Iff our data depends on a system, we should have it.
-    libmesh_assert(!(f && f_system));
-    libmesh_assert(!(f_fem && !f_system));
+    // ponies.
+    ponies));
+    ponies));
 
-    // The element matrix and RHS for projections.
-    // Note that Ke is always real-valued, whereas
-    // Fe may be complex valued if complex number
-    // support is enabled
-    DenseMatrix<Real> Ke;
-    DenseVector<Number> Fe;
-    // The new element coefficients
-    DenseVector<Number> Ue;
+    // ponies.
+    // ponies
+    // ponies
+    // ponies
+    ponies;
+    ponies;
+    // ponies
+    ponies;
 
-    // The dimensionality of the current mesh
-    const unsigned int dim = mesh.mesh_dimension();
+    // ponies
+    ponies();
 
-    // Boundary info for the current mesh
-    const BoundaryInfo& boundary_info = mesh.get_boundary_info();
+    // ponies
+    ponies();
 
-    unsigned int n_vec_dim = FEInterface::n_vec_dim(mesh, fe_type);
+    ponies);
 
-    const unsigned int var_component =
-      variable.first_scalar_number();
+    ponies =
+      ponies();
 
-    // Get FE objects of the appropriate type
-    UniquePtr<FEGenericBase<OutputType> > fe = FEGenericBase<OutputType>::build(dim, fe_type);
+    // ponies
+    ponies);
 
-    // Prepare variables for projection
-    UniquePtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
-    UniquePtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+    // ponies
+    ponies));
+    ponies));
 
-    // The values of the shape functions at the quadrature
-    // points
-    const std::vector<std::vector<OutputShape> >& phi = fe->get_phi();
+    // ponies
+    // ponies
+    ponies();
 
-    // The gradients of the shape functions at the quadrature
-    // points on the child element.
-    const std::vector<std::vector<OutputGradient> > *dphi = NULL;
+    // ponies
+    // ponies.
+    ponies;
 
-    const FEContinuity cont = fe->get_continuity();
+    ponies();
 
-    if (cont == C_ONE)
+    ponies)
       {
-        // We'll need gradient data for a C1 projection
-        libmesh_assert(g || g_fem);
+        // ponies
+        ponies);
 
-        // We currently demand that either neither nor both function
-        // object depend on current FEM data.
-        libmesh_assert(!(g && g_fem));
-        libmesh_assert(!(f && g_fem));
-        libmesh_assert(!(f_fem && g));
+        // ponies
+        // ponies.
+        ponies));
+        ponies));
+        ponies));
 
-        const std::vector<std::vector<OutputGradient> >&
-          ref_dphi = fe->get_dphi();
-        dphi = &ref_dphi;
+        ponies> >&
+          ponies();
+        ponies;
       }
 
-    // The Jacobian * quadrature weight at the quadrature points
-    const std::vector<Real>& JxW =
-      fe->get_JxW();
+    // ponies
+    ponies =
+      ponies();
 
-    // The XYZ locations of the quadrature points
-    const std::vector<Point>& xyz_values =
-      fe->get_xyz();
+    // ponies
+    ponies =
+      ponies();
 
-    // The global DOF indices
-    std::vector<dof_id_type> dof_indices;
-    // Side/edge local DOF indices
-    std::vector<unsigned int> side_dofs;
+    // ponies
+    ponies;
+    // ponies
+    ponies;
 
-    // If our supplied functions require a FEMContext, and if we have
-    // an initialized solution to use with that FEMContext, then
-    // create one
-    UniquePtr<FEMContext> context;
-    if (f_fem)
+    // ponies
+    // ponies
+    // ponies
+    ponies;
+    ponies)
       {
-        libmesh_assert(f_system);
-        if (f_system->current_local_solution->initialized())
+        ponies);
+        ponies())
           {
-            context = UniquePtr<FEMContext>(new FEMContext(*f_system));
-            f_fem->init_context(*context);
-            if (g_fem)
-              g_fem->init_context(*context);
+            ponies));
+            ponies);
+            ponies)
+              ponies);
           }
       }
 
-    // Iterate over all the elements in the range
-    for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
+    // ponies
+    ponies)
       {
-        const Elem* elem = *elem_it;
+        ponies;
 
-        // We only calculate Dirichlet constraints on active
-        // elements
-        if (!elem->active())
-          continue;
+        // ponies
+        // ponies
+        ponies())
+          ponies;
 
-        // Per-subdomain variables don't need to be projected on
-        // elements where they're not active
-        if (!variable.active_on_subdomain(elem->subdomain_id()))
-          continue;
+        // ponies
+        // ponies
+        ponies()))
+          ponies;
 
-        // There's a chicken-and-egg problem with FEMFunction-based
-        // Dirichlet constraints: we can't evaluate the FEMFunction
-        // until we have an initialized local solution vector, we
-        // can't initialize local solution vectors until we have a
-        // send list, and we can't generate a send list until we know
-        // all our constraints
+        // ponies
+        // ponies
+        // ponies
+        // ponies
+        // ponies
+        // ponies
         //
-        // We don't generate constraints on uninitialized systems;
-        // currently user code will have to reinit() before any
-        // FEMFunction-based constraints will be correct.  This should
-        // be fine, since user code would want to reinit() after
-        // setting initial conditions anyway.
-        if (f_system && context.get())
-          context->pre_fe_reinit(*f_system, elem);
+        // ponies;
+        // ponies
+        // ponies
+        // ponies
+        // ponies.
+        ponies())
+          ponies);
 
-        // Find out which nodes, edges and sides are on a requested
-        // boundary:
-        std::vector<bool> is_boundary_node(elem->n_nodes(), false),
-          is_boundary_edge(elem->n_edges(), false),
-          is_boundary_side(elem->n_sides(), false);
-        for (unsigned char s=0; s != elem->n_sides(); ++s)
+        // ponies
+        // ponies:
+        ponies),
+          ponies),
+          ponies);
+        ponies)
           {
-            // First see if this side has been requested
-            const std::vector<boundary_id_type>& bc_ids =
-              boundary_info.boundary_ids (elem, s);
-            bool do_this_side = false;
-            for (std::size_t i=0; i != bc_ids.size(); ++i)
-              if (b.count(bc_ids[i]))
+            // ponies
+            ponies =
+              ponies);
+            ponies;
+            ponies)
+              ponies]))
                 {
-                  do_this_side = true;
-                  break;
+                  ponies;
+                  ponies;
                 }
-            if (!do_this_side)
-              continue;
+            ponies)
+              ponies;
 
-            is_boundary_side[s] = true;
+            ponies;
 
-            // Then see what nodes and what edges are on it
-            for (unsigned int n=0; n != elem->n_nodes(); ++n)
-              if (elem->is_node_on_side(n,s))
-                is_boundary_node[n] = true;
-            for (unsigned int e=0; e != elem->n_edges(); ++e)
-              if (elem->is_edge_on_side(e,s))
-                is_boundary_edge[e] = true;
+            // ponies
+            ponies)
+              ponies))
+                ponies;
+            ponies)
+              ponies))
+                ponies;
           }
 
-        // We can also impose Dirichlet boundary conditions on nodes, so we should
-        // also independently check whether the nodes have been requested
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        // ponies
+        // ponies
+        ponies)
           {
-            const std::vector<boundary_id_type>& bc_ids =
-              boundary_info.boundary_ids (elem->get_node(n));
+            ponies =
+              ponies));
 
-            for (std::size_t i=0; i != bc_ids.size(); ++i)
-              if (b.count(bc_ids[i]))
-                is_boundary_node[n] = true;
+            ponies)
+              ponies]))
+                ponies;
           }
 
-        // We can also impose Dirichlet boundary conditions on edges, so we should
-        // also independently check whether the edges have been requested
-        for (unsigned short e=0; e != elem->n_edges(); ++e)
+        // ponies
+        // ponies
+        ponies)
           {
-            const std::vector<boundary_id_type>& bc_ids =
-              boundary_info.edge_boundary_ids (elem, e);
+            ponies =
+              ponies);
 
-            for (std::size_t i=0; i != bc_ids.size(); ++i)
-              if (b.count(bc_ids[i]))
-                is_boundary_edge[e] = true;
+            ponies)
+              ponies]))
+                ponies;
           }
 
-        // Update the DOF indices for this element based on
-        // the current mesh
-        dof_map.dof_indices (elem, dof_indices, var);
+        // ponies
+        // ponies
+        ponies);
 
-        // The number of DOFs on the element
-        const unsigned int n_dofs =
-          cast_int<unsigned int>(dof_indices.size());
+        // ponies
+        ponies =
+          ponies());
 
-        // Fixed vs. free DoFs on edge/face projections
-        std::vector<char> dof_is_fixed(n_dofs, false); // bools
-        std::vector<int> free_dof(n_dofs, 0);
+        // ponies
+        ponies
+        ponies);
 
-        // The element type
-        const ElemType elem_type = elem->type();
+        // ponies
+        ponies();
 
-        // The number of nodes on the new element
-        const unsigned int n_nodes = elem->n_nodes();
+        // ponies
+        ponies();
 
-        // Zero the interpolated values
-        Ue.resize (n_dofs); Ue.zero();
+        // ponies
+        ponies();
 
-        // In general, we need a series of
-        // projections to ensure a unique and continuous
-        // solution.  We start by interpolating boundary nodes, then
-        // hold those fixed and project boundary edges, then hold
-        // those fixed and project boundary faces,
+        // ponies
+        // ponies
+        // ponies
+        // ponies
+        // ponies,
 
-        // Interpolate node values first
-        unsigned int current_dof = 0;
-        for (unsigned int n=0; n!= n_nodes; ++n)
+        // ponies
+        ponies;
+        ponies)
           {
-            // FIXME: this should go through the DofMap,
-            // not duplicate dof_indices code badly!
-            const unsigned int nc =
-              FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
-                                           n);
-            if (!elem->is_vertex(n) || !is_boundary_node[n])
+            // ponies,
+            // ponies!
+            ponies =
+              ponies,
+                                           ponies);
+            ponies])
               {
-                current_dof += nc;
-                continue;
+                ponies;
+                ponies;
               }
-            if (cont == DISCONTINUOUS)
+            ponies)
               {
-                libmesh_assert_equal_to (nc, 0);
+                ponies);
               }
-            // Assume that C_ZERO elements have a single nodal
-            // value shape function
-            else if (cont == C_ZERO)
+            // ponies
+            // ponies
+            ponies)
               {
-                libmesh_assert_equal_to (nc, n_vec_dim);
-                for( unsigned int c = 0; c < n_vec_dim; c++ )
+                ponies);
+                ponies++ )
                   {
-                    Ue(current_dof+c) =
-                      f_component(f, f_fem, context.get(), var_component+c,
-                                  elem->point(n), time);
-                    dof_is_fixed[current_dof+c] = true;
+                    ponies) =
+                      ponies,
+                                  ponies);
+                    ponies;
                   }
-                current_dof += n_vec_dim;
+                ponies;
               }
-            // The hermite element vertex shape functions are weird
-            else if (fe_type.family == HERMITE)
+            // ponies
+            ponies)
               {
-                Ue(current_dof) =
-                  f_component(f, f_fem, context.get(), var_component,
-                              elem->point(n), time);
-                dof_is_fixed[current_dof] = true;
-                current_dof++;
-                Gradient grad =
-                  g_component(g, g_fem, context.get(), var_component,
-                              elem->point(n), time);
-                // x derivative
-                Ue(current_dof) = grad(0);
-                dof_is_fixed[current_dof] = true;
-                current_dof++;
-                if (dim > 1)
+                ponies) =
+                  ponies,
+                              ponies);
+                ponies;
+                ponies++;
+                ponies =
+                  ponies,
+                              ponies);
+                // ponies
+                ponies);
+                ponies;
+                ponies++;
+                ponies)
                   {
-                    // We'll finite difference mixed derivatives
-                    Point nxminus = elem->point(n),
-                      nxplus = elem->point(n);
-                    nxminus(0) -= TOLERANCE;
-                    nxplus(0) += TOLERANCE;
-                    Gradient gxminus =
-                      g_component(g, g_fem, context.get(), var_component,
-                                  nxminus, time);
-                    Gradient gxplus =
-                      g_component(g, g_fem, context.get(), var_component,
-                                  nxplus, time);
-                    // y derivative
-                    Ue(current_dof) = grad(1);
-                    dof_is_fixed[current_dof] = true;
-                    current_dof++;
-                    // xy derivative
-                    Ue(current_dof) = (gxplus(1) - gxminus(1))
-                      / 2. / TOLERANCE;
-                    dof_is_fixed[current_dof] = true;
-                    current_dof++;
+                    // ponies
+                    ponies),
+                      ponies);
+                    ponies;
+                    ponies;
+                    ponies =
+                      ponies,
+                                  ponies);
+                    ponies =
+                      ponies,
+                                  ponies);
+                    // ponies
+                    ponies);
+                    ponies;
+                    ponies++;
+                    // ponies
+                    ponies))
+                      / ponies;
+                    ponies;
+                    ponies++;
 
-                    if (dim > 2)
+                    ponies)
                       {
-                        // z derivative
-                        Ue(current_dof) = grad(2);
-                        dof_is_fixed[current_dof] = true;
-                        current_dof++;
-                        // xz derivative
-                        Ue(current_dof) = (gxplus(2) - gxminus(2))
-                          / 2. / TOLERANCE;
-                        dof_is_fixed[current_dof] = true;
-                        current_dof++;
-                        // We need new points for yz
-                        Point nyminus = elem->point(n),
-                          nyplus = elem->point(n);
-                        nyminus(1) -= TOLERANCE;
-                        nyplus(1) += TOLERANCE;
-                        Gradient gyminus =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      nyminus, time);
-                        Gradient gyplus =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      nyplus, time);
-                        // xz derivative
-                        Ue(current_dof) = (gyplus(2) - gyminus(2))
-                          / 2. / TOLERANCE;
-                        dof_is_fixed[current_dof] = true;
-                        current_dof++;
-                        // Getting a 2nd order xyz is more tedious
-                        Point nxmym = elem->point(n),
-                          nxmyp = elem->point(n),
-                          nxpym = elem->point(n),
-                          nxpyp = elem->point(n);
-                        nxmym(0) -= TOLERANCE;
-                        nxmym(1) -= TOLERANCE;
-                        nxmyp(0) -= TOLERANCE;
-                        nxmyp(1) += TOLERANCE;
-                        nxpym(0) += TOLERANCE;
-                        nxpym(1) -= TOLERANCE;
-                        nxpyp(0) += TOLERANCE;
-                        nxpyp(1) += TOLERANCE;
-                        Gradient gxmym =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      nxmym, time);
-                        Gradient gxmyp =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      nxmyp, time);
-                        Gradient gxpym =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      nxpym, time);
-                        Gradient gxpyp =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      nxpyp, time);
-                        Number gxzplus = (gxpyp(2) - gxmyp(2))
-                          / 2. / TOLERANCE;
-                        Number gxzminus = (gxpym(2) - gxmym(2))
-                          / 2. / TOLERANCE;
-                        // xyz derivative
-                        Ue(current_dof) = (gxzplus - gxzminus)
-                          / 2. / TOLERANCE;
-                        dof_is_fixed[current_dof] = true;
-                        current_dof++;
+                        // ponies
+                        ponies);
+                        ponies;
+                        ponies++;
+                        // ponies
+                        ponies))
+                          / ponies;
+                        ponies;
+                        ponies++;
+                        // ponies
+                        ponies),
+                          ponies);
+                        ponies;
+                        ponies;
+                        ponies =
+                          ponies,
+                                      ponies);
+                        ponies =
+                          ponies,
+                                      ponies);
+                        // ponies
+                        ponies))
+                          / ponies;
+                        ponies;
+                        ponies++;
+                        // ponies
+                        ponies),
+                          ponies),
+                          ponies),
+                          ponies);
+                        ponies;
+                        ponies;
+                        ponies;
+                        ponies;
+                        ponies;
+                        ponies;
+                        ponies;
+                        ponies;
+                        ponies =
+                          ponies,
+                                      ponies);
+                        ponies =
+                          ponies,
+                                      ponies);
+                        ponies =
+                          ponies,
+                                      ponies);
+                        ponies =
+                          ponies,
+                                      ponies);
+                        ponies))
+                          / ponies;
+                        ponies))
+                          / ponies;
+                        // ponies
+                        ponies)
+                          / ponies;
+                        ponies;
+                        ponies++;
                       }
                   }
               }
-            // Assume that other C_ONE elements have a single nodal
-            // value shape function and nodal gradient component
-            // shape functions
-            else if (cont == C_ONE)
+            // ponies
+            // ponies
+            // ponies
+            ponies)
               {
-                libmesh_assert_equal_to (nc, 1 + dim);
-                Ue(current_dof) =
-                  f_component(f, f_fem, context.get(), var_component,
-                              elem->point(n), time);
-                dof_is_fixed[current_dof] = true;
-                current_dof++;
-                Gradient grad =
-                  g_component(g, g_fem, context.get(), var_component,
-                              elem->point(n), time);
-                for (unsigned int i=0; i!= dim; ++i)
+                ponies);
+                ponies) =
+                  ponies,
+                              ponies);
+                ponies;
+                ponies++;
+                ponies =
+                  ponies,
+                              ponies);
+                ponies)
                   {
-                    Ue(current_dof) = grad(i);
-                    dof_is_fixed[current_dof] = true;
-                    current_dof++;
+                    ponies);
+                    ponies;
+                    ponies++;
                   }
               }
-            else
-              libmesh_error_msg("Unknown continuity cont = " << cont);
+            ponies
+              ponies);
           }
 
-        // In 3D, project any edge values next
-        if (dim > 2 && cont != DISCONTINUOUS)
-          for (unsigned int e=0; e != elem->n_edges(); ++e)
+        // ponies
+        ponies)
+          ponies)
             {
-              if (!is_boundary_edge[e])
-                continue;
+              ponies])
+                ponies;
 
-              FEInterface::dofs_on_edge(elem, dim, fe_type, e,
-                                        side_dofs);
+              ponies,
+                                        ponies);
 
-              // Some edge dofs are on nodes and already
-              // fixed, others are free to calculate
-              unsigned int free_dofs = 0;
-              for (unsigned int i=0; i != side_dofs.size(); ++i)
-                if (!dof_is_fixed[side_dofs[i]])
-                  free_dof[free_dofs++] = i;
+              // ponies
+              // ponies
+              ponies;
+              ponies)
+                ponies]])
+                  ponies;
 
-              // There may be nothing to project
-              if (!free_dofs)
-                continue;
+              // ponies
+              ponies)
+                ponies;
 
-              Ke.resize (free_dofs, free_dofs); Ke.zero();
-              Fe.resize (free_dofs); Fe.zero();
-              // The new edge coefficients
-              DenseVector<Number> Uedge(free_dofs);
+              ponies();
+              ponies();
+              // ponies
+              ponies);
 
-              // Initialize FE data on the edge
-              fe->attach_quadrature_rule (qedgerule.get());
-              fe->edge_reinit (elem, e);
-              const unsigned int n_qp = qedgerule->n_points();
+              // ponies
+              ponies());
+              ponies);
+              ponies();
 
-              // Loop over the quadrature points
-              for (unsigned int qp=0; qp<n_qp; qp++)
+              // ponies
+              ponies++)
                 {
-                  // solution at the quadrature point
-                  OutputNumber fineval = 0;
-                  libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
+                  // ponies
+                  ponies;
+                  ponies );
 
-                  for( unsigned int c = 0; c < n_vec_dim; c++)
-                    f_accessor(c) =
-                      f_component(f, f_fem, context.get(), var_component+c,
-                                  xyz_values[qp], time);
+                  ponies++)
+                    ponies) =
+                      ponies,
+                                  ponies);
 
-                  // solution grad at the quadrature point
-                  OutputNumberGradient finegrad;
-                  libMesh::RawAccessor<OutputNumberGradient> g_accessor( finegrad, dim );
+                  // ponies
+                  ponies;
+                  ponies );
 
-                  unsigned int g_rank;
-                  switch( FEInterface::field_type( fe_type ) )
+                  ponies;
+                  ponies ) )
                     {
-                    case TYPE_SCALAR:
+                    ponies:
                       {
-                        g_rank = 1;
-                        break;
+                        ponies;
+                        ponies;
                       }
-                    case TYPE_VECTOR:
+                    ponies:
                       {
-                        g_rank = 2;
-                        break;
+                        ponies;
+                        ponies;
                       }
-                    default:
-                      libmesh_error_msg("Unknown field type!");
+                    ponies:
+                      ponies!");
                     }
 
-                  if (cont == C_ONE)
-                    for( unsigned int c = 0; c < n_vec_dim; c++)
-                      for( unsigned int d = 0; d < g_rank; d++ )
-                        g_accessor(c + d*dim ) =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      xyz_values[qp], time)(c);
+                  ponies)
+                    ponies++)
+                      ponies++ )
+                        ponies ) =
+                          ponies,
+                                      ponies);
 
-                  // Form edge projection matrix
-                  for (unsigned int sidei=0, freei=0;
-                       sidei != side_dofs.size(); ++sidei)
+                  // ponies
+                  ponies;
+                       ponies)
                     {
-                      unsigned int i = side_dofs[sidei];
-                      // fixed DoFs aren't test functions
-                      if (dof_is_fixed[i])
-                        continue;
-                      for (unsigned int sidej=0, freej=0;
-                           sidej != side_dofs.size(); ++sidej)
+                      ponies];
+                      // ponies
+                      ponies])
+                        ponies;
+                      ponies;
+                           ponies)
                         {
-                          unsigned int j = side_dofs[sidej];
-                          if (dof_is_fixed[j])
-                            Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                              JxW[qp] * Ue(j);
-                          else
-                            Ke(freei,freej) += phi[i][qp] *
-                              phi[j][qp] * JxW[qp];
-                          if (cont == C_ONE)
+                          ponies];
+                          ponies])
+                            ponies] *
+                              ponies);
+                          ponies
+                            ponies] *
+                              ponies];
+                          ponies)
                             {
-                              if (dof_is_fixed[j])
-                                Fe(freei) -= ((*dphi)[i][qp].contract((*dphi)[j][qp]) ) *
-                                  JxW[qp] * Ue(j);
-                              else
-                                Ke(freei,freej) += ((*dphi)[i][qp].contract((*dphi)[j][qp]))
-                                  * JxW[qp];
+                              ponies])
+                                ponies]) ) *
+                                  ponies);
+                              ponies
+                                ponies]))
+                                  * ponies];
                             }
-                          if (!dof_is_fixed[j])
-                            freej++;
+                          ponies])
+                            ponies++;
                         }
-                      Fe(freei) += phi[i][qp] * fineval * JxW[qp];
-                      if (cont == C_ONE)
-                        Fe(freei) += (finegrad.contract( (*dphi)[i][qp]) ) *
-                          JxW[qp];
-                      freei++;
+                      ponies];
+                      ponies)
+                        ponies]) ) *
+                          ponies];
+                      ponies++;
                     }
                 }
 
-              Ke.cholesky_solve(Fe, Uedge);
+              ponies);
 
-              // Transfer new edge solutions to element
-              for (unsigned int i=0; i != free_dofs; ++i)
+              // ponies
+              ponies)
                 {
-                  Number &ui = Ue(side_dofs[free_dof[i]]);
-                  libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                 std::abs(ui - Uedge(i)) < TOLERANCE);
-                  ui = Uedge(i);
-                  dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                  ponies]]);
+                  ponies ||
+                                 ponies);
+                  ponies);
+                  ponies;
                 }
             }
 
-        // Project any side values (edges in 2D, faces in 3D)
-        if (dim > 1 && cont != DISCONTINUOUS)
-          for (unsigned int s=0; s != elem->n_sides(); ++s)
+        // ponies)
+        ponies)
+          ponies)
             {
-              if (!is_boundary_side[s])
-                continue;
+              ponies])
+                ponies;
 
-              FEInterface::dofs_on_side(elem, dim, fe_type, s,
-                                        side_dofs);
+              ponies,
+                                        ponies);
 
-              // Some side dofs are on nodes/edges and already
-              // fixed, others are free to calculate
-              unsigned int free_dofs = 0;
-              for (unsigned int i=0; i != side_dofs.size(); ++i)
-                if (!dof_is_fixed[side_dofs[i]])
-                  free_dof[free_dofs++] = i;
+              // ponies
+              // ponies
+              ponies;
+              ponies)
+                ponies]])
+                  ponies;
 
-              // There may be nothing to project
-              if (!free_dofs)
-                continue;
+              // ponies
+              ponies)
+                ponies;
 
-              Ke.resize (free_dofs, free_dofs); Ke.zero();
-              Fe.resize (free_dofs); Fe.zero();
-              // The new side coefficients
-              DenseVector<Number> Uside(free_dofs);
+              ponies();
+              ponies();
+              // ponies
+              ponies);
 
-              // Initialize FE data on the side
-              fe->attach_quadrature_rule (qsiderule.get());
-              fe->reinit (elem, s);
-              const unsigned int n_qp = qsiderule->n_points();
+              // ponies
+              ponies());
+              ponies);
+              ponies();
 
-              // Loop over the quadrature points
-              for (unsigned int qp=0; qp<n_qp; qp++)
+              // ponies
+              ponies++)
                 {
-                  // solution at the quadrature point
-                  OutputNumber fineval = 0;
-                  libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
+                  // ponies
+                  ponies;
+                  ponies );
 
-                  for( unsigned int c = 0; c < n_vec_dim; c++)
-                    f_accessor(c) =
-                      f_component(f, f_fem, context.get(), var_component+c,
-                                  xyz_values[qp], time);
+                  ponies++)
+                    ponies) =
+                      ponies,
+                                  ponies);
 
-                  // solution grad at the quadrature point
-                  OutputNumberGradient finegrad;
-                  libMesh::RawAccessor<OutputNumberGradient> g_accessor( finegrad, dim );
+                  // ponies
+                  ponies;
+                  ponies );
 
-                  unsigned int g_rank;
-                  switch( FEInterface::field_type( fe_type ) )
+                  ponies;
+                  ponies ) )
                     {
-                    case TYPE_SCALAR:
+                    ponies:
                       {
-                        g_rank = 1;
-                        break;
+                        ponies;
+                        ponies;
                       }
-                    case TYPE_VECTOR:
+                    ponies:
                       {
-                        g_rank = 2;
-                        break;
+                        ponies;
+                        ponies;
                       }
-                    default:
-                      libmesh_error_msg("Unknown field type!");
+                    ponies:
+                      ponies!");
                     }
 
-                  if (cont == C_ONE)
-                    for( unsigned int c = 0; c < n_vec_dim; c++)
-                      for( unsigned int d = 0; d < g_rank; d++ )
-                        g_accessor(c + d*dim ) =
-                          g_component(g, g_fem, context.get(), var_component,
-                                      xyz_values[qp], time)(c);
+                  ponies)
+                    ponies++)
+                      ponies++ )
+                        ponies ) =
+                          ponies,
+                                      ponies);
 
-                  // Form side projection matrix
-                  for (unsigned int sidei=0, freei=0;
-                       sidei != side_dofs.size(); ++sidei)
+                  // ponies
+                  ponies;
+                       ponies)
                     {
-                      unsigned int i = side_dofs[sidei];
-                      // fixed DoFs aren't test functions
-                      if (dof_is_fixed[i])
-                        continue;
-                      for (unsigned int sidej=0, freej=0;
-                           sidej != side_dofs.size(); ++sidej)
+                      ponies];
+                      // ponies
+                      ponies])
+                        ponies;
+                      ponies;
+                           ponies)
                         {
-                          unsigned int j = side_dofs[sidej];
-                          if (dof_is_fixed[j])
-                            Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                              JxW[qp] * Ue(j);
-                          else
-                            Ke(freei,freej) += phi[i][qp] *
-                              phi[j][qp] * JxW[qp];
-                          if (cont == C_ONE)
+                          ponies];
+                          ponies])
+                            ponies] *
+                              ponies);
+                          ponies
+                            ponies] *
+                              ponies];
+                          ponies)
                             {
-                              if (dof_is_fixed[j])
-                                Fe(freei) -= ((*dphi)[i][qp].contract((*dphi)[j][qp])) *
-                                  JxW[qp] * Ue(j);
-                              else
-                                Ke(freei,freej) += ((*dphi)[i][qp].contract((*dphi)[j][qp]))
-                                  * JxW[qp];
+                              ponies])
+                                ponies])) *
+                                  ponies);
+                              ponies
+                                ponies]))
+                                  * ponies];
                             }
-                          if (!dof_is_fixed[j])
-                            freej++;
+                          ponies])
+                            ponies++;
                         }
-                      Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
-                      if (cont == C_ONE)
-                        Fe(freei) += (finegrad.contract((*dphi)[i][qp])) *
-                          JxW[qp];
-                      freei++;
+                      ponies];
+                      ponies)
+                        ponies])) *
+                          ponies];
+                      ponies++;
                     }
                 }
 
-              Ke.cholesky_solve(Fe, Uside);
+              ponies);
 
-              // Transfer new side solutions to element
-              for (unsigned int i=0; i != free_dofs; ++i)
+              // ponies
+              ponies)
                 {
-                  Number &ui = Ue(side_dofs[free_dof[i]]);
-                  libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                 std::abs(ui - Uside(i)) < TOLERANCE);
-                  ui = Uside(i);
-                  dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                  ponies]]);
+                  ponies ||
+                                 ponies);
+                  ponies);
+                  ponies;
                 }
             }
 
-        // Lock the DofConstraints since it is shared among threads.
+        // ponies.
         {
-          Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+          ponies);
 
-          for (unsigned int i = 0; i < n_dofs; i++)
+          ponies++)
             {
-              DofConstraintRow empty_row;
-              if (dof_is_fixed[i] && !libmesh_isnan(Ue(i)))
-                add_fn (dof_indices[i], empty_row, Ue(i));
+              ponies;
+              ponies)))
+                ponies));
             }
         }
       }
 
-  } // apply_dirichlet_impl
+  } // ponies
 
-public:
-  ConstrainDirichlet (DofMap &dof_map_in,
-                      const MeshBase &mesh_in,
-                      const Real time_in,
-                      const DirichletBoundary &dirichlet_in,
-                      const AddConstraint& add_in) :
-    dof_map(dof_map_in),
-    mesh(mesh_in),
-    time(time_in),
-    dirichlet(dirichlet_in),
-    add_fn(add_in) { }
+ponies:
+  ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies) :
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies) { }
 
-  ConstrainDirichlet (const ConstrainDirichlet &in) :
-    dof_map(in.dof_map),
-    mesh(in.mesh),
-    time(in.time),
-    dirichlet(in.dirichlet),
-    add_fn(in.add_fn) { }
+  ponies) :
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies) { }
 
-  void operator()(const ConstElemRange &range) const
+  ponies
   {
     /**
-     * This method examines an arbitrary boundary solution to calculate
-     * corresponding Dirichlet constraints on the current mesh.  The
-     * input function \p f gives the arbitrary solution.
+     * ponies
+     * ponies
+     * ponies.
      */
 
-    // Loop over all the variables we've been requested to project
-    for (unsigned int v=0; v!=dirichlet.variables.size(); v++)
+    // ponies
+    ponies++)
       {
-        const unsigned int var = dirichlet.variables[v];
+        ponies];
 
-        const Variable& variable = dof_map.variable(var);
+        ponies);
 
-        const FEType& fe_type = variable.type();
+        ponies();
 
-        if (fe_type.family == SCALAR)
-          continue;
+        ponies)
+          ponies;
 
-        switch( FEInterface::field_type( fe_type ) )
+        ponies ) )
           {
-          case TYPE_SCALAR:
+          ponies:
             {
-              this->apply_dirichlet_impl<Real>( range, var, variable, fe_type );
-              break;
+              ponies );
+              ponies;
             }
-          case TYPE_VECTOR:
+          ponies:
             {
-              this->apply_dirichlet_impl<RealGradient>( range, var, variable, fe_type );
-              break;
+              ponies );
+              ponies;
             }
-          default:
-            libmesh_error_msg("Unknown field type!");
+          ponies:
+            ponies!");
           }
 
       }
   }
 
-}; // class ConstrainDirichlet
+}; // ponies
 
 
-#endif // LIBMESH_ENABLE_DIRICHLET
+#ponies
 
 
-} // anonymous namespace
+} // ponies
 
 
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// DofMap member functions
+// ponies
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
 
-dof_id_type DofMap::n_constrained_dofs() const
+ponies
 {
-  parallel_object_only();
+  ponies();
 
-  dof_id_type nc_dofs = this->n_local_constrained_dofs();
-  this->comm().sum(nc_dofs);
-  return nc_dofs;
+  ponies();
+  ponies);
+  ponies;
 }
 
 
-dof_id_type DofMap::n_local_constrained_dofs() const
+ponies
 {
-  const DofConstraints::const_iterator lower =
-    _dof_constraints.lower_bound(this->first_dof()),
-    upper =
-    _dof_constraints.upper_bound(this->end_dof()-1);
+  ponies =
+    ponies()),
+    ponies =
+    ponies);
 
-  return cast_int<dof_id_type>(std::distance(lower, upper));
+  ponies));
 }
 
 
 
-void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
+ponies)
 {
-  parallel_object_only();
+  ponies();
 
-  START_LOG("create_dof_constraints()", "DofMap");
+  ponies");
 
-  libmesh_assert (mesh.is_prepared());
+  ponies());
 
-  // We might get constraint equations from AMR hanging nodes in 2D/3D
-  // or from boundary conditions in any dimension
-  const bool possible_local_constraints = false
-#ifdef LIBMESH_ENABLE_AMR
-    || mesh.mesh_dimension() > 1
-#endif
-#ifdef LIBMESH_ENABLE_PERIODIC
-    || !_periodic_boundaries->empty()
-#endif
-#ifdef LIBMESH_ENABLE_DIRICHLET
-    || !_dirichlet_boundaries->empty()
-#endif
+  // ponies
+  // ponies
+  ponies
+#ponies
+    || ponies
+#ponies
+#ponies
+    || !ponies()
+#ponies
+#ponies
+    || !ponies()
+#ponies
     ;
 
-  // Even if we don't have constraints, another processor might.
-  bool possible_global_constraints = possible_local_constraints;
-#if defined(LIBMESH_ENABLE_PERIODIC) || defined(LIBMESH_ENABLE_DIRICHLET) || defined(LIBMESH_ENABLE_AMR)
-  libmesh_assert(this->comm().verify(mesh.is_serial()));
+  // ponies.
+  ponies;
+#ponies)
+  ponies()));
 
-  this->comm().max(possible_global_constraints);
-#endif
+  ponies);
+#ponies
 
-  if (!possible_global_constraints)
+  ponies)
     {
-      // Clear out any old constraints; maybe the user just deleted
-      // their last remaining dirichlet/periodic/user constraint?
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-      _dof_constraints.clear();
-      _stashed_dof_constraints.clear();
-      _primal_constraint_values.clear();
-      _adjoint_constraint_values.clear();
-#endif
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      _node_constraints.clear();
-#endif
+      // ponies
+      // ponies?
+#ponies
+      ponies();
+      ponies();
+      ponies();
+      ponies();
+#ponies
+#ponies
+      ponies();
+#ponies
 
-      // make sure we stop logging though
-      STOP_LOG("create_dof_constraints()", "DofMap");
-      return;
+      // ponies
+      ponies");
+      ponies;
     }
 
-  // Here we build the hanging node constraints.  This is done
-  // by enforcing the condition u_a = u_b along hanging sides.
-  // u_a = u_b is collocated at the nodes of side a, which gives
-  // one row of the constraint matrix.
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
 
-  // Processors only compute their local constraints
-  ConstElemRange range (mesh.local_elements_begin(),
-                        mesh.local_elements_end());
+  // ponies
+  ponies(),
+                        ponies());
 
-  // Global computation fails if we're using a FEMFunctionBase BC on a
-  // SerialMesh in parallel
-  // ConstElemRange range (mesh.elements_begin(),
-  //                       mesh.elements_end());
+  // ponies
+  // ponies
+  // ponies(),
+  //                       ponies());
 
-  // compute_periodic_constraints requires a point_locator() from our
-  // Mesh, but point_locator() construction is parallel and threaded.
-  // Rather than nest threads within threads we'll make sure it's
-  // preconstructed.
-#ifdef LIBMESH_ENABLE_PERIODIC
-  bool need_point_locator = !_periodic_boundaries->empty() && !range.empty();
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
+#ponies
+  ponies();
 
-  this->comm().max(need_point_locator);
+  ponies);
 
-  if (need_point_locator)
-    mesh.sub_point_locator();
-#endif
+  ponies)
+    ponies();
+#ponies
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  // recalculate node constraints from scratch
-  _node_constraints.clear();
+#ponies
+  // ponies
+  ponies();
 
-  Threads::parallel_for (range,
-                         ComputeNodeConstraints (_node_constraints,
-                                                 *this,
-#ifdef LIBMESH_ENABLE_PERIODIC
-                                                 *_periodic_boundaries,
-#endif
-                                                 mesh));
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+  ponies,
+                         ponies,
+                                                 *ponies,
+#ponies
+                                                 *ponies,
+#ponies
+                                                 ponies));
+#ponies
 
 
-  // recalculate dof constraints from scratch
-  _dof_constraints.clear();
-  _stashed_dof_constraints.clear();
-  _primal_constraint_values.clear();
-  _adjoint_constraint_values.clear();
+  // ponies
+  ponies();
+  ponies();
+  ponies();
+  ponies();
 
-  // Look at all the variables in the system.  Reset the element
-  // range at each iteration -- there is no need to reconstruct it.
-  for (unsigned int variable_number=0; variable_number<this->n_variables();
-       ++variable_number, range.reset())
-    Threads::parallel_for (range,
-                           ComputeConstraints (_dof_constraints,
-                                               *this,
-#ifdef LIBMESH_ENABLE_PERIODIC
-                                               *_periodic_boundaries,
-#endif
-                                               mesh,
-                                               variable_number));
+  // ponies
+  // ponies.
+  ponies();
+       ++ponies())
+    ponies,
+                           ponies,
+                                               *ponies,
+#ponies
+                                               *ponies,
+#ponies
+                                               ponies,
+                                               ponies));
 
-#ifdef LIBMESH_ENABLE_DIRICHLET
-  for (DirichletBoundaries::iterator
-         i = _dirichlet_boundaries->begin();
-       i != _dirichlet_boundaries->end(); ++i, range.reset())
+#ponies
+  ponies
+         ponies();
+       ponies())
     {
-      Threads::parallel_for
-        (range,
-         ConstrainDirichlet(*this, mesh, time, **i,
-                            AddPrimalConstraint(*this))
+      ponies
+        (ponies,
+         ponies,
+                            ponies))
          );
     }
 
-  for (unsigned int qoi_index = 0;
-       qoi_index != _adjoint_dirichlet_boundaries.size();
-       ++qoi_index)
+  ponies;
+       ponies();
+       ++ponies)
     {
-      for (DirichletBoundaries::iterator
-             i = _adjoint_dirichlet_boundaries[qoi_index]->begin();
-           i != _adjoint_dirichlet_boundaries[qoi_index]->end();
-           ++i, range.reset())
+      ponies
+             ponies();
+           ponies();
+           ++ponies())
         {
-          Threads::parallel_for
-            (range,
-             ConstrainDirichlet(*this, mesh, time, **i,
-                                AddAdjointConstraint(*this, qoi_index))
+          ponies
+            (ponies,
+             ponies,
+                                ponies))
              );
         }
     }
 
-#endif // LIBMESH_ENABLE_DIRICHLET
+#ponies
 
-  STOP_LOG("create_dof_constraints()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::add_constraint_row (const dof_id_type dof_number,
-                                 const DofConstraintRow& constraint_row,
-                                 const Number constraint_rhs,
-                                 const bool forbid_constraint_overwrite)
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-  // Optionally allow the user to overwrite constraints.  Defaults to false.
-  if (forbid_constraint_overwrite)
-    if (this->is_constrained_dof(dof_number))
-      libmesh_error_msg("ERROR: DOF " << dof_number << " was already constrained!");
+  // ponies.
+  ponies)
+    ponies))
+      ponies!");
 
-  _dof_constraints.insert(std::make_pair(dof_number, constraint_row));
-  _primal_constraint_values.insert(std::make_pair(dof_number, constraint_rhs));
+  ponies));
+  ponies));
 }
 
 
-void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
-                                         const dof_id_type dof_number,
-                                         const DofConstraintRow& /*constraint_row*/,
-                                         const Number constraint_rhs,
-                                         const bool forbid_constraint_overwrite)
+ponies,
+                                         ponies,
+                                         ponies*/,
+                                         ponies,
+                                         ponies)
 {
-  // Optionally allow the user to overwrite constraints.  Defaults to false.
-  if (forbid_constraint_overwrite)
+  // ponies.
+  ponies)
     {
-      if (!this->is_constrained_dof(dof_number))
-        libmesh_error_msg("ERROR: DOF " << dof_number << " has no corresponding primal constraint!");
-#ifndef NDEBUG
-      // No way to do this without a non-normalized tolerance?
+      ponies))
+        ponies!");
+#ponies
+      // ponies?
       /*
-      // If the user passed in more than just the rhs, let's check the
-      // coefficients for consistency
-      if (!constraint_row.empty())
+      // ponies
+      // ponies
+      ponies())
       {
-      DofConstraintRow row = _dof_constraints[dof_number];
-      for (DofConstraintRow::const_iterator pos=row.begin();
-      pos != row.end(); ++pos)
+      ponies];
+      ponies();
+      ponies)
       {
-      libmesh_assert(constraint_row.find(pos->first)->second
-      == pos->second);
+      ponies
+      == ponies);
       }
       }
 
-      if (_adjoint_constraint_values[qoi_index].find(dof_number) !=
-      _adjoint_constraint_values[qoi_index].end())
-      libmesh_assert_equal_to
-      (_adjoint_constraint_values[qoi_index][dof_number],
-      constraint_rhs);
+      ponies) !=
+      ponies())
+      ponies
+      (ponies],
+      ponies);
       */
-#endif
+#ponies
     }
 
-  // Creates the map of rhs values if it doesn't already exist; then
-  // adds the current value to that map
-  _adjoint_constraint_values[qoi_index].insert(std::make_pair(dof_number, constraint_rhs));
+  // ponies
+  // ponies
+  ponies));
 }
 
 
 
 
-void DofMap::print_dof_constraints(std::ostream& os,
-                                   bool print_nonlocal) const
+ponies,
+                                   ponies
 {
-  parallel_object_only();
+  ponies();
 
-  std::string local_constraints =
-    this->get_local_constraints(print_nonlocal);
+  ponies =
+    ponies);
 
-  if (this->processor_id())
+  ponies())
     {
-      this->comm().send(0, local_constraints);
+      ponies);
     }
-  else
+  ponies
     {
-      os << "Processor 0:\n";
-      os << local_constraints;
+      ponies";
+      ponies;
 
-      for (processor_id_type i=1; i<this->n_processors(); ++i)
+      ponies)
         {
-          this->comm().receive(i, local_constraints);
-          os << "Processor " << i << ":\n";
-          os << local_constraints;
+          ponies);
+          ponies";
+          ponies;
         }
     }
 }
 
-std::string DofMap::get_local_constraints(bool print_nonlocal) const
+ponies
 {
-  std::ostringstream os;
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  if (print_nonlocal)
-    os << "All ";
-  else
-    os << "Local ";
+  ponies;
+#ponies
+  ponies)
+    ponies ";
+  ponies
+    ponies ";
 
-  os << "Node Constraints:"
-     << std::endl;
+  ponies:"
+     << ponies;
 
-  for (NodeConstraints::const_iterator it=_node_constraints.begin();
-       it != _node_constraints.end(); ++it)
+  ponies();
+       ponies)
     {
-      const Node *node = it->first;
+      ponies;
 
-      // Skip non-local nodes if requested
-      if (!print_nonlocal &&
-          node->processor_id() != this->processor_id())
-        continue;
+      // ponies
+      ponies &&
+          ponies())
+        ponies;
 
-      const NodeConstraintRow& row = it->second.first;
-      const Point& offset = it->second.second;
+      ponies;
+      ponies;
 
-      os << "Constraints for Node id " << node->id()
-         << ": \t";
+      ponies()
+         << ": \ponies";
 
-      for (NodeConstraintRow::const_iterator pos=row.begin();
-           pos != row.end(); ++pos)
-        os << " (" << pos->first->id() << ","
-           << pos->second << ")\t";
+      ponies();
+           ponies)
+        ponies() << ","
+           << ponies";
 
-      os << "rhs: " << offset;
+      ponies;
 
-      os << std::endl;
+      ponies;
     }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-  if (print_nonlocal)
-    os << "All ";
-  else
-    os << "Local ";
+  ponies)
+    ponies ";
+  ponies
+    ponies ";
 
-  os << "DoF Constraints:"
-     << std::endl;
+  ponies:"
+     << ponies;
 
-  for (DofConstraints::const_iterator it=_dof_constraints.begin();
-       it != _dof_constraints.end(); ++it)
+  ponies();
+       ponies)
     {
-      const dof_id_type i = it->first;
+      ponies;
 
-      // Skip non-local dofs if requested
-      if (!print_nonlocal &&
-          ((i < this->first_dof()) ||
-           (i >= this->end_dof())))
-        continue;
+      // ponies
+      ponies &&
+          ((ponies()) ||
+           (ponies())))
+        ponies;
 
-      const DofConstraintRow& row = it->second;
-      DofConstraintValueMap::const_iterator rhsit =
-        _primal_constraint_values.find(i);
-      const Number rhs = (rhsit == _primal_constraint_values.end()) ?
-        0 : rhsit->second;
+      ponies;
+      ponies =
+        ponies);
+      ponies()) ?
+        ponies;
 
-      os << "Constraints for DoF " << i
-         << ": \t";
+      ponies
+         << ": \ponies";
 
-      for (DofConstraintRow::const_iterator pos=row.begin();
-           pos != row.end(); ++pos)
-        os << " (" << pos->first << ","
-           << pos->second << ")\t";
+      ponies();
+           ponies)
+        ponies << ","
+           << ponies";
 
-      os << "rhs: " << rhs;
+      ponies;
 
-      os << std::endl;
+      ponies;
     }
 
-  for (unsigned int qoi_index = 0;
-       qoi_index != _adjoint_dirichlet_boundaries.size();
-       ++qoi_index)
+  ponies;
+       ponies();
+       ++ponies)
     {
-      os << "Adjoint " << qoi_index << " DoF rhs values:"
-         << std::endl;
+      ponies:"
+         << ponies;
 
-      AdjointDofConstraintValues::const_iterator adjoint_map_it =
-        _adjoint_constraint_values.find(qoi_index);
+      ponies =
+        ponies);
 
-      if (adjoint_map_it != _adjoint_constraint_values.end())
-        for (DofConstraintValueMap::const_iterator
-               it=adjoint_map_it->second.begin();
-             it != adjoint_map_it->second.end(); ++it)
+      ponies())
+        ponies
+               ponies();
+             ponies)
           {
-            const dof_id_type i = it->first;
+            ponies;
 
-            // Skip non-local dofs if requested
-            if (!print_nonlocal &&
-                ((i < this->first_dof()) ||
-                 (i >= this->end_dof())))
-              continue;
+            // ponies
+            ponies &&
+                ((ponies()) ||
+                 (ponies())))
+              ponies;
 
-            const Number rhs = it->second;
+            ponies;
 
-            os << "RHS for DoF " << i
-               << ": " << rhs;
+            ponies
+               << ": " << ponies;
 
-            os << std::endl;
+            ponies;
           }
     }
 
-  return os.str();
+  ponies();
 }
 
 
 
-void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
-                                       std::vector<dof_id_type>& elem_dofs,
-                                       bool asymmetric_constraint_rows) const
+ponies,
+                                       ponies,
+                                       ponies
 {
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
+  ponies());
+  ponies());
 
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // The constrained matrix is built up as C^T K C.
-  DenseMatrix<Number> C;
+  // ponies.
+  ponies;
 
 
-  this->build_constraint_matrix (C, elem_dofs);
+  ponies);
 
-  START_LOG("constrain_elem_matrix()", "DofMap");
+  ponies");
 
-  // It is possible that the matrix is not constrained at all.
-  if ((C.m() == matrix.m()) &&
-      (C.n() == elem_dofs.size())) // It the matrix is constrained
+  // ponies.
+  ponies()) &&
+      (ponies
     {
-      // Compute the matrix-matrix-matrix product C^T K C
-      matrix.left_multiply_transpose  (C);
-      matrix.right_multiply (C);
+      // ponies
+      ponies);
+      ponies);
 
 
-      libmesh_assert_equal_to (matrix.m(), matrix.n());
-      libmesh_assert_equal_to (matrix.m(), elem_dofs.size());
-      libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
+      ponies());
+      ponies());
+      ponies());
 
 
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
-        // If the DOF is constrained
-        if (this->is_constrained_dof(elem_dofs[i]))
+      ponies++)
+        // ponies
+        ponies]))
           {
-            for (unsigned int j=0; j<matrix.n(); j++)
-              matrix(i,j) = 0.;
+            ponies++)
+              ponies.;
 
-            matrix(i,i) = 1.;
+            ponies.;
 
-            if (asymmetric_constraint_rows)
+            ponies)
               {
-                DofConstraints::const_iterator
-                  pos = _dof_constraints.find(elem_dofs[i]);
+                ponies
+                  ponies]);
 
-                libmesh_assert (pos != _dof_constraints.end());
+                ponies());
 
-                const DofConstraintRow& constraint_row = pos->second;
+                ponies;
 
-                // This is an overzealous assertion in the presence of
-                // heterogenous constraints: we now can constrain "u_i = c"
-                // with no other u_j terms involved.
+                // ponies
+                // ponies"
+                // ponies.
                 //
-                // libmesh_assert (!constraint_row.empty());
+                // ponies());
 
-                for (DofConstraintRow::const_iterator
-                       it=constraint_row.begin(); it != constraint_row.end();
-                     ++it)
-                  for (unsigned int j=0; j<elem_dofs.size(); j++)
-                    if (elem_dofs[j] == it->first)
-                      matrix(i,j) = -it->second;
+                ponies
+                       ponies();
+                     ++ponies)
+                  ponies++)
+                    ponies)
+                      ponies;
               }
           }
-    } // end if is constrained...
+    } // ponies...
 
-  STOP_LOG("constrain_elem_matrix()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
-                                                  DenseVector<Number>& rhs,
-                                                  std::vector<dof_id_type>& elem_dofs,
-                                                  bool asymmetric_constraint_rows) const
+ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies
 {
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
-  libmesh_assert_equal_to (elem_dofs.size(), rhs.size());
+  ponies());
+  ponies());
+  ponies());
 
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // The constrained matrix is built up as C^T K C.
-  // The constrained RHS is built up as C^T F
-  DenseMatrix<Number> C;
+  // ponies.
+  // ponies
+  ponies;
 
-  this->build_constraint_matrix (C, elem_dofs);
+  ponies);
 
-  START_LOG("cnstrn_elem_mat_vec()", "DofMap");
+  ponies");
 
-  // It is possible that the matrix is not constrained at all.
-  if ((C.m() == matrix.m()) &&
-      (C.n() == elem_dofs.size())) // It the matrix is constrained
+  // ponies.
+  ponies()) &&
+      (ponies
     {
-      // Compute the matrix-matrix-matrix product C^T K C
-      matrix.left_multiply_transpose  (C);
-      matrix.right_multiply (C);
+      // ponies
+      ponies);
+      ponies);
 
 
-      libmesh_assert_equal_to (matrix.m(), matrix.n());
-      libmesh_assert_equal_to (matrix.m(), elem_dofs.size());
-      libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
+      ponies());
+      ponies());
+      ponies());
 
 
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
-        if (this->is_constrained_dof(elem_dofs[i]))
+      ponies++)
+        ponies]))
           {
-            for (unsigned int j=0; j<matrix.n(); j++)
-              matrix(i,j) = 0.;
+            ponies++)
+              ponies.;
 
-            // If the DOF is constrained
-            matrix(i,i) = 1.;
+            // ponies
+            ponies.;
 
-            // This will put a nonsymmetric entry in the constraint
-            // row to ensure that the linear system produces the
-            // correct value for the constrained DOF.
-            if (asymmetric_constraint_rows)
+            // ponies
+            // ponies
+            // ponies.
+            ponies)
               {
-                DofConstraints::const_iterator
-                  pos = _dof_constraints.find(elem_dofs[i]);
+                ponies
+                  ponies]);
 
-                libmesh_assert (pos != _dof_constraints.end());
+                ponies());
 
-                const DofConstraintRow& constraint_row = pos->second;
+                ponies;
 
-                // p refinement creates empty constraint rows
-                //    libmesh_assert (!constraint_row.empty());
+                // ponies
+                //    ponies());
 
-                for (DofConstraintRow::const_iterator
-                       it=constraint_row.begin(); it != constraint_row.end();
-                     ++it)
-                  for (unsigned int j=0; j<elem_dofs.size(); j++)
-                    if (elem_dofs[j] == it->first)
-                      matrix(i,j) = -it->second;
+                ponies
+                       ponies();
+                     ++ponies)
+                  ponies++)
+                    ponies)
+                      ponies;
               }
           }
 
 
-      // Compute the matrix-vector product C^T F
-      DenseVector<Number> old_rhs(rhs);
+      // ponies
+      ponies);
 
-      // compute matrix/vector product
-      C.vector_mult_transpose(rhs, old_rhs);
-    } // end if is constrained...
+      // ponies
+      ponies);
+    } // ponies...
 
-  STOP_LOG("cnstrn_elem_mat_vec()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::heterogenously_constrain_element_matrix_and_vector
-(DenseMatrix<Number>& matrix,
- DenseVector<Number>& rhs,
- std::vector<dof_id_type>& elem_dofs,
- bool asymmetric_constraint_rows,
- int qoi_index) const
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies
 {
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
-  libmesh_assert_equal_to (elem_dofs.size(), rhs.size());
+  ponies());
+  ponies());
+  ponies());
 
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // The constrained matrix is built up as C^T K C.
-  // The constrained RHS is built up as C^T (F - K H)
-  DenseMatrix<Number> C;
-  DenseVector<Number> H;
+  // ponies.
+  // ponies)
+  ponies;
+  ponies;
 
-  this->build_constraint_matrix_and_vector (C, H, elem_dofs, qoi_index);
+  ponies);
 
-  START_LOG("hetero_cnstrn_elem_mat_vec()", "DofMap");
+  ponies");
 
-  // It is possible that the matrix is not constrained at all.
-  if ((C.m() == matrix.m()) &&
-      (C.n() == elem_dofs.size())) // It the matrix is constrained
+  // ponies.
+  ponies()) &&
+      (ponies
     {
-      // We may have rhs values to use later
-      const DofConstraintValueMap *rhs_values = NULL;
-      if (qoi_index < 0)
-        rhs_values = &_primal_constraint_values;
-      else
+      // ponies
+      ponies;
+      ponies)
+        ponies;
+      ponies
         {
-          const AdjointDofConstraintValues::const_iterator
-            it = _adjoint_constraint_values.find(qoi_index);
-          if (it != _adjoint_constraint_values.end())
-            rhs_values = &it->second;
+          ponies
+            ponies);
+          ponies())
+            ponies;
         }
 
-      // Compute matrix/vector product K H
-      DenseVector<Number> KH;
-      matrix.vector_mult(KH, H);
+      // ponies
+      ponies;
+      ponies);
 
-      // Compute the matrix-vector product C^T (F - KH)
-      DenseVector<Number> F_minus_KH(rhs);
-      F_minus_KH -= KH;
-      C.vector_mult_transpose(rhs, F_minus_KH);
+      // ponies)
+      ponies);
+      ponies;
+      ponies);
 
-      // Compute the matrix-matrix-matrix product C^T K C
-      matrix.left_multiply_transpose  (C);
-      matrix.right_multiply (C);
+      // ponies
+      ponies);
+      ponies);
 
-      libmesh_assert_equal_to (matrix.m(), matrix.n());
-      libmesh_assert_equal_to (matrix.m(), elem_dofs.size());
-      libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
+      ponies());
+      ponies());
+      ponies());
 
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
+      ponies++)
         {
-          const dof_id_type dof_id = elem_dofs[i];
+          ponies];
 
-          if (this->is_constrained_dof(dof_id))
+          ponies))
             {
-              for (unsigned int j=0; j<matrix.n(); j++)
-                matrix(i,j) = 0.;
+              ponies++)
+                ponies.;
 
-              // If the DOF is constrained
-              matrix(i,i) = 1.;
+              // ponies
+              ponies.;
 
-              // This will put a nonsymmetric entry in the constraint
-              // row to ensure that the linear system produces the
-              // correct value for the constrained DOF.
-              if (asymmetric_constraint_rows)
+              // ponies
+              // ponies
+              // ponies.
+              ponies)
                 {
-                  DofConstraints::const_iterator
-                    pos = _dof_constraints.find(dof_id);
+                  ponies
+                    ponies);
 
-                  libmesh_assert (pos != _dof_constraints.end());
+                  ponies());
 
-                  const DofConstraintRow& constraint_row = pos->second;
+                  ponies;
 
-                  for (DofConstraintRow::const_iterator
-                         it=constraint_row.begin(); it != constraint_row.end();
-                       ++it)
-                    for (unsigned int j=0; j<elem_dofs.size(); j++)
-                      if (elem_dofs[j] == it->first)
-                        matrix(i,j) = -it->second;
+                  ponies
+                         ponies();
+                       ++ponies)
+                    ponies++)
+                      ponies)
+                        ponies;
 
-                  if (rhs_values)
+                  ponies)
                     {
-                      const DofConstraintValueMap::const_iterator valpos =
-                        rhs_values->find(dof_id);
+                      ponies =
+                        ponies);
 
-                      rhs(i) = (valpos == rhs_values->end()) ?
-                        0 : valpos->second;
+                      ponies()) ?
+                        ponies;
                     }
                 }
-              else
-                rhs(i) = 0.;
+              ponies
+                ponies.;
             }
         }
 
-    } // end if is constrained...
+    } // ponies...
 
-  STOP_LOG("hetero_cnstrn_elem_mat_vec()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::heterogenously_constrain_element_vector
-(const DenseMatrix<Number>& matrix,
- DenseVector<Number>& rhs,
- std::vector<dof_id_type>& elem_dofs,
- bool asymmetric_constraint_rows,
- int qoi_index) const
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies
 {
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
-  libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
-  libmesh_assert_equal_to (elem_dofs.size(), rhs.size());
+  ponies());
+  ponies());
+  ponies());
 
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // The constrained matrix is built up as C^T K C.
-  // The constrained RHS is built up as C^T (F - K H)
-  DenseMatrix<Number> C;
-  DenseVector<Number> H;
+  // ponies.
+  // ponies)
+  ponies;
+  ponies;
 
-  this->build_constraint_matrix_and_vector (C, H, elem_dofs, qoi_index);
+  ponies);
 
-  START_LOG("hetero_cnstrn_elem_vec()", "DofMap");
+  ponies");
 
-  // It is possible that the matrix is not constrained at all.
-  if ((C.m() == matrix.m()) &&
-      (C.n() == elem_dofs.size())) // It the matrix is constrained
+  // ponies.
+  ponies()) &&
+      (ponies
     {
-      // We may have rhs values to use later
-      const DofConstraintValueMap *rhs_values = NULL;
-      if (qoi_index < 0)
-        rhs_values = &_primal_constraint_values;
-      else
+      // ponies
+      ponies;
+      ponies)
+        ponies;
+      ponies
         {
-          const AdjointDofConstraintValues::const_iterator
-            it = _adjoint_constraint_values.find(qoi_index);
-          if (it != _adjoint_constraint_values.end())
-            rhs_values = &it->second;
+          ponies
+            ponies);
+          ponies())
+            ponies;
         }
 
-      // Compute matrix/vector product K H
-      DenseVector<Number> KH;
-      matrix.vector_mult(KH, H);
+      // ponies
+      ponies;
+      ponies);
 
-      // Compute the matrix-vector product C^T (F - KH)
-      DenseVector<Number> F_minus_KH(rhs);
-      F_minus_KH -= KH;
-      C.vector_mult_transpose(rhs, F_minus_KH);
+      // ponies)
+      ponies);
+      ponies;
+      ponies);
 
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
+      ponies++)
         {
-          const dof_id_type dof_id = elem_dofs[i];
+          ponies];
 
-          if (this->is_constrained_dof(dof_id))
+          ponies))
             {
-              // This will put a nonsymmetric entry in the constraint
-              // row to ensure that the linear system produces the
-              // correct value for the constrained DOF.
-              if (asymmetric_constraint_rows && rhs_values)
+              // ponies
+              // ponies
+              // ponies.
+              ponies)
                 {
-                  const DofConstraintValueMap::const_iterator valpos =
-                    rhs_values->find(dof_id);
+                  ponies =
+                    ponies);
 
-                  rhs(i) = (valpos == rhs_values->end()) ?
-                    0 : valpos->second;
+                  ponies()) ?
+                    ponies;
                 }
-              else
-                rhs(i) = 0.;
+              ponies
+                ponies.;
             }
         }
 
-    } // end if is constrained...
+    } // ponies...
 
-  STOP_LOG("hetero_cnstrn_elem_vec()", "DofMap");
+  ponies");
 }
 
 
 
 
-void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
-                                       std::vector<dof_id_type>& row_dofs,
-                                       std::vector<dof_id_type>& col_dofs,
-                                       bool asymmetric_constraint_rows) const
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies
 {
-  libmesh_assert_equal_to (row_dofs.size(), matrix.m());
-  libmesh_assert_equal_to (col_dofs.size(), matrix.n());
+  ponies());
+  ponies());
 
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // The constrained matrix is built up as R^T K C.
-  DenseMatrix<Number> R;
-  DenseMatrix<Number> C;
+  // ponies.
+  ponies;
+  ponies;
 
-  // Safeguard against the user passing us the same
-  // object for row_dofs and col_dofs.  If that is done
-  // the calls to build_matrix would fail
-  std::vector<dof_id_type> orig_row_dofs(row_dofs);
-  std::vector<dof_id_type> orig_col_dofs(col_dofs);
+  // ponies
+  // ponies
+  // ponies
+  ponies);
+  ponies);
 
-  this->build_constraint_matrix (R, orig_row_dofs);
-  this->build_constraint_matrix (C, orig_col_dofs);
+  ponies);
+  ponies);
 
-  START_LOG("constrain_elem_matrix()", "DofMap");
+  ponies");
 
-  row_dofs = orig_row_dofs;
-  col_dofs = orig_col_dofs;
+  ponies;
+  ponies;
 
 
-  // It is possible that the matrix is not constrained at all.
-  if ((R.m() == matrix.m()) &&
-      (R.n() == row_dofs.size()) &&
-      (C.m() == matrix.n()) &&
-      (C.n() == col_dofs.size())) // If the matrix is constrained
+  // ponies.
+  ponies()) &&
+      (ponies()) &&
+      (ponies()) &&
+      (ponies
     {
-      // K_constrained = R^T K C
-      matrix.left_multiply_transpose  (R);
-      matrix.right_multiply (C);
+      // ponies
+      ponies);
+      ponies);
 
 
-      libmesh_assert_equal_to (matrix.m(), row_dofs.size());
-      libmesh_assert_equal_to (matrix.n(), col_dofs.size());
+      ponies());
+      ponies());
 
 
-      for (unsigned int i=0; i<row_dofs.size(); i++)
-        if (this->is_constrained_dof(row_dofs[i]))
+      ponies++)
+        ponies]))
           {
-            for (unsigned int j=0; j<matrix.n(); j++)
+            ponies++)
               {
-                if(row_dofs[i] != col_dofs[j])
-                  matrix(i,j) = 0.;
-                else // If the DOF is constrained
-                  matrix(i,j) = 1.;
+                ponies])
+                  ponies.;
+                ponies
+                  ponies.;
               }
 
-            if (asymmetric_constraint_rows)
+            ponies)
               {
-                DofConstraints::const_iterator
-                  pos = _dof_constraints.find(row_dofs[i]);
+                ponies
+                  ponies]);
 
-                libmesh_assert (pos != _dof_constraints.end());
+                ponies());
 
-                const DofConstraintRow& constraint_row = pos->second;
+                ponies;
 
-                libmesh_assert (!constraint_row.empty());
+                ponies());
 
-                for (DofConstraintRow::const_iterator
-                       it=constraint_row.begin(); it != constraint_row.end();
-                     ++it)
-                  for (unsigned int j=0; j<col_dofs.size(); j++)
-                    if (col_dofs[j] == it->first)
-                      matrix(i,j) = -it->second;
+                ponies
+                       ponies();
+                     ++ponies)
+                  ponies++)
+                    ponies)
+                      ponies;
               }
           }
-    } // end if is constrained...
+    } // ponies...
 
-  STOP_LOG("constrain_elem_matrix()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
-                                       std::vector<dof_id_type>& row_dofs,
-                                       bool) const
+ponies,
+                                       ponies,
+                                       ponies
 {
-  libmesh_assert_equal_to (rhs.size(), row_dofs.size());
+  ponies());
 
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // The constrained RHS is built up as R^T F.
-  DenseMatrix<Number> R;
+  // ponies.
+  ponies;
 
-  this->build_constraint_matrix (R, row_dofs);
+  ponies);
 
-  START_LOG("constrain_elem_vector()", "DofMap");
+  ponies");
 
-  // It is possible that the vector is not constrained at all.
-  if ((R.m() == rhs.size()) &&
-      (R.n() == row_dofs.size())) // if the RHS is constrained
+  // ponies.
+  ponies()) &&
+      (ponies
     {
-      // Compute the matrix-vector product
-      DenseVector<Number> old_rhs(rhs);
-      R.vector_mult_transpose(rhs, old_rhs);
+      // ponies
+      ponies);
+      ponies);
 
-      libmesh_assert_equal_to (row_dofs.size(), rhs.size());
+      ponies());
 
-      for (unsigned int i=0; i<row_dofs.size(); i++)
-        if (this->is_constrained_dof(row_dofs[i]))
+      ponies++)
+        ponies]))
           {
-            // If the DOF is constrained
-            libmesh_assert (_dof_constraints.find(row_dofs[i]) != _dof_constraints.end());
+            // ponies
+            ponies());
 
-            rhs(i) = 0;
+            ponies;
           }
-    } // end if the RHS is constrained.
+    } // ponies.
 
-  STOP_LOG("constrain_elem_vector()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
-                                            DenseVector<Number>& w,
-                                            std::vector<dof_id_type>& row_dofs,
-                                            bool) const
+ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies
 {
-  libmesh_assert_equal_to (v.size(), row_dofs.size());
-  libmesh_assert_equal_to (w.size(), row_dofs.size());
+  ponies());
+  ponies());
 
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // The constrained RHS is built up as R^T F.
-  DenseMatrix<Number> R;
+  // ponies.
+  ponies;
 
-  this->build_constraint_matrix (R, row_dofs);
+  ponies);
 
-  START_LOG("cnstrn_elem_dyad_mat()", "DofMap");
+  ponies");
 
-  // It is possible that the vector is not constrained at all.
-  if ((R.m() == v.size()) &&
-      (R.n() == row_dofs.size())) // if the RHS is constrained
+  // ponies.
+  ponies()) &&
+      (ponies
     {
-      // Compute the matrix-vector products
-      DenseVector<Number> old_v(v);
-      DenseVector<Number> old_w(w);
+      // ponies
+      ponies);
+      ponies);
 
-      // compute matrix/vector product
-      R.vector_mult_transpose(v, old_v);
-      R.vector_mult_transpose(w, old_w);
+      // ponies
+      ponies);
+      ponies);
 
-      libmesh_assert_equal_to (row_dofs.size(), v.size());
-      libmesh_assert_equal_to (row_dofs.size(), w.size());
+      ponies());
+      ponies());
 
-      /* Constrain only v, not w.  */
+      /* ponies.  */
 
-      for (unsigned int i=0; i<row_dofs.size(); i++)
-        if (this->is_constrained_dof(row_dofs[i]))
+      ponies++)
+        ponies]))
           {
-            // If the DOF is constrained
-            libmesh_assert (_dof_constraints.find(row_dofs[i]) != _dof_constraints.end());
+            // ponies
+            ponies());
 
-            v(i) = 0;
+            ponies;
           }
-    } // end if the RHS is constrained.
+    } // ponies.
 
-  STOP_LOG("cnstrn_elem_dyad_mat()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::constrain_nothing (std::vector<dof_id_type>& dofs) const
+ponies
 {
-  // check for easy return
-  if (this->_dof_constraints.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // All the work is done by \p build_constraint_matrix.  We just need
-  // a dummy matrix.
-  DenseMatrix<Number> R;
-  this->build_constraint_matrix (R, dofs);
+  // ponies
+  // ponies.
+  ponies;
+  ponies);
 }
 
 
 
-void DofMap::enforce_constraints_exactly (const System &system,
-                                          NumericVector<Number> *v,
-                                          bool homogeneous) const
+ponies,
+                                          ponies,
+                                          ponies
 {
-  parallel_object_only();
+  ponies();
 
-  if (!this->n_constrained_dofs())
-    return;
+  ponies())
+    ponies;
 
-  START_LOG("enforce_constraints_exactly()","DofMap");
+  ponies");
 
-  if (!v)
-    v = system.solution.get();
+  ponies)
+    ponies();
 
-  NumericVector<Number> *v_local  = NULL; // will be initialized below
-  NumericVector<Number> *v_global = NULL; // will be initialized below
-  UniquePtr<NumericVector<Number> > v_built;
-  if (v->type() == SERIAL)
+  ponies
+  ponies
+  ponies;
+  ponies)
     {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
-      v_built->close();
+      ponies());
+      ponies);
+      ponies();
 
-      for (dof_id_type i=v_built->first_local_index();
-           i<v_built->last_local_index(); i++)
-        v_built->set(i, (*v)(i));
-      v_built->close();
-      v_global = v_built.get();
+      ponies();
+           ponies++)
+        ponies));
+      ponies();
+      ponies();
 
-      v_local = v;
-      libmesh_assert (v_local->closed());
+      ponies;
+      ponies());
     }
-  else if (v->type() == PARALLEL)
+  ponies)
     {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v->size(), v->size(), true, SERIAL);
-      v->localize(*v_built);
-      v_built->close();
-      v_local = v_built.get();
+      ponies());
+      ponies);
+      ponies);
+      ponies();
+      ponies();
 
-      v_global = v;
+      ponies;
     }
-  else if (v->type() == GHOSTED)
+  ponies)
     {
-      v_local = v;
-      v_global = v;
+      ponies;
+      ponies;
     }
-  else // unknown v->type()
-    libmesh_error_msg("ERROR: Unknown v->type() == " << v->type());
+  ponies()
+    ponies());
 
-  // We should never hit these asserts because we should error-out in
-  // else clause above.  Just to be sure we don't try to use v_local
-  // and v_global uninitialized...
-  libmesh_assert(v_local);
-  libmesh_assert(v_global);
-  libmesh_assert_equal_to (this, &(system.get_dof_map()));
+  // ponies
+  // ponies
+  // ponies...
+  ponies);
+  ponies);
+  ponies()));
 
-  DofConstraints::const_iterator c_it = _dof_constraints.begin();
-  const DofConstraints::const_iterator c_end = _dof_constraints.end();
+  ponies();
+  ponies();
 
-  for ( ; c_it != c_end; ++c_it)
+  ponies)
     {
-      dof_id_type constrained_dof = c_it->first;
-      if (constrained_dof < this->first_dof() ||
-          constrained_dof >= this->end_dof())
-        continue;
+      ponies;
+      ponies() ||
+          ponies())
+        ponies;
 
-      const DofConstraintRow constraint_row = c_it->second;
+      ponies;
 
-      Number exact_value = 0;
-      if (!homogeneous)
+      ponies;
+      ponies)
         {
-          DofConstraintValueMap::const_iterator rhsit =
-            _primal_constraint_values.find(constrained_dof);
-          if (rhsit != _primal_constraint_values.end())
-            exact_value = rhsit->second;
+          ponies =
+            ponies);
+          ponies())
+            ponies;
         }
-      for (DofConstraintRow::const_iterator
-             j=constraint_row.begin(); j != constraint_row.end();
-           ++j)
-        exact_value += j->second * (*v_local)(j->first);
+      ponies
+             ponies();
+           ++ponies)
+        ponies);
 
-      v_global->set(constrained_dof, exact_value);
+      ponies);
     }
 
-  // If the old vector was serial, we probably need to send our values
-  // to other processors
-  if (v->type() == SERIAL)
+  // ponies
+  // ponies
+  ponies)
     {
-#ifndef NDEBUG
-      v_global->close();
-#endif
-      v_global->localize (*v);
+#ponies
+      ponies();
+#ponies
+      ponies);
     }
-  v->close();
+  ponies();
 
-  STOP_LOG("enforce_constraints_exactly()","DofMap");
+  ponies");
 }
 
 
 
-void DofMap::enforce_adjoint_constraints_exactly
-(NumericVector<Number> &v,
- unsigned int q) const
+ponies
+(ponies,
+ ponies
 {
-  parallel_object_only();
+  ponies();
 
-  if (!this->n_constrained_dofs())
-    return;
+  ponies())
+    ponies;
 
-  START_LOG("enforce_adjoint_constraints_exactly()","DofMap");
+  ponies");
 
-  NumericVector<Number> *v_local  = NULL; // will be initialized below
-  NumericVector<Number> *v_global = NULL; // will be initialized below
-  UniquePtr<NumericVector<Number> > v_built;
-  if (v.type() == SERIAL)
+  ponies
+  ponies
+  ponies;
+  ponies)
     {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
-      v_built->close();
+      ponies());
+      ponies);
+      ponies();
 
-      for (dof_id_type i=v_built->first_local_index();
-           i<v_built->last_local_index(); i++)
-        v_built->set(i, v(i));
-      v_built->close();
-      v_global = v_built.get();
+      ponies();
+           ponies++)
+        ponies));
+      ponies();
+      ponies();
 
-      v_local = &v;
-      libmesh_assert (v_local->closed());
+      ponies;
+      ponies());
     }
-  else if (v.type() == PARALLEL)
+  ponies)
     {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v.size(), v.size(), true, SERIAL);
-      v.localize(*v_built);
-      v_built->close();
-      v_local = v_built.get();
+      ponies());
+      ponies);
+      ponies);
+      ponies();
+      ponies();
 
-      v_global = &v;
+      ponies;
     }
-  else if (v.type() == GHOSTED)
+  ponies)
     {
-      v_local = &v;
-      v_global = &v;
+      ponies;
+      ponies;
     }
-  else // unknown v.type()
-    libmesh_error_msg("ERROR: Unknown v.type() == " << v.type());
+  ponies()
+    ponies());
 
-  // We should never hit these asserts because we should error-out in
-  // else clause above.  Just to be sure we don't try to use v_local
-  // and v_global uninitialized...
-  libmesh_assert(v_local);
-  libmesh_assert(v_global);
+  // ponies
+  // ponies
+  // ponies...
+  ponies);
+  ponies);
 
-  // Do we have any non_homogeneous constraints?
-  const AdjointDofConstraintValues::const_iterator
-    adjoint_constraint_map_it = _adjoint_constraint_values.find(q);
-  const DofConstraintValueMap *constraint_map =
-    (adjoint_constraint_map_it == _adjoint_constraint_values.end()) ?
-    NULL : &adjoint_constraint_map_it->second;
+  // ponies?
+  ponies
+    ponies);
+  ponies =
+    (ponies()) ?
+    ponies;
 
-  DofConstraints::const_iterator c_it = _dof_constraints.begin();
-  const DofConstraints::const_iterator c_end = _dof_constraints.end();
+  ponies();
+  ponies();
 
-  for ( ; c_it != c_end; ++c_it)
+  ponies)
     {
-      dof_id_type constrained_dof = c_it->first;
-      if (constrained_dof < this->first_dof() ||
-          constrained_dof >= this->end_dof())
-        continue;
+      ponies;
+      ponies() ||
+          ponies())
+        ponies;
 
-      const DofConstraintRow constraint_row = c_it->second;
+      ponies;
 
-      Number exact_value = 0;
-      if (constraint_map)
+      ponies;
+      ponies)
         {
-          const DofConstraintValueMap::const_iterator
-            adjoint_constraint_it =
-            constraint_map->find(constrained_dof);
-          if (adjoint_constraint_it != constraint_map->end())
-            exact_value = adjoint_constraint_it->second;
+          ponies
+            ponies =
+            ponies);
+          ponies())
+            ponies;
         }
 
-      for (DofConstraintRow::const_iterator
-             j=constraint_row.begin(); j != constraint_row.end();
-           ++j)
-        exact_value += j->second * (*v_local)(j->first);
+      ponies
+             ponies();
+           ++ponies)
+        ponies);
 
-      v_global->set(constrained_dof, exact_value);
+      ponies);
     }
 
-  // If the old vector was serial, we probably need to send our values
-  // to other processors
-  if (v.type() == SERIAL)
+  // ponies
+  // ponies
+  ponies)
     {
-#ifndef NDEBUG
-      v_global->close();
-#endif
-      v_global->localize (v);
+#ponies
+      ponies();
+#ponies
+      ponies);
     }
-  v.close();
+  ponies();
 
-  STOP_LOG("enforce_adjoint_constraints_exactly()","DofMap");
+  ponies");
 }
 
 
 
-std::pair<Real, Real>
-DofMap::max_constraint_error (const System &system,
-                              NumericVector<Number> *v) const
+ponies>
+ponies,
+                              ponies
 {
-  if (!v)
-    v = system.solution.get();
-  NumericVector<Number> &vec = *v;
+  ponies)
+    ponies();
+  ponies;
 
-  // We'll assume the vector is closed
-  libmesh_assert (vec.closed());
+  // ponies
+  ponies());
 
-  Real max_absolute_error = 0., max_relative_error = 0.;
+  ponies.;
 
-  const MeshBase &mesh = system.get_mesh();
+  ponies();
 
-  libmesh_assert_equal_to (this, &(system.get_dof_map()));
+  ponies()));
 
-  // indices on each element
-  std::vector<dof_id_type> local_dof_indices;
+  // ponies
+  ponies;
 
-  MeshBase::const_element_iterator       elem_it  =
-    mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end =
-    mesh.active_local_elements_end();
+  ponies  =
+    ponies();
+  ponies =
+    ponies();
 
-  for ( ; elem_it != elem_end; ++elem_it)
+  ponies)
     {
-      const Elem* elem = *elem_it;
+      ponies;
 
-      this->dof_indices(elem, local_dof_indices);
-      std::vector<dof_id_type> raw_dof_indices = local_dof_indices;
+      ponies);
+      ponies;
 
-      // Constraint matrix for each element
-      DenseMatrix<Number> C;
+      // ponies
+      ponies;
 
-      this->build_constraint_matrix (C, local_dof_indices);
+      ponies);
 
-      // Continue if the element is unconstrained
-      if (!C.m())
-        continue;
+      // ponies
+      ponies())
+        ponies;
 
-      libmesh_assert_equal_to (C.m(), raw_dof_indices.size());
-      libmesh_assert_equal_to (C.n(), local_dof_indices.size());
+      ponies());
+      ponies());
 
-      for (unsigned int i=0; i!=C.m(); ++i)
+      ponies)
         {
-          // Recalculate any constrained dof owned by this processor
-          dof_id_type global_dof = raw_dof_indices[i];
-          if (this->is_constrained_dof(global_dof) &&
-              global_dof >= vec.first_local_index() &&
-              global_dof < vec.last_local_index())
+          // ponies
+          ponies];
+          ponies) &&
+              ponies() &&
+              ponies())
             {
-              DofConstraints::const_iterator
-                pos = _dof_constraints.find(global_dof);
+              ponies
+                ponies);
 
-              libmesh_assert (pos != _dof_constraints.end());
+              ponies());
 
-              Number exact_value = 0;
-              DofConstraintValueMap::const_iterator rhsit =
-                _primal_constraint_values.find(global_dof);
-              if (rhsit != _primal_constraint_values.end())
-                exact_value = rhsit->second;
+              ponies;
+              ponies =
+                ponies);
+              ponies())
+                ponies;
 
-              for (unsigned int j=0; j!=C.n(); ++j)
+              ponies)
                 {
-                  if (local_dof_indices[j] != global_dof)
-                    exact_value += C(i,j) *
-                      vec(local_dof_indices[j]);
+                  ponies)
+                    ponies) *
+                      ponies]);
                 }
 
-              max_absolute_error = std::max(max_absolute_error,
-                                            std::abs(vec(global_dof) - exact_value));
-              max_relative_error = std::max(max_relative_error,
-                                            std::abs(vec(global_dof) - exact_value)
-                                            / std::abs(exact_value));
+              ponies,
+                                            ponies));
+              ponies,
+                                            ponies)
+                                            / ponies));
             }
         }
     }
 
-  return std::pair<Real, Real>(max_absolute_error, max_relative_error);
+  ponies);
 }
 
 
 
-void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
-                                      std::vector<dof_id_type>& elem_dofs,
-                                      const bool called_recursively) const
+ponies,
+                                      ponies,
+                                      ponies
 {
-  if (!called_recursively) START_LOG("build_constraint_matrix()", "DofMap");
+  ponies");
 
-  // Create a set containing the DOFs we already depend on
-  typedef std::set<dof_id_type> RCSet;
-  RCSet dof_set;
+  // ponies
+  ponies;
+  ponies;
 
-  bool we_have_constraints = false;
+  ponies;
 
-  // Next insert any other dofs the current dofs might be constrained
-  // in terms of.  Note that in this case we may not be done: Those
-  // may in turn depend on others.  So, we need to repeat this process
-  // in that case until the system depends only on unconstrained
-  // degrees of freedom.
-  for (unsigned int i=0; i<elem_dofs.size(); i++)
-    if (this->is_constrained_dof(elem_dofs[i]))
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies++)
+    ponies]))
       {
-        we_have_constraints = true;
+        ponies;
 
-        // If the DOF is constrained
-        DofConstraints::const_iterator
-          pos = _dof_constraints.find(elem_dofs[i]);
+        // ponies
+        ponies
+          ponies]);
 
-        libmesh_assert (pos != _dof_constraints.end());
+        ponies());
 
-        const DofConstraintRow& constraint_row = pos->second;
+        ponies;
 
-        // Constraint rows in p refinement may be empty
-        //libmesh_assert (!constraint_row.empty());
+        // ponies
+        //ponies());
 
-        for (DofConstraintRow::const_iterator
-               it=constraint_row.begin(); it != constraint_row.end();
-             ++it)
-          dof_set.insert (it->first);
+        ponies
+               ponies();
+             ++ponies)
+          ponies);
       }
 
-  // May be safe to return at this point
-  // (but remember to stop the perflog)
-  if (!we_have_constraints)
+  // ponies
+  // (ponies)
+  ponies)
     {
-      STOP_LOG("build_constraint_matrix()", "DofMap");
-      return;
+      ponies");
+      ponies;
     }
 
-  for (unsigned int i=0; i != elem_dofs.size(); ++i)
-    dof_set.erase (elem_dofs[i]);
+  ponies)
+    ponies]);
 
-  // If we added any DOFS then we need to do this recursively.
-  // It is possible that we just added a DOF that is also
-  // constrained!
+  // ponies.
+  // ponies
+  // ponies!
   //
-  // Also, we need to handle the special case of an element having DOFs
-  // constrained in terms of other, local DOFs
-  if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
-      !called_recursively) // case 2: constrained in terms of our own DOFs
+  // ponies
+  // ponies
+  ponies
+      !ponies
     {
-      const unsigned int old_size =
-        cast_int<unsigned int>(elem_dofs.size());
+      ponies =
+        ponies());
 
-      // Add new dependency dofs to the end of the current dof set
-      elem_dofs.insert(elem_dofs.end(),
-                       dof_set.begin(), dof_set.end());
+      // ponies
+      ponies(),
+                       ponies());
 
-      // Now we can build the constraint matrix.
-      // Note that resize also zeros for a DenseMatrix<Number>.
-      C.resize (old_size,
-                cast_int<unsigned int>(elem_dofs.size()));
+      // ponies.
+      // ponies>.
+      ponies,
+                ponies()));
 
-      // Create the C constraint matrix.
-      for (unsigned int i=0; i != old_size; i++)
-        if (this->is_constrained_dof(elem_dofs[i]))
+      // ponies.
+      ponies++)
+        ponies]))
           {
-            // If the DOF is constrained
-            DofConstraints::const_iterator
-              pos = _dof_constraints.find(elem_dofs[i]);
+            // ponies
+            ponies
+              ponies]);
 
-            libmesh_assert (pos != _dof_constraints.end());
+            ponies());
 
-            const DofConstraintRow& constraint_row = pos->second;
+            ponies;
 
-            // p refinement creates empty constraint rows
-            //    libmesh_assert (!constraint_row.empty());
+            // ponies
+            //    ponies());
 
-            for (DofConstraintRow::const_iterator
-                   it=constraint_row.begin(); it != constraint_row.end();
-                 ++it)
-              for (unsigned int j=0; j != elem_dofs.size(); j++)
-                if (elem_dofs[j] == it->first)
-                  C(i,j) = it->second;
+            ponies
+                   ponies();
+                 ++ponies)
+              ponies++)
+                ponies)
+                  ponies;
           }
-        else
+        ponies
           {
-            C(i,i) = 1.;
+            ponies.;
           }
 
-      // May need to do this recursively.  It is possible
-      // that we just replaced a constrained DOF with another
-      // constrained DOF.
-      DenseMatrix<Number> Cnew;
+      // ponies
+      // ponies
+      // ponies.
+      ponies;
 
-      this->build_constraint_matrix (Cnew, elem_dofs, true);
+      ponies);
 
-      if ((C.n() == Cnew.m()) &&
-          (Cnew.n() == elem_dofs.size())) // If the constraint matrix
-        C.right_multiply(Cnew);           // is constrained...
+      ponies()) &&
+          (ponies
+        ponies...
 
-      libmesh_assert_equal_to (C.n(), elem_dofs.size());
+      ponies());
     }
 
-  if (!called_recursively) STOP_LOG("build_constraint_matrix()", "DofMap");
+  ponies");
 }
 
 
 
-void DofMap::build_constraint_matrix_and_vector
-(DenseMatrix<Number>& C,
- DenseVector<Number>& H,
- std::vector<dof_id_type>& elem_dofs,
- int qoi_index,
- const bool called_recursively) const
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies
 {
-  if (!called_recursively)
-    START_LOG("build_constraint_matrix_and_vector()", "DofMap");
+  ponies)
+    ponies");
 
-  // Create a set containing the DOFs we already depend on
-  typedef std::set<dof_id_type> RCSet;
-  RCSet dof_set;
+  // ponies
+  ponies;
+  ponies;
 
-  bool we_have_constraints = false;
+  ponies;
 
-  // Next insert any other dofs the current dofs might be constrained
-  // in terms of.  Note that in this case we may not be done: Those
-  // may in turn depend on others.  So, we need to repeat this process
-  // in that case until the system depends only on unconstrained
-  // degrees of freedom.
-  for (unsigned int i=0; i<elem_dofs.size(); i++)
-    if (this->is_constrained_dof(elem_dofs[i]))
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies++)
+    ponies]))
       {
-        we_have_constraints = true;
+        ponies;
 
-        // If the DOF is constrained
-        DofConstraints::const_iterator
-          pos = _dof_constraints.find(elem_dofs[i]);
+        // ponies
+        ponies
+          ponies]);
 
-        libmesh_assert (pos != _dof_constraints.end());
+        ponies());
 
-        const DofConstraintRow& constraint_row = pos->second;
+        ponies;
 
-        // Constraint rows in p refinement may be empty
-        //libmesh_assert (!constraint_row.empty());
+        // ponies
+        //ponies());
 
-        for (DofConstraintRow::const_iterator
-               it=constraint_row.begin(); it != constraint_row.end();
-             ++it)
-          dof_set.insert (it->first);
+        ponies
+               ponies();
+             ++ponies)
+          ponies);
       }
 
-  // May be safe to return at this point
-  // (but remember to stop the perflog)
-  if (!we_have_constraints)
+  // ponies
+  // (ponies)
+  ponies)
     {
-      STOP_LOG("build_constraint_matrix_and_vector()", "DofMap");
-      return;
+      ponies");
+      ponies;
     }
 
-  for (unsigned int i=0; i != elem_dofs.size(); ++i)
-    dof_set.erase (elem_dofs[i]);
+  ponies)
+    ponies]);
 
-  // If we added any DOFS then we need to do this recursively.
-  // It is possible that we just added a DOF that is also
-  // constrained!
+  // ponies.
+  // ponies
+  // ponies!
   //
-  // Also, we need to handle the special case of an element having DOFs
-  // constrained in terms of other, local DOFs
-  if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
-      !called_recursively) // case 2: constrained in terms of our own DOFs
+  // ponies
+  // ponies
+  ponies
+      !ponies
     {
-      const DofConstraintValueMap *rhs_values = NULL;
-      if (qoi_index < 0)
-        rhs_values = &_primal_constraint_values;
-      else
+      ponies;
+      ponies)
+        ponies;
+      ponies
         {
-          const AdjointDofConstraintValues::const_iterator
-            it = _adjoint_constraint_values.find(qoi_index);
-          if (it != _adjoint_constraint_values.end())
-            rhs_values = &it->second;
+          ponies
+            ponies);
+          ponies())
+            ponies;
         }
 
-      const unsigned int old_size =
-        cast_int<unsigned int>(elem_dofs.size());
+      ponies =
+        ponies());
 
-      // Add new dependency dofs to the end of the current dof set
-      elem_dofs.insert(elem_dofs.end(),
-                       dof_set.begin(), dof_set.end());
+      // ponies
+      ponies(),
+                       ponies());
 
-      // Now we can build the constraint matrix and vector.
-      // Note that resize also zeros for a DenseMatrix and DenseVector
-      C.resize (old_size,
-                cast_int<unsigned int>(elem_dofs.size()));
-      H.resize (old_size);
+      // ponies.
+      // ponies
+      ponies,
+                ponies()));
+      ponies);
 
-      // Create the C constraint matrix.
-      for (unsigned int i=0; i != old_size; i++)
-        if (this->is_constrained_dof(elem_dofs[i]))
+      // ponies.
+      ponies++)
+        ponies]))
           {
-            // If the DOF is constrained
-            DofConstraints::const_iterator
-              pos = _dof_constraints.find(elem_dofs[i]);
+            // ponies
+            ponies
+              ponies]);
 
-            libmesh_assert (pos != _dof_constraints.end());
+            ponies());
 
-            const DofConstraintRow& constraint_row = pos->second;
+            ponies;
 
-            // p refinement creates empty constraint rows
-            //    libmesh_assert (!constraint_row.empty());
+            // ponies
+            //    ponies());
 
-            for (DofConstraintRow::const_iterator
-                   it=constraint_row.begin(); it != constraint_row.end();
-                 ++it)
-              for (unsigned int j=0; j != elem_dofs.size(); j++)
-                if (elem_dofs[j] == it->first)
-                  C(i,j) = it->second;
+            ponies
+                   ponies();
+                 ++ponies)
+              ponies++)
+                ponies)
+                  ponies;
 
-            if (rhs_values)
+            ponies)
               {
-                DofConstraintValueMap::const_iterator rhsit =
-                  rhs_values->find(elem_dofs[i]);
-                if (rhsit != rhs_values->end())
-                  H(i) = rhsit->second;
+                ponies =
+                  ponies]);
+                ponies())
+                  ponies;
               }
           }
-        else
+        ponies
           {
-            C(i,i) = 1.;
+            ponies.;
           }
 
-      // May need to do this recursively.  It is possible
-      // that we just replaced a constrained DOF with another
-      // constrained DOF.
-      DenseMatrix<Number> Cnew;
-      DenseVector<Number> Hnew;
+      // ponies
+      // ponies
+      // ponies.
+      ponies;
+      ponies;
 
-      this->build_constraint_matrix_and_vector (Cnew, Hnew, elem_dofs,
-                                                qoi_index, true);
+      ponies,
+                                                ponies);
 
-      if ((C.n() == Cnew.m()) &&          // If the constraint matrix
-          (Cnew.n() == elem_dofs.size())) // is constrained...
+      ponies
+          (ponies...
         {
-          C.right_multiply(Cnew);
+          ponies);
 
-          // If x = Cy + h and y = Dz + g
-          // Then x = (CD)z + (Cg + h)
-          C.vector_mult_add(H, 1, Hnew);
+          // ponies
+          // ponies)
+          ponies);
         }
 
-      libmesh_assert_equal_to (C.n(), elem_dofs.size());
+      ponies());
     }
 
-  if (!called_recursively)
-    STOP_LOG("build_constraint_matrix_and_vector()", "DofMap");
+  ponies)
+    ponies");
 }
 
 
-void DofMap::allgather_recursive_constraints(MeshBase& mesh)
+ponies)
 {
-  // This function must be run on all processors at once
-  parallel_object_only();
+  // ponies
+  ponies();
 
-  // Return immediately if there's nothing to gather
-  if (this->n_processors() == 1)
-    return;
+  // ponies
+  ponies)
+    ponies;
 
-  // We might get to return immediately if none of the processors
-  // found any constraints
-  unsigned int has_constraints = !_dof_constraints.empty()
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-    || !_node_constraints.empty()
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+  // ponies
+  // ponies
+  ponies()
+#ponies
+    || !ponies()
+#ponies
     ;
-  this->comm().max(has_constraints);
-  if (!has_constraints)
-    return;
+  ponies);
+  ponies)
+    ponies;
 
-  // If we have heterogenous adjoint constraints we need to
-  // communicate those too.
-  const unsigned int max_qoi_num =
-    _adjoint_constraint_values.empty() ?
-    0 : _adjoint_constraint_values.rbegin()->first;
+  // ponies
+  // ponies.
+  ponies =
+    ponies() ?
+    ponies;
 
-  // We might have calculated constraints for constrained dofs
-  // which have support on other processors.
-  // Push these out first.
+  // ponies
+  // ponies.
+  // ponies.
   {
-    std::vector<std::set<dof_id_type> > pushed_ids(this->n_processors());
+    ponies());
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-    std::vector<std::set<dof_id_type> > pushed_node_ids(this->n_processors());
-#endif
+#ponies
+    ponies());
+#ponies
 
-    const unsigned int sys_num = this->sys_number();
+    ponies();
 
-    MeshBase::element_iterator
-      foreign_elem_it  = mesh.active_not_local_elements_begin(),
-      foreign_elem_end = mesh.active_not_local_elements_end();
+    ponies
+      ponies(),
+      ponies();
 
-    // Collect the constraints to push to each processor
-    for (; foreign_elem_it != foreign_elem_end; ++foreign_elem_it)
+    // ponies
+    ponies)
       {
-        const Elem *elem = *foreign_elem_it;
+        ponies;
 
-        // Just checking dof_indices on the foreign element isn't
-        // enough.  Consider a central hanging node between a coarse
-        // Q2/Q1 element and its finer neighbors on a higher-ranked
-        // processor.  The coarse element's processor will own the node,
-        // and will thereby own the pressure dof on that node, despite
-        // the fact that that pressure dof doesn't directly exist on the
-        // coarse element!
+        // ponies
+        // ponies
+        // ponies
+        // ponies,
+        // ponies
+        // ponies
+        // ponies!
         //
-        // So, we loop through dofs manually.
+        // ponies.
 
         {
-          const unsigned int n_vars = elem->n_vars(sys_num);
-          for (unsigned int v=0; v != n_vars; ++v)
+          ponies);
+          ponies)
             {
-              const unsigned int n_comp = elem->n_comp(sys_num,v);
-              for (unsigned int c=0; c != n_comp; ++c)
+              ponies);
+              ponies)
                 {
-                  const unsigned int id =
-                    elem->dof_number(sys_num,v,c);
-                  if (this->is_constrained_dof(id))
-                    pushed_ids[elem->processor_id()].insert(id);
+                  ponies =
+                    ponies);
+                  ponies))
+                    ponies);
                 }
             }
         }
 
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        ponies)
           {
-            const Node *node = elem->get_node(n);
-            const unsigned int n_vars = node->n_vars(sys_num);
-            for (unsigned int v=0; v != n_vars; ++v)
+            ponies);
+            ponies);
+            ponies)
               {
-                const unsigned int n_comp = node->n_comp(sys_num,v);
-                for (unsigned int c=0; c != n_comp; ++c)
+                ponies);
+                ponies)
                   {
-                    const unsigned int id =
-                      node->dof_number(sys_num,v,c);
-                    if (this->is_constrained_dof(id))
-                      pushed_ids[elem->processor_id()].insert(id);
+                    ponies =
+                      ponies);
+                    ponies))
+                      ponies);
                   }
               }
           }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
-          if (this->is_constrained_node(elem->get_node(n)))
-            pushed_node_ids[elem->processor_id()].insert(elem->node(n));
-#endif
+#ponies
+        ponies)
+          ponies)))
+            ponies));
+#ponies
       }
 
-    // Now trade constraint rows
-    for (processor_id_type p = 0; p != this->n_processors(); ++p)
+    // ponies
+    ponies)
       {
-        // Push to processor procup while receiving from procdown
-        processor_id_type procup =
-          cast_int<processor_id_type>((this->processor_id() + p) %
-                                      this->n_processors());
-        processor_id_type procdown =
-          cast_int<processor_id_type>((this->n_processors() +
-                                       this->processor_id() - p) %
-                                      this->n_processors());
+        // ponies
+        ponies =
+          ponies) %
+                                      ponies());
+        ponies =
+          ponies() +
+                                       ponies) %
+                                      ponies());
 
-        // Pack the dof constraint rows and rhs's to push to procup
-        const std::size_t pushed_ids_size = pushed_ids[procup].size();
-        std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
-        std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
-        std::vector<Number> pushed_rhss(pushed_ids_size);
+        // ponies
+        ponies();
+        ponies);
+        ponies);
+        ponies);
 
-        std::vector<std::vector<Number> >
-          pushed_adj_rhss(max_qoi_num,
-                          std::vector<Number>(pushed_ids_size));
-        std::set<dof_id_type>::const_iterator it = pushed_ids[procup].begin();
-        for (std::size_t i = 0; it != pushed_ids[procup].end();
-             ++i, ++it)
+        ponies> >
+          ponies,
+                          ponies));
+        ponies();
+        ponies();
+             ++ponies)
           {
-            const dof_id_type pushed_id = *it;
-            DofConstraintRow &row = _dof_constraints[pushed_id];
-            std::size_t row_size = row.size();
-            pushed_keys[i].reserve(row_size);
-            pushed_vals[i].reserve(row_size);
-            for (DofConstraintRow::iterator j = row.begin();
-                 j != row.end(); ++j)
+            ponies;
+            ponies];
+            ponies();
+            ponies);
+            ponies);
+            ponies();
+                 ponies)
               {
-                pushed_keys[i].push_back(j->first);
-                pushed_vals[i].push_back(j->second);
+                ponies);
+                ponies);
               }
 
-            DofConstraintValueMap::const_iterator rhsit =
-              _primal_constraint_values.find(pushed_id);
-            pushed_rhss[i] =
-              (rhsit == _primal_constraint_values.end()) ?
-              0 : rhsit->second;
+            ponies =
+              ponies);
+            ponies] =
+              (ponies()) ?
+              ponies;
 
-            for (unsigned int q = 0; q != max_qoi_num; ++q)
+            ponies)
               {
-                AdjointDofConstraintValues::const_iterator adjoint_map_it =
-                  _adjoint_constraint_values.find(q);
+                ponies =
+                  ponies);
 
-                if (adjoint_map_it == _adjoint_constraint_values.end())
-                  continue;
+                ponies())
+                  ponies;
 
-                const DofConstraintValueMap &constraint_map =
-                  adjoint_map_it->second;
+                ponies =
+                  ponies;
 
-                DofConstraintValueMap::const_iterator rhsit =
-                  constraint_map.find(pushed_id);
+                ponies =
+                  ponies);
 
-                pushed_adj_rhss[q][i] =
-                  (rhsit == constraint_map.end()) ?
-                  0 : rhsit->second;
+                ponies] =
+                  (ponies()) ?
+                  ponies;
               }
           }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-        // Pack the node constraint rows to push to procup
-        const std::size_t pushed_nodes_size = pushed_node_ids[procup].size();
-        std::vector<std::vector<dof_id_type> > pushed_node_keys(pushed_nodes_size);
-        std::vector<std::vector<Real> > pushed_node_vals(pushed_nodes_size);
-        std::vector<Point> pushed_node_offsets(pushed_nodes_size);
-        std::set<dof_id_type>::const_iterator node_it = pushed_node_ids[procup].begin();
-        for (std::size_t i = 0; node_it != pushed_node_ids[procup].end();
-             ++i, ++node_it)
+#ponies
+        // ponies
+        ponies();
+        ponies);
+        ponies);
+        ponies);
+        ponies();
+        ponies();
+             ++ponies)
           {
-            const Node *node = mesh.node_ptr(*node_it);
-            NodeConstraintRow &row = _node_constraints[node].first;
-            std::size_t row_size = row.size();
-            pushed_node_keys[i].reserve(row_size);
-            pushed_node_vals[i].reserve(row_size);
-            for (NodeConstraintRow::iterator j = row.begin();
-                 j != row.end(); ++j)
+            ponies);
+            ponies;
+            ponies();
+            ponies);
+            ponies);
+            ponies();
+                 ponies)
               {
-                pushed_node_keys[i].push_back(j->first->id());
-                pushed_node_vals[i].push_back(j->second);
+                ponies());
+                ponies);
               }
-            pushed_node_offsets[i] = _node_constraints[node].second;
+            ponies;
           }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-        // Trade pushed dof constraint rows
-        std::vector<dof_id_type> pushed_ids_from_me
-          (pushed_ids[procup].begin(), pushed_ids[procup].end());
-        std::vector<dof_id_type> pushed_ids_to_me;
-        std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
-        std::vector<std::vector<Real> > pushed_vals_to_me;
-        std::vector<Number> pushed_rhss_to_me;
-        std::vector<std::vector<Number> > pushed_adj_rhss_to_me;
-        this->comm().send_receive(procup, pushed_ids_from_me,
-                                  procdown, pushed_ids_to_me);
-        this->comm().send_receive(procup, pushed_keys,
-                                  procdown, pushed_keys_to_me);
-        this->comm().send_receive(procup, pushed_vals,
-                                  procdown, pushed_vals_to_me);
-        this->comm().send_receive(procup, pushed_rhss,
-                                  procdown, pushed_rhss_to_me);
-        this->comm().send_receive(procup, pushed_adj_rhss,
-                                  procdown, pushed_adj_rhss_to_me);
-        libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
-        libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
-        libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_rhss_to_me.size());
+        // ponies
+        ponies
+          (ponies());
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies,
+                                  ponies);
+        ponies,
+                                  ponies);
+        ponies,
+                                  ponies);
+        ponies,
+                                  ponies);
+        ponies,
+                                  ponies);
+        ponies());
+        ponies());
+        ponies());
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-        // Trade pushed node constraint rows
-        std::vector<dof_id_type> pushed_node_ids_from_me
-          (pushed_node_ids[procup].begin(), pushed_node_ids[procup].end());
-        std::vector<dof_id_type> pushed_node_ids_to_me;
-        std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
-        std::vector<std::vector<Real> > pushed_node_vals_to_me;
-        std::vector<Point> pushed_node_offsets_to_me;
-        this->comm().send_receive(procup, pushed_node_ids_from_me,
-                                  procdown, pushed_node_ids_to_me);
-        this->comm().send_receive(procup, pushed_node_keys,
-                                  procdown, pushed_node_keys_to_me);
-        this->comm().send_receive(procup, pushed_node_vals,
-                                  procdown, pushed_node_vals_to_me);
-        this->comm().send_receive(procup, pushed_node_offsets,
-                                  procdown, pushed_node_offsets_to_me);
+#ponies
+        // ponies
+        ponies
+          (ponies());
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies,
+                                  ponies);
+        ponies,
+                                  ponies);
+        ponies,
+                                  ponies);
+        ponies,
+                                  ponies);
 
-        // Note that we aren't doing a send_receive on the Nodes
-        // themselves.  At this point we should only be pushing out
-        // "raw" constraints, and there should be no
-        // constrained-by-constrained-by-etc. situations that could
-        // involve non-semilocal nodes.
+        // ponies
+        // ponies
+        // "ponies
+        // ponies
+        // ponies.
 
-        libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_keys_to_me.size());
-        libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_vals_to_me.size());
-        libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_offsets_to_me.size());
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+        ponies());
+        ponies());
+        ponies());
+#ponies
 
-        // Add the dof constraints that I've been sent
-        for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
+        // ponies
+        ponies)
           {
-            libmesh_assert_equal_to (pushed_keys_to_me[i].size(), pushed_vals_to_me[i].size());
+            ponies());
 
-            dof_id_type constrained = pushed_ids_to_me[i];
+            ponies];
 
-            // If we don't already have a constraint for this dof,
-            // add the one we were sent
-            if (!this->is_constrained_dof(constrained))
+            // ponies,
+            // ponies
+            ponies))
               {
-                DofConstraintRow &row = _dof_constraints[constrained];
-                for (std::size_t j = 0; j != pushed_keys_to_me[i].size(); ++j)
+                ponies];
+                ponies)
                   {
-                    row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
+                    ponies];
                   }
-                if (libmesh_isnan(pushed_rhss_to_me[i]))
-                  libmesh_assert(pushed_keys_to_me[i].empty());
-                if (pushed_rhss_to_me[i] != Number(0))
-                  _primal_constraint_values[constrained] = pushed_rhss_to_me[i];
-                else
-                  _primal_constraint_values.erase(constrained);
+                ponies]))
+                  ponies());
+                ponies))
+                  ponies];
+                ponies
+                  ponies);
 
-                for (unsigned int q = 0; q != max_qoi_num; ++q)
+                ponies)
                   {
-                    AdjointDofConstraintValues::iterator adjoint_map_it =
-                      _adjoint_constraint_values.find(q);
+                    ponies =
+                      ponies);
 
-                    if ((adjoint_map_it == _adjoint_constraint_values.end()) &&
-                        pushed_adj_rhss_to_me[q][constrained] == Number(0))
-                      continue;
+                    ponies()) &&
+                        ponies))
+                      ponies;
 
-                    if (adjoint_map_it == _adjoint_constraint_values.end())
-                      adjoint_map_it = _adjoint_constraint_values.insert
-                        (std::make_pair(q,DofConstraintValueMap())).first;
+                    ponies())
+                      ponies
+                        (ponies;
 
-                    DofConstraintValueMap &constraint_map =
-                      adjoint_map_it->second;
+                    ponies =
+                      ponies;
 
-                    if (pushed_adj_rhss_to_me[q][i] != Number(0))
-                      constraint_map[constrained] =
-                        pushed_adj_rhss_to_me[q][i];
-                    else
-                      constraint_map.erase(constrained);
+                    ponies))
+                      ponies] =
+                        ponies];
+                    ponies
+                      ponies);
                   }
               }
           }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-        // Add the node constraints that I've been sent
-        for (std::size_t i = 0; i != pushed_node_ids_to_me.size(); ++i)
+#ponies
+        // ponies
+        ponies)
           {
-            libmesh_assert_equal_to (pushed_node_keys_to_me[i].size(), pushed_node_vals_to_me[i].size());
+            ponies());
 
-            dof_id_type constrained_id = pushed_node_ids_to_me[i];
+            ponies];
 
-            // If we don't already have a constraint for this node,
-            // add the one we were sent
-            const Node *constrained = mesh.node_ptr(constrained_id);
-            if (!this->is_constrained_node(constrained))
+            // ponies,
+            // ponies
+            ponies);
+            ponies))
               {
-                NodeConstraintRow &row = _node_constraints[constrained].first;
-                for (std::size_t j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
+                ponies;
+                ponies)
                   {
-                    const Node *key_node = mesh.node_ptr(pushed_node_keys_to_me[i][j]);
-                    libmesh_assert(key_node);
-                    row[key_node] = pushed_node_vals_to_me[i][j];
+                    ponies]);
+                    ponies);
+                    ponies];
                   }
-                _node_constraints[constrained].second = pushed_node_offsets_to_me[i];
+                ponies];
               }
           }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
       }
   }
 
-  // Now start checking for any other constraints we need
-  // to know about, requesting them recursively.
+  // ponies
+  // ponies.
 
-  // Create sets containing the DOFs and nodes we already depend on
-  typedef std::set<dof_id_type> DoF_RCSet;
-  DoF_RCSet unexpanded_dofs;
+  // ponies
+  ponies;
+  ponies;
 
-  for (DofConstraints::iterator i = _dof_constraints.begin();
-       i != _dof_constraints.end(); ++i)
+  ponies();
+       ponies)
     {
-      unexpanded_dofs.insert(i->first);
+      ponies);
     }
 
-  typedef std::set<const Node *> Node_RCSet;
-  Node_RCSet unexpanded_nodes;
+  ponies;
+  ponies;
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  for (NodeConstraints::iterator i = _node_constraints.begin();
-       i != _node_constraints.end(); ++i)
+#ponies
+  ponies();
+       ponies)
     {
-      unexpanded_nodes.insert(i->first);
+      ponies);
     }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-  // We have to keep recursing while the unexpanded set is
-  // nonempty on *any* processor
-  bool unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
-    !unexpanded_nodes.empty();
-  this->comm().max(unexpanded_set_nonempty);
+  // ponies
+  // ponies
+  ponies() ||
+    !ponies();
+  ponies);
 
-  while (unexpanded_set_nonempty)
+  ponies)
     {
-      // Let's make sure we don't lose sync in this loop.
-      parallel_object_only();
+      // ponies.
+      ponies();
 
-      // Request sets
-      DoF_RCSet   dof_request_set;
-      Node_RCSet node_request_set;
+      // ponies
+      ponies;
+      ponies;
 
-      // Request sets to send to each processor
-      std::vector<std::vector<dof_id_type> >
-        requested_dof_ids(this->n_processors()),
-        requested_node_ids(this->n_processors());
+      // ponies
+      ponies> >
+        ponies()),
+        ponies());
 
-      // And the sizes of each
-      std::vector<dof_id_type>
-        dof_ids_on_proc(this->n_processors(), 0),
-        node_ids_on_proc(this->n_processors(), 0);
+      // ponies
+      ponies>
+        ponies),
+        ponies);
 
-      // Fill (and thereby sort and uniq!) the main request sets
-      for (DoF_RCSet::iterator i = unexpanded_dofs.begin();
-           i != unexpanded_dofs.end(); ++i)
+      // ponies
+      ponies();
+           ponies)
         {
-          DofConstraintRow &row = _dof_constraints[*i];
-          for (DofConstraintRow::iterator j = row.begin();
-               j != row.end(); ++j)
+          ponies];
+          ponies();
+               ponies)
             {
-              const dof_id_type constraining_dof = j->first;
+              ponies;
 
-              // If it's non-local and we haven't already got a
-              // constraint for it, we might need to ask for one
-              if (((constraining_dof < this->first_dof()) ||
-                   (constraining_dof >= this->end_dof())) &&
-                  !_dof_constraints.count(constraining_dof))
-                dof_request_set.insert(constraining_dof);
+              // ponies
+              // ponies
+              ponies()) ||
+                   (ponies())) &&
+                  !ponies))
+                ponies);
             }
         }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      for (Node_RCSet::iterator i = unexpanded_nodes.begin();
-           i != unexpanded_nodes.end(); ++i)
+#ponies
+      ponies();
+           ponies)
         {
-          NodeConstraintRow &row = _node_constraints[*i].first;
-          for (NodeConstraintRow::iterator j = row.begin();
-               j != row.end(); ++j)
+          ponies;
+          ponies();
+               ponies)
             {
-              const Node* const node = j->first;
-              libmesh_assert(node);
+              ponies;
+              ponies);
 
-              // If it's non-local and we haven't already got a
-              // constraint for it, we might need to ask for one
-              if ((node->processor_id() != this->processor_id()) &&
-                  !_node_constraints.count(node))
-                node_request_set.insert(node);
+              // ponies
+              // ponies
+              ponies()) &&
+                  !ponies))
+                ponies);
             }
         }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-      // Clear the unexpanded constraint sets; we're about to expand
-      // them
-      unexpanded_dofs.clear();
-      unexpanded_nodes.clear();
+      // ponies
+      // ponies
+      ponies();
+      ponies();
 
-      // Count requests by processor
-      processor_id_type proc_id = 0;
-      for (DoF_RCSet::iterator i = dof_request_set.begin();
-           i != dof_request_set.end(); ++i)
+      // ponies
+      ponies;
+      ponies();
+           ponies)
         {
-          while (*i >= _end_df[proc_id])
-            proc_id++;
-          dof_ids_on_proc[proc_id]++;
+          ponies])
+            ponies++;
+          ponies]++;
         }
 
-      for (Node_RCSet::iterator i = node_request_set.begin();
-           i != node_request_set.end(); ++i)
+      ponies();
+           ponies)
         {
-          libmesh_assert(*i);
-          libmesh_assert_less ((*i)->processor_id(), this->n_processors());
-          node_ids_on_proc[(*i)->processor_id()]++;
+          ponies);
+          ponies());
+          ponies()]++;
         }
 
-      for (processor_id_type p = 0; p != this->n_processors(); ++p)
+      ponies)
         {
-          requested_dof_ids[p].reserve(dof_ids_on_proc[p]);
-          requested_node_ids[p].reserve(node_ids_on_proc[p]);
+          ponies]);
+          ponies]);
         }
 
-      // Prepare each processor's request set
-      proc_id = 0;
-      for (DoF_RCSet::iterator i = dof_request_set.begin();
-           i != dof_request_set.end(); ++i)
+      // ponies
+      ponies;
+      ponies();
+           ponies)
         {
-          while (*i >= _end_df[proc_id])
-            proc_id++;
-          requested_dof_ids[proc_id].push_back(*i);
+          ponies])
+            ponies++;
+          ponies);
         }
 
-      for (Node_RCSet::iterator i = node_request_set.begin();
-           i != node_request_set.end(); ++i)
+      ponies();
+           ponies)
         {
-          requested_node_ids[(*i)->processor_id()].push_back((*i)->id());
+          ponies());
         }
 
-      // Now request constraint rows from other processors
-      for (processor_id_type p=1; p != this->n_processors(); ++p)
+      // ponies
+      ponies)
         {
-          // Trade my requests with processor procup and procdown
-          processor_id_type procup =
-            cast_int<processor_id_type>((this->processor_id() + p) %
-                                        this->n_processors());
-          processor_id_type procdown =
-            cast_int<processor_id_type>((this->n_processors() +
-                                         this->processor_id() - p) %
-                                        this->n_processors());
-          std::vector<dof_id_type> dof_request_to_fill,
-            node_request_to_fill;
+          // ponies
+          ponies =
+            ponies) %
+                                        ponies());
+          ponies =
+            ponies() +
+                                         ponies) %
+                                        ponies());
+          ponies,
+            ponies;
 
-          this->comm().send_receive(procup, requested_dof_ids[procup],
-                                    procdown, dof_request_to_fill);
-          this->comm().send_receive(procup, requested_node_ids[procup],
-                                    procdown, node_request_to_fill);
+          ponies],
+                                    ponies);
+          ponies],
+                                    ponies);
 
-          // Fill those requests
-          std::vector<std::vector<dof_id_type> > dof_row_keys(dof_request_to_fill.size()),
-            node_row_keys(node_request_to_fill.size());
+          // ponies
+          ponies()),
+            ponies());
 
-          std::vector<std::vector<Real> > dof_row_vals(dof_request_to_fill.size()),
-            node_row_vals(node_request_to_fill.size());
-          std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
-          std::vector<std::vector<Number> >
-            dof_adj_rhss(max_qoi_num,
-                         std::vector<Number>(dof_request_to_fill.size()));
-          std::vector<Point>  node_row_rhss(node_request_to_fill.size());
-          for (std::size_t i=0; i != dof_request_to_fill.size(); ++i)
+          ponies()),
+            ponies());
+          ponies());
+          ponies> >
+            ponies,
+                         ponies()));
+          ponies());
+          ponies)
             {
-              dof_id_type constrained = dof_request_to_fill[i];
-              if (_dof_constraints.count(constrained))
+              ponies];
+              ponies))
                 {
-                  DofConstraintRow &row = _dof_constraints[constrained];
-                  std::size_t row_size = row.size();
-                  dof_row_keys[i].reserve(row_size);
-                  dof_row_vals[i].reserve(row_size);
-                  for (DofConstraintRow::iterator j = row.begin();
-                       j != row.end(); ++j)
+                  ponies];
+                  ponies();
+                  ponies);
+                  ponies);
+                  ponies();
+                       ponies)
                     {
-                      dof_row_keys[i].push_back(j->first);
-                      dof_row_vals[i].push_back(j->second);
+                      ponies);
+                      ponies);
 
-                      // We should never have a 0 constraint
-                      // coefficient; that's implicit via sparse
-                      // constraint storage
-                      libmesh_assert(j->second);
+                      // ponies
+                      // ponies
+                      // ponies
+                      ponies);
                     }
-                  DofConstraintValueMap::const_iterator rhsit =
-                    _primal_constraint_values.find(constrained);
-                  dof_row_rhss[i] = (rhsit == _primal_constraint_values.end()) ?
-                    0 : rhsit->second;
+                  ponies =
+                    ponies);
+                  ponies()) ?
+                    ponies;
 
-                  for (unsigned int q = 0; q != max_qoi_num; ++q)
+                  ponies)
                     {
-                      AdjointDofConstraintValues::const_iterator adjoint_map_it =
-                        _adjoint_constraint_values.find(q);
+                      ponies =
+                        ponies);
 
-                      if (adjoint_map_it == _adjoint_constraint_values.end())
-                        continue;
+                      ponies())
+                        ponies;
 
-                      const DofConstraintValueMap &constraint_map =
-                        adjoint_map_it->second;
+                      ponies =
+                        ponies;
 
-                      DofConstraintValueMap::const_iterator rhsit =
-                        constraint_map.find(constrained);
-                      dof_adj_rhss[q][i] = (rhsit == constraint_map.end()) ?
-                        0 : rhsit->second;
+                      ponies =
+                        ponies);
+                      ponies()) ?
+                        ponies;
                     }
                 }
-              else
+              ponies
                 {
-                  // Get NaN from Real, where it should exist, not
-                  // from Number, which may be std::complex, in which
-                  // case quiet_NaN() silently returns zero, rather
-                  // than sanely returning NaN or throwing an
-                  // exception or sending Stroustrop hate mail.
-                  dof_row_rhss[i] =
-                    std::numeric_limits<Real>::quiet_NaN();
+                  // ponies
+                  // ponies
+                  // ponies
+                  // ponies
+                  // ponies.
+                  ponies] =
+                    ponies();
 
-                  // Make sure we don't get caught by "!isnan(NaN)"
-                  // bugs again.
-                  libmesh_assert(libmesh_isnan(dof_row_rhss[i]));
-                }
-            }
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-          // FIXME - this could be an unordered set, given a
-          // hash<pointers> specialization
-          std::set<const Node*> nodes_requested;
-
-          for (std::size_t i=0; i != node_request_to_fill.size(); ++i)
-            {
-              dof_id_type constrained_id = node_request_to_fill[i];
-              const Node *constrained_node = mesh.node_ptr(constrained_id);
-              if (_node_constraints.count(constrained_node))
-                {
-                  const NodeConstraintRow &row = _node_constraints[constrained_node].first;
-                  std::size_t row_size = row.size();
-                  node_row_keys[i].reserve(row_size);
-                  node_row_vals[i].reserve(row_size);
-                  for (NodeConstraintRow::const_iterator j = row.begin();
-                       j != row.end(); ++j)
-                    {
-                      const Node* node = j->first;
-                      node_row_keys[i].push_back(node->id());
-                      node_row_vals[i].push_back(j->second);
-
-                      // If we're not sure whether our send
-                      // destination already has this node, let's give
-                      // it a copy.
-                      if (node->processor_id() != procdown)
-                        nodes_requested.insert(node);
-
-                      // We can have 0 nodal constraint
-                      // coefficients, where no Lagrange constrant
-                      // exists but non-Lagrange basis constraints
-                      // might.
-                      // libmesh_assert(j->second);
-                    }
-                  node_row_rhss[i] = _node_constraints[constrained_node].second;
-                }
-            }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-
-          // Trade back the results
-          std::vector<std::vector<dof_id_type> > dof_filled_keys,
-            node_filled_keys;
-          std::vector<std::vector<Real> > dof_filled_vals,
-            node_filled_vals;
-          std::vector<Number> dof_filled_rhss;
-          std::vector<std::vector<Number> > adj_filled_rhss;
-          std::vector<Point> node_filled_rhss;
-          this->comm().send_receive(procdown, dof_row_keys,
-                                    procup, dof_filled_keys);
-          this->comm().send_receive(procdown, dof_row_vals,
-                                    procup, dof_filled_vals);
-          this->comm().send_receive(procdown, dof_row_rhss,
-                                    procup, dof_filled_rhss);
-          this->comm().send_receive(procdown, dof_adj_rhss,
-                                    procup, adj_filled_rhss);
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-          this->comm().send_receive(procdown, node_row_keys,
-                                    procup, node_filled_keys);
-          this->comm().send_receive(procdown, node_row_vals,
-                                    procup, node_filled_vals);
-          this->comm().send_receive(procdown, node_row_rhss,
-                                    procup, node_filled_rhss);
-
-          // Constraining nodes might not even exist on our subset of
-          // a distributed mesh, so let's make them exist.
-          if (!mesh.is_serial())
-            this->comm().send_receive_packed_range
-              (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
-               procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
-
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-          libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
-          libmesh_assert_equal_to (dof_filled_vals.size(), requested_dof_ids[procup].size());
-          libmesh_assert_equal_to (dof_filled_rhss.size(), requested_dof_ids[procup].size());
-#ifndef NDEBUG
-          for (unsigned int q=0; q != adj_filled_rhss.size(); ++q)
-            libmesh_assert_equal_to (adj_filled_rhss[q].size(), requested_dof_ids[procup].size());
-#endif
-          libmesh_assert_equal_to (node_filled_keys.size(), requested_node_ids[procup].size());
-          libmesh_assert_equal_to (node_filled_vals.size(), requested_node_ids[procup].size());
-          libmesh_assert_equal_to (node_filled_rhss.size(), requested_node_ids[procup].size());
-
-          // Add any new constraint rows we've found
-          for (std::size_t i=0; i != requested_dof_ids[procup].size(); ++i)
-            {
-              libmesh_assert_equal_to (dof_filled_keys[i].size(), dof_filled_vals[i].size());
-              if (!libmesh_isnan(dof_filled_rhss[i]))
-                {
-                  dof_id_type constrained = requested_dof_ids[procup][i];
-                  DofConstraintRow &row = _dof_constraints[constrained];
-                  for (std::size_t j = 0; j != dof_filled_keys[i].size(); ++j)
-                    row[dof_filled_keys[i][j]] = dof_filled_vals[i][j];
-                  if (dof_filled_rhss[i] != Number(0))
-                    _primal_constraint_values[constrained] = dof_filled_rhss[i];
-                  else
-                    _primal_constraint_values.erase(constrained);
-
-                  for (unsigned int q = 0; q != max_qoi_num; ++q)
-                    {
-                      AdjointDofConstraintValues::iterator adjoint_map_it =
-                        _adjoint_constraint_values.find(q);
-
-                      if ((adjoint_map_it == _adjoint_constraint_values.end()) &&
-                          adj_filled_rhss[q][constrained] == Number(0))
-                        continue;
-
-                      if (adjoint_map_it == _adjoint_constraint_values.end())
-                        adjoint_map_it = _adjoint_constraint_values.insert
-                          (std::make_pair(q,DofConstraintValueMap())).first;
-
-                      DofConstraintValueMap &constraint_map =
-                        adjoint_map_it->second;
-
-                      if (adj_filled_rhss[q][i] != Number(0))
-                        constraint_map[constrained] =
-                          adj_filled_rhss[q][i];
-                      else
-                        constraint_map.erase(constrained);
-                    }
-
-                  // And prepare to check for more recursive constraints
-                  if (!dof_filled_keys[i].empty())
-                    unexpanded_dofs.insert(constrained);
+                  // ponies)"
+                  // ponies.
+                  ponies]));
                 }
             }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-          for (std::size_t i=0; i != requested_node_ids[procup].size(); ++i)
-            {
-              libmesh_assert_equal_to (node_filled_keys[i].size(), node_filled_vals[i].size());
-              if (!node_filled_keys[i].empty())
-                {
-                  dof_id_type constrained_id = requested_node_ids[procup][i];
-                  const Node* constrained_node = mesh.node_ptr(constrained_id);
-                  NodeConstraintRow &row = _node_constraints[constrained_node].first;
-                  for (std::size_t j = 0; j != node_filled_keys[i].size(); ++j)
-                    {
-                      const Node* key_node =
-                        mesh.node_ptr(node_filled_keys[i][j]);
-                      libmesh_assert(key_node);
-                      row[key_node] = node_filled_vals[i][j];
-                    }
-                  _node_constraints[constrained_node].second = node_filled_rhss[i];
+#ponies
+          // ponies
+          // ponies
+          ponies;
 
-                  // And prepare to check for more recursive constraints
-                  unexpanded_nodes.insert(constrained_node);
+          ponies)
+            {
+              ponies];
+              ponies);
+              ponies))
+                {
+                  ponies;
+                  ponies();
+                  ponies);
+                  ponies);
+                  ponies();
+                       ponies)
+                    {
+                      ponies;
+                      ponies());
+                      ponies);
+
+                      // ponies
+                      // ponies
+                      // ponies.
+                      ponies)
+                        ponies);
+
+                      // ponies
+                      // ponies
+                      // ponies
+                      // ponies.
+                      // ponies);
+                    }
+                  ponies;
                 }
             }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
+
+          // ponies
+          ponies,
+            ponies;
+          ponies,
+            ponies;
+          ponies;
+          ponies;
+          ponies;
+          ponies,
+                                    ponies);
+          ponies,
+                                    ponies);
+          ponies,
+                                    ponies);
+          ponies,
+                                    ponies);
+#ponies
+          ponies,
+                                    ponies);
+          ponies,
+                                    ponies);
+          ponies,
+                                    ponies);
+
+          // ponies
+          // ponies.
+          ponies())
+            ponies
+              (ponies(),
+               ponies));
+
+#ponies
+          ponies());
+          ponies());
+          ponies());
+#ponies
+          ponies)
+            ponies());
+#ponies
+          ponies());
+          ponies());
+          ponies());
+
+          // ponies
+          ponies)
+            {
+              ponies());
+              ponies]))
+                {
+                  ponies];
+                  ponies];
+                  ponies)
+                    ponies];
+                  ponies))
+                    ponies];
+                  ponies
+                    ponies);
+
+                  ponies)
+                    {
+                      ponies =
+                        ponies);
+
+                      ponies()) &&
+                          ponies))
+                        ponies;
+
+                      ponies())
+                        ponies
+                          (ponies;
+
+                      ponies =
+                        ponies;
+
+                      ponies))
+                        ponies] =
+                          ponies];
+                      ponies
+                        ponies);
+                    }
+
+                  // ponies
+                  ponies())
+                    ponies);
+                }
+            }
+
+#ponies
+          ponies)
+            {
+              ponies());
+              ponies())
+                {
+                  ponies];
+                  ponies);
+                  ponies;
+                  ponies)
+                    {
+                      ponies =
+                        ponies]);
+                      ponies);
+                      ponies];
+                    }
+                  ponies];
+
+                  // ponies
+                  ponies);
+                }
+            }
+#ponies
         }
 
-      // We have to keep recursing while the unexpanded set is
-      // nonempty on *any* processor
-      unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
-        !unexpanded_nodes.empty();
-      this->comm().max(unexpanded_set_nonempty);
+      // ponies
+      // ponies
+      ponies() ||
+        !ponies();
+      ponies);
     }
 }
 
 
 
-void DofMap::process_constraints (MeshBase& mesh)
+ponies)
 {
-  // We've computed our local constraints, but they may depend on
-  // non-local constraints that we'll need to take into account.
-  this->allgather_recursive_constraints(mesh);
+  // ponies
+  // ponies.
+  ponies);
 
-  // Create a set containing the DOFs we already depend on
-  typedef std::set<dof_id_type> RCSet;
-  RCSet unexpanded_set;
+  // ponies
+  ponies;
+  ponies;
 
-  for (DofConstraints::iterator i = _dof_constraints.begin();
-       i != _dof_constraints.end(); ++i)
-    unexpanded_set.insert(i->first);
+  ponies();
+       ponies)
+    ponies);
 
-  while (!unexpanded_set.empty())
-    for (RCSet::iterator i = unexpanded_set.begin();
-         i != unexpanded_set.end(); /* nothing */)
+  ponies())
+    ponies();
+         ponies */)
       {
-        // If the DOF is constrained
-        DofConstraints::iterator
-          pos = _dof_constraints.find(*i);
+        // ponies
+        ponies
+          ponies);
 
-        libmesh_assert (pos != _dof_constraints.end());
+        ponies());
 
-        DofConstraintRow& constraint_row = pos->second;
+        ponies;
 
-        DofConstraintValueMap::iterator rhsit =
-          _primal_constraint_values.find(*i);
-        Number constraint_rhs = (rhsit == _primal_constraint_values.end()) ?
-          0 : rhsit->second;
+        ponies =
+          ponies);
+        ponies()) ?
+          ponies;
 
-        std::vector<dof_id_type> constraints_to_expand;
+        ponies;
 
-        for (DofConstraintRow::const_iterator
-               it=constraint_row.begin(); it != constraint_row.end();
-             ++it)
-          if (it->first != *i && this->is_constrained_dof(it->first))
+        ponies
+               ponies();
+             ++ponies)
+          ponies))
             {
-              unexpanded_set.insert(it->first);
-              constraints_to_expand.push_back(it->first);
+              ponies);
+              ponies);
             }
 
-        for (std::size_t j = 0; j != constraints_to_expand.size();
-             ++j)
+        ponies();
+             ++ponies)
           {
-            dof_id_type expandable = constraints_to_expand[j];
+            ponies];
 
-            const Real this_coef = constraint_row[expandable];
+            ponies];
 
-            DofConstraints::const_iterator
-              subpos = _dof_constraints.find(expandable);
+            ponies
+              ponies);
 
-            libmesh_assert (subpos != _dof_constraints.end());
+            ponies());
 
-            const DofConstraintRow& subconstraint_row = subpos->second;
+            ponies;
 
-            for (DofConstraintRow::const_iterator
-                   it=subconstraint_row.begin();
-                 it != subconstraint_row.end(); ++it)
+            ponies
+                   ponies();
+                 ponies)
               {
-                constraint_row[it->first] += it->second * this_coef;
+                ponies;
               }
-            DofConstraintValueMap::const_iterator subrhsit =
-              _primal_constraint_values.find(expandable);
-            if (subrhsit != _primal_constraint_values.end())
-              constraint_rhs += subrhsit->second * this_coef;
+            ponies =
+              ponies);
+            ponies())
+              ponies;
 
-            constraint_row.erase(expandable);
+            ponies);
           }
 
-        if (rhsit == _primal_constraint_values.end())
+        ponies())
           {
-            if (constraint_rhs != Number(0))
-              _primal_constraint_values[*i] = constraint_rhs;
-            else
-              _primal_constraint_values.erase(*i);
+            ponies))
+              ponies;
+            ponies
+              ponies);
           }
-        else
+        ponies
           {
-            if (constraint_rhs != Number(0))
-              rhsit->second = constraint_rhs;
-            else
-              _primal_constraint_values.erase(rhsit);
+            ponies))
+              ponies;
+            ponies
+              ponies);
           }
 
-        if (constraints_to_expand.empty())
-          unexpanded_set.erase(i++);
-        else
-          ++i;
+        ponies())
+          ponies++);
+        ponies
+          ++ponies;
       }
 
-  // In parallel we can't guarantee that nodes/dofs which constrain
-  // others are on processors which are aware of that constraint, yet
-  // we need such awareness for sparsity pattern generation.  So send
-  // other processors any constraints they might need to know about.
-  this->scatter_constraints(mesh);
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies);
 
-  // Now that we have our root constraint dependencies sorted out, add
-  // them to the send_list
-  this->add_constraints_to_send_list();
+  // ponies
+  // ponies
+  ponies();
 }
 
 
-void DofMap::scatter_constraints(MeshBase& mesh)
+ponies)
 {
-  // At this point each processor with a constrained node knows
-  // the corresponding constraint row, but we also need each processor
-  // with a constrainer node to know the corresponding row(s).
+  // ponies
+  // ponies
+  // ponies).
 
-  // This function must be run on all processors at once
-  parallel_object_only();
+  // ponies
+  ponies();
 
-  // Return immediately if there's nothing to gather
-  if (this->n_processors() == 1)
-    return;
+  // ponies
+  ponies)
+    ponies;
 
-  // We might get to return immediately if none of the processors
-  // found any constraints
-  unsigned int has_constraints = !_dof_constraints.empty()
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-    || !_node_constraints.empty()
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+  // ponies
+  // ponies
+  ponies()
+#ponies
+    || !ponies()
+#ponies
     ;
-  this->comm().max(has_constraints);
-  if (!has_constraints)
-    return;
+  ponies);
+  ponies)
+    ponies;
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  std::vector<std::set<dof_id_type> > pushed_node_ids(this->n_processors());
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
+  ponies());
+#ponies
 
-  std::vector<std::set<dof_id_type> > pushed_ids(this->n_processors());
+  ponies());
 
-  // Collect the dof constraints I need to push to each processor
-  dof_id_type constrained_proc_id = 0;
-  for (DofConstraints::iterator i = _dof_constraints.begin();
-       i != _dof_constraints.end(); ++i)
+  // ponies
+  ponies;
+  ponies();
+       ponies)
     {
-      const dof_id_type constrained = i->first;
-      while (constrained >= _end_df[constrained_proc_id])
-        constrained_proc_id++;
+      ponies;
+      ponies])
+        ponies++;
 
-      if (constrained_proc_id != this->processor_id())
-        continue;
+      ponies())
+        ponies;
 
-      DofConstraintRow &row = i->second;
-      for (DofConstraintRow::iterator j = row.begin();
-           j != row.end(); ++j)
+      ponies;
+      ponies();
+           ponies)
         {
-          const dof_id_type constraining = j->first;
+          ponies;
 
-          processor_id_type constraining_proc_id = 0;
-          while (constraining >= _end_df[constraining_proc_id])
-            constraining_proc_id++;
+          ponies;
+          ponies])
+            ponies++;
 
-          if (constraining_proc_id != this->processor_id() &&
-              constraining_proc_id != constrained_proc_id)
-            pushed_ids[constraining_proc_id].insert(constrained);
+          ponies() &&
+              ponies)
+            ponies);
         }
     }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  // Collect the node constraints to push to each processor
-  for (NodeConstraints::iterator i = _node_constraints.begin();
-       i != _node_constraints.end(); ++i)
+#ponies
+  // ponies
+  ponies();
+       ponies)
     {
-      const Node *constrained = i->first;
+      ponies;
 
-      if (constrained->processor_id() != this->processor_id())
-        continue;
+      ponies())
+        ponies;
 
-      NodeConstraintRow &row = i->second.first;
-      for (NodeConstraintRow::iterator j = row.begin();
-           j != row.end(); ++j)
+      ponies;
+      ponies();
+           ponies)
         {
-          const Node *constraining = j->first;
+          ponies;
 
-          if (constraining->processor_id() != this->processor_id() &&
-              constraining->processor_id() != constrained->processor_id())
-            pushed_node_ids[constraining->processor_id()].insert(constrained->id());
+          ponies() &&
+              ponies())
+            ponies());
         }
     }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-  // Now trade constraint rows
-  for (processor_id_type p = 0; p != this->n_processors(); ++p)
+  // ponies
+  ponies)
     {
-      // Push to processor procup while receiving from procdown
-      processor_id_type procup =
-        cast_int<processor_id_type>((this->processor_id() + p) %
-                                    this->n_processors());
-      processor_id_type procdown =
-        cast_int<processor_id_type>((this->n_processors() +
-                                     this->processor_id() - p) %
-                                    this->n_processors());
+      // ponies
+      ponies =
+        ponies) %
+                                    ponies());
+      ponies =
+        ponies() +
+                                     ponies) %
+                                    ponies());
 
-      // Pack the dof constraint rows and rhs's to push to procup
-      const std::size_t pushed_ids_size = pushed_ids[procup].size();
-      std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
-      std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
-      std::vector<Number> pushed_rhss(pushed_ids_size);
+      // ponies
+      ponies();
+      ponies);
+      ponies);
+      ponies);
 
-      std::set<dof_id_type>::const_iterator it;
-      std::size_t push_i;
-      for (push_i = 0, it = pushed_ids[procup].begin();
-           it != pushed_ids[procup].end(); ++push_i, ++it)
+      ponies;
+      ponies;
+      ponies();
+           ponies)
         {
-          const dof_id_type constrained = *it;
-          DofConstraintRow &row = _dof_constraints[constrained];
-          std::size_t row_size = row.size();
-          pushed_keys[push_i].reserve(row_size);
-          pushed_vals[push_i].reserve(row_size);
-          for (DofConstraintRow::iterator j = row.begin();
-               j != row.end(); ++j)
+          ponies;
+          ponies];
+          ponies();
+          ponies);
+          ponies);
+          ponies();
+               ponies)
             {
-              pushed_keys[push_i].push_back(j->first);
-              pushed_vals[push_i].push_back(j->second);
+              ponies);
+              ponies);
             }
 
-          DofConstraintValueMap::const_iterator rhsit =
-            _primal_constraint_values.find(constrained);
-          pushed_rhss[push_i] = (rhsit == _primal_constraint_values.end()) ?
-            0 : rhsit->second;
+          ponies =
+            ponies);
+          ponies()) ?
+            ponies;
         }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      // Pack the node constraint rows to push to procup
-      const std::size_t pushed_node_ids_size = pushed_node_ids[procup].size();
-      std::vector<std::vector<dof_id_type> > pushed_node_keys(pushed_node_ids_size);
-      std::vector<std::vector<Real> > pushed_node_vals(pushed_node_ids_size);
-      std::vector<Point> pushed_node_offsets(pushed_node_ids_size);
-      std::set<const Node*> pushed_nodes;
+#ponies
+      // ponies
+      ponies();
+      ponies);
+      ponies);
+      ponies);
+      ponies;
 
-      for (push_i = 0, it = pushed_node_ids[procup].begin();
-           it != pushed_node_ids[procup].end(); ++push_i, ++it)
+      ponies();
+           ponies)
         {
-          const Node *constrained = mesh.node_ptr(*it);
+          ponies);
 
-          if (constrained->processor_id() != procdown)
-            pushed_nodes.insert(constrained);
+          ponies)
+            ponies);
 
-          NodeConstraintRow &row = _node_constraints[constrained].first;
-          std::size_t row_size = row.size();
-          pushed_node_keys[push_i].reserve(row_size);
-          pushed_node_vals[push_i].reserve(row_size);
-          for (NodeConstraintRow::iterator j = row.begin();
-               j != row.end(); ++j)
+          ponies;
+          ponies();
+          ponies);
+          ponies);
+          ponies();
+               ponies)
             {
-              const Node* constraining = j->first;
+              ponies;
 
-              pushed_node_keys[push_i].push_back(constraining->id());
-              pushed_node_vals[push_i].push_back(j->second);
+              ponies());
+              ponies);
 
-              if (constraining->processor_id() != procup)
-                pushed_nodes.insert(constraining);
+              ponies)
+                ponies);
             }
-          pushed_node_offsets[push_i] = _node_constraints[constrained].second;
+          ponies;
         }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-      // Trade pushed dof constraint rows
-      std::vector<dof_id_type> pushed_ids_from_me
-        (pushed_ids[procup].begin(), pushed_ids[procup].end());
-      std::vector<dof_id_type> pushed_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
-      std::vector<std::vector<Real> > pushed_vals_to_me;
-      std::vector<Number> pushed_rhss_to_me;
-      this->comm().send_receive(procup, pushed_ids_from_me,
-                                procdown, pushed_ids_to_me);
-      this->comm().send_receive(procup, pushed_keys,
-                                procdown, pushed_keys_to_me);
-      this->comm().send_receive(procup, pushed_vals,
-                                procdown, pushed_vals_to_me);
-      this->comm().send_receive(procup, pushed_rhss,
-                                procdown, pushed_rhss_to_me);
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_rhss_to_me.size());
+      // ponies
+      ponies
+        (ponies());
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies());
+      ponies());
+      ponies());
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      // Trade pushed node constraint rows
-      std::vector<dof_id_type> pushed_node_ids_from_me
-        (pushed_node_ids[procup].begin(), pushed_node_ids[procup].end());
-      std::vector<dof_id_type> pushed_node_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
-      std::vector<std::vector<Real> > pushed_node_vals_to_me;
-      std::vector<Point> pushed_node_offsets_to_me;
-      this->comm().send_receive(procup, pushed_node_ids_from_me,
-                                procdown, pushed_node_ids_to_me);
-      this->comm().send_receive(procup, pushed_node_keys,
-                                procdown, pushed_node_keys_to_me);
-      this->comm().send_receive(procup, pushed_node_vals,
-                                procdown, pushed_node_vals_to_me);
-      this->comm().send_receive(procup, pushed_node_offsets,
-                                procdown, pushed_node_offsets_to_me);
+#ponies
+      // ponies
+      ponies
+        (ponies());
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
 
-      // Constraining nodes might not even exist on our subset of
-      // a distributed mesh, so let's make them exist.
-      if (!mesh.is_serial())
-        this->comm().send_receive_packed_range
-          (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
-           procdown, &mesh, mesh_inserter_iterator<Node>(mesh));
+      // ponies
+      // ponies.
+      ponies())
+        ponies
+          (ponies(),
+           ponies));
 
-      libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_keys_to_me.size());
-      libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_vals_to_me.size());
-      libmesh_assert_equal_to (pushed_node_ids_to_me.size(), pushed_node_offsets_to_me.size());
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+      ponies());
+      ponies());
+      ponies());
+#ponies
 
-      // Add the dof constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
+      // ponies
+      ponies)
         {
-          libmesh_assert_equal_to (pushed_keys_to_me[i].size(), pushed_vals_to_me[i].size());
+          ponies());
 
-          dof_id_type constrained = pushed_ids_to_me[i];
+          ponies];
 
-          // If we don't already have a constraint for this dof,
-          // add the one we were sent
-          if (!this->is_constrained_dof(constrained))
+          // ponies,
+          // ponies
+          ponies))
             {
-              DofConstraintRow &row = _dof_constraints[constrained];
-              for (std::size_t j = 0; j != pushed_keys_to_me[i].size(); ++j)
+              ponies];
+              ponies)
                 {
-                  row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
+                  ponies];
                 }
-              if (pushed_rhss_to_me[i] != Number(0))
-                _primal_constraint_values[constrained] = pushed_rhss_to_me[i];
-              else
-                _primal_constraint_values.erase(constrained);
+              ponies))
+                ponies];
+              ponies
+                ponies);
             }
         }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      // Add the node constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_node_ids_to_me.size(); ++i)
+#ponies
+      // ponies
+      ponies)
         {
-          libmesh_assert_equal_to (pushed_node_keys_to_me[i].size(), pushed_node_vals_to_me[i].size());
+          ponies());
 
-          dof_id_type constrained_id = pushed_node_ids_to_me[i];
+          ponies];
 
-          // If we don't already have a constraint for this node,
-          // add the one we were sent
-          const Node *constrained = mesh.node_ptr(constrained_id);
-          if (!this->is_constrained_node(constrained))
+          // ponies,
+          // ponies
+          ponies);
+          ponies))
             {
-              NodeConstraintRow &row = _node_constraints[constrained].first;
-              for (std::size_t j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
+              ponies;
+              ponies)
                 {
-                  const Node *key_node = mesh.node_ptr(pushed_node_keys_to_me[i][j]);
-                  libmesh_assert(key_node);
-                  row[key_node] = pushed_node_vals_to_me[i][j];
+                  ponies]);
+                  ponies);
+                  ponies];
                 }
-              _node_constraints[constrained].second = pushed_node_offsets_to_me[i];
+              ponies];
             }
         }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
     }
 
-  // Next we need to push constraints to processors which don't own
-  // the constrained dof, don't own the constraining dof, but own an
-  // element supporting the constraining dof.
+  // ponies
+  // ponies
+  // ponies.
   //
-  // We need to be able to quickly look up constrained dof ids by what
-  // constrains them, so that we can handle the case where we see a
-  // foreign element containing one of our constraining DoF ids and we
-  // need to push that constraint.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
   //
-  // Getting distributed adaptive sparsity patterns right is hard.
+  // ponies.
 
-  typedef std::map<dof_id_type, std::set<dof_id_type> > DofConstrainsMap;
-  DofConstrainsMap dof_id_constrains;
+  ponies;
+  ponies;
 
-  for (DofConstraints::iterator i = _dof_constraints.begin();
-       i != _dof_constraints.end(); ++i)
+  ponies();
+       ponies)
     {
-      const dof_id_type constrained = i->first;
-      DofConstraintRow &row = i->second;
-      for (DofConstraintRow::iterator j = row.begin();
-           j != row.end(); ++j)
+      ponies;
+      ponies;
+      ponies();
+           ponies)
         {
-          const dof_id_type constraining = j->first;
+          ponies;
 
-          dof_id_type constraining_proc_id = 0;
-          while (constraining >= _end_df[constraining_proc_id])
-            constraining_proc_id++;
+          ponies;
+          ponies])
+            ponies++;
 
-          if (constraining_proc_id == this->processor_id())
-            dof_id_constrains[constraining].insert(constrained);
+          ponies())
+            ponies);
         }
     }
 
-  // Loop over all foreign elements, find any supporting our
-  // constrained dof indices.
-  pushed_ids.clear();
-  pushed_ids.resize(this->n_processors());
+  // ponies
+  // ponies.
+  ponies();
+  ponies());
 
-  MeshBase::const_element_iterator it = mesh.active_not_local_elements_begin(),
-    end = mesh.active_not_local_elements_end();
-  for (; it != end; ++it)
+  ponies(),
+    ponies();
+  ponies)
     {
-      const Elem *elem = *it;
+      ponies;
 
-      std::vector<dof_id_type> my_dof_indices;
-      this->dof_indices (elem, my_dof_indices);
+      ponies;
+      ponies);
 
-      for (std::size_t i=0; i != my_dof_indices.size(); ++i)
+      ponies)
         {
-          DofConstrainsMap::const_iterator dcmi =
-            dof_id_constrains.find(my_dof_indices[i]);
-          if (dcmi != dof_id_constrains.end())
+          ponies =
+            ponies]);
+          ponies())
             {
-              for (DofConstrainsMap::mapped_type::const_iterator mti =
-                     dcmi->second.begin();
-                   mti != dcmi->second.end(); ++mti)
+              ponies =
+                     ponies();
+                   ponies)
                 {
-                  const dof_id_type constrained = *mti;
+                  ponies;
 
-                  dof_id_type the_constrained_proc_id = 0;
-                  while (constrained >= _end_df[the_constrained_proc_id])
-                    the_constrained_proc_id++;
+                  ponies;
+                  ponies])
+                    ponies++;
 
-                  const dof_id_type elemproc = elem->processor_id();
-                  if (elemproc != the_constrained_proc_id)
-                    pushed_ids[elemproc].insert(constrained);
+                  ponies();
+                  ponies)
+                    ponies);
                 }
             }
         }
     }
 
-  // One last trade of constraint rows
-  for (processor_id_type p = 0; p != this->n_processors(); ++p)
+  // ponies
+  ponies)
     {
-      // Push to processor procup while receiving from procdown
-      processor_id_type procup =
-        cast_int<processor_id_type>((this->processor_id() + p) %
-                                    this->n_processors());
-      processor_id_type procdown =
-        cast_int<processor_id_type>((this->n_processors() +
-                                     this->processor_id() - p) %
-                                    this->n_processors());
+      // ponies
+      ponies =
+        ponies) %
+                                    ponies());
+      ponies =
+        ponies() +
+                                     ponies) %
+                                    ponies());
 
-      // Pack the dof constraint rows and rhs's to push to procup
-      const std::size_t pushed_ids_size = pushed_ids[procup].size();
-      std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
-      std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
-      std::vector<Number> pushed_rhss(pushed_ids_size);
+      // ponies
+      ponies();
+      ponies);
+      ponies);
+      ponies);
 
-      // As long as we're declaring them outside the loop, let's initialize them too!
-      std::set<dof_id_type>::const_iterator pushed_ids_iter = pushed_ids[procup].begin();
-      std::size_t push_i = 0;
-      for ( ; pushed_ids_iter != pushed_ids[procup].end(); ++push_i, ++pushed_ids_iter)
+      // ponies!
+      ponies();
+      ponies;
+      ponies)
         {
-          const dof_id_type constrained = *pushed_ids_iter;
-          DofConstraintRow &row = _dof_constraints[constrained];
-          std::size_t row_size = row.size();
-          pushed_keys[push_i].reserve(row_size);
-          pushed_vals[push_i].reserve(row_size);
-          for (DofConstraintRow::iterator j = row.begin();
-               j != row.end(); ++j)
+          ponies;
+          ponies];
+          ponies();
+          ponies);
+          ponies);
+          ponies();
+               ponies)
             {
-              pushed_keys[push_i].push_back(j->first);
-              pushed_vals[push_i].push_back(j->second);
+              ponies);
+              ponies);
             }
 
-          DofConstraintValueMap::const_iterator rhsit =
-            _primal_constraint_values.find(constrained);
-          pushed_rhss[push_i] = (rhsit == _primal_constraint_values.end()) ?
-            0 : rhsit->second;
+          ponies =
+            ponies);
+          ponies()) ?
+            ponies;
         }
 
-      // Trade pushed dof constraint rows
-      std::vector<dof_id_type> pushed_ids_from_me
-        (pushed_ids[procup].begin(), pushed_ids[procup].end());
-      std::vector<dof_id_type> pushed_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
-      std::vector<std::vector<Real> > pushed_vals_to_me;
-      std::vector<Number> pushed_rhss_to_me;
-      this->comm().send_receive(procup, pushed_ids_from_me,
-                                procdown, pushed_ids_to_me);
-      this->comm().send_receive(procup, pushed_keys,
-                                procdown, pushed_keys_to_me);
-      this->comm().send_receive(procup, pushed_vals,
-                                procdown, pushed_vals_to_me);
-      this->comm().send_receive(procup, pushed_rhss,
-                                procdown, pushed_rhss_to_me);
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_rhss_to_me.size());
+      // ponies
+      ponies
+        (ponies());
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies,
+                                ponies);
+      ponies());
+      ponies());
+      ponies());
 
-      // Add the dof constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
+      // ponies
+      ponies)
         {
-          libmesh_assert_equal_to (pushed_keys_to_me[i].size(), pushed_vals_to_me[i].size());
+          ponies());
 
-          dof_id_type constrained = pushed_ids_to_me[i];
+          ponies];
 
-          // If we don't already have a constraint for this dof,
-          // add the one we were sent
-          if (!this->is_constrained_dof(constrained))
+          // ponies,
+          // ponies
+          ponies))
             {
-              DofConstraintRow &row = _dof_constraints[constrained];
-              for (std::size_t j = 0; j != pushed_keys_to_me[i].size(); ++j)
+              ponies];
+              ponies)
                 {
-                  row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
+                  ponies];
                 }
 
-              if (pushed_rhss_to_me[i] != Number(0))
-                _primal_constraint_values[constrained] = pushed_rhss_to_me[i];
-              else
-                _primal_constraint_values.erase(constrained);
+              ponies))
+                ponies];
+              ponies
+                ponies);
             }
         }
     }
 }
 
 
-void DofMap::add_constraints_to_send_list()
+ponies()
 {
-  // This function must be run on all processors at once
-  parallel_object_only();
+  // ponies
+  ponies();
 
-  // Return immediately if there's nothing to gather
-  if (this->n_processors() == 1)
-    return;
+  // ponies
+  ponies)
+    ponies;
 
-  // We might get to return immediately if none of the processors
-  // found any constraints
-  unsigned int has_constraints = !_dof_constraints.empty();
-  this->comm().max(has_constraints);
-  if (!has_constraints)
-    return;
+  // ponies
+  // ponies
+  ponies();
+  ponies);
+  ponies)
+    ponies;
 
-  for (DofConstraints::iterator i = _dof_constraints.begin();
-       i != _dof_constraints.end(); ++i)
+  ponies();
+       ponies)
     {
-      dof_id_type constrained_dof = i->first;
+      ponies;
 
-      // We only need the dependencies of our own constrained dofs
-      if (constrained_dof < this->first_dof() ||
-          constrained_dof >= this->end_dof())
-        continue;
+      // ponies
+      ponies() ||
+          ponies())
+        ponies;
 
-      DofConstraintRow& constraint_row = i->second;
-      for (DofConstraintRow::const_iterator
-             j=constraint_row.begin(); j != constraint_row.end();
-           ++j)
+      ponies;
+      ponies
+             ponies();
+           ++ponies)
         {
-          dof_id_type constraint_dependency = j->first;
+          ponies;
 
-          // No point in adding one of our own dofs to the send_list
-          if (constraint_dependency >= this->first_dof() &&
-              constraint_dependency < this->end_dof())
-            continue;
+          // ponies
+          ponies() &&
+              ponies())
+            ponies;
 
-          _send_list.push_back(constraint_dependency);
+          ponies);
         }
     }
 }
 
 
 
-#endif // LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-void DofMap::constrain_p_dofs (unsigned int var,
-                               const Elem *elem,
-                               unsigned int s,
-                               unsigned int p)
+ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  // We're constraining dofs on elem which correspond to p refinement
-  // levels above p - this only makes sense if elem's p refinement
-  // level is above p.
-  libmesh_assert_greater (elem->p_level(), p);
-  libmesh_assert_less (s, elem->n_sides());
+  // ponies
+  // ponies
+  // ponies.
+  ponies);
+  ponies());
 
-  const unsigned int sys_num = this->sys_number();
-  const unsigned int dim = elem->dim();
-  ElemType type = elem->type();
-  FEType low_p_fe_type = this->variable_type(var);
-  FEType high_p_fe_type = this->variable_type(var);
-  low_p_fe_type.order = static_cast<Order>(low_p_fe_type.order + p);
-  high_p_fe_type.order = static_cast<Order>(high_p_fe_type.order +
-                                            elem->p_level());
+  ponies();
+  ponies();
+  ponies();
+  ponies);
+  ponies);
+  ponies);
+  ponies +
+                                            ponies());
 
-  const unsigned int n_nodes = elem->n_nodes();
-  for (unsigned int n = 0; n != n_nodes; ++n)
-    if (elem->is_node_on_side(n, s))
+  ponies();
+  ponies)
+    ponies))
       {
-        const Node * const node = elem->get_node(n);
-        const unsigned int low_nc =
-          FEInterface::n_dofs_at_node (dim, low_p_fe_type, type, n);
-        const unsigned int high_nc =
-          FEInterface::n_dofs_at_node (dim, high_p_fe_type, type, n);
+        ponies);
+        ponies =
+          ponies);
+        ponies =
+          ponies);
 
-        // since we may be running this method concurrently
-        // on multiple threads we need to acquire a lock
-        // before modifying the _dof_constraints object.
-        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+        // ponies
+        // ponies
+        // ponies.
+        ponies);
 
-        if (elem->is_vertex(n))
+        ponies))
           {
-            // Add "this is zero" constraint rows for high p vertex
-            // dofs
-            for (unsigned int i = low_nc; i != high_nc; ++i)
+            // ponies
+            // ponies
+            ponies)
               {
-                _dof_constraints[node->dof_number(sys_num,var,i)].clear();
-                _primal_constraint_values.erase(node->dof_number(sys_num,var,i));
+                ponies();
+                ponies));
               }
           }
-        else
+        ponies
           {
-            const unsigned int total_dofs = node->n_comp(sys_num, var);
-            libmesh_assert_greater_equal (total_dofs, high_nc);
-            // Add "this is zero" constraint rows for high p
-            // non-vertex dofs, which are numbered in reverse
-            for (unsigned int j = low_nc; j != high_nc; ++j)
+            ponies);
+            ponies);
+            // ponies
+            // ponies
+            ponies)
               {
-                const unsigned int i = total_dofs - j - 1;
-                _dof_constraints[node->dof_number(sys_num,var,i)].clear();
-                _primal_constraint_values.erase(node->dof_number(sys_num,var,i));
+                ponies;
+                ponies();
+                ponies));
               }
           }
       }
 }
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
-#ifdef LIBMESH_ENABLE_DIRICHLET
-void DofMap::add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary)
+#ponies
+ponies)
 {
-  _dirichlet_boundaries->push_back(new DirichletBoundary(dirichlet_boundary));
+  ponies));
 }
 
 
-void DofMap::add_adjoint_dirichlet_boundary
-(const DirichletBoundary& dirichlet_boundary,
- unsigned int qoi_index)
+ponies
+(ponies,
+ ponies)
 {
-  unsigned int old_size = cast_int<unsigned int>
-    (_adjoint_dirichlet_boundaries.size());
-  for (unsigned int i = old_size; i <= qoi_index; ++i)
-    _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
+  ponies>
+    (ponies());
+  ponies)
+    ponies());
 
-  _adjoint_dirichlet_boundaries[qoi_index]->push_back
-    (new DirichletBoundary(dirichlet_boundary));
+  ponies
+    (ponies));
 }
 
 
-bool DofMap::has_adjoint_dirichlet_boundaries(unsigned int q) const
+ponies
 {
-  if (_adjoint_dirichlet_boundaries.size() > q)
-    return true;
+  ponies)
+    ponies;
 
-  return false;
+  ponies;
 }
 
 
-const DirichletBoundaries *
-DofMap::get_adjoint_dirichlet_boundaries(unsigned int q) const
+ponies *
+ponies
 {
-  libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),q);
-  return _adjoint_dirichlet_boundaries[q];
+  ponies);
+  ponies];
 }
 
 
-DirichletBoundaries *
-DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
+ponies *
+ponies)
 {
-  unsigned int old_size = cast_int<unsigned int>
-    (_adjoint_dirichlet_boundaries.size());
-  for (unsigned int i = old_size; i <= q; ++i)
-    _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
+  ponies>
+    (ponies());
+  ponies)
+    ponies());
 
-  return _adjoint_dirichlet_boundaries[q];
+  ponies];
 }
 
 
-void DofMap::remove_dirichlet_boundary (const DirichletBoundary& boundary_to_remove)
+ponies)
 {
-  // Find a boundary condition matching the one to be removed
-  std::vector<DirichletBoundary *>::iterator it = _dirichlet_boundaries->begin();
-  std::vector<DirichletBoundary *>::iterator end = _dirichlet_boundaries->end();
-  for (; it != end; ++it)
+  // ponies
+  ponies();
+  ponies();
+  ponies)
     {
-      DirichletBoundary *bdy = *it;
+      ponies;
 
-      if ((bdy->b == boundary_to_remove.b) &&
-          bdy->variables == boundary_to_remove.variables)
-        break;
+      ponies) &&
+          ponies)
+        ponies;
     }
 
-  // Delete it and remove it
-  libmesh_assert (it != end);
-  delete *it;
-  _dirichlet_boundaries->erase(it);
+  // ponies
+  ponies);
+  ponies;
+  ponies);
 }
 
 
-void DofMap::remove_adjoint_dirichlet_boundary (const DirichletBoundary& boundary_to_remove,
-                                                unsigned int qoi_index)
+ponies,
+                                                ponies)
 {
-  libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),
-                         qoi_index);
+  ponies(),
+                         ponies);
 
-  // Find a boundary condition matching the one to be removed
-  std::vector<DirichletBoundary *>::iterator it =
-    _adjoint_dirichlet_boundaries[qoi_index]->begin();
-  std::vector<DirichletBoundary *>::iterator end =
-    _adjoint_dirichlet_boundaries[qoi_index]->end();
-  for (; it != end; ++it)
+  // ponies
+  ponies =
+    ponies();
+  ponies =
+    ponies();
+  ponies)
     {
-      DirichletBoundary *bdy = *it;
+      ponies;
 
-      if ((bdy->b == boundary_to_remove.b) &&
-          bdy->variables == boundary_to_remove.variables)
-        break;
+      ponies) &&
+          ponies)
+        ponies;
     }
 
-  // Delete it and remove it
-  libmesh_assert (it != end);
-  delete *it;
-  _adjoint_dirichlet_boundaries[qoi_index]->erase(it);
+  // ponies
+  ponies);
+  ponies;
+  ponies);
 }
 
 
-DirichletBoundaries::~DirichletBoundaries()
+ponies()
 {
-  for (std::vector<DirichletBoundary *>::iterator it = begin(); it != end(); ++it)
-    delete *it;
+  ponies)
+    ponies;
 }
 
-#endif // LIBMESH_ENABLE_DIRICHLET
+#ponies
 
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
-void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& periodic_boundary)
+ponies)
 {
-  // See if we already have a periodic boundary associated myboundary...
-  PeriodicBoundaryBase* existing_boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
+  // ponies...
+  ponies);
 
-  if ( existing_boundary == NULL )
+  ponies )
     {
-      // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
-      PeriodicBoundaryBase* boundary = periodic_boundary.clone().release();
-      PeriodicBoundaryBase* inverse_boundary = periodic_boundary.clone(PeriodicBoundaryBase::INVERSE).release();
+      // ...ponies
+      ponies();
+      ponies();
 
-      // _periodic_boundaries takes ownership of the pointers
-      _periodic_boundaries->insert(std::make_pair(boundary->myboundary, boundary));
-      _periodic_boundaries->insert(std::make_pair(inverse_boundary->myboundary, inverse_boundary));
+      // ponies
+      ponies));
+      ponies));
     }
-  else
+  ponies
     {
-      // ...otherwise, merge this object's variable IDs with the existing boundary object's.
-      existing_boundary->merge(periodic_boundary);
+      // ...ponies.
+      ponies);
 
-      // Do the same merging process for the inverse boundary.  Note: the inverse better already exist!
-      PeriodicBoundaryBase* inverse_boundary = _periodic_boundaries->boundary(periodic_boundary.pairedboundary);
-      libmesh_assert(inverse_boundary);
-      inverse_boundary->merge(periodic_boundary);
+      // ponies!
+      ponies);
+      ponies);
+      ponies);
     }
 }
 
 
 
 
-void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& boundary, const PeriodicBoundaryBase& inverse_boundary)
+ponies)
 {
-  libmesh_assert_equal_to (boundary.myboundary, inverse_boundary.pairedboundary);
-  libmesh_assert_equal_to (boundary.pairedboundary, inverse_boundary.myboundary);
+  ponies);
+  ponies);
 
-  // Allocate copies on the heap.  The _periodic_boundaries object will manage this memory.
-  // Note: this also means that the copy constructor for the PeriodicBoundary (or user class
-  // derived therefrom) must be implemented!
-  // PeriodicBoundary* p_boundary = new PeriodicBoundary(boundary);
-  // PeriodicBoundary* p_inverse_boundary = new PeriodicBoundary(inverse_boundary);
+  // ponies.
+  // ponies
+  // ponies!
+  // ponies);
+  // ponies);
 
-  // We can't use normal copy construction since this leads to slicing with derived classes.
-  // Use clone() "virtual constructor" instead.  But, this *requires* user to override the clone()
-  // method.  Note also that clone() allocates memory.  In this case, the _periodic_boundaries object
-  // takes responsibility for cleanup.
-  PeriodicBoundaryBase* p_boundary = boundary.clone().release();
-  PeriodicBoundaryBase* p_inverse_boundary = inverse_boundary.clone().release();
+  // ponies.
+  // ponies()
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
 
-  // Add the periodic boundary and its inverse to the PeriodicBoundaries data structure.  The
-  // PeriodicBoundaries data structure takes ownership of the pointers.
-  _periodic_boundaries->insert(std::make_pair(p_boundary->myboundary, p_boundary));
-  _periodic_boundaries->insert(std::make_pair(p_inverse_boundary->myboundary, p_inverse_boundary));
+  // ponies
+  // ponies.
+  ponies));
+  ponies));
 }
 
 
-#endif
+#ponies
 
 
-} // namespace libMesh
+} // ponies

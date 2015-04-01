@@ -1,105 +1,105 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_QUADRATURE_CONICAL_H
-#define LIBMESH_QUADRATURE_CONICAL_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/quadrature.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class implements the so-called conical product quadrature
- * rules for Tri and Tet elements. These rules are generally
- * non-optimal in the number of evaluation points, but have the nice
- * property of having all positive weights and being well-defined to
- * any order for which their underlying 1D Gauss and Jacobi quadrature
- * rules are available.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * The construction of these rules is given by e.g.
+ * ponies.
  *
- * Stroud, A.H. "Approximate Calculation of
- * Multiple Integrals.", 1972
+ * ponies
+ * ponies
  */
-class QConical : public QBase
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Declares the order of the quadrature rule.
+   * ponies.
    */
-  QConical (const unsigned int _dim,
-            const Order _order=INVALID_ORDER);
+  ponies,
+            ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~QConical();
+  ~ponies();
 
   /**
-   * @returns the QuadratureType for this class
+   * @ponies
    */
-  QuadratureType type() const { return QCONICAL; }
+  ponies; }
 
-private:
+ponies:
 
-  void init_1D (const ElemType,
-                unsigned int =0)
+  ponies,
+                ponies)
   {
-    // See about making this non-pure virtual in the base class
-    libmesh_not_implemented();
+    // ponies
+    ponies();
   }
 
   /**
-   * The conical product rules are defined in 2D only for Tris.
+   * ponies.
    */
-  void init_2D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  ponies,
+                ponies);
   /**
-   * The conical product rules are defined in 3D only for Tets.
+   * ponies.
    */
-  void init_3D (const ElemType _type=INVALID_ELEM,
-                unsigned int p_level=0);
+  ponies,
+                ponies);
 
   /**
-   * Implementation of conical product rule for a Tri in 2D of
-   * order = _order+2*p.
+   * ponies
+   * ponies.
    */
-  void conical_product_tri(unsigned int p);
+  ponies);
 
   /**
-   * Implementation of conical product rule for a Tet in 3D of
-   * order = _order+2*p.
+   * ponies
+   * ponies.
    */
-  void conical_product_tet(unsigned int p);
+  ponies);
 
   /**
-   * Implementation of conical product rule for a Pyramid in 3D of
-   * order = _order+2*p.
+   * ponies
+   * ponies.
    */
-  void conical_product_pyramid(unsigned int p);
+  ponies);
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_QUADRATURE_CONICAL_H
+#ponies

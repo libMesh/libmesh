@@ -1,126 +1,126 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local Includes
-#include "libmesh/dof_map.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/laspack_matrix.h"
-#include "libmesh/eigen_sparse_matrix.h"
-#include "libmesh/parallel.h"
-#include "libmesh/petsc_matrix.h"
-#include "libmesh/sparse_matrix.h"
-#include "libmesh/trilinos_epetra_matrix.h"
-#include "libmesh/numeric_vector.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 //------------------------------------------------------------------
-// SparseMatrix Methods
+// ponies
 
 
-// Constructor
-template <typename T>
-SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm_in) :
-  ParallelObject(comm_in),
-  _dof_map(NULL),
-  _is_initialized(false)
+// ponies
+ponies>
+ponies) :
+  ponies),
+  ponies),
+  ponies)
 {}
 
 
 
-// Destructor
-template <typename T>
-SparseMatrix<T>::~SparseMatrix ()
+// ponies
+ponies>
+ponies ()
 {}
 
 
 
 
-// default implementation is to fall back to non-blocked method
-template <typename T>
-void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
-                                        const std::vector<numeric_index_type> &brows,
-                                        const std::vector<numeric_index_type> &bcols)
+// ponies
+ponies>
+ponies,
+                                        ponies,
+                                        ponies)
 {
-  libmesh_assert_equal_to (dm.m() / brows.size(), dm.n() / bcols.size());
+  ponies());
 
-  const numeric_index_type blocksize = cast_int<numeric_index_type>
-    (dm.m() / brows.size());
+  ponies>
+    (ponies());
 
-  libmesh_assert_equal_to (dm.m()%blocksize, 0);
-  libmesh_assert_equal_to (dm.n()%blocksize, 0);
+  ponies);
+  ponies);
 
-  std::vector<numeric_index_type> rows, cols;
+  ponies;
 
-  rows.reserve(blocksize*brows.size());
-  cols.reserve(blocksize*bcols.size());
+  ponies());
+  ponies());
 
-  for (unsigned int ib=0; ib<brows.size(); ib++)
+  ponies++)
     {
-      numeric_index_type i=brows[ib]*blocksize;
+      ponies;
 
-      for (unsigned int v=0; v<blocksize; v++)
-        rows.push_back(i++);
+      ponies++)
+        ponies++);
     }
 
-  for (unsigned int jb=0; jb<bcols.size(); jb++)
+  ponies++)
     {
-      numeric_index_type j=bcols[jb]*blocksize;
+      ponies;
 
-      for (unsigned int v=0; v<blocksize; v++)
-        cols.push_back(j++);
+      ponies++)
+        ponies++);
     }
 
-  this->add_matrix (dm, rows, cols);
+  ponies);
 }
 
 
 
-// Full specialization of print method for Complex datatypes
-template <>
-void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
+// ponies
+ponies <>
+ponies
 {
-  // std::complex<>::operator<<() is defined, but use this form
+  // ponies
 
-  if(sparse)
+  ponies)
     {
-      libmesh_not_implemented();
+      ponies();
     }
 
-  os << "Real part:" << std::endl;
-  for (numeric_index_type i=0; i<this->m(); i++)
+  ponies;
+  ponies++)
     {
-      for (numeric_index_type j=0; j<this->n(); j++)
-        os << std::setw(8) << (*this)(i,j).real() << " ";
-      os << std::endl;
+      ponies++)
+        ponies() << " ";
+      ponies;
     }
 
-  os << std::endl << "Imaginary part:" << std::endl;
-  for (numeric_index_type i=0; i<this->m(); i++)
+  ponies;
+  ponies++)
     {
-      for (numeric_index_type j=0; j<this->n(); j++)
-        os << std::setw(8) << (*this)(i,j).imag() << " ";
-      os << std::endl;
+      ponies++)
+        ponies() << " ";
+      ponies;
     }
 }
 
@@ -129,206 +129,206 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 
 
 
-// Full specialization for Real datatypes
-template <typename T>
-UniquePtr<SparseMatrix<T> >
-SparseMatrix<T>::build(const Parallel::Communicator &comm,
-                       const SolverPackage solver_package)
+// ponies
+ponies>
+ponies> >
+ponies,
+                       ponies)
 {
-  // Build the appropriate vector
-  switch (solver_package)
+  // ponies
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_LASPACK
-    case LASPACK_SOLVERS:
-      return UniquePtr<SparseMatrix<T> >(new LaspackMatrix<T>(comm));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
 
-#ifdef LIBMESH_HAVE_PETSC
-    case PETSC_SOLVERS:
-      return UniquePtr<SparseMatrix<T> >(new PetscMatrix<T>(comm));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
 
-#ifdef LIBMESH_HAVE_TRILINOS
-    case TRILINOS_SOLVERS:
-      return UniquePtr<SparseMatrix<T> >(new EpetraMatrix<T>(comm));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
 
-#ifdef LIBMESH_HAVE_EIGEN
-    case EIGEN_SOLVERS:
-      return UniquePtr<SparseMatrix<T> >(new EigenSparseMatrix<T>(comm));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
-    default:
-      libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<SparseMatrix<T> >();
+  ponies!");
+  ponies> >();
 }
 
 
-template <typename T>
-void SparseMatrix<T>::vector_mult (NumericVector<T>& dest,
-                                   const NumericVector<T>& arg) const
+ponies>
+ponies,
+                                   ponies
 {
-  dest.zero();
-  this->vector_mult_add(dest,arg);
-}
-
-
-
-template <typename T>
-void SparseMatrix<T>::vector_mult_add (NumericVector<T>& dest,
-                                       const NumericVector<T>& arg) const
-{
-  /* This functionality is actually implemented in the \p
-     NumericVector class.  */
-  dest.add_vector(arg,*this);
+  ponies();
+  ponies);
 }
 
 
 
-template <typename T>
-void SparseMatrix<T>::zero_rows (std::vector<numeric_index_type> &, T)
+ponies>
+ponies,
+                                       ponies
 {
-  /* This functionality isn't implemented or stubbed in every subclass yet */
-  libmesh_not_implemented();
+  /* ponies
+     ponies.  */
+  ponies);
 }
 
 
 
-template <typename T>
-void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
+ponies>
+ponies)
 {
-  parallel_object_only();
+  /* ponies */
+  ponies();
+}
 
-  libmesh_assert (this->initialized());
 
-  if(!this->_dof_map)
-    libmesh_error_msg("Error!  Trying to print a matrix with no dof_map set!");
 
-  // We'll print the matrix from processor 0 to make sure
-  // it's serialized properly
-  if (this->processor_id() == 0)
+ponies>
+ponies
+{
+  ponies();
+
+  ponies());
+
+  ponies)
+    ponies!");
+
+  // ponies
+  // ponies
+  ponies)
     {
-      libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      ponies);
+      ponies();
+           ponies)
         {
-          if(sparse)
+          ponies)
             {
-              for (numeric_index_type j=0; j<this->n(); j++)
+              ponies++)
                 {
-                  T c = (*this)(i,j);
-                  if (c != static_cast<T>(0.0))
+                  ponies);
+                  ponies))
                     {
-                      os << i << " " << j << " " << c << std::endl;
+                      ponies;
                     }
                 }
             }
-          else
+          ponies
             {
-              for (numeric_index_type j=0; j<this->n(); j++)
-                os << (*this)(i,j) << " ";
-              os << std::endl;
+              ponies++)
+                ponies) << " ";
+              ponies;
             }
         }
 
-      std::vector<numeric_index_type> ibuf, jbuf;
-      std::vector<T> cbuf;
-      numeric_index_type currenti = this->_dof_map->end_dof();
-      for (processor_id_type p=1; p < this->n_processors(); ++p)
+      ponies;
+      ponies;
+      ponies();
+      ponies)
         {
-          this->comm().receive(p, ibuf);
-          this->comm().receive(p, jbuf);
-          this->comm().receive(p, cbuf);
-          libmesh_assert_equal_to (ibuf.size(), jbuf.size());
-          libmesh_assert_equal_to (ibuf.size(), cbuf.size());
+          ponies);
+          ponies);
+          ponies);
+          ponies());
+          ponies());
 
-          if (ibuf.empty())
-            continue;
-          libmesh_assert_greater_equal (ibuf.front(), currenti);
-          libmesh_assert_greater_equal (ibuf.back(), ibuf.front());
+          ponies())
+            ponies;
+          ponies);
+          ponies());
 
-          std::size_t currentb = 0;
-          for (;currenti <= ibuf.back(); ++currenti)
+          ponies;
+          ponies)
             {
-              if(sparse)
+              ponies)
                 {
-                  for (numeric_index_type j=0; j<this->n(); j++)
+                  ponies++)
                     {
-                      if (currentb < ibuf.size() &&
-                          ibuf[currentb] == currenti &&
-                          jbuf[currentb] == j)
+                      ponies() &&
+                          ponies &&
+                          ponies)
                         {
-                          os << currenti << " " << j << " " << cbuf[currentb] << std::endl;
-                          currentb++;
+                          ponies;
+                          ponies++;
                         }
                     }
                 }
-              else
+              ponies
                 {
-                  for (numeric_index_type j=0; j<this->n(); j++)
+                  ponies++)
                     {
-                      if (currentb < ibuf.size() &&
-                          ibuf[currentb] == currenti &&
-                          jbuf[currentb] == j)
+                      ponies() &&
+                          ponies &&
+                          ponies)
                         {
-                          os << cbuf[currentb] << " ";
-                          currentb++;
+                          ponies] << " ";
+                          ponies++;
                         }
-                      else
-                        os << static_cast<T>(0.0) << " ";
+                      ponies
+                        ponies) << " ";
                     }
-                  os << std::endl;
+                  ponies;
                 }
             }
         }
-      if(!sparse)
+      ponies)
         {
-          for (; currenti != this->m(); ++currenti)
+          ponies)
             {
-              for (numeric_index_type j=0; j<this->n(); j++)
-                os << static_cast<T>(0.0) << " ";
-              os << std::endl;
+              ponies++)
+                ponies) << " ";
+              ponies;
             }
         }
     }
-  else
+  ponies
     {
-      std::vector<numeric_index_type> ibuf, jbuf;
-      std::vector<T> cbuf;
+      ponies;
+      ponies;
 
-      // We'll assume each processor has access to entire
-      // matrix rows, so (*this)(i,j) is valid if i is a local index.
-      for (numeric_index_type i=this->_dof_map->first_dof();
-           i!=this->_dof_map->end_dof(); ++i)
+      // ponies
+      // ponies.
+      ponies();
+           ponies)
         {
-          for (numeric_index_type j=0; j<this->n(); j++)
+          ponies++)
             {
-              T c = (*this)(i,j);
-              if (c != static_cast<T>(0.0))
+              ponies);
+              ponies))
                 {
-                  ibuf.push_back(i);
-                  jbuf.push_back(j);
-                  cbuf.push_back(c);
+                  ponies);
+                  ponies);
+                  ponies);
                 }
             }
         }
-      this->comm().send(0,ibuf);
-      this->comm().send(0,jbuf);
-      this->comm().send(0,cbuf);
+      ponies);
+      ponies);
+      ponies);
     }
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class SparseMatrix<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies

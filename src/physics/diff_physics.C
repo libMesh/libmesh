@@ -1,101 +1,101 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/diff_context.h"
-#include "libmesh/diff_physics.h"
-#include "libmesh/system.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-DifferentiablePhysics::~DifferentiablePhysics()
+ponies()
 {
-  DifferentiablePhysics::clear_physics();
+  ponies();
 }
 
 
 
-void DifferentiablePhysics::clear_physics ()
+ponies ()
 {
-  _time_evolving.resize(0);
+  ponies);
 }
 
 
 
-void DifferentiablePhysics::init_physics (const System& sys)
+ponies)
 {
-  // give us flags for every variable that might be time evolving
-  _time_evolving.resize(sys.n_vars(), false);
+  // ponies
+  ponies);
 }
 
 
 
-bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
-                                                   DiffContext &c)
+ponies,
+                                                   ponies)
 {
-  FEMContext &context = cast_ref<FEMContext&>(c);
+  ponies);
 
-  for (unsigned int var = 0; var != context.n_vars(); ++var)
+  ponies)
     {
-      if (!this->is_time_evolving(var))
-        continue;
+      ponies))
+        ponies;
 
-      if (c.get_system().variable(var).type().family != SCALAR)
-        continue;
+      ponies)
+        ponies;
 
-      const std::vector<dof_id_type>& dof_indices =
-        context.get_dof_indices(var);
+      ponies =
+        ponies);
 
-      const unsigned int n_dofs = cast_int<unsigned int>
-        (dof_indices.size());
+      ponies>
+        (ponies());
 
-      DenseSubVector<Number> &Fs = context.get_elem_residual(var);
-      DenseSubMatrix<Number> &Kss = context.get_elem_jacobian( var, var );
+      ponies);
+      ponies );
 
-      const libMesh::DenseSubVector<libMesh::Number> &Us =
-        context.get_elem_solution(var);
+      ponies =
+        ponies);
 
-      for (unsigned int i=0; i != n_dofs; ++i)
+      ponies)
         {
-          Fs(i) -= Us(i);
+          ponies);
 
-          if (request_jacobian)
-            Kss(i,i) -= context.elem_solution_rate_derivative;
+          ponies)
+            ponies;
         }
     }
 
-  return request_jacobian;
+  ponies;
 }
 
 
 
-bool DifferentiablePhysics::_eulerian_time_deriv (bool request_jacobian,
-                                                  DiffContext &context)
+ponies,
+                                                  ponies)
 {
-  // For any problem we need time derivative terms
-  request_jacobian =
-    this->element_time_derivative(request_jacobian, context);
+  // ponies
+  ponies =
+    ponies);
 
-  // For a moving mesh problem we may need the pseudoconvection term too
-  return this->eulerian_residual(request_jacobian, context) &&
-    request_jacobian;
+  // ponies
+  ponies) &&
+    ponies;
 }
 
 
 
-} // namespace libMesh
+} // ponies

@@ -1,494 +1,494 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PARALLEL_MESH_H
-#define LIBMESH_PARALLEL_MESH_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/mapvector.h"
-#include "libmesh/unstructured_mesh.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <cstddef>
-#include <set>
+// ponies   -----------------------------------
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class Elem;
-class Node;
+// ponies
+ponies;
+ponies;
 
 
 /**
- * The \p ParallelMesh class is derived from the \p MeshBase class,
- * and is intended to provide identical functionality to the user
- * but be fully parallelized in memory.
- * By "is intended" I mean that it doesn't work that way yet.  Don't
- * use this class unless you're developing or debugging it.
+ * ponies,
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// UnstructuredMesh class definition
-class ParallelMesh : public UnstructuredMesh
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  explicit
-  ParallelMesh (const Parallel::Communicator &comm_in,
-                unsigned char dim=1);
+  ponies
+  ponies,
+                ponies);
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
+#ponies
   /**
-   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  explicit
-  ParallelMesh (unsigned char dim=1);
-#endif
+  ponies
+  ponies);
+#ponies
 
 
   /**
-   * Copy-constructor.  This should be able to take a
-   * serial or parallel mesh.
+   * ponies
+   * ponies.
    */
-  ParallelMesh (const UnstructuredMesh& other_mesh);
+  ponies);
 
   /**
-   * Copy-constructor, possibly specialized for a
-   * parallel mesh.
+   * ponies
+   * ponies.
    */
-  ParallelMesh (const ParallelMesh& other_mesh);
+  ponies);
 
   /**
-   * Virtual copy-constructor, creates a copy of this mesh
+   * ponies
    */
-  virtual UniquePtr<MeshBase> clone () const
-  { return UniquePtr<MeshBase>(new ParallelMesh(*this)); }
+  ponies
+  { ponies)); }
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~ParallelMesh();
+  ponies();
 
   /**
-   * Clear all internal data.
+   * ponies.
    */
-  virtual void clear();
+  ponies();
 
   /**
-   * Redistribute elements between processors.  This gets called
-   * automatically by the Partitioner, and is a no-op in the case of a
-   * serialized mesh.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void redistribute ();
+  ponies ();
 
   /**
-   * Recalculate cached data after elements and nodes have been
-   * repartitioned.
+   * ponies
+   * ponies.
    */
-  virtual void update_post_partitioning ();
+  ponies ();
 
   /**
-   * @returns \p true if all elements and nodes of the mesh
-   * exist on the current processor, \p false otherwise
+   * @ponies
+   * ponies
    */
-  virtual bool is_serial () const
-  { return _is_serial; }
+  ponies
+  { ponies; }
 
   /**
-   * Verify id and processor_id consistency of a parallel
-   * objects container.
-   * Calls libmesh_assert() on each possible failure in that container.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  template <typename T>
-  void libmesh_assert_valid_parallel_object_ids(const mapvector<T*,dof_id_type>&) const;
+  ponies>
+  ponies;
 
   /**
-   * Verify id and processor_id consistency of our elements and
-   * nodes containers.
-   * Calls libmesh_assert() on each possible failure.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  virtual void libmesh_assert_valid_parallel_ids() const;
+  ponies;
 
   /**
-   * Verify refinement_flag and p_refinement_flag consistency of our
-   * elements containers.
-   * Calls libmesh_assert() on each possible failure.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  void libmesh_assert_valid_parallel_flags() const;
+  ponies;
 
   /**
-   * Renumber a parallel objects container
-   * Returns the smallest globally unused id for that
-   * container.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  dof_id_type renumber_dof_objects (mapvector<T*,dof_id_type>&);
+  ponies>
+  ponies>&);
 
   /**
-   * Remove NULL elements from arrays
+   * ponies
    */
-  virtual void renumber_nodes_and_elements ();
+  ponies ();
 
   /**
-   * Gathers all elements and nodes of the mesh onto
-   * every processor
+   * ponies
+   * ponies
    */
-  virtual void allgather();
+  ponies();
 
   /**
-   * Deletes all nonlocal elements of the mesh
-   * except for "ghosts" which touch a local element, and deletes
-   * all nodes which are not part of a local or ghost element
+   * ponies
+   * ponies
+   * ponies
    */
-  virtual void delete_remote_elements();
+  ponies();
 
   /**
-   * Inserts the element _and_ adds it to a list of elements not to
-   * get deleted by delete_remote_elements.  This is handy for inserting
-   * off-processor elements that you want to keep track of on this processor.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void add_extra_ghost_elem(Elem* e);
+  ponies);
 
   /**
-   * Clears extra ghost elements.
+   * ponies.
    */
-  virtual void clear_extra_ghost_elems() { _extra_ghost_elems.clear(); }
+  ponies(); }
 
-  // Cached methods that can be called in serial
-  virtual dof_id_type n_nodes () const { return _n_nodes; }
-  virtual dof_id_type max_node_id () const { return _max_node_id; }
-  virtual void reserve_nodes (const dof_id_type) { }
-  virtual dof_id_type n_elem () const { return _n_elem; }
-  virtual dof_id_type n_active_elem () const;
-  virtual dof_id_type max_elem_id () const { return _max_elem_id; }
-  virtual void reserve_elem (const dof_id_type) { }
+  // ponies
+  ponies; }
+  ponies; }
+  ponies) { }
+  ponies; }
+  ponies;
+  ponies; }
+  ponies) { }
 
-  // Parallel only method to update the caches
-  virtual void update_parallel_id_counts ();
+  // ponies
+  ponies ();
 
-  // And more parallel only methods to test non-cached values
-  dof_id_type parallel_n_nodes () const;
-  dof_id_type parallel_max_node_id () const;
-  dof_id_type parallel_n_elem () const;
-  dof_id_type parallel_max_elem_id () const;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  virtual const Point& point (const dof_id_type i) const ;
-  virtual const Node&  node  (const dof_id_type i) const ;
-  virtual Node& node (const dof_id_type i) ;
-  virtual const Node* node_ptr (const dof_id_type i) const ;
-  virtual Node* node_ptr (const dof_id_type i) ;
-  virtual const Node* query_node_ptr (const dof_id_type i) const ;
-  virtual Node* query_node_ptr (const dof_id_type i) ;
-  virtual const Elem* elem (const dof_id_type i) const ;
-  virtual Elem* elem (const dof_id_type i) ;
-  virtual const Elem* query_elem (const dof_id_type i) const ;
-  virtual Elem* query_elem (const dof_id_type i) ;
+  ponies ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
 
   /**
-   * functions for adding /deleting nodes elements.
+   * ponies.
    */
-  virtual Node* add_point (const Point& p,
-                           const dof_id_type id =
-                           DofObject::invalid_id,
-                           const processor_id_type proc_id =
-                           DofObject::invalid_processor_id);
-  virtual Node* add_node (Node* n) ;
+  ponies,
+                           ponies =
+                           ponies,
+                           ponies =
+                           ponies);
+  ponies) ;
 
   /**
-   * Calls add_node().
+   * ponies().
    */
-  virtual Node* insert_node(Node* n);
+  ponies);
 
-  virtual void delete_node (Node* n) ;
-  virtual void renumber_node (dof_id_type old_id, dof_id_type new_id);
-  virtual Elem* add_elem (Elem* e) ;
-  virtual Elem* insert_elem (Elem* e) ;
-  virtual void delete_elem (Elem* e) ;
-  virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id);
+  ponies) ;
+  ponies);
+  ponies) ;
+  ponies) ;
+  ponies) ;
+  ponies);
 
   /**
-   * There is no reason for a user to ever call this function.
+   * ponies.
    *
-   * This function restores a previously broken element/node numbering such that
-   * \p mesh.node(n)->id() == n.
+   * ponies
+   * \ponies.
    */
-  virtual void fix_broken_node_and_element_numbering ();
+  ponies ();
 
-public:
+ponies:
   /**
-   * Elem iterator accessor functions.
+   * ponies.
    */
-  element_iterator elements_begin ();
-  element_iterator elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator active_elements_begin ();
-  element_iterator active_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator ancestor_elements_begin ();
-  element_iterator ancestor_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator subactive_elements_begin ();
-  element_iterator subactive_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_active_elements_begin ();
-  element_iterator not_active_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_ancestor_elements_begin ();
-  element_iterator not_ancestor_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_subactive_elements_begin ();
-  element_iterator not_subactive_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator local_elements_begin ();
-  element_iterator local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator semilocal_elements_begin ();
-  element_iterator semilocal_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator facelocal_elements_begin ();
-  element_iterator facelocal_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_local_elements_begin ();
-  element_iterator not_local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator active_local_elements_begin ();
-  element_iterator active_local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator active_not_local_elements_begin ();
-  element_iterator active_not_local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator level_elements_begin (unsigned int level);
-  element_iterator level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator not_level_elements_begin (unsigned int level);
-  element_iterator not_level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator local_level_elements_begin (unsigned int level);
-  element_iterator local_level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator local_not_level_elements_begin (unsigned int level);
-  element_iterator local_not_level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator pid_elements_begin (processor_id_type proc_id);
-  element_iterator pid_elements_end   (processor_id_type proc_id);
+  ponies);
+  ponies);
 
-  element_iterator type_elements_begin (ElemType type);
-  element_iterator type_elements_end   (ElemType type);
+  ponies);
+  ponies);
 
-  element_iterator active_type_elements_begin (ElemType type);
-  element_iterator active_type_elements_end   (ElemType type);
+  ponies);
+  ponies);
 
-  element_iterator active_pid_elements_begin (processor_id_type proc_id);
-  element_iterator active_pid_elements_end   (processor_id_type proc_id);
+  ponies);
+  ponies);
 
-  element_iterator unpartitioned_elements_begin ();
-  element_iterator unpartitioned_elements_end ();
+  ponies ();
+  ponies ();
 
-  element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id);
-  element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id);
+  ponies);
+  ponies);
 
-  element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id);
-  element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id);
-
-
-  /**
-   * const Elem iterator accessor functions.
-   */
-  const_element_iterator elements_begin() const;
-  const_element_iterator elements_end()   const;
-
-  const_element_iterator active_elements_begin() const;
-  const_element_iterator active_elements_end()   const;
-
-  const_element_iterator ancestor_elements_begin() const;
-  const_element_iterator ancestor_elements_end()   const;
-
-  const_element_iterator subactive_elements_begin() const;
-  const_element_iterator subactive_elements_end()   const;
-
-  const_element_iterator not_active_elements_begin() const;
-  const_element_iterator not_active_elements_end()   const;
-
-  const_element_iterator not_ancestor_elements_begin() const;
-  const_element_iterator not_ancestor_elements_end()   const;
-
-  const_element_iterator not_subactive_elements_begin() const;
-  const_element_iterator not_subactive_elements_end()   const;
-
-  const_element_iterator local_elements_begin () const;
-  const_element_iterator local_elements_end   () const;
-
-  const_element_iterator semilocal_elements_begin () const;
-  const_element_iterator semilocal_elements_end   () const;
-
-  const_element_iterator facelocal_elements_begin () const;
-  const_element_iterator facelocal_elements_end   () const;
-
-  const_element_iterator not_local_elements_begin () const;
-  const_element_iterator not_local_elements_end   () const;
-
-  const_element_iterator active_local_elements_begin () const;
-  const_element_iterator active_local_elements_end   () const;
-
-  const_element_iterator active_not_local_elements_begin () const;
-  const_element_iterator active_not_local_elements_end   () const;
-
-  const_element_iterator level_elements_begin (unsigned int level) const;
-  const_element_iterator level_elements_end   (unsigned int level) const;
-
-  const_element_iterator not_level_elements_begin (unsigned int level) const;
-  const_element_iterator not_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator local_level_elements_begin (unsigned int level) const;
-  const_element_iterator local_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator local_not_level_elements_begin (unsigned int level) const;
-  const_element_iterator local_not_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator pid_elements_begin (processor_id_type proc_id) const;
-  const_element_iterator pid_elements_end   (processor_id_type proc_id) const;
-
-  const_element_iterator type_elements_begin (ElemType type) const;
-  const_element_iterator type_elements_end   (ElemType type) const;
-
-  const_element_iterator active_type_elements_begin (ElemType type) const;
-  const_element_iterator active_type_elements_end   (ElemType type) const;
-
-  const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const;
-  const_element_iterator active_pid_elements_end   (processor_id_type proc_id) const;
-
-  const_element_iterator unpartitioned_elements_begin () const;
-  const_element_iterator unpartitioned_elements_end () const;
-
-  const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
-  const_element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
-
-  const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
-  const_element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
-
-
-
+  ponies);
+  ponies);
 
 
   /**
-   * non-const Node iterator accessor functions.
+   * ponies.
    */
-  node_iterator nodes_begin();
-  node_iterator nodes_end();
-  node_iterator active_nodes_begin();
-  node_iterator active_nodes_end();
-  node_iterator local_nodes_begin  ();
-  node_iterator local_nodes_end    ();
-  node_iterator pid_nodes_begin (processor_id_type proc_id);
-  node_iterator pid_nodes_end   (processor_id_type proc_id);
-  node_iterator bid_nodes_begin (boundary_id_type bndry_id);
-  node_iterator bid_nodes_end   (boundary_id_type bndry_id);
-  node_iterator bnd_nodes_begin ();
-  node_iterator bnd_nodes_end ();
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+
+
+
 
   /**
-   * const Node iterator accessor functions.
+   * ponies.
    */
-  const_node_iterator nodes_begin() const;
-  const_node_iterator nodes_end()   const;
-  const_node_iterator active_nodes_begin() const;
-  const_node_iterator active_nodes_end()   const;
-  const_node_iterator local_nodes_begin  () const;
-  const_node_iterator local_nodes_end    () const;
-  const_node_iterator pid_nodes_begin (processor_id_type proc_id) const;
-  const_node_iterator pid_nodes_end   (processor_id_type proc_id) const;
-  const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const;
-  const_node_iterator bid_nodes_end   (boundary_id_type bndry_id) const;
-  const_node_iterator bnd_nodes_begin () const;
-  const_node_iterator bnd_nodes_end () const;
-
-protected:
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies  ();
+  ponies    ();
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies ();
+  ponies ();
 
   /**
-   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
-   * if the library has been configured with unique_id support.
+   * ponies.
    */
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  virtual void assign_unique_ids();
-#endif
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+
+ponies:
 
   /**
-   * The verices (spatial coordinates) of the mesh.
+   * ponies)
+   * ponies.
    */
-  mapvector<Node*,dof_id_type> _nodes;
+#ponies
+  ponies();
+#ponies
 
   /**
-   * The elements in the mesh.
+   * ponies.
    */
-  mapvector<Elem*,dof_id_type> _elements;
+  ponies;
 
   /**
-   * A boolean remembering whether we're serialized or not
+   * ponies.
    */
-  bool _is_serial;
+  ponies;
 
   /**
-   * Cached data from the last renumber_nodes_and_elements call
+   * ponies
    */
-  dof_id_type _n_nodes, _n_elem, _max_node_id, _max_elem_id;
+  ponies;
 
   /**
-   * Guaranteed globally unused IDs for use when adding new
-   * nodes or elements.
+   * ponies
    */
-  dof_id_type _next_free_local_node_id,
-    _next_free_local_elem_id;
-  dof_id_type _next_free_unpartitioned_node_id,
-    _next_free_unpartitioned_elem_id;
+  ponies;
 
   /**
-   * These are extra ghost elements that we want to make sure
-   * not to delete when we call delete_remote_elements()
+   * ponies
+   * ponies.
    */
-  std::set<Elem *> _extra_ghost_elems;
-
-private:
-
-  /**
-   * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Elem*>.
-   */
-  typedef mapvector<Elem*,dof_id_type>::veclike_iterator             elem_iterator_imp;
-  typedef mapvector<Elem*,dof_id_type>::const_veclike_iterator const_elem_iterator_imp;
+  ponies,
+    ponies;
+  ponies,
+    ponies;
 
   /**
-   * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Node*>.
+   * ponies
+   * ponies()
    */
-  typedef mapvector<Node*,dof_id_type>::veclike_iterator             node_iterator_imp;
-  typedef mapvector<Node*,dof_id_type>::const_veclike_iterator const_node_iterator_imp;
+  ponies;
+
+ponies:
+
+  /**
+   * ponies,
+   * ponies*>.
+   */
+  ponies;
+  ponies;
+
+  /**
+   * ponies,
+   * ponies*>.
+   */
+  ponies;
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_PARALLEL_MESH_H
+#ponies

@@ -1,122 +1,122 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_DENSE_VECTOR_BASE_H
-#define LIBMESH_DENSE_VECTOR_BASE_H
+// ponies
+// ponies
+// ponies
 
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
 
-// C++ includes
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+
+// ponies
+
+ponies
 {
 
 
 
 
 /**
- * Defines an abstract dense vector base class for use in
- * Finite Element-type computations. Specialized dense vectors,
- * for example DenseSubVectors, can be derived from this class.
+ * ponies
+ * ponies,
+ * ponies.
  *
- * @author John W. Peterson, 2003
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DenseVectorBase class definition
-template<typename T>
-class DenseVectorBase
+// ponies
+ponies>
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Empty.
+   * ponies.
    */
-  DenseVectorBase() {}
+  ponies() {}
 
   /**
-   * Destructor.  Does nothing.
+   * ponies.
    */
-  virtual ~DenseVectorBase() {}
+  ponies() {}
 
   /**
-   * Set every element in the vector to 0.  Needs to
-   * be pure virtual since the storage method may
-   * be different in derived classes.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void zero() = 0;
+  ponies;
 
   /**
-   * @returns the \p (i) element of the vector.
+   * @ponies.
    */
-  virtual T el(const unsigned int i) const = 0;
+  ponies;
 
   /**
-   * @returns the \p (i) element of the vector as a writeable reference.
+   * @ponies.
    */
-  virtual T & el(const unsigned int i) = 0;
+  ponies;
 
   /**
-   * @returns the size of the vector.
+   * @ponies.
    */
-  virtual unsigned int size() const = 0;
+  ponies;
 
   /**
-   * @returns true iff size() is 0.
+   * @ponies.
    */
-  virtual bool empty() const { return (this->size() == 0); }
+  ponies); }
 
   /**
-   * Pretty-print the vector to \p stdout.
+   * ponies.
    */
-  void print(std::ostream& os) const;
+  ponies;
 
   /**
-   * Same as above, but allows you to print using the
-   * usual stream syntax.
+   * ponies
+   * ponies.
    */
-  friend std::ostream& operator << (std::ostream& os, const DenseVectorBase<T>& v)
+  ponies)
   {
-    v.print(os);
-    return os;
+    ponies);
+    ponies;
   }
 
   /**
-   * Prints the entries of the vector with additional
-   * decimal places in scientific notation.
+   * ponies
+   * ponies.
    */
-  void print_scientific(std::ostream& os) const;
+  ponies;
 
 };
 
 
 
 // ------------------------------------------------------------
-// DenseVectorBase member functions
+// ponies
 
 
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_DENSE_VECTOR_BASE_H
+#ponies

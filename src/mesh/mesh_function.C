@@ -1,81 +1,81 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
+// ponies
+// ponies
+// ponies
 
 
-// Local Includes
-#include "libmesh/mesh_function.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/point_locator_tree.h"
-#include "libmesh/fe_base.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/fe_compute_data.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/point.h"
 
-namespace libMesh
+// ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 //------------------------------------------------------------------
-// MeshFunction methods
-MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
-                            const NumericVector<Number>& vec,
-                            const DofMap& dof_map,
-                            const std::vector<unsigned int>& vars,
-                            const FunctionBase<Number>* master) :
-  FunctionBase<Number> (master),
-  ParallelObject       (eqn_systems),
-  _eqn_systems         (eqn_systems),
-  _vector              (vec),
-  _dof_map             (dof_map),
-  _system_vars         (vars),
-  _point_locator       (NULL),
-  _out_of_mesh_mode    (false),
-  _out_of_mesh_value   ()
+// ponies
+ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies   ()
 {
 }
 
 
 
-MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
-                            const NumericVector<Number>& vec,
-                            const DofMap& dof_map,
-                            const unsigned int var,
-                            const FunctionBase<Number>* master) :
-  FunctionBase<Number> (master),
-  ParallelObject       (eqn_systems),
-  _eqn_systems         (eqn_systems),
-  _vector              (vec),
-  _dof_map             (dof_map),
-  _system_vars         (1,var),
-  _point_locator       (NULL),
-  _out_of_mesh_mode    (false),
-  _out_of_mesh_value   ()
+ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies   ()
 {
-  //   std::vector<unsigned int> buf (1);
-  //   buf[0] = var;
-  //   _system_vars (buf);
+  //   ponies);
+  //   ponies;
+  //   ponies);
 }
 
 
@@ -84,449 +84,449 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 
 
 
-MeshFunction::~MeshFunction ()
+ponies ()
 {
-  // only delete the point locator when we are the master
-  if (this->_master == NULL)
-    delete this->_point_locator;
+  // ponies
+  ponies)
+    ponies;
 }
 
 
 
 
-void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
+ponies*/)
 {
-  // are indices of the desired variable(s) provided?
-  libmesh_assert_greater (this->_system_vars.size(), 0);
+  // ponies?
+  ponies);
 
-  // Don't do twice...
-  if (this->_initialized)
+  // ponies...
+  ponies)
     {
-      libmesh_assert(this->_point_locator);
-      return;
+      ponies);
+      ponies;
     }
 
   /*
-   * set up the PointLocator: either someone else
-   * is the master (go and get the address of his
-   * point locator) or this object is the master
-   * (build the point locator  on our own).
+   * ponies
+   * ponies
+   * ponies
+   * (ponies).
    */
-  if (this->_master != NULL)
+  ponies)
     {
-      // we aren't the master
-      const MeshFunction* master =
-        cast_ptr<const MeshFunction*>(this->_master);
+      // ponies
+      ponies =
+        ponies);
 
-      if (master->_point_locator == NULL)
-        libmesh_error_msg("ERROR: When the master-servant concept is used, the master has to be initialized first!");
+      ponies)
+        ponies!");
 
-      else
+      ponies
         {
-          this->_point_locator = master->_point_locator;
+          ponies;
         }
     }
-  else
+  ponies
     {
-      // we are the master: build the point locator
+      // ponies
 
-      // constant reference to the other mesh
-      const MeshBase& mesh = this->_eqn_systems.get_mesh();
+      // ponies
+      ponies();
 
-      // build the point locator.  Only \p TREE version available
-      //UniquePtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
-      //this->_point_locator = ap.release();
-      // this->_point_locator = new PointLocatorTree (mesh, point_locator_build_type);
-      this->_point_locator = mesh.sub_point_locator().release();
+      // ponies
+      //ponies));
+      //ponies();
+      // ponies);
+      ponies();
 
-      // Point locator no longer needs to be initialized.
-      //      this->_point_locator->init();
+      // ponies.
+      //      ponies();
     }
 
 
-  // ready for use
-  this->_initialized = true;
+  // ponies
+  ponies;
 }
 
 
-void
-MeshFunction::clear ()
+ponies
+ponies ()
 {
-  // only delete the point locator when we are the master
-  if ((this->_point_locator != NULL) && (this->_master == NULL))
+  // ponies
+  ponies))
     {
-      delete this->_point_locator;
-      this->_point_locator = NULL;
+      ponies;
+      ponies;
     }
-  this->_initialized = false;
+  ponies;
 }
 
 
 
-UniquePtr<FunctionBase<Number> > MeshFunction::clone () const
+ponies
 {
-  return UniquePtr<FunctionBase<Number> >
-    (new MeshFunction
-     (_eqn_systems, _vector, _dof_map, _system_vars, this));
+  ponies> >
+    (ponies
+     (ponies));
 }
 
 
 
-Number MeshFunction::operator() (const Point& p,
-                                 const Real time)
+ponies,
+                                 ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  DenseVector<Number> buf (1);
-  this->operator() (p, time, buf);
-  return buf(0);
+  ponies);
+  ponies);
+  ponies);
 }
 
 
 
-Gradient MeshFunction::gradient (const Point& p,
-                                 const Real time)
+ponies,
+                                 ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  std::vector<Gradient> buf (1);
-  this->gradient(p, time, buf);
-  return buf[0];
+  ponies);
+  ponies);
+  ponies];
 }
 
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-Tensor MeshFunction::hessian (const Point& p,
-                              const Real time)
+#ponies
+ponies,
+                              ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  std::vector<Tensor> buf (1);
-  this->hessian(p, time, buf);
-  return buf[0];
+  ponies);
+  ponies);
+  ponies];
 }
-#endif
+#ponies
 
-void MeshFunction::operator() (const Point& p,
-                               const Real time,
-                               DenseVector<Number>& output)
+ponies,
+                               ponies,
+                               ponies)
 {
-  this->operator() (p,time,output,NULL);
+  ponies);
 }
 
-void MeshFunction::operator() (const Point& p,
-                               const Real,
-                               DenseVector<Number>& output,
-                               const std::set<subdomain_id_type>* subdomain_ids)
+ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  const Elem* element = this->find_element(p,subdomain_ids);
+  ponies);
 
-  if (!element)
+  ponies)
     {
-      output = _out_of_mesh_value;
+      ponies;
     }
-  else
+  ponies
     {
-      // resize the output vector to the number of output values
-      // that the user told us
-      output.resize (cast_int<unsigned int>
-                     (this->_system_vars.size()));
+      // ponies
+      // ponies
+      ponies>
+                     (ponies()));
 
 
       {
-        const unsigned int dim = element->dim();
+        ponies();
 
 
         /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
+         * ponies().
+         * ponies,
+         * ponies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
-                                                            this->_dof_map.variable_type(0),
-                                                            element,
-                                                            p));
+        ponies,
+                                                            ponies),
+                                                            ponies,
+                                                            ponies));
 
 
-        // loop over all vars
-        for (unsigned int index=0; index < this->_system_vars.size(); index++)
+        // ponies
+        ponies++)
           {
             /*
-             * the data for this variable
+             * ponies
              */
-            const unsigned int var = _system_vars[index];
-            const FEType& fe_type = this->_dof_map.variable_type(var);
+            ponies];
+            ponies);
 
             /**
-             * Build an FEComputeData that contains both input and output data
-             * for the specific compute_data method.
+             * ponies
+             * ponies.
              */
             {
-              FEComputeData data (this->_eqn_systems, mapped_point);
+              ponies);
 
-              FEInterface::compute_data (dim, fe_type, element, data);
+              ponies);
 
-              // where the solution values for the var-th variable are stored
-              std::vector<dof_id_type> dof_indices;
-              this->_dof_map.dof_indices (element, dof_indices, var);
+              // ponies
+              ponies;
+              ponies);
 
-              // interpolate the solution
+              // ponies
               {
-                Number value = 0.;
+                ponies.;
 
-                for (unsigned int i=0; i<dof_indices.size(); i++)
-                  value += this->_vector(dof_indices[i]) * data.shape[i];
+                ponies++)
+                  ponies];
 
-                output(index) = value;
+                ponies;
               }
 
             }
 
-            // next variable
+            // ponies
           }
       }
     }
 
-  // all done
-  return;
+  // ponies
+  ponies;
 }
 
 
 
-void MeshFunction::gradient (const Point& p,
-                             const Real,
-                             std::vector<Gradient>& output,
-                             const std::set<subdomain_id_type>* subdomain_ids)
+ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  const Elem* element = this->find_element(p,subdomain_ids);
+  ponies);
 
-  if (!element)
+  ponies)
     {
-      output.resize(0);
+      ponies);
     }
-  else
+  ponies
     {
-      // resize the output vector to the number of output values
-      // that the user told us
-      output.resize (this->_system_vars.size());
+      // ponies
+      // ponies
+      ponies());
 
 
       {
-        const unsigned int dim = element->dim();
+        ponies();
 
 
         /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
+         * ponies().
+         * ponies,
+         * ponies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
-                                                            this->_dof_map.variable_type(0),
-                                                            element,
-                                                            p));
+        ponies,
+                                                            ponies),
+                                                            ponies,
+                                                            ponies));
 
-        std::vector<Point> point_list (1, mapped_point);
+        ponies);
 
-        // loop over all vars
-        for (unsigned int index=0; index < this->_system_vars.size(); index++)
+        // ponies
+        ponies++)
           {
             /*
-             * the data for this variable
+             * ponies
              */
-            const unsigned int var = _system_vars[index];
-            const FEType& fe_type = this->_dof_map.variable_type(var);
+            ponies];
+            ponies);
 
-            UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
-            const std::vector<std::vector<RealGradient> >& dphi = point_fe->get_dphi();
-            point_fe->reinit(element, &point_list);
+            ponies));
+            ponies();
+            ponies);
 
-            // where the solution values for the var-th variable are stored
-            std::vector<dof_id_type> dof_indices;
-            this->_dof_map.dof_indices (element, dof_indices, var);
+            // ponies
+            ponies;
+            ponies);
 
-            // interpolate the solution
-            Gradient grad(0.);
+            // ponies
+            ponies.);
 
-            for (unsigned int i=0; i<dof_indices.size(); i++)
-              grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
+            ponies++)
+              ponies]));
 
-            output[index] = grad;
+            ponies;
           }
       }
     }
 
-  // all done
-  return;
+  // ponies
+  ponies;
 }
 
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-void MeshFunction::hessian (const Point& p,
-                            const Real,
-                            std::vector<Tensor>& output,
-                            const std::set<subdomain_id_type>* subdomain_ids)
+#ponies
+ponies,
+                            ponies,
+                            ponies,
+                            ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  const Elem* element = this->find_element(p,subdomain_ids);
+  ponies);
 
-  if (!element)
+  ponies)
     {
-      output.resize(0);
+      ponies);
     }
-  else
+  ponies
     {
-      // resize the output vector to the number of output values
-      // that the user told us
-      output.resize (this->_system_vars.size());
+      // ponies
+      // ponies
+      ponies());
 
 
       {
-        const unsigned int dim = element->dim();
+        ponies();
 
 
         /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
+         * ponies().
+         * ponies,
+         * ponies
          */
-        const Point mapped_point (FEInterface::inverse_map (dim,
-                                                            this->_dof_map.variable_type(0),
-                                                            element,
-                                                            p));
+        ponies,
+                                                            ponies),
+                                                            ponies,
+                                                            ponies));
 
-        std::vector<Point> point_list (1, mapped_point);
+        ponies);
 
-        // loop over all vars
-        for (unsigned int index=0; index < this->_system_vars.size(); index++)
+        // ponies
+        ponies++)
           {
             /*
-             * the data for this variable
+             * ponies
              */
-            const unsigned int var = _system_vars[index];
-            const FEType& fe_type = this->_dof_map.variable_type(var);
+            ponies];
+            ponies);
 
-            UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
-            const std::vector<std::vector<RealTensor> >& d2phi =
-              point_fe->get_d2phi();
-            point_fe->reinit(element, &point_list);
+            ponies));
+            ponies =
+              ponies();
+            ponies);
 
-            // where the solution values for the var-th variable are stored
-            std::vector<dof_id_type> dof_indices;
-            this->_dof_map.dof_indices (element, dof_indices, var);
+            // ponies
+            ponies;
+            ponies);
 
-            // interpolate the solution
-            Tensor hess;
+            // ponies
+            ponies;
 
-            for (unsigned int i=0; i<dof_indices.size(); i++)
-              hess.add_scaled(d2phi[i][0], this->_vector(dof_indices[i]));
+            ponies++)
+              ponies]));
 
-            output[index] = hess;
+            ponies;
           }
       }
     }
 
-  // all done
-  return;
+  // ponies
+  ponies;
 }
-#endif
+#ponies
 
-const Elem* MeshFunction::find_element( const Point& p,
-                                        const std::set<subdomain_id_type>* subdomain_ids ) const
+ponies,
+                                        ponies
 {
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
-#ifdef DEBUG
-  if (this->_master != NULL)
+  /* ponies
+     ponies
+     ponies
+     ponies
+     ponies.  */
+#ponies
+  ponies)
     {
-      const MeshFunction* master =
-        cast_ptr<const MeshFunction*>(this->_master);
-      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
-        libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
-                          << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
+      ponies =
+        ponies);
+      ponies)
+        ponies " \
+                          << "ponies.");
     }
-#endif
+#ponies
 
-  // locate the point in the other mesh
-  const Elem* element = this->_point_locator->operator()(p,subdomain_ids);
+  // ponies
+  ponies);
 
-  // If we have an element, but it's not a local element, then we
-  // either need to have a serialized vector or we need to find a
-  // local element sharing the same point.
-  if (element &&
-      (element->processor_id() != this->processor_id()) &&
-      _vector.type() != SERIAL)
+  // ponies
+  // ponies
+  // ponies.
+  ponies &&
+      (ponies()) &&
+      ponies)
     {
-      // look for a local element containing the point
-      std::set<const Elem*> point_neighbors;
-      element->find_point_neighbors(p, point_neighbors);
-      element = NULL;
-      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
-      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
-      for (; it != end; ++it)
+      // ponies
+      ponies;
+      ponies);
+      ponies;
+      ponies();
+      ponies();
+      ponies)
         {
-          const Elem* elem = *it;
-          if (elem->processor_id() == this->processor_id())
+          ponies;
+          ponies())
             {
-              element = elem;
-              break;
+              ponies;
+              ponies;
             }
         }
     }
 
-  return element;
+  ponies;
 }
 
-const PointLocatorBase& MeshFunction::get_point_locator (void) const
+ponies
 {
-  libmesh_assert (this->initialized());
-  return *_point_locator;
+  ponies());
+  ponies;
 }
 
-void MeshFunction::enable_out_of_mesh_mode(const DenseVector<Number>& value)
+ponies)
 {
-  libmesh_assert (this->initialized());
-  _point_locator->enable_out_of_mesh_mode();
-  _out_of_mesh_mode = true;
-  _out_of_mesh_value = value;
+  ponies());
+  ponies();
+  ponies;
+  ponies;
 }
 
-void MeshFunction::enable_out_of_mesh_mode(const Number& value)
+ponies)
 {
-  DenseVector<Number> v(1);
-  v(0) = value;
-  this->enable_out_of_mesh_mode(v);
+  ponies);
+  ponies;
+  ponies);
 }
 
-void MeshFunction::disable_out_of_mesh_mode(void)
+ponies)
 {
-  libmesh_assert (this->initialized());
-  _point_locator->disable_out_of_mesh_mode();
-  _out_of_mesh_mode = false;
+  ponies());
+  ponies();
+  ponies;
 }
 
-void MeshFunction::set_point_locator_tolerance(Real tol)
+ponies)
 {
-  // We need to enable out_of_mesh mode in the point_locator
-  // in order for the point locator tolerance to be used.
-  _point_locator->enable_out_of_mesh_mode();
+  // ponies
+  // ponies.
+  ponies();
 
-  // Set the tolerance
-  _point_locator->set_close_to_point_tol(tol);
+  // ponies
+  ponies);
 }
 
-void MeshFunction::unset_point_locator_tolerance()
+ponies()
 {
-  _point_locator->unset_close_to_point_tol();
+  ponies();
 }
 
-} // namespace libMesh
+} // ponies

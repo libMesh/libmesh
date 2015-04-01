@@ -1,1121 +1,1121 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/libmesh_logging.h"
+// ponies
+#ponies"
+#ponies"
 
-// For projection code:
-#include "libmesh/boundary_info.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/elem.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/periodic_boundary.h"
-#include "libmesh/quadrature.h"
-#include "libmesh/quadrature_gauss.h"
-#include "libmesh/remote_elem.h"
-#include "libmesh/tensor_value.h"
-#include "libmesh/threads.h"
+// ponies:
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-UniquePtr<FEAbstract> FEAbstract::build(const unsigned int dim,
-                                        const FEType& fet)
+ponies,
+                                        ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 0D
-    case 0:
+      // ponies
+    ponies:
       {
-        switch (fet.family)
+        ponies)
           {
-          case CLOUGH:
-            return UniquePtr<FEAbstract>(new FE<0,CLOUGH>(fet));
+          ponies:
+            ponies));
 
-          case HERMITE:
-            return UniquePtr<FEAbstract>(new FE<0,HERMITE>(fet));
+          ponies:
+            ponies));
 
-          case LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<0,LAGRANGE>(fet));
+          ponies:
+            ponies));
 
-          case LAGRANGE_VEC:
-            return UniquePtr<FEAbstract>(new FE<0,LAGRANGE_VEC>(fet));
+          ponies:
+            ponies));
 
-          case L2_LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<0,L2_LAGRANGE>(fet));
+          ponies:
+            ponies));
 
-          case HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<0,HIERARCHIC>(fet));
+          ponies:
+            ponies));
 
-          case L2_HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<0,L2_HIERARCHIC>(fet));
+          ponies:
+            ponies));
 
-          case MONOMIAL:
-            return UniquePtr<FEAbstract>(new FE<0,MONOMIAL>(fet));
+          ponies:
+            ponies));
 
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            return UniquePtr<FEAbstract>(new FE<0,SZABAB>(fet));
+#ponies
+          ponies:
+            ponies));
 
-          case BERNSTEIN:
-            return UniquePtr<FEAbstract>(new FE<0,BERNSTEIN>(fet));
-#endif
+          ponies:
+            ponies));
+#ponies
 
-          case XYZ:
-            return UniquePtr<FEAbstract>(new FEXYZ<0>(fet));
+          ponies:
+            ponies));
 
-          case SCALAR:
-            return UniquePtr<FEAbstract>(new FEScalar<0>(fet));
+          ponies:
+            ponies));
 
-          default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+          ponies:
+            ponies);
           }
       }
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (fet.family)
+        ponies)
           {
-          case CLOUGH:
-            return UniquePtr<FEAbstract>(new FE<1,CLOUGH>(fet));
+          ponies:
+            ponies));
 
-          case HERMITE:
-            return UniquePtr<FEAbstract>(new FE<1,HERMITE>(fet));
+          ponies:
+            ponies));
 
-          case LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<1,LAGRANGE>(fet));
+          ponies:
+            ponies));
 
-          case LAGRANGE_VEC:
-            return UniquePtr<FEAbstract>(new FE<1,LAGRANGE_VEC>(fet));
+          ponies:
+            ponies));
 
-          case L2_LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<1,L2_LAGRANGE>(fet));
+          ponies:
+            ponies));
 
-          case HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<1,HIERARCHIC>(fet));
+          ponies:
+            ponies));
 
-          case L2_HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<1,L2_HIERARCHIC>(fet));
+          ponies:
+            ponies));
 
-          case MONOMIAL:
-            return UniquePtr<FEAbstract>(new FE<1,MONOMIAL>(fet));
+          ponies:
+            ponies));
 
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            return UniquePtr<FEAbstract>(new FE<1,SZABAB>(fet));
+#ponies
+          ponies:
+            ponies));
 
-          case BERNSTEIN:
-            return UniquePtr<FEAbstract>(new FE<1,BERNSTEIN>(fet));
-#endif
+          ponies:
+            ponies));
+#ponies
 
-          case XYZ:
-            return UniquePtr<FEAbstract>(new FEXYZ<1>(fet));
+          ponies:
+            ponies));
 
-          case SCALAR:
-            return UniquePtr<FEAbstract>(new FEScalar<1>(fet));
+          ponies:
+            ponies));
 
-          default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
-          }
-      }
-
-
-      // 2D
-    case 2:
-      {
-        switch (fet.family)
-          {
-          case CLOUGH:
-            return UniquePtr<FEAbstract>(new FE<2,CLOUGH>(fet));
-
-          case HERMITE:
-            return UniquePtr<FEAbstract>(new FE<2,HERMITE>(fet));
-
-          case LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<2,LAGRANGE>(fet));
-
-          case LAGRANGE_VEC:
-            return UniquePtr<FEAbstract>(new FE<2,LAGRANGE_VEC>(fet));
-
-          case L2_LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<2,L2_LAGRANGE>(fet));
-
-          case HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<2,HIERARCHIC>(fet));
-
-          case L2_HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<2,L2_HIERARCHIC>(fet));
-
-          case MONOMIAL:
-            return UniquePtr<FEAbstract>(new FE<2,MONOMIAL>(fet));
-
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            return UniquePtr<FEAbstract>(new FE<2,SZABAB>(fet));
-
-          case BERNSTEIN:
-            return UniquePtr<FEAbstract>(new FE<2,BERNSTEIN>(fet));
-#endif
-
-          case XYZ:
-            return UniquePtr<FEAbstract>(new FEXYZ<2>(fet));
-
-          case SCALAR:
-            return UniquePtr<FEAbstract>(new FEScalar<2>(fet));
-
-          case NEDELEC_ONE:
-            return UniquePtr<FEAbstract>(new FENedelecOne<2>(fet));
-
-          case SUBDIVISION:
-            return UniquePtr<FEAbstract>(new FESubdivision(fet));
-
-          default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (fet.family)
+        ponies)
           {
-          case CLOUGH:
-            libmesh_error_msg("ERROR: Clough-Tocher elements currently only support 1D and 2D");
+          ponies:
+            ponies));
 
-          case HERMITE:
-            return UniquePtr<FEAbstract>(new FE<3,HERMITE>(fet));
+          ponies:
+            ponies));
 
-          case LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<3,LAGRANGE>(fet));
+          ponies:
+            ponies));
 
-          case LAGRANGE_VEC:
-            return UniquePtr<FEAbstract>(new FE<3,LAGRANGE_VEC>(fet));
+          ponies:
+            ponies));
 
-          case L2_LAGRANGE:
-            return UniquePtr<FEAbstract>(new FE<3,L2_LAGRANGE>(fet));
+          ponies:
+            ponies));
 
-          case HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<3,HIERARCHIC>(fet));
+          ponies:
+            ponies));
 
-          case L2_HIERARCHIC:
-            return UniquePtr<FEAbstract>(new FE<3,L2_HIERARCHIC>(fet));
+          ponies:
+            ponies));
 
-          case MONOMIAL:
-            return UniquePtr<FEAbstract>(new FE<3,MONOMIAL>(fet));
+          ponies:
+            ponies));
 
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            return UniquePtr<FEAbstract>(new FE<3,SZABAB>(fet));
+#ponies
+          ponies:
+            ponies));
 
-          case BERNSTEIN:
-            return UniquePtr<FEAbstract>(new FE<3,BERNSTEIN>(fet));
-#endif
+          ponies:
+            ponies));
+#ponies
 
-          case XYZ:
-            return UniquePtr<FEAbstract>(new FEXYZ<3>(fet));
+          ponies:
+            ponies));
 
-          case SCALAR:
-            return UniquePtr<FEAbstract>(new FEScalar<3>(fet));
+          ponies:
+            ponies));
 
-          case NEDELEC_ONE:
-            return UniquePtr<FEAbstract>(new FENedelecOne<3>(fet));
+          ponies:
+            ponies));
 
-          default:
-            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
+          ponies:
+            ponies));
+
+          ponies:
+            ponies);
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid dimension dim = " << dim);
+
+      // ponies
+    ponies:
+      {
+        ponies)
+          {
+          ponies:
+            ponies");
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+#ponies
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+#ponies
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies));
+
+          ponies:
+            ponies);
+          }
+      }
+
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<FEAbstract>();
+  ponies!");
+  ponies>();
 }
 
-void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nodes)
+ponies)
 {
-  switch(itemType)
+  ponies)
     {
-    case EDGE2:
+    ponies:
       {
-        nodes.resize(2);
-        nodes[0] = Point (-1.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case EDGE3:
+    ponies:
       {
-        nodes.resize(3);
-        nodes[0] = Point (-1.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,0.,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case TRI3:
+    ponies:
       {
-        nodes.resize(3);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case TRI6:
+    ponies:
       {
-        nodes.resize(6);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        nodes[3] = Point (.5,0.,0.);
-        nodes[4] = Point (.5,.5,0.);
-        nodes[5] = Point (0.,.5,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case QUAD4:
+    ponies:
       {
-        nodes.resize(4);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case QUAD8:
+    ponies:
       {
-        nodes.resize(8);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-        nodes[4] = Point (0.,-1.,0.);
-        nodes[5] = Point (1.,0.,0.);
-        nodes[6] = Point (0.,1.,0.);
-        nodes[7] = Point (-1.,0.,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case QUAD9:
+    ponies:
       {
-        nodes.resize(9);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-        nodes[4] = Point (0.,-1.,0.);
-        nodes[5] = Point (1.,0.,0.);
-        nodes[6] = Point (0.,1.,0.);
-        nodes[7] = Point (-1.,0.,0.);
-        nodes[8] = Point (0.,0.,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case TET4:
+    ponies:
       {
-        nodes.resize(4);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        nodes[3] = Point (0.,0.,1.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case TET10:
+    ponies:
       {
-        nodes.resize(10);
-        nodes[0] = Point (0.,0.,0.);
-        nodes[1] = Point (1.,0.,0.);
-        nodes[2] = Point (0.,1.,0.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (.5,0.,0.);
-        nodes[5] = Point (.5,.5,0.);
-        nodes[6] = Point (0.,.5,0.);
-        nodes[7] = Point (0.,0.,.5);
-        nodes[8] = Point (.5,0.,.5);
-        nodes[9] = Point (0.,.5,.5);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
-    case HEX8:
+    ponies:
       {
-        nodes.resize(8);
-        nodes[0] = Point (-1.,-1.,-1.);
-        nodes[1] = Point (1.,-1.,-1.);
-        nodes[2] = Point (1.,1.,-1.);
-        nodes[3] = Point (-1.,1.,-1.);
-        nodes[4] = Point (-1.,-1.,1.);
-        nodes[5] = Point (1.,-1.,1.);
-        nodes[6] = Point (1.,1.,1.);
-        nodes[7] = Point (-1.,1.,1.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case HEX20:
+    ponies:
       {
-        nodes.resize(20);
-        nodes[0] = Point (-1.,-1.,-1.);
-        nodes[1] = Point (1.,-1.,-1.);
-        nodes[2] = Point (1.,1.,-1.);
-        nodes[3] = Point (-1.,1.,-1.);
-        nodes[4] = Point (-1.,-1.,1.);
-        nodes[5] = Point (1.,-1.,1.);
-        nodes[6] = Point (1.,1.,1.);
-        nodes[7] = Point (-1.,1.,1.);
-        nodes[8] = Point (0.,-1.,-1.);
-        nodes[9] = Point (1.,0.,-1.);
-        nodes[10] = Point (0.,1.,-1.);
-        nodes[11] = Point (-1.,0.,-1.);
-        nodes[12] = Point (-1.,-1.,0.);
-        nodes[13] = Point (1.,-1.,0.);
-        nodes[14] = Point (1.,1.,0.);
-        nodes[15] = Point (-1.,1.,0.);
-        nodes[16] = Point (0.,-1.,1.);
-        nodes[17] = Point (1.,0.,1.);
-        nodes[18] = Point (0.,1.,1.);
-        nodes[19] = Point (-1.,0.,1.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case HEX27:
+    ponies:
       {
-        nodes.resize(27);
-        nodes[0] = Point (-1.,-1.,-1.);
-        nodes[1] = Point (1.,-1.,-1.);
-        nodes[2] = Point (1.,1.,-1.);
-        nodes[3] = Point (-1.,1.,-1.);
-        nodes[4] = Point (-1.,-1.,1.);
-        nodes[5] = Point (1.,-1.,1.);
-        nodes[6] = Point (1.,1.,1.);
-        nodes[7] = Point (-1.,1.,1.);
-        nodes[8] = Point (0.,-1.,-1.);
-        nodes[9] = Point (1.,0.,-1.);
-        nodes[10] = Point (0.,1.,-1.);
-        nodes[11] = Point (-1.,0.,-1.);
-        nodes[12] = Point (-1.,-1.,0.);
-        nodes[13] = Point (1.,-1.,0.);
-        nodes[14] = Point (1.,1.,0.);
-        nodes[15] = Point (-1.,1.,0.);
-        nodes[16] = Point (0.,-1.,1.);
-        nodes[17] = Point (1.,0.,1.);
-        nodes[18] = Point (0.,1.,1.);
-        nodes[19] = Point (-1.,0.,1.);
-        nodes[20] = Point (0.,0.,-1.);
-        nodes[21] = Point (0.,-1.,0.);
-        nodes[22] = Point (1.,0.,0.);
-        nodes[23] = Point (0.,1.,0.);
-        nodes[24] = Point (-1.,0.,0.);
-        nodes[25] = Point (0.,0.,1.);
-        nodes[26] = Point (0.,0.,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case PRISM6:
+    ponies:
       {
-        nodes.resize(6);
-        nodes[0] = Point (0.,0.,-1.);
-        nodes[1] = Point (1.,0.,-1.);
-        nodes[2] = Point (0.,1.,-1.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (1.,0.,1.);
-        nodes[5] = Point (0.,1.,1.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case PRISM15:
+    ponies:
       {
-        nodes.resize(15);
-        nodes[0] = Point (0.,0.,-1.);
-        nodes[1] = Point (1.,0.,-1.);
-        nodes[2] = Point (0.,1.,-1.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (1.,0.,1.);
-        nodes[5] = Point (0.,1.,1.);
-        nodes[6] = Point (.5,0.,-1.);
-        nodes[7] = Point (.5,.5,-1.);
-        nodes[8] = Point (0.,.5,-1.);
-        nodes[9] = Point (0.,0.,0.);
-        nodes[10] = Point (1.,0.,0.);
-        nodes[11] = Point (0.,1.,0.);
-        nodes[12] = Point (.5,0.,1.);
-        nodes[13] = Point (.5,.5,1.);
-        nodes[14] = Point (0.,.5,1.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case PRISM18:
+    ponies:
       {
-        nodes.resize(18);
-        nodes[0] = Point (0.,0.,-1.);
-        nodes[1] = Point (1.,0.,-1.);
-        nodes[2] = Point (0.,1.,-1.);
-        nodes[3] = Point (0.,0.,1.);
-        nodes[4] = Point (1.,0.,1.);
-        nodes[5] = Point (0.,1.,1.);
-        nodes[6] = Point (.5,0.,-1.);
-        nodes[7] = Point (.5,.5,-1.);
-        nodes[8] = Point (0.,.5,-1.);
-        nodes[9] = Point (0.,0.,0.);
-        nodes[10] = Point (1.,0.,0.);
-        nodes[11] = Point (0.,1.,0.);
-        nodes[12] = Point (.5,0.,1.);
-        nodes[13] = Point (.5,.5,1.);
-        nodes[14] = Point (0.,.5,1.);
-        nodes[15] = Point (.5,0.,0.);
-        nodes[16] = Point (.5,.5,0.);
-        nodes[17] = Point (0.,.5,0.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case PYRAMID5:
+    ponies:
       {
-        nodes.resize(5);
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
-        nodes[4] = Point (0.,0.,1.);
-        return;
+        ponies);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies;
       }
-    case PYRAMID13:
+    ponies:
       {
-        nodes.resize(13);
+        ponies);
 
-        // base corners
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
+        // ponies
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
 
-        // apex
-        nodes[4] = Point (0.,0.,1.);
+        // ponies
+        ponies.);
 
-        // base midedge
-        nodes[5] = Point (0.,-1.,0.);
-        nodes[6] = Point (1.,0.,0.);
-        nodes[7] = Point (0.,1.,0.);
-        nodes[8] = Point (-1,0.,0.);
+        // ponies
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
 
-        // lateral midedge
-        nodes[9] = Point (-.5,-.5,.5);
-        nodes[10] = Point (.5,-.5,.5);
-        nodes[11] = Point (.5,.5,.5);
-        nodes[12] = Point (-.5,.5,.5);
+        // ponies
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        return;
+        ponies;
       }
-    case PYRAMID14:
+    ponies:
       {
-        nodes.resize(14);
+        ponies);
 
-        // base corners
-        nodes[0] = Point (-1.,-1.,0.);
-        nodes[1] = Point (1.,-1.,0.);
-        nodes[2] = Point (1.,1.,0.);
-        nodes[3] = Point (-1.,1.,0.);
+        // ponies
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
 
-        // apex
-        nodes[4] = Point (0.,0.,1.);
+        // ponies
+        ponies.);
 
-        // base midedge
-        nodes[5] = Point (0.,-1.,0.);
-        nodes[6] = Point (1.,0.,0.);
-        nodes[7] = Point (0.,1.,0.);
-        nodes[8] = Point (-1,0.,0.);
+        // ponies
+        ponies.);
+        ponies.);
+        ponies.);
+        ponies.);
 
-        // lateral midedge
-        nodes[9] = Point (-.5,-.5,.5);
-        nodes[10] = Point (.5,-.5,.5);
-        nodes[11] = Point (.5,.5,.5);
-        nodes[12] = Point (-.5,.5,.5);
+        // ponies
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        // base center
-        nodes[13] = Point (0.,0.,0.);
+        // ponies
+        ponies.);
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("ERROR: Unknown element type " << itemType);
+    ponies:
+      ponies);
     }
 }
 
-bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Real eps)
+ponies)
 {
-  libmesh_assert_greater_equal (eps, 0.);
+  ponies.);
 
-  const Real xi   = p(0);
-#if LIBMESH_DIM > 1
-  const Real eta  = p(1);
-#else
-  const Real eta  = 0.;
-#endif
-#if LIBMESH_DIM > 2
-  const Real zeta = p(2);
-#else
-  const Real zeta  = 0.;
-#endif
+  ponies);
+#ponies
+  ponies);
+#ponies
+  ponies.;
+#ponies
+#ponies
+  ponies);
+#ponies
+  ponies.;
+#ponies
 
-  switch (t)
+  ponies)
     {
-    case NODEELEM:
+    ponies:
       {
-        return (!xi && !eta && !zeta);
+        ponies);
       }
-    case EDGE2:
-    case EDGE3:
-    case EDGE4:
+    ponies:
+    ponies:
+    ponies:
       {
-        // The reference 1D element is [-1,1].
-        if ((xi >= -1.-eps) &&
-            (xi <=  1.+eps))
-          return true;
+        // ponies].
+        ponies) &&
+            (ponies))
+          ponies;
 
-        return false;
-      }
-
-
-    case TRI3:
-    case TRI6:
-      {
-        // The reference triangle is isocoles
-        // and is bound by xi=0, eta=0, and xi+eta=1.
-        if ((xi  >= 0.-eps) &&
-            (eta >= 0.-eps) &&
-            ((xi + eta) <= 1.+eps))
-          return true;
-
-        return false;
+        ponies;
       }
 
 
-    case QUAD4:
-    case QUAD8:
-    case QUAD9:
+    ponies:
+    ponies:
       {
-        // The reference quadrilateral element is [-1,1]^2.
-        if ((xi  >= -1.-eps) &&
-            (xi  <=  1.+eps) &&
-            (eta >= -1.-eps) &&
-            (eta <=  1.+eps))
-          return true;
+        // ponies
+        // ponies.
+        ponies) &&
+            (ponies) &&
+            ((ponies))
+          ponies;
 
-        return false;
+        ponies;
       }
 
 
-    case TET4:
-    case TET10:
+    ponies:
+    ponies:
+    ponies:
       {
-        // The reference tetrahedral is isocoles
-        // and is bound by xi=0, eta=0, zeta=0,
-        // and xi+eta+zeta=1.
-        if ((xi   >= 0.-eps) &&
-            (eta  >= 0.-eps) &&
-            (zeta >= 0.-eps) &&
-            ((xi + eta + zeta) <= 1.+eps))
-          return true;
+        // ponies.
+        ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies))
+          ponies;
 
-        return false;
+        ponies;
       }
 
 
-    case HEX8:
-    case HEX20:
-    case HEX27:
+    ponies:
+    ponies:
+      {
+        // ponies
+        // ponies,
+        // ponies.
+        ponies) &&
+            (ponies) &&
+            (ponies) &&
+            ((ponies))
+          ponies;
+
+        ponies;
+      }
+
+
+    ponies:
+    ponies:
+    ponies:
       {
         /*
-          if ((xi   >= -1.) &&
-          (xi   <=  1.) &&
-          (eta  >= -1.) &&
-          (eta  <=  1.) &&
-          (zeta >= -1.) &&
-          (zeta <=  1.))
-          return true;
+          ponies.) &&
+          (ponies.) &&
+          (ponies.) &&
+          (ponies.) &&
+          (ponies.) &&
+          (ponies.))
+          ponies;
         */
 
-        // The reference hexahedral element is [-1,1]^3.
-        if ((xi   >= -1.-eps) &&
-            (xi   <=  1.+eps) &&
-            (eta  >= -1.-eps) &&
-            (eta  <=  1.+eps) &&
-            (zeta >= -1.-eps) &&
-            (zeta <=  1.+eps))
+        // ponies.
+        ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies))
           {
-            //    libMesh::out << "Strange Point:\n";
-            //    p.print();
-            return true;
+            //    ponies";
+            //    ponies();
+            ponies;
           }
 
-        return false;
+        ponies;
       }
 
-    case PRISM6:
-    case PRISM15:
-    case PRISM18:
+    ponies:
+    ponies:
+    ponies:
       {
-        // Figure this one out...
-        // inside the reference triange with zeta in [-1,1]
-        if ((xi   >=  0.-eps) &&
-            (eta  >=  0.-eps) &&
-            (zeta >= -1.-eps) &&
-            (zeta <=  1.+eps) &&
-            ((xi + eta) <= 1.+eps))
-          return true;
+        // ponies...
+        // ponies]
+        ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies) &&
+            ((ponies))
+          ponies;
 
-        return false;
+        ponies;
       }
 
 
-    case PYRAMID5:
-    case PYRAMID13:
-    case PYRAMID14:
+    ponies:
+    ponies:
+    ponies:
       {
-        // Check that the point is on the same side of all the faces
-        // by testing whether:
+        // ponies
+        // ponies:
         //
-        // n_i.(x - x_i) <= 0
+        // ponies
         //
-        // for each i, where:
-        //   n_i is the outward normal of face i,
-        //   x_i is a point on face i.
-        if ((-eta - 1. + zeta <= 0.+eps) &&
-            (  xi - 1. + zeta <= 0.+eps) &&
-            ( eta - 1. + zeta <= 0.+eps) &&
-            ( -xi - 1. + zeta <= 0.+eps) &&
-            (            zeta >= 0.-eps))
-          return true;
+        // ponies:
+        //   ponies,
+        //   ponies.
+        ponies) &&
+            (  ponies) &&
+            ( ponies) &&
+            ( -ponies) &&
+            (            ponies))
+          ponies;
 
-        return false;
+        ponies;
       }
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-    case INFHEX8:
+#ponies
+    ponies:
       {
-        // The reference infhex8 is a [-1,1]^3.
-        if ((xi   >= -1.-eps) &&
-            (xi   <=  1.+eps) &&
-            (eta  >= -1.-eps) &&
-            (eta  <=  1.+eps) &&
-            (zeta >= -1.-eps) &&
-            (zeta <=  1.+eps))
+        // ponies.
+        ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies))
           {
-            return true;
+            ponies;
           }
-        return false;
+        ponies;
       }
 
-    case INFPRISM6:
+    ponies:
       {
-        // inside the reference triange with zeta in [-1,1]
-        if ((xi   >=  0.-eps) &&
-            (eta  >=  0.-eps) &&
-            (zeta >= -1.-eps) &&
-            (zeta <=  1.+eps) &&
-            ((xi + eta) <= 1.+eps))
+        // ponies]
+        ponies) &&
+            (ponies) &&
+            (ponies) &&
+            (ponies) &&
+            ((ponies))
           {
-            return true;
+            ponies;
           }
 
-        return false;
+        ponies;
       }
-#endif
+#ponies
 
-    default:
-      libmesh_error_msg("ERROR: Unknown element type " << t);
+    ponies:
+      ponies);
     }
 
-  // If we get here then the point is _not_ in the
-  // reference element.   Better return false.
+  // ponies
+  // ponies.
 
-  return false;
+  ponies;
 }
 
 
 
 
-void FEAbstract::print_JxW(std::ostream& os) const
+ponies
 {
-  this->_fe_map->print_JxW(os);
+  ponies);
 }
 
 
 
-void FEAbstract::print_xyz(std::ostream& os) const
+ponies
 {
-  this->_fe_map->print_xyz(os);
+  ponies);
 }
 
 
-void FEAbstract::print_info(std::ostream& os) const
+ponies
 {
-  os << "phi[i][j]: Shape function i at quadrature pt. j" << std::endl;
-  this->print_phi(os);
+  ponies;
+  ponies);
 
-  os << "dphi[i][j]: Shape function i's gradient at quadrature pt. j" << std::endl;
-  this->print_dphi(os);
+  ponies;
+  ponies);
 
-  os << "XYZ locations of the quadrature pts." << std::endl;
-  this->print_xyz(os);
+  ponies;
+  ponies);
 
-  os << "Values of JxW at the quadrature pts." << std::endl;
-  this->print_JxW(os);
+  ponies;
+  ponies);
 }
 
 
-std::ostream& operator << (std::ostream& os, const FEAbstract& fe)
+ponies)
 {
-  fe.print_info(os);
-  return os;
+  ponies);
+  ponies;
 }
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
-                                           const Elem* elem)
+#ponies
+ponies,
+                                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  const unsigned int Dim = elem->dim();
+  ponies();
 
-  // Only constrain elements in 2,3D.
-  if (Dim == 1)
-    return;
+  // ponies.
+  ponies)
+    ponies;
 
-  // Only constrain active and ancestor elements
-  if (elem->subactive())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // We currently always use LAGRANGE mappings for geometry
-  const FEType fe_type(elem->default_order(), LAGRANGE);
+  // ponies
+  ponies);
 
-  std::vector<const Node*> my_nodes, parent_nodes;
+  ponies;
 
-  // Look at the element faces.  Check to see if we need to
-  // build constraints.
-  for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor(s) != NULL &&
-        elem->neighbor(s) != remote_elem)
-      if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
-        {                                                     // this element and ones coarser
-          // than this element.
-          // Get pointers to the elements of interest and its parent.
-          const Elem* parent = elem->parent();
+  // ponies
+  // ponies.
+  ponies++)
+    ponies &&
+        ponies)
+      ponies
+        {                                                     // ponies
+          // ponies.
+          // ponies.
+          ponies();
 
-          // This can't happen...  Only level-0 elements have NULL
-          // parents, and no level-0 elements can be at a higher
-          // level than their neighbors!
-          libmesh_assert(parent);
+          // ponies
+          // ponies
+          // ponies!
+          ponies);
 
-          const UniquePtr<Elem> my_side     (elem->build_side(s));
-          const UniquePtr<Elem> parent_side (parent->build_side(s));
+          ponies));
+          ponies));
 
-          const unsigned int n_side_nodes = my_side->n_nodes();
+          ponies();
 
-          my_nodes.clear();
-          my_nodes.reserve (n_side_nodes);
-          parent_nodes.clear();
-          parent_nodes.reserve (n_side_nodes);
+          ponies();
+          ponies);
+          ponies();
+          ponies);
 
-          for (unsigned int n=0; n != n_side_nodes; ++n)
-            my_nodes.push_back(my_side->get_node(n));
+          ponies)
+            ponies));
 
-          for (unsigned int n=0; n != n_side_nodes; ++n)
-            parent_nodes.push_back(parent_side->get_node(n));
+          ponies)
+            ponies));
 
-          for (unsigned int my_side_n=0;
-               my_side_n < n_side_nodes;
-               my_side_n++)
+          ponies;
+               ponies;
+               ponies++)
             {
-              libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+              ponies()));
 
-              const Node* my_node = my_nodes[my_side_n];
+              ponies];
 
-              // The support point of the DOF
-              const Point& support_point = *my_node;
+              // ponies
+              ponies;
 
-              // Figure out where my node lies on their reference element.
-              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                  parent_side.get(),
-                                                                  support_point);
+              // ponies.
+              ponies,
+                                                                  ponies(),
+                                                                  ponies);
 
-              // Compute the parent's side shape function values.
-              for (unsigned int their_side_n=0;
-                   their_side_n < n_side_nodes;
-                   their_side_n++)
+              // ponies.
+              ponies;
+                   ponies;
+                   ponies++)
                 {
-                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
+                  ponies()));
 
-                  const Node* their_node = parent_nodes[their_side_n];
-                  libmesh_assert(their_node);
+                  ponies];
+                  ponies);
 
-                  const Real their_value = FEInterface::shape(Dim-1,
-                                                              fe_type,
-                                                              parent_side->type(),
-                                                              their_side_n,
-                                                              mapped_point);
+                  ponies,
+                                                              ponies,
+                                                              ponies(),
+                                                              ponies,
+                                                              ponies);
 
-                  const Real their_mag = std::abs(their_value);
-#ifdef DEBUG
-                  // Protect for the case u_i ~= u_j,
-                  // in which case i better equal j.
-                  if (their_mag > 0.999)
+                  ponies);
+#ponies
+                  // ponies,
+                  // ponies.
+                  ponies)
                     {
-                      libmesh_assert_equal_to (my_node, their_node);
-                      libmesh_assert_less (std::abs(their_value - 1.), 0.001);
+                      ponies);
+                      ponies);
                     }
-                  else
-#endif
-                    // To make nodal constraints useful for constructing
-                    // sparsity patterns faster, we need to get EVERY
-                    // POSSIBLE constraint coupling identified, even if
-                    // there is no coupling in the isoparametric
-                    // Lagrange case.
-                    if (their_mag < 1.e-5)
+                  ponies
+#ponies
+                    // ponies
+                    // ponies
+                    // ponies
+                    // ponies
+                    // ponies.
+                    ponies)
                       {
-                        // since we may be running this method concurrently
-                        // on multiple threads we need to acquire a lock
-                        // before modifying the shared constraint_row object.
-                        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                        // ponies
+                        // ponies
+                        // ponies.
+                        ponies);
 
-                        // A reference to the constraint row.
-                        NodeConstraintRow& constraint_row = constraints[my_node].first;
+                        // ponies.
+                        ponies;
 
-                        constraint_row.insert(std::make_pair (their_node,
-                                                              0.));
+                        ponies,
+                                                              ponies.));
                       }
-                  // To get nodal coordinate constraints right, only
-                  // add non-zero and non-identity values for Lagrange
-                  // basis functions.
-                    else // (1.e-5 <= their_mag <= .999)
+                  // ponies
+                  // ponies
+                  // ponies.
+                    ponies)
                       {
-                        // since we may be running this method concurrently
-                        // on multiple threads we need to acquire a lock
-                        // before modifying the shared constraint_row object.
-                        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                        // ponies
+                        // ponies
+                        // ponies.
+                        ponies);
 
-                        // A reference to the constraint row.
-                        NodeConstraintRow& constraint_row = constraints[my_node].first;
+                        // ponies.
+                        ponies;
 
-                        constraint_row.insert(std::make_pair (their_node,
-                                                              their_value));
+                        ponies,
+                                                              ponies));
                       }
                 }
             }
         }
 }
 
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
 
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints,
-                                                    const PeriodicBoundaries &boundaries,
-                                                    const MeshBase &mesh,
-                                                    const PointLocatorBase *point_locator,
-                                                    const Elem* elem)
+#ponies
+ponies,
+                                                    ponies,
+                                                    ponies,
+                                                    ponies,
+                                                    ponies)
 {
-  // Only bother if we truly have periodic boundaries
-  if (boundaries.empty())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  libmesh_assert(elem);
+  ponies);
 
-  // Only constrain active elements with this method
-  if (!elem->active())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  const unsigned int Dim = elem->dim();
+  ponies();
 
-  // We currently always use LAGRANGE mappings for geometry
-  const FEType fe_type(elem->default_order(), LAGRANGE);
+  // ponies
+  ponies);
 
-  std::vector<const Node*> my_nodes, neigh_nodes;
+  ponies;
 
-  // Look at the element faces.  Check to see if we need to
-  // build constraints.
-  for (unsigned short int s=0; s<elem->n_sides(); s++)
+  // ponies
+  // ponies.
+  ponies++)
     {
-      if (elem->neighbor(s))
-        continue;
+      ponies))
+        ponies;
 
-      const std::vector<boundary_id_type>& bc_ids =
-        mesh.get_boundary_info().boundary_ids (elem, s);
-      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      ponies =
+        ponies);
+      ponies)
         {
-          const boundary_id_type boundary_id = *id_it;
-          const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);
-          if (periodic)
+          ponies;
+          ponies);
+          ponies)
             {
-              libmesh_assert(point_locator);
+              ponies);
 
-              // Get pointers to the element's neighbor.
-              const Elem* neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
+              // ponies.
+              ponies);
 
-              // h refinement constraints:
-              // constrain dofs shared between
-              // this element and ones as coarse
-              // as or coarser than this element.
-              if (neigh->level() <= elem->level())
+              // ponies:
+              // ponies
+              // ponies
+              // ponies.
+              ponies())
                 {
-                  unsigned int s_neigh =
-                    mesh.get_boundary_info().side_with_boundary_id(neigh, periodic->pairedboundary);
-                  libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
+                  ponies =
+                    ponies);
+                  ponies);
 
-#ifdef LIBMESH_ENABLE_AMR
-                  libmesh_assert(neigh->active());
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
+                  ponies());
+#ponies
 
-                  const UniquePtr<Elem> my_side    (elem->build_side(s));
-                  const UniquePtr<Elem> neigh_side (neigh->build_side(s_neigh));
+                  ponies));
+                  ponies));
 
-                  const unsigned int n_side_nodes = my_side->n_nodes();
+                  ponies();
 
-                  my_nodes.clear();
-                  my_nodes.reserve (n_side_nodes);
-                  neigh_nodes.clear();
-                  neigh_nodes.reserve (n_side_nodes);
+                  ponies();
+                  ponies);
+                  ponies();
+                  ponies);
 
-                  for (unsigned int n=0; n != n_side_nodes; ++n)
-                    my_nodes.push_back(my_side->get_node(n));
+                  ponies)
+                    ponies));
 
-                  for (unsigned int n=0; n != n_side_nodes; ++n)
-                    neigh_nodes.push_back(neigh_side->get_node(n));
+                  ponies)
+                    ponies));
 
-                  // Make sure we're not adding recursive constraints
-                  // due to the redundancy in the way we add periodic
-                  // boundary constraints, or adding constraints to
-                  // nodes that already have AMR constraints
-                  std::vector<bool> skip_constraint(n_side_nodes, false);
+                  // ponies
+                  // ponies
+                  // ponies
+                  // ponies
+                  ponies);
 
-                  for (unsigned int my_side_n=0;
-                       my_side_n < n_side_nodes;
-                       my_side_n++)
+                  ponies;
+                       ponies;
+                       ponies++)
                     {
-                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                      ponies()));
 
-                      const Node* my_node = my_nodes[my_side_n];
+                      ponies];
 
-                      // Figure out where my node lies on their reference element.
-                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
+                      // ponies.
+                      ponies);
 
-                      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                          neigh_side.get(),
-                                                                          neigh_point);
+                      ponies,
+                                                                          ponies(),
+                                                                          ponies);
 
-                      // If we've already got a constraint on this
-                      // node, then the periodic constraint is
-                      // redundant
+                      // ponies
+                      // ponies
+                      // ponies
                       {
-                        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                        ponies);
 
-                        if (constraints.count(my_node))
+                        ponies))
                           {
-                            skip_constraint[my_side_n] = true;
-                            continue;
+                            ponies;
+                            ponies;
                           }
                       }
 
-                      // Compute the neighbors's side shape function values.
-                      for (unsigned int their_side_n=0;
-                           their_side_n < n_side_nodes;
-                           their_side_n++)
+                      // ponies.
+                      ponies;
+                           ponies;
+                           ponies++)
                         {
-                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+                          ponies()));
 
-                          const Node* their_node = neigh_nodes[their_side_n];
+                          ponies];
 
-                          // If there's a constraint on an opposing node,
-                          // we need to see if it's constrained by
-                          // *our side* making any periodic constraint
-                          // on us recursive
+                          // ponies,
+                          // ponies
+                          // *ponies
+                          // ponies
                           {
-                            Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                            ponies);
 
-                            if (!constraints.count(their_node))
-                              continue;
+                            ponies))
+                              ponies;
 
-                            const NodeConstraintRow& their_constraint_row =
-                              constraints[their_node].first;
+                            ponies =
+                              ponies;
 
-                            for (unsigned int orig_side_n=0;
-                                 orig_side_n < n_side_nodes;
-                                 orig_side_n++)
+                            ponies;
+                                 ponies;
+                                 ponies++)
                               {
-                                libmesh_assert_less (orig_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                                ponies()));
 
-                                const Node* orig_node = my_nodes[orig_side_n];
+                                ponies];
 
-                                if (their_constraint_row.count(orig_node))
-                                  skip_constraint[orig_side_n] = true;
+                                ponies))
+                                  ponies;
                               }
                           }
                         }
                     }
-                  for (unsigned int my_side_n=0;
-                       my_side_n < n_side_nodes;
-                       my_side_n++)
+                  ponies;
+                       ponies;
+                       ponies++)
                     {
-                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                      ponies()));
 
-                      if (skip_constraint[my_side_n])
-                        continue;
+                      ponies])
+                        ponies;
 
-                      const Node* my_node = my_nodes[my_side_n];
+                      ponies];
 
-                      // Figure out where my node lies on their reference element.
-                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
+                      // ponies.
+                      ponies);
 
-                      // Figure out where my node lies on their reference element.
-                      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                          neigh_side.get(),
-                                                                          neigh_point);
+                      // ponies.
+                      ponies,
+                                                                          ponies(),
+                                                                          ponies);
 
-                      for (unsigned int their_side_n=0;
-                           their_side_n < n_side_nodes;
-                           their_side_n++)
+                      ponies;
+                           ponies;
+                           ponies++)
                         {
-                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+                          ponies()));
 
-                          const Node* their_node = neigh_nodes[their_side_n];
-                          libmesh_assert(their_node);
+                          ponies];
+                          ponies);
 
-                          const Real their_value = FEInterface::shape(Dim-1,
-                                                                      fe_type,
-                                                                      neigh_side->type(),
-                                                                      their_side_n,
-                                                                      mapped_point);
+                          ponies,
+                                                                      ponies,
+                                                                      ponies(),
+                                                                      ponies,
+                                                                      ponies);
 
-                          // since we may be running this method concurrently
-                          // on multiple threads we need to acquire a lock
-                          // before modifying the shared constraint_row object.
+                          // ponies
+                          // ponies
+                          // ponies.
                           {
-                            Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                            ponies);
 
-                            NodeConstraintRow& constraint_row =
-                              constraints[my_node].first;
+                            ponies =
+                              ponies;
 
-                            constraint_row.insert(std::make_pair(their_node,
-                                                                 their_value));
+                            ponies,
+                                                                 ponies));
                           }
                         }
                     }
@@ -1124,9 +1124,9 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
         }
     }
 }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
 
-#endif // LIBMESH_ENABLE_PERIODIC
+#ponies
 
 
-} // namespace libMesh
+} // ponies

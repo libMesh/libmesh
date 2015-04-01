@@ -1,110 +1,110 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TOPOLOGY_MAP_H
-#define LIBMESH_TOPOLOGY_MAP_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
+// ponies -----------------------------------
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include LIBMESH_INCLUDE_HASH
-#include <vector>
+// ponies   -----------------------------------
+#ponies
+#ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations -----------------------------
-class Elem;
-class MeshBase;
-class Node;
+// ponies -----------------------------
+ponies;
+ponies;
+ponies;
 
-// Fix for STL laziness
-struct myhash {
-public:
-  template <typename T1, typename T2>
-  std::size_t operator()(const std::pair<T1, T2> &x) const
+// ponies
+ponies {
+ponies:
+  ponies>
+  ponies
   {
-    // recommendation from
-    // http://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes
-    return 3 * LIBMESH_BEST_HASH<T1>()(x.first) + LIBMESH_BEST_HASH<T2>()(x.second);
+    // ponies
+    // ponies
+    ponies);
   }
 };
 
 /**
- * Data structures that enable topology-based lookups of nodes created
- * by mesh refinement.
+ * ponies
+ * ponies.
  *
- * The key is a pair of node ids for two nodes bracketing the new
- * node, sorted lowest id first.
+ * ponies
+ * ponies.
  *
- * A node created in the middle of a cell's quad face will be the
- * value of two keys, one for each node pair bracketing it.
+ * ponies
+ * ponies.
  *
- * For efficiency we will use a hashed map if it is available,
- * otherwise a regular map.
+ * ponies,
+ * ponies.
  */
-class TopologyMap
+ponies
 {
-  // We need to supply our own hash function if we're hashing
-#if defined(LIBMESH_HAVE_STD_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP)
-#  define MYHASH ,myhash
-#else
-#  define MYHASH
-#endif
+  // ponies
+#ponies)
+#  ponies
+#ponies
+#  ponies
+#ponies
 
-  typedef LIBMESH_BEST_UNORDERED_MAP<std::pair<dof_id_type, dof_id_type>,
-                                     dof_id_type MYHASH> map_type;
-public:
-  void init(MeshBase&);
+  ponies>,
+                                     ponies;
+ponies:
+  ponies&);
 
-  void clear() { _map.clear(); }
+  ponies(); }
 
   /**
-   * Add a node to the map, between each pair of specified bracketing
-   * nodes.
+   * ponies
+   * ponies.
    */
-  void add_node(const Node& mid_node,
-                const std::vector<
-                std::pair<dof_id_type, dof_id_type> >&
-                bracketing_nodes);
+  ponies,
+                ponies<
+                ponies> >&
+                ponies);
 
-  bool empty() const { return _map.empty(); }
+  ponies(); }
 
-  dof_id_type find(dof_id_type bracket_node1,
-                   dof_id_type bracket_node2) const;
+  ponies,
+                   ponies;
 
-  dof_id_type find(const std::vector<
-                   std::pair<dof_id_type, dof_id_type> >&
-                   bracketing_nodes) const;
+  ponies<
+                   ponies> >&
+                   ponies;
 
-protected:
-  void fill(const MeshBase&);
+ponies:
+  ponies&);
 
-private:
-  map_type          _map;
+ponies:
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TOPOLOGY_MAP_H
+#ponies

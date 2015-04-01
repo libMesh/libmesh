@@ -1,136 +1,136 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_FACE_TRI3_SUBDIVISION_H
-#define LIBMESH_FACE_TRI3_SUBDIVISION_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/face_tri3.h"
 
-// C++ includes
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+
+// ponies
+
+ponies
 {
 
 /**
- * The \p Tri3 is an element in 2D composed of 3 nodes.
+ * ponies.
  */
-class Tri3Subdivision : public Tri3
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor without parent specification.
+   * ponies.
    */
-  Tri3Subdivision() :
-    Tri3(), _subdivision_updated(false), _is_ghost(false) {}
+  ponies() :
+    ponies) {}
 
   /**
-   * Constructor with parent specification.
+   * ponies.
    */
-  Tri3Subdivision(Elem *p);
+  ponies);
 
   /**
-   * @returns \p TRI3SUBDIVISION
+   * @ponies
    */
-  ElemType type () const { return TRI3SUBDIVISION; }
+  ponies; }
 
   /**
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @ponies
+   * ponies
    */
-  virtual bool has_affine_map () const { return false; }
+  ponies; }
 
   /**
-   * @returns true iff the Lagrange shape functions on this element
-   * are linear
+   * @ponies
+   * ponies
    */
-  virtual bool is_linear () const { return false; }
+  ponies; }
 
   /**
-   * @returns FOURTH
+   * @ponies
    */
-  Order default_order() const { return FOURTH; }
+  ponies; }
 
   /**
-   * Prepares the element for use by reordering the nodes such that
-   * the irregular node (valence != 6), if there is one, is the first.
-   * The nodes are ordered once in advance for efficiency.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  void prepare_subdivision_properties();
+  ponies();
 
   /**
-   * @returns \p true iff the subdivision element is ready for use,
-   * i.e. the nodes have been reordered.
+   * @ponies,
+   * ponies.
    */
-  bool is_subdivision_updated() const { return _subdivision_updated; }
+  ponies; }
 
   /**
-   * @returns a pointer to the node whose ordered id is \p node_id.
+   * @ponies.
    */
-  Node* get_ordered_node(unsigned int node_id) const;
+  ponies;
 
   /**
-   * @returns the number of nodes connected to the ordered node
-   * whose id is \p node_id.
+   * @ponies
+   * ponies.
    */
-  unsigned int get_ordered_valence(unsigned int node_id) const;
+  ponies;
 
   /**
-   * @returns the order number of the node whose unordered id is
-   * \p node_id. This is the inverse of an \p _ordered_nodes lookup.
+   * @ponies
+   * \ponies.
    */
-  unsigned int local_node_number(unsigned int node_id) const;
+  ponies;
 
   /**
-   * @returns \p true iff the element is a ghost element.
+   * @ponies.
    */
-  bool is_ghost() const { return _is_ghost; }
+  ponies; }
 
   /**
-   * Sets the boolean flag identifying ghost elements.
+   * ponies.
    */
-  void set_ghost(bool ghosted) { _is_ghost = ghosted; }
+  ponies; }
 
-private:
-
-  /**
-   * A list containing the ordered nodes such that the irregular
-   * node (valence != 6), if there is one, is the first.
-   */
-  Node* _ordered_nodes[3];
+ponies:
 
   /**
-   * \p true iff the subdivision element is ready for use,
-   * i.e. the nodes have been reordered.
+   * ponies
+   * ponies.
    */
-  bool _subdivision_updated;
+  ponies];
 
   /**
-   * \p true iff the element is a ghost element
-   * (e.g. for boundary conditions).
+   * \ponies,
+   * ponies.
    */
-  bool _is_ghost;
+  ponies;
+
+  /**
+   * \ponies
+   * (ponies).
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FACE_TRI3_SUBDIVISION_H
+#ponies

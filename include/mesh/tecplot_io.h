@@ -1,176 +1,176 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TECPLOT_IO_H
-#define LIBMESH_TECPLOT_IO_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_output.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ Includes
-#include <cstddef>
-#include <set>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class MeshBase;
+// ponies
+ponies;
 
 
 
 /**
- * This class implements writing meshes in the Tecplot format.
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2004
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// TecplotIO class definition
-class TecplotIO : public MeshOutput<MeshBase>
+// ponies
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * This constructor will only allow us to write the mesh.
-   * The optional parameter \p binary can be used to switch
-   * between ASCII (\p false, the default) or binary (\p true)
-   * output files.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies)
+   * ponies.
    */
-  explicit
-  TecplotIO (const MeshBase&, const bool binary=false,
-             const double time=0., const int strand_offset=0);
+  ponies
+  ponies,
+             ponies);
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * ponies.
    */
-  virtual void write (const std::string& );
+  ponies& );
 
   /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
+   * ponies
+   * ponies.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&);
+  ponies&,
+                                 ponies>&,
+                                 ponies>&);
 
   /**
-   * Flag indicating whether or not to write a binary file
-   * (if the tecio.a library was found by \p configure).
+   * ponies
+   * (ponies).
    */
-  bool & binary ();
+  ponies ();
 
   /**
-   * Solution time for transient data.
-   * Written to newer binary formats that are time-aware.
+   * ponies.
+   * ponies.
    */
-  double & time ();
+  ponies ();
 
   /**
-   * Strand offset for this file.  Each mesh block will
-   * be written to (strand_id=block_id+1+strand_offset).
-   * Written to newer binary formats that are time-aware,
-   * defaults to 0.
+   * ponies
+   * ponies).
+   * ponies,
+   * ponies.
    */
-  int & strand_offset ();
+  ponies ();
 
   /**
-   *  The zone title to write.
+   *  ponies.
    */
-  std::string & zone_title ();
+  ponies ();
 
   /**
-   * Set to true to write multiple solutions to a single file (ASCII
-   * only).  Tecplot will read multiple zones in a single file, but
-   * currently you have to repeat the mesh information each time.
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool & ascii_append ();
+  ponies ();
 
-private:
-
-  /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are optionally
-   * provided.  This will write an ASCII file.
-   */
-  void write_ascii (const std::string&,
-                    const std::vector<Number>* = NULL,
-                    const std::vector<std::string>* = NULL);
+ponies:
 
   /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are optionally
-   * provided.  This will write a binary file if the tecio.a library was
-   * found at compile time, otherwise a warning message will be printed and
-   * an ASCII file will be created.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void write_binary (const std::string&,
-                     const std::vector<Number>* = NULL,
-                     const std::vector<std::string>* = NULL);
+  ponies&,
+                    ponies,
+                    ponies);
 
   /**
-   * Determines the logical spatial dimension of the elements in the
-   * Mesh.  Ex: A 1D edge element living in 3D is a logically
-   * one-dimensional element as far as Tecplot is concerned.  Throws
-   * an error if mixed-dimension element types are found, since I'm
-   * not sure how to handle that case currently.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned elem_dimension();
+  ponies&,
+                     ponies,
+                     ponies);
+
+  /**
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   */
+  ponies();
 
   //---------------------------------------------------------------------------
-  // local data
+  // ponies
 
   /**
-   * Flag to write binary data.
+   * ponies.
    */
-  bool _binary;
+  ponies;
 
   /**
-   * Solution time.
+   * ponies.
    */
-  double _time;
+  ponies;
 
   /**
-   * Offset for Tecplot's STRANDID.
+   * ponies.
    */
-  int _strand_offset;
+  ponies;
 
   /**
-   * The zone title to write.
+   * ponies.
    */
-  std::string _zone_title;
+  ponies;
 
   /**
-   * If true, when writing in ASCII format, open the file in
-   * std::ofstream::app mode.
+   * ponies
+   * ponies.
    */
-  bool _ascii_append;
+  ponies;
 
   /**
-   * The subdomains in the mesh.
+   * ponies.
    */
-  std::set<subdomain_id_type> _subdomain_ids;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TECPLOT_IO_H
+#ponies

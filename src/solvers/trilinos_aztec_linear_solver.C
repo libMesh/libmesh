@@ -1,96 +1,96 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#include "libmesh/libmesh_common.h"
-
-#ifdef LIBMESH_HAVE_AZTECOO
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
 
-// Local Includes
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/trilinos_aztec_linear_solver.h"
-#include "libmesh/trilinos_epetra_matrix.h"
-#include "libmesh/trilinos_epetra_vector.h"
+#ponies"
 
-namespace libMesh
+#ponies
+
+
+// ponies
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-void AztecLinearSolver<T>::clear ()
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies ()
 {
-  if (this->initialized())
+  ponies())
     {
-      this->_is_initialized = false;
+      ponies;
 
-      // Mimic PETSc default solver and preconditioner
-      this->_solver_type           = GMRES;
+      // ponies
+      ponies;
 
-      if (this->n_processors() == 1)
-        this->_preconditioner_type = ILU_PRECOND;
-      else
-        this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+      ponies)
+        ponies;
+      ponies
+        ponies;
     }
 }
 
 
 
-template <typename T>
-void AztecLinearSolver<T>::init (const char * /*name*/)
+ponies>
+ponies*/)
 {
-  // Initialize the data structures if not done so already.
-  if (!this->initialized())
+  // ponies.
+  ponies())
     {
-      this->_is_initialized = true;
+      ponies;
 
-      _linear_solver = new AztecOO();
+      ponies();
 
-      set_solver_type();
+      ponies();
 
-      switch(this->_preconditioner_type)
+      ponies)
         {
-        case ILU_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
-          break;
+        ponies:
+          ponies);
+          ponies);
+          ponies;
 
-        case BLOCK_JACOBI_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_Jacobi);
-          break;
+        ponies:
+          ponies);
+          ponies;
 
-        case ICC_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_icc);
-          break;
+        ponies:
+          ponies);
+          ponies);
+          ponies;
 
-        case LU_PRECOND:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_lu);
-          break;
+        ponies:
+          ponies);
+          ponies);
+          ponies;
 
-        default:
-          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
+        ponies:
+          ponies);
+          ponies);
         }
     }
 }
@@ -98,146 +98,146 @@ void AztecLinearSolver<T>::init (const char * /*name*/)
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
-                             SparseMatrix<T>& precond_in,
-                             NumericVector<T>& solution_in,
-                             NumericVector<T>& rhs_in,
-                             const double tol,
-                             const unsigned int m_its)
+ponies>
+ponies>
+ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-  START_LOG("solve()", "AztecLinearSolver");
+  ponies");
 
-  // Make sure the data passed in are really of Epetra types
-  EpetraMatrix<T>* matrix   = cast_ptr<EpetraMatrix<T>*>(&matrix_in);
-  EpetraMatrix<T>* precond  = cast_ptr<EpetraMatrix<T>*>(&precond_in);
-  EpetraVector<T>* solution = cast_ptr<EpetraVector<T>*>(&solution_in);
-  EpetraVector<T>* rhs      = cast_ptr<EpetraVector<T>*>(&rhs_in);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  this->init();
+  ponies();
 
-  // Close the matrices and vectors in case this wasn't already done.
-  matrix->close ();
-  precond->close ();
-  solution->close ();
-  rhs->close ();
+  // ponies.
+  ponies ();
+  ponies ();
+  ponies ();
+  ponies ();
 
-  _linear_solver->SetAztecOption(AZ_max_iter,m_its);
-  _linear_solver->SetAztecParam(AZ_tol,tol);
+  ponies);
+  ponies);
 
-  Epetra_FECrsMatrix * emat = matrix->mat();
-  Epetra_Vector * esol = solution->vec();
-  Epetra_Vector * erhs = rhs->vec();
+  ponies();
+  ponies();
+  ponies();
 
-  _linear_solver->Iterate(emat, esol, erhs, m_its, tol);
+  ponies);
 
-  STOP_LOG("solve()", "AztecLinearSolver");
+  ponies");
 
-  // return the # of its. and the final residual norm.
-  return std::make_pair(_linear_solver->NumIters(), _linear_solver->TrueResidual());
+  // ponies.
+  ponies());
 }
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
-                             NumericVector<T>&,
-                             NumericVector<T>&,
-                             const double,
-                             const unsigned int)
-//AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-//     NumericVector<T>& solution_in,
-//     NumericVector<T>& rhs_in,
-//     const double tol,
-//     const unsigned int m_its)
+ponies>
+ponies>
+ponies>&,
+                             ponies>&,
+                             ponies>&,
+                             ponies,
+                             ponies)
+//ponies,
+//     ponies,
+//     ponies,
+//     ponies,
+//     ponies)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
 
-template <typename T>
-std::pair<unsigned int, Real>
-AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
-                             const SparseMatrix<T>&,
-                             NumericVector<T> &,
-                             NumericVector<T> &,
-                             const double,
-                             const unsigned int)
-//AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-//     const SparseMatrix<T>& precond_matrix,
-//     NumericVector<T> &solution_in,
-//     NumericVector<T> &rhs_in,
-//     const double tol,
-//     const unsigned int m_its)
+ponies>
+ponies>
+ponies>&,
+                             ponies>&,
+                             ponies> &,
+                             ponies> &,
+                             ponies,
+                             ponies)
+//ponies,
+//     ponies,
+//     ponies,
+//     ponies,
+//     ponies,
+//     ponies)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
 
-template <typename T>
-void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
+ponies>
+ponies */)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
 
 
 
-template <typename T>
-Real AztecLinearSolver<T>::get_initial_residual()
+ponies>
+ponies()
 {
-  return _linear_solver->TrueResidual();
+  ponies();
 }
 
 
 
-template <typename T>
-LinearConvergenceReason AztecLinearSolver<T>::get_converged_reason() const
+ponies>
+ponies
 {
-  libmesh_not_implemented();
+  ponies();
 
-  return UNKNOWN_FLAG;
+  ponies;
 }
 
 
 
-template <typename T>
-void AztecLinearSolver<T>::set_solver_type()
+ponies>
+ponies()
 {
-  switch (this->_solver_type)
+  ponies)
     {
-    case CG:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_cg); return;
+    ponies:
+      ponies;
 
-    case CGS:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_cgs); return;
+    ponies:
+      ponies;
 
-    case TFQMR:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_tfqmr); return;
+    ponies:
+      ponies;
 
-    case BICGSTAB:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_bicgstab); return;
+    ponies:
+      ponies;
 
-    case GMRES:
-      _linear_solver->SetAztecOption(AZ_solver, AZ_gmres); return;
+    ponies:
+      ponies;
 
-    default:
-      libMesh::err << "ERROR:  Unsupported AztecOO Solver: "
-                   << Utility::enum_to_string(this->_solver_type) << std::endl
-                   << "Continuing with AztecOO defaults" << std::endl;
+    ponies:
+      ponies: "
+                   << ponies
+                   << "ponies;
     }
 }
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class AztecLinearSolver<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // #ifdef LIBMESH_HAVE_AZTECOO
+#ponies

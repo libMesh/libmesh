@@ -1,139 +1,139 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <algorithm>  // std::lower_bound
+// ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/parallel_bin_sorter.h"
-#include "libmesh/parallel_histogram.h"
-#ifdef LIBMESH_HAVE_LIBHILBERT
-#  include "hilbert.h"
-#endif
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_conversion_utils.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies
+#  ponies"
+#ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
-namespace Parallel {
+ponies {
 
-template <typename KeyType, typename IdxType>
-BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator &comm_in,
-                                       const std::vector<KeyType>& d) :
-  ParallelObject(comm_in),
-  data(d)
+ponies>
+ponies,
+                                       ponies) :
+  ponies),
+  ponies)
 {
-  // Assume (& libmesh_assert) we are working with a sorted range
+  // ponies
 
-  // Ah...  is_sorted is an STL extension!
-  //libmesh_assert (std::is_sorted (data.begin(), data.end()));
+  // ponies!
+  //ponies()));
 
-  // Home-grown is_sorted
-  libmesh_assert (Parallel::Utils::is_sorted (data));
+  // ponies
+  ponies));
 }
 
 
 
-template <typename KeyType, typename IdxType>
-void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
-                                          KeyType max,
-                                          KeyType min)
+ponies>
+ponies,
+                                          ponies,
+                                          ponies)
 {
-  libmesh_assert_less (min, max);
+  ponies);
 
-  // Build a histogram in parallel from our data.
-  // Use this to create quasi-uniform bins.
-  Parallel::Histogram<KeyType,IdxType> phist (this->comm(), data);
-  phist.make_histogram (nbins*50, max, min);
-  phist.build_histogram ();
+  // ponies.
+  // ponies.
+  ponies);
+  ponies);
+  ponies ();
 
-  const std::vector<IdxType>& histogram =
-    phist.get_histogram();
+  ponies =
+    ponies();
 
 
-  // Now we will locate the bin boundaries so
-  // that each bin is roughly equal size
+  // ponies
+  // ponies
   {
-    // Find the total size of the data set
-    IdxType local_data_size = cast_int<IdxType>(data.size());
-    IdxType global_data_size = cast_int<IdxType>(local_data_size);
+    // ponies
+    ponies());
+    ponies);
 
-    this->comm().sum(global_data_size);
+    ponies);
 
-    std::vector<IdxType> target_bin_size (nbins, global_data_size / nbins);
+    ponies);
 
-    // Equally distribute the remainder
-    for (IdxType i=0; i<(global_data_size % nbins); i++)
-      ++target_bin_size[i];
+    // ponies
+    ponies++)
+      ++ponies];
 
-    // Set the iterators corresponding to the bin boundaries
+    // ponies
     {
-      std::vector<double> bin_bounds (nbins+1);
-      bin_iters.resize  (nbins+1, data.begin());
+      ponies);
+      ponies());
 
-      // Set the minimum bin boundary iterator
-      bin_iters[0]  = data.begin();
-      bin_bounds[0] = Parallel::Utils::to_double(min);
+      // ponies
+      ponies();
+      ponies);
 
-      // The current location in the histogram
-      IdxType current_histogram_bin = 0;
+      // ponies
+      ponies;
 
-      // How much above (+) or below (-) we are from the
-      // target size for the last bin.
-      // Note that when delta is (-) we will
-      // accept a slightly larger size for the next bin,
-      // the goal being to keep the whole mess average
-      int delta = 0;
+      // ponies
+      // ponies.
+      // ponies
+      // ponies,
+      // ponies
+      ponies;
 
-      // Set the internal bin boundary iterators
-      for (IdxType b=0; b<nbins; ++b)
+      // ponies
+      ponies)
         {
-          // The size of bin b.  We want this to
-          // be ~= target_bin_size[b]
-          int current_bin_size = 0;
+          // ponies
+          // ponies]
+          ponies;
 
-          // Step through the histogram until we have the
-          // desired bin size
-          while ((current_bin_size + histogram[current_histogram_bin] + delta) <= target_bin_size[b])
+          // ponies
+          // ponies
+          ponies])
             {
-              // Don't index out of the histogram!
-              if ((current_histogram_bin+1) == phist.n_bins())
-                break;
+              // ponies!
+              ponies())
+                ponies;
 
-              current_bin_size += histogram[current_histogram_bin++];
+              ponies++];
             }
 
-          delta += current_bin_size - target_bin_size[b];
+          ponies];
 
-          // Set the upper bound of the bin
-          bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
-          bin_iters[b+1]  = std::lower_bound(bin_iters[b], data.end(),
-                                             Parallel::Utils::to_key_type<KeyType>(bin_bounds[b+1]));
+          // ponies
+          ponies);
+          ponies(),
+                                             ponies]));
         }
 
-      // Just be sure the last boundary points to the right place
-      bin_iters[nbins]  = data.end();
-      // This gets destructed here anyway
-      // bin_bounds[nbins] = Parallel::Utils::to_double(max);
+      // ponies
+      ponies();
+      // ponies
+      // ponies);
     }
   }
 }
@@ -141,11 +141,11 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 }
 
 
-// Explicitly instantiate for int, double
-template class Parallel::BinSorter<int, unsigned int>;
-template class Parallel::BinSorter<double, unsigned int>;
-#ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::BinSorter<Hilbert::HilbertIndices, unsigned int>;
-#endif
+// ponies
+ponies>;
+ponies>;
+#ponies
+ponies>;
+#ponies
 
-} // namespace libMesh
+} // ponies

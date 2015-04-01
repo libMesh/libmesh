@@ -1,169 +1,169 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_POINT_LOCATOR_BASE_H
-#define LIBMESH_POINT_LOCATOR_BASE_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/enum_point_locator_type.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
-// Forward Declarations
-class PointLocatorBase;
-class MeshBase;
-class Point;
-class TreeBase;
-class Elem;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 
 /**
- * This is the base class for point locators.  They locate
- * points in space: given a mesh they return the element
- * and local coordinates for a given point in global coordinates.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Daniel Dreyer, 2003
+ * @ponies
  */
-class PointLocatorBase : public ReferenceCountedObject<PointLocatorBase>
+ponies>
 {
-protected:
+ponies:
   /**
-   * Constructor.  Protected so that this base class
-   * cannot be explicitly instantiated.  Takes a master
-   * PointLocator that helps in saving memory.
+   * ponies
+   * ponies
+   * ponies.
    */
-  PointLocatorBase (const MeshBase& mesh,
-                    const PointLocatorBase* master);
+  ponies,
+                    ponies);
 
-public:
+ponies:
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~PointLocatorBase ();
-
-  /**
-   * Builds an PointLocator for the mesh \p mesh.
-   * Optionally takes a master PointLocator to save memory.
-   * An \p UniquePtr<PointLocatorBase> is returned to prevent memory leak.
-   * This way the user need not remember to delete the object.
-   */
-  static UniquePtr<PointLocatorBase> build (PointLocatorType t,
-                                            const MeshBase& mesh,
-                                            const PointLocatorBase* master = NULL);
+  ponies ();
 
   /**
-   * Clears the \p PointLocator.
+   * ponies.
+   * ponies.
+   * ponies.
+   * ponies.
    */
-  virtual void clear() = 0;
+  ponies,
+                                            ponies,
+                                            ponies);
 
   /**
-   * Initializes the point locator, so that the \p operator() methods can
-   * be used.  Pure virtual.
+   * ponies.
    */
-  virtual void init() = 0;
+  ponies;
 
   /**
-   * Locates the element in which the point with global coordinates
-   * \p p is located.  Pure virtual. Optionally allows the user to restrict
-   * the subdomains searched.
+   * ponies
+   * ponies.
    */
-  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const = 0;
+  ponies;
 
   /**
-   * @returns \p true when this object is properly initialized
-   * and ready for use, \p false otherwise.
+   * ponies
+   * \ponies
+   * ponies.
    */
-  bool initialized () const;
+  ponies;
 
   /**
-   * Enables out-of-mesh mode.  In this mode, if asked to find a point
-   * that is contained in no mesh at all, the point locator will
-   * return a NULL pointer instead of crashing.  Per default, this
-   * mode is off.
+   * @ponies
+   * ponies.
    */
-  virtual void enable_out_of_mesh_mode () = 0;
+  ponies;
 
   /**
-   * Disables out-of-mesh mode (default).  If asked to find a point
-   * that is contained in no mesh at all, the point locator will now
-   * crash.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void disable_out_of_mesh_mode () = 0;
+  ponies;
 
   /**
-   * Set a tolerance to use when determining
-   * if a point is contained within the mesh.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void set_close_to_point_tol(Real close_to_point_tol);
+  ponies;
 
   /**
-   * Specify that we do not want to use a user-specified tolerance to
-   * determine if a point is contained within the mesh.
+   * ponies
+   * ponies.
    */
-  virtual void unset_close_to_point_tol();
+  ponies);
 
   /**
-   * Boolean flag to indicate whether to print out extra info.
+   * ponies
+   * ponies.
    */
-  bool _verbose;
-
-protected:
-  /**
-   * Const pointer to our master, initialized to \p NULL if none
-   * given.  When using multiple PointLocators, one can be assigned
-   * master and be in charge of something that all can have access to.
-   */
-  const PointLocatorBase* _master;
+  ponies();
 
   /**
-   * constant reference to the mesh in which the point is looked for.
+   * ponies.
    */
-  const MeshBase& _mesh;
+  ponies;
+
+ponies:
+  /**
+   * ponies
+   * ponies
+   * ponies.
+   */
+  ponies;
 
   /**
-   * \p true when properly initialized, \p false otherwise.
+   * ponies.
    */
-  bool _initialized;
+  ponies;
 
   /**
-   * \p true if we will use a user-specified tolerance for locating
-   * the element.
+   * \ponies.
    */
-  bool _use_close_to_point_tol;
+  ponies;
 
   /**
-   * The tolerance to use.
+   * \ponies
+   * ponies.
    */
-  Real _close_to_point_tol;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_POINT_LOCATOR_BASE_H
+#ponies

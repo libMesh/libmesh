@@ -1,121 +1,121 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/boundary_info.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/dirichlet_boundaries.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/elem.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/fe_base.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/quadrature_gauss.h"
-#include "libmesh/system.h"
-#include "libmesh/threads.h"
-#include "libmesh/wrapped_function.h"
-#include "libmesh/wrapped_functor.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// Helper class definitions
+// ponies
 
 /**
- * This class implements the loops to other projection operations.
- * This may be executed in parallel on multiple threads.
+ * ponies.
+ * ponies.
  */
-template <typename FFunctor, typename GFunctor,
-          typename FValue, typename ProjectionAction>
-class GenericProjector
+ponies,
+          ponies>
+ponies
 {
-private:
-  const System &system;
+ponies:
+  ponies;
 
-  FFunctor & f;
-  GFunctor * g;  // Needed for C1 type elements only
-  ProjectionAction & action;
-  const std::vector<unsigned int>& variables;
+  ponies;
+  ponies
+  ponies;
+  ponies;
 
-public:
-  GenericProjector (const System &system_in,
-                    FFunctor & f_in,
-                    GFunctor * g_in,
-                    ProjectionAction & act_in,
-                    const std::vector<unsigned int>& variables_in) :
-    system(system_in),
-    f(f_in),
-    g(g_in),
-    action(act_in),
-    variables(variables_in)
+ponies:
+  ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies) :
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
   {}
 
-  void operator() (const ConstElemRange &range) const;
+  ponies;
 };
 
 
 /**
- * This action class can be used with a GenericProjector to set
- * projection values (which must be of type Val) as coefficients of
- * the given NumericVector.
+ * ponies
+ * ponies
+ * ponies.
  */
 
-template <typename Val>
-class VectorSetAction
+ponies>
+ponies
 {
-private:
-  NumericVector<Val> &target_vector;
+ponies:
+  ponies;
 
-public:
-  VectorSetAction(NumericVector<Val> &target_vec) :
-    target_vector(target_vec) {}
+ponies:
+  ponies) :
+    ponies) {}
 
-  void insert(const FEMContext &c,
-              unsigned int var_num,
-              const DenseVector<Val> &Ue)
+  ponies,
+              ponies,
+              ponies)
   {
-    const numeric_index_type
-      first = target_vector.first_local_index(),
-      last  = target_vector.last_local_index();
+    ponies
+      ponies(),
+      ponies();
 
-    const std::vector<dof_id_type> & dof_indices =
-      c.get_dof_indices(var_num);
+    ponies =
+      ponies);
 
-    unsigned int size = Ue.size();
+    ponies();
 
-    libmesh_assert_equal_to(size, dof_indices.size());
+    ponies());
 
-    // Lock the new vector since it is shared among threads.
+    // ponies.
     {
-      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+      ponies);
 
-      for (unsigned int i = 0; i != size; ++i)
-        if ((dof_indices[i] >= first) && (dof_indices[i] <  last))
-          target_vector.set(dof_indices[i], Ue(i));
+      ponies)
+        ponies))
+          ponies));
     }
   }
 };
@@ -123,526 +123,526 @@ public:
 
 
 /**
- * This class implements projecting a vector from
- * an old mesh to the newly refined mesh.  This
- * may be executed in parallel on multiple threads.
+ * ponies
+ * ponies
+ * ponies.
  */
-class ProjectVector
+ponies
 {
-private:
-  const System                &system;
-  const NumericVector<Number> &old_vector;
-  NumericVector<Number>       &new_vector;
+ponies:
+  ponies;
+  ponies;
+  ponies;
 
-public:
-  ProjectVector (const System &system_in,
-                 const NumericVector<Number> &old_v_in,
-                 NumericVector<Number> &new_v_in) :
-    system(system_in),
-    old_vector(old_v_in),
-    new_vector(new_v_in)
+ponies:
+  ponies,
+                 ponies,
+                 ponies) :
+    ponies),
+    ponies),
+    ponies)
   {}
 
-  void operator()(const ConstElemRange &range) const;
+  ponies;
 };
 
 
 /**
- * This class builds the send_list of old dof indices
- * whose coefficients are needed to perform a projection.
- * This may be executed in parallel on multiple threads.
- * The end result is a \p send_list vector which is
- * unsorted and may contain duplicate elements.
- * The \p unique() method can be used to sort and
- * create a unique list.
+ * ponies
+ * ponies.
+ * ponies.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
-class BuildProjectionList
+ponies
 {
-private:
-  const System              &system;
+ponies:
+  ponies;
 
-public:
-  BuildProjectionList (const System &system_in) :
-    system(system_in),
-    send_list()
+ponies:
+  ponies) :
+    ponies),
+    ponies()
   {}
 
-  BuildProjectionList (BuildProjectionList &other, Threads::split) :
-    system(other.system),
-    send_list()
+  ponies) :
+    ponies),
+    ponies()
   {}
 
-  void unique();
-  void operator()(const ConstElemRange &range);
-  void join (const BuildProjectionList &other);
-  std::vector<dof_id_type> send_list;
+  ponies();
+  ponies);
+  ponies);
+  ponies;
 };
 
 
 
 /**
- * This class implements projecting an arbitrary
- * boundary function to the current mesh.  This
- * may be exectued in parallel on multiple threads.
+ * ponies
+ * ponies
+ * ponies.
  */
-class BoundaryProjectSolution
+ponies
 {
-private:
-  const std::set<boundary_id_type> &b;
-  const std::vector<unsigned int>  &variables;
-  const System                     &system;
-  UniquePtr<FunctionBase<Number> >    f;
-  UniquePtr<FunctionBase<Gradient> >  g;
-  const Parameters                 &parameters;
-  NumericVector<Number>            &new_vector;
+ponies:
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-public:
-  BoundaryProjectSolution (const std::set<boundary_id_type> &b_in,
-                           const std::vector<unsigned int> &variables_in,
-                           const System &system_in,
-                           FunctionBase<Number>* f_in,
-                           FunctionBase<Gradient>* g_in,
-                           const Parameters &parameters_in,
-                           NumericVector<Number> &new_v_in) :
-    b(b_in),
-    variables(variables_in),
-    system(system_in),
-    f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number> >()),
-    g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient> >()),
-    parameters(parameters_in),
-    new_vector(new_v_in)
+ponies:
+  ponies,
+                           ponies,
+                           ponies,
+                           ponies,
+                           ponies,
+                           ponies,
+                           ponies) :
+    ponies),
+    ponies),
+    ponies),
+    ponies> >()),
+    ponies> >()),
+    ponies),
+    ponies)
   {
-    libmesh_assert(f.get());
-    f->init();
-    if (g.get())
-      g->init();
+    ponies());
+    ponies();
+    ponies())
+      ponies();
   }
 
-  BoundaryProjectSolution (const BoundaryProjectSolution &in) :
-    b(in.b),
-    variables(in.variables),
-    system(in.system),
-    f(in.f.get() ? in.f->clone() : UniquePtr<FunctionBase<Number> >()),
-    g(in.g.get() ? in.g->clone() : UniquePtr<FunctionBase<Gradient> >()),
-    parameters(in.parameters),
-    new_vector(in.new_vector)
+  ponies) :
+    ponies),
+    ponies),
+    ponies),
+    ponies> >()),
+    ponies> >()),
+    ponies),
+    ponies)
   {
-    libmesh_assert(f.get());
-    f->init();
-    if (g.get())
-      g->init();
+    ponies());
+    ponies();
+    ponies())
+      ponies();
   }
 
-  void operator()(const ConstElemRange &range) const;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// System implementation
-void System::project_vector (NumericVector<Number>& vector,
-                             int is_adjoint) const
+// ponies
+ponies,
+                             ponies
 {
-  // Create a copy of the vector, which currently
-  // contains the old data.
-  UniquePtr<NumericVector<Number> >
-    old_vector (vector.clone());
+  // ponies
+  // ponies.
+  ponies> >
+    ponies());
 
-  // Project the old vector to the new vector
-  this->project_vector (*old_vector, vector, is_adjoint);
+  // ponies
+  ponies);
 }
 
 
 /**
- * This method projects the vector
- * via L2 projections or nodal
- * interpolations on each element.
+ * ponies
+ * ponies
+ * ponies.
  */
-void System::project_vector (const NumericVector<Number>& old_v,
-                             NumericVector<Number>& new_v,
-                             int is_adjoint) const
+ponies,
+                             ponies,
+                             ponies
 {
-  START_LOG ("project_vector()", "System");
+  ponies");
 
   /**
-   * This method projects a solution from an old mesh to a current, refined
-   * mesh.  The input vector \p old_v gives the solution on the
-   * old mesh, while the \p new_v gives the solution (to be computed)
-   * on the new mesh.
+   * ponies
+   * ponies
+   * ponies)
+   * ponies.
    */
-  new_v.clear();
+  ponies();
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-  // Resize the new vector and get a serial version.
-  NumericVector<Number> *new_vector_ptr = NULL;
-  UniquePtr<NumericVector<Number> > new_vector_built;
-  NumericVector<Number> *local_old_vector;
-  UniquePtr<NumericVector<Number> > local_old_vector_built;
-  const NumericVector<Number> *old_vector_ptr = NULL;
+  // ponies.
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  ConstElemRange active_local_elem_range
-    (this->get_mesh().active_local_elements_begin(),
-     this->get_mesh().active_local_elements_end());
+  ponies
+    (ponies(),
+     ponies());
 
-  // If the old vector was uniprocessor, make the new
-  // vector uniprocessor
-  if (old_v.type() == SERIAL)
+  // ponies
+  // ponies
+  ponies)
     {
-      new_v.init (this->n_dofs(), false, SERIAL);
-      new_vector_ptr = &new_v;
-      old_vector_ptr = &old_v;
+      ponies);
+      ponies;
+      ponies;
     }
 
-  // Otherwise it is a parallel, distributed vector, which
-  // we need to localize.
-  else if (old_v.type() == PARALLEL)
+  // ponies
+  // ponies.
+  ponies)
     {
-      // Build a send list for efficient localization
-      BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_elem_range,
-                                projection_list);
+      // ponies
+      ponies);
+      ponies,
+                                ponies);
 
-      // Create a sorted, unique send_list
-      projection_list.unique();
+      // ponies
+      ponies();
 
-      new_v.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-      new_vector_built = NumericVector<Number>::build(this->comm());
-      local_old_vector_built = NumericVector<Number>::build(this->comm());
-      new_vector_ptr = new_vector_built.get();
-      local_old_vector = local_old_vector_built.get();
-      new_vector_ptr->init(this->n_dofs(), false, SERIAL);
-      local_old_vector->init(old_v.size(), false, SERIAL);
-      old_v.localize(*local_old_vector, projection_list.send_list);
-      local_old_vector->close();
-      old_vector_ptr = local_old_vector;
+      ponies);
+      ponies());
+      ponies());
+      ponies();
+      ponies();
+      ponies);
+      ponies);
+      ponies);
+      ponies();
+      ponies;
     }
-  else if (old_v.type() == GHOSTED)
+  ponies)
     {
-      // Build a send list for efficient localization
-      BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_elem_range,
-                                projection_list);
+      // ponies
+      ponies);
+      ponies,
+                                ponies);
 
-      // Create a sorted, unique send_list
-      projection_list.unique();
+      // ponies
+      ponies();
 
-      new_v.init (this->n_dofs(), this->n_local_dofs(),
-                  this->get_dof_map().get_send_list(), false, GHOSTED);
+      ponies(),
+                  ponies);
 
-      local_old_vector_built = NumericVector<Number>::build(this->comm());
-      new_vector_ptr = &new_v;
-      local_old_vector = local_old_vector_built.get();
-      local_old_vector->init(old_v.size(), old_v.local_size(),
-                             projection_list.send_list, false, GHOSTED);
-      old_v.localize(*local_old_vector, projection_list.send_list);
-      local_old_vector->close();
-      old_vector_ptr = local_old_vector;
+      ponies());
+      ponies;
+      ponies();
+      ponies(),
+                             ponies);
+      ponies);
+      ponies();
+      ponies;
     }
-  else // unknown old_v.type()
-    libmesh_error_msg("ERROR: Unknown old_v.type() == " << old_v.type());
+  ponies()
+    ponies());
 
-  // Note that the above will have zeroed the new_vector.
-  // Just to be sure, assert that new_vector_ptr and old_vector_ptr
-  // were successfully set before trying to deref them.
-  libmesh_assert(new_vector_ptr);
-  libmesh_assert(old_vector_ptr);
+  // ponies.
+  // ponies
+  // ponies.
+  ponies);
+  ponies);
 
-  NumericVector<Number> &new_vector = *new_vector_ptr;
-  const NumericVector<Number> &old_vector = *old_vector_ptr;
+  ponies;
+  ponies;
 
-  Threads::parallel_for (active_local_elem_range,
-                         ProjectVector(*this,
-                                       old_vector,
-                                       new_vector)
+  ponies,
+                         ponies,
+                                       ponies,
+                                       ponies)
                          );
 
-  // Copy the SCALAR dofs from old_vector to new_vector
-  // Note: We assume that all SCALAR dofs are on the
-  // processor with highest ID
-  if(this->processor_id() == (this->n_processors()-1))
+  // ponies
+  // ponies
+  // ponies
+  ponies))
     {
-      const DofMap& dof_map = this->get_dof_map();
-      for (unsigned int var=0; var<this->n_vars(); var++)
-        if(this->variable(var).type().family == SCALAR)
+      ponies();
+      ponies++)
+        ponies)
           {
-            // We can just map SCALAR dofs directly across
-            std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
-            dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
-            dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
-            const unsigned int new_n_dofs =
-              cast_int<unsigned int>(new_SCALAR_indices.size());
+            // ponies
+            ponies;
+            ponies);
+            ponies);
+            ponies =
+              ponies());
 
-            for (unsigned int i=0; i<new_n_dofs; i++)
+            ponies++)
               {
-                new_vector.set( new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]) );
+                ponies]) );
               }
           }
     }
 
-  new_vector.close();
+  ponies();
 
-  // If the old vector was serial, we probably need to send our values
-  // to other processors
+  // ponies
+  // ponies
   //
-  // FIXME: I'm not sure how to make a NumericVector do that without
-  // creating a temporary parallel vector to use localize! - RHS
-  if (old_v.type() == SERIAL)
+  // ponies
+  // ponies
+  ponies)
     {
-      UniquePtr<NumericVector<Number> > dist_v = NumericVector<Number>::build(this->comm());
-      dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-      dist_v->close();
+      ponies());
+      ponies);
+      ponies();
 
-      for (dof_id_type i=0; i!=dist_v->size(); i++)
-        if (new_vector(i) != 0.0)
-          dist_v->set(i, new_vector(i));
+      ponies++)
+        ponies)
+          ponies));
 
-      dist_v->close();
+      ponies();
 
-      dist_v->localize (new_v, this->get_dof_map().get_send_list());
-      new_v.close();
+      ponies());
+      ponies();
     }
-  // If the old vector was parallel, we need to update it
-  // and free the localized copies
-  else if (old_v.type() == PARALLEL)
+  // ponies
+  // ponies
+  ponies)
     {
-      // We may have to set dof values that this processor doesn't
-      // own in certain special cases, like LAGRANGE FIRST or
-      // HERMITE THIRD elements on second-order meshes
-      for (dof_id_type i=0; i!=new_v.size(); i++)
-        if (new_vector(i) != 0.0)
-          new_v.set(i, new_vector(i));
-      new_v.close();
+      // ponies
+      // ponies
+      // ponies
+      ponies++)
+        ponies)
+          ponies));
+      ponies();
     }
 
-  if (is_adjoint == -1)
-    this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
-  else if (is_adjoint >= 0)
-    this->get_dof_map().enforce_adjoint_constraints_exactly(new_v,
-                                                            is_adjoint);
+  ponies)
+    ponies);
+  ponies)
+    ponies,
+                                                            ponies);
 
-#else
+#ponies
 
-  // AMR is disabled: simply copy the vector
-  new_v = old_v;
+  // ponies
+  ponies;
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-  STOP_LOG("project_vector()", "System");
+  ponies");
 }
 
 
 
 /**
- * This method projects an arbitrary function onto the solution via L2
- * projections and nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::project_solution (Number fptr(const Point& p,
-                                           const Parameters& parameters,
-                                           const std::string& sys_name,
-                                           const std::string& unknown_name),
-                               Gradient gptr(const Point& p,
-                                             const Parameters& parameters,
-                                             const std::string& sys_name,
-                                             const std::string& unknown_name),
-                               const Parameters& parameters) const
+ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies),
+                               ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies),
+                               ponies
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
-  this->project_solution(&f, &g);
+  ponies);
+  ponies);
+  ponies);
 }
 
 
 /**
- * This method projects an arbitrary function onto the solution via L2
- * projections and nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::project_solution (FunctionBase<Number> *f,
-                               FunctionBase<Gradient> *g) const
+ponies,
+                               ponies
 {
-  this->project_vector(*solution, f, g);
+  ponies);
 
-  solution->localize(*current_local_solution, _dof_map->get_send_list());
+  ponies());
 }
 
 
 /**
- * This method projects an arbitrary function onto the solution via L2
- * projections and nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::project_solution (FEMFunctionBase<Number> *f,
-                               FEMFunctionBase<Gradient> *g) const
+ponies,
+                               ponies
 {
-  this->project_vector(*solution, f, g);
+  ponies);
 
-  solution->localize(*current_local_solution, _dof_map->get_send_list());
+  ponies());
 }
 
 
 /**
- * This method projects an arbitrary function via L2 projections and
- * nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::project_vector (Number fptr(const Point& p,
-                                         const Parameters& parameters,
-                                         const std::string& sys_name,
-                                         const std::string& unknown_name),
-                             Gradient gptr(const Point& p,
-                                           const Parameters& parameters,
-                                           const std::string& sys_name,
-                                           const std::string& unknown_name),
-                             const Parameters& parameters,
-                             NumericVector<Number>& new_vector,
-                             int is_adjoint) const
+ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies),
+                             ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies),
+                             ponies,
+                             ponies,
+                             ponies
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
-  this->project_vector(new_vector, &f, &g, is_adjoint);
+  ponies);
+  ponies);
+  ponies);
 }
 
 /**
- * This method projects an arbitrary function via L2 projections and
- * nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::project_vector (NumericVector<Number>& new_vector,
-                             FunctionBase<Number> *f,
-                             FunctionBase<Gradient> *g,
-                             int is_adjoint) const
+ponies,
+                             ponies,
+                             ponies,
+                             ponies
 {
-  START_LOG ("project_vector()", "System");
+  ponies");
 
-  libmesh_assert(f);
+  ponies);
 
-  WrappedFunctor<Number> f_fem(*f);
+  ponies);
 
-  if (g)
+  ponies)
     {
-      WrappedFunctor<Gradient> g_fem(*g);
+      ponies);
 
-      this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint);
+      ponies);
     }
-  else
-    this->project_vector(new_vector, &f_fem, NULL, is_adjoint);
+  ponies
+    ponies);
 
-  STOP_LOG ("project_vector()", "System");
+  ponies");
 }
 
 
 /**
- * This method projects an arbitrary function via L2 projections and
- * nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::project_vector (NumericVector<Number>& new_vector,
-                             FEMFunctionBase<Number> *f,
-                             FEMFunctionBase<Gradient> *g,
-                             int is_adjoint) const
+ponies,
+                             ponies,
+                             ponies,
+                             ponies
 {
-  START_LOG ("project_fem_vector()", "System");
+  ponies");
 
-  libmesh_assert (f);
+  ponies);
 
-  ConstElemRange active_local_range
-    (this->get_mesh().active_local_elements_begin(),
-     this->get_mesh().active_local_elements_end() );
+  ponies
+    (ponies(),
+     ponies() );
 
-  VectorSetAction<Number> setter(new_vector);
+  ponies);
 
-  const unsigned int n_variables = this->n_vars();
+  ponies();
 
-  std::vector<unsigned int> vars(n_variables);
-  for (unsigned int i=0; i != n_variables; ++i)
-    vars[i] = i;
+  ponies);
+  ponies)
+    ponies;
 
-  // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-  typedef GenericProjector<FEMFunctionBase<Number>, FEMFunctionBase<Gradient>, Number, VectorSetAction<Number> > FEMProjector;
-  Threads::parallel_for(active_local_range, FEMProjector(*this, *f, g, setter, vars));
+  // ponies
+  ponies;
+  ponies));
 
-  // Also, load values into the SCALAR dofs
-  // Note: We assume that all SCALAR dofs are on the
-  // processor with highest ID
-  if(this->processor_id() == (this->n_processors()-1))
+  // ponies
+  // ponies
+  // ponies
+  ponies))
     {
-      // FIXME: Do we want to first check for SCALAR vars before building this? [PB]
-      FEMContext context( *this );
+      // ponies]
+      ponies );
 
-      const DofMap& dof_map = this->get_dof_map();
-      for (unsigned int var=0; var<this->n_vars(); var++)
-        if(this->variable(var).type().family == SCALAR)
+      ponies();
+      ponies++)
+        ponies)
           {
-            // FIXME: We reinit with an arbitrary element in case the user
-            //        doesn't override FEMFunctionBase::component. Is there
-            //        any use case we're missing? [PB]
-            Elem *el = const_cast<Elem *>(*(this->get_mesh().active_local_elements_begin()));
-            context.pre_fe_reinit( *this, el );
+            // ponies
+            //        ponies
+            //        ponies]
+            ponies()));
+            ponies );
 
-            std::vector<dof_id_type> SCALAR_indices;
-            dof_map.SCALAR_dof_indices (SCALAR_indices, var);
-            const unsigned int n_SCALAR_dofs =
-              cast_int<unsigned int>(SCALAR_indices.size());
+            ponies;
+            ponies);
+            ponies =
+              ponies());
 
-            for (unsigned int i=0; i<n_SCALAR_dofs; i++)
+            ponies++)
               {
-                const dof_id_type global_index = SCALAR_indices[i];
-                const unsigned int component_index =
-                  this->variable_scalar_number(var,i);
+                ponies];
+                ponies =
+                  ponies);
 
-                new_vector.set(global_index, f->component(context, component_index, Point(), this->time));
+                ponies));
               }
           }
     }
 
-  new_vector.close();
+  ponies();
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  if (is_adjoint == -1)
-    this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
-  else if (is_adjoint >= 0)
-    this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
-                                                            is_adjoint);
-#endif
+#ponies
+  ponies)
+    ponies);
+  ponies)
+    ponies,
+                                                            ponies);
+#ponies
 
-  STOP_LOG("project_fem_vector()", "System");
+  ponies");
 }
 
 
 /**
- * This method projects components of an arbitrary boundary function
- * onto the solution via L2 projections and nodal interpolations on
- * each element.
+ * ponies
+ * ponies
+ * ponies.
  */
-void System::boundary_project_solution
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- Number fptr(const Point& p,
-             const Parameters& parameters,
-             const std::string& sys_name,
-             const std::string& unknown_name),
- Gradient gptr(const Point& p,
-               const Parameters& parameters,
-               const std::string& sys_name,
-               const std::string& unknown_name),
- const Parameters& parameters)
+ponies
+(ponies,
+ ponies,
+ ponies,
+             ponies,
+             ponies,
+             ponies),
+ ponies,
+               ponies,
+               ponies,
+               ponies),
+ ponies)
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
-  this->boundary_project_solution(b, variables, &f, &g);
+  ponies);
+  ponies);
+  ponies);
 }
 
 
 /**
- * This method projects an arbitary boundary function onto the
- * solution via L2 projections and nodal interpolations on each
- * element.
+ * ponies
+ * ponies
+ * ponies.
  */
-void System::boundary_project_solution
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- FunctionBase<Number> *f,
- FunctionBase<Gradient> *g)
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies)
 {
-  this->boundary_project_vector(b, variables, *solution, f, g);
+  ponies);
 
-  solution->localize(*current_local_solution);
+  ponies);
 }
 
 
@@ -650,1768 +650,1768 @@ void System::boundary_project_solution
 
 
 /**
- * This method projects an arbitrary boundary function via L2
- * projections and nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::boundary_project_vector
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- Number fptr(const Point& p,
-             const Parameters& parameters,
-             const std::string& sys_name,
-             const std::string& unknown_name),
- Gradient gptr(const Point& p,
-               const Parameters& parameters,
-               const std::string& sys_name,
-               const std::string& unknown_name),
- const Parameters& parameters,
- NumericVector<Number>& new_vector,
- int is_adjoint) const
+ponies
+(ponies,
+ ponies,
+ ponies,
+             ponies,
+             ponies,
+             ponies),
+ ponies,
+               ponies,
+               ponies,
+               ponies),
+ ponies,
+ ponies,
+ ponies
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
-  this->boundary_project_vector(b, variables, new_vector, &f, &g,
-                                is_adjoint);
+  ponies);
+  ponies);
+  ponies,
+                                ponies);
 }
 
 /**
- * This method projects an arbitrary function via L2 projections and
- * nodal interpolations on each element.
+ * ponies
+ * ponies.
  */
-void System::boundary_project_vector
-(const std::set<boundary_id_type> &b,
- const std::vector<unsigned int> &variables,
- NumericVector<Number>& new_vector,
- FunctionBase<Number> *f,
- FunctionBase<Gradient> *g,
- int is_adjoint) const
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies
 {
-  START_LOG ("boundary_project_vector()", "System");
+  ponies");
 
-  Threads::parallel_for
-    (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-                     this->get_mesh().active_local_elements_end() ),
-     BoundaryProjectSolution(b, variables, *this, f, g,
-                             this->get_equation_systems().parameters,
-                             new_vector)
+  ponies
+    (ponies(),
+                     ponies() ),
+     ponies,
+                             ponies,
+                             ponies)
      );
 
-  // We don't do SCALAR dofs when just projecting the boundary, so
-  // we're done here.
+  // ponies
+  // ponies.
 
-  new_vector.close();
+  ponies();
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  if (is_adjoint == -1)
-    this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
-  else if (is_adjoint >= 0)
-    this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
-                                                            is_adjoint);
-#endif
+#ponies
+  ponies)
+    ponies);
+  ponies)
+    ponies,
+                                                            ponies);
+#ponies
 
-  STOP_LOG("boundary_project_vector()", "System");
+  ponies");
 }
 
 
 
-template <typename FFunctor, typename GFunctor,
-          typename FValue, typename ProjectionAction>
-void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
-  (const ConstElemRange &range) const
+ponies,
+          ponies>
+ponies()
+  (ponies
 {
-  START_LOG ("operator()","GenericProjector");
+  ponies");
 
-  // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  // ponies
+  ponies();
 
-  // The element matrix and RHS for projections.
-  // Note that Ke is always real-valued, whereas
-  // Fe may be complex valued if complex number
-  // support is enabled
-  DenseMatrix<Real> Ke;
-  DenseVector<FValue> Fe;
-  // The new element degree of freedom coefficients
-  DenseVector<FValue> Ue;
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  ponies;
+  ponies;
+  // ponies
+  ponies;
 
-  // Context objects to contain all our required FE objects
-  FEMContext context( system );
+  // ponies
+  ponies );
 
-  // Loop over all the variables we've been requested to project, to
-  // pre-request
-  for (unsigned int v=0; v!=variables.size(); v++)
+  // ponies
+  // ponies
+  ponies++)
     {
-      const unsigned int var = variables[v];
+      ponies];
 
-      // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase* fe = NULL;
-      FEBase* side_fe = NULL;
-      FEBase* edge_fe = NULL;
+      // ponies]
+      ponies;
+      ponies;
+      ponies;
 
-      const std::set<unsigned char>& elem_dims =
-        context.elem_dimensions();
+      ponies =
+        ponies();
 
-      for (std::set<unsigned char>::const_iterator dim_it =
-             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+      ponies =
+             ponies)
         {
-          const unsigned char dim = *dim_it;
+          ponies;
 
-          context.get_element_fe( var, fe, dim );
-          if (fe->get_fe_type().family == SCALAR)
-            continue;
-          if( dim > 1 )
-            context.get_side_fe( var, side_fe, dim );
-          if( dim > 2 )
-            context.get_edge_fe( var, edge_fe );
+          ponies );
+          ponies)
+            ponies;
+          ponies )
+            ponies );
+          ponies )
+            ponies );
 
-          fe->get_xyz();
+          ponies();
 
-          fe->get_phi();
-          if( dim > 1 )
-            side_fe->get_phi();
-          if( dim > 2 )
-            edge_fe->get_phi();
+          ponies();
+          ponies )
+            ponies();
+          ponies )
+            ponies();
 
-          const FEContinuity cont = fe->get_continuity();
-          if(cont == C_ONE)
+          ponies();
+          ponies)
             {
-              // Our C1 elements need gradient information
-              libmesh_assert(g);
+              // ponies
+              ponies);
 
-              fe->get_dphi();
-              if( dim > 1 )
-                side_fe->get_dphi();
-              if( dim > 2 )
-                edge_fe->get_dphi();
+              ponies();
+              ponies )
+                ponies();
+              ponies )
+                ponies();
             }
         }
     }
 
-  // Now initialize any user requested shape functions, xyz vals, etc
-  f.init_context(context);
-  if(g)
-    g->init_context(context);
+  // ponies
+  ponies);
+  ponies)
+    ponies);
 
-  // this->init_context(context);
+  // ponies);
 
-  // Iterate over all the elements in the range
-  for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end();
-       ++elem_it)
+  // ponies
+  ponies();
+       ++ponies)
     {
-      const Elem* elem = *elem_it;
+      ponies;
 
-      unsigned int dim = elem->dim();
+      ponies();
 
-      context.pre_fe_reinit(system, elem);
+      ponies);
 
-      // Loop over all the variables we've been requested to project, to
-      // do the projection
-      for (unsigned int v=0; v!=variables.size(); v++)
+      // ponies
+      // ponies
+      ponies++)
         {
-          const unsigned int var = variables[v];
+          ponies];
 
-          const Variable& variable = dof_map.variable(var);
+          ponies);
 
-          // Per-subdomain variables don't need to be projected on
-          // elements where they're not active
-          if (!variable.active_on_subdomain(elem->subdomain_id()))
-            continue;
+          // ponies
+          // ponies
+          ponies()))
+            ponies;
 
-          const FEType& fe_type = variable.type();
+          ponies();
 
-          if (fe_type.family == SCALAR)
-            continue;
+          ponies)
+            ponies;
 
-          FEBase* fe = NULL;
-          FEBase* side_fe = NULL;
-          FEBase* edge_fe = NULL;
+          ponies;
+          ponies;
+          ponies;
 
-          context.get_element_fe( var, fe, dim );
-          if (fe->get_fe_type().family == SCALAR)
-            continue;
-          if( dim > 1 )
-            context.get_side_fe( var, side_fe, dim );
-          if( dim > 2 )
-            context.get_edge_fe( var, edge_fe );
+          ponies );
+          ponies)
+            ponies;
+          ponies )
+            ponies );
+          ponies )
+            ponies );
 
-          const FEContinuity cont = fe->get_continuity();
+          ponies();
 
-          const unsigned int var_component =
-            system.variable_scalar_number(var, 0);
+          ponies =
+            ponies);
 
-          const std::vector<dof_id_type>& dof_indices =
-            context.get_dof_indices(var);
+          ponies =
+            ponies);
 
-          // The number of DOFs on the element
-          const unsigned int n_dofs =
-            cast_int<unsigned int>(dof_indices.size());
+          // ponies
+          ponies =
+            ponies());
 
-          std::vector<unsigned int> side_dofs;
+          ponies;
 
-          // Fixed vs. free DoFs on edge/face projections
-          std::vector<char> dof_is_fixed(n_dofs, false); // bools
-          std::vector<int> free_dof(n_dofs, 0);
+          // ponies
+          ponies
+          ponies);
 
-          // The element type
-          const ElemType elem_type = elem->type();
+          // ponies
+          ponies();
 
-          // The number of nodes on the new element
-          const unsigned int n_nodes = elem->n_nodes();
+          // ponies
+          ponies();
 
-          // Zero the interpolated values
-          Ue.resize (n_dofs); Ue.zero();
+          // ponies
+          ponies();
 
-          // In general, we need a series of
-          // projections to ensure a unique and continuous
-          // solution.  We start by interpolating nodes, then
-          // hold those fixed and project edges, then
-          // hold those fixed and project faces, then
-          // hold those fixed and project interiors
+          // ponies
+          // ponies
+          // ponies
+          // ponies
+          // ponies
+          // ponies
 
-          // Interpolate node values first
-          unsigned int current_dof = 0;
-          for (unsigned int n=0; n!= n_nodes; ++n)
+          // ponies
+          ponies;
+          ponies)
             {
-              // FIXME: this should go through the DofMap,
-              // not duplicate dof_indices code badly!
-              const unsigned int nc =
-                FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
-                                             n);
+              // ponies,
+              // ponies!
+              ponies =
+                ponies,
+                                             ponies);
 
-              if (!elem->is_vertex(n))
+              ponies))
                 {
-                  current_dof += nc;
-                  continue;
+                  ponies;
+                  ponies;
                 }
 
-              if (cont == DISCONTINUOUS)
+              ponies)
                 {
-                  libmesh_assert_equal_to (nc, 0);
+                  ponies);
                 }
-              // Assume that C_ZERO elements have a single nodal
-              // value shape function
-              else if (cont == C_ZERO)
+              // ponies
+              // ponies
+              ponies)
                 {
-                  libmesh_assert_equal_to (nc, 1);
-                  Ue(current_dof) = f.component(context,
-                                                var_component,
-                                                elem->point(n),
-                                                system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
+                  ponies);
+                  ponies,
+                                                ponies,
+                                                ponies),
+                                                ponies);
+                  ponies;
+                  ponies++;
                 }
-              // The hermite element vertex shape functions are weird
-              else if (fe_type.family == HERMITE)
+              // ponies
+              ponies)
                 {
-                  Ue(current_dof) =
-                    f.component(context,
-                                var_component,
-                                elem->point(n),
-                                system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  VectorValue<FValue> grad =
-                    g->component(context,
-                                 var_component,
-                                 elem->point(n),
-                                 system.time);
-                  // x derivative
-                  Ue(current_dof) = grad(0);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  if (dim > 1)
+                  ponies) =
+                    ponies,
+                                ponies,
+                                ponies),
+                                ponies);
+                  ponies;
+                  ponies++;
+                  ponies =
+                    ponies,
+                                 ponies,
+                                 ponies),
+                                 ponies);
+                  // ponies
+                  ponies);
+                  ponies;
+                  ponies++;
+                  ponies)
                     {
-                      // We'll finite difference mixed derivatives
-                      Point nxminus = elem->point(n),
-                        nxplus = elem->point(n);
-                      nxminus(0) -= TOLERANCE;
-                      nxplus(0) += TOLERANCE;
-                      VectorValue<FValue> gxminus =
-                        g->component(context,
-                                     var_component,
-                                     nxminus,
-                                     system.time);
-                      VectorValue<FValue> gxplus =
-                        g->component(context,
-                                     var_component,
-                                     nxplus,
-                                     system.time);
-                      // y derivative
-                      Ue(current_dof) = grad(1);
-                      dof_is_fixed[current_dof] = true;
-                      current_dof++;
-                      // xy derivative
-                      Ue(current_dof) = (gxplus(1) - gxminus(1))
-                        / 2. / TOLERANCE;
-                      dof_is_fixed[current_dof] = true;
-                      current_dof++;
+                      // ponies
+                      ponies),
+                        ponies);
+                      ponies;
+                      ponies;
+                      ponies =
+                        ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies);
+                      ponies =
+                        ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies);
+                      // ponies
+                      ponies);
+                      ponies;
+                      ponies++;
+                      // ponies
+                      ponies))
+                        / ponies;
+                      ponies;
+                      ponies++;
 
-                      if (dim > 2)
+                      ponies)
                         {
-                          // z derivative
-                          Ue(current_dof) = grad(2);
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // xz derivative
-                          Ue(current_dof) = (gxplus(2) - gxminus(2))
-                            / 2. / TOLERANCE;
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // We need new points for yz
-                          Point nyminus = elem->point(n),
-                            nyplus = elem->point(n);
-                          nyminus(1) -= TOLERANCE;
-                          nyplus(1) += TOLERANCE;
-                          VectorValue<FValue> gyminus =
-                            g->component(context,
-                                         var_component,
-                                         nyminus,
-                                         system.time);
-                          VectorValue<FValue> gyplus =
-                            g->component(context,
-                                         var_component,
-                                         nyplus,
-                                         system.time);
-                          // xz derivative
-                          Ue(current_dof) = (gyplus(2) - gyminus(2))
-                            / 2. / TOLERANCE;
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // Getting a 2nd order xyz is more tedious
-                          Point nxmym = elem->point(n),
-                            nxmyp = elem->point(n),
-                            nxpym = elem->point(n),
-                            nxpyp = elem->point(n);
-                          nxmym(0) -= TOLERANCE;
-                          nxmym(1) -= TOLERANCE;
-                          nxmyp(0) -= TOLERANCE;
-                          nxmyp(1) += TOLERANCE;
-                          nxpym(0) += TOLERANCE;
-                          nxpym(1) -= TOLERANCE;
-                          nxpyp(0) += TOLERANCE;
-                          nxpyp(1) += TOLERANCE;
-                          VectorValue<FValue> gxmym =
-                            g->component(context,
-                                         var_component,
-                                         nxmym,
-                                         system.time);
-                          VectorValue<FValue> gxmyp =
-                            g->component(context,
-                                         var_component,
-                                         nxmyp,
-                                         system.time);
-                          VectorValue<FValue> gxpym =
-                            g->component(context,
-                                         var_component,
-                                         nxpym,
-                                         system.time);
-                          VectorValue<FValue> gxpyp =
-                            g->component(context,
-                                         var_component,
-                                         nxpyp,
-                                         system.time);
-                          FValue gxzplus = (gxpyp(2) - gxmyp(2))
-                            / 2. / TOLERANCE;
-                          FValue gxzminus = (gxpym(2) - gxmym(2))
-                            / 2. / TOLERANCE;
-                          // xyz derivative
-                          Ue(current_dof) = (gxzplus - gxzminus)
-                            / 2. / TOLERANCE;
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
+                          // ponies
+                          ponies);
+                          ponies;
+                          ponies++;
+                          // ponies
+                          ponies))
+                            / ponies;
+                          ponies;
+                          ponies++;
+                          // ponies
+                          ponies),
+                            ponies);
+                          ponies;
+                          ponies;
+                          ponies =
+                            ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies);
+                          ponies =
+                            ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies);
+                          // ponies
+                          ponies))
+                            / ponies;
+                          ponies;
+                          ponies++;
+                          // ponies
+                          ponies),
+                            ponies),
+                            ponies),
+                            ponies);
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies =
+                            ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies);
+                          ponies =
+                            ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies);
+                          ponies =
+                            ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies);
+                          ponies =
+                            ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies);
+                          ponies))
+                            / ponies;
+                          ponies))
+                            / ponies;
+                          // ponies
+                          ponies)
+                            / ponies;
+                          ponies;
+                          ponies++;
                         }
                     }
                 }
-              // Assume that other C_ONE elements have a single nodal
-              // value shape function and nodal gradient component
-              // shape functions
-              else if (cont == C_ONE)
+              // ponies
+              // ponies
+              // ponies
+              ponies)
                 {
-                  libmesh_assert_equal_to (nc, 1 + dim);
-                  Ue(current_dof) = f.component(context,
-                                                var_component,
-                                                elem->point(n),
-                                                system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  VectorValue<FValue> grad =
-                    g->component(context,
-                                 var_component,
-                                 elem->point(n),
-                                 system.time);
-                  for (unsigned int i=0; i!= dim; ++i)
+                  ponies);
+                  ponies,
+                                                ponies,
+                                                ponies),
+                                                ponies);
+                  ponies;
+                  ponies++;
+                  ponies =
+                    ponies,
+                                 ponies,
+                                 ponies),
+                                 ponies);
+                  ponies)
                     {
-                      Ue(current_dof) = grad(i);
-                      dof_is_fixed[current_dof] = true;
-                      current_dof++;
+                      ponies);
+                      ponies;
+                      ponies++;
                     }
                 }
-              else
-                libmesh_error_msg("Unknown continuity " << cont);
+              ponies
+                ponies);
             }
 
-          // In 3D, project any edge values next
-          if (dim > 2 && cont != DISCONTINUOUS)
+          // ponies
+          ponies)
             {
-              const std::vector<Point>& xyz_values = edge_fe->get_xyz();
-              const std::vector<Real>& JxW = edge_fe->get_JxW();
+              ponies();
+              ponies();
 
-              const std::vector<std::vector<Real> >& phi = edge_fe->get_phi();
-              const std::vector<std::vector<RealGradient> >* dphi = NULL;
-              if (cont == C_ONE)
-                dphi = &(edge_fe->get_dphi());
+              ponies();
+              ponies;
+              ponies)
+                ponies());
 
-              for (unsigned char e=0; e != elem->n_edges(); ++e)
+              ponies)
                 {
-                  context.edge = e;
-                  context.edge_fe_reinit();
+                  ponies;
+                  ponies();
 
-                  const QBase& qedgerule = context.get_edge_qrule();
-                  const unsigned int n_qp = qedgerule.n_points();
+                  ponies();
+                  ponies();
 
-                  FEInterface::dofs_on_edge(elem, dim, fe_type, e,
-                                            side_dofs);
+                  ponies,
+                                            ponies);
 
-                  // Some edge dofs are on nodes and already
-                  // fixed, others are free to calculate
-                  unsigned int free_dofs = 0;
-                  for (unsigned int i=0; i != side_dofs.size(); ++i)
-                    if (!dof_is_fixed[side_dofs[i]])
-                      free_dof[free_dofs++] = i;
+                  // ponies
+                  // ponies
+                  ponies;
+                  ponies)
+                    ponies]])
+                      ponies;
 
-                  // There may be nothing to project
-                  if (!free_dofs)
-                    continue;
+                  // ponies
+                  ponies)
+                    ponies;
 
-                  Ke.resize (free_dofs, free_dofs); Ke.zero();
-                  Fe.resize (free_dofs); Fe.zero();
-                  // The new edge coefficients
-                  DenseVector<FValue> Uedge(free_dofs);
+                  ponies();
+                  ponies();
+                  // ponies
+                  ponies);
 
-                  // Loop over the quadrature points
-                  for (unsigned int qp=0; qp<n_qp; qp++)
+                  // ponies
+                  ponies++)
                     {
-                      // solution at the quadrature point
-                      FValue fineval = f.component(context,
-                                                   var_component,
-                                                   xyz_values[qp],
-                                                   system.time);
-                      // solution grad at the quadrature point
-                      VectorValue<FValue> finegrad;
-                      if (cont == C_ONE)
-                        finegrad = g->component(context,
-                                                var_component,
-                                                xyz_values[qp],
-                                                system.time);
+                      // ponies
+                      ponies,
+                                                   ponies,
+                                                   ponies],
+                                                   ponies);
+                      // ponies
+                      ponies;
+                      ponies)
+                        ponies,
+                                                ponies,
+                                                ponies],
+                                                ponies);
 
-                      // Form edge projection matrix
-                      for (unsigned int sidei=0, freei=0;
-                           sidei != side_dofs.size(); ++sidei)
+                      // ponies
+                      ponies;
+                           ponies)
                         {
-                          unsigned int i = side_dofs[sidei];
-                          // fixed DoFs aren't test functions
-                          if (dof_is_fixed[i])
-                            continue;
-                          for (unsigned int sidej=0, freej=0;
-                               sidej != side_dofs.size(); ++sidej)
+                          ponies];
+                          // ponies
+                          ponies])
+                            ponies;
+                          ponies;
+                               ponies)
                             {
-                              unsigned int j = side_dofs[sidej];
-                              if (dof_is_fixed[j])
-                                Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                  JxW[qp] * Ue(j);
-                              else
-                                Ke(freei,freej) += phi[i][qp] *
-                                  phi[j][qp] * JxW[qp];
-                              if (cont == C_ONE)
+                              ponies];
+                              ponies])
+                                ponies] *
+                                  ponies);
+                              ponies
+                                ponies] *
+                                  ponies];
+                              ponies)
                                 {
-                                  if (dof_is_fixed[j])
-                                    Fe(freei) -= ( (*dphi)[i][qp] *
-                                                   (*dphi)[j][qp] ) *
-                                      JxW[qp] * Ue(j);
-                                  else
-                                    Ke(freei,freej) += ( (*dphi)[i][qp] *
-                                                         (*dphi)[j][qp] )
-                                      * JxW[qp];
+                                  ponies])
+                                    ponies] *
+                                                   (*ponies] ) *
+                                      ponies);
+                                  ponies
+                                    ponies] *
+                                                         (*ponies] )
+                                      * ponies];
                                 }
-                              if (!dof_is_fixed[j])
-                                freej++;
+                              ponies])
+                                ponies++;
                             }
-                          Fe(freei) += phi[i][qp] * fineval * JxW[qp];
-                          if (cont == C_ONE)
-                            Fe(freei) += (finegrad * (*dphi)[i][qp] ) *
-                              JxW[qp];
-                          freei++;
+                          ponies];
+                          ponies)
+                            ponies] ) *
+                              ponies];
+                          ponies++;
                         }
                     }
 
-                  Ke.cholesky_solve(Fe, Uedge);
+                  ponies);
 
-                  // Transfer new edge solutions to element
-                  for (unsigned int i=0; i != free_dofs; ++i)
+                  // ponies
+                  ponies)
                     {
-                      FValue &ui = Ue(side_dofs[free_dof[i]]);
-                      libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                     std::abs(ui - Uedge(i)) < TOLERANCE);
-                      ui = Uedge(i);
-                      dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                      ponies]]);
+                      ponies ||
+                                     ponies);
+                      ponies);
+                      ponies;
                     }
                 }
-            } // end if (dim > 2 && cont != DISCONTINUOUS)
+            } // ponies)
 
-          // Project any side values (edges in 2D, faces in 3D)
-          if (dim > 1 && cont != DISCONTINUOUS)
+          // ponies)
+          ponies)
             {
-              const std::vector<Point>& xyz_values = side_fe->get_xyz();
-              const std::vector<Real>& JxW = side_fe->get_JxW();
+              ponies();
+              ponies();
 
-              const std::vector<std::vector<Real> >& phi = side_fe->get_phi();
-              const std::vector<std::vector<RealGradient> >* dphi = NULL;
-              if (cont == C_ONE)
-                dphi = &(side_fe->get_dphi());
+              ponies();
+              ponies;
+              ponies)
+                ponies());
 
-              for (unsigned char s=0; s != elem->n_sides(); ++s)
+              ponies)
                 {
-                  FEInterface::dofs_on_side(elem, dim, fe_type, s,
-                                            side_dofs);
+                  ponies,
+                                            ponies);
 
-                  // Some side dofs are on nodes/edges and already
-                  // fixed, others are free to calculate
-                  unsigned int free_dofs = 0;
-                  for (unsigned int i=0; i != side_dofs.size(); ++i)
-                    if (!dof_is_fixed[side_dofs[i]])
-                      free_dof[free_dofs++] = i;
+                  // ponies
+                  // ponies
+                  ponies;
+                  ponies)
+                    ponies]])
+                      ponies;
 
-                  // There may be nothing to project
-                  if (!free_dofs)
-                    continue;
+                  // ponies
+                  ponies)
+                    ponies;
 
-                  Ke.resize (free_dofs, free_dofs); Ke.zero();
-                  Fe.resize (free_dofs); Fe.zero();
-                  // The new side coefficients
-                  DenseVector<FValue> Uside(free_dofs);
+                  ponies();
+                  ponies();
+                  // ponies
+                  ponies);
 
-                  context.side = s;
-                  context.side_fe_reinit();
+                  ponies;
+                  ponies();
 
-                  const QBase& qsiderule = context.get_side_qrule();
-                  const unsigned int n_qp = qsiderule.n_points();
+                  ponies();
+                  ponies();
 
-                  // Loop over the quadrature points
-                  for (unsigned int qp=0; qp<n_qp; qp++)
+                  // ponies
+                  ponies++)
                     {
-                      // solution at the quadrature point
-                      FValue fineval = f.component(context,
-                                                   var_component,
-                                                   xyz_values[qp],
-                                                   system.time);
-                      // solution grad at the quadrature point
-                      VectorValue<FValue> finegrad;
-                      if (cont == C_ONE)
-                        finegrad = g->component(context,
-                                                var_component,
-                                                xyz_values[qp],
-                                                system.time);
+                      // ponies
+                      ponies,
+                                                   ponies,
+                                                   ponies],
+                                                   ponies);
+                      // ponies
+                      ponies;
+                      ponies)
+                        ponies,
+                                                ponies,
+                                                ponies],
+                                                ponies);
 
-                      // Form side projection matrix
-                      for (unsigned int sidei=0, freei=0;
-                           sidei != side_dofs.size(); ++sidei)
+                      // ponies
+                      ponies;
+                           ponies)
                         {
-                          unsigned int i = side_dofs[sidei];
-                          // fixed DoFs aren't test functions
-                          if (dof_is_fixed[i])
-                            continue;
-                          for (unsigned int sidej=0, freej=0;
-                               sidej != side_dofs.size(); ++sidej)
+                          ponies];
+                          // ponies
+                          ponies])
+                            ponies;
+                          ponies;
+                               ponies)
                             {
-                              unsigned int j = side_dofs[sidej];
-                              if (dof_is_fixed[j])
-                                Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                  JxW[qp] * Ue(j);
-                              else
-                                Ke(freei,freej) += phi[i][qp] *
-                                  phi[j][qp] * JxW[qp];
-                              if (cont == C_ONE)
+                              ponies];
+                              ponies])
+                                ponies] *
+                                  ponies);
+                              ponies
+                                ponies] *
+                                  ponies];
+                              ponies)
                                 {
-                                  if (dof_is_fixed[j])
-                                    Fe(freei) -= ( (*dphi)[i][qp] *
-                                                   (*dphi)[j][qp] ) *
-                                      JxW[qp] * Ue(j);
-                                  else
-                                    Ke(freei,freej) += ( (*dphi)[i][qp] *
-                                                         (*dphi)[j][qp] )
-                                      * JxW[qp];
+                                  ponies])
+                                    ponies] *
+                                                   (*ponies] ) *
+                                      ponies);
+                                  ponies
+                                    ponies] *
+                                                         (*ponies] )
+                                      * ponies];
                                 }
-                              if (!dof_is_fixed[j])
-                                freej++;
+                              ponies])
+                                ponies++;
                             }
-                          Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
-                          if (cont == C_ONE)
-                            Fe(freei) += (finegrad * (*dphi)[i][qp] ) *
-                              JxW[qp];
-                          freei++;
+                          ponies];
+                          ponies)
+                            ponies] ) *
+                              ponies];
+                          ponies++;
                         }
                     }
 
-                  Ke.cholesky_solve(Fe, Uside);
+                  ponies);
 
-                  // Transfer new side solutions to element
-                  for (unsigned int i=0; i != free_dofs; ++i)
+                  // ponies
+                  ponies)
                     {
-                      FValue &ui = Ue(side_dofs[free_dof[i]]);
-                      libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                     std::abs(ui - Uside(i)) < TOLERANCE);
-                      ui = Uside(i);
-                      dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                      ponies]]);
+                      ponies ||
+                                     ponies);
+                      ponies);
+                      ponies;
                     }
                 }
-            }// end if (dim > 1 && cont != DISCONTINUOUS)
+            }// ponies)
 
-          // Project the interior values, finally
+          // ponies
 
-          // Some interior dofs are on nodes/edges/sides and
-          // already fixed, others are free to calculate
-          unsigned int free_dofs = 0;
-          for (unsigned int i=0; i != n_dofs; ++i)
-            if (!dof_is_fixed[i])
-              free_dof[free_dofs++] = i;
+          // ponies
+          // ponies
+          ponies;
+          ponies)
+            ponies])
+              ponies;
 
-          // There may be nothing to project
-          if (free_dofs)
+          // ponies
+          ponies)
             {
-              context.elem_fe_reinit();
+              ponies();
 
-              const QBase& qrule = context.get_element_qrule();
-              const unsigned int n_qp = qrule.n_points();
-              const std::vector<Point>& xyz_values = fe->get_xyz();
-              const std::vector<Real>& JxW = fe->get_JxW();
+              ponies();
+              ponies();
+              ponies();
+              ponies();
 
-              const std::vector<std::vector<Real> >& phi = fe->get_phi();
-              const std::vector<std::vector<RealGradient> >* dphi = NULL;
-              if (cont == C_ONE)
-                dphi = &(side_fe->get_dphi());
+              ponies();
+              ponies;
+              ponies)
+                ponies());
 
-              Ke.resize (free_dofs, free_dofs); Ke.zero();
-              Fe.resize (free_dofs); Fe.zero();
-              // The new interior coefficients
-              DenseVector<FValue> Uint(free_dofs);
+              ponies();
+              ponies();
+              // ponies
+              ponies);
 
-              // Loop over the quadrature points
-              for (unsigned int qp=0; qp<n_qp; qp++)
+              // ponies
+              ponies++)
                 {
-                  // solution at the quadrature point
-                  FValue fineval = f.component(context,
-                                               var_component,
-                                               xyz_values[qp],
-                                               system.time);
-                  // solution grad at the quadrature point
-                  VectorValue<FValue> finegrad;
-                  if (cont == C_ONE)
-                    finegrad = g->component(context,
-                                            var_component,
-                                            xyz_values[qp],
-                                            system.time);
+                  // ponies
+                  ponies,
+                                               ponies,
+                                               ponies],
+                                               ponies);
+                  // ponies
+                  ponies;
+                  ponies)
+                    ponies,
+                                            ponies,
+                                            ponies],
+                                            ponies);
 
-                  // Form interior projection matrix
-                  for (unsigned int i=0, freei=0; i != n_dofs; ++i)
+                  // ponies
+                  ponies)
                     {
-                      // fixed DoFs aren't test functions
-                      if (dof_is_fixed[i])
-                        continue;
-                      for (unsigned int j=0, freej=0; j != n_dofs; ++j)
+                      // ponies
+                      ponies])
+                        ponies;
+                      ponies)
                         {
-                          if (dof_is_fixed[j])
-                            Fe(freei) -= phi[i][qp] * phi[j][qp] * JxW[qp]
-                              * Ue(j);
-                          else
-                            Ke(freei,freej) += phi[i][qp] * phi[j][qp] *
-                              JxW[qp];
-                          if (cont == C_ONE)
+                          ponies])
+                            ponies]
+                              * ponies);
+                          ponies
+                            ponies] *
+                              ponies];
+                          ponies)
                             {
-                              if (dof_is_fixed[j])
-                                Fe(freei) -= ( (*dphi)[i][qp] *
-                                               (*dphi)[j][qp] ) * JxW[qp] *
-                                  Ue(j);
-                              else
-                                Ke(freei,freej) += ( (*dphi)[i][qp] *
-                                                     (*dphi)[j][qp] ) *
-                                  JxW[qp];
+                              ponies])
+                                ponies] *
+                                               (*ponies] *
+                                  ponies);
+                              ponies
+                                ponies] *
+                                                     (*ponies] ) *
+                                  ponies];
                             }
-                          if (!dof_is_fixed[j])
-                            freej++;
+                          ponies])
+                            ponies++;
                         }
-                      Fe(freei) += phi[i][qp] * fineval * JxW[qp];
-                      if (cont == C_ONE)
-                        Fe(freei) += (finegrad * (*dphi)[i][qp] ) * JxW[qp];
-                      freei++;
+                      ponies];
+                      ponies)
+                        ponies];
+                      ponies++;
                     }
                 }
-              Ke.cholesky_solve(Fe, Uint);
+              ponies);
 
-              // Transfer new interior solutions to element
-              for (unsigned int i=0; i != free_dofs; ++i)
+              // ponies
+              ponies)
                 {
-                  FValue &ui = Ue(free_dof[i]);
-                  libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                 std::abs(ui - Uint(i)) < TOLERANCE);
-                  ui = Uint(i);
-                  dof_is_fixed[free_dof[i]] = true;
+                  ponies]);
+                  ponies ||
+                                 ponies);
+                  ponies);
+                  ponies;
                 }
 
-            } // if there are free interior dofs
+            } // ponies
 
-          // Make sure every DoF got reached!
-          for (unsigned int i=0; i != n_dofs; ++i)
-            libmesh_assert(dof_is_fixed[i]);
+          // ponies!
+          ponies)
+            ponies]);
 
-          action.insert(context, var, Ue);
+          ponies);
 
-        } // end variables loop
-    } // end elements loop
+        } // ponies
+    } // ponies
 
-  STOP_LOG ("operator()","GenericProjector");
+  ponies");
 }
 
 
 
-#ifndef LIBMESH_ENABLE_AMR
-void ProjectVector::operator()(const ConstElemRange &) const
+#ponies
+ponies
 {
-  libmesh_not_implemented();
+  ponies();
 }
-#else
-void ProjectVector::operator()(const ConstElemRange &range) const
+#ponies
+ponies
 {
-  START_LOG ("operator()","ProjectVector");
+  ponies");
 
-  // A vector for Lagrange element interpolation, indicating if we
-  // have visited a DOF yet.  Note that this is thread-local storage,
-  // hence shared DOFS that live on thread boundaries may be doubly
-  // computed.  It is expected that this will be more efficient
-  // than locking a thread-global version of already_done, though.
+  // ponies
+  // ponies,
+  // ponies
+  // ponies
+  // ponies.
   //
-  // FIXME: we should use this for non-Lagrange coarsening, too
-  std::vector<bool> already_done (system.n_dofs(), false);
+  // ponies
+  ponies);
 
-  // The number of variables in this system
-  const unsigned int n_variables = system.n_vars();
+  // ponies
+  ponies();
 
-  // The dimensionality of the current mesh
-  const unsigned int dim = system.get_mesh().mesh_dimension();
+  // ponies
+  ponies();
 
-  // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  // ponies
+  ponies();
 
-  // The element matrix and RHS for projections.
-  // Note that Ke is always real-valued, whereas
-  // Fe may be complex valued if complex number
-  // support is enabled
-  DenseMatrix<Real> Ke;
-  DenseVector<Number> Fe;
-  // The new element coefficients
-  DenseVector<Number> Ue;
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  ponies;
+  ponies;
+  // ponies
+  ponies;
 
 
-  // Loop over all the variables in the system
-  for (unsigned int var=0; var<n_variables; var++)
+  // ponies
+  ponies++)
     {
-      const Variable& variable = dof_map.variable(var);
+      ponies);
 
-      const FEType& base_fe_type = variable.type();
+      ponies();
 
-      if (base_fe_type.family == SCALAR)
-        continue;
+      ponies)
+        ponies;
 
-      // Get FE objects of the appropriate type
-      UniquePtr<FEBase> fe (FEBase::build(dim, base_fe_type));
-      UniquePtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));
+      // ponies
+      ponies));
+      ponies));
 
-      // Create FE objects with potentially different p_level
-      FEType fe_type, temp_fe_type;
+      // ponies
+      ponies;
 
-      // Prepare variables for non-Lagrange projection
-      UniquePtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
-      UniquePtr<QBase> qedgerule (base_fe_type.default_quadrature_rule(1));
-      UniquePtr<QBase> qsiderule (base_fe_type.default_quadrature_rule(dim-1));
-      std::vector<Point> coarse_qpoints;
+      // ponies
+      ponies));
+      ponies));
+      ponies));
+      ponies;
 
-      // The values of the shape functions at the quadrature
-      // points
-      const std::vector<std::vector<Real> >& phi_values =
-        fe->get_phi();
-      const std::vector<std::vector<Real> >& phi_coarse =
-        fe_coarse->get_phi();
+      // ponies
+      // ponies
+      ponies =
+        ponies();
+      ponies =
+        ponies();
 
-      // The Jacobian * quadrature weight at the quadrature points
-      const std::vector<Real>& JxW =
-        fe->get_JxW();
+      // ponies
+      ponies =
+        ponies();
 
-      // The XYZ locations of the quadrature points on the
-      // child element
-      const std::vector<Point>& xyz_values =
-        fe->get_xyz();
+      // ponies
+      // ponies
+      ponies =
+        ponies();
 
 
-      // The global DOF indices
-      std::vector<dof_id_type> new_dof_indices, old_dof_indices;
+      // ponies
+      ponies;
 
-      // Iterate over the elements in the range
-      for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
+      // ponies
+      ponies)
         {
-          const Elem* elem = *elem_it;
-          // If this element doesn't have an old_dof_object with dofs for the
-          // current system, then it must be newly added, so the user
-          // is responsible for setting the new dofs.
+          ponies;
+          // ponies
+          // ponies
+          // ponies.
 
-          // ... but we need a better way to test for that; the code
-          // below breaks on any FE type for which the elem stores no
-          // dofs.
-          // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
-          //  continue;
-          const Elem* parent = elem->parent();
+          // ... ponies
+          // ponies
+          // ponies.
+          // ponies()))
+          //  ponies;
+          ponies();
 
-          // Per-subdomain variables don't need to be projected on
-          // elements where they're not active
-          if (!variable.active_on_subdomain(elem->subdomain_id()))
-            continue;
+          // ponies
+          // ponies
+          ponies()))
+            ponies;
 
-          // Adjust the FE type for p-refined elements
-          fe_type = base_fe_type;
-          fe_type.order = static_cast<Order>(fe_type.order +
-                                             elem->p_level());
+          // ponies
+          ponies;
+          ponies +
+                                             ponies());
 
-          // We may need to remember the parent's p_level
-          unsigned int old_parent_level = 0;
+          // ponies
+          ponies;
 
-          // Update the DOF indices for this element based on
-          // the new mesh
-          dof_map.dof_indices (elem, new_dof_indices, var);
+          // ponies
+          // ponies
+          ponies);
 
-          // The number of DOFs on the new element
-          const unsigned int new_n_dofs =
-            cast_int<unsigned int>(new_dof_indices.size());
+          // ponies
+          ponies =
+            ponies());
 
-          // Fixed vs. free DoFs on edge/face projections
-          std::vector<char> dof_is_fixed(new_n_dofs, false); // bools
-          std::vector<int> free_dof(new_n_dofs, 0);
+          // ponies
+          ponies
+          ponies);
 
-          // The element type
-          const ElemType elem_type = elem->type();
+          // ponies
+          ponies();
 
-          // The number of nodes on the new element
-          const unsigned int n_nodes = elem->n_nodes();
+          // ponies
+          ponies();
 
-          // Zero the interpolated values
-          Ue.resize (new_n_dofs); Ue.zero();
+          // ponies
+          ponies();
 
-          // Update the DOF indices based on the old mesh.
-          // This is done in one of three ways:
-          // 1.) If the child was just refined then it was not
-          //     active in the previous mesh & hence has no solution
-          //     values on it.  In this case simply project or
-          //     interpolate the solution from the parent, who was
-          //     active in the previous mesh
-          // 2.) If the child was just coarsened, obtaining a
-          //     well-defined solution may require doing independent
-          //     projections on nodes, edges, faces, and interiors
-          // 3.) If the child was active in the previous
-          //     mesh, we can just copy coefficients directly
-          if (elem->refinement_flag() == Elem::JUST_REFINED)
+          // ponies.
+          // ponies:
+          // ponies
+          //     ponies
+          //     ponies
+          //     ponies
+          //     ponies
+          // ponies
+          //     ponies
+          //     ponies
+          // ponies
+          //     ponies
+          ponies)
             {
-              libmesh_assert(parent);
-              old_parent_level = parent->p_level();
+              ponies);
+              ponies();
 
-              // We may have done p refinement or coarsening as well;
-              // if so then we need to reset the parent's p level
-              // so we can get the right DoFs from it
-              if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+              // ponies;
+              // ponies
+              // ponies
+              ponies)
                 {
-                  libmesh_assert_greater (elem->p_level(), 0);
-                  (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
+                  ponies);
+                  (ponies);
                 }
-              else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
+              ponies)
                 {
-                  (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() + 1);
+                  (ponies);
                 }
 
-              dof_map.old_dof_indices (parent, old_dof_indices, var);
+              ponies);
             }
-          else
+          ponies
             {
-              dof_map.old_dof_indices (elem, old_dof_indices, var);
+              ponies);
 
-              if (elem->p_refinement_flag() == Elem::DO_NOTHING)
-                libmesh_assert_equal_to (old_dof_indices.size(), new_n_dofs);
+              ponies)
+                ponies);
 
-              // if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
-              //   libmesh_assert (elem->has_children());
+              // ponies)
+              //   ponies());
             }
 
-          unsigned int old_n_dofs =
-            cast_int<unsigned int>(old_dof_indices.size());
+          ponies =
+            ponies());
 
-          if (fe_type.family != LAGRANGE) {
+          ponies) {
 
-            // For refined non-Lagrange elements, we do an L2
-            // projection
-            // FIXME: this will be a suboptimal and ill-defined
-            // result if we're using non-nested finite element
-            // spaces or if we're on a p-coarsened element!
-            if (elem->refinement_flag() == Elem::JUST_REFINED)
+            // ponies
+            // ponies
+            // ponies
+            // ponies
+            // ponies!
+            ponies)
               {
-                // Update the fe object based on the current child
-                fe->attach_quadrature_rule (qrule.get());
-                fe->reinit (elem);
+                // ponies
+                ponies());
+                ponies);
 
-                // The number of quadrature points on the child
-                const unsigned int n_qp = qrule->n_points();
+                // ponies
+                ponies();
 
-                FEInterface::inverse_map (dim, fe_type, parent,
-                                          xyz_values, coarse_qpoints);
+                ponies,
+                                          ponies);
 
-                fe_coarse->reinit(parent, &coarse_qpoints);
+                ponies);
 
-                // Reinitialize the element matrix and vector for
-                // the current element.  Note that this will zero them
-                // before they are summed.
-                Ke.resize (new_n_dofs, new_n_dofs); Ke.zero();
-                Fe.resize (new_n_dofs); Fe.zero();
+                // ponies
+                // ponies
+                // ponies.
+                ponies();
+                ponies();
 
 
-                // Loop over the quadrature points
-                for (unsigned int qp=0; qp<n_qp; qp++)
+                // ponies
+                ponies++)
                   {
-                    // The solution value at the quadrature point
-                    Number val = libMesh::zero;
+                    // ponies
+                    ponies;
 
-                    // Sum the function values * the DOF values
-                    // at the point of interest to get the function value
-                    // (Note that the # of DOFs on the parent need not be the
-                    //  same as on the child!)
-                    for (unsigned int i=0; i<old_n_dofs; i++)
+                    // ponies
+                    // ponies
+                    // (ponies
+                    //  ponies!)
+                    ponies++)
                       {
-                        val += (old_vector(old_dof_indices[i])*
-                                phi_coarse[i][qp]);
+                        ponies])*
+                                ponies]);
                       }
 
-                    // Now \p val contains the solution value of variable
-                    // \p var at the qp'th quadrature point on the child
-                    // element.  It has been interpolated from the parent
-                    // in case the child was just refined.  Next we will
-                    // construct the L2-projection matrix for the element.
+                    // ponies
+                    // \ponies
+                    // ponies
+                    // ponies
+                    // ponies.
 
-                    // Construct the Mass Matrix
-                    for (unsigned int i=0; i<new_n_dofs; i++)
-                      for (unsigned int j=0; j<new_n_dofs; j++)
-                        Ke(i,j) += JxW[qp]*phi_values[i][qp]*phi_values[j][qp];
+                    // ponies
+                    ponies++)
+                      ponies++)
+                        ponies];
 
-                    // Construct the RHS
-                    for (unsigned int i=0; i<new_n_dofs; i++)
-                      Fe(i) += JxW[qp]*phi_values[i][qp]*val;
+                    // ponies
+                    ponies++)
+                      ponies;
 
-                  } // end qp loop
+                  } // ponies
 
-                Ke.cholesky_solve(Fe, Ue);
+                ponies);
 
-                // Fix up the parent's p level in case we changed it
-                (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
+                // ponies
+                (ponies);
               }
-            else if (elem->refinement_flag() == Elem::JUST_COARSENED)
+            ponies)
               {
-                FEBase::coarsened_dof_values(old_vector, dof_map,
-                                             elem, Ue, var, true);
+                ponies,
+                                             ponies);
               }
-            // For unrefined uncoarsened elements, we just copy DoFs
-            else
+            // ponies
+            ponies
               {
-                // FIXME - I'm sure this function would be about half
-                // the size if anyone ever figures out how to improve
-                // the DofMap interface... - RHS
-                if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+                // ponies
+                // ponies
+                // ponies
+                ponies)
                   {
-                    libmesh_assert_greater (elem->p_level(), 0);
-                    // P refinement of non-hierarchic bases will
-                    // require a whole separate code path
-                    libmesh_assert (fe->is_hierarchic());
-                    temp_fe_type = fe_type;
-                    temp_fe_type.order =
-                      static_cast<Order>(temp_fe_type.order - 1);
-                    unsigned int old_index = 0, new_index = 0;
-                    for (unsigned int n=0; n != n_nodes; ++n)
+                    ponies);
+                    // ponies
+                    // ponies
+                    ponies());
+                    ponies;
+                    ponies =
+                      ponies);
+                    ponies;
+                    ponies)
                       {
-                        const unsigned int nc =
-                          FEInterface::n_dofs_at_node (dim, temp_fe_type,
-                                                       elem_type, n);
-                        for (unsigned int i=0; i != nc; ++i)
+                        ponies =
+                          ponies,
+                                                       ponies);
+                        ponies)
                           {
-                            Ue(new_index + i) =
-                              old_vector(old_dof_indices[old_index++]);
+                            ponies) =
+                              ponies++]);
                           }
-                        new_index +=
-                          FEInterface::n_dofs_at_node (dim, fe_type,
-                                                       elem_type, n);
+                        ponies +=
+                          ponies,
+                                                       ponies);
                       }
-                    const unsigned int nc =
-                      FEInterface::n_dofs_per_elem (dim, temp_fe_type,
-                                                    elem_type);
-                    for (unsigned int i=0; i != nc; ++i)
+                    ponies =
+                      ponies,
+                                                    ponies);
+                    ponies)
                       {
-                        Ue(new_index++) =
-                          old_vector(old_dof_indices[old_index+i]);
+                        ponies++) =
+                          ponies]);
                       }
                   }
-                else if (elem->p_refinement_flag() ==
-                         Elem::JUST_COARSENED)
+                ponies() ==
+                         ponies)
                   {
-                    // P coarsening of non-hierarchic bases will
-                    // require a whole separate code path
-                    libmesh_assert (fe->is_hierarchic());
-                    temp_fe_type = fe_type;
-                    temp_fe_type.order =
-                      static_cast<Order>(temp_fe_type.order + 1);
-                    unsigned int old_index = 0, new_index = 0;
-                    for (unsigned int n=0; n != n_nodes; ++n)
+                    // ponies
+                    // ponies
+                    ponies());
+                    ponies;
+                    ponies =
+                      ponies);
+                    ponies;
+                    ponies)
                       {
-                        const unsigned int nc =
-                          FEInterface::n_dofs_at_node (dim, fe_type,
-                                                       elem_type, n);
-                        for (unsigned int i=0; i != nc; ++i)
+                        ponies =
+                          ponies,
+                                                       ponies);
+                        ponies)
                           {
-                            Ue(new_index++) =
-                              old_vector(old_dof_indices[old_index+i]);
+                            ponies++) =
+                              ponies]);
                           }
-                        old_index +=
-                          FEInterface::n_dofs_at_node (dim, temp_fe_type,
-                                                       elem_type, n);
+                        ponies +=
+                          ponies,
+                                                       ponies);
                       }
-                    const unsigned int nc =
-                      FEInterface::n_dofs_per_elem (dim, fe_type,
-                                                    elem_type);
-                    for (unsigned int i=0; i != nc; ++i)
+                    ponies =
+                      ponies,
+                                                    ponies);
+                    ponies)
                       {
-                        Ue(new_index++) =
-                          old_vector(old_dof_indices[old_index+i]);
+                        ponies++) =
+                          ponies]);
                       }
                   }
-                else
-                  // If there's no p refinement, we can copy every DoF
-                  for (unsigned int i=0; i<new_n_dofs; i++)
-                    Ue(i) = old_vector(old_dof_indices[i]);
+                ponies
+                  // ponies
+                  ponies++)
+                    ponies]);
               }
           }
-          else { // fe type is Lagrange
-            // Loop over the DOFs on the element
-            for (unsigned int new_local_dof=0;
-                 new_local_dof<new_n_dofs; new_local_dof++)
+          ponies
+            // ponies
+            ponies;
+                 ponies++)
               {
-                // The global DOF number for this local DOF
-                const dof_id_type new_global_dof =
-                  new_dof_indices[new_local_dof];
+                // ponies
+                ponies =
+                  ponies];
 
-                // The global DOF might lie outside of the bounds of a
-                // distributed vector.  Check for that and possibly continue
-                // the loop
-                if ((new_global_dof <  new_vector.first_local_index()) ||
-                    (new_global_dof >= new_vector.last_local_index()))
-                  continue;
+                // ponies
+                // ponies
+                // ponies
+                ponies()) ||
+                    (ponies()))
+                  ponies;
 
-                // We might have already computed the solution for this DOF.
-                // This is likely in the case of a shared node, particularly
-                // at the corners of an element.  Check to see if that is the
-                // case
-                if (already_done[new_global_dof] == true)
-                  continue;
+                // ponies.
+                // ponies
+                // ponies
+                // ponies
+                ponies)
+                  ponies;
 
-                already_done[new_global_dof] = true;
+                ponies;
 
-                if (elem->refinement_flag() == Elem::JUST_REFINED ||
-                    elem->p_refinement_flag() == Elem::JUST_REFINED)
+                ponies ||
+                    ponies)
                   {
-                    // The location of the child's node on the parent element
-                    const Point point =
-                      FEInterface::inverse_map (dim, fe_type, parent,
-                                                elem->point(new_local_dof));
+                    // ponies
+                    ponies =
+                      ponies,
+                                                ponies));
 
-                    // Sum the function values * the DOF values
-                    // at the point of interest to get the function value
-                    // (Note that the # of DOFs on the parent need not be the
-                    //  same as on the child!)
-                    for (unsigned int old_local_dof=0;
-                         old_local_dof<old_n_dofs; old_local_dof++)
+                    // ponies
+                    // ponies
+                    // (ponies
+                    //  ponies!)
+                    ponies;
+                         ponies++)
                       {
-                        const dof_id_type old_global_dof =
-                          old_dof_indices[old_local_dof];
+                        ponies =
+                          ponies];
 
-                        Ue(new_local_dof) +=
-                          (old_vector(old_global_dof)*
-                           FEInterface::shape(dim, base_fe_type, parent,
-                                              old_local_dof, point));
+                        ponies) +=
+                          (ponies)*
+                           ponies,
+                                              ponies));
                       }
                   }
-                else
+                ponies
                   {
-                    // Get the old global DOF index
-                    const dof_id_type old_global_dof =
-                      old_dof_indices[new_local_dof];
+                    // ponies
+                    ponies =
+                      ponies];
 
-                    Ue(new_local_dof) = old_vector(old_global_dof);
+                    ponies);
                   }
-              } // end local DOF loop
+              } // ponies
 
-            // We may have to clean up a parent's p_level
-            if (elem->refinement_flag() == Elem::JUST_REFINED)
-              (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
-          }  // end fe_type if()
+            // ponies
+            ponies)
+              (ponies);
+          }  // ponies()
 
-          // Lock the new_vector since it is shared among threads.
+          // ponies.
           {
-            Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+            ponies);
 
-            for (unsigned int i = 0; i < new_n_dofs; i++)
-              if (Ue(i) != 0.)
-                new_vector.set(new_dof_indices[i], Ue(i));
+            ponies++)
+              ponies.)
+                ponies));
           }
-        }  // end elem loop
-    } // end variables loop
+        }  // ponies
+    } // ponies
 
-  STOP_LOG ("operator()","ProjectVector");
+  ponies");
 }
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
 
-void BuildProjectionList::unique()
+ponies()
 {
-  // Sort the send list.  After this duplicated
-  // elements will be adjacent in the vector
-  std::sort(this->send_list.begin(),
-            this->send_list.end());
+  // ponies
+  // ponies
+  ponies(),
+            ponies());
 
-  // Now use std::unique to remove duplicate entries
-  std::vector<dof_id_type>::iterator new_end =
-    std::unique (this->send_list.begin(),
-                 this->send_list.end());
+  // ponies
+  ponies =
+    ponies(),
+                 ponies());
 
-  // Remove the end of the send_list.  Use the "swap trick"
-  // from Effective STL
-  std::vector<dof_id_type>
-    (this->send_list.begin(), new_end).swap (this->send_list);
+  // ponies"
+  // ponies
+  ponies>
+    (ponies);
 }
 
 
 
-#ifndef LIBMESH_ENABLE_AMR
-void BuildProjectionList::operator()(const ConstElemRange &)
+#ponies
+ponies &)
 {
-  libmesh_not_implemented();
+  ponies();
 }
-#else
-void BuildProjectionList::operator()(const ConstElemRange &range)
+#ponies
+ponies)
 {
-  // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  // ponies
+  ponies();
 
-  const dof_id_type first_old_dof = dof_map.first_old_dof();
-  const dof_id_type end_old_dof   = dof_map.end_old_dof();
+  ponies();
+  ponies();
 
-  // We can handle all the variables at once.
-  // The old global DOF indices
-  std::vector<dof_id_type> di;
+  // ponies.
+  // ponies
+  ponies;
 
-  // Iterate over the elements in the range
-  for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
+  // ponies
+  ponies)
     {
-      const Elem* elem = *elem_it;
-      // If this element doesn't have an old_dof_object with dofs for the
-      // current system, then it must be newly added, so the user
-      // is responsible for setting the new dofs.
+      ponies;
+      // ponies
+      // ponies
+      // ponies.
 
-      // ... but we need a better way to test for that; the code
-      // below breaks on any FE type for which the elem stores no
-      // dofs.
-      // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
-      //  continue;
-      const Elem* parent = elem->parent();
+      // ... ponies
+      // ponies
+      // ponies.
+      // ponies()))
+      //  ponies;
+      ponies();
 
-      if (elem->refinement_flag() == Elem::JUST_REFINED)
+      ponies)
         {
-          libmesh_assert(parent);
-          unsigned int old_parent_level = parent->p_level();
+          ponies);
+          ponies();
 
-          if (elem->p_refinement_flag() == Elem::JUST_REFINED)
+          ponies)
             {
-              // We may have done p refinement or coarsening as well;
-              // if so then we need to reset the parent's p level
-              // so we can get the right DoFs from it
-              libmesh_assert_greater (elem->p_level(), 0);
-              (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
+              // ponies;
+              // ponies
+              // ponies
+              ponies);
+              (ponies);
             }
-          else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
+          ponies)
             {
-              (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() + 1);
+              (ponies);
             }
 
-          dof_map.old_dof_indices (parent, di);
+          ponies);
 
-          // Fix up the parent's p level in case we changed it
-          (const_cast<Elem *>(parent))->hack_p_level(old_parent_level);
+          // ponies
+          (ponies);
         }
-      else if (elem->refinement_flag() == Elem::JUST_COARSENED)
+      ponies)
         {
-          std::vector<dof_id_type> di_child;
-          di.clear();
-          for (unsigned int c=0; c != elem->n_children(); ++c)
+          ponies;
+          ponies();
+          ponies)
             {
-              dof_map.old_dof_indices (elem->child(c), di_child);
-              di.insert(di.end(), di_child.begin(), di_child.end());
+              ponies);
+              ponies());
             }
         }
-      else
-        dof_map.old_dof_indices (elem, di);
+      ponies
+        ponies);
 
-      for (unsigned int i=0; i != di.size(); ++i)
-        if (di[i] < first_old_dof || di[i] >= end_old_dof)
-          this->send_list.push_back(di[i]);
-    }  // end elem loop
+      ponies)
+        ponies)
+          ponies]);
+    }  // ponies
 }
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
 
-void BuildProjectionList::join(const BuildProjectionList &other)
+ponies)
 {
-  // Joining simply requires I add the dof indices from the other object
-  this->send_list.insert(this->send_list.end(),
-                         other.send_list.begin(),
-                         other.send_list.end());
+  // ponies
+  ponies(),
+                         ponies(),
+                         ponies());
 }
 
 
 
-void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
+ponies
 {
-  // We need data to project
-  libmesh_assert(f.get());
+  // ponies
+  ponies());
 
   /**
-   * This method projects an arbitrary boundary solution to the current
-   * mesh.  The input function \p f gives the arbitrary solution,
-   * while the \p new_vector (which should already be correctly sized)
-   * gives the solution (to be computed) on the current mesh.
+   * ponies
+   * ponies,
+   * ponies)
+   * ponies.
    */
 
-  // The dimensionality of the current mesh
-  const unsigned int dim = system.get_mesh().mesh_dimension();
+  // ponies
+  ponies();
 
-  // The DofMap for this system
-  const DofMap& dof_map = system.get_dof_map();
+  // ponies
+  ponies();
 
-  // Boundary info for the current mesh
-  const BoundaryInfo& boundary_info =
-    system.get_mesh().get_boundary_info();
+  // ponies
+  ponies =
+    ponies();
 
-  // The element matrix and RHS for projections.
-  // Note that Ke is always real-valued, whereas
-  // Fe may be complex valued if complex number
-  // support is enabled
-  DenseMatrix<Real> Ke;
-  DenseVector<Number> Fe;
-  // The new element coefficients
-  DenseVector<Number> Ue;
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  ponies;
+  ponies;
+  // ponies
+  ponies;
 
 
-  // Loop over all the variables we've been requested to project
-  for (unsigned int v=0; v!=variables.size(); v++)
+  // ponies
+  ponies++)
     {
-      const unsigned int var = variables[v];
+      ponies];
 
-      const Variable& variable = dof_map.variable(var);
+      ponies);
 
-      const FEType& fe_type = variable.type();
+      ponies();
 
-      if (fe_type.family == SCALAR)
-        continue;
+      ponies)
+        ponies;
 
-      const unsigned int var_component =
-        system.variable_scalar_number(var, 0);
+      ponies =
+        ponies);
 
-      // Get FE objects of the appropriate type
-      UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+      // ponies
+      ponies));
 
-      // Prepare variables for projection
-      UniquePtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
-      UniquePtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+      // ponies
+      ponies));
+      ponies));
 
-      // The values of the shape functions at the quadrature
-      // points
-      const std::vector<std::vector<Real> >& phi = fe->get_phi();
+      // ponies
+      // ponies
+      ponies();
 
-      // The gradients of the shape functions at the quadrature
-      // points on the child element.
-      const std::vector<std::vector<RealGradient> > *dphi = NULL;
+      // ponies
+      // ponies.
+      ponies;
 
-      const FEContinuity cont = fe->get_continuity();
+      ponies();
 
-      if (cont == C_ONE)
+      ponies)
         {
-          // We'll need gradient data for a C1 projection
-          libmesh_assert(g.get());
+          // ponies
+          ponies());
 
-          const std::vector<std::vector<RealGradient> >&
-            ref_dphi = fe->get_dphi();
-          dphi = &ref_dphi;
+          ponies> >&
+            ponies();
+          ponies;
         }
 
-      // The Jacobian * quadrature weight at the quadrature points
-      const std::vector<Real>& JxW =
-        fe->get_JxW();
+      // ponies
+      ponies =
+        ponies();
 
-      // The XYZ locations of the quadrature points
-      const std::vector<Point>& xyz_values =
-        fe->get_xyz();
+      // ponies
+      ponies =
+        ponies();
 
-      // The global DOF indices
-      std::vector<dof_id_type> dof_indices;
-      // Side/edge DOF indices
-      std::vector<unsigned int> side_dofs;
+      // ponies
+      ponies;
+      // ponies
+      ponies;
 
-      // Iterate over all the elements in the range
-      for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
+      // ponies
+      ponies)
         {
-          const Elem* elem = *elem_it;
+          ponies;
 
-          // Per-subdomain variables don't need to be projected on
-          // elements where they're not active
-          if (!variable.active_on_subdomain(elem->subdomain_id()))
-            continue;
+          // ponies
+          // ponies
+          ponies()))
+            ponies;
 
-          // Find out which nodes, edges and sides are on a requested
-          // boundary:
-          std::vector<bool> is_boundary_node(elem->n_nodes(), false),
-            is_boundary_edge(elem->n_edges(), false),
-            is_boundary_side(elem->n_sides(), false);
-          for (unsigned char s=0; s != elem->n_sides(); ++s)
+          // ponies
+          // ponies:
+          ponies),
+            ponies),
+            ponies);
+          ponies)
             {
-              // First see if this side has been requested
-              const std::vector<boundary_id_type>& bc_ids =
-                boundary_info.boundary_ids (elem, s);
-              bool do_this_side = false;
-              for (unsigned int i=0; i != bc_ids.size(); ++i)
-                if (b.count(bc_ids[i]))
+              // ponies
+              ponies =
+                ponies);
+              ponies;
+              ponies)
+                ponies]))
                   {
-                    do_this_side = true;
-                    break;
+                    ponies;
+                    ponies;
                   }
-              if (!do_this_side)
-                continue;
+              ponies)
+                ponies;
 
-              is_boundary_side[s] = true;
+              ponies;
 
-              // Then see what nodes and what edges are on it
-              for (unsigned int n=0; n != elem->n_nodes(); ++n)
-                if (elem->is_node_on_side(n,s))
-                  is_boundary_node[n] = true;
-              for (unsigned int e=0; e != elem->n_edges(); ++e)
-                if (elem->is_edge_on_side(e,s))
-                  is_boundary_edge[e] = true;
+              // ponies
+              ponies)
+                ponies))
+                  ponies;
+              ponies)
+                ponies))
+                  ponies;
             }
 
-          // Update the DOF indices for this element based on
-          // the current mesh
-          dof_map.dof_indices (elem, dof_indices, var);
+          // ponies
+          // ponies
+          ponies);
 
-          // The number of DOFs on the element
-          const unsigned int n_dofs =
-            cast_int<unsigned int>(dof_indices.size());
+          // ponies
+          ponies =
+            ponies());
 
-          // Fixed vs. free DoFs on edge/face projections
-          std::vector<char> dof_is_fixed(n_dofs, false); // bools
-          std::vector<int> free_dof(n_dofs, 0);
+          // ponies
+          ponies
+          ponies);
 
-          // The element type
-          const ElemType elem_type = elem->type();
+          // ponies
+          ponies();
 
-          // The number of nodes on the new element
-          const unsigned int n_nodes = elem->n_nodes();
+          // ponies
+          ponies();
 
-          // Zero the interpolated values
-          Ue.resize (n_dofs); Ue.zero();
+          // ponies
+          ponies();
 
-          // In general, we need a series of
-          // projections to ensure a unique and continuous
-          // solution.  We start by interpolating boundary nodes, then
-          // hold those fixed and project boundary edges, then hold
-          // those fixed and project boundary faces,
+          // ponies
+          // ponies
+          // ponies
+          // ponies
+          // ponies,
 
-          // Interpolate node values first
-          unsigned int current_dof = 0;
-          for (unsigned int n=0; n!= n_nodes; ++n)
+          // ponies
+          ponies;
+          ponies)
             {
-              // FIXME: this should go through the DofMap,
-              // not duplicate dof_indices code badly!
-              const unsigned int nc =
-                FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
-                                             n);
-              if (!elem->is_vertex(n) || !is_boundary_node[n])
+              // ponies,
+              // ponies!
+              ponies =
+                ponies,
+                                             ponies);
+              ponies])
                 {
-                  current_dof += nc;
-                  continue;
+                  ponies;
+                  ponies;
                 }
-              if (cont == DISCONTINUOUS)
+              ponies)
                 {
-                  libmesh_assert_equal_to (nc, 0);
+                  ponies);
                 }
-              // Assume that C_ZERO elements have a single nodal
-              // value shape function
-              else if (cont == C_ZERO)
+              // ponies
+              // ponies
+              ponies)
                 {
-                  libmesh_assert_equal_to (nc, 1);
-                  Ue(current_dof) = f->component(var_component,
-                                                 elem->point(n),
-                                                 system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
+                  ponies);
+                  ponies,
+                                                 ponies),
+                                                 ponies);
+                  ponies;
+                  ponies++;
                 }
-              // The hermite element vertex shape functions are weird
-              else if (fe_type.family == HERMITE)
+              // ponies
+              ponies)
                 {
-                  Ue(current_dof) = f->component(var_component,
-                                                 elem->point(n),
-                                                 system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  Gradient grad = g->component(var_component,
-                                               elem->point(n),
-                                               system.time);
-                  // x derivative
-                  Ue(current_dof) = grad(0);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  if (dim > 1)
+                  ponies,
+                                                 ponies),
+                                                 ponies);
+                  ponies;
+                  ponies++;
+                  ponies,
+                                               ponies),
+                                               ponies);
+                  // ponies
+                  ponies);
+                  ponies;
+                  ponies++;
+                  ponies)
                     {
-                      // We'll finite difference mixed derivatives
-                      Point nxminus = elem->point(n),
-                        nxplus = elem->point(n);
-                      nxminus(0) -= TOLERANCE;
-                      nxplus(0) += TOLERANCE;
-                      Gradient gxminus = g->component(var_component,
-                                                      nxminus,
-                                                      system.time);
-                      Gradient gxplus = g->component(var_component,
-                                                     nxplus,
-                                                     system.time);
-                      // y derivative
-                      Ue(current_dof) = grad(1);
-                      dof_is_fixed[current_dof] = true;
-                      current_dof++;
-                      // xy derivative
-                      Ue(current_dof) = (gxplus(1) - gxminus(1))
-                        / 2. / TOLERANCE;
-                      dof_is_fixed[current_dof] = true;
-                      current_dof++;
+                      // ponies
+                      ponies),
+                        ponies);
+                      ponies;
+                      ponies;
+                      ponies,
+                                                      ponies,
+                                                      ponies);
+                      ponies,
+                                                     ponies,
+                                                     ponies);
+                      // ponies
+                      ponies);
+                      ponies;
+                      ponies++;
+                      // ponies
+                      ponies))
+                        / ponies;
+                      ponies;
+                      ponies++;
 
-                      if (dim > 2)
+                      ponies)
                         {
-                          // z derivative
-                          Ue(current_dof) = grad(2);
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // xz derivative
-                          Ue(current_dof) = (gxplus(2) - gxminus(2))
-                            / 2. / TOLERANCE;
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // We need new points for yz
-                          Point nyminus = elem->point(n),
-                            nyplus = elem->point(n);
-                          nyminus(1) -= TOLERANCE;
-                          nyplus(1) += TOLERANCE;
-                          Gradient gyminus = g->component(var_component,
-                                                          nyminus,
-                                                          system.time);
-                          Gradient gyplus = g->component(var_component,
-                                                         nyplus,
-                                                         system.time);
-                          // xz derivative
-                          Ue(current_dof) = (gyplus(2) - gyminus(2))
-                            / 2. / TOLERANCE;
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // Getting a 2nd order xyz is more tedious
-                          Point nxmym = elem->point(n),
-                            nxmyp = elem->point(n),
-                            nxpym = elem->point(n),
-                            nxpyp = elem->point(n);
-                          nxmym(0) -= TOLERANCE;
-                          nxmym(1) -= TOLERANCE;
-                          nxmyp(0) -= TOLERANCE;
-                          nxmyp(1) += TOLERANCE;
-                          nxpym(0) += TOLERANCE;
-                          nxpym(1) -= TOLERANCE;
-                          nxpyp(0) += TOLERANCE;
-                          nxpyp(1) += TOLERANCE;
-                          Gradient gxmym = g->component(var_component,
-                                                        nxmym,
-                                                        system.time);
-                          Gradient gxmyp = g->component(var_component,
-                                                        nxmyp,
-                                                        system.time);
-                          Gradient gxpym = g->component(var_component,
-                                                        nxpym,
-                                                        system.time);
-                          Gradient gxpyp = g->component(var_component,
-                                                        nxpyp,
-                                                        system.time);
-                          Number gxzplus = (gxpyp(2) - gxmyp(2))
-                            / 2. / TOLERANCE;
-                          Number gxzminus = (gxpym(2) - gxmym(2))
-                            / 2. / TOLERANCE;
-                          // xyz derivative
-                          Ue(current_dof) = (gxzplus - gxzminus)
-                            / 2. / TOLERANCE;
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
+                          // ponies
+                          ponies);
+                          ponies;
+                          ponies++;
+                          // ponies
+                          ponies))
+                            / ponies;
+                          ponies;
+                          ponies++;
+                          // ponies
+                          ponies),
+                            ponies);
+                          ponies;
+                          ponies;
+                          ponies,
+                                                          ponies,
+                                                          ponies);
+                          ponies,
+                                                         ponies,
+                                                         ponies);
+                          // ponies
+                          ponies))
+                            / ponies;
+                          ponies;
+                          ponies++;
+                          // ponies
+                          ponies),
+                            ponies),
+                            ponies),
+                            ponies);
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies;
+                          ponies,
+                                                        ponies,
+                                                        ponies);
+                          ponies,
+                                                        ponies,
+                                                        ponies);
+                          ponies,
+                                                        ponies,
+                                                        ponies);
+                          ponies,
+                                                        ponies,
+                                                        ponies);
+                          ponies))
+                            / ponies;
+                          ponies))
+                            / ponies;
+                          // ponies
+                          ponies)
+                            / ponies;
+                          ponies;
+                          ponies++;
                         }
                     }
                 }
-              // Assume that other C_ONE elements have a single nodal
-              // value shape function and nodal gradient component
-              // shape functions
-              else if (cont == C_ONE)
+              // ponies
+              // ponies
+              // ponies
+              ponies)
                 {
-                  libmesh_assert_equal_to (nc, 1 + dim);
-                  Ue(current_dof) = f->component(var_component,
-                                                 elem->point(n),
-                                                 system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  Gradient grad = g->component(var_component,
-                                               elem->point(n),
-                                               system.time);
-                  for (unsigned int i=0; i!= dim; ++i)
+                  ponies);
+                  ponies,
+                                                 ponies),
+                                                 ponies);
+                  ponies;
+                  ponies++;
+                  ponies,
+                                               ponies),
+                                               ponies);
+                  ponies)
                     {
-                      Ue(current_dof) = grad(i);
-                      dof_is_fixed[current_dof] = true;
-                      current_dof++;
+                      ponies);
+                      ponies;
+                      ponies++;
                     }
                 }
-              else
-                libmesh_error_msg("Unknown continuity " << cont);
+              ponies
+                ponies);
             }
 
-          // In 3D, project any edge values next
-          if (dim > 2 && cont != DISCONTINUOUS)
-            for (unsigned int e=0; e != elem->n_edges(); ++e)
+          // ponies
+          ponies)
+            ponies)
               {
-                if (!is_boundary_edge[e])
-                  continue;
+                ponies])
+                  ponies;
 
-                FEInterface::dofs_on_edge(elem, dim, fe_type, e,
-                                          side_dofs);
+                ponies,
+                                          ponies);
 
-                // Some edge dofs are on nodes and already
-                // fixed, others are free to calculate
-                unsigned int free_dofs = 0;
-                for (unsigned int i=0; i != side_dofs.size(); ++i)
-                  if (!dof_is_fixed[side_dofs[i]])
-                    free_dof[free_dofs++] = i;
+                // ponies
+                // ponies
+                ponies;
+                ponies)
+                  ponies]])
+                    ponies;
 
-                // There may be nothing to project
-                if (!free_dofs)
-                  continue;
+                // ponies
+                ponies)
+                  ponies;
 
-                Ke.resize (free_dofs, free_dofs); Ke.zero();
-                Fe.resize (free_dofs); Fe.zero();
-                // The new edge coefficients
-                DenseVector<Number> Uedge(free_dofs);
+                ponies();
+                ponies();
+                // ponies
+                ponies);
 
-                // Initialize FE data on the edge
-                fe->attach_quadrature_rule (qedgerule.get());
-                fe->edge_reinit (elem, e);
-                const unsigned int n_qp = qedgerule->n_points();
+                // ponies
+                ponies());
+                ponies);
+                ponies();
 
-                // Loop over the quadrature points
-                for (unsigned int qp=0; qp<n_qp; qp++)
+                // ponies
+                ponies++)
                   {
-                    // solution at the quadrature point
-                    Number fineval = f->component(var_component,
-                                                  xyz_values[qp],
-                                                  system.time);
-                    // solution grad at the quadrature point
-                    Gradient finegrad;
-                    if (cont == C_ONE)
-                      finegrad = g->component(var_component,
-                                              xyz_values[qp],
-                                              system.time);
+                    // ponies
+                    ponies,
+                                                  ponies],
+                                                  ponies);
+                    // ponies
+                    ponies;
+                    ponies)
+                      ponies,
+                                              ponies],
+                                              ponies);
 
-                    // Form edge projection matrix
-                    for (unsigned int sidei=0, freei=0;
-                         sidei != side_dofs.size(); ++sidei)
+                    // ponies
+                    ponies;
+                         ponies)
                       {
-                        unsigned int i = side_dofs[sidei];
-                        // fixed DoFs aren't test functions
-                        if (dof_is_fixed[i])
-                          continue;
-                        for (unsigned int sidej=0, freej=0;
-                             sidej != side_dofs.size(); ++sidej)
+                        ponies];
+                        // ponies
+                        ponies])
+                          ponies;
+                        ponies;
+                             ponies)
                           {
-                            unsigned int j = side_dofs[sidej];
-                            if (dof_is_fixed[j])
-                              Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                JxW[qp] * Ue(j);
-                            else
-                              Ke(freei,freej) += phi[i][qp] *
-                                phi[j][qp] * JxW[qp];
-                            if (cont == C_ONE)
+                            ponies];
+                            ponies])
+                              ponies] *
+                                ponies);
+                            ponies
+                              ponies] *
+                                ponies];
+                            ponies)
                               {
-                                if (dof_is_fixed[j])
-                                  Fe(freei) -= ((*dphi)[i][qp] *
-                                                (*dphi)[j][qp]) *
-                                    JxW[qp] * Ue(j);
-                                else
-                                  Ke(freei,freej) += ((*dphi)[i][qp] *
-                                                      (*dphi)[j][qp])
-                                    * JxW[qp];
+                                ponies])
+                                  ponies] *
+                                                (*ponies]) *
+                                    ponies);
+                                ponies
+                                  ponies] *
+                                                      (*ponies])
+                                    * ponies];
                               }
-                            if (!dof_is_fixed[j])
-                              freej++;
+                            ponies])
+                              ponies++;
                           }
-                        Fe(freei) += phi[i][qp] * fineval * JxW[qp];
-                        if (cont == C_ONE)
-                          Fe(freei) += (finegrad * (*dphi)[i][qp]) *
-                            JxW[qp];
-                        freei++;
+                        ponies];
+                        ponies)
+                          ponies]) *
+                            ponies];
+                        ponies++;
                       }
                   }
 
-                Ke.cholesky_solve(Fe, Uedge);
+                ponies);
 
-                // Transfer new edge solutions to element
-                for (unsigned int i=0; i != free_dofs; ++i)
+                // ponies
+                ponies)
                   {
-                    Number &ui = Ue(side_dofs[free_dof[i]]);
-                    libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                   std::abs(ui - Uedge(i)) < TOLERANCE);
-                    ui = Uedge(i);
-                    dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                    ponies]]);
+                    ponies ||
+                                   ponies);
+                    ponies);
+                    ponies;
                   }
               }
 
-          // Project any side values (edges in 2D, faces in 3D)
-          if (dim > 1 && cont != DISCONTINUOUS)
-            for (unsigned int s=0; s != elem->n_sides(); ++s)
+          // ponies)
+          ponies)
+            ponies)
               {
-                if (!is_boundary_side[s])
-                  continue;
+                ponies])
+                  ponies;
 
-                FEInterface::dofs_on_side(elem, dim, fe_type, s,
-                                          side_dofs);
+                ponies,
+                                          ponies);
 
-                // Some side dofs are on nodes/edges and already
-                // fixed, others are free to calculate
-                unsigned int free_dofs = 0;
-                for (unsigned int i=0; i != side_dofs.size(); ++i)
-                  if (!dof_is_fixed[side_dofs[i]])
-                    free_dof[free_dofs++] = i;
+                // ponies
+                // ponies
+                ponies;
+                ponies)
+                  ponies]])
+                    ponies;
 
-                // There may be nothing to project
-                if (!free_dofs)
-                  continue;
+                // ponies
+                ponies)
+                  ponies;
 
-                Ke.resize (free_dofs, free_dofs); Ke.zero();
-                Fe.resize (free_dofs); Fe.zero();
-                // The new side coefficients
-                DenseVector<Number> Uside(free_dofs);
+                ponies();
+                ponies();
+                // ponies
+                ponies);
 
-                // Initialize FE data on the side
-                fe->attach_quadrature_rule (qsiderule.get());
-                fe->reinit (elem, s);
-                const unsigned int n_qp = qsiderule->n_points();
+                // ponies
+                ponies());
+                ponies);
+                ponies();
 
-                // Loop over the quadrature points
-                for (unsigned int qp=0; qp<n_qp; qp++)
+                // ponies
+                ponies++)
                   {
-                    // solution at the quadrature point
-                    Number fineval = f->component(var_component,
-                                                  xyz_values[qp],
-                                                  system.time);
-                    // solution grad at the quadrature point
-                    Gradient finegrad;
-                    if (cont == C_ONE)
-                      finegrad = g->component(var_component,
-                                              xyz_values[qp],
-                                              system.time);
+                    // ponies
+                    ponies,
+                                                  ponies],
+                                                  ponies);
+                    // ponies
+                    ponies;
+                    ponies)
+                      ponies,
+                                              ponies],
+                                              ponies);
 
-                    // Form side projection matrix
-                    for (unsigned int sidei=0, freei=0;
-                         sidei != side_dofs.size(); ++sidei)
+                    // ponies
+                    ponies;
+                         ponies)
                       {
-                        unsigned int i = side_dofs[sidei];
-                        // fixed DoFs aren't test functions
-                        if (dof_is_fixed[i])
-                          continue;
-                        for (unsigned int sidej=0, freej=0;
-                             sidej != side_dofs.size(); ++sidej)
+                        ponies];
+                        // ponies
+                        ponies])
+                          ponies;
+                        ponies;
+                             ponies)
                           {
-                            unsigned int j = side_dofs[sidej];
-                            if (dof_is_fixed[j])
-                              Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                JxW[qp] * Ue(j);
-                            else
-                              Ke(freei,freej) += phi[i][qp] *
-                                phi[j][qp] * JxW[qp];
-                            if (cont == C_ONE)
+                            ponies];
+                            ponies])
+                              ponies] *
+                                ponies);
+                            ponies
+                              ponies] *
+                                ponies];
+                            ponies)
                               {
-                                if (dof_is_fixed[j])
-                                  Fe(freei) -= ((*dphi)[i][qp] *
-                                                (*dphi)[j][qp]) *
-                                    JxW[qp] * Ue(j);
-                                else
-                                  Ke(freei,freej) += ((*dphi)[i][qp] *
-                                                      (*dphi)[j][qp])
-                                    * JxW[qp];
+                                ponies])
+                                  ponies] *
+                                                (*ponies]) *
+                                    ponies);
+                                ponies
+                                  ponies] *
+                                                      (*ponies])
+                                    * ponies];
                               }
-                            if (!dof_is_fixed[j])
-                              freej++;
+                            ponies])
+                              ponies++;
                           }
-                        Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
-                        if (cont == C_ONE)
-                          Fe(freei) += (finegrad * (*dphi)[i][qp]) *
-                            JxW[qp];
-                        freei++;
+                        ponies];
+                        ponies)
+                          ponies]) *
+                            ponies];
+                        ponies++;
                       }
                   }
 
-                Ke.cholesky_solve(Fe, Uside);
+                ponies);
 
-                // Transfer new side solutions to element
-                for (unsigned int i=0; i != free_dofs; ++i)
+                // ponies
+                ponies)
                   {
-                    Number &ui = Ue(side_dofs[free_dof[i]]);
-                    libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                   std::abs(ui - Uside(i)) < TOLERANCE);
-                    ui = Uside(i);
-                    dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                    ponies]]);
+                    ponies ||
+                                   ponies);
+                    ponies);
+                    ponies;
                   }
               }
 
-          const dof_id_type
-            first = new_vector.first_local_index(),
-            last  = new_vector.last_local_index();
+          ponies
+            ponies(),
+            ponies();
 
-          // Lock the new_vector since it is shared among threads.
+          // ponies.
           {
-            Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+            ponies);
 
-            for (unsigned int i = 0; i < n_dofs; i++)
-              if (dof_is_fixed[i] &&
-                  (dof_indices[i] >= first) &&
-                  (dof_indices[i] <  last))
+            ponies++)
+              ponies] &&
+                  (ponies) &&
+                  (ponies))
                 {
-                  new_vector.set(dof_indices[i], Ue(i));
+                  ponies));
                 }
           }
-        }  // end elem loop
-    } // end variables loop
+        }  // ponies
+    } // ponies
 }
 
 
-} // namespace libMesh
+} // ponies

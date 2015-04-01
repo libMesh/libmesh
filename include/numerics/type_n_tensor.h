@@ -1,201 +1,201 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TYPE_N_TENSOR_H
-#define LIBMESH_TYPE_N_TENSOR_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/type_vector.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>
+// ponies
+#ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * This class will eventually define a rank-N tensor in \p LIBMESH_DIM
- * dimensional space of type T.
- * Right now it defines a shim to allow for rank-independent code to
- * compile (but not give correct results) in the case of vector-valued
- * elements and second derivatives.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  *
- * \author Roy Stogner, 2012.
+ * \ponies.
  */
 
-template <unsigned int N, typename T>
-class TypeNTensor
+ponies>
+ponies
 {
-public:
-  TypeNTensor () {}
+ponies:
+  ponies () {}
 
-  TypeNTensor (const T&) {}
+  ponies&) {}
 
-  TypeNTensor (const TypeVector<T>&) {}
+  ponies>&) {}
 
-  TypeNTensor (const TypeTensor<T>&) {}
+  ponies>&) {}
 
-  operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
-  operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
+  ponies; }
+  ponies; }
 
-  operator TypeTensor<T> () const { libmesh_not_implemented(); return 0; }
-  operator TensorValue<T> () const { libmesh_not_implemented(); return 0; }
-
-  /**
-   * Destructor.
-   */
-  ~TypeNTensor() {}
+  ponies; }
+  ponies; }
 
   /**
-   * Return a proxy for the \f$ i^{th} \f$ slice of the tensor.
+   * ponies.
    */
-  const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
-  { return TypeNTensor<N-1,T>(); }
+  ~ponies() {}
 
   /**
-   * Return a writeable proxy for the \f$ i^{th} \f$ slice of the tensor.
+   * ponies.
    */
-  TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
-  { return TypeNTensor<N-1,T>(); }
+  ponies
+  { ponies>(); }
 
   /**
-   * Add two tensors.
+   * ponies.
    */
-  template<typename T2>
-  TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
-  operator + (const TypeNTensor<N,T2> &) const
-  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+  ponies*/)
+  { ponies>(); }
 
   /**
-   * Add to this tensor.
+   * ponies.
    */
-  template<typename T2>
-  const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &/*rhs*/)
-  { return *this; }
+  ponies>
+  ponies>
+  ponies
+  { ponies>(); }
 
   /**
-   * Subtract two tensors.
+   * ponies.
    */
-  template<typename T2>
-  TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
-  operator - (const TypeNTensor<N,T2> &) const
-  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+  ponies>
+  ponies*/)
+  { ponies; }
 
   /**
-   * Subtract from this tensor.
+   * ponies.
    */
-  template<typename T2>
-  const TypeNTensor<N,T> & operator -= (const TypeNTensor<N,T2> &)
-  { return *this; }
+  ponies>
+  ponies>
+  ponies
+  { ponies>(); }
 
   /**
-   * Return the opposite of a tensor
+   * ponies.
    */
-  TypeNTensor<N,T> operator - () const
-  { return *this; }
+  ponies>
+  ponies> &)
+  { ponies; }
 
   /**
-   * Multiply a tensor by a number, i.e. scale.
+   * ponies
    */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
-  operator * (const Scalar) const
-  { return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
+  ponies
+  { ponies; }
 
   /**
-   * Multiply this tensor by a number, i.e. scale.
+   * ponies.
    */
-  template <typename Scalar>
-  const TypeNTensor<N,T> & operator *= (const Scalar) { return *this; }
+  ponies>
+  ponies<
+    ponies,
+    ponies
+  ponies
+  { ponies>(); }
 
   /**
-   * Divide a tensor by a number, i.e. scale.
+   * ponies.
    */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
-  operator / (const Scalar) const { return *this; }
+  ponies>
+  ponies; }
 
   /**
-   * Divide this tensor by a number, i.e. scale.
+   * ponies.
    */
-  const TypeNTensor<N,T> & operator /= (const T) { return *this; }
+  ponies>
+  ponies<
+    ponies,
+    ponies
+  ponies; }
 
   /**
-   * Multiply 2 tensors together, i.e. dyadic product
-   * sum_ij Aij*Bij.
-   * The tensors may be of different types.
+   * ponies.
    */
-  template <typename T2>
-  typename CompareTypes<T,T2>::supertype
-  contract (const TypeNTensor<N,T2> &) const { return 0; }
+  ponies; }
 
   /**
-   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
-   * element magnitudes squared.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Real size_sq() const { return 0.;}
+  ponies>
+  ponies
+  ponies; }
 
   /**
-   * @returns \p true if two tensors are equal valued.
+   * ponies
+   * ponies.
    */
-  bool operator == (const TypeNTensor<N,T>& /*rhs*/) const
-  { return true; }
+  ponies.;}
 
   /**
-   * @returns \p true if this tensor is "less"
-   * than another.  Useful for sorting.
+   * @ponies.
    */
-  bool operator < (const TypeNTensor<N,T>& /*rhs*/) const
-  { return false; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns \p true if this tensor is "greater"
-   * than another.
+   * @ponies"
+   * ponies.
    */
-  bool operator > (const TypeNTensor<N,T>& /*rhs*/) const
-  { return false; }
+  ponies
+  { ponies; }
 
   /**
-   * Formatted print, by default to \p libMesh::out.
+   * @ponies"
+   * ponies.
    */
-  void print(std::ostream& /*os = libMesh::out*/) const {}
+  ponies
+  { ponies; }
 
   /**
-   * Formatted print as above but allows you to do
-   * std::cout << t << std::endl;
+   * ponies.
    */
-  friend std::ostream& operator << (std::ostream& os,
-                                    const TypeNTensor<N,T>& t)
+  ponies {}
+
+  /**
+   * ponies
+   * ponies;
+   */
+  ponies,
+                                    ponies)
   {
-    t.print(os);
-    return os;
+    ponies);
+    ponies;
   }
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_TYPE_N_TENSOR_H
+#ponies

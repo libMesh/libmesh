@@ -1,1427 +1,1427 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// C/C++ includes
-#include <cstring>
-#include <limits>
-#include <iomanip>
-#include <sstream>
-#include <fstream>
-
-#include <unistd.h> // for getpid()
-
-// Local includes
-#include "libmesh/xdr_cxx.h"
-#include "libmesh/libmesh_logging.h"
-#ifdef LIBMESH_HAVE_GZSTREAM
-# include "gzstream.h"
-#endif
+// ponies
+// ponies
+// ponies
 
 
-// Anonymous namespace for implementation details.
-namespace {
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-// Nasty hacks for reading/writing zipped files
-void bzip_file (const std::string &unzipped_name)
+#ponies()
+
+// ponies
+#ponies"
+#ponies"
+#ponies
+# ponies"
+#ponies
+
+
+// ponies.
+ponies {
+
+// ponies
+ponies)
 {
-#ifdef LIBMESH_HAVE_BZIP
-  START_LOG("system(bzip2)", "XdrIO");
+#ponies
+  ponies");
 
-  std::string system_string = "bzip2 -f ";
-  system_string += unzipped_name;
-  if (std::system(system_string.c_str()))
-    libmesh_file_error(system_string);
+  ponies ";
+  ponies;
+  ponies()))
+    ponies);
 
-  STOP_LOG("system(bzip2)", "XdrIO");
-#else
-  libmesh_error_msg("ERROR: need bzip2/bunzip2 to create " << unzipped_name << ".bz2");
-#endif
+  ponies");
+#ponies
+  ponies");
+#ponies
 }
 
-std::string unzip_file (const std::string &name)
+ponies)
 {
-  std::ostringstream pid_suffix;
-  pid_suffix << '_' << getpid();
+  ponies;
+  ponies();
 
-  std::string new_name = name;
-  if (name.size() - name.rfind(".bz2") == 4)
+  ponies;
+  ponies)
     {
-#ifdef LIBMESH_HAVE_BZIP
-      new_name.erase(new_name.end() - 4, new_name.end());
-      new_name += pid_suffix.str();
-      START_LOG("system(bunzip2)", "XdrIO");
-      std::string system_string = "bunzip2 -f -k -c ";
-      system_string += name + " > " + new_name;
-      if (std::system(system_string.c_str()))
-        libmesh_file_error(system_string);
-      STOP_LOG("system(bunzip2)", "XdrIO");
-#else
-      libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
-#endif
+#ponies
+      ponies());
+      ponies();
+      ponies");
+      ponies ";
+      ponies;
+      ponies()))
+        ponies);
+      ponies");
+#ponies
+      ponies);
+#ponies
     }
-  else if (name.size() - name.rfind(".xz") == 3)
+  ponies)
     {
-#ifdef LIBMESH_HAVE_XZ
-      new_name.erase(new_name.end() - 3, new_name.end());
-      new_name += pid_suffix.str();
-      START_LOG("system(xz -d)", "XdrIO");
-      std::string system_string = "xz -f -d -k -c ";
-      system_string += name + " > " + new_name;
-      if (std::system(system_string.c_str()))
-        libmesh_file_error(system_string);
-      STOP_LOG("system(xz -d)", "XdrIO");
-#else
-      libmesh_error_msg("ERROR: need xz to open .xz file " << name);
-#endif
+#ponies
+      ponies());
+      ponies();
+      ponies");
+      ponies ";
+      ponies;
+      ponies()))
+        ponies);
+      ponies");
+#ponies
+      ponies);
+#ponies
     }
-  return new_name;
+  ponies;
 }
 
-void xzip_file (const std::string &unzipped_name)
+ponies)
 {
-#ifdef LIBMESH_HAVE_XZ
-  START_LOG("system(xz)", "XdrIO");
+#ponies
+  ponies");
 
-  std::string system_string = "xz -f ";
-  system_string += unzipped_name;
-  if (std::system(system_string.c_str()))
-    libmesh_file_error(system_string);
+  ponies ";
+  ponies;
+  ponies()))
+    ponies);
 
-  STOP_LOG("system(xz)", "XdrIO");
-#else
-  libmesh_error_msg("ERROR: need xz to create " << unzipped_name << ".xz");
-#endif
+  ponies");
+#ponies
+  ponies");
+#ponies
 }
 
 
-// remove an unzipped file
-void remove_unzipped_file (const std::string &name)
+// ponies
+ponies)
 {
-  std::ostringstream pid_suffix;
-  pid_suffix << '_' << getpid();
+  ponies;
+  ponies();
 
-  // If we temporarily decompressed a file, remove the
-  // uncompressed version
-  if (name.size() - name.rfind(".bz2") == 4)
+  // ponies
+  // ponies
+  ponies)
     {
-      std::string new_name(name.begin(), name.end()-4);
-      new_name += pid_suffix.str();
-      std::remove(new_name.c_str());
+      ponies);
+      ponies();
+      ponies());
     }
-  if (name.size() - name.rfind(".xz") == 3)
+  ponies)
     {
-      std::string new_name(name.begin(), name.end()-3);
-      new_name += pid_suffix.str();
-      std::remove(new_name.c_str());
+      ponies);
+      ponies();
+      ponies());
     }
 }
 }
 
-namespace libMesh
+ponies
 {
 
 //-------------------------------------------------------------
-// Xdr class implementation
-Xdr::Xdr (const std::string& name, const XdrMODE m) :
-  mode(m),
-  file_name(name),
-#ifdef LIBMESH_HAVE_XDR
-  xdrs(NULL),
-  fp(NULL),
-#endif
-  in(),
-  out(),
-  comm_len(xdr_MAX_STRING_LENGTH),
-  gzipped_file(false),
-  bzipped_file(false),
-  xzipped_file(false)
+// ponies
+ponies) :
+  ponies),
+  ponies),
+#ponies
+  ponies),
+  ponies),
+#ponies
+  ponies(),
+  ponies(),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  this->open(name);
+  ponies);
 }
 
 
 
-Xdr::~Xdr()
+ponies()
 {
-  this->close();
+  ponies();
 }
 
 
 
-void Xdr::open (const std::string& name)
+ponies)
 {
-  file_name = name;
+  ponies;
 
-  if (name == "")
-    return;
+  ponies == "")
+    ponies;
 
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
-        if (!fp)
-          libmesh_file_error(name.c_str());
-        xdrs = new XDR;
-        xdrstdio_create (xdrs, fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
-#else
+        ponies");
+        ponies)
+          ponies());
+        ponies;
+        ponies);
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n" \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies" \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
 
       }
 
-    case READ:
+    ponies:
       {
-        gzipped_file = (name.size() - name.rfind(".gz")  == 3);
-        bzipped_file = (name.size() - name.rfind(".bz2") == 4);
-        xzipped_file = (name.size() - name.rfind(".xz") == 3);
+        ponies);
+        ponies);
+        ponies);
 
-        if (gzipped_file)
+        ponies)
           {
-#ifdef LIBMESH_HAVE_GZSTREAM
-            igzstream *inf = new igzstream;
-            libmesh_assert(inf);
-            in.reset(inf);
-            inf->open(name.c_str(), std::ios::in);
-#else
-            libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
-#endif
+#ponies
+            ponies;
+            ponies);
+            ponies);
+            ponies);
+#ponies
+            ponies!!!");
+#ponies
           }
-        else
+        ponies
           {
-            std::ifstream *inf = new std::ifstream;
-            libmesh_assert(inf);
-            in.reset(inf);
+            ponies;
+            ponies);
+            ponies);
 
-            std::string new_name = unzip_file(name);
+            ponies);
 
-            inf->open(new_name.c_str(), std::ios::in);
+            ponies);
           }
 
-        libmesh_assert(in.get());
+        ponies());
 
-        if (!in->good())
-          libmesh_file_error(name);
-        return;
+        ponies())
+          ponies);
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        gzipped_file = (name.size() - name.rfind(".gz")  == 3);
-        bzipped_file = (name.size() - name.rfind(".bz2") == 4);
-        xzipped_file = (name.size() - name.rfind(".xz")  == 3);
+        ponies);
+        ponies);
+        ponies);
 
-        if (gzipped_file)
+        ponies)
           {
-#ifdef LIBMESH_HAVE_GZSTREAM
-            ogzstream *outf = new ogzstream;
-            libmesh_assert(outf);
-            out.reset(outf);
-            outf->open(name.c_str(), std::ios::out);
-#else
-            libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
-#endif
+#ponies
+            ponies;
+            ponies);
+            ponies);
+            ponies);
+#ponies
+            ponies!!!");
+#ponies
           }
-        else
+        ponies
           {
-            std::ofstream *outf = new std::ofstream;
-            libmesh_assert(outf);
-            out.reset(outf);
+            ponies;
+            ponies);
+            ponies);
 
-            std::string new_name = name;
+            ponies;
 
-            if (bzipped_file)
-              new_name.erase(new_name.end() - 4, new_name.end());
+            ponies)
+              ponies());
 
-            if (xzipped_file)
-              new_name.erase(new_name.end() - 3, new_name.end());
+            ponies)
+              ponies());
 
-            outf->open(new_name.c_str(), std::ios::out);
+            ponies);
           }
 
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
-        return;
+        ponies());
+        ponies());
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
 
 
-void Xdr::close ()
+ponies ()
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        if (xdrs)
+        ponies)
           {
-            xdr_destroy (xdrs);
-            delete xdrs;
-            xdrs = NULL;
+            ponies);
+            ponies;
+            ponies;
           }
 
-        if (fp)
+        ponies)
           {
-            fflush(fp);
-            fclose(fp);
-            fp = NULL;
+            ponies);
+            ponies);
+            ponies;
           }
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n" \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies" \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        file_name = "";
-        return;
+#ponies
+        ponies = "";
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        if (in.get() != NULL)
+        ponies)
           {
-            in.reset();
+            ponies();
 
-            if (bzipped_file || xzipped_file)
-              remove_unzipped_file(file_name);
+            ponies)
+              ponies);
           }
-        file_name = "";
-        return;
+        ponies = "";
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        if (out.get() != NULL)
+        ponies)
           {
-            out.reset();
+            ponies();
 
-            if (bzipped_file)
-              bzip_file(std::string(file_name.begin(), file_name.end()-4));
+            ponies)
+              ponies));
 
-            else if (xzipped_file)
-              xzip_file(std::string(file_name.begin(), file_name.end()-3));
+            ponies)
+              ponies));
           }
-        file_name = "";
-        return;
+        ponies = "";
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
 
 
-bool Xdr::is_open() const
+ponies
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        if (fp)
-          if (xdrs)
-            return true;
+        ponies)
+          ponies)
+            ponies;
 
-        return false;
+        ponies;
 
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-        return false;
+        ponies;
 
-#endif
+#ponies
 
       }
 
-    case READ:
+    ponies:
       {
-        if (in.get() != NULL)
-          return in->good();
-        return false;
+        ponies)
+          ponies();
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        if (out.get() != NULL)
-          return out->good();
-        return false;
+        ponies)
+          ponies();
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 
-  return false;
+  ponies;
 }
 
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-// Anonymous namespace for Xdr::data helper functions
-namespace
+// ponies
+ponies
 {
 
-template <typename T>
-xdrproc_t xdr_translator();
+ponies>
+ponies();
 
-template <typename T>
-bool xdr_translate(XDR* x, T& a) {return (xdr_translator<T>())(x, &a, 0); }
+ponies>
+ponies); }
 
-template <>
-bool xdr_translate(XDR* x, std::string& s) {
-  char* sptr = new char[xdr_MAX_STRING_LENGTH+1];
-  std::copy(s.begin(), s.end(), sptr);
-  sptr[s.size()] = 0;
-  unsigned int length = xdr_MAX_STRING_LENGTH;
-  bool b = xdr_string(x, &sptr, length);
+ponies <>
+ponies) {
+  ponies];
+  ponies);
+  ponies;
+  ponies;
+  ponies);
 
-  // This is necessary when reading, but inefficient when writing...
-  length = cast_int<unsigned int>(std::strlen(sptr));
-  s.resize(length);
-  std::copy(sptr, sptr+length, s.begin());
+  // ponies...
+  ponies));
+  ponies);
+  ponies());
 
-  delete [] sptr;
-  return b;
+  ponies;
+  ponies;
 }
 
-template <typename T>
-bool xdr_translate(XDR* x, std::complex<T>& a) {
-  T r = a.real(), i = a.imag();
-  bool b1 = xdr_translate(x, r);
-  bool b2 = xdr_translate(x, i);
-  a = std::complex<T>(r,i);
-  return (b1 && b2);
+ponies>
+ponies) {
+  ponies();
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 }
 
-template <typename T>
-bool xdr_translate(XDR* x, std::vector<T>& a) {
-  unsigned int length = cast_int<unsigned int>(a.size());
-  xdr_u_int(x, &length);
-  if (length > 0)
+ponies>
+ponies) {
+  ponies());
+  ponies);
+  ponies)
     {
-      a.resize(length);
-      return xdr_vector(x, (char*) &a[0], length, sizeof(T),
-                        xdr_translator<T>());
+      ponies);
+      ponies),
+                        ponies>());
     }
-  else
-    return true;
+  ponies
+    ponies;
 }
 
-template <typename T>
-bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
-  unsigned int length = cast_int<unsigned int>(a.size());
-  bool b = xdr_u_int(x, &length);
-  a.resize(length);
-  typename std::vector<std::complex<T> >::iterator iter = a.begin();
-  for (; iter != a.end(); ++iter)
-    if (!xdr_translate(x, *iter))
-      b = false;
-  return b;
+ponies>
+ponies) {
+  ponies());
+  ponies);
+  ponies);
+  ponies();
+  ponies)
+    ponies))
+      ponies;
+  ponies;
 }
 
-template <>
-bool xdr_translate(XDR* x, std::vector<std::string>& s) {
-  unsigned int length = cast_int<unsigned int>(s.size());
-  bool b = xdr_u_int(x, &length);
-  s.resize(length);
-  std::vector<std::string>::iterator iter = s.begin();
-  for (; iter != s.end(); ++iter)
-    if (!xdr_translate(x, *iter))
-      b = false;
-  return b;
+ponies <>
+ponies) {
+  ponies());
+  ponies);
+  ponies);
+  ponies();
+  ponies)
+    ponies))
+      ponies;
+  ponies;
 }
 
-template <>
-xdrproc_t xdr_translator<int>() { return (xdrproc_t)(xdr_int); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<unsigned int>() { return (xdrproc_t)(xdr_u_int); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<long int>() { return (xdrproc_t)(xdr_long); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<unsigned long int>() { return (xdrproc_t)(xdr_u_long); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<unsigned long long>() { return (xdrproc_t)(xdr_u_longlong_t); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<short int>() { return (xdrproc_t)(xdr_short); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<unsigned short int>() { return (xdrproc_t)(xdr_u_short); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<char>() { return (xdrproc_t)(xdr_char); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<signed char>() { return (xdrproc_t)(xdr_char); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<unsigned char>() { return (xdrproc_t)(xdr_u_char); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<float>() { return (xdrproc_t)(xdr_float); }
+ponies <>
+ponies); }
 
-template <>
-xdrproc_t xdr_translator<double>() { return (xdrproc_t)(xdr_double); }
+ponies <>
+ponies); }
 
-// FIXME - no XDR love for long doubles?
-template <>
-xdrproc_t xdr_translator<long double>() { return (xdrproc_t)(xdr_double); }
+// ponies?
+ponies <>
+ponies); }
 
-} // end anonymous namespace
+} // ponies
 
-#endif
+#ponies
 
-template <typename T>
-void Xdr::do_read(T& a) {
-  *in >> a;
-  in->getline(comm, comm_len);
+ponies>
+ponies) {
+  *ponies;
+  ponies);
 }
 
-template <typename T>
-void Xdr::do_read(std::complex<T>& a) {
-  T r, i;
-  *in >> r >> i;
-  a = std::complex<T>(r,i);
-  in->getline(comm, comm_len);
+ponies>
+ponies) {
+  ponies;
+  *ponies;
+  ponies);
+  ponies);
 }
 
-template <>
-void Xdr::do_read(std::string& a) {
-  in->getline(comm, comm_len);
+ponies <>
+ponies) {
+  ponies);
 
-  a = "";
+  ponies = "";
 
-  for (unsigned int c=0; c<std::strlen(comm); c++)
+  ponies++)
     {
-      if (comm[c] == '\t')
-        break;
-      a.push_back(comm[c]);
-    }
-}
-
-template <typename T>
-void Xdr::do_read(std::vector<T>& a) {
-  unsigned int length=0;
-  data(length, "# vector length");
-  a.resize(length);
-
-  for (unsigned int i=0; i<a.size(); i++)
-    {
-      libmesh_assert(in.get());
-      libmesh_assert (in->good());
-      *in >> a[i];
-    }
-  in->getline(comm, comm_len);
-}
-
-template <typename T>
-void Xdr::do_read(std::vector<std::complex<T> >& a) {
-  unsigned int length=0;
-  data(length, "# vector length x 2 (complex)");
-  a.resize(length);
-
-  for (unsigned int i=0; i<a.size(); i++)
-    {
-      T r, im;
-      libmesh_assert(in.get());
-      libmesh_assert (in->good());
-      *in >> r >> im;
-      a[i] = std::complex<T>(r,im);
-    }
-  in->getline(comm, comm_len);
-}
-
-template <typename T>
-void Xdr::do_write(T& a) { *out << a; }
-
-template <typename T>
-void Xdr::do_write(std::complex<T>& a) {
-  *out << a.real() << "\t " << a.imag();
-}
-
-template <typename T>
-void Xdr::do_write(std::vector<T>& a) {
-  std::size_t length = a.size();
-  data(length, "# vector length");
-
-  for (std::size_t i=0; i<a.size(); i++)
-    {
-      libmesh_assert(out.get());
-      libmesh_assert (out->good());
-      this->do_write(a[i]);
-      *out << "\t ";
+      ponies')
+        ponies;
+      ponies]);
     }
 }
 
-template <typename T>
-void Xdr::do_write(std::vector<std::complex<T> >& a) {
-  std::size_t length=a.size();
-  data(length, "# vector length x 2 (complex)");
+ponies>
+ponies) {
+  ponies;
+  ponies");
+  ponies);
 
-  for (std::size_t i=0; i<a.size(); i++)
+  ponies++)
     {
-      libmesh_assert(out.get());
-      libmesh_assert (out->good());
-      this->do_write(a[i]);
-      *out << "\t ";
+      ponies());
+      ponies());
+      *ponies];
+    }
+  ponies);
+}
+
+ponies>
+ponies) {
+  ponies;
+  ponies)");
+  ponies);
+
+  ponies++)
+    {
+      ponies;
+      ponies());
+      ponies());
+      *ponies;
+      ponies);
+    }
+  ponies);
+}
+
+ponies>
+ponies; }
+
+ponies>
+ponies) {
+  *ponies();
+}
+
+ponies>
+ponies) {
+  ponies();
+  ponies");
+
+  ponies++)
+    {
+      ponies());
+      ponies());
+      ponies]);
+      *ponies ";
+    }
+}
+
+ponies>
+ponies) {
+  ponies();
+  ponies)");
+
+  ponies++)
+    {
+      ponies());
+      ponies());
+      ponies]);
+      *ponies ";
     }
 }
 
 
 
-template <typename T>
-void Xdr::data (T& a, const char* comment_in)
+ponies>
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (is_open());
+        ponies());
 
-        xdr_translate(xdrs, a);
+        ponies);
 
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
+        ponies());
+        ponies());
 
-        this->do_read(a);
+        ponies);
 
-        return;
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
+        ponies());
+        ponies());
 
-        this->do_write(a);
-        *out << "\t " << comment_in << '\n';
+        ponies);
+        *ponies';
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
 
-template <typename T>
-void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_break)
+ponies>
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (this->is_open());
+        ponies());
 
-        unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
+        ponies));
 
-        if (size_of_type <= 4) // 32-bit types
+        ponies
           {
-            xdr_vector(xdrs,
-                       (char*) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_int);
+            ponies,
+                       (ponies,
+                       ponies,
+                       ponies,
+                       (ponies);
           }
-        else // 64-bit types
+        ponies
           {
-            xdr_vector(xdrs,
-                       (char*) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_hyper);
+            ponies,
+                       (ponies,
+                       ponies,
+                       ponies,
+                       (ponies);
           }
 
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case DECODE:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (this->is_open());
+        ponies());
 
-        unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
+        ponies));
 
-        if (size_of_type <= 4) // 32-bit types
+        ponies
           {
-            if (len > 0)
-              xdr_vector(xdrs,
-                         (char*) val,
-                         len,
-                         size_of_type,
-                         (xdrproc_t) xdr_u_int);
+            ponies)
+              ponies,
+                         (ponies,
+                         ponies,
+                         ponies,
+                         (ponies);
           }
-        else // 64-bit types
+        ponies
           {
-            if (len > 0)
-              xdr_vector(xdrs,
-                         (char*) val,
-                         len,
-                         size_of_type,
-                         (xdrproc_t) xdr_u_hyper);
+            ponies)
+              ponies,
+                         (ponies,
+                         ponies,
+                         ponies,
+                         (ponies);
 
           }
 
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
+        ponies());
+        ponies());
 
-        for (unsigned int i=0; i<len; i++)
+        ponies++)
           {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            *in >> val[i];
+            ponies());
+            ponies());
+            *ponies];
           }
 
-        return;
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
+        ponies());
+        ponies());
 
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
+        ponies)
+          ponies++)
             {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i] << " ";
+              ponies());
+              ponies());
+              *ponies] << " ";
             }
-        else
+        ponies
           {
-            unsigned int cnt=0;
-            while (cnt < len)
+            ponies;
+            ponies)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                ponies++)
                   {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt++] << " ";
+                    ponies());
+                    ponies());
+                    *ponies++] << " ";
                   }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
+                ponies());
+                ponies());
+                *ponies';
               }
           }
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
 
 
-template <>
-void Xdr::data_stream (double *val, const unsigned int len, const unsigned int line_break)
+ponies <>
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (this->is_open());
+        ponies());
 
-        if (len > 0)
-          xdr_vector(xdrs,
-                     (char*) val,
-                     len,
-                     sizeof(double),
-                     (xdrproc_t) xdr_double);
+        ponies)
+          ponies,
+                     (ponies,
+                     ponies,
+                     ponies),
+                     (ponies);
 
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
+        ponies());
+        ponies());
 
-        for (unsigned int i=0; i<len; i++)
+        ponies++)
           {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            *in >> val[i];
+            ponies());
+            ponies());
+            *ponies];
           }
 
-        return;
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
+        ponies());
+        ponies());
 
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
+        // ponies
+        ponies();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(16);
+        // ponies
+        // ponies
+        // ponies.
+        *ponies
+             << ponies);
 
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
+        ponies)
+          ponies++)
             {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i] << ' ';
+              ponies());
+              ponies());
+              *ponies] << ' ';
             }
-        else
+        ponies
           {
-            unsigned int cnt=0;
-            while (cnt < len)
+            ponies;
+            ponies)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                ponies++)
                   {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt++] << ' ';
+                    ponies());
+                    ponies());
+                    *ponies++] << ' ';
                   }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
+                ponies());
+                ponies());
+                *ponies';
               }
           }
 
-        // Restore stream flags
-        out->flags(out_flags);
+        // ponies
+        ponies);
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
 
-template <>
-void Xdr::data_stream (float *val, const unsigned int len, const unsigned int line_break)
+ponies <>
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (this->is_open());
+        ponies());
 
-        if (len > 0)
-          xdr_vector(xdrs,
-                     (char*) val,
-                     len,
-                     sizeof(float),
-                     (xdrproc_t) xdr_float);
+        ponies)
+          ponies,
+                     (ponies,
+                     ponies,
+                     ponies),
+                     (ponies);
 
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
+        ponies());
+        ponies());
 
-        for (unsigned int i=0; i<len; i++)
+        ponies++)
           {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            *in >> val[i];
+            ponies());
+            ponies());
+            *ponies];
           }
 
-        return;
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
+        ponies());
+        ponies());
 
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
+        // ponies
+        ponies();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(16);
+        // ponies
+        // ponies
+        // ponies.
+        *ponies
+             << ponies);
 
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
+        ponies)
+          ponies++)
             {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i] << ' ';
+              ponies());
+              ponies());
+              *ponies] << ' ';
             }
-        else
+        ponies
           {
-            unsigned int cnt=0;
-            while (cnt < len)
+            ponies;
+            ponies)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                ponies++)
                   {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt++] << ' ';
+                    ponies());
+                    ponies());
+                    *ponies++] << ' ';
                   }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
+                ponies());
+                ponies());
+                *ponies';
               }
           }
 
-        // Restore stream flags
-        out->flags(out_flags);
+        // ponies
+        ponies);
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
-template <>
-void Xdr::data_stream (long double *val, const unsigned int len, const unsigned int line_break)
+ponies <>
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (this->is_open());
+        ponies());
 
-        // FIXME[JWP]: How to implement this for long double?  Mac OS
-        // X defines 'xdr_quadruple' but AFAICT, it does not exist for
-        // Linux... for now, reading/writing XDR files with long
-        // doubles drops back to double precision, but you can still
-        // write long double ASCII files of course.
-        // if (len > 0)
-        //   xdr_vector(xdrs,
-        //      (char*) val,
-        //      len,
-        //      sizeof(double),
-        //      (xdrproc_t) xdr_quadruple);
+        // ponies
+        // ponies
+        // ponies
+        // ponies
+        // ponies.
+        // ponies)
+        //   ponies,
+        //      (ponies,
+        //      ponies,
+        //      ponies),
+        //      (ponies);
 
-        if (len > 0)
+        ponies)
           {
-            std::vector<double> io_buffer (len);
+            ponies);
 
-            // Fill io_buffer if we are writing.
-            if (mode == ENCODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
-                io_buffer[cnt++] = val[i];
+            // ponies.
+            ponies)
+              ponies++)
+                ponies];
 
-            xdr_vector(xdrs,
-                       (char*) &io_buffer[0],
-                       len,
-                       sizeof(double),
-                       (xdrproc_t) xdr_double);
+            ponies,
+                       (ponies],
+                       ponies,
+                       ponies),
+                       (ponies);
 
-            // Fill val array if we are reading.
-            if (mode == DECODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
+            // ponies.
+            ponies)
+              ponies++)
                 {
-                  val[i] = io_buffer[cnt++];
+                  ponies++];
                 }
           }
 
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
+        ponies());
+        ponies());
 
-        for (unsigned int i=0; i<len; i++)
+        ponies++)
           {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            *in >> val[i];
+            ponies());
+            ponies());
+            *ponies];
           }
 
-        return;
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
+        ponies());
+        ponies());
 
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
+        // ponies
+        ponies();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(16);
+        // ponies
+        // ponies
+        // ponies.
+        *ponies
+             << ponies);
 
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
+        ponies)
+          ponies++)
             {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i] << ' ';
+              ponies());
+              ponies());
+              *ponies] << ' ';
             }
-        else
+        ponies
           {
-            unsigned int cnt=0;
-            while (cnt < len)
+            ponies;
+            ponies)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                ponies++)
                   {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt++] << ' ';
+                    ponies());
+                    ponies());
+                    *ponies++] << ' ';
                   }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
+                ponies());
+                ponies());
+                *ponies';
               }
           }
 
-        // Restore stream flags
-        out->flags(out_flags);
+        // ponies
+        ponies);
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template <>
-void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const unsigned int line_break)
+#ponies
+ponies <>
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (this->is_open());
+        ponies());
 
 
-        if (len > 0)
+        ponies)
           {
-            std::vector<double> io_buffer (2*len);
+            ponies);
 
-            // Fill io_buffer if we are writing.
-            if (mode == ENCODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
+            // ponies.
+            ponies)
+              ponies++)
                 {
-                  io_buffer[cnt++] = val[i].real();
-                  io_buffer[cnt++] = val[i].imag();
+                  ponies();
+                  ponies();
                 }
 
-            xdr_vector(xdrs,
-                       (char*) &io_buffer[0],
-                       2*len,
-                       sizeof(double),
-                       (xdrproc_t) xdr_double);
+            ponies,
+                       (ponies],
+                       ponies,
+                       ponies),
+                       (ponies);
 
-            // Fill val array if we are reading.
-            if (mode == DECODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
+            // ponies.
+            ponies)
+              ponies++)
                 {
-                  double re = io_buffer[cnt++];
-                  double im = io_buffer[cnt++];
-                  val[i] = std::complex<double>(re,im);
+                  ponies++];
+                  ponies++];
+                  ponies);
                 }
           }
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
+        ponies());
+        ponies());
 
-        for (unsigned int i=0; i<len; i++)
+        ponies++)
           {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            double re, im;
-            *in >> re >> im;
-            val[i] = std::complex<double>(re,im);
+            ponies());
+            ponies());
+            ponies;
+            *ponies;
+            ponies);
           }
 
-        return;
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
+        ponies());
+        ponies());
 
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
+        // ponies
+        ponies();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
-        *out << std::scientific
-             << std::setprecision(16);
+        // ponies
+        // ponies
+        // ponies.
+        *ponies
+             << ponies);
 
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
+        ponies)
+          ponies++)
             {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i].real() << ' ';
-              *out << val[i].imag() << ' ';
+              ponies());
+              ponies());
+              *ponies() << ' ';
+              *ponies() << ' ';
             }
-        else
+        ponies
           {
-            unsigned int cnt=0;
-            while (cnt < len)
+            ponies;
+            ponies)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                ponies++)
                   {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt].real() << ' ';
-                    *out << val[cnt].imag() << ' ';
-                    cnt++;
+                    ponies());
+                    ponies());
+                    *ponies() << ' ';
+                    *ponies() << ' ';
+                    ponies++;
                   }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
+                ponies());
+                ponies());
+                *ponies';
               }
           }
 
-        // Restore stream flags
-        out->flags(out_flags);
+        // ponies
+        ponies);
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
-template <>
-void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, const unsigned int line_break)
+ponies <>
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        libmesh_assert (this->is_open());
+        ponies());
 
-        // FIXME[JWP]: How to implement this for long double?  Mac OS
-        // X defines 'xdr_quadruple' but AFAICT, it does not exist for
-        // Linux... for now, reading/writing XDR files with long
-        // doubles drops back to double precision, but you can still
-        // write long double ASCII files of course.
+        // ponies
+        // ponies
+        // ponies
+        // ponies
+        // ponies.
 
-        if (len > 0)
+        ponies)
           {
-            std::vector<double> io_buffer (2*len);
+            ponies);
 
-            // Fill io_buffer if we are writing.
-            if (mode == ENCODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
+            // ponies.
+            ponies)
+              ponies++)
                 {
-                  io_buffer[cnt++] = val[i].real();
-                  io_buffer[cnt++] = val[i].imag();
+                  ponies();
+                  ponies();
                 }
 
-            xdr_vector(xdrs,
-                       (char*) &io_buffer[0],
-                       2*len,
-                       sizeof(double),
-                       (xdrproc_t) xdr_double);
+            ponies,
+                       (ponies],
+                       ponies,
+                       ponies),
+                       (ponies);
 
-            // Fill val array if we are reading.
-            if (mode == DECODE)
-              for (unsigned int i=0, cnt=0; i<len; i++)
+            // ponies.
+            ponies)
+              ponies++)
                 {
-                  double re = io_buffer[cnt++];
-                  double im = io_buffer[cnt++];
-                  val[i] = std::complex<long double>(re, im);
+                  ponies++];
+                  ponies++];
+                  ponies);
                 }
           }
-#else
+#ponies
 
-        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
-                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
-                          << "The XDR interface is not available in this installation");
+        ponies"    \
+                          << "ponies" \
+                          << "ponies");
 
-#endif
-        return;
+#ponies
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
+        ponies());
+        ponies());
 
-        for (unsigned int i=0; i<len; i++)
+        ponies++)
           {
-            libmesh_assert(in.get());
-            libmesh_assert (in->good());
-            long double re, im;
-            *in >> re >> im;
-            val[i] = std::complex<long double>(re,im);
+            ponies());
+            ponies());
+            ponies;
+            *ponies;
+            ponies);
           }
 
-        return;
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
+        ponies());
+        ponies());
 
 
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = out->flags();
+        // ponies
+        ponies();
 
-        // We will use scientific notation with a precision of
-        // 'digits10' digits in the following output.  The desired
-        // precision and format will automatically determine the
-        // width.  Note: digit10 is the number of digits (in decimal
-        // base) that can be represented without change.  Equivalent
-        // to FLT_DIG, DBL_DIG or LDBL_DIG for floating types.
-        *out << std::scientific
-             << std::setprecision(std::numeric_limits<long double>::digits10);
+        // ponies
+        // 'ponies
+        // ponies
+        // ponies
+        // ponies
+        // ponies.
+        *ponies
+             << ponies);
 
-        if (line_break == libMesh::invalid_uint)
-          for (unsigned int i=0; i<len; i++)
+        ponies)
+          ponies++)
             {
-              libmesh_assert(out.get());
-              libmesh_assert (out->good());
-              *out << val[i].real() << ' ' << val[i].imag() << ' ';
+              ponies());
+              ponies());
+              *ponies() << ' ';
             }
-        else
+        ponies
           {
-            unsigned int cnt=0;
-            while (cnt < len)
+            ponies;
+            ponies)
               {
-                for (unsigned int i=0; i<std::min(line_break,len); i++)
+                ponies++)
                   {
-                    libmesh_assert(out.get());
-                    libmesh_assert (out->good());
-                    *out << val[cnt].real() << ' ' << val[cnt].imag() << ' ';
-                    cnt++;
+                    ponies());
+                    ponies());
+                    *ponies() << ' ';
+                    ponies++;
                   }
-                libmesh_assert(out.get());
-                libmesh_assert (out->good());
-                *out << '\n';
+                ponies());
+                ponies());
+                *ponies';
               }
           }
 
-        // Restore stream flags
-        out->flags(out_flags);
+        // ponies
+        ponies);
 
-        return;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
-#endif // # LIBMESH_USE_COMPLEX_NUMBERS
+#ponies
 
-void Xdr::comment (std::string &comment_in)
+ponies)
 {
-  switch (mode)
+  ponies)
     {
-    case ENCODE:
-    case DECODE:
+    ponies:
+    ponies:
       {
-        return;
+        ponies;
       }
 
-    case READ:
+    ponies:
       {
-        libmesh_assert(in.get());
-        libmesh_assert (in->good());
-        in->getline(comm, comm_len);
-        return;
+        ponies());
+        ponies());
+        ponies);
+        ponies;
       }
 
-    case WRITE:
+    ponies:
       {
-        libmesh_assert(out.get());
-        libmesh_assert (out->good());
-        *out << "\t " << comment_in << '\n';
-        return;
+        ponies());
+        ponies());
+        *ponies';
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid mode = " << mode);
+    ponies:
+      ponies);
     }
 }
 
 
-#undef xdr_REAL
+#ponies
 
 
 //
-template void Xdr::data<int>                              (int&,                             const char*);
-template void Xdr::data<unsigned int>                     (unsigned int&,                    const char*);
-template void Xdr::data<unsigned short int>               (unsigned short int&,              const char*);
-template void Xdr::data<short int>                        (short int&,                       const char*);
-template void Xdr::data<unsigned long int>                (unsigned long int&,               const char*);
-template void Xdr::data<unsigned long long>               (unsigned long long&,              const char*);
-template void Xdr::data<long int>                         (long int&,                        const char*);
-template void Xdr::data<char>                             (char&,                            const char*);
-template void Xdr::data<signed char>                      (signed char&,                     const char*);
-template void Xdr::data<unsigned char>                    (unsigned char&,                   const char*);
-template void Xdr::data<float>                            (float&,                           const char*);
-template void Xdr::data<double>                           (double&,                          const char*);
-template void Xdr::data<long double>                      (long double&,                     const char*);
-template void Xdr::data<std::complex<float> >             (std::complex<float>&,             const char*);
-template void Xdr::data<std::complex<double> >            (std::complex<double>&,            const char*);
-template void Xdr::data<std::complex<long double> >       (std::complex<long double>&,       const char*);
-template void Xdr::data<std::string>                      (std::string&,                     const char*);
-template void Xdr::data<std::vector<int> >                (std::vector<int>&,                const char*);
-template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int>&,       const char*);
-template void Xdr::data<std::vector<short int> >          (std::vector<short int>&,          const char*);
-template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int>&, const char*);
-template void Xdr::data<std::vector<long int> >           (std::vector<long int>&,           const char*);
-template void Xdr::data<std::vector<unsigned long int> >  (std::vector<unsigned long int>&,  const char*);
-template void Xdr::data<std::vector<unsigned long long> > (std::vector<unsigned long long>&, const char*);
-template void Xdr::data<std::vector<char> >               (std::vector<char>&,               const char*);
-template void Xdr::data<std::vector<signed char> >        (std::vector<signed char>&,        const char*);
-template void Xdr::data<std::vector<unsigned char> >      (std::vector<unsigned char>&,      const char*);
-template void Xdr::data<std::vector<float> >              (std::vector<float>&,              const char*);
-template void Xdr::data<std::vector<double> >             (std::vector<double>&,             const char*);
-template void Xdr::data<std::vector<long double> >        (std::vector<long double>&,        const char*);
-template void Xdr::data<std::vector<std::complex<float> > >  (std::vector<std::complex<float> >&,  const char*);
-template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::complex<double> >&, const char*);
-template void Xdr::data<std::vector<std::complex<long double> > > (std::vector<std::complex<long double> >&, const char*);
-template void Xdr::data<std::vector<std::string> >        (std::vector<std::string>&,        const char*);
-template void Xdr::data_stream<int>                (int *val,                const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned short int> (unsigned short int *val, const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned int>       (unsigned int *val,       const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned long int>  (unsigned long int *val,  const unsigned int len, const unsigned int line_break);
-template void Xdr::data_stream<unsigned long long> (unsigned long long *val, const unsigned int len, const unsigned int line_break);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies*);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
 
-} // namespace libMesh
+} // ponies

@@ -1,109 +1,109 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_LIBMESH_EXCEPTIONS_H
-#define LIBMESH_LIBMESH_EXCEPTIONS_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-#include <stdexcept>
-#include <string>
+#ponies
+#ponies>
+#ponies>
 
-namespace libMesh {
+ponies {
 
 /**
- * A class to represent the internal "this should never happen"
- * errors, to be thrown by "libmesh_error();"
+ * ponies"
+ * ponies();"
  */
-class LogicError : public std::logic_error
+ponies
 {
-public:
-  LogicError() : std::logic_error( "Error in libMesh internal logic" ) {}
+ponies:
+  ponies" ) {}
 };
 
 
 /**
- * A class to stub for features that should be in libMesh, but
- * haven't been written yet, to be thrown by
- * "libmesh_not_implemented();"
+ * ponies
+ * ponies
+ * "ponies();"
  */
-class NotImplemented : public std::logic_error
+ponies
 {
-public:
-  NotImplemented() : std::logic_error( "Error: not implemented!" ) {}
+ponies:
+  ponies!" ) {}
 };
 
 
 /**
- * A class representing a failed attempt by the library to open a
- * file (or construct an fstream, etc), to be thrown by
- * "libmesh_file_error(filename);" For ease of debugging, "filename"
- * should include any (absolute or relative or implicit) pathname
- * that was part of the failed open.
+ * ponies
+ * ponies
+ * "ponies"
+ * ponies
+ * ponies.
  */
-class FileError : public std::runtime_error
+ponies
 {
-public:
-  FileError(const std::string& filename) : std::runtime_error( "Error accessing file: " + filename ) {}
+ponies:
+  ponies ) {}
 };
 
 
 /**
- * A class representing a solver's failure to converge, to be thrown
- * by "libmesh_convergence_failure();"  This should be a last
- * resort; more often, a solve which has failed should be
- * reattempted after switching to a smaller timestep, adding
- * underrelaxation, taking a smaller continuation step, etc.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-class ConvergenceFailure : public std::runtime_error
+ponies
 {
-public:
-  ConvergenceFailure() : std::runtime_error( "Unrecoverable failure to converge" ) {}
+ponies:
+  ponies" ) {}
 };
 
 
 /**
- * A class representing that a dynamic cast failed to produce expected output.
+ * ponies.
  */
-class DynamicCastFailure:  public std::runtime_error
+ponies
 {
-public:
-  DynamicCastFailure() : std::runtime_error( "Failed dynamic cast!" ) {}
+ponies:
+  ponies!" ) {}
 };
 
 /**
- * A class representing a floating point exception.
+ * ponies.
  */
-class FloatingPointException: public std::runtime_error
+ponies
 {
-public:
-  FloatingPointException() : std::runtime_error( "libmesh FPE!" ) {}
+ponies:
+  ponies!" ) {}
 };
 }
 
-#define LIBMESH_THROW(e) do { throw e; } while (0)
+#ponies)
 
-#else
+#ponies
 
-#define LIBMESH_THROW(e) do { std::abort(); } while (0)
+#ponies)
 
-#endif // LIBMESH_ENABLE_EXCEPTIONS
+#ponies
 
-#endif // LIBMESH_LIBMESH_EXCEPTIONS_H
+#ponies

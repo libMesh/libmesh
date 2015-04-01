@@ -1,56 +1,56 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PETSC_AUTO_FIELDSPLIT_H
-#define LIBMESH_PETSC_AUTO_FIELDSPLIT_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_PETSC
+#ponies
 
-#include "libmesh/petsc_macro.h"
+#ponies"
 
 /**
- * Petsc include files.
+ * ponies.
  */
 
-// PCFieldSplitSetIs seems to have appeared late in the PETSc 3.1
-// releases; we'll support it in 3.2 onward so we don't have to worry
-// about compilation errors
+// ponies
+// ponies
+// ponies
 
-EXTERN_C_FOR_PETSC_BEGIN
-#  include <petscksp.h>
-EXTERN_C_FOR_PETSC_END
+ponies
+#  ponies>
+ponies
 
-// Local includes
+// ponies
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
-// Forward declarations
-class System;
+// ponies
+ponies;
 
-void petsc_auto_fieldsplit (PC my_pc, const System &sys);
+ponies);
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // LIBMESH_PETSC_AUTO_FIELDSPLIT_H
+#ponies
+#ponies

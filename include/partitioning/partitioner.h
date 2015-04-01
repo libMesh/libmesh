@@ -1,176 +1,176 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PARTITIONER_H
-#define LIBMESH_PARTITIONER_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/id_types.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <cstddef>
+// ponies   -----------------------------------
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class MeshBase;
-class ErrorVector;
+// ponies
+ponies;
+ponies;
 
 
 /**
- * The \p Partitioner class provides a uniform interface for
- * partitioning algorithms.  It takes a reference to a \p MeshBase
- * object as input, which it will partition into a number of
- * subdomains.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// Partitioner class definition
-class Partitioner
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  Partitioner ():_weights(NULL) {}
+  ponies) {}
 
   /**
-   * Destructor. Virtual so that we can derive from this class.
+   * ponies.
    */
-  virtual ~Partitioner() {}
+  ponies() {}
 
   /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   * This is used when copying meshes, and must be overloaded in the
-   * derived classes.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<Partitioner> clone () const = 0;
+  ponies;
 
 
   /**
-   * Partition the \p MeshBase into \p n parts.
-   * The partitioner currently does not modify the subdomain_id
-   * of each element.  This number is reserved for things like
-   * material properties, etc.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void partition (MeshBase& mesh,
-                  const unsigned int n);
+  ponies,
+                  ponies);
 
   /**
-   * Partition the \p MeshBase into \p mesh.n_processors() parts.
-   * The partitioner currently does not modify the subdomain_id
-   * of each element.  This number is reserved for things like
-   * material properties, etc.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void partition (MeshBase& mesh);
+  ponies);
 
   /**
-   * Repartitions the \p MeshBase into \p n parts.  This
-   * is required since some partitoning algorithms can repartition
-   * more efficiently than computing a new partitioning from scratch.
-   * The default behavior is to simply call this->partition(mesh,n)
+   * ponies
+   * ponies
+   * ponies.
+   * ponies)
    */
-  void repartition (MeshBase& mesh,
-                    const unsigned int n);
+  ponies,
+                    ponies);
 
   /**
-   * Repartitions the \p MeshBase into \p mesh.n_processors() parts.  This
-   * is required since some partitoning algorithms can repartition
-   * more efficiently than computing a new partitioning from scratch.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void repartition (MeshBase& mesh);
+  ponies);
 
   /**
-   * This function
+   * ponies
    */
-  static void partition_unpartitioned_elements (MeshBase &mesh);
+  ponies);
 
-  static void partition_unpartitioned_elements (MeshBase &mesh,
-                                                const unsigned int n);
+  ponies,
+                                                ponies);
 
   /**
-   * This function is called after partitioning to set the processor IDs
-   * for the inactive parent elements.  A Parent's processor ID is the same
-   * as its first child.
+   * ponies
+   * ponies
+   * ponies.
    */
-  static void set_parent_processor_ids(MeshBase& mesh);
+  ponies);
 
   /**
-   * This function is called after partitioning to set the processor IDs
-   * for the nodes.  By definition, a Node's processor ID is the minimum
-   * processor ID for all of the elements which share the node.
+   * ponies
+   * ponies
+   * ponies.
    */
-  static void set_node_processor_ids(MeshBase& mesh);
+  ponies);
 
   /**
-   * Attach weights that can be used for partitioning.  This ErrorVector should be
-   * _exactly_ the same on every processor and should have mesh->max_elem_id()
-   * entries.
+   * ponies
+   * ponies()
+   * ponies.
    */
-  virtual void attach_weights(ErrorVector * /*weights*/) { libmesh_not_implemented(); }
+  ponies(); }
 
-protected:
-
-  /**
-   * Trivially "partitions" the mesh for one processor.
-   * Simply loops through the elements and assigns all of them
-   * to processor 0.  Is is provided as a separate function
-   * so that derived classes may use it without reimplementing it.
-   */
-  void single_partition (MeshBase& mesh);
+ponies:
 
   /**
-   * This is the actual partitioning method which must be overloaded
-   * in derived classes.  It is called via the public partition()
-   * method above by the user.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void _do_partition(MeshBase& mesh,
-                             const unsigned int n) = 0;
+  ponies);
 
   /**
-   * This is the actual re-partitioning method which can be overloaded
-   * in derived classes.  Note that the default behavior is to simply
-   * call the partition function.
+   * ponies
+   * ponies()
+   * ponies.
    */
-  virtual void _do_repartition (MeshBase& mesh,
-                                const unsigned int n) { this->_do_partition (mesh, n); }
+  ponies,
+                             ponies;
 
   /**
-   * The blocksize to use when doing blocked parallel communication.  This limits the
-   * maximum vector size which can be used in a single communication step.
+   * ponies
+   * ponies
+   * ponies.
    */
-  static const dof_id_type communication_blocksize;
+  ponies,
+                                ponies); }
 
   /**
-   * The weights that might be used for partitioning.
+   * ponies
+   * ponies.
    */
-  ErrorVector * _weights;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_PARTITIONER_H
+#ponies

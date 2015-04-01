@@ -1,277 +1,277 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <fstream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/mesh_data.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/xdr_cxx.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 //------------------------------------------------------
-// MeshData functions
-void MeshData::read_xdr (const std::string& name,
-                         const XdrMODE mode)
+// ponies
+ponies,
+                         ponies)
 {
   /**
-   * This code implements the output of the MeshData
-   * object in XDR format.  This warrants some documentation.
-   * The output consists of 8 sections:
+   * ponies
+   * ponies.
+   * ponies:
    *
-   *   1.) The name of the data stored, if provided (string)
+   *   ponies)
    *
-   *   2.) A switch whether real or complex data is stored (string)
+   *   ponies)
    *
-   *   3.) The number of nodes for which values are stored
-   *       (unsigned int)
+   *   ponies
+   *       (ponies)
    *
-   *   4.) The number of elements for which values are stored
-   *       (unsigned int)
+   *   ponies
+   *       (ponies)
    *
-   *   for each node
+   *   ponies
    *
-   *     5.) The foreign node id (unsigned int)
+   *     ponies)
    *
-   *     6.) The actual values (vector of real/complex)
+   *     ponies)
    *
-   *   end node loop
+   *   ponies
    *
-   *   for each element
+   *   ponies
    *
-   *     7.) The foreign element id (unsigned int)
+   *     ponies)
    *
-   *     8.) The actual values (vector of real/complex)
+   *     ponies)
    *
-   *   end node loop
+   *   ponies
    *
-   * Note that the actual IO is handled through the Xdr class
-   * (to be renamed later?) which provides a uniform interface to
-   * both the XDR (eXternal Data Representation) interface and standard
-   * ASCII output.  Thus this one section of code will write XDR or ASCII
-   * files with no changes.
+   * ponies
+   * (ponies
+   * ponies
+   * ponies
+   * ponies.
    */
 
 
-  // we should better be active or in compatibility mode
-  libmesh_assert (_active || _compatibility_mode);
+  // ponies
+  ponies);
 
 
-  // make sure the id maps are ready
-  libmesh_assert (_node_id_map_closed);
-  libmesh_assert (_elem_id_map_closed);
+  // ponies
+  ponies);
+  ponies);
 
 
   /**
-   * clear the data, but keep the id maps
+   * ponies
    */
-  this->clear();
+  ponies();
 
 
-  Xdr io(name, mode);
+  ponies);
 
 
   /*
-   * all processors read the data in the same format,
-   * but only the processor that owns the element stores
-   * element-associated data.  For nodes, i haven't come
-   * up with such asmart idea, yet... :-P
+   * ponies,
+   * ponies
+   * ponies
+   * ponies
    */
-  const unsigned int proc_id = _mesh.processor_id();
+  ponies();
 
 
 
   /**
-   * 1.)
+   * ponies.)
    *
-   * Read the descriptive name
+   * ponies
    */
   {
-    std::string desc = "";
-    io.data (desc);
-    this->_data_descriptor = desc;
+    ponies = "";
+    ponies);
+    ponies;
   }
 
 
 
   /**
-   * 2.)
+   * ponies.)
    *
-   * Read: either real or complex
+   * ponies
    */
   {
-    std::string vtype="";
-    io.data (vtype);
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-    if (vtype != "COMPLEX")
-      libmesh_error_msg("ERROR: File does not contain complex-valued data!");
+    ponies="";
+    ponies);
+#ponies
+    ponies")
+      ponies!");
 
-#elif LIBMESH_USE_REAL_NUMBERS
-    if (vtype != "REAL")
-      libmesh_error_msg("ERROR: File does not contain real-valued data!");
+#ponies
+    ponies")
+      ponies!");
 
-#else
+#ponies
     /*
-     * What number type is this?
+     * ponies?
      */
-    libmesh_error_msg("Must be using either real or complex numbers!");
-#endif
+    ponies!");
+#ponies
   }
 
 
 
   /**
-   * 3.)
+   * ponies.)
    *
-   * Read the number of nodes for which data is there
+   * ponies
    */
-  unsigned int n_node = 0;
-  io.data (n_node);
+  ponies;
+  ponies);
 
 
   /**
-   * 4.)
+   * ponies.)
    *
-   * Read the number of elements for which data is there
+   * ponies
    */
-  unsigned int n_elem = 0;
-  io.data (n_elem);
+  ponies;
+  ponies);
 
-#ifdef DEBUG
-  std::size_t previous_values_size = 0;
-#endif
+#ponies
+  ponies;
+#ponies
 
-  for (unsigned int n_cnt=0; n_cnt < n_node; n_cnt++)
+  ponies++)
     {
       /**
-       * 5.)
+       * ponies.)
        *
-       * Read the foreign node id, locate the
-       * Node* associated with this foreign id
+       * ponies
+       * ponies
        */
-      unsigned int f_id = 0;
-      io.data (f_id);
+      ponies;
+      ponies);
 
-      const Node* node = foreign_id_to_node(f_id);
+      ponies);
 
 
       /**
-       * 6.)
+       * ponies.)
        *
-       * the actual values for this node, Xdr knows
-       * the length
+       * ponies
+       * ponies
        */
       {
-        std::vector<Number> values;
-        io.data (values);
+        ponies;
+        ponies);
 
 
-#ifdef DEBUG
+#ponies
         /*
-         * make sure the size of the values vectors
-         * are identical for all nodes
+         * ponies
+         * ponies
          */
-        if (n_cnt == 0)
-          previous_values_size = values.size();
-        else
+        ponies)
+          ponies();
+        ponies
           {
-            if (previous_values_size != values.size())
-              libmesh_error_msg("ERROR: Size mismatch for n_cnt = " << n_cnt);
+            ponies())
+              ponies);
           }
-#endif
+#ponies
 
 
         /**
-         * insert this node and the values in the _node_data
+         * ponies
          */
-        _node_data.insert (std::make_pair(node, values));
+        ponies));
       }
     }
 
 
 
-#ifdef DEBUG
-  previous_values_size = 0;
-#endif
+#ponies
+  ponies;
+#ponies
 
-  for (unsigned int n_cnt=0; n_cnt < n_elem; n_cnt++)
+  ponies++)
     {
       /**
-       * 7.)
+       * ponies.)
        *
-       * Read the foreign elem id, locate the Elem*
+       * ponies*
        */
-      unsigned int f_id = 0;
-      io.data (f_id);
+      ponies;
+      ponies);
 
-      const Elem* elem = foreign_id_to_elem(f_id);
+      ponies);
 
 
       /**
-       * 8.)
+       * ponies.)
        *
-       * the actual values for this elem, Xdr knows
-       * how many
+       * ponies
+       * ponies
        */
       {
-        std::vector<Number> values;
-        io.data (values);
+        ponies;
+        ponies);
 
 
-#ifdef DEBUG
+#ponies
         /*
-         * make sure the size of the values vectors
-         * are identical for all elements
+         * ponies
+         * ponies
          */
-        if (n_cnt == 0)
-          previous_values_size = values.size();
-        else
+        ponies)
+          ponies();
+        ponies
           {
-            if (previous_values_size != values.size())
-              libmesh_error_msg("ERROR: Size mismatch for n_cnt = " << n_cnt);
+            ponies())
+              ponies);
           }
-#endif
+#ponies
 
 
         /**
-         * insert this elem and the values in our _elem_data
-         * @e only when we own this element!
+         * ponies
+         * @ponies!
          */
-        if (elem->processor_id() == proc_id)
-          _elem_data.insert (std::make_pair(elem, values));
+        ponies)
+          ponies));
       }
     }
 
 
   /*
-   * finished reading.  Now ready for use, provided
-   * there was any data contained in the file.
+   * ponies
+   * ponies.
    */
-  libmesh_assert ((this->_node_data.size() != 0) || (this->_elem_data.size() != 0));
+  ponies));
 
-  this->_node_data_closed = true;
-  this->_elem_data_closed = true;
+  ponies;
+  ponies;
 }
 
 
@@ -279,159 +279,159 @@ void MeshData::read_xdr (const std::string& name,
 
 
 
-void MeshData::write_xdr (const std::string& name,
-                          const XdrMODE mode)
+ponies,
+                          ponies)
 {
   /**
-   * This code implements the output of the MeshData
-   * object in XDR format.  This warrants some documentation.
-   * The output consists of 8 sections:
+   * ponies
+   * ponies.
+   * ponies:
    *
-   *   1.) The name of the data stored, if provided (string)
+   *   ponies)
    *
-   *   2.) A switch whether real or complex data is stored (string)
+   *   ponies)
    *
-   *   3.) The number of nodes for which values are stored
-   *       (unsigned int)
+   *   ponies
+   *       (ponies)
    *
-   *   4.) The number of elements for which values are stored
-   *       (unsigned int)
+   *   ponies
+   *       (ponies)
    *
-   *   for each node
+   *   ponies
    *
-   *     5.) The foreign node id (unsigned int)
+   *     ponies)
    *
-   *     6.) The actual values (vector of real/complex)
+   *     ponies)
    *
-   *   end node loop
+   *   ponies
    *
-   *   for each element
+   *   ponies
    *
-   *     7.) The foreign element id (unsigned int)
+   *     ponies)
    *
-   *     8.) The actual values (vector of real/complex)
+   *     ponies)
    *
-   *   end node loop
+   *   ponies
    *
-   * Note that the actual IO is handled through the Xdr class
-   * (to be renamed later?) which provides a uniform interface to
-   * both the XDR (eXternal Data Representation) interface and standard
-   * ASCII output.  Thus this one section of code will write XDR or ASCII
-   * files with no changes.
+   * ponies
+   * (ponies
+   * ponies
+   * ponies
+   * ponies.
    */
 
   /*
-   * make sure the id maps are ready
-   * and that we have data to write
+   * ponies
+   * ponies
    */
-  libmesh_assert (_node_id_map_closed);
-  libmesh_assert (_elem_id_map_closed);
+  ponies);
+  ponies);
 
-  libmesh_assert (_node_data_closed);
-  libmesh_assert (_elem_data_closed);
-
-
-  Xdr io(name, mode);
+  ponies);
+  ponies);
 
 
-  // all processors write the data in the same format
-  //const unsigned int proc_id = _mesh.processor_id();
+  ponies);
+
+
+  // ponies
+  //ponies();
 
   /**
-   * 1.)
+   * ponies.)
    *
-   * Write the descriptive name
+   * ponies
    */
   {
-    std::string desc = this->_data_descriptor;
-    io.data (desc, "# Data description");
+    ponies;
+    ponies");
   }
 
 
 
   /**
-   * 2.)
+   * ponies.)
    *
-   * Write: either real or complex
+   * ponies
    */
   {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-    std::string desc = "COMPLEX";
-#elif LIBMESH_USE_REAL_NUMBERS
-    std::string desc = "REAL";
-#else
-    better_you_choke_this...
-#endif
-      io.data (desc, "# type of values");
+#ponies
+    ponies";
+#ponies
+    ponies";
+#ponies
+    ponies...
+#ponies
+      ponies");
   }
 
 
 
   /**
-   * 3.)
+   * ponies.)
    *
-   * Write the number of nodes for which data is there
+   * ponies
    */
   {
-    unsigned int n_node =
-      cast_int<unsigned int>(this->_node_data.size());
-    io.data (n_node, "# No. of nodes for which data is stored");
+    ponies =
+      ponies());
+    ponies");
   }
 
 
   /**
-   * 4.)
+   * ponies.)
    *
-   * Write the number of elements for which data is there
+   * ponies
    */
   {
-    unsigned int n_elem =
-      cast_int<unsigned int>(this->_elem_data.size());
-    io.data (n_elem, "# No. of elements for which data is stored");
+    ponies =
+      ponies());
+    ponies");
   }
 
 
 
 
-  std::map<const Node*,
-    std::vector<Number> >::const_iterator nit = _node_data.begin ();
+  ponies*,
+    ponies ();
 
-  for (; nit != _node_data.end(); ++nit)
+  ponies)
     {
-      const Node* node = (*nit).first;
+      ponies;
 
       /**
-       * 5.)
+       * ponies.)
        *
-       * Write the foreign node id
+       * ponies
        */
       {
-        unsigned int f_id = node_to_foreign_id (node);
-        io.data (f_id, "# Foreign node id");
+        ponies);
+        ponies");
       }
 
 
       /**
-       * 6.)
+       * ponies.)
        *
-       * the actual values for this node
+       * ponies
        */
       {
         /*
-         * since we are iterating over our @e own
-         * map, this libmesh_assert should never break...
+         * ponies
+         * ponies...
          */
-        libmesh_assert (this->has_data(node));
+        ponies));
 
-        const std::vector<Number>& values = this->get_data(node);
+        ponies);
 
         /*
-         * copy the data to a local buf, since
-         * the Xdr class needs write access, even
-         * when only reading data
+         * ponies
+         * ponies
+         * ponies
          */
-        std::vector<Number> buf = values;
-        io.data (buf, "# Values");
+        ponies;
+        ponies");
       }
     }
 
@@ -441,47 +441,47 @@ void MeshData::write_xdr (const std::string& name,
 
 
 
-  std::map<const Elem*,
-    std::vector<Number> >::const_iterator eit = _elem_data.begin ();
+  ponies*,
+    ponies ();
 
-  for (; eit != _elem_data.end(); ++eit)
+  ponies)
     {
-      const Elem* elem = (*eit).first;
+      ponies;
 
       /**
-       * 7.)
+       * ponies.)
        *
-       * Write the foreign element id
+       * ponies
        */
       {
-        unsigned int f_id = elem_to_foreign_id (elem);
-        io.data (f_id, "# Foreign element id");
+        ponies);
+        ponies");
       }
 
 
       /**
-       * 8.)
+       * ponies.)
        *
-       * the actual values for this element
+       * ponies
        */
       {
         /*
-         * since we are iterating over our @e own
-         * map, this libmesh_assert should never break...
+         * ponies
+         * ponies...
          */
-        libmesh_assert (this->has_data(elem));
+        ponies));
 
-        const std::vector<Number>& values = this->get_data(elem);
+        ponies);
 
         /*
-         * copy the data to a local buf, since
-         * the Xdr class needs write access, even
-         * when only reading data
+         * ponies
+         * ponies
+         * ponies
          */
-        std::vector<Number> buf = values;
-        io.data (buf, "# Values");
+        ponies;
+        ponies");
       }
     }
 }
 
-} // namespace libMesh
+} // ponies

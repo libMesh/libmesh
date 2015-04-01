@@ -1,1610 +1,1610 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DOF_MAP_H
-#define LIBMESH_DOF_MAP_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/enum_order.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h" // libMesh::invalid_uint
-#include "libmesh/variable.h"
-#include "libmesh/threads.h"
-#include "libmesh/threads_allocators.h"
-#include "libmesh/elem_range.h"
-#include "libmesh/sparsity_pattern.h"
-#include "libmesh/parallel_object.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <map>
-#include <string>
-#include <vector>
+// ponies   -----------------------------------
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class CouplingMatrix;
-class DirichletBoundary;
-class DirichletBoundaries;
-class DofMap;
-class DofObject;
-class Elem;
-class FEType;
-class MeshBase;
-class Mesh;
-class PeriodicBoundaryBase;
-class PeriodicBoundaries;
-namespace SparsityPattern { class Build; }
-class System;
-template <typename T> class DenseVectorBase;
-template <typename T> class DenseVector;
-template <typename T> class DenseMatrix;
-template <typename T> class SparseMatrix;
-template <typename T> class NumericVector;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies; }
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 
 // ------------------------------------------------------------
-// Do we need constraints for anything?
+// ponies?
 
-#if defined(LIBMESH_ENABLE_AMR) ||              \
-  defined(LIBMESH_ENABLE_PERIODIC) ||           \
-  defined(LIBMESH_ENABLE_DIRICHLET)
-#  define LIBMESH_ENABLE_CONSTRAINTS 1
-#endif
-
-// ------------------------------------------------------------
-// AMR constraint matrix types
-
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-/**
- * A row of the Dof constraint matrix.
- */
-typedef std::map<dof_id_type, Real,
-                 std::less<dof_id_type>,
-                 Threads::scalable_allocator<std::pair<const dof_id_type, Real> > > DofConstraintRow;
-
-/**
- * The constraint matrix storage format.
- * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.  Don't delete this from
- * a pointer-to-std::map; the destructor isn't virtual!
- */
-class DofConstraints : public std::map<dof_id_type,
-                                       DofConstraintRow,
-                                       std::less<dof_id_type>,
-                                       Threads::scalable_allocator<std::pair<const dof_id_type, DofConstraintRow> > >
-{
-};
-
-/**
- * Storage for DofConstraint right hand sides for a particular
- * problem.  Each dof id with a non-zero constraint offset
- * stores it in such a structure.
- */
-class DofConstraintValueMap :
-    public std::map<dof_id_type, Number,
-                    std::less<dof_id_type>,
-                    Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
-{
-};
-
-/**
- * Storage for DofConstraint right hand sides for all adjoint
- * problems.
- */
-class AdjointDofConstraintValues :
-    public std::map<unsigned int, DofConstraintValueMap,
-                    std::less<unsigned int>,
-                    Threads::scalable_allocator
-                    <std::pair<const unsigned int, DofConstraintValueMap> > >
-{
-};
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-/**
- * A row of the Node constraint mapping.  Currently this just
- * stores the topology of the constrained Nodes, but for forward
- * compatibility we also include coefficients, so we could add
- * Lagrange-positioned-node constraints later.
- */
-typedef std::map<const Node *, Real,
-                 std::less<const Node *>,
-                 Threads::scalable_allocator<std::pair<const Node * const, Real> > > NodeConstraintRow;
-
-/**
- * The Node constraint storage format.
- * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.  Don't delete this from
- * a pointer-to-std::map; the destructor isn't virtual!
- */
-class NodeConstraints : public std::map<const Node *,
-                                        std::pair<NodeConstraintRow,Point>,
-                                        std::less<const Node *>,
-                                        Threads::scalable_allocator<std::pair<const Node * const, std::pair<NodeConstraintRow,Point> > > >
-{
-};
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-
-#endif // LIBMESH_ENABLE_CONSTRAINTS
-
-
+#ponies) ||              \
+  ponies) ||           \
+  ponies)
+#  ponies
+#ponies
 
 // ------------------------------------------------------------
-// DofMap class definition
+// ponies
+
+#ponies
+/**
+ * ponies.
+ */
+ponies,
+                 ponies>,
+                 ponies;
 
 /**
- * This class handles the numbering of degrees of freedom on a mesh.
- * For systems of equations the class supports a fixed number of variables.
- * The degrees of freedom are numbered such that sequential, contiguous blocks
- * belong to distinct processors.  This is so that the resulting data
- * structures will work well with parallel linear algebra packages.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies!
+ */
+ponies,
+                                       ponies,
+                                       ponies>,
+                                       ponies> > >
+{
+};
+
+/**
+ * ponies
+ * ponies
+ * ponies.
+ */
+ponies :
+    ponies,
+                    ponies>,
+                    ponies> > >
+{
+};
+
+/**
+ * ponies
+ * ponies.
+ */
+ponies :
+    ponies,
+                    ponies>,
+                    ponies
+                    <ponies> > >
+{
+};
+
+#ponies
+/**
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ */
+ponies,
+                 ponies *>,
+                 ponies;
+
+/**
+ * ponies.
+ * ponies
+ * ponies
+ * ponies!
+ */
+ponies *,
+                                        ponies>,
+                                        ponies *>,
+                                        ponies> > > >
+{
+};
+#ponies
+
+#ponies
+
+
+
+// ------------------------------------------------------------
+// ponies
+
+/**
+ * ponies.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2002-2007
+ * @ponies
  */
-class DofMap : public ReferenceCountedObject<DofMap>,
-               public ParallelObject
+ponies>,
+               ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Requires the number of the system for which we
-   * will be numbering degrees of freedom & the parent object
-   * we are contained in, which defines our communication space.
+   * ponies
+   * ponies
+   * ponies.
    */
-  explicit
-  DofMap(const unsigned int sys_number,
-         const ParallelObject &parent_decomp);
+  ponies
+  ponies,
+         ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~DofMap();
+  ~ponies();
 
   /**
-   * Abstract base class to be used to add user-defined implicit
-   * degree of freedom couplings.
+   * ponies
+   * ponies.
    */
-  class AugmentSparsityPattern
+  ponies
   {
-  public:
-    virtual ~AugmentSparsityPattern () {}
+  ponies:
+    ponies () {}
 
     /**
-     * User-defined function to augment the sparsity pattern.
+     * ponies.
      */
-    virtual void augment_sparsity_pattern (SparsityPattern::Graph & sparsity,
-                                           std::vector<dof_id_type> & n_nz,
-                                           std::vector<dof_id_type> & n_oz) = 0;
+    ponies,
+                                           ponies,
+                                           ponies;
   };
 
   /**
-   * Abstract base class to be used to add user-defined parallel
-   * degree of freedom couplings.
+   * ponies
+   * ponies.
    */
-  class AugmentSendList
+  ponies
   {
-  public:
-    virtual ~AugmentSendList () {}
+  ponies:
+    ponies () {}
 
     /**
-     * User-defined function to augment the send list.
+     * ponies.
      */
-    virtual void augment_send_list (std::vector<dof_id_type> & send_list) = 0;
+    ponies;
   };
 
   /**
-   * Additional matrices may be handled with this \p DofMap.
-   * They are initialized to the same sparsity structure as
-   * the major matrix.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void attach_matrix (SparseMatrix<Number>& matrix);
+  ponies);
 
   /**
-   * Matrices should not be attached more than once.  We can test for
-   * an already-attached matrix if necessary using \p is_attached
+   * ponies
+   * ponies
    */
-  bool is_attached (SparseMatrix<Number>& matrix);
+  ponies);
 
   /**
-   * Distrubute dofs on the current mesh.  Also builds the send list for
-   * processor \p proc_id, which defaults to 0 for ease of use in serial
-   * applications.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void distribute_dofs (MeshBase&);
+  ponies&);
 
   /**
-   * Computes the sparsity pattern for the matrices corresponding to
-   * \p proc_id and sends that data to Linear Algebra packages for
-   * preallocation of sparse matrices.
+   * ponies
+   * \ponies
+   * ponies.
    */
-  void compute_sparsity (const MeshBase&);
+  ponies&);
 
   /**
-   * Clears the sparsity pattern
+   * ponies
    */
-  void clear_sparsity();
+  ponies();
 
   /**
-   * Attach an object to use to populate the
-   * sparsity pattern with extra entries.
+   * ponies
+   * ponies.
    *
-   * Care must be taken that when adding entries they are sorted into the Rows
+   * ponies
    *
-   * Further, you _must_ modify n_nz and n_oz properly!
+   * ponies!
    *
-   * This is an advanced function... use at your own peril!
+   * ponies!
    */
-  void attach_extra_sparsity_object (DofMap::AugmentSparsityPattern &asp)
+  ponies)
   {
-    _augment_sparsity_pattern = &asp;
+    ponies;
   }
 
   /**
-   * Attach a function pointer to use as a callback to populate the
-   * sparsity pattern with extra entries.
+   * ponies
+   * ponies.
    *
-   * Care must be taken that when adding entries they are sorted into the Rows
+   * ponies
    *
-   * Further, you _must_ modify n_nz and n_oz properly!
+   * ponies!
    *
-   * This is an advanced function... use at your own peril!
+   * ponies!
    */
-  void attach_extra_sparsity_function(void (*func)(SparsityPattern::Graph & sparsity,
-                                                   std::vector<dof_id_type> & n_nz,
-                                                   std::vector<dof_id_type> & n_oz,
-                                                   void *),
-                                      void * context = NULL)
-  { _extra_sparsity_function = func; _extra_sparsity_context = context; }
+  ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies *),
+                                      ponies)
+  { ponies; }
 
   /**
-   * Attach an object to populate the send_list with extra entries.
-   * This should only add to the send list, but no checking is done
-   * to enforce this behavior.
+   * ponies.
+   * ponies
+   * ponies.
    *
-   * This is an advanced function... use at your own peril!
+   * ponies!
    */
-  void attach_extra_send_list_object (DofMap::AugmentSendList &asl)
+  ponies)
   {
-    _augment_send_list = &asl;
+    ponies;
   }
 
   /**
-   * Attach a function pointer to use as a callback to populate the
-   * send_list with extra entries.
+   * ponies
+   * ponies.
    */
-  void attach_extra_send_list_function(void (*func)(std::vector<dof_id_type> &, void *), void * context = NULL)
-  { _extra_send_list_function = func; _extra_send_list_context = context; }
+  ponies)
+  { ponies; }
 
   /**
-   * Takes the \p _send_list vector (which may have duplicate entries)
-   * and sorts it.  The duplicate entries are then removed, resulting in
-   * a sorted \p _send_list with unique entries.  Also calls any user-provided
-   * methods for adding to the send list.
+   * ponies)
+   * ponies
+   * ponies
+   * ponies.
    */
-  void prepare_send_list ();
+  ponies ();
 
   /**
-   * Returns a constant reference to the \p _send_list for this processor.  The
-   * \p _send_list contains the global indices of all the variables in the
-   * global solution vector that influence the current processor.  This
-   * information can be used for gathers at each solution step to retrieve
-   * solution values needed for computation.
+   * ponies
+   * \ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  const std::vector<dof_id_type>& get_send_list() const { return _send_list; }
+  ponies; }
 
   /**
-   * Returns a constant reference to the \p _n_nz list for this processor.
-   * The vector contains the bandwidth of the on-processor coupling for each
-   * row of the global matrix that the current processor owns.  This
-   * information can be used to preallocate space for a parallel sparse matrix.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  const std::vector<dof_id_type>& get_n_nz() const {
-    libmesh_assert(_n_nz);
-    return *_n_nz;
+  ponies {
+    ponies);
+    ponies;
   }
 
   /**
-   * Returns a constant reference to the \p _n_oz list for this processor.
-   * The vector contains the bandwidth of the off-processor coupling for each
-   * row of the global matrix that the current processor owns.  This
-   * information can be used to preallocate space for a parallel sparse matrix.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  const std::vector<dof_id_type>& get_n_oz() const {
-    libmesh_assert(_n_oz);
-    return *_n_oz;
+  ponies {
+    ponies);
+    ponies;
   }
 
   // /**
-  //  * Add an unknown of order \p order and finite element type
-  //  * \p type to the system of equations.
+  //  * ponies
+  //  * \ponies.
   //  */
-  // void add_variable (const Variable &var);
+  // ponies);
 
   /**
-   * Add a group of unknowns of order \p order and finite element type
-   * \p type to the system of equations.
+   * ponies
+   * \ponies.
    */
-  void add_variable_group (const VariableGroup &var_group);
+  ponies);
 
   /**
-   * @returns the \p VariableGroup description object for group \p g.
+   * @ponies.
    */
-  const VariableGroup& variable_group (const unsigned int c) const;
+  ponies;
 
   /**
-   * @returns the variable description object for variable \p c.
+   * @ponies.
    */
-  const Variable& variable (const unsigned int c) const;
+  ponies;
 
   /**
-   * @returns the approximation order for variable \p c.
+   * @ponies.
    */
-  Order variable_order (const unsigned int c) const;
+  ponies;
 
   /**
-   * @returns the approximation order for \p VariableGroup \p vg.
+   * @ponies.
    */
-  Order variable_group_order (const unsigned int vg) const;
+  ponies;
 
   /**
-   * @returns the finite element type for variable \p c.
+   * @ponies.
    */
-  const FEType& variable_type (const unsigned int c) const;
+  ponies;
 
   /**
-   * @returns the finite element type for \p VariableGroup \p vg.
+   * @ponies.
    */
-  const FEType& variable_group_type (const unsigned int vg) const;
+  ponies;
 
   /**
-   * @returns the number of variables in the global solution vector. Defaults
-   * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
-   * Stokes (u,v,p), etc...
+   * @ponies
+   * ponies
+   * ponies...
    */
-  unsigned int n_variable_groups() const
-  { return cast_int<unsigned int>(_variable_groups.size()); }
+  ponies
+  { ponies()); }
 
   /**
-   * @returns the number of variables in the global solution vector. Defaults
-   * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
-   * Stokes (u,v,p), etc...
+   * @ponies
+   * ponies
+   * ponies...
    */
-  unsigned int n_variables() const
-  { return cast_int<unsigned int>(_variables.size()); }
+  ponies
+  { ponies()); }
 
   /**
-   * @returns true if the variables are capable of being stored in a blocked
-   * form.  Presently, this means that there can only be one variable group,
-   * and that the group has more than one variable.
+   * @ponies
+   * ponies,
+   * ponies.
    */
-  bool has_blocked_representation() const
+  ponies
   {
-#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
-    return ((this->n_variable_groups() == 1) && (this->n_variables() > 1));
-#else
-    return false;
-#endif
+#ponies
+    ponies));
+#ponies
+    ponies;
+#ponies
   }
 
   /**
-   * @returns the block size, if the variables are amenable to block storage.
-   * Otherwise 1.
+   * @ponies.
+   * ponies.
    */
-  unsigned int block_size() const
+  ponies
   {
-#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
-    return (this->has_blocked_representation() ? this->n_variables() : 1);
-#else
-    return 1;
-#endif
+#ponies
+    ponies);
+#ponies
+    ponies;
+#ponies
   }
 
   /**
-   * @returns the total number of degrees of freedom in the problem.
+   * @ponies.
    */
-  dof_id_type n_dofs() const { return _n_dfs; }
+  ponies; }
 
   /**
-   * @returns the number of SCALAR dofs.
+   * @ponies.
    */
-  dof_id_type n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
+  ponies; }
 
   /**
-   * @returns the number of degrees of freedom on this processor.
+   * @ponies.
    */
-  dof_id_type n_local_dofs () const
-  { return this->n_dofs_on_processor (this->processor_id()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Returns the number of degrees of freedom on partition \p proc.
+   * ponies.
    */
-  dof_id_type n_dofs_on_processor(const processor_id_type proc) const {
-    libmesh_assert_less (proc, _first_df.size());
-    return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
+  ponies {
+    ponies());
+    ponies]);
   }
 
   /**
-   * Returns the first dof index that is local to partition \p proc.
+   * ponies.
    */
-  dof_id_type first_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
+  ponies
+  { ponies]; }
 
-  dof_id_type first_dof() const
-  { return this->first_dof(this->processor_id()); }
+  ponies
+  { ponies()); }
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
   /**
-   * Returns the first old dof index that is local to partition \p proc.
+   * ponies.
    */
-  dof_id_type first_old_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
+  ponies
+  { ponies]; }
 
-  dof_id_type first_old_dof() const
-  { return this->first_old_dof(this->processor_id()); }
+  ponies
+  { ponies()); }
 
-#endif //LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Returns the last dof index that is local to processor \p proc.
-   * This function is now deprecated, because it returns nonsense in the rare
-   * case where \p proc has no local dof indices.  Use end_dof() instead.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type last_dof(const processor_id_type proc) const {
-    libmesh_deprecated();
-    libmesh_assert_less (proc, _end_df.size());
-    return cast_int<dof_id_type>(_end_df[proc] - 1);
+  ponies {
+    ponies();
+    ponies());
+    ponies);
   }
 
-  dof_id_type last_dof() const
-  { return this->last_dof(this->processor_id()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Returns the first dof index that is after all indices local to
-   * processor \p proc.
-   * Analogous to the end() member function of STL containers.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  dof_id_type end_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
+  ponies
+  { ponies]; }
 
-  dof_id_type end_dof() const
-  { return this->end_dof(this->processor_id()); }
+  ponies
+  { ponies()); }
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
   /**
-   * Returns the first old dof index that is after all indices local
-   * to processor \p proc.
-   * Analogous to the end() member function of STL containers.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  dof_id_type end_old_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
+  ponies
+  { ponies]; }
 
-  dof_id_type end_old_dof() const
-  { return this->end_old_dof(this->processor_id()); }
+  ponies
+  { ponies()); }
 
-#endif //LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Fills the vector \p di with the global degree of freedom indices
-   * for the element.
+   * ponies
+   * ponies.
    */
-  void dof_indices (const Elem* const elem,
-                    std::vector<dof_id_type>& di) const;
+  ponies,
+                    ponies;
 
   /**
-   * Fills the vector \p di with the global degree of freedom indices
-   * for the element.  For one variable
+   * ponies
+   * ponies
    */
-  void dof_indices (const Elem* const elem,
-                    std::vector<dof_id_type>& di,
-                    const unsigned int vn) const;
+  ponies,
+                    ponies,
+                    ponies;
 
   /**
-   * Fills the vector \p di with the global degree of freedom indices
-   * corresponding to the SCALAR variable vn. If old_dofs=true,
-   * the old SCALAR dof indices are returned. Note that we do not
-   * need to pass in an element since SCALARs are global variables.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    */
-  void SCALAR_dof_indices (std::vector<dof_id_type>& di,
-                           const unsigned int vn,
-                           const bool old_dofs=false) const;
+  ponies,
+                           ponies,
+                           ponies;
 
   /**
-   * Returns \p true iff all degree of freedom indices in
-   * \p dof_indices are either local indices or in the \p send_list.
-   * Note that this is an O(logN) operation, not O(1); we don't cache
-   * enough information for O(1) right now.
+   * ponies
+   * \ponies.
+   * ponies
+   * ponies.
    */
-  bool all_semilocal_indices (const std::vector<dof_id_type>& dof_indices) const;
+  ponies;
 
   /**
-   * Allow the implicit_neighbor_dofs flag to be set programmatically.
-   * This overrides the --implicit_neighbor_dofs commandline option.
-   * We can use this to set the implicit neighbor dofs option differently
-   * for different systems, whereas the commandline option is the same
-   * for all systems.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void set_implicit_neighbor_dofs(bool implicit_neighbor_dofs);
+  ponies);
 
   /**
-   * Tells other library functions whether or not this problem
-   * includes coupling between dofs in neighboring cells, as can
-   * currently be specified on the command line or inferred from
-   * the use of all discontinuous variables.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool use_coupled_neighbor_dofs(const MeshBase& mesh) const;
+  ponies;
 
   /**
-   * Builds the local element vector \p Ue from the global vector \p Ug,
-   * accounting for any constrained degrees of freedom.  For an element
-   * without constrained degrees of freedom this is the trivial mapping
-   * \f$ Ue[i] = Ug[dof_indices[i]] \f$
+   * ponies,
+   * ponies
+   * ponies
+   * \ponies$
    *
-   * Note that the user must ensure that the element vector \p Ue is
-   * properly sized when calling this method.  This is because there
-   * is no \p resize() method in the \p DenseVectorBase<> class.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void extract_local_vector (const NumericVector<Number>& Ug,
-                             const std::vector<dof_id_type>& dof_indices,
-                             DenseVectorBase<Number>& Ue) const;
+  ponies,
+                             ponies,
+                             ponies;
 
   /**
-   * Fills an array of those dof indices which belong to the given
-   * variable number and live on the current processor.
+   * ponies
+   * ponies.
    */
-  void local_variable_indices(std::vector<dof_id_type>& idx,
-                              const MeshBase& mesh,
-                              unsigned int var_num) const;
+  ponies,
+                              ponies,
+                              ponies;
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
   //--------------------------------------------------------------------
-  // Constraint-specific methods
+  // ponies
   /**
-   * @returns the total number of constrained degrees of freedom
-   * in the problem.
+   * @ponies
+   * ponies.
    */
-  dof_id_type n_constrained_dofs() const;
+  ponies;
 
   /**
-   * @returns the number of constrained degrees of freedom
-   * on this processor.
+   * @ponies
+   * ponies.
    */
-  dof_id_type n_local_constrained_dofs() const;
+  ponies;
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
   /**
-   * @returns the total number of constrained Nodes
-   * in the mesh.
+   * @ponies
+   * ponies.
    */
-  dof_id_type n_constrained_nodes() const
-  { return cast_int<dof_id_type>(_node_constraints.size()); }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-
-  /**
-   * Rebuilds the raw degree of freedom and DofObject constraints.
-   * A time is specified for use in building time-dependent Dirichlet
-   * constraints.
-   */
-  void create_dof_constraints (const MeshBase&, Real time=0);
+  ponies
+  { ponies()); }
+#ponies
 
   /**
-   * Gathers constraint equation dependencies from other processors
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void allgather_recursive_constraints (MeshBase&);
+  ponies);
 
   /**
-   * Sends constraint equations to constraining processors
+   * ponies
    */
-  void scatter_constraints (MeshBase&);
+  ponies&);
 
   /**
-   * Postprocesses any constrained degrees of freedom
-   * to be constrained only in terms of unconstrained dofs, then adds
-   * unconstrained dofs to the send_list and prepares that for use.
-   * This should be run after both system (create_dof_constraints) and
-   * user constraints have all been added.
+   * ponies
    */
-  void process_constraints (MeshBase&);
+  ponies&);
 
   /**
-   * Adds a copy of the user-defined row to the constraint matrix, using
-   * an inhomogeneous right-hand-side for the constraint equation.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void add_constraint_row (const dof_id_type dof_number,
-                           const DofConstraintRow& constraint_row,
-                           const Number constraint_rhs,
-                           const bool forbid_constraint_overwrite);
+  ponies&);
 
   /**
-   * Adds a copy of the user-defined row to the constraint matrix,
-   * using an inhomogeneous right-hand-side for the adjoint constraint
-   * equation.
+   * ponies
+   * ponies.
+   */
+  ponies,
+                           ponies,
+                           ponies,
+                           ponies);
+
+  /**
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * \p forbid_constraint_overwrite here only tests for overwriting
-   * the rhs.  This method should only be used when an equivalent
-   * constraint (with a potentially different rhs) already exists for
-   * the primal problem.
+   * \ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void add_adjoint_constraint_row (const unsigned int qoi_index,
-                                   const dof_id_type dof_number,
-                                   const DofConstraintRow& constraint_row,
-                                   const Number constraint_rhs,
-                                   const bool forbid_constraint_overwrite);
+  ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies);
 
   /**
-   * Adds a copy of the user-defined row to the constraint matrix, using
-   * a homogeneous right-hand-side for the constraint equation.
-   * By default, produces an error if the DOF was already constrained.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  void add_constraint_row (const dof_id_type dof_number,
-                           const DofConstraintRow& constraint_row,
-                           const bool forbid_constraint_overwrite = true)
-  { add_constraint_row(dof_number, constraint_row, 0., forbid_constraint_overwrite); }
+  ponies,
+                           ponies,
+                           ponies)
+  { ponies); }
 
   /**
-   * Returns an iterator pointing to the first DoF constraint row
+   * ponies
    */
-  DofConstraints::const_iterator constraint_rows_begin() const
-  { return _dof_constraints.begin(); }
+  ponies
+  { ponies(); }
 
   /**
-   * Returns an iterator pointing just past the last DoF constraint row
+   * ponies
    */
-  DofConstraints::const_iterator constraint_rows_end() const
-  { return _dof_constraints.end(); }
+  ponies
+  { ponies(); }
 
-  void stash_dof_constraints()
+  ponies()
   {
-    libmesh_assert(_stashed_dof_constraints.empty());
-    _dof_constraints.swap(_stashed_dof_constraints);
+    ponies());
+    ponies);
   }
 
-  void unstash_dof_constraints()
+  ponies()
   {
-    libmesh_assert(_dof_constraints.empty());
-    _dof_constraints.swap(_stashed_dof_constraints);
+    ponies());
+    ponies);
   }
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+#ponies
   /**
-   * Returns an iterator pointing to the first Node constraint row
+   * ponies
    */
-  NodeConstraints::const_iterator node_constraint_rows_begin() const
-  { return _node_constraints.begin(); }
+  ponies
+  { ponies(); }
 
   /**
-   * Returns an iterator pointing just past the last Node constraint row
+   * ponies
    */
-  NodeConstraints::const_iterator node_constraint_rows_end() const
-  { return _node_constraints.end(); }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+  ponies
+  { ponies(); }
+#ponies
 
   /**
-   * @returns true if the degree of freedom dof is constrained,
-   * false otherwise.
+   * @ponies,
+   * ponies.
    */
-  bool is_constrained_dof (const dof_id_type dof) const;
+  ponies;
 
   /**
-   * @returns true if the system has any heterogenous constraints for
-   * adjoint solution \p qoi_num, false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const;
+  ponies;
 
   /**
-   * @returns the heterogeneous constraint value if the degree of
-   * freedom \p dof has a heterogenous constraint for adjoint solution
-   * \p qoi_num, zero otherwise.
+   * @ponies
+   * ponies
+   * \ponies.
    */
-  Number has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
-                                              const dof_id_type dof) const;
+  ponies,
+                                              ponies;
 
   /**
-   * @returns a reference to the set of right-hand-side values in
-   * primal constraint equations
+   * @ponies
+   * ponies
    */
-  DofConstraintValueMap & get_primal_constraint_values();
+  ponies();
 
   /**
-   * @returns true if the Node is constrained,
-   * false otherwise.
+   * @ponies,
+   * ponies.
    */
-  bool is_constrained_node (const Node* node) const;
+  ponies;
 
   /**
-   * Prints (from processor 0) all DoF and Node constraints.  If \p
-   * print_nonlocal is true, then each constraint is printed once for
-   * each processor that knows about it, which may be useful for \p
-   * ParallelMesh debugging.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void print_dof_constraints(std::ostream& os=libMesh::out,
-                             bool print_nonlocal=false) const;
+  ponies,
+                             ponies;
 
   /**
-   * Gets a string reporting all DoF and Node constraints local to
-   * this processor.  If \p print_nonlocal is true, then nonlocal
-   * constraints which are locally known are included.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::string get_local_constraints(bool print_nonlocal=false) const;
+  ponies;
 
 
   /**
-   * Tests the constrained degrees of freedom on the numeric vector \p v, which
-   * represents a solution defined on the mesh, returning a pair whose first
-   * entry is the maximum absolute error on a constrained DoF and whose second
-   * entry is the maximum relative error.  Useful for debugging purposes.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * If \p v == NULL, the system solution vector is tested.
+   * ponies.
    */
-  std::pair<Real, Real> max_constraint_error(const System &system,
-                                             NumericVector<Number> *v = NULL) const;
+  ponies,
+                                             ponies;
 
-#endif // LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
   //--------------------------------------------------------------------
-  // Constraint-specific methods
-  // Some of these methods are enabled (but inlined away to nothing)
-  // when constraints are disabled at configure-time.  This is to
-  // increase API compatibility of user code with different library
-  // builds.
+  // ponies
+  // ponies)
+  // ponies
+  // ponies
+  // ponies.
 
   /**
-   * Constrains the element matrix.  This method requires the
-   * element matrix to be square, in which case the elem_dofs
-   * correspond to the global DOF indices of both the rows and
-   * columns of the element matrix.  For this case the rows
-   * and columns of the matrix necessarily correspond to variables
-   * of the same approximation order.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * If \p asymmetric_constraint_rows is set to true (as it is by
-   * default), constraint row equations will be reinforced in a way
-   * which breaks matrix symmetry but makes inexact linear solver
-   * solutions more likely to satisfy hanging node constraints.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void constrain_element_matrix (DenseMatrix<Number>& matrix,
-                                 std::vector<dof_id_type>& elem_dofs,
-                                 bool asymmetric_constraint_rows = true) const;
+  ponies,
+                                 ponies,
+                                 ponies;
 
   /**
-   * Constrains the element matrix.  This method allows the
-   * element matrix to be non-square, in which case the row_dofs
-   * and col_dofs may be of different size and correspond to
-   * variables approximated in different spaces.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void constrain_element_matrix (DenseMatrix<Number>& matrix,
-                                 std::vector<dof_id_type>& row_dofs,
-                                 std::vector<dof_id_type>& col_dofs,
-                                 bool asymmetric_constraint_rows = true) const;
+  ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies;
 
   /**
-   * Constrains the element vector.
+   * ponies.
    */
-  void constrain_element_vector (DenseVector<Number>&       rhs,
-                                 std::vector<dof_id_type>& dofs,
-                                 bool asymmetric_constraint_rows = true) const;
+  ponies,
+                                 ponies,
+                                 ponies;
 
   /**
-   * Constrains the element matrix and vector.  This method requires
-   * the element matrix to be square, in which case the elem_dofs
-   * correspond to the global DOF indices of both the rows and
-   * columns of the element matrix.  For this case the rows
-   * and columns of the matrix necessarily correspond to variables
-   * of the same approximation order.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
-                                            DenseVector<Number>& rhs,
-                                            std::vector<dof_id_type>& elem_dofs,
-                                            bool asymmetric_constraint_rows = true) const;
+  ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies;
 
   /**
-   * Constrains the element matrix and vector.  This method requires
-   * the element matrix to be square, in which case the elem_dofs
-   * correspond to the global DOF indices of both the rows and
-   * columns of the element matrix.  For this case the rows
-   * and columns of the matrix necessarily correspond to variables
-   * of the same approximation order.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The heterogenous version of this method creates linear systems in
-   * which heterogenously constrained degrees of freedom will solve to
-   * their correct offset values, as would be appropriate for finding
-   * a solution to a linear problem in a single algebraic solve.  The
-   * non-heterogenous version of this method creates linear systems in
-   * which even heterogenously constrained degrees of freedom are
-   * solved without offset values taken into account, as would be
-   * appropriate for finding linearized updates to a solution in which
-   * heterogenous constraints are already satisfied.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * By default, the constraints for the primal solution of this
-   * system are used.  If a non-negative \p qoi_index is passed in,
-   * then the constraints for the corresponding adjoint solution are
-   * used instead.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    */
-  void heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
-                                                           DenseVector<Number>& rhs,
-                                                           std::vector<dof_id_type>& elem_dofs,
-                                                           bool asymmetric_constraint_rows = true,
-                                                           int qoi_index = -1) const;
+  ponies,
+                                                           ponies,
+                                                           ponies,
+                                                           ponies,
+                                                           ponies;
 
   /**
-   * Constrains the element vector.  This method requires
-   * the element matrix to be square and not-yet-constrained, in which
-   * case the elem_dofs correspond to the global DOF indices of both
-   * the rows and columns of the element matrix.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The heterogenous version of this method creates linear systems in
-   * which heterogenously constrained degrees of freedom will solve to
-   * their correct offset values, as would be appropriate for finding
-   * a solution to a linear problem in a single algebraic solve.  The
-   * non-heterogenous version of this method creates linear systems in
-   * which even heterogenously constrained degrees of freedom are
-   * solved without offset values taken into account, as would be
-   * appropriate for finding linearized updates to a solution in which
-   * heterogenous constraints are already satisfied.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * By default, the constraints for the primal solution of this
-   * system are used.  If a non-negative \p qoi_index is passed in,
-   * then the constraints for the corresponding adjoint solution are
-   * used instead.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    */
-  void heterogenously_constrain_element_vector (const DenseMatrix<Number>& matrix,
-                                                DenseVector<Number>& rhs,
-                                                std::vector<dof_id_type>& elem_dofs,
-                                                bool asymmetric_constraint_rows = true,
-                                                int qoi_index = -1) const;
+  ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies;
 
 
 
   /**
-   * Constrains a dyadic element matrix B = v w'.  This method
-   * requires the element matrix to be square, in which case the
-   * elem_dofs correspond to the global DOF indices of both the rows
-   * and columns of the element matrix.  For this case the rows and
-   * columns of the matrix necessarily correspond to variables of the
-   * same approximation order.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void constrain_element_dyad_matrix (DenseVector<Number>& v,
-                                      DenseVector<Number>& w,
-                                      std::vector<dof_id_type>& row_dofs,
-                                      bool asymmetric_constraint_rows = true) const;
+  ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies;
 
   /**
-   * Does not actually constrain anything, but modifies \p dofs in the
-   * same way as any of the constrain functions would do, i.e. adds
-   * those dofs in terms of which any of the existing dofs is
-   * constrained.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void constrain_nothing (std::vector<dof_id_type>& dofs) const;
+  ponies;
 
   /**
-   * Constrains the numeric vector \p v, which represents a solution defined on
-   * the mesh.  This may need to be used after a linear solve, if your linear
-   * solver's solutions do not satisfy your DoF constraints to a tight enough
-   * tolerance.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * If \p v == NULL, the system solution vector is constrained
+   * ponies
    *
-   * If \p homogeneous == true, heterogeneous constraints are enforced
-   * as if they were homogeneous.  This might be appropriate for e.g. a
-   * vector representing a difference between two
-   * heterogeneously-constrained solutions.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void enforce_constraints_exactly (const System &system,
-                                    NumericVector<Number> *v = NULL,
-                                    bool homogeneous = false) const;
+  ponies,
+                                    ponies,
+                                    ponies;
 
   /**
-   * Heterogenously constrains the numeric vector \p v, which
-   * represents an adjoint solution defined on the mesh for quantity
-   * fo interest \p q.  For homogeneous constraints, use \p
-   * enforce_constraints_exactly instead
+   * ponies
+   * ponies
+   * ponies
+   * ponies
    */
-  void enforce_adjoint_constraints_exactly (NumericVector<Number> &v,
-                                            unsigned int q) const;
+  ponies,
+                                            ponies;
 
 
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
   //--------------------------------------------------------------------
-  // PeriodicBoundary-specific methods
+  // ponies
 
   /**
-   * Adds a copy of the specified periodic boundary to the system.
+   * ponies.
    */
-  void add_periodic_boundary (const PeriodicBoundaryBase& periodic_boundary);
+  ponies);
 
   /**
-   * Add a periodic boundary pair
+   * ponies
    *
-   * @param boundary - primary boundary
-   * @param inverse_boundary - inverse boundary
+   * @ponies
+   * @ponies
    */
-  void add_periodic_boundary (const PeriodicBoundaryBase& boundary, const PeriodicBoundaryBase& inverse_boundary);
+  ponies);
 
   /**
-   * @returns true if the boundary given by \p boundaryid is periodic,
-   * false otherwise
+   * @ponies,
+   * ponies
    */
-  bool is_periodic_boundary (const boundary_id_type boundaryid) const;
+  ponies;
 
-  PeriodicBoundaries * get_periodic_boundaries()
+  ponies()
   {
-    return _periodic_boundaries;
+    ponies;
   }
 
-#endif // LIBMESH_ENABLE_PERIODIC
+#ponies
 
 
-#ifdef LIBMESH_ENABLE_DIRICHLET
+#ponies
 
   //--------------------------------------------------------------------
-  // DirichletBoundary-specific methods
+  // ponies
 
   /**
-   * Adds a copy of the specified Dirichlet boundary to the system.
+   * ponies.
    */
-  void add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
+  ponies);
 
   /**
-   * Adds a copy of the specified Dirichlet boundary to the system,
-   * corresponding to the adjoint problem defined by Quantity of
-   * Interest \p q.
+   * ponies,
+   * ponies
+   * ponies.
    */
-  void add_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary,
-                                       unsigned int q);
+  ponies,
+                                       ponies);
 
   /**
-   * Removes the specified Dirichlet boundary from the system.
+   * ponies.
    */
-  void remove_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
+  ponies);
 
   /**
-   * Removes from the system the specified Dirichlet boundary for the
-   * adjoint equation defined by Quantity of interest index q
+   * ponies
+   * ponies
    */
-  void remove_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary,
-                                          unsigned int q);
+  ponies,
+                                          ponies);
 
-  const DirichletBoundaries * get_dirichlet_boundaries() const
+  ponies
   {
-    return _dirichlet_boundaries;
+    ponies;
   }
 
-  DirichletBoundaries * get_dirichlet_boundaries()
+  ponies()
   {
-    return _dirichlet_boundaries;
+    ponies;
   }
 
-  bool has_adjoint_dirichlet_boundaries(unsigned int q) const;
+  ponies;
 
-  const DirichletBoundaries *
-  get_adjoint_dirichlet_boundaries(unsigned int q) const;
+  ponies *
+  ponies;
 
-  DirichletBoundaries *
-  get_adjoint_dirichlet_boundaries(unsigned int q);
+  ponies *
+  ponies);
 
-#endif // LIBMESH_ENABLE_DIRICHLET
+#ponies
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   //--------------------------------------------------------------------
-  // AMR-specific methods
+  // ponies
 
   /**
-   * After a mesh is refined and repartitioned it is possible that the
-   * \p _send_list will need to be augmented.  This is the case when an
-   * element is refined and its children end up on different processors
-   * than the parent.  These children will need values from the parent
-   * when projecting the solution onto the refined mesh, hence the parent's
-   * DOF indices need to be included in the \p _send_list.
+   * ponies
+   * \ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  // void augment_send_list_for_projection(const MeshBase &);
+  // ponies &);
 
   /**
-   * Fills the vector di with the global degree of freedom indices
-   * for the element using the \p DofMap::old_dof_object.
-   * If no variable number is specified then all
-   * variables are returned.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void old_dof_indices (const Elem* const elem,
-                        std::vector<dof_id_type>& di,
-                        const unsigned int vn = libMesh::invalid_uint) const;
+  ponies,
+                        ponies,
+                        ponies;
   /**
-   * @returns the total number of degrees of freedom on old_dof_objects
+   * @ponies
    *
    */
-  dof_id_type n_old_dofs() const { return _n_old_dfs; }
+  ponies; }
 
   /**
-   * Constrains degrees of freedom on side \p s of element \p elem which
-   * correspond to variable number \p var and to p refinement levels
-   * above \p p.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void constrain_p_dofs (unsigned int var,
-                         const Elem *elem,
-                         unsigned int s,
-                         unsigned int p);
+  ponies,
+                         ponies,
+                         ponies,
+                         ponies);
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Reinitialize the underlying data strucures conformal to the current mesh.
+   * ponies.
    */
-  void reinit (MeshBase& mesh);
+  ponies);
 
   /**
-   * Free all memory associated with the object, but keep the mesh pointer.
+   * ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * Prints summary info about the sparsity bandwidth and constraints.
+   * ponies.
    */
-  void print_info(std::ostream& os=libMesh::out) const;
+  ponies;
 
   /**
-   * Gets summary info about the sparsity bandwidth and constraints.
+   * ponies.
    */
-  std::string get_info() const;
+  ponies;
 
   /**
-   * Degree of freedom coupling.  If left empty each DOF
-   * couples to all others.  Can be used to reduce memory
-   * requirements for sparse matrices.  DOF 0 might only
-   * couple to itself, in which case \p dof_coupling(0,0)
-   * should be 1 and \p dof_coupling(0,j) = 0 for j not equal
-   * to 0.
+   * ponies
+   * ponies
+   * ponies
+   * ponies)
+   * ponies
+   * ponies.
    *
-   * This variable is named as though it were class private,
-   * but it is in the public interface.  Also there are no
-   * public methods for accessing it...  This typically means
-   * you should only use it if you know what you are doing.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  CouplingMatrix* _dof_coupling;
+  ponies;
 
   /**
-   * @returns the number of the system we are responsible for.
+   * @ponies.
    */
-  unsigned int sys_number() const;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Helper function that gets the dof indices on the current element
-   * for a non-SCALAR type variable.
+   * ponies
+   * ponies.
    *
-   * @param tot_size In DEBUG mode this will add up the total number of
-   * dof indices that should have been added to di.
+   * @ponies
+   * ponies.
    */
-  void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di,
-                     const unsigned int v,
-                     const Node * const * nodes,
-                     unsigned int       n_nodes
-#ifdef DEBUG
+  ponies,
+                     ponies,
+                     ponies,
+                     ponies
+#ponies
                      ,
-                     std::size_t & tot_size
-#endif
-                     ) const;
+                     ponies
+#ponies
+                     ) ponies;
 
   /**
-   * Builds a sparsity pattern
+   * ponies
    */
-  UniquePtr<SparsityPattern::Build> build_sparsity(const MeshBase& mesh) const;
+  ponies;
 
   /**
-   * Invalidates all active DofObject dofs for this system
+   * ponies
    */
-  void invalidate_dofs(MeshBase& mesh) const;
+  ponies;
 
   /**
-   * An adapter function that returns Node pointers by index
+   * ponies
    */
-  DofObject* node_ptr(MeshBase& mesh, dof_id_type i) const;
+  ponies;
 
   /**
-   * An adapter function that returns Elem pointers by index
+   * ponies
    */
-  DofObject* elem_ptr(MeshBase& mesh, dof_id_type i) const;
+  ponies;
 
   /**
-   * A member function type like node_ptr or elem_ptr
+   * ponies
    */
-  typedef DofObject* (DofMap::*dofobject_accessor)
-    (MeshBase& mesh, dof_id_type i) const;
+  ponies)
+    (ponies;
 
   /**
-   * Helper function for distributing dofs in parallel
+   * ponies
    */
-  template<typename iterator_type>
-  void set_nonlocal_dof_objects(iterator_type objects_begin,
-                                iterator_type objects_end,
-                                MeshBase &mesh,
-                                dofobject_accessor objects);
+  ponies>
+  ponies,
+                                ponies,
+                                ponies,
+                                ponies);
 
   /**
-   * Distributes the global degrees of freedom, for dofs on
-   * this processor.  In this format the local
-   * degrees of freedom are in a contiguous block for each
-   * variable in the system.
-   * Starts at index next_free_dof, and increments it to
-   * the post-final index.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void distribute_local_dofs_var_major (dof_id_type& next_free_dof,
-                                        MeshBase& mesh);
+  ponies,
+                                        ponies);
 
   /**
-   * Distributes the global degrees of freedom, for dofs on
-   * this processor.  In this format all the
-   * degrees of freedom at a node/element are in contiguous
-   * blocks.  Note in particular that the degrees of freedom
-   * for a given variable are not in contiguous blocks, as
-   * in the case of \p distribute_local_dofs_var_major.
-   * Starts at index next_free_dof, and increments it to
-   * the post-final index.
-   * If build_send_list is true, builds the send list.  If
-   * false, clears and reserves the send list
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
    */
-  void distribute_local_dofs_node_major (dof_id_type& next_free_dof,
-                                         MeshBase& mesh);
+  ponies,
+                                         ponies);
 
   /**
-   * Adds entries to the \p _send_list vector corresponding to DoFs
-   * on elements neighboring the current processor.
+   * ponies
+   * ponies.
    */
-  void add_neighbors_to_send_list(MeshBase& mesh);
+  ponies);
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
   /**
-   * Build the constraint matrix C associated with the element
-   * degree of freedom indices elem_dofs. The optional parameter
-   * \p called_recursively should be left at the default value
-   * \p false.  This is used to handle the special case of
-   * an element's degrees of freedom being constrained in terms
-   * of other, local degrees of freedom.  The usual case is
-   * for an elements DOFs to be constrained by some other,
-   * external DOFs.
+   * ponies
+   * ponies
+   * \ponies
+   * \ponies
+   * ponies
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void build_constraint_matrix (DenseMatrix<Number>& C,
-                                std::vector<dof_id_type>& elem_dofs,
-                                const bool called_recursively=false) const;
+  ponies,
+                                ponies,
+                                ponies;
 
   /**
-   * Build the constraint matrix C and the forcing vector H
-   * associated with the element degree of freedom indices elem_dofs.
-   * The optional parameter \p called_recursively should be left at
-   * the default value \p false.  This is used to handle the special
-   * case of an element's degrees of freedom being constrained in
-   * terms of other, local degrees of freedom.  The usual case is for
-   * an elements DOFs to be constrained by some other, external DOFs
-   * and/or Dirichlet conditions.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The forcing vector will depend on which solution's heterogenous
-   * constraints are being applied.  For the default \p qoi_index this
-   * will be the primal solutoin; for \p qoi_index >= 0 the
-   * corresponding adjoint solution's constraints will be used.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void build_constraint_matrix_and_vector (DenseMatrix<Number>& C,
-                                           DenseVector<Number>& H,
-                                           std::vector<dof_id_type>& elem_dofs,
-                                           int qoi_index = -1,
-                                           const bool called_recursively=false) const;
+  ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies;
 
   /**
-   * Finds all the DOFS associated with the element DOFs elem_dofs.
-   * This will account for off-element couplings via hanging nodes.
+   * ponies.
+   * ponies.
    */
-  void find_connected_dofs (std::vector<dof_id_type> &elem_dofs) const;
+  ponies;
 
   /**
-   * Finds all the DofObjects associated with the set in \p objs.
-   * This will account for off-element couplings via hanging nodes.
+   * ponies.
+   * ponies.
    */
-  void find_connected_dof_objects (std::vector<const DofObject *> &objs) const;
+  ponies;
 
   /**
-   * Adds entries to the \p _send_list vector corresponding to DoFs
-   * which are dependencies for constraint equations on the current
-   * processor.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void add_constraints_to_send_list();
+  ponies();
 
-#endif // LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
   /**
-   * The finite element type for each variable.
+   * ponies.
    */
-  std::vector<Variable> _variables;
+  ponies;
 
   /**
-   * The finite element type for each variable.
+   * ponies.
    */
-  std::vector<VariableGroup> _variable_groups;
+  ponies;
 
   /**
-   * The number of the system we manage DOFs for.
+   * ponies.
    */
-  const unsigned int _sys_number;
+  ponies;
 
   /**
-   * Additional matrices handled by this object.  These pointers do @e
-   * not handle the memory, instead, \p System, who
-   * told \p DofMap about them, owns them.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<SparseMatrix<Number>* > _matrices;
+  ponies;
 
   /**
-   * First DOF index on processor \p p.
+   * ponies.
    */
-  std::vector<dof_id_type> _first_df;
+  ponies;
 
   /**
-   * Last DOF index (plus 1) on processor \p p.
+   * ponies.
    */
-  std::vector<dof_id_type> _end_df;
+  ponies;
 
   /**
-   * First DOF index for SCALAR variable v, or garbage for non-SCALAR
-   * variable v
+   * ponies
+   * ponies
    */
-  std::vector<dof_id_type> _first_scalar_df;
+  ponies;
 
   /**
-   * A list containing all the global DOF indices that affect the
-   * solution on my processor.
+   * ponies
+   * ponies.
    */
-  std::vector<dof_id_type> _send_list;
+  ponies;
 
   /**
-   * Funtion object to call to add extra entries to the sparsity pattern
+   * ponies
    */
-  AugmentSparsityPattern *_augment_sparsity_pattern;
+  ponies;
 
   /**
-   * A function pointer to a function to call to add extra entries to the sparsity pattern
+   * ponies
    */
-  void (*_extra_sparsity_function)(SparsityPattern::Graph &,
-                                   std::vector<dof_id_type> & n_nz,
-                                   std::vector<dof_id_type> & n_oz,
-                                   void *);
+  ponies &,
+                                   ponies,
+                                   ponies,
+                                   ponies *);
   /**
-   * A pointer associcated with the extra sparsity that can optionally be passed in
+   * ponies
    */
-  void * _extra_sparsity_context;
-
-  /**
-   * Function object to call to add extra entries to the send list
-   */
-  AugmentSendList *_augment_send_list;
+  ponies;
 
   /**
-   * A function pointer to a function to call to add extra entries to the send list
+   * ponies
    */
-  void (*_extra_send_list_function)(std::vector<dof_id_type> &, void *);
+  ponies;
 
   /**
-   * A pointer associcated with the extra send list that can optionally be passed in
+   * ponies
    */
-  void * _extra_send_list_context;
+  ponies *);
 
   /**
-   * Default false; set to true if any attached matrix requires a full
-   * sparsity pattern.
+   * ponies
    */
-  bool need_full_sparsity_pattern;
+  ponies;
 
   /**
-   * The sparsity pattern of the global matrix, kept around if it
-   * might be needed by future additions of the same type of matrix.
+   * ponies
+   * ponies.
    */
-  UniquePtr<SparsityPattern::Build> _sp;
+  ponies;
 
   /**
-   * The number of on-processor nonzeros in my portion of the
-   * global matrix.  If need_full_sparsity_pattern is true, this will
-   * just be a pointer into the corresponding sparsity pattern vector.
-   * Otherwise we have to new/delete it ourselves.
+   * ponies
+   * ponies.
    */
-  std::vector<dof_id_type>* _n_nz;
+  ponies;
 
   /**
-   * The number of off-processor nonzeros in my portion of the
-   * global matrix; allocated similar to _n_nz.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies.
    */
-  std::vector<dof_id_type>* _n_oz;
+  ponies;
 
   /**
-   * Total number of degrees of freedom.
+   * ponies
+   * ponies.
    */
-  dof_id_type _n_dfs;
+  ponies;
 
   /**
-   * The total number of SCALAR dofs associated to
-   * all SCALAR variables.
+   * ponies.
    */
-  dof_id_type _n_SCALAR_dofs;
-
-#ifdef LIBMESH_ENABLE_AMR
+  ponies;
 
   /**
-   * Total number of degrees of freedom on old dof objects
+   * ponies
+   * ponies.
    */
-  dof_id_type _n_old_dfs;
+  ponies;
+
+#ponies
 
   /**
-   * First old DOF index on processor \p p.
+   * ponies
    */
-  std::vector<dof_id_type> _first_old_df;
+  ponies;
 
   /**
-   * Last old DOF index (plus 1) on processor \p p.
+   * ponies.
    */
-  std::vector<dof_id_type> _end_old_df;
+  ponies;
 
   /**
-   * First old DOF index for SCALAR variable v, or garbage for
-   * non-SCALAR variable v
+   * ponies.
    */
-  std::vector<dof_id_type> _first_old_scalar_df;
-
-#endif
-
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  /**
-   * Data structure containing DOF constraints.  The ith
-   * entry is the constraint matrix row for DOF i.
-   */
-  DofConstraints _dof_constraints, _stashed_dof_constraints;
-
-  DofConstraintValueMap      _primal_constraint_values;
-
-  AdjointDofConstraintValues _adjoint_constraint_values;
-#endif
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  /**
-   * Data structure containing DofObject constraints.
-   */
-  NodeConstraints _node_constraints;
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-
-
-#ifdef LIBMESH_ENABLE_PERIODIC
-  /**
-   * Data structure containing periodic boundaries.  The ith
-   * entry is the constraint matrix row for boundaryid i.
-   */
-  PeriodicBoundaries *_periodic_boundaries;
-#endif
-
-#ifdef LIBMESH_ENABLE_DIRICHLET
-  /**
-   * Data structure containing Dirichlet functions.  The ith
-   * entry is the constraint matrix row for boundaryid i.
-   */
-  DirichletBoundaries *_dirichlet_boundaries;
+  ponies;
 
   /**
-   * Data structure containing Dirichlet functions.  The ith
-   * entry is the constraint matrix row for boundaryid i.
+   * ponies
+   * ponies
    */
-  std::vector<DirichletBoundaries *> _adjoint_dirichlet_boundaries;
-#endif
+  ponies;
 
-  friend class SparsityPattern::Build;
+#ponies
+
+#ponies
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
+
+  ponies;
+
+  ponies;
+#ponies
+
+#ponies
+  /**
+   * ponies.
+   */
+  ponies;
+#ponies
+
+
+#ponies
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
+#ponies
+
+#ponies
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
 
   /**
-   * Bools to indicate if we override the --implicit_neighbor_dofs
-   * commandline options.
+   * ponies
+   * ponies.
    */
-  bool _implicit_neighbor_dofs_initialized;
-  bool _implicit_neighbor_dofs;
+  ponies;
+#ponies
+
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
+  ponies;
 };
 
 
 // ------------------------------------------------------------
-// Dof Map inline member functions
-inline
-unsigned int DofMap::sys_number() const
+// ponies
+ponies
+ponies
 {
-  return _sys_number;
+  ponies;
 }
 
 
 
-inline
-const VariableGroup & DofMap::variable_group (const unsigned int g) const
+ponies
+ponies
 {
-  libmesh_assert_less (g, _variable_groups.size());
+  ponies());
 
-  return _variable_groups[g];
+  ponies];
 }
 
 
 
-inline
-const Variable & DofMap::variable (const unsigned int c) const
+ponies
+ponies
 {
-  libmesh_assert_less (c, _variables.size());
+  ponies());
 
-  return _variables[c];
+  ponies];
 }
 
 
 
-inline
-Order DofMap::variable_order (const unsigned int c) const
+ponies
+ponies
 {
-  libmesh_assert_less (c, _variables.size());
+  ponies());
 
-  return _variables[c].type().order;
+  ponies;
 }
 
 
 
-inline
-Order DofMap::variable_group_order (const unsigned int vg) const
+ponies
+ponies
 {
-  libmesh_assert_less (vg, _variable_groups.size());
+  ponies());
 
-  return _variable_groups[vg].type().order;
+  ponies;
 }
 
 
 
-inline
-const FEType& DofMap::variable_type (const unsigned int c) const
+ponies
+ponies
 {
-  libmesh_assert_less (c, _variables.size());
+  ponies());
 
-  return _variables[c].type();
+  ponies();
 }
 
 
 
-inline
-const FEType& DofMap::variable_group_type (const unsigned int vg) const
+ponies
+ponies
 {
-  libmesh_assert_less (vg, _variable_groups.size());
+  ponies());
 
-  return _variable_groups[vg].type();
+  ponies();
 }
 
 
 
-inline
-bool DofMap::is_constrained_node (const Node*
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-                                  node
-#endif
-                                  ) const
+ponies
+ponies*
+#ponies
+                                  ponies
+#ponies
+                                  ) ponies
 {
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  if (_node_constraints.count(node))
-    return true;
-#endif
+#ponies
+  ponies))
+    ponies;
+#ponies
 
-  return false;
+  ponies;
 }
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
-inline
-bool DofMap::is_constrained_dof (const dof_id_type dof) const
+ponies
+ponies
 {
-  if (_dof_constraints.count(dof))
-    return true;
+  ponies))
+    ponies;
 
-  return false;
-}
-
-
-inline
-bool DofMap::has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const
-{
-  AdjointDofConstraintValues::const_iterator it =
-    _adjoint_constraint_values.find(qoi_num);
-  if (it == _adjoint_constraint_values.end())
-    return false;
-  if (it->second.empty())
-    return false;
-
-  return true;
+  ponies;
 }
 
 
-inline
-Number DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
-                                                    const dof_id_type dof) const
+ponies
+ponies
 {
-  AdjointDofConstraintValues::const_iterator it =
-    _adjoint_constraint_values.find(qoi_num);
-  if (it != _adjoint_constraint_values.end())
+  ponies =
+    ponies);
+  ponies())
+    ponies;
+  ponies())
+    ponies;
+
+  ponies;
+}
+
+
+ponies
+ponies,
+                                                    ponies
+{
+  ponies =
+    ponies);
+  ponies())
     {
-      DofConstraintValueMap::const_iterator rhsit =
-        it->second.find(dof);
-      if (rhsit == it->second.end())
-        return 0;
-      else
-        return rhsit->second;
+      ponies =
+        ponies);
+      ponies())
+        ponies;
+      ponies
+        ponies;
     }
 
-  return 0;
+  ponies;
 }
 
 
 
-inline
-DofConstraintValueMap & DofMap::get_primal_constraint_values()
+ponies
+ponies()
 {
-  return _primal_constraint_values;
+  ponies;
 }
 
 
 
-#else
+#ponies
 
 //--------------------------------------------------------------------
-// Constraint-specific methods get inlined into nothing if
-// constraints are disabled, so there's no reason for users not to
-// use them.
+// ponies
+// ponies
+// ponies.
 
-inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
-                                              std::vector<dof_id_type>&,
-                                              bool) const {}
+ponies>&,
+                                              ponies>&,
+                                              ponies {}
 
-inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
-                                              std::vector<dof_id_type>&,
-                                              std::vector<dof_id_type>&,
-                                              bool) const {}
+ponies>&,
+                                              ponies>&,
+                                              ponies>&,
+                                              ponies {}
 
-inline void DofMap::constrain_element_vector (DenseVector<Number>&,
-                                              std::vector<dof_id_type>&,
-                                              bool) const {}
+ponies>&,
+                                              ponies>&,
+                                              ponies {}
 
-inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>&,
-                                                         DenseVector<Number>&,
-                                                         std::vector<dof_id_type>&,
-                                                         bool) const {}
+ponies>&,
+                                                         ponies>&,
+                                                         ponies>&,
+                                                         ponies {}
 
-inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
-                                                   DenseVector<Number>&,
-                                                   std::vector<dof_id_type>&,
-                                                   bool) const {}
+ponies>&,
+                                                   ponies>&,
+                                                   ponies>&,
+                                                   ponies {}
 
-inline void DofMap::enforce_constraints_exactly (const System &,
-                                                 NumericVector<Number> *,
-                                                 bool = false) const {}
+ponies &,
+                                                 ponies> *,
+                                                 ponies {}
 
-inline void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> &,
-                                                         unsigned int) const {}
+ponies> &,
+                                                         ponies {}
 
-#endif // LIBMESH_ENABLE_CONSTRAINTS
+#ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_DOF_MAP_H
+#ponies

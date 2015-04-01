@@ -1,656 +1,656 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#include "libmesh/libmesh_common.h"
-
-#ifdef LIBMESH_HAVE_PETSC
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
 
-// Local Includes
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/petsc_nonlinear_solver.h"
-#include "libmesh/petsc_linear_solver.h"
-#include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/preconditioner.h"
+#ponies"
 
-/* DMlibMesh include. */
-#include "libmesh/petscdmlibmesh.h"
+#ponies
 
-namespace libMesh
+
+// ponies
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+/* ponies. */
+#ponies"
+
+ponies
 {
 
 //--------------------------------------------------------------------
-// Functions with C linkage to pass to PETSc.  PETSc will call these
-// methods as needed.
+// ponies
+// ponies.
 //
-// Since they must have C linkage they have no knowledge of a namespace.
-// Give them an obscure name to avoid namespace pollution.
-extern "C"
+// ponies.
+// ponies.
+ponies"
 {
-  // Older versions of PETSc do not have the different int typedefs.
-  // On 64-bit machines, PetscInt may actually be a long long int.
-  // This change occurred in Petsc-2.2.1.
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-  typedef int PetscErrorCode;
-  typedef int PetscInt;
-#endif
+  // ponies.
+  // ponies.
+  // ponies.
+#ponies)
+  ponies;
+  ponies;
+#ponies
 
   //-------------------------------------------------------------------
-  // this function is called by PETSc at the end of each nonlinear step
-  PetscErrorCode
-  __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
+  // ponies
+  ponies
+  ponies *)
   {
-    //PetscErrorCode ierr=0;
+    //ponies;
 
-    //if (its > 0)
-    libMesh::out << "  NL step "
-                 << std::setw(2) << its
-                 << std::scientific
-                 << ", |residual|_2 = " << fnorm
-                 << std::endl;
+    //ponies)
+    ponies "
+                 << ponies
+                 << ponies
+                 << ", |ponies
+                 << ponies;
 
-    //return ierr;
-    return 0;
+    //ponies;
+    ponies;
   }
 
 
 
   //---------------------------------------------------------------
-  // this function is called by PETSc to evaluate the residual at X
-  PetscErrorCode
-  __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void *ctx)
+  // ponies
+  ponies
+  ponies)
   {
-    START_LOG("residual()", "PetscNonlinearSolver");
+    ponies");
 
-    PetscErrorCode ierr=0;
+    ponies;
 
-    libmesh_assert(x);
-    libmesh_assert(r);
-    libmesh_assert(ctx);
+    ponies);
+    ponies);
+    ponies);
 
-    // No way to safety-check this cast, since we got a void*...
-    PetscNonlinearSolver<Number>* solver =
-      static_cast<PetscNonlinearSolver<Number>*> (ctx);
+    // ponies*...
+    ponies =
+      ponies);
 
-    // Get the current iteration number from the snes object,
-    // store it in the PetscNonlinearSolver object for possible use
-    // by the user's residual function.
+    // ponies,
+    // ponies
+    // ponies.
     {
-      PetscInt n_iterations = 0;
-      ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
+      ponies;
+      ponies);
+      ponies);
+      ponies);
     }
 
-    NonlinearImplicitSystem &sys = solver->system();
+    ponies();
 
-    PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
-    PetscVector<Number>& R_sys = *cast_ptr<PetscVector<Number>*>(sys.rhs);
-    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
+    ponies());
+    ponies);
+    ponies());
 
-    // Use the systems update() to get a good local version of the parallel solution
-    X_global.swap(X_sys);
-    R.swap(R_sys);
+    // ponies
+    ponies);
+    ponies);
 
-    sys.get_dof_map().enforce_constraints_exactly(sys);
+    ponies);
 
-    sys.update();
+    ponies();
 
-    //Swap back
-    X_global.swap(X_sys);
-    R.swap(R_sys);
+    //ponies
+    ponies);
+    ponies);
 
-    if (solver->_zero_out_residual)
-      R.zero();
+    ponies)
+      ponies();
 
     //-----------------------------------------------------------------------------
-    // if the user has provided both function pointers and objects only the pointer
-    // will be used, so catch that as an error
-    if (solver->residual && solver->residual_object)
-      libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Residual!");
+    // ponies
+    // ponies
+    ponies)
+      ponies!");
 
-    if (solver->matvec && solver->residual_and_jacobian_object)
-      libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!");
+    ponies)
+      ponies!");
 
-    if (solver->residual != NULL)
-      solver->residual(*sys.current_local_solution.get(), R, sys);
+    ponies)
+      ponies);
 
-    else if (solver->residual_object != NULL)
-      solver->residual_object->residual(*sys.current_local_solution.get(), R, sys);
+    ponies)
+      ponies);
 
-    else if (solver->matvec != NULL)
-      solver->matvec (*sys.current_local_solution.get(), &R, NULL, sys);
+    ponies)
+      ponies);
 
-    else if (solver->residual_and_jacobian_object != NULL)
-      solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), &R, NULL, sys);
+    ponies)
+      ponies);
 
-    else
-      libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
+    ponies
+      ponies!");
 
-    R.close();
-    X_global.close();
+    ponies();
+    ponies();
 
-    STOP_LOG("residual()", "PetscNonlinearSolver");
+    ponies");
 
-    return ierr;
+    ponies;
   }
 
 
 
   //---------------------------------------------------------------
-  // this function is called by PETSc to evaluate the Jacobian at X
-  PetscErrorCode
-  __libmesh_petsc_snes_jacobian(
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-                                SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx
-#else
-                                SNES snes, Vec x, Mat jac, Mat pc, void *ctx
-#endif
+  // ponies
+  ponies
+  ponies(
+#ponies)
+                                ponies
+#ponies
+                                ponies
+#ponies
                                 )
   {
-    START_LOG("jacobian()", "PetscNonlinearSolver");
+    ponies");
 
-    PetscErrorCode ierr=0;
+    ponies;
 
-    libmesh_assert(ctx);
+    ponies);
 
-    // No way to safety-check this cast, since we got a void*...
-    PetscNonlinearSolver<Number>* solver =
-      static_cast<PetscNonlinearSolver<Number>*> (ctx);
+    // ponies*...
+    ponies =
+      ponies);
 
-    // Get the current iteration number from the snes object,
-    // store it in the PetscNonlinearSolver object for possible use
-    // by the user's Jacobian function.
+    // ponies,
+    // ponies
+    // ponies.
     {
-      PetscInt n_iterations = 0;
-      ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
+      ponies;
+      ponies);
+      ponies);
+      ponies);
     }
 
-    NonlinearImplicitSystem &sys = solver->system();
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-    PetscMatrix<Number> PC(*pc, sys.comm());
-    PetscMatrix<Number> Jac(*jac, sys.comm());
-#else
-    PetscMatrix<Number> PC(pc, sys.comm());
-    PetscMatrix<Number> Jac(jac, sys.comm());
-#endif
-    PetscVector<Number>& X_sys = *cast_ptr<PetscVector<Number>*>(sys.solution.get());
-    PetscMatrix<Number>& Jac_sys = *cast_ptr<PetscMatrix<Number>*>(sys.matrix);
-    PetscVector<Number> X_global(x, sys.comm());
+    ponies();
+#ponies)
+    ponies());
+    ponies());
+#ponies
+    ponies());
+    ponies());
+#ponies
+    ponies());
+    ponies);
+    ponies());
 
-    // Set the dof maps
-    PC.attach_dof_map(sys.get_dof_map());
-    Jac.attach_dof_map(sys.get_dof_map());
+    // ponies
+    ponies());
+    ponies());
 
-    // Use the systems update() to get a good local version of the parallel solution
-    X_global.swap(X_sys);
-    Jac.swap(Jac_sys);
+    // ponies
+    ponies);
+    ponies);
 
-    sys.get_dof_map().enforce_constraints_exactly(sys);
-    sys.update();
+    ponies);
+    ponies();
 
-    X_global.swap(X_sys);
-    Jac.swap(Jac_sys);
+    ponies);
+    ponies);
 
-    if (solver->_zero_out_jacobian)
-      PC.zero();
+    ponies)
+      ponies();
 
     //-----------------------------------------------------------------------------
-    // if the user has provided both function pointers and objects only the pointer
-    // will be used, so catch that as an error
-    if (solver->jacobian && solver->jacobian_object)
-      libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Jacobian!");
+    // ponies
+    // ponies
+    ponies)
+      ponies!");
 
-    if (solver->matvec && solver->residual_and_jacobian_object)
-      libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
+    ponies)
+      ponies!");
 
-    if (solver->jacobian != NULL)
-      solver->jacobian(*sys.current_local_solution.get(), PC, sys);
+    ponies)
+      ponies);
 
-    else if (solver->jacobian_object != NULL)
-      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), PC, sys);
+    ponies)
+      ponies);
 
-    else if (solver->matvec != NULL)
-      solver->matvec(*sys.current_local_solution.get(), NULL, &PC, sys);
+    ponies)
+      ponies);
 
-    else if (solver->residual_and_jacobian_object != NULL)
-      solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), NULL, &PC, sys);
+    ponies)
+      ponies);
 
-    else
-      libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
+    ponies
+      ponies!");
 
-    PC.close();
-    Jac.close();
-    X_global.close();
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-    *msflag = SAME_NONZERO_PATTERN;
-#endif
-    STOP_LOG("jacobian()", "PetscNonlinearSolver");
+    ponies();
+    ponies();
+    ponies();
+#ponies)
+    *ponies;
+#ponies
+    ponies");
 
-    return ierr;
+    ponies;
   }
 
-} // end extern "C"
+} // ponies"
 //---------------------------------------------------------------------
 
 
 
 //---------------------------------------------------------------------
-// PetscNonlinearSolver<> methods
-template <typename T>
-PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system_in) :
-  NonlinearSolver<T>(system_in),
-  _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
-  _n_linear_iterations(0),
-  _current_nonlinear_iteration_number(0),
-  _zero_out_residual(true),
-  _zero_out_jacobian(true),
-  _default_monitor(true)
+// ponies
+ponies>
+ponies) :
+  ponies),
+  ponies...
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <typename T>
-PetscNonlinearSolver<T>::~PetscNonlinearSolver ()
+ponies>
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
 
-template <typename T>
-void PetscNonlinearSolver<T>::clear ()
+ponies>
+ponies ()
 {
-  if (this->initialized())
+  ponies())
     {
-      this->_is_initialized = false;
+      ponies;
 
-      PetscErrorCode ierr=0;
+      ponies;
 
-      ierr = LibMeshSNESDestroy(&_snes);
-      LIBMESH_CHKERRABORT(ierr);
+      ponies);
+      ponies);
 
-      // Reset the nonlinear iteration counter.  This information is only relevant
-      // *during* the solve().  After the solve is completed it should return to
-      // the default value of 0.
-      _current_nonlinear_iteration_number = 0;
+      // ponies
+      // *ponies
+      // ponies.
+      ponies;
     }
 }
 
 
 
-template <typename T>
-void PetscNonlinearSolver<T>::init (const char* name)
+ponies>
+ponies)
 {
-  // Initialize the data structures if not done so already.
-  if (!this->initialized())
+  // ponies.
+  ponies())
     {
-      this->_is_initialized = true;
+      ponies;
 
-      PetscErrorCode ierr=0;
+      ponies;
 
-#if PETSC_VERSION_LESS_THAN(2,1,2)
-      // At least until Petsc 2.1.1, the SNESCreate had a different calling syntax.
-      // The second argument was of type SNESProblemType, and could have a value of
-      // either SNES_NONLINEAR_EQUATIONS or SNES_UNCONSTRAINED_MINIMIZATION.
-      ierr = SNESCreate(this->comm().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
-      LIBMESH_CHKERRABORT(ierr);
+#ponies)
+      // ponies.
+      // ponies
+      // ponies.
+      ponies);
+      ponies);
 
-#else
+#ponies
 
-      ierr = SNESCreate(this->comm().get(),&_snes);
-      LIBMESH_CHKERRABORT(ierr);
+      ponies);
+      ponies);
 
-#endif
+#ponies
 
-      if (name)
+      ponies)
         {
-          ierr = SNESSetOptionsPrefix(_snes, name);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies);
+          ponies);
         }
 
-#if !PETSC_RELEASE_LESS_THAN(3,3,0)
-      // Attaching a DM to SNES.
-      DM dm;
-      ierr = DMCreate(this->comm().get(), &dm);LIBMESH_CHKERRABORT(ierr);
-      ierr = DMSetType(dm,DMLIBMESH);LIBMESH_CHKERRABORT(ierr);
-      ierr = DMlibMeshSetSystem(dm,this->system());LIBMESH_CHKERRABORT(ierr);
-      if (name)
+#ponies)
+      // ponies.
+      ponies;
+      ponies);
+      ponies);
+      ponies);
+      ponies)
         {
-          ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
+          ponies);
         }
-      ierr = DMSetFromOptions(dm);               LIBMESH_CHKERRABORT(ierr);
-      ierr = DMSetUp(dm);                        LIBMESH_CHKERRABORT(ierr);
-      ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERRABORT(ierr);
-      // SNES now owns the reference to dm.
-      ierr = DMDestroy(&dm);                     LIBMESH_CHKERRABORT(ierr);
+      ponies);
+      ponies);
+      ponies);
+      // ponies.
+      ponies);
 
-#endif
+#ponies
 
-      if (_default_monitor)
+      ponies)
         {
-#if PETSC_VERSION_LESS_THAN(2,3,3)
-          ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
-                                 this, PETSC_NULL);
-#else
-          // API name change in PETSc 2.3.3
-          ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
-                                 this, PETSC_NULL);
-#endif
-          LIBMESH_CHKERRABORT(ierr);
+#ponies)
+          ponies,
+                                 ponies);
+#ponies
+          // ponies
+          ponies,
+                                 ponies);
+#ponies
+          ponies);
         }
 
-#if PETSC_VERSION_LESS_THAN(3,1,0)
-      // Cannot call SNESSetOptions before SNESSetFunction when using
-      // any matrix free options with PETSc 3.1.0+
-      ierr = SNESSetFromOptions(_snes);
-      LIBMESH_CHKERRABORT(ierr);
-#endif
+#ponies)
+      // ponies
+      // ponies+
+      ponies);
+      ponies);
+#ponies
 
-      if(this->_preconditioner)
+      ponies)
         {
-          KSP ksp;
-          ierr = SNESGetKSP (_snes, &ksp);
-          LIBMESH_CHKERRABORT(ierr);
-          PC pc;
-          ierr = KSPGetPC(ksp,&pc);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies;
+          ponies);
+          ponies);
+          ponies;
+          ponies);
+          ponies);
 
-          this->_preconditioner->init();
+          ponies();
 
-          PCSetType(pc, PCSHELL);
-          PCShellSetContext(pc,(void*)this->_preconditioner);
+          ponies);
+          ponies);
 
-          //Re-Use the shell functions from petsc_linear_solver
-          PCShellSetSetUp(pc,__libmesh_petsc_preconditioner_setup);
-          PCShellSetApply(pc,__libmesh_petsc_preconditioner_apply);
+          //ponies
+          ponies);
+          ponies);
         }
     }
 }
 
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
-template <typename T>
-void
-PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
-                                              void (*computeSubspace)(std::vector<NumericVector<Number>*>&, sys_type&),
-                                              MatNullSpace *msp)
+#ponies)
+ponies>
+ponies
+ponies,
+                                              ponies&),
+                                              ponies)
 {
-  PetscErrorCode ierr;
-  std::vector<NumericVector<Number>* > sp;
-  if (computeSubspaceObject)
-    (*computeSubspaceObject)(sp, this->system());
-  else
-    (*computeSubspace)(sp, this->system());
+  ponies;
+  ponies;
+  ponies)
+    (*ponies());
+  ponies
+    (*ponies());
 
-  *msp = PETSC_NULL;
-  if (sp.size())
+  *ponies;
+  ponies())
     {
-      Vec *modes;
-      PetscScalar *dots;
-      PetscInt nmodes = cast_int<PetscInt>(sp.size());
+      ponies;
+      ponies;
+      ponies());
 
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
-      ierr = PetscMalloc2(nmodes,Vec,&modes,nmodes,PetscScalar,&dots);
-#else
-      ierr = PetscMalloc2(nmodes,&modes,nmodes,&dots);
-#endif
-      LIBMESH_CHKERRABORT(ierr);
+#ponies)
+      ponies);
+#ponies
+      ponies);
+#ponies
+      ponies);
 
-      for (PetscInt i=0; i<nmodes; ++i)
+      ponies)
         {
-          PetscVector<T>* pv = cast_ptr<PetscVector<T>*>(sp[i]);
-          Vec v = pv->vec();
+          ponies]);
+          ponies();
 
-          ierr = VecDuplicate(v, modes+i);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies);
+          ponies);
 
-          ierr = VecCopy(v,modes[i]);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies]);
+          ponies);
         }
 
-      // Normalize.
-      ierr = VecNormalize(modes[0],PETSC_NULL);
-      LIBMESH_CHKERRABORT(ierr);
+      // ponies.
+      ponies);
+      ponies);
 
-      for (PetscInt i=1; i<nmodes; i++)
+      ponies++)
         {
-          // Orthonormalize vec[i] against vec[0:i-1]
-          ierr = VecMDot(modes[i],i,modes,dots);
-          LIBMESH_CHKERRABORT(ierr);
+          // ponies]
+          ponies);
+          ponies);
 
-          for (PetscInt j=0; j<i; j++)
-            dots[j] *= -1.;
+          ponies++)
+            ponies.;
 
-          ierr = VecMAXPY(modes[i],i,dots,modes);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies);
+          ponies);
 
-          ierr = VecNormalize(modes[i],PETSC_NULL);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies);
+          ponies);
         }
 
-      ierr = MatNullSpaceCreate(this->comm().get(), PETSC_FALSE, nmodes, modes, msp);
-      LIBMESH_CHKERRABORT(ierr);
+      ponies);
+      ponies);
 
-      for (PetscInt i=0; i<nmodes; ++i)
+      ponies)
         {
-          ierr = VecDestroy(modes+i);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies);
+          ponies);
         }
 
-      ierr = PetscFree2(modes,dots);
-      LIBMESH_CHKERRABORT(ierr);
+      ponies);
+      ponies);
     }
 }
-#endif
+#ponies
 
-template <typename T>
-std::pair<unsigned int, Real>
-PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
-                                NumericVector<T>& x_in,    // Solution vector
-                                NumericVector<T>& r_in,    // Residual vector
-                                const double,              // Stopping tolerance
-                                const unsigned int)
+ponies>
+ponies>
+ponies
+                                ponies
+                                ponies
+                                ponies
+                                ponies)
 {
-  START_LOG("solve()", "PetscNonlinearSolver");
-  this->init ();
+  ponies");
+  ponies ();
 
-  // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T>* jac = cast_ptr<PetscMatrix<T>*>(&jac_in);
-  PetscVector<T>* x   = cast_ptr<PetscVector<T>*>(&x_in);
-  PetscVector<T>* r   = cast_ptr<PetscVector<T>*>(&r_in);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
 
-  PetscErrorCode ierr=0;
-  PetscInt n_iterations =0;
-  // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
-  Real final_residual_norm=0.;
+  ponies;
+  ponies;
+  // ponies
+  ponies.;
 
-  ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
-  LIBMESH_CHKERRABORT(ierr);
+  ponies);
+  ponies);
 
-  // Only set the jacobian function if we've been provided with something to call.
-  // This allows a user to set their own jacobian function if they want to
-  if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
+  // ponies.
+  // ponies
+  ponies)
     {
-      ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
-      LIBMESH_CHKERRABORT(ierr);
+      ponies);
+      ponies);
     }
-#if !PETSC_VERSION_LESS_THAN(3,3,0)
-  // Only set the nullspace if we have a way of computing it and the result is non-empty.
-  if (this->nullspace || this->nullspace_object)
+#ponies)
+  // ponies.
+  ponies)
     {
-      MatNullSpace msp;
-      this->build_mat_null_space(this->nullspace_object, this->nullspace, &msp);
-      if (msp)
+      ponies;
+      ponies);
+      ponies)
         {
-          ierr = MatSetNullSpace(jac->mat(), msp);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies);
+          ponies);
 
-          ierr = MatNullSpaceDestroy(&msp);
-          LIBMESH_CHKERRABORT(ierr);
+          ponies);
+          ponies);
         }
     }
 
-  // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
-  if (this->nearnullspace || this->nearnullspace_object)
+  // ponies.
+  ponies)
     {
-      MatNullSpace msp = PETSC_NULL;
-      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
+      ponies;
+      ponies);
 
-      if(msp) {
-        ierr = MatSetNearNullSpace(jac->mat(), msp);
-        LIBMESH_CHKERRABORT(ierr);
+      ponies) {
+        ponies);
+        ponies);
 
-        ierr = MatNullSpaceDestroy(&msp);
-        LIBMESH_CHKERRABORT(ierr);
+        ponies);
+        ponies);
       }
     }
-#endif
-  // Have the Krylov subspace method use our good initial guess rather than 0
-  KSP ksp;
-  ierr = SNESGetKSP (_snes, &ksp);
-  LIBMESH_CHKERRABORT(ierr);
+#ponies
+  // ponies
+  ponies;
+  ponies);
+  ponies);
 
-  // Set the tolerances for the iterative solver.  Use the user-supplied
-  // tolerance for the relative residual & leave the others at default values
-  ierr = KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,
-                           PETSC_DEFAULT, this->max_linear_iterations);
-  LIBMESH_CHKERRABORT(ierr);
+  // ponies
+  // ponies
+  ponies,
+                           ponies);
+  ponies);
 
-  // Set the tolerances for the non-linear solver.
-  ierr = SNESSetTolerances(_snes, this->absolute_residual_tolerance, this->relative_residual_tolerance,
-                           this->relative_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
-  LIBMESH_CHKERRABORT(ierr);
+  // ponies.
+  ponies,
+                           ponies);
+  ponies);
 
-  //Pull in command-line options
-  KSPSetFromOptions(ksp);
-  SNESSetFromOptions(_snes);
+  //ponies
+  ponies);
+  ponies);
 
-  if (this->user_presolve)
-    this->user_presolve(this->system());
+  ponies)
+    ponies());
 
-  //Set the preconditioning matrix
-  if(this->_preconditioner)
+  //ponies
+  ponies)
     {
-      this->_preconditioner->set_matrix(jac_in);
-      this->_preconditioner->init();
+      ponies);
+      ponies();
     }
 
-  //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
-  //           LIBMESH_CHKERRABORT(ierr);
+  //    ponies);
+  //           ponies);
 
-  // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
-  // the last one being a pointer to an int to hold the number of iterations required.
-# if PETSC_VERSION_LESS_THAN(2,2,0)
+  // ponies,
+  // ponies.
+# ponies)
 
-  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
-  LIBMESH_CHKERRABORT(ierr);
+  ponies);
+  ponies);
 
-  // 2.2.x style
-#elif PETSC_VERSION_LESS_THAN(2,3,0)
+  // ponies
+#ponies)
 
-  ierr = SNESSolve (_snes, x->vec());
-  LIBMESH_CHKERRABORT(ierr);
+  ponies());
+  ponies);
 
-  // 2.3.x & newer style
-#else
+  // ponies
+#ponies
 
-  ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
-  LIBMESH_CHKERRABORT(ierr);
+  ponies());
+  ponies);
 
-  ierr = SNESGetIterationNumber(_snes,&n_iterations);
-  LIBMESH_CHKERRABORT(ierr);
+  ponies);
+  ponies);
 
-  ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
-  LIBMESH_CHKERRABORT(ierr);
+  ponies);
+  ponies);
 
-#endif
+#ponies
 
-  // SNESGetFunction has been around forever and should work on all
-  // versions of PETSc.  This is also now the recommended approach
-  // according to the documentation for the PETSc 3.5.1 release:
-  // http://www.mcs.anl.gov/petsc/documentation/changes/35.html
-  Vec f;
-  ierr = SNESGetFunction(_snes, &f, 0, 0);
-  LIBMESH_CHKERRABORT(ierr);
-  ierr = VecNorm(f, NORM_2, &final_residual_norm);
-  LIBMESH_CHKERRABORT(ierr);
+  // ponies
+  // ponies
+  // ponies:
+  // ponies
+  ponies;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  // Get and store the reason for convergence
-  SNESGetConvergedReason(_snes, &_reason);
+  // ponies
+  ponies);
 
-  //Based on Petsc 2.3.3 documentation all diverged reasons are negative
-  this->converged = (_reason >= 0);
+  //ponies
+  ponies);
 
-  this->clear();
+  ponies();
 
-  STOP_LOG("solve()", "PetscNonlinearSolver");
+  ponies");
 
-  // return the # of its. and the final residual norm.
-  return std::make_pair(n_iterations, final_residual_norm);
+  // ponies.
+  ponies);
 }
 
 
 
-template <typename T>
-void PetscNonlinearSolver<T>::print_converged_reason()
+ponies>
+ponies()
 {
 
-  libMesh::out << "Nonlinear solver convergence/divergence reason: "
-               << SNESConvergedReasons[this->get_converged_reason()] << std::endl;
+  ponies: "
+               << ponies;
 }
 
 
 
-template <typename T>
-SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
+ponies>
+ponies()
 {
-  PetscErrorCode ierr=0;
+  ponies;
 
-  if (this->initialized())
+  ponies())
     {
-      ierr = SNESGetConvergedReason(_snes, &_reason);
-      LIBMESH_CHKERRABORT(ierr);
+      ponies);
+      ponies);
     }
 
-  return _reason;
+  ponies;
 }
 
-template <typename T>
-int PetscNonlinearSolver<T>::get_total_linear_iterations()
+ponies>
+ponies()
 {
-  return _n_linear_iterations;
+  ponies;
 }
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class PetscNonlinearSolver<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // #ifdef LIBMESH_HAVE_PETSC
+#ponies

@@ -1,276 +1,276 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_EXODUSII_IO_H
-#define LIBMESH_EXODUSII_IO_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_input.h"
-#include "libmesh/mesh_output.h"
-#include "libmesh/parallel_object.h"
 
-// C++ includes
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies
+
+ponies
 {
 
-// Forward declarations
-class EquationSystems;
-class ExodusII_IO_Helper;
-class MeshBase;
-class System;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
 
 /**
- * The \p ExodusII_IO class implements reading meshes in the
- * \p ExodusII file format from Sandia National Labs.  By
- * default, LibMesh expects ExodusII files to have a ".exd"
- * or ".e" file extension.
+ * ponies
+ * \ponies
+ * ponies"
+ * ponies.
  *
- * @author Benjamin Kirk, John Peterson, 2004.
+ * @ponies.
  */
 
 // ------------------------------------------------------------
-// ExodusII_IO class definition
-class ExodusII_IO : public MeshInput<MeshBase>,
-                    public MeshOutput<MeshBase>,
-                    public ParallelObject
+// ponies
+ponies>,
+                    ponies>,
+                    ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
-   * This is the constructor required to read a mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  ExodusII_IO (MeshBase& mesh,
-               bool single_precision=false);
+  ponies
+  ponies,
+               ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~ExodusII_IO ();
+  ponies ();
 
   /**
-   * This method implements reading a mesh from a specified file.
-   * Open the file named \p name and read the mesh in Sandia National Lab's
-   * ExodusII format. This is the method to use for reading in meshes generated
-   * by cubit.  Works in 2D for \p TRIs, \p TRI6s, \p QUAD s, and \p QUAD9s.
-   * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies.
    */
-  virtual void read (const std::string& name);
+  ponies);
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * ponies.
    */
-  virtual void write (const std::string& fname);
+  ponies);
 
   /**
-   * Set the flag indicating if we should be verbose.
+   * ponies.
    */
-  void verbose (bool set_verbosity);
+  ponies);
 
   /**
-   * Returns an array containing the timesteps in the file
+   * ponies
    */
-  const std::vector<Real>& get_time_steps();
+  ponies();
 
   /**
-   * Returns the number of timesteps currently stored in the Exodus
-   * file.  Knowing the number of time steps currently stored in the
-   * file is sometimes necessary when appending, so we can know where
-   * to start writing new data.  Throws an error if the file is not
-   * currently open for reading or writing.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  int get_num_time_steps();
+  ponies();
 
   /**
-   * Backward compatibility version of function that takes a single variable name
+   * ponies
    */
-  void copy_nodal_solution(System& system,
-                           std::string var_name,
-                           unsigned int timestep=1);
+  ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * If we read in a nodal solution while reading in a mesh, we can attempt
-   * to copy that nodal solution into an EquationSystems object.
+   * ponies
+   * ponies.
    */
-  void copy_nodal_solution(System& system,
-                           std::string system_var_name,
-                           std::string exodus_var_name,
-                           unsigned int timestep=1);
+  ponies,
+                           ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * If we read in a elemental solution while reading in a mesh, we can attempt
-   * to copy that elemental solution into an EquationSystems object.
+   * ponies
+   * ponies.
    */
-  void copy_elemental_solution(System& system,
-                               std::string system_var_name,
-                               std::string exodus_var_name,
-                               unsigned int timestep=1);
+  ponies,
+                               ponies,
+                               ponies,
+                               ponies);
 
   /**
-   * Writes a exodusII file with discontinuous data
+   * ponies
    */
-  void write_discontinuous_exodusII (const std::string& name,
-                                     const EquationSystems& es,
-                                     const std::set<std::string>* system_names=NULL);
+  ponies,
+                                     ponies,
+                                     ponies);
 
   /**
-   * Write out element solution.
+   * ponies.
    */
-  void write_element_data (const EquationSystems& es);
+  ponies);
 
   /**
-   * Write out a nodal solution.
+   * ponies.
    */
-  void write_nodal_data (const std::string&,
-                         const std::vector<Number>&,
-                         const std::vector<std::string>&);
+  ponies&,
+                         ponies>&,
+                         ponies>&);
 
   /**
-   * Write out a discontinuous nodal solution.
+   * ponies.
    */
-  void write_nodal_data_discontinuous (const std::string&,
-                                       const std::vector<Number>&,
-                                       const std::vector<std::string>&);
+  ponies&,
+                                       ponies>&,
+                                       ponies>&);
 
   /**
-   * Write out global variables.
+   * ponies.
    */
-  void write_global_data (const std::vector<Number>&,
-                          const std::vector<std::string>&);
+  ponies>&,
+                          ponies>&);
 
   /**
-   * Write out information records.
+   * ponies.
    */
-  void write_information_records (const std::vector<std::string>&);
+  ponies>&);
 
   /**
-   * Writes out the solution at a specific timestep.
-   * @param timestep The timestep to write out, should be _1_ indexed.
+   * ponies.
+   * @ponies.
    */
-  void write_timestep (const std::string& fname,
-                       const EquationSystems& es,
-                       const int timestep,
-                       const Real time);
+  ponies,
+                       ponies,
+                       ponies,
+                       ponies);
 
   /**
-   * Sets the list of variable names to be included in the output.
-   * This is _optional_.  If this is never called then all variables
-   * will be present. If this is called and an empty vector is supplied
-   * no variables will be output. Setting the allow_empty = false will
-   * result in empty vectors supplied here to also be populated with all
-   * variables.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void set_output_variables(const std::vector<std::string>& output_variables,
-                            bool allow_empty = true);
+  ponies,
+                            ponies);
 
   /**
-   * In the general case, meshes containing 2D elements can be
-   * manifolds living in 3D space, thus by default we write all
-   * meshes with the Exodus dimension set to LIBMESH_DIM =
-   * mesh.spatial_dimension().
+   * ponies
+   * ponies
+   * ponies =
+   * ponies().
    *
-   * In certain cases, however, the user may know his 2D mesh actually
-   * lives in the z=0 plane, and therefore wants to write a truly 2D
-   * Exodus mesh.  In such a case, he should call this function with
-   * val=true.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void use_mesh_dimension_instead_of_spatial_dimension(bool val);
+  ponies);
 
   /**
-   * Allows you to set a vector that is added to the coordinates of all
-   * of the nodes.  Effectively, this "moves" the mesh to a particular position
+   * ponies
+   * ponies
    */
-  void set_coordinate_offset(Point p);
+  ponies);
 
   /**
-   * If true, this flag will cause the ExodusII_IO object to attempt to
-   * open an existing file for writing, rather than creating a new file.
-   * Obviously this will only work if the file already exists.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  void append(bool val);
+  ponies);
 
   /**
-   * Return list of the elemental variable names
+   * ponies
    */
-  const std::vector<std::string> & get_elem_var_names();
+  ponies();
 
   /**
-   * Return list of the nodal variable names
+   * ponies
    */
-  const std::vector<std::string> & get_nodal_var_names();
+  ponies();
 
-private:
+ponies:
   /**
-   * Only attempt to instantiate an ExodusII helper class
-   * if the Exodus API is defined.  This class will have no
-   * functionality when LIBMESH_HAVE_EXODUS_API is not defined.
+   * ponies
+   * ponies
+   * ponies.
    */
-#ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO_Helper *exio_helper;
-#endif
-
-  /**
-   * Stores the current value of the timestep when calling
-   * ExodusII_IO::write_timestep().
-   */
-  int _timestep;
+#ponies
+  ponies;
+#ponies
 
   /**
-   * should we be verbose?
+   * ponies
+   * ponies().
    */
-  bool _verbose;
+  ponies;
 
   /**
-   * The names of the variables to be output.
-   * If this is empty then all variables are output.
+   * ponies?
    */
-  std::vector<std::string> _output_variables;
+  ponies;
 
   /**
-   * Default false.  If true, files will be opened with EX_WRITE
-   * rather than created from scratch when writing.
+   * ponies.
+   * ponies.
    */
-  bool _append;
+  ponies;
 
   /**
-   * This function factors out a bunch of code which is common to the
-   * write_nodal_data() and write_nodal_data_discontinuous() functions
+   * ponies
+   * ponies.
    */
-  void write_nodal_data_common(std::string fname,
-                               const std::vector<std::string>& names,
-                               bool continuous=true);
+  ponies;
 
   /**
-   * If true, _output_variables is allowed to remain empty.
-   * If false, if _output_variables is empty it will be populated with a complete list of all variables
-   * By default, calling set_output_variables() sets this flag to true, but it provides an override.
+   * ponies
+   * ponies
    */
-  bool _allow_empty_variables;
+  ponies,
+                               ponies,
+                               ponies);
+
+  /**
+   * ponies.
+   * ponies
+   * ponies.
+   */
+  ponies;
 
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_EXODUSII_IO_H
+#ponies

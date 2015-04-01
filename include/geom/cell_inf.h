@@ -1,89 +1,89 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_INF_H
-#define LIBMESH_CELL_INF_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-// Local includes
-#include "libmesh/elem.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p InfCell is an abstract element type that lives in
- * three dimensions.  An infinite cell could be an infinite hexahedron,
- * or an infinite prism.
+ * ponies
+ * ponies,
+ * ponies.
  */
-class InfCell : public Elem
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  InfCell (const unsigned int nn,
-           const unsigned int ns,
-           Elem* p,
-           Elem** elemlinkdata,
-           Node** nodelinkdata) :
-    Elem (nn, ns, p, elemlinkdata, nodelinkdata)
+  ponies,
+           ponies,
+           ponies,
+           ponies,
+           ponies) :
+    ponies)
   {}
 
   /**
-   * @returns 3, the dimensionality of the object.
+   * @ponies.
    */
-  unsigned int dim () const { return 3; }
+  ponies; }
 
   /**
-   * @returns \p true.  All classes derived from \p InfCell
-   * are infinite elements.
+   * @ponies
+   * ponies.
    */
-  bool infinite () const { return true; }
+  ponies; }
 
   /**
-   * @returns the origin of this infinite element.
+   * @ponies.
    */
-  Point origin () const;
+  ponies;
 
 };
 
 
 // ------------------------------------------------------------
-// InfCell inline functions
-inline
-Point InfCell::origin () const
+// ponies
+ponies
+ponies
 {
-  return ( this->point(0)*2 - this->point( this->n_vertices()/2 ) );
+  ponies ) );
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-#endif // LIBMESH_CELL_INF_H
+#ponies

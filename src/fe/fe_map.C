@@ -1,1398 +1,1398 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::sqrt, std::abs
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/fe_macro.h"
-#include "libmesh/fe_map.h"
-#include "libmesh/fe_xyz_map.h"
-#include "libmesh/mesh_subdivision_support.h"
 
-namespace libMesh
+// ponies
+#ponies
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
-// Constructor (empty)
-FEMap::FEMap() {}
+// ponies)
+ponies() {}
 
 
 
-UniquePtr<FEMap> FEMap::build( FEType fe_type )
+ponies )
 {
-  switch( fe_type.family )
+  ponies )
     {
-    case XYZ:
-      return UniquePtr<FEMap>(new FEXYZMap);
+    ponies:
+      ponies);
 
-    default:
-      return UniquePtr<FEMap>(new FEMap);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<FEMap>();
+  ponies!");
+  ponies>();
 }
 
 
 
-template<unsigned int Dim>
-void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
-                                            const Elem* elem)
+ponies>
+ponies,
+                                            ponies)
 {
-  // Start logging the reference->physical map initialization
-  START_LOG("init_reference_to_physical_map()", "FEMap");
+  // ponies
+  ponies");
 
-  // The number of quadrature points.
-  const std::size_t n_qp = qp.size();
+  // ponies.
+  ponies();
 
-  // The element type and order to use in
-  // the map
-  const Order    mapping_order     (elem->default_order());
-  const ElemType mapping_elem_type (elem->type());
+  // ponies
+  // ponies
+  ponies());
+  ponies());
 
-  // Number of shape functions used to construt the map
-  // (Lagrange shape functions are used for mapping)
-  const unsigned int n_mapping_shape_functions =
-    FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-                                         mapping_order);
+  // ponies
+  // (ponies)
+  ponies =
+    ponies,
+                                         ponies);
 
-  this->phi_map.resize         (n_mapping_shape_functions);
-  if (Dim > 0)
+  ponies);
+  ponies)
     {
-      this->dphidxi_map.resize     (n_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      this->d2phidxi2_map.resize   (n_mapping_shape_functions);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      ponies);
+#ponies
+      ponies);
+#ponies
     }
 
-  if (Dim > 1)
+  ponies)
     {
-      this->dphideta_map.resize  (n_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      this->d2phidxideta_map.resize   (n_mapping_shape_functions);
-      this->d2phideta2_map.resize     (n_mapping_shape_functions);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      ponies);
+#ponies
+      ponies);
+      ponies);
+#ponies
     }
 
-  if (Dim > 2)
+  ponies)
     {
-      this->dphidzeta_map.resize (n_mapping_shape_functions);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      this->d2phidxidzeta_map.resize  (n_mapping_shape_functions);
-      this->d2phidetadzeta_map.resize (n_mapping_shape_functions);
-      this->d2phidzeta2_map.resize    (n_mapping_shape_functions);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      ponies);
+#ponies
+      ponies);
+      ponies);
+      ponies);
+#ponies
     }
 
 
-  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+  ponies++)
     {
-      this->phi_map[i].resize         (n_qp);
-      if (Dim > 0)
+      ponies);
+      ponies)
         {
-          this->dphidxi_map[i].resize     (n_qp);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          this->d2phidxi2_map[i].resize     (n_qp);
-          if (Dim > 1)
+          ponies);
+#ponies
+          ponies);
+          ponies)
             {
-              this->d2phidxideta_map[i].resize (n_qp);
-              this->d2phideta2_map[i].resize (n_qp);
+              ponies);
+              ponies);
             }
-          if (Dim > 2)
+          ponies)
             {
-              this->d2phidxidzeta_map[i].resize  (n_qp);
-              this->d2phidetadzeta_map[i].resize (n_qp);
-              this->d2phidzeta2_map[i].resize    (n_qp);
+              ponies);
+              ponies);
+              ponies);
             }
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-          if (Dim > 1)
-            this->dphideta_map[i].resize  (n_qp);
+          ponies)
+            ponies);
 
-          if (Dim > 2)
-            this->dphidzeta_map[i].resize (n_qp);
+          ponies)
+            ponies);
         }
     }
 
-  // Optimize for the *linear* geometric elements case:
-  bool is_linear = elem->is_linear();
+  // ponies:
+  ponies();
 
-  switch (Dim)
+  ponies)
     {
 
       //------------------------------------------------------------
-      // 0D
-    case 0:
+      // ponies
+    ponies:
       {
-        for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-          for (std::size_t p=0; p<n_qp; p++)
-            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+        ponies++)
+          ponies++)
+            ponies]);
 
-        break;
+        ponies;
       }
 
       //------------------------------------------------------------
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        // Compute the value of the mapping shape function i at quadrature point p
-        // (Lagrange shape functions are used for mapping)
-        if (is_linear)
+        // ponies
+        // (ponies)
+        ponies)
           {
-            for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            ponies++)
               {
-                this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
-                this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                for (std::size_t p=1; p<n_qp; p++)
+                ponies]);
+                ponies]);
+#ponies
+                ponies]);
+#ponies
+                ponies++)
                   {
-                    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
-                    this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                    this->d2phidxi2_map[i][p] = this->d2phidxi2_map[i][0];
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                    ponies]);
+                    ponies];
+#ponies
+                    ponies];
+#ponies
                   }
               }
           }
-        else
-          for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-            for (std::size_t p=0; p<n_qp; p++)
+        ponies
+          ponies++)
+            ponies++)
               {
-                this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-                this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                ponies]);
+                ponies]);
+#ponies
+                ponies]);
+#ponies
               }
 
-        break;
+        ponies;
       }
       //------------------------------------------------------------
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        // Compute the value of the mapping shape function i at quadrature point p
-        // (Lagrange shape functions are used for mapping)
-        if (is_linear)
+        // ponies
+        // (ponies)
+        ponies)
           {
-            for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            ponies++)
               {
-                this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
-                this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                this->d2phidxideta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-                this->d2phideta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                for (std::size_t p=1; p<n_qp; p++)
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
+                ponies++)
                   {
-                    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
-                    this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
-                    this->dphideta_map[i][p] = this->dphideta_map[i][0];
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                    this->d2phidxi2_map[i][p] = this->d2phidxi2_map[i][0];
-                    this->d2phidxideta_map[i][p] = this->d2phidxideta_map[i][0];
-                    this->d2phideta2_map[i][p] = this->d2phideta2_map[i][0];
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                    ponies]);
+                    ponies];
+                    ponies];
+#ponies
+                    ponies];
+                    ponies];
+                    ponies];
+#ponies
                   }
               }
           }
-        else
-          for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-            for (std::size_t p=0; p<n_qp; p++)
+        ponies
+          ponies++)
+            ponies++)
               {
-                this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-                this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                this->dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                this->d2phidxideta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-                this->d2phideta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
               }
 
-        break;
+        ponies;
       }
 
       //------------------------------------------------------------
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        // Compute the value of the mapping shape function i at quadrature point p
-        // (Lagrange shape functions are used for mapping)
-        if (is_linear)
+        // ponies
+        // (ponies)
+        ponies)
           {
-            for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            ponies++)
               {
-                this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
-                this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-                this->dphidzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-                this->d2phidxideta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-                this->d2phideta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
-                this->d2phidxidzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 3, qp[0]);
-                this->d2phidetadzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 4, qp[0]);
-                this->d2phidzeta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[0]);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                for (std::size_t p=1; p<n_qp; p++)
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
+                ponies++)
                   {
-                    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
-                    this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
-                    this->dphideta_map[i][p] = this->dphideta_map[i][0];
-                    this->dphidzeta_map[i][p] = this->dphidzeta_map[i][0];
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                    this->d2phidxi2_map[i][p] = this->d2phidxi2_map[i][0];
-                    this->d2phidxideta_map[i][p] = this->d2phidxideta_map[i][0];
-                    this->d2phideta2_map[i][p] = this->d2phideta2_map[i][0];
-                    this->d2phidxidzeta_map[i][p] = this->d2phidxidzeta_map[i][0];
-                    this->d2phidetadzeta_map[i][p] = this->d2phidetadzeta_map[i][0];
-                    this->d2phidzeta2_map[i][p] = this->d2phidzeta2_map[i][0];
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                    ponies]);
+                    ponies];
+                    ponies];
+                    ponies];
+#ponies
+                    ponies];
+                    ponies];
+                    ponies];
+                    ponies];
+                    ponies];
+                    ponies];
+#ponies
                   }
               }
           }
-        else
-          for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-            for (std::size_t p=0; p<n_qp; p++)
+        ponies
+          ponies++)
+            ponies++)
               {
-                this->phi_map[i][p]       = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-                this->dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                this->dphideta_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-                this->dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-                this->d2phidxideta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-                this->d2phideta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
-                this->d2phidxidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 3, qp[p]);
-                this->d2phidetadzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 4, qp[p]);
-                this->d2phidzeta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[p]);
-#endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+                ponies]);
+#ponies
               }
 
-        break;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid Dim = " << Dim);
+    ponies:
+      ponies);
     }
 
-  // Stop logging the reference->physical map initialization
-  STOP_LOG("init_reference_to_physical_map()", "FEMap");
-  return;
+  // ponies
+  ponies");
+  ponies;
 }
 
 
 
-void FEMap::compute_single_point_map(const unsigned int dim,
-                                     const std::vector<Real>& qw,
-                                     const Elem* elem,
-                                     unsigned int p,
-                                     const std::vector<Node*>& elem_nodes)
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
 {
-  libmesh_assert(elem);
-  libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
+  ponies);
+  ponies());
 
-  switch (dim)
+  ponies)
     {
       //--------------------------------------------------------------------
-      // 0D
-    case 0:
+      // ponies
+    ponies:
       {
-        libmesh_assert(elem_nodes[0]);
-        xyz[p] = *elem_nodes[0];
-        jac[p] = 1.0;
-        JxW[p] = qw[p];
-        break;
+        ponies]);
+        ponies];
+        ponies;
+        ponies];
+        ponies;
       }
 
       //--------------------------------------------------------------------
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        // Clear the entities that will be summed
-        xyz[p].zero();
-        dxyzdxi_map[p].zero();
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        d2xyzdxi2_map[p].zero();
-#endif
+        // ponies
+        ponies();
+        ponies();
+#ponies
+        ponies();
+#ponies
 
-        // compute x, dx, d2x at the quadrature point
-        for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+        // ponies
+        ponies
           {
-            // Reference to the point, helps eliminate
-            // exessive temporaries in the inner loop
-            libmesh_assert(elem_nodes[i]);
-            const Point& elem_point = *elem_nodes[i];
+            // ponies
+            // ponies
+            ponies]);
+            ponies];
 
-            xyz[p].add_scaled          (elem_point, phi_map[i][p]    );
-            dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-            d2xyzdxi2_map[p].add_scaled(elem_point, d2phidxi2_map[i][p]);
-#endif
+            ponies]    );
+            ponies]);
+#ponies
+            ponies]);
+#ponies
           }
 
-        // Compute the jacobian
+        // ponies
         //
-        // 1D elements can live in 2D or 3D space.
-        // The transformation matrix from local->global
-        // coordinates is
+        // ponies.
+        // ponies
+        // ponies
         //
-        // T = | dx/dxi |
-        //     | dy/dxi |
-        //     | dz/dxi |
+        // ponies |
+        //     | ponies |
+        //     | ponies |
         //
-        // The generalized determinant of T (from the
-        // so-called "normal" eqns.) is
-        // jac = "det(T)" = sqrt(det(T'T))
+        // ponies
+        // ponies
+        // ponies))
         //
-        // where T'= transpose of T, so
+        // ponies
         //
-        // jac = sqrt( (dx/dxi)^2 + (dy/dxi)^2 + (dz/dxi)^2 )
-        jac[p] = dxyzdxi_map[p].size();
+        // ponies )
+        ponies();
 
-        if (jac[p] <= 0.)
-          libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+        ponies.)
+          ponies());
 
-        // The inverse Jacobian entries also come from the
-        // generalized inverse of T (see also the 2D element
-        // living in 3D code).
-        const Real jacm2 = 1./jac[p]/jac[p];
-        dxidx_map[p] = jacm2*dxdxi_map(p);
-#if LIBMESH_DIM > 1
-        dxidy_map[p] = jacm2*dydxi_map(p);
-#endif
-#if LIBMESH_DIM > 2
-        dxidz_map[p] = jacm2*dzdxi_map(p);
-#endif
+        // ponies
+        // ponies
+        // ponies).
+        ponies];
+        ponies);
+#ponies
+        ponies);
+#ponies
+#ponies
+        ponies);
+#ponies
 
-        JxW[p] = jac[p]*qw[p];
+        ponies];
 
-        // done computing the map
-        break;
+        // ponies
+        ponies;
       }
 
 
       //--------------------------------------------------------------------
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
         //------------------------------------------------------------------
-        // Compute the (x,y) values at the quadrature points,
-        // the Jacobian at the quadrature points
+        // ponies,
+        // ponies
 
-        xyz[p].zero();
+        ponies();
 
-        dxyzdxi_map[p].zero();
-        dxyzdeta_map[p].zero();
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        d2xyzdxi2_map[p].zero();
-        d2xyzdxideta_map[p].zero();
-        d2xyzdeta2_map[p].zero();
-#endif
+        ponies();
+        ponies();
+#ponies
+        ponies();
+        ponies();
+        ponies();
+#ponies
 
 
-        // compute (x,y) at the quadrature points, derivatives once
-        for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+        // ponies
+        ponies
           {
-            // Reference to the point, helps eliminate
-            // exessive temporaries in the inner loop
-            libmesh_assert(elem_nodes[i]);
-            const Point& elem_point = *elem_nodes[i];
+            // ponies
+            // ponies
+            ponies]);
+            ponies];
 
-            xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
+            ponies]     );
 
-            dxyzdxi_map[p].add_scaled      (elem_point, dphidxi_map[i][p] );
-            dxyzdeta_map[p].add_scaled     (elem_point, dphideta_map[i][p]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-            d2xyzdxi2_map[p].add_scaled    (elem_point, d2phidxi2_map[i][p]);
-            d2xyzdxideta_map[p].add_scaled (elem_point, d2phidxideta_map[i][p]);
-            d2xyzdeta2_map[p].add_scaled   (elem_point, d2phideta2_map[i][p]);
-#endif
+            ponies] );
+            ponies]);
+#ponies
+            ponies]);
+            ponies]);
+            ponies]);
+#ponies
           }
 
-        // compute the jacobian once
-        const Real dx_dxi = dxdxi_map(p),
-          dx_deta = dxdeta_map(p),
-          dy_dxi = dydxi_map(p),
-          dy_deta = dydeta_map(p);
+        // ponies
+        ponies),
+          ponies),
+          ponies),
+          ponies);
 
-#if LIBMESH_DIM == 2
-        // Compute the Jacobian.  This assumes the 2D face
-        // lives in 2D space
+#ponies
+        // ponies
+        // ponies
         //
-        // Symbolically, the matrix determinant is
+        // ponies
         //
-        //         | dx/dxi  dx/deta |
-        // jac =   | dy/dxi  dy/deta |
+        //         | ponies |
+        // ponies |
         //
-        // jac = dx/dxi*dy/deta - dx/deta*dy/dxi
-        jac[p] = (dx_dxi*dy_deta - dx_deta*dy_dxi);
+        // ponies
+        ponies);
 
-        if (jac[p] <= 0.)
-          libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+        ponies.)
+          ponies());
 
-        JxW[p] = jac[p]*qw[p];
+        ponies];
 
-        // Compute the shape function derivatives wrt x,y at the
-        // quadrature points
-        const Real inv_jac = 1./jac[p];
+        // ponies
+        // ponies
+        ponies];
 
-        dxidx_map[p]  =  dy_deta*inv_jac; //dxi/dx  =  (1/J)*dy/deta
-        dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
-        detadx_map[p] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
-        detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
+        ponies
+        ponies
+        ponies
+        ponies
 
-        dxidz_map[p] = detadz_map[p] = 0.;
-#else
+        ponies.;
+#ponies
 
-        const Real dz_dxi = dzdxi_map(p),
-          dz_deta = dzdeta_map(p);
+        ponies),
+          ponies);
 
-        // Compute the Jacobian.  This assumes a 2D face in
-        // 3D space.
+        // ponies
+        // ponies.
         //
-        // The transformation matrix T from local to global
-        // coordinates is
+        // ponies
+        // ponies
         //
-        //         | dx/dxi  dx/deta |
-        //     T = | dy/dxi  dy/deta |
-        //         | dz/dxi  dz/deta |
-        // note det(T' T) = det(T')det(T) = det(T)det(T)
-        // so det(T) = std::sqrt(det(T' T))
+        //         | ponies |
+        //     ponies |
+        //         | ponies |
+        // ponies)
+        // ponies))
         //
         //----------------------------------------------
-        // Notes:
+        // ponies:
         //
-        //       dX = R dXi -> R'dX = R'R dXi
-        // (R^-1)dX =   dXi    [(R'R)^-1 R']dX = dXi
+        //       ponies
+        // (ponies
         //
-        // so R^-1 = (R'R)^-1 R'
+        // ponies'
         //
-        // and R^-1 R = (R'R)^-1 R'R = I.
+        // ponies.
         //
-        const Real g11 = (dx_dxi*dx_dxi +
-                          dy_dxi*dy_dxi +
-                          dz_dxi*dz_dxi);
+        ponies +
+                          ponies +
+                          ponies);
 
-        const Real g12 = (dx_dxi*dx_deta +
-                          dy_dxi*dy_deta +
-                          dz_dxi*dz_deta);
+        ponies +
+                          ponies +
+                          ponies);
 
-        const Real g21 = g12;
+        ponies;
 
-        const Real g22 = (dx_deta*dx_deta +
-                          dy_deta*dy_deta +
-                          dz_deta*dz_deta);
+        ponies +
+                          ponies +
+                          ponies);
 
-        const Real det = (g11*g22 - g12*g21);
+        ponies);
 
-        if (det <= 0.)
-          libmesh_error_msg("ERROR: negative Jacobian! " << " in element " << elem->id());
+        ponies.)
+          ponies());
 
-        const Real inv_det = 1./det;
-        jac[p] = std::sqrt(det);
+        ponies;
+        ponies);
 
-        JxW[p] = jac[p]*qw[p];
+        ponies];
 
-        const Real g11inv =  g22*inv_det;
-        const Real g12inv = -g12*inv_det;
-        const Real g21inv = -g21*inv_det;
-        const Real g22inv =  g11*inv_det;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
 
-        dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
-        dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
-        dxidz_map[p]  = g11inv*dz_dxi + g12inv*dz_deta;
+        ponies;
+        ponies;
+        ponies;
 
-        detadx_map[p] = g21inv*dx_dxi + g22inv*dx_deta;
-        detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
-        detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
+        ponies;
+        ponies;
+        ponies;
 
-#endif
-        // done computing the map
-        break;
+#ponies
+        // ponies
+        ponies;
       }
 
 
 
       //--------------------------------------------------------------------
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
         //------------------------------------------------------------------
-        // Compute the (x,y,z) values at the quadrature points,
-        // the Jacobian at the quadrature point
+        // ponies,
+        // ponies
 
-        // Clear the entities that will be summed
-        xyz[p].zero           ();
-        dxyzdxi_map[p].zero   ();
-        dxyzdeta_map[p].zero  ();
-        dxyzdzeta_map[p].zero ();
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-        d2xyzdxi2_map[p].zero();
-        d2xyzdxideta_map[p].zero();
-        d2xyzdxidzeta_map[p].zero();
-        d2xyzdeta2_map[p].zero();
-        d2xyzdetadzeta_map[p].zero();
-        d2xyzdzeta2_map[p].zero();
-#endif
+        // ponies
+        ponies           ();
+        ponies   ();
+        ponies  ();
+        ponies ();
+#ponies
+        ponies();
+        ponies();
+        ponies();
+        ponies();
+        ponies();
+        ponies();
+#ponies
 
 
-        // compute (x,y,z) at the quadrature points,
-        // dxdxi,   dydxi,   dzdxi,
-        // dxdeta,  dydeta,  dzdeta,
-        // dxdzeta, dydzeta, dzdzeta  all once
-        for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+        // ponies,
+        // ponies,
+        // ponies,
+        // ponies
+        ponies
           {
-            // Reference to the point, helps eliminate
-            // exessive temporaries in the inner loop
-            libmesh_assert(elem_nodes[i]);
-            const Point& elem_point = *elem_nodes[i];
+            // ponies
+            // ponies
+            ponies]);
+            ponies];
 
-            xyz[p].add_scaled           (elem_point, phi_map[i][p]      );
-            dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
-            dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
-            dxyzdzeta_map[p].add_scaled (elem_point, dphidzeta_map[i][p]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-            d2xyzdxi2_map[p].add_scaled      (elem_point,
-                                              d2phidxi2_map[i][p]);
-            d2xyzdxideta_map[p].add_scaled   (elem_point,
-                                              d2phidxideta_map[i][p]);
-            d2xyzdxidzeta_map[p].add_scaled  (elem_point,
-                                              d2phidxidzeta_map[i][p]);
-            d2xyzdeta2_map[p].add_scaled     (elem_point,
-                                              d2phideta2_map[i][p]);
-            d2xyzdetadzeta_map[p].add_scaled (elem_point,
-                                              d2phidetadzeta_map[i][p]);
-            d2xyzdzeta2_map[p].add_scaled    (elem_point,
-                                              d2phidzeta2_map[i][p]);
-#endif
+            ponies]      );
+            ponies]  );
+            ponies] );
+            ponies]);
+#ponies
+            ponies,
+                                              ponies]);
+            ponies,
+                                              ponies]);
+            ponies,
+                                              ponies]);
+            ponies,
+                                              ponies]);
+            ponies,
+                                              ponies]);
+            ponies,
+                                              ponies]);
+#ponies
           }
 
-        // compute the jacobian
-        const Real
-          dx_dxi   = dxdxi_map(p),   dy_dxi   = dydxi_map(p),   dz_dxi   = dzdxi_map(p),
-          dx_deta  = dxdeta_map(p),  dy_deta  = dydeta_map(p),  dz_deta  = dzdeta_map(p),
-          dx_dzeta = dxdzeta_map(p), dy_dzeta = dydzeta_map(p), dz_dzeta = dzdzeta_map(p);
+        // ponies
+        ponies
+          ponies),
+          ponies),
+          ponies);
 
-        // Symbolically, the matrix determinant is
+        // ponies
         //
-        //         | dx/dxi   dy/dxi   dz/dxi   |
-        // jac =   | dx/deta  dy/deta  dz/deta  |
-        //         | dx/dzeta dy/dzeta dz/dzeta |
+        //         | ponies   |
+        // ponies  |
+        //         | ponies |
         //
-        // jac = dx/dxi*(dy/deta*dz/dzeta - dz/deta*dy/dzeta) +
-        //       dy/dxi*(dz/deta*dx/dzeta - dx/deta*dz/dzeta) +
-        //       dz/dxi*(dx/deta*dy/dzeta - dy/deta*dx/dzeta)
+        // ponies) +
+        //       ponies) +
+        //       ponies)
 
-        jac[p] = (dx_dxi*(dy_deta*dz_dzeta - dz_deta*dy_dzeta)  +
-                  dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
-                  dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
+        ponies)  +
+                  ponies)  +
+                  ponies));
 
-        if (jac[p] <= 0.)
-          libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+        ponies.)
+          ponies());
 
-        JxW[p] = jac[p]*qw[p];
+        ponies];
 
-        // Compute the shape function derivatives wrt x,y at the
-        // quadrature points
-        const Real inv_jac  = 1./jac[p];
+        // ponies
+        // ponies
+        ponies];
 
-        dxidx_map[p]   = (dy_deta*dz_dzeta - dz_deta*dy_dzeta)*inv_jac;
-        dxidy_map[p]   = (dz_deta*dx_dzeta - dx_deta*dz_dzeta)*inv_jac;
-        dxidz_map[p]   = (dx_deta*dy_dzeta - dy_deta*dx_dzeta)*inv_jac;
+        ponies;
+        ponies;
+        ponies;
 
-        detadx_map[p]  = (dz_dxi*dy_dzeta  - dy_dxi*dz_dzeta )*inv_jac;
-        detady_map[p]  = (dx_dxi*dz_dzeta  - dz_dxi*dx_dzeta )*inv_jac;
-        detadz_map[p]  = (dy_dxi*dx_dzeta  - dx_dxi*dy_dzeta )*inv_jac;
+        ponies;
+        ponies;
+        ponies;
 
-        dzetadx_map[p] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
-        dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
-        dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
+        ponies;
+        ponies;
+        ponies;
 
-        // done computing the map
-        break;
+        // ponies
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
+    ponies:
+      ponies);
     }
 }
 
 
 
-void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n_qp)
+ponies)
 {
-  // Resize the vectors to hold data at the quadrature points
-  xyz.resize(n_qp);
-  dxyzdxi_map.resize(n_qp);
-  dxidx_map.resize(n_qp);
-  dxidy_map.resize(n_qp); // 1D element may live in 2D ...
-  dxidz_map.resize(n_qp); // ... or 3D
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  d2xyzdxi2_map.resize(n_qp);
-#endif
-  if (dim > 1)
+  // ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies ...
+  ponies
+#ponies
+  ponies);
+#ponies
+  ponies)
     {
-      dxyzdeta_map.resize(n_qp);
-      detadx_map.resize(n_qp);
-      detady_map.resize(n_qp);
-      detadz_map.resize(n_qp);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      d2xyzdxideta_map.resize(n_qp);
-      d2xyzdeta2_map.resize(n_qp);
-#endif
-      if (dim > 2)
+      ponies);
+      ponies);
+      ponies);
+      ponies);
+#ponies
+      ponies);
+      ponies);
+#ponies
+      ponies)
         {
-          dxyzdzeta_map.resize (n_qp);
-          dzetadx_map.resize   (n_qp);
-          dzetady_map.resize   (n_qp);
-          dzetadz_map.resize   (n_qp);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          d2xyzdxidzeta_map.resize(n_qp);
-          d2xyzdetadzeta_map.resize(n_qp);
-          d2xyzdzeta2_map.resize(n_qp);
-#endif
+          ponies);
+          ponies);
+          ponies);
+          ponies);
+#ponies
+          ponies);
+          ponies);
+          ponies);
+#ponies
         }
     }
 
-  jac.resize(n_qp);
-  JxW.resize(n_qp);
+  ponies);
+  ponies);
 }
 
 
 
-void FEMap::compute_affine_map( const unsigned int dim,
-                                const std::vector<Real>& qw,
-                                const Elem* elem )
+ponies,
+                                ponies,
+                                ponies )
 {
-  // Start logging the map computation.
-  START_LOG("compute_affine_map()", "FEMap");
+  // ponies.
+  ponies");
 
-  libmesh_assert(elem);
+  ponies);
 
-  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
+  ponies());
 
-  // Resize the vectors to hold data at the quadrature points
-  this->resize_quadrature_map_vectors(dim, n_qp);
+  // ponies
+  ponies);
 
-  // Determine the nodes contributing to element elem
-  std::vector<Node*> elem_nodes(elem->n_nodes(), NULL);
-  for (unsigned int i=0; i<elem->n_nodes(); i++)
-    elem_nodes[i] = elem->get_node(i);
+  // ponies
+  ponies);
+  ponies++)
+    ponies);
 
-  // Compute map at quadrature point 0
-  this->compute_single_point_map(dim, qw, elem, 0, elem_nodes);
+  // ponies
+  ponies);
 
-  // Compute xyz at all other quadrature points
-  for (unsigned int p=1; p<n_qp; p++)
+  // ponies
+  ponies++)
     {
-      xyz[p].zero();
-      for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-        xyz[p].add_scaled        (*elem_nodes[i], phi_map[i][p]    );
+      ponies();
+      ponies
+        ponies]    );
     }
 
-  // Copy other map data from quadrature point 0
-  for (unsigned int p=1; p<n_qp; p++) // for each extra quadrature point
+  // ponies
+  ponies
     {
-      dxyzdxi_map[p] = dxyzdxi_map[0];
-      dxidx_map[p] = dxidx_map[0];
-      dxidy_map[p] = dxidy_map[0];
-      dxidz_map[p] = dxidz_map[0];
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      // The map should be affine, so second derivatives are zero
-      d2xyzdxi2_map[p] = 0.;
-#endif
-      if (dim > 1)
+      ponies];
+      ponies];
+      ponies];
+      ponies];
+#ponies
+      // ponies
+      ponies.;
+#ponies
+      ponies)
         {
-          dxyzdeta_map[p] = dxyzdeta_map[0];
-          detadx_map[p] = detadx_map[0];
-          detady_map[p] = detady_map[0];
-          detadz_map[p] = detadz_map[0];
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          d2xyzdxideta_map[p] = 0.;
-          d2xyzdeta2_map[p] = 0.;
-#endif
-          if (dim > 2)
+          ponies];
+          ponies];
+          ponies];
+          ponies];
+#ponies
+          ponies.;
+          ponies.;
+#ponies
+          ponies)
             {
-              dxyzdzeta_map[p] = dxyzdzeta_map[0];
-              dzetadx_map[p] = dzetadx_map[0];
-              dzetady_map[p] = dzetady_map[0];
-              dzetadz_map[p] = dzetadz_map[0];
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              d2xyzdxidzeta_map[p] = 0.;
-              d2xyzdetadzeta_map[p] = 0.;
-              d2xyzdzeta2_map[p] = 0.;
-#endif
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+#ponies
+              ponies.;
+              ponies.;
+              ponies.;
+#ponies
             }
         }
-      jac[p] = jac[0];
-      JxW[p] = JxW[0] / qw[0] * qw[p];
+      ponies];
+      ponies];
     }
 
-  STOP_LOG("compute_affine_map()", "FEMap");
+  ponies");
 }
 
 
 
-void FEMap::compute_null_map( const unsigned int dim,
-                              const std::vector<Real>& qw)
+ponies,
+                              ponies)
 {
-  // Start logging the map computation.
-  START_LOG("compute_null_map()", "FEMap");
+  // ponies.
+  ponies");
 
-  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
+  ponies());
 
-  // Resize the vectors to hold data at the quadrature points
-  this->resize_quadrature_map_vectors(dim, n_qp);
+  // ponies
+  ponies);
 
-  // Compute "fake" xyz
-  for (unsigned int p=1; p<n_qp; p++)
+  // ponies
+  ponies++)
     {
-      xyz[p].zero();
+      ponies();
 
-      dxyzdxi_map[p] = 0;
-      dxidx_map[p] = 0;
-      dxidy_map[p] = 0;
-      dxidz_map[p] = 0;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      d2xyzdxi2_map[p] = 0;
-#endif
-      if (dim > 1)
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+#ponies
+      ponies;
+#ponies
+      ponies)
         {
-          dxyzdeta_map[p] = 0;
-          detadx_map[p] = 0;
-          detady_map[p] = 0;
-          detadz_map[p] = 0;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          d2xyzdxideta_map[p] = 0.;
-          d2xyzdeta2_map[p] = 0.;
-#endif
-          if (dim > 2)
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+#ponies
+          ponies.;
+          ponies.;
+#ponies
+          ponies)
             {
-              dxyzdzeta_map[p] = 0;
-              dzetadx_map[p] = 0;
-              dzetady_map[p] = 0;
-              dzetadz_map[p] = 0;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-              d2xyzdxidzeta_map[p] = 0;
-              d2xyzdetadzeta_map[p] = 0;
-              d2xyzdzeta2_map[p] = 0;
-#endif
+              ponies;
+              ponies;
+              ponies;
+              ponies;
+#ponies
+              ponies;
+              ponies;
+              ponies;
+#ponies
             }
         }
-      jac[p] = 1;
-      JxW[p] = qw[p];
+      ponies;
+      ponies];
     }
 
-  STOP_LOG("compute_null_map()", "FEMap");
+  ponies");
 }
 
 
 
-void FEMap::compute_map(const unsigned int dim,
-                        const std::vector<Real>& qw,
-                        const Elem* elem)
+ponies,
+                        ponies,
+                        ponies)
 {
-  if (!elem)
+  ponies)
     {
-      compute_null_map(dim, qw);
-      return;
+      ponies);
+      ponies;
     }
 
-  if (elem->has_affine_map())
+  ponies())
     {
-      compute_affine_map(dim, qw, elem);
-      return;
+      ponies);
+      ponies;
     }
 
-  // Start logging the map computation.
-  START_LOG("compute_map()", "FEMap");
+  // ponies.
+  ponies");
 
-  libmesh_assert(elem);
+  ponies);
 
-  const unsigned int n_qp = cast_int<unsigned int>(qw.size());
+  ponies());
 
-  // Resize the vectors to hold data at the quadrature points
-  this->resize_quadrature_map_vectors(dim, n_qp);
+  // ponies
+  ponies);
 
-  // Determine the nodes contributing to element elem
-  std::vector<Node*> elem_nodes;
-  if (elem->type() == TRI3SUBDIVISION)
+  // ponies
+  ponies;
+  ponies)
     {
-      // Subdivision surface FE require the 1-ring around elem
-      libmesh_assert_equal_to (dim, 2);
-      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
-      MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+      // ponies
+      ponies);
+      ponies);
+      ponies);
     }
-  else
+  ponies
     {
-      // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), NULL);
-      for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->get_node(i);
+      // ponies
+      ponies);
+      ponies++)
+        ponies);
     }
 
-  // Compute map at all quadrature points
-  for (unsigned int p=0; p!=n_qp; p++)
-    this->compute_single_point_map(dim, qw, elem, p, elem_nodes);
+  // ponies
+  ponies++)
+    ponies);
 
-  // Stop logging the map computation.
-  STOP_LOG("compute_map()", "FEMap");
+  // ponies.
+  ponies");
 }
 
 
 
-void FEMap::print_JxW(std::ostream& os) const
+ponies
 {
-  for (unsigned int i=0; i<JxW.size(); ++i)
-    os << " [" << i << "]: " <<  JxW[i] << std::endl;
+  ponies)
+    ponies;
 }
 
 
 
-void FEMap::print_xyz(std::ostream& os) const
+ponies
 {
-  for (unsigned int i=0; i<xyz.size(); ++i)
-    os << " [" << i << "]: " << xyz[i];
+  ponies)
+    ponies];
 }
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::inverse_map (const Elem* elem,
-                              const Point& physical_point,
-                              const Real tolerance,
-                              const bool secure)
+// ponies
+ponies>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-  libmesh_assert(elem);
-  libmesh_assert_greater_equal (tolerance, 0.);
+  ponies);
+  ponies.);
 
 
-  // Start logging the map inversion.
-  START_LOG("inverse_map()", "FE");
+  // ponies.
+  ponies");
 
-  // How much did the point on the reference
-  // element change by in this Newton step?
-  Real inverse_map_error = 0.;
+  // ponies
+  // ponies?
+  ponies.;
 
-  //  The point on the reference element.  This is
-  //  the "initial guess" for Newton's method.  The
-  //  centroid seems like a good idea, but computing
-  //  it is a little more intensive than, say taking
-  //  the zero point.
+  //  ponies
+  //  ponies
+  //  ponies
+  //  ponies
+  //  ponies.
   //
-  //  Convergence should be insensitive of this choice
-  //  for "good" elements.
-  Point p; // the zero point.  No computation required
+  //  ponies
+  //  ponies.
+  ponies
 
-  //  The number of iterations in the map inversion process.
-  unsigned int cnt = 0;
+  //  ponies.
+  ponies;
 
-  //  The number of iterations after which we give up and declare
-  //  divergence
-  const unsigned int max_cnt = 10;
+  //  ponies
+  //  ponies
+  ponies;
 
-  //  The distance (in master element space) beyond which we give up
-  //  and declare divergence.  This is no longer used...
-  // Real max_step_length = 4.;
+  //  ponies
+  //  ponies...
+  // ponies.;
 
 
 
-  //  Newton iteration loop.
-  do
+  //  ponies.
+  ponies
     {
-      //  Where our current iterate \p p maps to.
-      const Point physical_guess = FE<Dim,T>::map (elem, p);
+      //  ponies.
+      ponies);
 
-      //  How far our current iterate is from the actual point.
-      const Point delta = physical_point - physical_guess;
+      //  ponies.
+      ponies;
 
-      //  Increment in current iterate \p p, will be computed.
-      Point dp;
+      //  ponies.
+      ponies;
 
 
-      //  The form of the map and how we invert it depends
-      //  on the dimension that we are in.
-      switch (Dim)
+      //  ponies
+      //  ponies.
+      ponies)
         {
           // ------------------------------------------------------------------
-          //  0D map inversion is trivial
-        case 0:
+          //  ponies
+        ponies:
           {
-            break;
+            ponies;
           }
 
           // ------------------------------------------------------------------
-          //  1D map inversion
+          //  ponies
           //
-          //  Here we find the point on a 1D reference element that maps to
-          //  the point \p physical_point in the domain.  This is a bit tricky
-          //  since we do not want to assume that the point \p physical_point
-          //  is also in a 1D domain.  In particular, this method might get
-          //  called on the edge of a 3D element, in which case
-          //  \p physical_point actually lives in 3D.
-        case 1:
+          //  ponies
+          //  ponies
+          //  ponies
+          //  ponies
+          //  ponies
+          //  \ponies.
+        ponies:
           {
-            const Point dxi = FE<Dim,T>::map_xi (elem, p);
+            ponies);
 
-            //  Newton's method in this case looks like
+            //  ponies
             //
-            //  {X} - {X_n} = [J]*dp
+            //  {ponies
             //
-            //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
-            //  d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
-            //  system is either overdetermined or rank-deficient, we will
-            //  solve the normal equations for this system
+            //  ponies
+            //  ponies
+            //  ponies
+            //  ponies
             //
-            //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
+            //  [ponies}
             //
-            //  which involves the trivial inversion of the scalar
-            //  G = [J]^T [J]
-            const Real G = dxi*dxi;
+            //  ponies
+            //  ponies]
+            ponies;
 
-            if (secure)
-              libmesh_assert_greater (G, 0.);
+            ponies)
+              ponies.);
 
-            const Real Ginv = 1./G;
+            ponies;
 
-            const Real  dxidelta = dxi*delta;
+            ponies;
 
-            dp(0) = Ginv*dxidelta;
+            ponies;
 
-            // No master elements have radius > 4, but sometimes we
-            // can take a step that big while still converging
-            // if (secure)
-            // libmesh_assert_less (dp.size(), max_step_length);
+            // ponies
+            // ponies
+            // ponies)
+            // ponies);
 
-            break;
-          }
-
-
-
-          // ------------------------------------------------------------------
-          //  2D map inversion
-          //
-          //  Here we find the point on a 2D reference element that maps to
-          //  the point \p physical_point in the domain.  This is a bit tricky
-          //  since we do not want to assume that the point \p physical_point
-          //  is also in a 2D domain.  In particular, this method might get
-          //  called on the face of a 3D element, in which case
-          //  \p physical_point actually lives in 3D.
-        case 2:
-          {
-            const Point dxi  = FE<Dim,T>::map_xi  (elem, p);
-            const Point deta = FE<Dim,T>::map_eta (elem, p);
-
-            //  Newton's method in this case looks like
-            //
-            //  {X} - {X_n} = [J]*{dp}
-            //
-            //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x2 matrix
-            //  d(x,y,z)/d(xi,eta), and we seek {dp}, a 2x1 vector.  Since
-            //  the above system is either overdermined or rank-deficient,
-            //  we will solve the normal equations for this system
-            //
-            //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
-            //
-            //  which involves the inversion of the 2x2 matrix
-            //  [G] = [J]^T [J]
-            const Real
-              G11 = dxi*dxi,  G12 = dxi*deta,
-              G21 = dxi*deta, G22 = deta*deta;
-
-
-            const Real det = (G11*G22 - G12*G21);
-
-            if (secure)
-              libmesh_assert_not_equal_to (det, 0.);
-
-            const Real inv_det = 1./det;
-
-            const Real
-              Ginv11 =  G22*inv_det,
-              Ginv12 = -G12*inv_det,
-
-              Ginv21 = -G21*inv_det,
-              Ginv22 =  G11*inv_det;
-
-
-            const Real  dxidelta  = dxi*delta;
-            const Real  detadelta = deta*delta;
-
-            dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
-            dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
-
-            // No master elements have radius > 4, but sometimes we
-            // can take a step that big while still converging
-            // if (secure)
-            // libmesh_assert_less (dp.size(), max_step_length);
-
-            break;
+            ponies;
           }
 
 
 
           // ------------------------------------------------------------------
-          //  3D map inversion
+          //  ponies
           //
-          //  Here we find the point in a 3D reference element that maps to
-          //  the point \p physical_point in a 3D domain. Nothing special
-          //  has to happen here, since (unless the map is singular because
-          //  you have a BAD element) the map will be invertable and we can
-          //  apply Newton's method directly.
-        case 3:
+          //  ponies
+          //  ponies
+          //  ponies
+          //  ponies
+          //  ponies
+          //  \ponies.
+        ponies:
           {
-            const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
-            const Point deta  = FE<Dim,T>::map_eta  (elem, p);
-            const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
+            ponies);
+            ponies);
 
-            //  Newton's method in this case looks like
+            //  ponies
             //
-            //  {X} = {X_n} + [J]*{dp}
+            //  {ponies}
             //
-            //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
-            //  d(x,y,z)/d(xi,eta,zeta), and we seek {dp}, a 3x1 vector.
-            //  Since the above system is nonsingular for invertable maps
-            //  we will solve
+            //  ponies
+            //  ponies
+            //  ponies,
+            //  ponies
             //
-            //  {dp} = [J]^-1 ({X} - {X_n})
+            //  [ponies}
             //
-            //  which involves the inversion of the 3x3 matrix [J]
-            dp = RealTensorValue(dxi(0), deta(0), dzeta(0),
-                                 dxi(1), deta(1), dzeta(1),
-                                 dxi(2), deta(2), dzeta(2)).inverse() * delta;
+            //  ponies
+            //  [ponies]
+            ponies
+              ponies,
+              ponies;
 
-            // No master elements have radius > 4, but sometimes we
-            // can take a step that big while still converging
-            // if (secure)
-            // libmesh_assert_less (dp.size(), max_step_length);
 
-            break;
+            ponies);
+
+            ponies)
+              ponies.);
+
+            ponies;
+
+            ponies
+              ponies,
+              ponies,
+
+              ponies,
+              ponies;
+
+
+            ponies;
+            ponies;
+
+            ponies);
+            ponies);
+
+            // ponies
+            // ponies
+            // ponies)
+            // ponies);
+
+            ponies;
           }
 
 
-          //  Some other dimension?
-        default:
-          libmesh_error_msg("Invalid Dim = " << Dim);
-        } // end switch(Dim), dp now computed
+
+          // ------------------------------------------------------------------
+          //  ponies
+          //
+          //  ponies
+          //  ponies
+          //  ponies
+          //  ponies
+          //  ponies.
+        ponies:
+          {
+            ponies);
+            ponies);
+            ponies);
+
+            //  ponies
+            //
+            //  {ponies}
+            //
+            //  ponies
+            //  ponies.
+            //  ponies
+            //  ponies
+            //
+            //  {ponies})
+            //
+            //  ponies]
+            ponies),
+                                 ponies),
+                                 ponies;
+
+            // ponies
+            // ponies
+            // ponies)
+            // ponies);
+
+            ponies;
+          }
+
+
+          //  ponies?
+        ponies:
+          ponies);
+        } // ponies
 
 
 
-      //  ||P_n+1 - P_n||
-      inverse_map_error = dp.size();
+      //  ||ponies||
+      ponies();
 
-      //  P_n+1 = P_n + dp
-      p.add (dp);
+      //  ponies
+      ponies);
 
-      //  Increment the iteration count.
-      cnt++;
+      //  ponies.
+      ponies++;
 
-      //  Watch for divergence of Newton's
-      //  method.  Here's how it goes:
-      //  (1) For good elements, we expect convergence in 10
-      //      iterations, with no too-large steps.
-      //      - If called with (secure == true) and we have not yet converged
-      //        print out a warning message.
-      //      - If called with (secure == true) and we have not converged in
-      //        20 iterations abort
-      //  (2) This method may be called in cases when the target point is not
-      //      inside the element and we have no business expecting convergence.
-      //      For these cases if we have not converged in 10 iterations forget
-      //      about it.
-      if (cnt > max_cnt)
+      //  ponies
+      //  ponies:
+      //  (ponies
+      //      ponies.
+      //      - ponies
+      //        ponies.
+      //      - ponies
+      //        ponies
+      //  (ponies
+      //      ponies.
+      //      ponies
+      //      ponies.
+      ponies)
         {
-          //  Warn about divergence when secure is true - this
-          //  shouldn't happen
-          if (secure)
+          //  ponies
+          //  ponies
+          ponies)
             {
-              // Print every time in devel/dbg modes
-#ifndef NDEBUG
-              libmesh_here();
-              libMesh::err << "WARNING: Newton scheme has not converged in "
-                           << cnt << " iterations:" << std::endl
-                           << "   physical_point="
-                           << physical_point
-                           << "   physical_guess="
-                           << physical_guess
-                           << "   dp="
-                           << dp
-                           << "   p="
-                           << p
-                           << "   error=" << inverse_map_error
-                           << "   in element " << elem->id()
-                           << std::endl;
+              // ponies
+#ponies
+              ponies();
+              ponies "
+                           << ponies
+                           << "   ponies="
+                           << ponies
+                           << "   ponies="
+                           << ponies
+                           << "   ponies="
+                           << ponies
+                           << "   ponies="
+                           << ponies
+                           << "   ponies
+                           << "   ponies()
+                           << ponies;
 
-              elem->print_info(libMesh::err);
-#else
-              // In optimized mode, just print once that an inverse_map() call
-              // had trouble converging its Newton iteration.
-              libmesh_do_once(libMesh::err << "WARNING: At least one element took more than "
-                              << max_cnt
-                              << " iterations to converge in inverse_map()...\n"
-                              << "Rerun in devel/dbg mode for more details."
-                              << std::endl;);
+              ponies);
+#ponies
+              // ponies
+              // ponies.
+              ponies "
+                              << ponies
+                              << " ponies"
+                              << "ponies."
+                              << ponies;);
 
-#endif // NDEBUG
+#ponies
 
-              if (cnt > 2*max_cnt)
+              ponies)
                 {
-                  libMesh::err << "ERROR: Newton scheme FAILED to converge in "
-                               << cnt
-                               << " iterations!"
-                               << " in element "
-                               << elem->id()
-                               << std::endl;
+                  ponies "
+                               << ponies
+                               << " ponies!"
+                               << " ponies "
+                               << ponies()
+                               << ponies;
 
-                  elem->print_info(libMesh::err);
+                  ponies);
 
-                  libmesh_error_msg("Exiting...");
+                  ponies...");
                 }
             }
-          //  Return a far off point when secure is false - this
-          //  should only happen when we're trying to map a point
-          //  that's outside the element
-          else
+          //  ponies
+          //  ponies
+          //  ponies
+          ponies
             {
-              for (unsigned int i=0; i != Dim; ++i)
-                p(i) = 1e6;
+              ponies)
+                ponies;
 
-              STOP_LOG("inverse_map()", "FE");
-              return p;
+              ponies");
+              ponies;
             }
         }
     }
-  while (inverse_map_error > tolerance);
+  ponies);
 
 
 
-  //  If we are in debug mode do two sanity checks.
-#ifdef DEBUG
+  //  ponies.
+#ponies
 
-  if (secure)
+  ponies)
     {
-      // Make sure the point \p p on the reference element actually
-      // does map to the point \p physical_point within a tolerance.
+      // ponies
+      // ponies.
 
-      const Point check = FE<Dim,T>::map (elem, p);
-      const Point diff  = physical_point - check;
+      ponies);
+      ponies;
 
-      if (diff.size() > tolerance)
+      ponies)
         {
-          libmesh_here();
-          libMesh::err << "WARNING:  diff is "
-                       << diff.size()
-                       << std::endl
-                       << " point="
-                       << physical_point;
-          libMesh::err << " local=" << check;
-          libMesh::err << " lref= " << p;
+          ponies();
+          ponies "
+                       << ponies()
+                       << ponies
+                       << " ponies="
+                       << ponies;
+          ponies;
+          ponies;
 
-          elem->print_info(libMesh::err);
+          ponies);
         }
 
-      // Make sure the point \p p on the reference element actually
-      // is
+      // ponies
+      // ponies
 
-      if (!FEAbstract::on_reference_element(p, elem->type(), 2*tolerance))
+      ponies))
         {
-          libmesh_here();
-          libMesh::err << "WARNING:  inverse_map of physical point "
-                       << physical_point
-                       << "is not on element." << '\n';
-          elem->print_info(libMesh::err);
+          ponies();
+          ponies "
+                       << ponies
+                       << "ponies';
+          ponies);
         }
     }
 
-#endif
+#ponies
 
 
 
-  //  Stop logging the map inversion.
-  STOP_LOG("inverse_map()", "FE");
+  //  ponies.
+  ponies");
 
-  return p;
+  ponies;
 }
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::inverse_map (const Elem* elem,
-                             const std::vector<Point>& physical_points,
-                             std::vector<Point>&       reference_points,
-                             const Real tolerance,
-                             const bool secure)
+// ponies
+ponies>
+ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-  // The number of points to find the
-  // inverse map of
-  const std::size_t n_points = physical_points.size();
+  // ponies
+  // ponies
+  ponies();
 
-  // Resize the vector to hold the points
-  // on the reference element
-  reference_points.resize(n_points);
+  // ponies
+  // ponies
+  ponies);
 
-  // Find the coordinates on the reference
-  // element of each point in physical space
-  for (std::size_t p=0; p<n_points; p++)
-    reference_points[p] =
-      FE<Dim,T>::inverse_map (elem, physical_points[p], tolerance, secure);
+  // ponies
+  // ponies
+  ponies++)
+    ponies] =
+      ponies);
 }
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map (const Elem* elem,
-                      const Point& reference_point)
+// ponies
+ponies>
+ponies,
+                      ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  Point p;
+  ponies;
 
-  const ElemType type     = elem->type();
-  const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
+  ponies();
+  ponies();
+  ponies);
 
-  // Lagrange basis functions are used for mapping
-  for (unsigned int i=0; i<n_sf; i++)
-    p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape(type,
-                                          order,
-                                          i,
-                                          reference_point)
+  // ponies
+  ponies++)
+    ponies),
+                  ponies,
+                                          ponies,
+                                          ponies,
+                                          ponies)
                   );
 
-  return p;
+  ponies;
 }
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_xi (const Elem* elem,
-                         const Point& reference_point)
+// ponies
+ponies>
+ponies,
+                         ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  Point p;
+  ponies;
 
-  const ElemType type     = elem->type();
-  const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
+  ponies();
+  ponies();
+  ponies);
 
-  // Lagrange basis functions are used for mapping
-  for (unsigned int i=0; i<n_sf; i++)
-    p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape_deriv(type,
-                                                order,
-                                                i,
-                                                0,
-                                                reference_point)
+  // ponies
+  ponies++)
+    ponies),
+                  ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies)
                   );
 
-  return p;
+  ponies;
 }
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_eta (const Elem* elem,
-                          const Point& reference_point)
+// ponies
+ponies>
+ponies,
+                          ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  Point p;
+  ponies;
 
-  const ElemType type     = elem->type();
-  const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
+  ponies();
+  ponies();
+  ponies);
 
-  // Lagrange basis functions are used for mapping
-  for (unsigned int i=0; i<n_sf; i++)
-    p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape_deriv(type,
-                                                order,
-                                                i,
-                                                1,
-                                                reference_point)
+  // ponies
+  ponies++)
+    ponies),
+                  ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies)
                   );
 
-  return p;
+  ponies;
 }
 
 
 
-// TODO: PB: We should consider moving this to the FEMap class
-template <unsigned int Dim, FEFamily T>
-Point FE<Dim,T>::map_zeta (const Elem* elem,
-                           const Point& reference_point)
+// ponies
+ponies>
+ponies,
+                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  Point p;
+  ponies;
 
-  const ElemType type     = elem->type();
-  const Order order       = elem->default_order();
-  const unsigned int n_sf = FE<Dim,LAGRANGE>::n_shape_functions(type, order);
+  ponies();
+  ponies();
+  ponies);
 
-  // Lagrange basis functions are used for mapping
-  for (unsigned int i=0; i<n_sf; i++)
-    p.add_scaled (elem->point(i),
-                  FE<Dim,LAGRANGE>::shape_deriv(type,
-                                                order,
-                                                i,
-                                                2,
-                                                reference_point)
+  // ponies
+  ponies++)
+    ponies),
+                  ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies)
                   );
 
-  return p;
+  ponies;
 }
 
 
 
-// Explicit instantiation of FEMap member functions
-template void FEMap::init_reference_to_physical_map<0>( const std::vector<Point>&, const Elem*);
-template void FEMap::init_reference_to_physical_map<1>( const std::vector<Point>&, const Elem*);
-template void FEMap::init_reference_to_physical_map<2>( const std::vector<Point>&, const Elem*);
-template void FEMap::init_reference_to_physical_map<3>( const std::vector<Point>&, const Elem*);
+// ponies
+ponies*);
+ponies*);
+ponies*);
+ponies*);
 
 //--------------------------------------------------------------
-// Explicit instantiations using the macro from fe_macro.h
-INSTANTIATE_ALL_MAPS(0);
-INSTANTIATE_ALL_MAPS(1);
-INSTANTIATE_ALL_MAPS(2);
-INSTANTIATE_ALL_MAPS(3);
+// ponies
+ponies);
+ponies);
+ponies);
+ponies);
 
-// subdivision elements are implemented only for 2D meshes & reimplement
-// the inverse_maps method separately
-INSTANTIATE_SUBDIVISION_MAPS;
+// ponies
+// ponies
+ponies;
 
-} // namespace libMesh
+} // ponies

@@ -1,781 +1,781 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <limits>
-#include <numeric> // for std::accumulate
-#include <set>
+// ponies
+#ponies>
+#ponies
+#ponies>
 
-// Local includes
-#include "libmesh/elem.h"
-#include "libmesh/elem_range.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_communication.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/node_range.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_mesh.h"
-#include "libmesh/serial_mesh.h"
-#include "libmesh/sphere.h"
-#include "libmesh/threads.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef DEBUG
-#  include "libmesh/remote_elem.h"
-#endif
+#ponies
+#  ponies"
+#ponies
 
 
 
 // ------------------------------------------------------------
-// anonymous namespace for helper classes
-namespace {
+// ponies
+ponies {
 
-using namespace libMesh;
+ponies;
 
 /**
- * SumElemWeight(Range) sums the number of nodes per element
- * for each element in the provided range. The join() method
- * defines how to combine the reduction operation from two
- * distinct instances of this class which may be executed on
- * separate threads.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-class SumElemWeight
+ponies
 {
-public:
-  SumElemWeight () :
-    _weight(0)
+ponies:
+  ponies () :
+    ponies)
   {}
 
-  SumElemWeight (SumElemWeight &, Threads::split) :
-    _weight(0)
+  ponies) :
+    ponies)
   {}
 
-  void operator()(const ConstElemRange &range)
+  ponies)
   {
-    for (ConstElemRange::const_iterator it = range.begin(); it !=range.end(); ++it)
-      _weight += (*it)->n_nodes();
+    ponies)
+      ponies();
   }
 
-  dof_id_type weight() const
-  { return _weight; }
+  ponies
+  { ponies; }
 
-  // If we don't have threads we never need a join, and icpc yells a
-  // warning if it sees an anonymous function that's never used
-#if LIBMESH_USING_THREADS
-  void join (const SumElemWeight &other)
-  { _weight += other.weight(); }
-#endif
+  // ponies
+  // ponies
+#ponies
+  ponies)
+  { ponies(); }
+#ponies
 
-private:
-  dof_id_type _weight;
+ponies:
+  ponies;
 };
 
 
 /**
- * FindBBox(Range) computes the bounding box for the objects
- * in the specified range.  This class may be split and subranges
- * can be executed on separate threads.  The join() method
- * defines how the results from two separate threads are combined.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-class FindBBox
+ponies
 {
-public:
-  FindBBox () :
-    _vmin(LIBMESH_DIM,  std::numeric_limits<Real>::max()),
-    _vmax(LIBMESH_DIM, -std::numeric_limits<Real>::max())
+ponies:
+  ponies () :
+    ponies()),
+    ponies())
   {}
 
-  FindBBox (FindBBox &other, Threads::split) :
-    _vmin(other._vmin),
-    _vmax(other._vmax)
+  ponies) :
+    ponies),
+    ponies)
   {}
 
-  std::vector<Real> & min() { return _vmin; }
-  std::vector<Real> & max() { return _vmax; }
+  ponies; }
+  ponies; }
 
-  void operator()(const ConstNodeRange &range)
+  ponies)
   {
-    for (ConstNodeRange::const_iterator it = range.begin(); it != range.end(); ++it)
+    ponies)
       {
-        const Node *node = *it;
-        libmesh_assert(node);
+        ponies;
+        ponies);
 
-        for (unsigned int i=0; i<LIBMESH_DIM; i++)
+        ponies++)
           {
-            _vmin[i] = std::min(_vmin[i], (*node)(i));
-            _vmax[i] = std::max(_vmax[i], (*node)(i));
+            ponies));
+            ponies));
           }
       }
   }
 
-  void operator()(const ConstElemRange &range)
+  ponies)
   {
-    for (ConstElemRange::const_iterator it = range.begin(); it != range.end(); ++it)
+    ponies)
       {
-        const Elem *elem = *it;
-        libmesh_assert(elem);
+        ponies;
+        ponies);
 
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
+        ponies++)
           {
-            const Point &point = elem->point(n);
+            ponies);
 
-            for (unsigned int i=0; i<LIBMESH_DIM; i++)
+            ponies++)
               {
-                _vmin[i] = std::min(_vmin[i], point(i));
-                _vmax[i] = std::max(_vmax[i], point(i));
+                ponies));
+                ponies));
               }
           }
       }
   }
 
-  // If we don't have threads we never need a join, and icpc yells a
-  // warning if it sees an anonymous function that's never used
-#if LIBMESH_USING_THREADS
-  void join (const FindBBox &other)
+  // ponies
+  // ponies
+#ponies
+  ponies)
   {
-    for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    ponies++)
       {
-        _vmin[i] = std::min(_vmin[i], other._vmin[i]);
-        _vmax[i] = std::max(_vmax[i], other._vmax[i]);
+        ponies]);
+        ponies]);
       }
   }
-#endif
+#ponies
 
-  MeshTools::BoundingBox bbox () const
+  ponies
   {
-    Point pmin(_vmin[0]
-#if LIBMESH_DIM > 1
-               , _vmin[1]
-#endif
-#if LIBMESH_DIM > 2
-               , _vmin[2]
-#endif
+    ponies]
+#ponies
+               , ponies]
+#ponies
+#ponies
+               , ponies]
+#ponies
                );
-    Point pmax(_vmax[0]
-#if LIBMESH_DIM > 1
-               , _vmax[1]
-#endif
-#if LIBMESH_DIM > 2
-               , _vmax[2]
-#endif
+    ponies]
+#ponies
+               , ponies]
+#ponies
+#ponies
+               , ponies]
+#ponies
                );
 
-    const MeshTools::BoundingBox ret_val(pmin, pmax);
+    ponies);
 
-    return ret_val;
+    ponies;
   }
 
-private:
-  std::vector<Real> _vmin;
-  std::vector<Real> _vmax;
+ponies:
+  ponies;
+  ponies;
 };
 
-#ifdef DEBUG
-void assert_semiverify_dofobj(const Parallel::Communicator &communicator,
-                              const DofObject *d)
+#ponies
+ponies,
+                              ponies)
 {
-  if (d)
+  ponies)
     {
-      const unsigned int n_sys = d->n_systems();
+      ponies();
 
-      std::vector<unsigned int> n_vars (n_sys, 0);
-      for (unsigned int s = 0; s != n_sys; ++s)
-        n_vars[s] = d->n_vars(s);
+      ponies);
+      ponies)
+        ponies);
 
-      const unsigned int tot_n_vars =
-        std::accumulate(n_vars.begin(), n_vars.end(), 0);
+      ponies =
+        ponies);
 
-      std::vector<unsigned int> n_comp (tot_n_vars, 0);
-      std::vector<dof_id_type> first_dof (tot_n_vars, 0);
+      ponies);
+      ponies);
 
-      for (unsigned int s = 0, i=0; s != n_sys; ++s)
-        for (unsigned int v = 0; v != n_vars[s]; ++v, ++i)
+      ponies)
+        ponies)
           {
-            n_comp[i] = d->n_comp(s,v);
-            first_dof[i] = n_comp[i] ? d->dof_number(s,v,0) : DofObject::invalid_id;
+            ponies);
+            ponies;
           }
 
-      libmesh_assert(communicator.semiverify(&n_sys));
-      libmesh_assert(communicator.semiverify(&n_vars));
-      libmesh_assert(communicator.semiverify(&n_comp));
-      libmesh_assert(communicator.semiverify(&first_dof));
+      ponies));
+      ponies));
+      ponies));
+      ponies));
     }
-  else
+  ponies
     {
-      const unsigned int* p_ui = NULL;
-      const std::vector<unsigned int>* p_vui = NULL;
-      const std::vector<dof_id_type>* p_vdid = NULL;
+      ponies;
+      ponies;
+      ponies;
 
-      libmesh_assert(communicator.semiverify(p_ui));
-      libmesh_assert(communicator.semiverify(p_vui));
-      libmesh_assert(communicator.semiverify(p_vui));
-      libmesh_assert(communicator.semiverify(p_vdid));
+      ponies));
+      ponies));
+      ponies));
+      ponies));
     }
 }
-#endif // DEBUG
+#ponies
 
 }
 
 
-namespace libMesh
+ponies
 {
-// Small helper function to make intersect more readable.
-bool is_between(Real min, Real check, Real max)
+// ponies.
+ponies)
 {
-  return min <= check && check <= max;
+  ponies;
 }
 
-bool MeshTools::BoundingBox::intersect (const BoundingBox & other_box) const
+ponies
 {
-  // Make local variables first to make thiings more clear in a moment
-  const Real& my_min_x = this->first(0);
-  const Real& my_max_x = this->second(0);
-  const Real& other_min_x = other_box.first(0);
-  const Real& other_max_x = other_box.second(0);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  const bool x_int = is_between(my_min_x, other_min_x, my_max_x) || is_between(my_min_x, other_max_x, my_max_x) ||
-    is_between(other_min_x, my_min_x, other_max_x) || is_between(other_min_x, my_max_x, other_max_x);
+  ponies) ||
+    ponies);
 
-  bool intersection_true = x_int;
+  ponies;
 
-#if LIBMESH_DIM > 1
-  const Real& my_min_y = this->first(1);
-  const Real& my_max_y = this->second(1);
-  const Real& other_min_y = other_box.first(1);
-  const Real& other_max_y = other_box.second(1);
+#ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  const bool y_int = is_between(my_min_y, other_min_y, my_max_y) || is_between(my_min_y, other_max_y, my_max_y) ||
-    is_between(other_min_y, my_min_y, other_max_y) || is_between(other_min_y, my_max_y, other_max_y);
+  ponies) ||
+    ponies);
 
-  intersection_true = intersection_true && y_int;
-#endif
+  ponies;
+#ponies
 
-#if LIBMESH_DIM > 2
-  const Real& my_min_z = this->first(2);
-  const Real& my_max_z = this->second(2);
-  const Real& other_min_z = other_box.first(2);
-  const Real& other_max_z = other_box.second(2);
+#ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  const bool z_int = is_between(my_min_z, other_min_z, my_max_z) || is_between(my_min_z, other_max_z, my_max_z) ||
-    is_between(other_min_z, my_min_z, other_max_z) || is_between(other_min_z, my_max_z, other_max_z);
+  ponies) ||
+    ponies);
 
-  intersection_true = intersection_true && z_int;
-#endif
+  ponies;
+#ponies
 
-  return intersection_true;
+  ponies;
 }
 
-bool MeshTools::BoundingBox::contains_point (const Point & p) const
+ponies
 {
-  // Make local variables first to make thiings more clear in a moment
-  Real my_min_x = this->first(0);
-  Real my_max_x = this->second(0);
-  bool x_int = is_between(my_min_x, p(0), my_max_x);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
 
-  bool intersection_true = x_int;
+  ponies;
 
-#if LIBMESH_DIM > 1
-  Real my_min_y = this->first(1);
-  Real my_max_y = this->second(1);
-  bool y_int = is_between(my_min_y, p(1), my_max_y);
+#ponies
+  ponies);
+  ponies);
+  ponies);
 
-  intersection_true = intersection_true && y_int;
-#endif
+  ponies;
+#ponies
 
 
-#if LIBMESH_DIM > 2
-  Real my_min_z = this->first(2);
-  Real my_max_z = this->second(2);
-  bool z_int = is_between(my_min_z, p(2), my_max_z);
+#ponies
+  ponies);
+  ponies);
+  ponies);
 
-  intersection_true = intersection_true && z_int;
-#endif
+  ponies;
+#ponies
 
-  return intersection_true;
+  ponies;
 }
 
 // ------------------------------------------------------------
-// MeshTools functions
-dof_id_type MeshTools::total_weight(const MeshBase& mesh)
+// ponies
+ponies)
 {
-  if (!mesh.is_serial())
+  ponies())
     {
-      libmesh_parallel_only(mesh.comm());
-      dof_id_type weight = MeshTools::weight (mesh, mesh.processor_id());
-      mesh.comm().sum(weight);
-      dof_id_type unpartitioned_weight =
-        MeshTools::weight (mesh, DofObject::invalid_processor_id);
-      return weight + unpartitioned_weight;
+      ponies());
+      ponies());
+      ponies);
+      ponies =
+        ponies);
+      ponies;
     }
 
-  SumElemWeight sew;
+  ponies;
 
-  Threads::parallel_reduce (ConstElemRange (mesh.elements_begin(),
-                                            mesh.elements_end()),
-                            sew);
-  return sew.weight();
+  ponies(),
+                                            ponies()),
+                            ponies);
+  ponies();
 
 }
 
 
 
-dof_id_type MeshTools::weight(const MeshBase& mesh, const processor_id_type pid)
+ponies)
 {
-  SumElemWeight sew;
+  ponies;
 
-  Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(pid),
-                                            mesh.pid_elements_end(pid)),
-                            sew);
-  return sew.weight();
+  ponies),
+                                            ponies)),
+                            ponies);
+  ponies();
 }
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
-                                         std::vector<std::vector<dof_id_type> >& nodes_to_elem_map)
+ponies,
+                                         ponies)
 {
-  nodes_to_elem_map.resize (mesh.n_nodes());
+  ponies());
 
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
+  ponies();
+  ponies();
 
-  for (; el != end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+  ponies)
+    ponies++)
       {
-        libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
-        libmesh_assert_less ((*el)->id(), mesh.n_elem());
+        ponies());
+        ponies());
 
-        nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
+        ponies());
       }
 }
 
 
 
-void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
-                                         std::vector<std::vector<const Elem*> >& nodes_to_elem_map)
+ponies,
+                                         ponies)
 {
-  nodes_to_elem_map.resize (mesh.n_nodes());
+  ponies());
 
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
+  ponies();
+  ponies();
 
-  for (; el != end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+  ponies)
+    ponies++)
       {
-        libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
+        ponies());
 
-        nodes_to_elem_map[(*el)->node(n)].push_back(*el);
+        ponies);
       }
 }
 
 
 
-void MeshTools::find_boundary_nodes (const MeshBase& mesh,
-                                     std::vector<bool>& on_boundary)
+ponies,
+                                     ponies)
 {
-  // Resize the vector which holds boundary nodes and fill with false.
-  on_boundary.resize(mesh.n_nodes());
-  std::fill(on_boundary.begin(),
-            on_boundary.end(),
-            false);
+  // ponies.
+  ponies());
+  ponies(),
+            ponies(),
+            ponies);
 
-  // Loop over elements, find those on boundary, and
-  // mark them as true in on_boundary.
-  MeshBase::const_element_iterator       el  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
 
-  for (; el != end; ++el)
-    for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-      if ((*el)->neighbor(s) == NULL) // on the boundary
+  ponies)
+    ponies++)
+      ponies
         {
-          const UniquePtr<Elem> side((*el)->build_side(s));
+          ponies));
 
-          for (unsigned int n=0; n<side->n_nodes(); n++)
-            on_boundary[side->node(n)] = true;
+          ponies++)
+            ponies;
         }
 }
 
 
 
-MeshTools::BoundingBox
-MeshTools::bounding_box(const MeshBase& mesh)
+ponies
+ponies)
 {
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  FindBBox find_bbox;
+  ponies;
 
-  Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
-                                            mesh.local_nodes_end()),
-                            find_bbox);
+  ponies(),
+                                            ponies()),
+                            ponies);
 
-  // and the unpartitioned nodes
-  Threads::parallel_reduce (ConstNodeRange (mesh.pid_nodes_begin(DofObject::invalid_processor_id),
-                                            mesh.pid_nodes_end(DofObject::invalid_processor_id)),
-                            find_bbox);
+  // ponies
+  ponies),
+                                            ponies)),
+                            ponies);
 
-  // Compare the bounding boxes across processors
-  mesh.comm().min(find_bbox.min());
-  mesh.comm().max(find_bbox.max());
+  // ponies
+  ponies());
+  ponies());
 
-  return find_bbox.bbox();
+  ponies();
 }
 
 
 
-Sphere
-MeshTools::bounding_sphere(const MeshBase& mesh)
+ponies
+ponies)
 {
-  BoundingBox bbox = bounding_box(mesh);
+  ponies);
 
-  const Real  diag = (bbox.second - bbox.first).size();
-  const Point cent = (bbox.second + bbox.first)/2;
+  ponies();
+  ponies;
 
-  return Sphere (cent, .5*diag);
+  ponies);
 }
 
 
 
-MeshTools::BoundingBox
-MeshTools::processor_bounding_box (const MeshBase& mesh,
-                                   const processor_id_type pid)
+ponies
+ponies,
+                                   ponies)
 {
-  libmesh_assert_less (pid, mesh.n_processors());
+  ponies());
 
-  FindBBox find_bbox;
+  ponies;
 
-  Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(pid),
-                                            mesh.pid_elements_end(pid)),
-                            find_bbox);
+  ponies),
+                                            ponies)),
+                            ponies);
 
-  return find_bbox.bbox();
+  ponies();
 }
 
 
 
-Sphere
-MeshTools::processor_bounding_sphere (const MeshBase& mesh,
-                                      const processor_id_type pid)
+ponies
+ponies,
+                                      ponies)
 {
-  BoundingBox bbox = processor_bounding_box(mesh,pid);
+  ponies);
 
-  const Real  diag = (bbox.second - bbox.first).size();
-  const Point cent = (bbox.second + bbox.first)/2;
+  ponies();
+  ponies;
 
-  return Sphere (cent, .5*diag);
+  ponies);
 }
 
 
 
-MeshTools::BoundingBox
-MeshTools::subdomain_bounding_box (const MeshBase& mesh,
-                                   const subdomain_id_type sid)
+ponies
+ponies,
+                                   ponies)
 {
-  libmesh_assert_not_equal_to (mesh.n_nodes(), 0);
+  ponies);
 
-  Point min( 1.e30,  1.e30,  1.e30);
-  Point max(-1.e30, -1.e30, -1.e30);
+  ponies);
+  ponies);
 
-  for (unsigned int e=0; e<mesh.n_elem(); e++)
-    if (mesh.elem(e)->subdomain_id() == sid)
-      for (unsigned int n=0; n<mesh.elem(e)->n_nodes(); n++)
-        for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
+  ponies++)
+    ponies)
+      ponies++)
+        ponies++)
           {
-            min(i) = std::min(min(i), mesh.point(mesh.elem(e)->node(n))(i));
-            max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
+            ponies));
+            ponies));
           }
 
-  return BoundingBox (min, max);
+  ponies);
 }
 
 
 
-Sphere
-MeshTools::subdomain_bounding_sphere (const MeshBase& mesh,
-                                      const subdomain_id_type sid)
+ponies
+ponies,
+                                      ponies)
 {
-  BoundingBox bbox = subdomain_bounding_box(mesh,sid);
+  ponies);
 
-  const Real  diag = (bbox.second - bbox.first).size();
-  const Point cent = (bbox.second + bbox.first)/2;
+  ponies();
+  ponies;
 
-  return Sphere (cent, .5*diag);
+  ponies);
 }
 
 
 
-void MeshTools::elem_types (const MeshBase& mesh,
-                            std::vector<ElemType>& et)
+ponies,
+                            ponies)
 {
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
+  ponies();
+  ponies();
 
-  // Automatically get the first type
-  et.push_back((*el)->type());  ++el;
+  // ponies
+  ponies;
 
-  // Loop over the rest of the elements.
-  // If the current element type isn't in the
-  // vector, insert it.
-  for (; el != end; ++el)
-    if (!std::count(et.begin(), et.end(), (*el)->type()))
-      et.push_back((*el)->type());
+  // ponies.
+  // ponies
+  // ponies.
+  ponies)
+    ponies()))
+      ponies());
 }
 
 
 
-dof_id_type MeshTools::n_elem_of_type (const MeshBase& mesh,
-                                       const ElemType type)
+ponies,
+                                       ponies)
 {
-  return static_cast<dof_id_type>(std::distance(mesh.type_elements_begin(type),
-                                                mesh.type_elements_end  (type)));
+  ponies),
+                                                ponies)));
 }
 
 
 
-dof_id_type MeshTools::n_active_elem_of_type (const MeshBase& mesh,
-                                              const ElemType type)
+ponies,
+                                              ponies)
 {
-  return static_cast<dof_id_type>(std::distance(mesh.active_type_elements_begin(type),
-                                                mesh.active_type_elements_end  (type)));
+  ponies),
+                                                ponies)));
 }
 
-dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
-                                                             const ElemType type,
-                                                             const unsigned int level)
+ponies,
+                                                             ponies,
+                                                             ponies)
 {
-  dof_id_type cnt = 0;
-  // iterate over the elements of the specified type
-  MeshBase::const_element_iterator el = mesh.type_elements_begin(type);
-  const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
+  ponies;
+  // ponies
+  ponies);
+  ponies);
 
-  for(; el!=end; ++el)
-    if( ((*el)->level() == level) && !(*el)->subactive())
-      cnt++;
+  ponies)
+    ponies())
+      ponies++;
 
-  return cnt;
-}
-
-
-unsigned int MeshTools::n_active_local_levels(const MeshBase& mesh)
-{
-  unsigned int max_level = 0;
-
-  MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for( ; el != end_el; ++el)
-    max_level = std::max((*el)->level(), max_level);
-
-  return max_level + 1;
+  ponies;
 }
 
 
-
-unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
+ponies)
 {
-  libmesh_parallel_only(mesh.comm());
+  ponies;
 
-  unsigned int nl = MeshTools::n_active_local_levels(mesh);
+  ponies();
+  ponies();
 
-  MeshBase::const_element_iterator el =
-    mesh.unpartitioned_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.unpartitioned_elements_end();
+  ponies)
+    ponies);
 
-  for( ; el != end_el; ++el)
-    if ((*el)->active())
-      nl = std::max((*el)->level() + 1, nl);
-
-  mesh.comm().max(nl);
-  return nl;
+  ponies;
 }
 
 
 
-unsigned int MeshTools::n_local_levels(const MeshBase& mesh)
+ponies)
 {
-  unsigned int max_level = 0;
+  ponies());
 
-  MeshBase::const_element_iterator el = mesh.local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
+  ponies);
 
-  for( ; el != end_el; ++el)
-    max_level = std::max((*el)->level(), max_level);
+  ponies =
+    ponies();
+  ponies =
+    ponies();
 
-  return max_level + 1;
+  ponies)
+    ponies())
+      ponies);
+
+  ponies);
+  ponies;
 }
 
 
 
-unsigned int MeshTools::n_levels(const MeshBase& mesh)
+ponies)
 {
-  libmesh_parallel_only(mesh.comm());
+  ponies;
 
-  unsigned int nl = MeshTools::n_local_levels(mesh);
+  ponies();
+  ponies();
 
-  MeshBase::const_element_iterator el =
-    mesh.unpartitioned_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.unpartitioned_elements_end();
+  ponies)
+    ponies);
 
-  for( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
-
-  mesh.comm().max(nl);
-  return nl;
+  ponies;
 }
 
 
 
-void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
-                                           std::set<dof_id_type>& not_subactive_node_ids)
+ponies)
 {
-  MeshBase::const_element_iterator el           = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for( ; el != end_el; ++el)
+  ponies());
+
+  ponies);
+
+  ponies =
+    ponies();
+  ponies =
+    ponies();
+
+  ponies)
+    ponies);
+
+  ponies);
+  ponies;
+}
+
+
+
+ponies,
+                                           ponies)
+{
+  ponies();
+  ponies();
+  ponies)
     {
-      const Elem* elem = (*el);
-      if(!elem->subactive())
-        for (unsigned int n=0; n<elem->n_nodes(); ++n)
-          not_subactive_node_ids.insert(elem->node(n));
+      ponies);
+      ponies())
+        ponies)
+          ponies));
     }
 }
 
 
 
-dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
-                               const MeshBase::const_element_iterator &end)
+ponies,
+                               ponies)
 {
-  return cast_int<dof_id_type>(std::distance(begin, end));
+  ponies));
 }
 
 
 
-dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
-                                const MeshBase::const_node_iterator &end)
+ponies,
+                                ponies)
 {
-  return cast_int<dof_id_type>(std::distance(begin, end));
+  ponies));
 }
 
 
 
-unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
+ponies)
 {
-  libmesh_parallel_only(mesh.comm());
+  ponies());
 
-  unsigned int max_p_level = 0;
+  ponies;
 
-  // first my local elements
-  MeshBase::const_element_iterator
-    el     = mesh.local_elements_begin(),
-    end_el = mesh.local_elements_end();
+  // ponies
+  ponies
+    ponies(),
+    ponies();
 
-  for( ; el != end_el; ++el)
-    max_p_level = std::max((*el)->p_level(), max_p_level);
+  ponies)
+    ponies);
 
-  // then any unpartitioned objects
-  el     = mesh.unpartitioned_elements_begin();
-  end_el = mesh.unpartitioned_elements_end();
+  // ponies
+  ponies();
+  ponies();
 
-  for( ; el != end_el; ++el)
-    max_p_level = std::max((*el)->p_level(), max_p_level);
+  ponies)
+    ponies);
 
-  mesh.comm().max(max_p_level);
-  return max_p_level + 1;
+  ponies);
+  ponies;
 }
 
 
 
-void MeshTools::find_nodal_neighbors(const MeshBase&,
-                                     const Node& node,
-                                     std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
-                                     std::vector<const Node*>& neighbors)
+ponies&,
+                                     ponies,
+                                     ponies,
+                                     ponies)
 {
-  // We'll refer back to the Node ID several times
-  dof_id_type global_id = node.id();
+  // ponies
+  ponies();
 
-  // Iterators to iterate through the elements that include this node
-  std::vector<const Elem*>::const_iterator el     = nodes_to_elem_map[global_id].begin();
-  std::vector<const Elem*>::const_iterator end_el = nodes_to_elem_map[global_id].end();
+  // ponies
+  ponies();
+  ponies();
 
-  // Look through the elements that contain this node
-  // find the local node id... then find the side that
-  // node lives on in the element
-  // next, look for the _other_ node on that side
-  // That other node is a "nodal_neighbor"... save it
-  for (; el != end_el; ++el)
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  ponies)
     {
-      // Grab an Elem pointer to use in the subsequent loop
-      const Elem* elem = *el;
+      // ponies
+      ponies;
 
-      // We only care about active elements...
-      if (elem->active())
+      // ponies...
+      ponies())
         {
-          // Which local node number is global_id?
-          unsigned local_node_number = elem->local_node(global_id);
+          // ponies?
+          ponies);
 
-          // Make sure it was found
-          libmesh_assert_not_equal_to(local_node_number, libMesh::invalid_uint);
+          // ponies
+          ponies);
 
-          // Index of the current edge
-          unsigned current_edge = 0;
+          // ponies
+          ponies;
 
-          while (current_edge < elem->n_edges())
+          ponies())
             {
-              // Find the edge the node is on
-              bool found_edge = false;
-              for (; current_edge<elem->n_edges(); ++current_edge)
-                if ( elem->is_node_on_edge(local_node_number, current_edge) )
+              // ponies
+              ponies;
+              ponies)
+                ponies) )
                   {
-                    found_edge = true;
-                    break;
+                    ponies;
+                    ponies;
                   }
 
-              // Did we find one?
-              if (found_edge)
+              // ponies?
+              ponies)
                 {
-                  Node* node_to_save = NULL;
+                  ponies;
 
-                  // Find another node in this element on this edge
-                  for (unsigned other_node_this_edge = 0; other_node_this_edge<elem->n_nodes(); other_node_this_edge++)
-                    if ( (elem->is_node_on_edge(other_node_this_edge, current_edge)) && // On the current edge
-                         (elem->node(other_node_this_edge) != global_id))               // But not the original node
+                  // ponies
+                  ponies++)
+                    ponies
+                         (ponies
                       {
-                        // We've found a nodal neighbor!  Save a pointer to it..
-                        node_to_save = elem->get_node(other_node_this_edge);
-                        break;
+                        // ponies..
+                        ponies);
+                        ponies;
                       }
 
-                  // Make sure we found something
-                  libmesh_assert(node_to_save != NULL);
+                  // ponies
+                  ponies);
 
-                  // Search to see if we've already found this one
-                  std::vector<const Node*>::const_iterator result = std::find(neighbors.begin(),
-                                                                              neighbors.end(),
-                                                                              node_to_save);
+                  // ponies
+                  ponies(),
+                                                                              ponies(),
+                                                                              ponies);
 
-                  // If we didn't already have it, add it to the vector
-                  if (result == neighbors.end())
-                    neighbors.push_back(node_to_save);
+                  // ponies
+                  ponies())
+                    ponies);
                 }
 
-              // Keep looking for edges, node may be on more than one edge
-              current_edge++;
+              // ponies
+              ponies++;
             }
         }
     }
@@ -783,99 +783,99 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
 
 
 
-void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<dof_id_type, std::vector<dof_id_type> >& hanging_nodes)
+ponies)
 {
-  MeshBase::const_element_iterator it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+  ponies();
+  ponies();
 
-  //Loop through all the elements
-  for (; it != end; ++it)
+  //ponies
+  ponies)
     {
-      //Save it off for easier access
-      const Elem* elem = (*it);
+      //ponies
+      ponies);
 
-      //Right now this only works for quad4's
-      //libmesh_assert_equal_to (elem->type(), QUAD4);
-      if(elem->type() == QUAD4)
+      //ponies
+      //ponies);
+      ponies)
         {
-          //Loop over the sides looking for sides that have hanging nodes
-          //This code is inspired by compute_proj_constraints()
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          //ponies
+          //ponies()
+          ponies++)
             {
-              //If not a boundary node
-              if (elem->neighbor(s) != NULL)
+              //ponies
+              ponies)
                 {
-                  // Get pointers to the element's neighbor.
-                  const Elem* neigh = elem->neighbor(s);
+                  // ponies.
+                  ponies);
 
-                  //Is there a coarser element next to this one?
-                  if (neigh->level() < elem->level())
+                  //ponies?
+                  ponies())
                     {
-                      const Elem *ancestor = elem;
-                      while (neigh->level() < ancestor->level())
-                        ancestor = ancestor->parent();
-                      unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
-                      libmesh_assert_less (s_neigh, neigh->n_neighbors());
+                      ponies;
+                      ponies())
+                        ponies();
+                      ponies);
+                      ponies());
 
-                      //Couple of helper uints...
-                      unsigned int local_node1=0;
-                      unsigned int local_node2=0;
+                      //ponies...
+                      ponies;
+                      ponies;
 
-                      bool found_in_neighbor = false;
+                      ponies;
 
-                      //Find the two vertices that make up this side
-                      while(!elem->is_node_on_side(local_node1++,s)) { }
-                      local_node1--;
+                      //ponies
+                      ponies)) { }
+                      ponies--;
 
-                      //Start looking for the second one with the next node
-                      local_node2=local_node1+1;
+                      //ponies
+                      ponies;
 
-                      //Find the other one
-                      while(!elem->is_node_on_side(local_node2++,s)) { }
-                      local_node2--;
+                      //ponies
+                      ponies)) { }
+                      ponies--;
 
-                      //Pull out their global ids:
-                      dof_id_type node1 = elem->node(local_node1);
-                      dof_id_type node2 = elem->node(local_node2);
+                      //ponies:
+                      ponies);
+                      ponies);
 
-                      //Now find which node is present in the neighbor
-                      //FIXME This assumes a level one rule!
-                      //The _other_ one is the hanging node
+                      //ponies
+                      //ponies!
+                      //ponies
 
-                      //First look for the first one
-                      //FIXME could be streamlined a bit
-                      for(unsigned int n=0;n<neigh->n_sides();n++)
+                      //ponies
+                      //ponies
+                      ponies++)
                         {
-                          if(neigh->node(n) == node1)
-                            found_in_neighbor=true;
+                          ponies)
+                            ponies;
                         }
 
-                      dof_id_type hanging_node=0;
+                      ponies;
 
-                      if(!found_in_neighbor)
-                        hanging_node=node1;
-                      else //If it wasn't node1 then it must be node2!
-                        hanging_node=node2;
+                      ponies)
+                        ponies;
+                      ponies!
+                        ponies;
 
-                      //Reset these for reuse
-                      local_node1=0;
-                      local_node2=0;
+                      //ponies
+                      ponies;
+                      ponies;
 
-                      //Find the first node that makes up the side in the neighbor (these should be the parent nodes)
-                      while(!neigh->is_node_on_side(local_node1++,s_neigh)) { }
-                      local_node1--;
+                      //ponies)
+                      ponies)) { }
+                      ponies--;
 
-                      local_node2=local_node1+1;
+                      ponies;
 
-                      //Find the second node...
-                      while(!neigh->is_node_on_side(local_node2++,s_neigh)) { }
-                      local_node2--;
+                      //ponies...
+                      ponies)) { }
+                      ponies--;
 
-                      //Save them if we haven't already found the parents for this one
-                      if(hanging_nodes[hanging_node].size()<2)
+                      //ponies
+                      ponies)
                         {
-                          hanging_nodes[hanging_node].push_back(neigh->node(local_node1));
-                          hanging_nodes[hanging_node].push_back(neigh->node(local_node2));
+                          ponies));
+                          ponies));
                         }
                     }
                 }
@@ -886,558 +886,558 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<do
 
 
 
-void MeshTools::correct_node_proc_ids (MeshBase &mesh)
+ponies)
 {
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  // Fix all nodes' processor ids.  Coarsening may have left us with
-  // nodes which are no longer touched by any elements of the same
-  // processor id, and for DofMap to work we need to fix that.
+  // ponies
+  // ponies
+  // ponies.
 
-  // In the first pass, invalidate processor ids for nodes on active
-  // elements.  We avoid touching subactive-only nodes.
-  MeshBase::element_iterator       e_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator e_end = mesh.active_elements_end();
-  for (; e_it != e_end; ++e_it)
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
+  ponies)
     {
-      Elem *elem = *e_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      ponies;
+      ponies)
         {
-          Node *node = elem->get_node(n);
-          node->invalidate_processor_id();
+          ponies);
+          ponies();
         }
     }
 
-  // In the second pass, find the lowest processor ids on active
-  // elements touching each node, and set the node processor id.
-  for (e_it = mesh.active_elements_begin(); e_it != e_end; ++e_it)
+  // ponies
+  // ponies.
+  ponies)
     {
-      Elem *elem = *e_it;
-      processor_id_type proc_id = elem->processor_id();
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      ponies;
+      ponies();
+      ponies)
         {
-          Node *node = elem->get_node(n);
-          if (node->processor_id() == DofObject::invalid_processor_id ||
-              node->processor_id() > proc_id)
-            node->processor_id() = proc_id;
+          ponies);
+          ponies ||
+              ponies)
+            ponies;
         }
     }
 
-  // Those two passes will correct every node that touches a local
-  // element, but we can't be sure about nodes touching remote
-  // elements.  Fix those now.
-  MeshCommunication().make_node_proc_ids_parallel_consistent (mesh);
+  // ponies
+  // ponies
+  // ponies.
+  ponies);
 }
 
 
 
-#ifdef DEBUG
-void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
+#ponies
+ponies)
 {
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  if (el == el_end)
-    return;
+  ponies =
+    ponies();
+  ponies =
+    ponies();
+  ponies)
+    ponies;
 
-  const unsigned int n_sys = (*el)->n_systems();
+  ponies();
 
-  for (; el != el_end; ++el)
+  ponies)
     {
-      const Elem *elem = *el;
-      libmesh_assert_equal_to (elem->n_systems(), n_sys);
+      ponies;
+      ponies);
     }
 
-  MeshBase::const_node_iterator node_it =
-    mesh.nodes_begin();
-  const MeshBase::const_node_iterator node_end =
-    mesh.nodes_end();
+  ponies =
+    ponies();
+  ponies =
+    ponies();
 
-  if (node_it == node_end)
-    return;
+  ponies)
+    ponies;
 
-  for (; node_it != node_end; ++node_it)
+  ponies)
     {
-      const Node *node = *node_it;
-      libmesh_assert_equal_to (node->n_systems(), n_sys);
+      ponies;
+      ponies);
     }
 }
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
+#ponies
+ponies)
 {
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
+  ponies =
+    ponies();
+  ponies =
+    ponies();
 
-  for (; el != el_end; ++el)
+  ponies)
     {
-      const Elem *elem = *el;
+      ponies;
 
-      if (elem->refinement_flag() == Elem::JUST_REFINED ||
-          elem->refinement_flag() == Elem::INACTIVE)
-        continue;
+      ponies ||
+          ponies)
+        ponies;
 
-      if (elem->has_dofs())
-        libmesh_assert(elem->old_dof_object);
+      ponies())
+        ponies);
 
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      ponies)
         {
-          const Node *node = elem->get_node(n);
-          if (node->has_dofs())
-            libmesh_assert(elem->get_node(n)->old_dof_object);
+          ponies);
+          ponies())
+            ponies);
         }
     }
 }
-#else
-void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &) {}
-#endif // LIBMESH_ENABLE_AMR
+#ponies
+ponies &) {}
+#ponies
 
 
 
-void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
+ponies)
 {
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  ponies =
+    ponies();
+  ponies =
+         ponies)
     {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-      while (elem)
+      ponies;
+      ponies);
+      ponies)
         {
-          elem->libmesh_assert_valid_node_pointers();
-          for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-            if (elem->neighbor(n) &&
-                elem->neighbor(n) != remote_elem)
-              elem->neighbor(n)->libmesh_assert_valid_node_pointers();
+          ponies();
+          ponies)
+            ponies) &&
+                ponies)
+              ponies();
 
-          libmesh_assert_not_equal_to (elem->parent(), remote_elem);
-          elem = elem->parent();
-        }
-    }
-}
-
-
-void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
-{
-  const MeshBase::const_element_iterator el_end =
-    mesh.local_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.local_elements_begin(); el != el_end; ++el)
-    {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-        libmesh_assert_not_equal_to (elem->neighbor(n), remote_elem);
-#ifdef LIBMESH_ENABLE_AMR
-      const Elem* parent = elem->parent();
-      if (parent)
-        {
-          libmesh_assert_not_equal_to (parent, remote_elem);
-          for (unsigned int c=0; c != elem->n_children(); ++c)
-            libmesh_assert_not_equal_to (parent->child(c), remote_elem);
-        }
-#endif
-    }
-}
-
-
-void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
-                                                const Elem *bad_elem)
-{
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
-    {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-      libmesh_assert_not_equal_to (elem->parent(), bad_elem);
-      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-        libmesh_assert_not_equal_to (elem->neighbor(n), bad_elem);
-#ifdef LIBMESH_ENABLE_AMR
-      if (elem->has_children())
-        for (unsigned int c=0; c != elem->n_children(); ++c)
-          libmesh_assert_not_equal_to (elem->child(c), bad_elem);
-#endif
-    }
-}
-
-
-
-void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
-{
-  processor_id_type lastprocid = 0;
-  dof_id_type lastelemid = 0;
-
-  const MeshBase::const_element_iterator el_end =
-    mesh.active_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.active_elements_begin(); el != el_end; ++el)
-    {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-      processor_id_type elemprocid = elem->processor_id();
-      dof_id_type elemid = elem->id();
-
-      libmesh_assert_greater_equal (elemid, lastelemid);
-      libmesh_assert_greater_equal (elemprocid, lastprocid);
-
-      lastelemid = elemid;
-      lastprocid = elemprocid;
-    }
-}
-
-
-
-void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase &mesh)
-{
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
-    {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-
-      const Elem* parent = elem->parent();
-
-      if (parent)
-        {
-          libmesh_assert_greater_equal (elem->id(), parent->id());
-          libmesh_assert_greater_equal (elem->processor_id(), parent->processor_id());
+          ponies);
+          ponies();
         }
     }
 }
 
 
-
-void MeshTools::libmesh_assert_connected_nodes (const MeshBase &mesh)
+ponies)
 {
-  std::set<const Node*> used_nodes;
-
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  ponies =
+    ponies();
+  ponies =
+         ponies)
     {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        used_nodes.insert(elem->get_node(n));
-    }
-
-  const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-
-  for (MeshBase::const_node_iterator node_it = mesh.nodes_begin();
-       node_it != node_end; ++node_it)
-    {
-      Node *node = *node_it;
-      libmesh_assert(node);
-      libmesh_assert(used_nodes.count(node));
-    }
-}
-
-
-
-namespace MeshTools {
-
-void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
-{
-  if (mesh.n_processors() == 1)
-    return;
-
-  libmesh_parallel_only(mesh.comm());
-
-  dof_id_type pmax_elem_id = mesh.max_elem_id();
-  mesh.comm().max(pmax_elem_id);
-
-  for (dof_id_type i=0; i != pmax_elem_id; ++i)
-    assert_semiverify_dofobj(mesh.comm(),
-                             mesh.query_elem(i));
-
-  dof_id_type pmax_node_id = mesh.max_node_id();
-  mesh.comm().max(pmax_node_id);
-
-  for (dof_id_type i=0; i != pmax_node_id; ++i)
-    assert_semiverify_dofobj(mesh.comm(),
-                             mesh.query_node_ptr(i));
-}
-
-template <>
-void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
-{
-  if (mesh.n_processors() == 1)
-    return;
-
-  libmesh_parallel_only(mesh.comm());
-
-  // We want this test to be valid even when called even after nodes
-  // have been added asynchonously but before they're renumbered
-  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
-  mesh.comm().max(parallel_max_elem_id);
-
-  // Check processor ids for consistency between processors
-
-  for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
-    {
-      const Elem *elem = mesh.query_elem(i);
-
-      processor_id_type min_id =
-        elem ? elem->processor_id() :
-        std::numeric_limits<processor_id_type>::max();
-      mesh.comm().min(min_id);
-
-      processor_id_type max_id =
-        elem ? elem->processor_id() :
-        std::numeric_limits<processor_id_type>::min();
-      mesh.comm().max(max_id);
-
-      if (elem)
+      ponies;
+      ponies);
+      ponies)
+        ponies);
+#ponies
+      ponies();
+      ponies)
         {
-          libmesh_assert_equal_to (min_id, elem->processor_id());
-          libmesh_assert_equal_to (max_id, elem->processor_id());
+          ponies);
+          ponies)
+            ponies);
+        }
+#ponies
+    }
+}
+
+
+ponies,
+                                                ponies)
+{
+  ponies =
+    ponies();
+  ponies =
+         ponies)
+    {
+      ponies;
+      ponies);
+      ponies);
+      ponies)
+        ponies);
+#ponies
+      ponies())
+        ponies)
+          ponies);
+#ponies
+    }
+}
+
+
+
+ponies)
+{
+  ponies;
+  ponies;
+
+  ponies =
+    ponies();
+  ponies =
+         ponies)
+    {
+      ponies;
+      ponies);
+      ponies();
+      ponies();
+
+      ponies);
+      ponies);
+
+      ponies;
+      ponies;
+    }
+}
+
+
+
+ponies)
+{
+  ponies =
+    ponies();
+  ponies =
+         ponies)
+    {
+      ponies;
+      ponies);
+
+      ponies();
+
+      ponies)
+        {
+          ponies());
+          ponies());
+        }
+    }
+}
+
+
+
+ponies)
+{
+  ponies;
+
+  ponies =
+    ponies();
+  ponies =
+         ponies)
+    {
+      ponies;
+      ponies);
+
+      ponies)
+        ponies));
+    }
+
+  ponies();
+
+  ponies();
+       ponies)
+    {
+      ponies;
+      ponies);
+      ponies));
+    }
+}
+
+
+
+ponies {
+
+ponies)
+{
+  ponies)
+    ponies;
+
+  ponies());
+
+  ponies();
+  ponies);
+
+  ponies)
+    ponies(),
+                             ponies));
+
+  ponies();
+  ponies);
+
+  ponies)
+    ponies(),
+                             ponies));
+}
+
+ponies <>
+ponies)
+{
+  ponies)
+    ponies;
+
+  ponies());
+
+  // ponies
+  // ponies
+  ponies();
+  ponies);
+
+  // ponies
+
+  ponies)
+    {
+      ponies);
+
+      ponies =
+        ponies() :
+        ponies();
+      ponies);
+
+      ponies =
+        ponies() :
+        ponies();
+      ponies);
+
+      ponies)
+        {
+          ponies());
+          ponies());
         }
 
-      if (min_id == mesh.processor_id())
-        libmesh_assert(elem);
+      ponies())
+        ponies);
     }
 
-  // If we're adaptively refining, check processor ids for consistency
-  // between parents and children.
-#ifdef LIBMESH_ENABLE_AMR
+  // ponies
+  // ponies.
+#ponies
 
-  // Ancestor elements we won't worry about, but subactive and active
-  // elements ought to have parents with consistent processor ids
+  // ponies
+  // ponies
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  ponies =
+    ponies();
+  ponies =
+         ponies)
     {
-      const Elem *elem = *el;
-      libmesh_assert(elem);
+      ponies;
+      ponies);
 
-      if (!elem->active() && !elem->subactive())
-        continue;
+      ponies())
+        ponies;
 
-      const Elem *parent = elem->parent();
+      ponies();
 
-      if (parent)
+      ponies)
         {
-          libmesh_assert(parent->has_children());
-          processor_id_type parent_procid = parent->processor_id();
-          bool matching_child_id = false;
-          for (unsigned int c = 0; c != parent->n_children(); ++c)
+          ponies());
+          ponies();
+          ponies;
+          ponies)
             {
-              const Elem* child = parent->child(c);
-              libmesh_assert(child);
+              ponies);
+              ponies);
 
-              // If we've got a remote_elem then we don't know whether
-              // it's responsible for the parent's processor id; all
-              // we can do is assume it is and let its processor fail
-              // an assert if there's something wrong.
-              if (child == remote_elem ||
-                  child->processor_id() == parent_procid)
-                matching_child_id = true;
+              // ponies
+              // ponies
+              // ponies
+              // ponies.
+              ponies ||
+                  ponies)
+                ponies;
             }
-          libmesh_assert(matching_child_id);
+          ponies);
         }
     }
-#endif
+#ponies
 }
 
 
 
-template <>
-void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
+ponies <>
+ponies)
 {
-  if (mesh.n_processors() == 1)
-    return;
+  ponies)
+    ponies;
 
-  libmesh_parallel_only(mesh.comm());
+  ponies());
 
-  // We want this test to be valid even when called even after nodes
-  // have been added asynchonously but before they're renumbered
-  dof_id_type parallel_max_node_id = mesh.max_node_id();
-  mesh.comm().max(parallel_max_node_id);
+  // ponies
+  // ponies
+  ponies();
+  ponies);
 
-  // Check processor ids for consistency between processors
+  // ponies
 
-  for (dof_id_type i=0; i != parallel_max_node_id; ++i)
+  ponies)
     {
-      const Node *node = mesh.query_node_ptr(i);
+      ponies);
 
-      processor_id_type min_id =
-        node ? node->processor_id() :
-        std::numeric_limits<processor_id_type>::max();
-      mesh.comm().min(min_id);
+      ponies =
+        ponies() :
+        ponies();
+      ponies);
 
-      processor_id_type max_id =
-        node ? node->processor_id() :
-        std::numeric_limits<processor_id_type>::min();
-      mesh.comm().max(max_id);
+      ponies =
+        ponies() :
+        ponies();
+      ponies);
 
-      if (node)
+      ponies)
         {
-          libmesh_assert_equal_to (min_id, node->processor_id());
-          libmesh_assert_equal_to (max_id, node->processor_id());
+          ponies());
+          ponies());
         }
 
-      if (min_id == mesh.processor_id())
-        libmesh_assert(node);
+      ponies())
+        ponies);
     }
 
-  std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
+  ponies);
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.active_local_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.active_local_elements_begin(); el != el_end; ++el)
+  ponies =
+    ponies();
+  ponies =
+         ponies)
     {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
+      ponies;
+      ponies);
 
-      for (unsigned int i=0; i != elem->n_nodes(); ++i)
+      ponies)
         {
-          const Node *node = elem->get_node(i);
-          dof_id_type nodeid = node->id();
-          node_touched_by_me[nodeid] = true;
+          ponies);
+          ponies();
+          ponies;
         }
     }
-  std::vector<bool> node_touched_by_anyone(node_touched_by_me);
-  mesh.comm().max(node_touched_by_anyone);
+  ponies);
+  ponies);
 
-  const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
-       nd != nd_end; ++nd)
+  ponies();
+  ponies();
+       ponies)
     {
-      const Node *node = *nd;
-      libmesh_assert(node);
+      ponies;
+      ponies);
 
-      dof_id_type nodeid = node->id();
-      libmesh_assert(!node_touched_by_anyone[nodeid] ||
-                     node_touched_by_me[nodeid]);
+      ponies();
+      ponies] ||
+                     ponies]);
     }
 }
 
-} // namespace MeshTools
+} // ponies
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
+#ponies
+ponies)
 {
-  libmesh_parallel_only(mesh.comm());
-  if (mesh.n_processors() == 1)
-    return;
+  ponies());
+  ponies)
+    ponies;
 
-  std::vector<unsigned char> my_elem_h_state(mesh.max_elem_id(), 255);
-  std::vector<unsigned char> my_elem_p_state(mesh.max_elem_id(), 255);
+  ponies);
+  ponies);
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  ponies =
+    ponies();
+  ponies =
+         ponies)
     {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-      dof_id_type elemid = elem->id();
+      ponies;
+      ponies);
+      ponies();
 
-      my_elem_h_state[elemid] =
-        static_cast<unsigned char>(elem->refinement_flag());
+      ponies] =
+        ponies());
 
-      my_elem_p_state[elemid] =
-        static_cast<unsigned char>(elem->p_refinement_flag());
+      ponies] =
+        ponies());
     }
-  std::vector<unsigned char> min_elem_h_state(my_elem_h_state);
-  mesh.comm().min(min_elem_h_state);
+  ponies);
+  ponies);
 
-  std::vector<unsigned char> min_elem_p_state(my_elem_p_state);
-  mesh.comm().min(min_elem_p_state);
+  ponies);
+  ponies);
 
-  for (dof_id_type i=0; i!= mesh.max_elem_id(); ++i)
+  ponies)
     {
-      libmesh_assert(my_elem_h_state[i] == 255 ||
-                     my_elem_h_state[i] == min_elem_h_state[i]);
-      libmesh_assert(my_elem_p_state[i] == 255 ||
-                     my_elem_p_state[i] == min_elem_p_state[i]);
+      ponies ||
+                     ponies]);
+      ponies ||
+                     ponies]);
     }
 }
-#else
-void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
+#ponies
+ponies &)
 {
 }
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
-void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &mesh)
+#ponies
+ponies)
 {
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  ponies =
+    ponies();
+  ponies =
+         ponies)
     {
-      const Elem *elem = *el;
-      libmesh_assert(elem);
-      if (elem->has_children())
-        for (unsigned int n=0; n != elem->n_children(); ++n)
+      ponies;
+      ponies);
+      ponies())
+        ponies)
           {
-            libmesh_assert(elem->child(n));
-            if (elem->child(n) != remote_elem)
-              libmesh_assert_equal_to (elem->child(n)->parent(), elem);
+            ponies));
+            ponies)
+              ponies);
           }
-      if (elem->active())
+      ponies())
         {
-          libmesh_assert(!elem->ancestor());
-          libmesh_assert(!elem->subactive());
+          ponies());
+          ponies());
         }
-      else if (elem->ancestor())
+      ponies())
         {
-          libmesh_assert(!elem->subactive());
+          ponies());
         }
-      else
-        libmesh_assert(elem->subactive());
+      ponies
+        ponies());
     }
 }
-#else
-void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
+#ponies
+ponies &)
 {
 }
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
 
-void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
+ponies)
 {
-  const MeshBase::const_element_iterator el_end = mesh.elements_end();
-  for (MeshBase::const_element_iterator el = mesh.elements_begin();
-       el != el_end; ++el)
+  ponies();
+  ponies();
+       ponies)
     {
-      const Elem* elem = *el;
-      libmesh_assert (elem);
-      elem->libmesh_assert_valid_neighbors();
+      ponies;
+      ponies);
+      ponies();
     }
 }
 
 
 
-#endif
+#ponies
 
 
 
-void MeshTools::Private::globally_renumber_nodes_and_elements (MeshBase& mesh)
+ponies)
 {
-  MeshCommunication().assign_global_indices(mesh);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

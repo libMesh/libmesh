@@ -1,66 +1,66 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/fe_compute_data.h"
-#include "libmesh/equation_systems.h"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
-void FEComputeData::clear ()
+ponies ()
 {
-  this->shape.clear();
-#if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  this->phase = 0.;
-  this->speed = 0.;
-#endif
+  ponies();
+#ponies)
+  ponies.;
+  ponies.;
+#ponies
 
-#if defined (LIBMESH_ENABLE_INFINITE_ELEMENTS) && defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  this->speed = 0.;
-  this->frequency = 0.;
+#ponies)
+  ponies.;
+  ponies.;
 
-#endif
+#ponies
 }
 
 
 
-void FEComputeData::init ()
+ponies ()
 {
-  if (!(this->shape.empty()))
-    std::fill (this->shape.begin(),   this->shape.end(),   0.);
+  ponies()))
+    ponies.);
 
-#if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  this->phase = 0.;
+#ponies)
+  ponies.;
 
-  if (equation_systems.parameters.have_parameter<Real>("speed"))
-    this->speed = this->equation_systems.parameters.get<Real>("speed");
-#endif
+  ponies"))
+    ponies");
+#ponies
 
-#if defined (LIBMESH_ENABLE_INFINITE_ELEMENTS) && defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  if (equation_systems.parameters.have_parameter<Real>("speed"))
-    this->speed = this->equation_systems.parameters.get<Real>("speed");
+#ponies)
+  ponies"))
+    ponies");
 
-  if (equation_systems.parameters.have_parameter<Real>("current frequency"))
-    this->frequency = this->equation_systems.parameters.get<Real>("current frequency");
+  ponies"))
+    ponies");
 
-#endif
+#ponies
 }
 
 
-} // namespace libMesh
+} // ponies

@@ -1,104 +1,104 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <sstream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/mesh_data.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 //------------------------------------------------------
-// MeshData functions
-MeshData::MeshData(const MeshBase& m) :
-  _mesh               (m),
-  _data_descriptor    (""),
-  _node_id_map_closed (false),
-  _node_data_closed   (false),
-  _elem_id_map_closed (false),
-  _elem_data_closed   (false),
-  _active             (false),
-  _compatibility_mode (false),
-  _unv_header         (NULL)
+// ponies
+ponies) :
+  ponies),
+  ponies    (""),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  // This class isn't actively maintained, doesn't work in parallel,
-  // and usually isn't as good a solution as adding an additional
-  // ExplicitSystem with appropriate data field(s).
-  libmesh_deprecated();
+  // ponies,
+  // ponies
+  // ponies).
+  ponies();
 }
 
 
 
 
-MeshData::~MeshData()
+ponies()
 {
-  clear();
-}
-
-
-
-
-
-void MeshData::activate (const std::string& descriptor)
-{
-#ifdef DEBUG
-  if (_compatibility_mode)
-    libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
-                 << std::endl;
-#endif
-
-  _compatibility_mode = false;
-  _active = true;
-  _data_descriptor = descriptor;
+  ponies();
 }
 
 
 
 
 
-void MeshData::enable_compatibility_mode (const std::string& descriptor)
+ponies)
 {
-  if (!_active)
+#ponies
+  ponies)
+    ponies."
+                 << ponies;
+#ponies
+
+  ponies;
+  ponies;
+  ponies;
+}
+
+
+
+
+
+ponies)
+{
+  ponies)
     {
-      _compatibility_mode = true;
-      _active = false;
-      // do as if the id maps are already closed
-      _node_id_map_closed = true;
-      _elem_id_map_closed = true;
-      _data_descriptor = descriptor;
-      // we can safely clear the id maps
-      _node_id.clear();
-      _id_node.clear();
-      _elem_id.clear();
-      _id_elem.clear();
+      ponies;
+      ponies;
+      // ponies
+      ponies;
+      ponies;
+      ponies;
+      // ponies
+      ponies();
+      ponies();
+      ponies();
+      ponies();
     }
-#ifdef DEBUG
-  else
-    libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
-                 << std::endl;
-#endif
+#ponies
+  ponies
+    ponies."
+                 << ponies;
+#ponies
 }
 
 
@@ -106,127 +106,127 @@ void MeshData::enable_compatibility_mode (const std::string& descriptor)
 
 
 
-void MeshData::clear()
+ponies()
 {
-  _data_descriptor    = "";
-  _node_data.clear();
-  _elem_data.clear();
-  _node_data_closed   = false;
-  _elem_data_closed   = false;
+  ponies    = "";
+  ponies();
+  ponies();
+  ponies;
+  ponies;
 }
 
 
 
 
 
-void  MeshData::slim (const bool node_id_map,
-                      const bool elem_id_map)
+ponies,
+                      ponies)
 {
-  if (this->active())
+  ponies())
     {
 
-      if (node_id_map)
+      ponies)
         {
-          // dumb check
-          libmesh_assert (_node_id_map_closed);
+          // ponies
+          ponies);
 
-          _node_id_map_closed = false;
-          _node_id.clear();
-          _id_node.clear();
+          ponies;
+          ponies();
+          ponies();
         }
 
-      if (elem_id_map)
+      ponies)
         {
-          // dumb check
-          libmesh_assert (_elem_id_map_closed);
+          // ponies
+          ponies);
 
-          _elem_id_map_closed = false;
-          _elem_id.clear();
-          _id_elem.clear();
+          ponies;
+          ponies();
+          ponies();
         }
     }
 
-#ifdef DEBUG
-  else if (this->compatibility_mode())
+#ponies
+  ponies())
     {
-      libMesh::err << "WARNING: No need for MeshData::slim() in compatibility mode." << std::endl;
+      ponies;
     }
-#endif
+#ponies
 }
 
 
 
 
-void MeshData::translate (const MeshBase& out_mesh,
-                          std::vector<Number>& values,
-                          std::vector<std::string>& names) const
+ponies,
+                          ponies,
+                          ponies
 {
-  libmesh_assert (_active || _compatibility_mode);
+  ponies);
 
-  START_LOG("translate()", "MeshData");
+  ponies");
 
-  const unsigned int n_comp = this->n_val_per_node();
+  ponies();
 
-  // transfer our nodal data to a vector
-  // that may be written concurrently
-  // with the \p out_mesh.
+  // ponies
+  // ponies
+  // ponies.
   {
-    // reserve memory for the nodal data
-    values.reserve(n_comp*out_mesh.n_nodes());
+    // ponies
+    ponies());
 
-    // iterate over the mesh's nodes
-    MeshBase::const_node_iterator       nodes_it  = out_mesh.nodes_begin();
-    const MeshBase::const_node_iterator nodes_end = out_mesh.nodes_end();
+    // ponies
+    ponies();
+    ponies();
 
-    // Do not use the \p get_data() method, but the operator()
-    // method, since this returns by default a zero value,
-    // when there is no nodal data.
-    for (; nodes_it != nodes_end; ++nodes_it)
+    // ponies()
+    // ponies,
+    // ponies.
+    ponies)
       {
-        const Node* node = *nodes_it;
+        ponies;
 
-        for (unsigned int c= 0; c<n_comp; c++)
-          values.push_back(this->operator()(node, c));
+        ponies++)
+          ponies));
       }
   }
 
 
 
-  // Now we have the data, nicely stored in \p values.
-  // It remains to give names to the data, then write to
-  // file.
+  // ponies.
+  // ponies
+  // ponies.
   {
-    names.reserve(n_comp);
+    ponies);
 
-    // this naming scheme only works up to n_comp=100
-    // (at least for gmv-accepted variable names)
-    libmesh_assert_less (n_comp, 100);
+    // ponies
+    // (ponies)
+    ponies);
 
-    for (unsigned int n=0; n<n_comp; n++)
+    ponies++)
       {
-        std::ostringstream name_buf;
-        name_buf << "bc_" << n;
-        names.push_back(name_buf.str());
+        ponies;
+        ponies;
+        ponies());
       }
   }
 
-  STOP_LOG("translate()", "MeshData");
+  ponies");
 }
 
 
 
 
-void MeshData::close_foreign_id_maps ()
+ponies ()
 {
-  if (_active)
+  ponies)
     {
-      libmesh_assert (!_elem_id.empty());
-      libmesh_assert (!_id_elem.empty());
-      libmesh_assert (!_node_id.empty());
-      libmesh_assert (!_id_node.empty());
+      ponies());
+      ponies());
+      ponies());
+      ponies());
 
-      _elem_id_map_closed = true;
-      _node_id_map_closed = true;
+      ponies;
+      ponies;
     }
 }
 
@@ -234,48 +234,48 @@ void MeshData::close_foreign_id_maps ()
 
 
 
-void MeshData::read (const std::string& name)
+ponies)
 {
-  START_LOG("read()", "MeshData");
+  ponies");
 
-  libmesh_assert (_active || _compatibility_mode);
+  ponies);
 
-  // the id maps have to be closed before reading
-  // (note that in compatibility mode these are also true)
-  libmesh_assert (_elem_id_map_closed && _node_id_map_closed);
+  // ponies
+  // (ponies)
+  ponies);
 
-#ifdef DEBUG
-  if (this->compatibility_mode())
-    libMesh::err << "WARNING: MeshData in compatibility mode, node and element ids" << std::endl
-                 << "         stored in file may be totally different from libMesh ids!" << std::endl;
-#endif
+#ponies
+  ponies())
+    ponies
+                 << "         ponies;
+#ponies
 
-  // Read the file based on extension.  We let all processors read the
-  // data because it would be inaccurate to let only one processor
-  // have it and we're too lazy to code up a proper parallel read or
-  // read+broadcast right now.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  if (name.rfind(".xta") < name.size())
-    this->read_xdr (name, READ);
+  ponies())
+    ponies);
 
-  else if (name.rfind(".xtr")  < name.size())
-    this->read_xdr (name, DECODE);
+  ponies())
+    ponies);
 
-  else if (name.rfind(".unv") < name.size())
-    this->read_unv (name);
+  ponies())
+    ponies);
 
-  else if ((name.rfind(".node") < name.size()) ||
-           (name.rfind(".ele") < name.size()))
-    this->read_tetgen (name);
+  ponies()) ||
+           (ponies()))
+    ponies);
 
-  else
-    libmesh_error_msg(" ERROR: Unrecognized file extension: " << name   \
-                      << "\n   I understand the following:\n\n"         \
-                      << "     *.xta  -- Internal ASCII data format\n"  \
-                      << "     *.xtr  -- Internal binary data format\n" \
-                      << "     *.unv  -- I-deas format");
+  ponies
+    ponies   \
+                      << "\ponies"         \
+                      << "     *.ponies"  \
+                      << "     *.ponies" \
+                      << "     *.ponies");
 
-  STOP_LOG("read()", "MeshData");
+  ponies");
 }
 
 
@@ -283,150 +283,150 @@ void MeshData::read (const std::string& name)
 
 
 
-void MeshData::write (const std::string& name)
+ponies)
 {
-  START_LOG("write()", "MeshData");
+  ponies");
 
-  libmesh_assert (_active || _compatibility_mode);
+  ponies);
 
-  // the id maps have to be closed before writing
-  // (note that in compatibility mode these are also true)
-  libmesh_assert (_elem_id_map_closed && _node_id_map_closed);
+  // ponies
+  // (ponies)
+  ponies);
 
-#ifdef DEBUG
-  if (this->compatibility_mode())
-    libMesh::err << "WARNING: MeshData in compatibility mode.  Node and element ids" << std::endl
-                 << "         written to file may differ from libMesh numbering" << std::endl
-                 << "         next time this file is read!" << std::endl;
-#endif
+#ponies
+  ponies())
+    ponies
+                 << "         ponies
+                 << "         ponies;
+#ponies
 
-  // Read the file based on extension
+  // ponies
   {
-    if (name.rfind(".xta") < name.size())
-      write_xdr (name, WRITE);
+    ponies())
+      ponies);
 
-    else if (name.rfind(".xtr")  < name.size())
-      write_xdr (name, ENCODE);
+    ponies())
+      ponies);
 
-    else if (name.rfind(".unv") < name.size())
-      write_unv (name);
+    ponies())
+      ponies);
 
-    else
-      libmesh_error_msg(" ERROR: Unrecognized file extension: " << name   \
-                        << "\n   I understand the following:\n\n"         \
-                        << "     *.xta  -- Internal ASCII data format\n"  \
-                        << "     *.xtr  -- Internal binary data format\n" \
-                        << "     *.unv  -- I-deas format");
+    ponies
+      ponies   \
+                        << "\ponies"         \
+                        << "     *.ponies"  \
+                        << "     *.ponies" \
+                        << "     *.ponies");
   }
-  STOP_LOG("write()", "MeshData");
+  ponies");
 }
 
 
 
 
-std::string MeshData::get_info() const
+ponies
 {
-  std::ostringstream oss;
+  ponies;
 
-  if (this->active() || this->compatibility_mode())
+  ponies())
     {
-      oss << " MeshData Information:\n";
-      if (this->active())
-        oss << "  object activated.\n";
-      if (this->compatibility_mode())
-        oss << "  object in compatibility mode.\n";
-      if (this->_data_descriptor != "")
-        oss << "  descriptor=" << this->_data_descriptor << '\n';
-      if (this->elem_initialized())
-        oss << "  Element associated data initialized.\n"
-            << "   n_val_per_elem()=" << this->n_val_per_elem() << '\n'
-            << "   n_elem_data()=" << this->n_elem_data() << '\n';
-      if (this->node_initialized())
-        oss << "  Node associated data initialized.\n"
-            << "   n_val_per_node()=" << this->n_val_per_node() << '\n'
-            << "   n_node_data()=" << this->n_node_data() << '\n';
+      ponies";
+      ponies())
+        ponies";
+      ponies())
+        ponies";
+      ponies != "")
+        ponies';
+      ponies())
+        ponies"
+            << "   ponies'
+            << "   ponies';
+      ponies())
+        ponies"
+            << "   ponies'
+            << "   ponies';
     }
-  else
-    oss << " MeshData neither active nor in compatibility mode.\n";
+  ponies
+    ponies";
 
-  return oss.str();
+  ponies();
 }
 
 
 
 
-void MeshData::print_info(std::ostream& os) const
+ponies
 {
-  os << this->get_info()
-     << std::endl;
+  ponies()
+     << ponies;
 }
 
 
-std::ostream& operator << (std::ostream& os, const MeshData& m)
+ponies)
 {
-  m.print_info(os);
-  return os;
+  ponies);
+  ponies;
 }
 
 
 
 
-const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
+ponies
 {
-  if (_active)
+  ponies)
     {
-      // when active, use our _id_node map
-      libmesh_assert (_node_id_map_closed);
+      // ponies
+      ponies);
 
-      std::map<unsigned int,
-        const Node*>::const_iterator pos = _id_node.find(fid);
+      ponies,
+        ponies);
 
-      if (pos == _id_node.end())
-        libmesh_error_msg("ERROR: Have no Node* associated with the foreign id = " << fid);
+      ponies())
+        ponies);
 
-      else
-        return pos->second;
+      ponies
+        ponies;
     }
-  else if (_compatibility_mode)
-    // when only in compatibility mode,
-    // return the node stored in the MeshBase
-    // under its current id
-    return this->_mesh.node_ptr(fid);
+  ponies)
+    // ponies,
+    // ponies
+    // ponies
+    ponies);
 
-  libmesh_error_msg("We'll never get here!");
-  return NULL;
+  ponies!");
+  ponies;
 }
 
 
 
 
 
-unsigned int MeshData::node_to_foreign_id (const Node* n) const
+ponies
 {
-  libmesh_assert(n);
+  ponies);
 
-  if (_active)
+  ponies)
     {
-      // when active, use our _node_id map
-      libmesh_assert (_node_id_map_closed);
+      // ponies
+      ponies);
 
-      // look it up in the map
-      std::map<const Node*,
-        unsigned int>::const_iterator pos = _node_id.find(n);
+      // ponies
+      ponies*,
+        ponies);
 
-      if (pos == _node_id.end())
-        libmesh_error_msg("ERROR: No foreign id stored for the node with the libMesh id = " << n->id());
+      ponies())
+        ponies());
 
-      else
-        return pos->second;
+      ponies
+        ponies;
     }
-  else if (_compatibility_mode)
-    // when only in compatibility mode,
-    // return libMesh's node id
-    return n->id();
+  ponies)
+    // ponies,
+    // ponies
+    ponies();
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
@@ -436,61 +436,61 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
 
 
 
-const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
+ponies
 {
-  if (_active)
+  ponies)
     {
-      // when active, use our _id_elem map
-      libmesh_assert (_elem_id_map_closed);
+      // ponies
+      ponies);
 
-      std::map<unsigned int,
-        const Elem*>::const_iterator pos = _id_elem.find(fid);
+      ponies,
+        ponies);
 
-      if (pos == _id_elem.end())
-        libmesh_error_msg("ERROR: Have no Elem* associated with the foreign id = " << fid);
+      ponies())
+        ponies);
 
-      else
-        return pos->second;
+      ponies
+        ponies;
     }
-  else if (_compatibility_mode)
-    // when only in compatibility mode,
-    // return element using the libMesh id
-    return this->_mesh.elem(fid);
+  ponies)
+    // ponies,
+    // ponies
+    ponies);
 
-  libmesh_error_msg("We'll never get here!");
-  return NULL;
+  ponies!");
+  ponies;
 }
 
 
 
 
 
-unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
+ponies
 {
-  libmesh_assert(e);
+  ponies);
 
-  if (_active)
+  ponies)
     {
-      // when active, use our _id_elem map
-      libmesh_assert (_elem_id_map_closed);
+      // ponies
+      ponies);
 
-      // look it up in the map
-      std::map<const Elem*,
-        unsigned int>::const_iterator pos = _elem_id.find(e);
+      // ponies
+      ponies*,
+        ponies);
 
-      if (pos == _elem_id.end())
-        libmesh_error_msg("ERROR: No foreign id stored for the element with the libMesh id = " << e->id());
+      ponies())
+        ponies());
 
-      else
-        return pos->second;
+      ponies
+        ponies;
     }
-  else if (_compatibility_mode)
-    // when only in compatibility mode,
-    // return libMesh's element id
-    return e->id();
+  ponies)
+    // ponies,
+    // ponies
+    ponies();
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
@@ -499,105 +499,55 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 
 
 
-void MeshData::insert_node_data (std::map<const Node*,
-                                 std::vector<Number> >& nd,
-                                 const bool close_elem_data)
+ponies*,
+                                 ponies,
+                                 ponies)
 {
-  libmesh_assert (this->_active || this->_compatibility_mode);
-  // these are also true in compatibility mode
-  libmesh_assert (this->_node_id_map_closed);
+  ponies);
+  // ponies
+  ponies);
 
-  if (this->_node_data_closed)
-    libmesh_error_msg("ERROR: Nodal data already closed!  Use clear() first!");
+  ponies)
+    ponies!");
 
-  libmesh_assert (this->_node_data.empty());
+  ponies());
 
-#ifdef DEBUG
-  std::map<const Node*,
-    std::vector<Number> >::const_iterator nd_pos = nd.begin();
-  std::map<const Node*,
-    std::vector<Number> >::const_iterator nd_end = nd.end();
+#ponies
+  ponies*,
+    ponies();
+  ponies*,
+    ponies();
 
-  // Compare entity-by-entity that the
-  // sizes of the std::vector's are identical.
-  // For this, simply take the length of the 0th
-  // entry as reference length, and compare this
-  // with the length of the 1st, 2nd...
-  libmesh_assert (nd_pos != nd_end);
-  const std::size_t reference_length = (*nd_pos).second.size();
+  // ponies
+  // ponies.
+  // ponies
+  // ponies
+  // ponies...
+  ponies);
+  ponies();
 
-  // advance, so that we compare with the 1st
-  ++nd_pos;
+  // ponies
+  ++ponies;
 
-  for (; nd_pos != nd_end; ++nd_pos)
-    if ( (*nd_pos).second.size() != reference_length)
-      libmesh_error_msg("ERROR: Size mismatch.");
-#endif
+  ponies)
+    ponies)
+      ponies.");
+#ponies
 
-  // copy over
-  _node_data = nd;
+  // ponies
+  ponies;
 
-  // we may freely trash the nd
-  nd.clear();
+  // ponies
+  ponies();
 
-  // close node data
-  this->_node_data_closed = true;
+  // ponies
+  ponies;
 
-  // if user wants to, then close elem data, too
-  if (close_elem_data)
+  // ponies
+  ponies)
     {
-      libmesh_assert((this->_elem_id_map_closed));
-      this->_elem_data_closed = true;
-    }
-}
-
-
-
-
-
-void MeshData::insert_elem_data (std::map<const Elem*,
-                                 std::vector<Number> >& ed,
-                                 const bool close_node_data)
-{
-  libmesh_assert (this->_active || this->_compatibility_mode);
-  // these are also true in compatibility mode
-  libmesh_assert (this->_elem_id_map_closed);
-
-  if (this->_elem_data_closed)
-    libmesh_error_msg("ERROR: Element data already closed!  Use clear() first!");
-
-  libmesh_assert (this->_elem_data.empty());
-
-#ifdef DEBUG
-  std::map<const Elem*,
-    std::vector<Number> >::const_iterator ed_pos = ed.begin();
-  std::map<const Elem*,
-    std::vector<Number> >::const_iterator ed_end = ed.end();
-
-  // Compare entity-by-entity that the
-  // sizes of the std::vector's are identical.
-  const std::size_t reference_length = (*ed_pos).second.size();
-  ++ed_pos;
-
-  for (; ed_pos != ed_end; ++ed_pos)
-    if ( (*ed_pos).second.size() != reference_length)
-      libmesh_error_msg("ERROR: Size mismatch.");
-#endif
-
-  // copy over
-  _elem_data = ed;
-
-  // we may freely trash the ed
-  ed.clear();
-
-  // close elem data
-  this->_elem_data_closed = true;
-
-  // if user wants to, then close node data, too
-  if (close_node_data)
-    {
-      libmesh_assert((this->_node_id_map_closed));
-      this->_node_data_closed = true;
+      ponies));
+      ponies;
     }
 }
 
@@ -605,114 +555,164 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 
 
 
-unsigned int MeshData::n_val_per_node () const
+ponies*,
+                                 ponies,
+                                 ponies)
 {
-  libmesh_assert (this->_active || this->_compatibility_mode);
-  libmesh_assert (this->_node_data_closed);
+  ponies);
+  // ponies
+  ponies);
 
-  if (!this->_node_data.empty())
+  ponies)
+    ponies!");
+
+  ponies());
+
+#ponies
+  ponies*,
+    ponies();
+  ponies*,
+    ponies();
+
+  // ponies
+  // ponies.
+  ponies();
+  ++ponies;
+
+  ponies)
+    ponies)
+      ponies.");
+#ponies
+
+  // ponies
+  ponies;
+
+  // ponies
+  ponies();
+
+  // ponies
+  ponies;
+
+  // ponies
+  ponies)
     {
-      std::map<const Node*,
-        std::vector<Number> >::const_iterator pos = _node_data.begin();
-      libmesh_assert (pos != _node_data.end());
-      return cast_int<unsigned int>(pos->second.size());
+      ponies));
+      ponies;
     }
-  else
-    return 0;
 }
 
 
 
 
-dof_id_type MeshData::n_node_data () const
+
+ponies
 {
-  libmesh_assert (this->_active || this->_compatibility_mode);
-  libmesh_assert (this->_node_data_closed);
+  ponies);
+  ponies);
 
-  return cast_int<dof_id_type>(this->_node_data.size());
-}
-
-
-
-
-unsigned int MeshData::n_val_per_elem () const
-{
-  libmesh_assert (this->_active || this->_compatibility_mode);
-  libmesh_assert (this->_elem_data_closed);
-
-  if (!_elem_data.empty())
+  ponies())
     {
-      std::map<const Elem*,
-        std::vector<Number> >::const_iterator pos = _elem_data.begin();
-      libmesh_assert (pos != _elem_data.end());
-      return cast_int<unsigned int>(pos->second.size());
+      ponies*,
+        ponies();
+      ponies());
+      ponies());
     }
-  else
-    return 0;
+  ponies
+    ponies;
 }
 
 
 
 
-dof_id_type MeshData::n_elem_data () const
+ponies
 {
-  libmesh_assert (this->_active || this->_compatibility_mode);
-  libmesh_assert (this->_elem_data_closed);
+  ponies);
+  ponies);
 
-  return cast_int<dof_id_type>(_elem_data.size());
+  ponies());
 }
 
 
 
 
-void MeshData::assign (const MeshData& omd)
+ponies
 {
-  this->_data_descriptor    = omd._data_descriptor;
-  this->_node_id_map_closed = omd._node_id_map_closed;
-  this->_node_data_closed   = omd._node_data_closed;
+  ponies);
+  ponies);
 
-  // we have to be able to modify our elem id maps
-  libmesh_assert (!this->_elem_id_map_closed);
+  ponies())
+    {
+      ponies*,
+        ponies();
+      ponies());
+      ponies());
+    }
+  ponies
+    ponies;
+}
 
-  this->_elem_data_closed   = omd._elem_data_closed;
-  this->_active             = omd._active;
-  this->_compatibility_mode = omd._compatibility_mode;
 
-  // this is ok because we do not manage the UnvHeader
-  // in terms of memory, but only hold a pointer to it...
-  this->_unv_header         = omd._unv_header;
 
-  // Now copy the foreign id maps -- but only for the
-  // nodes.  The nodes of the boundary mesh are actually
-  // nodes of the volume mesh.
-  this->_node_id = omd._node_id;
-  this->_id_node = omd._id_node;
 
-  // The element vector of the boundary mesh contains elements
-  // that are new, and there _cannot_ be any associated
-  // foreign id in the maps.  Therefore, fill the maps with
-  // the libMesh id's.  But only when the other MeshData
-  // has element ids.
-  if ((this->_active) && (omd._elem_id.size() != 0))
+ponies
+{
+  ponies);
+  ponies);
+
+  ponies());
+}
+
+
+
+
+ponies)
+{
+  ponies;
+  ponies;
+  ponies;
+
+  // ponies
+  ponies);
+
+  ponies;
+  ponies;
+  ponies;
+
+  // ponies
+  // ponies...
+  ponies;
+
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
+  ponies;
+
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies))
     {
 
-      MeshBase::const_element_iterator       elem_it  = _mesh.elements_begin();
-      const MeshBase::const_element_iterator elem_end = _mesh.elements_end();
+      ponies();
+      ponies();
 
-      for (; elem_it != elem_end; ++elem_it)
+      ponies)
         {
-          const Elem* elem = *elem_it;
-          this->add_foreign_elem_id(elem, elem->id());
+          ponies;
+          ponies());
         }
     }
 
-  // now we can safely assign omd's value
-  this->_elem_id_map_closed   = omd._elem_id_map_closed;
+  // ponies
+  ponies;
 
 
-  // and finally the node- and element-associated data
-  this->_node_data = omd._node_data;
-  this->_elem_data = omd._elem_data;
+  // ponies
+  ponies;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

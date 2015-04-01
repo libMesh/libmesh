@@ -1,428 +1,428 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SYSTEM_NORM_H
-#define LIBMESH_SYSTEM_NORM_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h" // for Real
-#include "libmesh/enum_norm_type.h"
+// ponies
+#ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
+// ponies
 
 /**
- * This class defines a norm/seminorm to be applied to a NumericVector which
- * contains coefficients in a finite element space.
+ * ponies
+ * ponies.
  *
- * Discrete vector norms and weighted l2 combinations of Sobolev norms and
- * seminorms are representable.
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2008
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// SystemNorm class definition
-class SystemNorm
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor, defaults to DISCRETE_L2
+   * ponies
    */
-  SystemNorm();
+  ponies();
 
   /**
-   * Constructor, for discrete vector norms, systems with one variable,
-   * and systems for which the same norm type should be used with a
-   * weight of one on each variable.
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * This is deliberately an implicit constructor; we want user code
-   * to be able to include lines like "error_norm = L2"
+   * ponies
+   * ponies"
    */
-  SystemNorm(const FEMNormType &t);
+  ponies);
 
   /**
-   * Constructor, for unweighted sobolev norms on systems with multiple
-   * variables.
+   * ponies
+   * ponies.
    *
-   * For a system with n variables, the final norm will be the l2 norm of the
-   * n-vector of the norms in each variable.
+   * ponies
+   * ponies.
    */
-  explicit
-  SystemNorm(const std::vector<FEMNormType> &norms);
+  ponies
+  ponies);
 
   /**
-   * Constructor, for weighted sobolev norms on systems with multiple
-   * variables.
+   * ponies
+   * ponies.
    *
-   * For a system with n variables, the final norm will be the l2 norm of the
-   * n-vector of the norms in each variable, each multiplied by weight.
+   * ponies
+   * ponies.
    */
-  SystemNorm(const std::vector<FEMNormType> &norms, std::vector<Real> &weights);
+  ponies);
 
   /**
-   * Constructor, for weighted sobolev norms on systems with multiple
-   * variables and their adjoints
+   * ponies
+   * ponies
    *
-   * For a system with n variables, the final norm computed will be of the form
-   * norm_u^T*R*norm_z where R is a scaling matrix
+   * ponies
+   * ponies
    */
-  SystemNorm(const std::vector<FEMNormType> &norms, std::vector<std::vector<Real> > &weights);
+  ponies);
 
   /**
-   * Copy Constructor
+   * ponies
    */
-  SystemNorm(const SystemNorm &s);
+  ponies);
 
   /**
-   * Returns true if this is purely a discrete norm
+   * ponies
    */
-  bool is_discrete() const;
+  ponies;
 
   /**
-   * Returns the weighted norm v^T*W*v where W represents our
-   * weights matrix or weights vector times identity matrix.
+   * ponies
+   * ponies.
    */
-  Real calculate_norm(const std::vector<Real>& v);
+  ponies);
 
   /**
-   * Returns the weighted inner product v1^T*W*v2 where R is our weights
+   * ponies
    */
-  Real calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2);
+  ponies);
 
   /**
-   * Returns true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false
+   * ponies
    */
-  bool is_identity();
+  ponies();
 
   /**
-   * Returns the type of the norm in variable \p var
+   * ponies
    */
-  FEMNormType type(unsigned int var) const;
+  ponies;
 
   /**
-   * Sets the type of the norm in variable \p var
+   * ponies
    */
-  void set_type(unsigned int var, const FEMNormType& t);
+  ponies);
 
   /**
-   * Returns the weight corresponding to the norm in variable \p var
+   * ponies
    */
-  Real weight(unsigned int var) const;
+  ponies;
 
   /**
-   * Sets the weight corresponding to the norm in variable \p var
+   * ponies
    */
-  void set_weight(unsigned int var, Real w);
+  ponies);
 
   /**
-   * Sets the weight corresponding to the norm from the variable pair v1(var1) coming from v2(var2). See calculate_norm
+   * ponies
    */
-  void set_off_diagonal_weight(unsigned int i, unsigned int j, Real w);
+  ponies);
 
   /**
-   * Returns the squared weight corresponding to the norm in variable
-   * \p var.  We cache that at construction time to save a few flops.
+   * ponies
+   * \ponies.
    */
-  Real weight_sq(unsigned int var) const;
+  ponies;
 
 
 
-private:
-  std::vector<FEMNormType> _norms;
+ponies:
+  ponies;
 
-  std::vector<Real> _weights;
-  std::vector<Real> _weights_sq;
+  ponies;
+  ponies;
 
   /**
-   * One more data structure needed to store the off diagonal
-   * components for the generalize SystemNorm case
+   * ponies
+   * ponies
    */
-  std::vector<std::vector<Real> > _off_diagonal_weights;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// SystemNorm inline methods
+// ponies
 
-inline
-SystemNorm::SystemNorm() :
-  _norms(1, DISCRETE_L2), _weights(1, 1.0), _weights_sq(1, 1.0)
+ponies
+ponies() :
+  ponies)
 {
 }
 
 
-inline
-SystemNorm::SystemNorm(const FEMNormType &t) :
-  _norms(1, t), _weights(1, 1.0), _weights_sq(1, 1.0)
+ponies
+ponies) :
+  ponies)
 {
 }
 
 
-inline
-SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
-  _norms(norms), _weights(1, 1.0), _weights_sq(1, 1.0)
+ponies
+ponies) :
+  ponies)
 {
-  if (_norms.empty())
-    _norms.push_back(DISCRETE_L2);
+  ponies())
+    ponies);
 }
 
 
-inline
-SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
-                       std::vector<Real> &weights) :
-  _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
+ponies
+ponies,
+                       ponies) :
+  ponies)
 {
-  if (_norms.empty())
-    _norms.push_back(DISCRETE_L2);
+  ponies())
+    ponies);
 
-  if (_weights.empty())
+  ponies())
     {
-      _weights.push_back(1.0);
-      _weights_sq.push_back(1.0);
+      ponies);
+      ponies);
     }
-  else
-    for (std::size_t i=0; i != _weights.size(); ++i)
-      _weights_sq[i] = _weights[i] * _weights[i];
+  ponies
+    ponies)
+      ponies];
 }
 
-inline
-SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
-                       std::vector<std::vector<Real> > &weights):
-  _norms(norms),
-  _weights(weights.size()),
-  _weights_sq(weights.size()),
-  _off_diagonal_weights(weights)
+ponies
+ponies,
+                       ponies):
+  ponies),
+  ponies()),
+  ponies()),
+  ponies)
 {
-  if(_norms.empty())
-    _norms.push_back(DISCRETE_L2);
+  ponies())
+    ponies);
 
-  if (_weights.empty())
+  ponies())
     {
-      _weights.push_back(1.0);
-      _weights_sq.push_back(1.0);
+      ponies);
+      ponies);
     }
-  else
+  ponies
     {
-      // Loop over the entries of the user provided matrix and store its entries in
-      // the _off_diagonal_weights or _diagonal_weights
-      for(std::size_t i=0; i!=_off_diagonal_weights.size(); ++i)
+      // ponies
+      // ponies
+      ponies)
         {
-          if(_off_diagonal_weights[i].size() > i)
+          ponies)
             {
-              _weights[i] = _off_diagonal_weights[i][i];
-              _off_diagonal_weights[i][i] = 0;
+              ponies];
+              ponies;
             }
-          else
-            _weights[i] = 1.0;
+          ponies
+            ponies;
         }
-      for (std::size_t i=0; i != _weights.size(); ++i)
-        _weights_sq[i] = _weights[i] * _weights[i];
+      ponies)
+        ponies];
     }
 }
 
-inline
-SystemNorm::SystemNorm(const SystemNorm &s) :
-  _norms(s._norms), _weights(s._weights), _weights_sq(s._weights_sq)
+ponies
+ponies) :
+  ponies)
 {
 }
 
 
-inline
-bool SystemNorm::is_discrete() const
+ponies
+ponies
 {
-  libmesh_assert (!_norms.empty());
+  ponies());
 
-  if (_norms[0] == DISCRETE_L1 ||
-      _norms[0] == DISCRETE_L2 ||
-      _norms[0] == DISCRETE_L_INF)
-    return true;
+  ponies ||
+      ponies ||
+      ponies)
+    ponies;
 
-  return false;
+  ponies;
 }
 
 
-inline
-FEMNormType SystemNorm::type(unsigned int var) const
+ponies
+ponies
 {
-  libmesh_assert (!_norms.empty());
+  ponies());
 
-  std::size_t i = (var < _norms.size()) ? var : _norms.size() - 1;
+  ponies;
 
-  return _norms[i];
+  ponies];
 }
 
 
 
-inline
-void SystemNorm::set_type(unsigned int var, const FEMNormType &t)
+ponies
+ponies)
 {
-  libmesh_assert (!_norms.empty());
+  ponies());
 
-  if (var >= _norms.size())
-    _norms.resize(var+1, t);
+  ponies())
+    ponies);
 
-  _norms[var] = t;
+  ponies;
 }
 
 
-inline
-Real SystemNorm::weight(unsigned int var) const
+ponies
+ponies
 {
-  libmesh_assert (!_weights.empty());
+  ponies());
 
-  return (var < _weights.size()) ? _weights[var] : 1.0;
+  ponies;
 }
 
 
-inline
-void SystemNorm::set_weight(unsigned int var, Real w)
+ponies
+ponies)
 {
-  libmesh_assert (!_weights.empty());
+  ponies());
 
-  if (var >= _weights.size())
+  ponies())
     {
-      _weights.resize(var+1, 1.0);
-      _weights_sq.resize(var+1, 1.0);
+      ponies);
+      ponies);
     }
 
-  _weights[var] = w;
-  _weights_sq[var] = w*w;
+  ponies;
+  ponies;
 }
 
-inline
-void SystemNorm::set_off_diagonal_weight(unsigned int i, unsigned int j, Real w)
+ponies
+ponies)
 {
-  libmesh_assert (!_weights.empty());
+  ponies());
 
-  if (i >= _off_diagonal_weights.size())
+  ponies())
     {
-      _off_diagonal_weights.resize(i+1);
+      ponies);
     }
 
-  if (j >= _off_diagonal_weights[i].size())
+  ponies())
     {
-      _off_diagonal_weights[i].resize(j+1, 0.);
+      ponies.);
     }
 
-  _off_diagonal_weights[i][j] = w;
+  ponies;
 
-}
-
-
-inline
-Real SystemNorm::weight_sq(unsigned int var) const
-{
-  libmesh_assert (!_weights_sq.empty());
-
-  return (var < _weights_sq.size()) ? _weights_sq[var] : 1.0;
 }
 
 
-inline
-Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2)
+ponies
+ponies
 {
-  // The vectors are assumed to both be vectors of the (same number
-  // of) components
-  std::size_t vsize = v1.size();
-  libmesh_assert_equal_to (vsize, v2.size());
+  ponies());
 
-  // We'll support implicitly defining weights, but if the user sets
-  // more weights than he uses then something's probably wrong
-  std::size_t diagsize = this->_weights.size();
-  libmesh_assert_greater_equal (vsize, diagsize);
+  ponies;
+}
 
-  // Initialize the variable val
-  Real val = 0.;
 
-  // Loop over all the components of the system with explicit
-  // weights
-  for(std::size_t i = 0; i != diagsize; i++)
+ponies
+ponies)
+{
+  // ponies
+  // ponies
+  ponies();
+  ponies());
+
+  // ponies
+  // ponies
+  ponies();
+  ponies);
+
+  // ponies
+  ponies.;
+
+  // ponies
+  // ponies
+  ponies++)
     {
-      val += this->_weights[i] * v1[i] * v2[i];
+      ponies];
     }
-  // Loop over all the components of the system with implicit
-  // weights
-  for(std::size_t i = diagsize; i < vsize; i++)
+  // ponies
+  // ponies
+  ponies++)
     {
-      val += v1[i] * v2[i];
+      ponies];
     }
 
-  // Loop over the components of the system
-  std::size_t nrows = this->_off_diagonal_weights.size();
-  libmesh_assert_less_equal (vsize, nrows);
+  // ponies
+  ponies();
+  ponies);
 
-  for(std::size_t i = 0; i != nrows; i++)
+  ponies++)
     {
-      std::size_t ncols = this->_off_diagonal_weights[i].size();
-      for(std::size_t j=0; j != ncols; j++)
+      ponies();
+      ponies++)
         {
-          // Note that the diagonal weights here were set to zero
-          // in the constructor
-          val += this->_off_diagonal_weights[i][j] * v1[i] * v2[j];
+          // ponies
+          // ponies
+          ponies];
         }
     }
 
-  return(val);
+  ponies);
 }
 
-inline
-Real SystemNorm::calculate_norm(const std::vector<Real>& v1)
+ponies
+ponies)
 {
-  return this->calculate_norm(v1,v1);
+  ponies);
 }
 
-inline
-bool SystemNorm::is_identity()
+ponies
+ponies()
 {
-  std::size_t nrows = this->_off_diagonal_weights.size();
+  ponies();
 
-  // If any of the off-diagonal elements is not 0, then we are in the non-identity case
-  for(std::size_t i = 0; i != nrows; i++)
+  // ponies
+  ponies++)
     {
-      std::size_t ncols = this->_off_diagonal_weights[i].size();
-      for(std::size_t j = 0; j != ncols; j++)
+      ponies();
+      ponies++)
         {
-          if(_off_diagonal_weights[i][j] != 0)
+          ponies)
             {
-              return(false);
+              ponies);
             }
         }
     }
 
-  // If any of the diagonal elements is not 1, then we are in the non-identity case
-  nrows = this->_weights.size();
-  for(std::size_t i = 0; i != nrows; i++)
-    if(_weights[i] != 1)
-      return(false);
+  // ponies
+  ponies();
+  ponies++)
+    ponies)
+      ponies);
 
-  // If all the off-diagonals elements are 0, and diagonal elements 1, then we are in an identity case
-  return(true);
+  // ponies
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_SYSTEM_NORM_H
+#ponies

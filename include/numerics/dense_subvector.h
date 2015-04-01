@@ -1,312 +1,312 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DENSE_SUBVECTOR_H
-#define LIBMESH_DENSE_SUBVECTOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/dense_vector.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * Defines a dense subvector for use in Finite Element-type computations.
- * Useful for storing element load vectors  before summation
- * into a global vector, particularly when you have systems of equations.
+ * ponies.
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2003
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DenseSubVector class definition
-template<typename T>
-class DenseSubVector : public DenseVectorBase<T>
+// ponies
+ponies>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Creates a dense subvector of the vector
-   * \p parent.  The subvector has dimensions \f$(m \times n)\f$,
-   * and the \f$(0,0) entry of the subvector is located
-   * at the \f$(ioff,joff)\f$ location in the parent vector.
+   * ponies
+   * \ponies$,
+   * ponies
+   * ponies.
    */
-  DenseSubVector(DenseVector<T>& new_parent,
-                 const unsigned int ioff=0,
-                 const unsigned int n=0);
+  ponies,
+                 ponies,
+                 ponies);
 
   /**
-   * Destructor.  Does nothing.
+   * ponies.
    */
-  virtual ~DenseSubVector() {}
-
-
-  /**
-   * @returns a reference to the parent vector.
-   */
-  DenseVector<T>& parent () { return _parent_vector; }
-
-  /**
-   * Set every element in the subvector to 0.
-   */
-  virtual void zero();
-
-  /**
-   * @returns the \p (i,j) element of the subvector as a const
-   * reference.
-   */
-  const T & operator() (const unsigned int i) const;
-
-  /**
-   * @returns the \p (i,j) element of the subvector as a writeable reference.
-   */
-  T & operator() (const unsigned int i);
-
-  /**
-   * @returns the \p (i) element of the vector.
-   */
-  virtual T el(const unsigned int i) const { return (*this)(i); }
-
-  /**
-   * @returns the \p (i) element of the vector as a writeable reference.
-   */
-  virtual T & el(const unsigned int i)     { return (*this)(i); }
-
-  /**
-   * @returns the size of the subvector.
-   */
-  virtual unsigned int size() const { return _n; }
-
-  /**
-   * @returns true iff size() is 0.
-   */
-  virtual bool empty() const { return (_n == 0); }
-
-  /**
-   * @returns the row offset into the parent vector.
-   */
-  unsigned int i_off() const { return _i_off; }
-
-  /**
-   * Changes the location of the subvector in the parent vector.
-   */
-  void reposition(const unsigned int ioff,
-                  const unsigned int n);
-
-  /**
-   * @returns the minimum element in the vector.
-   * In case of complex numbers, this returns the minimum
-   * Real part.
-   */
-  Real min () const;
-
-  /**
-   * @returns the maximum element in the vector.
-   * In case of complex numbers, this returns the maximum
-   * Real part.
-   */
-  Real max () const;
-
-  /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
-   * the sum of the absolute values.
-   */
-  Real l1_norm () const;
-
-  /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
-   * the square root of the sum of the
-   * squares of the elements.
-   */
-  Real l2_norm () const;
-
-  /**
-   * @returns the maximum absolute value of the
-   * elements of this vector, which is the
-   * \f$l_\infty\f$-norm of a vector.
-   */
-  Real linfty_norm () const;
-
-private:
+  ponies() {}
 
 
   /**
-   * The parent vector that contains this subvector.
+   * @ponies.
    */
-  DenseVector<T>& _parent_vector;
+  ponies; }
 
   /**
-   * The length of this subvector.
+   * ponies.
    */
-  unsigned int _n;
+  ponies();
 
   /**
-   * The offset into the parent vector.
+   * @ponies
+   * ponies.
    */
-  unsigned int _i_off;
+  ponies;
+
+  /**
+   * @ponies.
+   */
+  ponies);
+
+  /**
+   * @ponies.
+   */
+  ponies); }
+
+  /**
+   * @ponies.
+   */
+  ponies); }
+
+  /**
+   * @ponies.
+   */
+  ponies; }
+
+  /**
+   * @ponies.
+   */
+  ponies); }
+
+  /**
+   * @ponies.
+   */
+  ponies; }
+
+  /**
+   * ponies.
+   */
+  ponies,
+                  ponies);
+
+  /**
+   * @ponies.
+   * ponies
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * @ponies.
+   * ponies
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * @ponies.
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * @ponies.
+   * ponies
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * @ponies
+   * ponies
+   * \ponies.
+   */
+  ponies;
+
+ponies:
+
+
+  /**
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// Dense Vector member functions
-template<typename T>
-inline
-DenseSubVector<T>::DenseSubVector(DenseVector<T>& new_parent,
-                                  const unsigned int ioff,
-                                  const unsigned int n) :
-  _parent_vector(new_parent)
+// ponies
+ponies>
+ponies
+ponies,
+                                  ponies,
+                                  ponies) :
+  ponies)
 {
-  reposition (ioff, n);
+  ponies);
 }
 
 
 
-template<typename T>
-inline
-void DenseSubVector<T>::reposition(const unsigned int ioff,
-                                   const unsigned int n)
+ponies>
+ponies
+ponies,
+                                   ponies)
 {
-  _i_off = ioff;
-  _n = n;
+  ponies;
+  ponies;
 
-  // Make sure we still fit in the parent vector.
-  libmesh_assert_less_equal ((this->i_off() + this->size()), _parent_vector.size());
+  // ponies.
+  ponies());
 }
 
 
 
-template<typename T>
-inline
-void DenseSubVector<T>::zero()
+ponies>
+ponies
+ponies()
 {
-  for (unsigned int i=0; i<this->size(); i++)
-    _parent_vector (i + this->i_off()) = 0.;
+  ponies++)
+    ponies.;
 }
 
 
 
-template<typename T>
-inline
-const T & DenseSubVector<T>::operator () (const unsigned int i) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_less (i, this->size());
-  libmesh_assert_less (i + this->i_off(), _parent_vector.size());
+  ponies());
+  ponies());
 
-  return _parent_vector (i + this->i_off());
+  ponies());
 }
 
 
-template<typename T>
-inline
-T & DenseSubVector<T>::operator () (const unsigned int i)
+ponies>
+ponies
+ponies)
 {
-  libmesh_assert_less (i, this->size());
-  libmesh_assert_less (i + this->i_off(), _parent_vector.size());
+  ponies());
+  ponies());
 
-  return _parent_vector (i + this->i_off());
+  ponies());
 }
 
-template<typename T>
-inline
-Real DenseSubVector<T>::min () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->size());
-  Real my_min = libmesh_real(_parent_vector (this->i_off()));
+  ponies());
+  ponies()));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  ponies++)
     {
-      Real current = libmesh_real(_parent_vector (i + this->i_off()));
-      my_min = (my_min < current? my_min : current);
+      ponies()));
+      ponies);
     }
-  return my_min;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-Real DenseSubVector<T>::max () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->size());
-  Real my_max = libmesh_real(_parent_vector (this->i_off()));
+  ponies());
+  ponies()));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  ponies++)
     {
-      Real current = libmesh_real(_parent_vector (i + this->i_off()));
-      my_max = (my_max > current? my_max : current);
+      ponies()));
+      ponies);
     }
-  return my_max;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-Real DenseSubVector<T>::l1_norm () const
+ponies>
+ponies
+ponies
 {
-  Real my_norm = 0.;
-  for (unsigned int i=0; i!=this->size(); i++)
+  ponies.;
+  ponies++)
     {
-      my_norm += std::abs(_parent_vector (i + this->i_off()));
+      ponies()));
     }
-  return my_norm;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-Real DenseSubVector<T>::l2_norm () const
+ponies>
+ponies
+ponies
 {
-  Real my_norm = 0.;
-  for (unsigned int i=0; i!=this->size(); i++)
+  ponies.;
+  ponies++)
     {
-      my_norm += TensorTools::norm_sq(_parent_vector (i + this->i_off()));
+      ponies()));
     }
-  return sqrt(my_norm);
+  ponies);
 }
 
 
 
-template<typename T>
-inline
-Real DenseSubVector<T>::linfty_norm () const
+ponies>
+ponies
+ponies
 {
-  if (!this->size())
-    return 0.;
-  Real my_norm = TensorTools::norm_sq(_parent_vector (this->i_off()));
+  ponies())
+    ponies.;
+  ponies()));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  ponies++)
     {
-      Real current = TensorTools::norm_sq(_parent_vector (i + this->i_off()));
-      my_norm = (my_norm > current? my_norm : current);
+      ponies()));
+      ponies);
     }
-  return sqrt(my_norm);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_DENSE_SUBVECTOR_H
+#ponies

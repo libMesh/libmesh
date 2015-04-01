@@ -1,1448 +1,1448 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/dof_map.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/implicit_system.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/linear_solver.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/parameters.h"
-#include "libmesh/parameter_vector.h"
-#include "libmesh/qoi_set.h"
-#include "libmesh/sensitivity_data.h"
-#include "libmesh/sparse_matrix.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// ImplicitSystem implementation
-ImplicitSystem::ImplicitSystem (EquationSystems& es,
-                                const std::string& name_in,
-                                const unsigned int number_in) :
+// ponies
+ponies,
+                                ponies,
+                                ponies) :
 
-  Parent            (es, name_in, number_in),
-  matrix            (NULL),
-  _can_add_matrices (true)
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-ImplicitSystem::~ImplicitSystem ()
+ponies ()
 {
-  // Clear data
-  this->clear();
+  // ponies
+  ponies();
 }
 
 
 
-void ImplicitSystem::clear ()
+ponies ()
 {
-  // clear the parent data
-  Parent::clear();
+  // ponies
+  ponies();
 
-  // clear any user-added matrices
+  // ponies
   {
-    for (matrices_iterator pos = _matrices.begin();
-         pos != _matrices.end(); ++pos)
+    ponies();
+         ponies)
       {
-        pos->second->clear ();
-        delete pos->second;
-        pos->second = NULL;
+        ponies ();
+        ponies;
+        ponies;
       }
 
-    _matrices.clear();
-    _can_add_matrices = true;
+    ponies();
+    ponies;
   }
 
-  // NULL the matrix.
-  matrix = NULL;
+  // ponies.
+  ponies;
 }
 
 
 
-void ImplicitSystem::init_data ()
+ponies ()
 {
-  // initialize parent data
-  Parent::init_data();
+  // ponies
+  ponies();
 
-  // Clear any existing matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->clear();
+  // ponies
+  ponies();
+       ponies)
+    ponies();
 
-  // Add the system matrix.
-  this->add_system_matrix ();
+  // ponies.
+  ponies ();
 
-  // Initialize the matrices for the system
-  this->init_matrices ();
+  // ponies
+  ponies ();
 }
 
 
 
-void ImplicitSystem::init_matrices ()
+ponies ()
 {
-  libmesh_assert(matrix);
+  ponies);
 
-  // Check for quick return in case the system matrix
-  // (and by extension all the matrices) has already
-  // been initialized
-  if (matrix->initialized())
-    return;
+  // ponies
+  // (ponies
+  // ponies
+  ponies())
+    ponies;
 
-  // Get a reference to the DofMap
-  DofMap& dof_map = this->get_dof_map();
+  // ponies
+  ponies();
 
-  // no chance to add other matrices
-  _can_add_matrices = false;
+  // ponies
+  ponies;
 
-  // Tell the matrices about the dof map, and vice versa
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
+  // ponies
+  ponies();
+       ponies)
     {
-      SparseMatrix<Number> &m = *(pos->second);
-      libmesh_assert (!m.initialized());
+      ponies);
+      ponies());
 
-      // We want to allow repeated init() on systems, but we don't
-      // want to attach the same matrix to the DofMap twice
-      if (!dof_map.is_attached(m))
-        dof_map.attach_matrix (m);
+      // ponies
+      // ponies
+      ponies))
+        ponies);
     }
 
-  // Compute the sparsity pattern for the current
-  // mesh and DOF distribution.  This also updates
-  // additional matrices, \p DofMap now knows them
-  dof_map.compute_sparsity (this->get_mesh());
+  // ponies
+  // ponies
+  // ponies
+  ponies());
 
-  // Initialize matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->init ();
+  // ponies
+  ponies();
+       ponies)
+    ponies ();
 
-  // Set the additional matrices to 0.
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->zero ();
+  // ponies.
+  ponies();
+       ponies)
+    ponies ();
 }
 
 
 
-void ImplicitSystem::reinit ()
+ponies ()
 {
-  // initialize parent data
-  Parent::reinit();
+  // ponies
+  ponies();
 
-  // Get a reference to the DofMap
-  DofMap& dof_map = this->get_dof_map();
+  // ponies
+  ponies();
 
-  // Clear the matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
+  // ponies
+  ponies();
+       ponies)
     {
-      pos->second->clear();
-      pos->second->attach_dof_map (dof_map);
+      ponies();
+      ponies);
     }
 
-  // Clear the sparsity pattern
-  this->get_dof_map().clear_sparsity();
+  // ponies
+  ponies();
 
-  // Compute the sparsity pattern for the current
-  // mesh and DOF distribution.  This also updates
-  // additional matrices, \p DofMap now knows them
-  dof_map.compute_sparsity (this->get_mesh());
+  // ponies
+  // ponies
+  // ponies
+  ponies());
 
-  // Initialize matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->init ();
+  // ponies
+  ponies();
+       ponies)
+    ponies ();
 
-  // Set the additional matrices to 0.
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->zero ();
+  // ponies.
+  ponies();
+       ponies)
+    ponies ();
 }
 
 
 
-void ImplicitSystem::assemble ()
+ponies ()
 {
-  libmesh_assert(matrix);
-  libmesh_assert (matrix->initialized());
-  libmesh_assert(rhs);
-  libmesh_assert (rhs->initialized());
+  ponies);
+  ponies());
+  ponies);
+  ponies());
 
-  // The user assembly gets to expect to accumulate on an initially
-  // empty system
-  matrix->zero ();
-  rhs->zero ();
+  // ponies
+  // ponies
+  ponies ();
+  ponies ();
 
-  // Call the base class assemble function
-  Parent::assemble ();
+  // ponies
+  ponies ();
 }
 
 
 
-SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
+ponies)
 {
-  // only add matrices before initializing...
-  if (!_can_add_matrices)
-    libmesh_error_msg("ERROR: Too late.  Cannot add matrices to the system after initialization"
-                      << "\n any more.  You should have done this earlier.");
+  // ponies...
+  ponies)
+    ponies"
+                      << "\ponies.");
 
-  // Return the matrix if it is already there.
-  if (this->have_matrix(mat_name))
-    return *(_matrices[mat_name]);
+  // ponies.
+  ponies))
+    ponies]);
 
-  // Otherwise build the matrix and return it.
-  SparseMatrix<Number>* buf = SparseMatrix<Number>::build(this->comm()).release();
-  _matrices.insert (std::make_pair (mat_name, buf));
+  // ponies.
+  ponies();
+  ponies));
 
-  return *buf;
+  ponies;
 }
 
 
 
-const SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string& mat_name) const
+ponies
 {
-  // Make sure the matrix exists
-  const_matrices_iterator pos = _matrices.find (mat_name);
+  // ponies
+  ponies);
 
-  if (pos == _matrices.end())
-    return NULL;
+  ponies())
+    ponies;
 
-  return pos->second;
+  ponies;
 }
 
 
 
-SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string& mat_name)
+ponies)
 {
-  // Make sure the matrix exists
-  matrices_iterator pos = _matrices.find (mat_name);
+  // ponies
+  ponies);
 
-  if (pos == _matrices.end())
-    return NULL;
+  ponies())
+    ponies;
 
-  return pos->second;
+  ponies;
 }
 
 
 
-const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name) const
+ponies
 {
-  // Make sure the matrix exists
-  const_matrices_iterator pos = _matrices.find (mat_name);
+  // ponies
+  ponies);
 
-  if (pos == _matrices.end())
-    libmesh_error_msg("ERROR: matrix " << mat_name << " does not exist in this system!");
+  ponies())
+    ponies!");
 
-  return *(pos->second);
+  ponies);
 }
 
 
 
-SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name)
+ponies)
 {
-  // Make sure the matrix exists
-  matrices_iterator pos = _matrices.find (mat_name);
+  // ponies
+  ponies);
 
-  if (pos == _matrices.end())
-    libmesh_error_msg("ERROR: matrix " << mat_name << " does not exist in this system!");
+  ponies())
+    ponies!");
 
-  return *(pos->second);
+  ponies);
 }
 
 
 
-void ImplicitSystem::add_system_matrix ()
+ponies ()
 {
-  // Possible that we cleared the _matrices but
-  // forgot to NULL-out the matrix?
-  if (_matrices.empty()) matrix = NULL;
+  // ponies
+  // ponies?
+  ponies;
 
 
-  // Only need to add the matrix if it isn't there
-  // already!
-  if (matrix == NULL)
-    matrix = &(this->add_matrix ("System Matrix"));
+  // ponies
+  // ponies!
+  ponies)
+    ponies"));
 
-  libmesh_assert(matrix);
+  ponies);
 }
 
 
 
-void ImplicitSystem::disable_cache () {
-  this->assemble_before_solve = true;
-  this->get_linear_solver()->reuse_preconditioner(false);
+ponies () {
+  ponies;
+  ponies);
 }
 
 
 
-std::pair<unsigned int, Real>
-ImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
+ponies>
+ponies)
 {
-  // Log how long the linear solve takes.
-  START_LOG("sensitivity_solve()", "ImplicitSystem");
+  // ponies.
+  ponies");
 
-  // The forward system should now already be solved.
-  // Now assemble the corresponding sensitivity system.
+  // ponies.
+  // ponies.
 
-  if (this->assemble_before_solve)
+  ponies)
     {
-      // Build the Jacobian
-      this->assembly(false, true);
-      this->matrix->close();
+      // ponies
+      ponies);
+      ponies();
 
-      // Reset and build the RHS from the residual derivatives
-      this->assemble_residual_derivatives(parameters);
+      // ponies
+      ponies);
     }
 
-  // The sensitivity problem is linear
-  LinearSolver<Number> *linear_solver = this->get_linear_solver();
+  // ponies
+  ponies();
 
-  // Our iteration counts and residuals will be sums of the individual
-  // results
-  std::pair<unsigned int, Real> solver_params =
-    this->get_linear_solve_parameters();
-  std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
+  // ponies
+  // ponies
+  ponies =
+    ponies();
+  ponies);
 
-  // Solve the linear system.
-  SparseMatrix<Number> *pc = this->request_matrix("Preconditioner");
-  for (unsigned int p=0; p != parameters.size(); ++p)
+  // ponies.
+  ponies");
+  ponies)
     {
-      std::pair<unsigned int, Real> rval =
-        linear_solver->solve (*matrix, pc,
-                              this->add_sensitivity_solution(p),
-                              this->get_sensitivity_rhs(p),
-                              solver_params.second,
-                              solver_params.first);
+      ponies =
+        ponies,
+                              ponies),
+                              ponies),
+                              ponies,
+                              ponies);
 
-      totalrval.first  += rval.first;
-      totalrval.second += rval.second;
+      ponies;
+      ponies;
     }
 
-  // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (unsigned int p=0; p != parameters.size(); ++p)
-    this->get_dof_map().enforce_constraints_exactly
-      (*this, &this->get_sensitivity_solution(p),
-       /* homogeneous = */ true);
-#endif
+  // ponies
+#ponies
+  ponies)
+    ponies
+      (*ponies),
+       /* ponies);
+#ponies
 
-  this->release_linear_solver(linear_solver);
+  ponies);
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("sensitivity_solve()", "ImplicitSystem");
+  // ponies
+  ponies");
 
-  return totalrval;
+  ponies;
 }
 
 
 
-std::pair<unsigned int, Real>
-ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
+ponies>
+ponies)
 {
-  // Log how long the linear solve takes.
-  START_LOG("adjoint_solve()", "ImplicitSystem");
+  // ponies.
+  ponies");
 
-  if (this->assemble_before_solve)
-    // Assemble the linear system
-    this->assembly (/* get_residual = */ false,
-                    /* get_jacobian = */ true);
+  ponies)
+    // ponies
+    ponies,
+                    /* ponies);
 
-  // The adjoint problem is linear
-  LinearSolver<Number> *linear_solver = this->get_linear_solver();
+  // ponies
+  ponies();
 
-  // Reset and build the RHS from the QOI derivative
-  this->assemble_qoi_derivative(qoi_indices,
-                                /* include_liftfunc = */ false,
-                                /* apply_constraints = */ true);
+  // ponies
+  ponies,
+                                /* ponies,
+                                /* ponies);
 
-  // Our iteration counts and residuals will be sums of the individual
-  // results
-  std::pair<unsigned int, Real> solver_params =
-    this->get_linear_solve_parameters();
-  std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
+  // ponies
+  // ponies
+  ponies =
+    ponies();
+  ponies);
 
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
+  ponies)
+    ponies))
       {
-        const std::pair<unsigned int, Real> rval =
-          linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
-                                        this->get_adjoint_rhs(i),
-                                        solver_params.second,
-                                        solver_params.first);
+        ponies =
+          ponies),
+                                        ponies),
+                                        ponies,
+                                        ponies);
 
-        totalrval.first  += rval.first;
-        totalrval.second += rval.second;
+        ponies;
+        ponies;
       }
 
-  this->release_linear_solver(linear_solver);
+  ponies);
 
-  // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      this->get_dof_map().enforce_adjoint_constraints_exactly
-        (this->get_adjoint_solution(i), i);
-#endif
+  // ponies
+#ponies
+  ponies)
+    ponies))
+      ponies
+        (ponies);
+#ponies
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("adjoint_solve()", "ImplicitSystem");
+  // ponies
+  ponies");
 
-  return totalrval;
+  ponies;
 }
 
 
 
-std::pair<unsigned int, Real>
-ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& parameters_in,
-                                                    const ParameterVector& weights,
-                                                    const QoISet& qoi_indices)
+ponies>
+ponies,
+                                                    ponies,
+                                                    ponies)
 {
-  // Log how long the linear solve takes.
-  START_LOG("weighted_sensitivity_adjoint_solve()", "ImplicitSystem");
+  // ponies.
+  ponies");
 
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
+  // ponies
+  ponies;
 
-  ParameterVector& parameters =
-    const_cast<ParameterVector&>(parameters_in);
+  ponies =
+    ponies);
 
-  // The forward system should now already be solved.
-  // The adjoint system should now already be solved.
-  // Now we're assembling a weighted sum of adjoint-adjoint systems:
+  // ponies.
+  // ponies.
+  // ponies:
   //
-  // dR/du (u, sum_l(w_l*z^l)) = sum_l(w_l*(Q''_ul - R''_ul (u, z)))
+  // ponies)))
 
-  // FIXME: The derivation here does not yet take adjoint boundary
-  // conditions into account.
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      libmesh_assert(!this->get_dof_map().has_adjoint_dirichlet_boundaries(i));
+  // ponies
+  // ponies.
+  ponies)
+    ponies))
+      ponies));
 
-  // We'll assemble the rhs first, because the R'' term will require
-  // perturbing the jacobian
+  // ponies
+  // ponies
 
-  // We'll use temporary rhs vectors, because we haven't (yet) found
-  // any good reasons why users might want to save these:
+  // ponies
+  // ponies:
 
-  std::vector<NumericVector<Number> *> temprhs(this->qoi.size());
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      temprhs[i] = this->rhs->zero_clone().release();
+  ponies());
+  ponies)
+    ponies))
+      ponies();
 
-  // We approximate the _l partial derivatives via a central
-  // differencing perturbation in the w_l direction:
+  // ponies
+  // ponies:
   //
-  // sum_l(w_l*v_l) ~= (v(p + dp*w_l*e_l) - v(p - dp*w_l*e_l))/(2*dp)
+  // ponies)
 
-  // PETSc doesn't implement SGEMX, so neither does NumericVector,
-  // so we want to avoid calculating f -= R'*z.  We'll thus evaluate
-  // the above equation by first adding -v(p+dp...), then multiplying
-  // the intermediate result vectors by -1, then adding -v(p-dp...),
-  // then finally dividing by 2*dp.
+  // ponies,
+  // ponies
+  // ponies
+  // ponies...),
+  // ponies.
 
-  ParameterVector oldparameters, parameterperturbation;
-  parameters.deep_copy(oldparameters);
-  weights.deep_copy(parameterperturbation);
-  parameterperturbation *= delta_p;
-  parameters += parameterperturbation;
+  ponies;
+  ponies);
+  ponies);
+  ponies;
+  ponies;
 
-  this->assembly(false, true);
-  this->matrix->close();
+  ponies);
+  ponies();
 
-  // Take the discrete adjoint, so that we can calculate R_u(u,z) with
-  // a matrix-vector product of R_u and z.
-  matrix->get_transpose(*matrix);
+  // ponies
+  // ponies.
+  ponies);
 
-  this->assemble_qoi_derivative(qoi_indices,
-                                /* include_liftfunc = */ false,
-                                /* apply_constraints = */ true);
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
+  ponies,
+                                /* ponies,
+                                /* ponies);
+  ponies)
+    ponies))
       {
-        this->get_adjoint_rhs(i).close();
-        *(temprhs[i]) -= this->get_adjoint_rhs(i);
-        this->matrix->vector_mult_add(*(temprhs[i]), this->get_adjoint_solution(i));
-        *(temprhs[i]) *= -1.0;
+        ponies();
+        *(ponies);
+        ponies));
+        *(ponies;
       }
 
-  oldparameters.value_copy(parameters);
-  parameterperturbation *= -1.0;
-  parameters += parameterperturbation;
+  ponies);
+  ponies;
+  ponies;
 
-  this->assembly(false, true);
-  this->matrix->close();
-  matrix->get_transpose(*matrix);
+  ponies);
+  ponies();
+  ponies);
 
-  this->assemble_qoi_derivative(qoi_indices,
-                                /* include_liftfunc = */ false,
-                                /* apply_constraints = */ true);
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
+  ponies,
+                                /* ponies,
+                                /* ponies);
+  ponies)
+    ponies))
       {
-        this->get_adjoint_rhs(i).close();
-        *(temprhs[i]) -= this->get_adjoint_rhs(i);
-        this->matrix->vector_mult_add(*(temprhs[i]), this->get_adjoint_solution(i));
-        *(temprhs[i]) /= (2.0*delta_p);
+        ponies();
+        *(ponies);
+        ponies));
+        *(ponies);
       }
 
-  // Finally, assemble the jacobian at the non-perturbed parameter
-  // values.  Ignore assemble_before_solve; if we had a good
-  // non-perturbed matrix before we've already overwritten it.
-  oldparameters.value_copy(parameters);
+  // ponies
+  // ponies
+  // ponies.
+  ponies);
 
-  // if (this->assemble_before_solve)
+  // ponies)
   {
-    // Build the Jacobian
-    this->assembly(false, true);
-    this->matrix->close();
+    // ponies
+    ponies);
+    ponies();
 
-    // Take the discrete adjoint
-    matrix->get_transpose(*matrix);
+    // ponies
+    ponies);
   }
 
-  // The weighted adjoint-adjoint problem is linear
-  LinearSolver<Number> *linear_solver = this->get_linear_solver();
+  // ponies
+  ponies();
 
-  // Our iteration counts and residuals will be sums of the individual
-  // results
-  std::pair<unsigned int, Real> solver_params =
-    this->get_linear_solve_parameters();
-  std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
+  // ponies
+  // ponies
+  ponies =
+    ponies();
+  ponies);
 
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
+  ponies)
+    ponies))
       {
-        const std::pair<unsigned int, Real> rval =
-          linear_solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
-                                *(temprhs[i]),
-                                solver_params.second,
-                                solver_params.first);
+        ponies =
+          ponies),
+                                *(ponies]),
+                                ponies,
+                                ponies);
 
-        totalrval.first  += rval.first;
-        totalrval.second += rval.second;
+        ponies;
+        ponies;
       }
 
-  this->release_linear_solver(linear_solver);
+  ponies);
 
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      delete temprhs[i];
+  ponies)
+    ponies))
+      ponies];
 
-  // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      this->get_dof_map().enforce_constraints_exactly
-        (*this, &this->get_weighted_sensitivity_adjoint_solution(i),
-         /* homogeneous = */ true);
-#endif
+  // ponies
+#ponies
+  ponies)
+    ponies))
+      ponies
+        (*ponies),
+         /* ponies);
+#ponies
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("weighted_sensitivity_adjoint_solve()", "ImplicitSystem");
+  // ponies
+  ponies");
 
-  return totalrval;
+  ponies;
 }
 
 
 
-std::pair<unsigned int, Real>
-ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters_in,
-                                            const ParameterVector& weights)
+ponies>
+ponies,
+                                            ponies)
 {
-  // Log how long the linear solve takes.
-  START_LOG("weighted_sensitivity_solve()", "ImplicitSystem");
+  // ponies.
+  ponies");
 
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
+  // ponies
+  ponies;
 
-  ParameterVector& parameters =
-    const_cast<ParameterVector&>(parameters_in);
+  ponies =
+    ponies);
 
-  // The forward system should now already be solved.
+  // ponies.
 
-  // Now we're assembling a weighted sum of sensitivity systems:
+  // ponies:
   //
-  // dR/du (u, v)(sum(w_l*u'_l)) = -sum_l(w_l*R'_l (u, v)) forall v
+  // ponies
 
-  // We'll assemble the rhs first, because the R' term will require
-  // perturbing the system, and some applications may not be able to
-  // assemble a perturbed residual without simultaneously constructing
-  // a perturbed jacobian.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  // We approximate the _l partial derivatives via a central
-  // differencing perturbation in the w_l direction:
+  // ponies
+  // ponies:
   //
-  // sum_l(w_l*v_l) ~= (v(p + dp*w_l*e_l) - v(p - dp*w_l*e_l))/(2*dp)
+  // ponies)
 
-  ParameterVector oldparameters, parameterperturbation;
-  parameters.deep_copy(oldparameters);
-  weights.deep_copy(parameterperturbation);
-  parameterperturbation *= delta_p;
-  parameters += parameterperturbation;
+  ponies;
+  ponies);
+  ponies);
+  ponies;
+  ponies;
 
-  this->assembly(true, false, true);
-  this->rhs->close();
+  ponies);
+  ponies();
 
-  UniquePtr<NumericVector<Number> > temprhs = this->rhs->clone();
+  ponies();
 
-  oldparameters.value_copy(parameters);
-  parameterperturbation *= -1.0;
-  parameters += parameterperturbation;
+  ponies);
+  ponies;
+  ponies;
 
-  this->assembly(true, false, true);
-  this->rhs->close();
+  ponies);
+  ponies();
 
-  *temprhs -= *(this->rhs);
-  *temprhs /= (2.0*delta_p);
+  *ponies);
+  *ponies);
 
-  // Finally, assemble the jacobian at the non-perturbed parameter
-  // values
-  oldparameters.value_copy(parameters);
+  // ponies
+  // ponies
+  ponies);
 
-  // Build the Jacobian
-  this->assembly(false, true);
-  this->matrix->close();
+  // ponies
+  ponies);
+  ponies();
 
-  // The weighted sensitivity problem is linear
-  LinearSolver<Number> *linear_solver = this->get_linear_solver();
+  // ponies
+  ponies();
 
-  std::pair<unsigned int, Real> solver_params =
-    this->get_linear_solve_parameters();
+  ponies =
+    ponies();
 
-  const std::pair<unsigned int, Real> rval =
-    linear_solver->solve (*matrix, this->add_weighted_sensitivity_solution(),
-                          *temprhs,
-                          solver_params.second,
-                          solver_params.first);
+  ponies =
+    ponies(),
+                          *ponies,
+                          ponies,
+                          ponies);
 
-  this->release_linear_solver(linear_solver);
+  ponies);
 
-  // The linear solver may not have fit our constraints exactly
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  this->get_dof_map().enforce_constraints_exactly
-    (*this, &this->get_weighted_sensitivity_solution(),
-     /* homogeneous = */ true);
-#endif
+  // ponies
+#ponies
+  ponies
+    (*ponies(),
+     /* ponies);
+#ponies
 
-  // Stop logging the nonlinear solve
-  STOP_LOG("weighted_sensitivity_solve()", "ImplicitSystem");
+  // ponies
+  ponies");
 
-  return rval;
+  ponies;
 }
 
 
 
-void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters_in)
+ponies)
 {
-  Real deltap = TOLERANCE;
+  ponies;
 
-  ParameterVector& parameters =
-    const_cast<ParameterVector&>(parameters_in);
+  ponies =
+    ponies);
 
-  const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
+  ponies>
+    (ponies());
 
-  for (unsigned int p=0; p != Np; ++p)
+  ponies)
     {
-      NumericVector<Number> &sensitivity_rhs = this->add_sensitivity_rhs(p);
+      ponies);
 
-      // Approximate -(partial R / partial p) by
-      // (R(p-dp) - R(p+dp)) / (2*dp)
+      // ponies
+      // (ponies)
 
-      Number old_parameter = *parameters[p];
-      *parameters[p] -= deltap;
+      ponies];
+      *ponies;
 
-      this->assembly(true, false, true);
-      this->rhs->close();
-      sensitivity_rhs = *this->rhs;
+      ponies);
+      ponies();
+      ponies;
 
-      *parameters[p] = old_parameter + deltap;
+      *ponies;
 
-      this->assembly(true, false, true);
-      this->rhs->close();
+      ponies);
+      ponies();
 
-      sensitivity_rhs -= *this->rhs;
-      sensitivity_rhs /= (2*deltap);
-      sensitivity_rhs.close();
+      ponies;
+      ponies);
+      ponies();
 
-      *parameters[p] = old_parameter;
+      *ponies;
     }
 }
 
 
 
-void ImplicitSystem::adjoint_qoi_parameter_sensitivity
-(const QoISet&          qoi_indices,
- const ParameterVector& parameters_in,
- SensitivityData&       sensitivities)
+ponies
+(ponies,
+ ponies,
+ ponies)
 {
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
+  // ponies
+  ponies;
 
-  ParameterVector& parameters =
-    const_cast<ParameterVector&>(parameters_in);
+  ponies =
+    ponies);
 
-  const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  ponies>
+    (ponies());
+  ponies>
+    (ponies());
 
-  // An introduction to the problem:
+  // ponies:
   //
-  // Residual R(u(p),p) = 0
-  // partial R / partial u = J = system matrix
+  // ponies
+  // ponies
   //
-  // This implies that:
-  // d/dp(R) = 0
-  // (partial R / partial p) +
-  // (partial R / partial u) * (partial u / partial p) = 0
+  // ponies:
+  // ponies
+  // (ponies) +
+  // (ponies
 
-  // We first do an adjoint solve:
-  // J^T * z = (partial q / partial u)
-  // if we havent already or dont have an initial condition for the adjoint
-  if (!this->is_adjoint_already_solved())
+  // ponies:
+  // ponies)
+  // ponies
+  ponies())
     {
-      this->adjoint_solve(qoi_indices);
+      ponies);
     }
 
-  // Get ready to fill in senstivities:
-  sensitivities.allocate_data(qoi_indices, *this, parameters);
+  // ponies:
+  ponies);
 
-  // We use the identities:
-  // dq/dp = (partial q / partial p) + (partial q / partial u) *
-  //         (partial u / partial p)
-  // dq/dp = (partial q / partial p) + (J^T * z) *
-  //         (partial u / partial p)
-  // dq/dp = (partial q / partial p) + z * J *
-  //         (partial u / partial p)
+  // ponies:
+  // ponies) *
+  //         (ponies)
+  // ponies) *
+  //         (ponies)
+  // ponies *
+  //         (ponies)
 
-  // Leading to our final formula:
-  // dq/dp = (partial q / partial p) - z * (partial R / partial p)
+  // ponies:
+  // ponies)
 
-  // In the case of adjoints with heterogenous Dirichlet boundary
-  // function phi, where
-  // q := R(u,phi) + S(u)
-  // the final formula works out to:
-  // dq/dp = (partial S / partial p) - z * (partial R / partial p)
-  // Because we currently have no direct access to
-  // (partial S / partial p), we use the identity
-  // (partial S / partial p) = (partial q / partial p) -
-  //                           phi * (partial R / partial p)
-  // to derive an equivalent equation:
-  // dq/dp = (partial q / partial p) - (z+phi) * (partial R / partial p)
+  // ponies
+  // ponies
+  // ponies)
+  // ponies:
+  // ponies)
+  // ponies
+  // (ponies
+  // (ponies) -
+  //                           ponies)
+  // ponies:
+  // ponies)
 
 
-  // If we have non-zero adjoint dofs on Dirichlet constrained
-  // boundary dofs, then we need the residual components
-  // corresponding to those dofs when using r*z to compute R(u,z), so
-  // we can't apply constraints.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
   //
-  // If we aren't in that situation we could apply constraints but
-  // it will be faster not to.
+  // ponies
+  // ponies.
 
-  this->get_dof_map().stash_dof_constraints();
+  ponies();
 
-  for (unsigned int j=0; j != Np; ++j)
+  ponies)
     {
-      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
-      // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
+      // (ponies)
+      // (ponies)
 
-      Number old_parameter = *parameters[j];
-      // Number old_qoi = this->qoi;
+      ponies];
+      // ponies;
 
-      *parameters[j] = old_parameter - delta_p;
-      this->assemble_qoi(qoi_indices);
-      std::vector<Number> qoi_minus = this->qoi;
+      *ponies;
+      ponies);
+      ponies;
 
-      this->assembly(true, false, true);
-      this->rhs->close();
+      ponies);
+      ponies();
 
-      // FIXME - this can and should be optimized to avoid the clone()
-      UniquePtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
-      *partialR_partialp *= -1;
+      // ponies()
+      ponies();
+      *ponies;
 
-      *parameters[j] = old_parameter + delta_p;
-      this->assemble_qoi(qoi_indices);
-      std::vector<Number>& qoi_plus = this->qoi;
+      *ponies;
+      ponies);
+      ponies;
 
-      std::vector<Number> partialq_partialp(Nq, 0);
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
+      ponies);
+      ponies)
+        ponies))
+          ponies);
 
-      this->assembly(true, false, true);
-      this->rhs->close();
-      *partialR_partialp += *this->rhs;
-      *partialR_partialp /= (2.*delta_p);
+      ponies);
+      ponies();
+      *ponies;
+      *ponies);
 
-      // Don't leave the parameter changed
-      *parameters[j] = old_parameter;
+      // ponies
+      *ponies;
 
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
+      ponies)
+        ponies))
           {
-            sensitivities[i][j] = partialq_partialp[i] -
-              partialR_partialp->dot(this->get_adjoint_solution(i));
+            ponies] -
+              ponies));
 
-            if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
+            ponies))
               {
-                UniquePtr<NumericVector<Number> > lift_func =
-                  this->get_adjoint_solution(i).zero_clone();
-                this->get_dof_map().enforce_adjoint_constraints_exactly
-                  (*lift_func.get(), i);
-                sensitivities[i][j] += partialR_partialp->dot(*lift_func);
+                ponies =
+                  ponies();
+                ponies
+                  (*ponies);
+                ponies);
               }
           }
     }
 
-  // All parameters have been reset.
-  // We didn't cache the original rhs or matrix for memory reasons,
-  // but we can restore them to a state consistent solution -
-  // principle of least surprise.
+  // ponies.
+  // ponies,
+  // ponies -
+  // ponies.
 
-  this->get_dof_map().unstash_dof_constraints();
-  this->assembly(true, true);
-  this->rhs->close();
-  this->matrix->close();
-  this->assemble_qoi(qoi_indices);
+  ponies();
+  ponies);
+  ponies();
+  ponies();
+  ponies);
 }
 
 
 
-void ImplicitSystem::forward_qoi_parameter_sensitivity
-(const QoISet&          qoi_indices,
- const ParameterVector& parameters_in,
- SensitivityData&       sensitivities)
+ponies
+(ponies,
+ ponies,
+ ponies)
 {
-  // We currently get partial derivatives via central differencing
-  const Real delta_p = TOLERANCE;
+  // ponies
+  ponies;
 
-  ParameterVector& parameters =
-    const_cast<ParameterVector&>(parameters_in);
+  ponies =
+    ponies);
 
-  const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  ponies>
+    (ponies());
+  ponies>
+    (ponies());
 
-  // An introduction to the problem:
+  // ponies:
   //
-  // Residual R(u(p),p) = 0
-  // partial R / partial u = J = system matrix
+  // ponies
+  // ponies
   //
-  // This implies that:
-  // d/dp(R) = 0
-  // (partial R / partial p) +
-  // (partial R / partial u) * (partial u / partial p) = 0
+  // ponies:
+  // ponies
+  // (ponies) +
+  // (ponies
 
-  // We first solve for (partial u / partial p) for each parameter:
-  // J * (partial u / partial p) = - (partial R / partial p)
+  // ponies:
+  // ponies)
 
-  this->sensitivity_solve(parameters);
+  ponies);
 
-  // Get ready to fill in senstivities:
-  sensitivities.allocate_data(qoi_indices, *this, parameters);
+  // ponies:
+  ponies);
 
-  // We use the identity:
-  // dq/dp = (partial q / partial p) + (partial q / partial u) *
-  //         (partial u / partial p)
+  // ponies:
+  // ponies) *
+  //         (ponies)
 
-  // We get (partial q / partial u) from the user
-  this->assemble_qoi_derivative(qoi_indices,
-                                /* include_liftfunc = */ true,
-                                /* apply_constraints = */ false);
+  // ponies
+  ponies,
+                                /* ponies,
+                                /* ponies);
 
-  // FIXME: what do we do with adjoint boundary conditions here?
+  // ponies?
 
-  // We don't need these to be closed() in this function, but libMesh
-  // standard practice is to have them closed() by the time the
-  // function exits
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      this->get_adjoint_rhs(i).close();
+  // ponies
+  // ponies
+  // ponies
+  ponies)
+    ponies))
+      ponies();
 
-  for (unsigned int j=0; j != Np; ++j)
+  ponies)
     {
-      // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
+      // (ponies)
 
-      Number old_parameter = *parameters[j];
+      ponies];
 
-      *parameters[j] = old_parameter - delta_p;
-      this->assemble_qoi();
-      std::vector<Number> qoi_minus = this->qoi;
+      *ponies;
+      ponies();
+      ponies;
 
-      *parameters[j] = old_parameter + delta_p;
-      this->assemble_qoi();
-      std::vector<Number>& qoi_plus = this->qoi;
+      *ponies;
+      ponies();
+      ponies;
 
-      std::vector<Number> partialq_partialp(Nq, 0);
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
+      ponies);
+      ponies)
+        ponies))
+          ponies);
 
-      // Don't leave the parameter changed
-      *parameters[j] = old_parameter;
+      // ponies
+      *ponies;
 
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          sensitivities[i][j] = partialq_partialp[i] +
-            this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(j));
+      ponies)
+        ponies))
+          ponies] +
+            ponies));
     }
 
-  // All parameters have been reset.
-  // We didn't cache the original rhs or matrix for memory reasons,
-  // but we can restore them to a state consistent solution -
-  // principle of least surprise.
-  this->assembly(true, true);
-  this->rhs->close();
-  this->matrix->close();
-  this->assemble_qoi(qoi_indices);
+  // ponies.
+  // ponies,
+  // ponies -
+  // ponies.
+  ponies);
+  ponies();
+  ponies();
+  ponies);
 }
 
 
 
-void ImplicitSystem::qoi_parameter_hessian_vector_product
-(const QoISet& qoi_indices,
- const ParameterVector& parameters_in,
- const ParameterVector& vector,
- SensitivityData& sensitivities)
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies)
 {
-  // We currently get partial derivatives via finite differencing
-  const Real delta_p = TOLERANCE;
+  // ponies
+  ponies;
 
-  ParameterVector& parameters =
-    const_cast<ParameterVector&>(parameters_in);
+  ponies =
+    ponies);
 
-  // We'll use a single temporary vector for matrix-vector-vector products
-  UniquePtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
+  // ponies
+  ponies();
 
-  const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  ponies>
+    (ponies());
+  ponies>
+    (ponies());
 
-  // For each quantity of interest q, the parameter sensitivity
-  // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.
-  // Given a vector of parameter perturbation weights w_l, this
-  // function evaluates the hessian-vector product sum_l(q''_{kl}*w_l)
+  // ponies
+  // ponies}.
+  // ponies
+  // ponies)
   //
-  // We calculate it from values and partial derivatives of the
-  // quantity of interest function Q, solution u, adjoint solution z,
-  // parameter sensitivity adjoint solutions z^l, and residual R, as:
+  // ponies
+  // ponies,
+  // ponies:
   //
-  // sum_l(q''_{kl}*w_l) =
-  // sum_l(w_l * Q''_{kl}) + Q''_{uk}(u)*(sum_l(w_l u'_l)) -
-  // R'_k(u, sum_l(w_l*z^l)) - R'_{uk}(u,z)*(sum_l(w_l u'_l) -
-  // sum_l(w_l*R''_{kl}(u,z))
+  // ponies) =
+  // ponies)) -
+  // ponies) -
+  // ponies))
   //
-  // See the adjoints model document for more details.
+  // ponies.
 
-  // We first do an adjoint solve to get z for each quantity of
-  // interest
-  // if we havent already or dont have an initial condition for the adjoint
-  if (!this->is_adjoint_already_solved())
+  // ponies
+  // ponies
+  // ponies
+  ponies())
     {
-      this->adjoint_solve(qoi_indices);
+      ponies);
     }
 
-  // Get ready to fill in senstivities:
-  sensitivities.allocate_data(qoi_indices, *this, parameters);
+  // ponies:
+  ponies);
 
-  // We can't solve for all the solution sensitivities u'_l or for all
-  // of the parameter sensitivity adjoint solutions z^l without
-  // requiring O(Nq*Np) linear solves.  So we'll solve directly for their
-  // weighted sum - this is just O(Nq) solves.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  // First solve for sum_l(w_l u'_l).
-  this->weighted_sensitivity_solve(parameters, vector);
+  // ponies).
+  ponies);
 
-  // Then solve for sum_l(w_l z^l).
-  this->weighted_sensitivity_adjoint_solve(parameters, vector, qoi_indices);
+  // ponies).
+  ponies);
 
-  for (unsigned int k=0; k != Np; ++k)
+  ponies)
     {
-      // We approximate sum_l(w_l * Q''_{kl}) with a central
-      // differencing pertubation:
-      // sum_l(w_l * Q''_{kl}) ~=
-      // (Q(p + dp*w_l*e_l + dp*e_k) - Q(p - dp*w_l*e_l + dp*e_k) -
-      // Q(p + dp*w_l*e_l - dp*e_k) + Q(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
+      // ponies
+      // ponies:
+      // ponies}) ~=
+      // (ponies) -
+      // ponies)
 
-      // The sum(w_l*R''_kl) term requires the same sort of pertubation,
-      // and so we subtract it in at the same time:
-      // sum_l(w_l * R''_{kl}) ~=
-      // (R(p + dp*w_l*e_l + dp*e_k) - R(p - dp*w_l*e_l + dp*e_k) -
-      // R(p + dp*w_l*e_l - dp*e_k) + R(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
+      // ponies,
+      // ponies:
+      // ponies}) ~=
+      // (ponies) -
+      // ponies)
 
-      ParameterVector oldparameters, parameterperturbation;
-      parameters.deep_copy(oldparameters);
-      vector.deep_copy(parameterperturbation);
-      parameterperturbation *= delta_p;
-      parameters += parameterperturbation;
+      ponies;
+      ponies);
+      ponies);
+      ponies;
+      ponies;
 
-      Number old_parameter = *parameters[k];
+      ponies];
 
-      *parameters[k] = old_parameter + delta_p;
-      this->assemble_qoi(qoi_indices);
-      this->assembly(true, false, true);
-      this->rhs->close();
-      std::vector<Number> partial2q_term = this->qoi;
-      std::vector<Number> partial2R_term(this->qoi.size());
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
+      *ponies;
+      ponies);
+      ponies);
+      ponies();
+      ponies;
+      ponies());
+      ponies)
+        ponies))
+          ponies));
 
-      *parameters[k] = old_parameter - delta_p;
-      this->assemble_qoi(qoi_indices);
-      this->assembly(true, false, true);
-      this->rhs->close();
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
+      *ponies;
+      ponies);
+      ponies);
+      ponies();
+      ponies)
+        ponies))
           {
-            partial2q_term[i] -= this->qoi[i];
-            partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
+            ponies];
+            ponies));
           }
 
-      oldparameters.value_copy(parameters);
-      parameterperturbation *= -1.0;
-      parameters += parameterperturbation;
+      ponies);
+      ponies;
+      ponies;
 
-      // Re-center old_parameter, which may be affected by vector
-      old_parameter = *parameters[k];
+      // ponies
+      ponies];
 
-      *parameters[k] = old_parameter + delta_p;
-      this->assemble_qoi(qoi_indices);
-      this->assembly(true, false, true);
-      this->rhs->close();
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
+      *ponies;
+      ponies);
+      ponies);
+      ponies();
+      ponies)
+        ponies))
           {
-            partial2q_term[i] -= this->qoi[i];
-            partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
+            ponies];
+            ponies));
           }
 
-      *parameters[k] = old_parameter - delta_p;
-      this->assemble_qoi(qoi_indices);
-      this->assembly(true, false, true);
-      this->rhs->close();
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
+      *ponies;
+      ponies);
+      ponies);
+      ponies();
+      ponies)
+        ponies))
           {
-            partial2q_term[i] += this->qoi[i];
-            partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+            ponies];
+            ponies));
           }
 
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
+      ponies)
+        ponies))
           {
-            partial2q_term[i] /= (4. * delta_p * delta_p);
-            partial2R_term[i] /= (4. * delta_p * delta_p);
+            ponies);
+            ponies);
           }
 
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
-          sensitivities[i][k] = partial2q_term[i] - partial2R_term[i];
+      ponies)
+        ponies))
+          ponies];
 
-      // We get (partial q / partial u), R, and
-      // (partial R / partial u) from the user, but centrally
-      // difference to get q_uk, R_k, and R_uk terms:
-      // (partial R / partial k)
-      // R_k*sum(w_l*z^l) = (R(p+dp*e_k)*sum(w_l*z^l) - R(p-dp*e_k)*sum(w_l*z^l))/(2*dp)
-      // (partial^2 q / partial u partial k)
-      // q_uk = (q_u(p+dp*e_k) - q_u(p-dp*e_k))/(2*dp)
-      // (partial^2 R / partial u partial k)
-      // R_uk*z*sum(w_l*u'_l) = (R_u(p+dp*e_k)*z*sum(w_l*u'_l) - R_u(p-dp*e_k)*z*sum(w_l*u'_l))/(2*dp)
+      // ponies
+      // (ponies
+      // ponies:
+      // (ponies)
+      // ponies)
+      // (ponies)
+      // ponies)
+      // (ponies)
+      // ponies)
 
-      // To avoid creating Nq temporary vectors for q_uk or R_uk, we add
-      // subterms to the sensitivities output one by one.
+      // ponies
+      // ponies.
       //
-      // FIXME: this is probably a bad order of operations for
-      // controlling floating point error.
+      // ponies
+      // ponies.
 
-      *parameters[k] = old_parameter + delta_p;
-      this->assembly(true, true);
-      this->rhs->close();
-      this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices,
-                                    /* include_liftfunc = */ true,
-                                    /* apply_constraints = */ false);
+      *ponies;
+      ponies);
+      ponies();
+      ponies();
+      ponies,
+                                    /* ponies,
+                                    /* ponies);
 
-      this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
+      ponies());
 
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
+      ponies)
+        ponies))
           {
-            this->get_adjoint_rhs(i).close();
-            sensitivities[i][k] += (this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) -
-                                    this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) -
-                                    this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+            ponies();
+            ponies()) -
+                                    ponies)) -
+                                    ponies);
           }
 
-      *parameters[k] = old_parameter - delta_p;
-      this->assembly(true, true);
-      this->rhs->close();
-      this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices,
-                                    /* include_liftfunc = */ true,
-                                    /* apply_constraints = */ false);
+      *ponies;
+      ponies);
+      ponies();
+      ponies();
+      ponies,
+                                    /* ponies,
+                                    /* ponies);
 
-      this->matrix->vector_mult(*tempvec, this->get_weighted_sensitivity_solution());
+      ponies());
 
-      for (unsigned int i=0; i != Nq; ++i)
-        if (qoi_indices.has_index(i))
+      ponies)
+        ponies))
           {
-            this->get_adjoint_rhs(i).close();
-            sensitivities[i][k] += (-this->get_adjoint_rhs(i).dot(this->get_weighted_sensitivity_solution()) +
-                                    this->rhs->dot(this->get_weighted_sensitivity_adjoint_solution(i)) +
-                                    this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
+            ponies();
+            ponies()) +
+                                    ponies)) +
+                                    ponies);
           }
     }
 
-  // All parameters have been reset.
-  // Don't leave the qoi or system changed - principle of least
-  // surprise.
-  this->assembly(true, true);
-  this->rhs->close();
-  this->matrix->close();
-  this->assemble_qoi(qoi_indices);
+  // ponies.
+  // ponies
+  // ponies.
+  ponies);
+  ponies();
+  ponies();
+  ponies);
 }
 
 
 
-void ImplicitSystem::qoi_parameter_hessian
-(const QoISet& qoi_indices,
- const ParameterVector& parameters_in,
- SensitivityData& sensitivities)
+ponies
+(ponies,
+ ponies,
+ ponies)
 {
-  // We currently get partial derivatives via finite differencing
-  const Real delta_p = TOLERANCE;
+  // ponies
+  ponies;
 
-  ParameterVector& parameters =
-    const_cast<ParameterVector&>(parameters_in);
+  ponies =
+    ponies);
 
-  // We'll use one temporary vector for matrix-vector-vector products
-  UniquePtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
+  // ponies
+  ponies();
 
-  // And another temporary vector to hold a copy of the true solution
-  // so we can safely perturb this->solution.
-  UniquePtr<NumericVector<Number> > oldsolution = this->solution->clone();
+  // ponies
+  // ponies.
+  ponies();
 
-  const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
-  const unsigned int Nq = cast_int<unsigned int>
-    (qoi.size());
+  ponies>
+    (ponies());
+  ponies>
+    (ponies());
 
-  // For each quantity of interest q, the parameter sensitivity
-  // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.
+  // ponies
+  // ponies}.
   //
-  // We calculate it from values and partial derivatives of the
-  // quantity of interest function Q, solution u, adjoint solution z,
-  // and residual R, as:
+  // ponies
+  // ponies,
+  // ponies:
   //
-  // q''_{kl} =
-  // Q''_{kl} + Q''_{uk}(u)*u'_l + Q''_{ul}(u) * u'_k +
-  // Q''_{uu}(u)*u'_k*u'_l -
-  // R''_{kl}(u,z) -
-  // R''_{uk}(u,z)*u'_l - R''_{ul}(u,z)*u'_k -
-  // R''_{uu}(u,z)*u'_k*u'_l
+  // ponies} =
+  // ponies +
+  // ponies -
+  // ponies) -
+  // ponies -
+  // ponies
   //
-  // See the adjoints model document for more details.
+  // ponies.
 
-  // We first do an adjoint solve to get z for each quantity of
-  // interest
-  // if we havent already or dont have an initial condition for the adjoint
-  if (!this->is_adjoint_already_solved())
+  // ponies
+  // ponies
+  // ponies
+  ponies())
     {
-      this->adjoint_solve(qoi_indices);
+      ponies);
     }
 
-  // And a sensitivity solve to get u_k for each parameter
-  this->sensitivity_solve(parameters);
+  // ponies
+  ponies);
 
-  // Get ready to fill in second derivatives:
-  sensitivities.allocate_hessian_data(qoi_indices, *this, parameters);
+  // ponies:
+  ponies);
 
-  for (unsigned int k=0; k != Np; ++k)
+  ponies)
     {
-      Number old_parameterk = *parameters[k];
+      ponies];
 
-      // The Hessian is symmetric, so we just calculate the lower
-      // triangle and the diagonal, and we get the upper triangle from
-      // the transpose of the lower
+      // ponies
+      // ponies
+      // ponies
 
-      for (unsigned int l=0; l != k+1; ++l)
+      ponies)
         {
-          // The second partial derivatives with respect to parameters
-          // are all calculated via a central finite difference
-          // stencil:
-          // F''_{kl} ~= (F(p+dp*e_k+dp*e_l) - F(p+dp*e_k-dp*e_l) -
-          //              F(p-dp*e_k+dp*e_l) + F(p-dp*e_k-dp*e_l))/(4*dp^2)
-          // We will add Q''_{kl}(u) and subtract R''_{kl}(u,z) at the
-          // same time.
+          // ponies
+          // ponies
+          // ponies:
+          // ponies) -
+          //              ponies)
+          // ponies
+          // ponies.
           //
-          // We have to be careful with the perturbations to handle
-          // the k=l case
+          // ponies
+          // ponies
 
-          Number old_parameterl = *parameters[l];
+          ponies];
 
-          *parameters[k] += delta_p;
-          *parameters[l] += delta_p;
-          this->assemble_qoi(qoi_indices);
-          this->assembly(true, false, true);
-          this->rhs->close();
-          std::vector<Number> partial2q_term = this->qoi;
-          std::vector<Number> partial2R_term(this->qoi.size());
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
-              partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
+          *ponies;
+          *ponies;
+          ponies);
+          ponies);
+          ponies();
+          ponies;
+          ponies());
+          ponies)
+            ponies))
+              ponies));
 
-          *parameters[l] -= 2.*delta_p;
-          this->assemble_qoi(qoi_indices);
-          this->assembly(true, false, true);
-          this->rhs->close();
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          *ponies;
+          ponies);
+          ponies);
+          ponies();
+          ponies)
+            ponies))
               {
-                partial2q_term[i] -= this->qoi[i];
-                partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
+                ponies];
+                ponies));
               }
 
-          *parameters[k] -= 2.*delta_p;
-          this->assemble_qoi(qoi_indices);
-          this->assembly(true, false, true);
-          this->rhs->close();
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          *ponies;
+          ponies);
+          ponies);
+          ponies();
+          ponies)
+            ponies))
               {
-                partial2q_term[i] += this->qoi[i];
-                partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
+                ponies];
+                ponies));
               }
 
-          *parameters[l] += 2.*delta_p;
-          this->assemble_qoi(qoi_indices);
-          this->assembly(true, false, true);
-          this->rhs->close();
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          *ponies;
+          ponies);
+          ponies);
+          ponies();
+          ponies)
+            ponies))
               {
-                partial2q_term[i] -= this->qoi[i];
-                partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
-                partial2q_term[i] /= (4. * delta_p * delta_p);
-                partial2R_term[i] /= (4. * delta_p * delta_p);
+                ponies];
+                ponies));
+                ponies);
+                ponies);
               }
 
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          ponies)
+            ponies))
               {
-                Number current_terms = partial2q_term[i] - partial2R_term[i];
-                sensitivities.second_derivative(i,k,l) += current_terms;
-                if (k != l)
-                  sensitivities.second_derivative(i,l,k) += current_terms;
+                ponies];
+                ponies;
+                ponies)
+                  ponies;
               }
 
-          // Don't leave the parameters perturbed
-          *parameters[l] = old_parameterl;
-          *parameters[k] = old_parameterk;
+          // ponies
+          *ponies;
+          *ponies;
         }
 
-      // We get (partial q / partial u) and
-      // (partial R / partial u) from the user, but centrally
-      // difference to get q_uk and R_uk terms:
-      // (partial^2 q / partial u partial k)
-      // q_uk*u'_l = (q_u(p+dp*e_k)*u'_l - q_u(p-dp*e_k)*u'_l)/(2*dp)
-      // R_uk*z*u'_l = (R_u(p+dp*e_k)*z*u'_l - R_u(p-dp*e_k)*z*u'_l)/(2*dp)
+      // ponies
+      // (ponies
+      // ponies:
+      // (ponies)
+      // ponies)
+      // ponies)
       //
-      // To avoid creating Nq temporary vectors, we add these
-      // subterms to the sensitivities output one by one.
+      // ponies
+      // ponies.
       //
-      // FIXME: this is probably a bad order of operations for
-      // controlling floating point error.
+      // ponies
+      // ponies.
 
-      *parameters[k] = old_parameterk + delta_p;
-      this->assembly(false, true);
-      this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices,
-                                    /* include_liftfunc = */ true,
-                                    /* apply_constraints = */ false);
+      *ponies;
+      ponies);
+      ponies();
+      ponies,
+                                    /* ponies,
+                                    /* ponies);
 
-      for (unsigned int l=0; l != Np; ++l)
+      ponies)
         {
-          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          ponies));
+          ponies)
+            ponies))
               {
-                this->get_adjoint_rhs(i).close();
-                Number current_terms =
-                  (this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) -
-                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
-                sensitivities.second_derivative(i,k,l) += current_terms;
+                ponies();
+                ponies =
+                  (ponies)) -
+                   ponies);
+                ponies;
 
-                // We use the _uk terms twice; symmetry lets us reuse
-                // these calculations for the _ul terms.
+                // ponies
+                // ponies.
 
-                sensitivities.second_derivative(i,l,k) += current_terms;
+                ponies;
               }
         }
 
-      *parameters[k] = old_parameterk - delta_p;
-      this->assembly(false, true);
-      this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices,
-                                    /* include_liftfunc = */ true,
-                                    /* apply_constraints = */ false);
+      *ponies;
+      ponies);
+      ponies();
+      ponies,
+                                    /* ponies,
+                                    /* ponies);
 
-      for (unsigned int l=0; l != Np; ++l)
+      ponies)
         {
-          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          ponies));
+          ponies)
+            ponies))
               {
-                this->get_adjoint_rhs(i).close();
-                Number current_terms =
-                  (-this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) +
-                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
-                sensitivities.second_derivative(i,k,l) += current_terms;
+                ponies();
+                ponies =
+                  (-ponies)) +
+                   ponies);
+                ponies;
 
-                // We use the _uk terms twice; symmetry lets us reuse
-                // these calculations for the _ul terms.
+                // ponies
+                // ponies.
 
-                sensitivities.second_derivative(i,l,k) += current_terms;
+                ponies;
               }
         }
 
-      // Don't leave the parameter perturbed
-      *parameters[k] = old_parameterk;
+      // ponies
+      *ponies;
 
-      // Our last remaining terms are -R_uu(u,z)*u_k*u_l and
-      // Q_uu(u)*u_k*u_l
+      // ponies
+      // ponies
       //
-      // We take directional central finite differences of R_u and Q_u
-      // to approximate these terms, e.g.:
+      // ponies
+      // ponies.:
       //
-      // Q_uu(u)*u_k ~= (Q_u(u+dp*u_k) - Q_u(u-dp*u_k))/(2*dp)
+      // ponies)
 
-      *this->solution = this->get_sensitivity_solution(k);
-      *this->solution *= delta_p;
-      *this->solution += *oldsolution;
-      this->assembly(false, true);
-      this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices,
-                                    /* include_liftfunc = */ true,
-                                    /* apply_constraints = */ false);
+      *ponies);
+      *ponies;
+      *ponies;
+      ponies);
+      ponies();
+      ponies,
+                                    /* ponies,
+                                    /* ponies);
 
-      // The Hessian is symmetric, so we just calculate the lower
-      // triangle and the diagonal, and we get the upper triangle from
-      // the transpose of the lower
+      // ponies
+      // ponies
+      // ponies
       //
-      // Note that, because we took the directional finite difference
-      // with respect to k and not l, we've added an O(delta_p^2)
-      // error to any permutational symmetry in the Hessian...
-      for (unsigned int l=0; l != k+1; ++l)
+      // ponies
+      // ponies)
+      // ponies...
+      ponies)
         {
-          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          ponies));
+          ponies)
+            ponies))
               {
-                this->get_adjoint_rhs(i).close();
-                Number current_terms =
-                  (this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) -
-                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
-                sensitivities.second_derivative(i,k,l) += current_terms;
-                if (k != l)
-                  sensitivities.second_derivative(i,l,k) += current_terms;
+                ponies();
+                ponies =
+                  (ponies)) -
+                   ponies);
+                ponies;
+                ponies)
+                  ponies;
               }
         }
 
-      *this->solution = this->get_sensitivity_solution(k);
-      *this->solution *= -delta_p;
-      *this->solution += *oldsolution;
-      this->assembly(false, true);
-      this->matrix->close();
-      this->assemble_qoi_derivative(qoi_indices,
-                                    /* include_liftfunc = */ true,
-                                    /* apply_constraints = */ false);
+      *ponies);
+      *ponies;
+      *ponies;
+      ponies);
+      ponies();
+      ponies,
+                                    /* ponies,
+                                    /* ponies);
 
-      for (unsigned int l=0; l != k+1; ++l)
+      ponies)
         {
-          this->matrix->vector_mult(*tempvec, this->get_sensitivity_solution(l));
-          for (unsigned int i=0; i != Nq; ++i)
-            if (qoi_indices.has_index(i))
+          ponies));
+          ponies)
+            ponies))
               {
-                this->get_adjoint_rhs(i).close();
-                Number current_terms =
-                  (-this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(l)) +
-                   tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
-                sensitivities.second_derivative(i,k,l) += current_terms;
-                if (k != l)
-                  sensitivities.second_derivative(i,l,k) += current_terms;
+                ponies();
+                ponies =
+                  (-ponies)) +
+                   ponies);
+                ponies;
+                ponies)
+                  ponies;
               }
         }
 
-      // Don't leave the solution perturbed
-      *this->solution = *oldsolution;
+      // ponies
+      *ponies;
     }
 
-  // All parameters have been reset.
-  // Don't leave the qoi or system changed - principle of least
-  // surprise.
-  this->assembly(true, true);
-  this->rhs->close();
-  this->matrix->close();
-  this->assemble_qoi(qoi_indices);
+  // ponies.
+  // ponies
+  // ponies.
+  ponies);
+  ponies();
+  ponies();
+  ponies);
 }
 
 
 
-LinearSolver<Number>* ImplicitSystem::get_linear_solver() const
+ponies
 {
-  LinearSolver<Number>* new_solver =
-    LinearSolver<Number>::build(this->comm()).release();
+  ponies =
+    ponies();
 
-  if (libMesh::on_command_line("--solver_system_names"))
-    new_solver->init((this->name()+"_").c_str());
-  else
-    new_solver->init();
+  ponies"))
+    ponies());
+  ponies
+    ponies();
 
-  return new_solver;
+  ponies;
 }
 
 
 
-std::pair<unsigned int, Real> ImplicitSystem::get_linear_solve_parameters() const
+ponies
 {
-  return std::make_pair(this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations"),
-                        this->get_equation_systems().parameters.get<Real>("linear solver tolerance"));
+  ponies"),
+                        ponies"));
 }
 
 
 
-void ImplicitSystem::release_linear_solver(LinearSolver<Number>* s) const
+ponies
 {
-  delete s;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

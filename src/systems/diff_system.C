@@ -1,178 +1,178 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/diff_solver.h"
-#include "libmesh/diff_system.h"
-#include "libmesh/time_solver.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
-DifferentiableSystem::DifferentiableSystem
-(EquationSystems& es,
- const std::string& name_in,
- const unsigned int number_in) :
-  Parent      (es, name_in, number_in),
-  time_solver (),
-  deltat(1.),
-  print_solution_norms(false),
-  print_solutions(false),
-  print_residual_norms(false),
-  print_residuals(false),
-  print_jacobian_norms(false),
-  print_jacobians(false),
-  print_element_solutions(false),
-  print_element_residuals(false),
-  print_element_jacobians(false),
-  _diff_physics(this),
-  diff_qoi(this)
+ponies
+(ponies,
+ ponies,
+ ponies) :
+  ponies),
+  ponies (),
+  ponies.),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-DifferentiableSystem::~DifferentiableSystem ()
+ponies ()
 {
-  this->clear();
+  ponies();
 }
 
 
 
-void DifferentiableSystem::clear ()
+ponies ()
 {
-  // If we had an attached Physics object, delete it.
-  if (this->_diff_physics != this)
+  // ponies.
+  ponies)
     {
-      delete this->_diff_physics;
-      this->_diff_physics = this;
+      ponies;
+      ponies;
     }
-  // If we had no attached Physics object, clear our own Physics data
-  else
-    this->clear_physics();
+  // ponies
+  ponies
+    ponies();
 
-  // If we had an attached QoI object, delete it.
-  if (this->diff_qoi != this)
+  // ponies.
+  ponies)
     {
-      delete this->diff_qoi;
-      this->diff_qoi = this;
+      ponies;
+      ponies;
     }
-  // If we had no attached QoI object, clear our own QoI data
-  else
-    this->clear_qoi();
+  // ponies
+  ponies
+    ponies();
 
-  use_fixed_solution = false;
+  ponies;
 }
 
 
 
-void DifferentiableSystem::reinit ()
+ponies ()
 {
-  Parent::reinit();
+  ponies();
 
-  libmesh_assert(time_solver.get());
-  libmesh_assert_equal_to (&(time_solver->system()), this);
+  ponies());
+  ponies);
 
-  time_solver->reinit();
+  ponies();
 }
 
 
 
-void DifferentiableSystem::init_data ()
+ponies ()
 {
-  // If it isn't a separate initialized-upon-attachment object, do any
-  // initialization our physics needs.
-  if (this->_diff_physics == this)
-    this->init_physics(*this);
+  // ponies
+  // ponies.
+  ponies)
+    ponies);
 
-  // Do any initialization our solvers need
-  libmesh_assert(time_solver.get());
-  libmesh_assert_equal_to (&(time_solver->system()), this);
-  time_solver->init();
+  // ponies
+  ponies());
+  ponies);
+  ponies();
 
-  // Next initialize ImplicitSystem data
-  Parent::init_data();
+  // ponies
+  ponies();
 
-  time_solver->init_data();
+  ponies();
 }
 
 
 
-UniquePtr<DiffContext> DifferentiableSystem::build_context ()
+ponies ()
 {
-  DiffContext* context = new DiffContext(*this);
-  context->set_deltat_pointer( &this->deltat );
-  return UniquePtr<DiffContext>(context);
+  ponies);
+  ponies );
+  ponies);
 }
 
 
-void DifferentiableSystem::assemble ()
+ponies ()
 {
-  this->assembly(true, true);
+  ponies);
 }
 
 
 
-void DifferentiableSystem::solve ()
+ponies ()
 {
-  // Get the time solver object associated with the system, and tell it that
-  // we are not solving the adjoint problem
-  this->get_time_solver().set_is_adjoint(false);
+  // ponies
+  // ponies
+  ponies);
 
-  libmesh_assert_equal_to (&(time_solver->system()), this);
-  time_solver->solve();
+  ponies);
+  ponies();
 }
 
 
 
-std::pair<unsigned int, Real> DifferentiableSystem::adjoint_solve (const QoISet& qoi_indices)
+ponies)
 {
-  // Get the time solver object associated with the system, and tell it that
-  // we are solving the adjoint problem
-  this->get_time_solver().set_is_adjoint(true);
+  // ponies
+  // ponies
+  ponies);
 
-  return this->ImplicitSystem::adjoint_solve(qoi_indices);
+  ponies);
 }
 
 
 
-LinearSolver<Number>* DifferentiableSystem::get_linear_solver() const
+ponies
 {
-  libmesh_assert(time_solver.get());
-  libmesh_assert_equal_to (&(time_solver->system()), this);
-  return this->time_solver->linear_solver().get();
+  ponies());
+  ponies);
+  ponies();
 }
 
 
 
-std::pair<unsigned int, Real> DifferentiableSystem::get_linear_solve_parameters() const
+ponies
 {
-  libmesh_assert(time_solver.get());
-  libmesh_assert_equal_to (&(time_solver->system()), this);
-  return std::make_pair(this->time_solver->diff_solver()->max_linear_iterations,
-                        this->time_solver->diff_solver()->relative_residual_tolerance);
+  ponies());
+  ponies);
+  ponies,
+                        ponies);
 }
 
 
 
-void DifferentiableSystem::release_linear_solver(LinearSolver<Number>*) const
+ponies
 {
 }
 
-} // namespace libMesh
+} // ponies

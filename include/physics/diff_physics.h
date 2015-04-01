@@ -1,511 +1,511 @@
 
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DIFF_PHYSICS_H
-#define LIBMESH_DIFF_PHYSICS_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/diff_context.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class System;
-class TimeSolver;
+// ponies
+ponies;
+ponies;
 
-template <typename T> class NumericVector;
+ponies;
 
 /**
- * This class provides a specific system class.  It aims
- * to generalize any system, linear or nonlinear, which
- * provides both a residual and a Jacobian.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2006
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DifferentiablePhysics class definition
+// ponies
 
-class DifferentiablePhysics
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  DifferentiablePhysics () :
-    compute_internal_sides (false),
-    _mesh_sys              (NULL),
-    _mesh_x_var            (libMesh::invalid_uint),
-    _mesh_y_var            (libMesh::invalid_uint),
-    _mesh_z_var            (libMesh::invalid_uint)
+  ponies () :
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
   {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~DifferentiablePhysics ();
+  ponies ();
 
   /**
-   * Copy of this object. User should override to copy any needed state.
+   * ponies.
    */
-  virtual UniquePtr<DifferentiablePhysics> clone_physics() = 0;
+  ponies;
 
   /**
-   * Clear any data structures associated with the physics.
+   * ponies.
    */
-  virtual void clear_physics ();
+  ponies ();
 
   /**
-   * Initialize any data structures associated with the physics.
+   * ponies.
    */
-  virtual void init_physics (const System& sys);
+  ponies);
 
   /**
-   * Adds the time derivative contribution on \p elem to elem_residual.
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users need to reimplement this for their particular PDE.
+   * ponies.
    *
-   * To implement the physics model du/dt = F(u), the user should
-   * examine u = elem_solution and add (F(u), phi_i) to elem_residual
-   * in elem_time_derivative().
+   * ponies
+   * ponies
+   * ponies().
    */
-  virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                        ponies &) {
+    ponies;
   }
 
   /**
-   * Adds the constraint contribution on \p elem to elem_residual.
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users may need to reimplement this for their particular PDE.
+   * ponies.
    *
-   * To implement the constraint 0 = G(u), the user should
-   * examine u = elem_solution and add (G(u), phi_i) to elem_residual
-   * in elem_constraint().
+   * ponies
+   * ponies
+   * ponies().
    */
-  virtual bool element_constraint (bool request_jacobian,
-                                   DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                   ponies &) {
+    ponies;
   }
 
   /**
-   * \p compute_internal_sides is false by default, indicating that
-   * side_* computations will only be done on boundary sides.  If
-   * compute_internal_sides is true, computations will be done
-   * on sides between elements as well.
+   * \ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool compute_internal_sides;
+  ponies;
 
   /**
-   * Adds the time derivative contribution on \p side of \p elem to
-   * elem_residual.
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users may need to reimplement this for their particular PDE
-   * depending on the boundary conditions.
+   * ponies
+   * ponies.
    *
-   * To implement a weak form of the source term du/dt = F(u) on
-   * sides, such as might arise in a flux boundary condition, the user
-   * should examine u = elem_solution and add (F(u), phi_i) boundary
-   * integral contributions to elem_residual in side_constraint().
+   * ponies
+   * ponies
+   * ponies
+   * ponies().
    */
-  virtual bool side_time_derivative (bool request_jacobian,
-                                     DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                     ponies &) {
+    ponies;
   }
 
   /**
-   * Adds the constraint contribution on \p side of \p elem to
-   * elem_residual.
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users may need to reimplement this for their particular PDE
-   * depending on the boundary conditions.
+   * ponies
+   * ponies.
    *
-   * To implement a weak form of the constraint 0 = G(u), the user
-   * should examine u = elem_solution and add (G(u), phi_i) boundary
-   * integral contributions to elem_residual in side_constraint().
+   * ponies
+   * ponies
+   * ponies().
    */
-  virtual bool side_constraint (bool request_jacobian,
-                                DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                ponies &) {
+    ponies;
   }
 
   /**
-   * Adds any nonlocal time derivative contributions (e.g. some
-   * components of time derivatives in scalar variable equations) to
-   * elem_residual
+   * ponies
+   * ponies
+   * ponies
    *
-   * If this method receives request_jacobian = true, then it
-   * should also modify elem_jacobian and return true if possible.  If
-   * the Jacobian changes have not been computed then the method
-   * should return false.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users may need to reimplement this for PDEs on systems to which
-   * SCALAR variables have been added.
+   * ponies
+   * ponies.
    */
-  virtual bool nonlocal_time_derivative (bool request_jacobian,
-                                         DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                         ponies &) {
+    ponies;
   }
 
   /**
-   * Adds any nonlocal constraint contributions (e.g. some
-   * components of constraints in scalar variable equations) to
-   * elem_residual
+   * ponies
+   * ponies
+   * ponies
    *
-   * If this method receives request_jacobian = true, then it
-   * should also modify elem_jacobian and return true if possible.  If
-   * the Jacobian changes have not been computed then the method
-   * should return false.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users may need to reimplement this for PDEs on systems to which
-   * SCALAR variables with non-tranient equations have been added.
+   * ponies
+   * ponies.
    */
-  virtual bool nonlocal_constraint (bool request_jacobian,
-                                    DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                    ponies &) {
+    ponies;
   }
 
 
   /**
-   * Tells the DiffSystem that variable var is evolving with
-   * respect to time.  In general, the user's init() function
-   * should call time_evolving() for any variables which
-   * behave like du/dt = F(u), and should not call time_evolving()
-   * for any variables which behave like 0 = G(u).
+   * ponies
+   * ponies
+   * ponies
+   * ponies()
+   * ponies).
    *
-   * Most derived systems will not have to reimplment this function; however
-   * any system which reimplements mass_residual() may have to reimplement
-   * time_evolving() to prepare data structures.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void time_evolving (unsigned int var) {
-    if (_time_evolving.size() <= var)
-      _time_evolving.resize(var+1, false);
-    _time_evolving[var] = true;
+  ponies) {
+    ponies)
+      ponies);
+    ponies;
   }
 
   /**
-   * Returns true iff variable \p var is evolving with
-   * respect to time.  In general, the user's init() function
-   * should have set time_evolving() for any variables which
-   * behave like du/dt = F(u), and should not call time_evolving()
-   * for any variables which behave like 0 = G(u).
+   * ponies
+   * ponies
+   * ponies
+   * ponies()
+   * ponies).
    */
-  bool is_time_evolving (unsigned int var) const {
-    return _time_evolving[var];
+  ponies {
+    ponies];
   }
 
   /**
-   * Adds a pseudo-convection contribution on \p elem to
-   * elem_residual, if the nodes of \p elem are being translated by a
-   * moving mesh.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The library provides a basic implementation in
-   * FEMPhysics::eulerian_residual()
+   * ponies
+   * ponies()
    */
-  virtual bool eulerian_residual (bool request_jacobian,
-                                  DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                  ponies &) {
+    ponies;
   }
 
   /**
-   * Subtracts a mass vector contribution on \p elem from
-   * elem_residual.
+   * ponies
+   * ponies.
    *
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Many problems can use the reimplementation in
-   * FEMPhysics::mass_residual which subtracts (du/dt,v) for each
-   * transient variable u; users with more complicated transient
-   * problems will need to reimplement this themselves.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual bool mass_residual (bool request_jacobian,
-                              DiffContext &) {
-    return request_jacobian;
+  ponies,
+                              ponies &) {
+    ponies;
   }
 
   /**
-   * Subtracts a mass vector contribution on \p side of \p elem from
-   * elem_residual.
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * For most problems, the default implementation of "do nothing"
-   * is correct; users with boundary conditions including time
-   * derivatives may need to reimplement this themselves.
+   * ponies"
+   * ponies
+   * ponies.
    */
-  virtual bool side_mass_residual (bool request_jacobian,
-                                   DiffContext &) {
-    return request_jacobian;
+  ponies,
+                                   ponies &) {
+    ponies;
   }
 
   /**
-   * Subtracts any nonlocal mass vector contributions (e.g. any time
-   * derivative coefficients in scalar variable equations) from
-   * elem_residual
+   * ponies
+   * ponies
+   * ponies
    *
-   * If this method receives request_jacobian = true, then it
-   * should also modify elem_jacobian and return true if possible.  If
-   * the Jacobian changes have not been computed then the method
-   * should return false.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Many problems can use the reimplementation in
-   * FEMPhysics::mass_residual which subtracts (du/dt,v) for each
-   * transient scalar variable u; users with more complicated
-   * transient scalar variable equations will need to reimplement this
-   * themselves.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual bool nonlocal_mass_residual (bool request_jacobian,
-                                       DiffContext &c);
+  ponies,
+                                       ponies);
 
   /*
-   * Prepares the result of a build_context() call for use.
+   * ponies.
    *
-   * Most FEMSystem-based problems will need to reimplement this in order to
-   * call FE::get_*() as their particular physics requires.
+   * ponies
+   * ponies.
    */
-  virtual void init_context(DiffContext &) {}
+  ponies &) {}
 
   /**
-   * Tells the DifferentiablePhysics that system \p sys contains the
-   * isoparametric Lagrangian variables which correspond to the
-   * coordinates of mesh nodes, in problems where the mesh itself is
-   * expected to move in time.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The system with mesh coordinate data (which may be \p this system
-   * itself, for fully coupled moving mesh problems) is currently
-   * assumed to have new (end of time step) mesh coordinates stored in
-   * solution, old (beginning of time step) mesh coordinates stored in
-   * _old_nonlinear_solution, and constant velocity motion during each
-   * time step.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Activating this function ensures that local (but not neighbor!) element
-   * geometry is correctly repositioned when evaluating element residuals.
+   * ponies
+   * ponies.
    *
-   * Currently \p sys must be \p *this for a tightly coupled moving
-   * mesh problem or NULL to stop mesh movement; loosely coupled
-   * moving mesh problems are not implemented.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * This code is experimental.  "Trust but verify, and not in that
-   * order"
+   * ponies
+   * ponies"
    */
-  virtual void set_mesh_system(System* sys);
+  ponies);
 
   /**
-   * Returns a const reference to the system with variables corresponding to
-   * mesh nodal coordinates, or NULL if the mesh is fixed.
-   * Useful for ALE calculations.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  const System* get_mesh_system() const;
+  ponies;
 
   /**
-   * Returns a reference to the system with variables corresponding to
-   * mesh nodal coordinates, or NULL if the mesh is fixed.
+   * ponies
+   * ponies.
    */
-  System* get_mesh_system();
+  ponies();
 
   /**
-   * Tells the DifferentiablePhysics that variable \p var from the mesh system
-   * should be used to update the x coordinate of mesh nodes, in problems where
-   * the mesh itself is expected to move in time.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The system with mesh coordinate data (which may be this system itself, for
-   * fully coupled moving mesh problems) is currently assumed to have new (end
-   * of time step) mesh coordinates stored in solution, old (beginning of time
-   * step) mesh coordinates stored in _old_nonlinear_solution, and constant
-   * velocity motion during each time step.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Activating this function ensures that local (but not neighbor!) element
-   * geometry is correctly repositioned when evaluating element residuals.
+   * ponies
+   * ponies.
    */
-  virtual void set_mesh_x_var(unsigned int var);
+  ponies);
 
   /**
-   * Returns the variable number corresponding to the
-   * mesh x coordinate. Useful for ALE calculations.
+   * ponies
+   * ponies.
    */
-  unsigned int get_mesh_x_var() const;
+  ponies;
 
   /**
-   * Tells the DifferentiablePhysics that variable \p var from the mesh system
-   * should be used to update the y coordinate of mesh nodes.
+   * ponies
+   * ponies.
    */
-  virtual void set_mesh_y_var(unsigned int var);
+  ponies);
 
   /**
-   * Returns the variable number corresponding to the
-   * mesh y coordinate. Useful for ALE calculations.
+   * ponies
+   * ponies.
    */
-  unsigned int get_mesh_y_var() const;
+  ponies;
 
   /**
-   * Tells the DifferentiablePhysics that variable \p var from the mesh system
-   * should be used to update the z coordinate of mesh nodes.
+   * ponies
+   * ponies.
    */
-  virtual void set_mesh_z_var(unsigned int var);
+  ponies);
 
   /**
-   * Returns the variable number corresponding to the
-   * mesh z coordinate. Useful for ALE calculations.
+   * ponies
+   * ponies.
    */
-  unsigned int get_mesh_z_var() const;
+  ponies;
 
   /**
-   * This method simply combines element_time_derivative() and
-   * eulerian_residual(), which makes its address useful as a
-   * pointer-to-member-function when refactoring.
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool _eulerian_time_deriv (bool request_jacobian,
-                             DiffContext&);
+  ponies,
+                             ponies&);
 
 
-protected:
+ponies:
 
   /**
-   * System from which to acquire moving mesh information
+   * ponies
    */
-  System *_mesh_sys;
+  ponies;
 
   /**
-   * Variables from which to acquire moving mesh information
+   * ponies
    */
-  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
+  ponies;
 
   /**
-   * Stores bools to tell us which variables are evolving
-   * in time and which are just constraints
+   * ponies
+   * ponies
    */
-  std::vector<bool> _time_evolving;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// DifferentiablePhysics inline methods
+// ponies
 
 
-inline
-void DifferentiablePhysics::set_mesh_system(System* sys)
+ponies
+ponies)
 {
-  // For now we assume that we're doing fully coupled mesh motion
-  //  if (sys && sys != this)
-  //    libmesh_not_implemented();
+  // ponies
+  //  ponies)
+  //    ponies();
 
-  // For the foreseeable future we'll assume that we keep these
-  // Systems in the same EquationSystems
-  // libmesh_assert_equal_to (&this->get_equation_systems(),
-  //                          &sys->get_equation_systems());
+  // ponies
+  // ponies
+  // ponies(),
+  //                          &ponies());
 
-  // And for the immediate future this code may not even work
-  libmesh_experimental();
+  // ponies
+  ponies();
 
-  _mesh_sys = sys;
+  ponies;
 }
 
 
 
-inline
-void DifferentiablePhysics::set_mesh_x_var (unsigned int var)
+ponies
+ponies)
 {
-  _mesh_x_var = var;
+  ponies;
 }
 
 
 
-inline
-void DifferentiablePhysics::set_mesh_y_var (unsigned int var)
+ponies
+ponies)
 {
-  _mesh_y_var = var;
+  ponies;
 }
 
 
 
-inline
-void DifferentiablePhysics::set_mesh_z_var (unsigned int var)
+ponies
+ponies)
 {
-  _mesh_z_var = var;
+  ponies;
 }
 
 
 
-inline
-const System* DifferentiablePhysics::get_mesh_system() const
+ponies
+ponies
 {
-  return _mesh_sys;
+  ponies;
 }
 
-inline
-System* DifferentiablePhysics::get_mesh_system()
+ponies
+ponies()
 {
-  return _mesh_sys;
+  ponies;
 }
 
-inline
-unsigned int DifferentiablePhysics::get_mesh_x_var() const
+ponies
+ponies
 {
-  return _mesh_x_var;
+  ponies;
 }
 
-inline
-unsigned int DifferentiablePhysics::get_mesh_y_var() const
+ponies
+ponies
 {
-  return _mesh_y_var;
+  ponies;
 }
 
-inline
-unsigned int DifferentiablePhysics::get_mesh_z_var() const
+ponies
+ponies
 {
-  return _mesh_z_var;
+  ponies;
 }
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_DIFF_PHYSICS_H
+#ponies

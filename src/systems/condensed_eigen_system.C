@@ -1,226 +1,226 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-// Currently, the EigenSystem should only be available
-// if SLEPc support is enabled.
-#if defined(LIBMESH_HAVE_SLEPC)
+// ponies
+// ponies.
+#ponies)
 
-#include "libmesh/condensed_eigen_system.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/parallel.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-CondensedEigenSystem::CondensedEigenSystem (EquationSystems& es,
-                                            const std::string& name_in,
-                                            const unsigned int number_in)
-  : Parent(es, name_in, number_in),
-    condensed_matrix_A(SparseMatrix<Number>::build(es.comm())),
-    condensed_matrix_B(SparseMatrix<Number>::build(es.comm())),
-    condensed_dofs_initialized(false)
+ponies,
+                                            ponies,
+                                            ponies)
+  : ponies),
+    ponies())),
+    ponies())),
+    ponies)
 {
 }
 
-void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int>& global_dirichlet_dofs_set)
+ponies)
 {
-  // First, put all local dofs into non_dirichlet_dofs_set and
-  std::set<unsigned int> local_non_condensed_dofs_set;
-  for(unsigned int i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
-    local_non_condensed_dofs_set.insert(i);
+  // ponies
+  ponies;
+  ponies++)
+    ponies);
 
-  // Now erase the condensed dofs
-  std::set<unsigned int>::iterator iter     = global_dirichlet_dofs_set.begin();
-  std::set<unsigned int>::iterator iter_end = global_dirichlet_dofs_set.end();
+  // ponies
+  ponies();
+  ponies();
 
-  for ( ; iter != iter_end ; ++iter)
+  ponies)
     {
-      unsigned int condensed_dof_index = *iter;
-      if ( (this->get_dof_map().first_dof() <= condensed_dof_index) &&
-           (condensed_dof_index < this->get_dof_map().end_dof()) )
+      ponies;
+      ponies) &&
+           (ponies()) )
         {
-          local_non_condensed_dofs_set.erase(condensed_dof_index);
+          ponies);
         }
     }
 
-  // Finally, move local_non_condensed_dofs_set over to a vector for convenience in solve()
-  iter     = local_non_condensed_dofs_set.begin();
-  iter_end = local_non_condensed_dofs_set.end();
+  // ponies()
+  ponies();
+  ponies();
 
-  this->local_non_condensed_dofs_vector.clear();
+  ponies();
 
-  for ( ; iter != iter_end; ++iter)
+  ponies)
     {
-      unsigned int non_condensed_dof_index = *iter;
+      ponies;
 
-      this->local_non_condensed_dofs_vector.push_back(non_condensed_dof_index);
+      ponies);
     }
 
-  condensed_dofs_initialized = true;
+  ponies;
 }
 
-unsigned int CondensedEigenSystem::n_global_non_condensed_dofs() const
+ponies
 {
-  if(!condensed_dofs_initialized)
+  ponies)
     {
-      return this->n_dofs();
+      ponies();
     }
-  else
+  ponies
     {
-      unsigned int n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
-      this->comm().sum(n_global_non_condensed_dofs);
+      ponies();
+      ponies);
 
-      return n_global_non_condensed_dofs;
+      ponies;
     }
 }
 
 
-void CondensedEigenSystem::solve()
+ponies()
 {
-  START_LOG("solve()", "CondensedEigenSystem");
+  ponies");
 
-  // If we haven't initialized any condensed dofs,
-  // just use the default eigen_system
-  if(!condensed_dofs_initialized)
+  // ponies,
+  // ponies
+  ponies)
     {
-      STOP_LOG("solve()", "CondensedEigenSystem");
-      Parent::solve();
-      return;
+      ponies");
+      ponies();
+      ponies;
     }
 
-  // A reference to the EquationSystems
-  EquationSystems& es = this->get_equation_systems();
+  // ponies
+  ponies();
 
-  // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+  // ponies
+  ponies"));
+  ponies"));
 
-  if (this->assemble_before_solve)
-    // Assemble the linear system
-    this->assemble ();
+  ponies)
+    // ponies
+    ponies ();
 
-  // If we reach here, then there should be some non-condensed dofs
-  libmesh_assert(!local_non_condensed_dofs_vector.empty());
+  // ponies
+  ponies());
 
-  // Now condense the matrices
-  matrix_A->create_submatrix(*condensed_matrix_A,
-                             local_non_condensed_dofs_vector,
-                             local_non_condensed_dofs_vector);
+  // ponies
+  ponies,
+                             ponies,
+                             ponies);
 
-  if(generalized())
+  ponies())
     {
-      matrix_B->create_submatrix(*condensed_matrix_B,
-                                 local_non_condensed_dofs_vector,
-                                 local_non_condensed_dofs_vector);
+      ponies,
+                                 ponies,
+                                 ponies);
     }
 
 
-  // Get the tolerance for the solver and the maximum
-  // number of iterations. Here, we simply adopt the linear solver
-  // specific parameters.
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
+  // ponies
+  // ponies
+  // ponies.
+  ponies            =
+    ponies");
 
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+  ponies =
+    ponies");
 
-  const unsigned int nev    =
-    es.parameters.get<unsigned int>("eigenpairs");
+  ponies    =
+    ponies");
 
-  const unsigned int ncv    =
-    es.parameters.get<unsigned int>("basis vectors");
+  ponies    =
+    ponies");
 
-  std::pair<unsigned int, unsigned int> solve_data;
+  ponies;
 
-  // call the solver depending on the type of eigenproblem
-  if ( generalized() )
+  // ponies
+  ponies() )
     {
-      //in case of a generalized eigenproblem
-      solve_data = eigen_solver->solve_generalized
-        (*condensed_matrix_A,*condensed_matrix_B, nev, ncv, tol, maxits);
+      //ponies
+      ponies
+        (*ponies);
     }
 
-  else
+  ponies
     {
-      libmesh_assert (!matrix_B);
+      ponies);
 
-      //in case of a standard eigenproblem
-      solve_data = eigen_solver->solve_standard (*condensed_matrix_A, nev, ncv, tol, maxits);
+      //ponies
+      ponies);
     }
 
-  set_n_converged(solve_data.first);
-  set_n_iterations(solve_data.second);
+  ponies);
+  ponies);
 
-  STOP_LOG("solve()", "CondensedEigenSystem");
+  ponies");
 }
 
 
 
-std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
+ponies)
 {
-  START_LOG("get_eigenpair()", "CondensedEigenSystem");
+  ponies");
 
-  // If we haven't initialized any condensed dofs,
-  // just use the default eigen_system
-  if(!condensed_dofs_initialized)
+  // ponies,
+  // ponies
+  ponies)
     {
-      STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
-      return Parent::get_eigenpair(i);
+      ponies");
+      ponies);
     }
 
-  // If we reach here, then there should be some non-condensed dofs
-  libmesh_assert(!local_non_condensed_dofs_vector.empty());
+  // ponies
+  ponies());
 
-  // This function assumes that condensed_solve has just been called.
-  // If this is not the case, then we will trip an asset in get_eigenpair
-  UniquePtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
-  unsigned int n_local = local_non_condensed_dofs_vector.size();
-  unsigned int n       = n_local;
-  this->comm().sum(n);
+  // ponies.
+  // ponies
+  ponies());
+  ponies();
+  ponies;
+  ponies);
 
-  temp->init (n, n_local, false, PARALLEL);
+  ponies);
 
-  std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp);
+  ponies);
 
-  // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
-  this->solution->zero();
-  for (unsigned int j=0; j<local_non_condensed_dofs_vector.size(); j++)
+  // ponies
+  ponies();
+  ponies++)
     {
-      unsigned int index = local_non_condensed_dofs_vector[j];
-      solution->set(index,(*temp)(temp->first_local_index()+j));
+      ponies];
+      ponies));
     }
 
-  solution->close();
-  this->update();
+  ponies();
+  ponies();
 
-  STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
+  ponies");
 
-  return eval;
+  ponies;
 }
 
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_HAVE_SLEPC
+#ponies

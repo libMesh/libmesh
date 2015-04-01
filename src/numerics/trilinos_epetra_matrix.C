@@ -1,257 +1,257 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ponies
 
-// Local includes
-#include "libmesh/trilinos_epetra_matrix.h"
-#include "libmesh/trilinos_epetra_vector.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/parallel.h"
-#include "libmesh/sparsity_pattern.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 //-----------------------------------------------------------------------
-//EpetraMatrix members
+//ponies
 
-template <typename T>
-void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sparsity_pattern)
+ponies>
+ponies)
 {
-  // clear data, start over
-  this->clear ();
+  // ponies
+  ponies ();
 
-  // big trouble if this fails!
-  libmesh_assert(this->_dof_map);
+  // ponies!
+  ponies);
 
-  const numeric_index_type n_rows = sparsity_pattern.size();
+  ponies();
 
-  const numeric_index_type m   = this->_dof_map->n_dofs();
-  const numeric_index_type n   = m;
-  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(this->processor_id());
-  const numeric_index_type m_l = n_l;
+  ponies();
+  ponies;
+  ponies());
+  ponies;
 
-  // error checking
-#ifndef NDEBUG
+  // ponies
+#ponies
   {
-    libmesh_assert_equal_to (n, m);
-    libmesh_assert_equal_to (n_l, m_l);
+    ponies);
+    ponies);
 
-    numeric_index_type
-      summed_m_l = m_l,
-      summed_n_l = n_l;
+    ponies
+      ponies,
+      ponies;
 
-    this->comm().sum (summed_m_l);
-    this->comm().sum (summed_n_l);
+    ponies);
+    ponies);
 
-    libmesh_assert_equal_to (m, summed_m_l);
-    libmesh_assert_equal_to (n, summed_n_l);
+    ponies);
+    ponies);
   }
-#endif
+#ponies
 
-  // build a map defining the data distribution
-  _map = new Epetra_Map (static_cast<int>(m),
-                         m_l,
-                         0,
-                         Epetra_MpiComm (this->comm().get()));
+  // ponies
+  ponies),
+                         ponies,
+                         ponies,
+                         ponies()));
 
-  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
-  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
+  ponies);
+  ponies);
 
-  const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
-  const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
+  ponies();
+  ponies();
 
-  // Make sure the sparsity pattern isn't empty
-  libmesh_assert_equal_to (n_nz.size(), n_l);
-  libmesh_assert_equal_to (n_oz.size(), n_l);
+  // ponies
+  ponies);
+  ponies);
 
-  // Epetra wants the total number of nonzeros, both local and remote.
-  std::vector<int> n_nz_tot; /**/ n_nz_tot.reserve(n_nz.size());
+  // ponies.
+  ponies());
 
-  for (numeric_index_type i=0; i<n_nz.size(); i++)
-    n_nz_tot.push_back(std::min(n_nz[i] + n_oz[i], n));
+  ponies++)
+    ponies));
 
-  if (m==0)
-    return;
+  ponies)
+    ponies;
 
-  _graph = new Epetra_CrsGraph(Copy, *_map, &n_nz_tot[0]);
+  ponies]);
 
-  // Tell the matrix about its structure.  Initialize it
-  // to zero.
-  for (numeric_index_type i=0; i<n_rows; i++)
-    _graph->InsertGlobalIndices(_graph->GRID(i),
-                                sparsity_pattern[i].size(),
-                                const_cast<int *>((const int *)&sparsity_pattern[i][0]));
+  // ponies
+  // ponies.
+  ponies++)
+    ponies),
+                                ponies(),
+                                ponies]));
 
-  _graph->FillComplete();
+  ponies();
 
-  //Initialize the matrix
-  libmesh_assert (!this->initialized());
-  this->init ();
-  libmesh_assert (this->initialized());
+  //ponies
+  ponies());
+  ponies ();
+  ponies());
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::init (const numeric_index_type m,
-                            const numeric_index_type n,
-                            const numeric_index_type m_l,
-                            const numeric_index_type n_l,
-                            const numeric_index_type nnz,
-                            const numeric_index_type noz,
-                            const numeric_index_type /* blocksize */)
+ponies>
+ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies */)
 {
-  if ((m==0) || (n==0))
-    return;
-
-  {
-    // Clear initialized matrices
-    if (this->initialized())
-      this->clear();
-
-    libmesh_assert (!this->_mat);
-    libmesh_assert (!this->_map);
-
-    this->_is_initialized = true;
-  }
-
-  // error checking
-#ifndef NDEBUG
-  {
-    libmesh_assert_equal_to (n, m);
-    libmesh_assert_equal_to (n_l, m_l);
-
-    numeric_index_type
-      summed_m_l = m_l,
-      summed_n_l = n_l;
-
-    this->comm().sum (summed_m_l);
-    this->comm().sum (summed_n_l);
-
-    libmesh_assert_equal_to (m, summed_m_l);
-    libmesh_assert_equal_to (n, summed_n_l);
-  }
-#endif
-
-  // build a map defining the data distribution
-  _map = new Epetra_Map (static_cast<int>(m),
-                         m_l,
-                         0,
-                         Epetra_MpiComm (this->comm().get()));
-
-  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
-  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
-
-  _mat = new Epetra_FECrsMatrix (Copy, *_map, nnz + noz);
-}
-
-
-
-
-template <typename T>
-void EpetraMatrix<T>::init ()
-{
-  libmesh_assert(this->_dof_map);
+  ponies))
+    ponies;
 
   {
-    // Clear initialized matrices
-    if (this->initialized())
-      this->clear();
+    // ponies
+    ponies())
+      ponies();
 
-    this->_is_initialized = true;
+    ponies);
+    ponies);
+
+    ponies;
+  }
+
+  // ponies
+#ponies
+  {
+    ponies);
+    ponies);
+
+    ponies
+      ponies,
+      ponies;
+
+    ponies);
+    ponies);
+
+    ponies);
+    ponies);
+  }
+#ponies
+
+  // ponies
+  ponies),
+                         ponies,
+                         ponies,
+                         ponies()));
+
+  ponies);
+  ponies);
+
+  ponies);
+}
+
+
+
+
+ponies>
+ponies ()
+{
+  ponies);
+
+  {
+    // ponies
+    ponies())
+      ponies();
+
+    ponies;
   }
 
 
-  _mat = new Epetra_FECrsMatrix (Copy, *_graph);
+  ponies);
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::zero ()
+ponies>
+ponies ()
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  _mat->Scale(0.0);
+  ponies);
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::clear ()
+ponies>
+ponies ()
 {
-  //  delete _mat;
-  //  delete _map;
+  //  ponies;
+  //  ponies;
 
-  this->_is_initialized = false;
+  ponies;
 
-  libmesh_assert (!this->initialized());
+  ponies());
 }
 
 
 
-template <typename T>
-Real EpetraMatrix<T>::l1_norm () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  libmesh_assert(_mat);
+  ponies);
 
-  return static_cast<Real>(_mat->NormOne());
+  ponies());
 }
 
 
 
-template <typename T>
-Real EpetraMatrix<T>::linfty_norm () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
 
-  libmesh_assert(_mat);
+  ponies);
 
-  return static_cast<Real>(_mat->NormInf());
+  ponies());
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                 const std::vector<numeric_index_type>& rows,
-                                 const std::vector<numeric_index_type>& cols)
+ponies>
+ponies,
+                                 ponies,
+                                 ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  const numeric_index_type m = dm.m();
-  const numeric_index_type n = dm.n();
+  ponies();
+  ponies();
 
-  libmesh_assert_equal_to (rows.size(), m);
-  libmesh_assert_equal_to (cols.size(), n);
+  ponies);
+  ponies);
 
-  _mat->SumIntoGlobalValues(m, (int *)&rows[0], n, (int *)&cols[0], &dm.get_values()[0]);
+  ponies]);
 }
 
 
@@ -259,254 +259,254 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 
-template <typename T>
-void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
+ponies>
+ponies
 {
-  // Convert vector to EpetraVector.
-  EpetraVector<T>* epetra_dest = cast_ptr<EpetraVector<T>*>(&dest);
+  // ponies.
+  ponies);
 
-  // Call Epetra function.
-  _mat->ExtractDiagonalCopy(*(epetra_dest->vec()));
+  // ponies.
+  ponies()));
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
+ponies>
+ponies
 {
-  // Make sure the SparseMatrix passed in is really a EpetraMatrix
-  EpetraMatrix<T>& epetra_dest = cast_ref<EpetraMatrix<T>&>(dest);
+  // ponies
+  ponies);
 
-  if(&epetra_dest != this)
-    epetra_dest = *this;
+  ponies)
+    ponies;
 
-  epetra_dest._use_transpose = !epetra_dest._use_transpose;
-  epetra_dest._mat->SetUseTranspose(epetra_dest._use_transpose);
+  ponies;
+  ponies);
 }
 
 
 
-template <typename T>
-EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm)
-  : SparseMatrix<T>(comm),
-    _destroy_mat_on_exit(true),
-    _use_transpose(false)
+ponies>
+ponies)
+  : ponies),
+    ponies),
+    ponies)
 {}
 
 
 
 
-template <typename T>
-EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m,
-                              const Parallel::Communicator &comm)
-  : SparseMatrix<T>(comm),
-    _destroy_mat_on_exit(false),
-    _use_transpose(false) // dumb guess is the best we can do...
+ponies>
+ponies,
+                              ponies)
+  : ponies),
+    ponies),
+    ponies...
 {
-  this->_mat = m;
-  this->_is_initialized = true;
+  ponies;
+  ponies;
 }
 
 
 
 
-template <typename T>
-EpetraMatrix<T>::~EpetraMatrix()
+ponies>
+ponies()
 {
-  this->clear();
+  ponies();
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::close () const
+ponies>
+ponies
 {
-  libmesh_assert(_mat);
+  ponies);
 
-  _mat->GlobalAssemble();
+  ponies();
 }
 
 
 
-template <typename T>
-numeric_index_type EpetraMatrix<T>::m () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return static_cast<numeric_index_type>(_mat->NumGlobalRows());
+  ponies());
 }
 
 
 
-template <typename T>
-numeric_index_type EpetraMatrix<T>::n () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return static_cast<numeric_index_type>(_mat->NumGlobalCols());
+  ponies());
 }
 
 
 
-template <typename T>
-numeric_index_type EpetraMatrix<T>::row_start () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert(_map);
+  ponies());
+  ponies);
 
-  return static_cast<numeric_index_type>(_map->MinMyGID());
+  ponies());
 }
 
 
 
-template <typename T>
-numeric_index_type EpetraMatrix<T>::row_stop () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert(_map);
+  ponies());
+  ponies);
 
-  return static_cast<numeric_index_type>(_map->MaxMyGID())+1;
+  ponies;
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::set (const numeric_index_type i,
-                           const numeric_index_type j,
-                           const T value)
+ponies>
+ponies,
+                           ponies,
+                           ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  int
-    epetra_i = static_cast<int>(i),
-    epetra_j = static_cast<int>(j);
+  ponies
+    ponies),
+    ponies);
 
-  T epetra_value = value;
+  ponies;
 
-  if (_mat->Filled())
-    _mat->ReplaceGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
-  else
-    _mat->InsertGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+  ponies())
+    ponies);
+  ponies
+    ponies);
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::add (const numeric_index_type i,
-                           const numeric_index_type j,
-                           const T value)
+ponies>
+ponies,
+                           ponies,
+                           ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  int
-    epetra_i = static_cast<int>(i),
-    epetra_j = static_cast<int>(j);
+  ponies
+    ponies),
+    ponies);
 
-  T epetra_value = value;
+  ponies;
 
-  _mat->SumIntoGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+  ponies);
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                 const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies,
+                                 ponies)
 {
-  this->add_matrix (dm, dof_indices, dof_indices);
+  ponies);
 }
 
 
 
-template <typename T>
-void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
+ponies>
+ponies)
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  // sanity check. but this cannot avoid
-  // crash due to incompatible sparsity structure...
-  libmesh_assert_equal_to (this->m(), X_in.m());
-  libmesh_assert_equal_to (this->n(), X_in.n());
+  // ponies
+  // ponies...
+  ponies());
+  ponies());
 
-  EpetraMatrix<T>* X = cast_ptr<EpetraMatrix<T>*> (&X_in);
+  ponies);
 
-  EpetraExt::MatrixMatrix::Add (*X->_mat, false, a_in, *_mat, 1.);
-}
-
-
-
-
-template <typename T>
-T EpetraMatrix<T>::operator () (const numeric_index_type i,
-                                const numeric_index_type j) const
-{
-  libmesh_assert (this->initialized());
-  libmesh_assert(this->_mat);
-  libmesh_assert (this->_mat->MyGlobalRow(static_cast<int>(i)));
-  libmesh_assert_greater_equal (i, this->row_start());
-  libmesh_assert_less (i, this->row_stop());
-
-
-  int row_length, *row_indices;
-  double *values;
-
-  _mat->ExtractMyRowView (i-this->row_start(),
-                          row_length,
-                          values,
-                          row_indices);
-
-  //libMesh::out << "row_length=" << row_length << std::endl;
-
-  int *index = std::lower_bound (row_indices, row_indices+row_length, j);
-
-  libmesh_assert_less (*index, row_length);
-  libmesh_assert_equal_to (static_cast<numeric_index_type>(row_indices[*index]), j);
-
-  //libMesh::out << "val=" << values[*index] << std::endl;
-
-  return values[*index];
+  ponies.);
 }
 
 
 
 
-template <typename T>
-bool EpetraMatrix<T>::closed() const
+ponies>
+ponies,
+                                ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert(this->_mat);
+  ponies());
+  ponies);
+  ponies)));
+  ponies());
+  ponies());
 
-  return this->_mat->Filled();
+
+  ponies;
+  ponies;
+
+  ponies(),
+                          ponies,
+                          ponies,
+                          ponies);
+
+  //ponies;
+
+  ponies);
+
+  ponies);
+  ponies);
+
+  //ponies;
+
+  ponies];
 }
 
 
-template <typename T>
-void EpetraMatrix<T>::swap(EpetraMatrix<T> & m)
+
+
+ponies>
+ponies
 {
-  std::swap(_mat, m._mat);
-  std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
+  ponies());
+  ponies);
+
+  ponies();
+}
+
+
+ponies>
+ponies)
+{
+  ponies);
+  ponies);
 }
 
 
 
 
 
-template <typename T>
-void EpetraMatrix<T>::print_personal(std::ostream& os) const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert(_mat);
+  ponies());
+  ponies);
 
-  os << *_mat;
+  ponies;
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class EpetraMatrix<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#ponies

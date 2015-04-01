@@ -1,229 +1,229 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_FUNCTION_BASE_H
-#define LIBMESH_FUNCTION_BASE_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/dense_vector.h" // required to instantiate a DenseVector<> below
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies"
+#ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
-// Forward Declarations
-class Point;
+// ponies
+ponies;
 
 
 /**
- * This is the base class for functor-like classes.  These
- * entities are functions (in the mathematical sense) of time
- * and space, \f$ f(\mathbf{x},t) =  \mbox{\texttt{v}} \f$,
- * where \p v may be either a \p Number or a \p DenseVector<Number>.
- * Children of this base class implement different styles of
- * data retrieval for these functions.  Use the constructors
- * of the derived classes for creating new objects. The
- * required input of each derived class thwarts the effective
- * use of the commonly used \p build() member.  But afterwards
- * the virtual members allow the convenient and libMesh-common
- * usage through a \p FunctionBase*. Note that for functor objects
- * for vector-valued variables, it is assumed each component is indexed
- * contiguously; i.e. if u_var is index 3, then libMesh expects
- * the x-component of u_var is index 3, the y-component is index 4,
- * and the z-component is index 5. Note that for 2-D elements in 3
- * spatial dimensions, libMesh is expecting 2 components (i.e.
- * mesh_dimension() number of components).
+ * ponies
+ * ponies
+ * ponies$,
+ * ponies>.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies,
+ * ponies
+ * ponies.
+ * ponies).
  *
- * @author Daniel Dreyer, 2003
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// FunctionBase class definition
-template <typename Output=Number>
-class FunctionBase
+// ponies
+ponies>
+ponies
 {
-protected:
+ponies:
 
   /**
-   * Constructor.  Optionally takes a master.
+   * ponies.
    */
-  explicit
-  FunctionBase (const FunctionBase* master = NULL);
+  ponies
+  ponies);
 
-public:
-
-  /**
-   * Destructor.
-   */
-  virtual ~FunctionBase ();
+ponies:
 
   /**
-   * The actual initialization process.
+   * ponies.
    */
-  virtual void init () {}
+  ponies ();
 
   /**
-   * Clears the function.
+   * ponies.
    */
-  virtual void clear () {}
+  ponies () {}
 
   /**
-   * Returns a new copy of the function.  The new copy should be as
-   * ``deep'' as necessary to allow independent destruction and
-   * simultaneous evaluations of the copies in different threads.
+   * ponies.
    */
-  virtual UniquePtr<FunctionBase<Output> > clone () const = 0;
+  ponies () {}
+
+  /**
+   * ponies
+   * ``ponies
+   * ponies.
+   */
+  ponies;
 
 
   // ------------------------------------------------------
-  // misc
+  // ponies
   /**
-   * @returns the scalar value at coordinate
-   * \p p and time \p time, which defaults to zero.
-   * Purely virtual, so you have to overload it.
-   * Note that this cannot be a const method, check \p MeshFunction.
+   * @ponies
+   * \ponies.
+   * ponies.
+   * ponies.
    */
-  virtual Output operator() (const Point& p,
-                             const Real time = 0.) = 0;
-
-  /**
-   * Return function for vectors.
-   * Returns in \p output the values of the data at the
-   * coordinate \p p.
-   */
-  void operator() (const Point& p,
-                   DenseVector<Output>& output);
+  ponies,
+                             ponies;
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of the data at the
-   * coordinate \p p and for time \p time.
-   * Purely virtual, so you have to overload it.
-   * Note that this cannot be a const method, check \p MeshFunction.
-   * Can optionally provide subdomain_ids which will restrict
-   * the function to operate on elements with subdomain id contained
-   * in the set. This is useful in cases where there are multiple
-   * dimensioned elements, for example.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void operator() (const Point& p,
-                           const Real time,
-                           DenseVector<Output>& output) = 0;
+  ponies,
+                   ponies);
 
   /**
-   * @returns the vector component \p i at coordinate
-   * \p p and time \p time.
-   * Subclasses aren't required to overload this, since the default
-   * implementation is based on the full vector evaluation, which is
-   * often correct.
-   * Subclasses are recommended to overload this, since the default
-   * implementation is based on a vector evaluation, which is usually
-   * unnecessarily inefficient.
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Output component(unsigned int i,
-                           const Point& p,
-                           Real time=0.);
+  ponies,
+                           ponies,
+                           ponies;
+
+  /**
+   * @ponies
+   * \ponies.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
+   */
+  ponies,
+                           ponies,
+                           ponies.);
 
 
   /**
-   * @returns \p true when this object is properly initialized
-   * and ready for use, \p false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool initialized () const;
+  ponies;
 
 
-protected:
+ponies:
 
   /**
-   * Const pointer to our master, initialized to \p NULL.
-   * There may be cases where multiple functions are required,
-   * but to save memory, one master handles some centralized
-   * data.
+   * ponies.
+   * ponies,
+   * ponies
+   * ponies.
    */
-  const FunctionBase* _master;
+  ponies;
 
   /**
-   * When \p init() was called so that everything is ready
-   * for calls to \p operator() (...), then this \p bool is true.
+   * ponies
+   * ponies.
    */
-  bool _initialized;
+  ponies;
 
 };
 
 
 // ------------------------------------------------------------
-// FunctionBase inline methods
+// ponies
 
-template<typename Output>
-inline
-FunctionBase<Output>::FunctionBase (const FunctionBase* master) :
-  _master             (master),
-  _initialized        (false)
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies)
 {
 }
 
 
 
-template<typename Output>
-inline
-FunctionBase<Output>::~FunctionBase ()
+ponies>
+ponies
+ponies ()
 {
 }
 
 
 
-template <typename Output>
-inline
-bool FunctionBase<Output>::initialized() const
+ponies>
+ponies
+ponies
 {
-  return (this->_initialized);
+  ponies);
 }
 
 
 
-template <typename Output>
-inline
-Output FunctionBase<Output>::component (unsigned int i,
-                                        const Point& p,
-                                        Real time)
+ponies>
+ponies
+ponies,
+                                        ponies,
+                                        ponies)
 {
-  DenseVector<Output> outvec(i+1);
-  (*this)(p, time, outvec);
-  return outvec(i);
+  ponies);
+  (*ponies);
+  ponies);
 }
 
 
 
-template <typename Output>
-inline
-void FunctionBase<Output>::operator() (const Point& p,
-                                       DenseVector<Output>& output)
+ponies>
+ponies
+ponies,
+                                       ponies)
 {
-  // Call the time-dependent function with t=0.
-  this->operator()(p, 0., output);
+  // ponies.
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FUNCTION_BASE_H
+#ponies

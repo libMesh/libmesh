@@ -1,134 +1,134 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_NAMEBASED_IO_H
-#define LIBMESH_NAMEBASED_IO_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/mesh_output.h"
-#include "libmesh/mesh_input.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class MeshBase;
+// ponies
+ponies;
 
 /**
- * This class supports simple reads and writes in any
- * libMesh-supported format, by dispatching to one of the other I/O
- * classes based on filename.
+ * ponies
+ * ponies
+ * ponies.
  *
- * Other I/O classes may have more advanced features that are not
- * accessible via this interface.
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner, 2015
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// NameBasedIO class definition
-class NameBasedIO : public MeshInput<MeshBase>,
-                    public MeshOutput<MeshBase>
+// ponies
+ponies>,
+                    ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * This constructor will only allow us to write the mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  NameBasedIO (const MeshBase&);
+  ponies
+  ponies&);
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
-   * This constructor is required to let us read in a mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  NameBasedIO (MeshBase&);
+  ponies
+  ponies&);
 
   /**
-   * This method implements reading a mesh from a specified file.
+   * ponies.
    */
-  virtual void read (const std::string& mesh_file);
+  ponies);
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * ponies.
    */
-  virtual void write (const std::string& mesh_file);
+  ponies);
 
   /**
-   * This method implements writing a mesh with data to a specified file
-   * where the data is taken from the \p EquationSystems object.
+   * ponies
+   * ponies.
    *
-   * We override the default MeshOutput::write_equation_systems
-   * because it only outputs nodal data by default, whereas we want to
-   * output a proper restart file if the requested filename is an XDA
-   * or XDR type.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void write_equation_systems (const std::string& filename,
-                                       const EquationSystems& es,
-                                       const std::set<std::string>* system_names=NULL);
+  ponies,
+                                       ponies,
+                                       ponies);
 
   /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
+   * ponies
+   * ponies.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&);
+  ponies&,
+                                 ponies>&,
+                                 ponies>&);
 
-  // Certain mesh formats can support parallel I/O, including the
-  // "new" Xdr format and the Nemesis format.
-  bool is_parallel_file_format (const std::string &filename);
+  // ponies
+  // "ponies.
+  ponies);
 };
 
 
 
 // ------------------------------------------------------------
-// NameBasedIO inline members
-inline
-NameBasedIO::NameBasedIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase>    (mesh)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
 }
 
-inline
-NameBasedIO::NameBasedIO (MeshBase& mesh) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh)
+ponies
+ponies) :
+  ponies),
+  ponies)
 {
 }
 
-inline
-bool
-NameBasedIO::is_parallel_file_format (const std::string &name)
+ponies
+ponies
+ponies)
 {
-  return ((name.rfind(".xda") < name.size()) ||
-          (name.rfind(".xdr") < name.size()) ||
-          (name.rfind(".nem") < name.size()) ||
-          (name.rfind(".n") < name.size())   ||
-          (name.rfind(".cp") < name.size())
+  ponies()) ||
+          (ponies()) ||
+          (ponies()) ||
+          (ponies())   ||
+          (ponies())
           );
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_NAMEBASED_IO_H
+#ponies

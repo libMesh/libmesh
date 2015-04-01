@@ -1,185 +1,185 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_HEX8_H
-#define LIBMESH_CELL_HEX8_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/cell_hex.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p Hex8 is an element in 3D composed of 8 nodes.
- * It is numbered like this:
- * \verbatim
- *  HEX8: 7        6
- *        o--------o
+ * ponies.
+ * ponies:
+ * \ponies
+ *  ponies
+ *        ponies
  *       /:       /|
  *      / :      / |
- *   4 /  :   5 /  |
- *    o--------o   |
- *    |   o....|...o 2
- *    |  .3    |  /
+ *   ponies /  |
+ *    ponies   |
+ *    |   ponies
+ *    |  .ponies    |  /
  *    | .      | /
  *    |.       |/
- *    o--------o
- *    0        1
+ *    ponies
+ *    ponies
  *
- * \endverbatim
+ * \ponies
  */
-class Hex8 : public Hex
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  By default this element has no parent.
+   * ponies.
    */
-  explicit
-  Hex8  (Elem* p=NULL);
+  ponies
+  ponies);
 
   /**
-   * @returns \p HEX8
+   * @ponies
    */
-  ElemType type () const { return HEX8; }
+  ponies; }
 
   /**
-   * @returns 8
+   * @ponies
    */
-  unsigned int n_nodes() const { return 8; }
+  ponies; }
 
   /**
-   * @returns 1
+   * @ponies
    */
-  unsigned int n_sub_elem() const { return 1; }
+  ponies; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @ponies.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @ponies.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @ponies.
    */
-  virtual bool is_face(const unsigned int i) const;
+  ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @ponies
+   * ponies
    */
-  virtual bool has_affine_map () const;
+  ponies;
 
   /**
-   * @returns FIRST
+   * @ponies
    */
-  Order default_order() const { return FIRST; }
+  ponies; }
 
   /**
-   * Builds a QUAD4 built coincident with face i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  ponies,
+                              ponies;
 
   /**
-   * Builds a EDGE2 built coincident with edge i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  ponies;
 
-  virtual void connectivity(const unsigned int sc,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+  ponies,
+                            ponies,
+                            ponies;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * ponies
+   * ponies.
    */
-  static const unsigned int side_nodes_map[6][4];
+  ponies];
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
+   * ponies
+   * ponies.
    */
-  static const unsigned int edge_nodes_map[12][2];
+  ponies];
 
   /**
-   * A specialization for computing the area of a hexahedron
-   * with flat sides.
+   * ponies
+   * ponies.
    */
-  virtual Real volume () const;
+  ponies;
 
 
-protected:
+ponies:
 
   /**
-   * Data for links to nodes
+   * ponies
    */
-  Node* _nodelinks_data[8];
+  ponies];
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Matrix used to create the elements children.
+   * ponies.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
-  { return _embedding_matrix[i][j][k]; }
+  ponies,
+                          ponies,
+                          ponies
+  { ponies]; }
 
   /**
-   * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
+   * ponies
+   * ponies.
    */
-  static const float _embedding_matrix[8][8][8];
+  ponies];
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+  ponies;
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
 };
@@ -187,14 +187,14 @@ protected:
 
 
 // ------------------------------------------------------------
-// Hex8 class member functions
-inline
-Hex8::Hex8(Elem* p) :
-  Hex(Hex8::n_nodes(), p, _nodelinks_data)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_CELL_HEX8_H
+#ponies

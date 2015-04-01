@@ -1,428 +1,428 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
 /*
- * Require complex arithmetic
+ * ponies
  */
-#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
+#ponies)
 
 
-// C++ includes
-#include <cstdio>          // for sprintf
+// ponies
+#ponies
 
-// Local includes
-#include "libmesh/frequency_system.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/linear_solver.h"
-#include "libmesh/numeric_vector.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// FrequencySystem implementation
-FrequencySystem::FrequencySystem (EquationSystems& es,
-                                  const std::string& name_in,
-                                  const unsigned int number_in) :
-  LinearImplicitSystem      (es, name_in, number_in),
-  solve_system              (NULL),
-  _finished_set_frequencies (false),
-  _keep_solution_duplicates (true),
-  _finished_init            (false),
-  _finished_assemble        (false)
+// ponies
+ponies,
+                                  ponies,
+                                  ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  // default value for wave speed & fluid density
-  //_equation_systems.parameters.set<Real>("wave speed") = 340.;
-  //_equation_systems.parameters.set<Real>("rho")        = 1.225;
+  // ponies
+  //ponies.;
+  //ponies;
 }
 
 
 
-FrequencySystem::~FrequencySystem ()
+ponies ()
 {
-  this->clear ();
+  ponies ();
 
-  // the additional matrices and vectors are cleared and zero'ed in System
+  // ponies
 }
 
 
 
 
-void FrequencySystem::clear ()
+ponies ()
 {
-  LinearImplicitSystem::clear();
+  ponies();
 
-  _finished_set_frequencies = false;
-  _keep_solution_duplicates = true;
-  _finished_init            = false;
-  _finished_assemble        = false;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /*
-   * We have to distinguish between the
-   * simple straightforward "clear()"
-   * and the clear that also touches the
-   * EquationSystems parameters "current frequency" etc.
-   * Namely, when reading from file (through equation_systems_io.C
-   * methods), the param's are read in, then the systems.
-   * Prior to reading a system, this system gets cleared...
-   * And there, all the previously loaded frequency parameters
-   * would get lost...
+   * ponies
+   * ponies()"
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies...
+   * ponies
+   * ponies...
    */
 }
 
 
 
-void FrequencySystem::clear_all ()
+ponies ()
 {
-  this->clear ();
+  ponies ();
 
-  EquationSystems& es =
-    this->get_equation_systems();
+  ponies =
+    ponies();
 
-  // clear frequencies in the parameters section of the
-  // EquationSystems object
-  if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
+  // ponies
+  // ponies
+  ponies"))
     {
-      unsigned int n_freq = es.parameters.get<unsigned int>("n_frequencies");
-      for (unsigned int n=0; n < n_freq; n++)
-        es.parameters.remove(this->form_freq_param_name(n));
-      es.parameters.remove("current frequency");
+      ponies");
+      ponies++)
+        ponies));
+      ponies");
     }
 }
 
 
 
 
-void FrequencySystem::init_data ()
+ponies ()
 {
-  // initialize parent data and additional solution vectors
-  LinearImplicitSystem::init_data();
+  // ponies
+  ponies();
 
-  // Log how long initializing the system takes
-  START_LOG("init()", "FrequencySystem");
+  // ponies
+  ponies");
 
-  EquationSystems& es =
-    this->get_equation_systems();
+  ponies =
+    ponies();
 
-  // make sure we have frequencies to solve for
-  if (!_finished_set_frequencies)
+  // ponies
+  ponies)
     {
       /*
-       * when this system was read from file, check
-       * if this has a "n_frequencies" parameter,
-       * and initialize us with these.
+       * ponies
+       * ponies,
+       * ponies.
        */
-      if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
+      ponies"))
         {
-          const unsigned int n_freq =
-            es.parameters.get<unsigned int>("n_frequencies");
+          ponies =
+            ponies");
 
-          libmesh_assert_greater (n_freq, 0);
+          ponies);
 
-          _finished_set_frequencies = true;
+          ponies;
 
-          this->set_current_frequency(0);
+          ponies);
         }
-      else
-        libmesh_error_msg("ERROR: Need to set frequencies before calling init().");
+      ponies
+        ponies().");
     }
 
-  _finished_init = true;
+  ponies;
 
-  // Stop logging init()
-  STOP_LOG("init()", "FrequencySystem");
+  // ponies()
+  ponies");
 }
 
 
 
-void FrequencySystem::assemble ()
+ponies ()
 {
-  libmesh_assert (_finished_init);
+  ponies);
 
-  if (_finished_assemble)
-    libmesh_error_msg("ERROR: Matrices already assembled.");
+  ponies)
+    ponies.");
 
-  // Log how long assemble() takes
-  START_LOG("assemble()", "FrequencySystem");
+  // ponies
+  ponies");
 
-  // prepare matrix with the help of the _dof_map,
-  // fill with sparsity pattern, initialize the
-  // additional matrices
-  LinearImplicitSystem::assemble();
+  // ponies,
+  // ponies
+  // ponies
+  ponies();
 
-  //matrix.print ();
-  //rhs.print    ();
+  //ponies ();
+  //ponies    ();
 
-  _finished_assemble = true;
+  ponies;
 
-  // Log how long assemble() takes
-  STOP_LOG("assemble()", "FrequencySystem");
+  // ponies
+  ponies");
 }
 
 
 
-void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
-                                                const Real freq_step,
-                                                const unsigned int n_freq,
-                                                const bool allocate_solution_duplicates)
+ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies)
 {
-  this->_keep_solution_duplicates = allocate_solution_duplicates;
+  ponies;
 
-  // sanity check
-  if (_finished_set_frequencies)
-    libmesh_error_msg("ERROR: frequencies already initialized.");
+  // ponies
+  ponies)
+    ponies.");
 
-  EquationSystems& es =
-    this->get_equation_systems();
+  ponies =
+    ponies();
 
-  // store number of frequencies as parameter
-  es.parameters.set<unsigned int>("n_frequencies") = n_freq;
+  // ponies
+  ponies;
 
-  for (unsigned int n=0; n<n_freq; n++)
+  ponies++)
     {
-      // remember frequencies as parameters
-      es.parameters.set<Real>(this->form_freq_param_name(n)) =
-        base_freq + n * freq_step;
+      // ponies
+      ponies)) =
+        ponies;
 
-      // build storage for solution vector, if wanted
-      if (this->_keep_solution_duplicates)
-        this->add_vector(this->form_solu_vec_name(n));
+      // ponies
+      ponies)
+        ponies));
     }
 
-  _finished_set_frequencies = true;
+  ponies;
 
-  // set the current frequency
-  this->set_current_frequency(0);
+  // ponies
+  ponies);
 }
 
 
 
-void FrequencySystem::set_frequencies_by_range (const Real min_freq,
-                                                const Real max_freq,
-                                                const unsigned int n_freq,
-                                                const bool allocate_solution_duplicates)
+ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies)
 {
-  this->_keep_solution_duplicates = allocate_solution_duplicates;
+  ponies;
 
-  // sanity checks
-  libmesh_assert_greater (max_freq, min_freq);
-  libmesh_assert_greater (n_freq, 0);
+  // ponies
+  ponies);
+  ponies);
 
-  if (_finished_set_frequencies)
-    libmesh_error_msg("ERROR: frequencies already initialized.");
+  ponies)
+    ponies.");
 
-  EquationSystems& es =
-    this->get_equation_systems();
+  ponies =
+    ponies();
 
-  // store number of frequencies as parameter
-  es.parameters.set<unsigned int>("n_frequencies") = n_freq;
+  // ponies
+  ponies;
 
-  // set frequencies, build solution storage
-  for (unsigned int n=0; n<n_freq; n++)
+  // ponies
+  ponies++)
     {
-      // remember frequencies as parameters
-      es.parameters.set<Real>(this->form_freq_param_name(n)) =
-        min_freq + n*(max_freq-min_freq)/(n_freq-1);
+      // ponies
+      ponies)) =
+        ponies);
 
-      // build storage for solution vector, if wanted
-      if (this->_keep_solution_duplicates)
-        System::add_vector(this->form_solu_vec_name(n));
+      // ponies
+      ponies)
+        ponies));
     }
 
-  _finished_set_frequencies = true;
+  ponies;
 
-  // set the current frequency
-  this->set_current_frequency(0);
+  // ponies
+  ponies);
 }
 
 
 
-void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
-                                       const bool allocate_solution_duplicates)
+ponies,
+                                       ponies)
 {
-  this->_keep_solution_duplicates = allocate_solution_duplicates;
+  ponies;
 
-  // sanity checks
-  libmesh_assert(!frequencies.empty());
+  // ponies
+  ponies());
 
-  if (_finished_set_frequencies)
-    libmesh_error_msg("ERROR: frequencies already initialized.");
+  ponies)
+    ponies.");
 
-  EquationSystems& es =
-    this->get_equation_systems();
+  ponies =
+    ponies();
 
-  // store number of frequencies as parameter
-  es.parameters.set<unsigned int>("n_frequencies") = frequencies.size();
+  // ponies
+  ponies();
 
-  // set frequencies, build solution storage
-  for (unsigned int n=0; n<frequencies.size(); n++)
+  // ponies
+  ponies++)
     {
-      // remember frequencies as parameters
-      es.parameters.set<Real>(this->form_freq_param_name(n)) = frequencies[n];
+      // ponies
+      ponies];
 
-      // build storage for solution vector, if wanted
-      if (this->_keep_solution_duplicates)
-        System::add_vector(this->form_solu_vec_name(n));
+      // ponies
+      ponies)
+        ponies));
     }
 
-  _finished_set_frequencies = true;
+  ponies;
 
-  // set the current frequency
-  this->set_current_frequency(0);
+  // ponies
+  ponies);
 }
 
 
 
 
-unsigned int FrequencySystem::n_frequencies () const
+ponies
 {
-  libmesh_assert(_finished_set_frequencies);
-  return this->get_equation_systems().parameters.get<unsigned int>("n_frequencies");
+  ponies);
+  ponies");
 }
 
 
 
-void FrequencySystem::solve ()
+ponies ()
 {
-  libmesh_assert_greater (this->n_frequencies(), 0);
+  ponies);
 
-  // Solve for all the specified frequencies
-  this->solve (0, this->n_frequencies()-1);
+  // ponies
+  ponies);
 }
 
 
 
-void FrequencySystem::solve (const unsigned int n_start,
-                             const unsigned int n_stop)
+ponies,
+                             ponies)
 {
-  // Assemble the linear system, if not already done
-  if (!_finished_assemble)
-    this->assemble ();
+  // ponies
+  ponies)
+    ponies ();
 
-  // the user-supplied solve method _has_ to be provided by the user
-  libmesh_assert(solve_system);
+  // ponies
+  ponies);
 
-  // existence & range checks
-  libmesh_assert_greater (this->n_frequencies(), 0);
-  libmesh_assert_less (n_stop, this->n_frequencies());
+  // ponies
+  ponies);
+  ponies());
 
-  EquationSystems& es =
-    this->get_equation_systems();
+  ponies =
+    ponies();
 
-  // Get the user-specified linear solver tolerance,
-  //     the user-specified maximum # of linear solver iterations,
-  //     the user-specified wave speed
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+  // ponies,
+  //     ponies,
+  //     ponies
+  ponies            =
+    ponies");
+  ponies =
+    ponies");
 
 
-  //   // return values
-  //   std::vector< std::pair<unsigned int, Real> > vec_rval;
+  //   // ponies
+  //   ponies;
 
-  // start solver loop
-  for (unsigned int n=n_start; n<= n_stop; n++)
+  // ponies
+  ponies++)
     {
-      // set the current frequency
-      this->set_current_frequency(n);
+      // ponies
+      ponies);
 
-      // Call the user-supplied pre-solve method
-      START_LOG("user_pre_solve()", "FrequencySystem");
+      // ponies
+      ponies");
 
-      this->solve_system (es, this->name());
+      ponies());
 
-      STOP_LOG("user_pre_solve()", "FrequencySystem");
+      ponies");
 
 
-      // Solve the linear system for this specific frequency
-      const std::pair<unsigned int, Real> rval =
-        linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
+      // ponies
+      ponies =
+        ponies);
 
-      _n_linear_iterations   = rval.first;
-      _final_linear_residual = rval.second;
+      ponies;
+      ponies;
 
-      vec_rval.push_back(rval);
+      ponies);
 
       /**
-       * store the current solution in the additional vector
+       * ponies
        */
-      if (this->_keep_solution_duplicates)
-        this->get_vector(this->form_solu_vec_name(n)) = *solution;
+      ponies)
+        ponies;
     }
 
-  // sanity check
-  //libmesh_assert_equal_to (vec_rval.size(), (n_stop-n_start+1));
+  // ponies
+  //ponies));
 
-  //return vec_rval;
+  //ponies;
 }
 
 
 
-void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
-                                                      const std::string& name))
+ponies,
+                                                      ponies))
 {
-  libmesh_assert(fptr);
+  ponies);
 
-  solve_system = fptr;
+  ponies;
 }
 
 
 
-void FrequencySystem::set_current_frequency(unsigned int n)
+ponies)
 {
-  libmesh_assert_less (n, n_frequencies());
+  ponies());
 
-  EquationSystems& es =
-    this->get_equation_systems();
+  ponies =
+    ponies();
 
-  es.parameters.set<Real>("current frequency") =
-    es.parameters.get<Real>(this->form_freq_param_name(n));
+  ponies") =
+    ponies));
 }
 
 
 
-std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
+ponies
 {
-  libmesh_assert_less (n, 9999);
-  char buf[15];
-  sprintf(buf, "frequency %04u", n);
-  return (buf);
+  ponies);
+  ponies];
+  ponies);
+  ponies);
 }
 
 
 
-std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
+ponies
 {
-  libmesh_assert_less (n, 9999);
-  char buf[15];
-  sprintf(buf, "solution %04u", n);
-  return (buf);
+  ponies);
+  ponies];
+  ponies);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // if defined(LIBMESH_USE_COMPLEX_NUMBERS)
+#ponies)

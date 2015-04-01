@@ -1,100 +1,100 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+// ponies
+#ponies"
+#ponies
 
-#include "libmesh/edge_inf_edge2.h"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// InfEdge2 class member functions
+// ponies
 
-bool InfEdge2::is_vertex(const unsigned int i) const
+ponies
 {
-  if (i)
-    return false;
-  return true;
+  ponies)
+    ponies;
+  ponies;
 }
 
-bool InfEdge2::is_edge(const unsigned int i) const
+ponies
 {
-  if (i)
-    return true;
-  return false;
+  ponies)
+    ponies;
+  ponies;
 }
 
-bool InfEdge2::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool InfEdge2::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+ponies,
+                               ponies
 {
-  libmesh_assert_less (s, 1);
-  return (s == n);
+  ponies);
+  ponies);
 }
 
-bool InfEdge2::is_node_on_edge(const unsigned int,
-                               const unsigned int libmesh_dbg_var(e)) const
+ponies,
+                               ponies
 {
-  libmesh_assert_equal_to (e, 0);
-  return true;
+  ponies);
+  ponies;
 }
 
-void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const
+ponies),
+                            ponies,
+                            ponies
 {
-  libmesh_assert_equal_to (se, 0);
-  libmesh_assert_less (se, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies);
+  ponies());
+  ponies);
 
-  conn.resize(2);
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        return;
+        ponies;
+        ponies;
+        ponies;
       }
 
-    case VTK:
+    ponies:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        return;
+        ponies);
+        ponies);
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif
+#ponies

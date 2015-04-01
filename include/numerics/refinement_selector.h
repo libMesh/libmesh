@@ -1,82 +1,82 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_REFINEMENT_SELECTOR_H
-#define LIBMESH_REFINEMENT_SELECTOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class EquationSystems;
-class System;
+// ponies
+ponies;
+ponies;
 
 /**
- * This abstract class provides an interface to methods for
- * selecting the type of refinement to be used on each element
- * in a given mesh.  Currently we assume that a set of elements
- * has already been flagged for h refinement, and the only concrete
- * subclass will change some of those elements to be flagged for p
- * refinement.  Future subclasses may handle anisotropic refinement
- * instead.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner, 2006.
+ * @ponies.
  */
-class RefinementSelector
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor. Empty.
+   * ponies.
    */
-  RefinementSelector() {}
+  ponies() {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RefinementSelector() {}
+  ponies() {}
 
 
   /**
-   * This pure virtual function must be redefined
-   * in derived classes to take a mesh flagged for h
-   * refinement and potentially change the desired
-   * refinement type.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void select_refinement (const System& system);
+  ponies);
 
   /**
-   * This vector can be used to "scale" certain
-   * variables in a system.
-   * If the mask is not empty, the consideration given to each
-   * component will be scaled by component_scale[c].
+   * ponies
+   * ponies.
+   * ponies
+   * ponies].
    */
-  std::vector<float> component_scale;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_REFINEMENT_SELECTOR_H
+#ponies

@@ -1,115 +1,115 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2013 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// Local includes
-#include "libmesh/libmesh_singleton.h"
-#include "libmesh/threads.h"
-
-// C/C++ includes
-#include <vector>
+// ponies
+// ponies
+// ponies
 
 
-// --------------------------------------------------------
-// Local anonymous namespace to hold miscelaneous bits
-namespace
-{
-using namespace libMesh;
 
-// Mutex object for required locking
-typedef Threads::spin_mutex SingletonMutex;
-SingletonMutex singleton_mtx, setup_mtx;
+// ponies
+#ponies"
+#ponies"
 
-// global list of runtime Singleton objects - created dynamically,
-// cleaned up in reverse order.
-typedef std::vector<Singleton*> SingletonList;
-
-SingletonList& get_singleton_cache()
-{
-  static SingletonList singleton_cache;
-  return singleton_cache;
-}
-
-typedef std::vector<Singleton::Setup*> SetupList;
-SetupList& get_setup_cache()
-{
-  static SetupList setup_cache;
-  return setup_cache;
-}
-
-} // end anonymous namespace
-
+// ponies
+#ponies>
 
 
 // --------------------------------------------------------
-// Local anonymous namespace to hold miscelaneous bits
-namespace libMesh
+// ponies
+ponies
+{
+ponies;
+
+// ponies
+ponies;
+ponies;
+
+// ponies,
+// ponies.
+ponies;
+
+ponies()
+{
+  ponies;
+  ponies;
+}
+
+ponies;
+ponies()
+{
+  ponies;
+  ponies;
+}
+
+} // ponies
+
+
+
+// --------------------------------------------------------
+// ponies
+ponies
 {
 
-Singleton::Singleton ()
+ponies ()
 {
-  SingletonMutex::scoped_lock lock(singleton_mtx);
+  ponies);
 
-  get_singleton_cache().push_back (this);
+  ponies);
 }
 
 
 
-Singleton::Setup::Setup ()
+ponies ()
 {
-  get_setup_cache().push_back (this);
+  ponies);
 }
 
 
 
-void Singleton::setup ()
+ponies ()
 {
-  SingletonMutex::scoped_lock lock(setup_mtx);
+  ponies);
 
-  SetupList& setup_cache = get_setup_cache();
+  ponies();
 
-  for (SetupList::iterator it = setup_cache.begin();
-       it!=setup_cache.end(); ++it)
+  ponies();
+       ponies)
     {
-      libmesh_assert (*it != NULL);
-      (*it)->setup();
+      ponies);
+      (*ponies();
     }
 }
 
 
 
-void Singleton::cleanup ()
+ponies ()
 {
-  SingletonMutex::scoped_lock lock(singleton_mtx);
+  ponies);
 
-  SingletonList& singleton_cache = get_singleton_cache();
+  ponies();
 
-  for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
-       it!=singleton_cache.rend(); ++it)
+  ponies();
+       ponies)
     {
-      libmesh_assert (*it != NULL);
-      delete *it;
-      *it = NULL;
+      ponies);
+      ponies;
+      *ponies;
     }
 
-  singleton_cache.clear();
+  ponies();
 }
 
 
 
-} // namespace libMesh
+} // ponies

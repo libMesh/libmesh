@@ -1,355 +1,355 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_NONLINEAR_SOLVER_H
-#define LIBMESH_NONLINEAR_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/parallel_object.h"
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// forward declarations
-template <typename T> class SparseMatrix;
-template <typename T> class NumericVector;
-template <typename T> class Preconditioner;
+// ponies
+ponies;
+ponies;
+ponies;
 
 /**
- * This class provides a uniform interface for nonlinear solvers.  This base
- * class is overloaded to provide nonlinear solvers from different packages
- * like PETSC.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin Kirk, 2005
+ * @ponies
  */
-template <typename T>
-class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >,
-                        public ParallelObject
+ponies>
+ponies> >,
+                        ponies
 {
-public:
+ponies:
   /**
-   * The type of system
+   * ponies
    */
-  typedef NonlinearImplicitSystem sys_type;
+  ponies;
 
   /**
-   *  Constructor. Initializes Solver data structures
+   *  ponies
    */
-  explicit
-  NonlinearSolver (sys_type& s);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~NonlinearSolver ();
+  ponies ();
 
   /**
-   * Builds a \p NonlinearSolver using the nonlinear solver package specified by
-   * \p solver_package
+   * ponies
+   * \ponies
    */
-  static UniquePtr<NonlinearSolver<T> > build(sys_type& s,
-                                              const SolverPackage solver_package = libMesh::default_solver_package());
+  ponies,
+                                              ponies());
 
   /**
-   * @returns true if the data structures are
-   * initialized, false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool initialized () const { return _is_initialized; }
+  ponies; }
 
   /**
-   * Release all memory and clear data structures.
+   * ponies.
    */
-  virtual void clear () {}
+  ponies () {}
 
   /**
-   * Initialize data structures if not done so already.
-   * May assign a name to the solver in some implementations
+   * ponies.
+   * ponies
    */
-  virtual void init (const char* name = NULL) = 0;
+  ponies;
 
   /**
-   * Solves the nonlinear system.
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Jacobian Matrix
-                                               NumericVector<T>&, // Solution vector
-                                               NumericVector<T>&, // Residual vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+  ponies
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
 
   /**
-   * Prints a useful message about why the latest nonlinear solve
-   * con(di)verged.
+   * ponies
+   * ponies.
    */
-  virtual void print_converged_reason() { libmesh_not_implemented(); }
+  ponies(); }
 
   /**
-   * Get the total number of linear iterations done in the last solve
+   * ponies
    */
-  virtual int get_total_linear_iterations() = 0;
+  ponies;
 
   /**
-   * If called *during* the solve(), for example by the user-specified
-   * residual or Jacobian function, returns the current nonlinear iteration
-   * number.  Must be redefined in derived classes.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual unsigned get_current_nonlinear_iteration_number() const = 0;
+  ponies;
 
   /**
-   * Function that computes the residual \p R(X) of the nonlinear system
-   * at the input iterate \p X.
+   * ponies
+   * ponies.
    */
-  void (* residual) (const NumericVector<Number>& X,
-                     NumericVector<Number>& R,
-                     sys_type& S);
+  ponies,
+                     ponies,
+                     ponies);
 
   /**
-   * Object that computes the residual \p R(X) of the nonlinear system
-   * at the input iterate \p X.
+   * ponies
+   * ponies.
    */
-  NonlinearImplicitSystem::ComputeResidual *residual_object;
+  ponies;
 
   /**
-   * Function that computes the Jacobian \p J(X) of the nonlinear system
-   * at the input iterate \p X.
+   * ponies
+   * ponies.
    */
-  void (* jacobian) (const NumericVector<Number>& X,
-                     SparseMatrix<Number>& J,
-                     sys_type& S);
+  ponies,
+                     ponies,
+                     ponies);
 
   /**
-   * Object that computes the Jacobian \p J(X) of the nonlinear system
-   * at the input iterate \p X.
+   * ponies
+   * ponies.
    */
-  NonlinearImplicitSystem::ComputeJacobian *jacobian_object;
+  ponies;
 
   /**
-   * Function that computes either the residual \f$ R(X) \f$ or the
-   * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
-   * iterate \f$ X \f$.  Note that either \p R or \p J could be
-   * \p XSNULL.
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  void (* matvec) (const NumericVector<Number>& X,
-                   NumericVector<Number>* R,
-                   SparseMatrix<Number>*  J,
-                   sys_type& S);
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies);
 
   /**
-   * Object that computes either the residual \f$ R(X) \f$ or the
-   * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
-   * iterate \f$ X \f$.  Note that either \p R or \p J could be
-   * \p XSNULL.
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  NonlinearImplicitSystem::ComputeResidualandJacobian *residual_and_jacobian_object;
+  ponies;
 
   /**
-   * Function that computes the lower and upper bounds \p XL and \p XU on the solution of the nonlinear system.
+   * ponies.
    */
-  void (* bounds) (NumericVector<Number>& XL,
-                   NumericVector<Number>& XU,
-                   sys_type& S);
+  ponies,
+                   ponies,
+                   ponies);
   /**
-   * Object that computes the bounds vectors  \f$ XL \f$ and \f$ XU \f$.
+   * ponies$.
    */
-  NonlinearImplicitSystem::ComputeBounds *bounds_object;
+  ponies;
 
   /**
-   * Function that computes a basis for the Jacobian's nullspace --
-   * the kernel or the "zero energy modes" -- that can be used in
-   * solving a degenerate problem iteratively, if the solver supports it
-   * (e.g., PETSc's KSP).
+   * ponies --
+   * ponies
+   * ponies
+   * (ponies).
    */
-  void (* nullspace) (std::vector<NumericVector<Number>*>& sp, sys_type& S);
+  ponies);
 
   /**
-   * A callable object that computes a basis for the Jacobian's nullspace --
-   * the kernel or the "zero energy modes" -- that can be used in
-   * solving a degenerate problem iteratively, if the solver supports it
-   * (e.g., PETSc's KSP).
+   * ponies --
+   * ponies
+   * ponies
+   * (ponies).
    */
-  NonlinearImplicitSystem::ComputeVectorSubspace *nullspace_object;
+  ponies;
 
   /**
-   * Function that computes a basis for the Jacobian's near nullspace --
-   * the set of "low energy modes" -- that can be used for AMG coarsening,
-   * if the solver supports it (e.g., ML, PETSc's GAMG).
+   * ponies --
+   * ponies,
+   * ponies).
    */
-  void (* nearnullspace) (std::vector<NumericVector<Number>*>& sp, sys_type& S);
+  ponies);
 
   /**
-   * A callable object that computes a basis for the Jacobian's near nullspace --
-   * the set of "low energy modes" -- that can be used for AMG coarsening,
-   * if the solver supports it (e.g., ML, PETSc's GAMG).
+   * ponies --
+   * ponies,
+   * ponies).
    */
-  NonlinearImplicitSystem::ComputeVectorSubspace *nearnullspace_object;
+  ponies;
 
 
-  void (* user_presolve)(sys_type& S);
+  ponies);
 
   /**
-   * @returns a constant reference to the system we are solving.
+   * @ponies.
    */
-  const sys_type & system () const { return _system; }
+  ponies; }
 
   /**
-   * @returns a writeable reference to the system we are solving.
+   * @ponies.
    */
-  sys_type & system () { return _system; }
+  ponies; }
 
   /**
-   * Attaches a Preconditioner object to be used during the linear solves.
+   * ponies.
    */
-  void attach_preconditioner(Preconditioner<T> * preconditioner);
+  ponies);
 
   /**
-   * Maximum number of non-linear iterations.
+   * ponies.
    */
-  unsigned int max_nonlinear_iterations;
+  ponies;
 
   /**
-   * Maximum number of function evaluations.
+   * ponies.
    */
-  unsigned int max_function_evaluations;
+  ponies;
 
   /**
-   * The NonlinearSolver should exit after the residual is
-   * reduced to either less than absolute_residual_tolerance
-   * or less than relative_residual_tolerance times the
-   * initial residual.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users should increase any of these tolerances that they want to use for a
-   * stopping condition.
+   * ponies
+   * ponies.
    *
    */
-  Real absolute_residual_tolerance;
-  Real relative_residual_tolerance;
+  ponies;
+  ponies;
 
   /**
-   * The NonlinearSolver should exit after the full nonlinear step norm is
-   * reduced to either less than absolute_step_tolerance
-   * or less than relative_step_tolerance times the largest
-   * nonlinear solution which has been seen so far.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Users should increase any of these tolerances that they want to use for a
-   * stopping condition.
+   * ponies
+   * ponies.
    *
-   * Note that not all NonlinearSolvers support relative_step_tolerance!
+   * ponies!
    */
-  Real absolute_step_tolerance;
-  Real relative_step_tolerance;
+  ponies;
+  ponies;
 
   /**
-   * Each linear solver step should exit after \p max_linear_iterations
-   * is exceeded.
+   * ponies
+   * ponies.
    */
-  unsigned int max_linear_iterations;
+  ponies;
 
   /**
-   * Any required linear solves will at first be done with this tolerance;
-   * the NonlinearSolver may tighten the tolerance for later solves.
+   * ponies;
+   * ponies.
    */
-  Real initial_linear_tolerance;
+  ponies;
 
   /**
-   * The tolerance for linear solves is kept above this minimum
+   * ponies
    */
-  Real minimum_linear_tolerance;
+  ponies;
 
   /**
-   * After a call to solve this will reflect whether or not the nonlinear
-   * solve was successful.
+   * ponies
+   * ponies.
    */
-  bool converged;
+  ponies;
 
-protected:
+ponies:
   /**
-   * A reference to the system we are solving.
+   * ponies.
    */
-  sys_type& _system;
-
-  /**
-   * Flag indicating if the data structures have been initialized.
-   */
-  bool _is_initialized;
+  ponies;
 
   /**
-   * Holds the Preconditioner object to be used for the linear solves.
+   * ponies.
    */
-  Preconditioner<T> * _preconditioner;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
 
 
-/*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
-  ParallelObject               (s),
-  residual                     (NULL),
-  residual_object              (NULL),
-  jacobian                     (NULL),
-  jacobian_object              (NULL),
-  matvec                       (NULL),
-  residual_and_jacobian_object (NULL),
-  bounds                       (NULL),
-  bounds_object                (NULL),
-  nullspace                    (NULL),
-  nullspace_object             (NULL),
-  nearnullspace                (NULL),
-  nearnullspace_object         (NULL),
-  user_presolve                (NULL),
-  max_nonlinear_iterations(0),
-  max_function_evaluations(0),
-  absolute_residual_tolerance(0),
-  relative_residual_tolerance(0),
-  absolute_step_tolerance(0),
-  relative_step_tolerance(0),
-  max_linear_iterations(0),
-  initial_linear_tolerance(0),
-  minimum_linear_tolerance(0),
-  converged(false),
-  _system(s),
-  _is_initialized (false),
-  _preconditioner (NULL)
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <typename T>
-inline
-NonlinearSolver<T>::~NonlinearSolver ()
+ponies>
+ponies
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_NONLINEAR_SOLVER_H
+#ponies

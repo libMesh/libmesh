@@ -1,161 +1,161 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_EDGE_INF_EDGE2_H
-#define LIBMESH_EDGE_INF_EDGE2_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_common.h"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-// Local includes
-#include "libmesh/edge.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes.
- * It is numbered like this:
+ * ponies.
+ * ponies:
  *
- * \verbatim
- * INFEDGE2:
+ * \ponies
+ * ponies:
  *
- *     o         closer to infinity
- *     | 1
+ *     ponies
+ *     | ponies
  *     |
  *     |
  *     |
- *     o         base node
- *       0
- * \endverbatim
+ *     ponies
+ *       ponies
+ * \ponies
  */
-class InfEdge2 : public Edge
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  By default this element has no parent.
+   * ponies.
    */
-  explicit
-  InfEdge2 (Elem* p=NULL) :
-    Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
+  ponies
+  ponies) :
+    ponies) {}
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_less(i, this->n_nodes());
-    return Point(0,i,0);
+    ponies());
+    ponies);
   }
 
   /**
-   * @returns 1
+   * @ponies
    */
-  unsigned int n_sub_elem() const { return 1; }
+  ponies; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @ponies.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @ponies.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @ponies.
    */
-  virtual bool is_face(const unsigned int i) const;
+  ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge (i.e. "returns true" in 1D)
+   * @ponies
+   * ponies)
    */
-  virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+  ponies,
+                               ponies;
 
   /**
-   * @returns \p INFEDGE2
+   * @ponies
    */
-  ElemType type()  const { return INFEDGE2; }
+  ponies; }
 
   /**
-   * @returns FIRST
+   * @ponies
    */
-  Order default_order() const { return FIRST; }
+  ponies; }
 
-  virtual void connectivity(const unsigned int se,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+  ponies,
+                            ponies,
+                            ponies;
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
   /**
-   * @returns \p true.  This is an infinite element.
+   * @ponies.
    */
-  bool infinite () const { return true; }
+  ponies; }
 
   /**
-   * @returns the origin of this infinite element.
+   * @ponies.
    */
-  Point origin () const;
+  ponies;
 
-#endif
+#ponies
 
 
-protected:
+ponies:
 
   /**
-   * Data for links to nodes
+   * ponies
    */
-  Node* _nodelinks_data[2];
+  ponies];
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Matrix used to create the elements children.
+   * ponies.
    */
-  float embedding_matrix (const unsigned int,
-                          const unsigned int,
-                          const unsigned int) const
-  { libmesh_not_implemented(); return 0.; }
+  ponies,
+                          ponies,
+                          ponies
+  { ponies.; }
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+  ponies;
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 };
 
@@ -163,16 +163,16 @@ protected:
 
 
 // ------------------------------------------------------------
-// InfEdge2 class member functions
-inline
-Point InfEdge2::origin () const
+// ponies
+ponies
+ponies
 {
-  return ( this->point(0)*2 - this->point(1) );
+  ponies) );
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif
+#ponies
 
-#endif // LIBMESH_EDGE_INF_EDGE2_H
+#ponies

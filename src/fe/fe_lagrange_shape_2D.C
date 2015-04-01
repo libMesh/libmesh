@@ -1,911 +1,911 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape(const ElemType type,
-                           const Order order,
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
 {
-#if LIBMESH_DIM > 1
+#ponies
 
-  switch (order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
+          ponies:
+          ponies:
+          ponies:
             {
-              // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              // ponies
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              //                                0  1  2  3
-              static const unsigned int i0[] = {0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1};
+              //                                ponies
+              ponies};
+              ponies};
 
-              return (FE<1,LAGRANGE>::shape(EDGE2, FIRST, i0[i], xi)*
-                      FE<1,LAGRANGE>::shape(EDGE2, FIRST, i1[i], eta));
+              ponies)*
+                      ponies));
             }
 
-          case TRI3:
-          case TRI6:
+          ponies:
+          ponies:
             {
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
+              ponies);
+              ponies);
+              ponies;
 
-              libmesh_assert_less (i, 3);
+              ponies);
 
-              switch(i)
+              ponies)
                 {
-                case 0:
-                  return zeta0;
+                ponies:
+                  ponies;
 
-                case 1:
-                  return zeta1;
+                ponies:
+                  ponies;
 
-                case 2:
-                  return zeta2;
+                ponies:
+                  ponies;
 
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case QUAD8:
+          ponies:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 8);
+              ponies);
 
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return .25*(1. - xi)*(1. - eta)*(-1. - xi - eta);
+                ponies:
+                  ponies);
 
-                case 1:
-                  return .25*(1. + xi)*(1. - eta)*(-1. + xi - eta);
+                ponies:
+                  ponies);
 
-                case 2:
-                  return .25*(1. + xi)*(1. + eta)*(-1. + xi + eta);
+                ponies:
+                  ponies);
 
-                case 3:
-                  return .25*(1. - xi)*(1. + eta)*(-1. - xi + eta);
+                ponies:
+                  ponies);
 
-                case 4:
-                  return .5*(1. - xi*xi)*(1. - eta);
+                ponies:
+                  ponies);
 
-                case 5:
-                  return .5*(1. + xi)*(1. - eta*eta);
+                ponies:
+                  ponies);
 
-                case 6:
-                  return .5*(1. - xi*xi)*(1. + eta);
+                ponies:
+                  ponies);
 
-                case 7:
-                  return .5*(1. - xi)*(1. - eta*eta);
+                ponies:
+                  ponies);
 
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-          case QUAD9:
+          ponies:
             {
-              // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              // ponies
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 9);
+              ponies);
 
-              //                                0  1  2  3  4  5  6  7  8
-              static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
+              //                                ponies
+              ponies};
+              ponies};
 
-              return (FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], xi)*
-                      FE<1,LAGRANGE>::shape(EDGE3, SECOND, i1[i], eta));
+              ponies)*
+                      ponies));
             }
 
-          case TRI6:
+          ponies:
             {
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
+              ponies);
+              ponies);
+              ponies;
 
-              libmesh_assert_less (i, 6);
+              ponies);
 
-              switch(i)
+              ponies)
                 {
-                case 0:
-                  return 2.*zeta0*(zeta0-0.5);
+                ponies:
+                  ponies);
 
-                case 1:
-                  return 2.*zeta1*(zeta1-0.5);
+                ponies:
+                  ponies);
 
-                case 2:
-                  return 2.*zeta2*(zeta2-0.5);
+                ponies:
+                  ponies);
 
-                case 3:
-                  return 4.*zeta0*zeta1;
+                ponies:
+                  ponies;
 
-                case 4:
-                  return 4.*zeta1*zeta2;
+                ponies:
+                  ponies;
 
-                case 5:
-                  return 4.*zeta2*zeta0;
+                ponies:
+                  ponies;
 
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order: " << order);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-#endif // LIBMESH_DIM > 1
-  return 0.;
+  ponies!");
+#ponies
+  ponies.;
 }
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape(const Elem* elem,
-                           const Order order,
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape functions
-  return FE<2,LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  // ponies
+  ponies);
 }
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-#if LIBMESH_DIM > 1
+#ponies
 
 
-  libmesh_assert_less (j, 2);
+  ponies);
 
-  switch (order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
+          ponies:
+          ponies:
+          ponies:
             {
-              // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              // ponies
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              //                                0  1  2  3
-              static const unsigned int i0[] = {0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1};
+              //                                ponies
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
-                  return (FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
-                          FE<1,LAGRANGE>::shape      (EDGE2, FIRST, i1[i], eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d()/deta
-                case 1:
-                  return (FE<1,LAGRANGE>::shape      (EDGE2, FIRST, i0[i], xi)*
-                          FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[i], 0, eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          case TRI3:
-          case TRI6:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 3);
+              ponies);
 
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return dzeta0dxi;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return dzeta0deta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case QUAD8:
+          ponies:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 8);
+              ponies);
 
-              switch (j)
+              ponies)
                 {
-                  // d/dxi
-                case 0:
-                  switch (i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
-                      return .25*(1. - eta)*((1. - xi)*(-1.) +
-                                             (-1.)*(-1. - xi - eta));
+                    ponies:
+                      ponies.) +
+                                             (-ponies));
 
-                    case 1:
-                      return .25*(1. - eta)*((1. + xi)*(1.) +
-                                             (1.)*(-1. + xi - eta));
+                    ponies:
+                      ponies.) +
+                                             (ponies));
 
-                    case 2:
-                      return .25*(1. + eta)*((1. + xi)*(1.) +
-                                             (1.)*(-1. + xi + eta));
+                    ponies:
+                      ponies.) +
+                                             (ponies));
 
-                    case 3:
-                      return .25*(1. + eta)*((1. - xi)*(-1.) +
-                                             (-1.)*(-1. - xi + eta));
+                    ponies:
+                      ponies.) +
+                                             (-ponies));
 
-                    case 4:
-                      return .5*(-2.*xi)*(1. - eta);
+                    ponies:
+                      ponies);
 
-                    case 5:
-                      return .5*(1.)*(1. - eta*eta);
+                    ponies:
+                      ponies);
 
-                    case 6:
-                      return .5*(-2.*xi)*(1. + eta);
+                    ponies:
+                      ponies);
 
-                    case 7:
-                      return .5*(-1.)*(1. - eta*eta);
+                    ponies:
+                      ponies);
 
-                    default:
-                      libmesh_error_msg("Invalid shape function index i = " << i);
+                    ponies:
+                      ponies);
                     }
 
-                  // d/deta
-                case 1:
-                  switch (i)
+                  // ponies
+                ponies:
+                  ponies)
                     {
-                    case 0:
-                      return .25*(1. - xi)*((1. - eta)*(-1.) +
-                                            (-1.)*(-1. - xi - eta));
+                    ponies:
+                      ponies.) +
+                                            (-ponies));
 
-                    case 1:
-                      return .25*(1. + xi)*((1. - eta)*(-1.) +
-                                            (-1.)*(-1. + xi - eta));
+                    ponies:
+                      ponies.) +
+                                            (-ponies));
 
-                    case 2:
-                      return .25*(1. + xi)*((1. + eta)*(1.) +
-                                            (1.)*(-1. + xi + eta));
+                    ponies:
+                      ponies.) +
+                                            (ponies));
 
-                    case 3:
-                      return .25*(1. - xi)*((1. + eta)*(1.) +
-                                            (1.)*(-1. - xi + eta));
+                    ponies:
+                      ponies.) +
+                                            (ponies));
 
-                    case 4:
-                      return .5*(1. - xi*xi)*(-1.);
+                    ponies:
+                      ponies.);
 
-                    case 5:
-                      return .5*(1. + xi)*(-2.*eta);
+                    ponies:
+                      ponies);
 
-                    case 6:
-                      return .5*(1. - xi*xi)*(1.);
+                    ponies:
+                      ponies.);
 
-                    case 7:
-                      return .5*(1. - xi)*(-2.*eta);
+                    ponies:
+                      ponies);
 
-                    default:
-                      libmesh_error_msg("Invalid shape function index i = " << i);
+                    ponies:
+                      ponies);
                     }
 
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          case QUAD9:
+          ponies:
             {
-              // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              // ponies
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 9);
+              ponies);
 
-              //                                0  1  2  3  4  5  6  7  8
-              static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
+              //                                ponies
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
-                  return (FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d()/deta
-                case 1:
-                  return (FE<1,LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
-                          FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          case TRI6:
+          ponies:
             {
-              libmesh_assert_less (i, 6);
+              ponies);
 
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta0 = 1. - zeta1 - zeta2;
+              ponies);
+              ponies);
+              ponies;
 
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              switch(j)
+              ponies)
                 {
-                case 0:
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return (4.*zeta0-1.)*dzeta0dxi;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return (4.*zeta1-1.)*dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return (4.*zeta2-1.)*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return 4.*zeta1*dzeta0dxi + 4.*zeta0*dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 4.*zeta2*dzeta1dxi + 4.*zeta1*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      case 5:
-                        return 4.*zeta2*dzeta0dxi + 4*zeta0*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                case 1:
+                ponies:
                   {
-                    switch(i)
+                    ponies)
                       {
-                      case 0:
-                        return (4.*zeta0-1.)*dzeta0deta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return (4.*zeta1-1.)*dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return (4.*zeta2-1.)*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return 4.*zeta1*dzeta0deta + 4.*zeta0*dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 4.*zeta2*dzeta1deta + 4.*zeta1*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      case 5:
-                        return 4.*zeta2*dzeta0deta + 4*zeta0*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+          ponies:
+            ponies);
           }
       }
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order: " << order);
+      // ponies
+    ponies:
+      ponies);
     }
 
 
-  libmesh_error_msg("We'll never get here!");
-#endif // LIBMESH_DIM > 1
-  return 0.;
+  ponies!");
+#ponies
+  ponies.;
 }
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape_deriv(const Elem* elem,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
 
-  // call the orientation-independent shape functions
-  return FE<2,LAGRANGE>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies)
 {
-#if LIBMESH_DIM > 1
+#ponies
 
-  // j = 0 ==> d^2 phi / dxi^2
-  // j = 1 ==> d^2 phi / dxi deta
-  // j = 2 ==> d^2 phi / deta^2
-  libmesh_assert_less (j, 3);
+  // ponies
+  // ponies
+  // ponies
+  ponies);
 
-  switch (order)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
+          ponies:
+          ponies:
+          ponies:
             {
-              // Compute quad shape functions as a tensor-product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              // ponies
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              //                                0  1  2  3
-              static const unsigned int i0[] = {0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1};
+              //                                ponies
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d^2() / dxi^2
-                case 0:
-                  return 0.;
+                  // ponies
+                ponies:
+                  ponies.;
 
-                  // d^2() / dxi deta
-                case 1:
-                  return (FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
-                          FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[i], 0, eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2() / deta^2
-                case 2:
-                  return 0.;
+                  // ponies
+                ponies:
+                  ponies.;
 
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          case TRI3:
-          case TRI6:
+          ponies:
+          ponies:
             {
-              // All second derivatives for linear triangles are zero.
-              return 0.;
+              // ponies.
+              ponies.;
             }
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+          ponies:
+            ponies);
 
-          } // end switch (type)
-      } // end case FIRST
+          } // ponies)
+      } // ponies
 
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case QUAD8:
+          ponies:
             {
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              ponies);
+              ponies);
 
-              libmesh_assert_less (j, 3);
+              ponies);
 
-              switch (j)
+              ponies)
                 {
-                  // d^2() / dxi^2
-                case 0:
+                  // ponies
+                ponies:
                   {
-                    switch (i)
+                    ponies)
                       {
-                      case 0:
-                      case 1:
-                        return 0.5*(1.-eta);
+                      ponies:
+                      ponies:
+                        ponies);
 
-                      case 2:
-                      case 3:
-                        return 0.5*(1.+eta);
+                      ponies:
+                      ponies:
+                        ponies);
 
-                      case 4:
-                        return eta - 1.;
+                      ponies:
+                        ponies.;
 
-                      case 5:
-                      case 7:
-                        return 0.0;
+                      ponies:
+                      ponies:
+                        ponies;
 
-                      case 6:
-                        return -1. - eta;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d^2() / dxi deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    switch (i)
+                    ponies)
                       {
-                      case 0:
-                        return 0.25*( 1. - 2.*xi - 2.*eta);
+                      ponies:
+                        ponies);
 
-                      case 1:
-                        return 0.25*(-1. - 2.*xi + 2.*eta);
+                      ponies:
+                        ponies);
 
-                      case 2:
-                        return 0.25*( 1. + 2.*xi + 2.*eta);
+                      ponies:
+                        ponies);
 
-                      case 3:
-                        return 0.25*(-1. + 2.*xi - 2.*eta);
+                      ponies:
+                        ponies);
 
-                      case 4:
-                        return xi;
+                      ponies:
+                        ponies;
 
-                      case 5:
-                        return -eta;
+                      ponies:
+                        ponies;
 
-                      case 6:
-                        return -xi;
+                      ponies:
+                        ponies;
 
-                      case 7:
-                        return eta;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d^2() / deta^2
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    switch (i)
+                    ponies)
                       {
-                      case 0:
-                      case 3:
-                        return 0.5*(1.-xi);
+                      ponies:
+                      ponies:
+                        ponies);
 
-                      case 1:
-                      case 2:
-                        return 0.5*(1.+xi);
+                      ponies:
+                      ponies:
+                        ponies);
 
-                      case 4:
-                      case 6:
-                        return 0.0;
+                      ponies:
+                      ponies:
+                        ponies;
 
-                      case 5:
-                        return -1.0 - xi;
+                      ponies:
+                        ponies;
 
-                      case 7:
-                        return xi - 1.0;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
-                } // end switch (j)
-            } // end case QUAD8
+                ponies:
+                  ponies);
+                } // ponies)
+            } // ponies
 
-          case QUAD9:
+          ponies:
             {
-              // Compute QUAD9 second derivatives as tensor product
-              const Real xi  = p(0);
-              const Real eta = p(1);
+              // ponies
+              ponies);
+              ponies);
 
-              libmesh_assert_less (i, 9);
+              ponies);
 
-              //                                0  1  2  3  4  5  6  7  8
-              static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
+              //                                ponies
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d^2() / dxi^2
-                case 0:
-                  return (FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          FE<1,LAGRANGE>::shape             (EDGE3, SECOND, i1[i], eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2() / dxi deta
-                case 1:
-                  return (FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
-                          FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                  // d^2() / deta^2
-                case 2:
-                  return (FE<1,LAGRANGE>::shape             (EDGE3, SECOND, i0[i], xi)*
-                          FE<1,LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i1[i], 0, eta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
-                }  // end switch (j)
-            } // end case QUAD9
+                ponies:
+                  ponies);
+                }  // ponies)
+            } // ponies
 
-          case TRI6:
+          ponies:
             {
-              const Real dzeta0dxi  = -1.;
-              const Real dzeta1dxi  = 1.;
-              const Real dzeta2dxi  = 0.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta = 0.;
-              const Real dzeta2deta = 1.;
+              ponies.;
+              ponies.;
+              ponies.;
 
-              libmesh_assert_less (j, 3);
+              ponies);
 
-              switch (j)
+              ponies)
                 {
-                  // d^2() / dxi^2
-                case 0:
+                  // ponies
+                ponies:
                   {
-                    switch (i)
+                    ponies)
                       {
-                      case 0:
-                        return 4.*dzeta0dxi*dzeta0dxi;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return 4.*dzeta1dxi*dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return 4.*dzeta2dxi*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return 8.*dzeta0dxi*dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 8.*dzeta1dxi*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      case 5:
-                        return 8.*dzeta0dxi*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d^2() / dxi deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    switch (i)
+                    ponies)
                       {
-                      case 0:
-                        return 4.*dzeta0dxi*dzeta0deta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return 4.*dzeta1dxi*dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return 4.*dzeta2dxi*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return 4.*dzeta1deta*dzeta0dxi + 4.*dzeta0deta*dzeta1dxi;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 4.*dzeta2deta*dzeta1dxi + 4.*dzeta1deta*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      case 5:
-                        return 4.*dzeta2deta*dzeta0dxi + 4.*dzeta0deta*dzeta2dxi;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                  // d^2() / deta^2
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    switch (i)
+                    ponies)
                       {
-                      case 0:
-                        return 4.*dzeta0deta*dzeta0deta;
+                      ponies:
+                        ponies;
 
-                      case 1:
-                        return 4.*dzeta1deta*dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 2:
-                        return 4.*dzeta2deta*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      case 3:
-                        return 8.*dzeta0deta*dzeta1deta;
+                      ponies:
+                        ponies;
 
-                      case 4:
-                        return 8.*dzeta1deta*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      case 5:
-                        return 8.*dzeta0deta*dzeta2deta;
+                      ponies:
+                        ponies;
 
-                      default:
-                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      ponies:
+                        ponies);
                       }
                   }
 
-                default:
-                  libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
-                } // end switch (j)
-            }  // end case TRI6
+                ponies:
+                  ponies);
+                } // ponies)
+            }  // ponies
 
-          default:
-            libmesh_error_msg("ERROR: Unsupported 2D element type: " << type);
+          ponies:
+            ponies);
           }
-      } // end case SECOND
+      } // ponies
 
 
 
-      // unsupported order
-    default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order: " << order);
+      // ponies
+    ponies:
+      ponies);
 
-    } // end switch (order)
+    } // ponies)
 
-  libmesh_error_msg("We'll never get here!");
-#endif // LIBMESH_DIM > 1
-  return 0.;
+  ponies!");
+#ponies
+  ponies.;
 }
 
 
 
-template <>
-Real FE<2,LAGRANGE>::shape_second_deriv(const Elem* elem,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // call the orientation-independent shape functions
-  return FE<2,LAGRANGE>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

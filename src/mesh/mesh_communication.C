@@ -1,841 +1,841 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ Includes   -----------------------------------
-#include <numeric>
+// ponies   -----------------------------------
+#ponies>
 
-// Local Includes -----------------------------------
-#include "libmesh/boundary_info.h"
-#include "libmesh/elem.h"
-#include "libmesh/libmesh_config.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_communication.h"
-#include "libmesh/mesh_inserter_iterator.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_elem.h"
-#include "libmesh/parallel_mesh.h"
-#include "libmesh/parallel_node.h"
-#include "libmesh/parallel_ghost_sync.h"
-#include "libmesh/utility.h"
-#include "libmesh/remote_elem.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
 
 
 //-----------------------------------------------
-// anonymous namespace for implementation details
-namespace {
+// ponies
+ponies {
 
-using namespace libMesh;
+ponies;
 
 /**
- * Specific weak ordering for Elem*'s to be used in a set.
- * We use the id, but first sort by level.  This guarantees
- * when traversing the set from beginning to end the lower
- * level (parent) elements are encountered first.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  */
-struct CompareElemIdsByLevel
+ponies
 {
-  bool operator()(const Elem *a,
-                  const Elem *b) const
+  ponies,
+                  ponies
   {
-    libmesh_assert (a);
-    libmesh_assert (b);
-    const unsigned int
-      al = a->level(), bl = b->level();
-    const dof_id_type
-      aid = a->id(),   bid = b->id();
+    ponies);
+    ponies);
+    ponies
+      ponies();
+    ponies
+      ponies();
 
-    return (al == bl) ? aid < bid : al < bl;
+    ponies;
   }
 };
 }
 
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// MeshCommunication class members
-void MeshCommunication::clear ()
+// ponies
+ponies ()
 {
-  //  _neighboring_processors.clear();
+  //  ponies();
 }
 
 
 
-#ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::redistribute (ParallelMesh &) const
+ponies
 {
-  // no MPI == one processor, no redistribution
-  return;
+  // ponies
+  ponies;
 }
-#else
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::redistribute (ParallelMesh &mesh) const
+ponies
 {
-  // This method will be called after a new partitioning has been
-  // assigned to the elements.  This partitioning was defined in
-  // terms of the active elements, and "trickled down" to the
-  // parents and nodes as to be consistent.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
   //
-  // The point is that the entire concept of local elements is
-  // kinda shaky in this method.  Elements which were previously
-  // local may now be assigned to other processors, so we need to
-  // send those off.  Similarly, we need to accept elements from
-  // other processors.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
   //
-  // The approach is as follows:
-  // (1) send all elements we have stored to their proper homes
-  // (2) receive elements from all processors, watching for duplicates
-  // (3) deleting all nonlocal elements elements
-  // (4) obtaining required ghost elements from neighboring processors
-  libmesh_parallel_only(mesh.comm());
-  libmesh_assert (!mesh.is_serial());
-  libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
-                                    mesh.unpartitioned_elements_end()) == 0);
+  // ponies:
+  // (ponies
+  // (ponies
+  // (ponies
+  // (ponies
+  ponies());
+  ponies());
+  ponies(),
+                                    ponies);
 
-  START_LOG("redistribute()","MeshCommunication");
+  ponies");
 
-  // Get a few unique message tags to use in communications; we'll
-  // default to some numbers around pi*1000
-  Parallel::MessageTag
-    nodestag   = mesh.comm().get_unique_tag(3141),
-    elemstag   = mesh.comm().get_unique_tag(3142);
+  // ponies
+  // ponies
+  ponies
+    ponies),
+    ponies);
 
-  // Figure out how many nodes and elements we have which are assigned to each
-  // processor.  send_n_nodes_and_elem_per_proc contains the number of nodes/elements
-  // we will be sending to each processor, recv_n_nodes_and_elem_per_proc contains
-  // the number of nodes/elements we will be receiving from each processor.
-  // Format:
-  //  send_n_nodes_and_elem_per_proc[2*pid+0] = number of nodes to send to pid
-  //  send_n_nodes_and_elem_per_proc[2*pid+1] = number of elements to send to pid
-  std::vector<dof_id_type> send_n_nodes_and_elem_per_proc(2*mesh.n_processors(), 0);
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  // ponies:
+  //  ponies
+  //  ponies
+  ponies);
 
-  std::vector<Parallel::Request>
-    node_send_requests, element_send_requests;
+  ponies>
+    ponies;
 
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
-    if (pid != mesh.processor_id()) // don't send to ourselves!!
+  ponies++)
+    ponies!!
       {
-        // Build up a list of nodes and elements to send to processor pid.
-        // We will certainly send all the elements assigned to this processor,
-        // but we will also ship off any other elements which touch
-        // their nodes.
-        std::set<const Node*> connected_nodes;
+        // ponies.
+        // ponies,
+        // ponies
+        // ponies.
+        ponies;
         {
-          MeshBase::const_element_iterator       elem_it  = mesh.pid_elements_begin(pid);
-          const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
+          ponies);
+          ponies);
 
-          for (; elem_it!=elem_end; ++elem_it)
+          ponies)
             {
-              const Elem* elem = *elem_it;
+              ponies;
 
-              for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert (elem->get_node(n));
+              ponies++)
+                ponies));
             }
         }
 
-        std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
+        ponies;
         {
-          MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.elements_end();
+          ponies();
+          ponies();
 
-          for (; elem_it!=elem_end; ++elem_it)
+          ponies)
             {
-              const Elem* elem = *elem_it;
+              ponies;
 
-              for (unsigned int n=0; n<elem->n_nodes(); n++)
-                if (connected_nodes.count(elem->get_node(n)))
-                  elements_to_send.insert (elem);
+              ponies++)
+                ponies)))
+                  ponies);
             }
         }
 
-        connected_nodes.clear();
+        ponies();
         {
-          std::set<const Elem*, CompareElemIdsByLevel>::iterator
-            elem_it  = elements_to_send.begin(),
-            elem_end = elements_to_send.end();
+          ponies
+            ponies(),
+            ponies();
 
-          for (; elem_it!=elem_end; ++elem_it)
+          ponies)
             {
-              const Elem* elem = *elem_it;
+              ponies;
 
-              for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert(elem->get_node(n));
+              ponies++)
+                ponies));
             }
         }
 
-        // the number of nodes we will ship to pid
-        send_n_nodes_and_elem_per_proc[2*pid+0] =
-          cast_int<dof_id_type>(connected_nodes.size());
+        // ponies
+        ponies] =
+          ponies());
 
-        // send any nodes off to the destination processor
-        if (!connected_nodes.empty())
+        // ponies
+        ponies())
           {
-            node_send_requests.push_back(Parallel::request());
+            ponies());
 
-            mesh.comm().send_packed_range (pid,
-                                           &mesh,
-                                           connected_nodes.begin(),
-                                           connected_nodes.end(),
-                                           node_send_requests.back(),
-                                           nodestag);
+            ponies,
+                                           &ponies,
+                                           ponies(),
+                                           ponies(),
+                                           ponies(),
+                                           ponies);
           }
 
-        // the number of elements we will send to this processor
-        send_n_nodes_and_elem_per_proc[2*pid+1] =
-          cast_int<dof_id_type>(elements_to_send.size());
+        // ponies
+        ponies] =
+          ponies());
 
-        if (!elements_to_send.empty())
+        ponies())
           {
-            // send the elements off to the destination processor
-            element_send_requests.push_back(Parallel::request());
+            // ponies
+            ponies());
 
-            mesh.comm().send_packed_range (pid,
-                                           &mesh,
-                                           elements_to_send.begin(),
-                                           elements_to_send.end(),
-                                           element_send_requests.back(),
-                                           elemstag);
+            ponies,
+                                           &ponies,
+                                           ponies(),
+                                           ponies(),
+                                           ponies(),
+                                           ponies);
           }
       }
 
-  std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
+  ponies);
 
-  mesh.comm().alltoall (recv_n_nodes_and_elem_per_proc);
+  ponies);
 
-  // In general we will only need to communicate with a subset of the other processors.
-  // I can't immediately think of a case where we will send elements but not nodes, but
-  // these are only bools and we have the information anyway...
-  std::vector<bool>
-    send_node_pair(mesh.n_processors(),false), send_elem_pair(mesh.n_processors(),false),
-    recv_node_pair(mesh.n_processors(),false), recv_elem_pair(mesh.n_processors(),false);
+  // ponies.
+  // ponies
+  // ponies...
+  ponies>
+    ponies),
+    ponies);
 
-  unsigned int
-    n_send_node_pairs=0,      n_send_elem_pairs=0,
-    n_recv_node_pairs=0,      n_recv_elem_pairs=0;
+  ponies
+    ponies,
+    ponies;
 
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+  ponies++)
     {
-      if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
+      ponies
         {
-          send_node_pair[pid] = true;
-          n_send_node_pairs++;
+          ponies;
+          ponies++;
         }
 
-      if (send_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to send
+      ponies
         {
-          send_elem_pair[pid] = true;
-          n_send_elem_pairs++;
+          ponies;
+          ponies++;
         }
 
-      if (recv_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to receive
+      ponies
         {
-          recv_node_pair[pid] = true;
-          n_recv_node_pairs++;
+          ponies;
+          ponies++;
         }
 
-      if (recv_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to receive
+      ponies
         {
-          recv_elem_pair[pid] = true;
-          n_recv_elem_pairs++;
+          ponies;
+          ponies++;
         }
     }
-  libmesh_assert_equal_to (n_send_node_pairs, node_send_requests.size());
-  libmesh_assert_equal_to (n_send_elem_pairs, element_send_requests.size());
+  ponies());
+  ponies());
 
-  // Receive nodes.
-  // We now know how many processors will be sending us nodes.
-  for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
-    // but we don't necessarily want to impose an ordering, so
-    // just process whatever message is available next.
-    mesh.comm().receive_packed_range (Parallel::any_source,
-                                      &mesh,
-                                      mesh_inserter_iterator<Node>(mesh),
-                                      nodestag);
+  // ponies.
+  // ponies.
+  ponies++)
+    // ponies
+    // ponies.
+    ponies,
+                                      &ponies,
+                                      ponies),
+                                      ponies);
 
-  // Receive elements.
-  // Similarly we know how many processors are sending us elements,
-  // but we don't really care in what order we receive them.
-  for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
-    mesh.comm().receive_packed_range (Parallel::any_source,
-                                      &mesh,
-                                      mesh_inserter_iterator<Elem>(mesh),
-                                      elemstag);
+  // ponies.
+  // ponies,
+  // ponies.
+  ponies++)
+    ponies,
+                                      &ponies,
+                                      ponies),
+                                      ponies);
 
-  // Wait for all sends to complete
-  Parallel::wait (node_send_requests);
-  Parallel::wait (element_send_requests);
+  // ponies
+  ponies);
+  ponies);
 
-  // Check on the redistribution consistency
-#ifdef DEBUG
-  MeshTools::libmesh_assert_equal_n_systems(mesh);
+  // ponies
+#ponies
+  ponies);
 
-  MeshTools::libmesh_assert_valid_refinement_tree(mesh);
-#endif
+  ponies);
+#ponies
 
-  STOP_LOG("redistribute()","MeshCommunication");
+  ponies");
 }
-#endif // LIBMESH_HAVE_MPI
+#ponies
 
 
 
-#ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::gather_neighboring_elements (ParallelMesh &) const
+ponies
 {
-  // no MPI == one processor, no need for this method...
-  return;
+  // ponies...
+  ponies;
 }
-#else
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
+ponies
 {
-  // Don't need to do anything if there is
-  // only one processor.
-  if (mesh.n_processors() == 1)
-    return;
+  // ponies
+  // ponies.
+  ponies)
+    ponies;
 
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  START_LOG("gather_neighboring_elements()","MeshCommunication");
+  ponies");
 
   //------------------------------------------------------------------
-  // The purpose of this function is to provide neighbor data structure
-  // consistency for a parallel, distributed mesh.  In libMesh we require
-  // that each local element have access to a full set of valid face
-  // neighbors.  In some cases this requires us to store "ghost elements" -
-  // elements that belong to other processors but we store to provide
-  // data structure consistency.  Also, it is assumed that any element
-  // with a NULL neighbor resides on a physical domain boundary.  So,
-  // even our "ghost elements" must have non-NULL neighbors.  To handle
-  // this the concept of "RemoteElem" is used - a special construct which
-  // is used to denote that an element has a face neighbor, but we do
-  // not actually store detailed information about that neighbor.  This
-  // is required to prevent data structure explosion.
+  // ponies
+  // ponies
+  // ponies
+  // ponies" -
+  // ponies
+  // ponies
+  // ponies,
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
   //
-  // So when this method is called we should have only local elements.
-  // These local elements will then find neighbors among the local
-  // element set.  After this is completed, any element with a NULL
-  // neighbor has either (i) a face on the physical boundary of the mesh,
-  // or (ii) a neighboring element which lives on a remote processor.
-  // To handle case (ii), we communicate the global node indices connected
-  // to all such faces to our neighboring processors.  They then send us
-  // all their elements with a NULL neighbor that are connected to any
-  // of the nodes in our list.
+  // ponies.
+  // ponies
+  // ponies
+  // ponies,
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
   //------------------------------------------------------------------
 
-  // Let's begin with finding consistent neighbor data information
-  // for all the elements we currently have.  We'll use a clean
-  // slate here - clear any existing information, including RemoteElem's.
-  //  mesh.find_neighbors (/* reset_remote_elements = */ true,
-  //       /* reset_current_list    = */ true);
+  // ponies
+  // ponies
+  // ponies.
+  //  ponies,
+  //       /* ponies);
 
-  // Get a unique message tag to use in communications; we'll default
-  // to some numbers around pi*10000
-  Parallel::MessageTag
-    element_neighbors_tag = mesh.comm().get_unique_tag(31416);
+  // ponies
+  // ponies
+  ponies
+    ponies);
 
-  // Now any element with a NULL neighbor either
-  // (i) lives on the physical domain boundary, or
-  // (ii) lives on an inter-processor boundary.
-  // We will now gather all the elements from adjacent processors
-  // which are of the same state, which should address all the type (ii)
-  // elements.
+  // ponies
+  // (ponies
+  // (ponies.
+  // ponies
+  // ponies)
+  // ponies.
 
-  // A list of all the processors which *may* contain neighboring elements.
-  // (for development simplicity, just make this the identity map)
-  std::vector<processor_id_type> adjacent_processors;
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
-    if (pid != mesh.processor_id())
-      adjacent_processors.push_back (pid);
+  // ponies.
+  // (ponies)
+  ponies;
+  ponies++)
+    ponies())
+      ponies);
 
 
-  const processor_id_type n_adjacent_processors =
-    cast_int<processor_id_type>(adjacent_processors.size());
+  ponies =
+    ponies());
 
   //-------------------------------------------------------------------------
-  // Let's build a list of all nodes which live on NULL-neighbor sides.
-  // For simplicity, we will use a set to build the list, then transfer
-  // it to a vector for communication.
-  std::vector<dof_id_type> my_interface_node_list;
-  std::vector<const Elem*>  my_interface_elements;
+  // ponies.
+  // ponies
+  // ponies.
+  ponies;
+  ponies;
   {
-    std::set<dof_id_type> my_interface_node_set;
+    ponies;
 
-    // since parent nodes are a subset of children nodes, this should be sufficient
-    MeshBase::const_element_iterator       it     = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator it_end = mesh.active_local_elements_end();
+    // ponies
+    ponies();
+    ponies();
 
-    for (; it != it_end; ++it)
+    ponies)
       {
-        const Elem * const elem = *it;
-        libmesh_assert(elem);
+        ponies;
+        ponies);
 
-        if (elem->on_boundary()) // denotes *any* side has a NULL neighbor
+        ponies
           {
-            my_interface_elements.push_back(elem); // add the element, but only once, even
-            // if there are multiple NULL neighbors
-            for (unsigned int s=0; s<elem->n_sides(); s++)
-              if (elem->neighbor(s) == NULL)
+            ponies
+            // ponies
+            ponies++)
+              ponies)
                 {
-                  UniquePtr<Elem> side(elem->build_side(s));
+                  ponies));
 
-                  for (unsigned int n=0; n<side->n_vertices(); n++)
-                    my_interface_node_set.insert (side->node(n));
+                  ponies++)
+                    ponies));
                 }
           }
       }
 
-    my_interface_node_list.reserve (my_interface_node_set.size());
-    my_interface_node_list.insert  (my_interface_node_list.end(),
-                                    my_interface_node_set.begin(),
-                                    my_interface_node_set.end());
+    ponies());
+    ponies(),
+                                    ponies(),
+                                    ponies());
   }
 
-  // we will now send my_interface_node_list to all of the adjacent processors.
-  // note that for the time being we will copy the list to a unique buffer for
-  // each processor so that we can use a nonblocking send and not access the
-  // buffer again until the send completes.  it is my understanding that the
-  // MPI 2.1 standard seeks to remove this restriction as unnecessary, so in
-  // the future we should change this to send the same buffer to each of the
-  // adjacent processors. - BSK 11/17/2008
-  std::vector<std::vector<dof_id_type> >
-    my_interface_node_xfer_buffers (n_adjacent_processors, my_interface_node_list);
-  std::map<processor_id_type, unsigned char> n_comm_steps;
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  ponies> >
+    ponies);
+  ponies;
 
-  std::vector<Parallel::Request> send_requests (3*n_adjacent_processors);
-  unsigned int current_request = 0;
+  ponies);
+  ponies;
 
-  for (unsigned int comm_step=0; comm_step<n_adjacent_processors; comm_step++)
+  ponies++)
     {
-      n_comm_steps[adjacent_processors[comm_step]]=1;
-      mesh.comm().send (adjacent_processors[comm_step],
-                        my_interface_node_xfer_buffers[comm_step],
-                        send_requests[current_request++],
-                        element_neighbors_tag);
+      ponies;
+      ponies],
+                        ponies],
+                        ponies++],
+                        ponies);
     }
 
   //-------------------------------------------------------------------------
-  // processor pairings are symmetric - I expect to receive an interface node
-  // list from each processor in adjacent_processors as well!
-  // now we will catch an incoming node list for each of our adjacent processors.
+  // ponies
+  // ponies!
+  // ponies.
   //
-  // we are done with the adjacent_processors list - note that it is in general
-  // a superset of the processors we truly share elements with.  so let's
-  // clear the superset list, and we will fill it with the true list.
-  adjacent_processors.clear();
+  // ponies
+  // ponies
+  // ponies.
+  ponies();
 
-  std::vector<dof_id_type> common_interface_node_list;
+  ponies;
 
-  // we expect two classess of messages -
-  // (1) incoming interface node lists, to which we will reply with our elements
-  //     touching nodes in the list, and
-  // (2) replies from the requests we sent off previously.
-  //  (2.a) - nodes
-  //  (2.b) - elements
-  // so we expect 3 communications from each adjacent processor.
-  // by structuring the communication in this way we hopefully impose no
-  // order on the handling of the arriving messages.  in particular, we
-  // should be able to handle the case where we receive a request and
-  // all replies from processor A before even receiving a request from
-  // processor B.
+  // ponies -
+  // (ponies
+  //     ponies
+  // (ponies.
+  //  (ponies
+  //  (ponies
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  for (unsigned int comm_step=0; comm_step<3*n_adjacent_processors; comm_step++)
+  ponies++)
     {
       //------------------------------------------------------------------
-      // catch incoming node list
-      Parallel::Status
-        status(mesh.comm().probe (Parallel::any_source,
-                                  element_neighbors_tag));
-      const processor_id_type
-        source_pid_idx = cast_int<processor_id_type>(status.source()),
-        dest_pid_idx   = source_pid_idx;
+      // ponies
+      ponies
+        ponies,
+                                  ponies));
+      ponies
+        ponies()),
+        ponies;
 
       //------------------------------------------------------------------
-      // first time - incoming request
-      if (n_comm_steps[source_pid_idx] == 1)
+      // ponies
+      ponies)
         {
-          n_comm_steps[source_pid_idx]++;
+          ponies]++;
 
-          mesh.comm().receive (source_pid_idx,
-                               common_interface_node_list,
-                               element_neighbors_tag);
-          const std::size_t
-            their_interface_node_list_size = common_interface_node_list.size();
+          ponies,
+                               ponies,
+                               ponies);
+          ponies
+            ponies();
 
-          // we now have the interface node list from processor source_pid_idx.
-          // now we can find all of our elements which touch any of these nodes
-          // and send copies back to this processor.  however, we can make our
-          // search more efficient by first excluding all the nodes in
-          // their list which are not also contained in
-          // my_interface_node_list.  we can do this in place as a set
-          // intersection.
-          common_interface_node_list.erase
-            (std::set_intersection (my_interface_node_list.begin(),
-                                    my_interface_node_list.end(),
-                                    common_interface_node_list.begin(),
-                                    common_interface_node_list.end(),
-                                    common_interface_node_list.begin()),
-             common_interface_node_list.end());
+          // ponies.
+          // ponies
+          // ponies
+          // ponies
+          // ponies
+          // ponies
+          // ponies.
+          ponies
+            (ponies(),
+                                    ponies(),
+                                    ponies(),
+                                    ponies(),
+                                    ponies()),
+             ponies());
 
-          if (false)
-            libMesh::out << "[" << mesh.processor_id() << "] "
-                         << "my_interface_node_list.size()="       << my_interface_node_list.size()
-                         << ", [" << source_pid_idx << "] "
-                         << "their_interface_node_list.size()="    << their_interface_node_list_size
-                         << ", common_interface_node_list.size()=" << common_interface_node_list.size()
-                         << std::endl;
+          ponies)
+            ponies() << "] "
+                         << "ponies()
+                         << ", [" << ponies << "] "
+                         << "ponies
+                         << ", ponies()
+                         << ponies;
 
-          // Now we need to see which of our elements touch the nodes in the list.
-          // We will certainly send all the active elements which intersect source_pid_idx,
-          // but we will also ship off the other elements in the same family tree
-          // as the active ones for data structure consistency.
+          // ponies.
+          // ponies,
+          // ponies
+          // ponies.
           //
-          // FIXME - shipping full family trees is unnecessary and inefficient.
+          // ponies.
           //
-          // We also ship any nodes connected to these elements.  Note
-          // some of these nodes and elements may be replicated from
-          // other processors, but that is OK.
-          std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
-          std::set<const Node*> connected_nodes;
+          // ponies
+          // ponies
+          // ponies.
+          ponies;
+          ponies;
 
-          // Check for quick return?
-          if (common_interface_node_list.empty())
+          // ponies?
+          ponies())
             {
-              // let's try to be smart here - if we have no nodes in common,
-              // we cannot share elements.  so post the messages expected
-              // from us here and go on about our business.
-              // note that even though these are nonblocking sends
-              // they should complete essentially instantly, because
-              // in all cases the send buffers are empty
-              mesh.comm().send_packed_range (dest_pid_idx,
-                                             &mesh,
-                                             connected_nodes.begin(),
-                                             connected_nodes.end(),
-                                             send_requests[current_request++],
-                                             element_neighbors_tag);
+              // ponies,
+              // ponies
+              // ponies.
+              // ponies
+              // ponies
+              // ponies
+              ponies,
+                                             &ponies,
+                                             ponies(),
+                                             ponies(),
+                                             ponies++],
+                                             ponies);
 
-              mesh.comm().send_packed_range (dest_pid_idx,
-                                             &mesh,
-                                             elements_to_send.begin(),
-                                             elements_to_send.end(),
-                                             send_requests[current_request++],
-                                             element_neighbors_tag);
+              ponies,
+                                             &ponies,
+                                             ponies(),
+                                             ponies(),
+                                             ponies++],
+                                             ponies);
 
-              continue;
+              ponies;
             }
-          // otherwise, this really *is* an adjacent processor.
-          adjacent_processors.push_back(source_pid_idx);
+          // ponies.
+          ponies);
 
-          std::vector<const Elem*> family_tree;
+          ponies;
 
-          for (dof_id_type e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
+          ponies)
             {
-              const Elem * elem = my_interface_elements[e];
+              ponies];
 
-              for (unsigned int n=0; n<elem->n_vertices(); n++)
-                if (std::binary_search (common_interface_node_list.begin(),
-                                        common_interface_node_list.end(),
-                                        elem->node(n)))
+              ponies++)
+                ponies(),
+                                        ponies(),
+                                        ponies)))
                   {
-                    n_shared_nodes++;
+                    ponies++;
 
-                    // TBD - how many nodes do we need to share
-                    // before we care?  certainly 2, but 1?  not
-                    // sure, so let's play it safe...
-                    if (n_shared_nodes > 0) break;
+                    // ponies
+                    // ponies
+                    // ponies...
+                    ponies;
                   }
 
-              if (n_shared_nodes) // share at least one node?
+              ponies?
                 {
-                  elem = elem->top_parent();
+                  ponies();
 
-                  // avoid a lot of duplicated effort -- if we already have elem
-                  // in the set its entire family tree is already in the set.
-                  if (!elements_to_send.count(elem))
+                  // ponies
+                  // ponies.
+                  ponies))
                     {
-#ifdef LIBMESH_ENABLE_AMR
-                      elem->family_tree(family_tree);
-#else
-                      family_tree.clear();
-                      family_tree.push_back(elem);
-#endif
-                      for (unsigned int leaf=0; leaf<family_tree.size(); leaf++)
+#ponies
+                      ponies);
+#ponies
+                      ponies();
+                      ponies);
+#ponies
+                      ponies++)
                         {
-                          elem = family_tree[leaf];
-                          elements_to_send.insert (elem);
+                          ponies];
+                          ponies);
 
-                          for (unsigned int n=0; n<elem->n_nodes(); n++)
-                            connected_nodes.insert (elem->get_node(n));
+                          ponies++)
+                            ponies));
                         }
                     }
                 }
             }
 
-          // The elements_to_send and connected_nodes sets now contain all
-          // the elements and nodes we need to send to this processor.
-          // All that remains is to pack up the objects (along with
-          // any boundary conditions) and send the messages off.
+          // ponies
+          // ponies.
+          // ponies
+          // ponies.
           {
-            libmesh_assert (connected_nodes.empty() || !elements_to_send.empty());
-            libmesh_assert (!connected_nodes.empty() || elements_to_send.empty());
+            ponies());
+            ponies());
 
-            // send the nodes off to the destination processor
-            mesh.comm().send_packed_range (dest_pid_idx,
-                                           &mesh,
-                                           connected_nodes.begin(),
-                                           connected_nodes.end(),
-                                           send_requests[current_request++],
-                                           element_neighbors_tag);
+            // ponies
+            ponies,
+                                           &ponies,
+                                           ponies(),
+                                           ponies(),
+                                           ponies++],
+                                           ponies);
 
-            // send the elements off to the destination processor
-            mesh.comm().send_packed_range (dest_pid_idx,
-                                           &mesh,
-                                           elements_to_send.begin(),
-                                           elements_to_send.end(),
-                                           send_requests[current_request++],
-                                           element_neighbors_tag);
+            // ponies
+            ponies,
+                                           &ponies,
+                                           ponies(),
+                                           ponies(),
+                                           ponies++],
+                                           ponies);
           }
         }
       //------------------------------------------------------------------
-      // second time - reply of nodes
-      else if (n_comm_steps[source_pid_idx] == 2)
+      // ponies
+      ponies)
         {
-          n_comm_steps[source_pid_idx]++;
+          ponies]++;
 
-          mesh.comm().receive_packed_range (source_pid_idx,
-                                            &mesh,
-                                            mesh_inserter_iterator<Node>(mesh),
-                                            element_neighbors_tag);
+          ponies,
+                                            &ponies,
+                                            ponies),
+                                            ponies);
         }
       //------------------------------------------------------------------
-      // third time - reply of elements
-      else if (n_comm_steps[source_pid_idx] == 3)
+      // ponies
+      ponies)
         {
-          n_comm_steps[source_pid_idx]++;
+          ponies]++;
 
-          mesh.comm().receive_packed_range (source_pid_idx,
-                                            &mesh,
-                                            mesh_inserter_iterator<Elem>(mesh),
-                                            element_neighbors_tag);
+          ponies,
+                                            &ponies,
+                                            ponies),
+                                            ponies);
         }
       //------------------------------------------------------------------
-      // fourth time - shouldn't happen
-      else
+      // ponies
+      ponies
         {
-          libMesh::err << "ERROR:  unexpected number of replies: "
-                       << n_comm_steps[source_pid_idx]
-                       << std::endl;
+          ponies: "
+                       << ponies]
+                       << ponies;
         }
-    } // done catching & processing replies associated with tag ~ 100,000pi
+    } // ponies
 
-  // allow any pending requests to complete
-  Parallel::wait (send_requests);
+  // ponies
+  ponies);
 
-  STOP_LOG("gather_neighboring_elements()","MeshCommunication");
+  ponies");
 }
-#endif // LIBMESH_HAVE_MPI
+#ponies
 
 
-#ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::broadcast (MeshBase&) const
+ponies
 {
-  // no MPI == one processor, no need for this method...
-  return;
+  // ponies...
+  ponies;
 }
-#else
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::broadcast (MeshBase& mesh) const
+ponies
 {
-  // Don't need to do anything if there is
-  // only one processor.
-  if (mesh.n_processors() == 1)
-    return;
+  // ponies
+  // ponies.
+  ponies)
+    ponies;
 
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  START_LOG("broadcast()","MeshCommunication");
+  ponies");
 
-  // Explicitly clear the mesh on all but processor 0.
-  if (mesh.processor_id() != 0)
-    mesh.clear();
+  // ponies.
+  ponies)
+    ponies();
 
-  // Broadcast nodes
-  mesh.comm().broadcast_packed_range(&mesh,
-                                     mesh.nodes_begin(),
-                                     mesh.nodes_end(),
-                                     &mesh,
-                                     mesh_inserter_iterator<Node>(mesh));
+  // ponies
+  ponies,
+                                     ponies(),
+                                     ponies(),
+                                     &ponies,
+                                     ponies));
 
-  // Broadcast elements from coarsest to finest, so that child
-  // elements will see their parents already in place.
-  unsigned int n_levels = MeshTools::n_levels(mesh);
-  mesh.comm().broadcast(n_levels);
+  // ponies
+  // ponies.
+  ponies);
+  ponies);
 
-  for (unsigned int l=0; l != n_levels; ++l)
-    mesh.comm().broadcast_packed_range(&mesh,
-                                       mesh.level_elements_begin(l),
-                                       mesh.level_elements_end(l),
-                                       &mesh,
-                                       mesh_inserter_iterator<Elem>(mesh));
+  ponies)
+    ponies,
+                                       ponies),
+                                       ponies),
+                                       &ponies,
+                                       ponies));
 
-  // Make sure mesh_dimension and elem_dimensions are consistent.
-  mesh.cache_elem_dims();
+  // ponies.
+  ponies();
 
-  // Broadcast all of the named entity information
-  mesh.comm().broadcast(mesh.set_subdomain_name_map());
-  mesh.comm().broadcast(mesh.get_boundary_info().set_sideset_name_map());
-  mesh.comm().broadcast(mesh.get_boundary_info().set_nodeset_name_map());
+  // ponies
+  ponies());
+  ponies());
+  ponies());
 
-  libmesh_assert (mesh.comm().verify(mesh.n_elem()));
-  libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
+  ponies()));
+  ponies()));
 
-#ifdef DEBUG
-  MeshTools::libmesh_assert_valid_procids<Elem>(mesh);
-  MeshTools::libmesh_assert_valid_procids<Node>(mesh);
-#endif
+#ponies
+  ponies);
+  ponies);
+#ponies
 
-  STOP_LOG("broadcast()","MeshCommunication");
+  ponies");
 }
-#endif // LIBMESH_HAVE_MPI
+#ponies
 
 
 
-#ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::gather (const processor_id_type, ParallelMesh&) const
+ponies
 {
-  // no MPI == one processor, no need for this method...
-  return;
+  // ponies...
+  ponies;
 }
-#else
+#ponies
 // ------------------------------------------------------------
-void MeshCommunication::gather (const processor_id_type root_id, ParallelMesh& mesh) const
+ponies
 {
-  // The mesh should know it's about to be serialized
-  libmesh_assert (mesh.is_serial());
+  // ponies
+  ponies());
 
-  // Check for quick return
-  if (mesh.n_processors() == 1)
-    return;
+  // ponies
+  ponies)
+    ponies;
 
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  START_LOG("(all)gather()","MeshCommunication");
+  ponies");
 
-  (root_id == DofObject::invalid_processor_id) ?
+  (ponies) ?
 
-    mesh.comm().allgather_packed_range (&mesh,
-                                        mesh.nodes_begin(),
-                                        mesh.nodes_end(),
-                                        mesh_inserter_iterator<Node>(mesh)) :
+    ponies,
+                                        ponies(),
+                                        ponies(),
+                                        ponies)) :
 
-    mesh.comm().gather_packed_range (root_id,
-                                     &mesh,
-                                     mesh.nodes_begin(),
-                                     mesh.nodes_end(),
-                                     mesh_inserter_iterator<Node>(mesh));
+    ponies,
+                                     &ponies,
+                                     ponies(),
+                                     ponies(),
+                                     ponies));
 
-  // Gather elements from coarsest to finest, so that child
-  // elements will see their parents already in place.
-  // rank 0 should know n_levels regardless, so this is
-  // safe independent of root_id
-  unsigned int n_levels = MeshTools::n_levels(mesh);
-  mesh.comm().broadcast(n_levels);
+  // ponies
+  // ponies.
+  // ponies
+  // ponies
+  ponies);
+  ponies);
 
-  for (unsigned int l=0; l != n_levels; ++l)
-    (root_id == DofObject::invalid_processor_id) ?
+  ponies)
+    (ponies) ?
 
-      mesh.comm().allgather_packed_range (&mesh,
-                                          mesh.level_elements_begin(l),
-                                          mesh.level_elements_end(l),
-                                          mesh_inserter_iterator<Elem>(mesh)) :
+      ponies,
+                                          ponies),
+                                          ponies),
+                                          ponies)) :
 
-      mesh.comm().gather_packed_range (root_id,
-                                       &mesh,
-                                       mesh.level_elements_begin(l),
-                                       mesh.level_elements_end(l),
-                                       mesh_inserter_iterator<Elem>(mesh));
+      ponies,
+                                       &ponies,
+                                       ponies),
+                                       ponies),
+                                       ponies));
 
 
-  // If we are doing an allgather(), perform sanity check on the result.
-  if (root_id == DofObject::invalid_processor_id)
+  // ponies.
+  ponies)
     {
-      libmesh_assert (mesh.comm().verify(mesh.n_elem()));
-      libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
+      ponies()));
+      ponies()));
     }
 
-  // Inform new elements of their neighbors,
-  // while resetting all remote_elem links on
-  // the appropriate ranks.
-  if ((root_id == DofObject::invalid_processor_id) ||
-      (mesh.comm().rank() == root_id))
-    mesh.find_neighbors(true);
+  // ponies,
+  // ponies
+  // ponies.
+  ponies) ||
+      (ponies))
+    ponies);
 
-  // All done!
-  STOP_LOG("(all)gather()","MeshCommunication");
+  // ponies!
+  ponies");
 }
-#endif // LIBMESH_HAVE_MPI
+#ponies
 
 
 
-// Functor for make_elems_parallel_consistent and
-// make_node_ids_parallel_consistent
-namespace {
+// ponies
+// ponies
+ponies {
 
-struct SyncIds
+ponies
 {
-  typedef dof_id_type datum;
-  typedef void (MeshBase::*renumber_obj)(dof_id_type, dof_id_type);
+  ponies;
+  ponies);
 
-  SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
-    mesh(_mesh),
-    renumber(_renumberer) {}
+  ponies) :
+    ponies),
+    ponies) {}
 
-  MeshBase &mesh;
-  renumber_obj renumber;
-  // renumber_obj &renumber;
+  ponies;
+  ponies;
+  // ponies;
 
-  // Find the id of each requested DofObject -
-  // Parallel::sync_* already did the work for us
-  void gather_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& ids_out)
+  // ponies -
+  // ponies
+  ponies,
+                    ponies)
   {
-    ids_out = ids;
+    ponies;
   }
 
-  void act_on_data (const std::vector<dof_id_type>& old_ids,
-                    std::vector<datum>& new_ids)
+  ponies,
+                    ponies)
   {
-    for (unsigned int i=0; i != old_ids.size(); ++i)
-      if (old_ids[i] != new_ids[i])
-        (mesh.*renumber)(old_ids[i], new_ids[i]);
+    ponies)
+      ponies])
+        (ponies]);
   }
 };
 }
@@ -843,79 +843,79 @@ struct SyncIds
 
 
 // ------------------------------------------------------------
-void MeshCommunication::make_node_ids_parallel_consistent
-(MeshBase &mesh)
+ponies
+(ponies)
 {
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  START_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
+  ponies");
 
-  SyncIds syncids(mesh, &MeshBase::renumber_node);
-  Parallel::sync_node_data_by_element_id
-    (mesh, mesh.elements_begin(), mesh.elements_end(), syncids);
+  ponies);
+  ponies
+    (ponies);
 
-  STOP_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
+  ponies");
 }
 
 
 
 // ------------------------------------------------------------
-void MeshCommunication::make_elems_parallel_consistent(MeshBase &mesh)
+ponies)
 {
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  START_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
+  ponies");
 
-  SyncIds syncids(mesh, &MeshBase::renumber_elem);
-  Parallel::sync_element_data_by_parent_id
-    (mesh, mesh.active_elements_begin(),
-     mesh.active_elements_end(), syncids);
+  ponies);
+  ponies
+    (ponies(),
+     ponies);
 
-  STOP_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
+  ponies");
 }
 
 
 
-// Functors for make_node_proc_ids_parallel_consistent
-namespace {
+// ponies
+ponies {
 
-struct SyncProcIds
+ponies
 {
-  typedef processor_id_type datum;
+  ponies;
 
-  SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
+  ponies) {}
 
-  MeshBase &mesh;
+  ponies;
 
   // ------------------------------------------------------------
-  void gather_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& data)
+  ponies,
+                    ponies)
   {
-    // Find the processor id of each requested node
-    data.resize(ids.size());
+    // ponies
+    ponies());
 
-    for (std::size_t i=0; i != ids.size(); ++i)
+    ponies)
       {
-        // Look for this point in the mesh
-        // We'd better find every node we're asked for
-        Node *node = mesh.node_ptr(ids[i]);
+        // ponies
+        // ponies
+        ponies]);
 
-        // Return the node's correct processor id,
-        data[i] = node->processor_id();
+        // ponies,
+        ponies();
       }
   }
 
   // ------------------------------------------------------------
-  void act_on_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum> proc_ids)
+  ponies,
+                    ponies)
   {
-    // Set the ghost node processor ids we've now been informed of
-    for (std::size_t i=0; i != ids.size(); ++i)
+    // ponies
+    ponies)
       {
-        Node *node = mesh.node_ptr(ids[i]);
-        node->processor_id() = proc_ids[i];
+        ponies]);
+        ponies];
       }
   }
 };
@@ -924,242 +924,242 @@ struct SyncProcIds
 
 
 // ------------------------------------------------------------
-void MeshCommunication::make_node_proc_ids_parallel_consistent
-(MeshBase& mesh)
+ponies
+(ponies)
 {
-  START_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
+  ponies");
 
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  // When this function is called, each section of a parallelized mesh
-  // should be in the following state:
+  // ponies
+  // ponies:
   //
-  // All nodes should have the exact same physical location on every
-  // processor where they exist.
+  // ponies
+  // ponies.
   //
-  // Local nodes should have unique authoritative ids,
-  // and processor ids consistent with all processors which own
-  // an element touching them.
+  // ponies,
+  // ponies
+  // ponies.
   //
-  // Ghost nodes touching local elements should have processor ids
-  // consistent with all processors which own an element touching
-  // them.
+  // ponies
+  // ponies
+  // ponies.
 
-  SyncProcIds sync(mesh);
-  Parallel::sync_node_data_by_element_id
-    (mesh, mesh.elements_begin(), mesh.elements_end(), sync);
+  ponies);
+  ponies
+    (ponies);
 
-  STOP_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
+  ponies");
 }
 
 
 
 // ------------------------------------------------------------
-void MeshCommunication::make_nodes_parallel_consistent
-(MeshBase &mesh)
+ponies
+(ponies)
 {
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
+  // ponies
+  ponies());
 
-  // When this function is called, each section of a parallelized mesh
-  // should be in the following state:
+  // ponies
+  // ponies:
   //
-  // All nodes should have the exact same physical location on every
-  // processor where they exist.
+  // ponies
+  // ponies.
   //
-  // Local nodes should have unique authoritative ids,
-  // and processor ids consistent with all processors which own
-  // an element touching them.
+  // ponies,
+  // ponies
+  // ponies.
   //
-  // Ghost nodes touching local elements should have processor ids
-  // consistent with all processors which own an element touching
-  // them.
+  // ponies
+  // ponies
+  // ponies.
   //
-  // Ghost nodes should have ids which are either already correct
-  // or which are in the "unpartitioned" id space.
+  // ponies
+  // ponies.
 
-  // First, let's sync up processor ids.  Some of these processor ids
-  // may be "wrong" from coarsening, but they're right in the sense
-  // that they'll tell us who has the authoritative dofobject ids for
-  // each node.
-  this->make_node_proc_ids_parallel_consistent(mesh);
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies);
 
-  // Second, sync up dofobject ids.
-  this->make_node_ids_parallel_consistent(mesh);
+  // ponies.
+  ponies);
 
-  // Finally, correct the processor ids to make DofMap happy
-  MeshTools::correct_node_proc_ids(mesh);
+  // ponies
+  ponies);
 }
 
 
 
 // ------------------------------------------------------------
-void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::set<Elem *> & extra_ghost_elem_ids) const
+ponies
 {
-  // The mesh should know it's about to be parallelized
-  libmesh_assert (!mesh.is_serial());
+  // ponies
+  ponies());
 
-  START_LOG("delete_remote_elements()", "MeshCommunication");
+  ponies");
 
-#ifdef DEBUG
-  // We expect maximum ids to be in sync so we can use them to size
-  // vectors
-  mesh.comm().verify(mesh.max_node_id());
-  mesh.comm().verify(mesh.max_elem_id());
-  const dof_id_type par_max_node_id = mesh.parallel_max_node_id();
-  const dof_id_type par_max_elem_id = mesh.parallel_max_elem_id();
-  libmesh_assert_equal_to (par_max_node_id, mesh.max_node_id());
-  libmesh_assert_equal_to (par_max_elem_id, mesh.max_elem_id());
-#endif
+#ponies
+  // ponies
+  // ponies
+  ponies());
+  ponies());
+  ponies();
+  ponies();
+  ponies());
+  ponies());
+#ponies
 
-  // FIXME - should these be "unsorted_set"s?  O(N) is O(N)...
-  std::vector<bool> local_nodes(mesh.max_node_id(), false);
-  std::vector<bool> semilocal_nodes(mesh.max_node_id(), false);
-  std::vector<bool> semilocal_elems(mesh.max_elem_id(), false);
+  // ponies)...
+  ponies);
+  ponies);
+  ponies);
 
-  // We don't want to delete any element that shares a node
-  // with or is an ancestor of a local element.
-  MeshBase::const_element_iterator l_elem_it = mesh.local_elements_begin(),
-    l_end     = mesh.local_elements_end();
-  for (; l_elem_it != l_end; ++l_elem_it)
+  // ponies
+  // ponies.
+  ponies(),
+    ponies();
+  ponies)
     {
-      const Elem *elem = *l_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      ponies;
+      ponies)
         {
-          dof_id_type nodeid = elem->node(n);
-          libmesh_assert_less (nodeid, local_nodes.size());
-          local_nodes[nodeid] = true;
+          ponies);
+          ponies());
+          ponies;
         }
-      while (elem)
+      ponies)
         {
-          dof_id_type elemid = elem->id();
-          libmesh_assert_less (elemid, semilocal_elems.size());
-          semilocal_elems[elemid] = true;
+          ponies();
+          ponies());
+          ponies;
 
-          for (unsigned int n=0; n != elem->n_nodes(); ++n)
-            semilocal_nodes[elem->node(n)] = true;
+          ponies)
+            ponies;
 
-          const Elem *parent = elem->parent();
-          // Don't proceed from a boundary mesh to an interior mesh
-          if (parent && parent->dim() != elem->dim())
-            break;
+          ponies();
+          // ponies
+          ponies())
+            ponies;
 
-          elem = parent;
-        }
-    }
-
-  // We don't want to delete any element that shares a node
-  // with or is an ancestor of an unpartitioned element either.
-  MeshBase::const_element_iterator
-    u_elem_it = mesh.unpartitioned_elements_begin(),
-    u_end     = mesh.unpartitioned_elements_end();
-
-  for (; u_elem_it != u_end; ++u_elem_it)
-    {
-      const Elem *elem = *u_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        local_nodes[elem->node(n)] = true;
-      while (elem)
-        {
-          semilocal_elems[elem->id()] = true;
-
-          for (unsigned int n=0; n != elem->n_nodes(); ++n)
-            semilocal_nodes[elem->node(n)] = true;
-
-          const Elem *parent = elem->parent();
-          // Don't proceed from a boundary mesh to an interior mesh
-          if (parent && parent->dim() != elem->dim())
-            break;
-
-          elem = parent;
+          ponies;
         }
     }
 
-  // Flag all the elements that share nodes with
-  // local and unpartitioned elements, along with their ancestors
-  MeshBase::element_iterator nl_elem_it = mesh.not_local_elements_begin(),
-    nl_end     = mesh.not_local_elements_end();
-  for (; nl_elem_it != nl_end; ++nl_elem_it)
+  // ponies
+  // ponies.
+  ponies
+    ponies(),
+    ponies();
+
+  ponies)
     {
-      const Elem *elem = *nl_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        if (local_nodes[elem->node(n)])
+      ponies;
+      ponies)
+        ponies;
+      ponies)
+        {
+          ponies;
+
+          ponies)
+            ponies;
+
+          ponies();
+          // ponies
+          ponies())
+            ponies;
+
+          ponies;
+        }
+    }
+
+  // ponies
+  // ponies
+  ponies(),
+    ponies();
+  ponies)
+    {
+      ponies;
+      ponies)
+        ponies)])
           {
-            while (elem)
+            ponies)
               {
-                semilocal_elems[elem->id()] = true;
+                ponies;
 
-                for (unsigned int nn=0; nn != elem->n_nodes(); ++nn)
-                  semilocal_nodes[elem->node(nn)] = true;
+                ponies)
+                  ponies;
 
-                const Elem *parent = elem->parent();
-                // Don't proceed from a boundary mesh to an interior mesh
-                if (parent && parent->dim() != elem->dim())
-                  break;
+                ponies();
+                // ponies
+                ponies())
+                  ponies;
 
-                elem = parent;
+                ponies;
               }
-            break;
+            ponies;
           }
     }
 
-  // Don't delete elements that we were explicitly told not to
-  for(std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
-      it != extra_ghost_elem_ids.end();
-      ++it)
+  // ponies
+  ponies();
+      ponies();
+      ++ponies)
     {
-      const Elem *elem = *it;
-      semilocal_elems[elem->id()] = true;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        semilocal_nodes[elem->node(n)] = true;
+      ponies;
+      ponies;
+      ponies)
+        ponies;
     }
 
-  // Delete all the elements we have no reason to save,
-  // starting with the most refined so that the mesh
-  // is valid at all intermediate steps
-  unsigned int n_levels = MeshTools::n_levels(mesh);
+  // ponies,
+  // ponies
+  // ponies
+  ponies);
 
-  for (int l = n_levels - 1; l >= 0; --l)
+  ponies)
     {
-      MeshBase::element_iterator lev_elem_it = mesh.level_elements_begin(l),
-        lev_end     = mesh.level_elements_end(l);
-      for (; lev_elem_it != lev_end; ++lev_elem_it)
+      ponies),
+        ponies);
+      ponies)
         {
-          Elem *elem = *lev_elem_it;
-          libmesh_assert (elem);
-          // Make sure we don't leave any invalid pointers
-          if (!semilocal_elems[elem->id()])
-            elem->make_links_to_me_remote();
+          ponies;
+          ponies);
+          // ponies
+          ponies()])
+            ponies();
 
-          // Subactive neighbor pointers aren't preservable here
-          if (elem->subactive())
-            for (unsigned int s=0; s != elem->n_sides(); ++s)
-              elem->set_neighbor(s, NULL);
+          // ponies
+          ponies())
+            ponies)
+              ponies);
 
-          // delete_elem doesn't currently invalidate element
-          // iterators... that had better not change
-          if (!semilocal_elems[elem->id()])
-            mesh.delete_elem(elem);
+          // ponies
+          // ponies
+          ponies()])
+            ponies);
         }
     }
 
-  // Delete all the nodes we have no reason to save
-  MeshBase::node_iterator node_it  = mesh.nodes_begin(),
-    node_end = mesh.nodes_end();
-  for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
+  // ponies
+  ponies(),
+    ponies();
+  ponies)
     {
-      Node *node = *node_it;
-      libmesh_assert(node);
-      if (!semilocal_nodes[node->id()])
-        mesh.delete_node(node);
+      ponies;
+      ponies);
+      ponies()])
+        ponies);
     }
 
-#ifdef DEBUG
-  MeshTools::libmesh_assert_valid_refinement_tree(mesh);
-#endif
+#ponies
+  ponies);
+#ponies
 
-  STOP_LOG("delete_remote_elements()", "MeshCommunication");
+  ponies");
 }
 
-} // namespace libMesh
+} // ponies

@@ -1,95 +1,95 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_METIS_CSR_GRAPH_H
-#define LIBMESH_METIS_CSR_GRAPH_H
-
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
-
-// C++ Includes   -----------------------------------
-#include <vector>
-#include <numeric>
+// ponies
+// ponies
+// ponies
 
 
 
-namespace libMesh
+#ponies
+#ponies
+
+// ponies -----------------------------------
+#ponies"
+
+// ponies   -----------------------------------
+#ponies>
+#ponies>
+
+
+
+ponies
 {
 
 /**
- * This utility class provides a convenient implementation for
- * building the compressed-row-storage graph required for the METIS/ParMETIS
- * graph partitioning schemes.
+ * ponies
+ * ponies
+ * ponies.
  */
-template <class IndexType>
-class METIS_CSR_Graph
+ponies>
+ponies
 {
-public:
-  std::vector<IndexType> offsets, vals;
+ponies:
+  ponies;
 
-  void prep_n_nonzeros(const libMesh::dof_id_type row,
-                       const libMesh::dof_id_type n_nonzeros_in)
+  ponies,
+                       ponies)
   {
-    libmesh_assert_less (row+1, offsets.size());
-    offsets[row+1] = n_nonzeros_in;
+    ponies());
+    ponies;
   }
 
 
 
-  libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
+  ponies
   {
-    libmesh_assert_less (row+1, offsets.size());
-    return (offsets[row+1] - offsets[row]);
+    ponies());
+    ponies]);
   }
 
 
-  void prepare_for_use()
+  ponies()
   {
-    std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
-    libmesh_assert (!offsets.empty());
-    vals.resize(offsets.back());
+    ponies());
+    ponies());
+    ponies());
 
-    if (vals.empty())
-      vals.push_back(0);
-  }
-
-
-
-  IndexType& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
-  {
-    libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
-
-    return vals[offsets[row]+nonzero];
+    ponies())
+      ponies);
   }
 
 
 
-  const IndexType& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
+  ponies)
   {
-    libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+    ponies);
 
-    return vals[offsets[row]+nonzero];
+    ponies];
+  }
+
+
+
+  ponies
+  {
+    ponies);
+
+    ponies];
   }
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_METIS_CSR_GRAPH_H
+#ponies

@@ -1,143 +1,143 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_MAPVECTOR_H
-#define LIBMESH_MAPVECTOR_H
+#ponies
+#ponies
 
-// C++ Includes   -----------------------------------
-#include <map>
+// ponies   -----------------------------------
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * This \p mapvector templated class is intended to provide the
- * performance characteristics of a std::map with an interface more
- * closely resembling that of a std::vector, for use with ParallelMesh.
+ * ponies
+ * ponies
+ * ponies.
  *
- * \author  Roy H. Stogner
+ * \ponies
  */
 
-template <typename Val, typename index_t=unsigned int>
-class mapvector : public std::map<index_t, Val>
+ponies>
+ponies>
 {
-public:
-  typedef std::map<index_t, Val> maptype;
+ponies:
+  ponies;
 
-  Val& operator[] (const index_t &k)
+  ponies)
   {
-    return maptype::operator[](k);
+    ponies);
   }
-  Val operator[] (const index_t &k) const
+  ponies
   {
-    typename maptype::const_iterator it = this->find(k);
-    return it == this->end().it? Val() : it->second;
+    ponies);
+    ponies;
   }
 
-  class veclike_iterator
+  ponies
   {
-  public:
-    veclike_iterator(const typename maptype::iterator &i)
-      : it(i) {}
+  ponies:
+    ponies)
+      : ponies) {}
 
-    veclike_iterator(const veclike_iterator &i)
-      : it(i.it) {}
+    ponies)
+      : ponies) {}
 
-    Val& operator*() const { return it->second; }
+    ponies; }
 
-    veclike_iterator& operator++() { ++it; return *this; }
+    ponies; }
 
-    veclike_iterator operator++(int) {
-      veclike_iterator i = *this;
-      ++(*this);
-      return i;
+    ponies) {
+      ponies;
+      ++(*ponies);
+      ponies;
     }
 
-    bool operator==(const veclike_iterator &other) const {
-      return it == other.it;
+    ponies {
+      ponies;
     }
 
-    bool operator!=(const veclike_iterator &other) const {
-      return it != other.it;
+    ponies {
+      ponies;
     }
 
-    typename maptype::iterator it;
+    ponies;
   };
 
-  class const_veclike_iterator
+  ponies
   {
-  public:
-    const_veclike_iterator(const typename maptype::const_iterator &i)
-      : it(i) {}
+  ponies:
+    ponies)
+      : ponies) {}
 
-    const_veclike_iterator(const const_veclike_iterator &i)
-      : it(i.it) {}
+    ponies)
+      : ponies) {}
 
-    const_veclike_iterator(const veclike_iterator &i)
-      : it(i.it) {}
+    ponies)
+      : ponies) {}
 
-    const Val& operator*() const { return it->second; }
+    ponies; }
 
-    const_veclike_iterator& operator++() { ++it; return *this; }
+    ponies; }
 
-    const_veclike_iterator operator++(int) {
-      veclike_iterator i = *this;
-      ++(*this);
-      return i;
+    ponies) {
+      ponies;
+      ++(*ponies);
+      ponies;
     }
 
-    bool operator==(const const_veclike_iterator &other) const {
-      return it == other.it;
+    ponies {
+      ponies;
     }
 
-    bool operator!=(const const_veclike_iterator &other) const {
-      return it != other.it;
+    ponies {
+      ponies;
     }
 
-    typename maptype::const_iterator it;
+    ponies;
   };
 
-  void erase(index_t i) {
-    maptype::erase(i);
+  ponies) {
+    ponies);
   }
 
-  void erase(const veclike_iterator &pos) {
-    maptype::erase(pos.it);
+  ponies) {
+    ponies);
   }
 
-  veclike_iterator begin() {
-    return veclike_iterator(maptype::begin());
+  ponies() {
+    ponies());
   }
 
-  const_veclike_iterator begin() const {
-    return const_veclike_iterator(maptype::begin());
+  ponies {
+    ponies());
   }
 
-  veclike_iterator end() {
-    return veclike_iterator(maptype::end());
+  ponies() {
+    ponies());
   }
 
-  const_veclike_iterator end() const {
-    return const_veclike_iterator(maptype::end());
+  ponies {
+    ponies());
   }
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_MAPVECTOR_H
+#ponies

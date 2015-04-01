@@ -1,155 +1,155 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_MESH_OUTPUT_H
-#define LIBMESH_MESH_OUTPUT_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/mesh_serializer.h"
 
-// C++ includes
-#include <cstddef>
-#include <limits>
-#include <string>
-#include <vector>
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+
+ponies
 {
 
-// Forward declares
-class EquationSystems;
+// ponies
+ponies;
 
 
 /**
- * This class defines an abstract interface for \p Mesh output.
- * Specific classes derived from this class actually implement
- * writing various mesh formats.
+ * ponies.
+ * ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk
- * \date 2004
+ * \ponies
+ * \ponies
  */
 
 // ------------------------------------------------------------
-// MeshOutput class definition
-template <class MT>
-class MeshOutput
+// ponies
+ponies>
+ponies
 {
-protected:
+ponies:
 
   /**
-   * Default constructor. Will set the _obj to NULL, effectively
-   * rendering this object useless.
+   * ponies
+   * ponies.
    */
-  explicit
-  MeshOutput (const bool is_parallel_format = false);
+  ponies
+  ponies);
 
   /**
-   * Constructor.  Takes a reference to a constant object.
-   * This constructor will only allow us to write the object.
+   * ponies.
+   * ponies.
    */
-  explicit
-  MeshOutput (const MT&, const bool is_parallel_format = false);
+  ponies
+  ponies);
 
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~MeshOutput ();
+  ponies ();
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * ponies.
    */
-  virtual void write (const std::string&) = 0;
+  ponies;
 
   /**
-   * This method implements writing a mesh with data to a specified file
-   * where the data is taken from the \p EquationSystems object.
+   * ponies
+   * ponies.
    */
-  virtual void write_equation_systems (const std::string&,
-                                       const EquationSystems&,
-                                       const std::set<std::string>* system_names=NULL);
+  ponies&,
+                                       ponies&,
+                                       ponies);
 
   /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
+   * ponies
+   * ponies.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&)
-  { libmesh_not_implemented(); }
+  ponies&,
+                                 ponies>&,
+                                 ponies>&)
+  { ponies(); }
 
   /**
-   * Return/set the precision to use when writing ASCII files.
+   * ponies.
    *
-   * By default we use numeric_limits<Real>::digits10 + 2, which
-   * should be enough to write out to ASCII and get the exact same
-   * Real back when reading in.
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned int & ascii_precision ();
+  ponies ();
 
-protected:
+ponies:
 
 
   /**
-   * Returns the object as a read-only reference.
+   * ponies.
    */
-  const MT& mesh() const;
+  ponies;
 
 
   /**
-   * Flag specifying whether this format is parallel-capable.
-   * If this is false (default) I/O is only permitted when the mesh
-   * has been serialized.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  const bool _is_parallel_format;
+  ponies;
 
 
-private:
+ponies:
 
 
   /**
-   *  A pointer to a constant object.
-   * This allows us to write the object to file.
+   *  ponies.
+   * ponies.
    */
-  const MT* const _obj;
+  ponies;
 
   /**
-   * Precision to use when writing ASCII files.
+   * ponies.
    */
-  unsigned int _ascii_precision;
+  ponies;
 
   /**
-   * A helper function which allows us to fill temporary
-   * name and solution vectors with an EquationSystems object.
-   * Only generate names and solution data corresponding to
-   * systems specified in system_names.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void _build_variable_names_and_solution_vector(const EquationSystems& es,
-                                                 std::vector<Number>& soln,
-                                                 std::vector<std::string>& names,
-                                                 const std::set<std::string>* system_names=NULL);
+  ponies,
+                                                 ponies,
+                                                 ponies,
+                                                 ponies);
 };
 
 
@@ -158,64 +158,64 @@ private:
 
 
 // ------------------------------------------------------------
-// MeshOutput inline members
-template <class MT>
-inline
-MeshOutput<MT>::MeshOutput (const bool is_parallel_format) :
-  _is_parallel_format(is_parallel_format),
-  _obj(NULL),
-  _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
+// ponies
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies)
 {}
 
 
 
-template <class MT>
-inline
-MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
-  _is_parallel_format(is_parallel_format),
-  _obj (&obj),
-  _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies)
 {
-  if (!_is_parallel_format && !this->mesh().is_serial())
+  ponies())
     {
-      if (this->mesh().processor_id() == 0)
+      ponies)
         {
-          libmesh_do_once(libMesh::out <<
-                          "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
-                          << std::endl;);
+          ponies <<
+                          "ponies!"
+                          << ponies;);
         }
     }
 }
 
 
 
-template <class MT>
-inline
-MeshOutput<MT>::~MeshOutput ()
+ponies>
+ponies
+ponies ()
 {
 }
 
 
 
-template <class MT>
-inline
-const MT& MeshOutput<MT>::mesh () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert(_obj);
-  return *_obj;
+  ponies);
+  ponies;
 }
 
 
 
-template <class MT>
-inline
-unsigned int & MeshOutput<MT>::ascii_precision ()
+ponies>
+ponies
+ponies ()
 {
-  return _ascii_precision;
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_MESH_OUTPUT_H
+#ponies

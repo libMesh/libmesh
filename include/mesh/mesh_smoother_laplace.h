@@ -1,118 +1,118 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_MESH_SMOOTHER_LAPLACE_H
-#define LIBMESH_MESH_SMOOTHER_LAPLACE_H
+// ponies
+// ponies
+// ponies
 
 
-// forward declarations
 
-// C++ Includes   -----------------------------------
-#include <vector>
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh.h" // libMesh::out/err
-#include "libmesh/mesh_smoother.h"
 
-namespace libMesh
+// ponies
+
+// ponies   -----------------------------------
+#ponies>
+
+// ponies -----------------------------------
+#ponies
+#ponies"
+
+ponies
 {
 
 
 /**
- * This class defines the data structures necessary
- * for Laplace smoothing.  Note that this is a simple
- * averaging smoother, which does NOT guarantee that
- * points will be smoothed to valid locations, e.g.
- * locations inside the boundary!  This aspect could
- * use work.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
- * \author John W. Peterson
- * \date 2002-2007
+ * \ponies
+ * \ponies
  */
 
 
 // ------------------------------------------------------------
-// LaplaceMeshSmoother class definition
-class LaplaceMeshSmoother : public MeshSmoother
+// ponies
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor.  Sets the constant mesh reference
-   * in the protected data section of the class.
+   * ponies
+   * ponies.
    */
-  explicit
-  LaplaceMeshSmoother(UnstructuredMesh& mesh);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~LaplaceMeshSmoother() {}
+  ponies() {}
 
   /**
-   * Redefinition of the smooth function from the
-   * base class.  All this does is call the smooth
-   * function in this class which takes an int, using
-   * a default value of 1.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void smooth() { this->smooth(1); }
+  ponies); }
 
   /**
-   * The actual smoothing function, gets called whenever
-   * the user specifies an actual number of smoothing
-   * iterations.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void smooth(unsigned int n_iterations);
+  ponies);
 
   /**
-   * Initialization for the Laplace smoothing routine
-   * is basically identical to building an "L-graph"
-   * which is expensive.  It's provided separately from
-   * the constructor since you may or may not want
-   * to build the L-graph on construction.
+   * ponies
+   * ponies"
+   * ponies
+   * ponies
+   * ponies.
    */
-  void init();
+  ponies();
 
   /**
-   * Mainly for debugging, this function will print
-   * out the connectivity graph which has been created.
+   * ponies
+   * ponies.
    */
-  void print_graph(std::ostream& out = libMesh::out) const;
+  ponies;
 
-private:
+ponies:
   /**
-   * This function allgather's the (local) graph after
-   * it is computed on each processor by the init() function.
+   * ponies
+   * ponies.
    */
-  void allgather_graph();
-
-  /**
-   * True if the L-graph has been created, false otherwise.
-   */
-  bool _initialized;
+  ponies();
 
   /**
-   * Data structure for holding the L-graph
+   * ponies.
    */
-  std::vector<std::vector<dof_id_type> > _graph;
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_MESH_SMOOTHER_LAPLACE_H
+#ponies

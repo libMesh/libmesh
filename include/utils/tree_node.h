@@ -1,213 +1,213 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TREE_NODE_H
-#define LIBMESH_TREE_NODE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/point.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <vector>
-#include <set>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class MeshBase;
-class Node;
-class Elem;
+// ponies
+ponies;
+ponies;
+ponies;
 
 /**
- * This class defines a node on a tree.  A tree node
- * contains a pointer to its parent (NULL if the node is
- * the root) and pointers to its children (NULL if the
- * node is active.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-template <unsigned int N>
-class TreeNode
+ponies>
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor.  Takes a pointer to this node's
-   * parent.  The pointer should only be NULL
-   * for the top-level (root) node.
+   * ponies
+   * ponies
+   * ponies.
    */
-  TreeNode (const MeshBase& m,
-            unsigned int tbs,
-            const TreeNode<N> *p = NULL);
+  ponies,
+            ponies,
+            ponies);
 
   /**
-   * Destructor.  Deletes all children, if any.  Thus
-   * to delete a tree it is sufficient to explicitly
-   * delete the root node.
+   * ponies
+   * ponies
+   * ponies.
    */
-  ~TreeNode ();
+  ~ponies ();
 
   /**
-   * @returns true if this node is the root node, false
-   * otherwise.
+   * @ponies
+   * ponies.
    */
-  bool is_root() const { return (parent == NULL); }
+  ponies); }
 
   /**
-   * @returns true if this node is active (i.e. has no
-   * children), false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool active() const { return children.empty(); }
+  ponies(); }
 
   /**
-   * Tries to insert \p Node \p nd into the TreeNode.
-   * Returns \p true iff \p nd is inserted into the TreeNode or one of
-   * its children.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  bool insert (const Node* nd);
+  ponies);
 
   /**
-   * Inserts \p Elem \p el into the TreeNode.
-   * Returns \p true iff \p el is inserted into the TreeNode or one of
-   * its children.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  bool insert (const Elem* nd);
+  ponies);
 
   /**
-   * Refine the tree node into N children if it contains
-   * more than tol nodes.
+   * ponies
+   * ponies.
    */
-  void refine ();
+  ponies ();
 
   /**
-   * Sets the bounding box;
+   * ponies;
    */
-  void set_bounding_box (const std::pair<Point, Point>& bbox);
+  ponies);
 
   /**
-   * @returns true if this TreeNode (or its children) contain node n
-   * (within relative tolerance), false otherwise.
+   * @ponies
+   * (ponies.
    */
-  bool bounds_node (const Node* nd,
-                    Real relative_tol = 0) const;
+  ponies,
+                    ponies;
 
   /**
-   * @returns true if this TreeNode (or its children) contain point p
-   * (within relative tolerance), false otherwise.
+   * @ponies
+   * (ponies.
    */
-  bool bounds_point (const Point &p,
-                     Real relative_tol = 0) const;
+  ponies,
+                     ponies;
 
   /**
-   * @returns the level of the node.
+   * @ponies.
    */
-  unsigned int level () const;
+  ponies;
 
   /**
-   * Prints the contents of the node_numbers vector if we
-   * are active.
+   * ponies
+   * ponies.
    */
-  void print_nodes(std::ostream& out=libMesh::out) const;
+  ponies;
 
   /**
-   * Prints the contents of the elements set if we
-   * are active.
+   * ponies
+   * ponies.
    */
-  void print_elements(std::ostream& out=libMesh::out) const;
+  ponies;
 
   /**
-   * Transforms node numbers to element pointers.
+   * ponies.
    */
-  void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& nodes_to_elem);
+  ponies);
 
   /**
-   * @returns the number of active bins below
-   * (including) this element.
+   * @ponies
+   * (ponies.
    */
-  unsigned int n_active_bins() const;
+  ponies;
 
   /**
-   * @returns an element containing point p,
-   * optionally restricted to a set of allowed subdomains.
+   * @ponies,
+   * ponies.
    */
-  const Elem* find_element (const Point& p,
-                            const std::set<subdomain_id_type>* allowed_subdomains = NULL,
-                            Real relative_tol = TOLERANCE) const;
+  ponies,
+                            ponies,
+                            ponies;
 
 
-private:
+ponies:
   /**
-   * Look for point \p p in our children,
-   * optionally restricted to a set of allowed subdomains.
+   * ponies,
+   * ponies.
    */
-  const Elem* find_element_in_children (const Point& p,
-                                        const std::set<subdomain_id_type>* allowed_subdomains,
-                                        Real relative_tol) const;
-
-  /**
-   * Constructs the bounding box for child \p c.
-   */
-  std::pair<Point, Point> create_bounding_box (unsigned int c) const;
+  ponies,
+                                        ponies,
+                                        ponies;
 
   /**
-   * Reference to the mesh.
+   * ponies.
    */
-  const MeshBase& mesh;
+  ponies;
 
   /**
-   * Pointer to this node's parent.
+   * ponies.
    */
-  const TreeNode<N> *parent;
+  ponies;
 
   /**
-   * Pointers to our children.  This vector
-   * is empty if the node is active.
+   * ponies.
    */
-  std::vector<TreeNode<N>* > children;
+  ponies;
 
   /**
-   * The Cartesian bounding box for the node.
-   * The minimum point is stored as bounding_box.first,
-   * the maximum point is stored as bounding_box.second.
+   * ponies
+   * ponies.
    */
-  std::pair<Point, Point> bounding_box;
+  ponies;
 
   /**
-   * Pointers to the elements in this tree node.
+   * ponies.
+   * ponies,
+   * ponies.
    */
-  std::vector<const Elem*> elements;
+  ponies;
 
   /**
-   * The node numbers contained in this portion of the tree.
+   * ponies.
    */
-  std::vector<const Node*> nodes;
+  ponies;
 
   /**
-   * The maximum number of things we should store before
-   * refining ourself.
+   * ponies.
    */
-  const unsigned int tgt_bin_size;
+  ponies;
 
   /**
-   * Does this node contain any infinite elements.
+   * ponies
+   * ponies.
    */
-  bool contains_ifems;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
@@ -215,54 +215,54 @@ private:
 
 
 // ------------------------------------------------------------
-// TreeNode class inline methods
-template <unsigned int N>
-inline
-TreeNode<N>::TreeNode (const MeshBase& m,
-                       unsigned int tbs,
-                       const TreeNode<N>* p) :
-  mesh           (m),
-  parent         (p),
-  tgt_bin_size   (tbs),
-  contains_ifems (false)
+// ponies
+ponies>
+ponies
+ponies,
+                       ponies,
+                       ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  // libmesh_assert our children are empty, thus we are active.
-  libmesh_assert (children.empty());
-  libmesh_assert (this->active());
+  // ponies.
+  ponies());
+  ponies());
 
-  // Reserve space for the nodes & elements
-  nodes.reserve    (tgt_bin_size);
-  elements.reserve (tgt_bin_size);
+  // ponies
+  ponies);
+  ponies);
 }
 
 
 
-template <unsigned int N>
-inline
-TreeNode<N>::~TreeNode ()
+ponies>
+ponies
+ponies ()
 {
-  // When we are destructed we must delete all of our
-  // children.  They will this delete their children,
-  // All the way down the line...
-  for (unsigned int c=0; c<children.size(); c++)
-    delete children[c];
+  // ponies
+  // ponies,
+  // ponies...
+  ponies++)
+    ponies];
 }
 
 
 
-template <unsigned int N>
-inline
-unsigned int TreeNode<N>::level () const
+ponies>
+ponies
+ponies
 {
-  if (parent != NULL)
-    return parent->level()+1;
+  ponies)
+    ponies;
 
-  // if we have no parent, we are a level-0 box
-  return 0;
+  // ponies
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TREE_NODE_H
+#ponies
