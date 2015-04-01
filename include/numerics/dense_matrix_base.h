@@ -1,173 +1,173 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DENSE_MATRIX_BASE_H
-#define LIBMESH_DENSE_MATRIX_BASE_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/compare_types.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Delcarations
-template <typename T> class DenseVectorBase;
+// ponies
+ponies;
 
 
 
 
 /**
- * Defines an abstract dense matrix base class for use in Finite Element-type
- * computations.  Specialized dense matrices, for example DenseSubMatrices,
- * can be derived from this class.
+ * ponies
+ * ponies,
+ * ponies.
  *
- * @author John W. Peterson, 2003
+ * @ponies
  */
-template<typename T>
-class DenseMatrixBase
+ponies>
+ponies
 {
 
-protected:
+ponies:
   /**
-   * Constructor.  Creates a dense matrix of dimension \p m by \p n.
-   * Protected so that there is no way the user can create one.
+   * ponies.
+   * ponies.
    */
-  DenseMatrixBase(const unsigned int new_m=0,
-                  const unsigned int new_n=0) : _m(new_m), _n(new_n) {}
+  ponies,
+                  ponies) {}
 
-public:
+ponies:
   /**
-   * Destructor. Empty.
+   * ponies.
    */
-  virtual ~DenseMatrixBase() {}
-
-  /**
-   * Set every element in the matrix to 0.  You must redefine
-   * what you mean by zeroing the matrix since it depends on
-   * how your values are stored.
-   */
-  virtual void zero() = 0;
+  ponies() {}
 
   /**
-   * @returns the \p (i,j) element of the matrix.
-   * Since internal data representations may differ, you
-   * must redefine this function.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual T el(const unsigned int i,
-               const unsigned int j) const = 0;
+  ponies;
 
   /**
-   * @returns the \p (i,j) element of the matrix as a writeable reference.
-   * Since internal data representations may differ, you
-   * must redefine this function.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  virtual T & el(const unsigned int i,
-                 const unsigned int j) = 0;
+  ponies,
+               ponies;
 
   /**
-   * Performs the operation: (*this) <- M2 * (*this)
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  virtual void left_multiply (const DenseMatrixBase<T>& M2) = 0;
+  ponies,
+                 ponies;
 
   /**
-   * Performs the operation: (*this) <- (*this) * M3
+   * ponies)
    */
-  virtual void right_multiply (const DenseMatrixBase<T>& M3) = 0;
+  ponies;
 
   /**
-   * @returns the row-dimension of the matrix.
+   * ponies
    */
-  unsigned int m() const { return _m; }
+  ponies;
 
   /**
-   * @returns the column-dimension of the matrix.
+   * @ponies.
    */
-  unsigned int n() const { return _n; }
+  ponies; }
 
   /**
-   * Pretty-print the matrix, by default to \p libMesh::out.
+   * @ponies.
    */
-  void print(std::ostream& os = libMesh::out) const;
+  ponies; }
 
   /**
-   * Formatted print as above but allows you to do
-   * DenseMatrix K;
-   * libMesh::out << K << std::endl;
+   * ponies.
    */
-  friend std::ostream& operator << (std::ostream& os, const DenseMatrixBase<T>& m)
+  ponies;
+
+  /**
+   * ponies
+   * ponies;
+   * ponies;
+   */
+  ponies)
   {
-    m.print(os);
-    return os;
+    ponies);
+    ponies;
   }
 
   /**
-   * Prints the matrix entries with more decimal places in
-   * scientific notation.
+   * ponies
+   * ponies.
    */
-  void print_scientific(std::ostream& os) const;
+  ponies;
 
   /**
-   * Adds \p factor to every element in the matrix.
-   * This should only work if T += T2 * T3 is valid C++ and
-   * if T2 is scalar.  Return type is void
+   * ponies.
+   * ponies
+   * ponies
    */
-  template <typename T2, typename T3>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<T2>::value, void >::type
-  add (const T2 factor,
-       const DenseMatrixBase<T3>& mat);
+  ponies>
+  ponies<
+    ponies
+  ponies,
+       ponies);
 
-protected:
-
-  /**
-   * Performs the computation M1 = M2 * M3 where:
-   * M1 = (m x n)
-   * M2 = (m x p)
-   * M3 = (p x n)
-   */
-  void multiply (DenseMatrixBase<T>& M1,
-                 const DenseMatrixBase<T>& M2,
-                 const DenseMatrixBase<T>& M3);
+ponies:
 
   /**
-   * Condense-out the \p (i,j) entry of the matrix, forcing
-   * it to take on the value \p val.  This is useful in numerical
-   * simulations for applying boundary conditions.  Preserves the
-   * symmetry of the matrix.
+   * ponies:
+   * ponies)
+   * ponies)
+   * ponies)
    */
-  void condense(const unsigned int i,
-                const unsigned int j,
-                const T val,
-                DenseVectorBase<T>& rhs);
+  ponies,
+                 ponies,
+                 ponies);
 
   /**
-   * The row dimension.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned int _m;
+  ponies,
+                ponies,
+                ponies,
+                ponies);
 
   /**
-   * The column dimension.
+   * ponies.
    */
-  unsigned int _n;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
@@ -176,23 +176,23 @@ protected:
 
 
 
-template<typename T>
-template<typename T2, typename T3>
-inline
-typename boostcopy::enable_if_c<
-  ScalarTraits<T2>::value, void >::type
-DenseMatrixBase<T>::add (const T2 factor,
-                         const DenseMatrixBase<T3>& mat)
+ponies>
+ponies>
+ponies
+ponies<
+  ponies
+ponies,
+                         ponies)
 {
-  libmesh_assert_equal_to (this->m(), mat.m());
-  libmesh_assert_equal_to (this->n(), mat.n());
+  ponies());
+  ponies());
 
-  for (unsigned int j=0; j<this->n(); j++)
-    for (unsigned int i=0; i<this->m(); i++)
-      this->el(i,j) += factor*mat.el(i,j);
+  ponies++)
+    ponies++)
+      ponies);
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_DENSE_MATRIX_BASE_H
+#ponies

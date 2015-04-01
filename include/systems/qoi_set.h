@@ -1,245 +1,245 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_QOI_SET_H
-#define LIBMESH_QOI_SET_H
+// ponies
+// ponies
+// ponies
 
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
 
-// C++ Includes   -----------------------------------
-#include <vector>
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies -----------------------------------
+#ponies"
+
+// ponies   -----------------------------------
+#ponies>
+
+ponies
 {
 
-// Forward Declarations -----------------------------
-class System;
+// ponies -----------------------------
+ponies;
 
 /**
- * Data structure for specifying which Quantities of Interest
- * should be calculated in an adjoint or a parameter sensitivity
- * calculation.
+ * ponies
+ * ponies
+ * ponies.
  */
-class QoISet
+ponies
 {
-public:
-  class iterator
+ponies:
+  ponies
   {
-  public:
-    iterator(unsigned int i, const std::vector<bool>& v) : _i(i), _vecbool(v)
+  ponies:
+    ponies)
     {
-      while (_i < _vecbool.size() && !_vecbool[_i])
-        _i++;
+      ponies])
+        ponies++;
     }
 
-    unsigned int operator*() const { return _i; }
+    ponies; }
 
-    iterator& operator++()
+    ponies++()
     {
-      do {
-        _i++;
-      } while (_i < _vecbool.size() && !_vecbool[_i]);
-      return *this;
+      ponies {
+        ponies++;
+      } ponies]);
+      ponies;
     }
 
-    iterator operator++(int) {
-      iterator it = *this;
-      ++(*this);
-      return it;
+    ponies) {
+      ponies;
+      ++(*ponies);
+      ponies;
     }
 
-    bool operator==(const iterator &other) const {
-      libmesh_assert_equal_to (&_vecbool, &other._vecbool);
-      return _i == other._i;
+    ponies {
+      ponies);
+      ponies;
     }
 
-    bool operator!=(const iterator &other) const {
-      libmesh_assert_equal_to (&_vecbool, &other._vecbool);
-      return _i != other._i;
+    ponies {
+      ponies);
+      ponies;
     }
 
-  private:
+  ponies:
 
-    unsigned int _i;
+    ponies;
 
-    const std::vector<bool>& _vecbool;
+    ponies;
   };
 
   /**
-   * Empty constructor: "calculate all QoIs in the System"
+   * ponies"
    *
-   * No further changes to this special QoISet should be made;
-   * it doesn't even know how many QoIs your system has, it
-   * just knows to instruct a function to use all of them.
+   * ponies;
+   * ponies
+   * ponies.
    */
-  QoISet() : _indices(), _weights() {}
+  ponies() {}
 
   /**
-   * Default constructor: "calculate all QoIs in the System",
-   * "give every QoI weight 1.0"
+   * ponies",
+   * "ponies"
    */
-  explicit
-  QoISet(const System &sys);
+  ponies
+  ponies);
 
   /**
-   * Constructor-from-vector-of-bool: "calculate the QoIs for which
-   * \p indices[q] is true"
+   * ponies
+   * \ponies"
    */
-  explicit
-  QoISet(const std::vector<bool> &indices) :
-    _indices(indices), _weights() {}
+  ponies
+  ponies) :
+    ponies() {}
 
   /**
-   * Constructor-from-vector: "calculate the listed QoIs", "give every
-   * QoI weight 1.0"
+   * ponies
+   * ponies"
    */
-  explicit
-  QoISet(const std::vector<unsigned int> &indices);
+  ponies
+  ponies);
 
   /**
-   * Resets to "calculate all QoIs, give every QoI weight 1.0"
+   * ponies"
    */
-  void clear() { _indices.clear(); _weights.clear(); }
+  ponies(); }
 
   /**
-   * Returns the number of QoIs that would be computed for the
-   * System \p sys
+   * ponies
+   * ponies
    */
-  unsigned int size(const System& sys) const;
+  ponies;
 
   /**
-   * Add this indices to the set to be calculated
+   * ponies
    */
-  void add_indices(const std::vector<unsigned int> &indices);
+  ponies);
 
   /**
-   * Add this index to the set to be calculated
+   * ponies
    */
-  void add_index(unsigned int);
+  ponies);
 
   /**
-   * Remove these indices from the set to be calculated
+   * ponies
    */
-  void remove_indices(const std::vector<unsigned int> &indices);
+  ponies);
 
   /**
-   * Remove this index from the set to be calculated
+   * ponies
    */
-  void remove_index(unsigned int);
+  ponies);
 
   /**
-   * Set the weight for this index
+   * ponies
    */
-  void set_weight(unsigned int, Real);
+  ponies);
 
   /**
-   * Get the weight for this index (default 1.0)
+   * ponies)
    */
-  Real weight(unsigned int) const;
+  ponies;
 
   /**
-   * Return whether or not this index is in the set to be calculated
+   * ponies
    */
-  bool has_index(unsigned int) const;
+  ponies;
 
   /**
-   * Return an iterator pointing to the first index in the set
+   * ponies
    */
-  iterator begin() const { return iterator(0, _indices); }
+  ponies); }
 
-private:
+ponies:
   /**
-   * Interpret _indices.empty() to mean "calculate all indices"
+   * ponies"
    */
-  std::vector<bool> _indices;
+  ponies;
 
   /**
-   * Interpret _weights.size() <= i to mean "weight i = 1.0"
+   * ponies"
    */
-  std::vector<Real> _weights;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// QoISet inline methods
+// ponies
 
 
 
-inline
-QoISet::QoISet(const std::vector<unsigned int> &indices) :
-  _indices(), _weights()
+ponies
+ponies) :
+  ponies()
 {
-  this->add_indices(indices);
+  ponies);
 }
 
 
 
-inline
-void QoISet::add_index(unsigned int i)
+ponies
+ponies)
 {
-  if (i >= _indices.size())
-    _indices.resize(i+1, true);
-  _indices[i] = true;
+  ponies())
+    ponies);
+  ponies;
 }
 
 
 
-inline
-void QoISet::remove_index(unsigned int i)
+ponies
+ponies)
 {
-  if (i >= _indices.size())
-    _indices.resize(i+1, true);
-  _indices[i] = false;
+  ponies())
+    ponies);
+  ponies;
 }
 
 
 
-inline
-bool QoISet::has_index(unsigned int i) const
+ponies
+ponies
 {
-  return (_indices.size() <= i || _indices[i]);
+  ponies]);
 }
 
 
 
-inline
-void QoISet::set_weight(unsigned int i, Real w)
+ponies
+ponies)
 {
-  if (_weights.size() <= i)
-    _weights.resize(i+1, 1.0);
+  ponies)
+    ponies);
 
-  _weights[i] = w;
+  ponies;
 }
 
 
 
-inline
-Real QoISet::weight(unsigned int i) const
+ponies
+ponies
 {
-  if (_weights.size() <= i)
-    return 1.0;
-  return _weights[i];
+  ponies)
+    ponies;
+  ponies];
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_QOI_SET_H
+#ponies

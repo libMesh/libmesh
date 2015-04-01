@@ -1,135 +1,135 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_CONDENSED_EIGEN_SYSTEM_H
-#define LIBMESH_CONDENSED_EIGEN_SYSTEM_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-// Currently, the EigenSystem should only be available
-// if SLEPc support is enabled.
-#if defined(LIBMESH_HAVE_SLEPC)
+// ponies
+// ponies.
+#ponies)
 
-// Local Includes
-#include "libmesh/eigen_system.h"
-#include "libmesh/sparse_matrix.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class extends EigenSystem to allow a simple way of solving
- * (standard or generalized) eigenvalue problems in the case where
- * we want to remove certain degrees of freedom from the system.
- * This is useful, for example, in the case that one wants to solve
- * eigenvalue problems with Dirichlet boundary conditions.
+ * ponies
+ * (ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// CondensedEigenSystem class definition
+// ponies
 
-class CondensedEigenSystem : public EigenSystem
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  CondensedEigenSystem (EquationSystems& es,
-                        const std::string& name_in,
-                        const unsigned int number_in);
+  ponies,
+                        ponies,
+                        ponies);
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef CondensedEigenSystem sys_type;
+  ponies;
 
   /**
-   * The type of the parent
+   * ponies
    */
-  typedef EigenSystem Parent;
+  ponies;
 
   /**
-   * @returns a clever pointer to the system.
+   * @ponies.
    */
-  sys_type & system () { return *this; }
+  ponies; }
 
   /**
-   * Loop over the dofs on each processor to initialize the list
-   * of non-condensed dofs. These are the dofs in the system that
-   * are not contained in \p global_dirichlet_dofs_set.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void initialize_condensed_dofs(std::set<unsigned int>& global_dirichlet_dofs_set);
+  ponies);
 
   /**
-   * @return the global number of non-condensed dofs in the system.
+   * @ponies.
    */
-  unsigned int n_global_non_condensed_dofs() const;
+  ponies;
 
   /**
-   * Override to solve the condensed eigenproblem with
-   * the dofs in local_non_condensed_dofs_vector
-   * stripped out of the system matrices on each processor.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void solve();
+  ponies();
 
   /**
-   * Overload get_eigenpair to retrieve the eigenpair for
-   * the condensed eigensolve. We only set the non-condensed
-   * entries of the solution vector (the condensed
-   * entries are set to zero by default).
+   * ponies
+   * ponies
+   * ponies
+   * ponies).
    */
-  virtual std::pair<Real, Real> get_eigenpair(unsigned int i);
+  ponies);
 
   /**
-   * The (condensed) system matrix for standard eigenvalue problems.
+   * ponies.
    */
-  UniquePtr< SparseMatrix<Number> > condensed_matrix_A;
+  ponies;
 
   /**
-   * A second (condensed) system matrix for generalized eigenvalue problems.
+   * ponies.
    */
-  UniquePtr< SparseMatrix<Number> > condensed_matrix_B;
+  ponies;
 
   /**
-   * Vector storing the local dof indices that will not be condensed.
-   * All dofs that are not in this vector will be eliminated from
-   * the system when we perform a solve.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  std::vector<dof_id_type> local_non_condensed_dofs_vector;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * A private flag to indicate whether the condensed dofs
-   * have been initialized.
+   * ponies
+   * ponies.
    */
-  bool condensed_dofs_initialized;
+  ponies;
 
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_HAVE_SLEPC
+#ponies
 
-#endif // LIBMESH_CONDENSED_EIGEN_SYSTEM_H
+#ponies

@@ -1,200 +1,200 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SYSTEM_SUBSET_BY_SUBDOMAIN_H
-#define LIBMESH_SYSTEM_SUBSET_BY_SUBDOMAIN_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/system_subset.h"
-#include "libmesh/id_types.h"
-#include "libmesh/parallel_object.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <set>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
+// ponies
 
 /**
- * This class represents a subset of the dofs of a \p System, selected
- * by the \p subdomain_id and possible the variable numbers.  The dofs
- * in the subset will be sorted.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Tim Kroeger, 2010.
+ * @ponies.
  */
 
 // ------------------------------------------------------------
-// SystemSubset class definition
-class SystemSubsetBySubdomain : public SystemSubset,
-                                public ParallelObject
+// ponies
+ponies,
+                                ponies
 {
-public:
+ponies:
 
   /**
-   * Subclass for user-specified selection of subdomain ids to be
-   * included in a \p SystemSubset.
+   * ponies
+   * ponies.
    */
-  class SubdomainSelection : public ReferenceCountedObject<SubdomainSelection>
+  ponies>
   {
-  public:
+  ponies:
 
     /**
-     * Constructor.
+     * ponies.
      */
-    SubdomainSelection (void);
+    ponies);
 
     /**
-     * Destructor.
+     * ponies.
      */
-    virtual ~SubdomainSelection (void);
+    ponies);
 
     /**
-     * Method that decides whether a given subdomain id is included in
-     * the subset or nor.
+     * ponies
+     * ponies.
      */
-    virtual bool operator()(const subdomain_id_type& subdomain_id)const=0;
+    ponies;
 
-  private:
+  ponies:
     /**
-     * This isn't a copyable object, so let's make sure nobody tries.
+     * ponies.
      *
-     * We won't even bother implementing this; we'll just make sure
-     * that the compiler doesn't implement a default.
+     * ponies
+     * ponies.
      */
-    SubdomainSelection(const SubdomainSelection&);
+    ponies&);
 
     /**
-     * This isn't a copyable object, so let's make sure nobody tries.
+     * ponies.
      *
-     * We won't even bother implementing this; we'll just make sure
-     * that the compiler doesn't implement a default.
+     * ponies
+     * ponies.
      */
-    SubdomainSelection& operator=(const SubdomainSelection&);
+    ponies&);
 
-  }; // subclass \p SubdomainSelection
+  }; // ponies
 
   /**
-   * Selection of subdomain ids by a list.
+   * ponies.
    */
-  class SubdomainSelectionByList : public SubdomainSelection
+  ponies
   {
-  public:
+  ponies:
     /**
-     * Constructor.  Does not take a copy of the \p list, so make sure
-     * that the \p list does not go out of scope before \p *this does.
+     * ponies
+     * ponies.
      */
-    explicit
-    SubdomainSelectionByList (const std::set<subdomain_id_type>& list);
+    ponies
+    ponies);
 
     /**
-     * Method that decides whether a given subdomain id is included in
-     * the subset or nor.
+     * ponies
+     * ponies.
      */
-    virtual bool operator()(const subdomain_id_type& subdomain_id)const;
+    ponies;
 
-  protected:
+  ponies:
     /**
-     * The actual list.
+     * ponies.
      */
-    const std::set<subdomain_id_type>& _list;
+    ponies;
   };
 
   /**
-   * Constructor.  The subset will consist of those dofs which are
-   * associated to at least one mesh element that has a subdomain id
-   * contained in the \p subdomain_selection.  If \p var_nums is not a
-   * \p NULL pointer, dofs that are associated to a variable number
-   * that is not contained in \p var_nums will not contain to the
-   * subset, no matter what elements they belong to.
+   * ponies
+   * ponies
+   * ponies
+   * \ponies
+   * ponies
+   * ponies.
    */
-  SystemSubsetBySubdomain (const System& system,
-                           const SubdomainSelection& subdomain_selection,
-                           const std::set<unsigned int>* const var_nums = NULL);
+  ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * Constructor.  The subset will consist of those dofs which are
-   * associated to at least one mesh element that has a subdomain id
-   * contained in the set \p subdomain_ids.  If \p var_nums is not a
-   * \p NULL pointer, dofs that are associated to a variable number
-   * that is not contained in \p var_nums will not contain to the
-   * subset, no matter what elements they belong to.
+   * ponies
+   * ponies
+   * ponies
+   * \ponies
+   * ponies
+   * ponies.
    */
-  SystemSubsetBySubdomain (const System& system,
-                           const std::set<subdomain_id_type>& subdomain_ids,
-                           const std::set<unsigned int>* const var_nums = NULL);
+  ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~SystemSubsetBySubdomain ();
+  ponies ();
 
   /**
-   * Method that returns the actual set of dofs that the subset
-   * consists of.  The result will contain local dofs on each
-   * processor only and will not contain duplictates.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual const std::vector<unsigned int>& dof_ids(void)const;
+  ponies;
 
   /**
-   * Initializes the class.  Will be called by the constructors.  Can
-   * also be called manually to update the subset.  This is required
-   * if (a) the subdomain ids of some elements have changed in the
-   * meantime and you want these changes to take effect, or (b) you
-   * want to use a different \p SubdomainSelection object now.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void init (const SubdomainSelection& subdomain_selection);
+  ponies);
 
   /**
-   * Initializes the class.  Will be called by the constructors.  Can
-   * also be called manually to update the subset.  This is required
-   * if (a) the subdomain ids of some elements have changed in the
-   * meantime and you want these changes to take effect, or (b) you
-   * want to use a different list of subdomain ids now.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void init (const std::set<subdomain_id_type>& subdomain_ids);
+  ponies);
 
-protected:
+ponies:
 
   /**
-   * Sets \p _var_nums to either a copy of \p var_nums or, if that is
-   * \p NULL, a set of all variable numbers that occur in the system.
+   * ponies
+   * \ponies.
    */
-  void set_var_nums (const std::set<unsigned int>* const var_nums);
+  ponies);
 
   /**
-   * The set of all variable numbers that are contained in the subset.
-   * This will be set by the constructor to either a copy of its \p
-   * var_nums argument or, if that is \p NULL, a set of all variable
-   * numbers that occur in the system.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::set<unsigned int> _var_nums;
+  ponies;
 
   /**
-   * The actual set of the dof ids.
+   * ponies.
    */
-  std::vector<unsigned int> _dof_ids;
+  ponies;
 
-}; // class SystemSubset
+}; // ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_SYSTEM_SUBSET_BY_SUBDOMAIN_H
+#ponies

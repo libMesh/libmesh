@@ -1,350 +1,350 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_QUADRATURE_H
-#define LIBMESH_QUADRATURE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/point.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/enum_order.h"
-#include "libmesh/enum_quadrature_type.h"
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
-#include <string>
-#include <utility>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// forward declarations
-class Elem;
+// ponies
+ponies;
 
 /**
- * This is the \p QBase class.  It provides the basic functionality
- * from which various quadrature rules can be derived.  The class contains
- * \p dim dimensional points describing the quadrature locations
- * (referenced to a master object) and associated weights.
+ * ponies
+ * ponies
+ * \ponies
+ * (ponies.
  *
- * @author Benjamin S. Kirk, 2002
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// QBase class definition
+// ponies
 
-class QBase : public ReferenceCountedObject<QBase>
+ponies>
 {
-protected:
+ponies:
 
   /**
-   * Constructor. Protected to prevent instantiation
-   * of this base class.
+   * ponies
+   * ponies.
    */
-  QBase (const unsigned int _dim,
-         const Order _order=INVALID_ORDER);
+  ponies,
+         ponies);
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~QBase() {}
+  ponies() {}
 
   /**
-   * @returns the quadrature type in derived classes.
+   * @ponies.
    */
-  virtual QuadratureType type() const = 0;
+  ponies;
 
   /**
-   * Builds a specific quadrature rule, identified through the
-   * \p name string.  An \p UniquePtr<QBase> is returned
-   * to prevent a memory leak. This way the user need not
-   * remember to delete the object.  Enables run-time decision of
-   * the quadrature rule.  The input parameter \p name
-   * must be mappable through the \p Utility::string_to_enum<>()
-   * function.
+   * ponies
+   * \ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies<>()
+   * ponies.
    */
-  static UniquePtr<QBase> build (const std::string &name,
-                                 const unsigned int _dim,
-                                 const Order _order=INVALID_ORDER);
+  ponies,
+                                 ponies,
+                                 ponies);
 
   /**
-   * Builds a specific quadrature rule, identified through the
-   * \p QuadratureType.  An \p UniquePtr<QBase> is returned
-   * to prevent a memory leak. This way the user need not
-   * remember to delete the object.  Enables run-time decision of
-   * the quadrature rule.
+   * ponies
+   * \ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  static UniquePtr<QBase> build (const QuadratureType _qt,
-                                 const unsigned int _dim,
-                                 const Order _order=INVALID_ORDER);
+  ponies,
+                                 ponies,
+                                 ponies);
 
   /**
-   * @returns the current element type we're set up for
+   * @ponies
    */
-  ElemType get_elem_type() const
-  { return _type; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the current p refinement level we're initialized with
+   * @ponies
    */
-  unsigned int get_p_level() const
-  { return _p_level; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the number of points associated with the quadrature rule.
+   * @ponies.
    */
-  unsigned int n_points() const
-  { libmesh_assert (!_points.empty());
-    return cast_int<unsigned int>(_points.size()); }
+  ponies
+  { ponies());
+    ponies()); }
 
   /**
-   * @returns the dimension of the quadrature rule.
+   * @ponies.
    */
-  unsigned int get_dim() const { return _dim;  }
+  ponies;  }
 
   /**
-   * @returns a \p std::vector containing the quadrature point locations
-   * on a reference object.
+   * @ponies
+   * ponies.
    */
-  const std::vector<Point>& get_points() const { return _points;  }
+  ponies;  }
 
   /**
-   * @returns a \p std::vector containing the quadrature point locations
-   * on a reference object as a writeable reference.
+   * @ponies
+   * ponies.
    */
-  std::vector<Point>& get_points() { return _points;  }
+  ponies;  }
 
   /**
-   * @returns a \p std::vector containing the quadrature weights.
+   * @ponies.
    */
-  const std::vector<Real>& get_weights() const { return _weights; }
+  ponies; }
 
   /**
-   * @returns a \p std::vector containing the quadrature weights.
+   * @ponies.
    */
-  std::vector<Real>& get_weights() { return _weights; }
+  ponies; }
 
   /**
-   * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
+   * @ponies.
    */
-  Point qp(const unsigned int i) const
-  { libmesh_assert_less (i, _points.size()); return _points[i]; }
+  ponies
+  { ponies]; }
 
   /**
-   * @returns the \f$ i^{th} \f$ quadrature weight.
+   * @ponies.
    */
-  Real w(const unsigned int i) const
-  { libmesh_assert_less (i, _weights.size()); return _weights[i]; }
+  ponies
+  { ponies]; }
 
   /**
-   * Initializes the data structures to contain a quadrature rule
-   * for an object of type \p type.
+   * ponies
+   * ponies.
    */
-  virtual void init (const ElemType type=INVALID_ELEM,
-                     unsigned int p_level=0);
+  ponies,
+                     ponies);
 
   /**
-   * Initializes the data structures for a specific, potentially cut
-   * element.  The array \p vertex_distance_func contains vertex
-   * values of a signed distance function that cuts the element.  This
-   * interface is indended to be extended by derived classes that can
-   * cut the element into subelements, for example, and constuct a
-   * composite quadrature rule for the cut element.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void init (const Elem &elem,
-                     const std::vector<Real> &vertex_distance_func,
-                     unsigned int p_level=0);
+  ponies,
+                     ponies,
+                     ponies);
 
   /**
-   * @returns the order of the quadrature rule.
+   * @ponies.
    */
-  Order get_order() const { return static_cast<Order>(_order + _p_level); }
+  ponies); }
 
   /**
-   * Prints information relevant to the quadrature rule, by default to
-   * libMesh::out.
+   * ponies
+   * ponies.
    */
-  void print_info(std::ostream& os=libMesh::out) const;
+  ponies;
 
   /**
-   * Maps the points of a 1D interval quadrature rule (typically [-1,1])
-   * to any other 1D interval (typically [0,1]) and scales the weights
-   * accordingly.  The quadrature rule will be mapped from the
-   * entries of old_range to the entries of new_range.
+   * ponies])
+   * ponies
+   * ponies
+   * ponies.
    */
-  void scale(std::pair<Real, Real> old_range,
-             std::pair<Real, Real> new_range);
+  ponies,
+             ponies);
 
   /**
-   * Same as above, but allows you to use the stream syntax.
+   * ponies.
    */
-  friend std::ostream& operator << (std::ostream& os, const QBase& q);
+  ponies);
 
   /**
-   * Returns true if the shape functions need to be recalculated.
+   * ponies.
    *
-   * This can happen if the number of points or their positions change.
+   * ponies.
    *
-   * By default this will return false.
+   * ponies.
    */
-  virtual bool shapes_need_reinit() { return false; }
+  ponies; }
 
   /**
-   * Flag (default true) controlling the use of quadrature rules with negative
-   * weights.  Set this to false to ONLY use (potentially) safer but more expensive
-   * rules with all positive weights.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Negative weights typically appear in Gaussian quadrature rules
-   * over three-dimensional elements.  Rules with negative weights can
-   * be unsuitable for some problems.  For example, it is possible for
-   * a rule with negative weights to obtain a negative result when
-   * integrating a positive function.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * A particular example: if rules with negative weights are not allowed,
-   * a request for TET,THIRD (5 points) will return the TET,FIFTH (14 points)
-   * rule instead, nearly tripling the computational effort required!
+   * ponies,
+   * ponies)
+   * ponies!
    */
-  bool allow_rules_with_negative_weights;
+  ponies;
 
-protected:
+ponies:
 
 
   /**
-   * Initializes the 0D quadrature rule by filling the points and
-   * weights vectors with the appropriate values.  Generally this
-   * is just one point with weight 1.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void init_0D (const ElemType type=INVALID_ELEM,
-                        unsigned int p_level=0);
+  ponies,
+                        ponies);
 
   /**
-   * Initializes the 1D quadrature rule by filling the points and
-   * weights vectors with the appropriate values.  The order of
-   * the rule will be defined by the implementing class.
-   * It is assumed that derived quadrature rules will at least
-   * define the init_1D function, therefore it is pure virtual.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void init_1D (const ElemType type=INVALID_ELEM,
-                        unsigned int p_level=0) = 0;
+  ponies,
+                        ponies;
 
   /**
-   * Initializes the 2D quadrature rule by filling the points and
-   * weights vectors with the appropriate values.  The order of
-   * the rule will be defined by the implementing class.
-   * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D.  If not redefined, gives an
-   * error (when \p DEBUG defined) when called.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void init_2D (const ElemType,
-                        unsigned int =0)
-#ifndef DEBUG
+  ponies,
+                        ponies)
+#ponies
   {}
-#else
+#ponies
   {
-    libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 2D.");
+    ponies.");
   }
-#endif
+#ponies
 
   /**
-   * Initializes the 3D quadrature rule by filling the points and
-   * weights vectors with the appropriate values.  The order of
-   * the rule will be defined by the implementing class.
-   * Should not be pure virtual since a derived quadrature rule
-   * may only be defined in 1D.  If not redefined, gives an
-   * error (when \p DEBUG defined) when called.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void init_3D (const ElemType,
-                        unsigned int =0)
-#ifndef DEBUG
+  ponies,
+                        ponies)
+#ponies
   {}
-#else
+#ponies
   {
-    libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 3D.");
+    ponies.");
   }
-#endif
+#ponies
 
 
   /**
-   * Computes the tensor product of
-   * two 1D rules and returns a 2D rule.
-   * Used in the init_2D routines for
-   * quadrilateral element types.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void tensor_product_quad (const QBase& q1D);
+  ponies);
 
   /**
-   * Computes the tensor product quadrature rule
-   * [q1D x q1D x q1D] from the 1D rule q1D.
-   * Used in the init_3D routines for
-   * hexahedral element types.
+   * ponies
+   * [ponies.
+   * ponies
+   * ponies.
    */
-  void tensor_product_hex (const QBase& q1D);
+  ponies);
 
   /**
-   * Computes the tensor product of
-   * a 1D quadrature rule and a 2D
-   * quadrature rule.
-   * Used in the init_3D routines for
-   * prismatic element types.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void tensor_product_prism (const QBase& q1D, const QBase& q2D);
+  ponies);
 
 
 
   /**
-   * The dimension
+   * ponies
    */
-  const unsigned int _dim;
+  ponies;
 
   /**
-   * The order of the quadrature rule.
+   * ponies.
    */
-  const Order _order;
+  ponies;
 
   /**
-   * The type of element for which the current values have
-   * been computed.
+   * ponies
+   * ponies.
    */
-  ElemType _type;
+  ponies;
 
   /**
-   * The p level of element for which the current values have
-   * been computed.
+   * ponies
+   * ponies.
    */
-  unsigned int _p_level;
+  ponies;
 
   /**
-   * The reference element locations of the
-   * quadrature points.
+   * ponies
+   * ponies.
    */
-  std::vector<Point> _points;
+  ponies;
 
   /**
-   * The value of the quadrature weights.
+   * ponies.
    */
-  std::vector<Real> _weights;
+  ponies;
 };
 
 
@@ -352,43 +352,43 @@ protected:
 
 
 // ------------------------------------------------------------
-// QBase class members
+// ponies
 
-inline
-QBase::QBase(const unsigned int d,
-             const Order o) :
-  allow_rules_with_negative_weights(true),
-  _dim(d),
-  _order(o),
-  _type(INVALID_ELEM),
-  _p_level(0)
+ponies
+ponies,
+             ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
 
-inline
-void QBase::print_info(std::ostream& os) const
+ponies
+ponies
 {
-  libmesh_assert(!_points.empty());
-  libmesh_assert(!_weights.empty());
+  ponies());
+  ponies());
 
-  Real summed_weights=0;
-  os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
-  for (unsigned int qpoint=0; qpoint<this->n_points(); qpoint++)
+  ponies;
+  ponies;
+  ponies++)
     {
-      os << " Point " << qpoint << ":\n"
+      ponies"
          << "  "
-         << _points[qpoint]
-         << "\n Weight:\n "
-         << "  w=" << _weights[qpoint] << "\n" << std::endl;
+         << ponies]
+         << "\ponies "
+         << "  ponies;
 
-      summed_weights += _weights[qpoint];
+      ponies];
     }
-  os << "Summed Weights: " << summed_weights << std::endl;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_QUADRATURE_H
+#ponies

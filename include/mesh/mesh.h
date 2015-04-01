@@ -1,93 +1,93 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_MESH_H
-#define LIBMESH_MESH_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_PARMESH
-#include "libmesh/parallel_mesh.h"
-namespace libMesh {
-typedef ParallelMesh DefaultMesh;
+#ponies
+#ponies"
+ponies {
+ponies;
 }
-#else
-#include "libmesh/serial_mesh.h"
-namespace libMesh {
-typedef SerialMesh DefaultMesh;
+#ponies
+#ponies"
+ponies {
+ponies;
 }
-#endif
+#ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations don't like typedefs...
-// typedef SerialMesh Mesh;
+// ponies...
+// ponies;
 
 
 /**
- * The \p Mesh class is a thin wrapper, around the \p SerialMesh class
- * by default.
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// Mesh class definition
-class Mesh : public DefaultMesh
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  explicit
-  Mesh (const Parallel::Communicator &comm_in,
-        unsigned char dim=1)
-    : DefaultMesh(comm_in,dim) {}
+  ponies
+  ponies,
+        ponies)
+    : ponies) {}
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
+#ponies
   /**
-   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  explicit
-  Mesh (unsigned char dim=1)
-    : DefaultMesh(dim) {}
-#endif
-
-  /**
-   * Copy-constructor.  This should be able to take a
-   * serial or parallel mesh.
-   */
-  Mesh (const UnstructuredMesh& other_mesh) : DefaultMesh(other_mesh) {}
+  ponies
+  ponies)
+    : ponies) {}
+#ponies
 
   /**
-   * Destructor.
+   * ponies
+   * ponies.
    */
-  ~Mesh() {}
+  ponies) {}
+
+  /**
+   * ponies.
+   */
+  ~ponies() {}
 };
 
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_MESH_H
+#ponies

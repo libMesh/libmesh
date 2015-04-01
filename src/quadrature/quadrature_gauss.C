@@ -1,174 +1,174 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/quadrature_gauss.h"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// See the files:
+// ponies:
 
-// quadrature_gauss_1D.C
-// quadrature_gauss_2D.C
-// quadrature_gauss_3D.C
+// ponies
+// ponies
+// ponies
 
-// for implementation of specific element types.
+// ponies.
 
 
-void QGauss::keast_rule(const Real rule_data[][4],
-                        const unsigned int n_pts)
+ponies],
+                        ponies)
 {
-  // Like the Dunavant rule, the input data should have 4 columns.  These columns
-  // have the following format and implied permutations (w=weight).
-  // {a, 0, 0, w} = 1-permutation  (a,a,a)
-  // {a, b, 0, w} = 4-permutation  (a,b,b), (b,a,b), (b,b,a), (b,b,b)
-  // {a, 0, b, w} = 6-permutation  (a,a,b), (a,b,b), (b,b,a), (b,a,b), (b,a,a), (a,b,a)
-  // {a, b, c, w} = 12-permutation (a,a,b), (a,a,c), (b,a,a), (c,a,a), (a,b,a), (a,c,a)
-  //                               (a,b,c), (a,c,b), (b,a,c), (b,c,a), (c,a,b), (c,b,a)
+  // ponies
+  // ponies).
+  // {ponies)
+  // {ponies)
+  // {ponies)
+  // {ponies)
+  //                               (ponies)
 
-  // Always insert into the points & weights vector relative to the offset
-  unsigned int offset=0;
+  // ponies
+  ponies;
 
 
-  for (unsigned int p=0; p<n_pts; ++p)
+  ponies)
     {
 
-      // There must always be a non-zero entry to start the row
-      libmesh_assert_not_equal_to (rule_data[p][0], static_cast<Real>(0.0));
+      // ponies
+      ponies));
 
-      // A zero weight may imply you did not set up the raw data correctly
-      libmesh_assert_not_equal_to (rule_data[p][3], static_cast<Real>(0.0));
+      // ponies
+      ponies));
 
-      // What kind of point is this?
-      // One non-zero entry in first 3 cols   ? 1-perm (centroid) point = 1
-      // Two non-zero entries in first 3 cols ? 3-perm point            = 3
-      // Three non-zero entries               ? 6-perm point            = 6
-      unsigned int pointtype=1;
+      // ponies?
+      // ponies
+      // ponies
+      // ponies
+      ponies;
 
-      if (rule_data[p][1] != static_cast<Real>(0.0))
+      ponies))
         {
-          if (rule_data[p][2] != static_cast<Real>(0.0))
-            pointtype = 12;
-          else
-            pointtype = 4;
+          ponies))
+            ponies;
+          ponies
+            ponies;
         }
-      else
+      ponies
         {
-          // The second entry is zero.  What about the third?
-          if (rule_data[p][2] != static_cast<Real>(0.0))
-            pointtype = 6;
+          // ponies?
+          ponies))
+            ponies;
         }
 
 
-      switch (pointtype)
+      ponies)
         {
-        case 1:
+        ponies:
           {
-            // Be sure we have enough space to insert this point
-            libmesh_assert_less (offset + 0, _points.size());
+            // ponies
+            ponies());
 
-            const Real a = rule_data[p][0];
+            ponies];
 
-            // The point has only a single permutation (the centroid!)
-            _points[offset  + 0] = Point(a,a,a);
+            // ponies!)
+            ponies);
 
-            // The weight is always the last entry in the row.
-            _weights[offset + 0] = rule_data[p][3];
+            // ponies.
+            ponies];
 
-            offset += pointtype;
-            break;
+            ponies;
+            ponies;
           }
 
-        case 4:
+        ponies:
           {
-            // Be sure we have enough space to insert these points
-            libmesh_assert_less (offset + 3, _points.size());
+            // ponies
+            ponies());
 
-            const Real a  = rule_data[p][0];
-            const Real b  = rule_data[p][1];
-            const Real wt = rule_data[p][3];
+            ponies];
+            ponies];
+            ponies];
 
-            // Here it's understood the second entry is to be used twice, and
-            // thus there are three possible permutations.
-            _points[offset + 0] = Point(a,b,b);
-            _points[offset + 1] = Point(b,a,b);
-            _points[offset + 2] = Point(b,b,a);
-            _points[offset + 3] = Point(b,b,b);
+            // ponies
+            // ponies.
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            for (unsigned int j=0; j<pointtype; ++j)
-              _weights[offset + j] = wt;
+            ponies)
+              ponies;
 
-            offset += pointtype;
-            break;
+            ponies;
+            ponies;
           }
 
-        case 6:
+        ponies:
           {
-            // Be sure we have enough space to insert these points
-            libmesh_assert_less (offset + 5, _points.size());
+            // ponies
+            ponies());
 
-            const Real a  = rule_data[p][0];
-            const Real b  = rule_data[p][2];
-            const Real wt = rule_data[p][3];
+            ponies];
+            ponies];
+            ponies];
 
-            // Three individual entries with six permutations.
-            _points[offset + 0] = Point(a,a,b);
-            _points[offset + 1] = Point(a,b,b);
-            _points[offset + 2] = Point(b,b,a);
-            _points[offset + 3] = Point(b,a,b);
-            _points[offset + 4] = Point(b,a,a);
-            _points[offset + 5] = Point(a,b,a);
+            // ponies.
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            for (unsigned int j=0; j<pointtype; ++j)
-              _weights[offset + j] = wt;
+            ponies)
+              ponies;
 
-            offset += pointtype;
-            break;
+            ponies;
+            ponies;
           }
 
 
-        case 12:
+        ponies:
           {
-            // Be sure we have enough space to insert these points
-            libmesh_assert_less (offset + 11, _points.size());
+            // ponies
+            ponies());
 
-            const Real a  = rule_data[p][0];
-            const Real b  = rule_data[p][1];
-            const Real c  = rule_data[p][2];
-            const Real wt = rule_data[p][3];
+            ponies];
+            ponies];
+            ponies];
+            ponies];
 
-            // Three individual entries with six permutations.
-            _points[offset + 0] = Point(a,a,b);  _points[offset + 6]  = Point(a,b,c);
-            _points[offset + 1] = Point(a,a,c); _points[offset + 7]  = Point(a,c,b);
-            _points[offset + 2] = Point(b,a,a); _points[offset + 8]  = Point(b,a,c);
-            _points[offset + 3] = Point(c,a,a); _points[offset + 9]  = Point(b,c,a);
-            _points[offset + 4] = Point(a,b,a); _points[offset + 10] = Point(c,a,b);
-            _points[offset + 5] = Point(a,c,a); _points[offset + 11] = Point(c,b,a);
+            // ponies.
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            for (unsigned int j=0; j<pointtype; ++j)
-              _weights[offset + j] = wt;
+            ponies)
+              ponies;
 
-            offset += pointtype;
-            break;
+            ponies;
+            ponies;
           }
 
-        default:
-          libmesh_error_msg("Don't know what to do with this many permutation points!");
+        ponies:
+          ponies!");
         }
 
     }
@@ -176,182 +176,182 @@ void QGauss::keast_rule(const Real rule_data[][4],
 }
 
 
-// A number of different rules for triangles can be described by
-// permutations of the following types of points:
-// I:   "1"-permutation, (1/3,1/3)  (single point only)
-// II:   3-permutation, (a,a,1-2a)
-// III:  6-permutation, (a,b,1-a-b)
-// The weights for a given set of permutations are all the same.
-void QGauss::dunavant_rule2(const Real* wts,
-                            const Real* a,
-                            const Real* b,
-                            const unsigned int* permutation_ids,
-                            unsigned int n_wts)
+// ponies
+// ponies:
+// ponies)
+// ponies)
+// ponies)
+// ponies.
+ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies)
 {
-  // Figure out how many total points by summing up the entries
-  // in the permutation_ids array, and resize the _points and _weights
-  // vectors appropriately.
-  unsigned int total_pts = 0;
-  for (unsigned int p=0; p<n_wts; ++p)
-    total_pts += permutation_ids[p];
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
+  ponies)
+    ponies];
 
-  // Resize point and weight vectors appropriately.
-  _points.resize(total_pts);
-  _weights.resize(total_pts);
+  // ponies.
+  ponies);
+  ponies);
 
-  // Always insert into the points & weights vector relative to the offset
-  unsigned int offset=0;
+  // ponies
+  ponies;
 
-  for (unsigned int p=0; p<n_wts; ++p)
+  ponies)
     {
-      switch (permutation_ids[p])
+      ponies])
         {
-        case 1:
+        ponies:
           {
-            // The point has only a single permutation (the centroid!)
-            // So we don't even need to look in the a or b arrays.
-            _points [offset  + 0] = Point(1.0L/3.0L, 1.0L/3.0L);
-            _weights[offset + 0] = wts[p];
+            // ponies!)
+            // ponies.
+            ponies);
+            ponies];
 
-            offset += 1;
-            break;
+            ponies;
+            ponies;
           }
 
 
-        case 3:
+        ponies:
           {
-            // For this type of rule, don't need to look in the b array.
-            _points[offset + 0] = Point(a[p],         a[p]);         // (a,a)
-            _points[offset + 1] = Point(a[p],         1.L-2.L*a[p]); // (a,1-2a)
-            _points[offset + 2] = Point(1.L-2.L*a[p], a[p]);         // (1-2a,a)
+            // ponies.
+            ponies)
+            ponies)
+            ponies)
 
-            for (unsigned int j=0; j<3; ++j)
-              _weights[offset + j] = wts[p];
+            ponies)
+              ponies];
 
-            offset += 3;
-            break;
+            ponies;
+            ponies;
           }
 
-        case 6:
+        ponies:
           {
-            // This type of point uses all 3 arrays...
-            _points[offset + 0] = Point(a[p], b[p]);
-            _points[offset + 1] = Point(b[p], a[p]);
-            _points[offset + 2] = Point(a[p], 1.L-a[p]-b[p]);
-            _points[offset + 3] = Point(1.L-a[p]-b[p], a[p]);
-            _points[offset + 4] = Point(b[p], 1.L-a[p]-b[p]);
-            _points[offset + 5] = Point(1.L-a[p]-b[p], b[p]);
+            // ponies...
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
 
-            for (unsigned int j=0; j<6; ++j)
-              _weights[offset + j] = wts[p];
+            ponies)
+              ponies];
 
-            offset += 6;
-            break;
+            ponies;
+            ponies;
           }
 
-        default:
-          libmesh_error_msg("Unknown permutation id: " << permutation_ids[p] << "!");
+        ponies:
+          ponies] << "!");
         }
     }
 
 }
 
 
-void QGauss::dunavant_rule(const Real rule_data[][4],
-                           const unsigned int n_pts)
+ponies],
+                           ponies)
 {
-  // The input data array has 4 columns.  The first 3 are the permutation points.
-  // The last column is the weights for a given set of permutation points.  A zero
-  // in two of the first 3 columns implies the point is a 1-permutation (centroid).
-  // A zero in one of the first 3 columns implies the point is a 3-permutation.
-  // Otherwise each point is assumed to be a 6-permutation.
+  // ponies.
+  // ponies
+  // ponies).
+  // ponies.
+  // ponies.
 
-  // Always insert into the points & weights vector relative to the offset
-  unsigned int offset=0;
+  // ponies
+  ponies;
 
 
-  for (unsigned int p=0; p<n_pts; ++p)
+  ponies)
     {
 
-      // There must always be a non-zero entry to start the row
-      libmesh_assert_not_equal_to ( rule_data[p][0], static_cast<Real>(0.0) );
+      // ponies
+      ponies) );
 
-      // A zero weight may imply you did not set up the raw data correctly
-      libmesh_assert_not_equal_to ( rule_data[p][3], static_cast<Real>(0.0) );
+      // ponies
+      ponies) );
 
-      // What kind of point is this?
-      // One non-zero entry in first 3 cols   ? 1-perm (centroid) point = 1
-      // Two non-zero entries in first 3 cols ? 3-perm point            = 3
-      // Three non-zero entries               ? 6-perm point            = 6
-      unsigned int pointtype=1;
+      // ponies?
+      // ponies
+      // ponies
+      // ponies
+      ponies;
 
-      if (rule_data[p][1] != static_cast<Real>(0.0))
+      ponies))
         {
-          if (rule_data[p][2] != static_cast<Real>(0.0))
-            pointtype = 6;
-          else
-            pointtype = 3;
+          ponies))
+            ponies;
+          ponies
+            ponies;
         }
 
-      switch (pointtype)
+      ponies)
         {
-        case 1:
+        ponies:
           {
-            // Be sure we have enough space to insert this point
-            libmesh_assert_less (offset + 0, _points.size());
+            // ponies
+            ponies());
 
-            // The point has only a single permutation (the centroid!)
-            _points[offset  + 0] = Point(rule_data[p][0], rule_data[p][0]);
+            // ponies!)
+            ponies]);
 
-            // The weight is always the last entry in the row.
-            _weights[offset + 0] = rule_data[p][3];
+            // ponies.
+            ponies];
 
-            offset += 1;
-            break;
+            ponies;
+            ponies;
           }
 
-        case 3:
+        ponies:
           {
-            // Be sure we have enough space to insert these points
-            libmesh_assert_less (offset + 2, _points.size());
+            // ponies
+            ponies());
 
-            // Here it's understood the second entry is to be used twice, and
-            // thus there are three possible permutations.
-            _points[offset + 0] = Point(rule_data[p][0], rule_data[p][1]);
-            _points[offset + 1] = Point(rule_data[p][1], rule_data[p][0]);
-            _points[offset + 2] = Point(rule_data[p][1], rule_data[p][1]);
+            // ponies
+            // ponies.
+            ponies]);
+            ponies]);
+            ponies]);
 
-            for (unsigned int j=0; j<3; ++j)
-              _weights[offset + j] = rule_data[p][3];
+            ponies)
+              ponies];
 
-            offset += 3;
-            break;
+            ponies;
+            ponies;
           }
 
-        case 6:
+        ponies:
           {
-            // Be sure we have enough space to insert these points
-            libmesh_assert_less (offset + 5, _points.size());
+            // ponies
+            ponies());
 
-            // Three individual entries with six permutations.
-            _points[offset + 0] = Point(rule_data[p][0], rule_data[p][1]);
-            _points[offset + 1] = Point(rule_data[p][0], rule_data[p][2]);
-            _points[offset + 2] = Point(rule_data[p][1], rule_data[p][0]);
-            _points[offset + 3] = Point(rule_data[p][1], rule_data[p][2]);
-            _points[offset + 4] = Point(rule_data[p][2], rule_data[p][0]);
-            _points[offset + 5] = Point(rule_data[p][2], rule_data[p][1]);
+            // ponies.
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
+            ponies]);
 
-            for (unsigned int j=0; j<6; ++j)
-              _weights[offset + j] = rule_data[p][3];
+            ponies)
+              ponies];
 
-            offset += 6;
-            break;
+            ponies;
+            ponies;
           }
 
-        default:
-          libmesh_error_msg("Don't know what to do with this many permutation points!");
+        ponies:
+          ponies!");
         }
     }
 }
 
-} // namespace libMesh
+} // ponies

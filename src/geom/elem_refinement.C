@@ -1,183 +1,183 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/elem.h"
-#include "libmesh/mesh_refinement.h"
-#include "libmesh/remote_elem.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 //--------------------------------------------------------------------
-// Elem methods
+// ponies
 
 /**
- * The following functions only apply when
- * AMR is enabled and thus are not present
- * otherwise.
+ * ponies
+ * ponies
+ * ponies.
  */
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-void Elem::refine (MeshRefinement& mesh_refinement)
+ponies)
 {
-  libmesh_assert_equal_to (this->refinement_flag(), Elem::REFINE);
-  libmesh_assert (this->active());
+  ponies);
+  ponies());
 
-  // Create my children if necessary
-  if (!_children)
+  // ponies
+  ponies)
     {
-      _children = new Elem*[this->n_children()];
+      ponies()];
 
-      unsigned int parent_p_level = this->p_level();
-      for (unsigned int c=0; c<this->n_children(); c++)
+      ponies();
+      ponies++)
         {
-          _children[c] = Elem::build(this->type(), this).release();
-          Elem *current_child = this->child(c);
+          ponies();
+          ponies);
 
-          current_child->set_refinement_flag(Elem::JUST_REFINED);
-          current_child->set_p_level(parent_p_level);
-          current_child->set_p_refinement_flag(this->p_refinement_flag());
+          ponies);
+          ponies);
+          ponies());
 
-          for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
+          ponies++)
             {
-              Node *node =
-                mesh_refinement.add_node(*this, c, nc,
-                                         current_child->processor_id());
-              node->set_n_systems (this->n_systems());
-              current_child->set_node(nc) = node;
+              ponies =
+                ponies,
+                                         ponies());
+              ponies());
+              ponies;
             }
 
-          mesh_refinement.add_elem (current_child);
-          current_child->set_n_systems(this->n_systems());
+          ponies);
+          ponies());
         }
     }
-  else
+  ponies
     {
-      unsigned int parent_p_level = this->p_level();
-      for (unsigned int c=0; c<this->n_children(); c++)
+      ponies();
+      ponies++)
         {
-          Elem *current_child = this->child(c);
-          libmesh_assert(current_child->subactive());
-          current_child->set_refinement_flag(Elem::JUST_REFINED);
-          current_child->set_p_level(parent_p_level);
-          current_child->set_p_refinement_flag(this->p_refinement_flag());
+          ponies);
+          ponies());
+          ponies);
+          ponies);
+          ponies());
         }
     }
 
-  // Un-set my refinement flag now
-  this->set_refinement_flag(Elem::INACTIVE);
-  this->set_p_refinement_flag(Elem::INACTIVE);
+  // ponies
+  ponies);
+  ponies);
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  ponies++)
     {
-      libmesh_assert_equal_to (this->child(c)->parent(), this);
-      libmesh_assert(this->child(c)->active());
+      ponies);
+      ponies());
     }
-  libmesh_assert (this->ancestor());
+  ponies());
 }
 
 
 
-void Elem::coarsen()
+ponies()
 {
-  libmesh_assert_equal_to (this->refinement_flag(), Elem::COARSEN_INACTIVE);
-  libmesh_assert (!this->active());
+  ponies);
+  ponies());
 
-  // We no longer delete children until MeshRefinement::contract()
-  // delete [] _children;
-  // _children = NULL;
+  // ponies()
+  // ponies;
+  // ponies;
 
-  unsigned int parent_p_level = 0;
+  ponies;
 
-  // re-compute hanging node nodal locations
-  for (unsigned int c=0; c<this->n_children(); c++)
+  // ponies
+  ponies++)
     {
-      Elem *mychild = this->child(c);
-      if (mychild == remote_elem)
-        continue;
-      for (unsigned int nc=0; nc<mychild->n_nodes(); nc++)
+      ponies);
+      ponies)
+        ponies;
+      ponies++)
         {
-          Point new_pos;
-          bool calculated_new_pos = false;
+          ponies;
+          ponies;
 
-          for (unsigned int n=0; n<this->n_nodes(); n++)
+          ponies++)
             {
-              // The value from the embedding matrix
-              const float em_val = this->embedding_matrix(c,nc,n);
+              // ponies
+              ponies);
 
-              // The node location is somewhere between existing vertices
-              if ((em_val != 0.) && (em_val != 1.))
+              // ponies
+              ponies.))
                 {
-                  new_pos.add_scaled (this->point(n), em_val);
-                  calculated_new_pos = true;
+                  ponies);
+                  ponies;
                 }
             }
 
-          if(calculated_new_pos)
+          ponies)
             {
-              //Move the existing node back into it's original location
-              for(unsigned int i=0; i<LIBMESH_DIM; i++)
+              //ponies
+              ponies++)
                 {
-                  Point & child_node = *(mychild->get_node(nc));
-                  child_node(i)=new_pos(i);
+                  ponies));
+                  ponies);
                 }
             }
         }
     }
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  ponies++)
     {
-      Elem *mychild = this->child(c);
-      if (mychild == remote_elem)
-        continue;
-      libmesh_assert_equal_to (mychild->refinement_flag(), Elem::COARSEN);
-      mychild->set_refinement_flag(Elem::INACTIVE);
-      if (mychild->p_level() > parent_p_level)
-        parent_p_level = mychild->p_level();
+      ponies);
+      ponies)
+        ponies;
+      ponies);
+      ponies);
+      ponies)
+        ponies();
     }
 
-  this->set_refinement_flag(Elem::JUST_COARSENED);
-  this->set_p_level(parent_p_level);
+  ponies);
+  ponies);
 
-  libmesh_assert (this->active());
+  ponies());
 }
 
 
 
-void Elem::contract()
+ponies()
 {
-  // Subactive elements get deleted entirely, not contracted
-  libmesh_assert (this->active());
+  // ponies
+  ponies());
 
-  // Active contracted elements no longer can have children
-  delete [] _children;
-  _children = NULL;
+  // ponies
+  ponies;
+  ponies;
 
-  if (this->refinement_flag() == Elem::JUST_COARSENED)
-    this->set_refinement_flag(Elem::DO_NOTHING);
+  ponies)
+    ponies);
 }
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
 
-} // namespace libMesh
+} // ponies

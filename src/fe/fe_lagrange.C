@@ -1,315 +1,315 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/dof_map.h"
-#include "libmesh/fe.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/elem.h"
-#include "libmesh/threads.h"
-#include "libmesh/string_to_enum.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// Lagrange-specific implementations
+// ponies
 
 
-// Anonymous namespace for local helper functions
-namespace {
-void lagrange_nodal_soln(const Elem* elem,
-                         const Order order,
-                         const std::vector<Number>& elem_soln,
-                         std::vector<Number>&       nodal_soln)
+// ponies
+ponies {
+ponies,
+                         ponies,
+                         ponies,
+                         ponies)
 {
-  const unsigned int n_nodes = elem->n_nodes();
-  const ElemType type        = elem->type();
+  ponies();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order+elem->p_level());
+  ponies());
 
-  nodal_soln.resize(n_nodes);
+  ponies);
 
 
 
-  switch (totalorder)
+  ponies)
     {
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case EDGE3:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 2);
-              libmesh_assert_equal_to (nodal_soln.size(), 3);
+              ponies);
+              ponies);
 
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = .5*(elem_soln[0] + elem_soln[1]);
+              ponies];
+              ponies];
+              ponies]);
 
-              return;
+              ponies;
             }
 
-          case EDGE4:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 2);
-              libmesh_assert_equal_to (nodal_soln.size(), 4);
+              ponies);
+              ponies);
 
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = (2.*elem_soln[0] + elem_soln[1])/3.;
-              nodal_soln[3] = (elem_soln[0] + 2.*elem_soln[1])/3.;
+              ponies];
+              ponies];
+              ponies.;
+              ponies.;
 
-              return;
-            }
-
-
-          case TRI6:
-            {
-              libmesh_assert_equal_to (elem_soln.size(), 3);
-              libmesh_assert_equal_to (nodal_soln.size(), 6);
-
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = elem_soln[2];
-              nodal_soln[3] = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[4] = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[5] = .5*(elem_soln[2] + elem_soln[0]);
-
-              return;
+              ponies;
             }
 
 
-          case QUAD8:
-          case QUAD9:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 4);
+              ponies);
+              ponies);
 
-              if (type == QUAD8)
-                libmesh_assert_equal_to (nodal_soln.size(), 8);
-              else
-                libmesh_assert_equal_to (nodal_soln.size(), 9);
+              ponies];
+              ponies];
+              ponies];
+              ponies]);
+              ponies]);
+              ponies]);
 
-
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = elem_soln[2];
-              nodal_soln[3] = elem_soln[3];
-              nodal_soln[4] = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[5] = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[6] = .5*(elem_soln[2] + elem_soln[3]);
-              nodal_soln[7] = .5*(elem_soln[3] + elem_soln[0]);
-
-              if (type == QUAD9)
-                nodal_soln[8] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3]);
-
-              return;
+              ponies;
             }
 
 
-          case TET10:
+          ponies:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 4);
-              libmesh_assert_equal_to (nodal_soln.size(), 10);
+              ponies);
 
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = elem_soln[2];
-              nodal_soln[3] = elem_soln[3];
-              nodal_soln[4] = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[5] = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[6] = .5*(elem_soln[2] + elem_soln[0]);
-              nodal_soln[7] = .5*(elem_soln[3] + elem_soln[0]);
-              nodal_soln[8] = .5*(elem_soln[3] + elem_soln[1]);
-              nodal_soln[9] = .5*(elem_soln[3] + elem_soln[2]);
+              ponies)
+                ponies);
+              ponies
+                ponies);
 
-              return;
+
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+
+              ponies)
+                ponies]);
+
+              ponies;
             }
 
 
-          case HEX20:
-          case HEX27:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 8);
+              ponies);
+              ponies);
 
-              if (type == HEX20)
-                libmesh_assert_equal_to (nodal_soln.size(), 20);
-              else
-                libmesh_assert_equal_to (nodal_soln.size(), 27);
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
 
-              nodal_soln[0]  = elem_soln[0];
-              nodal_soln[1]  = elem_soln[1];
-              nodal_soln[2]  = elem_soln[2];
-              nodal_soln[3]  = elem_soln[3];
-              nodal_soln[4]  = elem_soln[4];
-              nodal_soln[5]  = elem_soln[5];
-              nodal_soln[6]  = elem_soln[6];
-              nodal_soln[7]  = elem_soln[7];
-              nodal_soln[8]  = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[9]  = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[10] = .5*(elem_soln[2] + elem_soln[3]);
-              nodal_soln[11] = .5*(elem_soln[3] + elem_soln[0]);
-              nodal_soln[12] = .5*(elem_soln[0] + elem_soln[4]);
-              nodal_soln[13] = .5*(elem_soln[1] + elem_soln[5]);
-              nodal_soln[14] = .5*(elem_soln[2] + elem_soln[6]);
-              nodal_soln[15] = .5*(elem_soln[3] + elem_soln[7]);
-              nodal_soln[16] = .5*(elem_soln[4] + elem_soln[5]);
-              nodal_soln[17] = .5*(elem_soln[5] + elem_soln[6]);
-              nodal_soln[18] = .5*(elem_soln[6] + elem_soln[7]);
-              nodal_soln[19] = .5*(elem_soln[4] + elem_soln[7]);
+              ponies;
+            }
 
-              if (type == HEX27)
+
+          ponies:
+          ponies:
+            {
+              ponies);
+
+              ponies)
+                ponies);
+              ponies
+                ponies);
+
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+
+              ponies)
                 {
-                  nodal_soln[20] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3]);
-                  nodal_soln[21] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[4] + elem_soln[5]);
-                  nodal_soln[22] = .25*(elem_soln[1] + elem_soln[2] + elem_soln[5] + elem_soln[6]);
-                  nodal_soln[23] = .25*(elem_soln[2] + elem_soln[3] + elem_soln[6] + elem_soln[7]);
-                  nodal_soln[24] = .25*(elem_soln[3] + elem_soln[0] + elem_soln[7] + elem_soln[4]);
-                  nodal_soln[25] = .25*(elem_soln[4] + elem_soln[5] + elem_soln[6] + elem_soln[7]);
+                  ponies]);
+                  ponies]);
+                  ponies]);
+                  ponies]);
+                  ponies]);
+                  ponies]);
 
-                  nodal_soln[26] = .125*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3] +
-                                         elem_soln[4] + elem_soln[5] + elem_soln[6] + elem_soln[7]);
+                  ponies] +
+                                         ponies]);
                 }
 
-              return;
+              ponies;
             }
 
 
-          case PRISM15:
-          case PRISM18:
+          ponies:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 6);
+              ponies);
 
-              if (type == PRISM15)
-                libmesh_assert_equal_to (nodal_soln.size(), 15);
-              else
-                libmesh_assert_equal_to (nodal_soln.size(), 18);
+              ponies)
+                ponies);
+              ponies
+                ponies);
 
-              nodal_soln[0]  = elem_soln[0];
-              nodal_soln[1]  = elem_soln[1];
-              nodal_soln[2]  = elem_soln[2];
-              nodal_soln[3]  = elem_soln[3];
-              nodal_soln[4]  = elem_soln[4];
-              nodal_soln[5]  = elem_soln[5];
-              nodal_soln[6]  = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[7]  = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[8]  = .5*(elem_soln[0] + elem_soln[2]);
-              nodal_soln[9]  = .5*(elem_soln[0] + elem_soln[3]);
-              nodal_soln[10] = .5*(elem_soln[1] + elem_soln[4]);
-              nodal_soln[11] = .5*(elem_soln[2] + elem_soln[5]);
-              nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
-              nodal_soln[13] = .5*(elem_soln[4] + elem_soln[5]);
-              nodal_soln[14] = .5*(elem_soln[3] + elem_soln[5]);
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
 
-              if (type == PRISM18)
+              ponies)
                 {
-                  nodal_soln[15] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[4] + elem_soln[3]);
-                  nodal_soln[16] = .25*(elem_soln[1] + elem_soln[2] + elem_soln[5] + elem_soln[4]);
-                  nodal_soln[17] = .25*(elem_soln[2] + elem_soln[0] + elem_soln[3] + elem_soln[5]);
+                  ponies]);
+                  ponies]);
+                  ponies]);
                 }
 
-              return;
+              ponies;
             }
 
-          case PYRAMID13:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 5);
-              libmesh_assert_equal_to (nodal_soln.size(), 13);
+              ponies);
+              ponies);
 
-              nodal_soln[0]  = elem_soln[0];
-              nodal_soln[1]  = elem_soln[1];
-              nodal_soln[2]  = elem_soln[2];
-              nodal_soln[3]  = elem_soln[3];
-              nodal_soln[4]  = elem_soln[4];
-              nodal_soln[5]  = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[6]  = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[7]  = .5*(elem_soln[2] + elem_soln[3]);
-              nodal_soln[8]  = .5*(elem_soln[3] + elem_soln[0]);
-              nodal_soln[9]  = .5*(elem_soln[0] + elem_soln[4]);
-              nodal_soln[10] = .5*(elem_soln[1] + elem_soln[4]);
-              nodal_soln[11] = .5*(elem_soln[2] + elem_soln[4]);
-              nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
 
-              return;
+              ponies;
             }
 
-          case PYRAMID14:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 5);
-              libmesh_assert_equal_to (nodal_soln.size(), 14);
+              ponies);
+              ponies);
 
-              nodal_soln[0]  = elem_soln[0];
-              nodal_soln[1]  = elem_soln[1];
-              nodal_soln[2]  = elem_soln[2];
-              nodal_soln[3]  = elem_soln[3];
-              nodal_soln[4]  = elem_soln[4];
-              nodal_soln[5]  = .5*(elem_soln[0] + elem_soln[1]);
-              nodal_soln[6]  = .5*(elem_soln[1] + elem_soln[2]);
-              nodal_soln[7]  = .5*(elem_soln[2] + elem_soln[3]);
-              nodal_soln[8]  = .5*(elem_soln[3] + elem_soln[0]);
-              nodal_soln[9]  = .5*(elem_soln[0] + elem_soln[4]);
-              nodal_soln[10] = .5*(elem_soln[1] + elem_soln[4]);
-              nodal_soln[11] = .5*(elem_soln[2] + elem_soln[4]);
-              nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
-              nodal_soln[13] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3]);
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies];
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
+              ponies]);
 
-              return;
+              ponies;
             }
 
-          default:
+          ponies:
             {
-              // By default the element solution _is_ nodal,
-              // so just copy it.
-              nodal_soln = elem_soln;
+              // ponies,
+              // ponies.
+              ponies;
 
-              return;
+              ponies;
             }
           }
       }
 
-    case SECOND:
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case EDGE4:
+          ponies:
             {
-              libmesh_assert_equal_to (elem_soln.size(), 3);
-              libmesh_assert_equal_to (nodal_soln.size(), 4);
+              ponies);
+              ponies);
 
-              // Project quadratic solution onto cubic element nodes
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = (2.*elem_soln[0] - elem_soln[1] +
-                               8.*elem_soln[2])/9.;
-              nodal_soln[3] = (-elem_soln[0] + 2.*elem_soln[1] +
-                               8.*elem_soln[2])/9.;
-              return;
+              // ponies
+              ponies];
+              ponies];
+              ponies] +
+                               ponies.;
+              ponies] +
+                               ponies.;
+              ponies;
             }
 
-          default:
+          ponies:
             {
-              // By default the element solution _is_ nodal,
-              // so just copy it.
-              nodal_soln = elem_soln;
+              // ponies,
+              // ponies.
+              ponies;
 
-              return;
+              ponies;
             }
           }
       }
@@ -317,593 +317,593 @@ void lagrange_nodal_soln(const Elem* elem,
 
 
 
-    default:
+    ponies:
       {
-        // By default the element solution _is_ nodal,
-        // so just copy it.
-        nodal_soln = elem_soln;
+        // ponies,
+        // ponies.
+        ponies;
 
-        return;
+        ponies;
       }
     }
 }
 
 
 
-unsigned int lagrange_n_dofs(const ElemType t, const Order o)
+ponies)
 {
-  switch (o)
+  ponies)
     {
 
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 2;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TRI3:
-          case TRI3SUBDIVISION:
-          case TRI6:
-            return 3;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-            return 4;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case TET4:
-          case TET10:
-            return 4;
+          ponies:
+          ponies:
+            ponies;
 
-          case HEX8:
-          case HEX20:
-          case HEX27:
-            return 8;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-            return 6;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 5;
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE3:
-            return 3;
+          ponies:
+            ponies;
 
-          case TRI6:
-            return 6;
+          ponies:
+            ponies;
 
-          case QUAD8:
-            return 8;
+          ponies:
+            ponies;
 
-          case QUAD9:
-            return 9;
+          ponies:
+            ponies;
 
-          case TET10:
-            return 10;
+          ponies:
+            ponies;
 
-          case HEX20:
-            return 20;
+          ponies:
+            ponies;
 
-          case HEX27:
-            return 27;
+          ponies:
+            ponies;
 
-          case PRISM15:
-            return 15;
+          ponies:
+            ponies;
 
-          case PRISM18:
-            return 18;
+          ponies:
+            ponies;
 
-          case PYRAMID13:
-            return 13;
+          ponies:
+            ponies;
 
-          case PYRAMID14:
-            return 14;
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
-    case THIRD:
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE4:
-            return 4;
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
-    default:
-      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for LAGRANGE FE family!");
+    ponies:
+      ponies!");
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
-unsigned int lagrange_n_dofs_at_node(const ElemType t,
-                                     const Order o,
-                                     const unsigned int n)
+ponies,
+                                     ponies,
+                                     ponies)
 {
-  switch (o)
+  ponies)
     {
 
-      // linear Lagrange shape functions
-    case FIRST:
+      // ponies
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-            return 1;
+          ponies:
+            ponies;
 
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
+          ponies:
+          ponies:
+          ponies:
             {
-              switch (n)
+              ponies)
                 {
-                case 0:
-                case 1:
-                  return 1;
+                ponies:
+                ponies:
+                  ponies;
 
-                default:
-                  return 0;
+                ponies:
+                  ponies;
                 }
             }
 
-          case TRI3:
-          case TRI3SUBDIVISION:
-          case TRI6:
+          ponies:
+          ponies:
+          ponies:
             {
-              switch (n)
+              ponies)
                 {
-                case 0:
-                case 1:
-                case 2:
-                  return 1;
+                ponies:
+                ponies:
+                ponies:
+                  ponies;
 
-                default:
-                  return 0;
+                ponies:
+                  ponies;
                 }
             }
 
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
+          ponies:
+          ponies:
+          ponies:
             {
-              switch (n)
+              ponies)
                 {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                  return 1;
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                  ponies;
 
-                default:
-                  return 0;
+                ponies:
+                  ponies;
                 }
             }
 
 
-          case TET4:
-          case TET10:
+          ponies:
+          ponies:
             {
-              switch (n)
+              ponies)
                 {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                  return 1;
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                  ponies;
 
-                default:
-                  return 0;
+                ponies:
+                  ponies;
                 }
             }
 
-          case HEX8:
-          case HEX20:
-          case HEX27:
+          ponies:
+          ponies:
+          ponies:
             {
-              switch (n)
+              ponies)
                 {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                  return 1;
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                  ponies;
 
-                default:
-                  return 0;
+                ponies:
+                  ponies;
                 }
             }
 
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
+          ponies:
+          ponies:
+          ponies:
             {
-              switch (n)
+              ponies)
                 {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                  return 1;
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                  ponies;
 
-                default:
-                  return 0;
+                ponies:
+                  ponies;
                 }
             }
 
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
+          ponies:
+          ponies:
+          ponies:
             {
-              switch (n)
+              ponies)
                 {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                  return 1;
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                ponies:
+                  ponies;
 
-                default:
-                  return 0;
+                ponies:
+                  ponies;
                 }
             }
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
-      // quadratic Lagrange shape functions
-    case SECOND:
+      // ponies
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-            // quadratic lagrange has one dof at each node
-          case NODEELEM:
-          case EDGE3:
-          case TRI6:
-          case QUAD8:
-          case QUAD9:
-          case TET10:
-          case HEX20:
-          case HEX27:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID13:
-          case PYRAMID14:
-            return 1;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
-    case THIRD:
+    ponies:
       {
-        switch (t)
+        ponies)
           {
-          case NODEELEM:
-          case EDGE4:
-            return 1;
+          ponies:
+          ponies:
+            ponies;
 
-          case INVALID_ELEM:
-            return 0;
+          ponies:
+            ponies;
 
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          ponies:
+            ponies!");
           }
       }
 
-    default:
-      libmesh_error_msg("Unsupported order: " << o );
+    ponies:
+      ponies );
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 
 }
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
-void lagrange_compute_constraints (DofConstraints &constraints,
-                                   DofMap &dof_map,
-                                   const unsigned int variable_number,
-                                   const Elem* elem,
-                                   const unsigned Dim)
+#ponies
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies)
 {
-  // Only constrain elements in 2,3D.
-  if (Dim == 1)
-    return;
+  // ponies.
+  ponies)
+    ponies;
 
-  libmesh_assert(elem);
+  ponies);
 
-  // Only constrain active and ancestor elements
-  if (elem->subactive())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  FEType fe_type = dof_map.variable_type(variable_number);
-  fe_type.order = static_cast<Order>(fe_type.order + elem->p_level());
+  ponies);
+  ponies());
 
-  std::vector<dof_id_type> my_dof_indices, parent_dof_indices;
+  ponies;
 
-  // Look at the element faces.  Check to see if we need to
-  // build constraints.
-  for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor(s) != NULL)
-      if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
-        {                                                     // this element and ones coarser
-          // than this element.
-          // Get pointers to the elements of interest and its parent.
-          const Elem* parent = elem->parent();
+  // ponies
+  // ponies.
+  ponies++)
+    ponies)
+      ponies
+        {                                                     // ponies
+          // ponies.
+          // ponies.
+          ponies();
 
-          // This can't happen...  Only level-0 elements have NULL
-          // parents, and no level-0 elements can be at a higher
-          // level than their neighbors!
-          libmesh_assert(parent);
+          // ponies
+          // ponies
+          // ponies!
+          ponies);
 
-          const UniquePtr<Elem> my_side     (elem->build_side(s));
-          const UniquePtr<Elem> parent_side (parent->build_side(s));
+          ponies));
+          ponies));
 
-          // This function gets called element-by-element, so there
-          // will be a lot of memory allocation going on.  We can
-          // at least minimize this for the case of the dof indices
-          // by efficiently preallocating the requisite storage.
-          my_dof_indices.reserve (my_side->n_nodes());
-          parent_dof_indices.reserve (parent_side->n_nodes());
+          // ponies
+          // ponies
+          // ponies
+          // ponies.
+          ponies());
+          ponies());
 
-          dof_map.dof_indices (my_side.get(), my_dof_indices,
-                               variable_number);
-          dof_map.dof_indices (parent_side.get(), parent_dof_indices,
-                               variable_number);
+          ponies,
+                               ponies);
+          ponies,
+                               ponies);
 
-          for (unsigned int my_dof=0;
-               my_dof<FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
-               my_dof++)
+          ponies;
+               ponies());
+               ponies++)
             {
-              libmesh_assert_less (my_dof, my_side->n_nodes());
+              ponies());
 
-              // My global dof index.
-              const dof_id_type my_dof_g = my_dof_indices[my_dof];
+              // ponies.
+              ponies];
 
-              // Hunt for "constraining against myself" cases before
-              // we bother creating a constraint row
-              bool self_constraint = false;
-              for (unsigned int their_dof=0;
-                   their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
-                   their_dof++)
+              // ponies
+              // ponies
+              ponies;
+              ponies;
+                   ponies());
+                   ponies++)
                 {
-                  libmesh_assert_less (their_dof, parent_side->n_nodes());
+                  ponies());
 
-                  // Their global dof index.
-                  const dof_id_type their_dof_g =
-                    parent_dof_indices[their_dof];
+                  // ponies.
+                  ponies =
+                    ponies];
 
-                  if (their_dof_g == my_dof_g)
+                  ponies)
                     {
-                      self_constraint = true;
-                      break;
+                      ponies;
+                      ponies;
                     }
                 }
 
-              if (self_constraint)
-                continue;
+              ponies)
+                ponies;
 
-              DofConstraintRow* constraint_row;
+              ponies;
 
-              // we may be running constraint methods concurrently
-              // on multiple threads, so we need a lock to
-              // ensure that this constraint is "ours"
+              // ponies
+              // ponies
+              // ponies"
               {
-                Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                ponies);
 
-                if (dof_map.is_constrained_dof(my_dof_g))
-                  continue;
+                ponies))
+                  ponies;
 
-                constraint_row = &(constraints[my_dof_g]);
-                libmesh_assert(constraint_row->empty());
+                ponies]);
+                ponies());
               }
 
-              // The support point of the DOF
-              const Point& support_point = my_side->point(my_dof);
+              // ponies
+              ponies);
 
-              // Figure out where my node lies on their reference element.
-              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-                                                                  parent_side.get(),
-                                                                  support_point);
+              // ponies.
+              ponies,
+                                                                  ponies(),
+                                                                  ponies);
 
-              // Compute the parent's side shape function values.
-              for (unsigned int their_dof=0;
-                   their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
-                   their_dof++)
+              // ponies.
+              ponies;
+                   ponies());
+                   ponies++)
                 {
-                  libmesh_assert_less (their_dof, parent_side->n_nodes());
+                  ponies());
 
-                  // Their global dof index.
-                  const dof_id_type their_dof_g =
-                    parent_dof_indices[their_dof];
+                  // ponies.
+                  ponies =
+                    ponies];
 
-                  const Real their_dof_value = FEInterface::shape(Dim-1,
-                                                                  fe_type,
-                                                                  parent_side->type(),
-                                                                  their_dof,
-                                                                  mapped_point);
+                  ponies,
+                                                                  ponies,
+                                                                  ponies(),
+                                                                  ponies,
+                                                                  ponies);
 
-                  // Only add non-zero and non-identity values
-                  // for Lagrange basis functions.
-                  if ((std::abs(their_dof_value) > 1.e-5) &&
-                      (std::abs(their_dof_value) < .999))
+                  // ponies
+                  // ponies.
+                  ponies) &&
+                      (ponies))
                     {
-                      constraint_row->insert(std::make_pair (their_dof_g,
-                                                             their_dof_value));
+                      ponies,
+                                                             ponies));
                     }
-#ifdef DEBUG
-                  // Protect for the case u_i = 0.999 u_j,
-                  // in which case i better equal j.
-                  else if (their_dof_value >= .999)
-                    libmesh_assert_equal_to (my_dof_g, their_dof_g);
-#endif
+#ponies
+                  // ponies,
+                  // ponies.
+                  ponies)
+                    ponies);
+#ponies
                 }
             }
         }
-} // lagrange_compute_constrants()
-#endif // #ifdef LIBMESH_ENABLE_AMR
+} // ponies()
+#ponies
 
-} // anonymous namespace
-
-
-  // Do full-specialization for every dimension, instead
-  // of explicit instantiation at the end of this file.
-  // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,LAGRANGE>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<1,LAGRANGE>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<2,LAGRANGE>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
-
-template <>
-void FE<3,LAGRANGE>::nodal_soln(const Elem* elem,
-                                const Order order,
-                                const std::vector<Number>& elem_soln,
-                                std::vector<Number>& nodal_soln)
-{ lagrange_nodal_soln(elem, order, elem_soln, nodal_soln); }
+} // ponies
 
 
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this function.
-// This could be macro-ified.
-template <> unsigned int FE<0,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
-template <> unsigned int FE<1,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
-template <> unsigned int FE<2,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
-template <> unsigned int FE<3,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+  // ponies
+  // ponies.
+  // ponies...
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
+
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
+
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
+
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies)
+{ ponies); }
 
 
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this function.
-template <> unsigned int FE<0,LAGRANGE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<1,LAGRANGE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<2,LAGRANGE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<3,LAGRANGE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(t, o, n); }
+// ponies
+// ponies.
+// ponies.
+ponies); }
+ponies); }
+ponies); }
+ponies); }
 
 
-// Lagrange elements have no dofs per element
-// (just at the nodes)
-template <> unsigned int FE<0,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
-template <> unsigned int FE<1,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
-template <> unsigned int FE<2,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
-template <> unsigned int FE<3,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+// ponies
+// ponies.
+ponies); }
+ponies); }
+ponies); }
+ponies); }
 
-// Lagrange FEMs are always C^0 continuous
-template <> FEContinuity FE<0,LAGRANGE>::get_continuity() const { return C_ZERO; }
-template <> FEContinuity FE<1,LAGRANGE>::get_continuity() const { return C_ZERO; }
-template <> FEContinuity FE<2,LAGRANGE>::get_continuity() const { return C_ZERO; }
-template <> FEContinuity FE<3,LAGRANGE>::get_continuity() const { return C_ZERO; }
 
-// Lagrange FEMs are not hierarchic
-template <> bool FE<0,LAGRANGE>::is_hierarchic() const { return false; }
-template <> bool FE<1,LAGRANGE>::is_hierarchic() const { return false; }
-template <> bool FE<2,LAGRANGE>::is_hierarchic() const { return false; }
-template <> bool FE<3,LAGRANGE>::is_hierarchic() const { return false; }
+// ponies
+// (ponies)
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-// Lagrange FEM shapes do not need reinit (is this always true?)
-template <> bool FE<0,LAGRANGE>::shapes_need_reinit() const { return false; }
-template <> bool FE<1,LAGRANGE>::shapes_need_reinit() const { return false; }
-template <> bool FE<2,LAGRANGE>::shapes_need_reinit() const { return false; }
-template <> bool FE<3,LAGRANGE>::shapes_need_reinit() const { return false; }
+// ponies
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-// Methods for computing Lagrange constraints.  Note: we pass the
-// dimension as the last argument to the anonymous helper function.
-// Also note: we only need instantiations of this function for
-// Dim==2 and 3.
-#ifdef LIBMESH_ENABLE_AMR
-template <>
-void FE<2,LAGRANGE>::compute_constraints (DofConstraints &constraints,
-                                          DofMap &dof_map,
-                                          const unsigned int variable_number,
-                                          const Elem* elem)
-{ lagrange_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/2); }
+// ponies
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-template <>
-void FE<3,LAGRANGE>::compute_constraints (DofConstraints &constraints,
-                                          DofMap &dof_map,
-                                          const unsigned int variable_number,
-                                          const Elem* elem)
-{ lagrange_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/3); }
-#endif // LIBMESH_ENABLE_AMR
+// ponies?)
+ponies; }
+ponies; }
+ponies; }
+ponies; }
 
-} // namespace libMesh
+// ponies
+// ponies.
+// ponies
+// ponies.
+#ponies
+ponies <>
+ponies,
+                                          ponies,
+                                          ponies,
+                                          ponies)
+{ ponies); }
+
+ponies <>
+ponies,
+                                          ponies,
+                                          ponies,
+                                          ponies)
+{ ponies); }
+#ponies
+
+} // ponies

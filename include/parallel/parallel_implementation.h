@@ -1,3581 +1,3581 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_PARALLEL_IMPLEMENTATION_H
-#define LIBMESH_PARALLEL_IMPLEMENTATION_H
+#ponies
+#ponies
 
-// Local includes
-#include "parallel.h"
-#include "libmesh_logging.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <iterator> // iterator_traits
+// ponies
+#ponies
 
-namespace libMesh {
-namespace Parallel {
+ponies {
+ponies {
 
-// First declare StandardType specializations so we can use them in anonymous
-// helper functions later
+// ponies
+// ponies
 
-#ifdef LIBMESH_HAVE_MPI
+#ponies
 
-#define STANDARD_TYPE(cxxtype,mpitype)                                  \
-  template<>                                                            \
-  class StandardType<cxxtype> : public DataType                         \
+#ponies)                                  \
+  ponies<>                                                            \
+  ponies                         \
   {                                                                     \
-  public:                                                               \
-    explicit                                                            \
-      StandardType(const cxxtype* = NULL) : DataType(mpitype) {}        \
+  ponies:                                                               \
+    ponies                                                            \
+      ponies) {}        \
   }
 
-#else
+#ponies
 
-#define STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                    \
-  class StandardType<cxxtype> : public DataType                 \
+#ponies)                          \
+  ponies<>                                                    \
+  ponies                 \
   {                                                             \
-  public:                                                       \
-    explicit                                                    \
-      StandardType(const cxxtype* = NULL) : DataType() {}       \
+  ponies:                                                       \
+    ponies                                                    \
+      ponies() {}       \
   }
 
-#endif
+#ponies
 
-#define INT_TYPE(cxxtype,mpitype)                                       \
-  STANDARD_TYPE(cxxtype,mpitype);                                       \
+#ponies)                                       \
+  ponies);                                       \
                                                                         \
-  template<>                                                            \
-  struct Attributes<cxxtype>                                            \
+  ponies<>                                                            \
+  ponies>                                            \
   {                                                                     \
-    static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype& x) { x = std::numeric_limits<cxxtype>::min(); } \
-    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+    ponies;                               \
+    ponies(); } \
+    ponies(); } \
   }
 
-#define FLOAT_TYPE(cxxtype,mpitype)                                     \
-  STANDARD_TYPE(cxxtype,mpitype);                                       \
+#ponies)                                     \
+  ponies);                                       \
                                                                         \
-  template<>                                                            \
-  struct Attributes<cxxtype>                                            \
+  ponies<>                                                            \
+  ponies>                                            \
   {                                                                     \
-    static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::max(); } \
-    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+    ponies;                               \
+    ponies(); } \
+    ponies(); } \
   }
 
-#define CONTAINER_TYPE(cxxtype)                                         \
-  template<typename T>                                                  \
-  struct Attributes<cxxtype<T> >                                        \
+#ponies)                                         \
+  ponies>                                                  \
+  ponies> >                                        \
   {                                                                     \
-    static const bool has_min_max = Attributes<T>::has_min_max;         \
-    static void set_lowest(cxxtype<T>& x) {                             \
-      for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
-        Attributes<T>::set_lowest(*i); }                                \
-    static void set_highest(cxxtype<T>& x) {                            \
-      for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
-        Attributes<T>::set_highest(*i); }                               \
+    ponies;         \
+    ponies) {                             \
+      ponies) \
+        ponies); }                                \
+    ponies) {                            \
+      ponies) \
+        ponies); }                               \
   }
 
 
-INT_TYPE(char,MPI_CHAR);
-#if MPI_VERSION > 1
-INT_TYPE(signed char,MPI_SIGNED_CHAR);
-#endif
-INT_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
-INT_TYPE(short int,MPI_SHORT);
-INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
-INT_TYPE(int,MPI_INT);
-INT_TYPE(unsigned int,MPI_UNSIGNED);
-INT_TYPE(long,MPI_LONG);
-INT_TYPE(long long,MPI_LONG_LONG_INT);
-INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
-INT_TYPE(unsigned long long,MPI_LONG_LONG_INT);
-FLOAT_TYPE(float,MPI_FLOAT);
-FLOAT_TYPE(double,MPI_DOUBLE);
-FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
-CONTAINER_TYPE(std::set);
-CONTAINER_TYPE(std::vector);
+ponies);
+#ponies
+ponies);
+#ponies
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
 
-// We'd love to do a singleton pattern on derived data types, rather
-// than commit, free, commit, free, ad infinitum... but it's a
-// little tricky when our T1 and T2 are undefined.
-template<typename T1, typename T2>
-class StandardType<std::pair<T1, T2> > : public DataType
+// ponies
+// ponies
+// ponies.
+ponies>
+ponies
 {
-public:
-  explicit
-  StandardType(const std::pair<T1, T2> *example = NULL) {
-    // We need an example for MPI_Address to use
-    libmesh_assert(example);
+ponies:
+  ponies
+  ponies) {
+    // ponies
+    ponies);
 
-#ifdef LIBMESH_HAVE_MPI
-    // Get the sub-data-types, and make sure they live long enough
-    // to construct the derived type
-    StandardType<T1> d1(&example->first);
-    StandardType<T2> d2(&example->second);
-    MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
-    int blocklengths[] = {1,1};
+#ponies
+    // ponies
+    // ponies
+    ponies);
+    ponies);
+    ponies };
+    ponies};
 
-    MPI_Aint displs[2];
-#if MPI_VERSION > 1
-    MPI_Get_address (const_cast<T1*>(&example->first), &displs[0]);
-    MPI_Get_address (const_cast<T2*>(&example->second), &displs[1]);
-#else
-    MPI_Address (const_cast<T1*>(&example->first), &displs[0]);
-    MPI_Address (const_cast<T2*>(&example->second), &displs[1]);
-#endif
-    displs[1] -= displs[0];
-    displs[0] = 0;
+    ponies];
+#ponies
+    ponies]);
+    ponies]);
+#ponies
+    ponies]);
+    ponies]);
+#ponies
+    ponies];
+    ponies;
 
-#if MPI_VERSION > 1
-    MPI_Type_create_struct (2, blocklengths, displs, types, &_datatype);
-#else
-    MPI_Type_struct (2, blocklengths, displs, types, &_datatype);
-#endif // #if MPI_VERSION > 1
-    MPI_Type_commit (&_datatype);
-#endif // LIBMESH_HAVE_MPI
+#ponies
+    ponies);
+#ponies
+    ponies);
+#ponies
+    ponies);
+#ponies
   }
 
-  ~StandardType() { this->free(); }
+  ~ponies(); }
 };
 
-template<typename T>
-class StandardType<std::complex<T> > : public DataType
+ponies>
+ponies
 {
-public:
-  explicit
-  StandardType(const std::complex<T> * /*example*/ = NULL) :
-    DataType(StandardType<T>(NULL), 2) {}
+ponies:
+  ponies
+  ponies) :
+    ponies) {}
 
-  ~StandardType() { this->free(); }
+  ~ponies(); }
 };
 
-} // namespace Parallel
+} // ponies
 
-} // namespace libMesh
+} // ponies
 
 
-// Anonymous namespace for helper functions
-namespace {
+// ponies
+ponies {
 
-// Internal helper function to create vector<something_useable> from
-// vector<bool> for compatibility with MPI bitwise operations
-template <typename T>
-inline void pack_vector_bool(const std::vector<bool> &in,
-                             std::vector<T> &out)
+// ponies
+// ponies
+ponies>
+ponies,
+                             ponies)
 {
-  unsigned int data_bits = 8*sizeof(T);
-  std::size_t in_size = in.size();
-  std::size_t out_size = in_size/data_bits + ((in_size%data_bits)?1:0);
-  out.clear();
-  out.resize(out_size);
-  for (std::size_t i=0; i != in_size; ++i)
+  ponies);
+  ponies();
+  ponies);
+  ponies();
+  ponies);
+  ponies)
     {
-      std::size_t index = i/data_bits;
-      std::size_t offset = i%data_bits;
-      out[index] += (in[i]?1:0) << offset;
+      ponies;
+      ponies;
+      ponies;
     }
 }
 
-// Internal helper function to create vector<bool> from
-// vector<something usable> for compatibility with MPI byte
-// operations
-template <typename T>
-inline void unpack_vector_bool(const std::vector<T> &in,
-                               std::vector<bool> &out)
+// ponies
+// ponies
+// ponies
+ponies>
+ponies,
+                               ponies)
 {
-  unsigned int data_bits = 8*sizeof(T);
-  // We need the output vector to already be properly sized
-  std::size_t out_size = out.size();
-  libmesh_assert_equal_to (out_size/data_bits + (out_size%data_bits?1:0), in.size());
+  ponies);
+  // ponies
+  ponies();
+  ponies());
 
-  for (std::size_t i=0; i != out_size; ++i)
+  ponies)
     {
-      std::size_t index = i/data_bits;
-      std::size_t offset = i%data_bits;
-      out[i] = in[index] << (data_bits-1-offset) >> (data_bits-1);
+      ponies;
+      ponies;
+      ponies);
     }
 }
 
 
-#ifdef LIBMESH_HAVE_MPI
-// We use a helper function here to avoid ambiguity when calling
-// send_receive of (vector<vector<T>>,vector<vector<T>>)
-template <typename T1, typename T2>
-inline void send_receive_vec_of_vec
-(const unsigned int dest_processor_id,
- std::vector<std::vector<T1> > &send,
- const unsigned int source_processor_id,
- std::vector<std::vector<T2> > &recv,
- const libMesh::Parallel::MessageTag &send_tag,
- const libMesh::Parallel::MessageTag &recv_tag,
- const libMesh::Parallel::Communicator &comm)
+#ponies
+// ponies
+// ponies>>)
+ponies>
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies)
 {
-  START_LOG("send_receive()", "Parallel");
+  ponies");
 
-  if (dest_processor_id   == comm.rank() &&
-      source_processor_id == comm.rank())
+  ponies() &&
+      ponies())
     {
-      recv = send;
-      STOP_LOG("send_receive()", "Parallel");
-      return;
+      ponies;
+      ponies");
+      ponies;
     }
 
-  // temporary buffers - these will be sized in bytes
-  // and manipulated with MPI_Pack and friends
-  std::vector<char> sendbuf, recvbuf;
+  // ponies
+  // ponies
+  ponies;
 
-  // figure out how many bytes we need to pack all the data
-  int packedsize=0, sendsize=0;
+  // ponies
+  ponies;
 
-  // The outer buffer size
-  MPI_Pack_size (1,
-                 libMesh::Parallel::StandardType<unsigned int>(),
-                 comm.get(),
-                 &packedsize);
-  sendsize += packedsize;
+  // ponies
+  ponies,
+                 ponies>(),
+                 ponies(),
+                 &ponies);
+  ponies;
 
-  for (std::size_t i=0; i<send.size(); i++)
+  ponies++)
     {
-      // The size of the ith inner buffer
-      MPI_Pack_size (1,
-                     libMesh::Parallel::StandardType<unsigned int>(),
-                     comm.get(),
-                     &packedsize);
-      sendsize += packedsize;
+      // ponies
+      ponies,
+                     ponies>(),
+                     ponies(),
+                     &ponies);
+      ponies;
 
-      // The data for each inner buffer
-      MPI_Pack_size (libMesh::cast_int<int>(send[i].size()),
-                     libMesh::Parallel::StandardType<T1>
-                     (send[i].empty() ? NULL : &send[i][0]),
-                     comm.get(),
-                     &packedsize);
-      sendsize += packedsize;
+      // ponies
+      ponies()),
+                     ponies>
+                     (ponies]),
+                     ponies(),
+                     &ponies);
+      ponies;
     }
 
-  libmesh_assert (sendsize /* should at least be 1! */);
-  sendbuf.resize (sendsize);
+  ponies! */);
+  ponies);
 
-  // Pack the send buffer
-  int pos=0;
+  // ponies
+  ponies;
 
-  // ... the size of the outer buffer
-  sendsize = libMesh::cast_int<int>(send.size());
-  MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-            &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
-            comm.get());
+  // ... ponies
+  ponies());
+  ponies>(),
+            &ponies,
+            ponies());
 
-  for (std::size_t i=0; i<send.size(); i++)
+  ponies++)
     {
-      // ... the size of the ith inner buffer
-      sendsize = libMesh::cast_int<int>(send[i].size());
-      MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-                &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
-                comm.get());
+      // ... ponies
+      ponies());
+      ponies>(),
+                &ponies,
+                ponies());
 
-      // ... the contents of the ith inner buffer
-      if (!send[i].empty())
-        MPI_Pack (&send[i][0], libMesh::cast_int<int>(send[i].size()),
-                  libMesh::Parallel::StandardType<T1>(&send[i][0]),
-                  &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
-                  comm.get());
+      // ... ponies
+      ponies())
+        ponies()),
+                  ponies]),
+                  &ponies,
+                  ponies());
     }
 
-  libmesh_assert_equal_to (static_cast<unsigned int>(pos), sendbuf.size());
+  ponies());
 
-  libMesh::Parallel::Request request;
+  ponies;
 
-  comm.send (dest_processor_id, sendbuf, MPI_PACKED, request, send_tag);
+  ponies);
 
-  comm.receive (source_processor_id, recvbuf, MPI_PACKED, recv_tag);
+  ponies);
 
-  // Unpack the received buffer
-  libmesh_assert (!recvbuf.empty());
-  pos=0;
-  MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
-              &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-              comm.get());
+  // ponies
+  ponies());
+  ponies;
+  ponies,
+              &ponies>(),
+              ponies());
 
-  // ... size the outer buffer
-  recv.resize (sendsize);
+  // ... ponies
+  ponies);
 
-  for (std::size_t i=0; i<recv.size(); i++)
+  ponies++)
     {
-      MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
-                  &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-                  comm.get());
+      ponies,
+                  &ponies>(),
+                  ponies());
 
-      // ... size the inner buffer
-      recv[i].resize (sendsize);
+      // ... ponies
+      ponies);
 
-      // ... unpack the inner buffer if it is not empty
-      if (!recv[i].empty())
-        MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
-                    &recv[i][0], libMesh::cast_int<int>(recv[i].size()),
-                    libMesh::Parallel::StandardType<T2>(&recv[i][0]),
-                    comm.get());
+      // ... ponies
+      ponies())
+        ponies,
+                    &ponies()),
+                    ponies]),
+                    ponies());
     }
 
-  request.wait();
+  ponies();
 
-  STOP_LOG("send_receive()", "Parallel");
+  ponies");
 }
 
-#endif // LIBMESH_HAVE_MPI
+#ponies
 
-} // Anonymous namespace
+} // ponies
 
 
 
-namespace libMesh
+ponies
 {
 
-namespace Parallel
+ponies
 {
 
 /*
- * A reference to the default libMesh communicator.  This is now
- * deprecated - instead of libMesh::Parallel::Communicator_World use
- * libMesh::CommWorld
+ * ponies
+ * ponies
+ * ponies
  */
-#ifdef LIBMESH_DISABLE_COMMWORLD
-extern FakeCommunicator& Communicator_World;
-#else
-extern Communicator& Communicator_World;
-#endif
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
 
 
 /**
- * Helper function for range packing
+ * ponies
  */
-template <typename Context, typename Iter>
-inline std::size_t packed_range_size (const Context *context,
-                                      Iter range_begin,
-                                      const Iter range_end)
+ponies>
+ponies,
+                                      ponies,
+                                      ponies)
 {
-  std::size_t buffer_size = 0;
-  for (Iter range_count = range_begin;
-       range_count != range_end;
-       ++range_count)
+  ponies;
+  ponies;
+       ponies;
+       ++ponies)
     {
-      buffer_size += Parallel::packable_size(*range_count, context);
+      ponies);
     }
-  return buffer_size;
+  ponies;
 }
 
 
 /**
- * Helper function for range packing
+ * ponies
  */
-template <typename Context, typename buffertype, typename Iter>
-inline Iter pack_range (const Context *context,
-                        Iter range_begin,
-                        const Iter range_end,
-                        std::vector<buffertype>& buffer)
+ponies>
+ponies,
+                        ponies,
+                        ponies,
+                        ponies)
 {
-  // When we serialize into buffers, we need to use large buffers to optimize MPI
-  // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
-  // is measured in number of buffer type entries; number of bytes may be 4 or 8
-  // times larger depending on configuration.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  static const std::size_t max_buffer_size = 1000000;
-  // static const std::size_t max_buffer_size = std::size_t(-1);
+  ponies;
+  // ponies);
 
-  // Count the total size of and preallocate buffer for efficiency.
-  // Prepare to stop early if the buffer would be too large.
-  std::size_t buffer_size = 0;
-  Iter range_stop = range_begin;
-  for (; range_stop != range_end; ++range_stop)
+  // ponies.
+  // ponies.
+  ponies;
+  ponies;
+  ponies)
     {
-      std::size_t next_buffer_size =
-        Parallel::packable_size(*range_stop, context);
-      if (buffer_size + next_buffer_size >= max_buffer_size)
-        break;
-      else
-        buffer_size += next_buffer_size;
+      ponies =
+        ponies);
+      ponies)
+        ponies;
+      ponies
+        ponies;
     }
-  buffer.reserve(buffer.size() + buffer_size);
+  ponies);
 
-  // Pack the objects into the buffer
-  for (; range_begin != range_stop; ++range_begin)
+  // ponies
+  ponies)
     {
-#ifndef NDEBUG
-      std::size_t old_size = buffer.size();
-#endif
+#ponies
+      ponies();
+#ponies
 
-      Parallel::pack(*range_begin, buffer, context);
+      ponies);
 
-#ifndef NDEBUG
-      unsigned int my_packable_size =
-        Parallel::packable_size(*range_begin, context);
-      unsigned int my_packed_size =
-        Parallel::packed_size (*range_begin, buffer.begin() +
-                               old_size);
-      libmesh_assert_equal_to (my_packable_size, my_packed_size);
-      libmesh_assert_equal_to (buffer.size(), old_size + my_packable_size);
-#endif
+#ponies
+      ponies =
+        ponies);
+      ponies =
+        ponies() +
+                               ponies);
+      ponies);
+      ponies);
+#ponies
     }
 
-  return range_stop;
+  ponies;
 }
 
 
 
 /**
- * Helper function for range unpacking
+ * ponies
  */
-template <typename Context, typename buffertype, typename OutputIter>
-inline void unpack_range (const std::vector<buffertype>& buffer,
-                          Context *context,
-                          OutputIter out)
+ponies>
+ponies,
+                          ponies,
+                          ponies)
 {
-  // Our objects should be of the correct type to be assigned to the
-  // output iterator
-  typedef typename std::iterator_traits<OutputIter>::value_type T;
+  // ponies
+  // ponies
+  ponies;
 
-  // Loop through the buffer and unpack each object, returning the
-  // object pointer via the output iterator
-  typename std::vector<buffertype>::const_iterator
-    next_object_start = buffer.begin();
+  // ponies
+  // ponies
+  ponies
+    ponies();
 
-  while (next_object_start < buffer.end())
+  ponies())
     {
-      T* obj;
-      Parallel::unpack(next_object_start, &obj, context);
-      libmesh_assert(obj);
-      next_object_start += Parallel::packed_size(obj, next_object_start);
-      *out++ = obj;
+      ponies;
+      ponies);
+      ponies);
+      ponies);
+      *ponies;
     }
 
-  // We should have used up the exact amount of data in the buffer
-  libmesh_assert (next_object_start == buffer.end());
+  // ponies
+  ponies());
 }
 
 
-inline Communicator::Communicator () :
-#ifdef LIBMESH_HAVE_MPI
-  _communicator(MPI_COMM_SELF),
-#endif
-  _rank(0),
-  _size(1),
-  _send_mode(DEFAULT),
-  used_tag_values(),
-  _I_duped_it(false) {}
+ponies () :
+#ponies
+  ponies),
+#ponies
+  ponies),
+  ponies),
+  ponies),
+  ponies(),
+  ponies) {}
 
-inline Communicator::Communicator (const communicator &comm) :
-#ifdef LIBMESH_HAVE_MPI
-  _communicator(MPI_COMM_SELF),
-#endif
-  _rank(0),
-  _size(1),
-  _send_mode(DEFAULT),
-  used_tag_values(),
-  _I_duped_it(false)
+ponies) :
+#ponies
+  ponies),
+#ponies
+  ponies),
+  ponies),
+  ponies),
+  ponies(),
+  ponies)
 {
-  this->assign(comm);
+  ponies);
 }
 
-inline Communicator::~Communicator () {
-  this->clear();
+ponies () {
+  ponies();
 }
 
-#ifdef LIBMESH_HAVE_MPI
-inline void Communicator::split(int color, int key, Communicator &target) const {
-  target.clear();
-  MPI_Comm newcomm;
-  MPI_Comm_split(this->get(), color, key, &newcomm);
-  target.assign(newcomm);
-  target.send_mode(this->send_mode());
+#ponies
+ponies {
+  ponies();
+  ponies;
+  ponies);
+  ponies);
+  ponies());
 }
-#else
-inline void Communicator::split(int, int, Communicator &target) const {
-  target.assign(this->get());
+#ponies
+ponies {
+  ponies());
 }
-#endif
+#ponies
 
-inline void Communicator::duplicate(const Communicator &comm) {
-  this->duplicate(comm._communicator);
-  this->send_mode(comm.send_mode());
+ponies) {
+  ponies);
+  ponies());
 }
 
-#ifdef LIBMESH_HAVE_MPI
-inline void Communicator::duplicate(const communicator &comm) {
-  if (_communicator != MPI_COMM_NULL)
+#ponies
+ponies) {
+  ponies)
     {
-      MPI_Comm_dup(comm, &_communicator);
-      _I_duped_it = true;
+      ponies);
+      ponies;
     }
-  this->assign(_communicator);
+  ponies);
 }
-#else
-inline void Communicator::duplicate(const communicator &) { }
-#endif
+#ponies
+ponies &) { }
+#ponies
 
-inline void Communicator::clear() {
-#ifdef LIBMESH_HAVE_MPI
-  if (_I_duped_it)
+ponies() {
+#ponies
+  ponies)
     {
-      libmesh_assert (_communicator != MPI_COMM_NULL);
-      MPI_Comm_free(&_communicator);
-      _communicator = MPI_COMM_NULL;
+      ponies);
+      ponies);
+      ponies;
     }
-  _I_duped_it = false;
-#endif
+  ponies;
+#ponies
 }
 
-inline Communicator& Communicator::operator= (const communicator &comm) {
-  this->clear();
-  this->assign(comm);
-  return *this;
+ponies) {
+  ponies();
+  ponies);
+  ponies;
 }
 
-// Disallowed copy constructor
-inline Communicator::Communicator (const Communicator &) :
-#ifdef LIBMESH_HAVE_MPI
-  _communicator(MPI_COMM_NULL),
-#endif
-  _rank(0),
-  _size(1),
-  _send_mode(DEFAULT),
-  used_tag_values(),
-  _I_duped_it(false)
+// ponies
+ponies &) :
+#ponies
+  ponies),
+#ponies
+  ponies),
+  ponies),
+  ponies),
+  ponies(),
+  ponies)
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-inline void Communicator::assign(const communicator &comm)
+ponies)
 {
-  _communicator = comm;
-#ifdef LIBMESH_HAVE_MPI
-  if (_communicator != MPI_COMM_NULL)
+  ponies;
+#ponies
+  ponies)
     {
-      int i;
-      MPI_Comm_size(_communicator, &i);
-      libmesh_assert_greater_equal (i, 0);
-      _size = static_cast<unsigned int>(i);
+      ponies;
+      ponies);
+      ponies);
+      ponies);
 
-      MPI_Comm_rank(_communicator, &i);
-      libmesh_assert_greater_equal (i, 0);
-      _rank = static_cast<unsigned int>(i);
+      ponies);
+      ponies);
+      ponies);
     }
-  else
+  ponies
     {
-      _rank = 0;
-      _size = 1;
+      ponies;
+      ponies;
     }
-#endif
-  _send_mode = DEFAULT;
+#ponies
+  ponies;
 }
 
 
 
-inline Status::Status () :
-  _status(),
-  _datatype()
+ponies () :
+  ponies(),
+  ponies()
 {}
 
-inline Status::Status (const data_type &type) :
-  _status(),
-  _datatype(type)
+ponies) :
+  ponies(),
+  ponies)
 {}
 
-inline Status::Status (const status &stat) :
-  _status(stat),
-  _datatype()
+ponies) :
+  ponies),
+  ponies()
 {}
 
-inline Status::Status (const status &stat,
-                       const data_type &type) :
-  _status(stat),
-  _datatype(type)
+ponies,
+                       ponies) :
+  ponies),
+  ponies)
 {}
 
-inline Status::Status (const Status &stat) :
-  _status(stat._status),
-  _datatype(stat._datatype)
+ponies) :
+  ponies),
+  ponies)
 {}
 
-inline Status::Status (const Status    &stat,
-                       const data_type &type) :
-  _status(stat._status),
-  _datatype(type)
+ponies,
+                       ponies) :
+  ponies),
+  ponies)
 {}
 
-inline int Status::source () const
+ponies
 {
-#ifdef LIBMESH_HAVE_MPI
-  return _status.MPI_SOURCE;
-#else
-  return 0;
-#endif
+#ponies
+  ponies;
+#ponies
+  ponies;
+#ponies
 }
 
-inline int Status::tag () const
+ponies
 {
-#ifdef LIBMESH_HAVE_MPI
-  return _status.MPI_TAG;
-#else
-  libmesh_not_implemented();
-  return 0;
-#endif
+#ponies
+  ponies;
+#ponies
+  ponies();
+  ponies;
+#ponies
 }
 
-#ifdef LIBMESH_HAVE_MPI
-inline unsigned int Status::size (const data_type &type) const
+#ponies
+ponies
 {
-  int msg_size;
-  MPI_Get_count (const_cast<MPI_Status*>(&_status), type, &msg_size);
-  libmesh_assert_greater_equal (msg_size, 0);
-  return msg_size;
+  ponies;
+  ponies);
+  ponies);
+  ponies;
 }
-#else
-inline unsigned int Status::size (const data_type &) const
+#ponies
+ponies
 {
-  libmesh_not_implemented();
-  return 0;
+  ponies();
+  ponies;
 }
-#endif
+#ponies
 
-inline unsigned int Status::size () const
-{ return this->size (this->datatype()); }
+ponies
+{ ponies()); }
 
 
 
-inline Request::Request () :
-#ifdef LIBMESH_HAVE_MPI
-  _request(MPI_REQUEST_NULL),
-#else
-  _request(),
-#endif
-  post_wait_work(NULL)
+ponies () :
+#ponies
+  ponies),
+#ponies
+  ponies(),
+#ponies
+  ponies)
 {}
 
-inline Request::Request (const request &r) :
-  _request(r),
-  post_wait_work(NULL)
+ponies) :
+  ponies),
+  ponies)
 {}
 
-inline Request::Request (const Request &other) :
-  _request(other._request),
-  post_wait_work(other.post_wait_work)
+ponies) :
+  ponies),
+  ponies)
 {
-  if (other._prior_request.get())
-    _prior_request = UniquePtr<Request>
-      (new Request(*other._prior_request.get()));
+  ponies())
+    ponies>
+      (ponies()));
 
-  // operator= should behave like a shared pointer
-  if (post_wait_work)
-    post_wait_work->second++;
+  // ponies
+  ponies)
+    ponies++;
 }
 
-inline void Request::cleanup()
+ponies()
 {
-  if (post_wait_work)
+  ponies)
     {
-      // Decrement the use count
-      post_wait_work->second--;
+      // ponies
+      ponies--;
 
-      if (!post_wait_work->second)
+      ponies)
         {
-#ifdef DEBUG
-          // If we're done using this request, then we'd better have
-          // done the work we waited for
-          for (std::vector<PostWaitWork*>::iterator i =
-                 post_wait_work->first.begin();
-               i != post_wait_work->first.end(); ++i)
-            libmesh_assert(!(*i));
-#endif
-          delete post_wait_work;
-          post_wait_work = NULL;
+#ponies
+          // ponies
+          // ponies
+          ponies =
+                 ponies();
+               ponies)
+            ponies));
+#ponies
+          ponies;
+          ponies;
         }
     }
 }
 
-inline Request& Request::operator = (const Request &other)
+ponies)
 {
-  this->cleanup();
-  _request = other._request;
-  post_wait_work = other.post_wait_work;
+  ponies();
+  ponies;
+  ponies;
 
-  if (other._prior_request.get())
-    _prior_request = UniquePtr<Request>
-      (new Request(*other._prior_request.get()));
+  ponies())
+    ponies>
+      (ponies()));
 
-  // operator= should behave like a shared pointer
-  if (post_wait_work)
-    post_wait_work->second++;
+  // ponies
+  ponies)
+    ponies++;
 
-  return *this;
+  ponies;
 }
 
-inline Request& Request::operator = (const request &r)
+ponies)
 {
-  this->cleanup();
-  _request = r;
-  post_wait_work = NULL;
-  return *this;
+  ponies();
+  ponies;
+  ponies;
+  ponies;
 }
 
-inline Request::~Request () {
-  this->cleanup();
+ponies () {
+  ponies();
 }
 
-inline Status Request::wait ()
+ponies ()
 {
-  START_LOG("wait()", "Parallel::Request");
+  ponies");
 
-  if (_prior_request.get())
-    _prior_request->wait();
+  ponies())
+    ponies();
 
-  Status stat;
-#ifdef LIBMESH_HAVE_MPI
-  MPI_Wait (&_request, stat.get());
-#endif
-  if (post_wait_work)
-    for (std::vector<PostWaitWork*>::iterator i =
-           post_wait_work->first.begin();
-         i != post_wait_work->first.end(); ++i)
+  ponies;
+#ponies
+  ponies());
+#ponies
+  ponies)
+    ponies =
+           ponies();
+         ponies)
       {
-        // The user should never try to give us NULL work or try
-        // to wait() twice.
-        libmesh_assert (*i);
-        (*i)->run();
-        delete (*i);
-        *i = NULL;
+        // ponies
+        // ponies.
+        ponies);
+        (*ponies();
+        ponies);
+        *ponies;
       }
 
-  STOP_LOG("wait()", "Parallel::Request");
-  return stat;
+  ponies");
+  ponies;
 }
 
-inline bool Request::test ()
+ponies ()
 {
-#ifdef LIBMESH_HAVE_MPI
-  int val=0;
+#ponies
+  ponies;
 
-  MPI_Test (&_request,
-            &val,
-            MPI_STATUS_IGNORE);
-  if (val)
+  ponies,
+            &ponies,
+            ponies);
+  ponies)
     {
-      libmesh_assert          (_request == MPI_REQUEST_NULL);
-      libmesh_assert_equal_to (val, 1);
+      ponies);
+      ponies);
     }
 
-  return val;
-#else
-  return true;
-#endif
+  ponies;
+#ponies
+  ponies;
+#ponies
 }
 
-#ifdef LIBMESH_HAVE_MPI
-inline bool Request::test (status &stat)
+#ponies
+ponies)
 {
-  int val=0;
+  ponies;
 
-  MPI_Test (&_request,
-            &val,
-            &stat);
+  ponies,
+            &ponies,
+            &ponies);
 
-  return val;
+  ponies;
 }
-#else
-inline bool Request::test (status &)
+#ponies
+ponies &)
 {
-  return true;
+  ponies;
 }
-#endif
+#ponies
 
-inline void Request::add_prior_request(const Request& req)
+ponies)
 {
-  // We're making a chain of prior requests, not a tree
-  libmesh_assert(!req._prior_request.get());
+  // ponies
+  ponies());
 
-  Request *new_prior_req = new Request(req);
+  ponies);
 
-  // new_prior_req takes ownership of our existing _prior_request
-  new_prior_req->_prior_request.reset(this->_prior_request.release());
+  // ponies
+  ponies());
 
-  // Our _prior_request now manages the new resource we just set up
-  this->_prior_request.reset(new_prior_req);
+  // ponies
+  ponies);
 }
 
-inline void Request::add_post_wait_work(PostWaitWork* work)
+ponies)
 {
-  if (!post_wait_work)
-    post_wait_work = new
-      std::pair<std::vector <PostWaitWork* >, unsigned int>
-      (std::vector <PostWaitWork* >(), 1);
-  post_wait_work->first.push_back(work);
+  ponies)
+    ponies
+      ponies>
+      (ponies);
+  ponies);
 }
 
 
 
 /**
- * Pause execution until all processors reach a certain point.
+ * ponies.
  */
-#ifdef LIBMESH_HAVE_MPI
-inline void Communicator::barrier () const
+#ponies
+ponies
 {
-  if (this->size() > 1)
+  ponies)
     {
-      START_LOG("barrier()", "Parallel");
+      ponies");
 
-      MPI_Barrier (this->get());
+      ponies());
 
-      STOP_LOG("barrier()", "Parallel");
+      ponies");
     }
 }
-#else
-inline void Communicator::barrier () const {}
-#endif
+#ponies
+ponies {}
+#ponies
 
 
-// legacy e.g. Paralell::send() methods, requires
-// Communicator_World
-#ifndef LIBMESH_DISABLE_COMMWORLD
-inline void barrier (const Communicator &comm = Communicator_World)
+// ponies
+// ponies
+#ponies
+ponies)
 {
-  comm.barrier();
+  ponies();
 }
 
-template <typename T>
-inline bool verify(const T &r,
-                   const Communicator &comm = Communicator_World)
-{ return comm.verify(r); }
+ponies>
+ponies,
+                   ponies)
+{ ponies); }
 
-template <typename T>
-inline void min(T &r,
-                const Communicator &comm = Communicator_World)
-{ comm.min(r); }
+ponies>
+ponies,
+                ponies)
+{ ponies); }
 
-template <typename T, typename U>
-inline void minloc(T &r,
-                   U &min_id,
-                   const Communicator &comm = Communicator_World)
-{ comm.minloc(r, min_id); }
+ponies>
+ponies,
+                   ponies,
+                   ponies)
+{ ponies); }
 
-template <typename T>
-inline void max(T &r,
-                const Communicator &comm = Communicator_World)
-{ comm.max(r); }
+ponies>
+ponies,
+                ponies)
+{ ponies); }
 
-template <typename T, typename U>
-inline void maxloc(T &r,
-                   U &max_id,
-                   const Communicator &comm = Communicator_World)
-{ comm.maxloc(r, max_id); }
+ponies>
+ponies,
+                   ponies,
+                   ponies)
+{ ponies); }
 
-template <typename T>
-inline void sum(T &r,
-                const Communicator &comm = Communicator_World)
-{ comm.sum(r); }
+ponies>
+ponies,
+                ponies)
+{ ponies); }
 
-template <typename T>
-inline void set_union(T &data, const unsigned int root_id,
-                      const Communicator &comm = Communicator_World)
-{ comm.set_union(data, root_id); }
+ponies>
+ponies,
+                      ponies)
+{ ponies); }
 
-template <typename T>
-inline void set_union(T &data,
-                      const Communicator &comm = Communicator_World)
-{ comm.set_union(data); }
+ponies>
+ponies,
+                      ponies)
+{ ponies); }
 
-inline status probe (const unsigned int src_processor_id,
-                     const MessageTag &tag=any_tag,
-                     const Communicator &comm = Communicator_World)
-{ return comm.probe(src_processor_id, tag); }
+ponies,
+                     ponies,
+                     ponies)
+{ ponies); }
 
-template <typename T>
-inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
-{ comm.send(dest_processor_id, data, tag); }
+ponies>
+ponies,
+                  ponies,
+                  ponies,
+                  ponies)
+{ ponies); }
 
-template <typename T>
-inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  Request &req,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
-{ comm.send(dest_processor_id, data, req, tag); }
+ponies>
+ponies,
+                  ponies,
+                  ponies,
+                  ponies,
+                  ponies)
+{ ponies); }
 
-template <typename T>
-inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  const DataType &type,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
-{ comm.send(dest_processor_id, data, type, tag); }
+ponies>
+ponies,
+                  ponies,
+                  ponies,
+                  ponies,
+                  ponies)
+{ ponies); }
 
-template <typename T>
-inline void send (const unsigned int dest_processor_id,
-                  T &data,
-                  const DataType &type,
-                  Request &req,
-                  const MessageTag &tag=no_tag,
-                  const Communicator &comm = Communicator_World)
-{ comm.send(dest_processor_id, data, type, req, tag); }
-
-
-template <typename Context, typename Iter>
-inline void send_packed_range (const unsigned int dest_processor_id,
-                               const Context *context,
-                               Iter range_begin,
-                               const Iter range_end,
-                               const MessageTag &tag=no_tag,
-                               const Communicator &comm = Communicator_World)
-{ comm.send_packed_range(dest_processor_id, context, range_begin, range_end, tag); }
+ponies>
+ponies,
+                  ponies,
+                  ponies,
+                  ponies,
+                  ponies,
+                  ponies)
+{ ponies); }
 
 
-template <typename Context, typename Iter>
-inline void send_packed_range (const unsigned int dest_processor_id,
-                               const Context *context,
-                               Iter range_begin,
-                               const Iter range_end,
-                               Request &req,
-                               const MessageTag &tag=no_tag,
-                               const Communicator &comm = Communicator_World)
-{ comm.send_packed_range(dest_processor_id, context, range_begin, range_end, req, tag); }
+ponies>
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
+{ ponies); }
 
 
-template <typename T>
-inline void nonblocking_send (const unsigned int dest_processor_id,
-                              T &buf,
-                              const DataType &type,
-                              Request &r,
-                              const MessageTag &tag=no_tag,
-                              const Communicator &comm = Communicator_World)
-{ comm.send (dest_processor_id, buf, type, r, tag); }
+ponies>
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
+{ ponies); }
 
-template <typename T>
-inline void nonblocking_send (const unsigned int dest_processor_id,
-                              T &buf,
-                              Request &r,
-                              const MessageTag &tag=no_tag,
-                              const Communicator &comm = Communicator_World)
-{ comm.send (dest_processor_id, buf, r, tag); }
 
-template <typename T>
-inline Status receive (const unsigned int src_processor_id,
-                       T &buf,
-                       const MessageTag &tag=any_tag,
-                       const Communicator &comm = Communicator_World)
-{ return comm.receive (src_processor_id, buf, tag); }
+ponies>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies)
+{ ponies); }
 
-template <typename T>
-inline void receive (const unsigned int src_processor_id,
-                     T &buf,
-                     Request &req,
-                     const MessageTag &tag=any_tag,
-                     const Communicator &comm = Communicator_World)
-{ comm.receive (src_processor_id, buf, req, tag); }
+ponies>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies)
+{ ponies); }
 
-template <typename T>
-inline Status receive (const unsigned int src_processor_id,
-                       T &buf,
-                       const DataType &type,
-                       const MessageTag &tag=any_tag,
-                       const Communicator &comm = Communicator_World)
-{ return comm.receive (src_processor_id, buf, type, tag); }
+ponies>
+ponies,
+                       ponies,
+                       ponies,
+                       ponies)
+{ ponies); }
 
-template <typename T>
-inline void receive (const unsigned int src_processor_id,
-                     T &buf,
-                     const DataType &type,
-                     Request &req,
-                     const MessageTag &tag=any_tag,
-                     const Communicator &comm = Communicator_World)
-{ comm.receive (src_processor_id, buf, type, req, tag); }
+ponies>
+ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies)
+{ ponies); }
 
-template <typename Context, typename OutputIter>
-inline void receive_packed_range (const unsigned int src_processor_id,
-                                  Context *context,
-                                  OutputIter out,
-                                  const MessageTag &tag=any_tag,
-                                  const Communicator &comm = Communicator_World)
-{ comm.receive_packed_range (src_processor_id, context, out, tag); }
+ponies>
+ponies,
+                       ponies,
+                       ponies,
+                       ponies,
+                       ponies)
+{ ponies); }
 
-// template <typename Context, typename OutputIter>
-// inline void receive_packed_range (const unsigned int src_processor_id,
-//                                   Context *context,
-//                                   OutputIter out,
-//                                   Request &req,
-//                                   const MessageTag &tag=any_tag,
-//                                   const Communicator &comm = Communicator_World)
-// { comm.receive_packed_range (src_processor_id, context, out, req, tag); }
+ponies>
+ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies,
+                     ponies)
+{ ponies); }
 
-template <typename T>
-inline void nonblocking_receive (const unsigned int src_processor_id,
-                                 T &buf,
-                                 const DataType &type,
-                                 Request &r,
-                                 const MessageTag &tag=any_tag,
-                                 const Communicator &comm = Communicator_World)
-{ comm.receive (src_processor_id, buf, type, r, tag); }
+ponies>
+ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies)
+{ ponies); }
 
-template <typename T>
-inline void nonblocking_receive (const unsigned int src_processor_id,
-                                 T &buf,
-                                 Request &r,
-                                 const MessageTag &tag=any_tag,
-                                 const Communicator &comm = Communicator_World)
-{ comm.receive (src_processor_id, buf, r, tag); }
+// ponies>
+// ponies,
+//                                   ponies,
+//                                   ponies,
+//                                   ponies,
+//                                   ponies,
+//                                   ponies)
+// { ponies); }
 
-template <typename T1, typename T2>
-inline void send_receive(const unsigned int dest_processor_id,
-                         T1 &send,
-                         const unsigned int source_processor_id,
-                         T2 &recv,
-                         const MessageTag &send_tag = no_tag,
-                         const MessageTag &recv_tag = any_tag,
-                         const Communicator &comm = Communicator_World)
-{ comm.send_receive(dest_processor_id, send, source_processor_id, recv,
-                    send_tag, recv_tag); }
+ponies>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
+{ ponies); }
 
-template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
-inline void send_receive_packed_range(const unsigned int dest_processor_id,
-                                      const Context1* context1,
-                                      RangeIter send_begin,
-                                      const RangeIter send_end,
-                                      const unsigned int source_processor_id,
-                                      Context2* context2,
-                                      OutputIter out,
-                                      const MessageTag &send_tag = no_tag,
-                                      const MessageTag &recv_tag = any_tag,
-                                      const Communicator &comm = Communicator_World)
-{ comm.send_receive_packed_range(dest_processor_id, context1, send_begin, send_end,
-                                 source_processor_id, context2, out, send_tag, recv_tag); }
+ponies>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
+{ ponies); }
 
-template <typename T1, typename T2>
-inline void send_receive(const unsigned int dest_processor_id,
-                         T1 &send,
-                         const DataType &type1,
-                         const unsigned int source_processor_id,
-                         T2 &recv,
-                         const DataType &type2,
-                         const MessageTag &send_tag = no_tag,
-                         const MessageTag &recv_tag = any_tag,
-                         const Communicator &comm = Communicator_World)
-{ comm.send_receive(dest_processor_id, send, type1, source_processor_id,
-                    recv, type2, send_tag, recv_tag); }
+ponies>
+ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies)
+{ ponies,
+                    ponies); }
 
-template <typename T>
-inline void gather(const unsigned int root_id,
-                   T send,
-                   std::vector<T> &recv,
-                   const Communicator &comm = Communicator_World)
-{ comm.gather(root_id, send, recv); }
+ponies>
+ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies)
+{ ponies,
+                                 ponies); }
 
-template <typename T>
-inline void gather(const unsigned int root_id,
-                   std::vector<T> &r,
-                   const Communicator &comm = Communicator_World)
-{ comm.gather(root_id, r); }
+ponies>
+ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies)
+{ ponies,
+                    ponies); }
 
-template <typename T>
-inline void allgather(T send,
-                      std::vector<T> &recv,
-                      const Communicator &comm = Communicator_World)
-{ comm.allgather(send, recv); }
+ponies>
+ponies,
+                   ponies,
+                   ponies,
+                   ponies)
+{ ponies); }
 
-template <typename T>
-inline void allgather(std::vector<T> &r,
-                      const bool identical_buffer_sizes = false,
-                      const Communicator &comm = Communicator_World)
-{ comm.allgather(r, identical_buffer_sizes); }
+ponies>
+ponies,
+                   ponies,
+                   ponies)
+{ ponies); }
 
-template <typename Context, typename Iter, typename OutputIter>
-inline void gather_packed_range (const unsigned int root_id,
-                                 Context *context,
-                                 Iter range_begin,
-                                 const Iter range_end,
-                                 OutputIter out,
-                                 const Communicator &comm = Communicator_World)
-{ comm.gather_packed_range(root_id, context, range_begin, range_end, out); }
+ponies>
+ponies,
+                      ponies,
+                      ponies)
+{ ponies); }
 
-template <typename Context, typename Iter, typename OutputIter>
-inline void allgather_packed_range (Context *context,
-                                    Iter range_begin,
-                                    const Iter range_end,
-                                    OutputIter out,
-                                    const Communicator &comm = Communicator_World)
-{ comm.allgather_packed_range(context, range_begin, range_end, out); }
+ponies>
+ponies,
+                      ponies,
+                      ponies)
+{ ponies); }
 
-template <typename T>
-inline void alltoall(std::vector<T> &r,
-                     const Communicator &comm = Communicator_World)
-{ comm.alltoall(r); }
+ponies>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
+{ ponies); }
 
-template <typename T>
-inline void broadcast(T &data, const unsigned int root_id=0,
-                      const Communicator &comm = Communicator_World)
-{ comm.broadcast(data, root_id); }
+ponies>
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
+{ ponies); }
 
-template <typename Context, typename OutputContext, typename Iter, typename OutputIter>
-inline void broadcast_packed_range (const Context *context1,
-                                    Iter range_begin,
-                                    const Iter range_end,
-                                    OutputContext *context2,
-                                    OutputIter out,
-                                    const unsigned int root_id = 0,
-                                    const Communicator &comm = Communicator_World)
-{ comm.broadcast_packed_range(context1, range_begin, range_end, context2, out, root_id); }
+ponies>
+ponies,
+                     ponies)
+{ ponies); }
 
-#endif // #ifndef LIBMESH_DISABLE_COMMWORLD
+ponies>
+ponies,
+                      ponies)
+{ ponies); }
+
+ponies>
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
+{ ponies); }
+
+#ponies
 
 //-----------------------------------------------------------------------
-// Parallel members
+// ponies
 
-inline
-MessageTag::~MessageTag()
+ponies
+ponies()
 {
-  if (_comm)
-    _comm->dereference_unique_tag(_tagvalue);
+  ponies)
+    ponies);
 }
 
 
-inline
-MessageTag::MessageTag(const MessageTag &other)
-  : _tagvalue(other._tagvalue), _comm(other._comm)
+ponies
+ponies)
+  : ponies)
 {
-  if (_comm)
-    _comm->reference_unique_tag(_tagvalue);
+  ponies)
+    ponies);
 }
 
 
-inline
-MessageTag Communicator::get_unique_tag(int tagvalue) const
+ponies
+ponies
 {
-  if (used_tag_values.count(tagvalue))
+  ponies))
     {
-      // Get the largest value in the used values, and pick one
-      // larger
-      tagvalue = used_tag_values.rbegin()->first+1;
-      libmesh_assert(!used_tag_values.count(tagvalue));
+      // ponies
+      // ponies
+      ponies;
+      ponies));
     }
-  used_tag_values[tagvalue] = 1;
+  ponies;
 
-  // #ifndef NDEBUG
-  //   // Make sure everyone called get_unique_tag and make sure
-  //   // everyone got the same value
-  //   int maxval = tagvalue;
-  //   this->max(maxval);
-  //   libmesh_assert_equal_to (tagvalue, maxval);
-  // #endif
+  // #ponies
+  //   // ponies
+  //   // ponies
+  //   ponies;
+  //   ponies);
+  //   ponies);
+  // #ponies
 
-  return MessageTag(tagvalue, this);
+  ponies);
 }
 
 
-inline
-void Communicator::reference_unique_tag(int tagvalue) const
+ponies
+ponies
 {
-  // This has better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
+  // ponies.
+  ponies));
 
-  used_tag_values[tagvalue]++;
+  ponies]++;
 }
 
 
-inline
-void Communicator::dereference_unique_tag(int tagvalue) const
+ponies
+ponies
 {
-  // This has better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
+  // ponies.
+  ponies));
 
-  used_tag_values[tagvalue]--;
-  // If we don't have any more outstanding references, we
-  // don't even need to keep this tag in our "used" set.
-  if (!used_tag_values[tagvalue])
-    used_tag_values.erase(tagvalue);
+  ponies]--;
+  // ponies
+  // ponies.
+  ponies])
+    ponies);
 }
 
 
-#ifdef LIBMESH_HAVE_MPI
-template<>
-inline data_type dataplusint_type<short int>() { return MPI_SHORT_INT; }
+#ponies
+ponies<>
+ponies; }
 
-template<>
-inline data_type dataplusint_type<int>() { return MPI_2INT; }
+ponies<>
+ponies; }
 
-template<>
-inline data_type dataplusint_type<long>() { return MPI_LONG_INT; }
+ponies<>
+ponies; }
 
-template<>
-inline data_type dataplusint_type<float>() { return MPI_FLOAT_INT; }
+ponies<>
+ponies; }
 
-template<>
-inline data_type dataplusint_type<double>() { return MPI_DOUBLE_INT; }
+ponies<>
+ponies; }
 
-template<>
-inline data_type dataplusint_type<long double>() { return MPI_LONG_DOUBLE_INT; }
+ponies<>
+ponies; }
 
-template <typename T>
-inline bool Communicator::verify(const T &r) const
+ponies>
+ponies
 {
-  if (this->size() > 1 && Attributes<T>::has_min_max == true)
+  ponies)
     {
-      T tempmin = r, tempmax = r;
-      this->min(tempmin);
-      this->max(tempmax);
-      bool verified = (r == tempmin) &&
-        (r == tempmax);
-      this->min(verified);
-      return verified;
+      ponies;
+      ponies);
+      ponies);
+      ponies) &&
+        (ponies);
+      ponies);
+      ponies;
     }
-  return true;
+  ponies;
 }
 
 
 
-template <typename T>
-inline bool Communicator::semiverify(const T *r) const
+ponies>
+ponies
 {
-  if (this->size() > 1 && Attributes<T>::has_min_max == true)
+  ponies)
     {
-      T tempmin, tempmax;
-      if (r)
-        tempmin = tempmax = *r;
-      else
+      ponies;
+      ponies)
+        ponies;
+      ponies
         {
-          Attributes<T>::set_highest(tempmin);
-          Attributes<T>::set_lowest(tempmax);
+          ponies);
+          ponies);
         }
-      this->min(tempmin);
-      this->max(tempmax);
-      bool invalid = r && ((*r != tempmin) &&
-                           (*r != tempmax));
-      this->max(invalid);
-      return !invalid;
+      ponies);
+      ponies);
+      ponies) &&
+                           (*ponies));
+      ponies);
+      ponies;
     }
-  return true;
+  ponies;
 }
 
 
 
-template <typename T>
-inline bool Communicator::semiverify(const std::vector<T> *r) const
+ponies>
+ponies
 {
-  if (this->size() > 1 && Attributes<T>::has_min_max == true)
+  ponies)
     {
-      std::size_t rsize = r ? r->size() : 0;
-      std::size_t *psize = r ? &rsize : NULL;
+      ponies;
+      ponies;
 
-      if (!this->semiverify(psize))
-        return false;
+      ponies))
+        ponies;
 
-      this->max(rsize);
+      ponies);
 
-      std::vector<T> tempmin, tempmax;
-      if (r)
+      ponies;
+      ponies)
         {
-          tempmin = tempmax = *r;
+          ponies;
         }
-      else
+      ponies
         {
-          tempmin.resize(rsize);
-          tempmax.resize(rsize);
-          Attributes<std::vector<T> >::set_highest(tempmin);
-          Attributes<std::vector<T> >::set_lowest(tempmax);
+          ponies);
+          ponies);
+          ponies);
+          ponies);
         }
-      this->min(tempmin);
-      this->max(tempmax);
-      bool invalid = r && ((*r != tempmin) &&
-                           (*r != tempmax));
-      this->max(invalid);
-      return !invalid;
+      ponies);
+      ponies);
+      ponies) &&
+                           (*ponies));
+      ponies);
+      ponies;
     }
-  return true;
+  ponies;
 }
 
 
 
-inline bool Communicator::verify(const std::string & r) const
+ponies
 {
-  if (this->size() > 1)
+  ponies)
     {
-      // Cannot use <char> since MPI_MIN is not
-      // strictly defined for chars!
-      std::vector<short int> temp; temp.reserve(r.size());
-      for (std::size_t i=0; i != r.size(); ++i)
-        temp.push_back(r[i]);
-      return this->verify(temp);
+      // ponies
+      // ponies!
+      ponies());
+      ponies)
+        ponies]);
+      ponies);
     }
-  return true;
+  ponies;
 }
 
 
 
-inline bool Communicator::semiverify(const std::string * r) const
+ponies
 {
-  if (this->size() > 1)
+  ponies)
     {
-      std::size_t rsize = r ? r->size() : 0;
-      std::size_t *psize = r ? &rsize : NULL;
+      ponies;
+      ponies;
 
-      if (!this->semiverify(psize))
-        return false;
+      ponies))
+        ponies;
 
-      this->max(rsize);
+      ponies);
 
-      // Cannot use <char> since MPI_MIN is not
-      // strictly defined for chars!
-      std::vector<short int> temp (rsize);
-      if (r)
+      // ponies
+      // ponies!
+      ponies);
+      ponies)
         {
-          temp.reserve(rsize);
-          for (std::size_t i=0; i != rsize; ++i)
-            temp.push_back((*r)[i]);
-        }
-
-      std::vector<short int> *ptemp = r ? &temp: NULL;
-
-      return this->semiverify(ptemp);
-    }
-  return true;
-}
-
-
-
-template <typename T>
-inline void Communicator::min(T &r) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("min(scalar)", "Parallel");
-
-      T temp = r;
-      MPI_Allreduce (&temp,
-                     &r,
-                     1,
-                     StandardType<T>(&temp),
-                     MPI_MIN,
-                     this->get());
-
-      STOP_LOG("min(scalar)", "Parallel");
-    }
-}
-
-
-inline void Communicator::min(bool &r) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("min(bool)", "Parallel");
-
-      unsigned int tempsend = r;
-      unsigned int temp;
-      MPI_Allreduce (&tempsend,
-                     &temp,
-                     1,
-                     StandardType<unsigned int>(),
-                     MPI_MIN,
-                     this->get());
-      r = temp;
-
-      STOP_LOG("min(bool)", "Parallel");
-    }
-}
-
-
-template <typename T>
-inline void Communicator::min(std::vector<T> &r) const
-{
-  if (this->size() > 1 && !r.empty())
-    {
-      START_LOG("min(vector)", "Parallel");
-
-      libmesh_assert(this->verify(r.size()));
-
-      std::vector<T> temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size()),
-                     StandardType<T>(&temp[0]),
-                     MPI_MIN,
-                     this->get());
-
-      STOP_LOG("min(vector)", "Parallel");
-    }
-}
-
-
-inline void Communicator::min(std::vector<bool> &r) const
-{
-  if (this->size() > 1 && !r.empty())
-    {
-      START_LOG("min(vector<bool>)", "Parallel");
-
-      libmesh_assert(this->verify(r.size()));
-
-      std::vector<unsigned int> ruint;
-      pack_vector_bool(r, ruint);
-      std::vector<unsigned int> temp(ruint.size());
-      MPI_Allreduce (&ruint[0],
-                     &temp[0],
-                     cast_int<int>(ruint.size()),
-                     StandardType<unsigned int>(),
-                     MPI_BAND,
-                     this->get());
-      unpack_vector_bool(temp, r);
-
-      STOP_LOG("min(vector<bool>)", "Parallel");
-    }
-}
-
-
-template <typename T>
-inline void Communicator::minloc(T &r,
-                                 unsigned int &min_id) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("minloc(scalar)", "Parallel");
-
-      DataPlusInt<T> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<T> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<T>(),
-                     MPI_MINLOC,
-                     this->get());
-      r = out.val;
-      min_id = out.rank;
-
-      STOP_LOG("minloc(scalar)", "Parallel");
-    }
-  else
-    min_id = this->rank();
-}
-
-
-inline void Communicator::minloc(bool &r,
-                                 unsigned int &min_id) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("minloc(bool)", "Parallel");
-
-      DataPlusInt<int> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<int> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<int>(),
-                     MPI_MINLOC,
-                     this->get());
-      r = out.val;
-      min_id = out.rank;
-
-      STOP_LOG("minloc(bool)", "Parallel");
-    }
-  else
-    min_id = this->rank();
-}
-
-
-template <typename T>
-inline void Communicator::minloc(std::vector<T> &r,
-                                 std::vector<unsigned int> &min_id) const
-{
-  if (this->size() > 1 && !r.empty())
-    {
-      START_LOG("minloc(vector)", "Parallel");
-
-      libmesh_assert(this->verify(r.size()));
-
-      std::vector<DataPlusInt<T> > in(r.size());
-      for (std::size_t i=0; i != r.size(); ++i)
-        {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
-        }
-      std::vector<DataPlusInt<T> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     dataplusint_type<T>(),
-                     MPI_MINLOC,
-                     this->get());
-      for (std::size_t i=0; i != r.size(); ++i)
-        {
-          r[i]      = out[i].val;
-          min_id[i] = out[i].rank;
+          ponies);
+          ponies)
+            ponies]);
         }
 
-      STOP_LOG("minloc(vector)", "Parallel");
+      ponies;
+
+      ponies);
     }
-  else if (!r.empty())
+  ponies;
+}
+
+
+
+ponies>
+ponies
+{
+  ponies)
     {
-      for (std::size_t i=0; i != r.size(); ++i)
-        min_id[i] = this->rank();
+      ponies");
+
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies),
+                     ponies,
+                     ponies());
+
+      ponies");
     }
 }
 
 
-inline void Communicator::minloc(std::vector<bool> &r,
-                                 std::vector<unsigned int> &min_id) const
+ponies
 {
-  if (this->size() > 1 && !r.empty())
+  ponies)
     {
-      START_LOG("minloc(vector<bool>)", "Parallel");
+      ponies");
 
-      libmesh_assert(this->verify(r.size()));
+      ponies;
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies;
 
-      std::vector<DataPlusInt<int> > in(r.size());
-      for (std::size_t i=0; i != r.size(); ++i)
+      ponies");
+    }
+}
+
+
+ponies>
+ponies
+{
+  ponies())
+    {
+      ponies");
+
+      ponies()));
+
+      ponies);
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies]),
+                     ponies,
+                     ponies());
+
+      ponies");
+    }
+}
+
+
+ponies
+{
+  ponies())
+    {
+      ponies");
+
+      ponies()));
+
+      ponies;
+      ponies);
+      ponies());
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies);
+
+      ponies");
+    }
+}
+
+
+ponies>
+ponies,
+                                 ponies
+{
+  ponies)
+    {
+      ponies");
+
+      ponies;
+      ponies;
+      ponies();
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies;
+      ponies;
+
+      ponies");
+    }
+  ponies
+    ponies();
+}
+
+
+ponies,
+                                 ponies
+{
+  ponies)
+    {
+      ponies");
+
+      ponies;
+      ponies;
+      ponies();
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies;
+      ponies;
+
+      ponies");
+    }
+  ponies
+    ponies();
+}
+
+
+ponies>
+ponies,
+                                 ponies
+{
+  ponies())
+    {
+      ponies");
+
+      ponies()));
+
+      ponies());
+      ponies)
         {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
+          ponies];
+          ponies();
         }
-      std::vector<DataPlusInt<int> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     StandardType<int>(),
-                     MPI_MINLOC,
-                     this->get());
-      for (std::size_t i=0; i != r.size(); ++i)
+      ponies());
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies)
         {
-          r[i]      = out[i].val;
-          min_id[i] = out[i].rank;
-        }
-
-      STOP_LOG("minloc(vector<bool>)", "Parallel");
-    }
-  else if (!r.empty())
-    {
-      for (std::size_t i=0; i != r.size(); ++i)
-        min_id[i] = this->rank();
-    }
-}
-
-
-template <typename T>
-inline void Communicator::max(T &r) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("max(scalar)", "Parallel");
-
-      T temp;
-      MPI_Allreduce (&r,
-                     &temp,
-                     1,
-                     StandardType<T>(&r),
-                     MPI_MAX,
-                     this->get());
-      r = temp;
-
-      STOP_LOG("max(scalar)", "Parallel");
-    }
-}
-
-
-inline void Communicator::max(bool &r) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("max(bool)", "Parallel");
-
-      unsigned int tempsend = r;
-      unsigned int temp;
-      MPI_Allreduce (&tempsend,
-                     &temp,
-                     1,
-                     StandardType<unsigned int>(),
-                     MPI_MAX,
-                     this->get());
-      r = temp;
-
-      STOP_LOG("max(bool)", "Parallel");
-    }
-}
-
-
-template <typename T>
-inline void Communicator::max(std::vector<T> &r) const
-{
-  if (this->size() > 1 && !r.empty())
-    {
-      START_LOG("max(vector)", "Parallel");
-
-      libmesh_assert(this->verify(r.size()));
-
-      std::vector<T> temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size()),
-                     StandardType<T>(&temp[0]),
-                     MPI_MAX,
-                     this->get());
-
-      STOP_LOG("max(vector)", "Parallel");
-    }
-}
-
-
-inline void Communicator::max(std::vector<bool> &r) const
-{
-  if (this->size() > 1 && !r.empty())
-    {
-      START_LOG("max(vector<bool>)", "Parallel");
-
-      libmesh_assert(this->verify(r.size()));
-
-      std::vector<unsigned int> ruint;
-      pack_vector_bool(r, ruint);
-      std::vector<unsigned int> temp(ruint.size());
-      MPI_Allreduce (&ruint[0],
-                     &temp[0],
-                     cast_int<int>(ruint.size()),
-                     StandardType<unsigned int>(),
-                     MPI_BOR,
-                     this->get());
-      unpack_vector_bool(temp, r);
-
-      STOP_LOG("max(vector<bool>)", "Parallel");
-    }
-}
-
-
-template <typename T>
-inline void Communicator::maxloc(T &r,
-                                 unsigned int &max_id) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("maxloc(scalar)", "Parallel");
-
-      DataPlusInt<T> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<T> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<T>(),
-                     MPI_MAXLOC,
-                     this->get());
-      r = out.val;
-      max_id = out.rank;
-
-      STOP_LOG("maxloc(scalar)", "Parallel");
-    }
-  else
-    max_id = this->rank();
-}
-
-
-inline void Communicator::maxloc(bool &r,
-                                 unsigned int &max_id) const
-{
-  if (this->size() > 1)
-    {
-      START_LOG("maxloc(bool)", "Parallel");
-
-      DataPlusInt<int> in;
-      in.val = r;
-      in.rank = this->rank();
-      DataPlusInt<int> out;
-      MPI_Allreduce (&in,
-                     &out,
-                     1,
-                     dataplusint_type<int>(),
-                     MPI_MAXLOC,
-                     this->get());
-      r = out.val;
-      max_id = out.rank;
-
-      STOP_LOG("maxloc(bool)", "Parallel");
-    }
-  else
-    max_id = this->rank();
-}
-
-
-template <typename T>
-inline void Communicator::maxloc(std::vector<T> &r,
-                                 std::vector<unsigned int> &max_id) const
-{
-  if (this->size() > 1 && !r.empty())
-    {
-      START_LOG("maxloc(vector)", "Parallel");
-
-      libmesh_assert(this->verify(r.size()));
-
-      std::vector<DataPlusInt<T> > in(r.size());
-      for (std::size_t i=0; i != r.size(); ++i)
-        {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
-        }
-      std::vector<DataPlusInt<T> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     dataplusint_type<T>(),
-                     MPI_MAXLOC,
-                     this->get());
-      for (std::size_t i=0; i != r.size(); ++i)
-        {
-          r[i]      = out[i].val;
-          max_id[i] = out[i].rank;
+          ponies;
+          ponies;
         }
 
-      STOP_LOG("maxloc(vector)", "Parallel");
+      ponies");
     }
-  else if (!r.empty())
+  ponies())
     {
-      for (std::size_t i=0; i != r.size(); ++i)
-        max_id[i] = this->rank();
+      ponies)
+        ponies();
     }
 }
 
 
-inline void Communicator::maxloc(std::vector<bool> &r,
-                                 std::vector<unsigned int> &max_id) const
+ponies,
+                                 ponies
 {
-  if (this->size() > 1 && !r.empty())
+  ponies())
     {
-      START_LOG("maxloc(vector<bool>)", "Parallel");
+      ponies");
 
-      libmesh_assert(this->verify(r.size()));
+      ponies()));
 
-      std::vector<DataPlusInt<int> > in(r.size());
-      for (std::size_t i=0; i != r.size(); ++i)
+      ponies());
+      ponies)
         {
-          in[i].val  = r[i];
-          in[i].rank = this->rank();
+          ponies];
+          ponies();
         }
-      std::vector<DataPlusInt<int> > out(r.size());
-      MPI_Allreduce (&in[0],
-                     &out[0],
-                     cast_int<int>(r.size()),
-                     StandardType<int>(),
-                     MPI_MAXLOC,
-                     this->get());
-      for (std::size_t i=0; i != r.size(); ++i)
+      ponies());
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies)
         {
-          r[i]      = out[i].val;
-          max_id[i] = out[i].rank;
+          ponies;
+          ponies;
         }
 
-      STOP_LOG("maxloc(vector<bool>)", "Parallel");
+      ponies");
     }
-  else if (!r.empty())
+  ponies())
     {
-      for (std::size_t i=0; i != r.size(); ++i)
-        max_id[i] = this->rank();
+      ponies)
+        ponies();
     }
 }
 
 
-template <typename T>
-inline void Communicator::sum(T &r) const
+ponies>
+ponies
 {
-  if (this->size() > 1)
+  ponies)
     {
-      START_LOG("sum()", "Parallel");
+      ponies");
 
-      T temp = r;
-      MPI_Allreduce (&temp,
-                     &r,
-                     1,
-                     StandardType<T>(&temp),
-                     MPI_SUM,
-                     this->get());
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies),
+                     ponies,
+                     ponies());
+      ponies;
 
-      STOP_LOG("sum()", "Parallel");
+      ponies");
     }
 }
 
 
-template <typename T>
-inline void Communicator::sum(std::vector<T> &r) const
+ponies
 {
-  if (this->size() > 1 && !r.empty())
+  ponies)
     {
-      START_LOG("sum()", "Parallel");
+      ponies");
 
-      libmesh_assert(this->verify(r.size()));
+      ponies;
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies;
 
-      std::vector<T> temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size()),
-                     StandardType<T>(&temp[0]),
-                     MPI_SUM,
-                     this->get());
-
-      STOP_LOG("sum()", "Parallel");
+      ponies");
     }
 }
 
 
-// We still do function overloading for complex sums - in a perfect
-// world we'd have a StandardSumOp to go along with StandardType...
-template <typename T>
-inline void Communicator::sum(std::complex<T> &r) const
+ponies>
+ponies
 {
-  if (this->size() > 1)
+  ponies())
     {
-      START_LOG("sum()", "Parallel");
+      ponies");
 
-      std::complex<T> temp(r);
-      MPI_Allreduce (&temp,
-                     &r,
-                     2,
-                     StandardType<T>(),
-                     MPI_SUM,
-                     this->get());
+      ponies()));
 
-      STOP_LOG("sum()", "Parallel");
+      ponies);
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies]),
+                     ponies,
+                     ponies());
+
+      ponies");
     }
 }
 
 
-template <typename T>
-inline void Communicator::sum(std::vector<std::complex<T> > &r) const
+ponies
 {
-  if (this->size() > 1 && !r.empty())
+  ponies())
     {
-      START_LOG("sum()", "Parallel");
+      ponies");
 
-      libmesh_assert(this->verify(r.size()));
+      ponies()));
 
-      std::vector<std::complex<T> > temp(r);
-      MPI_Allreduce (&temp[0],
-                     &r[0],
-                     cast_int<int>(r.size() * 2),
-                     StandardType<T>(NULL),
-                     MPI_SUM,
-                     this->get());
+      ponies;
+      ponies);
+      ponies());
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies);
 
-      STOP_LOG("sum()", "Parallel");
+      ponies");
     }
 }
 
 
-template <typename T>
-inline void Communicator::set_union(std::set<T> &data,
-                                    const unsigned int root_id) const
+ponies>
+ponies,
+                                 ponies
 {
-  std::vector<T> vecdata(data.begin(), data.end());
-  this->gather(root_id, vecdata);
-  if (this->rank() == root_id)
-    data.insert(vecdata.begin(), vecdata.end());
-}
-
-
-
-template <typename T>
-inline void Communicator::set_union(std::set<T> &data) const
-{
-  std::vector<T> vecdata(data.begin(), data.end());
-  this->allgather(vecdata, false);
-  data.insert(vecdata.begin(), vecdata.end());
-}
-
-
-
-template <typename T1, typename T2>
-inline void Communicator::set_union(std::map<T1,T2> &data,
-                                    const unsigned int root_id) const
-{
-  std::vector<std::pair<T1,T2> > vecdata(data.begin(), data.end());
-  this->gather(root_id, vecdata);
-  if (this->rank() == root_id)
-    data.insert(vecdata.begin(), vecdata.end());
-}
-
-
-
-template <typename T1, typename T2>
-inline void Communicator::set_union(std::map<T1,T2> &data) const
-{
-  std::vector<std::pair<T1,T2> > vecdata(data.begin(), data.end());
-  this->allgather(vecdata, false);
-  data.insert(vecdata.begin(), vecdata.end());
-}
-
-
-
-inline status Communicator::probe (const unsigned int src_processor_id,
-                                   const MessageTag &tag) const
-{
-  START_LOG("probe()", "Parallel");
-
-  status stat;
-
-  MPI_Probe (src_processor_id,
-             tag.value(),
-             this->get(),
-             &stat);
-
-  STOP_LOG("probe()", "Parallel");
-
-  return stat;
-}
-
-
-
-template<typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::basic_string<T> &buf,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-  T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Ssend : MPI_Send) (dataptr,
-                            cast_int<int>(buf.size()),
-                            StandardType<T>(dataptr),
-                            dest_processor_id,
-                            tag.value(),
-                            this->get());
-
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::basic_string<T> &buf,
-                                Request &req,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-  T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Issend : MPI_Isend) (dataptr,
-                              cast_int<int>(buf.size()),
-                              StandardType<T>(dataptr),
-                              dest_processor_id,
-                              tag.value(),
-                              this->get(),
-                              req.get());
-
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                T &buf,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-  T* dataptr = &buf;
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Ssend : MPI_Send) (dataptr,
-                            1,
-                            StandardType<T>(dataptr),
-                            dest_processor_id,
-                            tag.value(),
-                            this->get());
-
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                T &buf,
-                                Request &req,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-  T* dataptr = &buf;
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Issend : MPI_Isend) (dataptr,
-                              1,
-                              StandardType<T>(dataptr),
-                              dest_processor_id,
-                              tag.value(),
-                              this->get(),
-                              req.get());
-
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                const MessageTag &tag) const
-{
-  this->send(dest_processor_id,
-             StandardType<T>(buf.empty() ? NULL : &buf.front()), tag);
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                Request &req,
-                                const MessageTag &tag) const
-{
-  this->send(dest_processor_id,
-             StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                const DataType &type,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-  std::vector<T> vecbuf(buf.begin(), buf.end());
-  this->send(dest_processor_id, vecbuf, type, tag);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::set<T> &buf,
-                                const DataType &type,
-                                Request &req,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-  // Allocate temporary buffer on the heap so it lives until after
-  // the non-blocking send completes
-  std::vector<T> *vecbuf =
-    new std::vector<T>(buf.begin(), buf.end());
-
-  // Make the Request::wait() handle deleting the buffer
-  req.add_post_wait_work
-    (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
-
-  this->send(dest_processor_id, *vecbuf, type, req, tag);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                const MessageTag &tag) const
-{
-  this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? NULL : &buf.front()), tag);
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                Request &req,
-                                const MessageTag &tag) const
-{
-  this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                const DataType &type,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Ssend : MPI_Send) (buf.empty() ? NULL : &buf[0],
-                            cast_int<int>(buf.size()),
-                            type,
-                            dest_processor_id,
-                            tag.value(),
-                            this->get());
-
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::send (const unsigned int dest_processor_id,
-                                std::vector<T> &buf,
-                                const DataType &type,
-                                Request &req,
-                                const MessageTag &tag) const
-{
-  START_LOG("send()", "Parallel");
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    ((this->send_mode() == SYNCHRONOUS) ?
-     MPI_Issend : MPI_Isend) (buf.empty() ? NULL : &buf[0],
-                              cast_int<int>(buf.size()),
-                              type,
-                              dest_processor_id,
-                              tag.value(),
-                              this->get(),
-                              req.get());
-
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("send()", "Parallel");
-}
-
-
-template <typename Context, typename Iter>
-inline void Communicator::send_packed_range (const unsigned int dest_processor_id,
-                                             const Context *context,
-                                             Iter range_begin,
-                                             const Iter range_end,
-                                             const MessageTag &tag) const
-{
-  // We will serialize variable size objects from *range_begin to
-  // *range_end as a sequence of plain data (e.g. ints) in this buffer
-  typedef typename std::iterator_traits<Iter>::value_type T;
-
-  std::size_t total_buffer_size =
-    Parallel::packed_range_size(context, range_begin, range_end);
-
-  this->send(dest_processor_id, total_buffer_size, tag);
-
-#ifdef DEBUG
-  std::size_t used_buffer_size = 0;
-#endif
-
-  while (range_begin != range_end)
+  ponies)
     {
-      std::vector<typename Parallel::BufferType<T>::type> buffer;
+      ponies");
 
-      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
+      ponies;
+      ponies;
+      ponies();
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies;
+      ponies;
 
-#ifdef DEBUG
-      used_buffer_size += buffer.size();
-#endif
-
-      // Blocking send of the buffer
-      this->send(dest_processor_id, buffer, tag);
+      ponies");
     }
-
-#ifdef DEBUG
-  libmesh_assert_equal_to(used_buffer_size, total_buffer_size);
-#endif
+  ponies
+    ponies();
 }
 
 
-template <typename Context, typename Iter>
-inline void Communicator::send_packed_range (const unsigned int dest_processor_id,
-                                             const Context *context,
-                                             Iter range_begin,
-                                             const Iter range_end,
-                                             Request &req,
-                                             const MessageTag &tag) const
+ponies,
+                                 ponies
 {
-  // Allocate a buffer on the heap so we don't have to free it until
-  // after the Request::wait()
-  typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
-
-  std::size_t total_buffer_size =
-    Parallel::packed_range_size(context, range_begin, range_end);
-
-  Request intermediate_req = request();
-  this->send(dest_processor_id, total_buffer_size, intermediate_req, tag);
-
-  req.add_prior_request(intermediate_req);
-
-#ifdef DEBUG
-  std::size_t used_buffer_size = 0;
-#endif
-
-  while (range_begin != range_end)
+  ponies)
     {
-      std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
+      ponies");
 
-      range_begin = Parallel::pack_range(context, range_begin, range_end, *buffer);
+      ponies;
+      ponies;
+      ponies();
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies;
+      ponies;
 
-#ifdef DEBUG
-      used_buffer_size += buffer->size();
-#endif
-
-      Request next_intermediate_req;
-
-      Request *my_req = (range_begin == range_end) ? &req : &next_intermediate_req;
-
-      // Make the Request::wait() handle deleting the buffer
-      my_req->add_post_wait_work
-        (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >
-         (buffer));
-
-      // Non-blocking send of the buffer
-      this->send(dest_processor_id, *buffer, *my_req, tag);
-
-      if (range_begin != range_end)
-        req.add_prior_request(*my_req);
+      ponies");
     }
+  ponies
+    ponies();
 }
 
 
-
-template <typename T>
-inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::basic_string<T> &buf,
-                                     const MessageTag &tag) const
+ponies>
+ponies,
+                                 ponies
 {
-  std::vector<T> tempbuf;  // Officially C++ won't let us get a
-                           // modifiable array from a string
-
-  Status stat = this->receive(src_processor_id, tempbuf, tag);
-  buf.assign(tempbuf.begin(), tempbuf.end());
-  return stat;
-}
-
-
-
-template <typename T>
-inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::basic_string<T> &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
-{
-  // Officially C++ won't let us get a modifiable array from a
-  // string, and we can't even put one on the stack for the
-  // non-blocking case.
-  std::vector<T> *tempbuf = new std::vector<T>();
-
-  // We can clear the string, but the Request::wait() will need to
-  // handle copying our temporary buffer to it
-  buf.clear();
-
-  req.add_post_wait_work
-    (new Parallel::PostWaitCopyBuffer<std::vector<T>,
-     std::back_insert_iterator<std::basic_string<T> > >
-     (tempbuf, std::back_inserter(buf)));
-
-  // Make the Request::wait() then handle deleting the buffer
-  req.add_post_wait_work
-    (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(tempbuf));
-
-  this->receive(src_processor_id, tempbuf, req, tag);
-}
-
-
-
-template <typename T>
-inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     T &buf,
-                                     const MessageTag &tag) const
-{
-  START_LOG("receive()", "Parallel");
-
-  // Get the status of the message, explicitly provide the
-  // datatype so we can later query the size
-  Status stat(this->probe(src_processor_id, tag), StandardType<T>(&buf));
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Recv (&buf,
-              1,
-              StandardType<T>(&buf),
-              src_processor_id,
-              tag.value(),
-              this->get(),
-              stat.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("receive()", "Parallel");
-
-  return stat;
-}
-
-
-
-template <typename T>
-inline void Communicator::receive (const unsigned int src_processor_id,
-                                   T &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
-{
-  START_LOG("receive()", "Parallel");
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Irecv (&buf,
-               1,
-               StandardType<T>(&buf),
-               src_processor_id,
-               tag.value(),
-               this->get(),
-               req.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("receive()", "Parallel");
-}
-
-
-
-template <typename T>
-inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::set<T> &buf,
-                                     const MessageTag &tag) const
-{
-  return this->receive
-    (src_processor_id, buf,
-     StandardType<T>(buf.empty() ? NULL : &buf.front()), tag);
-}
-
-
-
-template <typename T>
-inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::set<T> &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
-{
-  this->receive (src_processor_id, buf,
-                 StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
-}
-
-
-
-template <typename T>
-inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::set<T> &buf,
-                                     const DataType &type,
-                                     const MessageTag &tag) const
-{
-  START_LOG("receive()", "Parallel");
-
-  std::vector<T> vecbuf;
-  Status stat = this->receive(src_processor_id, vecbuf, type, tag);
-  buf.clear();
-  buf.insert(vecbuf.begin(), vecbuf.end());
-
-  STOP_LOG("receive()", "Parallel");
-
-  return stat;
-}
-
-
-
-template <typename T>
-inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::set<T> &buf,
-                                   const DataType &type,
-                                   Request &req,
-                                   const MessageTag &tag) const
-{
-  START_LOG("receive()", "Parallel");
-
-  // Allocate temporary buffer on the heap so it lives until after
-  // the non-blocking send completes
-  std::vector<T> *vecbuf = new std::vector<T>();
-
-  // We can clear the set, but the Request::wait() will need to
-  // handle copying our temporary buffer to it
-  buf.clear();
-
-  req.add_post_wait_work
-    (new Parallel::PostWaitCopyBuffer<std::vector<T>,
-     std::back_insert_iterator<std::set<T> > >
-     (vecbuf, std::back_inserter(buf)));
-
-  // Make the Request::wait() then handle deleting the buffer
-  req.add_post_wait_work
-    (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
-
-  this->receive(src_processor_id, *vecbuf, type, req, tag);
-
-  STOP_LOG("receive()", "Parallel");
-}
-
-
-
-template <typename T>
-inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::vector<T> &buf,
-                                     const MessageTag &tag) const
-{
-  return this->receive
-    (src_processor_id, buf,
-     StandardType<T>(buf.empty() ? NULL : &buf.front()), tag);
-}
-
-
-
-template <typename T>
-inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::vector<T> &buf,
-                                   Request &req,
-                                   const MessageTag &tag) const
-{
-  this->receive (src_processor_id, buf,
-                 StandardType<T>(buf.empty() ? NULL : &buf.front()), req, tag);
-}
-
-
-
-template <typename T>
-inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::vector<T> &buf,
-                                     const DataType &type,
-                                     const MessageTag &tag) const
-{
-  START_LOG("receive()", "Parallel");
-
-  // Get the status of the message, explicitly provide the
-  // datatype so we can later query the size
-  Status stat(this->probe(src_processor_id, tag), type);
-
-  buf.resize(stat.size());
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Recv (buf.empty() ? NULL : &buf[0],
-              cast_int<int>(buf.size()),
-              type,
-              src_processor_id,
-              tag.value(),
-              this->get(),
-              stat.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("receive()", "Parallel");
-
-  return stat;
-}
-
-
-
-template <typename T>
-inline void Communicator::receive (const unsigned int src_processor_id,
-                                   std::vector<T> &buf,
-                                   const DataType &type,
-                                   Request &req,
-                                   const MessageTag &tag) const
-{
-  START_LOG("receive()", "Parallel");
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Irecv (buf.empty() ? NULL : &buf[0],
-               cast_int<int>(buf.size()),
-               type,
-               src_processor_id,
-               tag.value(),
-               this->get(),
-               req.get());
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("receive()", "Parallel");
-}
-
-
-template <typename Context, typename OutputIter>
-inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
-                                                Context *context,
-                                                OutputIter out,
-                                                const MessageTag &tag) const
-{
-  typedef typename std::iterator_traits<OutputIter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
-
-  // Receive serialized variable size objects as sequences of buffer_t
-  std::size_t total_buffer_size = 0;
-  this->receive(src_processor_id, total_buffer_size, tag);
-
-  std::size_t received_buffer_size = 0;
-  while (received_buffer_size < total_buffer_size)
+  ponies())
     {
-      std::vector<buffer_t> buffer;
-      this->receive(src_processor_id, buffer, tag);
-      received_buffer_size += buffer.size();
-      Parallel::unpack_range(buffer, context, out);
+      ponies");
+
+      ponies()));
+
+      ponies());
+      ponies)
+        {
+          ponies];
+          ponies();
+        }
+      ponies());
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies)
+        {
+          ponies;
+          ponies;
+        }
+
+      ponies");
+    }
+  ponies())
+    {
+      ponies)
+        ponies();
+    }
+}
+
+
+ponies,
+                                 ponies
+{
+  ponies())
+    {
+      ponies");
+
+      ponies()));
+
+      ponies());
+      ponies)
+        {
+          ponies];
+          ponies();
+        }
+      ponies());
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies>(),
+                     ponies,
+                     ponies());
+      ponies)
+        {
+          ponies;
+          ponies;
+        }
+
+      ponies");
+    }
+  ponies())
+    {
+      ponies)
+        ponies();
+    }
+}
+
+
+ponies>
+ponies
+{
+  ponies)
+    {
+      ponies");
+
+      ponies;
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies),
+                     ponies,
+                     ponies());
+
+      ponies");
+    }
+}
+
+
+ponies>
+ponies
+{
+  ponies())
+    {
+      ponies");
+
+      ponies()));
+
+      ponies);
+      ponies],
+                     &ponies],
+                     ponies()),
+                     ponies]),
+                     ponies,
+                     ponies());
+
+      ponies");
+    }
+}
+
+
+// ponies
+// ponies...
+ponies>
+ponies
+{
+  ponies)
+    {
+      ponies");
+
+      ponies);
+      ponies,
+                     &ponies,
+                     ponies,
+                     ponies>(),
+                     ponies,
+                     ponies());
+
+      ponies");
+    }
+}
+
+
+ponies>
+ponies
+{
+  ponies())
+    {
+      ponies");
+
+      ponies()));
+
+      ponies);
+      ponies],
+                     &ponies],
+                     ponies),
+                     ponies),
+                     ponies,
+                     ponies());
+
+      ponies");
+    }
+}
+
+
+ponies>
+ponies,
+                                    ponies
+{
+  ponies());
+  ponies);
+  ponies)
+    ponies());
+}
+
+
+
+ponies>
+ponies
+{
+  ponies());
+  ponies);
+  ponies());
+}
+
+
+
+ponies>
+ponies,
+                                    ponies
+{
+  ponies());
+  ponies);
+  ponies)
+    ponies());
+}
+
+
+
+ponies>
+ponies
+{
+  ponies());
+  ponies);
+  ponies());
+}
+
+
+
+ponies,
+                                   ponies
+{
+  ponies");
+
+  ponies;
+
+  ponies,
+             ponies(),
+             ponies(),
+             &ponies);
+
+  ponies");
+
+  ponies;
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+  ponies());
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ((ponies) ?
+     ponies,
+                            ponies()),
+                            ponies),
+                            ponies,
+                            ponies(),
+                            ponies());
+
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+  ponies());
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ((ponies) ?
+     ponies,
+                              ponies()),
+                              ponies),
+                              ponies,
+                              ponies(),
+                              ponies(),
+                              ponies());
+
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+  ponies;
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ((ponies) ?
+     ponies,
+                            ponies,
+                            ponies),
+                            ponies,
+                            ponies(),
+                            ponies());
+
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+  ponies;
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ((ponies) ?
+     ponies,
+                              ponies,
+                              ponies),
+                              ponies,
+                              ponies(),
+                              ponies(),
+                              ponies());
+
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies
+{
+  ponies,
+             ponies);
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies,
+             ponies);
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+  ponies());
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+  // ponies
+  // ponies
+  ponies =
+    ponies());
+
+  // ponies
+  ponies
+    (ponies));
+
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies
+{
+  ponies,
+             ponies);
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies,
+             ponies);
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ((ponies) ?
+     ponies],
+                            ponies()),
+                            ponies,
+                            ponies,
+                            ponies(),
+                            ponies());
+
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies
+{
+  ponies");
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ((ponies) ?
+     ponies],
+                              ponies()),
+                              ponies,
+                              ponies,
+                              ponies(),
+                              ponies(),
+                              ponies());
+
+  ponies);
+
+  ponies");
+}
+
+
+ponies>
+ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies
+{
+  // ponies
+  // *ponies
+  ponies;
+
+  ponies =
+    ponies);
+
+  ponies);
+
+#ponies
+  ponies;
+#ponies
+
+  ponies)
+    {
+      ponies;
+
+      ponies);
+
+#ponies
+      ponies();
+#ponies
+
+      // ponies
+      ponies);
+    }
+
+#ponies
+  ponies);
+#ponies
+}
+
+
+ponies>
+ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies
+{
+  // ponies
+  // ponies()
+  ponies;
+  ponies;
+
+  ponies =
+    ponies);
+
+  ponies();
+  ponies);
+
+  ponies);
+
+#ponies
+  ponies;
+#ponies
+
+  ponies)
+    {
+      ponies>();
+
+      ponies);
+
+#ponies
+      ponies();
+#ponies
+
+      ponies;
+
+      ponies;
+
+      // ponies
+      ponies
+        (ponies> >
+         (ponies));
+
+      // ponies
+      ponies);
+
+      ponies)
+        ponies);
     }
 }
 
 
 
-// template <typename Context, typename OutputIter>
-// inline void Communicator::receive_packed_range (const unsigned int src_processor_id,
-//                                                 Context *context,
-//                                                 OutputIter out,
-//                                                 Request &req,
-//                                                 const MessageTag &tag) const
+ponies>
+ponies,
+                                     ponies,
+                                     ponies
+{
+  ponies
+                           // ponies
+
+  ponies);
+  ponies());
+  ponies;
+}
+
+
+
+ponies>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies
+{
+  // ponies
+  // ponies
+  // ponies.
+  ponies>();
+
+  // ponies
+  // ponies
+  ponies();
+
+  ponies
+    (ponies>,
+     ponies> > >
+     (ponies)));
+
+  // ponies
+  ponies
+    (ponies));
+
+  ponies);
+}
+
+
+
+ponies>
+ponies,
+                                     ponies,
+                                     ponies
+{
+  ponies");
+
+  // ponies
+  // ponies
+  ponies));
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies,
+              ponies,
+              ponies),
+              ponies,
+              ponies(),
+              ponies(),
+              ponies());
+  ponies);
+
+  ponies");
+
+  ponies;
+}
+
+
+
+ponies>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies
+{
+  ponies");
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies,
+               ponies,
+               ponies),
+               ponies,
+               ponies(),
+               ponies(),
+               ponies());
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                     ponies,
+                                     ponies
+{
+  ponies
+    (ponies,
+     ponies);
+}
+
+
+
+ponies>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies
+{
+  ponies,
+                 ponies);
+}
+
+
+
+ponies>
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies
+{
+  ponies");
+
+  ponies;
+  ponies);
+  ponies();
+  ponies());
+
+  ponies");
+
+  ponies;
+}
+
+
+
+ponies>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies
+{
+  ponies");
+
+  // ponies
+  // ponies
+  ponies>();
+
+  // ponies
+  // ponies
+  ponies();
+
+  ponies
+    (ponies>,
+     ponies> > >
+     (ponies)));
+
+  // ponies
+  ponies
+    (ponies));
+
+  ponies);
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                     ponies,
+                                     ponies
+{
+  ponies
+    (ponies,
+     ponies);
+}
+
+
+
+ponies>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies
+{
+  ponies,
+                 ponies);
+}
+
+
+
+ponies>
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies
+{
+  ponies");
+
+  // ponies
+  // ponies
+  ponies);
+
+  ponies());
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies],
+              ponies()),
+              ponies,
+              ponies,
+              ponies(),
+              ponies(),
+              ponies());
+  ponies);
+
+  ponies");
+
+  ponies;
+}
+
+
+
+ponies>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies
+{
+  ponies");
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies],
+               ponies()),
+               ponies,
+               ponies,
+               ponies(),
+               ponies(),
+               ponies());
+  ponies);
+
+  ponies");
+}
+
+
+ponies>
+ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies
+{
+  ponies;
+  ponies;
+
+  // ponies
+  ponies;
+  ponies);
+
+  ponies;
+  ponies)
+    {
+      ponies;
+      ponies);
+      ponies();
+      ponies);
+    }
+}
+
+
+
+// ponies>
+// ponies,
+//                                                 ponies,
+//                                                 ponies,
+//                                                 ponies,
+//                                                 ponies
 // {
-//   typedef typename std::iterator_traits<OutputIter>::value_type T;
-//   typedef typename Parallel::BufferType<T>::type buffer_t;
+//   ponies;
+//   ponies;
 //
-//   // Receive serialized variable size objects as a sequence of
-//   // buffer_t.
-//   // Allocate a buffer on the heap so we don't have to free it until
-//   // after the Request::wait()
-//   std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
-//   this->receive(src_processor_id, *buffer, req, tag);
+//   // ponies
+//   // ponies.
+//   // ponies
+//   // ponies()
+//   ponies>();
+//   ponies);
 //
-//   // Make the Request::wait() handle unpacking the buffer
-//   req.add_post_wait_work
-//     (new Parallel::PostWaitUnpackBuffer<std::vector<buffer_t>, Context, OutputIter>
-//      (buffer, context, out));
+//   // ponies
+//   ponies
+//     (ponies>
+//      (ponies));
 //
-//   // Make the Request::wait() then handle deleting the buffer
-//   req.add_post_wait_work
-//     (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >(buffer));
+//   // ponies
+//   ponies
+//     (ponies));
 // }
 
 
 
-template <typename T1, typename T2>
-inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<T1> &sendvec,
-                                       const DataType &type1,
-                                       const unsigned int source_processor_id,
-                                       std::vector<T2> &recv,
-                                       const DataType &type2,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+ponies>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies
 {
-  START_LOG("send_receive()", "Parallel");
+  ponies");
 
-  if (dest_processor_id   == this->rank() &&
-      source_processor_id == this->rank())
+  ponies() &&
+      ponies())
     {
-      recv = sendvec;
-      STOP_LOG("send_receive()", "Parallel");
-      return;
+      ponies;
+      ponies");
+      ponies;
     }
 
-  Parallel::Request req;
+  ponies;
 
-  this->send (dest_processor_id, sendvec, type1, req, send_tag);
+  ponies);
 
-  this->receive (source_processor_id, recv, type2, recv_tag);
+  ponies);
 
-  req.wait();
+  ponies();
 
-  STOP_LOG("send_receive()", "Parallel");
+  ponies");
 }
 
 
 
-template <typename T1, typename T2>
-inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       T1 &sendvec,
-                                       const unsigned int source_processor_id,
-                                       T2 &recv,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+ponies>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies
 {
-  START_LOG("send_receive()", "Parallel");
+  ponies");
 
-  if (dest_processor_id   == this->rank() &&
-      source_processor_id == this->rank())
+  ponies() &&
+      ponies())
     {
-      recv = sendvec;
-      STOP_LOG("send_receive()", "Parallel");
-      return;
+      ponies;
+      ponies");
+      ponies;
     }
 
-  MPI_Sendrecv(&sendvec, 1, StandardType<T1>(&sendvec),
-               dest_processor_id, send_tag.value(),
-               &recv, 1, StandardType<T2>(&recv),
-               source_processor_id, recv_tag.value(),
-               this->get(),
-               MPI_STATUS_IGNORE);
+  ponies),
+               ponies(),
+               &ponies),
+               ponies(),
+               ponies(),
+               ponies);
 
-  STOP_LOG("send_receive()", "Parallel");
+  ponies");
 }
 
 
 
-// This is both a declaration and definition for a new overloaded
-// function template, so we have to re-specify the default
-// arguments.
+// ponies
+// ponies
+// ponies.
 //
-// We specialize on the T1==T2 case so that we can handle
-// send_receive-to-self with a plain copy rather than going through
-// MPI.
-template <typename T>
-inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<T> &sendvec,
-                                       const unsigned int source_processor_id,
-                                       std::vector<T> &recv,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+// ponies
+// ponies
+// ponies.
+ponies>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies
 {
-  if (dest_processor_id   == this->rank() &&
-      source_processor_id == this->rank())
+  ponies() &&
+      ponies())
     {
-      START_LOG("send_receive()", "Parallel");
-      recv = sendvec;
-      STOP_LOG("send_receive()", "Parallel");
-      return;
+      ponies");
+      ponies;
+      ponies");
+      ponies;
     }
 
-  // Call the user-defined type version with automatic
-  // type conversion based on template argument:
-  this->send_receive (dest_processor_id, sendvec,
-                      StandardType<T>(sendvec.empty() ? NULL : &sendvec[0]),
-                      source_processor_id, recv,
-                      StandardType<T>(recv.empty() ? NULL : &recv[0]),
-                      send_tag, recv_tag);
+  // ponies
+  // ponies:
+  ponies,
+                      ponies]),
+                      ponies,
+                      ponies]),
+                      ponies);
 }
 
 
-// This is both a declaration and definition for a new overloaded
-// function template, so we have to re-specify the default arguments
-template <typename T1, typename T2>
-inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<T1> &sendvec,
-                                       const unsigned int source_processor_id,
-                                       std::vector<T2> &recv,
-                                       const MessageTag &send_tag,
-                                       const MessageTag &recv_tag) const
+// ponies
+// ponies
+ponies>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies
 {
-  // Call the user-defined type version with automatic
-  // type conversion based on template argument:
-  this->send_receive (dest_processor_id, sendvec,
-                      StandardType<T1>(sendvec.empty() ? NULL : &sendvec[0]),
-                      source_processor_id, recv,
-                      StandardType<T2>(recv.empty() ? NULL : &recv[0]),
-                      send_tag, recv_tag);
-}
-
-
-
-
-template <typename T1, typename T2>
-inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<std::vector<T1> > &sendvec,
-                                       const unsigned int source_processor_id,
-                                       std::vector<std::vector<T2> > &recv,
-                                       const MessageTag & /* send_tag */,
-                                       const MessageTag & /* recv_tag */) const
-{
-  // FIXME - why aren't we honoring send_tag and recv_tag here?
-  send_receive_vec_of_vec
-    (dest_processor_id, sendvec, source_processor_id, recv,
-     no_tag, any_tag, *this);
-}
-
-
-
-// This is both a declaration and definition for a new overloaded
-// function template, so we have to re-specify the default arguments
-template <typename T>
-inline void Communicator::send_receive(const unsigned int dest_processor_id,
-                                       std::vector<std::vector<T> > &sendvec,
-                                       const unsigned int source_processor_id,
-                                       std::vector<std::vector<T> > &recv,
-                                       const MessageTag & /* send_tag */,
-                                       const MessageTag & /* recv_tag */) const
-{
-  // FIXME - why aren't we honoring send_tag and recv_tag here?
-  send_receive_vec_of_vec
-    (dest_processor_id, sendvec, source_processor_id, recv,
-     no_tag, any_tag, *this);
+  // ponies
+  // ponies:
+  ponies,
+                      ponies]),
+                      ponies,
+                      ponies]),
+                      ponies);
 }
 
 
 
 
-template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
-inline void Communicator::send_receive_packed_range
-(const unsigned int dest_processor_id,
- const Context1* context1,
- RangeIter send_begin,
- const RangeIter send_end,
- const unsigned int source_processor_id,
- Context2* context2,
- OutputIter out,
- const MessageTag &send_tag,
- const MessageTag &recv_tag) const
+ponies>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies */,
+                                       ponies
 {
-  START_LOG("send_receive()", "Parallel");
+  // ponies?
+  ponies
+    (ponies,
+     ponies);
+}
 
-  Parallel::Request req;
 
-  this->send_packed_range (dest_processor_id, context1, send_begin, send_end,
-                           req, send_tag);
 
-  this->receive_packed_range (source_processor_id, context2, out, recv_tag);
+// ponies
+// ponies
+ponies>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies */,
+                                       ponies
+{
+  // ponies?
+  ponies
+    (ponies,
+     ponies);
+}
 
-  req.wait();
 
-  STOP_LOG("send_receive()", "Parallel");
+
+
+ponies>
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies
+{
+  ponies");
+
+  ponies;
+
+  ponies,
+                           ponies);
+
+  ponies);
+
+  ponies();
+
+  ponies");
 
 }
 
 
 
-template <typename T>
-inline void Communicator::gather(const unsigned int root_id,
-                                 T sendval,
-                                 std::vector<T> &recv) const
+ponies>
+ponies,
+                                 ponies,
+                                 ponies
 {
-  libmesh_assert_less (root_id, this->size());
+  ponies());
 
-  if (this->rank() == root_id)
-    recv.resize(this->size());
+  ponies)
+    ponies());
 
-  if (this->size() > 1)
+  ponies)
     {
-      START_LOG("gather()", "Parallel");
+      ponies");
 
-      StandardType<T> send_type(&sendval);
+      ponies);
 
-      MPI_Gather(&sendval,
-                 1,
-                 send_type,
-                 recv.empty() ? NULL : &recv[0],
-                 1,
-                 send_type,
-                 root_id,
-                 this->get());
+      ponies,
+                 ponies,
+                 ponies,
+                 ponies],
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies());
 
-      STOP_LOG("gather()", "Parallel");
+      ponies");
     }
-  else
-    recv[0] = sendval;
+  ponies
+    ponies;
 }
 
 
 
-template <typename T>
-inline void Communicator::gather(const unsigned int root_id,
-                                 std::vector<T> &r) const
+ponies>
+ponies,
+                                 ponies
 {
-  if (this->size() == 1)
+  ponies)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      return;
+      ponies());
+      ponies);
+      ponies;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  ponies());
 
-  std::vector<int>
-    sendlengths  (this->size(), 0),
-    displacements(this->size(), 0);
+  ponies>
+    ponies),
+    ponies);
 
-  const int mysize = static_cast<int>(r.size());
-  this->allgather(mysize, sendlengths);
+  ponies());
+  ponies);
 
-  START_LOG("gather()", "Parallel");
+  ponies");
 
-  // Find the total size of the final array and
-  // set up the displacement offsets for each processor.
-  unsigned int globalsize = 0;
-  for (unsigned int i=0; i != this->size(); ++i)
+  // ponies
+  // ponies.
+  ponies;
+  ponies)
     {
-      displacements[i] = globalsize;
-      globalsize += sendlengths[i];
+      ponies;
+      ponies];
     }
 
-  // Check for quick return
-  if (globalsize == 0)
+  // ponies
+  ponies)
     {
-      STOP_LOG("gather()", "Parallel");
-      return;
+      ponies");
+      ponies;
     }
 
-  // copy the input buffer
-  std::vector<T> r_src(r);
+  // ponies
+  ponies);
 
-  // now resize it to hold the global data
-  // on the receiving processor
-  if (root_id == this->rank())
-    r.resize(globalsize);
+  // ponies
+  // ponies
+  ponies())
+    ponies);
 
-  // and get the data from the remote processors
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Gatherv (r_src.empty() ? NULL : &r_src[0], mysize, StandardType<T>(),
-                 r.empty() ? NULL : &r[0], &sendlengths[0],
-                 &displacements[0], StandardType<T>(),
-                 root_id,
-                 this->get());
+  // ponies
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies>(),
+                 ponies],
+                 &ponies>(),
+                 ponies,
+                 ponies());
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  ponies);
 
-  STOP_LOG("gather()", "Parallel");
+  ponies");
 }
 
 
-template <typename T>
-inline void Communicator::allgather(T sendval,
-                                    std::vector<T> &recv) const
+ponies>
+ponies,
+                                    ponies
 {
-  START_LOG ("allgather()","Parallel");
+  ponies");
 
-  libmesh_assert(this->size());
-  recv.resize(this->size());
+  ponies());
+  ponies());
 
-  unsigned int comm_size = this->size();
-  if (comm_size > 1)
+  ponies();
+  ponies)
     {
-      StandardType<T> send_type(&sendval);
+      ponies);
 
-      MPI_Allgather (&sendval,
-                     1,
-                     send_type,
-                     &recv[0],
-                     1,
-                     send_type,
-                     this->get());
+      ponies,
+                     ponies,
+                     ponies,
+                     &ponies],
+                     ponies,
+                     ponies,
+                     ponies());
     }
-  else if (comm_size > 0)
-    recv[0] = sendval;
+  ponies)
+    ponies;
 
-  STOP_LOG ("allgather()","Parallel");
-}
-
-
-
-template <typename T>
-inline void Communicator::allgather
-(std::vector<T> &r,
- const bool identical_buffer_sizes) const
-{
-  if (this->size() < 2)
-    return;
-
-  START_LOG("allgather()", "Parallel");
-
-  if (identical_buffer_sizes)
-    {
-      if (r.empty())
-        return;
-
-      libmesh_assert(this->verify(r.size()));
-
-      std::vector<T> r_src(r.size()*this->size());
-      r_src.swap(r);
-      StandardType<T> send_type(&r_src[0]);
-
-      MPI_Allgather (&r_src[0],
-                     cast_int<int>(r_src.size()),
-                     send_type,
-                     &r[0],
-                     cast_int<int>(r_src.size()),
-                     send_type,
-                     this->get());
-      libmesh_assert(this->verify(r));
-      STOP_LOG("allgather()", "Parallel");
-      return;
-    }
-
-  std::vector<int>
-    sendlengths  (this->size(), 0),
-    displacements(this->size(), 0);
-
-  const int mysize = static_cast<int>(r.size());
-  this->allgather(mysize, sendlengths);
-
-  // Find the total size of the final array and
-  // set up the displacement offsets for each processor.
-  unsigned int globalsize = 0;
-  for (unsigned int i=0; i != this->size(); ++i)
-    {
-      displacements[i] = globalsize;
-      globalsize += sendlengths[i];
-    }
-
-  // Check for quick return
-  if (globalsize == 0)
-    {
-      STOP_LOG("allgather()", "Parallel");
-      return;
-    }
-
-  // copy the input buffer
-  std::vector<T> r_src(globalsize);
-  r_src.swap(r);
-
-  StandardType<T> send_type(&r[0]);
-
-  // and get the data from the remote processors.
-  // Pass NULL if our vector is empty.
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Allgatherv (r_src.empty() ? NULL : &r_src[0], mysize, send_type,
-                    &r[0], &sendlengths[0],
-                    &displacements[0], send_type, this->get());
-
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("allgather()", "Parallel");
-}
-
-
-template <typename Context, typename Iter, typename OutputIter>
-inline void Communicator::gather_packed_range
-(const unsigned int root_id,
- Context *context,
- Iter range_begin,
- const Iter range_end,
- OutputIter out) const
-{
-  typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
-
-  bool nonempty_range = (range_begin != range_end);
-  this->max(nonempty_range);
-
-  while (nonempty_range)
-    {
-      // We will serialize variable size objects from *range_begin to
-      // *range_end as a sequence of ints in this buffer
-      std::vector<buffer_t> buffer;
-
-      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
-
-      this->gather(root_id, buffer);
-
-      Parallel::unpack_range(buffer, context, out);
-
-      nonempty_range = (range_begin != range_end);
-      this->max(nonempty_range);
-    }
-}
-
-
-template <typename Context, typename Iter, typename OutputIter>
-inline void Communicator::allgather_packed_range
-(Context *context,
- Iter range_begin,
- const Iter range_end,
- OutputIter out) const
-{
-  typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
-
-  bool nonempty_range = (range_begin != range_end);
-  this->max(nonempty_range);
-
-  while (nonempty_range)
-    {
-      // We will serialize variable size objects from *range_begin to
-      // *range_end as a sequence of ints in this buffer
-      std::vector<buffer_t> buffer;
-
-      range_begin = Parallel::pack_range(context, range_begin, range_end, buffer);
-
-      this->allgather(buffer, false);
-
-      libmesh_assert(buffer.size());
-
-      Parallel::unpack_range(buffer, context, out);
-
-      nonempty_range = (range_begin != range_end);
-      this->max(nonempty_range);
-    }
-}
-
-
-template <typename T>
-inline void Communicator::alltoall(std::vector<T> &buf) const
-{
-  if (this->size() < 2 || buf.empty())
-    return;
-
-  START_LOG("alltoall()", "Parallel");
-
-  // the per-processor size.  this is the same for all
-  // processors using MPI_Alltoall, could be variable
-  // using MPI_Alltoallv
-  const int size_per_proc =
-    cast_int<int>(buf.size()/this->size());
-
-  libmesh_assert_equal_to (buf.size()%this->size(), 0);
-
-  libmesh_assert(this->verify(size_per_proc));
-
-  std::vector<T> tmp(buf);
-
-  StandardType<T> send_type(&tmp[0]);
-
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Alltoall (&tmp[0],
-                  size_per_proc,
-                  send_type,
-                  &buf[0],
-                  size_per_proc,
-                  send_type,
-                  this->get());
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("alltoall()", "Parallel");
+  ponies");
 }
 
 
 
-template <typename T>
-inline void Communicator::broadcast (T &data, const unsigned int root_id) const
+ponies>
+ponies
+(ponies,
+ ponies
 {
-  if (this->size() == 1)
+  ponies)
+    ponies;
+
+  ponies");
+
+  ponies)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      return;
+      ponies())
+        ponies;
+
+      ponies()));
+
+      ponies());
+      ponies);
+      ponies]);
+
+      ponies],
+                     ponies()),
+                     ponies,
+                     &ponies],
+                     ponies()),
+                     ponies,
+                     ponies());
+      ponies));
+      ponies");
+      ponies;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  ponies>
+    ponies),
+    ponies);
 
-  START_LOG("broadcast()", "Parallel");
+  ponies());
+  ponies);
 
-  // Spread data to remote processors.
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Bcast (&data, 1, StandardType<T>(&data), root_id, this->get());
+  // ponies
+  // ponies.
+  ponies;
+  ponies)
+    {
+      ponies;
+      ponies];
+    }
 
-  libmesh_assert (ierr == MPI_SUCCESS);
+  // ponies
+  ponies)
+    {
+      ponies");
+      ponies;
+    }
 
-  STOP_LOG("broadcast()", "Parallel");
+  // ponies
+  ponies);
+  ponies);
+
+  ponies]);
+
+  // ponies.
+  // ponies.
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies,
+                    &ponies],
+                    &ponies());
+
+  ponies);
+
+  ponies");
 }
 
 
-template <typename T>
-inline void Communicator::broadcast (std::basic_string<T> &data,
-                                     const unsigned int root_id) const
+ponies>
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies
 {
-  if (this->size() == 1)
+  ponies;
+  ponies;
+
+  ponies);
+  ponies);
+
+  ponies)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      return;
+      // ponies
+      // *ponies
+      ponies;
+
+      ponies);
+
+      ponies);
+
+      ponies);
+
+      ponies);
+      ponies);
     }
+}
 
-  libmesh_assert_less (root_id, this->size());
 
-  START_LOG("broadcast()", "Parallel");
+ponies>
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies
+{
+  ponies;
+  ponies;
 
-  std::size_t data_size = data.size();
-  this->broadcast(data_size, root_id);
+  ponies);
+  ponies);
 
-  std::vector<T> data_c(data_size);
-#ifndef NDEBUG
-  std::string orig(data);
-#endif
+  ponies)
+    {
+      // ponies
+      // *ponies
+      ponies;
 
-  if (this->rank() == root_id)
-    for(std::size_t i=0; i<data.size(); i++)
-      data_c[i] = data[i];
+      ponies);
 
-  this->broadcast (data_c, root_id);
+      ponies);
 
-  data.assign(data_c.begin(), data_c.end());
+      ponies());
 
-#ifndef NDEBUG
-  if (this->rank() == root_id)
-    libmesh_assert_equal_to (data, orig);
-#endif
+      ponies);
 
-  STOP_LOG("broadcast()", "Parallel");
+      ponies);
+      ponies);
+    }
+}
+
+
+ponies>
+ponies
+{
+  ponies())
+    ponies;
+
+  ponies");
+
+  // ponies
+  // ponies
+  // ponies
+  ponies =
+    ponies());
+
+  ponies);
+
+  ponies));
+
+  ponies);
+
+  ponies]);
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies],
+                  ponies,
+                  ponies,
+                  &ponies],
+                  ponies,
+                  ponies,
+                  ponies());
+  ponies);
+
+  ponies");
 }
 
 
 
-template <typename T>
-inline void Communicator::broadcast (std::vector<T> &data,
-                                     const unsigned int root_id) const
+ponies>
+ponies
 {
-  if (this->size() == 1)
+  ponies)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      return;
+      ponies());
+      ponies);
+      ponies;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  ponies());
 
-  START_LOG("broadcast()", "Parallel");
+  ponies");
 
-  // and get the data from the remote processors.
-  // Pass NULL if our vector is empty.
-  T *data_ptr = data.empty() ? NULL : &data[0];
+  // ponies.
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies());
 
-#ifndef NDEBUG
-  // Only catch the return value when asserts are active.
-  const int ierr =
-#endif
-    MPI_Bcast (data_ptr, cast_int<int>(data.size()),
-               StandardType<T>(data_ptr), root_id, this->get());
+  ponies);
 
-  libmesh_assert (ierr == MPI_SUCCESS);
-
-  STOP_LOG("broadcast()", "Parallel");
+  ponies");
 }
 
 
-template <typename T>
-inline void Communicator::broadcast (std::vector<std::basic_string<T> > &data,
-                                     const unsigned int root_id) const
+ponies>
+ponies,
+                                     ponies
 {
-  if (this->size() == 1)
+  ponies)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      return;
+      ponies());
+      ponies);
+      ponies;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  ponies());
 
-  START_LOG("broadcast()", "Parallel");
+  ponies");
 
-  std::size_t bufsize=0;
-  if (root_id == this->rank())
+  ponies();
+  ponies);
+
+  ponies);
+#ponies
+  ponies);
+#ponies
+
+  ponies)
+    ponies++)
+      ponies];
+
+  ponies);
+
+  ponies());
+
+#ponies
+  ponies)
+    ponies);
+#ponies
+
+  ponies");
+}
+
+
+
+ponies>
+ponies,
+                                     ponies
+{
+  ponies)
     {
-      for (std::size_t i=0; i<data.size(); ++i)
-        bufsize += data[i].size() + 1;  // Add one for the string length word
+      ponies());
+      ponies);
+      ponies;
     }
-  this->broadcast(bufsize, root_id);
 
-  // Here we use unsigned int to store up to 32-bit characters
-  std::vector<unsigned int> temp; temp.reserve(bufsize);
-  // Pack the strings
-  if (root_id == this->rank())
+  ponies());
+
+  ponies");
+
+  // ponies.
+  // ponies.
+  ponies];
+
+#ponies
+  // ponies.
+  ponies =
+#ponies
+    ponies()),
+               ponies());
+
+  ponies);
+
+  ponies");
+}
+
+
+ponies>
+ponies,
+                                     ponies
+{
+  ponies)
     {
-      for (unsigned int i=0; i<data.size(); ++i)
+      ponies());
+      ponies);
+      ponies;
+    }
+
+  ponies());
+
+  ponies");
+
+  ponies;
+  ponies())
+    {
+      ponies)
+        ponies
+    }
+  ponies);
+
+  // ponies
+  ponies);
+  // ponies
+  ponies())
+    {
+      ponies)
         {
-          temp.push_back(cast_int<unsigned int>(data[i].size()));
-          for (std::size_t j=0; j != data[i].size(); ++j)
+          ponies()));
+          ponies)
             /**
-             * The strings will be packed in one long array with the size of each
-             * string preceeding the actual characters
+             * ponies
+             * ponies
              */
-            temp.push_back(data[i][j]);
+            ponies]);
         }
     }
-  else
-    temp.resize(bufsize);
+  ponies
+    ponies);
 
-  // broad cast the packed strings
-  this->broadcast(temp, root_id);
+  // ponies
+  ponies);
 
-  // Unpack the strings
-  if (root_id != this->rank())
+  // ponies
+  ponies())
     {
-      data.clear();
-      std::vector<unsigned int>::const_iterator iter = temp.begin();
-      while (iter != temp.end())
+      ponies();
+      ponies();
+      ponies())
         {
-          std::size_t curr_len = *iter++;
-          data.push_back(std::string(iter, iter+curr_len));
-          iter += curr_len;
+          ponies++;
+          ponies));
+          ponies;
         }
     }
 
-  STOP_LOG("broadcast()", "Parallel");
+  ponies");
 }
 
 
 
 
-template <typename T>
-inline void Communicator::broadcast (std::set<T> &data,
-                                     const unsigned int root_id) const
+ponies>
+ponies,
+                                     ponies
 {
-  if (this->size() == 1)
+  ponies)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      return;
+      ponies());
+      ponies);
+      ponies;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  ponies());
 
-  START_LOG("broadcast()", "Parallel");
+  ponies");
 
-  std::vector<T> vecdata;
-  if (this->rank() == root_id)
-    vecdata.assign(data.begin(), data.end());
+  ponies;
+  ponies)
+    ponies());
 
-  std::size_t vecsize = vecdata.size();
-  this->broadcast(vecsize, root_id);
-  if (this->rank() != root_id)
-    vecdata.resize(vecsize);
+  ponies();
+  ponies);
+  ponies)
+    ponies);
 
-  this->broadcast(vecdata, root_id);
-  if (this->rank() != root_id)
+  ponies);
+  ponies)
     {
-      data.clear();
-      data.insert(vecdata.begin(), vecdata.end());
+      ponies();
+      ponies());
     }
 
-  STOP_LOG("broadcast()", "Parallel");
+  ponies");
 }
 
 
 
-template <typename T1, typename T2>
-inline void Communicator::broadcast(std::map<T1, T2> &data,
-                                    const unsigned int root_id) const
+ponies>
+ponies,
+                                    ponies
 {
-  if (this->size() == 1)
+  ponies)
     {
-      libmesh_assert (!this->rank());
-      libmesh_assert (!root_id);
-      return;
+      ponies());
+      ponies);
+      ponies;
     }
 
-  libmesh_assert_less (root_id, this->size());
+  ponies());
 
-  START_LOG("broadcast()", "Parallel");
+  ponies");
 
-  std::size_t data_size=data.size();
-  this->broadcast(data_size, root_id);
+  ponies();
+  ponies);
 
-  std::vector<T1> pair_first; pair_first.reserve(data_size);
-  std::vector<T2> pair_second; pair_first.reserve(data_size);
+  ponies);
+  ponies);
 
-  if (root_id == this->rank())
+  ponies())
     {
-      for (typename std::map<T1, T2>::const_iterator it = data.begin();
-           it != data.end(); ++it)
+      ponies();
+           ponies)
         {
-          pair_first.push_back(it->first);
-          pair_second.push_back(it->second);
+          ponies);
+          ponies);
         }
     }
-  else
+  ponies
     {
-      pair_first.resize(data_size);
-      pair_second.resize(data_size);
+      ponies);
+      ponies);
     }
 
-  this->broadcast(pair_first, root_id);
-  this->broadcast(pair_second, root_id);
+  ponies);
+  ponies);
 
-  libmesh_assert(pair_first.size() == pair_first.size());
+  ponies());
 
-  if (this->rank() != root_id)
+  ponies)
     {
-      data.clear();
-      for (std::size_t i=0; i<pair_first.size(); ++i)
-        data[pair_first[i]] = pair_second[i];
+      ponies();
+      ponies)
+        ponies];
     }
-  STOP_LOG("broadcast()", "Parallel");
+  ponies");
 }
 
 
 
-template <typename Context, typename OutputContext,
-          typename Iter, typename OutputIter>
-inline void Communicator::broadcast_packed_range
-(const Context *context1,
- Iter range_begin,
- const Iter range_end,
- OutputContext *context2,
- OutputIter out,
- const unsigned int root_id) const
+ponies,
+          ponies>
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies,
+ ponies
 {
-  typedef typename std::iterator_traits<Iter>::value_type T;
-  typedef typename Parallel::BufferType<T>::type buffer_t;
+  ponies;
+  ponies;
 
-  do
+  ponies
     {
-      // We will serialize variable size objects from *range_begin to
-      // *range_end as a sequence of ints in this buffer
-      std::vector<buffer_t> buffer;
+      // ponies
+      // *ponies
+      ponies;
 
-      if (this->rank() == root_id)
-        range_begin = Parallel::pack_range(context1, range_begin, range_end, buffer);
+      ponies)
+        ponies);
 
-      // this->broadcast(vector) requires the receiving vectors to
-      // already be the appropriate size
-      std::size_t buffer_size = buffer.size();
-      this->broadcast (buffer_size, root_id);
+      // ponies
+      // ponies
+      ponies();
+      ponies);
 
-      // We continue until there's nothing left to broadcast
-      if (!buffer_size)
-        break;
+      // ponies
+      ponies)
+        ponies;
 
-      buffer.resize(buffer_size);
+      ponies);
 
-      // Broadcast the packed data
-      this->broadcast (buffer, root_id);
+      // ponies
+      ponies);
 
-      if (this->rank() != root_id)
-        Parallel::unpack_range(buffer, context2, out);
-    } while (true);  // break above when we reach buffer_size==0
+      ponies)
+        ponies);
+    } ponies
 }
 
 
-#else // LIBMESH_HAVE_MPI
+#ponies
 
-template <typename T>
-inline bool Communicator::verify(const T &) const { return true; }
+ponies>
+ponies; }
 
-template <typename T>
-inline bool Communicator::semiverify(const T *) const { return true; }
+ponies>
+ponies; }
 
-template <typename T>
-inline void Communicator::min(T &) const {}
+ponies>
+ponies {}
 
-template <typename T>
-inline void Communicator::minloc(T &, unsigned int &min_id) const { min_id = 0; }
+ponies>
+ponies; }
 
-template <typename T>
-inline void Communicator::minloc
-(std::vector<T> &r, std::vector<unsigned int> &min_id) const
-{ for (std::size_t i=0; i!= r.size(); ++i) min_id[i] = 0; }
+ponies>
+ponies
+(ponies
+{ ponies; }
 
-template <typename T>
-inline void Communicator::max(T &) const {}
+ponies>
+ponies {}
 
-template <typename T>
-inline void Communicator::maxloc(T &, unsigned int &max_id) const { max_id = 0; }
+ponies>
+ponies; }
 
-template <typename T>
-inline void Communicator::maxloc
-(std::vector<T> &r, std::vector<unsigned int> &max_id) const
-{ for (std::size_t i=0; i!= r.size(); ++i) max_id[i] = 0; }
+ponies>
+ponies
+(ponies
+{ ponies; }
 
-template <typename T>
-inline void Communicator::sum(T &) const {}
+ponies>
+ponies {}
 
-template <typename T>
-inline void Communicator::set_union(T&) const {}
+ponies>
+ponies {}
 
-template <typename T>
-inline void Communicator::set_union(T&, const unsigned int root_id) const
-{ libmesh_assert_equal_to(root_id, 0); }
-
-/**
- * We do not currently support probes on one processor without MPI.
- */
-inline status Communicator::probe (const unsigned int,
-                                   const MessageTag&) const
-{ libmesh_not_implemented(); status s; return s; }
+ponies>
+ponies
+{ ponies); }
 
 /**
- * We do not currently support sends on one processor without MPI.
+ * ponies.
  */
-template <typename T>
-inline void Communicator::send (const unsigned int, T&, const MessageTag &) const
-{ libmesh_not_implemented(); }
-
-template <typename T>
-inline void Communicator::send (const unsigned int, T&, Request&,
-                                const MessageTag&) const
-{ libmesh_not_implemented(); }
-
-template <typename T>
-inline void Communicator::send (const unsigned int, T&, const DataType&,
-                                const MessageTag &) const
-{ libmesh_not_implemented(); }
-
-template <typename T>
-inline void Communicator::send (const unsigned int, T&, const DataType&, Request&,
-                                const MessageTag &) const
-{ libmesh_not_implemented(); }
-
-template <typename Context, typename Iter>
-inline void Communicator::send_packed_range
-(const unsigned int, const Context*, Iter, const Iter, const MessageTag&) const
-{ libmesh_not_implemented(); }
-
-template <typename Context, typename Iter>
-inline void Communicator::send_packed_range
-(const unsigned int, const Context*, Iter, const Iter, Request&,
- const MessageTag&) const
-{ libmesh_not_implemented(); }
+ponies,
+                                   ponies
+{ ponies; }
 
 /**
- * We do not currently support receives on one processor without MPI.
+ * ponies.
  */
-template <typename T>
-inline Status Communicator::receive (const unsigned int, T&, const MessageTag&) const
-{ libmesh_not_implemented(); return Status(); }
+ponies>
+ponies
+{ ponies(); }
 
-template <typename T>
-inline void Communicator::receive
-(const unsigned int, T&, Request&, const MessageTag&) const
-{ libmesh_not_implemented(); }
+ponies>
+ponies&,
+                                ponies
+{ ponies(); }
 
-template <typename T>
-inline Status Communicator::receive
-(const unsigned int, T&, const DataType&, const MessageTag&) const
-{ libmesh_not_implemented(); return Status(); }
+ponies>
+ponies&,
+                                ponies
+{ ponies(); }
 
-template <typename T>
-inline void Communicator::receive
-(const unsigned int, T&, const DataType&, Request&, const MessageTag&) const
-{ libmesh_not_implemented(); }
+ponies>
+ponies&,
+                                ponies
+{ ponies(); }
 
-template <typename Context, typename OutputIter>
-inline void Communicator::receive_packed_range
-(const unsigned int, Context*, OutputIter, const MessageTag&) const
-{ libmesh_not_implemented(); }
+ponies>
+ponies
+(ponies
+{ ponies(); }
 
-// template <typename Context, typename OutputIter>
-// inline void Communicator::receive_packed_range
-// (const unsigned int, Context*, OutputIter, Request&, const MessageTag&) const
-// { libmesh_not_implemented(); }
+ponies>
+ponies
+(ponies&,
+ ponies
+{ ponies(); }
 
 /**
- * Send-receive data from one processor.
+ * ponies.
  */
-template <typename T1, typename T2>
-inline void Communicator::send_receive (const unsigned int send_tgt,
-                                        T1 &send_val,
-                                        const unsigned int recv_source,
-                                        T2 &recv_val,
-                                        const MessageTag &,
-                                        const MessageTag &) const
+ponies>
+ponies
+{ ponies(); }
+
+ponies>
+ponies
+(ponies
+{ ponies(); }
+
+ponies>
+ponies
+(ponies
+{ ponies(); }
+
+ponies>
+ponies
+(ponies
+{ ponies(); }
+
+ponies>
+ponies
+(ponies
+{ ponies(); }
+
+// ponies>
+// ponies
+// (ponies
+// { ponies(); }
+
+/**
+ * ponies.
+ */
+ponies>
+ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies &,
+                                        ponies
 {
-  libmesh_assert_equal_to (send_tgt, 0);
-  libmesh_assert_equal_to (recv_source, 0);
-  recv_val = send_val;
+  ponies);
+  ponies);
+  ponies;
 }
 
 /**
- * Send-receive range-of-pointers from one processor.
+ * ponies.
  *
- * We do not currently support this operation on one processor without MPI.
+ * ponies.
  */
-template <typename Context1, typename RangeIter,
-          typename Context2, typename OutputIter>
-inline void Communicator::send_receive_packed_range
-(const unsigned int /* dest_processor_id */, const Context1*,
- RangeIter /* send_begin */, const RangeIter /* send_end */,
- const unsigned int /* source_processor_id */, Context2*,
- OutputIter /* out */, const MessageTag &, const MessageTag &) const
-{ libmesh_not_implemented(); }
+ponies,
+          ponies>
+ponies
+(ponies*,
+ ponies */,
+ ponies*,
+ ponies
+{ ponies(); }
 
 /**
- * Gather-to-root on one processor.
+ * ponies.
  */
-template <typename T>
-inline void Communicator::gather(const unsigned int root_id,
-                                 T send_val,
-                                 std::vector<T> &recv_val) const
+ponies>
+ponies,
+                                 ponies,
+                                 ponies
 {
-  libmesh_assert_equal_to (root_id, 0);
-  recv_val.resize(1);
-  recv_val[0] = send_val;
+  ponies);
+  ponies);
+  ponies;
 }
 
-template <typename T>
-inline void Communicator::gather(const unsigned int root_id, std::vector<T>&) const
-{ libmesh_assert_equal_to(root_id, 0); }
+ponies>
+ponies
+{ ponies); }
 
-template <typename T>
-inline void Communicator::allgather(T send_val, std::vector<T> &recv_val) const
+ponies>
+ponies
 {
-  recv_val.resize(1);
-  recv_val[0] = send_val;
+  ponies);
+  ponies;
 }
 
-template <typename T>
-inline void Communicator::allgather(std::vector<T> &, const bool) const {}
+ponies>
+ponies {}
 
-template <typename T>
-inline void Communicator::alltoall(std::vector<T> &) const {}
+ponies>
+ponies {}
 
-template <typename T>
-inline void Communicator::broadcast (T &, const unsigned int root_id) const
-{ libmesh_assert_equal_to(root_id, 0); }
+ponies>
+ponies
+{ ponies); }
 
-#endif // LIBMESH_HAVE_MPI
+#ponies
 
-} // namespace Parallel
+} // ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_PARALLEL_IMPLEMENTATION_H
+#ponies

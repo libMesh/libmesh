@@ -1,70 +1,70 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ELEM_TYPE_H
-#define LIBMESH_ELEM_TYPE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/enum_elem_type.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <string>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
-// A namespace for element type utility
-// functions.  Similar to the one used
-// in elem_quality.h
-namespace ElementTypes
+// ponies
+// ponies
+// ponies
+ponies
 {
 /**
- * The number of element types that are
- * defined (INVALD_ELEM excluded).
- * You might have to update this
- * if you add a new one!
+ * ponies
+ * ponies).
+ * ponies
+ * ponies!
  */
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-const unsigned int num_types = 24;
-#else
-const unsigned int num_types = 16;
-#endif
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
 
 /**
- * Returns a standard string representation
- * of the basic name for element type t.
- * For example, a HEX27 has the basic name
- * of "Hexahedron".
+ * ponies
+ * ponies.
+ * ponies
+ * ponies".
  */
-std::string basic_name (const ElemType t);
+ponies);
 
 /**
- * Returns a standard string representation
- * for the specific name of element type t.
- * For example, HEX27 returns "Hex 27".
+ * ponies
+ * ponies.
+ * ponies".
  */
-std::string name (const ElemType t);
+ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_ELEM_TYPE_H
+#ponies

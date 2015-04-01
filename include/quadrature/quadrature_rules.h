@@ -1,73 +1,73 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_QUADRATURE_RULES_H
-#define LIBMESH_QUADRATURE_RULES_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/enum_quadrature_type.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <string>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * A namespace for utility functions for
- * quadrature rules.
+ * ponies
+ * ponies.
  */
-namespace QuadratureRules
+ponies
 {
 
 /**
- * The number of quadrature rules that
- * are defined (INVALD_Q_RULE excluded).
- * You might have to update this if you
- * add a new one!
+ * ponies
+ * ponies).
+ * ponies
+ * ponies!
  */
-const unsigned int num_rules = 5;
+ponies;
 
 /**
- * The types of quadrature rules that may
- * be used for numerical integration
- * over geometric entities.
+ * ponies
+ * ponies
+ * ponies.
  */
-const QuadratureType valid_elem_rules[] = {QGAUSS,
-                                           QSIMPSON,
-                                           QTRAP};
+ponies,
+                                           ponies,
+                                           ponies};
 
 /**
- * The number of valid quadrature rules for
- * numerical integration over geometric entities.
+ * ponies
+ * ponies.
  */
-const unsigned int num_valid_elem_rules = 3;
+ponies;
 
 
 /**
- * Returns a standard string representation
- * for the specific quadrature rule.
+ * ponies
+ * ponies.
  */
-std::string name (const QuadratureType t);
+ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_QUADRATURE_RULES_H
+#ponies

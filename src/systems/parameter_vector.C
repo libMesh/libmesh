@@ -1,127 +1,127 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ Includes   -----------------------------------
+// ponies   -----------------------------------
 
-// Local Includes -----------------------------------
-#include "libmesh/parameter_vector.h"
+// ponies -----------------------------------
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// ParameterVector implementation
+// ponies
 
 
 
-void ParameterVector::deep_copy(ParameterVector &target) const
+ponies
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
-  target.clear();
-  target._params.resize(Np);
-  target._my_data.resize(Np);
-  for (unsigned int i=0; i != Np; ++i)
+  ponies>
+    (ponies());
+  ponies();
+  ponies);
+  ponies);
+  ponies)
     {
-      target._params[i] =
-        new ParameterPointer<Number>(&target._my_data[i]);
-      target._my_data[i] = *(*this)[i];
+      ponies] =
+        ponies]);
+      ponies];
     }
 }
 
 
 
-void ParameterVector::shallow_copy(ParameterVector &target) const
+ponies
 {
-  target._my_data.clear();
-  target._params = this->_params;
-  target._is_shallow_copy = true;
+  ponies();
+  ponies;
+  ponies;
 }
 
 
 
-void ParameterVector::value_copy(ParameterVector &target) const
+ponies
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
-  libmesh_assert_equal_to (target._params.size(), Np);
+  ponies>
+    (ponies());
+  ponies);
 
-  for (unsigned int i=0; i != Np; ++i)
-    *target[i] = *(*this)[i];
+  ponies)
+    *ponies];
 }
 
 
 
-void ParameterVector::resize(unsigned int s)
+ponies)
 {
-  libmesh_assert(!_is_shallow_copy);
+  ponies);
 
-  const std::size_t old_size = this->_params.size();
+  ponies();
 
-  // If we're shrinking the vector, we don't want to leak memory.
-  // Note that we're using < in these for loops, not !=
-  // We don't know a priori if we're shrinking or growing
-  for (unsigned int i=s; i < old_size; ++i)
-    delete _params[i];
+  // ponies.
+  // ponies !=
+  // ponies
+  ponies)
+    ponies];
 
-  this->_params.resize(s);
+  ponies);
 
-  for (unsigned int i=old_size; i < s; ++i)
-    this->_params[i] =
-      new ParameterPointer<Number>(NULL);
+  ponies)
+    ponies] =
+      ponies);
 }
 
 
 
-void ParameterVector::deep_resize(unsigned int s)
+ponies)
 {
-  libmesh_assert(!_is_shallow_copy);
+  ponies);
 
-  this->_params.resize(s);
-  this->_my_data.resize(s);
-  for (unsigned int i=0; i != s; ++i)
-    this->_params[i] =
-      new ParameterPointer<Number>(&this->_my_data[i]);
+  ponies);
+  ponies);
+  ponies)
+    ponies] =
+      ponies]);
 }
 
 
 
-ParameterVector& ParameterVector::operator *= (const Number a)
+ponies)
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
-  for (unsigned int i=0; i != Np; ++i)
-    *(*this)[i] *= a;
-  return *this;
+  ponies>
+    (ponies());
+  ponies)
+    *(*ponies;
+  ponies;
 }
 
 
 
-ParameterVector& ParameterVector::operator += (const ParameterVector& a)
+ponies)
 {
-  const unsigned int Np = cast_int<unsigned int>
-    (this->_params.size());
-  libmesh_assert_equal_to (a._params.size(), Np);
-  for (unsigned int i=0; i != Np; ++i)
-    *(*this)[i] += *a[i];
-  return *this;
+  ponies>
+    (ponies());
+  ponies);
+  ponies)
+    *(*ponies];
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies

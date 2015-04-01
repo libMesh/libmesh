@@ -1,1086 +1,1086 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// rbOOmit includes
-#include "libmesh/transient_rb_evaluation.h"
-#include "libmesh/transient_rb_theta_expansion.h"
+// ponies
+#ponies"
+#ponies"
 
-// libMesh includes
-#include "libmesh/numeric_vector.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/xdr_cxx.h"
-#include "libmesh/parallel.h"
-#include "libmesh/getpot.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <fstream>
-#include <sstream>
-#include <iomanip>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-TransientRBEvaluation::TransientRBEvaluation(const Parallel::Communicator &comm_in) :
-  RBEvaluation(comm_in),
-  _rb_solve_data_cached(false)
+ponies) :
+  ponies),
+  ponies)
 {
-  // Indicate that we need to compute the RB
-  // inner product matrix in this case
-  compute_RB_inner_product = true;
+  // ponies
+  // ponies
+  ponies;
 }
 
-TransientRBEvaluation::~TransientRBEvaluation ()
+ponies ()
 {
-  clear();
+  ponies();
 }
 
-void TransientRBEvaluation::clear()
+ponies()
 {
-  Parent::clear();
+  ponies();
 
-  clear_riesz_representors();
+  ponies();
 }
 
-void TransientRBEvaluation::clear_riesz_representors()
+ponies()
 {
-  Parent::clear_riesz_representors();
+  ponies();
 
-  // Delete the M_q representors
-  for(unsigned int q_m=0; q_m<M_q_representor.size(); q_m++)
+  // ponies
+  ponies++)
     {
-      for(unsigned int i=0; i<M_q_representor[q_m].size(); i++)
+      ponies++)
         {
-          if(M_q_representor[q_m][i])
+          ponies])
             {
-              M_q_representor[q_m][i]->clear();
-              delete M_q_representor[q_m][i];
-              M_q_representor[q_m][i] = NULL;
+              ponies();
+              ponies];
+              ponies;
             }
         }
     }
 }
 
-void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
-                                                   bool resize_error_bound_data)
+ponies,
+                                                   ponies)
 {
-  START_LOG("resize_data_structures()", "TransientRBEvaluation");
+  ponies");
 
-  Parent::resize_data_structures(Nmax, resize_error_bound_data);
+  ponies);
 
-  RB_L2_matrix.resize(Nmax,Nmax);
-  RB_LHS_matrix.resize(Nmax,Nmax);
-  RB_RHS_matrix.resize(Nmax,Nmax);
-  RB_RHS_save.resize(Nmax);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
-  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
-  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
+  ponies =
+    ponies());
+  ponies();
+  ponies();
+  ponies();
 
-  // Allocate dense matrices for RB solves
-  RB_M_q_vector.resize(Q_m);
-  for(unsigned int q=0; q<Q_m; q++)
+  // ponies
+  ponies);
+  ponies++)
     {
-      // Initialize the memory for the RB matrices
-      RB_M_q_vector[q].resize(Nmax,Nmax);
+      // ponies
+      ponies);
     }
 
-  // Initialize the initial condition storage
-  RB_initial_condition_all_N.resize(Nmax);
-  for(unsigned int i=0; i<RB_initial_condition_all_N.size(); i++)
+  // ponies
+  ponies);
+  ponies++)
     {
-      // The i^th row holds a vector of lenght i+1
-      RB_initial_condition_all_N[i].resize(i+1);
+      // ponies
+      ponies);
     }
 
-  initial_L2_error_all_N.resize(Nmax, 0.);
+  ponies.);
 
 
-  if(resize_error_bound_data)
+  ponies)
     {
-      // Initialize vectors for the norms of the representors
-      Fq_Mq_representor_innerprods.resize(Q_f);
-      for(unsigned int i=0; i<Q_f; i++)
+      // ponies
+      ponies);
+      ponies++)
         {
-          Fq_Mq_representor_innerprods[i].resize(Q_m);
-          for(unsigned int j=0; j<Q_m; j++)
+          ponies);
+          ponies++)
             {
-              Fq_Mq_representor_innerprods[i][j].resize(Nmax, 0.);
+              ponies.);
             }
         }
 
-      unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
-      Mq_Mq_representor_innerprods.resize(Q_m_hat);
-      for(unsigned int i=0; i<Q_m_hat; i++)
+      ponies;
+      ponies);
+      ponies++)
         {
-          Mq_Mq_representor_innerprods[i].resize(Nmax);
-          for(unsigned int j=0; j<Nmax; j++)
+          ponies);
+          ponies++)
             {
-              Mq_Mq_representor_innerprods[i][j].resize(Nmax, 0.);
+              ponies.);
             }
         }
 
-      Aq_Mq_representor_innerprods.resize(Q_a);
-      for(unsigned int i=0; i<Q_a; i++)
+      ponies);
+      ponies++)
         {
-          Aq_Mq_representor_innerprods[i].resize(Q_m);
-          for(unsigned int j=0; j<Q_m; j++)
+          ponies);
+          ponies++)
             {
-              Aq_Mq_representor_innerprods[i][j].resize(Nmax);
-              for(unsigned int k=0; k<Nmax; k++)
+              ponies);
+              ponies++)
                 {
-                  Aq_Mq_representor_innerprods[i][j][k].resize(Nmax, 0.);
+                  ponies.);
                 }
             }
         }
 
-      // Resize M_q_representor
-      // This is cleared in the call to clear_riesz_representors
-      // in Parent::resize_RB_data, so just resize here
-      M_q_representor.resize(Q_m);
-      for(unsigned int q_m=0; q_m<Q_m; q_m++)
+      // ponies
+      // ponies
+      // ponies
+      ponies);
+      ponies++)
         {
-          M_q_representor[q_m].resize(Nmax);
+          ponies);
         }
     }
 
-  STOP_LOG("resize_data_structures()", "TransientRBEvaluation");
+  ponies");
 }
 
-Real TransientRBEvaluation::rb_solve(unsigned int N)
+ponies)
 {
-  START_LOG("rb_solve()", "TransientRBEvaluation");
+  ponies");
 
-  if(N > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+  ponies())
+    ponies");
 
-  const RBParameters& mu = get_parameters();
+  ponies();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
-  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
-  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
+  ponies =
+    ponies());
+  ponies();
+  ponies();
+  ponies();
 
-  const unsigned int n_time_steps = get_n_time_steps();
-  const Real dt                   = get_delta_t();
-  const Real euler_theta          = get_euler_theta();
+  ponies();
+  ponies();
+  ponies();
 
-  // Resize the RB and error bound vectors
-  error_bound_all_k.resize(n_time_steps+1);
-  RB_outputs_all_k.resize(trans_theta_expansion.get_n_outputs());
-  RB_output_error_bounds_all_k.resize(trans_theta_expansion.get_n_outputs());
-  for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
+  // ponies
+  ponies);
+  ponies());
+  ponies());
+  ponies++)
     {
-      RB_outputs_all_k[n].resize(n_time_steps+1, 0.);
-      RB_output_error_bounds_all_k[n].resize(n_time_steps+1, 0.);
+      ponies.);
+      ponies.);
     }
 
-  // First assemble the mass matrix
-  DenseMatrix<Number> RB_mass_matrix_N(N,N);
-  RB_mass_matrix_N.zero();
-  DenseMatrix<Number> RB_M_q_m;
-  for(unsigned int q_m=0; q_m<Q_m; q_m++)
+  // ponies
+  ponies);
+  ponies();
+  ponies;
+  ponies++)
     {
-      RB_M_q_vector[q_m].get_principal_submatrix(N, RB_M_q_m);
-      RB_mass_matrix_N.add(trans_theta_expansion.eval_M_theta(q_m, mu), RB_M_q_m);
+      ponies);
+      ponies);
     }
 
-  RB_LHS_matrix.resize(N,N);
-  RB_LHS_matrix.zero();
+  ponies);
+  ponies();
 
-  RB_RHS_matrix.resize(N,N);
-  RB_RHS_matrix.zero();
+  ponies);
+  ponies();
 
-  RB_LHS_matrix.add(1./dt, RB_mass_matrix_N);
-  RB_RHS_matrix.add(1./dt, RB_mass_matrix_N);
+  ponies);
+  ponies);
 
-  DenseMatrix<Number> RB_Aq_a;
-  for(unsigned int q_a=0; q_a<Q_a; q_a++)
+  ponies;
+  ponies++)
     {
-      RB_Aq_vector[q_a].get_principal_submatrix(N, RB_Aq_a);
+      ponies);
 
-      RB_LHS_matrix.add(       euler_theta*trans_theta_expansion.eval_A_theta(q_a,mu), RB_Aq_a);
-      RB_RHS_matrix.add( -(1.-euler_theta)*trans_theta_expansion.eval_A_theta(q_a,mu), RB_Aq_a);
+      ponies);
+      ponies);
     }
 
-  // Add forcing terms
-  DenseVector<Number> RB_Fq_f;
-  RB_RHS_save.resize(N);
-  RB_RHS_save.zero();
-  for(unsigned int q_f=0; q_f<Q_f; q_f++)
+  // ponies
+  ponies;
+  ponies);
+  ponies();
+  ponies++)
     {
-      RB_Fq_vector[q_f].get_principal_subvector(N, RB_Fq_f);
-      RB_RHS_save.add(trans_theta_expansion.eval_F_theta(q_f,mu), RB_Fq_f);
+      ponies);
+      ponies);
     }
 
-  // Set system time level to 0
-  set_time_step(0);
+  // ponies
+  ponies);
 
-  // Resize/clear the solution vector
-  RB_solution.resize(N);
+  // ponies
+  ponies);
 
-  // Load the initial condition into RB_solution
-  if(N > 0)
+  // ponies
+  ponies)
     {
-      RB_solution = RB_initial_condition_all_N[N-1];
+      ponies];
     }
 
-  // Resize/clear the old solution vector
-  old_RB_solution.resize(N);
+  // ponies
+  ponies);
 
-  // Initialize the RB rhs
-  DenseVector<Number> RB_rhs(N);
-  RB_rhs.zero();
+  // ponies
+  ponies);
+  ponies();
 
-  // Initialize the vectors storing solution data
-  RB_temporal_solution_data.resize(n_time_steps+1);
-  for(unsigned int time_level=0; time_level<=n_time_steps; time_level++)
+  // ponies
+  ponies);
+  ponies++)
     {
-      RB_temporal_solution_data[time_level].resize(N);
+      ponies);
     }
-  // and load the initial data
-  RB_temporal_solution_data[0] = RB_solution;
+  // ponies
+  ponies;
 
-  // Set outputs at initial time
+  // ponies
   {
-    DenseVector<Number> RB_output_vector_N;
-    for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
+    ponies;
+    ponies++)
       {
-        RB_outputs_all_k[n][0] = 0.;
-        for(unsigned int q_l=0; q_l<trans_theta_expansion.get_n_output_terms(n); q_l++)
+        ponies.;
+        ponies++)
           {
-            RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-            RB_outputs_all_k[n][0] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
+            ponies);
+            ponies);
           }
       }
   }
 
-  // Initialize error bounds, if necessary
-  Real error_bound_sum = 0.;
-  Real alpha_LB = 0.;
-  if(evaluate_RB_error_bound)
+  // ponies
+  ponies.;
+  ponies.;
+  ponies)
     {
-      if(N > 0)
+      ponies)
         {
-          error_bound_sum += pow( initial_L2_error_all_N[N-1], 2.);
+          ponies.);
         }
 
-      // Set error bound at the initial time
-      error_bound_all_k[get_time_step()] = std::sqrt(error_bound_sum);
+      // ponies
+      ponies);
 
-      // Compute the outputs and associated error bounds at the initial time
-      DenseVector<Number> RB_output_vector_N;
-      for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
+      // ponies
+      ponies;
+      ponies++)
         {
-          RB_outputs_all_k[n][0] = 0.;
-          for(unsigned int q_l=0; q_l<trans_theta_expansion.get_n_output_terms(n); q_l++)
+          ponies.;
+          ponies++)
             {
-              RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-              RB_outputs_all_k[n][0] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
+              ponies);
+              ponies);
             }
 
-          RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * eval_output_dual_norm(n,mu);
+          ponies);
         }
 
-      alpha_LB = get_stability_lower_bound();
+      ponies();
 
-      // Precompute time-invariant parts of the dual norm of the residual.
-      cache_online_residual_terms(N);
+      // ponies.
+      ponies);
     }
 
-  for(unsigned int time_level=1; time_level<=n_time_steps; time_level++)
+  ponies++)
     {
-      set_time_step(time_level);
-      old_RB_solution = RB_solution;
+      ponies);
+      ponies;
 
-      // Compute RB_rhs, as RB_LHS_matrix x old_RB_solution
-      RB_RHS_matrix.vector_mult(RB_rhs, old_RB_solution);
+      // ponies
+      ponies);
 
-      // Add forcing terms
-      RB_rhs.add(get_control(time_level), RB_RHS_save);
+      // ponies
+      ponies);
 
-      if(N > 0)
+      ponies)
         {
-          RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
+          ponies);
         }
 
-      // Save RB_solution for current time level
-      RB_temporal_solution_data[time_level] = RB_solution;
+      // ponies
+      ponies;
 
-      // Evaluate outputs
-      DenseVector<Number> RB_output_vector_N;
-      for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
+      // ponies
+      ponies;
+      ponies++)
         {
-          RB_outputs_all_k[n][time_level] = 0.;
-          for(unsigned int q_l=0; q_l<trans_theta_expansion.get_n_output_terms(n); q_l++)
+          ponies.;
+          ponies++)
             {
-              RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-              RB_outputs_all_k[n][time_level] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*
-                RB_output_vector_N.dot(RB_solution);
+              ponies);
+              ponies)*
+                ponies);
             }
         }
 
-      // Calculate RB error bounds
-      if(evaluate_RB_error_bound)
+      // ponies
+      ponies)
         {
-          // Evaluate the dual norm of the residual for RB_solution_vector
-          // Real epsilon_N = uncached_compute_residual_dual_norm(N);
-          Real epsilon_N = compute_residual_dual_norm(N);
+          // ponies
+          // ponies);
+          ponies);
 
-          error_bound_sum += residual_scaling_numer(alpha_LB) * pow(epsilon_N, 2.);
+          ponies.);
 
-          // store error bound at time-level _k
-          error_bound_all_k[time_level] = std::sqrt(error_bound_sum/residual_scaling_denom(alpha_LB));
+          // ponies
+          ponies));
 
-          // Now evaluated output error bounds
-          for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
+          // ponies
+          ponies++)
             {
-              RB_output_error_bounds_all_k[n][time_level] = error_bound_all_k[time_level] *
-                eval_output_dual_norm(n,mu);
+              ponies] *
+                ponies);
             }
         }
     }
 
-  STOP_LOG("rb_solve()", "TransientRBEvaluation");
+  ponies");
 
-  _rb_solve_data_cached = true ;
+  ponies ;
 
-  if(evaluate_RB_error_bound) // Calculate the error bounds
+  ponies
     {
-      return error_bound_all_k[n_time_steps];
+      ponies];
     }
-  else // Don't calculate the error bounds
+  ponies
     {
-      // Just return -1. if we did not compute the error bound
-      return -1.;
+      // ponies
+      ponies.;
     }
 }
 
-Real TransientRBEvaluation::rb_solve_again()
+ponies()
 {
-  libmesh_assert(_rb_solve_data_cached);
+  ponies);
 
-  const unsigned int n_time_steps = get_n_time_steps();
-  // Set system time level to 0
-  set_time_step(0);
+  ponies();
+  // ponies
+  ponies);
 
-  // Resize/clear the solution vector
-  const unsigned int N = RB_RHS_save.size();
-  RB_solution.resize(N);
+  // ponies
+  ponies();
+  ponies);
 
-  // Load the initial condition into RB_solution
-  if(N > 0)
-    RB_solution = RB_initial_condition_all_N[N-1];
+  // ponies
+  ponies)
+    ponies];
 
-  // Resize/clear the old solution vector
-  old_RB_solution.resize(N);
+  // ponies
+  ponies);
 
-  // Initialize the RB rhs
-  DenseVector<Number> RB_rhs(N);
-  RB_rhs.zero();
+  // ponies
+  ponies);
+  ponies();
 
-  for (unsigned int time_level=1; time_level<=n_time_steps; time_level++)
+  ponies++)
     {
-      set_time_step(time_level);
-      old_RB_solution = RB_solution;
+      ponies);
+      ponies;
 
-      // Compute RB_rhs, as *RB_lhs_matrix x old_RB_solution
-      RB_RHS_matrix.vector_mult(RB_rhs, old_RB_solution);
+      // ponies
+      ponies);
 
-      // Add forcing terms
-      RB_rhs.add(get_control(time_level), RB_RHS_save);
+      // ponies
+      ponies);
 
-      if (N > 0)
-        RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
+      ponies)
+        ponies);
     }
 
   {
-    // Just return -1. We did not compute the error bound
-    return -1.;
+    // ponies
+    ponies.;
   }
 }
 
-Real TransientRBEvaluation::get_rb_solution_norm()
+ponies()
 {
-  // Return the L2 norm of RB_solution
-  // After an rb_solve, RB_solution will hold the
-  // solution vector for the final time level.
+  // ponies
+  // ponies
+  // ponies.
 
-  const unsigned int N = RB_solution.size();
-  DenseVector<Number> temp(N);
-  DenseMatrix<Number> RB_L2_matrix_N;
-  RB_L2_matrix.get_principal_submatrix(N, RB_L2_matrix_N);
-  RB_L2_matrix_N.vector_mult(temp, RB_solution);
+  ponies();
+  ponies);
+  ponies;
+  ponies);
+  ponies);
 
-  return libmesh_real(std::sqrt(RB_solution.dot(temp)));
+  ponies)));
 }
 
-Real TransientRBEvaluation::residual_scaling_numer(Real)
+ponies)
 {
-  return get_delta_t();
+  ponies();
 }
 
-void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
+ponies)
 {
-  START_LOG("cache_online_residual_terms()", "TransientRBEvaluation");
+  ponies");
 
-  const RBParameters mu = get_parameters();
+  ponies();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
-  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
-  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
+  ponies =
+    ponies());
+  ponies();
+  ponies();
+  ponies();
 
-  cached_Fq_term = 0.;
-  unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<Q_f; q_f1++)
+  ponies.;
+  ponies;
+  ponies++)
     {
-      Number cached_theta_q_f1 = trans_theta_expansion.eval_F_theta(q_f1,mu);
-      for(unsigned int q_f2=q_f1; q_f2<Q_f; q_f2++)
+      ponies);
+      ponies++)
         {
-          Real delta = (q_f1==q_f2) ? 1. : 2.;
-          cached_Fq_term += delta*cached_theta_q_f1*trans_theta_expansion.eval_F_theta(q_f2,mu) *
-            Fq_representor_innerprods[q];
+          ponies.;
+          ponies) *
+            ponies];
 
-          q++;
+          ponies++;
         }
     }
 
-  cached_Fq_Aq_vector.resize(N);
-  for(unsigned int q_f=0; q_f<Q_f; q_f++)
+  ponies);
+  ponies++)
     {
-      Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
-      for(unsigned int q_a=0; q_a<Q_a; q_a++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
-          for(unsigned int i=0; i<N; i++)
+          ponies);
+          ponies++)
             {
-              cached_Fq_Aq_vector(i) += 2.*cached_theta_q_f*cached_theta_q_a*
-                Fq_Aq_representor_innerprods[q_f][q_a][i];
+              ponies*
+                ponies];
             }
         }
     }
 
-  cached_Aq_Aq_matrix.resize(N,N);
-  q=0;
-  for(unsigned int q_a1=0; q_a1<Q_a; q_a1++)
+  ponies);
+  ponies;
+  ponies++)
     {
-      Number cached_theta_q_a1 = trans_theta_expansion.eval_A_theta(q_a1,mu);
-      for(unsigned int q_a2=q_a1; q_a2<Q_a; q_a2++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_a2 = trans_theta_expansion.eval_A_theta(q_a2,mu);
-          Real delta = (q_a1==q_a2) ? 1. : 2.;
+          ponies);
+          ponies.;
 
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<N; j++)
+              ponies++)
                 {
-                  cached_Aq_Aq_matrix(i,j) += delta*
-                    cached_theta_q_a1*cached_theta_q_a2*
-                    Aq_Aq_representor_innerprods[q][i][j];
+                  ponies*
+                    ponies*
+                    ponies];
                 }
             }
-          q++;
+          ponies++;
         }
     }
 
-  cached_Fq_Mq_vector.resize(N);
-  for(unsigned int q_f=0; q_f<Q_f; q_f++)
+  ponies);
+  ponies++)
     {
-      Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
-      for(unsigned int q_m=0; q_m<Q_m; q_m++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
-          for(unsigned int i=0; i<N; i++)
+          ponies);
+          ponies++)
             {
-              cached_Fq_Mq_vector(i) += 2.*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_innerprods[q_f][q_m][i];
+              ponies];
             }
         }
     }
 
-  cached_Aq_Mq_matrix.resize(N,N);
-  for(unsigned int q_a=0; q_a<Q_a; q_a++)
+  ponies);
+  ponies++)
     {
-      Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
+      ponies);
 
-      for(unsigned int q_m=0; q_m<Q_m; q_m++)
+      ponies++)
         {
-          Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
+          ponies);
 
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<N; j++)
+              ponies++)
                 {
-                  cached_Aq_Mq_matrix(i,j) += 2.*cached_theta_q_a*cached_theta_q_m*Aq_Mq_representor_innerprods[q_a][q_m][i][j];
+                  ponies];
                 }
             }
         }
     }
 
-  cached_Mq_Mq_matrix.resize(N,N);
-  q=0;
-  for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
+  ponies);
+  ponies;
+  ponies++)
     {
-      Number cached_theta_q_m1 = trans_theta_expansion.eval_M_theta(q_m1,mu);
-      for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_m2 = trans_theta_expansion.eval_M_theta(q_m2,mu);
-          Real delta = (q_m1==q_m2) ? 1. : 2.;
+          ponies);
+          ponies.;
 
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<N; j++)
+              ponies++)
                 {
-                  cached_Mq_Mq_matrix(i,j) += delta*
-                    cached_theta_q_m1*cached_theta_q_m2*
-                    Mq_Mq_representor_innerprods[q][i][j];
+                  ponies*
+                    ponies*
+                    ponies];
                 }
             }
-          q++;
+          ponies++;
         }
     }
 
-  STOP_LOG("cache_online_residual_terms()", "TransientRBEvaluation");
+  ponies");
 }
 
-Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
+ponies)
 {
-  START_LOG("compute_residual_dual_norm()", "TransientRBEvaluation");
+  ponies");
 
-  // This assembly assumes we have already called cache_online_residual_terms
-  // and that the rb_solve parameter is constant in time
+  // ponies
+  // ponies
 
-  const Real dt          = get_delta_t();
-  const Real euler_theta = get_euler_theta();
-  const Real current_control = get_control(get_time_step());
+  ponies();
+  ponies();
+  ponies());
 
-  DenseVector<Number> RB_u_euler_theta(N);
-  DenseVector<Number> mass_coeffs(N);
-  for(unsigned int i=0; i<N; i++)
+  ponies);
+  ponies);
+  ponies++)
     {
-      RB_u_euler_theta(i)  = euler_theta*RB_solution(i) +
-        (1.-euler_theta)*old_RB_solution(i);
-      mass_coeffs(i) = -(RB_solution(i) - old_RB_solution(i))/dt;
+      ponies) +
+        (ponies);
+      ponies;
     }
 
-  Number residual_norm_sq = current_control*current_control*cached_Fq_term;
+  ponies;
 
-  residual_norm_sq += current_control*RB_u_euler_theta.dot(cached_Fq_Aq_vector);
-  residual_norm_sq += current_control*mass_coeffs.dot(cached_Fq_Mq_vector);
+  ponies);
+  ponies);
 
-  for(unsigned int i=0; i<N; i++)
-    for(unsigned int j=0; j<N; j++)
+  ponies++)
+    ponies++)
       {
-        residual_norm_sq += RB_u_euler_theta(i)*RB_u_euler_theta(j)*cached_Aq_Aq_matrix(i,j);
-        residual_norm_sq += mass_coeffs(i)*mass_coeffs(j)*cached_Mq_Mq_matrix(i,j);
-        residual_norm_sq += RB_u_euler_theta(i)*mass_coeffs(j)*cached_Aq_Mq_matrix(i,j);
+        ponies);
+        ponies);
+        ponies);
       }
 
 
-  if(libmesh_real(residual_norm_sq) < 0)
+  ponies)
     {
-      libMesh::out << "Warning: Square of residual norm is negative "
-                   << "in TransientRBEvaluation::compute_residual_dual_norm()" << std::endl;
+      ponies "
+                   << "ponies;
 
-      // Sometimes this is negative due to rounding error,
-      // but error is on the order of 1.e-10, so shouldn't
-      // affect result
-      residual_norm_sq = std::abs(residual_norm_sq);
+      // ponies,
+      // ponies
+      // ponies
+      ponies);
     }
 
-  STOP_LOG("compute_residual_dual_norm()", "TransientRBEvaluation");
+  ponies");
 
-  return libmesh_real(std::sqrt( residual_norm_sq ));
+  ponies ));
 }
 
-Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned int N)
+ponies)
 {
-  START_LOG("uncached_compute_residual_dual_norm()", "TransientRBEvaluation");
+  ponies");
 
-  // Use the stored representor inner product values
-  // to evaluate the residual norm
+  // ponies
+  // ponies
 
-  const RBParameters& mu = get_parameters();
+  ponies();
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
-  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
-  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
+  ponies =
+    ponies());
+  ponies();
+  ponies();
+  ponies();
 
-  const Real dt          = get_delta_t();
-  const Real euler_theta = get_euler_theta();
+  ponies();
+  ponies();
 
-  std::vector<Number> RB_u_euler_theta(N);
-  std::vector<Number> mass_coeffs(N);
-  for(unsigned int i=0; i<N; i++)
+  ponies);
+  ponies);
+  ponies++)
     {
-      RB_u_euler_theta[i]  = euler_theta*RB_solution(i) +
-        (1.-euler_theta)*old_RB_solution(i);
-      mass_coeffs[i] = -(RB_solution(i) - old_RB_solution(i))/dt;
+      ponies) +
+        (ponies);
+      ponies;
     }
 
-  Number residual_norm_sq = 0.;
+  ponies.;
 
-  unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<Q_f; q_f1++)
+  ponies;
+  ponies++)
     {
-      Number cached_theta_q_f1 = trans_theta_expansion.eval_F_theta(q_f1,mu);
-      for(unsigned int q_f2=q_f1; q_f2<Q_f; q_f2++)
+      ponies);
+      ponies++)
         {
-          Real delta = (q_f1==q_f2) ? 1. : 2.;
-          residual_norm_sq += delta*cached_theta_q_f1*trans_theta_expansion.eval_F_theta(q_f2,mu) * Fq_representor_innerprods[q];
+          ponies.;
+          ponies];
 
-          q++;
+          ponies++;
         }
     }
 
-  for(unsigned int q_f=0; q_f<Q_f; q_f++)
+  ponies++)
     {
-      Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
-      for(unsigned int q_a=0; q_a<Q_a; q_a++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
-          for(unsigned int i=0; i<N; i++)
+          ponies);
+          ponies++)
             {
-              residual_norm_sq += 2.*RB_u_euler_theta[i]*cached_theta_q_f*cached_theta_q_a*
-                Fq_Aq_representor_innerprods[q_f][q_a][i];
+              ponies*
+                ponies];
             }
         }
     }
 
-  q=0;
-  for(unsigned int q_a1=0; q_a1<Q_a; q_a1++)
+  ponies;
+  ponies++)
     {
-      Number cached_theta_q_a1 = trans_theta_expansion.eval_A_theta(q_a1,mu);
-      for(unsigned int q_a2=q_a1; q_a2<Q_a; q_a2++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_a2 = trans_theta_expansion.eval_A_theta(q_a2,mu);
-          Real delta = (q_a1==q_a2) ? 1. : 2.;
+          ponies);
+          ponies.;
 
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<N; j++)
+              ponies++)
                 {
-                  residual_norm_sq += delta*RB_u_euler_theta[i]*RB_u_euler_theta[j]*
-                    cached_theta_q_a1*cached_theta_q_a2*
-                    Aq_Aq_representor_innerprods[q][i][j];
+                  ponies]*
+                    ponies*
+                    ponies];
                 }
             }
-          q++;
+          ponies++;
         }
     }
 
-  // Now add the terms due to the time-derivative
-  q=0;
-  for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
+  // ponies
+  ponies;
+  ponies++)
     {
-      Number cached_theta_q_m1 = trans_theta_expansion.eval_M_theta(q_m1,mu);
-      for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_m2 = trans_theta_expansion.eval_M_theta(q_m2,mu);
-          Real delta = (q_m1==q_m2) ? 1. : 2.;
+          ponies);
+          ponies.;
 
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<N; j++)
+              ponies++)
                 {
-                  residual_norm_sq += delta*mass_coeffs[i]*mass_coeffs[j]*
-                    cached_theta_q_m1*cached_theta_q_m2*
-                    Mq_Mq_representor_innerprods[q][i][j];
+                  ponies]*
+                    ponies*
+                    ponies];
                 }
             }
-          q++;
+          ponies++;
         }
     }
 
-  for(unsigned int q_f=0; q_f<Q_f; q_f++)
+  ponies++)
     {
-      Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
-      for(unsigned int q_m=0; q_m<Q_m; q_m++)
+      ponies);
+      ponies++)
         {
-          Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
-          for(unsigned int i=0; i<N; i++)
+          ponies);
+          ponies++)
             {
-              residual_norm_sq += 2.*mass_coeffs[i]*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_innerprods[q_f][q_m][i];
+              ponies];
             }
         }
     }
 
-  for(unsigned int q_a=0; q_a<Q_a; q_a++)
+  ponies++)
     {
-      Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
+      ponies);
 
-      for(unsigned int q_m=0; q_m<Q_m; q_m++)
+      ponies++)
         {
-          Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
+          ponies);
 
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<N; j++)
+              ponies++)
                 {
-                  residual_norm_sq += 2.*RB_u_euler_theta[i]*mass_coeffs[j]*
-                    cached_theta_q_a*cached_theta_q_m*
-                    Aq_Mq_representor_innerprods[q_a][q_m][i][j];
+                  ponies]*
+                    ponies*
+                    ponies];
                 }
             }
         }
     }
 
-  if(libmesh_real(residual_norm_sq) < 0)
+  ponies)
     {
-      libMesh::out << "Warning: Square of residual norm is negative "
-                   << "in TransientRBEvaluation::compute_residual_dual_norm()" << std::endl;
+      ponies "
+                   << "ponies;
 
-      // Sometimes this is negative due to rounding error,
-      // but error is on the order of 1.e-10, so shouldn't
-      // affect result
-      residual_norm_sq = std::abs(residual_norm_sq);
+      // ponies,
+      // ponies
+      // ponies
+      ponies);
     }
 
-  //   libMesh::out << "slow residual_sq = " << slow_residual_norm_sq
-  //                << ", fast residual_sq = " << residual_norm_sq << std::endl;
+  //   ponies
+  //                << ", ponies;
 
-  STOP_LOG("uncached_compute_residual_dual_norm()", "TransientRBEvaluation");
+  ponies");
 
-  return libmesh_real(std::sqrt( residual_norm_sq ));
+  ponies ));
 }
 
-void TransientRBEvaluation::write_offline_data_to_files(const std::string& directory_name,
-                                                        const bool write_binary_data)
+ponies,
+                                                        ponies)
 {
-  START_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
+  ponies");
 
-  Parent::write_offline_data_to_files(directory_name);
+  ponies);
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
-  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
-  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
+  ponies =
+    ponies());
+  ponies();
+  ponies();
+  ponies();
 
-  const unsigned int n_bfs = get_n_basis_functions();
+  ponies();
 
-  // The writing mode: ENCODE for binary, WRITE for ASCII
-  XdrMODE mode = write_binary_data ? ENCODE : WRITE;
+  // ponies
+  ponies;
 
-  // The suffix to use for all the files that are written out
-  const std::string suffix = write_binary_data ? ".xdr" : ".dat";
+  // ponies
+  ponies";
 
-  if(this->processor_id() == 0)
+  ponies)
     {
-      std::ostringstream file_name;
+      ponies;
 
-      // Write out the temporal discretization data
-      file_name.str("");
-      file_name << directory_name << "/temporal_discretization_data" << suffix;
-      Xdr temporal_discretization_data_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      Real real_value; unsigned int int_value;
-      real_value = get_delta_t(); temporal_discretization_data_out << real_value;
-      real_value = get_euler_theta(); temporal_discretization_data_out << real_value;
-      int_value = get_n_time_steps(); temporal_discretization_data_out << int_value;
-      int_value = get_time_step(); temporal_discretization_data_out << int_value;
-      temporal_discretization_data_out.close();
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+      ponies();
 
 
-      // Write out the L2 matrix
-      file_name.str("");
-      file_name << directory_name << "/RB_L2_matrix" << suffix;
-      Xdr RB_L2_matrix_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      ponies++)
         {
-          for(unsigned int j=0; j<n_bfs; j++)
+          ponies++)
             {
-              RB_L2_matrix_out << RB_L2_matrix(i,j);
+              ponies);
             }
         }
-      RB_L2_matrix_out.close();
+      ponies();
 
-      // Write out the M_q matrices
-      for(unsigned int q_m=0; q_m<Q_m; q_m++)
+      // ponies
+      ponies++)
         {
-          file_name.str("");
-          file_name << directory_name << "/RB_M_";
-          file_name << std::setw(3)
-                    << std::setprecision(0)
-                    << std::setfill('0')
-                    << std::right
-                    << q_m;
-          file_name << suffix;
-          Xdr RB_M_q_m_out(file_name.str(), mode);
+          ponies("");
+          ponies";
+          ponies)
+                    << ponies)
+                    << ponies')
+                    << ponies
+                    << ponies;
+          ponies;
+          ponies);
 
-          for(unsigned int i=0; i<n_bfs; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<n_bfs; j++)
+              ponies++)
                 {
-                  RB_M_q_m_out << RB_M_q_vector[q_m](i,j);
+                  ponies);
                 }
             }
-          RB_M_q_m_out.close();
+          ponies();
         }
 
-      // Write out the initial condition data
-      // and the initial L2 error for all N
-      file_name.str("");
-      file_name << directory_name << "/initial_conditions" << suffix;
-      Xdr initial_conditions_out(file_name.str(), mode);
-      file_name.str("");
-      file_name << directory_name << "/initial_L2_error" << suffix;
-      Xdr initial_L2_error_out(file_name.str(), mode);
+      // ponies
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      ponies++)
         {
-          initial_L2_error_out << initial_L2_error_all_N[i];
-          for(unsigned int j=0; j<=i; j++)
+          ponies];
+          ponies++)
             {
-              initial_conditions_out << RB_initial_condition_all_N[i](j);
+              ponies);
             }
         }
-      initial_conditions_out.close();
-      initial_L2_error_out.close();
+      ponies();
+      ponies();
 
-      // Next write out the Fq_Mq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Fq_Mq_terms" << suffix;
-      Xdr RB_Fq_Mq_terms_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int q_f=0; q_f<Q_f; q_f++)
+      ponies++)
         {
-          for(unsigned int q_m=0; q_m<Q_m; q_m++)
+          ponies++)
             {
-              for(unsigned int i=0; i<n_bfs; i++)
+              ponies++)
                 {
-                  RB_Fq_Mq_terms_out << Fq_Mq_representor_innerprods[q_f][q_m][i];
-                }
-            }
-        }
-      RB_Fq_Mq_terms_out.close();
-
-      // Next write out the Mq_Mq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Mq_Mq_terms" << suffix;
-      Xdr RB_Mq_Mq_terms_out(file_name.str(), mode);
-
-      unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
-      for(unsigned int q=0; q<Q_m_hat; q++)
-        {
-          for(unsigned int i=0; i<n_bfs; i++)
-            {
-              for(unsigned int j=0; j<n_bfs; j++)
-                {
-                  RB_Mq_Mq_terms_out << Mq_Mq_representor_innerprods[q][i][j];
+                  ponies];
                 }
             }
         }
-      RB_Mq_Mq_terms_out.close();
+      ponies();
 
-      // Next write out the Aq_Mq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Aq_Mq_terms" << suffix;
-      Xdr RB_Aq_Mq_terms_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int q_a=0; q_a<Q_a; q_a++)
+      ponies;
+      ponies++)
         {
-          for(unsigned int q_m=0; q_m<Q_m; q_m++)
+          ponies++)
             {
-              for(unsigned int i=0; i<n_bfs; i++)
+              ponies++)
                 {
-                  for(unsigned int j=0; j<n_bfs; j++)
+                  ponies];
+                }
+            }
+        }
+      ponies();
+
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
+
+      ponies++)
+        {
+          ponies++)
+            {
+              ponies++)
+                {
+                  ponies++)
                     {
-                      RB_Aq_Mq_terms_out << Aq_Mq_representor_innerprods[q_a][q_m][i][j];
+                      ponies];
                     }
                 }
             }
         }
-      RB_Aq_Mq_terms_out.close();
+      ponies();
     }
 
-  STOP_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
+  ponies");
 }
 
-void TransientRBEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                         bool read_error_bound_data,
-                                                         const bool read_binary_data)
+ponies,
+                                                         ponies,
+                                                         ponies)
 {
-  START_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
+  ponies");
 
-  Parent::read_offline_data_from_files(directory_name);
+  ponies);
 
-  TransientRBThetaExpansion& trans_theta_expansion =
-    cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
-  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
-  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
+  ponies =
+    ponies());
+  ponies();
+  ponies();
+  ponies();
 
-  // First, find out how many basis functions we had when Greedy terminated
-  // This was set in RBSystem::read_offline_data_from_files
-  unsigned int n_bfs = this->get_n_basis_functions();
+  // ponies
+  // ponies
+  ponies();
 
-  // The reading mode: DECODE for binary, READ for ASCII
-  XdrMODE mode = read_binary_data ? DECODE : READ;
+  // ponies
+  ponies;
 
-  // The suffix to use for all the files that are written out
-  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
+  // ponies
+  ponies";
 
-  // The string stream we'll use to make the file names
-  std::ostringstream file_name;
+  // ponies
+  ponies;
 
-  // Write out the temporal discretization data
-  file_name.str("");
-  file_name << directory_name << "/temporal_discretization_data" << suffix;
-  Xdr temporal_discretization_data_in(file_name.str(), mode);
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  Real real_value; unsigned int int_value;
-  temporal_discretization_data_in >> real_value; set_delta_t(real_value);
-  temporal_discretization_data_in >> real_value; set_euler_theta(real_value);
-  temporal_discretization_data_in >> int_value; set_n_time_steps(int_value);
-  temporal_discretization_data_in >> int_value; set_time_step(int_value);
-  temporal_discretization_data_in.close();
+  ponies;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies();
 
-  file_name.str("");
-  file_name << directory_name << "/RB_L2_matrix" << suffix;
-  Xdr RB_L2_matrix_in(file_name.str(), mode);
+  ponies("");
+  ponies;
+  ponies);
 
-  for(unsigned int i=0; i<n_bfs; i++)
+  ponies++)
     {
-      for(unsigned int j=0; j<n_bfs; j++)
+      ponies++)
         {
-          Number value;
-          RB_L2_matrix_in >> value;
-          RB_L2_matrix(i,j) = value;
+          ponies;
+          ponies;
+          ponies;
         }
     }
-  RB_L2_matrix_in.close();
+  ponies();
 
-  // Read in the M_q matrices
-  for(unsigned int q_m=0; q_m<Q_m; q_m++)
+  // ponies
+  ponies++)
     {
-      file_name.str("");
-      file_name << directory_name << "/RB_M_";
-      file_name << std::setw(3)
-                << std::setprecision(0)
-                << std::setfill('0')
-                << std::right
-                << q_m;
+      ponies("");
+      ponies";
+      ponies)
+                << ponies)
+                << ponies')
+                << ponies
+                << ponies;
 
-      file_name << suffix;
-      Xdr RB_M_q_m_in(file_name.str(), mode);
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      ponies++)
         {
-          for(unsigned int j=0; j<n_bfs; j++)
+          ponies++)
             {
-              Number value;
-              RB_M_q_m_in >> value;
-              RB_M_q_vector[q_m](i,j) = value;
+              ponies;
+              ponies;
+              ponies;
             }
         }
-      RB_M_q_m_in.close();
+      ponies();
     }
 
 
-  // Read in the initial condition data
-  // and the initial L2 error for all N
-  file_name.str("");
-  file_name << directory_name << "/initial_conditions" << suffix;
-  Xdr initial_conditions_in(file_name.str(), mode);
+  // ponies
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  file_name.str("");
-  file_name << directory_name << "/initial_L2_error" << suffix;
-  Xdr initial_L2_error_in(file_name.str(), mode);
+  ponies("");
+  ponies;
+  ponies);
 
-  for(unsigned int i=0; i<n_bfs; i++)
+  ponies++)
     {
-      initial_L2_error_in >> initial_L2_error_all_N[i];
-      for(unsigned int j=0; j<=i; j++)
+      ponies];
+      ponies++)
         {
-          initial_conditions_in >> RB_initial_condition_all_N[i](j);
+          ponies);
         }
     }
-  initial_conditions_in.close();
-  initial_L2_error_in.close();
+  ponies();
+  ponies();
 
 
-  if(read_error_bound_data)
+  ponies)
     {
-      // Next read in the Fq_Mq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Fq_Mq_terms" << suffix;
-      Xdr RB_Fq_Mq_terms_in(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int q_f=0; q_f<Q_f; q_f++)
+      ponies++)
         {
-          for(unsigned int q_m=0; q_m<Q_m; q_m++)
+          ponies++)
             {
-              for(unsigned int i=0; i<n_bfs; i++)
+              ponies++)
                 {
-                  RB_Fq_Mq_terms_in >> Fq_Mq_representor_innerprods[q_f][q_m][i];
+                  ponies];
                 }
             }
         }
-      RB_Fq_Mq_terms_in.close();
+      ponies();
 
-      // Next read in the Mq_Mq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Mq_Mq_terms" << suffix;
-      Xdr RB_Mq_Mq_terms_in(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
-      for(unsigned int q=0; q<Q_m_hat; q++)
+      ponies;
+      ponies++)
         {
-          for(unsigned int i=0; i<n_bfs; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<n_bfs; j++)
+              ponies++)
                 {
-                  RB_Mq_Mq_terms_in >> Mq_Mq_representor_innerprods[q][i][j];
+                  ponies];
                 }
             }
         }
-      RB_Mq_Mq_terms_in.close();
+      ponies();
 
-      // Next read in the Aq_Mq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Aq_Mq_terms" << suffix;
-      Xdr RB_Aq_Mq_terms_in(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int q_a=0; q_a<Q_a; q_a++)
+      ponies++)
         {
-          for(unsigned int q_m=0; q_m<Q_m; q_m++)
+          ponies++)
             {
-              for(unsigned int i=0; i<n_bfs; i++)
+              ponies++)
                 {
-                  for(unsigned int j=0; j<n_bfs; j++)
+                  ponies++)
                     {
-                      RB_Aq_Mq_terms_in >> Aq_Mq_representor_innerprods[q_a][q_m][i][j];
+                      ponies];
                     }
                 }
             }
         }
-      RB_Aq_Mq_terms_in.close();
+      ponies();
     }
 
-  STOP_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
+  ponies");
 
 }
 

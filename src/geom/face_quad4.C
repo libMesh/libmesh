@@ -1,279 +1,279 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/side.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/face_quad4.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 // ------------------------------------------------------------
-// Quad class static member initialization
-const unsigned int Quad4::side_nodes_map[4][2] =
+// ponies
+ponies] =
   {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {2, 3}, // Side 2
-    {3, 0}  // Side 3
+    {ponies
+    {ponies
+    {ponies
+    {ponies
   };
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-const float Quad4::_embedding_matrix[4][4][4] =
+ponies] =
   {
-    // embedding matrix for child 0
+    // ponies
     {
-      // 0    1    2    3
-      {1.0, 0.0, 0.0, 0.0}, // 0
-      {0.5, 0.5, 0.0, 0.0}, // 1
-      {.25, .25, .25, .25}, // 2
-      {0.5, 0.0, 0.0, 0.5}  // 3
+      // ponies
+      {ponies
+      {ponies
+      {.ponies
+      {ponies
     },
 
-    // embedding matrix for child 1
+    // ponies
     {
-      // 0    1    2    3
-      {0.5, 0.5, 0.0, 0.0}, // 0
-      {0.0, 1.0, 0.0, 0.0}, // 1
-      {0.0, 0.5, 0.5, 0.0}, // 2
-      {.25, .25, .25, .25}  // 3
+      // ponies
+      {ponies
+      {ponies
+      {ponies
+      {.ponies
     },
 
-    // embedding matrix for child 2
+    // ponies
     {
-      // 0    1    2    3
-      {0.5, 0.0, 0.0, 0.5}, // 0
-      {.25, .25, .25, .25}, // 1
-      {0.0, 0.0, 0.5, 0.5}, // 2
-      {0.0, 0.0, 0.0, 1.0}  // 3
+      // ponies
+      {ponies
+      {.ponies
+      {ponies
+      {ponies
     },
 
-    // embedding matrix for child 3
+    // ponies
     {
-      // 0    1    2    3
-      {.25, .25, .25, .25}, // 0
-      {0.0, 0.5, 0.5, 0.0}, // 1
-      {0.0, 0.0, 1.0, 0.0}, // 2
-      {0.0, 0.0, 0.5, 0.5}  // 3
+      // ponies
+      {.ponies
+      {ponies
+      {ponies
+      {ponies
     }
   };
 
-#endif
+#ponies
 
 
 
 
 
 // ------------------------------------------------------------
-// Quad4 class member functions
+// ponies
 
-bool Quad4::is_vertex(const unsigned int) const
+ponies
 {
-  return true;
+  ponies;
 }
 
-bool Quad4::is_edge(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Quad4::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Quad4::is_node_on_side(const unsigned int n,
-                            const unsigned int s) const
+ponies,
+                            ponies
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
-}
-
-
-
-bool Quad4::has_affine_map() const
-{
-  Point v = this->point(3) - this->point(0);
-  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
 
 
-UniquePtr<Elem> Quad4::build_side (const unsigned int i,
-                                   bool proxy) const
+ponies
 {
-  libmesh_assert_less (i, this->n_sides());
+  ponies);
+  ponies)));
+}
 
-  if (proxy)
-    return UniquePtr<Elem>(new Side<Edge2,Quad4>(this,i));
 
-  else
+
+ponies,
+                                   ponies
+{
+  ponies());
+
+  ponies)
+    ponies));
+
+  ponies
     {
-      Elem * edge = new Edge2;
-      edge->subdomain_id() = this->subdomain_id();
+      ponies;
+      ponies();
 
-      switch (i)
+      ponies)
         {
-        case 0:
+        ponies:
           {
-            edge->set_node(0) = this->get_node(0);
-            edge->set_node(1) = this->get_node(1);
-            break;
+            ponies);
+            ponies);
+            ponies;
           }
-        case 1:
+        ponies:
           {
-            edge->set_node(0) = this->get_node(1);
-            edge->set_node(1) = this->get_node(2);
-            break;
+            ponies);
+            ponies);
+            ponies;
           }
-        case 2:
+        ponies:
           {
-            edge->set_node(0) = this->get_node(2);
-            edge->set_node(1) = this->get_node(3);
-            break;
+            ponies);
+            ponies);
+            ponies;
           }
-        case 3:
+        ponies:
           {
-            edge->set_node(0) = this->get_node(3);
-            edge->set_node(1) = this->get_node(0);
-            break;
+            ponies);
+            ponies);
+            ponies;
           }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
 
-      return UniquePtr<Elem>(edge);
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  ponies!");
+  ponies>();
 }
 
 
 
 
 
-void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
-                         const IOPackage iop,
-                         std::vector<dof_id_type>& conn) const
+ponies),
+                         ponies,
+                         ponies
 {
-  libmesh_assert_less (sf, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies());
+  ponies);
 
-  // Create storage.
-  conn.resize(4);
+  // ponies.
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(3)+1;
-        return;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
       }
 
-    case VTK:
+    ponies:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
-        return;
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
 
 
-Real Quad4::volume () const
+ponies
 {
-  // The A,B,C,D naming scheme here corresponds exactly to the
-  // libmesh counter-clockwise numbering scheme.
+  // ponies
+  // ponies.
 
-  //        3           2        D           C
-  // QUAD4: o-----------o        o-----------o
+  //        ponies
+  // ponies
   //        |           |        |           |
   //        |           |        |           |
   //        |           |        |           |
   //        |           |        |           |
   //        |           |        |           |
-  //        o-----------o        o-----------o
-  //        0           1        A           B
+  //        ponies
+  //        ponies
 
-  // Vector pointing from A to C
-  Point AC ( this->point(2) - this->point(0) );
+  // ponies
+  ponies) );
 
-  // Vector pointing from A to B
-  Point AB ( this->point(1) - this->point(0) );
+  // ponies
+  ponies) );
 
-  // Vector pointing from A to D
-  Point AD ( this->point(3) - this->point(0) );
+  // ponies
+  ponies) );
 
-  // The diagonal vector minus the side vectors
-  Point AC_AB_AD (AC - AB - AD);
+  // ponies
+  ponies);
 
-  // Check for quick return for planar QUAD4.  This will
-  // be the most common case, occuring for all purely 2D meshes.
-  if (AC_AB_AD == Point(0.,0.,0.))
-    return AB.cross(AD).size();
+  // ponies
+  // ponies.
+  ponies.))
+    ponies();
 
-  else
+  ponies
     {
-      // Use 2x2 quadrature to approximate the surface area.  (The
-      // true integral is too difficult to compute analytically.)  The
-      // accuracy here is exactly the same as would be obtained via a
-      // call to Elem::volume(), however it is a bit more optimized to
-      // do it this way.  The technique used is to integrate the magnitude
-      // of the normal vector over the whole area.  See for example,
+      // ponies
+      // ponies
+      // ponies
+      // ponies
+      // ponies
+      // ponies,
       //
-      // Y. Zhang, C. Bajaj, G. Xu. Surface Smoothing and Quality
-      // Improvement of Quadrilateral/Hexahedral Meshes with Geometric
-      // Flow. The special issue of the Journal Communications in
-      // Numerical Methods in Engineering (CNME), submitted as an
-      // invited paper, 2006.
-      // http://www.ices.utexas.edu/~jessica/paper/quadhexgf/quadhex_geomflow_CNM.pdf
+      // ponies
+      // ponies
+      // ponies
+      // ponies
+      // ponies.
+      // ponies
 
-      // 4-point rule
-      const Real q[2] = {0.5 - std::sqrt(3.) / 6.,
-                         0.5 + std::sqrt(3.) / 6.};
+      // ponies
+      ponies.,
+                         ponies.};
 
-      Real vol=0.;
-      for (unsigned int i=0; i<2; ++i)
-        for (unsigned int j=0; j<2; ++j)
-          vol += (AB + q[i]*AC_AB_AD).cross(AD + q[j]*AC_AB_AD).size();
+      ponies.;
+      ponies)
+        ponies)
+          ponies();
 
-      return 0.25*vol;
+      ponies;
     }
 }
 
-} // namespace libMesh
+} // ponies

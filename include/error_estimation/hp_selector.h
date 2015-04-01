@@ -1,84 +1,84 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_HP_SELECTOR_H
-#define LIBMESH_HP_SELECTOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class System;
+// ponies
+ponies;
 
 
 /**
- * Subclasses of this abstract base class choose between h
- * refining and p elevation.
- * Currently we assume that a set of elements has already been flagged
- * for h refinement, and we may want to change some of those elements
- * to be flagged for p refinement.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner, 2006.
+ * @ponies.
  */
-class HPSelector
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  HPSelector() {}
+  ponies() {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~HPSelector() {}
+  ponies() {}
 
 
   /**
-   * This pure virtual function must be redefined
-   * in derived classes to take a mesh flagged for h
-   * refinement and potentially change the desired
-   * refinement type.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void select_refinement (System& system) = 0;
+  ponies;
 
   /**
-   * This vector can be used to "scale" certain
-   * variables in a system.
-   * If the mask is not empty, the consideration given to each
-   * component's h and p error estimates will be scaled by
-   * component_scale[c].
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies].
    */
-  std::vector<float> component_scale;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-#endif // LIBMESH_HP_SELECTOR_H
+#ponies

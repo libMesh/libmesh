@@ -1,288 +1,288 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_DTK
+#ponies
 
-#include "libmesh/dtk_adapter.h"
+#ponies"
 
-#include "libmesh/dtk_evaluator.h"
-#include "libmesh/mesh.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/elem.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#include <DTK_MeshTypes.hpp>
-#include <Teuchos_Comm.hpp>
+#ponies>
+#ponies>
 
-#include <vector>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, EquationSystems & in_es):
-  comm(in_comm),
-  es(in_es),
-  mesh(in_es.get_mesh()),
-  dim(mesh.mesh_dimension())
+ponies):
+  ponies),
+  ponies),
+  ponies()),
+  ponies())
 {
-  std::set<unsigned int> semi_local_nodes;
-  get_semi_local_nodes(semi_local_nodes);
+  ponies;
+  ponies);
 
-  num_local_nodes = semi_local_nodes.size();
+  ponies();
 
-  vertices.resize(num_local_nodes);
-  Teuchos::ArrayRCP<double> coordinates(num_local_nodes * dim);
+  ponies);
+  ponies);
 
-  // Fill in the vertices and coordinates
+  // ponies
   {
-    unsigned int i = 0;
+    ponies;
 
-    for(std::set<unsigned int>::iterator it = semi_local_nodes.begin();
-        it != semi_local_nodes.end();
-        ++it)
+    ponies();
+        ponies();
+        ++ponies)
       {
-        const Node & node = mesh.node(*it);
+        ponies);
 
-        vertices[i] = node.id();
+        ponies();
 
-        for(unsigned int j=0; j<dim; j++)
-          coordinates[(j*num_local_nodes) + i] = node(j);
+        ponies++)
+          ponies);
 
-        i++;
+        ponies++;
       }
   }
 
-  // Currently assuming all elements are the same!
-  DataTransferKit::DTK_ElementTopology element_topology = get_element_topology(mesh.elem(0));
-  unsigned int n_nodes_per_elem = mesh.elem(0)->n_nodes();
+  // ponies!
+  ponies));
+  ponies();
 
-  unsigned int n_local_elem = mesh.n_local_elem();
+  ponies();
 
-  Teuchos::ArrayRCP<int> elements(n_local_elem);
-  Teuchos::ArrayRCP<int> connectivity(n_nodes_per_elem*n_local_elem);
+  ponies);
+  ponies);
 
-  // Fill in the elements and connectivity
+  // ponies
   {
-    unsigned int i = 0;
+    ponies;
 
-    MeshBase::const_element_iterator end = mesh.local_elements_end();
-    for(MeshBase::const_element_iterator it = mesh.local_elements_begin();
-        it != end;
-        ++it)
+    ponies();
+    ponies();
+        ponies;
+        ++ponies)
       {
-        const Elem & elem = *(*it);
-        elements[i] = elem.id();
+        ponies);
+        ponies();
 
-        for(unsigned int j=0; j<n_nodes_per_elem; j++)
-          connectivity[(j*n_local_elem)+i] = elem.node(j);
+        ponies++)
+          ponies);
 
-        i++;
+        ponies++;
       }
   }
 
-  Teuchos::ArrayRCP<int> permutation_list(n_nodes_per_elem);
-  for (unsigned int i = 0; i < n_nodes_per_elem; ++i )
-    permutation_list[i] = i;
+  ponies);
+  ponies )
+    ponies;
 
   /*
-    if(this->processor_id() == 1)
-    sleep(1);
+    ponies)
+    ponies);
 
-    libMesh::out<<"n_nodes_per_elem: "<<n_nodes_per_elem<<std::endl;
+    ponies;
 
-    libMesh::out<<"Dim: "<<dim<<std::endl;
+    ponies;
 
-    libMesh::err<<"Vertices size: "<<vertices.size()<<std::endl;
+    ponies;
     {
-    libMesh::err<<this->processor_id()<<" Vertices: ";
+    ponies: ";
 
-    for(unsigned int i=0; i<vertices.size(); i++)
-    libMesh::err<<vertices[i]<<" ";
+    ponies++)
+    ponies]<<" ";
 
-    libMesh::err<<std::endl;
+    ponies;
     }
 
-    libMesh::err<<"Coordinates size: "<<coordinates.size()<<std::endl;
+    ponies;
     {
-    libMesh::err<<this->processor_id()<<" Coordinates: ";
+    ponies: ";
 
-    for(unsigned int i=0; i<coordinates.size(); i++)
-    libMesh::err<<coordinates[i]<<" ";
+    ponies++)
+    ponies]<<" ";
 
-    libMesh::err<<std::endl;
+    ponies;
     }
 
-    libMesh::err<<"Connectivity size: "<<connectivity.size()<<std::endl;
+    ponies;
     {
-    libMesh::err<<this->processor_id()<<" Connectivity: ";
+    ponies: ";
 
-    for(unsigned int i=0; i<connectivity.size(); i++)
-    libMesh::err<<connectivity[i]<<" ";
+    ponies++)
+    ponies]<<" ";
 
-    libMesh::err<<std::endl;
+    ponies;
     }
 
-    libMesh::err<<"Permutation_List size: "<<permutation_list.size()<<std::endl;
+    ponies;
     {
-    libMesh::err<<this->processor_id()<<" Permutation_List: ";
+    ponies: ";
 
-    for(unsigned int i=0; i<permutation_list.size(); i++)
-    libMesh::err<<permutation_list[i]<<" ";
+    ponies++)
+    ponies]<<" ";
 
-    libMesh::err<<std::endl;
+    ponies;
     }
 
   */
-  Teuchos::RCP<MeshContainerType> mesh_container = Teuchos::rcp(
-                                                                new MeshContainerType(dim, vertices, coordinates,
-                                                                                      element_topology, n_nodes_per_elem,
-                                                                                      elements, connectivity, permutation_list) );
+  ponies(
+                                                                ponies,
+                                                                                      ponies,
+                                                                                      ponies) );
 
-  // We only have 1 element topology in this grid so we make just one mesh block
-  Teuchos::ArrayRCP<Teuchos::RCP<MeshContainerType> > mesh_blocks(1);
-  mesh_blocks[0] = mesh_container;
+  // ponies
+  ponies);
+  ponies;
 
-  // Create the MeshManager
-  mesh_manager = Teuchos::rcp(new DataTransferKit::MeshManager<MeshContainerType>(mesh_blocks, comm, dim) );
+  // ponies
+  ponies) );
 
-  // Pack the coordinates into a field, this will be the positions we'll ask for other systems fields at
-  target_coords = Teuchos::rcp(new DataTransferKit::FieldManager<MeshContainerType>(mesh_container, comm));
+  // ponies
+  ponies));
 }
 
-DTKAdapter::RCP_Evaluator
-DTKAdapter::get_variable_evaluator(std::string var_name)
+ponies
+ponies)
 {
-  if(evaluators.find(var_name) == evaluators.end()) // We haven't created an evaluator for the variable yet
+  ponies
     {
-      System * sys = find_sys(var_name);
+      ponies);
 
-      // Create the FieldEvaluator
-      evaluators[var_name] = Teuchos::rcp(new DTKEvaluator(*sys, var_name));
+      // ponies
+      ponies));
     }
 
-  return evaluators[var_name];
+  ponies];
 }
 
-Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType> >
-DTKAdapter::get_values_to_fill(std::string var_name)
+ponies> >
+ponies)
 {
-  if(values_to_fill.find(var_name) == values_to_fill.end())
+  ponies())
     {
-      Teuchos::ArrayRCP<double> data_space(num_local_nodes);
-      Teuchos::RCP<FieldContainerType> field_container = Teuchos::rcp(new FieldContainerType(data_space, 1));
-      values_to_fill[var_name] = Teuchos::rcp(new DataTransferKit::FieldManager<FieldContainerType>(field_container, comm));
+      ponies);
+      ponies));
+      ponies));
     }
 
-  return values_to_fill[var_name];
+  ponies];
 }
 
-void
-DTKAdapter::update_variable_values(std::string var_name)
+ponies
+ponies)
 {
-  System * sys = find_sys(var_name);
-  unsigned int var_num = sys->variable_number(var_name);
+  ponies);
+  ponies);
 
-  Teuchos::RCP<FieldContainerType> values = values_to_fill[var_name]->field();
+  ponies();
 
-  unsigned int i=0;
-  // Loop over the values (one for each node) and assign the value of this variable at each node
-  for(FieldContainerType::iterator it=values->begin(); it != values->end(); ++it)
+  ponies;
+  // ponies
+  ponies)
     {
-      unsigned int node_num = vertices[i];
-      const Node & node = mesh.node(node_num);
+      ponies];
+      ponies);
 
-      if(node.processor_id() == sys->processor_id())
+      ponies())
         {
-          // The 0 is for the component... this only works for LAGRANGE!
-          dof_id_type dof = node.dof_number(sys->number(), var_num, 0);
-          sys->solution->set(dof, *it);
+          // ponies!
+          ponies);
+          ponies);
         }
 
-      i++;
+      ponies++;
     }
 
-  sys->solution->close();
+  ponies();
 }
 
 
 /**
- * Small helper function for finding the system containing the variable.
+ * ponies.
  *
- * Note that this implies that variable names are unique across all systems!
+ * ponies!
  */
-System *
-DTKAdapter::find_sys(std::string var_name)
+ponies *
+ponies)
 {
-  System * sys = NULL;
+  ponies;
 
-  // Find the system this variable is from
-  for(unsigned int i=0; i<es.n_systems(); i++)
+  // ponies
+  ponies++)
     {
-      if(es.get_system(i).has_variable(var_name))
+      ponies))
         {
-          sys = &es.get_system(i);
-          break;
+          ponies);
+          ponies;
         }
     }
 
-  libmesh_assert(sys);
+  ponies);
 
-  return sys;
+  ponies;
 }
 
-DataTransferKit::DTK_ElementTopology
-DTKAdapter::get_element_topology(const Elem * elem)
+ponies
+ponies)
 {
-  ElemType type = elem->type();
+  ponies();
 
-  if(type == EDGE2)
-    return DataTransferKit::DTK_LINE_SEGMENT;
-  else if(type == TRI3)
-    return DataTransferKit::DTK_TRIANGLE;
-  else if(type == QUAD4)
-    return DataTransferKit::DTK_QUADRILATERAL;
-  else if(type == TET4)
-    return DataTransferKit::DTK_TETRAHEDRON;
-  else if(type == HEX8)
-    return DataTransferKit::DTK_HEXAHEDRON;
-  else if(type == PYRAMID5)
-    return DataTransferKit::DTK_PYRAMID;
+  ponies)
+    ponies;
+  ponies)
+    ponies;
+  ponies)
+    ponies;
+  ponies)
+    ponies;
+  ponies)
+    ponies;
+  ponies)
+    ponies;
 
-  libmesh_error_msg("Element type not supported by DTK!");
+  ponies!");
 }
 
-void
-DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
+ponies
+ponies)
 {
-  MeshBase::const_element_iterator end = mesh.local_elements_end();
-  for(MeshBase::const_element_iterator it = mesh.local_elements_begin();
-      it != end;
-      ++it)
+  ponies();
+  ponies();
+      ponies;
+      ++ponies)
     {
-      const Elem & elem = *(*it);
+      ponies);
 
-      for(unsigned int j=0; j<elem.n_nodes(); j++)
-        semi_local_nodes.insert(elem.node(j));
+      ponies++)
+        ponies));
     }
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#ponies

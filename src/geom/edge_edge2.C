@@ -1,117 +1,117 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/edge_edge2.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-const float Edge2::_embedding_matrix[2][2][2] =
+ponies] =
   {
-    // embedding matrix for child 0
+    // ponies
     {
-      // 0    1    2
-      {1.0, 0.0}, // 0
-      {0.5, 0.5}  // 1
+      // ponies
+      {ponies
+      {ponies
     },
 
-    // embedding matrix for child 1
+    // ponies
     {
-      // 0    1    2
-      {0.5, 0.5}, // 0
-      {0.0, 1.0}  // 1
+      // ponies
+      {ponies
+      {ponies
     }
   };
 
-#endif
+#ponies
 
-bool Edge2::is_vertex(const unsigned int) const
+ponies
 {
-  return true;
+  ponies;
 }
 
-bool Edge2::is_edge(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Edge2::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Edge2::is_node_on_side(const unsigned int n,
-                            const unsigned int s) const
+ponies,
+                            ponies
 {
-  libmesh_assert_less (s, 2);
-  return (s == n);
+  ponies);
+  ponies);
 }
 
-bool Edge2::is_node_on_edge(const unsigned int,
-                            const unsigned int libmesh_dbg_var(e)) const
+ponies,
+                            ponies
 {
-  libmesh_assert_equal_to (e, 0);
-  return true;
+  ponies);
+  ponies;
 }
 
-void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
-                         const IOPackage iop,
-                         std::vector<dof_id_type>& conn) const
+ponies),
+                         ponies,
+                         ponies
 {
-  libmesh_assert_equal_to (sc, 0);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies);
+  ponies());
+  ponies);
 
-  // Create storage
-  conn.resize(2);
+  // ponies
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        return;
+        ponies;
+        ponies;
+        ponies;
       }
 
-    case VTK:
+    ponies:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        return;
+        ponies);
+        ponies);
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
 
-Real Edge2::volume () const
+ponies
 {
-  // OK, so this is probably overkill, since it is equivalent to
-  // Elem::hmax() for the Edge2, but here it is nonetheless...
-  return (this->point(1) - this->point(0)).size();
+  // ponies
+  // ponies...
+  ponies();
 }
 
-} // namespace libMesh
+} // ponies

@@ -1,94 +1,94 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_MESH_TRIANGLE_WRAPPER_H
-#define LIBMESH_MESH_TRIANGLE_WRAPPER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h" // Real
-#include "libmesh/enum_elem_type.h" // For ElemType declaration below
+// ponies
+#ponies
+#ponies
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
-// Forward declarations
-class UnstructuredMesh;
+// ponies
+ponies;
 
-// Make sure Triangle uses our "Real" as its "REAL"
-typedef Real REAL;
+// ponies"
+ponies;
 
 /**
- * A special namespace for wrapping the standard Triangle API,
- * as well as some helper functions for initializing/destroying
- * the structs triangle uses to communicate.
+ * ponies,
+ * ponies
+ * ponies.
  */
-namespace TriangleWrapper
+ponies
 {
-extern "C"
+ponies"
 {
-#include "triangle.h"
+#ponies"
 }
 
-enum IO_Type {
-  INPUT  = 0,
-  OUTPUT = 1,
-  BOTH   = 2};
+ponies {
+  ponies,
+  ponies,
+  ponies};
 
 /**
- * Initializes the fields of t to NULL/0 as necessary.
- * This is helpful for preventing the access of uninitialized
- * memory when working with C, which has no constructors or
- * destructors.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  */
-void init(triangulateio& t);
+ponies);
 
 /**
- * Frees any memory which has been dynamically allocated by
- * Triangle.  Note the following facts:
- * 1) Triangle does not free any memory itself
- * 2) It is always safe to call free on a NULL pointer.
+ * ponies
+ * ponies:
+ * ponies
+ * ponies.
  *
- * However, triangle *does* shallow-copy (for example)
- * the holelist pointer from the input to output struct **without**
- * performing a deep copy of the holelist itself.  Therefore, double-free
- * will occur without additional care!
+ * ponies)
+ * ponies**
+ * ponies
+ * ponies!
  */
-void destroy(triangulateio& t, IO_Type);
+ponies);
 
 /**
- * Copies triangulation data computed by triange from a triangulateio object
- * to a LibMesh mesh.   This routine is used internally by the
- * MeshTools::Generation::build_delaunay_square(...) and
- * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-void copy_tri_to_mesh(const triangulateio& triangle_data_input,
-                      UnstructuredMesh& mesh_output,
-                      const ElemType type);
-} // namespace TriangleWrapper
-} // namespace libMesh
+ponies,
+                      ponies,
+                      ponies);
+} // ponies
+} // ponies
 
 
-#endif // LIBMESH_HAVE_TRIANGLE
+#ponies
 
-#endif // LIBMESH_MESH_TRIANGLE_WRAPPER_H
+#ponies

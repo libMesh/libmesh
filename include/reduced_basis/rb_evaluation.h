@@ -1,346 +1,346 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_EVALUATION_H
-#define LIBMESH_RB_EVALUATION_H
+#ponies
+#ponies
 
-// rbOOmit includes
-#include "libmesh/rb_parametrized.h"
-#include "libmesh/rb_theta_expansion.h"
+// ponies
+#ponies"
+#ponies"
 
-// libMesh includes
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/parallel_object.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-class System;
-template <typename T> class NumericVector;
+ponies;
+ponies;
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * RBEvaluation encapsulates the functionality required
- * to _evaluate_ a given reduced basis model.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// RBEvaluation class definition
-class RBEvaluation : public RBParametrized,
-                     public ParallelObject
+// ponies
+ponies,
+                     ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  RBEvaluation (const Parallel::Communicator &comm
-                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBEvaluation ();
+  ponies ();
 
   /**
-   * Clear this RBEvaluation object. Delete the basis functions
-   * and clear and extra data in subclasses.
+   * ponies
+   * ponies.
    */
-  virtual void clear();
+  ponies();
 
   /**
-   * Set the RBThetaExpansion object.
+   * ponies.
    */
-  void set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in);
+  ponies);
 
   /**
-   * Get a reference to the rb_theta_expansion.
+   * ponies.
    */
-  RBThetaExpansion& get_rb_theta_expansion();
+  ponies();
 
   /**
-   * @return true if the theta expansion has been initialized.
+   * @ponies.
    */
-  bool is_rb_theta_expansion_initialized() const;
+  ponies;
 
   /**
-   * Resize and clear the data vectors corresponding to the
-   * value of \p Nmax. Optionally resize the data structures
-   * required for the error bound.
-   * Overload to also clear and resize any extra
-   * data in subclasses.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void resize_data_structures(const unsigned int Nmax,
-                                      bool resize_error_bound_data=true);
+  ponies,
+                                      ponies);
 
   /**
-   * Get a reference to the i^th basis function.
+   * ponies.
    */
-  NumericVector<Number>& get_basis_function(unsigned int i);
+  ponies);
 
   /**
-   * Perform online solve with the N RB basis functions, for the
-   * set of parameters in current_params, where 0 <= N <= RB_size.
-   * @return the (absolute) error bound associated with
-   * the RB approximation.
-   * With an empty RB space (N=0), our RB solution is zero, but we
-   * still obtain a meaningful error bound associated with the
-   * forcing terms.
+   * ponies
+   * ponies.
+   * @ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real rb_solve(unsigned int N);
+  ponies);
 
   /**
-   * Return the norm of RB_solution.
+   * ponies.
    */
-  virtual Real get_rb_solution_norm();
+  ponies();
 
   /**
-   * Compute the dual norm of the residual for the solution
-   * saved in RB_solution_vector.
+   * ponies
+   * ponies.
    */
-  virtual Real compute_residual_dual_norm(const unsigned int N);
+  ponies);
 
   /**
-   * Specifies the residual scaling on the denominator to
-   * be used in the a posteriori error bound. Overload
-   * in subclass in order to obtain the desired error bound.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real residual_scaling_denom(Real alpha_LB);
+  ponies);
 
   /**
-   * Evaluate the dual norm of output \p n
-   * for the current parameters.
+   * ponies
+   * ponies.
    */
-  Real eval_output_dual_norm(unsigned int n, const RBParameters& mu);
+  ponies);
 
   /**
-   * Get a lower bound for the stability constant (e.g. coercivity constant or
-   * inf-sup constant) at the current parameter value.
+   * ponies
+   * ponies.
    */
-  virtual Real get_stability_lower_bound();
+  ponies();
 
   /**
-   * Get the current number of basis functions.
+   * ponies.
    */
-  virtual unsigned int get_n_basis_functions() const
-  { return cast_int<unsigned int>(basis_functions.size()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Set the number of basis functions. Useful when reading in
-   * stored data.
+   * ponies
+   * ponies.
    */
-  virtual void set_n_basis_functions(unsigned int n_bfs) { basis_functions.resize(n_bfs); }
+  ponies); }
 
   /**
-   * Clear all the Riesz representors that are used to compute the RB residual
-   * (and hence error bound). This is useful since once we complete the Greedy
-   * we may not need the representors any more.
+   * ponies
+   * (ponies
+   * ponies.
    */
-  virtual void clear_riesz_representors();
+  ponies();
 
   /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage.
+   * ponies
+   * ponies.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
-                                           const bool write_binary_data=true);
+  ponies",
+                                           ponies);
 
   /**
-   * Read in the saved Offline reduced basis data
-   * to initialize the system for Online solves.
+   * ponies
+   * ponies.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
-                                            bool read_error_bound_data=true,
-                                            const bool read_binary_data=true);
+  ponies",
+                                            ponies,
+                                            ponies);
 
   /**
-   * Write out all the basis functions to file.
-   * \p sys is used for file IO
-   * \p directory_name specifies which directory to write files to
-   * \p read_binary_basis_functions indicates whether to expect
-   * binary or ASCII data
+   * ponies.
+   * \ponies
+   * \ponies
+   * \ponies
+   * ponies
    */
-  virtual void write_out_basis_functions(System& sys,
-                                         const std::string& directory_name = "offline_data",
-                                         const bool write_binary_basis_functions = true);
+  ponies,
+                                         ponies",
+                                         ponies);
 
   /**
-   * Same as write_out_basis_functions, except in this case we pass in the vectors to be
-   * written.
+   * ponies
+   * ponies.
    */
-  virtual void write_out_vectors(System& sys,
-                                 std::vector<NumericVector<Number>*>& vectors,
-                                 const std::string& directory_name = "offline_data",
-                                 const std::string& data_name = "bf",
-                                 const bool write_binary_basis_functions = true);
+  ponies,
+                                 ponies,
+                                 ponies",
+                                 ponies",
+                                 ponies);
 
   /**
-   * Read in all the basis functions from file.
-   * \p sys is used for file IO
-   * \p directory_name specifies which directory to write files to
-   * \p read_binary_basis_functions indicates whether to expect
-   * binary or ASCII data
+   * ponies.
+   * \ponies
+   * \ponies
+   * \ponies
+   * ponies
    */
-  virtual void read_in_basis_functions(System& sys,
-                                       const std::string& directory_name = "offline_data",
-                                       const bool read_binary_basis_functions = true);
+  ponies,
+                                       ponies",
+                                       ponies);
 
   /**
-   * Same as read_in_basis_functions, except in this case we pass in the vectors to be
-   * written. We assume that the size of vectors indicates the number of vectors
-   * that need to be read in.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void read_in_vectors(System& sys,
-                       std::vector<NumericVector<Number>*>& vectors,
-                       const std::string& directory_name,
-                       const std::string& data_name,
-                       const bool read_binary_vectors);
+  ponies,
+                       ponies,
+                       ponies,
+                       ponies,
+                       ponies);
 
   /**
-   * Performs read_in_vectors for a list of directory names and data names.
-   * Reading in vectors requires us to renumber the dofs in a partition-indepdent
-   * way. This function only renumbers the dofs once at the start (and reverts
-   * it at the end), which can save a lot of work compared to renumbering on every read.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void read_in_vectors_from_multiple_files(System& sys,
-                                           std::vector< std::vector<NumericVector<Number>*>* > multiple_vectors,
-                                           const std::vector<std::string>& multiple_directory_names,
-                                           const std::vector<std::string>& multiple_data_names,
-                                           const bool read_binary_vectors);
+  ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies);
 
   /**
-   * Version string that we need to use for writing/reading basis functions.
+   * ponies.
    */
-  static std::string get_io_version_string();
+  ponies();
 
-  //----------- PUBLIC DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * The libMesh vectors storing the finite element coefficients
-   * of the RB basis functions.
+   * ponies
+   * ponies.
    */
-  std::vector< NumericVector<Number>* > basis_functions;
+  ponies;
 
   /**
-   * The list of parameters selected by the Greedy algorithm in generating
-   * the Reduced Basis associated with this RBEvaluation object.
+   * ponies
+   * ponies.
    */
-  std::vector< RBParameters > greedy_param_list;
+  ponies;
 
   /**
-   * The inner product matrix. This should be close to the identity,
-   * we need to calculate this rather than assume diagonality in order
-   * to accurately perform projections since orthogonality degrades
-   * with increasing N.
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  DenseMatrix<Number> RB_inner_product_matrix;
+  ponies;
 
   /**
-   * Dense matrices for the RB computations.
+   * ponies.
    */
-  std::vector< DenseMatrix<Number> > RB_Aq_vector;
+  ponies;
 
   /**
-   * Dense vector for the RHS.
+   * ponies.
    */
-  std::vector< DenseVector<Number> > RB_Fq_vector;
+  ponies;
 
   /**
-   * The RB solution vector.
+   * ponies.
    */
-  DenseVector<Number> RB_solution;
+  ponies;
 
   /**
-   * The vectors storing the RB output vectors.
+   * ponies.
    */
-  std::vector< std::vector< DenseVector<Number> > > RB_output_vectors;
+  ponies;
 
   /**
-   * The vectors storing the RB output values and
-   * corresponding error bounds.
+   * ponies
+   * ponies.
    */
-  std::vector< Number > RB_outputs;
-  std::vector< Real > RB_output_error_bounds;
+  ponies;
+  ponies;
 
   /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   * These values are independent of a basis, hence they can
-   * be copied over directly from an RBSystem.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  std::vector<Number> Fq_representor_innerprods;
+  ponies;
 
   /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
-   * We store the Aq-dependent representor inner products because they depend
-   * on a reduced basis space. The basis independent representors
-   * are stored in RBSystem.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_innerprods;
-  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_innerprods;
+  ponies;
+  ponies;
 
   /**
-   * The vector storing the dual norm inner product terms
-   * for each output.
-   * These values are independent of a basis, hence they can
-   * be copied over directly from an RBSystem.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector< Number > > output_dual_innerprods;
+  ponies;
 
   /**
-   * Vector storing the residual representors associated with the
-   * left-hand side.
-   * These are basis dependent and hence stored here, whereas
-   * the Fq_representors are stored in RBSystem.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector< NumericVector<Number>* > > Aq_representor;
+  ponies;
 
   /**
-   * Boolean to indicate whether we evaluate a posteriori error bounds
-   * when rb_solve is called.
+   * ponies
+   * ponies.
    */
-  bool evaluate_RB_error_bound;
+  ponies;
 
   /**
-   * Boolean flag to indicate whether we compute the RB_inner_product_matrix.
+   * ponies.
    */
-  bool compute_RB_inner_product;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * A pointer to to the object that stores the theta expansion.
-   * This is not an UniquePtr since we may want to share it.
-   * (Note: a shared_ptr would be a good option here.)
+   * ponies.
+   * ponies.
+   * (ponies.)
    */
-  RBThetaExpansion* rb_theta_expansion;
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_RB_EVALUATION_H
+#ponies

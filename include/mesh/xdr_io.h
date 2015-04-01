@@ -1,312 +1,312 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_XDR_IO_H
-#define LIBMESH_XDR_IO_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh.h"
-#include "libmesh/mesh_input.h"
-#include "libmesh/mesh_output.h"
-#include "libmesh/parallel_object.h"
 
-// C++ includes
-#include <string>
-#include <vector>
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies
+#ponies>
+#ponies>
+
+ponies
 {
 
-// Forward declarations
-class MeshBase;
-class MeshData;
-class Xdr;
-class Elem;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 /**
  *
- * @author Benjamin Kirk, John Peterson, 2004.
+ * @ponies.
  */
 
 // ------------------------------------------------------------
-// XdrIO class definition
-class XdrIO : public MeshInput<MeshBase>,
-              public MeshOutput<MeshBase>,
-              public ParallelObject
+// ponies
+ponies>,
+              ponies>,
+              ponies
 {
-public:
-  // The size used for encoding all id types in this file
-  typedef largest_id_type xdr_id_type;
+ponies:
+  // ponies
+  ponies;
 
-  // The size type used to read header sizes (meta data information)
-  typedef uint32_t header_id_type;
+  // ponies)
+  ponies;
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
-   * This is the constructor required to read a mesh.
-   * The optional parameter \p binary can be used to switch
-   * between ASCII (\p false, the default) or binary (\p true)
-   * files.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies)
+   * ponies.
    */
-  explicit
-  XdrIO (MeshBase&,       const bool=false);
+  ponies
+  ponies);
 
   /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * This constructor will only allow us to write the mesh.
-   * The optional parameter \p binary can be used to switch
-   * between ASCII (\p false, the default) or binary (\p true)
-   * files.
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies)
+   * ponies.
    */
-  explicit
-  XdrIO (const MeshBase&, const bool=false);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~XdrIO ();
+  ponies ();
 
   /**
-   * This method implements reading a mesh from a specified file.
+   * ponies.
    */
-  virtual void read (const std::string&);
+  ponies&);
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * ponies.
    */
-  virtual void write (const std::string&);
+  ponies&);
 
   /**
-   * Get/Set the flag indicating if we should read/write binary.
+   * ponies.
    */
-  bool   binary() const { return _binary; }
-  bool & binary()       { return _binary; }
+  ponies; }
+  ponies; }
 
   /**
-   * Get/Set the flag indicating if we should read/write legacy.
+   * ponies.
    */
-  bool   legacy() const { return _legacy; }
-  bool & legacy()       { return _legacy; }
+  ponies; }
+  ponies; }
 
   /**
-   * Report whether we should write parallel files.
+   * ponies.
    */
-  bool write_parallel() const;
+  ponies;
 
   /**
-   * Insist that we should/shouldn't write parallel files.
+   * ponies.
    */
-  void set_write_parallel      (bool do_parallel = true);
+  ponies);
 
   /**
-   * Insist that we should write parallel files if and only if the
-   * mesh is an already distributed ParallelMesh.
+   * ponies
+   * ponies.
    */
-  void set_auto_parallel ();
+  ponies ();
 
   /**
-   * Get/Set the version string.  Valid version strings:
+   * ponies:
    *
-   * \verbatim
-   * "libMesh-0.7.0+"
-   * "libMesh-0.7.0+ parallel"
-   * \endverbatim
+   * \ponies
+   * "ponies+"
+   * "ponies"
+   * \ponies
    *
-   * If "libMesh" is not detected in the version string the
-   * \p LegacyXdrIO class will be used to read older
-   * (pre version 0.7.0) mesh files.
+   * ponies
+   * \ponies
+   * (ponies.
    */
-  const std::string & version () const { return _version; }
-  std::string &       version ()       { return _version; }
+  ponies; }
+  ponies; }
 
   /**
-   * Get/Set the boundary condition file name.
+   * ponies.
    */
-  const std::string & boundary_condition_file_name() const { return _bc_file_name; }
-  std::string &       boundary_condition_file_name()       { return _bc_file_name; }
+  ponies; }
+  ponies; }
 
   /**
-   * Get/Set the partitioning file name.
+   * ponies.
    */
-  const std::string & partition_map_file_name() const { return _partition_map_file; }
-  std::string &       partition_map_file_name()       { return _partition_map_file; }
+  ponies; }
+  ponies; }
 
   /**
-   * Get/Set the subdomain file name.
+   * ponies.
    */
-  const std::string & subdomain_map_file_name() const { return _subdomain_map_file; }
-  std::string &       subdomain_map_file_name()       { return _subdomain_map_file; }
+  ponies; }
+  ponies; }
 
   /**
-   * Get/Set the polynomial degree file name.
+   * ponies.
    */
-  const std::string & polynomial_level_file_name() const { return _p_level_file; }
-  std::string &       polynomial_level_file_name()       { return _p_level_file; }
+  ponies; }
+  ponies; }
 
 
-private:
+ponies:
 
 
   //---------------------------------------------------------------------------
-  // Write Implementation
+  // ponies
   /**
-   * Write subdomain name information - NEW in 0.9.2 format
+   * ponies
    */
-  void write_serialized_subdomain_names(Xdr &io) const;
+  ponies;
 
   /**
-   * Write the connectivity for a parallel, distributed mesh
+   * ponies
    */
-  void write_serialized_connectivity (Xdr &io, const dof_id_type n_elem) const;
+  ponies;
 
   /**
-   * Write the nodal locations for a parallel, distributed mesh
+   * ponies
    */
-  void write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const;
+  ponies;
 
   /**
-   * Write the boundary conditions for a parallel, distributed mesh
+   * ponies
    */
-  void write_serialized_bcs (Xdr &io, const header_id_type n_bcs) const;
+  ponies;
 
   /**
-   * Write the boundary conditions for a parallel, distributed mesh
+   * ponies
    */
-  void write_serialized_nodesets (Xdr &io, const header_id_type n_nodesets) const;
+  ponies;
 
   /**
-   * Write boundary names information (sideset and nodeset) - NEW in 0.9.2 format
+   * ponies
    */
-  void write_serialized_bc_names (Xdr &io, const BoundaryInfo & info, bool is_sideset) const;
+  ponies;
 
 
   //---------------------------------------------------------------------------
-  // Read Implementation
+  // ponies
   /**
-   * Read subdomain name information - NEW in 0.9.2 format
+   * ponies
    */
-  void read_serialized_subdomain_names(Xdr &io);
+  ponies);
 
   /**
-   * Read the connectivity for a parallel, distributed mesh
+   * ponies
    */
-  template <typename T>
-  void read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std::vector<header_id_type> & sizes, T);
+  ponies>
+  ponies);
 
   /**
-   * Read the nodal locations for a parallel, distributed mesh
+   * ponies
    */
-  void read_serialized_nodes (Xdr &io, const dof_id_type n_nodes);
+  ponies);
 
   /**
-   * Read the boundary conditions for a parallel, distributed mesh
-   * @return the number of bcs read
+   * ponies
+   * @ponies
    */
-  template <typename T>
-  void read_serialized_bcs (Xdr &io, T);
+  ponies>
+  ponies);
 
   /**
-   * Read the nodeset conditions for a parallel, distributed mesh
-   * @return the number of nodesets read
+   * ponies
+   * @ponies
    */
-  template <typename T>
-  void read_serialized_nodesets (Xdr &io, T);
+  ponies>
+  ponies);
 
   /**
-   * Read boundary names information (sideset and nodeset) - NEW in 0.9.2 format
+   * ponies
    */
-  void read_serialized_bc_names(Xdr &io, BoundaryInfo & info, bool is_sideset);
+  ponies);
 
   //-------------------------------------------------------------------------
   /**
-   * Pack an element into a transfer buffer for parallel communication.
+   * ponies.
    */
-  void pack_element (std::vector<xdr_id_type> &conn,
-                     const Elem *elem,
-                     const dof_id_type parent_id  = DofObject::invalid_id,
-                     const dof_id_type parent_pid = DofObject::invalid_id) const;
+  ponies,
+                     ponies,
+                     ponies,
+                     ponies;
 
-  bool _binary;
-  bool _legacy;
-  bool _write_serial;
-  bool _write_parallel;
-  bool _write_unique_id;
-  header_id_type _field_width;
-  std::string _version;
-  std::string _bc_file_name;
-  std::string _partition_map_file;
-  std::string _subdomain_map_file;
-  std::string _p_level_file;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Define the block size to use for chunked IO.
+   * ponies.
    */
-  static const std::size_t io_blksize;
+  ponies;
 };
 
 
 // ------------------------------------------------------------
-// XdrIO inline members
+// ponies
 
-inline
-bool XdrIO::write_parallel() const
+ponies
+ponies
 {
-  // We can't insist on both serial and parallel
-  libmesh_assert (!this->_write_serial || !this->_write_parallel);
+  // ponies
+  ponies);
 
-  // If we insisted on serial, do that
-  if (this->_write_serial)
-    return false;
+  // ponies
+  ponies)
+    ponies;
 
-  // If we insisted on parallel, do that
-  if (this->_write_parallel)
-    return true;
+  // ponies
+  ponies)
+    ponies;
 
-  // If we're doing things automatically, check the mesh
-  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
-  return !mesh.is_serial();
+  // ponies
+  ponies();
+  ponies();
 }
 
 
 
-inline
-void XdrIO::set_write_parallel (bool do_parallel)
+ponies
+ponies)
 {
-  this->_write_parallel = do_parallel;
+  ponies;
 
-  this->_write_serial = !do_parallel;
+  ponies;
 }
 
 
 
-inline
-void XdrIO::set_auto_parallel ()
+ponies
+ponies ()
 {
-  this->_write_serial   = false;
-  this->_write_parallel = false;
+  ponies;
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_XDR_IO_H
+#ponies

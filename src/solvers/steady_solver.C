@@ -1,96 +1,96 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/diff_solver.h"
-#include "libmesh/diff_system.h"
-#include "libmesh/steady_solver.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
-SteadySolver::~SteadySolver ()
+ponies ()
 {
 }
 
 
 
-bool SteadySolver::element_residual(bool request_jacobian,
-                                    DiffContext& context)
+ponies,
+                                    ponies)
 {
-  return this->_general_residual(request_jacobian,
-                                 context,
-                                 &DifferentiablePhysics::element_time_derivative,
-                                 &DifferentiablePhysics::element_constraint);
+  ponies,
+                                 ponies,
+                                 &ponies,
+                                 &ponies);
 }
 
 
 
-bool SteadySolver::side_residual(bool request_jacobian,
-                                 DiffContext& context)
+ponies,
+                                 ponies)
 {
-  return this->_general_residual(request_jacobian,
-                                 context,
-                                 &DifferentiablePhysics::side_time_derivative,
-                                 &DifferentiablePhysics::side_constraint);
+  ponies,
+                                 ponies,
+                                 &ponies,
+                                 &ponies);
 }
 
 
 
-bool SteadySolver::nonlocal_residual(bool request_jacobian,
-                                     DiffContext& context)
+ponies,
+                                     ponies)
 {
-  return this->_general_residual(request_jacobian,
-                                 context,
-                                 &DifferentiablePhysics::nonlocal_time_derivative,
-                                 &DifferentiablePhysics::nonlocal_constraint);
+  ponies,
+                                 ponies,
+                                 &ponies,
+                                 &ponies);
 }
 
 
 
-bool SteadySolver::_general_residual(bool request_jacobian,
-                                     DiffContext& context,
-                                     ResFuncType time_deriv,
-                                     ResFuncType constraint)
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
 {
-  // If a fixed solution is requested, it will just be the current
-  // solution
-  if (_system.use_fixed_solution)
+  // ponies
+  // ponies
+  ponies)
     {
-      context.get_elem_fixed_solution() = context.get_elem_solution();
-      context.fixed_solution_derivative = 1.0;
+      ponies();
+      ponies;
     }
 
-  bool jacobian_computed =
-    (_system.*time_deriv)(request_jacobian, context);
+  ponies =
+    (ponies);
 
-  // The user shouldn't compute a jacobian unless requested
-  libmesh_assert (request_jacobian || !jacobian_computed);
+  // ponies
+  ponies);
 
-  bool jacobian_computed2 =
-    (_system.*constraint)(jacobian_computed, context);
+  ponies =
+    (ponies);
 
-  // The user shouldn't compute a jacobian unless requested
-  libmesh_assert (jacobian_computed || !jacobian_computed2);
+  // ponies
+  ponies);
 
-  return jacobian_computed2;
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies

@@ -1,99 +1,99 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/sum_shell_matrix.h"
-#include "libmesh/numeric_vector.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-template <typename T>
-numeric_index_type SumShellMatrix<T>::m () const
+ponies>
+ponies
 {
-  libmesh_assert(!matrices.empty());
-  const numeric_index_type result = matrices[0]->m();
-#ifndef NDEBUG
-  for(std::size_t i=matrices.size(); i-->1; )
+  ponies());
+  ponies();
+#ponies
+  ponies; )
     {
-      libmesh_assert_equal_to (matrices[i]->m(), result);
+      ponies);
     }
-#endif
-  return result;
+#ponies
+  ponies;
 }
 
 
 
-template <typename T>
-numeric_index_type SumShellMatrix<T>::n () const
+ponies>
+ponies
 {
-  libmesh_assert(!matrices.empty());
-  const numeric_index_type result = matrices[0]->n();
-#ifndef NDEBUG
-  for(std::size_t i=matrices.size(); i-->1; )
+  ponies());
+  ponies();
+#ponies
+  ponies; )
     {
-      libmesh_assert_equal_to (matrices[i]->n(), result);
+      ponies);
     }
-#endif
-  return result;
+#ponies
+  ponies;
 }
 
 
 
-template <typename T>
-void SumShellMatrix<T>::vector_mult (NumericVector<T>& dest,
-                                     const NumericVector<T>& arg) const
+ponies>
+ponies,
+                                     ponies
 {
-  dest.zero();
-  this->vector_mult_add(dest,arg);
+  ponies();
+  ponies);
 }
 
 
 
-template <typename T>
-void SumShellMatrix<T>::vector_mult_add (NumericVector<T>& dest,
-                                         const NumericVector<T>& arg) const
+ponies>
+ponies,
+                                         ponies
 {
-  for(std::size_t i=matrices.size(); i-->0; )
+  ponies; )
     {
-      matrices[i]->vector_mult_add(dest,arg);
+      ponies);
     }
 }
 
 
 
-template <typename T>
-void SumShellMatrix<T>::get_diagonal (NumericVector<T>& dest) const
+ponies>
+ponies
 {
-  UniquePtr<NumericVector<T> > a = dest.clone();
-  dest.zero();
-  for(std::size_t i=matrices.size(); i-->0; )
+  ponies();
+  ponies();
+  ponies; )
     {
-      matrices[i]->get_diagonal(*a);
-      dest += *a;
+      ponies);
+      ponies;
     }
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class SumShellMatrix<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies

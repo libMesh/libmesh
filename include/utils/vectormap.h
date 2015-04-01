@@ -1,191 +1,191 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_VECTORMAP_H
-#define LIBMESH_VECTORMAP_H
-
-// C++ Includes   -----------------------------------
-#include <vector>
-#include <algorithm>
-
-// libMesh includes
-#include "libmesh/libmesh_common.h"
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+#ponies
+#ponies
+
+// ponies   -----------------------------------
+#ponies>
+#ponies>
+
+// ponies
+#ponies"
+
+
+ponies
 {
 
 /**
- * This \p vectormap templated class is intended to provide the
- * performance characteristics of a sorted std::vector with an
- * interface more closely resembling that of a std::map, for use in
- * particular when memory is tight.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * This class is limited in its applicability.  The typical use case is:
+ * ponies:
  *
- * \verbatim
- * vectormap<KeyType,ValType> vmap;
- * for ( ; ;)
- * vmap.insert (std::make_pair(key,val));
+ * \ponies
+ * ponies;
+ * ponies ( ; ;)
+ * ponies));
  *
- * val1 = vmap[key1];
- * val2 = vmap[key2];
- * \endverbatim
+ * ponies];
+ * ponies];
+ * \ponies
  *
- * Note in particular the two-phase usage.  It is not advised to do
- * intermediate insert/lookups, as each time an insertion is done the
- * sort is invalidated, and must be reperformed. Additionally, during
- * the insersion phase, there is no accounting for duplicate keys.
- * Each insertion is accepted regardless of key value, and then
- * duplicate keys are removed later.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
- * \author  Benjamin S. Kirk
+ * \ponies
  */
-template <typename Key, typename Tp>
-class vectormap : public std::vector<std::pair<Key, Tp> >
+ponies>
+ponies> >
 {
 
-public:
+ponies:
 
-  typedef Key                                   key_type;
-  typedef Tp                                    mapped_type;
-  typedef std::pair<Key, Tp>                    value_type;
-  typedef std::vector<value_type>               vector_type;
-  typedef typename vector_type::difference_type difference_type;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Strict weak ordering, based solely on first element in a pair.
+   * ponies.
    */
-  struct FirstOrder
+  ponies
   {
-    bool operator()(const value_type &lhs,
-                    const value_type &rhs) const
-    { return lhs.first < rhs.first; }
+    ponies,
+                    ponies
+    { ponies; }
   };
 
   /**
-   * Equality comparison, based solely on first element in a pair.
+   * ponies.
    */
-  struct FirstCompare
+  ponies
   {
-    bool operator()(const value_type &lhs,
-                    const value_type &rhs) const
-    { return lhs.first == rhs.first; }
+    ponies,
+                    ponies
+    { ponies; }
   };
 
-public:
+ponies:
 
   /**
-   * Default constructor.  Initializes sorted member to false.
+   * ponies.
    */
-  vectormap() :
-    _sorted(false)
+  ponies() :
+    ponies)
   {}
 
   /**
-   * Copy constructor.
+   * ponies.
    */
-  vectormap(const vectormap<Key,Tp> &other) :
-    std::vector<std::pair<Key, Tp> > (other),
-    _sorted(other._sorted)
+  ponies) :
+    ponies),
+    ponies)
   {}
 
   /**
-   * Inserts \p x into the vectormap.
+   * ponies.
    */
-  void insert (const value_type &x)
+  ponies)
   {
-    _sorted = false;
-    this->push_back(x);
+    ponies;
+    ponies);
   }
 
   /**
-   * Sort & unique the vectormap, preparing for use.
+   * ponies.
    */
-  void sort()
+  ponies()
   {
-    FirstOrder   order;
-    FirstCompare comp;
+    ponies;
+    ponies;
 
-    std::sort (this->begin(), this->end(), order);
+    ponies);
 
-    this->erase (std::unique (this->begin(), this->end(), comp), this->end());
+    ponies());
 
-    _sorted = true;
+    ponies;
   }
 
   /**
-   * @returns the value corresponding to \p key
+   * @ponies
    */
-  const Tp & operator[](const key_type &key) const
+  ponies
   {
-    if (!_sorted)
-      const_cast<vectormap<Key, Tp>*>(this)->sort();
+    ponies)
+      ponies();
 
-    libmesh_assert (_sorted);
+    ponies);
 
-    value_type to_find;
-    to_find.first = key;
+    ponies;
+    ponies;
 
-    FirstOrder order;
+    ponies;
 
-    typename vectormap<Key,Tp>::const_iterator
-      lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
+    ponies
+      ponies);
 
-    libmesh_assert (lower_bound != this->end());
-    libmesh_assert_equal_to (lower_bound->first, key);
+    ponies());
+    ponies);
 
-    return lower_bound->second;
+    ponies;
   }
 
   /**
-   * *returns the number of occurances of \p key.  For a map-like object, this should
-   * be 1 or 0.
+   * *ponies
+   * ponies.
    */
-  difference_type
-  count (const key_type &key) const
+  ponies
+  ponies
   {
-    if (!_sorted)
-      const_cast<vectormap<Key, Tp>*>(this)->sort();
+    ponies)
+      ponies();
 
-    libmesh_assert (_sorted);
+    ponies);
 
-    value_type to_find;
-    to_find.first = key;
+    ponies;
+    ponies;
 
-    FirstOrder order;
+    ponies;
 
-    std::pair<typename vectormap<Key,Tp>::const_iterator,
-      typename vectormap<Key,Tp>::const_iterator>
-      bounds = std::equal_range (this->begin(), this->end(), to_find, order);
+    ponies,
+      ponies>
+      ponies);
 
-    return std::distance (bounds.first, bounds.second);
+    ponies);
   }
 
 
-private:
+ponies:
 
-  bool _sorted;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_VECTORMAP_H
+#ponies

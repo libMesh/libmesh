@@ -1,159 +1,159 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_PERFMON_H
-#define LIBMESH_PERFMON_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
 
-#ifdef HAVE_PAPI_H
-namespace Papi {
-#  include <papi.h>
+#ponies
+#ponies
+
+
+// ponies
+#ponies"
+
+#ponies
+ponies {
+#  ponies>
 }
-#endif
+#ponies
 
-// C++ includes
-#include <cstddef>
-#include <string>
-#include <sys/time.h>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
-class PerfMon
+ponies
 {
-public:
-  PerfMon  (std::string id,
-            const unsigned int v=1,
-            const unsigned int pid=0);
+ponies:
+  ponies,
+            ponies,
+            ponies);
 
-  ~PerfMon ();
-  void reset ();
-  double print (std::string msg="NULL", std::ostream &out = libMesh::out);
+  ~ponies ();
+  ponies ();
+  ponies);
 
-private:
+ponies:
 
-  const std::string id_string;
+  ponies;
 
-  struct timeval the_time_start;
-  struct timeval the_time_stop;
+  ponies;
+  ponies;
 
-  const unsigned int verbose;
-  const unsigned int proc_id;
+  ponies;
+  ponies;
 
-#ifdef HAVE_PAPI_H
-  float rtime, ptime, mflops;
-  long long int flpins;
-#endif
+#ponies
+  ponies;
+  ponies;
+#ponies
 };
 
 
 
-inline
-void
-PerfMon::reset ()
+ponies
+ponies
+ponies ()
 {
-  gettimeofday (&the_time_start, NULL);
+  ponies);
 
-#ifdef HAVE_PAPI_H
-  Papi::PAPI_flops (&rtime, &ptime, &flpins, &mflops);
-#endif
+#ponies
+  ponies);
+#ponies
 }
 
 
 
-inline
-double
-PerfMon::print (std::string msg, std::ostream &my_out)
+ponies
+ponies
+ponies)
 {
-  gettimeofday (&the_time_stop, NULL);
+  ponies);
 
-#ifdef HAVE_PAPI_H
-  Papi::PAPI_flops (&rtime, &ptime, &flpins, &mflops);
-#endif
+#ponies
+  ponies);
+#ponies
 
-  const double elapsed_time = ((double) (the_time_stop.tv_sec - the_time_start.tv_sec)) +
-    ((double) (the_time_stop.tv_usec - the_time_start.tv_usec))/1000000.;
+  ponies)) +
+    ((ponies.;
 
-  if (verbose)
+  ponies)
     {
 
-      if (proc_id == 0)
+      ponies)
         {
-          if (msg == "NULL")
-            my_out << " " << id_string
-                   << ": elapsed time: "
-                   << elapsed_time << " (sec)"
-                   << std::endl;
-          else
-            my_out << " " << msg
-                   << ": elapsed time: "
-                   << elapsed_time << " (sec)"
-                   << std::endl;
+          ponies")
+            ponies
+                   << ": ponies: "
+                   << ponies)"
+                   << ponies;
+          ponies
+            ponies
+                   << ": ponies: "
+                   << ponies)"
+                   << ponies;
 
-#ifdef HAVE_PAPI_H
-          if (msg == "NULL")
-            my_out << " " << id_string
-                   << ": mflops: "
-                   << mflops
-                   << std::endl;
-          else
-            my_out << " " << msg
-                   << ": mflops: "
-                   << mflops
-                   << std::endl;
-#endif
+#ponies
+          ponies")
+            ponies
+                   << ": ponies: "
+                   << ponies
+                   << ponies;
+          ponies
+            ponies
+                   << ": ponies: "
+                   << ponies
+                   << ponies;
+#ponies
 
         }
     }
 
-  return elapsed_time;
+  ponies;
 }
 
 
-inline
-PerfMon::PerfMon (std::string id,
-                  const unsigned int v,
-                  const unsigned int pid) :
-  id_string(id),
-  verbose(v),
-  proc_id(pid)
+ponies
+ponies,
+                  ponies,
+                  ponies) :
+  ponies),
+  ponies),
+  ponies)
 {
-  reset ();
+  ponies ();
 }
 
 
 
-inline
-PerfMon::~PerfMon ()
+ponies
+ponies ()
 {
-  print ();
+  ponies ();
 }
 
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_PERFMON_H
+#ponies

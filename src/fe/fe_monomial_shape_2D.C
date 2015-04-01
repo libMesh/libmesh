@@ -1,554 +1,554 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
-template <>
-Real FE<2,MONOMIAL>::shape(const ElemType,
-                           const Order libmesh_dbg_var(order),
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies),
+                           ponies,
+                           ponies)
 {
-#if LIBMESH_DIM > 1
+#ponies
 
-  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-                       (static_cast<unsigned int>(order)+2)/2);
+  ponies)*
+                       (ponies);
 
-  const Real xi  = p(0);
-  const Real eta = p(1);
+  ponies);
+  ponies);
 
-  switch (i)
+  ponies)
     {
-      // constant
-    case 0:
-      return 1.;
+      // ponies
+    ponies:
+      ponies.;
 
-      // linear
-    case 1:
-      return xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 2:
-      return eta;
+    ponies:
+      ponies;
 
-      // quadratics
-    case 3:
-      return xi*xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 4:
-      return xi*eta;
+    ponies:
+      ponies;
 
-    case 5:
-      return eta*eta;
+    ponies:
+      ponies;
 
-      // cubics
-    case 6:
-      return xi*xi*xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 7:
-      return xi*xi*eta;
+    ponies:
+      ponies;
 
-    case 8:
-      return xi*eta*eta;
+    ponies:
+      ponies;
 
-    case 9:
-      return eta*eta*eta;
+    ponies:
+      ponies;
 
-      // quartics
-    case 10:
-      return xi*xi*xi*xi;
+      // ponies
+    ponies:
+      ponies;
 
-    case 11:
-      return xi*xi*xi*eta;
+    ponies:
+      ponies;
 
-    case 12:
-      return xi*xi*eta*eta;
+    ponies:
+      ponies;
 
-    case 13:
-      return xi*eta*eta*eta;
+    ponies:
+      ponies;
 
-    case 14:
-      return eta*eta*eta*eta;
+    ponies:
+      ponies;
 
-    default:
-      unsigned int o = 0;
-      for (; i >= (o+1)*(o+2)/2; o++) { }
-      unsigned int ny = i - (o*(o+1)/2);
-      unsigned int nx = o - ny;
-      Real val = 1.;
-      for (unsigned int index=0; index != nx; index++)
-        val *= xi;
-      for (unsigned int index=0; index != ny; index++)
-        val *= eta;
-      return val;
+    ponies:
+      ponies;
+      ponies++) { }
+      ponies);
+      ponies;
+      ponies.;
+      ponies++)
+        ponies;
+      ponies++)
+        ponies;
+      ponies;
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 
-#endif
+#ponies
 }
 
 
 
-template <>
-Real FE<2,MONOMIAL>::shape(const Elem* elem,
-                           const Order order,
-                           const unsigned int i,
-                           const Point& p)
+ponies <>
+ponies,
+                           ponies,
+                           ponies,
+                           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // by default call the orientation-independent shape functions
-  return FE<2,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
+  // ponies
+  ponies);
 }
 
 
 
-template <>
-Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
-                                 const Order libmesh_dbg_var(order),
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies),
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-#if LIBMESH_DIM > 1
+#ponies
 
 
-  libmesh_assert_less (j, 2);
+  ponies);
 
-  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-                       (static_cast<unsigned int>(order)+2)/2);
+  ponies)*
+                       (ponies);
 
-  const Real xi  = p(0);
-  const Real eta = p(1);
+  ponies);
+  ponies);
 
-  // monomials. since they are hierarchic we only need one case block.
+  // ponies.
 
-  switch (j)
+  ponies)
     {
-      // d()/dxi
-    case 0:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constants
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linears
-          case 1:
-            return 1.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 2:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quadratics
-          case 3:
-            return 2.*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 4:
-            return eta;
+          ponies:
+            ponies;
 
-          case 5:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubics
-          case 6:
-            return 3.*xi*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 7:
-            return 2.*xi*eta;
+          ponies:
+            ponies;
 
-          case 8:
-            return eta*eta;
+          ponies:
+            ponies;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 10:
-            return 4.*xi*xi*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 11:
-            return 3.*xi*xi*eta;
+          ponies:
+            ponies;
 
-          case 12:
-            return 2.*xi*eta*eta;
+          ponies:
+            ponies;
 
-          case 13:
-            return eta*eta*eta;
+          ponies:
+            ponies;
 
-          case 14:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
-            Real val = nx;
-            for (unsigned int index=1; index < nx; index++)
-              val *= xi;
-            for (unsigned int index=0; index != ny; index++)
-              val *= eta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d()/deta
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constants
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linears
-          case 1:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 2:
-            return 1.;
+          ponies:
+            ponies.;
 
-            // quadratics
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 4:
-            return xi;
+          ponies:
+            ponies;
 
-          case 5:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-            // cubics
-          case 6:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 7:
-            return xi*xi;
+          ponies:
+            ponies;
 
-          case 8:
-            return 2.*xi*eta;
+          ponies:
+            ponies;
 
-          case 9:
-            return 3.*eta*eta;
+          ponies:
+            ponies;
 
-            // quartics
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return xi*xi*xi;
+          ponies:
+            ponies;
 
-          case 12:
-            return 2.*xi*xi*eta;
+          ponies:
+            ponies;
 
-          case 13:
-            return 3.*xi*eta*eta;
+          ponies:
+            ponies;
 
-          case 14:
-            return 4.*eta*eta*eta;
+          ponies:
+            ponies;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
-            Real val = ny;
-            for (unsigned int index=0; index != nx; index++)
-              val *= xi;
-            for (unsigned int index=1; index < ny; index++)
-              val *= eta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid shape function derivative j = " << j);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 
-#endif
+#ponies
 }
 
 
 
-template <>
-Real FE<2,MONOMIAL>::shape_deriv(const Elem* elem,
-                                 const Order order,
-                                 const unsigned int i,
-                                 const unsigned int j,
-                                 const Point& p)
+ponies <>
+ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // by default call the orientation-independent shape functions
-  return FE<2,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
 
 
-template <>
-Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
-                                        const Order libmesh_dbg_var(order),
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies),
+                                        ponies,
+                                        ponies,
+                                        ponies)
 {
-#if LIBMESH_DIM > 1
+#ponies
 
 
-  libmesh_assert_less_equal (j, 2);
+  ponies);
 
-  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-                       (static_cast<unsigned int>(order)+2)/2);
+  ponies)*
+                       (ponies);
 
-  const Real xi  = p(0);
-  const Real eta = p(1);
+  ponies);
+  ponies);
 
-  // monomials. since they are hierarchic we only need one case block.
+  // ponies.
 
-  switch (j)
+  ponies)
     {
-      // d^2()/dxi^2
-    case 0:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constants
-          case 0:
-            // linears
-          case 1:
-          case 2:
-            return 0.;
+            // ponies
+          ponies:
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratics
-          case 3:
-            return 2.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 4:
-          case 5:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubics
-          case 6:
-            return 6.*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 7:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 10:
-            return 12.*xi*xi;
+            // ponies
+          ponies:
+            ponies;
 
-          case 11:
-            return 6.*xi*eta;
+          ponies:
+            ponies;
 
-          case 12:
-            return 2.*eta*eta;
+          ponies:
+            ponies;
 
-          case 13:
-          case 14:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
-            Real val = nx * (nx - 1);
-            for (unsigned int index=2; index < nx; index++)
-              val *= xi;
-            for (unsigned int index=0; index != ny; index++)
-              val *= eta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-      // d^2()/dxideta
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constants
-          case 0:
+            // ponies
+          ponies:
 
-            // linears
-          case 1:
-          case 2:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratics
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 4:
-            return 1.;
+          ponies:
+            ponies.;
 
-          case 5:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubics
-          case 6:
-            return 0.;
-          case 7:
-            return 2.*xi;
+            // ponies
+          ponies:
+            ponies.;
+          ponies:
+            ponies;
 
-          case 8:
-            return 2.*eta;
+          ponies:
+            ponies;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return 3.*xi*xi;
+          ponies:
+            ponies;
 
-          case 12:
-            return 4.*xi*eta;
+          ponies:
+            ponies;
 
-          case 13:
-            return 3.*eta*eta;
+          ponies:
+            ponies;
 
-          case 14:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
-            Real val = nx * ny;
-            for (unsigned int index=1; index < nx; index++)
-              val *= xi;
-            for (unsigned int index=1; index < ny; index++)
-              val *= eta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-      // d^2()/deta^2
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constants
-          case 0:
+            // ponies
+          ponies:
 
-            // linears
-          case 1:
-          case 2:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratics
-          case 3:
-          case 4:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 5:
-            return 2.;
+          ponies:
+            ponies.;
 
-            // cubics
-          case 6:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 7:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 8:
-            return 2.*xi;
+          ponies:
+            ponies;
 
-          case 9:
-            return 6.*eta;
+          ponies:
+            ponies;
 
-            // quartics
-          case 10:
-          case 11:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 12:
-            return 2.*xi*xi;
+          ponies:
+            ponies;
 
-          case 13:
-            return 6.*xi*eta;
+          ponies:
+            ponies;
 
-          case 14:
-            return 12.*eta*eta;
+          ponies:
+            ponies;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
-            Real val = ny * (ny - 1);
-            for (unsigned int index=0; index != nx; index++)
-              val *= xi;
-            for (unsigned int index=2; index < ny; index++)
-              val *= eta;
-            return val;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid shape function derivative j = " << j);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 
-#endif
+#ponies
 }
 
 
 
-template <>
-Real FE<2,MONOMIAL>::shape_second_deriv(const Elem* elem,
-                                        const Order order,
-                                        const unsigned int i,
-                                        const unsigned int j,
-                                        const Point& p)
+ponies <>
+ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // by default call the orientation-independent shape functions
-  return FE<2,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
+  // ponies
+  ponies);
 }
 
 
-} // namespace libMesh
+} // ponies

@@ -1,281 +1,281 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// C++ includes
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-
-// Local Includes
-#include "libmesh/adjoint_residual_error_estimator.h"
-#include "libmesh/error_vector.h"
-#include "libmesh/patch_recovery_error_estimator.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/system.h"
-#include "libmesh/system_norm.h"
-#include "libmesh/qoi_set.h"
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+// ponies
+#ponies>
+#ponies>
+#ponies>
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+
+ponies
 {
 
 //-----------------------------------------------------------------
-// AdjointResidualErrorEstimator implementations
-AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
-  ErrorEstimator(),
-  error_plot_suffix(),
-  _primal_error_estimator(new PatchRecoveryErrorEstimator()),
-  _dual_error_estimator(new PatchRecoveryErrorEstimator()),
-  _qoi_set(QoISet())
+// ponies
+ponies () :
+  ponies(),
+  ponies(),
+  ponies()),
+  ponies()),
+  ponies())
 {
 }
 
 
 
-void AdjointResidualErrorEstimator::estimate_error (const System& _system,
-                                                    ErrorVector& error_per_cell,
-                                                    const NumericVector<Number>* solution_vector,
-                                                    bool estimate_parent_error)
+ponies,
+                                                    ponies,
+                                                    ponies,
+                                                    ponies)
 {
-  START_LOG("estimate_error()", "AdjointResidualErrorEstimator");
+  ponies");
 
-  // The current mesh
-  const MeshBase& mesh = _system.get_mesh();
+  // ponies
+  ponies();
 
-  // Resize the error_per_cell vector to be
-  // the number of elements, initialize it to 0.
-  error_per_cell.resize (mesh.max_elem_id());
-  std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
+  // ponies
+  // ponies.
+  ponies());
+  ponies.);
 
-  // Get the number of variables in the system
-  unsigned int n_vars = _system.n_vars();
+  // ponies
+  ponies();
 
-  // We need to make a map of the pointer to the solution vector
-  std::map<const System*, const NumericVector<Number>*>solutionvecs;
-  solutionvecs[&_system] = _system.solution.get();
+  // ponies
+  ponies;
+  ponies();
 
-  // Solve the dual problem if we have to
-  if (!_system.is_adjoint_already_solved())
+  // ponies
+  ponies())
     {
-      // FIXME - we'll need to change a lot of APIs to make this trick
-      // work with a const System...
-      System&  system = const_cast<System&>(_system);
-      system.adjoint_solve(_qoi_set);
+      // ponies
+      // ponies...
+      ponies);
+      ponies);
     }
 
-  // Flag to check whether we have not been asked to weight the variable error contributions in any specific manner
-  bool error_norm_is_identity = error_norm.is_identity();
+  // ponies
+  ponies();
 
-  // Create an ErrorMap/ErrorVector to store the primal, dual and total_dual variable errors
-  ErrorMap primal_errors_per_cell;
-  ErrorMap dual_errors_per_cell;
-  ErrorMap total_dual_errors_per_cell;
-  // Allocate ErrorVectors to this map if we're going to use it
-  if (!error_norm_is_identity)
-    for(unsigned int v = 0; v < n_vars; v++)
+  // ponies
+  ponies;
+  ponies;
+  ponies;
+  // ponies
+  ponies)
+    ponies++)
       {
-        primal_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
-        dual_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
-        total_dual_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
+        ponies;
+        ponies;
+        ponies;
       }
-  ErrorVector primal_error_per_cell;
-  ErrorVector dual_error_per_cell;
-  ErrorVector total_dual_error_per_cell;
+  ponies;
+  ponies;
+  ponies;
 
-  // Have we been asked to weight the variable error contributions in any specific manner
-  if(!error_norm_is_identity) // If we do
+  // ponies
+  ponies
     {
-      // Estimate the primal problem error for each variable
-      _primal_error_estimator->estimate_errors
-        (_system.get_equation_systems(), primal_errors_per_cell, &solutionvecs, estimate_parent_error);
+      // ponies
+      ponies
+        (ponies);
     }
-  else // If not
+  ponies
     {
-      // Just get the combined error estimate
-      _primal_error_estimator->estimate_error
-        (_system, primal_error_per_cell, solution_vector, estimate_parent_error);
+      // ponies
+      ponies
+        (ponies);
     }
 
-  // Sum and weight the dual error estimate based on our QoISet
-  for (unsigned int i = 0; i != _system.qoi.size(); ++i)
+  // ponies
+  ponies)
     {
-      if (_qoi_set.has_index(i))
+      ponies))
         {
-          // Get the weight for the current QoI
-          Real error_weight = _qoi_set.weight(i);
+          // ponies
+          ponies);
 
-          // We need to make a map of the pointer to the adjoint solution vector
-          std::map<const System*, const NumericVector<Number>*>adjointsolutionvecs;
-          adjointsolutionvecs[&_system] = &_system.get_adjoint_solution(i);
+          // ponies
+          ponies;
+          ponies);
 
-          // Have we been asked to weight the variable error contributions in any specific manner
-          if(!error_norm_is_identity) // If we have
+          // ponies
+          ponies
             {
-              _dual_error_estimator->estimate_errors
-                (_system.get_equation_systems(), dual_errors_per_cell, &adjointsolutionvecs,
-                 estimate_parent_error);
+              ponies
+                (ponies,
+                 ponies);
             }
-          else // If not
+          ponies
             {
-              // Just get the combined error estimate
-              _dual_error_estimator->estimate_error
-                (_system, dual_error_per_cell, &(_system.get_adjoint_solution(i)), estimate_parent_error);
-            }
-
-          std::size_t error_size;
-
-          // Get the size of the first ErrorMap vector; this will give us the number of elements
-          if(!error_norm_is_identity) // If in non default weights case
-            {
-              error_size = dual_errors_per_cell[std::make_pair(&_system, 0)]->size();
-            }
-          else // If in the standard default weights case
-            {
-              error_size = dual_error_per_cell.size();
+              // ponies
+              ponies
+                (ponies);
             }
 
-          // Resize the ErrorVector(s)
-          if(!error_norm_is_identity)
+          ponies;
+
+          // ponies
+          ponies
             {
-              // Loop over variables
-              for(unsigned int v = 0; v < n_vars; v++)
+              ponies();
+            }
+          ponies
+            {
+              ponies();
+            }
+
+          // ponies)
+          ponies)
+            {
+              // ponies
+              ponies++)
                 {
-                  libmesh_assert(!total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() ||
-                                 total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() == error_size) ;
-                  total_dual_errors_per_cell[std::make_pair(&_system, v)]->resize(error_size);
+                  ponies() ||
+                                 ponies) ;
+                  ponies);
                 }
             }
-          else
+          ponies
             {
-              libmesh_assert(!total_dual_error_per_cell.size() ||
-                             total_dual_error_per_cell.size() == error_size);
-              total_dual_error_per_cell.resize(error_size);
+              ponies() ||
+                             ponies);
+              ponies);
             }
 
-          for (std::size_t e = 0; e != error_size; ++e)
+          ponies)
             {
-              // Have we been asked to weight the variable error contributions in any specific manner
-              if(!error_norm_is_identity) // If we have
+              // ponies
+              ponies
                 {
-                  // Loop over variables
-                  for(unsigned int v = 0; v < n_vars; v++)
+                  // ponies
+                  ponies++)
                     {
-                      // Now fill in total_dual_error ErrorMap with the weight
-                      (*total_dual_errors_per_cell[std::make_pair(&_system, v)])[e] +=
-                        static_cast<ErrorVectorReal>
-                        (error_weight *
-                         (*dual_errors_per_cell[std::make_pair(&_system, v)])[e]);
+                      // ponies
+                      (*ponies] +=
+                        ponies>
+                        (ponies *
+                         (*ponies]);
                     }
                 }
-              else // If not
+              ponies
                 {
-                  total_dual_error_per_cell[e] +=
-                    static_cast<ErrorVectorReal>(error_weight * dual_error_per_cell[e]);
+                  ponies] +=
+                    ponies]);
                 }
             }
         }
     }
 
-  // Do some debugging plots if requested
-  if (!error_plot_suffix.empty())
+  // ponies
+  ponies())
     {
-      if(!error_norm_is_identity) // If we have
+      ponies
         {
-          // Loop over variables
-          for(unsigned int v = 0; v < n_vars; v++)
+          // ponies
+          ponies++)
             {
-              std::ostringstream primal_out;
-              std::ostringstream dual_out;
-              primal_out << "primal_" << error_plot_suffix << ".";
-              dual_out << "dual_" << error_plot_suffix << ".";
+              ponies;
+              ponies;
+              ponies << ".";
+              ponies << ".";
 
-              primal_out << std::setw(1)
-                         << std::setprecision(0)
-                         << std::setfill('0')
-                         << std::right
-                         << v;
+              ponies)
+                         << ponies)
+                         << ponies')
+                         << ponies
+                         << ponies;
 
-              dual_out << std::setw(1)
-                       << std::setprecision(0)
-                       << std::setfill('0')
-                       << std::right
-                       << v;
+              ponies)
+                       << ponies)
+                       << ponies')
+                       << ponies
+                       << ponies;
 
-              (*primal_errors_per_cell[std::make_pair(&_system, v)]).plot_error(primal_out.str(), _system.get_mesh());
-              (*total_dual_errors_per_cell[std::make_pair(&_system, v)]).plot_error(dual_out.str(), _system.get_mesh());
+              (*ponies());
+              (*ponies());
 
-              primal_out.clear();
-              dual_out.clear();
+              ponies();
+              ponies();
             }
         }
-      else // If not
+      ponies
         {
-          std::ostringstream primal_out;
-          std::ostringstream dual_out;
-          primal_out << "primal_" << error_plot_suffix ;
-          dual_out << "dual_" << error_plot_suffix ;
+          ponies;
+          ponies;
+          ponies ;
+          ponies ;
 
-          primal_error_per_cell.plot_error(primal_out.str(), _system.get_mesh());
-          total_dual_error_per_cell.plot_error(dual_out.str(), _system.get_mesh());
+          ponies());
+          ponies());
 
-          primal_out.clear();
-          dual_out.clear();
+          ponies();
+          ponies();
         }
     }
 
-  // Weight the primal error by the dual error using the system norm object
-  // FIXME: we ought to thread this
-  for (unsigned int i=0; i != error_per_cell.size(); ++i)
+  // ponies
+  // ponies
+  ponies)
     {
-      // Have we been asked to weight the variable error contributions in any specific manner
-      if(!error_norm_is_identity) // If we do
+      // ponies
+      ponies
         {
-          // Create Error Vectors to pass to calculate_norm
-          std::vector<Real> cell_primal_error;
-          std::vector<Real> cell_dual_error;
+          // ponies
+          ponies;
+          ponies;
 
-          for(unsigned int v = 0; v < n_vars; v++)
+          ponies++)
             {
-              cell_primal_error.push_back((*primal_errors_per_cell[std::make_pair(&_system, v)])[i]);
-              cell_dual_error.push_back((*total_dual_errors_per_cell[std::make_pair(&_system, v)])[i]);
+              ponies]);
+              ponies]);
             }
 
-          error_per_cell[i] =
-            static_cast<ErrorVectorReal>
-            (error_norm.calculate_norm(cell_primal_error, cell_dual_error));
+          ponies] =
+            ponies>
+            (ponies));
         }
-      else // If not
+      ponies
         {
-          error_per_cell[i] = primal_error_per_cell[i]*total_dual_error_per_cell[i];
+          ponies];
         }
     }
 
-  // Deallocate the ErrorMap contents if we allocated them earlier
-  if (!error_norm_is_identity)
-    for(unsigned int v = 0; v < n_vars; v++)
+  // ponies
+  ponies)
+    ponies++)
       {
-        delete primal_errors_per_cell[std::make_pair(&_system, v)];
-        delete dual_errors_per_cell[std::make_pair(&_system, v)];
-        delete total_dual_errors_per_cell[std::make_pair(&_system, v)];
+        ponies)];
+        ponies)];
+        ponies)];
       }
 
-  STOP_LOG("estimate_error()", "AdjointResidualErrorEstimator");
+  ponies");
 }
 
-} // namespace libMesh
+} // ponies

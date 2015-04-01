@@ -1,294 +1,294 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TIME_SOLVER_H
-#define LIBMESH_TIME_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/linear_solver.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/solution_history.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class DiffContext;
-class DiffSolver;
-class DifferentiablePhysics;
-class DifferentiableSystem;
-class ParameterVector;
-class SystemNorm;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 /**
- * This is a generic class that defines a solver to handle
- * time integration of DifferentiableSystems.
+ * ponies
+ * ponies.
  *
- * A user can define a solver by deriving from this class and
- * implementing certain functions.
+ * ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2006
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class TimeSolver : public ReferenceCountedObject<TimeSolver>
+// ponies
+ponies>
 {
-public:
+ponies:
   /**
-   * The type of system
+   * ponies
    */
-  typedef DifferentiableSystem sys_type;
+  ponies;
 
   /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
+   * ponies
+   * ponies.
    */
-  explicit
-  TimeSolver (sys_type& s);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~TimeSolver ();
+  ponies ();
 
   /**
-   * The initialization function.  This method is used to
-   * initialize internal data structures before a simulation begins.
+   * ponies
+   * ponies.
    */
-  virtual void init ();
+  ponies ();
 
   /**
-   * The data initialization function.  This method is used to
-   * initialize internal data structures after the underlying System
-   * has been initialized
+   * ponies
+   * ponies
+   * ponies
    */
-  virtual void init_data ();
+  ponies ();
 
   /**
-   * The reinitialization function.  This method is used after
-   * changes in the mesh
+   * ponies
+   * ponies
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * This method solves for the solution at the next timestep (or
-   * solves for a steady-state solution).  Usually we will only need
-   * to solve one (non)linear system per timestep, but more complex
-   * subclasses may override this.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void solve ();
+  ponies ();
 
   /**
-   * This method advances the solution to the next timestep, after a
-   * solve() has been performed.  Often this will be done after every
-   * UnsteadySolver::solve(), but adaptive mesh refinement and/or adaptive
-   * time step selection may require some solve() steps to be repeated.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void advance_timestep ();
+  ponies ();
 
   /**
-   * This method advances the adjoint solution to the previous
-   * timestep, after an adjoint_solve() has been performed.  This will
-   * be done before every UnsteadySolver::adjoint_solve().
+   * ponies
+   * ponies
+   * ponies().
    */
-  virtual void adjoint_advance_timestep ();
+  ponies ();
 
   /**
-   * This method retrieves all the stored solutions at the current
-   * system.time
+   * ponies
+   * ponies
    */
-  virtual void retrieve_timestep();
+  ponies();
 
   /**
-   * This method uses the DifferentiablePhysics
-   * element_time_derivative(), element_constraint(), and
-   * mass_residual() to build a full residual on an element.  What
-   * combination
+   * ponies
+   * ponies
+   * ponies
+   * ponies
    *
-   * it uses will depend on the type of solver.  See
-   * the subclasses for more details.
+   * ponies
+   * ponies.
    */
-  virtual bool element_residual (bool request_jacobian,
-                                 DiffContext &) = 0;
+  ponies,
+                                 ponies;
 
   /**
-   * This method uses the DifferentiablePhysics
-   * side_time_derivative(), side_constraint(), and
-   * side_mass_residual() to build a full residual on an element's
-   * side.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * What combination it uses will depend on the type
-   * of solver.  See the subclasses for more details.
+   * ponies
+   * ponies.
    */
-  virtual bool side_residual (bool request_jacobian,
-                              DiffContext &) = 0;
+  ponies,
+                              ponies;
 
   /**
-   * This method uses the DifferentiablePhysics
-   * nonlocal_time_derivative(), nonlocal_constraint(), and
-   * nonlocal_mass_residual() to build a full residual of non-local
-   * terms.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * What combination it uses will depend on the type
-   * of solver.  See the subclasses for more details.
+   * ponies
+   * ponies.
    */
-  virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext &) = 0;
+  ponies,
+                                  ponies;
 
   /**
-   * This method is for subclasses or users to override
-   * to do arbitrary processing between timesteps
+   * ponies
+   * ponies
    */
-  virtual void before_timestep () {}
+  ponies () {}
 
   /**
-   * @returns a constant reference to the system we are solving.
+   * @ponies.
    */
-  const sys_type & system () const { return _system; }
+  ponies; }
 
   /**
-   * @returns a writeable reference to the system we are solving.
+   * @ponies.
    */
-  sys_type & system () { return _system; }
+  ponies; }
 
   /**
-   * An implicit linear or nonlinear solver to use at each timestep.
+   * ponies.
    */
-  virtual UniquePtr<DiffSolver> &diff_solver() { return _diff_solver; }
+  ponies; }
 
   /**
-   * An implicit linear solver to use for adjoint and sensitivity problems.
+   * ponies.
    */
-  virtual UniquePtr<LinearSolver<Number> > &linear_solver() { return _linear_solver; }
+  ponies; }
 
   /**
-   * Print extra debugging information if quiet ==  false.
+   * ponies.
    */
-  bool quiet;
+  ponies;
 
   /**
-   * Computes the size of ||u^{n+1} - u^{n}|| in some norm.
+   * ponies.
    *
-   * Note that, while you can always call this function, its
-   * result may or may not be very meaningful.  For example, if
-   * you call this function right after calling advance_timestep()
-   * then you'll get a result of zero since old_nonlinear_solution
-   * is set equal to nonlinear_solution in this function.
+   * ponies
+   * ponies
+   * ponies()
+   * ponies
+   * ponies.
    */
-  virtual Real du(const SystemNorm& norm) const = 0;
+  ponies;
 
   /**
-   * Is this effectively a steady-state solver?
+   * ponies?
    */
-  virtual bool is_steady() const = 0;
+  ponies;
 
   /**
-   * This value (which defaults to zero) is the number of times the
-   * TimeSolver is allowed to halve deltat and let the DiffSolver
-   * repeat the latest failed solve with a reduced timestep.  Note
-   * that this has no effect for SteadySolvers.  Note that you must
-   * set at least one of the DiffSolver flags
-   * "continue_after_max_iterations" or
-   * "continue_after_backtrack_failure" to allow the TimeSolver to
-   * retry the solve.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * "ponies
+   * "ponies
+   * ponies.
    */
-  unsigned int reduce_deltat_on_diffsolver_failure;
+  ponies;
 
   /**
-   * A setter function users will employ if they need to do something
-   * other than save no solution history
+   * ponies
+   * ponies
    */
-  void set_solution_history(const SolutionHistory & _solution_history);
+  ponies);
 
   /**
-   * Accessor for querying whether we need to do a primal
-   * or adjoint solve
+   * ponies
+   * ponies
    */
-  bool is_adjoint() const
-  { return _is_adjoint; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for setting whether we need to do a primal
-   * or adjoint solve
+   * ponies
+   * ponies
    */
-  void set_is_adjoint(bool _is_adjoint_value)
-  { _is_adjoint = _is_adjoint_value; }
+  ponies)
+  { ponies; }
 
-protected:
+ponies:
 
   /**
-   * An implicit linear or nonlinear solver to use at each timestep.
+   * ponies.
    */
-  UniquePtr<DiffSolver> _diff_solver;
+  ponies;
 
   /**
-   * An implicit linear solver to use for adjoint problems.
+   * ponies.
    */
-  UniquePtr<LinearSolver<Number> > _linear_solver;
+  ponies;
 
   /**
-   * A reference to the system we are solving.
+   * ponies.
    */
-  sys_type& _system;
+  ponies;
 
   /**
-   * Serial vector of _system.get_vector("_old_nonlinear_solution")
+   * ponies")
    */
-  UniquePtr<NumericVector<Number> > old_local_nonlinear_solution;
+  ponies;
 
   /**
-   * An UniquePtr to a SolutionHistory object. Default is
-   * NoSolutionHistory, which the user can override by declaring a
-   * different kind of SolutionHistory in the application
+   * ponies
+   * ponies
+   * ponies
    */
-  UniquePtr<SolutionHistory> solution_history;
+  ponies;
 
   /**
-   * Definitions of argument types for use in refactoring subclasses.
+   * ponies.
    */
 
-  typedef bool (DifferentiablePhysics::*ResFuncType) (bool, DiffContext &);
+  ponies &);
 
-  typedef void (DiffContext::*ReinitFuncType) (Real);
+  ponies);
 
-private:
+ponies:
 
   /**
-   * This boolean tells the TimeSolver whether we are solving a primal or
-   * adjoint problem
+   * ponies
+   * ponies
    */
-  bool _is_adjoint;
+  ponies;
 
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TIME_SOLVER_H
+#ponies

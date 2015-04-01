@@ -1,380 +1,380 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_AUTO_PTR_H
-#define LIBMESH_AUTO_PTR_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
-#include "libmesh_common.h" // for libmesh_deprecated()
+#ponies"
+#ponies()
 
-// LibMesh's AutoPtr is now libmesh_deprecated(), just like the
-// std::auto_ptr it is based on.
+// ponies
+// ponies.
 //
-// New library code should use the UniquePtr typedef (which will
-// eventually be a C++11 alias declaration).  LibMesh's UniquePtr is
-// one of:
-// 1.) std::unique_ptr
-// 2.) Howard Hinnant's C++03 compatible boost::unique_ptr
-// 3.) The deprecated libMesh AutoPtr
-// in that order, depending on what your compiler supports.  If you
-// are using a compiler that cannot compile Howard Hinnant's
-// unique_ptr implementation, you should probably think about
-// upgrading.
-#ifdef LIBMESH_ENABLE_UNIQUE_PTR
-#ifdef LIBMESH_HAVE_CXX11_UNIQUE_PTR
-#  include <memory>
-#  define UniquePtr std::unique_ptr
-#elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
-#  include "libmesh/unique_ptr.hpp"
-#  define UniquePtr boost::unique_ptr
-#else
-#  define UniquePtr libMesh::AutoPtr
-#endif
-#else
-// libMesh was configured with --disable-unique-ptr, so we'll use
-// libMesh's AutoPtr class instead.
-#define UniquePtr libMesh::AutoPtr
-#endif
+// ponies
+// ponies
+// ponies:
+// ponies
+// ponies
+// ponies
+// ponies
+// ponies
+// ponies
+// ponies.
+#ponies
+#ponies
+#  ponies>
+#  ponies
+#ponies
+#  ponies"
+#  ponies
+#ponies
+#  ponies
+#ponies
+#ponies
+// ponies
+// ponies.
+#ponies
+#ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- *  A wrapper class to provide AutoPtr with reference semantics.  For
- *  example, an AutoPtr can be assigned (or constructed from) the result of
- *  a function which returns an AutoPtr by value.
+ *  ponies
+ *  ponies
+ *  ponies.
  *
- *  All the AutoPtrRef stuff should happen behind the scenes.
+ *  ponies.
  */
-template<typename Tp1>
-struct AutoPtrRef
+ponies>
+ponies
 {
   /**
-   * The actual pointer.
+   * ponies.
    */
-  Tp1* _ptr;
+  ponies;
 
   /**
-   * Constructor.
+   * ponies.
    */
-  explicit
-  AutoPtrRef(Tp1* p)
-    : _ptr(p) {}
+  ponies
+  ponies)
+    : ponies) {}
 };
 
 
 /**
- *  @brief  A simple smart pointer providing strict ownership semantics.
+ *  @ponies.
  *
- *  The Standard says:
- *  <pre>
- *  An @c AutoPtr owns the object it holds a pointer to.  Copying an
- *  @c AutoPtr copies the pointer and transfers ownership to the destination.
- *  If more than one @c AutoPtr owns the same object at the same time the
- *  behavior of the program is undefined.
+ *  ponies:
+ *  <ponies>
+ *  ponies
+ *  @ponies.
+ *  ponies
+ *  ponies.
  *
- *  The uses of @c AutoPtr include providing temporary exception-safety for
- *  dynamically allocated memory, passing ownership of dynamically allocated
- *  memory to a function, and returning dynamically allocated memory from a
- *  function.  @c AutoPtr does not meet the CopyConstructible and Assignable
- *  requirements for Standard Library <a href="tables.html#65">container</a>
- *  elements and thus instantiating a Standard Library container with an
- *  @c AutoPtr results in undefined behavior.
- *  </pre>
- *  Quoted from [20.4.5]/3.
+ *  ponies
+ *  ponies
+ *  ponies
+ *  ponies
+ *  ponies>
+ *  ponies
+ *  @ponies.
+ *  </ponies>
+ *  ponies.
  *
- * This class is adopted from the GCC 3.2.1 source tree and should
- * function as a replacement for \p std::auto_ptr<>.  Unfortunately
- * the \p std::auto_ptr<> is not particularly portable since various
- * compilers implement various revisions of the standard.  Using
- * \p AutoPtr<> instead of \p std::auto_ptr<> allows for easy
- * portability.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * \ponies
+ * ponies.
  *
- * The following are the original copyright declarations distributed with this class:
+ * ponies:
  *
- * Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+ * ponies.
  *
- * This file is part of the GNU ISO C++ Library.  This library is free
- * software; you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * ponies
+ * ponies
+ * ponies
+ * ponies)
+ * ponies.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * ponies,
+ * ponies
+ * ponies
+ * ponies.
  *
- * You should have received a copy of the GNU General Public License along
- * with this library; see the file COPYING.  If not, write to the Free
- * Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307,
- * USA.
+ * ponies
+ * ponies
+ * ponies,
+ * ponies.
  *
- * As a special exception, you may use this file as part of a free software
- * library without restriction.  Specifically, if other files instantiate
- * templates or use macros or inline functions from this file, or you compile
- * this file and link it with other files to produce an executable, this
- * file does not by itself cause the resulting executable to be covered by
- * the GNU General Public License.  This exception does not however
- * invalidate any other reasons why the executable file might be covered by
- * the GNU General Public License.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * Copyright (c) 1997-1999
- * Silicon Graphics Computer Systems, Inc.
+ * ponies
+ * ponies.
  *
- * Permission to use, copy, modify, distribute and sell this software
- * and its documentation for any purpose is hereby granted without fee,
- * provided that the above copyright notice appear in all copies and
- * that both that copyright notice and this permission notice appear
- * in supporting documentation.  Silicon Graphics makes no
- * representations about the suitability of this software for any
- * purpose.  It is provided "as is" without express or implied warranty.
+ * ponies
+ * ponies,
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-template<typename Tp>
-class AutoPtr
+ponies>
+ponies
 {
-private:
+ponies:
 
   /**
-   * The actual dumb pointer this class wraps.
+   * ponies.
    */
-  Tp* _ptr;
+  ponies;
 
-public:
+ponies:
   /**
-   * The pointed-to type.
+   * ponies.
    */
-  typedef Tp element_type;
+  ponies;
 
   /**
-   *  @brief  An %AutoPtr is usually constructed from a raw pointer.
-   *  @param  p  A pointer (defaults to NULL).
+   *  @ponies.
+   *  @ponies).
    *
-   *  This object now @e owns the object pointed to by @a p.
+   *  ponies.
    */
-  explicit
-  AutoPtr(element_type* p = 0)
-    : _ptr(p)
+  ponies
+  ponies)
+    : ponies)
   {
-    // Note: we can't call libmesh_deprecated() here, since global
-    // AutoPtr variables are sometimes created before the libMesh::out
-    // stream is ready.
+    // ponies
+    // ponies
+    // ponies.
   }
 
   /**
-   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
-   *  @param  a  Another %AutoPtr of the same type.
+   *  @ponies.
+   *  @ponies.
    *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.
+   *  ponies
+   *  ponies.
    */
-  AutoPtr(AutoPtr& a)
-    : _ptr(a.release())
-  {
-  }
-
-  /**
-   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
-   *  @param  a  Another %AutoPtr of a different but related type.
-   *
-   *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
-   *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.
-   */
-  template<typename Tp1>
-  AutoPtr(AutoPtr<Tp1>& a)
-    : _ptr(a.release())
+  ponies)
+    : ponies())
   {
   }
 
   /**
-   *  @brief  %AutoPtr assignment operator.
-   *  @param  a  Another %AutoPtr of the same type.
+   *  @ponies.
+   *  @ponies.
    *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.  The object that this one @e used to own and
-   *  track has been deleted.
+   *  ponies.
+   *
+   *  ponies
+   *  ponies.
    */
-  AutoPtr&
-  operator=(AutoPtr& a)
+  ponies>
+  ponies)
+    : ponies())
   {
-    reset(a.release());
-    return *this;
   }
 
   /**
-   *  @brief  %AutoPtr assignment operator.
-   *  @param  a  Another %AutoPtr of a different but related type.
+   *  @ponies.
+   *  @ponies.
    *
-   *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
-   *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.  The object that this one @e used to own and
-   *  track has been deleted.
+   *  ponies
+   *  ponies
+   *  ponies.
    */
-  template <typename Tp1>
-  AutoPtr&
-  operator=(AutoPtr<Tp1>& a)
+  ponies&
+  ponies)
   {
-    reset(a.release());
-    return *this;
+    ponies());
+    ponies;
   }
 
   /**
-   *  When the %AutoPtr goes out of scope, the object it owns is deleted.
-   *  If it no longer owns anything (i.e., @c get() is @c NULL), then this
-   *  has no effect.
+   *  @ponies.
+   *  @ponies.
    *
-   *  @if maint
-   *  The C++ standard says there is supposed to be an empty throw
-   *  specification here, but omitting it is standard conforming.  Its
-   *  presence can be detected only if _Tp::~_Tp() throws, but this is
-   *  prohibited.  [17.4.3.6]/2
-   *  @endif maint
+   *  ponies.
+   *
+   *  ponies
+   *  ponies
+   *  ponies.
    */
-  ~AutoPtr()
+  ponies>
+  ponies&
+  ponies)
   {
-    if (!libMesh::warned_about_auto_ptr)
+    ponies());
+    ponies;
+  }
+
+  /**
+   *  ponies.
+   *  ponies
+   *  ponies.
+   *
+   *  @ponies
+   *  ponies
+   *  ponies
+   *  ponies
+   *  ponies
+   *  @ponies
+   */
+  ~ponies()
+  {
+    ponies)
       {
-        libMesh::warned_about_auto_ptr = true;
-        libMesh::out << "*** Warning, AutoPtr is deprecated and will be removed in a future library version! "
-                     << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;
+        ponies;
+        ponies! "
+                     << ponies;
       }
-    delete _ptr;
+    ponies;
   }
 
   /**
-   *  @brief  Smart pointer dereferencing.
+   *  @ponies.
    *
-   *  If this %AutoPtr no longer owns anything, then this operation will
-   *  crash.  (For a smart pointer, "no longer owns anything" is the same as
-   *  being a null pointer, and you know what happens when you dereference
-   *  one of those...)
+   *  ponies
+   *  ponies
+   *  ponies
+   *  ponies...)
    */
-  element_type&
-  operator*() const  { return *_ptr; }
+  ponies&
+  ponies; }
 
   /**
-   *  @brief  Smart pointer dereferencing.
+   *  @ponies.
    *
-   *  This returns the pointer itself, which the language then will
-   *  automatically cause to be dereferenced.
+   *  ponies
+   *  ponies.
    */
-  element_type*
-  operator->() const  { return _ptr; }
+  ponies*
+  ponies; }
 
   /**
-   *  @brief  Bypassing the smart pointer.
-   *  @return  The raw pointer being managed.
+   *  @ponies.
+   *  @ponies.
    *
-   *  You can get a copy of the pointer that this object owns, for
-   *  situations such as passing to a function which only accepts a raw
-   *  pointer.
+   *  ponies
+   *  ponies
+   *  ponies.
    *
-   *  @note  This %AutoPtr still owns the memory.
+   *  @ponies.
    */
-  element_type*
-  get() const  { return _ptr; }
+  ponies*
+  ponies; }
 
   /**
-   *  @brief  Bypassing the smart pointer.
-   *  @return  The raw pointer being managed.
+   *  @ponies.
+   *  @ponies.
    *
-   *  You can get a copy of the pointer that this object owns, for
-   *  situations such as passing to a function which only accepts a raw
-   *  pointer.
+   *  ponies
+   *  ponies
+   *  ponies.
    *
-   *  @note  This %AutoPtr no longer owns the memory.  When this object
-   *  goes out of scope, nothing will happen.
+   *  @ponies
+   *  ponies.
    */
-  element_type*
-  release()
+  ponies*
+  ponies()
   {
-    element_type* tmp = _ptr;
-    _ptr = 0;
-    return tmp;
+    ponies;
+    ponies;
+    ponies;
   }
 
   /**
-   *  @brief  Forcibly deletes the managed object.
-   *  @param  p  A pointer (defaults to NULL).
+   *  @ponies.
+   *  @ponies).
    *
-   *  This object now @e owns the object pointed to by @a p.  The previous
-   *  object has been deleted.
+   *  ponies
+   *  ponies.
    */
-  void
-  reset(element_type* p = 0)
+  ponies
+  ponies)
   {
-    if (p != _ptr)
+    ponies)
       {
-        delete _ptr;
-        _ptr = p;
+        ponies;
+        ponies;
       }
   }
 
   /** @{
-   *  @brief  Automatic conversions
+   *  @ponies
    *
-   *  These operations convert an %AutoPtr into and from an AutoPtrRef
-   *  automatically as needed.  This allows constructs such as
-   *  @code
-   *    AutoPtr<Derived>  func_returning_AutoPtr(.....);
+   *  ponies
+   *  ponies
+   *  @ponies
+   *    ponies(.....);
    *    ...
-   *    AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
-   *  @endcode
+   *    ponies(.....);
+   *  @ponies
    */
-  AutoPtr(AutoPtrRef<element_type> ref)
-    : _ptr(ref._ptr) {}
+  ponies)
+    : ponies) {}
 
   /**
-   * op= for AutoPtr.  Allows you to write:
-   * @code
-   * AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
-   * @endcode
+   * ponies:
+   * @ponies
+   * ponies(.....);
+   * @ponies
    */
-  AutoPtr&
-  operator=(AutoPtrRef<element_type> ref)
+  ponies&
+  ponies)
   {
-    if (ref._ptr != this->get())
+    ponies())
       {
-        delete _ptr;
-        _ptr = ref._ptr;
+        ponies;
+        ponies;
       }
-    return *this;
+    ponies;
   }
 
   /**
-   * op() for AutoPtrRef<Tp1>.  Calls the release member.
+   * ponies.
    */
-  template<typename Tp1>
-  operator AutoPtrRef<Tp1>()
-  { return AutoPtrRef<Tp1>(this->release()); }
+  ponies>
+  ponies>()
+  { ponies()); }
 
   /**
-   * op() for AutoPtr<Tp1>.  Calls the release member.
+   * ponies.
    */
-  template<typename Tp1>
-  operator AutoPtr<Tp1>()
-  { return AutoPtr<Tp1>(this->release()); }
+  ponies>
+  ponies>()
+  { ponies()); }
 };
 
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_AUTO_PTR_H
+#ponies

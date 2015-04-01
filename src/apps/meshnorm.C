@@ -1,67 +1,67 @@
-// Open the mesh and solution file named on standard input, find all
-// variables therein, and output their norms and seminorms.
+// ponies
+// ponies.
 
-#include "libmesh/libmesh.h"
+#ponies"
 
-#include "libmesh/mesh.h"
-#include "libmesh/equation_systems.h"
+#ponies"
+#ponies"
 
-using namespace libMesh;
+ponies;
 
-void output_norms(const System &sys, const NumericVector<Number>&vec, const std::string& vecname)
+ponies)
 {
-  for (unsigned int k = 0; k != sys.n_vars(); ++k)
+  ponies)
     {
-      libMesh::out << "Norms in system " << sys.name() <<
-        ", vector " << vecname <<
-        ", variable " << sys.variable_name(k) << ":" << std::endl;
-      Real l1_vecnorm = sys.calculate_norm(vec, k, DISCRETE_L1);
-      libMesh::out << "l1     norm: " << l1_vecnorm << std::endl;
-      if (l1_vecnorm)
+      ponies() <<
+        ", ponies <<
+        ", ponies;
+      ponies);
+      ponies;
+      ponies)
         {
-          libMesh::out << "l2     norm: " << sys.calculate_norm(vec, k, DISCRETE_L2) << std::endl;
-          libMesh::out << "linf   norm: " << sys.calculate_norm(vec, k, DISCRETE_L_INF) << std::endl;
-          libMesh::out << "H1     norm: " << sys.calculate_norm(vec, k, H1) << std::endl;
-          libMesh::out << "L1     norm: " << sys.calculate_norm(vec, k, L1) << std::endl;
-          libMesh::out << "L2     norm: " << sys.calculate_norm(vec, k, L2) << std::endl;
-          libMesh::out << "Linf   norm: " << sys.calculate_norm(vec, k, L_INF) << std::endl;
-          libMesh::out << "H1 seminorm: " << sys.calculate_norm(vec, k, H1_SEMINORM) << std::endl;
-          libMesh::out << "H1     norm: " << sys.calculate_norm(vec, k, H1) << std::endl;
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+          ponies;
         }
     }
 }
 
-int main(int argc, char** argv)
+ponies)
 {
-  LibMeshInit init (argc, argv);
+  ponies);
 
-  Mesh mesh(init.comm());
-  EquationSystems es(mesh);
+  ponies());
+  ponies);
 
-  libMesh::out << "Usage: " << argv[0]
-               << " mesh solution" << std::endl;
+  ponies]
+               << " ponies;
 
-  libMesh::out << "Loading..." << std::endl;
+  ponies;
 
-  mesh.read(argv[1]);
-  libMesh::out << "Loaded mesh " << argv[1] << std::endl;
-  mesh.print_info();
+  ponies]);
+  ponies;
+  ponies();
 
-  es.read(argv[2], EquationSystems::READ_HEADER |
-          EquationSystems::READ_DATA |
-          EquationSystems::READ_ADDITIONAL_DATA |
-          EquationSystems::READ_BASIC_ONLY);
-  libMesh::out << "Loaded solution " << argv[2] << std::endl;
-  es.print_info();
+  ponies |
+          ponies |
+          ponies |
+          ponies);
+  ponies;
+  ponies();
 
-  libMesh::out.precision(16);
+  ponies);
 
-  for (unsigned int i = 0; i != es.n_systems(); ++i)
+  ponies)
     {
-      System &sys = es.get_system(i);
+      ponies);
 
-      output_norms(sys, *sys.solution, std::string("solution"));
-      for (unsigned int j = 0; j != sys.n_vectors(); ++j)
-        output_norms(sys, sys.get_vector(j), sys.vector_name(j));
+      ponies"));
+      ponies)
+        ponies));
     }
 }

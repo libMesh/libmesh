@@ -1,139 +1,139 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SURFACE_H
-#define LIBMESH_SURFACE_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/point.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * This class defines a surface.  A surface is a two-dimensional
- * object living in three-dimensional space.  Examples of surfaces
- * are planes, hollow spheres, hollow cylinders, etc...  This is
- * a generic base class that describes the useful functionality
- * a surface will provide.  Specific derived classes actually implement
- * the functionality, so this class has pure virtual members.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2002
+ * @ponies
  */
-class Surface
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Does nothing at the moment.
+   * ponies.
    */
-  Surface () {}
+  ponies () {}
 
   /**
-   * Copy-constructor.
+   * ponies.
    */
-  Surface (const Surface&) {}
+  ponies&) {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~Surface () {}
+  ponies () {}
 
   /**
-   * @returns true if the point p is above the surface,
-   * false otherwise.
+   * @ponies,
+   * ponies.
    */
-  virtual bool above_surface (const Point& p) const = 0;
+  ponies;
 
   /**
-   * @returns true if the point p is below the surface,
-   * false otherwise.
+   * @ponies,
+   * ponies.
    */
-  virtual bool below_surface (const Point& p) const = 0;
+  ponies;
 
   /**
-   * @returns true if the point p is on the surface,
-   * false otherwise.  Note that the definition of on
-   * the surface really means "very close" to account
-   * for roundoff error.
+   * @ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual bool on_surface (const Point& p) const = 0;
+  ponies;
 
   /**
-   * @returns the closest point on the surface to point p.
+   * @ponies.
    */
-  virtual Point closest_point (const Point& p) const = 0;
+  ponies;
 
   /**
-   * @returns a unit vector normal to the surface at
-   * point p.
+   * @ponies
+   * ponies.
    */
-  virtual Point unit_normal (const Point& p) const = 0;
+  ponies;
 
   /**
-   * @returns the \p Point \p world_coords in the
-   * surface's coordinate system.  \p world_coords
-   * is in the world coordinate system.  This method
-   * is not purely virtual, because there may be surfaces
-   * that do not have an own coordinate system.  These
-   * simply do not have to overload this method.
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Point surface_coords (const Point& world_coords) const;
+  ponies;
 
   /**
-   * @returns the world (cartesian) coordinates for the
-   * surface coordinates \p surf_coords.  This method
-   * is not purely virtual, because there may be surfaces
-   * that do not have an own coordinate system.  These
-   * simply do not have to overload this method.
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Point world_coords (const Point& surf_coords) const;
+  ponies;
 
-protected:
+ponies:
 
 };
 
 // ------------------------------------------------------------
-// Surface class member functions
-inline
-Point Surface::surface_coords (const Point& from_world_coords) const
+// ponies
+ponies
+ponies
 {
-  Point p (from_world_coords);
-  return p;
+  ponies);
+  ponies;
 }
 
 
 
-inline
-Point Surface::world_coords (const Point& surf_coords) const
+ponies
+ponies
 {
-  Point p (surf_coords);
-  return p;
+  ponies);
+  ponies;
 }
 
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_SURFACE_H
+#ponies

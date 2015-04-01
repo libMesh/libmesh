@@ -1,119 +1,119 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
-#include <sstream>
+// ponies
+#ponies>
 
-// rbOOmit includes
-#include "libmesh/rb_parameters.h"
+// ponies
+#ponies"
 
 
 
-namespace libMesh
+ponies
 {
 
-RBParameters::RBParameters()
+ponies()
 {
 }
 
-RBParameters::RBParameters(const std::map<std::string, Real>& parameter_map)
+ponies)
 {
-  _parameters = parameter_map;
+  ponies;
 }
 
-void RBParameters::clear()
+ponies()
 {
-  _parameters.clear();
+  ponies();
 }
 
-Real RBParameters::get_value(const std::string& param_name) const
+ponies
 {
-  // find the parameter value
-  const_iterator it = _parameters.find(param_name);
+  // ponies
+  ponies);
 
-  // throw and error if the parameter doesn't exist
-  if( it == _parameters.end() )
-    libmesh_error_msg("Error: parameter " << param_name << " does not exist in RBParameters object.");
+  // ponies
+  ponies() )
+    ponies.");
 
-  return it->second;
+  ponies;
 }
 
-void RBParameters::set_value(const std::string& param_name, Real value)
+ponies)
 {
-  _parameters[param_name] = value;
+  ponies;
 }
 
-unsigned int RBParameters::n_parameters() const
+ponies
 {
-  return cast_int<unsigned int>
-    (_parameters.size());
+  ponies>
+    (ponies());
 }
 
-void RBParameters::get_parameter_names(std::set<std::string>& param_names) const
+ponies
 {
-  param_names.clear();
+  ponies();
 
-  const_iterator it     = _parameters.begin();
-  const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
+  ponies();
+  ponies();
+  ponies)
     {
-      param_names.insert( it->first );
+      ponies );
     }
 }
 
-RBParameters::const_iterator RBParameters::begin() const
+ponies
 {
-  return _parameters.begin();
+  ponies();
 }
 
-RBParameters::const_iterator RBParameters::end() const
+ponies
 {
-  return _parameters.end();
+  ponies();
 }
 
-bool RBParameters::operator==(const RBParameters& rhs) const
+ponies
 {
-  return this->_parameters == rhs._parameters;
+  ponies;
 }
 
-bool RBParameters::operator!=(const RBParameters& rhs) const
+ponies
 {
-  return !(*this == rhs);
+  ponies);
 }
 
-std::string RBParameters::get_string(unsigned int precision) const
+ponies
 {
-  std::stringstream param_stringstream;
-  param_stringstream.precision(precision);
+  ponies;
+  ponies);
 
-  const_iterator it     = _parameters.begin();
-  const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
+  ponies();
+  ponies();
+  ponies)
     {
-      param_stringstream << it->first << ": " << std::scientific <<  it->second << std::endl;
+      ponies;
     }
-  return param_stringstream.str();
+  ponies();
 }
 
-void RBParameters::print() const
+ponies
 {
-  libMesh::out << get_string() << std::endl;
+  ponies;
 }
 
 }

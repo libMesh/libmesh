@@ -1,454 +1,454 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_MESH_TOOLS_H
-#define LIBMESH_MESH_TOOLS_H
+// ponies
+// ponies
+// ponies
 
 
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/id_types.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/point.h" // some compilers want the full definition - I think so they can do
-// return-value-optimization for BoundingBox'es - BSK
+#ponies
+#ponies
 
-// C++ Includes   -----------------------------------
-#include <vector>
-#include <set>
-#include <limits>
 
-namespace libMesh
+
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies
+// ponies
+
+// ponies   -----------------------------------
+#ponies>
+#ponies>
+#ponies>
+
+ponies
 {
 
-// forward declarations
-class SerialMesh;
-class ParallelMesh;
-class Sphere;
-class Elem;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
 
 /**
- * Utility functions for operations on a \p Mesh object.  Here is where
- * useful functions for interfacing with a \p Mesh should be defined.
- * In general this namespace should be used to prevent the \p Mesh class
- * from becoming too cluttered.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk
- * \date 2004
+ * \ponies
+ * \ponies
  */
 
 
 // ------------------------------------------------------------
-// MeshTools namespace
-namespace MeshTools
+// ponies
+ponies
 {
 /**
- * Defines a Cartesian bounding box by the two
- * corner extremum.
+ * ponies
+ * ponies.
  */
-class BoundingBox : public std::pair<Point, Point>
+ponies>
 {
-public:
+ponies:
 
-  BoundingBox (const Point &new_min, const Point &new_max) :
-    std::pair<Point, Point>(new_min, new_max)
+  ponies) :
+    ponies)
   {}
 
-  BoundingBox (const std::pair<Point, Point> &bbox) :
-    std::pair<Point, Point> (bbox)
+  ponies) :
+    ponies)
   {}
 
   /**
-   * Default constructor sets invalid bounds.
+   * ponies.
    */
-  BoundingBox ()
+  ponies ()
   {
-    this->invalidate();
+    ponies();
   }
 
-  void invalidate ()
+  ponies ()
   {
-    for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    ponies++)
       {
-        this->first(i)  =  std::numeric_limits<Real>::max();
-        this->second(i) = -std::numeric_limits<Real>::max();
+        ponies();
+        ponies();
       }
   }
 
-  const Point & min() const
-  { return this->first; }
+  ponies
+  { ponies; }
 
-  Point & min()
-  { return this->first; }
+  ponies()
+  { ponies; }
 
-  const Point & max() const
-  { return this->second; }
+  ponies
+  { ponies; }
 
-  Point & max()
-  { return this->second; }
+  ponies()
+  { ponies; }
 
-  BoundingBox & expand()
-  { return *this; }
+  ponies()
+  { ponies; }
 
-  bool intersect (const BoundingBox &) const;
+  ponies;
 
-  bool contains_point (const Point &) const;
+  ponies;
 
-private:
+ponies:
 };
 
 /**
- * This function returns the sum over all the elemenents of the number
- * of nodes per element.  This can be useful for partitioning hybrid meshes.
- * A feasible load balancing scheme is to keep the weight per processor as
- * uniform as possible.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
-dof_id_type total_weight (const MeshBase &mesh);
+ponies);
 
 /**
- * This function returns the sum over all the elemenents on processor \p pid
- * of nodes per element.  This can be useful for partitioning hybrid meshes.
- * A feasible load balancing scheme is to keep the weight per processor as
- * uniform as possible.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
-dof_id_type weight (const MeshBase &mesh, const processor_id_type pid);
+ponies);
 
-inline
-dof_id_type weight (const MeshBase &mesh)
-{ return MeshTools::weight (mesh, mesh.processor_id()); }
-
-/**
- * After calling this function the input vector \p nodes_to_elem_map
- * will contain the node to element connectivity.  That is to say
- * \p nodes_to_elem_map[i][j] is the global number of \f$ j^{th} \f$
- * element connected to node \p i.
- */
-void build_nodes_to_elem_map (const MeshBase &mesh,
-                              std::vector<std::vector<dof_id_type> > &nodes_to_elem_map);
+ponies
+ponies)
+{ ponies()); }
 
 /**
- * The same, except element pointers are returned instead of indices.
+ * ponies
+ * ponies
+ * \ponies$
+ * ponies.
  */
-void build_nodes_to_elem_map (const MeshBase &mesh,
-                              std::vector<std::vector<const Elem*> >&nodes_to_elem_map);
+ponies,
+                              ponies);
+
+/**
+ * ponies.
+ */
+ponies,
+                              ponies);
 
 
 //   /**
-//    * Calling this function on a 2D mesh will convert all the elements
-//    * to triangles.  \p QUAD4s will be converted to \p TRI3s, \p QUAD8s
-//    * and \p QUAD9s will be converted to \p TRI6s.
+//    * ponies
+//    * ponies
+//    * ponies.
 //    */
-//   void all_tri (MeshBase &mesh);
+//   ponies);
 
 /**
- * Fills the vector "on_boundary" with flags that tell whether each node
- * is on the domain boundary (true)) or not (false).
+ * ponies
+ * ponies).
  */
-void find_boundary_nodes (const MeshBase &mesh,
-                          std::vector<bool> &on_boundary);
+ponies,
+                          ponies);
 
 /**
- * @returns two points defining a cartesian box that bounds the
- * mesh.  The first entry in the pair is the mininum, the second
- * is the maximim.
+ * @ponies
+ * ponies
+ * ponies.
  */
-BoundingBox
-bounding_box (const MeshBase &mesh);
+ponies
+ponies);
 
 /**
- * Same, but returns a sphere instead of a box.
+ * ponies.
  */
-Sphere
-bounding_sphere (const MeshBase &mesh);
+ponies
+ponies);
 
 /**
- * @returns two points defining a cartesian box that bounds the
- * elements belonging to processor pid.
+ * @ponies
+ * ponies.
  */
-BoundingBox
-processor_bounding_box (const MeshBase &mesh,
-                        const processor_id_type pid);
+ponies
+ponies,
+                        ponies);
 
 /**
- * Same, but returns a sphere instead of a box.
+ * ponies.
  */
-Sphere
-processor_bounding_sphere (const MeshBase &mesh,
-                           const processor_id_type pid);
+ponies
+ponies,
+                           ponies);
 
 /**
- * @returns two points defining a Cartesian box that bounds the
- * elements belonging to subdomain sid.
+ * @ponies
+ * ponies.
  */
-BoundingBox
-subdomain_bounding_box (const MeshBase &mesh,
-                        const subdomain_id_type sid);
+ponies
+ponies,
+                        ponies);
 
 /**
- * Same, but returns a sphere instead of a box.
+ * ponies.
  */
-Sphere
-subdomain_bounding_sphere (const MeshBase &mesh,
-                           const subdomain_id_type sid);
+ponies
+ponies,
+                           ponies);
 
 
 /**
- * Return a vector of all element types for the mesh.  Implemented
- * in terms of element_iterators.
+ * ponies
+ * ponies.
  */
-void elem_types (const MeshBase &mesh,
-                 std::vector<ElemType> &et);
+ponies,
+                 ponies);
 
 /**
- * Return the number of elements of type \p type.  Implemented
- * in terms of type_element_iterators.
+ * ponies
+ * ponies.
  */
-dof_id_type n_elem_of_type (const MeshBase &mesh,
-                            const ElemType type);
+ponies,
+                            ponies);
 
 /**
- * Return the number of active elements of type \p type.
- * Implemented in terms of active_type_element_iterators.
+ * ponies.
+ * ponies.
  */
-dof_id_type n_active_elem_of_type (const MeshBase &mesh,
-                                   const ElemType type);
+ponies,
+                                   ponies);
 
 /**
- * Return the number of elements of type \p type at the specified
- * refinement level.
+ * ponies
+ * ponies.
  *
- * TODO: Replace all of the n_xxx_elem() functions like this with
- * a single function which takes a range of iterators and returns the
- * std::distance between them.
+ * ponies
+ * ponies
+ * ponies.
  */
-dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase &mesh,
-                                                  const ElemType type,
-                                                  const unsigned int level);
+ponies,
+                                                  ponies,
+                                                  ponies);
 
 /**
- * Return the number of levels of refinement in the mesh.
- * Implemented by looping over all the local elements and finding the
- * maximum level, then summing in parallel.
+ * ponies.
+ * ponies
+ * ponies.
  */
-unsigned int n_levels(const MeshBase &mesh);
+ponies);
 
 /**
- * Return the number of levels of refinement in the local mesh.
- * Implemented by looping over all the local elements and finding the
- * maximum level.
+ * ponies.
+ * ponies
+ * ponies.
  */
-unsigned int n_local_levels(const MeshBase &mesh);
+ponies);
 
 /**
- * Return the number of levels of refinement in the active mesh.
- * Implemented by looping over all the active local elements and finding
- * the maximum level, then maxxing in parallel.
+ * ponies.
+ * ponies
+ * ponies.
  */
-unsigned int n_active_levels(const MeshBase &mesh);
+ponies);
 
 /**
- * Return the number of levels of refinement in the active local mesh.
- * Implemented by looping over all the active local elements and finding
- * the maximum level.
+ * ponies.
+ * ponies
+ * ponies.
  */
-unsigned int n_active_local_levels(const MeshBase &mesh);
+ponies);
 
 /**
- * Return the number of p-levels of refinement in the mesh.
- * Implemented by looping over all the local elements and finding the
- * maximum p-level, then summing in parallel.
+ * ponies.
+ * ponies
+ * ponies.
  */
-unsigned int n_p_levels (const MeshBase &mesh);
+ponies);
 
 /**
- * Builds a set of node IDs for nodes which belong to non-subactive
- * elements.  Non-subactive elements are those which are either active
- * or inactive.  This is useful for determining which nodes should be
- * written to a data file, and is used by the XDA mesh writing methods.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-void get_not_subactive_node_ids(const MeshBase &mesh,
-                                std::set<dof_id_type> &not_subactive_node_ids);
+ponies,
+                                ponies);
 
 /**
- * Count up the number of elements of a specific type
- * (as defined by an iterator range).
+ * ponies
+ * (ponies).
  */
-dof_id_type n_elem (const MeshBase::const_element_iterator &begin,
-                    const MeshBase::const_element_iterator &end);
-
-
-/**
- * Count up the number of nodes of a specific type
- * (as defined by an iterator range).
- */
-dof_id_type n_nodes (const MeshBase::const_node_iterator &begin,
-                     const MeshBase::const_node_iterator &end);
+ponies,
+                    ponies);
 
 
 /**
- * Find the maxium h-refinement level in a mesh.
+ * ponies
+ * (ponies).
  */
-unsigned int max_level (const MeshBase &mesh);
+ponies,
+                     ponies);
 
 
 /**
- * Given a mesh and a node in the mesh, the vector will be filled with
- * every node directly attached to the given one.
+ * ponies.
  */
-void find_nodal_neighbors(const MeshBase &mesh, const Node &n,
-                          std::vector<std::vector<const Elem*> > &nodes_to_elem_map,
-                          std::vector<const Node*> &neighbors);
+ponies);
+
 
 /**
- * Given a mesh hanging_nodes will be filled with an associative array keyed off the
- * global id of all the hanging nodes in the mesh.  It will hold an array of the
- * parents of the node (meaning the two nodes to either side of it that make up
- * the side the hanging node is on.
+ * ponies
+ * ponies.
  */
-void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<dof_id_type, std::vector<dof_id_type> > &hanging_nodes);
+ponies,
+                          ponies,
+                          ponies);
 
 /**
- * Changes the processor ids on each node so be the same as the id of the
- * lowest element touching that node.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ */
+ponies);
+
+/**
+ * ponies
+ * ponies.
  *
- * This corrects "orphaned" processor ids that may occur from element
- * coarsening.
+ * ponies
+ * ponies.
  *
- * On a distributed mesh, this function must be called in parallel
- * to sync everyone's corrected processor ids on ghost nodes.
+ * ponies
+ * ponies.
  */
-void correct_node_proc_ids(MeshBase &);
+ponies &);
 
 
-#ifdef DEBUG
+#ponies
 /**
- * A function for verifying that an element has been cut off
- * from the rest of the mesh
+ * ponies
+ * ponies
  */
-void libmesh_assert_no_links_to_elem(const MeshBase &mesh,
-                                     const Elem *bad_elem);
-
-/**
- * A function for testing that all DofObjects within a mesh
- * have the same n_systems count
- */
-void libmesh_assert_equal_n_systems (const MeshBase &mesh);
+ponies,
+                                     ponies);
 
 /**
- * A function for testing that all non-recently-created DofObjects
- * within a mesh have old_dof_object data.  This is not expected to
- * be true at all points within a simulation code.
+ * ponies
+ * ponies
  */
-void libmesh_assert_old_dof_objects (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for walking across the mesh to try and ferret out
- * invalidated or misassigned pointers
+ * ponies
+ * ponies
+ * ponies.
  */
-void libmesh_assert_valid_node_pointers (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that active local elements' neighbors
- * are never remote elements
+ * ponies
+ * ponies
  */
-void libmesh_assert_valid_remote_elems (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that ids and processor assignment of elements
- * are correctly sorted (monotone increasing)
+ * ponies
+ * ponies
  */
-void libmesh_assert_valid_elem_ids (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that ids of elements are correctly
- * sorted for AMR (parents have lower ids than children)
+ * ponies
+ * ponies)
  */
-void libmesh_assert_valid_amr_elem_ids (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that all nodes are connected to at least
- * one element.
+ * ponies
+ * ponies)
+ */
+ponies);
+
+/**
+ * ponies
+ * ponies.
  *
- * This will fail in the most general case.  When ParallelMesh and
- * NodeConstraints are enabled, we expect the possibility that a
- * processor will be given remote nodes to satisfy node constraints
- * without also being given the remote elements connected to those
- * nodes.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-void libmesh_assert_connected_nodes (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that degree of freedom indexing matches
- * across processors.
+ * ponies
+ * ponies.
  */
-void libmesh_assert_valid_dof_ids (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that processor assignment is
- * self-consistent on nodes (each node part of an active element on
- * its processor) or elements (each parent has the processor id of
- * one of its children), and verifying that assignment is consistent
- * (every processor agrees on the processor id of each dof object it
- * can see)
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * (ponies
+ * ponies)
  */
-template <typename DofObjectSubclass>
-void libmesh_assert_valid_procids (const MeshBase &mesh);
+ponies>
+ponies);
 
 /**
- * A function for verifying that refinement flags on elements
- * are consistent between processors
+ * ponies
+ * ponies
  */
-void libmesh_assert_valid_refinement_flags (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that elements on this processor have
- * valid descendants and consistent active flags.
+ * ponies
+ * ponies.
  */
-void libmesh_assert_valid_refinement_tree (const MeshBase &mesh);
+ponies);
 
 /**
- * A function for verifying that neighbor connectivity is correct (each
- * element is a neighbor of or descendant of a neighbor of its neighbors)
+ * ponies
+ * ponies)
  */
-void libmesh_assert_valid_neighbors (const MeshBase &mesh);
-#endif
+ponies);
+#ponies
 
-// There is no reason for users to call functions in the MeshTools::Private namespace.
-namespace Private {
+// ponies.
+ponies {
 /**
- * There is no reason for a user to ever call this function.
+ * ponies.
  *
- * This function determines partition-agnostic global indices for all nodes and elements
- * in the mesh.  Note that after this function is called the mesh will likely be in an
- * inconsistent state, i.e. \p mesh.nodes(i)->id() != i in the nodes container.
- * Direct node/element access via the \p mesh.node(n) or \p mesh.elem(e) functions will
- * likely fail. The original numbering can (and should) be restored with a subsequent call to
- * \p fix_node_and_element_numbering().
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * \ponies().
  *
  */
-void globally_renumber_nodes_and_elements (MeshBase &);
-} // end namespace Private
+ponies &);
+} // ponies
 
-} // end namespace MeshTools
+} // ponies
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_MESH_TOOLS_H
+#ponies

@@ -1,86 +1,86 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_DIVA_IO_H
-#define LIBMESH_DIVA_IO_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_output.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
+// ponies   -----------------------------------
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class MeshBase;
+// ponies
+ponies;
 
 
 
 /**
- * This class implements writing meshes in the Diva format.
- * This is a scientific visualization program created by Kelly Gaither.
- * More information on Diva can be found here:
- * http://www.erc.msstate.edu/simcenter/docs/diva/
+ * ponies.
+ * ponies.
+ * ponies:
+ * ponies/
  *
- * @author John W. Peterson, 2004
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DivaIO class definition
-class DivaIO : public MeshOutput<MeshBase>
+// ponies
+ponies>
 {
-public:
+ponies:
   /**
-   * Note that only writing diva files is supported since Diva is
-   * not a mesh generator.
+   * ponies
+   * ponies.
    */
-  //TODO:[JWP] figure out how to implement a const write method!
-  explicit
-  DivaIO (const MeshBase&);
+  //ponies!
+  ponies
+  ponies&);
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * ponies.
    */
-  virtual void write (const std::string& );
+  ponies& );
 
-private:
+ponies:
 
   /**
-   * The actual implementation of writing the diva file.  This
-   * file is called by the public interface file after it
-   * constructs an ofstream.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void write_stream(std::ostream& out);
+  ponies);
 };
 
 
 
 
 // ------------------------------------------------------------
-// DivaIO inline members
-inline
-DivaIO::DivaIO (const MeshBase& mesh_in) :
-  MeshOutput<MeshBase>  (mesh_in)
+// ponies
+ponies
+ponies) :
+  ponies)
 {}
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_DIVA_IO_H
+#ponies

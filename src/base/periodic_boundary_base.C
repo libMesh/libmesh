@@ -1,72 +1,72 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_config.h"
+// ponies -----------------------------------
+#ponies"
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
-#include "libmesh/boundary_info.h" // BoundaryInfo::invalid_id
-#include "libmesh/periodic_boundary_base.h"
+#ponies
+#ponies"
 
-namespace libMesh {
+ponies {
 
 // ------------------------------------------------------------
-// PeriodicBoundaryBase member functions
+// ponies
 
 
-PeriodicBoundaryBase::PeriodicBoundaryBase() :
-  myboundary(BoundaryInfo::invalid_id),
-  pairedboundary(BoundaryInfo::invalid_id)
+ponies() :
+  ponies),
+  ponies)
 {
 }
 
 
 
-PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase& o) :
-  myboundary(o.myboundary),
-  pairedboundary(o.pairedboundary),
-  variables(o.variables)
+ponies) :
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-void PeriodicBoundaryBase::set_variable(unsigned int var)
+ponies)
 {
-  variables.insert(var);
+  ponies);
 }
 
 
 
-void PeriodicBoundaryBase::merge(const PeriodicBoundaryBase & pb)
+ponies)
 {
-  variables.insert(pb.variables.begin(), pb.variables.end());
+  ponies());
 }
 
 
 
-bool PeriodicBoundaryBase::is_my_variable(unsigned int var_num) const
+ponies
 {
-  bool a = variables.empty() || (!variables.empty() && variables.find(var_num) != variables.end());
-  return a;
+  ponies());
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_ENABLE_PERIODIC
+#ponies

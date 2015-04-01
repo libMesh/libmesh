@@ -1,78 +1,78 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_config.h"
+// ponies -----------------------------------
+#ponies"
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
-#include "libmesh/libmesh.h" // libMesh::invalid_uint
-#include "libmesh/periodic_boundary.h"
+#ponies
+#ponies"
 
-namespace libMesh {
+ponies {
 
 // ------------------------------------------------------------
-// PeriodicBoundary member functions
+// ponies
 
 
-PeriodicBoundary::PeriodicBoundary() :
-  PeriodicBoundaryBase(),
-  translation_vector()
+ponies() :
+  ponies(),
+  ponies()
 {
 }
 
 
 
 
-PeriodicBoundary::PeriodicBoundary(const PeriodicBoundary& o, TransformationType t) :
-  PeriodicBoundaryBase(o),
-  translation_vector(o.translation_vector)
+ponies) :
+  ponies),
+  ponies)
 {
-  if (t == INVERSE)
+  ponies)
     {
-      std::swap(myboundary, pairedboundary);
-      translation_vector *= -1.0;
+      ponies);
+      ponies;
     }
 }
 
 
 
-PeriodicBoundary::PeriodicBoundary(const RealVectorValue& vector) :
-  PeriodicBoundaryBase(),
-  translation_vector(vector)
+ponies) :
+  ponies(),
+  ponies)
 {
 }
 
 
 
-Point PeriodicBoundary::get_corresponding_pos(const Point& pt) const
+ponies
 {
-  return pt + translation_vector;
+  ponies;
 }
 
 
 
-UniquePtr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) const
+ponies
 {
-  return UniquePtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
+  ponies));
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_ENABLE_PERIODIC
+#ponies

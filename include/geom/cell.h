@@ -1,81 +1,81 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_H
-#define LIBMESH_CELL_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/elem.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
-// Forward declarations
+// ponies
 
 
 
 /**
- * The \p Cell is an abstract element type that lives in
- * three dimensions.  A cell could be a tetrahedron, a hexahedron,
- * a pyramid, a prism, etc...
+ * ponies
+ * ponies,
+ * ponies...
  */
-class Cell : public Elem
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  Cell (const unsigned int nn,
-        const unsigned int ns,
-        Elem* p,
-        Elem** elemlinkdata,
-        Node** nodelinkdata) :
-    Elem (nn, ns, p, elemlinkdata, nodelinkdata)
+  ponies,
+        ponies,
+        ponies,
+        ponies,
+        ponies) :
+    ponies)
   {}
 
   /**
-   * @returns 3, the dimensionality of the object.
+   * @ponies.
    */
-  unsigned int dim () const { return 3; }
+  ponies; }
 
   //   /**
-  //    * @returns 4
+  //    * @ponies
   //    */
-  //   unsigned int n_children_per_side(const unsigned int) const { return 4; }
+  //   ponies; }
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
   /**
-   * @returns \p false.  All classes derived from \p Cell
-   * are finite elements.
+   * @ponies
+   * ponies.
    */
-  bool infinite () const { return false; }
+  ponies; }
 
-#endif
+#ponies
 
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_CELL_H
+#ponies

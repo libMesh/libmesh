@@ -1,1123 +1,1123 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// rbOOmit includes
-#include "libmesh/rb_evaluation.h"
+// ponies
+#ponies"
 
-// libMesh includes
-#include "libmesh/libmesh_version.h"
-#include "libmesh/system.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/parallel.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/xdr_cxx.h"
-#include "libmesh/mesh_tools.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C/C++ includes
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <fstream>
-#include <sstream>
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-RBEvaluation::RBEvaluation (const Parallel::Communicator &comm_in)
+ponies)
   :
-  ParallelObject(comm_in),
-  evaluate_RB_error_bound(true),
-  compute_RB_inner_product(false),
-  rb_theta_expansion(NULL)
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 
 }
 
-RBEvaluation::~RBEvaluation()
+ponies()
 {
-  this->clear();
+  ponies();
 }
 
-void RBEvaluation::clear()
+ponies()
 {
-  START_LOG("clear()", "RBEvaluation");
+  ponies");
 
-  // Clear the basis functions
-  for(unsigned int i=0; i<basis_functions.size(); i++)
+  // ponies
+  ponies++)
     {
-      if (basis_functions[i])
+      ponies])
         {
-          basis_functions[i]->clear();
-          delete basis_functions[i];
-          basis_functions[i] = NULL;
+          ponies();
+          ponies];
+          ponies;
         }
     }
-  set_n_basis_functions(0);
+  ponies);
 
-  clear_riesz_representors();
+  ponies();
 
-  // Clear the Greedy param list
-  for(unsigned int i=0; i<greedy_param_list.size(); i++)
-    greedy_param_list[i].clear();
-  greedy_param_list.clear();
+  // ponies
+  ponies++)
+    ponies();
+  ponies();
 
-  STOP_LOG("clear()", "RBEvaluation");
+  ponies");
 }
 
-void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in)
+ponies)
 {
-  rb_theta_expansion = &rb_theta_expansion_in;
+  ponies;
 }
 
-RBThetaExpansion& RBEvaluation::get_rb_theta_expansion()
+ponies()
 {
-  if(!is_rb_theta_expansion_initialized())
-    libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
+  ponies())
+    ponies");
 
-  return *rb_theta_expansion;
+  ponies;
 }
 
-bool RBEvaluation::is_rb_theta_expansion_initialized() const
+ponies
 {
-  if(rb_theta_expansion)
+  ponies)
     {
-      return true;
+      ponies;
     }
-  else
+  ponies
     {
-      return false;
+      ponies;
     }
 }
 
-void RBEvaluation::resize_data_structures(const unsigned int Nmax,
-                                          bool resize_error_bound_data)
+ponies,
+                                          ponies)
 {
-  START_LOG("resize_data_structures()", "RBEvaluation");
+  ponies");
 
-  if(Nmax < this->get_n_basis_functions())
-    libmesh_error_msg("Error: Cannot set Nmax to be less than the current number of basis functions.");
+  ponies())
+    ponies.");
 
-  // Resize/clear inner product matrix
-  if(compute_RB_inner_product)
-    RB_inner_product_matrix.resize(Nmax,Nmax);
+  // ponies
+  ponies)
+    ponies);
 
-  // Allocate dense matrices for RB solves
-  RB_Aq_vector.resize(rb_theta_expansion->get_n_A_terms());
+  // ponies
+  ponies());
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
+  ponies++)
     {
-      // Initialize the memory for the RB matrices
-      RB_Aq_vector[q].resize(Nmax,Nmax);
+      // ponies
+      ponies);
     }
 
-  RB_Fq_vector.resize(rb_theta_expansion->get_n_F_terms());
+  ponies());
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_n_F_terms(); q++)
+  ponies++)
     {
-      // Initialize the memory for the RB vectors
-      RB_Fq_vector[q].resize(Nmax);
+      // ponies
+      ponies);
     }
 
 
-  // Initialize the RB output vectors
-  RB_output_vectors.resize(rb_theta_expansion->get_n_outputs());
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+  // ponies
+  ponies());
+  ponies++)
     {
-      RB_output_vectors[n].resize(rb_theta_expansion->get_n_output_terms(n));
-      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
+      ponies));
+      ponies++)
         {
-          RB_output_vectors[n][q_l].resize(Nmax);
+          ponies);
         }
     }
 
-  // Initialize vectors storing output data
-  RB_outputs.resize(rb_theta_expansion->get_n_outputs(), 0.);
+  // ponies
+  ponies.);
 
 
-  if(resize_error_bound_data)
+  ponies)
     {
-      // Initialize vectors for the norms of the Fq representors
-      unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
-      Fq_representor_innerprods.resize(Q_f_hat);
+      // ponies
+      ponies;
+      ponies);
 
-      // Initialize vectors for the norms of the representors
-      Fq_Aq_representor_innerprods.resize(rb_theta_expansion->get_n_F_terms());
-      for(unsigned int i=0; i<rb_theta_expansion->get_n_F_terms(); i++)
+      // ponies
+      ponies());
+      ponies++)
         {
-          Fq_Aq_representor_innerprods[i].resize(rb_theta_expansion->get_n_A_terms());
-          for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
+          ponies());
+          ponies++)
             {
-              Fq_Aq_representor_innerprods[i][j].resize(Nmax, 0.);
+              ponies.);
             }
         }
 
-      unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
-      Aq_Aq_representor_innerprods.resize(Q_a_hat);
-      for(unsigned int i=0; i<Q_a_hat; i++)
+      ponies;
+      ponies);
+      ponies++)
         {
-          Aq_Aq_representor_innerprods[i].resize(Nmax);
-          for(unsigned int j=0; j<Nmax; j++)
+          ponies);
+          ponies++)
             {
-              Aq_Aq_representor_innerprods[i][j].resize(Nmax, 0.);
+              ponies.);
             }
         }
 
-      RB_output_error_bounds.resize(rb_theta_expansion->get_n_outputs(), 0.);
+      ponies.);
 
-      // Resize the output dual norm vectors
-      output_dual_innerprods.resize(rb_theta_expansion->get_n_outputs());
-      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+      // ponies
+      ponies());
+      ponies++)
         {
-          unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
-          output_dual_innerprods[n].resize(Q_l_hat);
+          ponies;
+          ponies);
         }
 
-      // Clear and resize the vector of Aq_representors
-      clear_riesz_representors();
+      // ponies
+      ponies();
 
-      Aq_representor.resize(rb_theta_expansion->get_n_A_terms());
-      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
+      ponies());
+      ponies++)
         {
-          Aq_representor[q_a].resize(Nmax);
+          ponies);
         }
     }
 
 
-  STOP_LOG("resize_data_structures()", "RBEvaluation");
+  ponies");
 }
 
-NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
+ponies)
 {
-  libmesh_assert_less (i, basis_functions.size());
+  ponies());
 
-  return *(basis_functions[i]);
+  ponies]);
 }
 
-Real RBEvaluation::rb_solve(unsigned int N)
+ponies)
 {
-  START_LOG("rb_solve()", "RBEvaluation");
+  ponies");
 
-  if(N > get_n_basis_functions())
-    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+  ponies())
+    ponies");
 
-  const RBParameters& mu = get_parameters();
+  ponies();
 
-  // Resize (and clear) the solution vector
-  RB_solution.resize(N);
+  // ponies
+  ponies);
 
-  // Assemble the RB system
-  DenseMatrix<Number> RB_system_matrix(N,N);
-  RB_system_matrix.zero();
+  // ponies
+  ponies);
+  ponies();
 
-  DenseMatrix<Number> RB_Aq_a;
-  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
+  ponies;
+  ponies++)
     {
-      RB_Aq_vector[q_a].get_principal_submatrix(N, RB_Aq_a);
+      ponies);
 
-      RB_system_matrix.add(rb_theta_expansion->eval_A_theta(q_a, mu), RB_Aq_a);
+      ponies);
     }
 
-  // Assemble the RB rhs
-  DenseVector<Number> RB_rhs(N);
-  RB_rhs.zero();
+  // ponies
+  ponies);
+  ponies();
 
-  DenseVector<Number> RB_Fq_f;
-  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
+  ponies;
+  ponies++)
     {
-      RB_Fq_vector[q_f].get_principal_subvector(N, RB_Fq_f);
+      ponies);
 
-      RB_rhs.add(rb_theta_expansion->eval_F_theta(q_f, mu), RB_Fq_f);
+      ponies);
     }
 
-  // Solve the linear system
-  if(N > 0)
+  // ponies
+  ponies)
     {
-      RB_system_matrix.lu_solve(RB_rhs, RB_solution);
+      ponies);
     }
 
-  // Evaluate RB outputs
-  DenseVector<Number> RB_output_vector_N;
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+  // ponies
+  ponies;
+  ponies++)
     {
-      RB_outputs[n] = 0.;
-      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
+      ponies.;
+      ponies++)
         {
-          RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-          RB_outputs[n] += rb_theta_expansion->eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
+          ponies);
+          ponies);
         }
     }
 
-  if(evaluate_RB_error_bound) // Calculate the error bounds
+  ponies
     {
-      // Evaluate the dual norm of the residual for RB_solution_vector
-      Real epsilon_N = compute_residual_dual_norm(N);
+      // ponies
+      ponies);
 
-      // Get lower bound for coercivity constant
-      const Real alpha_LB = get_stability_lower_bound();
-      // alpha_LB needs to be positive to get a valid error bound
-      libmesh_assert_greater ( alpha_LB, 0. );
+      // ponies
+      ponies();
+      // ponies
+      ponies. );
 
-      // Evaluate the (absolute) error bound
-      Real abs_error_bound = epsilon_N / residual_scaling_denom(alpha_LB);
+      // ponies
+      ponies);
 
-      // Now compute the output error bounds
-      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+      // ponies
+      ponies++)
         {
-          RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n, mu);
+          ponies);
         }
 
-      STOP_LOG("rb_solve()", "RBEvaluation");
+      ponies");
 
-      return abs_error_bound;
+      ponies;
     }
-  else // Don't calculate the error bounds
+  ponies
     {
-      STOP_LOG("rb_solve()", "RBEvaluation");
-      // Just return -1. if we did not compute the error bound
-      return -1.;
+      ponies");
+      // ponies
+      ponies.;
     }
 }
 
-Real RBEvaluation::get_rb_solution_norm()
+ponies()
 {
-  return RB_solution.l2_norm();
+  ponies();
 }
 
-Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
+ponies)
 {
-  START_LOG("compute_residual_dual_norm()", "RBEvaluation");
+  ponies");
 
-  const RBParameters& mu = get_parameters();
+  ponies();
 
-  // Use the stored representor inner product values
-  // to evaluate the residual norm
-  Number residual_norm_sq = 0.;
+  // ponies
+  // ponies
+  ponies.;
 
-  unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<rb_theta_expansion->get_n_F_terms(); q_f1++)
+  ponies;
+  ponies++)
     {
-      for(unsigned int q_f2=q_f1; q_f2<rb_theta_expansion->get_n_F_terms(); q_f2++)
+      ponies++)
         {
-          Real delta = (q_f1==q_f2) ? 1. : 2.;
-          residual_norm_sq += delta * libmesh_real(
-                                                   rb_theta_expansion->eval_F_theta(q_f1, mu)
-                                                   * libmesh_conj(rb_theta_expansion->eval_F_theta(q_f2, mu)) * Fq_representor_innerprods[q] );
+          ponies.;
+          ponies(
+                                                   ponies)
+                                                   * ponies] );
 
-          q++;
+          ponies++;
         }
     }
 
-  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
+  ponies++)
     {
-      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
+      ponies++)
         {
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              Real delta = 2.;
-              residual_norm_sq +=
-                delta * libmesh_real( rb_theta_expansion->eval_F_theta(q_f, mu) *
-                                      libmesh_conj(rb_theta_expansion->eval_A_theta(q_a, mu)) *
-                                      libmesh_conj(RB_solution(i)) * Fq_Aq_representor_innerprods[q_f][q_a][i] );
+              ponies.;
+              ponies +=
+                ponies) *
+                                      ponies)) *
+                                      ponies] );
             }
         }
     }
 
-  q=0;
-  for(unsigned int q_a1=0; q_a1<rb_theta_expansion->get_n_A_terms(); q_a1++)
+  ponies;
+  ponies++)
     {
-      for(unsigned int q_a2=q_a1; q_a2<rb_theta_expansion->get_n_A_terms(); q_a2++)
+      ponies++)
         {
-          Real delta = (q_a1==q_a2) ? 1. : 2.;
+          ponies.;
 
-          for(unsigned int i=0; i<N; i++)
+          ponies++)
             {
-              for(unsigned int j=0; j<N; j++)
+              ponies++)
                 {
-                  residual_norm_sq +=
-                    delta * libmesh_real( libmesh_conj(rb_theta_expansion->eval_A_theta(q_a1, mu)) *
-                                          rb_theta_expansion->eval_A_theta(q_a2, mu) *
-                                          libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_innerprods[q][i][j] );
+                  ponies +=
+                    ponies)) *
+                                          ponies) *
+                                          ponies] );
                 }
             }
 
-          q++;
+          ponies++;
         }
     }
 
-  if(libmesh_real(residual_norm_sq) < 0.)
+  ponies.)
     {
-      //    libMesh::out << "Warning: Square of residual norm is negative "
-      //                 << "in RBSystem::compute_residual_dual_norm()" << std::endl;
+      //    ponies "
+      //                 << "ponies;
 
-      //     Sometimes this is negative due to rounding error,
-      //     but when this occurs the error is on the order of 1.e-10,
-      //     so shouldn't affect error bound much...
-      residual_norm_sq = std::abs(residual_norm_sq);
+      //     ponies,
+      //     ponies,
+      //     ponies...
+      ponies);
     }
 
-  STOP_LOG("compute_residual_dual_norm()", "RBEvaluation");
+  ponies");
 
-  return std::sqrt( libmesh_real(residual_norm_sq) );
+  ponies) );
 }
 
-Real RBEvaluation::get_stability_lower_bound()
+ponies()
 {
-  // Return a default value of 1, this function should
-  // be overloaded to specify a problem-dependent stability
-  // factor lower bound
-  return 1.;
+  // ponies
+  // ponies
+  // ponies
+  ponies.;
 }
 
-Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
+ponies)
 {
-  // Here we implement the residual scaling for a coercive
-  // problem.
-  return alpha_LB;
+  // ponies
+  // ponies.
+  ponies;
 }
 
-Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters& mu)
+ponies)
 {
-  Number output_bound_sq = 0.;
-  unsigned int q=0;
-  for(unsigned int q_l1=0; q_l1<rb_theta_expansion->get_n_output_terms(n); q_l1++)
+  ponies.;
+  ponies;
+  ponies++)
     {
-      for(unsigned int q_l2=q_l1; q_l2<rb_theta_expansion->get_n_output_terms(n); q_l2++)
+      ponies++)
         {
-          Real delta = (q_l1==q_l2) ? 1. : 2.;
-          output_bound_sq += delta * libmesh_real(
-                                                  libmesh_conj(rb_theta_expansion->eval_output_theta(n,q_l1,mu))*
-                                                  rb_theta_expansion->eval_output_theta(n,q_l2,mu) * output_dual_innerprods[n][q] );
-          q++;
+          ponies.;
+          ponies(
+                                                  ponies))*
+                                                  ponies] );
+          ponies++;
         }
     }
 
-  return libmesh_real(std::sqrt( output_bound_sq ));
+  ponies ));
 }
 
-void RBEvaluation::clear_riesz_representors()
+ponies()
 {
 
-  // Clear the Aq_representors
-  for(unsigned int q_a=0; q_a<Aq_representor.size(); q_a++)
+  // ponies
+  ponies++)
     {
-      for(unsigned int i=0; i<Aq_representor[q_a].size(); i++)
+      ponies++)
         {
-          delete Aq_representor[q_a][i];
-          Aq_representor[q_a][i] = NULL;
+          ponies];
+          ponies;
         }
     }
 
 }
 
-void RBEvaluation::write_offline_data_to_files(const std::string& directory_name,
-                                               const bool write_binary_data)
+ponies,
+                                               ponies)
 {
-  START_LOG("write_offline_data_to_files()", "RBEvaluation");
+  ponies");
 
-  // Get the number of basis functions
-  unsigned int n_bfs = get_n_basis_functions();
+  // ponies
+  ponies();
 
-  // The writing mode: ENCODE for binary, WRITE for ASCII
-  XdrMODE mode = write_binary_data ? ENCODE : WRITE;
+  // ponies
+  ponies;
 
-  // The suffix to use for all the files that are written out
-  const std::string suffix = write_binary_data ? ".xdr" : ".dat";
+  // ponies
+  ponies";
 
-  if(this->processor_id() == 0)
+  ponies)
     {
 
-      // Make a directory to store all the data files
-      mkdir(directory_name.c_str(), 0777);
-      //    if( mkdir(directory_name.c_str(), 0777) == -1)
+      // ponies
+      ponies);
+      //    ponies)
       //    {
-      //      libMesh::out << "In RBEvaluation::write_offline_data_to_files, directory "
-      //                   << directory_name << " already exists, overwriting contents." << std::endl;
+      //      ponies "
+      //                   << ponies;
       //    }
 
-      // First, write out how many basis functions we have generated
-      std::ostringstream file_name;
+      // ponies
+      ponies;
       {
-        file_name << directory_name << "/n_bfs" << suffix;
-        Xdr n_bfs_out(file_name.str(), mode);
-        n_bfs_out << n_bfs;
-        n_bfs_out.close();
+        ponies;
+        ponies);
+        ponies;
+        ponies();
       }
 
-      // Write out the parameter ranges
-      file_name.str("");
-      file_name << directory_name << "/parameter_ranges" << suffix;
-      std::string continuous_param_file_name = file_name.str();
+      // ponies
+      ponies("");
+      ponies;
+      ponies();
 
-      // Write out the discrete parameter values
-      file_name.str("");
-      file_name << directory_name << "/discrete_parameter_values" << suffix;
-      std::string discrete_param_file_name = file_name.str();
+      // ponies
+      ponies("");
+      ponies;
+      ponies();
 
-      write_parameter_data_to_files(continuous_param_file_name,
-                                    discrete_param_file_name,
-                                    write_binary_data);
+      ponies,
+                                    ponies,
+                                    ponies);
 
-      // Write out Fq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Fq_innerprods" << suffix;
-      Xdr RB_Fq_innerprods_out(file_name.str(), mode);
-      unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
-      for(unsigned int i=0; i<Q_f_hat; i++)
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
+      ponies;
+      ponies++)
         {
-          RB_Fq_innerprods_out << Fq_representor_innerprods[i];
+          ponies];
         }
-      RB_Fq_innerprods_out.close();
+      ponies();
 
-      // Write out output data
-      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+      // ponies
+      ponies++)
         {
-          file_name.str("");
-          file_name << directory_name << "/output_";
-          file_name << std::setw(3)
-                    << std::setprecision(0)
-                    << std::setfill('0')
-                    << std::right
-                    << n;
+          ponies("");
+          ponies";
+          ponies)
+                    << ponies)
+                    << ponies')
+                    << ponies
+                    << ponies;
 
-          file_name << "_dual_innerprods" << suffix;
-          Xdr output_dual_innerprods_out(file_name.str(), mode);
+          ponies;
+          ponies);
 
-          unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
-          for(unsigned int q=0; q<Q_l_hat; q++)
+          ponies;
+          ponies++)
             {
-              output_dual_innerprods_out << output_dual_innerprods[n][q];
+              ponies];
             }
-          output_dual_innerprods_out.close();
+          ponies();
         }
 
 
-      // Write out output data to multiple files
-      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+      // ponies
+      ponies++)
         {
-          for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
+          ponies++)
             {
-              file_name.str("");
-              file_name << directory_name << "/output_";
-              file_name << std::setw(3)
-                        << std::setprecision(0)
-                        << std::setfill('0')
-                        << std::right
-                        << n;
-              file_name << "_";
-              file_name << std::setw(3)
-                        << std::setprecision(0)
-                        << std::setfill('0')
-                        << std::right
-                        << q_l;
-              file_name << suffix;
-              Xdr output_n_out(file_name.str(), mode);
+              ponies("");
+              ponies";
+              ponies)
+                        << ponies)
+                        << ponies')
+                        << ponies
+                        << ponies;
+              ponies";
+              ponies)
+                        << ponies)
+                        << ponies')
+                        << ponies
+                        << ponies;
+              ponies;
+              ponies);
 
-              for(unsigned int j=0; j<n_bfs; j++)
+              ponies++)
                 {
-                  output_n_out << RB_output_vectors[n][q_l](j);
+                  ponies);
                 }
-              output_n_out.close();
+              ponies();
             }
         }
 
-      if(compute_RB_inner_product)
+      ponies)
         {
-          // Next write out the inner product matrix
-          file_name.str("");
-          file_name << directory_name << "/RB_inner_product_matrix" << suffix;
-          Xdr RB_inner_product_matrix_out(file_name.str(), mode);
-          for(unsigned int i=0; i<n_bfs; i++)
+          // ponies
+          ponies("");
+          ponies;
+          ponies);
+          ponies++)
             {
-              for(unsigned int j=0; j<n_bfs; j++)
+              ponies++)
                 {
-                  RB_inner_product_matrix_out << RB_inner_product_matrix(i,j);
-                }
-            }
-          RB_inner_product_matrix_out.close();
-        }
-
-      // Next write out the Fq vectors
-      for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
-        {
-          file_name.str("");
-          file_name << directory_name << "/RB_F_";
-          file_name << std::setw(3)
-                    << std::setprecision(0)
-                    << std::setfill('0')
-                    << std::right
-                    << q_f;
-          file_name << suffix;
-          Xdr RB_Fq_f_out(file_name.str(), mode);
-
-          for(unsigned int i=0; i<n_bfs; i++)
-            {
-              RB_Fq_f_out << RB_Fq_vector[q_f](i);
-            }
-          RB_Fq_f_out.close();
-        }
-
-      // Next write out the Aq matrices
-      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
-        {
-          file_name.str("");
-          file_name << directory_name << "/RB_A_";
-          file_name << std::setw(3)
-                    << std::setprecision(0)
-                    << std::setfill('0')
-                    << std::right
-                    << q_a;
-          file_name << suffix;
-          Xdr RB_Aq_a_out(file_name.str(), mode);
-
-          for(unsigned int i=0; i<n_bfs; i++)
-            {
-              for(unsigned int j=0; j<n_bfs; j++)
-                {
-                  RB_Aq_a_out << RB_Aq_vector[q_a](i,j);
+                  ponies);
                 }
             }
-          RB_Aq_a_out.close();
+          ponies();
         }
 
-      // Next write out Fq_Aq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Fq_Aq_innerprods" << suffix;
-      Xdr RB_Fq_Aq_innerprods_out(file_name.str(), mode);
-
-      for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
+      // ponies
+      ponies++)
         {
-          for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
+          ponies("");
+          ponies";
+          ponies)
+                    << ponies)
+                    << ponies')
+                    << ponies
+                    << ponies;
+          ponies;
+          ponies);
+
+          ponies++)
             {
-              for(unsigned int i=0; i<n_bfs; i++)
+              ponies);
+            }
+          ponies();
+        }
+
+      // ponies
+      ponies++)
+        {
+          ponies("");
+          ponies";
+          ponies)
+                    << ponies)
+                    << ponies')
+                    << ponies
+                    << ponies;
+          ponies;
+          ponies);
+
+          ponies++)
+            {
+              ponies++)
                 {
-                  RB_Fq_Aq_innerprods_out << Fq_Aq_representor_innerprods[q_f][q_a][i];
+                  ponies);
                 }
             }
+          ponies();
         }
-      RB_Fq_Aq_innerprods_out.close();
 
-      // Next write out Aq_Aq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Aq_Aq_innerprods" << suffix;
-      Xdr RB_Aq_Aq_innerprods_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
-      for(unsigned int i=0; i<Q_a_hat; i++)
+      ponies++)
         {
-          for(unsigned int j=0; j<n_bfs; j++)
+          ponies++)
             {
-              for(unsigned int l=0; l<n_bfs; l++)
+              ponies++)
                 {
-                  RB_Aq_Aq_innerprods_out << Aq_Aq_representor_innerprods[i][j][l];
+                  ponies];
                 }
             }
         }
-      RB_Aq_Aq_innerprods_out.close();
+      ponies();
 
-      // Also, write out the greedily selected parameters
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
+
+      ponies;
+      ponies++)
+        {
+          ponies++)
+            {
+              ponies++)
+                {
+                  ponies];
+                }
+            }
+        }
+      ponies();
+
+      // ponies
       {
-        file_name.str("");
-        file_name << directory_name << "/greedy_params" << suffix;
-        Xdr greedy_params_out(file_name.str(), mode);
+        ponies("");
+        ponies;
+        ponies);
 
-        for(unsigned int i=0; i<greedy_param_list.size(); i++)
+        ponies++)
           {
-            RBParameters::const_iterator it     = greedy_param_list[i].begin();
-            RBParameters::const_iterator it_end = greedy_param_list[i].end();
-            for( ; it != it_end; ++it)
+            ponies();
+            ponies();
+            ponies)
               {
-                // Need to make a copy of the value so that it's not const
-                // Xdr is not templated on const's
-                Real param_value = it->second;
-                greedy_params_out << param_value;
+                // ponies
+                // ponies
+                ponies;
+                ponies;
               }
           }
-        greedy_params_out.close();
+        ponies();
       }
 
     }
 
-  STOP_LOG("write_offline_data_to_files()", "RBEvaluation");
+  ponies");
 }
 
-void RBEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                bool read_error_bound_data,
-                                                const bool read_binary_data)
+ponies,
+                                                ponies,
+                                                ponies)
 {
-  START_LOG("read_offline_data_from_files()", "RBEvaluation");
+  ponies");
 
-  // The reading mode: DECODE for binary, READ for ASCII
-  XdrMODE mode = read_binary_data ? DECODE : READ;
+  // ponies
+  ponies;
 
-  // The suffix to use for all the files that are written out
-  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
+  // ponies
+  ponies";
 
-  // The string stream we'll use to make the file names
-  std::ostringstream file_name;
+  // ponies
+  ponies;
 
-  // First, find out how many basis functions we had when Greedy terminated
-  unsigned int n_bfs;
+  // ponies
+  ponies;
   {
-    file_name << directory_name << "/n_bfs" << suffix;
-    Xdr n_bfs_in(file_name.str(), mode);
+    ponies;
+    ponies);
 
-    n_bfs_in >> n_bfs;
-    n_bfs_in.close();
+    ponies;
+    ponies();
   }
 
-  resize_data_structures(n_bfs, read_error_bound_data);
+  ponies);
 
-  // Read in the parameter ranges
-  file_name.str("");
-  file_name << directory_name << "/parameter_ranges" << suffix;
-  std::string continuous_param_file_name = file_name.str();
+  // ponies
+  ponies("");
+  ponies;
+  ponies();
 
-  // Read in the discrete parameter values
-  file_name.str("");
-  file_name << directory_name << "/discrete_parameter_values" << suffix;
-  std::string discrete_param_file_name = file_name.str();
-  read_parameter_data_from_files(continuous_param_file_name,
-                                 discrete_param_file_name,
-                                 read_binary_data);
+  // ponies
+  ponies("");
+  ponies;
+  ponies();
+  ponies,
+                                 ponies,
+                                 ponies);
 
-  // Read in output data in multiple files
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+  // ponies
+  ponies++)
     {
-      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
+      ponies++)
         {
-          file_name.str("");
-          file_name << directory_name << "/output_";
-          file_name << std::setw(3)
-                    << std::setprecision(0)
-                    << std::setfill('0')
-                    << std::right
-                    << n;
-          file_name << "_";
-          file_name << std::setw(3)
-                    << std::setprecision(0)
-                    << std::setfill('0')
-                    << std::right
-                    << q_l;
-          file_name << suffix;
-          Xdr output_n_in(file_name.str(), mode);
+          ponies("");
+          ponies";
+          ponies)
+                    << ponies)
+                    << ponies')
+                    << ponies
+                    << ponies;
+          ponies";
+          ponies)
+                    << ponies)
+                    << ponies')
+                    << ponies
+                    << ponies;
+          ponies;
+          ponies);
 
-          for(unsigned int j=0; j<n_bfs; j++)
+          ponies++)
             {
-              Number value;
-              output_n_in >> value;
-              RB_output_vectors[n][q_l](j) = value;
+              ponies;
+              ponies;
+              ponies;
             }
-          output_n_in.close();
+          ponies();
         }
     }
 
-  if(compute_RB_inner_product)
+  ponies)
     {
-      // Next read in the inner product matrix
-      file_name.str("");
-      file_name << directory_name << "/RB_inner_product_matrix" << suffix;
-      Xdr RB_inner_product_matrix_in(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      ponies++)
         {
-          for(unsigned int j=0; j<n_bfs; j++)
+          ponies++)
             {
-              Number value;
-              RB_inner_product_matrix_in >> value;
-              RB_inner_product_matrix(i,j) = value;
+              ponies;
+              ponies;
+              ponies;
             }
         }
-      RB_inner_product_matrix_in.close();
+      ponies();
     }
 
-  // Next read in the Fq vectors
-  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
+  // ponies
+  ponies++)
     {
-      file_name.str("");
-      file_name << directory_name << "/RB_F_";
-      file_name << std::setw(3)
-                << std::setprecision(0)
-                << std::setfill('0')
-                << std::right
-                << q_f;
-      file_name << suffix;
-      Xdr RB_Fq_f_in(file_name.str(), mode);
+      ponies("");
+      ponies";
+      ponies)
+                << ponies)
+                << ponies')
+                << ponies
+                << ponies;
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      ponies++)
         {
-          Number value;
-          RB_Fq_f_in >> value;
-          RB_Fq_vector[q_f](i) = value;
+          ponies;
+          ponies;
+          ponies;
         }
-      RB_Fq_f_in.close();
+      ponies();
     }
 
-  // Next read in the Aq matrices
-  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
+  // ponies
+  ponies++)
     {
-      file_name.str("");
-      file_name << directory_name << "/RB_A_";
-      file_name << std::setw(3)
-                << std::setprecision(0)
-                << std::setfill('0')
-                << std::right
-                << q_a;
-      file_name << suffix;
-      Xdr RB_Aq_a_in(file_name.str(), mode);
+      ponies("");
+      ponies";
+      ponies)
+                << ponies)
+                << ponies')
+                << ponies
+                << ponies;
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      ponies++)
         {
-          for(unsigned int j=0; j<n_bfs; j++)
+          ponies++)
             {
-              Number  value;
-              RB_Aq_a_in >> value;
-              RB_Aq_vector[q_a](i,j) = value;
+              ponies;
+              ponies;
+              ponies;
             }
         }
-      RB_Aq_a_in.close();
+      ponies();
     }
 
 
-  if(read_error_bound_data)
+  ponies)
     {
-      // Next read in Fq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Fq_innerprods" << suffix;
-      Xdr RB_Fq_innerprods_in(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
-      for(unsigned int i=0; i<Q_f_hat; i++)
+      ponies;
+      ponies++)
         {
-          RB_Fq_innerprods_in >> Fq_representor_innerprods[i];
+          ponies];
         }
-      RB_Fq_innerprods_in.close();
+      ponies();
 
-      // Read in output data
-      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+      // ponies
+      ponies++)
         {
-          file_name.str("");
-          file_name << directory_name << "/output_";
-          file_name << std::setw(3)
-                    << std::setprecision(0)
-                    << std::setfill('0')
-                    << std::right
-                    << n;
-          file_name << "_dual_innerprods" << suffix;
-          Xdr output_dual_innerprods_in(file_name.str(), mode);
+          ponies("");
+          ponies";
+          ponies)
+                    << ponies)
+                    << ponies')
+                    << ponies
+                    << ponies;
+          ponies;
+          ponies);
 
-          unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
-          for(unsigned int q=0; q<Q_l_hat; q++)
+          ponies;
+          ponies++)
             {
-              output_dual_innerprods_in >> output_dual_innerprods[n][q];
+              ponies];
             }
-          output_dual_innerprods_in.close();
+          ponies();
         }
 
 
-      // Next read in Fq_Aq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Fq_Aq_innerprods" << suffix;
-      Xdr RB_Fq_Aq_innerprods_in(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
+      ponies++)
         {
-          for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
+          ponies++)
             {
-              for(unsigned int i=0; i<n_bfs; i++)
+              ponies++)
                 {
-                  RB_Fq_Aq_innerprods_in >> Fq_Aq_representor_innerprods[q_f][q_a][i];
+                  ponies];
                 }
             }
         }
-      RB_Fq_Aq_innerprods_in.close();
+      ponies();
 
-      // Next read in Aq_Aq representor norm data
-      file_name.str("");
-      file_name << directory_name << "/Aq_Aq_innerprods" << suffix;
-      Xdr RB_Aq_Aq_innerprods_in(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
-      for(unsigned int i=0; i<Q_a_hat; i++)
+      ponies;
+      ponies++)
         {
-          for(unsigned int j=0; j<n_bfs; j++)
+          ponies++)
             {
-              for(unsigned int l=0; l<n_bfs; l++)
+              ponies++)
                 {
-                  RB_Aq_Aq_innerprods_in >> Aq_Aq_representor_innerprods[i][j][l];
+                  ponies];
                 }
             }
         }
-      RB_Aq_Aq_innerprods_in.close();
+      ponies();
     }
 
-  // Resize basis_functions even if we don't read them in so that
-  // get_n_bfs() returns the correct value. Initialize the pointers
-  // to NULL
-  set_n_basis_functions(n_bfs);
-  for(unsigned int i=0; i<basis_functions.size(); i++)
+  // ponies
+  // ponies
+  // ponies
+  ponies);
+  ponies++)
     {
-      if(basis_functions[i])
+      ponies])
         {
-          basis_functions[i]->clear();
-          delete basis_functions[i];
+          ponies();
+          ponies];
         }
-      basis_functions[i] = NULL;
+      ponies;
     }
 
-  STOP_LOG("read_offline_data_from_files()", "RBEvaluation");
+  ponies");
 }
 
-void RBEvaluation::write_out_basis_functions(System& sys,
-                                             const std::string& directory_name,
-                                             const bool write_binary_basis_functions)
+ponies,
+                                             ponies,
+                                             ponies)
 {
-  START_LOG("write_out_basis_functions()", "RBEvaluation");
+  ponies");
 
-  write_out_vectors(sys,
-                    basis_functions,
-                    directory_name,
-                    "bf",
-                    write_binary_basis_functions);
+  ponies,
+                    ponies,
+                    ponies,
+                    "ponies",
+                    ponies);
 
-  STOP_LOG("write_out_basis_functions()", "RBEvaluation");
+  ponies");
 }
 
-void RBEvaluation::write_out_vectors(System& sys,
-                                     std::vector<NumericVector<Number>*>& vectors,
-                                     const std::string& directory_name,
-                                     const std::string& data_name,
-                                     const bool write_binary_vectors)
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
 {
-  START_LOG("write_out_vectors()", "RBEvaluation");
-  //libMesh::out << "Writing out the basis functions..." << std::endl;
+  ponies");
+  //ponies;
 
-  if(this->processor_id() == 0)
+  ponies)
     {
-      // Make a directory to store all the data files
-      mkdir(directory_name.c_str(), 0777);
+      // ponies
+      ponies);
     }
 
-  // Make sure processors are synced up before we begin
-  this->comm().barrier();
+  // ponies
+  ponies();
 
-  std::ostringstream file_name;
-  const std::string basis_function_suffix = (write_binary_vectors ? ".xdr" : ".dat");
+  ponies;
+  ponies");
 
-  file_name << directory_name << "/" << data_name << "_header" << basis_function_suffix;
-  Xdr header_data(file_name.str(),
-                  write_binary_vectors ? ENCODE : WRITE);
-  sys.write_header(header_data, get_io_version_string(), /*write_additional_data=*/false);
+  ponies;
+  ponies(),
+                  ponies);
+  ponies);
 
-  // Following EquationSystemsIO::write, we use a temporary numbering (node major)
-  // before writing out the data
-  MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
+  // ponies)
+  // ponies
+  ponies());
 
-  // // Use System::write_serialized_data to write out the basis functions
-  // // by copying them into this->solution one at a time.
-  // for(unsigned int i=0; i<vectors.size(); i++)
+  // // ponies
+  // // ponies.
+  // ponies++)
   // {
-  //   // No need to copy, just swap
-  //   // *solution = *vectors[i];
-  //   vectors[i]->swap(*sys.solution);
-  //   file_name.str(""); // reset the string
-  //   file_name << directory_name << "/bf" << i << basis_function_suffix;
-  //   Xdr bf_data(file_name.str(),
-  //               write_binary_vectors ? ENCODE : WRITE);
-  //   // set the current version
-  //   bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
-  //    LIBMESH_MINOR_VERSION,
-  //    LIBMESH_MICRO_VERSION));
+  //   // ponies
+  //   // *ponies];
+  //   ponies);
+  //   ponies
+  //   ponies;
+  //   ponies(),
+  //               ponies);
+  //   // ponies
+  //   ponies,
+  //    ponies,
+  //    ponies));
 
-  //   sys.write_serialized_data(bf_data, false);
+  //   ponies);
 
-  //   // Synchronize before moving on
-  //   this->comm().barrier();
-  //   // Swap back
-  //   vectors[i]->swap(*sys.solution);
+  //   // ponies
+  //   ponies();
+  //   // ponies
+  //   ponies);
   // }
 
-  file_name.str("");
-  file_name << directory_name << "/" << data_name << "_data" << basis_function_suffix;
+  ponies("");
+  ponies;
 
-  Xdr bf_data(file_name.str(),
-              write_binary_vectors ? ENCODE : WRITE);
+  ponies(),
+              ponies);
 
-  // Write all vectors at once.
+  // ponies.
   {
-    // Note the API wants pointers to constant vectors, hence this...
-    std::vector<const NumericVector<Number>*> bf_out(vectors.begin(),
-                                                     vectors.end());
-    // for(unsigned int i=0; i<vectors.size(); i++)
-    //   bf_out.push_back(vectors[i]);
-    sys.write_serialized_vectors (bf_data, bf_out);
+    // ponies...
+    ponies(),
+                                                     ponies());
+    // ponies++)
+    //   ponies]);
+    ponies);
   }
 
 
-  // set the current version
-  bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
-                                         LIBMESH_MINOR_VERSION,
-                                         LIBMESH_MICRO_VERSION));
+  // ponies
+  ponies,
+                                         ponies,
+                                         ponies));
 
 
-  // Undo the temporary renumbering
-  sys.get_mesh().fix_broken_node_and_element_numbering();
+  // ponies
+  ponies();
 
-  STOP_LOG("write_out_vectors()", "RBEvaluation");
+  ponies");
 }
 
-void RBEvaluation::read_in_basis_functions(System& sys,
-                                           const std::string& directory_name,
-                                           const bool read_binary_basis_functions)
+ponies,
+                                           ponies,
+                                           ponies)
 {
-  START_LOG("read_in_basis_functions()", "RBEvaluation");
+  ponies");
 
-  read_in_vectors(sys,
-                  basis_functions,
-                  directory_name,
-                  "bf",
-                  read_binary_basis_functions);
+  ponies,
+                  ponies,
+                  ponies,
+                  "ponies",
+                  ponies);
 
-  STOP_LOG("read_in_basis_functions()", "RBEvaluation");
+  ponies");
 }
 
-void RBEvaluation::read_in_vectors(System& sys,
-                                   std::vector<NumericVector<Number>*>& vectors,
-                                   const std::string& directory_name,
-                                   const std::string& data_name,
-                                   const bool read_binary_vectors)
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies)
 {
-  std::vector< std::vector<NumericVector<Number>*>* > vectors_vec;
-  vectors_vec.push_back(&vectors);
+  ponies;
+  ponies);
 
-  std::vector<std::string> directory_name_vec;
-  directory_name_vec.push_back(directory_name);
+  ponies;
+  ponies);
 
-  std::vector<std::string> data_name_vec;
-  data_name_vec.push_back(data_name);
+  ponies;
+  ponies);
 
-  read_in_vectors_from_multiple_files(sys,
-                                      vectors_vec,
-                                      directory_name_vec,
-                                      data_name_vec,
-                                      read_binary_vectors);
+  ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies);
 }
 
-void RBEvaluation::read_in_vectors_from_multiple_files(System& sys,
-                                                       std::vector< std::vector<NumericVector<Number>*>* > multiple_vectors,
-                                                       const std::vector<std::string>& multiple_directory_names,
-                                                       const std::vector<std::string>& multiple_data_names,
-                                                       const bool read_binary_vectors)
+ponies,
+                                                       ponies,
+                                                       ponies,
+                                                       ponies,
+                                                       ponies)
 {
-  START_LOG("read_in_vectors_from_multiple_files()", "RBEvaluation");
+  ponies");
 
-  unsigned int n_files = multiple_vectors.size();
-  unsigned int n_directories = multiple_directory_names.size();
-  unsigned int n_data_names = multiple_data_names.size();
-  libmesh_assert( (n_files == n_directories) && (n_files == n_data_names) );
+  ponies();
+  ponies();
+  ponies();
+  ponies) );
 
-  if (n_files == 0)
-    return;
+  ponies)
+    ponies;
 
-  // Make sure processors are synced up before we begin
-  this->comm().barrier();
+  // ponies
+  ponies();
 
-  std::ostringstream file_name;
-  const std::string basis_function_suffix = (read_binary_vectors ? ".xdr" : ".dat");
-  struct stat stat_info;
+  ponies;
+  ponies");
+  ponies;
 
-  // Assume that all the headers are the same, hence we can just use the first one.
-  file_name << multiple_directory_names[0] << "/"
-            << multiple_data_names[0] << "_header" << basis_function_suffix;
-  Xdr header_data(file_name.str(),
-                  read_binary_vectors ? DECODE : READ);
+  // ponies.
+  ponies] << "/"
+            << ponies;
+  ponies(),
+                  ponies);
 
-  // set the version number in header_data from io_version_string
-  // (same code as in EquationSystemsIO::_read_impl)
-  std::string io_version_string = get_io_version_string();
-  std::string::size_type lm_pos = io_version_string.find("libMesh");
-  std::istringstream iss(io_version_string.substr(lm_pos + 8));
-  int ver_major = 0, ver_minor = 0, ver_patch = 0;
-  char dot;
-  iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
-  header_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+  // ponies
+  // (ponies)
+  ponies();
+  ponies");
+  ponies));
+  ponies;
+  ponies;
+  ponies;
+  ponies));
 
-  // We need to call sys.read_header (e.g. to set _written_var_indices properly),
-  // but by setting the read_header argument to false, it doesn't reinitialize the system
-  sys.read_header(header_data, io_version_string, /*read_header=*/false, /*read_additional_data=*/false);
+  // ponies),
+  // ponies
+  ponies);
 
-  // Following EquationSystemsIO::read, we use a temporary numbering (node major)
-  // before writing out the data
-  MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
+  // ponies)
+  // ponies
+  ponies());
 
-  for (unsigned int data_index=0; data_index<n_directories; data_index++)
+  ponies++)
     {
-      std::vector<NumericVector<Number>*>& vectors = *multiple_vectors[data_index];
+      ponies];
 
-      // Allocate storage for each vector
-      for (unsigned int i=0; i<vectors.size(); i++)
+      // ponies
+      ponies++)
         {
-          vectors[i] = NumericVector<Number>::build(sys.comm()).release();
+          ponies();
 
-          vectors[i]->init (sys.n_dofs(),
-                            sys.n_local_dofs(),
-                            false,
-                            PARALLEL);
+          ponies(),
+                            ponies(),
+                            ponies,
+                            ponies);
         }
 
-      file_name.str("");
-      file_name << multiple_directory_names[data_index]
-                << "/" << multiple_data_names[data_index]
-                << "_data" << basis_function_suffix;
+      ponies("");
+      ponies]
+                << "/" << ponies]
+                << "ponies;
 
-      // On processor zero check to be sure the file exists
-      if (this->processor_id() == 0)
+      // ponies
+      ponies)
         {
-          int stat_result = stat(file_name.str().c_str(), &stat_info);
+          ponies);
 
-          if (stat_result != 0)
-            libmesh_error_msg("File does not exist: " << file_name.str());
+          ponies)
+            ponies());
         }
 
-      Xdr vector_data(file_name.str(),
-                      read_binary_vectors ? DECODE : READ);
+      ponies(),
+                      ponies);
 
-      // The vector_data needs to know which version to read.
-      vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+      // ponies.
+      ponies));
 
-      sys.read_serialized_vectors (vector_data, vectors);
+      ponies);
     }
 
-  // Undo the temporary renumbering
-  sys.get_mesh().fix_broken_node_and_element_numbering();
+  // ponies
+  ponies();
 
-  STOP_LOG("read_in_vectors_from_multiple_files()", "RBEvaluation");
+  ponies");
 }
 
-std::string RBEvaluation::get_io_version_string()
+ponies()
 {
-  std::string retval("libMesh-" + libMesh::get_io_compatibility_version());
+  ponies());
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  retval += " with infinite elements";
-#endif
+#ponies
+  ponies";
+#ponies
 
-  return retval;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

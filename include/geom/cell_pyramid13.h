@@ -1,214 +1,214 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_PYRAMID13_H
-#define LIBMESH_CELL_PYRAMID13_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/cell_pyramid.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p Pyramid13 is an element in 3D composed of 13 nodes, designed
- * to interface with a QUAD8 element on the base and a TRI6 element on
- * each of the triangular faces.  Cubit will generate hybrid meshes
- * with linear pyramids, but as of version 14 will not export
- * quadratic pyramids.  Paraview should support 13-node pyramids...
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies...
  *
- * The node numbering for the pyramid13 is given below:
- * \verbatim
- * PYRAMID13:
- *                     o 4
+ * ponies:
+ * \ponies
+ * ponies:
+ *                     ponies
  *                   //|\
  *                  // | \
  *                 //  |  \
  *                //   |   \
- *            12 o/    |    o 11
+ *            ponies
  *              //     |     \
- *             /o 9    o 10   \
+ *             /ponies   \
  *            //       |       \
  *           //        |        \
- *        3 o/.......o.|........o 2
- *         ./       7  |       /
+ *        ponies
+ *         ./       ponies  |       /
  *        ./           |      /
  *       ./            |     /
  *      ./             |    /
- *   8 o/              |   o 6
+ *   ponies
  *    ./               |  /
  *   ./                | /
  *  ./                 |/
- *  o--------o---------o
- *  0        5         1
+ *  ponies
+ *  ponies
  *
- * \endverbatim
+ * \ponies
  */
-class Pyramid13 : public Pyramid
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  By default this element has no parent.
+   * ponies.
    */
-  explicit
-  Pyramid13  (Elem* p=NULL);
+  ponies
+  ponies);
 
   /**
-   * @returns 13.
+   * @ponies.
    */
-  virtual unsigned int n_nodes() const { return 13; }
+  ponies; }
 
   /**
-   * @returns \p PRYAMID13
+   * @ponies
    */
-  ElemType type () const { return PYRAMID13; }
+  ponies; }
 
   /**
-   * FIXME: we don't yet have a refinement pattern for pyramids...
-   * @returns 1
+   * ponies...
+   * @ponies
    */
-  unsigned int n_sub_elem() const { return 1; }
+  ponies; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @ponies.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @ponies.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @ponies.
    */
-  virtual bool is_face(const unsigned int i) const;
+  ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @ponies
+   * ponies
    */
-  virtual bool has_affine_map () const;
+  ponies;
 
   /**
-   * @returns SECOND
+   * @ponies
    */
-  Order default_order() const { return SECOND; }
+  ponies; }
 
   /**
-   * Builds a \p QUAD8 or \p TRI6 coincident with face i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  ponies,
+                              ponies;
 
   /**
-   * Builds a \p EDGE3 coincident with edge i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  ponies;
 
-  virtual void connectivity(const unsigned int sc,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+  ponies,
+                            ponies,
+                            ponies;
 
   /**
-   * @returns 2 for all edge nodes
+   * @ponies
    */
-  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const;
+  ponies;
 
   /**
-   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
-   * that defines the \f$ n^{th} \f$ second-order node.
+   * @ponies
+   * ponies.
    */
-  virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
-                                                           const unsigned int v) const;
+  ponies,
+                                                           ponies;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * ponies
+   * ponies.
    */
-  static const unsigned int side_nodes_map[5][8];
+  ponies];
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
+   * ponies
+   * ponies.
    */
-  static const unsigned int edge_nodes_map[8][3];
+  ponies];
 
-protected:
+ponies:
 
   /**
-   * Data for links to nodes
+   * ponies
    */
-  Node* _nodelinks_data[13];
+  ponies];
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Matrix used to create the elements children.
+   * ponies.
    */
-  float embedding_matrix (const unsigned int,
-                          const unsigned int,
-                          const unsigned int) const
-  { libmesh_not_implemented(); return 0.; }
+  ponies,
+                          ponies,
+                          ponies
+  { ponies.; }
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+  ponies;
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 };
 
 
 
 // ------------------------------------------------------------
-// Pyramid13 class member functions
-inline
-Pyramid13::Pyramid13(Elem* p) :
-  Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_CELL_PYRAMID13_H
+#ponies

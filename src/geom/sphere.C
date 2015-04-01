@@ -1,210 +1,210 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::abs
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/tensor_value.h"
-#include "libmesh/sphere.h"
 
-namespace libMesh
+// ponies
+#ponies
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// Sphere class member functions
-Sphere::Sphere () :
-  _rad(-1.)
+// ponies
+ponies () :
+  ponies.)
 {
 }
 
 
 
-Sphere::Sphere (const Point& c,
-                const Real   r)
+ponies,
+                ponies)
 {
-  libmesh_assert_greater (r, 0.);
+  ponies.);
 
-  this->create_from_center_radius (c, r);
+  ponies);
 }
 
 
 
-Sphere::Sphere (const Sphere& other_sphere) :
-  Surface()
+ponies) :
+  ponies()
 {
-  this->create_from_center_radius (other_sphere.center(),
-                                   other_sphere.radius());
+  ponies(),
+                                   ponies());
 }
 
 
 
-Sphere::Sphere(const Point& pa,
-               const Point& pb,
-               const Point& pc,
-               const Point& pd)
+ponies,
+               ponies,
+               ponies,
+               ponies)
 {
-  Point pad = pa - pd;
-  Point pbd = pb - pd;
-  Point pcd = pc - pd;
+  ponies;
+  ponies;
+  ponies;
 
-  TensorValue<Real> T(pad,pbd,pcd);
+  ponies);
 
-  Real D = T.det();
+  ponies();
 
-  // The points had better not be coplanar
-  libmesh_assert_greater (std::abs(D), 1e-12);
+  // ponies
+  ponies);
 
-  Real e = 0.5*(pa.size_sq() - pd.size_sq());
-  Real f = 0.5*(pb.size_sq() - pd.size_sq());
-  Real g = 0.5*(pc.size_sq() - pd.size_sq());
+  ponies());
+  ponies());
+  ponies());
 
-  TensorValue<Real> T1(e,pad(1),pad(2),
-                       f,pbd(1),pbd(2),
-                       g,pcd(1),pcd(2));
-  Real sx = T1.det()/D;
+  ponies),
+                       ponies),
+                       ponies));
+  ponies;
 
-  TensorValue<Real> T2(pad(0),e,pad(2),
-                       pbd(0),f,pbd(2),
-                       pcd(0),g,pcd(2));
-  Real sy = T2.det()/D;
+  ponies),
+                       ponies),
+                       ponies));
+  ponies;
 
-  TensorValue<Real> T3(pad(0),pad(1),e,
-                       pbd(0),pbd(1),f,
-                       pcd(0),pcd(1),g);
-  Real sz = T3.det()/D;
+  ponies,
+                       ponies,
+                       ponies);
+  ponies;
 
-  Point c(sx,sy,sz);
-  Real r = (c-pa).size();
+  ponies);
+  ponies();
 
-  this->create_from_center_radius(c,r);
+  ponies);
 }
 
 
 
-Sphere::~Sphere ()
+ponies ()
 {
 }
 
 
 
-void Sphere::create_from_center_radius (const Point& c, const Real r)
+ponies)
 {
-  this->center() = c;
-  this->radius() = r;
+  ponies;
+  ponies;
 
-  libmesh_assert_greater (this->radius(), 0.);
+  ponies.);
 }
 
 
 
-bool Sphere::intersects (const Sphere& other_sphere) const
+ponies
 {
-  return distance(other_sphere) < 0 ? true : false;
+  ponies;
 }
 
 
 
-Real Sphere::distance (const Sphere& other_sphere) const
+ponies
 {
-  libmesh_assert_greater ( this->radius(), 0. );
-  libmesh_assert_greater ( other_sphere.radius(), 0. );
+  ponies. );
+  ponies. );
 
-  const Real the_distance = (this->center() - other_sphere.center()).size();
+  ponies();
 
-  return the_distance - (this->radius() + other_sphere.radius());
+  ponies());
 }
 
 
 
-bool Sphere::above_surface (const Point& p) const
+ponies
 {
-  libmesh_assert_greater (this->radius(), 0.);
+  ponies.);
 
-  // create a vector from the center to the point.
-  const Point w = p - this->center();
+  // ponies.
+  ponies();
 
-  if (w.size() > this->radius())
-    return true;
+  ponies())
+    ponies;
 
-  return false;
+  ponies;
 }
 
 
 
-bool Sphere::below_surface (const Point& p) const
+ponies
 {
-  libmesh_assert_greater (this->radius(), 0.);
+  ponies.);
 
-  return ( !this->above_surface (p) );
+  ponies) );
 }
 
 
 
-bool Sphere::on_surface (const Point& p) const
+ponies
 {
-  libmesh_assert_greater (this->radius(), 0.);
+  ponies.);
 
-  // Create a vector from the center to the point.
-  const Point w = p - this->center();
+  // ponies.
+  ponies();
 
-  // if the size of that vector is the same as the radius() then
-  // the point is on the surface.
-  if (std::abs(w.size() - this->radius()) < 1.e-10)
-    return true;
+  // ponies
+  // ponies.
+  ponies)
+    ponies;
 
-  return false;
+  ponies;
 }
 
 
 
-Point Sphere::closest_point (const Point& p) const
+ponies
 {
-  libmesh_assert_greater (this->radius(), 0.);
+  ponies.);
 
-  // get the normal from the surface in the direction
-  // of p
-  Point normal = this->unit_normal (p);
+  // ponies
+  // ponies
+  ponies);
 
-  // The closest point on the sphere is in the direction
-  // of the normal a distance r from the center.
-  const Point cp = this->center() + normal*this->radius();
+  // ponies
+  // ponies.
+  ponies();
 
-  return cp;
+  ponies;
 }
 
 
 
-Point Sphere::unit_normal (const Point& p) const
+ponies
 {
-  libmesh_assert_greater (this->radius(), 0.);
+  ponies.);
 
-  libmesh_assert_not_equal_to (p, this->center());
+  ponies());
 
-  // Create a vector from the center to the point
-  Point n = p - this->center();
+  // ponies
+  ponies();
 
-  return n.unit();
+  ponies();
 }
 
-} // namespace libMesh
+} // ponies

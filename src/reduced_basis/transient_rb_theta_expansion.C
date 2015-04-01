@@ -1,51 +1,51 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/transient_rb_theta_expansion.h"
-#include "libmesh/rb_theta.h"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// RBThetaExpansion implementation
+// ponies
 
-TransientRBThetaExpansion::TransientRBThetaExpansion()
+ponies()
 {
 }
 
-Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
-                                               const RBParameters& mu)
+ponies,
+                                               ponies)
 {
-  if(q >= get_n_M_terms())
-    libmesh_error_msg("Error: We must have q < get_n_M_terms in eval_M_theta.");
+  ponies())
+    ponies.");
 
-  libmesh_assert(_M_theta_vector[q]);
+  ponies]);
 
-  return _M_theta_vector[q]->evaluate( mu );
+  ponies );
 }
 
-void TransientRBThetaExpansion::attach_M_theta(RBTheta* theta_q_m)
+ponies)
 {
-  libmesh_assert(theta_q_m);
+  ponies);
 
-  _M_theta_vector.push_back(theta_q_m);
+  ponies);
 }
 
 

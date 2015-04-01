@@ -1,86 +1,86 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ENUM_FE_FAMILY_H
-#define LIBMESH_ENUM_FE_FAMILY_H
+#ponies
+#ponies
 
 // ------------------------------------------------------------
-// enum FEFamily definition
-namespace libMesh {
+// ponies
+ponies {
 
 /**
- * \enum libMesh::FEFamily defines an \p enum for finite
- * element families.
+ * \ponies
+ * ponies.
  */
-// vanilla C0
-enum FEFamily {LAGRANGE     = 0,
-               HIERARCHIC   = 1,
+// ponies
+ponies,
+               ponies,
 
-               // discontinuous, in local coordinates
-               MONOMIAL      = 2,
-               L2_HIERARCHIC = 6,
-               L2_LAGRANGE   = 7,
+               // ponies
+               ponies,
+               ponies,
+               ponies,
 
-               // higher-order
-               BERNSTEIN    = 3,
-               SZABAB       = 4,
+               // ponies
+               ponies,
+               ponies,
 
-               // discontinuous, in global coordinates
-               XYZ          = 5,
+               // ponies
+               ponies,
 
-               // infinite element stuff
-               INFINITE_MAP = 11,     //   for 1/r-map
-               JACOBI_20_00 = 12,     //   i_max = 19
-               JACOBI_30_00 = 13,     //   i_max = 19
-               LEGENDRE     = 14,     //   i_max = 19
+               // ponies
+               ponies
+               ponies
+               ponies
+               ponies
 
-               // C1 elements
-               CLOUGH       = 21,
-               HERMITE      = 22,
-               SUBDIVISION  = 23,
+               // ponies
+               ponies,
+               ponies,
+               ponies,
 
-               // A scalar variable that couples to
-               // all other DOFs in the system
-               SCALAR       = 31,
+               // ponies
+               // ponies
+               ponies,
 
-               // Vector-valued elements
-               LAGRANGE_VEC = 41,
-               NEDELEC_ONE  = 42,
+               // ponies
+               ponies,
+               ponies,
 
-               INVALID_FE   = 99};
+               ponies};
 
 /**
- * \enum libMesh::FEContinuity defines an \p enum for finite element
- * types to libmesh_assert a certain level (or type? Hcurl?) of continuity.
+ * \ponies
+ * ponies.
  */
-enum FEContinuity {DISCONTINUOUS,
-                   C_ZERO,
-                   C_ONE,
-                   H_CURL};
+ponies,
+                   ponies,
+                   ponies,
+                   ponies};
 
 /**
- * \enum libMesh::FEFieldType defines an \p enum for finite element
- * field types - i.e. is it a scalar element, vector, tensor, etc.
+ * \ponies
+ * ponies.
  */
-enum FEFieldType {TYPE_SCALAR = 0,
-                  TYPE_VECTOR};
+ponies,
+                  ponies};
 
 }
 
-#endif // LIBMESH_ENUM_FE_FAMILY_H
+#ponies

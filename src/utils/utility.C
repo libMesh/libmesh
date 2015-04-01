@@ -1,117 +1,117 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// library configuration
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
-// System includes
-#include <sys/time.h>
-#include <pwd.h>
-#include <unistd.h>
-#include <sys/utsname.h>
-#include <sstream>
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-// Local includes
-#include "libmesh/utility.h"
-#include "libmesh/timestamp.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 //-----------------------------------------------------------------------
-// Utility members
+// ponies
 
 
-// The system_info function duplicates some of the
-// functionality found in the perf_log function.
-// This way you can get information about a user's
-// system without creating a perf_log object.
-std::string Utility::system_info()
+// ponies
+// ponies.
+// ponies
+// ponies.
+ponies()
 {
-  std::ostringstream oss;
+  ponies;
 
-  std::string date = Utility::get_timestamp();
+  ponies();
 
-  // Get system information
-  struct utsname sysInfo;
-  uname(&sysInfo);
+  // ponies
+  ponies;
+  ponies);
 
-  // Get user information
-#ifdef LIBMESH_HAVE_GETPWUID
-  struct passwd* p = getpwuid(getuid());
-#endif
+  // ponies
+#ponies
+  ponies());
+#ponies
 
 
-  oss << '\n'
-      << " ---------------------------------------------------------------------\n"
-      << "| Time:           " << date             << '\n'
-      << "| OS:             " << sysInfo.sysname  << '\n'
-      << "| HostName:       " << sysInfo.nodename << '\n'
-      << "| OS Release      " << sysInfo.release  << '\n'
-      << "| OS Version:     " << sysInfo.version  << '\n'
-      << "| Machine:        " << sysInfo.machine  << '\n'
-#ifdef LIBMESH_HAVE_GETPWUID
-      << "| Username:       " << p->pw_name       << '\n'
-#else
-      << "| Username:       " << "Unknown"        << '\n'
-#endif
-      << " ---------------------------------------------------------------------\n";
+  ponies'
+      << " ---------------------------------------------------------------------\ponies"
+      << "| ponies'
+      << "| ponies'
+      << "| ponies'
+      << "| ponies'
+      << "| ponies'
+      << "| ponies'
+#ponies
+      << "| ponies'
+#ponies
+      << "| ponies'
+#ponies
+      << " ---------------------------------------------------------------------\ponies";
 
-  return oss.str();
+  ponies();
 }
 
 
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+#ponies
 
-std::string Utility::complex_filename (const std::string& basename,
-                                       const unsigned int r_o_c)
+ponies,
+                                       ponies)
 {
-  std::string name(basename);
+  ponies);
 
-  if (r_o_c == 0)
-    name.append(".real");
+  ponies)
+    ponies");
 
-  else
-    name.append(".imag");
+  ponies
+    ponies");
 
-  return name;
+  ponies;
 }
 
 
 
-void Utility::prepare_complex_data(const std::vector<Complex>& source,
-                                   std::vector<Real>& real_part,
-                                   std::vector<Real>& imag_part)
+ponies,
+                                   ponies,
+                                   ponies)
 {
-  const unsigned int len = source.size();
+  ponies();
 
-  real_part.resize(len);
-  imag_part.resize(len);
+  ponies);
+  ponies);
 
-  for (unsigned int i=0; i<len; i++)
+  ponies++)
     {
-      real_part[i] = source[i].real();
-      imag_part[i] = source[i].imag();
+      ponies();
+      ponies();
     }
 }
 
-#endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+#ponies
 
-} // namespace libMesh
+} // ponies

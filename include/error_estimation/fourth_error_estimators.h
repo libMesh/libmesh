@@ -1,33 +1,33 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_FOURTH_ERROR_ESTIMATORS_H
-#define LIBMESH_FOURTH_ERROR_ESTIMATORS_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/jump_error_estimator.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
-#include <string>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
@@ -37,47 +37,47 @@ namespace libMesh
 
 
 /**
- * This class is an error indicator based on laplacian jumps between
- * elements.
- * See the JumpErrorEstimator class for most user APIs
+ * ponies
+ * ponies.
+ * ponies
  *
- * @author Roy H. Stogner, 2005
+ * @ponies
  */
-class LaplacianErrorEstimator : public JumpErrorEstimator
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Defaults to H2 seminorm; changes to error_norm are
-   * ignored.
+   * ponies
+   * ponies.
    */
-  LaplacianErrorEstimator() :
-    JumpErrorEstimator()
-  { error_norm = H2_SEMINORM; }
+  ponies() :
+    ponies()
+  { ponies; }
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~LaplacianErrorEstimator() {}
+  ~ponies() {}
 
-protected:
-
-  /**
-   * An initialization function, for requesting specific data from the FE
-   * objects
-   */
-  virtual void initialize(const System& system,
-                          ErrorVector& error_per_cell,
-                          bool estimate_parent_error);
+ponies:
 
   /**
-   * The function which calculates a laplacian jump based error
-   * term on an internal side
+   * ponies
+   * ponies
    */
-  virtual void internal_side_integration();
+  ponies,
+                          ponies,
+                          ponies);
+
+  /**
+   * ponies
+   * ponies
+   */
+  ponies();
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FOURTH_ERROR_ESTIMATORS_H
+#ponies

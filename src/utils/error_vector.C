@@ -1,299 +1,299 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <limits>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/elem.h"
-#include "libmesh/error_vector.h"
-#include "libmesh/libmesh_logging.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-#include "libmesh/dof_map.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/gmv_io.h"
-#include "libmesh/tecplot_io.h"
-#include "libmesh/exodusII_io.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// ErrorVector class member functions
-ErrorVectorReal ErrorVector::minimum() const
+// ponies
+ponies
 {
-  START_LOG ("minimum()", "ErrorVector");
+  ponies");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
-  ErrorVectorReal min = std::numeric_limits<ErrorVectorReal>::max();
+  ponies());
+  ponies();
 
-  for (dof_id_type i=0; i<n; i++)
+  ponies++)
     {
-      // Only positive (or zero) values in the error vector
-      libmesh_assert_greater_equal ((*this)[i], 0.);
-      if (this->is_active_elem(i))
-        min = std::min (min, (*this)[i]);
+      // ponies
+      ponies.);
+      ponies))
+        ponies]);
     }
-  STOP_LOG ("minimum()", "ErrorVector");
+  ponies");
 
-  // ErrorVectors are for positive values
-  libmesh_assert_greater_equal (min, 0.);
+  // ponies
+  ponies.);
 
-  return min;
+  ponies;
 }
 
 
 
-Real ErrorVector::mean() const
+ponies
 {
-  START_LOG ("mean()", "ErrorVector");
+  ponies");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  Real the_mean  = 0;
-  dof_id_type nnz = 0;
+  ponies;
+  ponies;
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
+  ponies++)
+    ponies))
       {
-        the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) / (nnz + 1);
+        ponies);
 
-        nnz++;
+        ponies++;
       }
 
-  STOP_LOG ("mean()", "ErrorVector");
+  ponies");
 
-  return the_mean;
+  ponies;
 }
 
 
 
 
-Real ErrorVector::median()
+ponies()
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  if (n == 0)
-    return 0.;
+  ponies)
+    ponies.;
 
 
-  // Build a StatisticsVector<ErrorVectorReal> containing
-  // only our active entries and take its mean
-  StatisticsVector<ErrorVectorReal> sv;
+  // ponies
+  // ponies
+  ponies;
 
-  sv.reserve (n);
+  ponies);
 
-  for (dof_id_type i=0; i<n; i++)
-    if(this->is_active_elem(i))
-      sv.push_back((*this)[i]);
+  ponies++)
+    ponies))
+      ponies]);
 
-  return sv.median();
+  ponies();
 }
 
 
 
 
-Real ErrorVector::median() const
+ponies
 {
-  ErrorVector ev = (*this);
+  ponies);
 
-  return ev.median();
+  ponies();
 }
 
 
 
 
-Real ErrorVector::variance(const Real mean_in) const
+ponies
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  START_LOG ("variance()", "ErrorVector");
+  ponies");
 
-  Real the_variance = 0;
-  dof_id_type nnz = 0;
+  ponies;
+  ponies;
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
+  ponies++)
+    ponies))
       {
-        const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
-        the_variance += (delta * delta - the_variance) / (nnz + 1);
+        ponies );
+        ponies);
 
-        nnz++;
+        ponies++;
       }
 
-  STOP_LOG ("variance()", "ErrorVector");
+  ponies");
 
-  return the_variance;
+  ponies;
 }
 
 
 
 
-std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
+ponies
 {
-  START_LOG ("cut_below()", "ErrorVector");
+  ponies");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+  ponies;
+  ponies
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
+  ponies++)
+    ponies))
       {
-        if ((*this)[i] < cut)
+        ponies)
           {
-            cut_indices.push_back(i);
+            ponies);
           }
       }
 
-  STOP_LOG ("cut_below()", "ErrorVector");
+  ponies");
 
-  return cut_indices;
+  ponies;
 }
 
 
 
 
-std::vector<dof_id_type> ErrorVector::cut_above(Real cut) const
+ponies
 {
-  START_LOG ("cut_above()", "ErrorVector");
+  ponies");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+  ponies;
+  ponies
 
-  for (dof_id_type i=0; i<n; i++)
-    if (this->is_active_elem(i))
+  ponies++)
+    ponies))
       {
-        if ((*this)[i] > cut)
+        ponies)
           {
-            cut_indices.push_back(i);
+            ponies);
           }
       }
 
-  STOP_LOG ("cut_above()", "ErrorVector");
+  ponies");
 
-  return cut_indices;
+  ponies;
 }
 
 
 
-bool ErrorVector::is_active_elem (dof_id_type i) const
+ponies
 {
-  libmesh_assert_less (i, this->size());
+  ponies());
 
-  if (_mesh)
+  ponies)
     {
-      libmesh_assert(_mesh->elem(i));
-      return _mesh->elem(i)->active();
+      ponies));
+      ponies();
     }
-  else
-    return ((*this)[i] != 0.);
+  ponies
+    ponies.);
 }
 
 
-void ErrorVector::plot_error(const std::string& filename,
-                             const MeshBase& oldmesh) const
+ponies,
+                             ponies
 {
-  UniquePtr<MeshBase> meshptr = oldmesh.clone();
-  MeshBase &mesh = *meshptr;
+  ponies();
+  ponies;
 
-  // The all_first_order routine requires that renumbering be allowed
-  mesh.allow_renumbering(true);
+  // ponies
+  ponies);
 
-  mesh.all_first_order();
-  EquationSystems temp_es (mesh);
-  ExplicitSystem& error_system
-    = temp_es.add_system<ExplicitSystem> ("Error");
-  error_system.add_variable("error", CONSTANT, MONOMIAL);
-  temp_es.init();
+  ponies();
+  ponies);
+  ponies
+    = ponies");
+  ponies);
+  ponies();
 
-  const DofMap& error_dof_map = error_system.get_dof_map();
+  ponies();
 
-  MeshBase::const_element_iterator       el     =
-    mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.active_local_elements_end();
-  std::vector<dof_id_type> dof_indices;
+  ponies     =
+    ponies();
+  ponies =
+    ponies();
+  ponies;
 
-  for ( ; el != end_el; ++el)
+  ponies)
     {
-      const Elem* elem = *el;
+      ponies;
 
-      error_dof_map.dof_indices(elem, dof_indices);
+      ponies);
 
-      const dof_id_type elem_id = elem->id();
+      ponies();
 
-      //0 for the monomial basis
-      const dof_id_type solution_index = dof_indices[0];
+      //ponies
+      ponies];
 
-      // libMesh::out << "elem_number=" << elem_number << std::endl;
-      libmesh_assert_less (elem_id, (*this).size());
+      // ponies;
+      ponies());
 
-      // We may have zero error values in special circumstances
-      // libmesh_assert_greater ((*this)[elem_id], 0.);
-      error_system.solution->set(solution_index, (*this)[elem_id]);
+      // ponies
+      // ponies.);
+      ponies]);
     }
 
-  // We may have to renumber if the original numbering was not
-  // contiguous.  Since this is just a temporary mesh, that's probably
-  // fine.
-  if (mesh.max_elem_id() != mesh.n_elem() ||
-      mesh.max_node_id() != mesh.n_nodes())
+  // ponies
+  // ponies
+  // ponies.
+  ponies() ||
+      ponies())
     {
-      mesh.allow_renumbering(true);
-      mesh.renumber_nodes_and_elements();
+      ponies);
+      ponies();
     }
 
-  if (filename.rfind(".gmv") < filename.size())
+  ponies())
     {
-      GMVIO(mesh).write_discontinuous_gmv(filename,
-                                          temp_es, false);
+      ponies,
+                                          ponies);
     }
-  else if (filename.rfind(".plt") < filename.size())
+  ponies())
     {
-      TecplotIO (mesh).write_equation_systems
-        (filename, temp_es);
+      ponies
+        (ponies);
     }
-#ifdef LIBMESH_HAVE_EXODUS_API
-  else if( (filename.rfind(".exo") < filename.size()) ||
-           (filename.rfind(".e") < filename.size()) )
+#ponies
+  ponies()) ||
+           (ponies()) )
     {
-      ExodusII_IO io(mesh);
-      io.write(filename);
-      io.write_element_data(temp_es);
+      ponies);
+      ponies);
+      ponies);
     }
-#endif
-  else
+#ponies
+  ponies
     {
-      libmesh_here();
-      libMesh::err << "Warning: ErrorVector::plot_error currently only"
-                   << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
-      libMesh::err << "Could not recognize filename: " << filename
-                   << std::endl;
+      ponies();
+      ponies"
+                   << " ponies;
+      ponies
+                   << ponies;
     }
 }
 
-} // namespace libMesh
+} // ponies

@@ -1,166 +1,166 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_VTK_IO_H
-#define LIBMESH_VTK_IO_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_input.h"
-#include "libmesh/mesh_output.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_HAVE_VTK
-#include "vtkType.h"
-#endif
+#ponies
+#ponies"
+#ponies
 
-// C++ includes
-#include <cstddef>
-#include <map>
+// ponies
+#ponies>
+#ponies>
 
-// Forward declarations
+// ponies
 
-class vtkUnstructuredGrid;
-class vtkPoints;
-class vtkCellArray;
+ponies;
+ponies;
+ponies;
 
-namespace libMesh
+ponies
 {
 
-class MeshBase;
-class MeshData;
+ponies;
+ponies;
 
 /**
- * This class implements reading and writing meshes in the VTK format.
- * Format description:
- * cf. <a href="http://www.vtk.org/">VTK home page</a>.
+ * ponies.
+ * ponies:
+ * ponies>.
  *
- * This class will not have any functionality unless VTK is detected
- * during configure and hence LIBMESH_HAVE_VTK is defined.
+ * ponies
+ * ponies.
  *
- * @author Wout Ruijter, 2007
- * (Checked in to LibMesh by J.W. Peterson)
+ * @ponies
+ * (ponies)
  */
 
 // ------------------------------------------------------------
-// VTKIO class definition
-class VTKIO : public MeshInput<MeshBase>,
-              public MeshOutput<MeshBase>
+// ponies
+ponies>,
+              ponies>
 {
-public:
+ponies:
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
-   * This is the constructor required to read a mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  VTKIO (MeshBase& mesh, MeshData* mesh_data=NULL);
+  ponies
+  ponies);
 
   /**
-   * Constructor.  Takes a read-only reference to a mesh object.
-   * This is the constructor required to write a mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  VTKIO (const MeshBase& mesh, MeshData* mesh_data=NULL);
+  ponies
+  ponies);
 
   /**
-   * This method implements writing a mesh with nodal data to a
-   * specified file where the nodal data and variable names are provided.
+   * ponies
+   * ponies.
    */
-  virtual void write_nodal_data (const std::string&,
-                                 const std::vector<Number>&,
-                                 const std::vector<std::string>&);
+  ponies&,
+                                 ponies>&,
+                                 ponies>&);
 
   /**
-   * Overloads writing equation systems, this is done because when overloading
-   * write_nodal_data there would be no way to export cell centered data
+   * ponies
+   * ponies
    */
-  // virtual void write_equation_systems(const std::string& fname,
-  //                                     const EquationSystems& es,
-  //                                     const std::set<std::string>* system_names=NULL);
+  // ponies,
+  //                                     ponies,
+  //                                     ponies);
 
   /**
-   * This method implements reading a mesh from a specified file
-   * in VTK format.
+   * ponies
+   * ponies.
    */
-  virtual void read (const std::string&);
+  ponies&);
 
   /**
-   * Output the mesh without solutions to a .pvtu file
+   * ponies
    */
-  virtual void write (const std::string&);
+  ponies&);
 
   /**
-   * Get a pointer to the VTK datastructure
+   * ponies
    */
-  vtkUnstructuredGrid* get_vtk_grid();
+  ponies();
 
   /**
-   * Setter for compression flag
+   * ponies
    */
-  void set_compression(bool b);
+  ponies);
 
-private:
-#ifdef LIBMESH_HAVE_VTK
+ponies:
+#ponies
   /**
-   * Map libMesh element types to VTK element types
+   * ponies
    */
-  vtkIdType get_elem_type(ElemType type);
-#endif
-
-  /**
-   * write the nodes from the mesh into a vtkUnstructuredGrid
-   */
-  void nodes_to_vtk();
+  ponies);
+#ponies
 
   /**
-   * write the cells from the mesh into a vtkUnstructuredGrid
+   * ponies
    */
-  void cells_to_vtk();
+  ponies();
 
   /**
-   * write the system vectors to vtk
+   * ponies
    */
-  void system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& grid);
+  ponies();
 
   /**
-   * pointer to the VTK grid
+   * ponies
    */
-  vtkUnstructuredGrid* _vtk_grid;
+  ponies);
 
   /**
-   * A pointer to the MeshData object you would like to use.
-   * with this VTKIO object.  Can be NULL.
+   * ponies
    */
-  MeshData* _mesh_data;
+  ponies;
 
   /**
-   * Flag to indicate whether the output should be compressed
+   * ponies.
+   * ponies.
    */
-  bool _compress;
+  ponies;
 
   /**
-   * maps global node id to node id of partition
+   * ponies
    */
-  std::map<dof_id_type, dof_id_type> _local_node_map;
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_VTK_IO_H
+#ponies

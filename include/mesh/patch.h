@@ -1,137 +1,137 @@
 
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PATCH_H
-#define LIBMESH_PATCH_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/id_types.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
-#include <string>
-#include <set>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class Elem;
+// ponies
+ponies;
 
 
 
 /**
- * This class implements useful utility functions for a patch of
- * elements
+ * ponies
+ * ponies
  *
- * @author Roy H. Stogner, 2007.
- * based on code by Varis Carey, Benjamin S. Kirk, 2004.
+ * @ponies.
+ * ponies.
  */
-class Patch : public std::set<const Elem *>
+ponies *>
 {
-public:
+ponies:
 
   /**
-   * Constructor. Requires the processor ID to be interpreted as "local".
+   * ponies".
    */
-  Patch(const processor_id_type my_procid = static_cast<processor_id_type>(-1)) :
-    _my_procid(my_procid)
+  ponies)) :
+    ponies)
   {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~Patch() {}
+  ~ponies() {}
 
   /**
-   * This function finds all elements which touch the current patch at
-   * a face, and adds them to the patch.
+   * ponies
+   * ponies.
    */
-  void add_face_neighbors();
+  ponies();
 
   /**
-   * This function finds all elements on the current processor which
-   * touch the current patch at a face, and adds them to the patch.
+   * ponies
+   * ponies.
    */
-  void add_local_face_neighbors();
+  ponies();
 
   /**
-   * This function finds all elements which touch the current patch at
-   * a face and which touch one of our processor's elements at any
-   * point, and it adds them to the patch.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void add_semilocal_face_neighbors();
+  ponies();
 
   /**
-   * This function finds all elements which touch the current patch at
-   * any point, and adds them to the patch.
+   * ponies
+   * ponies.
    */
-  void add_point_neighbors();
+  ponies();
 
   /**
-   * This function finds all elements on the current processor which
-   * touch the current patch at any point, and adds them to the patch.
+   * ponies
+   * ponies.
    */
-  void add_local_point_neighbors();
+  ponies();
 
   /**
-   * This function finds all elements which touch the current patch at
-   * any point and which touch one of our processor's elements at any
-   * point, and it adds them to the patch.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void add_semilocal_point_neighbors();
+  ponies();
 
   /**
-   * Pointer to Member Function typedef
+   * ponies
    */
-  typedef void (Patch::*PMF)();
+  ponies)();
 
   /**
-   * Erases any elements in the current patch, then builds a new patch
-   * containing element \p elem by repeated addition of neighbors on
-   * the current processor.  This procedure is repeated until the
-   * number of elements meets or exceeds \p target_patch_size, or
-   * until the patch has no more local neighbors.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void build_around_element(const Elem* elem,
-                            const unsigned int target_patch_size = 10,
-                            PMF patchtype = &Patch::add_local_face_neighbors);
+  ponies,
+                            ponies,
+                            ponies);
 
-protected:
+ponies:
 
   /**
-   * This function finds all elements which
-   * touch the current patch at a face
+   * ponies
+   * ponies
    */
-  void find_face_neighbors(std::set<const Elem *> &neighbor_set);
+  ponies);
 
   /**
-   * This function finds all elements which
-   * touch the current patch at any point
+   * ponies
+   * ponies
    */
-  void find_point_neighbors(std::set<const Elem *> &neighbor_set);
+  ponies);
 
-  const processor_id_type _my_procid;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_PATCH_H
+#ponies

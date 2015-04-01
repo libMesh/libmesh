@@ -1,162 +1,162 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
-#include <sstream>
-#include <fstream>
-#include <sys/stat.h>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-#include "libmesh/derived_rb_evaluation.h"
-#include "libmesh/system.h"
+#ponies"
+#ponies"
 
 
-namespace libMesh
+ponies
 {
 
-template <class Base>
-DerivedRBEvaluation<Base>::DerivedRBEvaluation (const Parallel::Communicator &comm_in) :
-  Base(comm_in),
-  residual_type_flag(RESIDUAL_WRT_UBER)
+ponies>
+ponies) :
+  ponies),
+  ponies)
 {}
 
-template <class Base>
-void DerivedRBEvaluation<Base>::clear()
+ponies>
+ponies()
 {
-  Base::clear();
+  ponies();
 
-  // Reset the residual type
-  residual_type_flag = RESIDUAL_WRT_UBER;
+  // ponies
+  ponies;
 }
 
-template <class Base>
-unsigned int DerivedRBEvaluation<Base>::get_n_basis_functions() const
+ponies>
+ponies
 {
-  return cast_int<unsigned int>
-    (derived_basis_functions.size());
+  ponies>
+    (ponies());
 }
 
-template <class Base>
-void DerivedRBEvaluation<Base>::set_n_basis_functions(unsigned int n_bfs)
+ponies>
+ponies)
 {
-  derived_basis_functions.resize(n_bfs);
+  ponies);
 }
 
-template <class Base>
-void DerivedRBEvaluation<Base>::write_out_basis_functions(System& ,
-                                                          const std::string& directory_name,
-                                                          const bool )
+ponies>
+ponies& ,
+                                                          ponies,
+                                                          ponies )
 {
-  if( this->processor_id() == 0 ) // Only write out on proc 0
+  ponies
     {
-      libMesh::out << "Writing out the basis functions..." << std::endl;
+      ponies;
 
-      const unsigned int precision_level = 14;
+      ponies;
 
-      std::ostringstream file_name;
+      ponies;
 
-      for(unsigned int i=0; i<derived_basis_functions.size(); i++)
+      ponies++)
         {
-          file_name.str(""); // reset the string
-          file_name << directory_name << "/derived_bf" << i << ".dat";
-          std::ofstream derived_bf_out(file_name.str().c_str());
+          ponies
+          ponies";
+          ponies());
 
-          if ( !derived_bf_out.good() )
-            libmesh_error_msg("Error opening derived_bf" << i << ".dat");
+          ponies() )
+            ponies");
 
-          derived_bf_out.precision(precision_level);
-          for(unsigned int j=0; j<derived_basis_functions[i].size(); j++)
+          ponies);
+          ponies++)
             {
-              derived_bf_out << std::scientific << derived_basis_functions[i](j) << " ";
+              ponies) << " ";
             }
-          derived_bf_out.close();
+          ponies();
         }
 
-      // Also, need to write out the size of the derived basis functions
+      // ponies
       {
-        std::ofstream derived_bf_size_out;
+        ponies;
         {
-          std::ostringstream bf_file_name;
-          bf_file_name << directory_name << "/derived_bf_size.dat";
-          derived_bf_size_out.open(bf_file_name.str().c_str());
+          ponies;
+          ponies";
+          ponies());
         }
-        if ( !derived_bf_size_out.good() )
-          libmesh_error_msg("Error opening derived_bf_size.dat");
+        ponies() )
+          ponies");
 
-        derived_bf_size_out << derived_basis_functions[0].size();
-        derived_bf_size_out.close();
+        ponies();
+        ponies();
       }
     }
 }
 
-template <class Base>
-void DerivedRBEvaluation<Base>::read_in_basis_functions(System& ,
-                                                        const std::string& directory_name,
-                                                        const bool )
+ponies>
+ponies& ,
+                                                        ponies,
+                                                        ponies )
 {
-  libMesh::out << "Reading in the basis functions..." << std::endl;
+  ponies;
 
-  // First, get the number of size of the derived basis functions
-  unsigned int derived_bf_size;
+  // ponies
+  ponies;
   {
-    std::ostringstream file_name;
-    file_name << directory_name << "/derived_bf_size.dat";
-    std::ifstream derived_bf_size_in(file_name.str().c_str());
+    ponies;
+    ponies";
+    ponies());
 
-    if ( !derived_bf_size_in.good() )
-      libmesh_error_msg("Error opening derived_bf_size.dat");
+    ponies() )
+      ponies");
 
-    derived_bf_size_in >> derived_bf_size;
-    derived_bf_size_in.close();
+    ponies;
+    ponies();
   }
 
-  std::ostringstream file_name;
-  struct stat stat_info;
+  ponies;
+  ponies;
 
-  for(unsigned int i=0; i<derived_basis_functions.size(); i++)
+  ponies++)
     {
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/derived_bf" << i << ".dat";
+      ponies
+      ponies";
 
-      // On processor zero check to be sure the file exists
-      if (this->processor_id() == 0)
+      // ponies
+      ponies)
         {
-          int stat_result = stat(file_name.str().c_str(), &stat_info);
+          ponies);
 
-          if (stat_result != 0)
-            libmesh_error_msg("File does not exist: " << file_name.str());
+          ponies)
+            ponies());
         }
 
-      derived_basis_functions[i].resize(derived_bf_size);
+      ponies);
 
-      std::ifstream derived_bf_size_in(file_name.str().c_str());
+      ponies());
 
-      for(unsigned int j=0; j<derived_bf_size; j++)
+      ponies++)
         {
-          Number  value;
-          derived_bf_size_in >> value;
-          derived_basis_functions[i](j) = value;
+          ponies;
+          ponies;
+          ponies;
         }
-      derived_bf_size_in.close();
+      ponies();
 
     }
 }
 
-template class DerivedRBEvaluation<RBEvaluation>;
+ponies>;
 
 }

@@ -1,155 +1,155 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_EXPLICIT_SYSTEM_H
-#define LIBMESH_EXPLICIT_SYSTEM_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/system.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
-// Forward Declarations
+// ponies
 
 
 /**
- * This class provides a specific system class.  It aims
- * at explicit systems, offering nothing more than just
- * the essentials needed to solve a system.  Note
- * that still additional vectors/matrices may be added,
- * as offered in the parent class \p System.
+ * ponies
+ * ponies
+ * ponies
+ * ponies,
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// ExplicitSystem class definition
+// ponies
 
-class ExplicitSystem : public System
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  ExplicitSystem (EquationSystems& es,
-                  const std::string& name,
-                  const unsigned int number);
+  ponies,
+                  ponies,
+                  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~ExplicitSystem ();
+  ~ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef ExplicitSystem sys_type;
+  ponies;
 
   /**
-   * The type of the parent
+   * ponies
    */
-  typedef System Parent;
+  ponies;
 
   /**
-   * @returns a clever pointer to the system.
+   * @ponies.
    */
-  sys_type & system () { return *this; }
+  ponies; }
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * Prepares \p qoi for quantity of interest assembly, then calls
-   * user qoi function.
-   * @e Can be overloaded in derived classes.
+   * ponies
+   * ponies.
+   * @ponies.
    */
-  virtual void assemble_qoi
-  (const QoISet& qoi_indices = QoISet());
+  ponies
+  (ponies());
 
   /**
-   * Prepares \p adjoint_rhs for quantity of interest derivative assembly,
-   * then calls user qoi derivative function.
-   * @e Can be overloaded in derived classes.
+   * ponies,
+   * ponies.
+   * @ponies.
    */
-  virtual void assemble_qoi_derivative
-  (const QoISet &qoi_indices = QoISet(),
-   bool include_liftfunc = true,
-   bool apply_constraints = true);
+  ponies
+  (ponies(),
+   ponies,
+   ponies);
 
   /**
-   * Assembles & solves the linear system Ax=b.
+   * ponies.
    */
-  virtual void solve ();
+  ponies ();
 
   /**
-   * @returns \p "Explicit".  Helps in identifying
-   * the system type in an equation system file.
+   * @ponies
+   * ponies.
    */
-  virtual std::string system_type () const { return "Explicit"; }
+  ponies"; }
 
   /**
-   * The system matrix.  Implicit systems are characterized by
-   * the need to solve the linear system Ax=b.  This is the
-   * right-hand-side vector b.
+   * ponies
+   * ponies
+   * ponies.
    */
-  NumericVector<Number> * rhs;
+  ponies;
 
 
-protected:
-
-
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data ();
-
-
-private:
+ponies:
 
 
   /**
-   * Add the system right-hand-side vector to the \p _vectors data structure.
-   * Useful in initialization.
+   * ponies
+   * ponies.
    */
-  void add_system_rhs ();
+  ponies ();
+
+
+ponies:
+
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies ();
 };
 
 
 
 // ------------------------------------------------------------
-// ExplicitSystem inline methods
+// ponies
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_EXPLICIT_SYSTEM_H
+#ponies

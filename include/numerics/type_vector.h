@@ -1,350 +1,350 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TYPE_VECTOR_H
-#define LIBMESH_TYPE_VECTOR_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/compare_types.h"
-#include "libmesh/tensor_tools.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>
-#include <complex>
+// ponies
+#ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-template <typename T> class TypeTensor;
-template <typename T> class VectorValue;
-template <typename T> class TensorValue;
+// ponies
+ponies;
+ponies;
+ponies;
 
 /**
- * This class defines a vector in \p LIBMESH_DIM dimensional space of type T.
- * T may either be Real or Complex.  The default constructor for
- * this class is protected, suggesting that you should not instantiate
- * one of these directly.  Instead use one of the derived types: \p Point
- * for a real-valued point in LIBMESH_DIM-space, or \p SpaceVector for a real
- * or complex-valued vector in LIBMESH_DIM-space.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk, 2003.
+ * \ponies.
  */
 
-template <typename T>
-class TypeVector
+ponies>
+ponies
 {
-  template <typename T2>
-  friend class TypeVector;
+  ponies>
+  ponies;
 
-  friend class TypeTensor<T>;
+  ponies>;
 
-protected:
-
-  /**
-   * Empty constructor.  Gives the vector 0 in \p LIBMESH_DIM
-   * dimensions.
-   */
-  TypeVector  ();
-
+ponies:
 
   /**
-   * Constructor-from-T.  By default sets higher dimensional
-   * entries to 0.
+   * ponies
+   * ponies.
    */
-  TypeVector (const T x,
-              const T y=0,
-              const T z=0);
+  ponies  ();
 
 
   /**
-   * Constructor-from-scalars.  By default sets higher dimensional
-   * entries to 0.
+   * ponies
+   * ponies.
    */
-  template <typename Scalar>
-  TypeVector (const Scalar x,
-              const Scalar y=0,
-              typename
-              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-              const Scalar>::type z=0);
+  ponies,
+              ponies,
+              ponies);
 
-public:
 
   /**
-   * Copy-constructor.
+   * ponies
+   * ponies.
    */
-  template <typename T2>
-  TypeVector (const TypeVector<T2>& p);
+  ponies>
+  ponies,
+              ponies,
+              ponies
+              ponies,
+              ponies);
+
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~TypeVector ();
+  ponies>
+  ponies);
 
   /**
-   * Assign to a vector without creating a temporary.
+   * ponies.
    */
-  template <typename T2>
-  void assign (const TypeVector<T2> &);
+  ~ponies ();
 
   /**
-   * Assignment-from-scalar operator.  Used only to zero out vectors.
+   * ponies.
    */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeVector&>::type
-  operator = (const Scalar& p)
-  { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
+  ponies>
+  ponies> &);
 
   /**
-   * Return the \f$ i^{th} \f$ element of the vector.
+   * ponies.
    */
-  const T & operator () (const unsigned int i) const;
-
-  const T & slice (const unsigned int i) const { return (*this)(i); }
+  ponies>
+  ponies<
+    ponies,
+    ponies
+  ponies)
+  { ponies; }
 
   /**
-   * Return a writeable reference to the \f$ i^{th} \f$ element of the vector.
+   * ponies.
    */
-  T & operator () (const unsigned int i);
+  ponies;
 
-  T & slice (const unsigned int i) { return (*this)(i); }
-
-  /**
-   * Add two vectors.
-   */
-  template <typename T2>
-  TypeVector<typename CompareTypes<T, T2>::supertype>
-  operator + (const TypeVector<T2> &) const;
+  ponies); }
 
   /**
-   * Add to this vector.
+   * ponies.
    */
-  template <typename T2>
-  const TypeVector<T> & operator += (const TypeVector<T2> &);
+  ponies);
+
+  ponies); }
 
   /**
-   * Add to this vector without creating a temporary.
+   * ponies.
    */
-  template <typename T2>
-  void add (const TypeVector<T2> &);
+  ponies>
+  ponies>
+  ponies;
 
   /**
-   * Add a scaled value to this vector without
-   * creating a temporary.
+   * ponies.
    */
-  template <typename T2>
-  void add_scaled (const TypeVector<T2> &, const T);
+  ponies>
+  ponies> &);
 
   /**
-   * Subtract two vectors.
+   * ponies.
    */
-  template <typename T2>
-  TypeVector<typename CompareTypes<T, T2>::supertype>
-  operator - (const TypeVector<T2> &) const;
+  ponies>
+  ponies> &);
 
   /**
-   * Subtract from this vector.
+   * ponies
+   * ponies.
    */
-  template <typename T2>
-  const TypeVector<T> & operator -= (const TypeVector<T2> &);
+  ponies>
+  ponies);
 
   /**
-   * Subtract from this vector without creating a temporary.
+   * ponies.
    */
-  template <typename T2>
-  void subtract (const TypeVector<T2> &);
+  ponies>
+  ponies>
+  ponies;
 
   /**
-   * Subtract a scaled value from this vector without
-   * creating a temporary.
+   * ponies.
    */
-  template <typename T2>
-  void subtract_scaled (const TypeVector<T2> &, const T);
+  ponies>
+  ponies> &);
 
   /**
-   * Return the opposite of a vector
+   * ponies.
    */
-  TypeVector<T> operator - () const;
+  ponies>
+  ponies> &);
 
   /**
-   * Multiply a vector by a number, i.e. scale.
+   * ponies
+   * ponies.
    */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
-  operator * (const Scalar) const;
+  ponies>
+  ponies);
 
   /**
-   * Multiply this vector by a number, i.e. scale.
+   * ponies
    */
-  const TypeVector<T> & operator *= (const T);
+  ponies;
 
   /**
-   * Divide a vector by a number, i.e. scale.
+   * ponies.
    */
-  template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
-  operator / (const Scalar) const;
+  ponies>
+  ponies<
+    ponies,
+    ponies
+  ponies;
 
   /**
-   * Divide this vector by a number, i.e. scale.
+   * ponies.
    */
-  const TypeVector<T> & operator /= (const T);
+  ponies);
 
   /**
-   * Multiply 2 vectors together, i.e. dot-product.
-   * The vectors may be of different types.
+   * ponies.
    */
-  template <typename T2>
-  typename CompareTypes<T, T2>::supertype
-  operator * (const TypeVector<T2> &) const;
+  ponies>
+  ponies<
+    ponies,
+    ponies
+  ponies;
 
   /**
-   * Multiply 2 vectors together, i.e. dot-product.
-   * The vectors may be of different types.
+   * ponies.
    */
-  template <typename T2>
-  typename CompareTypes<T, T2>::supertype
-  contract (const TypeVector<T2> &) const;
+  ponies);
 
   /**
-   * Cross 2 vectors together, i.e. cross-product.
+   * ponies.
+   * ponies.
    */
-  template <typename T2>
-  TypeVector<typename CompareTypes<T, T2>::supertype>
-  cross(const TypeVector<T2> &) const;
+  ponies>
+  ponies
+  ponies;
 
   /**
-   * Think of a vector as a \p dim dimensional vector.  This
-   * will return a unit vector aligned in that direction.
+   * ponies.
+   * ponies.
    */
-  TypeVector<T> unit() const;
+  ponies>
+  ponies
+  ponies;
 
   /**
-   * Returns the magnitude of the vector, i.e. the square-root of the
-   * sum of the elements squared.
+   * ponies.
    */
-  Real size() const;
+  ponies>
+  ponies>
+  ponies;
 
   /**
-   * Returns the magnitude of the vector squared, i.e. the sum of the element
-   * magnitudes squared.
+   * ponies
+   * ponies.
    */
-  Real size_sq() const;
+  ponies;
 
   /**
-   * Zero the vector in any dimension.
+   * ponies
+   * ponies.
    */
-  void zero();
+  ponies;
 
   /**
-   * @returns \p true iff two vectors occupy approximately the same
-   * physical location in space, to within a relative tolerance of \p tol.
+   * ponies
+   * ponies.
    */
-  bool relative_fuzzy_equals(const TypeVector<T>& rhs, Real tol = TOLERANCE) const;
+  ponies;
 
   /**
-   * @returns \p true iff two vectors occupy approximately the same
-   * physical location in space, to within an absolute tolerance of \p tol.
+   * ponies.
    */
-  bool absolute_fuzzy_equals(const TypeVector<T>& rhs, Real tol = TOLERANCE) const;
+  ponies();
 
   /**
-   * @returns \p true iff two vectors occupy approximately the same
-   * physical location in space, to within an absolute tolerance of \p TOLERANCE.
+   * @ponies
+   * ponies.
    */
-  bool operator == (const TypeVector<T>& rhs) const;
+  ponies;
 
   /**
-   * @returns \p true iff two vectors do not occupy approximately the same
-   * physical location in space.
+   * @ponies
+   * ponies.
    */
-  bool operator != (const TypeVector<T>& rhs) const;
+  ponies;
 
   /**
-   * @returns \p true if this vector is "less"
-   * than another.  Useful for sorting.
-   * Also used for choosing some arbitrary basis function
-   * orientations
+   * @ponies
+   * ponies.
    */
-  bool operator < (const TypeVector<T>& rhs) const;
+  ponies;
 
   /**
-   * @returns \p true if this vector is "less"
-   * than or equal to another.  Useful for sorting.
-   * Also used for choosing some arbitrary constraint
-   * equation directions
+   * @ponies
+   * ponies.
    */
-  bool operator <= (const TypeVector<T>& rhs) const;
+  ponies;
 
   /**
-   * @returns \p true if this vector is "greater"
-   * than another.  Useful for sorting.
-   * Also used for choosing some arbitrary basis function
-   * orientations
+   * @ponies"
+   * ponies.
+   * ponies
+   * ponies
    */
-  bool operator > (const TypeVector<T>& rhs) const;
+  ponies;
 
   /**
-   * @returns \p true if this vector is "greater"
-   * than or equal to another.  Useful for sorting.
-   * Also used for choosing some arbitrary constraint
-   * equation directions
+   * @ponies"
+   * ponies.
+   * ponies
+   * ponies
    */
-  bool operator >= (const TypeVector<T>& rhs) const;
+  ponies;
 
   /**
-   * Formatted print, by default to \p libMesh::out.
+   * @ponies"
+   * ponies.
+   * ponies
+   * ponies
    */
-  void print(std::ostream& os = libMesh::out) const;
+  ponies;
 
   /**
-   * Formatted print as above but allows you to do
-   * Point p(1,2,3);
-   * std::cout << p << std::endl;
+   * @ponies"
+   * ponies.
+   * ponies
+   * ponies
    */
-  friend std::ostream& operator << (std::ostream& os, const TypeVector<T>& t)
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * ponies
+   * ponies);
+   * ponies;
+   */
+  ponies)
   {
-    t.print(os);
-    return os;
+    ponies);
+    ponies;
   }
 
   /**
-   * Unformatted print to the stream \p out.  Simply prints the elements
-   * of the vector separated by spaces.  Optionally prints a newline,
-   * which it does by default.
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void write_unformatted (std::ostream &out, const bool newline = true) const;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * The coordinates of the \p TypeVector
+   * ponies
    */
-  T _coords[LIBMESH_DIM];
+  ponies];
 };
 
 
@@ -352,582 +352,582 @@ protected:
 
 
 //------------------------------------------------------
-// Inline functions
+// ponies
 
-template <typename T>
-inline
-TypeVector<T>::TypeVector ()
+ponies>
+ponies
+ponies ()
 {
-  _coords[0] = 0;
+  ponies;
 
-#if LIBMESH_DIM > 1
-  _coords[1] = 0;
-#endif
+#ponies
+  ponies;
+#ponies
 
-#if LIBMESH_DIM > 2
-  _coords[2] = 0;
-#endif
+#ponies
+  ponies;
+#ponies
 }
 
 
 
-template <typename T>
-inline
-TypeVector<T>::TypeVector (const T x,
-                           const T y,
-                           const T z)
+ponies>
+ponies
+ponies,
+                           ponies,
+                           ponies)
 {
-  _coords[0] = x;
+  ponies;
 
-#if LIBMESH_DIM > 1
-  _coords[1] = y;
-#else
-  libmesh_assert_equal_to (y, 0);
-#endif
+#ponies
+  ponies;
+#ponies
+  ponies);
+#ponies
 
-#if LIBMESH_DIM > 2
-  _coords[2] = z;
-#else
-  libmesh_assert_equal_to (z, 0);
-#endif
+#ponies
+  ponies;
+#ponies
+  ponies);
+#ponies
 }
 
 
-template <typename T>
-template <typename Scalar>
-inline
-TypeVector<T>::TypeVector (const Scalar x,
-                           const Scalar y,
-                           typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                           const Scalar>::type z)
+ponies>
+ponies>
+ponies
+ponies,
+                           ponies,
+                           ponies
+                           ponies,
+                           ponies)
 {
-  _coords[0] = x;
+  ponies;
 
-#if LIBMESH_DIM > 1
-  _coords[1] = y;
-#else
-  libmesh_assert_equal_to (y, 0);
-#endif
+#ponies
+  ponies;
+#ponies
+  ponies);
+#ponies
 
-#if LIBMESH_DIM > 2
-  _coords[2] = z;
-#else
-  libmesh_assert_equal_to (z, 0);
-#endif
-}
-
-
-
-template <typename T>
-template <typename T2>
-inline
-TypeVector<T>::TypeVector (const TypeVector<T2> &p)
-{
-  // copy the nodes from vector p to me
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    _coords[i] = p._coords[i];
+#ponies
+  ponies;
+#ponies
+  ponies);
+#ponies
 }
 
 
 
-template <typename T>
-inline
-TypeVector<T>::~TypeVector ()
+ponies>
+ponies>
+ponies
+ponies)
+{
+  // ponies
+  ponies++)
+    ponies];
+}
+
+
+
+ponies>
+ponies
+ponies ()
 {
 }
 
 
 
-template <typename T>
-template <typename T2>
-inline
-void TypeVector<T>::assign (const TypeVector<T2> &p)
+ponies>
+ponies>
+ponies
+ponies)
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    _coords[i] = p._coords[i];
+  ponies++)
+    ponies];
 }
 
 
 
-template <typename T>
-inline
-const T & TypeVector<T>::operator () (const unsigned int i) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_less (i, LIBMESH_DIM);
+  ponies);
 
-  return _coords[i];
+  ponies];
 }
 
 
 
-template <typename T>
-inline
-T & TypeVector<T>::operator () (const unsigned int i)
+ponies>
+ponies
+ponies)
 {
-  libmesh_assert_less (i, LIBMESH_DIM);
+  ponies);
 
-  return _coords[i];
+  ponies];
 }
 
 
 
-template <typename T>
-template <typename T2>
-inline
-TypeVector<typename CompareTypes<T, T2>::supertype>
-TypeVector<T>::operator + (const TypeVector<T2> &p) const
+ponies>
+ponies>
+ponies
+ponies>
+ponies
 {
-  typedef typename CompareTypes<T, T2>::supertype TS;
-#if LIBMESH_DIM == 1
-  return TypeVector<TS> (_coords[0] + p._coords[0]);
-#endif
+  ponies;
+#ponies
+  ponies]);
+#ponies
 
-#if LIBMESH_DIM == 2
-  return TypeVector<TS> (_coords[0] + p._coords[0],
-                         _coords[1] + p._coords[1]);
-#endif
+#ponies
+  ponies],
+                         ponies]);
+#ponies
 
-#if LIBMESH_DIM == 3
-  return TypeVector<TS> (_coords[0] + p._coords[0],
-                         _coords[1] + p._coords[1],
-                         _coords[2] + p._coords[2]);
-#endif
-
-}
-
-
-
-template <typename T>
-template <typename T2>
-inline
-const TypeVector<T> & TypeVector<T>::operator += (const TypeVector<T2> &p)
-{
-  this->add (p);
-
-  return *this;
-}
-
-
-
-template <typename T>
-template <typename T2>
-inline
-void TypeVector<T>::add (const TypeVector<T2> &p)
-{
-#if LIBMESH_DIM == 1
-  _coords[0] += p._coords[0];
-#endif
-
-#if LIBMESH_DIM == 2
-  _coords[0] += p._coords[0];
-  _coords[1] += p._coords[1];
-#endif
-
-#if LIBMESH_DIM == 3
-  _coords[0] += p._coords[0];
-  _coords[1] += p._coords[1];
-  _coords[2] += p._coords[2];
-#endif
+#ponies
+  ponies],
+                         ponies],
+                         ponies]);
+#ponies
 
 }
 
 
 
-template <typename T>
-template <typename T2>
-inline
-void TypeVector<T>::add_scaled (const TypeVector<T2> &p, const T factor)
+ponies>
+ponies>
+ponies
+ponies)
 {
-#if LIBMESH_DIM == 1
-  _coords[0] += factor*p(0);
-#endif
+  ponies);
 
-#if LIBMESH_DIM == 2
-  _coords[0] += factor*p(0);
-  _coords[1] += factor*p(1);
-#endif
+  ponies;
+}
 
-#if LIBMESH_DIM == 3
-  _coords[0] += factor*p(0);
-  _coords[1] += factor*p(1);
-  _coords[2] += factor*p(2);
-#endif
+
+
+ponies>
+ponies>
+ponies
+ponies)
+{
+#ponies
+  ponies];
+#ponies
+
+#ponies
+  ponies];
+  ponies];
+#ponies
+
+#ponies
+  ponies];
+  ponies];
+  ponies];
+#ponies
 
 }
 
 
 
-template <typename T>
-template <typename T2>
-inline
-TypeVector<typename CompareTypes<T, T2>::supertype>
-TypeVector<T>::operator - (const TypeVector<T2> &p) const
+ponies>
+ponies>
+ponies
+ponies)
 {
-  typedef typename CompareTypes<T, T2>::supertype TS;
+#ponies
+  ponies);
+#ponies
 
-#if LIBMESH_DIM == 1
-  return TypeVector<TS>(_coords[0] - p._coords[0]);
-#endif
+#ponies
+  ponies);
+  ponies);
+#ponies
 
-#if LIBMESH_DIM == 2
-  return TypeVector<TS>(_coords[0] - p._coords[0],
-                        _coords[1] - p._coords[1]);
-#endif
-
-#if LIBMESH_DIM == 3
-  return TypeVector<TS>(_coords[0] - p._coords[0],
-                        _coords[1] - p._coords[1],
-                        _coords[2] - p._coords[2]);
-#endif
+#ponies
+  ponies);
+  ponies);
+  ponies);
+#ponies
 
 }
 
 
 
-template <typename T>
-template <typename T2>
-inline
-const TypeVector<T> & TypeVector<T>::operator -= (const TypeVector<T2> &p)
+ponies>
+ponies>
+ponies
+ponies>
+ponies
 {
-  this->subtract (p);
+  ponies;
 
-  return *this;
-}
+#ponies
+  ponies]);
+#ponies
 
+#ponies
+  ponies],
+                        ponies]);
+#ponies
 
-
-template <typename T>
-template <typename T2>
-inline
-void TypeVector<T>::subtract (const TypeVector<T2>& p)
-{
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    _coords[i] -= p._coords[i];
-}
-
-
-
-template <typename T>
-template <typename T2>
-inline
-void TypeVector<T>::subtract_scaled (const TypeVector<T2> &p, const T factor)
-{
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    _coords[i] -= factor*p(i);
-}
-
-
-
-template <typename T>
-inline
-TypeVector<T> TypeVector<T>::operator - () const
-{
-
-#if LIBMESH_DIM == 1
-  return TypeVector(-_coords[0]);
-#endif
-
-#if LIBMESH_DIM == 2
-  return TypeVector(-_coords[0],
-                    -_coords[1]);
-#endif
-
-#if LIBMESH_DIM == 3
-  return TypeVector(-_coords[0],
-                    -_coords[1],
-                    -_coords[2]);
-#endif
+#ponies
+  ponies],
+                        ponies],
+                        ponies]);
+#ponies
 
 }
 
 
 
-template <typename T>
-template <typename Scalar>
-inline
-typename boostcopy::enable_if_c<
-  ScalarTraits<Scalar>::value,
-  TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
-TypeVector<T>::operator * (const Scalar factor) const
+ponies>
+ponies>
+ponies
+ponies)
 {
-  typedef typename CompareTypes<T, Scalar>::supertype SuperType;
+  ponies);
 
-#if LIBMESH_DIM == 1
-  return TypeVector<SuperType>(_coords[0]*factor);
-#endif
-
-#if LIBMESH_DIM == 2
-  return TypeVector<SuperType>(_coords[0]*factor,
-                               _coords[1]*factor);
-#endif
-
-#if LIBMESH_DIM == 3
-  return TypeVector<SuperType>(_coords[0]*factor,
-                               _coords[1]*factor,
-                               _coords[2]*factor);
-#endif
+  ponies;
 }
 
 
 
-template <typename T, typename Scalar>
-inline
-typename boostcopy::enable_if_c<
-  ScalarTraits<Scalar>::value,
-  TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
-operator * (const Scalar factor,
-            const TypeVector<T> &v)
+ponies>
+ponies>
+ponies
+ponies)
 {
-  return v * factor;
+  ponies++)
+    ponies];
 }
 
 
 
-template <typename T>
-inline
-const TypeVector<T> & TypeVector<T>::operator *= (const T factor)
+ponies>
+ponies>
+ponies
+ponies)
 {
-#if LIBMESH_DIM == 1
-  _coords[0] *= factor;
-#endif
-
-#if LIBMESH_DIM == 2
-  _coords[0] *= factor;
-  _coords[1] *= factor;
-#endif
-
-#if LIBMESH_DIM == 3
-  _coords[0] *= factor;
-  _coords[1] *= factor;
-  _coords[2] *= factor;
-#endif
-
-  return *this;
+  ponies++)
+    ponies);
 }
 
 
 
-template <typename T>
-template <typename Scalar>
-inline
-typename boostcopy::enable_if_c<
-  ScalarTraits<Scalar>::value,
-  TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
-TypeVector<T>::operator / (const Scalar factor) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
-  typedef typename CompareTypes<T, Scalar>::supertype TS;
+#ponies
+  ponies]);
+#ponies
 
-#if LIBMESH_DIM == 1
-  return TypeVector<TS>(_coords[0]/factor);
-#endif
+#ponies
+  ponies],
+                    -ponies]);
+#ponies
 
-#if LIBMESH_DIM == 2
-  return TypeVector<TS>(_coords[0]/factor,
-                        _coords[1]/factor);
-#endif
-
-#if LIBMESH_DIM == 3
-  return TypeVector<TS>(_coords[0]/factor,
-                        _coords[1]/factor,
-                        _coords[2]/factor);
-#endif
+#ponies
+  ponies],
+                    -ponies],
+                    -ponies]);
+#ponies
 
 }
 
 
 
-
-template <typename T>
-inline
-const TypeVector<T> &
-TypeVector<T>::operator /= (const T factor)
+ponies>
+ponies>
+ponies
+ponies<
+  ponies,
+  ponies
+ponies
 {
-  libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
+  ponies;
 
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    _coords[i] /= factor;
+#ponies
+  ponies);
+#ponies
 
-  return *this;
+#ponies
+  ponies,
+                               ponies);
+#ponies
+
+#ponies
+  ponies,
+                               ponies,
+                               ponies);
+#ponies
+}
+
+
+
+ponies>
+ponies
+ponies<
+  ponies,
+  ponies
+ponies,
+            ponies)
+{
+  ponies;
+}
+
+
+
+ponies>
+ponies
+ponies)
+{
+#ponies
+  ponies;
+#ponies
+
+#ponies
+  ponies;
+  ponies;
+#ponies
+
+#ponies
+  ponies;
+  ponies;
+  ponies;
+#ponies
+
+  ponies;
+}
+
+
+
+ponies>
+ponies>
+ponies
+ponies<
+  ponies,
+  ponies
+ponies
+{
+  ponies.));
+
+  ponies;
+
+#ponies
+  ponies);
+#ponies
+
+#ponies
+  ponies,
+                        ponies);
+#ponies
+
+#ponies
+  ponies,
+                        ponies,
+                        ponies);
+#ponies
+
 }
 
 
 
 
-template <typename T>
-template <typename T2>
-inline
-typename CompareTypes<T, T2>::supertype
-TypeVector<T>::operator * (const TypeVector<T2> &p) const
+ponies>
+ponies
+ponies> &
+ponies)
 {
-#if LIBMESH_DIM == 1
-  return _coords[0]*p._coords[0];
-#endif
+  ponies.));
 
-#if LIBMESH_DIM == 2
-  return (_coords[0]*p._coords[0] +
-          _coords[1]*p._coords[1]);
-#endif
+  ponies++)
+    ponies;
 
-#if LIBMESH_DIM == 3
-  return (_coords[0]*p(0) +
-          _coords[1]*p(1) +
-          _coords[2]*p(2));
-#endif
-}
-
-template <typename T>
-template <typename T2>
-inline
-typename CompareTypes<T, T2>::supertype
-TypeVector<T>::contract(const TypeVector<T2> &p) const
-{
-  return (*this)*(p);
+  ponies;
 }
 
 
 
-template <typename T>
-template <typename T2>
-TypeVector<typename CompareTypes<T, T2>::supertype>
-TypeVector<T>::cross(const TypeVector<T2>& p) const
+
+ponies>
+ponies>
+ponies
+ponies
+ponies
 {
-  typedef typename CompareTypes<T, T2>::supertype TS;
-  libmesh_assert_equal_to (LIBMESH_DIM, 3);
+#ponies
+  ponies];
+#ponies
 
-  // |     i          j          k    |
-  // |(*this)(0) (*this)(1) (*this)(2)|
-  // |   p(0)       p(1)       p(2)   |
+#ponies
+  ponies] +
+          ponies]);
+#ponies
 
-  return TypeVector<TS>( _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
-                         -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
-                         _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
+#ponies
+  ponies) +
+          ponies) +
+          ponies));
+#ponies
+}
+
+ponies>
+ponies>
+ponies
+ponies
+ponies
+{
+  ponies);
 }
 
 
 
-template <typename T>
-inline
-Real TypeVector<T>::size() const
+ponies>
+ponies>
+ponies>
+ponies
 {
-  return std::sqrt(this->size_sq());
+  ponies;
+  ponies);
+
+  // |     ponies    |
+  // |(*ponies)|
+  // |   ponies)   |
+
+  ponies],
+                         -ponies],
+                         ponies]);
 }
 
 
 
-template <typename T>
-inline
-void TypeVector<T>::zero()
+ponies>
+ponies
+ponies
 {
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    _coords[i] = 0.;
+  ponies());
 }
 
 
 
-template <typename T>
-inline
-Real TypeVector<T>::size_sq() const
+ponies>
+ponies
+ponies()
 {
-#if LIBMESH_DIM == 1
-  return (TensorTools::norm_sq(_coords[0]));
-#endif
-
-#if LIBMESH_DIM == 2
-  return (TensorTools::norm_sq(_coords[0]) +
-          TensorTools::norm_sq(_coords[1]));
-#endif
-
-#if LIBMESH_DIM == 3
-  return (TensorTools::norm_sq(_coords[0]) +
-          TensorTools::norm_sq(_coords[1]) +
-          TensorTools::norm_sq(_coords[2]));
-#endif
+  ponies++)
+    ponies.;
 }
 
 
 
-template <typename T>
-inline
-bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T>& rhs, Real tol) const
+ponies>
+ponies
+ponies
 {
-#if LIBMESH_DIM == 1
-  return (std::abs(_coords[0] - rhs._coords[0])
-          <= tol);
-#endif
+#ponies
+  ponies]));
+#ponies
 
-#if LIBMESH_DIM == 2
-  return (std::abs(_coords[0] - rhs._coords[0]) +
-          std::abs(_coords[1] - rhs._coords[1])
-          <= tol);
-#endif
+#ponies
+  ponies]) +
+          ponies]));
+#ponies
 
-#if LIBMESH_DIM == 3
-  return (std::abs(_coords[0] - rhs._coords[0]) +
-          std::abs(_coords[1] - rhs._coords[1]) +
-          std::abs(_coords[2] - rhs._coords[2])
-          <= tol);
-#endif
+#ponies
+  ponies]) +
+          ponies]) +
+          ponies]));
+#ponies
 }
 
 
 
-template <typename T>
-inline
-bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T>& rhs, Real tol) const
+ponies>
+ponies
+ponies
 {
-#if LIBMESH_DIM == 1
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0])));
-#endif
+#ponies
+  ponies])
+          <= ponies);
+#ponies
 
-#if LIBMESH_DIM == 2
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-                                      std::abs(_coords[1]) + std::abs(rhs._coords[1])));
-#endif
+#ponies
+  ponies]) +
+          ponies])
+          <= ponies);
+#ponies
 
-#if LIBMESH_DIM == 3
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-                                      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
-                                      std::abs(_coords[2]) + std::abs(rhs._coords[2])));
-#endif
+#ponies
+  ponies]) +
+          ponies]) +
+          ponies])
+          <= ponies);
+#ponies
 }
 
 
 
-template <typename T>
-inline
-bool TypeVector<T>::operator == (const TypeVector<T>& rhs) const
+ponies>
+ponies
+ponies
 {
-#if LIBMESH_DIM == 1
-  return (_coords[0] == rhs._coords[0]);
-#endif
+#ponies
+  ponies *
+                                     (ponies])));
+#ponies
 
-#if LIBMESH_DIM == 2
-  return (_coords[0] == rhs._coords[0] &&
-          _coords[1] == rhs._coords[1]);
-#endif
+#ponies
+  ponies *
+                                     (ponies]) +
+                                      ponies])));
+#ponies
 
-#if LIBMESH_DIM == 3
-  return (_coords[0] == rhs._coords[0] &&
-          _coords[1] == rhs._coords[1] &&
-          _coords[2] == rhs._coords[2]);
-#endif
+#ponies
+  ponies *
+                                     (ponies]) +
+                                      ponies]) +
+                                      ponies])));
+#ponies
 }
 
 
 
-template <>
-inline
-bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
+ponies>
+ponies
+ponies
 {
-  return (!(*this == rhs));
+#ponies
+  ponies]);
+#ponies
+
+#ponies
+  ponies] &&
+          ponies]);
+#ponies
+
+#ponies
+  ponies] &&
+          ponies] &&
+          ponies]);
+#ponies
 }
 
-} // namespace libMesh
 
-#endif // LIBMESH_TYPE_VECTOR_H
+
+ponies <>
+ponies
+ponies
+{
+  ponies));
+}
+
+} // ponies
+
+#ponies

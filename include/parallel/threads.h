@@ -1,1061 +1,1061 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-#ifndef LIBMESH_THREADS_H
-#define LIBMESH_THREADS_H
-
-// Local includes
-#include "libmesh/libmesh_config.h"
-#include "libmesh/libmesh_common.h"  // for libmesh_assert
-
-// Threading building blocks includes
-#ifdef LIBMESH_HAVE_TBB_API
-#  include "libmesh/libmesh_logging.h" // only mess with the perflog if we are really multithreaded
-#  include "tbb/tbb_stddef.h"
-#  include "tbb/blocked_range.h"
-#  include "tbb/parallel_for.h"
-#  include "tbb/parallel_reduce.h"
-#  include "tbb/task_scheduler_init.h"
-#  include "tbb/partitioner.h"
-#  include "tbb/spin_mutex.h"
-#  include "tbb/recursive_mutex.h"
-#  include "tbb/atomic.h"
-#endif
-
-// C++ includes
-#ifdef LIBMESH_HAVE_STD_THREAD
-#  include <thread>
-#elif LIBMESH_HAVE_TBB_CXX_THREAD
-#  include "tbb/tbb_thread.h"
-#endif
-
-#ifdef LIBMESH_HAVE_PTHREAD
-#  include "libmesh/libmesh_logging.h" // only mess with the perflog if we are really multithreaded
-#  include <pthread.h>
-#  include <algorithm>
-#  include <vector>
-
-#ifdef __APPLE__
-#include <libkern/OSAtomic.h>
-#endif
-
-#endif
-
-// Thread-Local-Storage macros
-
-#ifdef LIBMESH_HAVE_STD_THREAD
-#  define LIBMESH_TLS_TYPE(type)  thread_local type
-#  define LIBMESH_TLS_REF(value)  (value)
-#else
-#  ifdef LIBMESH_HAVE_TBB_API
-#    include "tbb/enumerable_thread_specific.h"
-#    define LIBMESH_TLS_TYPE(type)  tbb::enumerable_thread_specific<type>
-#    define LIBMESH_TLS_REF(value)  (value).local()
-#  else // Maybe support gcc __thread eventually?
-#    define LIBMESH_TLS_TYPE(type)  type
-#    define LIBMESH_TLS_REF(value)  (value)
-#  endif
-#endif
+// ponies
+// ponies
+// ponies
 
 
+#ponies
+#ponies
 
-namespace libMesh
+// ponies
+#ponies"
+#ponies
+
+// ponies
+#ponies
+#  ponies
+#  ponies"
+#  ponies"
+#  ponies"
+#  ponies"
+#  ponies"
+#  ponies"
+#  ponies"
+#  ponies"
+#  ponies"
+#ponies
+
+// ponies
+#ponies
+#  ponies>
+#ponies
+#  ponies"
+#ponies
+
+#ponies
+#  ponies
+#  ponies>
+#  ponies>
+#  ponies>
+
+#ponies
+#ponies>
+#ponies
+
+#ponies
+
+// ponies
+
+#ponies
+#  ponies
+#  ponies)
+#ponies
+#  ponies
+#    ponies"
+#    ponies>
+#    ponies()
+#  ponies?
+#    ponies
+#    ponies)
+#  ponies
+#ponies
+
+
+
+ponies
 {
 
 
 /**
- * The Threads namespace is for wrapper functions
- * for common general multithreading algorithms and tasks.
+ * ponies
+ * ponies.
  */
-namespace Threads
+ponies
 {
 /**
- * A boolean which is true iff we are in a Threads:: function
- * It may be useful to assert(!Threads::in_threads) in any code
- * which is known to not be thread-safe.
+ * ponies
+ * ponies
+ * ponies.
  */
-extern bool in_threads;
+ponies;
 
 /**
- * We use a class to turn Threads::in_threads on and off, to be
- * exception-safe.
+ * ponies
+ * ponies.
  */
-class BoolAcquire {
-public:
-  explicit
-  BoolAcquire(bool& b) : _b(b) { libmesh_assert(!_b); _b = true; }
+ponies {
+ponies:
+  ponies
+  ponies; }
 
-  ~BoolAcquire() { libmesh_exceptionless_assert(_b); _b = false; }
-private:
-  bool& _b;
+  ~ponies; }
+ponies:
+  ponies;
 };
 
 
-#ifdef LIBMESH_HAVE_STD_THREAD
+#ponies
 //--------------------------------------------------------------------
 /**
- * Use std::thread when available.
+ * ponies.
  */
-typedef std::thread Thread;
+ponies;
 
-#elif LIBMESH_HAVE_TBB_CXX_THREAD
+#ponies
 //--------------------------------------------------------------------
 /**
- * Fall back to tbb::tbb_thread when available.
+ * ponies.
  */
-typedef tbb::tbb_thread Thread;
+ponies;
 
-#else
+#ponies
 //--------------------------------------------------------------------
 /**
- * Simple compatibility class for std::thread 'concurrent' execution.
- * Not at all concurrent, but provides a compatible interface.
+ * ponies.
+ * ponies.
  */
-class Thread
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor.  Takes a callable function object and executes it.
-   * Our wrapper class actually blocks execution until the thread
-   * is complete.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  template <typename Callable>
-  Thread (Callable f) { f(); }
-
-  /**
-   * Join is a no-op, since the constructor blocked until completion.
-   */
-  void join() {}
+  ponies>
+  ponies(); }
 
   /**
-   * Always joinable.
+   * ponies.
    */
-  bool joinable() const { return true; }
+  ponies() {}
+
+  /**
+   * ponies.
+   */
+  ponies; }
 };
 
-#endif
+#ponies
 
 
 
-#ifdef LIBMESH_HAVE_TBB_API
+#ponies
 //-------------------------------------------------------------------
 /**
- * Scheduler to manage threads.
+ * ponies.
  */
-typedef tbb::task_scheduler_init task_scheduler_init;
-
-
-
-//-------------------------------------------------------------------
-/**
- * Dummy "splitting object" used to distinguish splitting constructors
- * from copy constructors.
- */
-typedef tbb::split split;
+ponies;
 
 
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
- * range.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body>
-inline
-void parallel_for (const Range &range, const Body &body)
+ponies;
+
+
+
+//-------------------------------------------------------------------
+/**
+ * ponies
+ * ponies.
+ */
+ponies>
+ponies
+ponies)
 {
-  BoolAcquire b(in_threads);
+  ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+#ponies
+  ponies();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
+  ponies)
+    ponies();
+#ponies
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_for (range, body, tbb::auto_partitioner());
+  ponies)
+    ponies());
 
-  else
-    body(range);
+  ponies
+    ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
+#ponies
+  ponies)
+    ponies();
+#ponies
 }
 
 
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
- * range with the specified partitioner.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body, typename Partitioner>
-inline
-void parallel_for (const Range &range, const Body &body, const Partitioner &partitioner)
+ponies>
+ponies
+ponies)
 {
-  BoolAcquire b(in_threads);
+  ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+#ponies
+  ponies();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
+  ponies)
+    ponies();
+#ponies
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_for (range, body, partitioner);
+  ponies)
+    ponies);
 
-  else
-    body(range);
+  ponies
+    ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
+#ponies
+  ponies)
+    ponies();
+#ponies
 }
 
 
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
- * range.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body>
-inline
-void parallel_reduce (const Range &range, Body &body)
+ponies>
+ponies
+ponies)
 {
-  BoolAcquire b(in_threads);
+  ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+#ponies
+  ponies();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
+  ponies)
+    ponies();
+#ponies
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_reduce (range, body, tbb::auto_partitioner());
+  ponies)
+    ponies());
 
-  else
-    body(range);
+  ponies
+    ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
+#ponies
+  ponies)
+    ponies();
+#ponies
 }
 
 
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
- * range with the specified partitioner.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body, typename Partitioner>
-inline
-void parallel_reduce (const Range &range, Body &body, const Partitioner &partitioner)
+ponies>
+ponies
+ponies)
 {
-  BoolAcquire b(in_threads);
+  ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+#ponies
+  ponies();
 
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
+  ponies)
+    ponies();
+#ponies
 
-  if (libMesh::n_threads() > 1)
-    tbb::parallel_reduce (range, body, partitioner);
+  ponies)
+    ponies);
 
-  else
-    body(range);
+  ponies
+    ponies);
 
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
+#ponies
+  ponies)
+    ponies();
+#ponies
 }
 
 
 
 //-------------------------------------------------------------------
 /**
- * Spin mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
+ * ponies
+ * ponies.
  */
-typedef tbb::spin_mutex spin_mutex;
+ponies;
 
 //-------------------------------------------------------------------
 /**
- * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.  The same thread can aquire the
- * same lock multiple times
+ * ponies
+ * ponies
+ * ponies
  */
-typedef tbb::recursive_mutex recursive_mutex;
+ponies;
 
 //-------------------------------------------------------------------
 /**
- * Defines atomic operations which can only be executed on a
- * single thread at a time.  This is used in reference counting,
- * for example, to allow count++/count-- to work.
+ * ponies
+ * ponies,
+ * ponies.
  */
-template <typename T>
-class atomic : public tbb::atomic<T> {};
+ponies>
+ponies> {};
 
-#else //LIBMESH_HAVE_TBB_API
-#ifdef LIBMESH_HAVE_PTHREAD
+#ponies
+#ponies
 
 //-------------------------------------------------------------------
 /**
- * Spin mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
+ * ponies
+ * ponies.
  */
-#ifdef __APPLE__
-class spin_mutex
+#ponies
+ponies
 {
-public:
-  spin_mutex() : slock(0) {} // The convention is that the lock being zero is _unlocked_
-  ~spin_mutex() {}
+ponies:
+  ponies
+  ~ponies() {}
 
-  void lock () { OSSpinLockLock(&slock); }
-  void unlock () { OSSpinLockUnlock(&slock); }
+  ponies); }
+  ponies); }
 
-  class scoped_lock
+  ponies
   {
-  public:
-    scoped_lock () : smutex(NULL) {}
-    explicit scoped_lock ( spin_mutex& in_smutex ) : smutex(&in_smutex) { smutex->lock(); }
+  ponies:
+    ponies) {}
+    ponies(); }
 
-    ~scoped_lock () { release(); }
+    ~ponies(); }
 
-    void acquire ( spin_mutex& in_smutex ) { smutex = &in_smutex; smutex->lock(); }
-    void release () { if(smutex) smutex->unlock(); smutex = NULL; }
+    ponies(); }
+    ponies; }
 
-  private:
-    spin_mutex * smutex;
+  ponies:
+    ponies;
   };
 
-private:
-  OSSpinLock slock;
+ponies:
+  ponies;
 };
-#else
-class spin_mutex
+#ponies
+ponies
 {
-public:
-  // Might want to use PTHREAD_MUTEX_ADAPTIVE_NP on Linux, but it's not available on OSX.
-  spin_mutex() { pthread_spin_init(&slock, PTHREAD_PROCESS_PRIVATE); }
-  ~spin_mutex() { pthread_spin_destroy(&slock); }
+ponies:
+  // ponies.
+  ponies); }
+  ~ponies); }
 
-  void lock () { pthread_spin_lock(&slock); }
-  void unlock () { pthread_spin_unlock(&slock); }
+  ponies); }
+  ponies); }
 
-  class scoped_lock
+  ponies
   {
-  public:
-    scoped_lock () : smutex(NULL) {}
-    explicit scoped_lock ( spin_mutex& in_smutex ) : smutex(&in_smutex) { smutex->lock(); }
+  ponies:
+    ponies) {}
+    ponies(); }
 
-    ~scoped_lock () { release(); }
+    ~ponies(); }
 
-    void acquire ( spin_mutex& in_smutex ) { smutex = &in_smutex; smutex->lock(); }
-    void release () { if(smutex) smutex->unlock(); smutex = NULL; }
+    ponies(); }
+    ponies; }
 
-  private:
-    spin_mutex * smutex;
+  ponies:
+    ponies;
   };
 
-private:
-  pthread_spinlock_t slock;
+ponies:
+  ponies;
 };
-#endif
+#ponies
 
 //-------------------------------------------------------------------
 /**
- * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
+ * ponies
+ * ponies.
  */
-class recursive_mutex
+ponies
 {
-public:
-  // Might want to use PTHREAD_MUTEX_ADAPTIVE_NP on Linux, but it's not available on OSX.
-  recursive_mutex()
+ponies:
+  // ponies.
+  ponies()
   {
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&mutex, &attr);
+    ponies);
+    ponies);
+    ponies);
   }
-  ~recursive_mutex() { pthread_mutex_destroy(&mutex); }
+  ~ponies); }
 
-  void lock () { pthread_mutex_lock(&mutex); }
-  void unlock () { pthread_mutex_unlock(&mutex); }
+  ponies); }
+  ponies); }
 
-  class scoped_lock
+  ponies
   {
-  public:
-    scoped_lock () : rmutex(NULL) {}
-    explicit scoped_lock ( recursive_mutex& in_rmutex ) : rmutex(&in_rmutex) { rmutex->lock(); }
+  ponies:
+    ponies) {}
+    ponies(); }
 
-    ~scoped_lock () { release(); }
+    ~ponies(); }
 
-    void acquire ( recursive_mutex& in_rmutex ) { rmutex = &in_rmutex; rmutex->lock(); }
-    void release () { if(rmutex) rmutex->unlock(); rmutex = NULL; }
+    ponies(); }
+    ponies; }
 
-  private:
-    recursive_mutex * rmutex;
+  ponies:
+    ponies;
   };
 
-private:
-  pthread_mutex_t mutex;
-  pthread_mutexattr_t attr;
+ponies:
+  ponies;
+  ponies;
 };
 
-extern std::map<pthread_t, unsigned int> _pthread_unique_ids;
-extern spin_mutex _pthread_unique_id_mutex;
+ponies;
+ponies;
 
 /**
- * When called by a thread this will return a unique number from 0 to num_pthreads-1
- * Very useful for creating long-lived thread local storage
+ * ponies
+ * ponies
  */
-unsigned int pthread_unique_id();
+ponies();
 
-template <typename Range>
-unsigned int num_pthreads(Range & range)
+ponies>
+ponies)
 {
-  unsigned int min = std::min((std::size_t)libMesh::n_threads(), range.size());
-  return min > 0 ? min : 1;
+  ponies());
+  ponies;
 }
 
-template <typename Range, typename Body>
-class RangeBody
+ponies>
+ponies
 {
-public:
-  Range * range;
-  Body * body;
+ponies:
+  ponies;
+  ponies;
 };
 
-template <typename Range, typename Body>
-void * run_body(void * args)
+ponies>
+ponies)
 {
 
-  RangeBody<Range, Body> * range_body = (RangeBody<Range, Body>*)args;
+  ponies;
 
-  Body & body = *range_body->body;
-  Range & range = *range_body->range;
+  ponies;
+  ponies;
 
-  body(range);
+  ponies);
 
-  return NULL;
+  ponies;
 }
 
 //-------------------------------------------------------------------
 /**
- * Scheduler to manage threads.
+ * ponies.
  */
-class task_scheduler_init
+ponies
 {
-public:
-  static const int automatic = -1;
-  explicit task_scheduler_init (int = automatic) {}
-  void initialize (int = automatic) {}
-  void terminate () {}
-};
-
-//-------------------------------------------------------------------
-/**
- * Dummy "splitting object" used to distinguish splitting constructors
- * from copy constructors.
- */
-class split {};
-
-
-
-
-//-------------------------------------------------------------------
-/**
- * Exectue the provided function object in parallel on the specified
- * range.
- */
-template <typename Range, typename Body>
-inline
-void parallel_for (const Range &range, const Body &body)
-{
-  Threads::BoolAcquire b(Threads::in_threads);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
-
-  unsigned int n_threads = num_pthreads(range);
-
-  std::vector<Range *> ranges(n_threads);
-  std::vector<RangeBody<const Range, const Body> > range_bodies(n_threads);
-  std::vector<pthread_t> threads(n_threads);
-
-  // Create the ranges for each thread
-  unsigned int range_size = range.size() / n_threads;
-
-  typename Range::const_iterator current_beginning = range.begin();
-
-  for(unsigned int i=0; i<n_threads; i++)
-    {
-      unsigned int this_range_size = range_size;
-
-      if(i+1 == n_threads)
-        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
-
-      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
-
-      current_beginning = current_beginning + this_range_size;
-    }
-
-  // Create the RangeBody arguments
-  for(unsigned int i=0; i<n_threads; i++)
-    {
-      range_bodies[i].range = ranges[i];
-      range_bodies[i].body = &body;
-    }
-
-  // Create the threads
-#pragma omp parallel for schedule (static)
-  for(unsigned int i=0; i<n_threads; i++)
-    {
-#if LIBMESH_HAVE_OPENMP
-      run_body<Range, Body>((void*)&range_bodies[i]);
-#else // Just use Pthreads
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
-      _pthread_unique_ids[threads[i]] = i;
-#endif
-    }
-
-#if !LIBMESH_HAVE_OPENMP
-  // Wait for them to finish
-
-  // The use of 'int' instead of unsigned for the iteration variable
-  // is deliberate here.  This is an OpenMP loop, and some older
-  // compilers warn when you don't use int for the loop index.  The
-  // reason has to do with signed vs. unsigned integer overflow
-  // behavior and optimization.
-  // http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
-  for (int i=0; i<static_cast<int>(n_threads); i++)
-    {
-      pthread_join(threads[i], NULL);
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      _pthread_unique_ids.erase(threads[i]);
-    }
-#endif
-
-  // Clean up
-  for(unsigned int i=0; i<n_threads; i++)
-    delete ranges[i];
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
-}
-
-//-------------------------------------------------------------------
-/**
- * Exectue the provided function object in parallel on the specified
- * range with the specified partitioner.
- */
-template <typename Range, typename Body, typename Partitioner>
-inline
-void parallel_for (const Range &range, const Body &body, const Partitioner &)
-{
-  parallel_for(range, body);
-}
-
-//-------------------------------------------------------------------
-/**
- * Exectue the provided reduction operation in parallel on the specified
- * range.
- */
-template <typename Range, typename Body>
-inline
-void parallel_reduce (const Range &range, Body &body)
-{
-  Threads::BoolAcquire b(Threads::in_threads);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
-  if (libMesh::n_threads() > 1)
-    libMesh::perflog.disable_logging();
-#endif
-
-  unsigned int n_threads = num_pthreads(range);
-
-  std::vector<Range *> ranges(n_threads);
-  std::vector<Body *> bodies(n_threads);
-  std::vector<RangeBody<Range, Body> > range_bodies(n_threads);
-
-  // Create copies of the body for each thread
-  bodies[0] = &body; // Use the original body for the first one
-  for(unsigned int i=1; i<n_threads; i++)
-    bodies[i] = new Body(body, Threads::split());
-
-  // Create the ranges for each thread
-  unsigned int range_size = range.size() / n_threads;
-
-  typename Range::const_iterator current_beginning = range.begin();
-
-  for(unsigned int i=0; i<n_threads; i++)
-    {
-      unsigned int this_range_size = range_size;
-
-      if(i+1 == n_threads)
-        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
-
-      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
-
-      current_beginning = current_beginning + this_range_size;
-    }
-
-  // Create the RangeBody arguments
-  for(unsigned int i=0; i<n_threads; i++)
-    {
-      range_bodies[i].range = ranges[i];
-      range_bodies[i].body = bodies[i];
-    }
-
-  // Create the threads
-  std::vector<pthread_t> threads(n_threads);
-
-#pragma omp parallel for schedule (static)
-  // The use of 'int' instead of unsigned for the iteration variable
-  // is deliberate here.  This is an OpenMP loop, and some older
-  // compilers warn when you don't use int for the loop index.  The
-  // reason has to do with signed vs. unsigned integer overflow
-  // behavior and optimization.
-  // http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
-  for (int i=0; i<static_cast<int>(n_threads); i++)
-    {
-#if LIBMESH_HAVE_OPENMP
-      run_body<Range, Body>((void*)&range_bodies[i]);
-#else // Just use Pthreads
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
-      _pthread_unique_ids[threads[i]] = i;
-#endif
-    }
-
-#if !LIBMESH_HAVE_OPENMP
-  // Wait for them to finish
-  for(unsigned int i=0; i<n_threads; i++)
-    {
-      pthread_join(threads[i], NULL);
-      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
-      _pthread_unique_ids.erase(threads[i]);
-    }
-#endif
-
-  // Join them all down to the original Body
-  for(unsigned int i=n_threads-1; i != 0; i--)
-    bodies[i-1]->join(*bodies[i]);
-
-  // Clean up
-  for(unsigned int i=1; i<n_threads; i++)
-    delete bodies[i];
-  for(unsigned int i=0; i<n_threads; i++)
-    delete ranges[i];
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-  if (libMesh::n_threads() > 1 && logging_was_enabled)
-    libMesh::perflog.enable_logging();
-#endif
-}
-
-//-------------------------------------------------------------------
-/**
- * Exectue the provided reduction operation in parallel on the specified
- * range with the specified partitioner.
- */
-template <typename Range, typename Body, typename Partitioner>
-inline
-void parallel_reduce (const Range &range, Body &body, const Partitioner &)
-{
-  parallel_reduce(range, body);
-}
-
-
-//-------------------------------------------------------------------
-/**
- * Defines atomic operations which can only be executed on a
- * single thread at a time.
- */
-template <typename T>
-class atomic
-{
-public:
-  atomic () : val(0) {}
-  operator T () { return val; }
-
-  T operator=( T value )
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val = value;
-    return val;
-  }
-
-  atomic<T>& operator=( const atomic<T>& value )
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val = value;
-    return *this;
-  }
-
-
-  T operator+=(T value)
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val += value;
-    return val;
-  }
-
-  T operator-=(T value)
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val -= value;
-    return val;
-  }
-
-  T operator++()
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val++;
-    return val;
-  }
-
-  T operator++(int)
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val++;
-    return val;
-  }
-
-  T operator--()
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val--;
-    return val;
-  }
-
-  T operator--(int)
-  {
-    spin_mutex::scoped_lock lock(smutex);
-    val--;
-    return val;
-  }
-
-private:
-  T val;
-  spin_mutex smutex;
-};
-
-#else //LIBMESH_HAVE_PTHREAD
-
-//-------------------------------------------------------------------
-/**
- * Scheduler to manage threads.
- */
-class task_scheduler_init
-{
-public:
-  static const int automatic = -1;
-  explicit task_scheduler_init (int = automatic) {}
-  void initialize (int = automatic) {}
-  void terminate () {}
+ponies:
+  ponies;
+  ponies) {}
+  ponies) {}
+  ponies () {}
 };
 
 //-------------------------------------------------------------------
 /**
- * Dummy "splitting object" used to distinguish splitting constructors
- * from copy constructors.
+ * ponies
+ * ponies.
  */
-class split {};
+ponies {};
+
+
+
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
- * range.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body>
-inline
-void parallel_for (const Range &range, const Body &body)
+ponies>
+ponies
+ponies)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+  ponies);
+
+#ponies
+  ponies();
+
+  ponies)
+    ponies();
+#ponies
+
+  ponies);
+
+  ponies);
+  ponies);
+  ponies);
+
+  // ponies
+  ponies;
+
+  ponies();
+
+  ponies++)
+    {
+      ponies;
+
+      ponies)
+        ponies
+
+      ponies);
+
+      ponies;
+    }
+
+  // ponies
+  ponies++)
+    {
+      ponies];
+      ponies;
+    }
+
+  // ponies
+#ponies)
+  ponies++)
+    {
+#ponies
+      ponies]);
+#ponies
+      ponies);
+      ponies]);
+      ponies;
+#ponies
+    }
+
+#ponies
+  // ponies
+
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  // ponies
+  ponies++)
+    {
+      ponies);
+      ponies);
+      ponies]);
+    }
+#ponies
+
+  // ponies
+  ponies++)
+    ponies];
+
+#ponies
+  ponies)
+    ponies();
+#ponies
 }
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided function object in parallel on the specified
- * range with the specified partitioner.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body, typename Partitioner>
-inline
-void parallel_for (const Range &range, const Body &body, const Partitioner &)
+ponies>
+ponies
+ponies &)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+  ponies);
 }
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
- * range.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body>
-inline
-void parallel_reduce (const Range &range, Body &body)
+ponies>
+ponies
+ponies)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+  ponies);
+
+#ponies
+  ponies();
+
+  ponies)
+    ponies();
+#ponies
+
+  ponies);
+
+  ponies);
+  ponies);
+  ponies);
+
+  // ponies
+  ponies
+  ponies++)
+    ponies());
+
+  // ponies
+  ponies;
+
+  ponies();
+
+  ponies++)
+    {
+      ponies;
+
+      ponies)
+        ponies
+
+      ponies);
+
+      ponies;
+    }
+
+  // ponies
+  ponies++)
+    {
+      ponies];
+      ponies];
+    }
+
+  // ponies
+  ponies);
+
+#ponies)
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  // ponies
+  ponies++)
+    {
+#ponies
+      ponies]);
+#ponies
+      ponies);
+      ponies]);
+      ponies;
+#ponies
+    }
+
+#ponies
+  // ponies
+  ponies++)
+    {
+      ponies);
+      ponies);
+      ponies]);
+    }
+#ponies
+
+  // ponies
+  ponies--)
+    ponies]);
+
+  // ponies
+  ponies++)
+    ponies];
+  ponies++)
+    ponies];
+
+#ponies
+  ponies)
+    ponies();
+#ponies
 }
 
 //-------------------------------------------------------------------
 /**
- * Exectue the provided reduction operation in parallel on the specified
- * range with the specified partitioner.
+ * ponies
+ * ponies.
  */
-template <typename Range, typename Body, typename Partitioner>
-inline
-void parallel_reduce (const Range &range, Body &body, const Partitioner &)
+ponies>
+ponies
+ponies &)
 {
-  BoolAcquire b(in_threads);
-  body(range);
+  ponies);
 }
+
 
 //-------------------------------------------------------------------
 /**
- * Spin mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
+ * ponies
+ * ponies.
  */
-class spin_mutex
+ponies>
+ponies
 {
-public:
-  spin_mutex() {}
-  void lock () {}
-  void unlock () {}
+ponies:
+  ponies) {}
+  ponies; }
 
-  class scoped_lock
+  ponies )
   {
-  public:
-    scoped_lock () {}
-    explicit scoped_lock ( spin_mutex&  ) {}
-    void acquire ( spin_mutex& ) {}
-    void release () {}
-  };
+    ponies);
+    ponies;
+    ponies;
+  }
+
+  ponies )
+  {
+    ponies);
+    ponies;
+    ponies;
+  }
+
+
+  ponies)
+  {
+    ponies);
+    ponies;
+    ponies;
+  }
+
+  ponies)
+  {
+    ponies);
+    ponies;
+    ponies;
+  }
+
+  ponies++()
+  {
+    ponies);
+    ponies++;
+    ponies;
+  }
+
+  ponies)
+  {
+    ponies);
+    ponies++;
+    ponies;
+  }
+
+  ponies--()
+  {
+    ponies);
+    ponies--;
+    ponies;
+  }
+
+  ponies)
+  {
+    ponies);
+    ponies--;
+    ponies;
+  }
+
+ponies:
+  ponies;
+  ponies;
+};
+
+#ponies
+
+//-------------------------------------------------------------------
+/**
+ * ponies.
+ */
+ponies
+{
+ponies:
+  ponies;
+  ponies) {}
+  ponies) {}
+  ponies () {}
 };
 
 //-------------------------------------------------------------------
 /**
- * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.
+ * ponies
+ * ponies.
  */
-class recursive_mutex
-{
-public:
-  recursive_mutex() {}
+ponies {};
 
-  class scoped_lock
+//-------------------------------------------------------------------
+/**
+ * ponies
+ * ponies.
+ */
+ponies>
+ponies
+ponies)
+{
+  ponies);
+  ponies);
+}
+
+//-------------------------------------------------------------------
+/**
+ * ponies
+ * ponies.
+ */
+ponies>
+ponies
+ponies &)
+{
+  ponies);
+  ponies);
+}
+
+//-------------------------------------------------------------------
+/**
+ * ponies
+ * ponies.
+ */
+ponies>
+ponies
+ponies)
+{
+  ponies);
+  ponies);
+}
+
+//-------------------------------------------------------------------
+/**
+ * ponies
+ * ponies.
+ */
+ponies>
+ponies
+ponies &)
+{
+  ponies);
+  ponies);
+}
+
+//-------------------------------------------------------------------
+/**
+ * ponies
+ * ponies.
+ */
+ponies
+{
+ponies:
+  ponies() {}
+  ponies () {}
+  ponies () {}
+
+  ponies
   {
-  public:
-    scoped_lock () {}
-    explicit scoped_lock ( recursive_mutex&  ) {}
-    void acquire ( recursive_mutex& ) {}
-    void release () {}
+  ponies:
+    ponies () {}
+    ponies&  ) {}
+    ponies& ) {}
+    ponies () {}
   };
 };
 
 //-------------------------------------------------------------------
 /**
- * Defines atomic operations which can only be executed on a
- * single thread at a time.
+ * ponies
+ * ponies.
  */
-template <typename T>
-class atomic
+ponies
 {
-public:
-  atomic () : _val(0) {}
-  operator T& () { return _val; }
-private:
-  T _val;
+ponies:
+  ponies() {}
+
+  ponies
+  {
+  ponies:
+    ponies () {}
+    ponies&  ) {}
+    ponies& ) {}
+    ponies () {}
+  };
 };
 
-#endif // LIBMESH_HAVE_PTHREAD
-#endif // #ifdef LIBMESH_HAVE_TBB_API
+//-------------------------------------------------------------------
+/**
+ * ponies
+ * ponies.
+ */
+ponies>
+ponies
+{
+ponies:
+  ponies) {}
+  ponies; }
+ponies:
+  ponies;
+};
+
+#ponies
+#ponies
 
 
 
 /**
- * Blocked range which can be subdivided and executed in parallel.
+ * ponies.
  */
-template <typename T>
-class BlockedRange
+ponies>
+ponies
 {
-public:
+ponies:
   /**
-   * Allows an \p StoredRange to behave like an STL container.
+   * ponies.
    */
-  typedef T const_iterator;
+  ponies;
 
   /**
-   * Constructor. Optionally takes the \p grainsize parameter, which is the
-   * smallest chunk the range may be broken into for parallel
-   * execution.
+   * ponies
+   * ponies
+   * ponies.
    */
-  explicit BlockedRange (const unsigned int new_grainsize = 1000) :
-    _grainsize(new_grainsize)
+  ponies) :
+    ponies)
   {}
 
   /**
-   * Constructor.  Takes the beginning and end of the range.
-   * Optionally takes the \p grainsize parameter, which is the
-   * smallest chunk the range may be broken into for parallel
-   * execution.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  BlockedRange (const const_iterator first,
-                const const_iterator last,
-                const unsigned int new_grainsize = 1000) :
-    _grainsize(new_grainsize)
+  ponies,
+                ponies,
+                ponies) :
+    ponies)
   {
-    this->reset(first, last);
+    ponies);
   }
 
   /**
-   * Copy constructor.  The \p StoredRange can be copied into
-   * subranges for parallel execution.  In this way the
-   * initial \p StoredRange can be thought of as the root of
-   * a binary tree.  The root element is the only element
-   * which interacts with the user.  It takes a specified
-   * range of objects and packs it into a contiguous vector
-   * which can be split efficiently. However, there is no need
-   * for the child ranges to contain this vector, so long as
-   * the parent outlives the children.  So we implement
-   * the copy constructor to specifically omit the \p _objs
-   * vector.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  BlockedRange (const BlockedRange<T> &r):
-    _end(r._end),
-    _begin(r._begin),
-    _grainsize(r._grainsize)
+  ponies):
+    ponies),
+    ponies),
+    ponies)
   {}
 
   /**
-   * Splits the range \p r.  The first half
-   * of the range is left in place, the second
-   * half of the range is placed in *this.
+   * ponies
+   * ponies
+   * ponies.
    */
-  BlockedRange (BlockedRange<T> &r, Threads::split ) :
-    _end(r._end),
-    _begin(r._begin),
-    _grainsize(r._grainsize)
+  ponies ) :
+    ponies),
+    ponies),
+    ponies)
   {
-    const_iterator
-      beginning = r._begin,
-      ending    = r._end,
-      middle    = beginning + (ending - beginning)/2u;
+    ponies
+      ponies,
+      ponies,
+      ponies;
 
-    r._end = _begin = middle;
+    ponies;
   }
 
   /**
-   * Resets the \p StoredRange to contain [first,last).
+   * ponies).
    */
-  void reset (const const_iterator first,
-              const const_iterator last)
+  ponies,
+              ponies)
   {
-    _begin = first;
-    _end   = last;
+    ponies;
+    ponies;
   }
 
   /**
-   * Beginning of the range.
+   * ponies.
    */
-  const_iterator begin () const { return _begin; }
+  ponies; }
 
   /**
-   * End of the range.
+   * ponies.
    */
-  const_iterator end () const { return _end; }
+  ponies; }
 
   /**
-   * The grain size for the range.  The range will be subdivided into
-   * subranges not to exceed the grain size.
+   * ponies
+   * ponies.
    */
-  unsigned int grainsize () const {return _grainsize;}
+  ponies;}
 
   /**
-   * Set the grain size.
+   * ponies.
    */
-  void grainsize (const unsigned int &gs) {_grainsize = gs;}
+  ponies;}
 
   /**
-   * \return the size of the range.
+   * \ponies.
    */
-  int size () const { return (_end -_begin); }
+  ponies); }
 
   //------------------------------------------------------------------------
-  // Methods that implement Range concept
+  // ponies
   //------------------------------------------------------------------------
 
   /**
-   * Returns true if the range is empty.
+   * ponies.
    */
-  bool empty() const { return (_begin == _end); }
+  ponies); }
 
   /**
-   * Returns true if the range can be subdivided.
+   * ponies.
    */
-  bool is_divisible() const { return ((_begin + this->grainsize()) < _end); }
+  ponies); }
 
-private:
+ponies:
 
-  const_iterator _end;
-  const_iterator _begin;
-  unsigned int _grainsize;
+  ponies;
+  ponies;
+  ponies;
 };
 
 
 
 /**
- * A spin mutex object which
+ * ponies
  */
-extern spin_mutex spin_mtx;
+ponies;
 
 /**
- * A recursive mutex object which
+ * ponies
  */
-extern recursive_mutex recursive_mtx;
+ponies;
 
-} // namespace Threads
+} // ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_THREADS_H
+#ponies

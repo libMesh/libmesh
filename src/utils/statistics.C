@@ -1,184 +1,184 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <algorithm> // for std::min_element, std::max_element
-#include <fstream> // std::ofstream
-#include <numeric> // std::accumulate
+// ponies
+#ponies
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/statistics.h"
-#include "libmesh/libmesh_logging.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// StatisticsVector class member functions
-template <typename T>
-Real StatisticsVector<T>::l2_norm() const
+// ponies
+ponies>
+ponies
 {
-  Real normsq = 0.;
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
-  for (dof_id_type i = 0; i != n; ++i)
-    normsq += ((*this)[i] * (*this)[i]);
+  ponies.;
+  ponies());
+  ponies)
+    ponies]);
 
-  return std::sqrt(normsq);
+  ponies);
 }
 
 
-template <typename T>
-T StatisticsVector<T>::minimum() const
+ponies>
+ponies
 {
-  START_LOG ("minimum()", "StatisticsVector");
+  ponies");
 
-  const T min = *(std::min_element(this->begin(), this->end()));
+  ponies()));
 
-  STOP_LOG ("minimum()", "StatisticsVector");
+  ponies");
 
-  return min;
-}
-
-
-
-
-template <typename T>
-T StatisticsVector<T>::maximum() const
-{
-  START_LOG ("maximum()", "StatisticsVector");
-
-  const T max = *(std::max_element(this->begin(), this->end()));
-
-  STOP_LOG ("maximum()", "StatisticsVector");
-
-  return max;
+  ponies;
 }
 
 
 
 
-template <typename T>
-Real StatisticsVector<T>::mean() const
+ponies>
+ponies
 {
-  START_LOG ("mean()", "StatisticsVector");
+  ponies");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies()));
 
-  Real the_mean = 0;
+  ponies");
 
-  for (dof_id_type i=0; i<n; i++)
+  ponies;
+}
+
+
+
+
+ponies>
+ponies
+{
+  ponies");
+
+  ponies());
+
+  ponies;
+
+  ponies++)
     {
-      the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) /
-        static_cast<Real>(i + 1);
+      ponies ) /
+        ponies);
     }
 
-  STOP_LOG ("mean()", "StatisticsVector");
+  ponies");
 
-  return the_mean;
+  ponies;
 }
 
 
 
 
-template <typename T>
-Real StatisticsVector<T>::median()
+ponies>
+ponies()
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  if (n == 0)
-    return 0.;
+  ponies)
+    ponies.;
 
-  START_LOG ("median()", "StatisticsVector");
+  ponies");
 
-  std::sort(this->begin(), this->end());
+  ponies());
 
-  const dof_id_type lhs = (n-1) / 2;
-  const dof_id_type rhs = n / 2;
+  ponies;
+  ponies;
 
-  Real the_median = 0;
+  ponies;
 
 
-  if (lhs == rhs)
+  ponies)
     {
-      the_median = static_cast<Real>((*this)[lhs]);
+      ponies]);
     }
 
-  else
+  ponies
     {
-      the_median = ( static_cast<Real>((*this)[lhs]) +
-                     static_cast<Real>((*this)[rhs]) ) / 2.0;
+      ponies]) +
+                     ponies;
     }
 
-  STOP_LOG ("median()", "StatisticsVector");
+  ponies");
 
-  return the_median;
+  ponies;
 }
 
 
 
 
-template <typename T>
-Real StatisticsVector<T>::median() const
+ponies>
+ponies
 {
-  StatisticsVector<T> sv = (*this);
+  ponies);
 
-  return sv.median();
+  ponies();
 }
 
 
 
 
-template <typename T>
-Real StatisticsVector<T>::variance(const Real mean_in) const
+ponies>
+ponies
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  START_LOG ("variance()", "StatisticsVector");
+  ponies");
 
-  Real the_variance = 0;
+  ponies;
 
-  for (dof_id_type i=0; i<n; i++)
+  ponies++)
     {
-      const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
-      the_variance += (delta * delta - the_variance) /
-        static_cast<Real>(i + 1);
+      ponies );
+      ponies) /
+        ponies);
     }
 
-  if (n > 1)
-    the_variance *= static_cast<Real>(n) / static_cast<Real>(n - 1);
+  ponies)
+    ponies);
 
-  STOP_LOG ("variance()", "StatisticsVector");
+  ponies");
 
-  return the_variance;
+  ponies;
 }
 
 
-template <typename T>
-void StatisticsVector<T>::normalize()
+ponies>
+ponies()
 {
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
-  const Real max = this->maximum();
+  ponies());
+  ponies();
 
-  for (dof_id_type i=0; i<n; i++)
+  ponies++)
     {
-      (*this)[i] = static_cast<T>((*this)[i] / max);
+      (*ponies);
     }
 }
 
@@ -186,216 +186,216 @@ void StatisticsVector<T>::normalize()
 
 
 
-template <typename T>
-void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
-                                    unsigned int n_bins)
+ponies>
+ponies,
+                                    ponies)
 {
-  // Must have at least 1 bin
-  libmesh_assert (n_bins>0);
+  // ponies
+  ponies);
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  std::sort(this->begin(), this->end());
+  ponies());
 
-  // The StatisticsVector can hold both integer and float types.
-  // We will define all the bins, etc. using Reals.
-  Real min      = static_cast<Real>(this->minimum());
-  Real max      = static_cast<Real>(this->maximum());
-  Real bin_size = (max - min) / static_cast<Real>(n_bins);
+  // ponies.
+  // ponies.
+  ponies());
+  ponies());
+  ponies);
 
-  START_LOG ("histogram()", "StatisticsVector");
+  ponies");
 
-  std::vector<Real> bin_bounds(n_bins+1);
-  for (unsigned int i=0; i<bin_bounds.size(); i++)
-    bin_bounds[i] = min + i * bin_size;
+  ponies);
+  ponies++)
+    ponies;
 
-  // Give the last bin boundary a little wiggle room: we don't want
-  // it to be just barely less than the max, otherwise our bin test below
-  // may fail.
-  bin_bounds.back() += 1.e-6 * bin_size;
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
 
-  // This vector will store the number of members each bin has.
-  bin_members.resize(n_bins);
+  // ponies.
+  ponies);
 
-  dof_id_type data_index = 0;
-  for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
+  ponies;
+  ponies
     {
-      // libMesh::out << "(debug) Filling bin " << j << std::endl;
+      // ponies;
 
-      for (dof_id_type i=data_index; i<n; i++) // data vector indexing
+      ponies
         {
-          //libMesh::out << "(debug) Processing index=" << i << std::endl;
-          Real current_val = static_cast<Real>( (*this)[i] );
+          //ponies;
+          ponies] );
 
-          // There may be entries in the vector smaller than the value
-          // reported by this->minimum().  (e.g. inactive elements in an
-          // ErrorVector.)  We just skip entries like that.
-          if ( current_val < min )
+          // ponies
+          // ponies
+          // ponies.
+          ponies )
             {
-              //     libMesh::out << "(debug) Skipping entry v[" << i << "]="
-              //       << (*this)[i]
-              //       << " which is less than the min value: min="
-              //       << min << std::endl;
-              continue;
+              //     ponies << "]="
+              //       << (*ponies]
+              //       << " ponies="
+              //       << ponies;
+              ponies;
             }
 
-          if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
-            // by bin_bounds[j] and bin_bounds[j+1])
+          ponies
+            // ponies])
             {
-              // libMesh::out.precision(16);
-              //     libMesh::out.setf(std::ios_base::fixed);
-              //     libMesh::out << "(debug) (*this)[i]= " << (*this)[i]
-              //       << " is greater than bin_bounds[j+1]="
-              //      << bin_bounds[j+1] << std::endl;
-              data_index = i; // start searching here for next bin
-              break; // go to next bin
+              // ponies);
+              //     ponies);
+              //     ponies]
+              //       << " ponies]="
+              //      << ponies;
+              ponies
+              ponies
             }
 
-          // Otherwise, increment current bin's count
-          bin_members[j]++;
-          // libMesh::out << "(debug) Binned index=" << i << std::endl;
+          // ponies
+          ponies]++;
+          // ponies;
         }
     }
 
-#ifdef DEBUG
-  // Check the number of binned entries
-  const dof_id_type n_binned = std::accumulate(bin_members.begin(),
-                                               bin_members.end(),
-                                               static_cast<dof_id_type>(0),
-                                               std::plus<dof_id_type>());
+#ponies
+  // ponies
+  ponies(),
+                                               ponies(),
+                                               ponies),
+                                               ponies>());
 
-  if (n != n_binned)
+  ponies)
     {
-      libMesh::out << "Warning: The number of binned entries, n_binned="
-                   << n_binned
-                   << ", did not match the total number of entries, n="
-                   << n << "." << std::endl;
+      ponies="
+                   << ponies
+                   << ", ponies="
+                   << ponies;
     }
-#endif
+#ponies
 
 
-  STOP_LOG ("histogram()", "StatisticsVector");
+  ponies");
 }
 
 
 
 
 
-template <typename T>
-void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
-                                         const std::string& filename,
-                                         unsigned int n_bins)
+ponies>
+ponies,
+                                         ponies,
+                                         ponies)
 {
-  // First generate the histogram with the desired number of bins
-  std::vector<dof_id_type> bin_members;
-  this->histogram(bin_members, n_bins);
+  // ponies
+  ponies;
+  ponies);
 
-  // The max, min and bin size are used to generate x-axis values.
-  T min      = this->minimum();
-  T max      = this->maximum();
-  T bin_size = (max - min) / static_cast<T>(n_bins);
+  // ponies.
+  ponies();
+  ponies();
+  ponies);
 
-  // On processor 0: Write histogram to file
-  if (my_procid==0)
+  // ponies
+  ponies)
     {
-      std::ofstream out_stream (filename.c_str());
+      ponies());
 
-      out_stream << "clear all\n";
-      out_stream << "clf\n";
-      //out_stream << "x=linspace(" << min << "," << max << "," << n_bins+1 << ");\n";
+      ponies";
+      ponies";
+      //ponies";
 
-      // abscissa values are located at the center of each bin.
-      out_stream << "x=[";
-      for (unsigned int i=0; i<bin_members.size(); ++i)
+      // ponies.
+      ponies=[";
+      ponies)
         {
-          out_stream << min + (i+0.5)*bin_size << " ";
+          ponies << " ";
         }
-      out_stream << "];\n";
+      ponies";
 
-      out_stream << "y=[";
-      for (unsigned int i=0; i<bin_members.size(); ++i)
+      ponies=[";
+      ponies)
         {
-          out_stream << bin_members[i] << " ";
+          ponies] << " ";
         }
-      out_stream << "];\n";
-      out_stream << "bar(x,y);\n";
+      ponies";
+      ponies";
     }
 }
 
 
 
-template <typename T>
-void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
-                                    unsigned int n_bins) const
+ponies>
+ponies,
+                                    ponies
 {
-  StatisticsVector<T> sv = (*this);
+  ponies);
 
-  return sv.histogram(bin_members, n_bins);
+  ponies);
 }
 
 
 
 
-template <typename T>
-std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
+ponies>
+ponies
 {
-  START_LOG ("cut_below()", "StatisticsVector");
+  ponies");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+  ponies;
+  ponies
 
-  for (dof_id_type i=0; i<n; i++)
+  ponies++)
     {
-      if ((*this)[i] < cut)
+      ponies)
         {
-          cut_indices.push_back(i);
+          ponies);
         }
     }
 
-  STOP_LOG ("cut_below()", "StatisticsVector");
+  ponies");
 
-  return cut_indices;
+  ponies;
 }
 
 
 
 
-template <typename T>
-std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
+ponies>
+ponies
 {
-  START_LOG ("cut_above()", "StatisticsVector");
+  ponies");
 
-  const dof_id_type n = cast_int<dof_id_type>(this->size());
+  ponies());
 
-  std::vector<dof_id_type> cut_indices;
-  cut_indices.reserve(n/2);  // Arbitrary
+  ponies;
+  ponies
 
-  for (dof_id_type i=0; i<n; i++)
+  ponies++)
     {
-      if ((*this)[i] > cut)
+      ponies)
         {
-          cut_indices.push_back(i);
+          ponies);
         }
     }
 
-  STOP_LOG ("cut_above()", "StatisticsVector");
+  ponies");
 
-  return cut_indices;
+  ponies;
 }
 
 
 
 
 //------------------------------------------------------------
-// Explicit Instantions
-template class StatisticsVector<float>;
-template class StatisticsVector<double>;
-#ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
-template class StatisticsVector<long double>;
-#endif
-template class StatisticsVector<int>;
-template class StatisticsVector<unsigned int>;
+// ponies
+ponies>;
+ponies>;
+#ponies
+ponies>;
+#ponies
+ponies>;
+ponies>;
 
-} // namespace libMesh
+} // ponies

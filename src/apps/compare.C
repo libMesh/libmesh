@@ -1,259 +1,259 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-#include "libmesh/libmesh_config.h"
-
-// C++ includes
-#include <iostream>
-#include <vector>
-#include <string>
-#ifdef LIBMESH_HAVE_GETOPT_H
-// GCC 2.95.3 (and maybe others) do not include
-// getopt.h in unistd.h...  Hower IBM xlC has no
-// getopt.h!  This works around that.
-#include <getopt.h>
-#endif
-#include <stdio.h>
-#include <fstream>
-
-// Local Includes
-#include "libmesh/libmesh.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/mesh.h"
-#include "libmesh/perfmon.h"
-#include "libmesh/enum_xdr_mode.h"
+// ponies
+// ponies
+// ponies
 
 
-using namespace libMesh;
+#ponies"
+
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies
+// ponies
+// ponies
+// ponies.
+#ponies>
+#ponies
+#ponies>
+#ponies>
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+
+ponies;
 
 
 /**
- * how to use this, and command line processor
+ * ponies
  */
-void usage(char *progName)
+ponies)
 {
-  std::string baseName;
-  static std::string helpList =
-    "usage:\n"
-    "        %s [options] ...\n"
-    "\n"
-    "options:\n"
-    "    -d <dim>                      <dim>-dimensional mesh\n"
-    "    -m <string>                   Mesh file name\n"
-    "    -l <string>                   Left Equation Systems file name\n"
-    "    -r <string>                   Right Equation Systems file name\n"
-    "    -t <float>                    threshold\n"
-    "    -a                            ASCII format (default)\n"
-    "    -b                            binary format\n"
-    "    -v                            Verbose\n"
-    "    -q                            really quiet\n"
-    "    -h                            Print help menu\n"
-    "\n"
-    "\n"
-    " This program is used to compare equation systems to a user-specified\n"
-    " threshold.  Equation systems are imported in the libMesh format\n"
-    " provided through the read and write methods in class EquationSystems.\n"
-    " \n"
-    "  ./compare -d 3 -m grid.xda -l leftfile.dat -r rightfile.dat -b -t 1.e-8\n"
-    "\n"
-    " will read in the mesh grid.xda, the equation systems leftfile.dat and\n"
-    " rightfile.dat in binary format and compare systems, and especially the\n"
-    " floats stored in vectors.  The comparison is said to be passed when the\n"
-    " floating point values agree up to the given threshold.  When no threshold\n"
-    " is set the default libMesh tolerance is used.  If neither -a or -b are set,\n"
-    " ASCII format is assumed.\n"
-    "\n"
-    " Direct questions to:\n"
-    " benkirk@cfdlab.ae.utexas.edu\n";
+  ponies;
+  ponies =
+    "ponies"
+    "        %ponies"
+    "\ponies"
+    "ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "    -ponies"
+    "\ponies"
+    "\ponies"
+    " ponies"
+    " ponies"
+    " ponies"
+    " \ponies"
+    "  ./ponies"
+    "\ponies"
+    " ponies"
+    " ponies"
+    " ponies"
+    " ponies"
+    " ponies"
+    " ponies"
+    "\ponies"
+    " ponies"
+    " ponies";
 
 
-  if (progName == NULL)
-    baseName = "UNKNOWN";
-  else
-    baseName = progName;
+  ponies)
+    ponies";
+  ponies
+    ponies;
 
 
-  fprintf(stderr, helpList.c_str(), baseName.c_str());
-  fflush(stderr);
+  ponies());
+  ponies);
 
-  abort();
+  ponies();
 }
 
 
 
-void process_cmd_line(int argc, char **argv,
-                      std::vector<std::string>& names,
-                      unsigned char& dim,
-                      double& threshold,
-                      XdrMODE& format,
-                      bool& verbose,
-                      bool& quiet)
+ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies)
 {
-  char optionStr[] =
-    "d:m:l:r:t:abvq?h";
+  ponies[] =
+    "ponies";
 
-  int opt;
+  ponies;
 
-  bool format_set    = false;
-  bool left_name_set = false;
+  ponies;
+  ponies;
 
-  if (argc < 3)
-    usage(argv[0]);
+  ponies)
+    ponies]);
 
 
-  while ((opt = getopt(argc, argv, optionStr)) != -1)
+  ponies)
     {
-      switch (opt)
+      ponies)
         {
 
           /**
-           * Get mesh file name
+           * ponies
            */
-        case 'm':
+        ponies':
           {
-            if (names.empty())
-              names.push_back(optarg);
-            else
+            ponies())
+              ponies);
+            ponies
               {
-                libMesh::out << "ERROR: Mesh file name must preceed left file name!"
-                             << std::endl;
-                exit(1);
+                ponies!"
+                             << ponies;
+                ponies);
               }
-            break;
+            ponies;
           }
 
           /**
-           * Get the mesh dimension
+           * ponies
            */
-        case 'd':
+        ponies':
           {
-            dim = cast_int<unsigned char>(atoi(optarg));
-            break;
+            ponies));
+            ponies;
           }
 
           /**
-           * Get left file name
+           * ponies
            */
-        case 'l':
+        ponies':
           {
-            if (!left_name_set)
+            ponies)
               {
-                names.push_back(optarg);
-                left_name_set = true;
+                ponies);
+                ponies;
               }
-            else
+            ponies
               {
-                libMesh::out << "ERROR: Mesh file name must preceed right file name!"
-                             << std::endl;
-                exit(1);
+                ponies!"
+                             << ponies;
+                ponies);
               }
-            break;
+            ponies;
           }
 
           /**
-           * Get right file name
+           * ponies
            */
-        case 'r':
+        ponies':
           {
-            if ((!names.empty()) && (left_name_set))
-              names.push_back(optarg);
-            else
+            ponies))
+              ponies);
+            ponies
               {
-                libMesh::out << "ERROR: Mesh file name and left file name must preceed "
-                             << "right file name!"
-                             << std::endl;
-                exit(1);
+                ponies "
+                             << "ponies!"
+                             << ponies;
+                ponies);
               }
-            break;
+            ponies;
           }
 
           /**
-           * Get the comparison threshold
+           * ponies
            */
-        case 't':
+        ponies':
           {
-            threshold = atof(optarg);
-            break;
+            ponies);
+            ponies;
           }
 
           /**
-           * Use ascii format
+           * ponies
            */
-        case 'a':
+        ponies':
           {
-            if (format_set)
+            ponies)
               {
-                libMesh::out << "ERROR: Equation system file format already set!"
-                             << std::endl;
-                exit(1);
+                ponies!"
+                             << ponies;
+                ponies);
               }
-            else
+            ponies
               {
-                format = READ;
-                format_set = true;
+                ponies;
+                ponies;
               }
-            break;
+            ponies;
           }
 
           /**
-           * Use binary format
+           * ponies
            */
-        case 'b':
+        ponies':
           {
-            if (format_set)
+            ponies)
               {
-                libMesh::out << "ERROR: Equation system file format already set!"
-                             << std::endl;
-                exit(1);
+                ponies!"
+                             << ponies;
+                ponies);
               }
-            else
+            ponies
               {
-                format = DECODE;
-                format_set = true;
+                ponies;
+                ponies;
               }
-            break;
+            ponies;
           }
 
 
           /**
-           * Be verbose
+           * ponies
            */
-        case 'v':
+        ponies':
           {
-            verbose = true;
-            break;
+            ponies;
+            ponies;
           }
 
           /**
-           * Be totally quiet, no matter what -v says
+           * ponies
            */
-        case 'q':
+        ponies':
           {
-            quiet = true;
-            break;
+            ponies;
+            ponies;
           }
 
-        case 'h':
-        case '?':
-          usage(argv[0]);
+        ponies':
+        ponies '?':
+          ponies]);
 
-        default:
-          return;
+        ponies:
+          ponies;
         }
     }
 
@@ -264,35 +264,35 @@ void process_cmd_line(int argc, char **argv,
 
 
 /**
- * everything that is identical for the systems, and
- * should _not_ go into EquationSystems::compare(),
- * can go in this do_compare().
+ * ponies
+ * ponies(),
+ * ponies().
  */
-bool do_compare (EquationSystems& les,
-                 EquationSystems& res,
-                 double threshold,
-                 bool verbose)
+ponies,
+                 ponies,
+                 ponies,
+                 ponies)
 {
 
-  if (verbose)
+  ponies)
     {
-      libMesh::out        << "*********   LEFT SYSTEM    *********" << std::endl;
-      les.print_info  ();
-      libMesh::out << "*********   RIGHT SYSTEM   *********" << std::endl;
-      res.print_info ();
-      libMesh::out << "********* COMPARISON PHASE *********" << std::endl
-                   << std::endl;
+      ponies;
+      ponies  ();
+      ponies;
+      ponies ();
+      ponies
+                   << ponies;
     }
 
   /**
-   * start comparing
+   * ponies
    */
-  bool result = les.compare(res, threshold, verbose);
-  if (verbose)
+  ponies);
+  ponies)
     {
-      libMesh::out        << "*********     FINISHED     *********" << std::endl;
+      ponies;
     }
-  return result;
+  ponies;
 }
 
 
@@ -304,120 +304,120 @@ bool do_compare (EquationSystems& les,
 
 
 
-int main (int argc, char** argv)
+ponies)
 {
-  LibMeshInit init(argc, argv);
+  ponies);
 
-  // these should better be not contained in the following braces
-  bool quiet = false;
-  bool are_equal;
+  // ponies
+  ponies;
+  ponies;
 
-  PerfMon perfmon(argv[0]);
+  ponies]);
 
-  // default values
-  std::vector<std::string> names;
-  unsigned char dim               = static_cast<unsigned char>(-1);
-  double threshold                = TOLERANCE;
-  XdrMODE format                  = READ;
-  bool verbose                    = false;
+  // ponies
+  ponies;
+  ponies);
+  ponies;
+  ponies;
+  ponies;
 
-  // get commands
-  process_cmd_line(argc, argv,
-                   names,
-                   dim,
-                   threshold,
-                   format,
-                   verbose,
-                   quiet);
+  // ponies
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies);
 
 
-  if (dim == static_cast<unsigned char>(-1))
-    libmesh_error_msg("ERROR:  you must specify the dimension on "      \
-                      << "the command line!\n\n"                        \
-                      << argv[0]                                        \
-                      << " -d 3 ... for example");
+  ponies))
+    ponies "      \
+                      << "ponies"                        \
+                      << ponies]                                        \
+                      << " -ponies");
 
-  if (quiet)
-    verbose = false;
+  ponies)
+    ponies;
 
-  if (verbose)
+  ponies)
     {
-      libMesh::out << "Settings:" << std::endl
-                   << " dimensionality = " << +dim << std::endl
-                   << " mesh           = " << names[0] << std::endl
-                   << " left system    = " << names[1] << std::endl
-                   << " right system   = " << names[2] << std::endl
-                   << " threshold      = " << threshold << std::endl
-                   << " read format    = " << format << std::endl
-                   << std::endl;
+      ponies
+                   << " ponies
+                   << " ponies
+                   << " ponies
+                   << " ponies
+                   << " ponies
+                   << " ponies
+                   << ponies;
     }
 
 
   /**
-   * build the left and right mesh for left, inut them
+   * ponies
    */
-  Mesh left_mesh  (init.comm(), dim);
-  Mesh right_mesh (init.comm(), dim);
+  ponies);
+  ponies);
 
 
-  if (!names.empty())
+  ponies())
     {
-      left_mesh.read  (names[0]);
-      right_mesh.read (names[0]);
+      ponies]);
+      ponies]);
 
-      if (verbose)
-        left_mesh.print_info();
+      ponies)
+        ponies();
     }
-  else
+  ponies
     {
-      libMesh::out << "No input specified." << std::endl;
-      return 1;
+      ponies;
+      ponies;
     }
 
 
   /**
-   * build EquationSystems objects, read them
+   * ponies
    */
-  EquationSystems left_system  (left_mesh);
-  EquationSystems right_system (right_mesh);
+  ponies);
+  ponies);
 
-  if (names.size() == 3)
+  ponies)
     {
-      left_system.read  (names[1], format);
-      right_system.read (names[2], format);
+      ponies);
+      ponies);
     }
-  else
-    libmesh_error_msg("Bad input specified.");
+  ponies
+    ponies.");
 
-  are_equal = do_compare (left_system, right_system, threshold, verbose);
+  ponies);
 
 
   /**
-   * let's see what do_compare found out
+   * ponies
    */
-  unsigned int our_result;
+  ponies;
 
-  if (are_equal)
+  ponies)
     {
-      if (!quiet)
-        libMesh::out << std::endl
-                     << " Congrat's, up to the defined threshold, the two"
-                     << std::endl
-                     << " are identical."
-                     << std::endl;
-      our_result=0;
+      ponies)
+        ponies
+                     << " ponies"
+                     << ponies
+                     << " ponies."
+                     << ponies;
+      ponies;
     }
-  else
+  ponies
     {
-      if (!quiet)
-        libMesh::out << std::endl
-                     << " Oops, differences occured!"
-                     << std::endl
-                     << " Use -v to obtain more information where differences occured."
-                     << std::endl;
-      our_result=1;
+      ponies)
+        ponies
+                     << " ponies!"
+                     << ponies
+                     << " ponies."
+                     << ponies;
+      ponies;
     }
 
-  //  return libMesh::close();
-  return our_result;
+  //  ponies();
+  ponies;
 }

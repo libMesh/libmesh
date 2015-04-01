@@ -1,230 +1,230 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_FACE_INF_QUAD_H
-#define LIBMESH_FACE_INF_QUAD_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-// Local includes
-#include "libmesh/elem.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
-// Forward declarations
+// ponies
 
 
 
 /**
- * The \p InfQuad is an abstract element type that lives in
- * two dimensions.  Here, an infinite face is @e always a quadrilateral,
- * so this class is directly derived from \p Elem, without an intermediate
- * \p InfFace class or so.
- * It looks like this:
- * \verbatim
+ * ponies
+ * ponies,
+ * ponies
+ * \ponies.
+ * ponies:
+ * \ponies
  *
- *                                 closer to infinity
+ *                                 ponies
  *        |           |
  *        |           |
- * side 2 |           | side 1
+ * ponies
  *        |           |
  *        |           |
- *         -----------             base side
+ *         -----------             ponies
  *
- *           side 0
+ *           ponies
  *
- * \endverbatim
+ * \ponies
  */
-class InfQuad : public Elem
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Derived classes implement 'true' elements.
+   * ponies.
    */
-  explicit
-  InfQuad (const unsigned int nn,
-           Elem* p,
-           Node** nodelinkdata) :
-    Elem(nn, InfQuad::n_sides(), p, _elemlinks_data, nodelinkdata) {}
+  ponies
+  ponies,
+           ponies,
+           ponies) :
+    ponies) {}
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_less(i, this->n_nodes());
-    return Point(_master_points[i][0],
-                 _master_points[i][1],
-                 _master_points[i][2]);
+    ponies());
+    ponies],
+                 ponies],
+                 ponies]);
   }
 
   /**
-   * @returns 2, the dimensionality of the object.
+   * @ponies.
    */
-  unsigned int dim() const { return 2; }
+  ponies; }
 
   //   /**
-  //    * @returns 2 for the base, 1 otherwise
+  //    * @ponies
   //    */
-  //   unsigned int n_children_per_side(const unsigned int s) const;
+  //   ponies;
 
   /**
-   * @returns 3.  Infinite faces have one side less
-   * than their conventional counterparts, since one
-   * side is supposed to be located at infinity.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  unsigned int n_sides() const { return 3; }
+  ponies; }
 
   /**
-   * @returns 4.  All infinite quads (in our setting) have 4 vertices.
+   * @ponies.
    */
-  unsigned int n_vertices() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 3.  All infinite quads have 1 edge in the
-   * base, and 2 perpendicular to the base.
+   * @ponies
+   * ponies.
    */
-  unsigned int n_edges() const { return 3; }
+  ponies; }
 
   /**
-   * @returns 0.  All 2D elements have no faces, just
-   * edges.
+   * @ponies
+   * ponies.
    */
-  unsigned int n_faces() const { return 0; }
+  ponies; }
 
   /**
-   * @returns 2
+   * @ponies
    */
-  unsigned int n_children() const { return 2; }
+  ponies; }
 
   /*
-   * @returns true iff the specified child is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+  ponies,
+                                ponies;
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type key (const unsigned int s) const;
+  ponies;
 
   /**
-   * @returns a primitive (2-noded) edge or infedge for
-   * edge \p i.
+   * @ponies
+   * ponies.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  ponies;
 
   /**
-   * build_edge and build_side are identical in 2D
+   * ponies
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const
-  { return build_side(i); }
+  ponies
+  { ponies); }
 
   /*
-   * is_edge_on_side is trivial in 2D
+   * ponies
    */
-  virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const
-  { return (e == s); }
+  ponies,
+                               ponies
+  { ponies); }
 
   /**
-   * Based on the quality metric \p q specified by the user,
-   * returns a quantitative assessment of element quality.
+   * ponies,
+   * ponies.
    */
-  Real quality (const ElemQuality q) const;
+  ponies;
 
   /**
-   * Returns the suggested quality bounds for
-   * the hex based on quality measure q.  These are
-   * the values suggested by the CUBIT User's Manual.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
+  ponies;
 
   /**
-   * @returns \p true.  All classes derived from \p InfQuad
-   * are infinite elements.
+   * @ponies
+   * ponies.
    */
-  bool infinite () const { return true; }
+  ponies; }
 
   /**
-   * @returns the origin of this infinite element.
+   * @ponies.
    */
-  Point origin () const;
+  ponies;
 
 
-protected:
+ponies:
 
   /**
-   * Data for links to parent/neighbor/interior_parent elements.
+   * ponies.
    */
-  Elem* _elemlinks_data[4+(LIBMESH_DIM>2)];
+  ponies)];
 
   /**
-   * Master element node locations
+   * ponies
    */
-  static const Real _master_points[6][3];
+  ponies];
 };
 
 
 
 // ------------------------------------------------------------
-// InfQuad class member functions
-// inline
-// unsigned int InfQuad::n_children_per_side(const unsigned int s) const
+// ponies
+// ponies
+// ponies
 // {
-//   libmesh_assert_less (s, this->n_sides());
+//   ponies());
 
-//   switch (s)
+//   ponies)
 //   {
-//     case 0:
-//       // every infinite face has 2 children in the base edge
-//       return 2;
+//     ponies:
+//       // ponies
+//       ponies;
 
-//     default:
-//       // on infinite edges only 1 child
-//       return 1;
+//     ponies:
+//       // ponies
+//       ponies;
 //   }
 // }
 
 
 
-inline
-Point InfQuad::origin () const
+ponies
+ponies
 {
-  return ( this->point(0)*2 - this->point(this->n_vertices()/2) );
+  ponies) );
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-#endif // LIBMESH_FACE_INF_QUAD_H
+#ponies

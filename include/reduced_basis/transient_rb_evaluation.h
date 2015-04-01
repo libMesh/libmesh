@@ -1,255 +1,255 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_TRANSIENT_RB_EVALUATION_H
-#define LIBMESH_TRANSIENT_RB_EVALUATION_H
+#ponies
+#ponies
 
-// rbOOmit includes
-#include "libmesh/rb_evaluation.h"
-#include "libmesh/rb_temporal_discretization.h"
+// ponies
+#ponies"
+#ponies"
 
-// libMesh includes
+// ponies
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-class TransientRBThetaExpansion;
+ponies;
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * TransientRBEvaluation extends RBEvaluation to
- * encapsulate the code and data required
- * to perform "online" RB evaluations for
- * Linear Time Invariant (LTI) transient problems.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * We can handle time controls on the RHS as h(t)*f(x,\mu).
- * See Martin Grepl's thesis for more details.
+ * ponies).
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 
 // ------------------------------------------------------------
-// TransientRBEvaluation class definition
+// ponies
 
-class TransientRBEvaluation : public RBEvaluation, public RBTemporalDiscretization
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  TransientRBEvaluation (const Parallel::Communicator &comm_in
-                         LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                         ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~TransientRBEvaluation ();
+  ~ponies ();
 
   /**
-   * The type of the parent.
+   * ponies.
    */
-  typedef RBEvaluation Parent;
+  ponies;
 
   /**
-   * Clear this TransientRBEvaluation object.
-   * Override to also clear the M_q representors
+   * ponies.
+   * ponies
    */
-  virtual void clear();
+  ponies();
 
   /**
-   * Resize and clear the data vectors corresponding to the
-   * value of \p Nmax. Optionally resize the data structures
-   * required for the error bound.
-   * Overridden to resize data relevant in the time-dependent
-   * case.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void resize_data_structures(const unsigned int Nmax,
-                                      bool resize_error_bound_data=true);
+  ponies,
+                                      ponies);
 
   /**
-   * Perform online solve for current_params
-   * with the N basis functions. Overridden
-   * to perform a time-dependent solve.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real rb_solve(unsigned int N);
+  ponies);
 
   /**
-   * If a solve has already been performed, then we cached some data
-   * and we can perform a new solve much more rapidly
-   * (with the same parameters but a possibly different initial condition/rhs control).
+   * ponies
+   * ponies
+   * (ponies).
    */
-  virtual Real rb_solve_again();
+  ponies();
 
   /**
-   * Override to return the L2 norm of RB_solution.
+   * ponies.
    */
-  virtual Real get_rb_solution_norm();
+  ponies();
 
   /**
-   * Specifies the residual scaling on the numerator to
-   * be used in the a posteriori error bound. Override
-   * in subclass in order to obtain the desired error bound.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real residual_scaling_numer(Real alpha_LB);
+  ponies);
 
   /**
-   * Compute the dual norm of the residual for the solution
-   * saved in RB_solution. This function uses the cached time-independent
-   * data.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real compute_residual_dual_norm(const unsigned int N);
+  ponies);
 
   /**
-   * Compute the dual norm of the residual for the solution
-   * saved in RB_solution. This function does not used the cached
-   * data and therefore also works when the parameter changes as
-   * a function of time.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real uncached_compute_residual_dual_norm(const unsigned int N);
+  ponies);
 
   /**
-   * Helper function for caching the terms in the
-   * online residual assembly that do not change in time.
-   * (This is only useful when the parameter is fixed in time.)
+   * ponies
+   * ponies.
+   * (ponies.)
    */
-  void cache_online_residual_terms(const unsigned int N);
+  ponies);
 
   /**
-   * Clear all the Riesz representors that are used to compute the RB residual
-   * (and hence error bound). This is useful since once we complete the Greedy
-   * we may not need the representors any more.
-   * Override to clear the M_q representors.
+   * ponies
+   * (ponies
+   * ponies.
+   * ponies.
    */
-  virtual void clear_riesz_representors();
+  ponies();
 
   /**
-   * Write out all the data to text files in order to segregate the
-   * Offline stage from the Online stage.
+   * ponies
+   * ponies.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
-                                           const bool write_binary_data=true);
+  ponies",
+                                           ponies);
 
   /**
-   * Read in the saved Offline reduced basis data
-   * to initialize the system for Online solves.
+   * ponies
+   * ponies.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
-                                            bool read_error_bound_data=true,
-                                            const bool read_binary_data=true);
+  ponies",
+                                            ponies,
+                                            ponies);
 
-  //----------- PUBLIC DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * Dense RB L2 matrix.
+   * ponies.
    */
-  DenseMatrix<Number> RB_L2_matrix;
+  ponies;
 
   /**
-   * Cached data for subsequent solves.
+   * ponies.
    */
-  DenseMatrix<Number> RB_LHS_matrix;
-  DenseMatrix<Number> RB_RHS_matrix;
-  DenseVector<Number> RB_RHS_save;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Dense matrices for the RB mass matrices.
+   * ponies.
    */
-  std::vector< DenseMatrix<Number> > RB_M_q_vector;
+  ponies;
 
   /**
-   * The RB outputs for all time-levels from the
-   * most recent rb_solve.
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector<Number> > RB_outputs_all_k;
+  ponies;
 
   /**
-   * The error bounds for each RB output for all
-   * time-levels from the most recent rb_solve.
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector<Real> > RB_output_error_bounds_all_k;
+  ponies;
 
   /**
-   * The RB solution at the previous time-level.
+   * ponies.
    */
-  DenseVector<Number> old_RB_solution;
+  ponies;
 
   /**
-   * Array storing the solution data at each time level from the most recent solve.
+   * ponies.
    */
-  std::vector< DenseVector<Number> > RB_temporal_solution_data;
+  ponies;
 
   /**
-   * The error bound data for all time-levels from the
-   * most recent rb_solve.
+   * ponies
+   * ponies.
    */
-  std::vector< Real > error_bound_all_k;
+  ponies;
 
   /**
-   * Vector storing initial L2 error for all
-   * 1 <= N <= RB_size.
+   * ponies
+   * ponies.
    */
-  std::vector<Real> initial_L2_error_all_N;
+  ponies;
 
   /**
-   * The RB initial conditions (i.e. L2 projection of the truth
-   * initial condition) for each N.
+   * ponies
+   * ponies.
    */
-  std::vector< DenseVector<Number> > RB_initial_condition_all_N;
+  ponies;
 
   /**
-   * Vectors storing the residual representor inner products
-   * to be used in computing the residuals online.
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_innerprods;
-  std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_innerprods;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_innerprods;
+  ponies;
+  ponies;
+  ponies;
 
 
   /**
-   * Cached residual terms. These can be used to accelerate residual calculations
-   * when we have an LTI system.
+   * ponies
+   * ponies.
    */
-  Number cached_Fq_term;
-  DenseVector<Number> cached_Fq_Aq_vector;
-  DenseMatrix<Number> cached_Aq_Aq_matrix;
-  DenseVector<Number> cached_Fq_Mq_vector;
-  DenseMatrix<Number> cached_Aq_Mq_matrix;
-  DenseMatrix<Number> cached_Mq_Mq_matrix;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Vector storing the mass matrix representors.
-   * These are basis dependent and hence stored here.
+   * ponies.
+   * ponies.
    */
-  std::vector< std::vector< NumericVector<Number>* > > M_q_representor;
+  ponies;
 
   /**
-   * Check that the data has been cached in case of using rb_solve_again
+   * ponies
    */
-  bool _rb_solve_data_cached;
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_TRANSIENT_RB_EVALUATION_H
+#ponies

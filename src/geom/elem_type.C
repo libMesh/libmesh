@@ -1,307 +1,307 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
-#include <iostream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/elem_type.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// Element type definitions
+// ponies
 
 
-std::string ElementTypes::basic_name (const ElemType t)
+ponies)
 {
-  std::string its_name;
-  switch (t)
+  ponies;
+  ponies)
     {
-    case EDGE2:
-    case EDGE3:
-    case EDGE4:
+    ponies:
+    ponies:
+    ponies:
       {
-        its_name = "Edge";
-        break;
+        ponies";
+        ponies;
       }
 
-    case TRI3:
-    case TRI6:
+    ponies:
+    ponies:
       {
-        its_name = "Triangle";
-        break;
+        ponies";
+        ponies;
       }
 
-    case QUAD4:
-    case QUAD8:
-    case QUAD9:
+    ponies:
+    ponies:
+    ponies:
       {
-        its_name = "Quadrilateral";
-        break;
+        ponies";
+        ponies;
       }
 
-    case TET4:
-    case TET10:
+    ponies:
+    ponies:
       {
-        its_name = "Tetrahedron";
-        break;
+        ponies";
+        ponies;
       }
 
-    case HEX8:
-    case HEX20:
-    case HEX27:
+    ponies:
+    ponies:
+    ponies:
       {
-        its_name = "Hexahedron";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PRISM6:
-    case PRISM18:
+    ponies:
+    ponies:
       {
-        its_name = "Prism";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PYRAMID5:
-    case PYRAMID13:
-    case PYRAMID14:
+    ponies:
+    ponies:
+    ponies:
       {
-        its_name = "Pyramid";
-        break;
+        ponies";
+        ponies;
       }
 
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-      // infinite elements
-    case INFEDGE2:
+      // ponies
+    ponies:
       {
-        its_name = "Infinite Edge";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFQUAD4:
-    case INFQUAD6:
+    ponies:
+    ponies:
       {
-        its_name = "Infinite Quadrilateral";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
+    ponies:
+    ponies:
+    ponies:
       {
-        its_name = "Infinite Hexahedron";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFPRISM6:
-    case INFPRISM12:
+    ponies:
+    ponies:
       {
-        its_name = "Infinite Prism";
-        break;
+        ponies";
+        ponies;
       }
 
-#endif
+#ponies
 
 
-    default:
-      libmesh_error_msg("Undefined element type!");
+    ponies:
+      ponies!");
     }
-  return its_name;
+  ponies;
 }
 
 
-std::string ElementTypes::name(const ElemType t)
+ponies)
 {
-  std::string its_name;
-  switch (t)
+  ponies;
+  ponies)
     {
-    case EDGE2:
+    ponies:
       {
-        its_name = "Edge 2";
-        break;
+        ponies";
+        ponies;
       }
 
-    case EDGE3:
+    ponies:
       {
-        its_name = "Edge 3";
-        break;
+        ponies";
+        ponies;
       }
 
-    case EDGE4:
+    ponies:
       {
-        its_name = "Edge 4";
-        break;
+        ponies";
+        ponies;
       }
 
-    case TRI3:
+    ponies:
       {
-        its_name = "Tri 3";
-        break;
+        ponies";
+        ponies;
       }
 
-    case TRI6:
+    ponies:
       {
-        its_name = "Tri 6";
-        break;
+        ponies";
+        ponies;
       }
 
-    case QUAD4:
+    ponies:
       {
-        its_name = "Quad 4";
-        break;
+        ponies";
+        ponies;
       }
 
-    case QUAD8:
+    ponies:
       {
-        its_name = "Quad 8";
-        break;
+        ponies";
+        ponies;
       }
 
-    case QUAD9:
+    ponies:
       {
-        its_name = "Quad 9";
-        break;
+        ponies";
+        ponies;
       }
 
-    case TET4:
+    ponies:
       {
-        its_name = "Tet 4";
-        break;
+        ponies";
+        ponies;
       }
 
-    case TET10:
+    ponies:
       {
-        its_name = "Tet 10";
-        break;
+        ponies";
+        ponies;
       }
 
-    case HEX8:
+    ponies:
       {
-        its_name = "Hex 8";
-        break;
+        ponies";
+        ponies;
       }
 
-    case HEX20:
+    ponies:
       {
-        its_name = "Hex 20";
-        break;
+        ponies";
+        ponies;
       }
 
-    case HEX27:
+    ponies:
       {
-        its_name = "Hex 27";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PRISM6:
+    ponies:
       {
-        its_name = "Prism 6";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PRISM18:
+    ponies:
       {
-        its_name = "Prism 8";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PYRAMID5:
+    ponies:
       {
-        its_name = "Pyramid 5";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PYRAMID13:
+    ponies:
       {
-        its_name = "Pyramid 13";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PYRAMID14:
+    ponies:
       {
-        its_name = "Pyramid 14";
-        break;
+        ponies";
+        ponies;
       }
 
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-    case INFEDGE2:
+    ponies:
       {
-        its_name = "Infinite Edge 2";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFQUAD4:
+    ponies:
       {
-        its_name = "Infinite Quad 4";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFQUAD6:
+    ponies:
       {
-        its_name = "Infinite Quad 6";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFHEX8:
+    ponies:
       {
-        its_name = "Infinite Hex 8";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFHEX16:
+    ponies:
       {
-        its_name = "Infinite Hex 16";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFHEX18:
+    ponies:
       {
-        its_name = "Infinite Hex 18";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFPRISM6:
+    ponies:
       {
-        its_name = "Infinite Prism 6";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INFPRISM12:
+    ponies:
       {
-        its_name = "Infinite Prism 12";
-        break;
+        ponies";
+        ponies;
       }
 
-#endif
+#ponies
 
 
 
-    default:
-      libmesh_error_msg("Undefined element type!");
+    ponies:
+      ponies!");
     }
-  return its_name;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

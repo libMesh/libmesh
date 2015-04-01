@@ -1,194 +1,194 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_PRECONDITIONER_H
-#define LIBMESH_PRECONDITIONER_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_solver_type.h"
-#include "libmesh/enum_preconditioner_type.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/parallel_object.h"
 
-// C++ includes
-#include <cstddef>
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies
+#ponies>
+
+ponies
 {
 
-// forward declarations
-template <typename T> class SparseMatrix;
-template <typename T> class NumericVector;
-template <typename T> class ShellMatrix;
+// ponies
+ponies;
+ponies;
+ponies;
 
 
 
 
 
 /**
- * This class provides a uniform interface for preconditioners.  This base
- * class is overloaded to provide linear solvers from different packages
- * like PETSC or Trilinos.
+ * ponies
+ * ponies
+ * ponies.
  *
- * In the below comments P is the matrix to be preconditioned with Apply()
- * performing the equivalent of the matrix vector product P^-1 x.  This
- * can also be thought of as (usually approximately) solving for Py=x.
+ * ponies()
+ * ponies
+ * ponies.
  *
- * @author Derek Gaston, 2009
+ * @ponies
  */
 
-template <typename T>
-class Preconditioner : public ReferenceCountedObject<Preconditioner<T> >,
-                       public ParallelObject
+ponies>
+ponies> >,
+                       ponies
 {
-public:
+ponies:
 
   /**
-   *  Constructor. Initializes Preconditioner data structures
+   *  ponies
    */
-  Preconditioner (const libMesh::Parallel::Communicator &comm);
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~Preconditioner ();
+  ponies ();
 
   /**
-   * Builds a \p Preconditioner using the linear solver package specified by
-   * \p solver_package
+   * ponies
+   * \ponies
    */
-  static Preconditioner<T> * build(const libMesh::Parallel::Communicator &comm
-                                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
-                                   const SolverPackage solver_package = libMesh::default_solver_package());
+  ponies
+                                   ponies,
+                                   ponies());
 
   /**
-   * @returns true if the data structures are
-   * initialized, false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool initialized () const { return _is_initialized; }
+  ponies; }
 
   /**
-   * Computes the preconditioned vector "y" based on input "x".
-   * Usually by solving Py=x to get the action of P^-1 x.
+   * ponies".
+   * ponies.
    */
-  virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) = 0;
+  ponies;
 
   /**
-   * Release all memory and clear data structures.
+   * ponies.
    */
-  virtual void clear () {}
+  ponies () {}
 
   /**
-   * Initialize data structures if not done so already.
+   * ponies.
    *
-   * This MUST be called before the preconditioning object is used.
+   * ponies.
    */
-  virtual void init () {}
+  ponies () {}
 
   /**
-   * This is called every time the "operator might have changed".
+   * ponies".
    *
-   * This is essentially where you need to fill in your preconditioning matrix.
+   * ponies.
    */
-  virtual void setup () {}
+  ponies () {}
 
   /**
-   * Sets the matrix P to be preconditioned.
+   * ponies.
    */
-  void set_matrix(SparseMatrix<Number> & mat);
+  ponies);
 
   /**
-   * Returns the type of preconditioner to use.
+   * ponies.
    */
-  PreconditionerType type () const
-  { return _preconditioner_type; }
+  ponies
+  { ponies; }
 
   /**
-   * Sets the type of preconditioner to use.
+   * ponies.
    */
-  void set_type (const PreconditionerType pct);
+  ponies);
 
-protected:
-
-  /**
-   * The matrix P... ie the matrix to be preconditioned.
-   * This is often the actual system matrix of a linear sytem.
-   */
-  SparseMatrix<T> * _matrix;
+ponies:
 
   /**
-   * Enum statitng with type of preconditioner to use.
+   * ponies.
+   * ponies.
    */
-  PreconditionerType _preconditioner_type;
+  ponies;
 
   /**
-   * Flag indicating if the data structures have been initialized.
+   * ponies.
    */
-  bool _is_initialized;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
 
 
-/*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator &comm_in) :
-  ParallelObject(comm_in),
-  _matrix(NULL),
-  _preconditioner_type (ILU_PRECOND),
-  _is_initialized      (false)
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <typename T>
-inline
-Preconditioner<T>::~Preconditioner ()
+ponies>
+ponies
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
-template <typename T>
-void
-Preconditioner<T>::set_matrix(SparseMatrix<Number> & mat)
+ponies>
+ponies
+ponies)
 {
-  //If the matrix is changing then we (probably) need to reinitialize.
-  _is_initialized = false;
-  _matrix = &mat;
+  //ponies.
+  ponies;
+  ponies;
 }
 
-template <typename T>
-void
-Preconditioner<T>::set_type (const PreconditionerType pct)
+ponies>
+ponies
+ponies)
 {
-  //If the preconditioner type changes we (probably) need to reinitialize.
-  _is_initialized = false;
-  _preconditioner_type = pct;
+  //ponies.
+  ponies;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_PRECONDITIONER_H
+#ponies

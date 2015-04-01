@@ -1,80 +1,80 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_LOCATION_MAPS_H
-#define LIBMESH_LOCATION_MAPS_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
-#include "libmesh/point.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include LIBMESH_INCLUDE_UNORDERED_MULTIMAP
-#include <vector>
+// ponies   -----------------------------------
+#ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations -----------------------------
-class Elem;
-class MeshBase;
-class Node;
+// ponies -----------------------------
+ponies;
+ponies;
+ponies;
 
 
 /**
- * Data structures that enable location-based lookups
- * The key is a hash of the Point location.
- * For efficiency we will use a hashed multimap if it is
- * available, otherwise a regular multimap.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
-template <typename T>
-class LocationMap
+ponies>
+ponies
 {
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<unsigned int, T*> map_type;
-public:
-  void init(MeshBase&);
+  ponies;
+ponies:
+  ponies&);
 
-  void clear() { _map.clear(); }
+  ponies(); }
 
-  void insert(T&);
+  ponies&);
 
-  bool empty() const { return _map.empty(); }
+  ponies(); }
 
-  T* find(const Point&,
-          const Real tol = TOLERANCE);
+  ponies&,
+          ponies);
 
-  Point point_of(const T&) const;
+  ponies;
 
-protected:
-  unsigned int key(const Point&);
+ponies:
+  ponies&);
 
-  void fill(MeshBase&);
+  ponies&);
 
-private:
-  map_type          _map;
-  std::vector<Real> _lower_bound;
-  std::vector<Real> _upper_bound;
+ponies:
+  ponies;
+  ponies;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_LOCATION_MAPS_H
+#ponies

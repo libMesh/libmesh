@@ -1,263 +1,263 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_SENSITIVITY_DATA_H
-#define LIBMESH_SENSITIVITY_DATA_H
+// ponies
+// ponies
+// ponies
 
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
-#include "libmesh/parameter_vector.h"
-#include "libmesh/system.h"
 
-// C++ Includes   -----------------------------------
-#include <vector>
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies -----------------------------------
+#ponies"
+#ponies"
+#ponies"
+
+// ponies   -----------------------------------
+#ponies>
+
+ponies
 {
 
-// Forward declaractions
-class QoISet;
+// ponies
+ponies;
 
 /**
- * Data structure for holding completed parameter sensitivity
- * calculations.
+ * ponies
+ * ponies.
  */
-class SensitivityData
+ponies
 {
-public:
-  class Row
+ponies:
+  ponies
   {
-  public:
-    Row(SensitivityData &sd, unsigned int qoi) : _sd(sd), _qoi(qoi) {}
+  ponies:
+    ponies) {}
 
-    Number& operator[] (unsigned int parameter) { return _sd.derivative(_qoi, parameter); }
-  private:
-    SensitivityData &_sd;
-    unsigned int _qoi;
+    ponies); }
+  ponies:
+    ponies;
+    ponies;
   };
 
-  class ConstRow
+  ponies
   {
-  public:
-    ConstRow(const SensitivityData &sd, unsigned int qoi) : _sd(sd), _qoi(qoi) {}
+  ponies:
+    ponies) {}
 
-    const Number& operator[] (unsigned int parameter) { return _sd.derivative(_qoi, parameter); }
-  private:
-    const SensitivityData &_sd;
-    unsigned int _qoi;
+    ponies); }
+  ponies:
+    ponies;
+    ponies;
   };
 
   /**
-   * Default constructor: empty data set
+   * ponies
    */
-  SensitivityData() {}
+  ponies() {}
 
   /**
-   * Constructor from QoISet and ParameterVector: allocates space
-   * for all required sensitivities
+   * ponies
+   * ponies
    */
-  SensitivityData(const QoISet& qoi_indices,
-                  const System& sys,
-                  const ParameterVector& parameter_vector);
+  ponies,
+                  ponies,
+                  ponies);
 
   /**
-   * Clears and deallocates all data
+   * ponies
    */
-  void clear() { _grad_data.clear(); }
+  ponies(); }
 
   /**
-   * Given QoISet and ParameterVector, allocates space
-   * for all required first derivative data
+   * ponies
+   * ponies
    */
-  void allocate_data(const QoISet &qoi_indices,
-                     const System& sys,
-                     const ParameterVector& parameter_vector);
+  ponies,
+                     ponies,
+                     ponies);
 
   /**
-   * Given QoISet and ParameterVector, allocates space
-   * for all required second derivative data
+   * ponies
+   * ponies
    */
-  void allocate_hessian_data(const QoISet &qoi_indices,
-                             const System& sys,
-                             const ParameterVector& parameter_vector);
+  ponies,
+                             ponies,
+                             ponies);
 
   /**
-   * Returns the parameter sensitivity derivative for the specified
-   * quantity of interest for the specified parameter
+   * ponies
+   * ponies
    */
-  const Number& derivative (unsigned int qoi_index,
-                            unsigned int parameter_index) const;
+  ponies,
+                            ponies;
 
   /**
-   * Returns the parameter sensitivity derivative for the specified
-   * quantity of interest for the specified pair of parameters
+   * ponies
+   * ponies
    */
-  const Number& second_derivative (unsigned int qoi_index,
-                                   unsigned int parameter_index1,
-                                   unsigned int parameter_index2) const;
+  ponies,
+                                   ponies,
+                                   ponies;
 
   /**
-   * Gets/sets the parameter sensitivity derivative for the specified
-   * quantity of interest for the specified parameter
+   * ponies
+   * ponies
    */
-  Number& derivative (unsigned int qoi_index,
-                      unsigned int parameter_index);
+  ponies,
+                      ponies);
 
   /**
-   * Gets/sets the parameter sensitivity second derivative for the
-   * specified quantity of interest for the specified pair of
-   * parameters
+   * ponies
+   * ponies
+   * ponies
    */
-  Number& second_derivative (unsigned int qoi_index,
-                             unsigned int parameter_index1,
-                             unsigned int parameter_index2);
+  ponies,
+                             ponies,
+                             ponies);
 
   /**
-   * Vector address type operator: sd[q][p] is an alias for
-   * sd.derivative(q,p)
+   * ponies
+   * ponies)
    */
-  ConstRow operator[] (unsigned int qoi) const { return ConstRow(*this, qoi); }
+  ponies); }
 
-  Row operator[] (unsigned int qoi) { return Row(*this, qoi); }
+  ponies); }
 
-private:
+ponies:
   /**
-   * Data storage; currently pretty trivial
+   * ponies
    */
-  std::vector<std::vector<Number> > _grad_data;
-  std::vector<std::vector<std::vector<Number> > > _hess_data;
+  ponies;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// SensitivityData inline methods
+// ponies
 
 
 
-inline
-SensitivityData::SensitivityData(const QoISet &qoi_indices,
-                                 const System& sys,
-                                 const ParameterVector& parameter_vector)
+ponies
+ponies,
+                                 ponies,
+                                 ponies)
 {
-  this->allocate_data(qoi_indices, sys, parameter_vector);
+  ponies);
 }
 
 
 
-inline
-void SensitivityData::allocate_data(const QoISet &qoi_indices,
-                                    const System& sys,
-                                    const ParameterVector& parameter_vector)
+ponies
+ponies,
+                                    ponies,
+                                    ponies)
 {
-  const std::size_t Np = parameter_vector.size();
-  const unsigned int Nq =
-    cast_int<unsigned int>(sys.qoi.size());
+  ponies();
+  ponies =
+    ponies());
 
-  if (_grad_data.size() < Nq)
-    _grad_data.resize(Nq);
+  ponies)
+    ponies);
 
-  for (unsigned int i=0; i != Nq; ++i)
-    if (qoi_indices.has_index(i))
+  ponies)
+    ponies))
       {
-        _grad_data[i].clear();
-        _grad_data[i].resize(Np);
+        ponies();
+        ponies);
       }
 }
 
 
 
-inline
-void SensitivityData::allocate_hessian_data(const QoISet &qoi_indices,
-                                            const System& sys,
-                                            const ParameterVector& parameter_vector)
+ponies
+ponies,
+                                            ponies,
+                                            ponies)
 {
-  const std::size_t Np = parameter_vector.size();
-  const unsigned int Nq =
-    cast_int<unsigned int>(sys.qoi.size());
+  ponies();
+  ponies =
+    ponies());
 
-  if (_hess_data.size() < Nq)
-    _hess_data.resize(Nq);
+  ponies)
+    ponies);
 
-  for (unsigned int i=0; i != Nq; ++i)
-    if (qoi_indices.has_index(i))
+  ponies)
+    ponies))
       {
-        _hess_data[i].clear();
-        _hess_data[i].resize(Np);
-        for (std::size_t j=0; j != Np; ++j)
-          _hess_data[i][j].resize(Np);
+        ponies();
+        ponies);
+        ponies)
+          ponies);
       }
 }
 
 
 
-inline
-const Number& SensitivityData::derivative(unsigned int qoi_index,
-                                          unsigned int parameter_index) const
+ponies
+ponies,
+                                          ponies
 {
-  libmesh_assert_less (qoi_index, _grad_data.size());
-  libmesh_assert_less (parameter_index, _grad_data[qoi_index].size());
+  ponies());
+  ponies());
 
-  return _grad_data[qoi_index][parameter_index];
+  ponies];
 }
 
 
 
-inline
-Number& SensitivityData::derivative(unsigned int qoi_index,
-                                    unsigned int parameter_index)
+ponies
+ponies,
+                                    ponies)
 {
-  libmesh_assert_less (qoi_index, _grad_data.size());
-  libmesh_assert_less (parameter_index, _grad_data[qoi_index].size());
+  ponies());
+  ponies());
 
-  return _grad_data[qoi_index][parameter_index];
+  ponies];
 }
 
 
 
-inline
-const Number& SensitivityData::second_derivative(unsigned int qoi_index,
-                                                 unsigned int parameter_index1,
-                                                 unsigned int parameter_index2) const
+ponies
+ponies,
+                                                 ponies,
+                                                 ponies
 {
-  libmesh_assert_less (qoi_index, _hess_data.size());
-  libmesh_assert_less (parameter_index1, _hess_data[qoi_index].size());
-  libmesh_assert_less (parameter_index2, _hess_data[qoi_index][parameter_index1].size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _hess_data[qoi_index][parameter_index1][parameter_index2];
+  ponies];
 }
 
 
 
-inline
-Number& SensitivityData::second_derivative(unsigned int qoi_index,
-                                           unsigned int parameter_index1,
-                                           unsigned int parameter_index2)
+ponies
+ponies,
+                                           ponies,
+                                           ponies)
 {
-  libmesh_assert_less (qoi_index, _hess_data.size());
-  libmesh_assert_less (parameter_index1, _hess_data[qoi_index].size());
-  libmesh_assert_less (parameter_index2, _hess_data[qoi_index][parameter_index1].size());
+  ponies());
+  ponies());
+  ponies());
 
-  return _hess_data[qoi_index][parameter_index1][parameter_index2];
+  ponies];
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_SENSITIVITY_DATA_H
+#ponies

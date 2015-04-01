@@ -1,571 +1,571 @@
-// Copyright (C) 2002-2007  Benjamin S. Kirk
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <fstream>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/plt_loader.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
-// extern "C" {
+// ponies" {
 
-//   void open_   (const int*, const char*, int*);
-//   void idata_  (const int*, int*, int*);
-//   void fdata_  (const int*, float*, int*);
-//   void ddata_  (const int*, double*, int*);
-//   void close_  (const int*);
+//   ponies*);
+//   ponies*);
+//   ponies*);
+//   ponies*);
+//   ponies*);
 // }
 
 
 
 //-----------------------------------------------------------------------------
-// PltLoader write members
-// void PltLoader::write_plot3d (const std::string& basename,
-//       const bool reverse,
-//       const bool gridonly) const
+// ponies
+// ponies,
+//       ponies,
+//       ponies
 // {
-//   const std::string gname = basename + ".g";
-//   const std::string qname = basename + ".q";
+//   ponies";
+//   ponies";
 
-//   // FORTAN file unit numbers
-//   const int gunit = 25;
-//   const int qunit = 26;
+//   // ponies
+//   ponies;
+//   ponies;
 
-//   // Tell the user what files we are creating
-//   if (this->verbose())
+//   // ponies
+//   ponies())
 //     {
-//       libMesh::out << "Plot3D output will be written to " << gname;
+//       ponies;
 
-//       if (!gridonly)
-// libMesh::out << " and " << qname;
+//       ponies)
+// ponies;
 
-//       libMesh::out << std::endl;
+//       ponies;
 //     }
 
 
-//   // Open the FORTRAN unformatted file
+//   // ponies
 //   {
-//     libmesh_assert_equal_to (gname.size(), qname.size());
-//     int len = gname.size();
+//     ponies());
+//     ponies();
 
-//     open_ (&gunit, gname.c_str(), &len);
+//     ponies);
 
-//     if (!gridonly)
-//       open_ (&qunit, qname.c_str(), &len);
+//     ponies)
+//       ponies);
 //   }
 
-//   // Write the headers
+//   // ponies
 //   {
-//     std::vector<int> ints;
-//     ints.reserve (3*this->n_zones());
+//     ponies;
+//     ponies());
 
-//     for (unsigned int zn=0; zn<this->n_zones(); zn++)
+//     ponies++)
 //       {
-// ints.push_back(this->imax(zn));
-// ints.push_back(this->jmax(zn));
-// ints.push_back(this->kmax(zn));
+// ponies));
+// ponies));
+// ponies));
 //       }
 
-//     int nb  = this->n_zones();
-//     int one = 1;
-//     int len = ints.size();
+//     ponies();
+//     ponies;
+//     ponies();
 
-//     libmesh_assert_equal_to (static_cast<unsigned int>(len), 3*this->n_zones());
+//     ponies());
 
-//     idata_ (&gunit, &nb, &one);
-//     idata_ (&gunit, &ints[0], &len);
+//     ponies);
+//     ponies);
 
-//     if (!gridonly)
+//     ponies)
 //       {
-// idata_ (&qunit, &nb, &one);
-// idata_ (&qunit, &ints[0], &len);
+// ponies);
+// ponies);
 //       }
 //   }
 
 
-//   // Variables to write to plot3D file
-//   std::vector<unsigned int> write_vars;
-//   write_vars.reserve (5);
+//   // ponies
+//   ponies;
+//   ponies);
 
-//   std::fill (write_vars.begin(), write_vars.end(), 0);
+//   ponies);
 
 
 //   //------------------------------------------------------------------------
-//   // Ask the user which variables to write
-//   if (!gridonly)
+//   // ponies
+//   ponies)
 //     {
-//       libMesh::out << "Variables:" << std::endl;
+//       ponies;
 
-//       for (unsigned int v=0; v<this->n_vars(); v++)
-// libMesh::out << " " << v << ") \"" << this->var_name(v) << "\""
-//   << std::endl;
-//       libMesh::out << std::endl;
+//       ponies++)
+// ponies) << "\""
+//   << ponies;
+//       ponies;
 
-//       int n_write_vars = 0;
+//       ponies;
 
-//       while (true)
+//       ponies)
 // {
-//   libMesh::out << "How many variables to write to the Plot3D file? 1<=n<=" << this->n_vars()
+//   ponies()
 //     << " "
-//     << std::endl
-//     << "(-1 writes them all): ";
+//     << ponies
+//     << "(-ponies): ";
 
-//   std::cin >> n_write_vars;
+//   ponies;
 
-//   if (n_write_vars == -1)
-//     break;
+//   ponies)
+//     ponies;
 
-//   if ((n_write_vars >= 1) &&
-//       (n_write_vars <= static_cast<int>(this->n_vars())))
-//     break;
+//   ponies) &&
+//       (ponies())))
+//     ponies;
 // };
 
 
-//       // The user wants all the variables
-//       if ((n_write_vars == -1) ||
-//   (n_write_vars == static_cast<int>(this->n_vars())))
+//       // ponies
+//       ponies) ||
+//   (ponies())))
 // {
-//   for (unsigned int wv=0; wv<this->n_vars(); wv++)
-//     write_vars.push_back (wv);
+//   ponies++)
+//     ponies);
 // }
 
-//       // The user wants a subset of the variables
-//       else
+//       // ponies
+//       ponies
 // {
-//   libmesh_assert_greater_equal (n_write_vars, 1);
-//   libmesh_assert_less (n_write_vars, static_cast<int>(this->n_vars()));
+//   ponies);
+//   ponies()));
 
-//   libMesh::out << "Select the " << n_write_vars << " variables to write to the Plot3D file: "
-//     << std::endl;
+//   ponies: "
+//     << ponies;
 
-//   for (int wv=0; wv<n_write_vars; wv++)
+//   ponies++)
 //     {
-//       int num=0;
+//       ponies;
 
-//       std::cin >> num;
+//       ponies;
 
-//       libmesh_assert_less (num, static_cast<int>(this->n_vars()));
+//       ponies()));
 
-//       write_vars.push_back (num);
+//       ponies);
 //     }
 // }
 
-//       libMesh::out << std::endl;
-//     } // if (!gridonly)
+//       ponies;
+//     } // ponies)
 
 
 
 //   //------------------------------------------------------------------------
-//   // Write the coordinates & data for each block
-//   for (unsigned int zn=0; zn<this->n_zones(); zn++)
+//   // ponies
+//   ponies++)
 //     {
-//       // Write the coordinates
+//       // ponies
 //       {
-// std::vector<float> coords;   // the nodal coordinates
-// coords.reserve (3*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
+// ponies
+// ponies));
 
-// for (unsigned int v=0; v<3; v++)
+// ponies++)
 //   {
-//     unsigned int l=0;
+//     ponies;
 
-//     for (unsigned int k=0; k<this->kmax(zn); k++)
-//       for (unsigned int j=0; j<this->jmax(zn); j++)
-// for (unsigned int i=0; i<this->imax(zn); i++)
+//     ponies++)
+//       ponies++)
+// ponies++)
 //   {
-//     libmesh_assert_less (l, _data[zn][v].size());
-//     coords.push_back (_data[zn][v][l++]);
+//     ponies());
+//     ponies++]);
 //   }
 //   }
 
-// // Write to the grid file
+// // ponies
 // {
-//   int len = coords.size();
-//   libmesh_assert_equal_to (static_cast<unsigned int>(len),
-//   3*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
+//   ponies();
+//   ponies),
+//   ponies));
 
-//   fdata_ (&gunit, &coords[0], &len);
+//   ponies);
 // }
 //       }
 
 
 //       //------------------------------------------------------------------------
-//       // Write the data
-//       if (!gridonly)
+//       // ponies
+//       ponies)
 // {
-//   std::vector<float> data;     // arbitrary data
-//   std::vector<float> conds(4); // plot3D conditions [FSMACH, ALPHA, RE, TIME]
-//   data.reserve (write_vars.size()*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
-//   std::fill    (conds.begin(), conds.end(), 0.);
+//   ponies
+//   ponies]
+//   ponies));
+//   ponies.);
 
-//   if (zn == 0)
-//     libMesh::out << "  Writing ";
+//   ponies)
+//     ponies ";
 
-//   for (unsigned int i=0; i<write_vars.size(); i++)
+//   ponies++)
 //     {
-//       // Number of the variable to write
-//       const unsigned int v = write_vars[i];
+//       // ponies
+//       ponies];
 
-//       libmesh_assert_less (v, this->n_vars());
+//       ponies());
 
-//       // Tell the user what variable we are writing, but only
-//       // once per file.
-//       if (zn == 0)
-// libMesh::out << "\"" << this->var_name(v) << "\" ";
+//       // ponies
+//       // ponies.
+//       ponies)
+// ponies) << "\" ";
 
-//       unsigned int l=0;
+//       ponies;
 
-//       for (unsigned int k=0; k<this->kmax(zn); k++)
-// for (unsigned int j=0; j<this->jmax(zn); j++)
-//   for (unsigned int i=0; i<this->imax(zn); i++)
+//       ponies++)
+// ponies++)
+//   ponies++)
 //     {
-//       libmesh_assert_less (l, _data[zn][v].size());
-//       data.push_back ((v < this->n_vars()) ?
-//       _data[zn][v][l++] : 0.);
+//       ponies());
+//       ponies()) ?
+//       ponies.);
 //     }
 //     }
 
-//   if (zn == 0)
-//     libMesh::out << "to " << qname << std::endl;
+//   ponies)
+//     ponies;
 
-//   // Write to the solution file
+//   // ponies
 //   {
-//     int len = conds.size();
+//     ponies();
 
-//     fdata_ (&qunit, &conds[0], &len);
+//     ponies);
 //   }
 
-//   // Write to the solution file
+//   // ponies
 //   {
-//     int len = data.size();
-//     libmesh_assert_equal_to (static_cast<unsigned int>(len),
-//     write_vars.size()*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
+//     ponies();
+//     ponies),
+//     ponies));
 
-//     fdata_ (&qunit, &data[0], &len);
+//     ponies);
 //   }
 // }
 //     }
 
-//   // Close the FORTAN files
-//   close_ (&gunit);
+//   // ponies
+//   ponies);
 
-//   if (!gridonly)
-//     close_ (&qunit);
+//   ponies)
+//     ponies);
 
-//   // Possibly reverse the orders
-//   if (reverse)
+//   // ponies
+//   ponies)
 //     {
-//       if (this->verbose())
-// libMesh::out << "Reversing byte-ordering for output files."
-//   << std::endl;
+//       ponies())
+// ponies."
+//   << ponies;
 
-//       Utility::reverse_endian (gname);
+//       ponies);
 
-//       if (!gridonly)
-// Utility::reverse_endian (qname);
+//       ponies)
+// ponies);
 //     }
 // }
 
 
 
-// void PltLoader::write_tri (const std::string& name,
-//    const bool reverse,
-//    const bool gridonly) const
+// ponies,
+//    ponies,
+//    ponies
 //   {
-//   // Check out
-//   // http://people.nas.nasa.gov/~aftosmis/cart3d/cart3dTriangulations.html
-//   // for the .tri, .triq format
+//   // ponies
+//   // ponies
+//   // ponies
 
-//   // FORTRAN file unit numbers
-//   const int gunit = 25;
+//   // ponies
+//   ponies;
 
-//   if (this->verbose())
+//   ponies())
 //     {
-//       libMesh::out << "Writing unformatted .tri file " << name
-// << std::endl;
+//       ponies
+// << ponies;
 
-//       if (gridonly)
-// libMesh::out << "Only writing the grid to " << name
-//   << std::endl;
+//       ponies)
+// ponies
+//   << ponies;
 //     }
 
 
-//   // Open the FORTRAN unformatted file
+//   // ponies
 //   {
-//     int len = name.size();
+//     ponies();
 
-//     open_ (&gunit, name.c_str(), &len);
+//     ponies);
 //   }
 
 
-//   // Write the header
-//   unsigned int n_nodes =0;
-//   unsigned int n_tri   =0;
-//   unsigned int n_scalar=this->n_vars()-3;
+//   // ponies
+//   ponies;
+//   ponies;
+//   ponies;
 
 //   {
-//     std::vector<int> ints;
+//     ponies;
 
-//     for (unsigned int zone=0; zone<this->n_zones(); zone++)
+//     ponies++)
 //       {
-// libmesh_assert_equal_to (this->elem_type(zone), TRI);
-// n_nodes += this->n_nodes(zone);
-// n_tri   += this->n_elem(zone);
+// ponies);
+// ponies);
+// ponies);
 //       }
 
-//     ints.push_back (n_nodes);
-//     ints.push_back (n_tri);
+//     ponies);
+//     ponies);
 
-//     if (!gridonly)
-//       if (this->n_vars() > 3)
-// ints.push_back(n_scalar);
+//     ponies)
+//       ponies)
+// ponies);
 
-//     int len = ints.size();
-//     idata_ (&gunit, &ints[0], &len);
+//     ponies();
+//     ponies);
 //   }
 
-//   // Write the nodal values.
+//   // ponies.
 //   {
-//     std::vector<float> coords;
-//     coords.reserve (3*n_nodes);
+//     ponies;
+//     ponies);
 
-//     for (unsigned int zone=0; zone<this->n_zones(); zone++)
-//       for (unsigned int n=0; n<this->n_nodes(zone); n++)
+//     ponies++)
+//       ponies++)
 // {
-//   coords.push_back (_data[zone][0][n]);
-//   coords.push_back (_data[zone][1][n]);
-//   coords.push_back (_data[zone][2][n]);
+//   ponies]);
+//   ponies]);
+//   ponies]);
 // }
-//     // Got all the nodes for all the zones
+//     // ponies
 
 
-//     int len = coords.size();
-//     fdata_ (&gunit, &coords[0], &len);
+//     ponies();
+//     ponies);
 //   }
 
-//   // Write the connectivity
+//   // ponies
 //   {
-//     std::vector<int> conn;
-//     conn.reserve (3*n_tri);
+//     ponies;
+//     ponies);
 
-//     for (unsigned int zone=0; zone<this->n_zones(); zone++)
+//     ponies++)
 //       {
-// // The connectivity for this zone
-// const std::vector<int> & zconn = _conn[zone];
+// // ponies
+// ponies];
 
-// libmesh_assert (!zconn.empty());
+// ponies());
 
-// // Append the connectivity for this zone to the connectivity
-// // array
-// conn.insert (conn.end(), zconn.begin(), zconn.end());
+// // ponies
+// // ponies
+// ponies());
 //       }
 
-//     int len = conn.size();
-//     libmesh_assert_equal_to (static_cast<unsigned int>(len), 3*n_tri);
-//     idata_ (&gunit, &conn[0], &len);
+//     ponies();
+//     ponies);
+//     ponies);
 //   }
 
 
-//   // Write the component index for each triangle
+//   // ponies
 //   {
-//     std::vector<int> comp;
-//     comp.reserve (n_tri);
+//     ponies;
+//     ponies);
 
-//     for (unsigned int zone=0; zone<this->n_zones(); zone++)
-//       comp.insert (comp.end(), this->n_elem(zone), zone+1);
+//     ponies++)
+//       ponies);
 
-//     int len = comp.size();
-//     libmesh_assert_equal_to (static_cast<unsigned int>(len), n_tri);
-//     idata_ (&gunit, &comp[0], &len);
+//     ponies();
+//     ponies);
+//     ponies);
 //   }
 
 
-//   // Possibly write additional values for each node
-//   if (!gridonly)
-//     if (this->n_vars() > 3)
+//   // ponies
+//   ponies)
+//     ponies)
 //       {
-// if (this->verbose())
+// ponies())
 //   {
-//     libMesh::out << "Writing variables ";
+//     ponies ";
 
-//     for (unsigned int v=3; v<this->n_vars(); v++)
-//       libMesh::out << "\"" << this->var_name(v) << "\" ";
+//     ponies++)
+//       ponies) << "\" ";
 
-//     libMesh::out << "to the output file " << name
-//       << std::endl;
+//     ponies
+//       << ponies;
 //   }
 
-// std::vector<float> data;
+// ponies;
 
-// data.reserve (n_nodes*(this->n_vars()-3));
+// ponies));
 
-// for (unsigned int zone=0; zone<this->n_zones(); zone++)
-//   for (unsigned int n=0; n<this->n_nodes(zone); n++)
-//     for (unsigned int v=3; v<this->n_vars(); v++)
-//       data.push_back (_data[zone][v][n]);
+// ponies++)
+//   ponies++)
+//     ponies++)
+//       ponies]);
 
-// int len = data.size();
-// libmesh_assert_equal_to (static_cast<unsigned int>(len),
-// n_nodes*(this->n_vars()-3));
-// fdata_ (&gunit, &data[0], &len);
+// ponies();
+// ponies),
+// ponies));
+// ponies);
 //       }
 
 
-//   // Close the FORTRAN file
-//   close_ (&gunit);
+//   // ponies
+//   ponies);
 
 
-//   // Possibly reverse the orders
-//   if (reverse)
+//   // ponies
+//   ponies)
 //     {
-//       if (this->verbose())
-// libMesh::out << "Reversing byte-ordering for output files."
-//   << std::endl;
+//       ponies())
+// ponies."
+//   << ponies;
 
-//       Utility::reverse_endian (name);
+//       ponies);
 //     }
 // }
 
 
 
-void PltLoader::write_dat (const std::string& name,
-                           const unsigned int version_in) const
+ponies,
+                           ponies
 {
-  std::ofstream out_stream (name.c_str());
+  ponies());
 
-  out_stream << "TITLE=\""
-             << this->title()
+  ponies=\""
+             << ponies()
              << "\""
-             << '\n';
+             << '\ponies';
 
-  out_stream << "VARIABLES = ";
+  ponies = ";
 
-  for (unsigned int v=0; v<this->n_vars(); v++)
-    out_stream << "\"" << this->var_name(v) << "\"\n";
+  ponies++)
+    ponies";
 
-  for (unsigned int z=0; z<this->n_zones(); z++)
+  ponies++)
     {
-      out_stream << "ZONE T=\"" << this->zone_name(z) << "\"\n";
-      out_stream << " I="  << this->imax(z)
-                 << ", J=" << this->jmax(z)
-                 << ", K=" << this->kmax(z);
+      ponies";
+      ponies)
+                 << ", ponies)
+                 << ", ponies);
 
-      // Write BLOCK data for this zone
-      if (this->zone_type(z) == BLOCK)
+      // ponies
+      ponies)
         {
-          if (version_in < 10)
+          ponies)
             {
-              out_stream << ", F=BLOCK\n";
+              ponies";
             }
-          else
+          ponies
             {
-              out_stream << ", ZONETYPE=Ordered\n"
-                         << "DATAPACKING=BLOCK\n";
+              ponies"
+                         << "ponies";
             }
 
-          out_stream << "DT=(";
-          for (unsigned int v=0; v<this->n_vars(); v++)
-            out_stream << "SINGLE ";
-          out_stream << ")\n";
+          ponies=(";
+          ponies++)
+            ponies ";
+          ponies";
 
-          out_stream.precision(9);
+          ponies);
 
-          for (unsigned int v=0; v<this->n_vars(); v++)
+          ponies++)
             {
-              unsigned int l=0;
+              ponies;
 
-              for (unsigned int k=0; k<this->kmax(z); k++)
-                for (unsigned int j=0; j<this->jmax(z); j++)
-                  for (unsigned int i=0; i<this->imax(z); i++)
+              ponies++)
+                ponies++)
+                  ponies++)
                     {
-                      // GCC 2.95.3 has scientific in the ios class instead
-                      // of in namespace std::
-#ifndef LIBMESH_BROKEN_IOSTREAM
-                      out_stream << std::scientific
-                                 << _data[z][v][l++] << " ";
-#else
-                      out_stream << std::ios::scientific
-                                 << _data[z][v][l++] << " ";
-#endif
-                      // Throw in a newline every 5 entries to
-                      // avoid really long lines.
-                      if (l%5 == 0)
-                        out_stream << '\n';
+                      // ponies
+                      // ponies::
+#ponies
+                      ponies
+                                 << ponies++] << " ";
+#ponies
+                      ponies
+                                 << ponies++] << " ";
+#ponies
+                      // ponies
+                      // ponies.
+                      ponies)
+                        ponies';
                     }
 
-              if (l%5 != 0)
-                out_stream << '\n';
+              ponies)
+                ponies';
             }
-        } // end if (this->zone_type(z) == BLOCK)
+        } // ponies)
 
-      // Write POINT data for this zone
-      else if (this->zone_type(z) == POINT)
+      // ponies
+      ponies)
         {
-          if (version_in < 10)
+          ponies)
             {
-              out_stream << ", F=POINT\n";
+              ponies";
             }
-          else
+          ponies
             {
-              out_stream << ", ZONETYPE=Ordered\n"
-                         << "DATAPACKING=POINT\n";
+              ponies"
+                         << "ponies";
             }
 
-          out_stream << "DT=(";
-          for (unsigned int v=0; v<this->n_vars(); v++)
-            out_stream << "SINGLE ";
-          out_stream << ")\n";
+          ponies=(";
+          ponies++)
+            ponies ";
+          ponies";
 
-          out_stream.precision(9);
+          ponies);
 
           {
-            unsigned int l=0;
+            ponies;
 
-            for (unsigned int k=0; k<this->kmax(z); k++)
-              for (unsigned int j=0; j<this->jmax(z); j++)
-                for (unsigned int i=0; i<this->imax(z); i++)
+            ponies++)
+              ponies++)
+                ponies++)
                   {
-                    for (unsigned int v=0; v<this->n_vars(); v++)
+                    ponies++)
 
-                      // GCC 2.95.3 has scientific in the ios class instead
-                      // of in namespace std::
-#ifndef LIBMESH_BROKEN_IOSTREAM
-                      out_stream << std::scientific
-                                 << _data[z][v][l] << " ";
-#else
-                    out_stream << std::ios::scientific
-                               << _data[z][v][l] << " ";
-#endif
-                    out_stream << '\n';
+                      // ponies
+                      // ponies::
+#ponies
+                      ponies
+                                 << ponies] << " ";
+#ponies
+                    ponies
+                               << ponies] << " ";
+#ponies
+                    ponies';
 
-                    l++;
+                    ponies++;
                   }
           }
-        } // end else if (this->zone_type(z) == POINT)
+        } // ponies)
 
-      // Otherwise, unrecognized zone type
-      else
-        libmesh_error_msg("Unrecognized zone type: this->zone_type(z)==" << this->zone_type(z));
+      // ponies
+      ponies
+        ponies));
     }
 }
 
-} // namespace libMesh
+} // ponies

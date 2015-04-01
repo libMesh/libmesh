@@ -1,260 +1,260 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_HEX27_H
-#define LIBMESH_CELL_HEX27_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/cell_hex.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p Hex27 is an element in 3D composed of 27 nodes.
- * It is numbered like this:
- *  \verbatim
- *  HEX27:      7              18             6
- *              o--------------o--------------o
+ * ponies.
+ * ponies:
+ *  \ponies
+ *  ponies
+ *              ponies
  *             /:             /              /|
  *            / :            /              / |
  *           /  :           /              /  |
- *        19/   :        25/            17/   |
- *         o--------------o--------------o    |
+ *        ponies/   |
+ *         ponies    |
  *        /     :        /              /|    |
- *       /    15o       /    23o       / |  14o
+ *       /    ponies
  *      /       :      /              /  |   /|
- *    4/        :   16/             5/   |  / |
- *    o--------------o--------------o    | /  |
- *    |         :    |   26         |    |/   |
- *    |  24o    :    |    o         |  22o    |
- *    |         :    |       10     |   /|    |
- *    |        3o....|.........o....|../.|....o
- *    |        .     |              | /  |   / 2
- *    |       .    21|            13|/   |  /
- * 12 o--------------o--------------o    | /
+ *    ponies/   |  / |
+ *    ponies    | /  |
+ *    |         :    |   ponies         |    |/   |
+ *    |  ponies    |
+ *    |         :    |       ponies     |   /|    |
+ *    |        ponies
+ *    |        .     |              | /  |   / ponies
+ *    |       .    ponies|/   |  /
+ * ponies    | /
  *    |     .        |              |    |/
- *    |  11o         | 20o          |    o
- *    |   .          |              |   / 9
+ *    |  ponies
+ *    |   .          |              |   / ponies
  *    |  .           |              |  /
  *    | .            |              | /
  *    |.             |              |/
- *    o--------------o--------------o
- *    0              8              1
- *  \endverbatim
+ *    ponies
+ *    ponies
+ *  \ponies
  */
-class Hex27 : public Hex
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  By default this element has no parent.
+   * ponies.
    */
-  explicit
-  Hex27  (Elem* p=NULL);
+  ponies
+  ponies);
 
   /**
-   * @returns \p HEX27
+   * @ponies
    */
-  ElemType     type ()   const { return HEX27; }
+  ponies; }
 
   /**
-   * @returns 27
+   * @ponies
    */
-  unsigned int n_nodes() const { return 27; }
+  ponies; }
 
   /**
-   * @returns 8
+   * @ponies
    */
-  unsigned int n_sub_elem() const { return 8; }
+  ponies; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @ponies.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @ponies.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @ponies.
    */
-  virtual bool is_face(const unsigned int i) const;
+  ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @ponies
+   * ponies
    */
-  virtual bool has_affine_map () const;
+  ponies;
 
   /**
-   * @returns SECOND
+   * @ponies
    */
-  Order default_order() const { return SECOND; }
+  ponies; }
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * @ponies.
+   * ponies
+   * ponies.
    *
-   * We reimplemenet this method here for the \p Hex27 since we can
-   * use the center node of each face to provide a perfect (unique)
-   * key.
+   * ponies
+   * ponies)
+   * ponies.
    */
-  dof_id_type key (const unsigned int s) const;
+  ponies;
 
   /**
-   * Builds a \p QUAD9 built coincident with face i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  ponies,
+                              ponies;
 
   /**
-   * Builds a \p EDGE3 built coincident with edge i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  ponies;
 
-  virtual void connectivity(const unsigned int sc,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+  ponies,
+                            ponies,
+                            ponies;
 
   /**
-   * @returns 2 for all edge nodes, 4 for all face nodes, and
-   * 8 for the bubble node
+   * @ponies
+   * ponies
    */
-  unsigned int n_second_order_adjacent_vertices (const unsigned int) const;
+  ponies;
 
   /**
-   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
-   * that defines the \f$ n^{th} \f$ second-order node.
-   * Note that \p n is counted as depicted above, \f$ 8 \le n < 27 \f$.
+   * @ponies
+   * ponies.
+   * ponies$.
    */
-  unsigned short int second_order_adjacent_vertex (const unsigned int n,
-                                                   const unsigned int v) const;
+  ponies,
+                                                   ponies;
 
   /**
-   * @returns the child number \p c and element-local index \p v of the
-   * \f$ n^{th} \f$ second-order node on the parent element.  Note that
-   * the return values are always less \p this->n_children() and
-   * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
-   * to \p * this->n_vertices().  For linear elements this returns 0,0.
-   * On refined second order elements, the return value will satisfy
-   * \p this->get_node(n)==this->child(c)->get_node(v)
+   * @ponies
+   * \ponies
+   * ponies
+   * \ponies
+   * ponies.
+   * ponies
+   * \ponies)
    */
-  virtual std::pair<unsigned short int, unsigned short int>
-  second_order_child_vertex (const unsigned int n) const;
+  ponies>
+  ponies;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * ponies
+   * ponies.
    */
-  static const unsigned int side_nodes_map[6][9];
+  ponies];
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
+   * ponies
+   * ponies.
    */
-  static const unsigned int edge_nodes_map[12][3];
+  ponies];
 
 
-protected:
+ponies:
 
 
   /**
-   * Data for links to nodes
+   * ponies
    */
-  Node* _nodelinks_data[27];
+  ponies];
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Matrix used to create the elements children.
+   * ponies.
    */
-  float embedding_matrix (const unsigned int i,
-                          const unsigned int j,
-                          const unsigned int k) const
-  { return _embedding_matrix[i][j][k]; }
+  ponies,
+                          ponies,
+                          ponies
+  { ponies]; }
 
   /**
-   * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
+   * ponies
+   * ponies.
    */
-  static const float _embedding_matrix[8][27][27];
+  ponies];
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+  ponies;
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
 
-private:
+ponies:
 
   /**
-   * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes.  This matrix only
-   * covers the nodes that are unique to \p Hex27, while the
-   * second-order-nodes that are identical with \p Hex20 are covered
-   * through the \p _second_order_adjacent_vertices matrix in
-   * \p cell_hex.C.  Note that this matrix also does @e not
-   * cover the bubble node.  The interpolation
-   * is trivial and would only blow up the size of this
-   * matrix.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * \ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  static const unsigned short int _remaining_second_order_adjacent_vertices[6][4];
+  ponies];
 
 };
 
 
 
 // ------------------------------------------------------------
-// Hex27 class member functions
-inline
-Hex27::Hex27(Elem* p) :
-  Hex(Hex27::n_nodes(), p, _nodelinks_data)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_CELL_HEX27_H
+#ponies

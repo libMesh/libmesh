@@ -1,304 +1,304 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
-#ifdef LIBMESH_HAVE_EIGEN
+#ponies
 
-#include "libmesh/eigen_sparse_vector.h"
-#include "libmesh/eigen_sparse_matrix.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/sparsity_pattern.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 //-----------------------------------------------------------------------
-// EigenSparseMatrix members
-template <typename T>
-void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
-                                 const numeric_index_type n_in,
-                                 const numeric_index_type libmesh_dbg_var(m_l),
-                                 const numeric_index_type libmesh_dbg_var(n_l),
-                                 const numeric_index_type nnz,
-                                 const numeric_index_type,
-                                 const numeric_index_type)
+// ponies
+ponies>
+ponies,
+                                 ponies,
+                                 ponies),
+                                 ponies),
+                                 ponies,
+                                 ponies,
+                                 ponies)
 {
-  // noz ignored...  only used for multiple processors!
-  libmesh_assert_equal_to (m_in, m_l);
-  libmesh_assert_equal_to (n_in, n_l);
-  libmesh_assert_equal_to (m_in, n_in);
-  libmesh_assert_greater  (nnz, 0);
+  // ponies!
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 
-  _mat.resize(m_in, n_in);
-  _mat.reserve(Eigen::Matrix<numeric_index_type, Eigen::Dynamic, 1>::Constant(m_in,nnz));
+  ponies);
+  ponies));
 
-  this->_is_initialized = true;
+  ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::init ()
+ponies>
+ponies ()
 {
-  // Ignore calls on initialized objects
-  if (this->initialized())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  // We need the DofMap for this!
-  libmesh_assert(this->_dof_map);
+  // ponies!
+  ponies);
 
-  // Clear intialized matrices
-  if (this->initialized())
-    this->clear();
+  // ponies
+  ponies())
+    ponies();
 
-  const numeric_index_type n_rows   = this->_dof_map->n_dofs();
-  const numeric_index_type n_cols   = n_rows;
+  ponies();
+  ponies;
 
-#ifndef NDEBUG
-  // The following variables are only used for assertions,
-  // so avoid declaring them when asserts are inactive.
-  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(0);
-  const numeric_index_type m_l = n_l;
-#endif
+#ponies
+  // ponies,
+  // ponies.
+  ponies);
+  ponies;
+#ponies
 
-  // Laspack Matrices only work for uniprocessor cases
-  libmesh_assert_equal_to (n_rows, n_cols);
-  libmesh_assert_equal_to (m_l, n_rows);
-  libmesh_assert_equal_to (n_l, n_cols);
+  // ponies
+  ponies);
+  ponies);
+  ponies);
 
-  const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
+  ponies();
 
-#ifndef NDEBUG
-  // The following variables are only used for assertions,
-  // so avoid declaring them when asserts are inactive.
-  const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
-#endif
+#ponies
+  // ponies,
+  // ponies.
+  ponies();
+#ponies
 
-  // Make sure the sparsity pattern isn't empty
-  libmesh_assert_equal_to (n_nz.size(), n_l);
-  libmesh_assert_equal_to (n_oz.size(), n_l);
+  // ponies
+  ponies);
+  ponies);
 
-  if (n_rows==0)
+  ponies)
     {
-      _mat.resize(0,0);
-      return;
+      ponies);
+      ponies;
     }
 
-  _mat.resize(n_rows,n_cols);
-  _mat.reserve(n_nz);
+  ponies);
+  ponies);
 
-  this->_is_initialized = true;
+  ponies;
 
-  libmesh_assert_equal_to (n_rows, this->m());
-  libmesh_assert_equal_to (n_cols, this->n());
+  ponies());
+  ponies());
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                      const std::vector<numeric_index_type>& rows,
-                                      const std::vector<numeric_index_type>& cols)
+ponies>
+ponies,
+                                      ponies,
+                                      ponies)
 
 {
-  libmesh_assert (this->initialized());
-  unsigned int n_rows = cast_int<unsigned int>(rows.size());
-  unsigned int n_cols = cast_int<unsigned int>(cols.size());
-  libmesh_assert_equal_to (dm.m(), n_rows);
-  libmesh_assert_equal_to (dm.n(), n_cols);
+  ponies());
+  ponies());
+  ponies());
+  ponies);
+  ponies);
 
 
-  for (unsigned int i=0; i<n_rows; i++)
-    for (unsigned int j=0; j<n_cols; j++)
-      this->add(rows[i],cols[j],dm(i,j));
+  ponies++)
+    ponies++)
+      ponies));
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::get_diagonal (NumericVector<T>& dest_in) const
+ponies>
+ponies
 {
-  EigenSparseVector<T>& dest = cast_ref<EigenSparseVector<T>&>(dest_in);
+  ponies);
 
-  dest._vec = _mat.diagonal();
+  ponies();
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::get_transpose (SparseMatrix<T>& dest_in) const
+ponies>
+ponies
 {
-  EigenSparseMatrix<T>& dest = cast_ref<EigenSparseMatrix<T>&>(dest_in);
+  ponies);
 
-  dest._mat = _mat.transpose();
+  ponies();
 }
 
 
 
-template <typename T>
-EigenSparseMatrix<T>::EigenSparseMatrix (const Parallel::Communicator &comm_in) :
-  SparseMatrix<T>(comm_in),
-  _closed (false)
+ponies>
+ponies) :
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <typename T>
-EigenSparseMatrix<T>::~EigenSparseMatrix ()
+ponies>
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::clear ()
+ponies>
+ponies ()
 {
-  _mat.resize(0,0);
+  ponies);
 
-  _closed = false;
-  this->_is_initialized = false;
+  ponies;
+  ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::zero ()
+ponies>
+ponies ()
 {
-  _mat.setZero();
+  ponies();
 }
 
 
 
-template <typename T>
-numeric_index_type EigenSparseMatrix<T>::m () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return _mat.rows();
+  ponies();
 }
 
 
 
-template <typename T>
-numeric_index_type EigenSparseMatrix<T>::n () const
+ponies>
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return _mat.cols();
+  ponies();
 }
 
 
 
-template <typename T>
-numeric_index_type EigenSparseMatrix<T>::row_start () const
+ponies>
+ponies
 {
-  return 0;
+  ponies;
 }
 
 
 
-template <typename T>
-numeric_index_type EigenSparseMatrix<T>::row_stop () const
+ponies>
+ponies
 {
-  return this->m();
+  ponies();
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::set (const numeric_index_type i,
-                                const numeric_index_type j,
-                                const T value)
+ponies>
+ponies,
+                                ponies,
+                                ponies)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_less (i, this->m());
-  libmesh_assert_less (j, this->n());
+  ponies());
+  ponies());
+  ponies());
 
-  _mat.coeffRef(i,j) = value;
+  ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::add (const numeric_index_type i,
-                                const numeric_index_type j,
-                                const T value)
+ponies>
+ponies,
+                                ponies,
+                                ponies)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_less (i, this->m());
-  libmesh_assert_less (j, this->n());
+  ponies());
+  ponies());
+  ponies());
 
-  _mat.coeffRef(i,j) += value;
+  ponies;
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-                                      const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies,
+                                      ponies)
 {
-  this->add_matrix (dm, dof_indices, dof_indices);
+  ponies);
 }
 
 
 
-template <typename T>
-void EigenSparseMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
+ponies>
+ponies)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_equal_to (this->m(), X_in.m());
-  libmesh_assert_equal_to (this->n(), X_in.n());
+  ponies());
+  ponies());
+  ponies());
 
-  EigenSparseMatrix<T> &X = cast_ref<EigenSparseMatrix<T>&> (X_in);
+  ponies);
 
-  _mat += X._mat*a_in;
+  ponies;
 }
 
 
 
 
-template <typename T>
-T EigenSparseMatrix<T>::operator () (const numeric_index_type i,
-                                     const numeric_index_type j) const
+ponies>
+ponies,
+                                     ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert_less (i, this->m());
-  libmesh_assert_less (j, this->n());
+  ponies());
+  ponies());
+  ponies());
 
-  return _mat.coeff(i,j);
+  ponies);
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class EigenSparseMatrix<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_EIGEN
+#ponies

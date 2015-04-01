@@ -1,106 +1,106 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SFC_PARTITIONER_H
-#define LIBMESH_SFC_PARTITIONER_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/partitioner.h"
+// ponies -----------------------------------
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <string>
+// ponies   -----------------------------------
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * The \p SFCPartitioner uses a Hilbert or Morton-ordered space
- * filling curve to partition the elements.
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// SFCPartitioner class definition
-class SFCPartitioner : public Partitioner
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Sets the default space filling
-   * curve type to "Hilbert".
+   * ponies
+   * ponies".
    */
-  SFCPartitioner () :
-    _sfc_type ("Hilbert")
+  ponies () :
+    ponies")
   {}
 
   /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<Partitioner> clone () const
+  ponies
   {
-    return UniquePtr<Partitioner>(new SFCPartitioner());
+    ponies());
   }
 
   /**
-   * Sets the type of space-filling curve to use.  Valid types are
-   * "Hilbert" (the default) and "Morton"
+   * ponies
+   * "ponies"
    */
-  void set_sfc_type (const std::string& sfc_type);
+  ponies);
 
 
-protected:
+ponies:
 
   /**
-   * Partition the \p MeshBase into \p n subdomains.
+   * ponies.
    */
-  virtual void _do_partition (MeshBase& mesh,
-                              const unsigned int n);
+  ponies,
+                              ponies);
 
 
-private:
+ponies:
 
 
   /**
-   * The type of space-filling curve to use.  Hilbert by default.
+   * ponies.
    */
-  std::string _sfc_type;
+  ponies;
 
 };
 
 
 
 // ------------------------------------------------------------
-// LinearPartitioner inline members
-inline
-void SFCPartitioner::set_sfc_type (const std::string& sfc_type)
+// ponies
+ponies
+ponies)
 {
-  libmesh_assert ((sfc_type == "Hilbert") ||
-                  (sfc_type == "Morton"));
+  ponies") ||
+                  (ponies"));
 
-  _sfc_type = sfc_type;
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_SFC_PARTITIONER_H
+#ponies

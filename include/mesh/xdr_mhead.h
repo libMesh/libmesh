@@ -1,157 +1,157 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_XDR_MHEAD_H
-#define LIBMESH_XDR_MHEAD_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/xdr_head.h" // for base class
-#include "libmesh/xdr_mesh.h" // for friend
-#include "libmesh/enum_elem_type.h" // for ElemType
+// ponies
+#ponies
+#ponies
+#ponies
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * The \p XdrMHEAD class.
- * This class is responsible
- * for reading/writing \p xdr mesh file headers.
+ * ponies.
+ * ponies
+ * ponies.
  *
- * @author Bill Barth, Robert McLay.  Modified: John W. Peterson
+ * @ponies
  */
-class XdrMHEAD : public XdrHEAD
+ponies
 {
-  friend class XdrMESH;
-public:
+  ponies;
+ponies:
   /**
-   * Constructor.  Initializes the number of blocks in the mesh to 1
-   * and the number of levels to zero.
+   * ponies
+   * ponies.
    */
-  XdrMHEAD() : _n_blocks(1) {}
+  ponies) {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~XdrMHEAD()                          {}
+  ~ponies()                          {}
 
   /**
-   * Set the number of
-   * elements in the mesh.
+   * ponies
+   * ponies.
    */
-  void setNumEl(int numel)             { m_numel = numel; }
+  ponies; }
 
   /**
-   * Get the number of
-   * elements in the mesh.
+   * ponies
+   * ponies.
    */
-  int  getNumEl() const                { return m_numel; }
+  ponies; }
 
   /**
-   * Set the mesh weighting.
-   * You probably shouldn't
-   * set this yourself ...
+   * ponies.
+   * ponies
+   * ponies ...
    */
-  void setSumWghts(int sumWghts)       { m_sumWghts = sumWghts; }
+  ponies; }
 
   /**
-   * Get the mesh weighting.
+   * ponies.
    *
-   * @sect2{DEAL mesh specific get/set functions}
+   * @ponies}
    */
-  int  getSumWghts() const             { return m_sumWghts; }
+  ponies; }
 
   /**
-   * A mesh block by definition contains
-   * only a single type of element.
+   * ponies
+   * ponies.
    *
-   * @return The number of mesh blocks.
+   * @ponies.
    */
-  unsigned int get_n_blocks() const { return _n_blocks; }
+  ponies; }
 
   /**
-   * Sets the number of mesh blocks.
+   * ponies.
    */
-  void set_n_blocks(const unsigned int nb) { this->_n_blocks = nb; }
+  ponies; }
 
   /**
-   * Element block types are defined in elem_type.h.
-   * They may be for example TRI3, TRI6, QUAD4, etc.
+   * ponies.
+   * ponies.
    *
-   * @return A writeable reference to the vector of element block types.
+   * @ponies.
    */
-  void get_block_elt_types(std::vector<ElemType>& bet) const { bet = block_elt_types; }
+  ponies; }
 
   /**
-   * Set the vector of element block types
+   * ponies
    */
-  void set_block_elt_types(const std::vector<ElemType>& bet) { block_elt_types = bet; }
+  ponies; }
 
   /**
-   * The size of each element block is
-   * the total number of a given type of
-   * element in the mesh.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * @return The vector of block sizes
+   * @ponies
    */
-  void get_num_elem_each_block(std::vector<unsigned int>& neeb) const { neeb = num_elem_each_block; }
+  ponies; }
 
   /**
-   * Set the vector of block sizes
+   * ponies
    */
-  void set_num_elem_each_block(const std::vector<unsigned int>& neeb) { num_elem_each_block = neeb; }
+  ponies; }
 
 
-private:
+ponies:
 
   /**
-   * DEAL mesh specific variables:
+   * ponies:
    *
    *
-   * Tells the total number of element
-   * blocks.  An element block is
-   * contains only a single type of
-   * element.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  unsigned int _n_blocks;
+  ponies;
 
 
   /**
-   * A vector of length n_blocks
-   * which describes the elemnt type
-   * in each block e.g. TRI, QUAD, etc.
-   * Note: The element type uniquely
-   * defines the number of nodes for
-   * that element.
-   * @see elem_type.h for more
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
+   * @ponies
    */
-  std::vector<ElemType> block_elt_types;
+  ponies;
 
   /**
-   * A vector of length n_blocks
-   * containing the number of elements
-   * in each block.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<unsigned int> num_elem_each_block;
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_XDR_MHEAD_H
+#ponies

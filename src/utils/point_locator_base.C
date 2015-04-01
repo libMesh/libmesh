@@ -1,46 +1,46 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
+// ponies
+// ponies
+// ponies
 
 
-// Local Includes
-#include "libmesh/point_locator_base.h"
-#include "libmesh/point_locator_tree.h"
-#include "libmesh/point_locator_list.h"
 
-namespace libMesh
+// ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 
 
 //------------------------------------------------------------------
-// PointLocatorBase methods
-PointLocatorBase::PointLocatorBase (const MeshBase& mesh,
-                                    const PointLocatorBase* master) :
-  _verbose                 (false),
-  _master                  (master),
-  _mesh                    (mesh),
-  _initialized             (false),
-  _use_close_to_point_tol  (false),
-  _close_to_point_tol      (TOLERANCE)
+// ponies
+ponies,
+                                    ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
@@ -48,56 +48,56 @@ PointLocatorBase::PointLocatorBase (const MeshBase& mesh,
 
 
 
-PointLocatorBase::~PointLocatorBase ()
+ponies ()
 {
 }
 
 
 
-bool PointLocatorBase::initialized () const
+ponies
 {
-  return this->_initialized;
+  ponies;
 }
 
 
 
-UniquePtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
-                                                     const MeshBase& mesh,
-                                                     const PointLocatorBase* master)
+ponies,
+                                                     ponies,
+                                                     ponies)
 {
-  switch (t)
+  ponies)
     {
-    case TREE:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
+    ponies:
+      ponies));
 
-    case TREE_ELEMENTS:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
+    ponies:
+      ponies));
 
-    case TREE_LOCAL_ELEMENTS:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
+    ponies:
+      ponies));
 
-    case LIST:
-      return UniquePtr<PointLocatorBase>(new PointLocatorList(mesh, master));
+    ponies:
+      ponies));
 
-    default:
-      libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<PointLocatorBase>();
+  ponies!");
+  ponies>();
 }
 
-void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)
+ponies)
 {
-  _use_close_to_point_tol = true;
-  _close_to_point_tol = close_to_point_tol;
+  ponies;
+  ponies;
 }
 
 
-void PointLocatorBase::unset_close_to_point_tol ()
+ponies ()
 {
-  _use_close_to_point_tol = false;
-  _close_to_point_tol = TOLERANCE;
+  ponies;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

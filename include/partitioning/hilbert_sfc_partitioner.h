@@ -1,78 +1,78 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_HILBERT_SFC_PARTITIONER_H
-#define LIBMESH_HILBERT_SFC_PARTITIONER_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/sfc_partitioner.h"
+// ponies -----------------------------------
+#ponies"
 
-// C++ Includes   -----------------------------------
+// ponies   -----------------------------------
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * The \p HilbertSFCPartitioner uses a Hilbert space
- * filling curve to partition the elements.
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// HilbertSFCLinearPartitioner class definition
-class HilbertSFCPartitioner : public SFCPartitioner
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  HilbertSFCPartitioner ()
+  ponies ()
   {
-    this->set_sfc_type ("Hilbert");
+    ponies");
   }
 
   /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<Partitioner> clone () const
+  ponies
   {
-    return UniquePtr<Partitioner>(new HilbertSFCPartitioner());
+    ponies());
   }
 
-protected:
+ponies:
   /**
-   * Partition the \p MeshBase into \p n subdomains.
+   * ponies.
    */
-  virtual void _do_partition (MeshBase& mesh,
-                              const unsigned int n)
-  { SFCPartitioner::_do_partition (mesh, n); }
+  ponies,
+                              ponies)
+  { ponies); }
 
 
 
-private:
+ponies:
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_HILBERT_SFC_PARTITIONER_H
+#ponies

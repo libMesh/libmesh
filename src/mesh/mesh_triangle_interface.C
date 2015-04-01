@@ -1,349 +1,349 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#ponies
 
-// C/C++ includes
-#include <sstream>
+// ponies
+#ponies>
 
-#include "libmesh/mesh_triangle_interface.h"
-#include "libmesh/unstructured_mesh.h"
-#include "libmesh/face_tri3.h"
-#include "libmesh/face_tri6.h"
-#include "libmesh/mesh_generation.h"
-#include "libmesh/mesh_smoother_laplace.h"
-#include "libmesh/boundary_info.h"
-#include "libmesh/mesh_triangle_holes.h"
-#include "libmesh/mesh_triangle_wrapper.h"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 //
-// Function definitions for the TriangleInterface class
+// ponies
 //
 
-// Constructor
-TriangleInterface::TriangleInterface(UnstructuredMesh& mesh)
-  : _mesh(mesh),
-    _holes(NULL),
-    _elem_type(TRI3),
-    _desired_area(0.1),
-    _minimum_angle(20.0),
-    _extra_flags(""),
-    _triangulation_type(GENERATE_CONVEX_HULL),
-    _insert_extra_points(false),
-    _smooth_after_generating(true),
-    _serializer(_mesh)
+// ponies
+ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies(""),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 {}
 
 
 
-// Primary function responsible for performing the triangulation
-void TriangleInterface::triangulate()
+// ponies
+ponies()
 {
-  // Will the triangulation have holes?
-  const bool have_holes = ((_holes != NULL) && (!_holes->empty()));
+  // ponies?
+  ponies()));
 
-  // If the initial PSLG is really simple, e.g. an L-shaped domain or
-  // a square/rectangle, the resulting triangulation may be very
-  // "structured" looking.  Sometimes this is a problem if your
-  // intention is to work with an "unstructured" looking grid.  We can
-  // attempt to work around this limitation by inserting midpoints
-  // into the original PSLG.  Inserting additional points into a
-  // set of points meant to be a convex hull usually makes less sense.
+  // ponies
+  // ponies
+  // "ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
 
-  // May or may not need to insert new points ...
-  if ((_triangulation_type==PSLG) && (_insert_extra_points))
+  // ponies ...
+  ponies))
     {
-      // Make a copy of the original points from the Mesh
-      std::vector<Point> original_points (_mesh.n_nodes());
+      // ponies
+      ponies());
 
-      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-      const MeshBase::node_iterator node_end = _mesh.nodes_end();
+      ponies();
+      ponies();
 
-      for (unsigned int ctr=0; node_it != node_end; ++node_it)
-        original_points[ctr++] = **node_it;
+      ponies)
+        ponies;
 
-      // Clear out the mesh
-      _mesh.clear();
+      // ponies
+      ponies();
 
-      // Make sure the new Mesh will be 2D
-      _mesh.set_mesh_dimension(2);
+      // ponies
+      ponies);
 
-      // Insert a new point on each PSLG at some random location
-      // np=index into new points vector
-      // n =index into original points vector
-      for (unsigned int np=0, n=0; np<2*original_points.size(); ++np)
+      // ponies
+      // ponies
+      // ponies
+      ponies)
         {
-          // the even entries are the original points
-          if (np%2==0)
-            _mesh.add_point(original_points[n++]);
+          // ponies
+          ponies)
+            ponies++]);
 
-          else // the odd entries are the midpoints of the original PSLG segments
-            _mesh.add_point ((original_points[n] + original_points[n-1])/2);
+          ponies
+            ponies);
         }
     }
 
-  // Regardless of whether we added additional points, the set of points to
-  // triangulate is now sitting in the mesh.
+  // ponies
+  // ponies.
 
-  // If the holes vector is non-NULL (and non-empty) we need to determine
-  // the number of additional points which the holes will add to the
-  // triangulation.
-  unsigned int n_hole_points = 0;
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
 
-  if (have_holes)
+  ponies)
     {
-      for (unsigned int i=0; i<_holes->size(); ++i)
-        n_hole_points += (*_holes)[i]->n_points();
+      ponies)
+        ponies();
     }
 
-  // Triangle data structure for the mesh
-  TriangleWrapper::triangulateio initial;
-  TriangleWrapper::triangulateio final;
+  // ponies
+  ponies;
+  ponies;
 
-  // Pseudo-Constructor for the triangle io structs
-  TriangleWrapper::init(initial);
-  TriangleWrapper::init(final);
+  // ponies
+  ponies);
+  ponies);
 
-  initial.numberofpoints = _mesh.n_nodes() + n_hole_points;
-  initial.pointlist      = static_cast<REAL*>(std::malloc(initial.numberofpoints * 2 * sizeof(REAL)));
+  ponies;
+  ponies)));
 
-  if (_triangulation_type==PSLG)
+  ponies)
     {
-      // Implicit segment ordering: One segment per point, including hole points
-      if (this->segments.empty())
-        initial.numberofsegments = initial.numberofpoints;
+      // ponies
+      ponies())
+        ponies;
 
-      // User-defined segment ordering: One segment per entry in the segments vector
-      else
-        initial.numberofsegments = this->segments.size();
+      // ponies
+      ponies
+        ponies();
     }
 
-  else if (_triangulation_type==GENERATE_CONVEX_HULL)
-    initial.numberofsegments = n_hole_points; // One segment for each hole point
+  ponies)
+    ponies
 
-  // Debugging
-  // libMesh::out << "Number of segments set to: " << initial.numberofsegments << std::endl;
+  // ponies
+  // ponies;
 
-  // Allocate space for the segments (2 int per segment)
-  if (initial.numberofsegments > 0)
+  // ponies)
+  ponies)
     {
-      initial.segmentlist = static_cast<int*> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
+      ponies)));
     }
 
 
-  // Copy all the holes' points and segments into the triangle struct.
+  // ponies.
 
-  // The hole_offset is a constant offset into the points vector which points
-  // past the end of the last hole point added.
-  unsigned int hole_offset=0;
+  // ponies
+  // ponies.
+  ponies;
 
-  if (have_holes)
-    for (unsigned int i=0; i<_holes->size(); ++i)
+  ponies)
+    ponies)
       {
-        for (unsigned int ctr=0, h=0; h<(*_holes)[i]->n_points(); ctr+=2, ++h)
+        ponies)
           {
-            Point p = (*_holes)[i]->point(h);
+            ponies);
 
-            const unsigned int index0 = 2*hole_offset+ctr;
-            const unsigned int index1 = 2*hole_offset+ctr+1;
+            ponies;
+            ponies;
 
-            // Save the x,y locations in the triangle struct.
-            initial.pointlist[index0] = p(0);
-            initial.pointlist[index1] = p(1);
+            // ponies.
+            ponies);
+            ponies);
 
-            // Set the points which define the segments
-            initial.segmentlist[index0] = hole_offset+h;
-            initial.segmentlist[index1] = (h==(*_holes)[i]->n_points()-1) ? hole_offset : hole_offset+h+1; // wrap around
+            // ponies
+            ponies;
+            ponies
           }
 
-        // Update the hole_offset for the next hole
-        hole_offset += (*_holes)[i]->n_points();
+        // ponies
+        ponies();
       }
 
 
-  // Copy all the non-hole points and segments into the triangle struct.
+  // ponies.
   {
-    MeshBase::node_iterator it = _mesh.nodes_begin();
-    const MeshBase::node_iterator end = _mesh.nodes_end();
+    ponies();
+    ponies();
 
-    for (dof_id_type ctr=0; it != end; ctr+=2, ++it)
+    ponies)
       {
-        dof_id_type index = 2*hole_offset + ctr;
+        ponies;
 
-        // Get pointer to the current node
-        Node* node = *it;
+        // ponies
+        ponies;
 
-        // Set x,y values in pointlist
-        initial.pointlist[index] = (*node)(0);
-        initial.pointlist[index+1] = (*node)(1);
+        // ponies
+        ponies);
+        ponies);
 
-        // If the user requested a PSLG, the non-hole points are also segments
-        if (_triangulation_type==PSLG)
+        // ponies
+        ponies)
           {
-            // Use implicit ordering to define segments
-            if (this->segments.empty())
+            // ponies
+            ponies())
               {
-                dof_id_type n = ctr/2; // ctr is always even
-                initial.segmentlist[index] = hole_offset+n;
-                initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
+                ponies
+                ponies;
+                ponies
               }
           }
       }
   }
 
 
-  // If the user provided it, use his ordering to define the segments
-  for (unsigned int ctr=0, s=0; s<this->segments.size(); ctr+=2, ++s)
+  // ponies
+  ponies)
     {
-      const unsigned int index0 = 2*hole_offset+ctr;
-      const unsigned int index1 = 2*hole_offset+ctr+1;
+      ponies;
+      ponies;
 
-      initial.segmentlist[index0] = hole_offset + this->segments[s].first;
-      initial.segmentlist[index1] = hole_offset + this->segments[s].second;
+      ponies;
+      ponies;
     }
 
 
 
-  // Tell the input struct about the holes
-  if (have_holes)
+  // ponies
+  ponies)
     {
-      initial.numberofholes = _holes->size();
-      initial.holelist      = static_cast<REAL*>(std::malloc(initial.numberofholes * 2 * sizeof(REAL)));
-      for (unsigned int i=0, ctr=0; i<_holes->size(); ++i, ctr+=2)
+      ponies();
+      ponies)));
+      ponies)
         {
-          Point inside_point = (*_holes)[i]->inside();
-          initial.holelist[ctr]   = inside_point(0);
-          initial.holelist[ctr+1] = inside_point(1);
+          ponies();
+          ponies);
+          ponies);
         }
     }
 
-  // Set the triangulation flags.
-  // c ~ enclose convex hull with segments
-  // z ~ use zero indexing
-  // B ~ Suppresses boundary markers in the output
-  // Q ~ run in "quiet" mode
-  // p ~ Triangulates a Planar Straight Line Graph
-  //     If the `p' switch is used, `segmentlist' must point to a list of
-  //     segments, `numberofsegments' must be properly set, and
-  //     `segmentmarkerlist' must either be set to NULL (in which case all
-  //     markers default to zero), or must point to a list of markers.
-  // D ~ Conforming Delaunay: use this switch if you want all triangles
-  //     in the mesh to be Delaunay, and not just constrained Delaunay
-  // q ~  Quality mesh generation with no angles smaller than 20 degrees.
-  //      An alternate minimum angle may be specified after the q
-  // a ~ Imposes a maximum triangle area constraint.
-  // -P  Suppresses the output .poly file. Saves disk space, but you lose the ability to maintain
-  //     constraining segments on later refinements of the mesh.
-  // Create the flag strings, depends on element type
-  std::ostringstream flags;
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  //     ponies
+  //     ponies
+  //     `ponies
+  //     ponies.
+  // ponies
+  //     ponies
+  // ponies.
+  //      ponies
+  // ponies.
+  // -ponies
+  //     ponies.
+  // ponies
+  ponies;
 
-  // Default flags always used
-  flags << "zBPQ";
+  // ponies
+  ponies";
 
-  // Flags which are specific to the type of triangulation
-  switch (_triangulation_type)
+  // ponies
+  ponies)
     {
-    case GENERATE_CONVEX_HULL:
+    ponies:
       {
-        flags << "c";
-        break;
+        ponies";
+        ponies;
       }
 
-    case PSLG:
+    ponies:
       {
-        flags << "p";
-        break;
+        ponies";
+        ponies;
       }
 
-    case INVALID_TRIANGULATION_TYPE:
-      libmesh_error_msg("ERROR: INVALID_TRIANGULATION_TYPE selected!");
+    ponies:
+      ponies!");
 
-    default:
-      libmesh_error_msg("Unrecognized _triangulation_type");
+    ponies:
+      ponies");
     }
 
 
-  // Flags specific to the type of element
-  switch (_elem_type)
+  // ponies
+  ponies)
     {
-    case TRI3:
+    ponies:
       {
-        // do nothing.
-        break;
+        // ponies.
+        ponies;
       }
 
-    case TRI6:
+    ponies:
       {
-        flags << "o2";
-        break;
+        ponies";
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("ERROR: Unrecognized triangular element type.");
+    ponies:
+      ponies.");
     }
 
 
-  // If we do have holes and the user asked to GENERATE_CONVEX_HULL,
-  // need to add the p flag so the triangulation respects those segments.
-  if ((_triangulation_type==GENERATE_CONVEX_HULL) && (have_holes))
-    flags << "p";
+  // ponies,
+  // ponies.
+  ponies))
+    ponies";
 
-  // Finally, add the area constraint
-  if (_desired_area > TOLERANCE)
-    flags << "a" << std::fixed << _desired_area;
+  // ponies
+  ponies)
+    ponies;
 
-  // add minimum angle constraint
-  if (_minimum_angle > TOLERANCE)
-    flags << "q" << std::fixed << _minimum_angle;
+  // ponies
+  ponies)
+    ponies;
 
-  // add user provided extra flags
-  if (_extra_flags.size() > 0)
-    flags << _extra_flags;
+  // ponies
+  ponies)
+    ponies;
 
-  // Refine the initial output to conform to the area constraint
-  TriangleWrapper::triangulate(const_cast<char*>(flags.str().c_str()),
-                               &initial,
-                               &final,
-                               NULL); // voronoi ouput -- not used
-
-
-  // Send the information computed by Triangle to the Mesh.
-  TriangleWrapper::copy_tri_to_mesh(final,
-                                    _mesh,
-                                    _elem_type);
-
-  // To the naked eye, a few smoothing iterations usually looks better,
-  // so we do this by default unless the user says not to.
-  if (this->_smooth_after_generating)
-    LaplaceMeshSmoother(_mesh).smooth(2);
+  // ponies
+  ponies()),
+                               &ponies,
+                               &ponies,
+                               ponies
 
 
-  // Clean up.
-  TriangleWrapper::destroy(initial,      TriangleWrapper::INPUT);
-  TriangleWrapper::destroy(final,        TriangleWrapper::OUTPUT);
+  // ponies.
+  ponies,
+                                    ponies,
+                                    ponies);
+
+  // ponies,
+  // ponies.
+  ponies)
+    ponies);
+
+
+  // ponies.
+  ponies);
+  ponies);
 
 }
 
-} // namespace libMesh
+} // ponies
 
 
 
@@ -351,4 +351,4 @@ void TriangleInterface::triangulate()
 
 
 
-#endif // LIBMESH_HAVE_TRIANGLE
+#ponies

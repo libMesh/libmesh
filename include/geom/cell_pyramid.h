@@ -1,153 +1,153 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_PYRAMID_H
-#define LIBMESH_CELL_PYRAMID_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/cell.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p Pyramid is an element in 3D with 5 sides.
+ * ponies.
  */
-class Pyramid : public Cell
+ponies
 {
-public:
+ponies:
 
   /**
-   * Default pyramid, one quad face, four triangular faces,
-   * takes number of nodes and parent.
-   * Derived classes implement 'true' elements.
+   * ponies,
+   * ponies.
+   * ponies.
    */
-  Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata);
+  ponies);
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_less(i, this->n_nodes());
-    return Point(_master_points[i][0],
-                 _master_points[i][1],
-                 _master_points[i][2]);
+    ponies());
+    ponies],
+                 ponies],
+                 ponies]);
   }
 
   /**
-   * @returns 5.  All pyramid-derivatives are guaranteed to have at
-   * least 5 nodes.
+   * @ponies
+   * ponies.
    */
-  unsigned int n_nodes() const { return 5; }
+  ponies; }
 
   /**
-   * @returns 5
+   * @ponies
    */
-  unsigned int n_sides() const { return 5; }
+  ponies; }
 
   /**
-   * @returns 5.  All pyramids have 5 vertices.
+   * @ponies.
    */
-  unsigned int n_vertices() const { return 5; }
+  ponies; }
 
   /**
-   * @returns 8.  All pyramids have 8 edges.
+   * @ponies.
    */
-  unsigned int n_edges() const { return 8; }
+  ponies; }
 
   /**
-   * @returns 5.  All pyramids have 5 faces.
+   * @ponies.
    */
-  unsigned int n_faces() const { return 5; }
+  ponies; }
 
   /**
-   * @returns 10
+   * @ponies
    */
-  unsigned int n_children() const { return 10; }
+  ponies; }
 
   /*
-   * @returns true iff the specified child is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+  ponies,
+                                ponies;
 
   /*
-   * @returns true iff the specified edge is on the specified side
+   * @ponies
    */
-  virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type key (const unsigned int s) const;
+  ponies;
 
   /**
-   * @returns a primitive triangle or quad for
-   * face i.
+   * @ponies
+   * ponies.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  ponies;
 
 
-protected:
+ponies:
 
   /**
-   * Data for links to parent/neighbor/interior_parent elements.
+   * ponies.
    */
-  Elem* _elemlinks_data[6+(LIBMESH_DIM>3)];
+  ponies)];
 
   /**
-   * Master element node locations
+   * ponies
    */
-  static const Real _master_points[14][3];
+  ponies];
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Matrix that allows children to inherit boundary conditions.
+   * ponies.
    */
-  unsigned int side_children_matrix (const unsigned int,
-                                     const unsigned int) const
-  { libmesh_not_implemented(); return 0; }
+  ponies,
+                                     ponies
+  { ponies; }
 
-#endif
+#ponies
 
 };
 
 
 
 // ------------------------------------------------------------
-// Pyramid class member functions
-inline
-Pyramid::Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata) :
-  Cell(nn, Pyramid::n_sides(), p, _elemlinks_data, nodelinkdata)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_CELL_PYRAMID_H
+#ponies

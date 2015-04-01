@@ -1,220 +1,220 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_EIGEN_SYSTEM_H
-#define LIBMESH_EIGEN_SYSTEM_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-// Currently, the EigenSystem should only be available
-// if SLEPc support is enabled.
-#if defined(LIBMESH_HAVE_SLEPC)
+// ponies
+// ponies.
+#ponies)
 
-// Local Includes
-#include "libmesh/system.h"
-#include "libmesh/eigen_solver.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 
-// Forward Declarations
-template <typename T> class SparseMatrix;
+// ponies
+ponies;
 
 
 /**
- * This class provides a specific system class.  It aims
- * at solving eigenvalue problems.  Currently, this class
- * is able  to handle standard eigenvalue problems
- * \p A*x=lambda*x  and generalited eigenvalue problems
- * \p A*x=lambda*B*x.
+ * ponies
+ * ponies
+ * ponies
+ * \ponies
+ * \ponies.
  */
 
 // ------------------------------------------------------------
-// EigenSystem class definition
+// ponies
 
-class EigenSystem : public System
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  EigenSystem (EquationSystems& es,
-               const std::string& name_in,
-               const unsigned int number_in);
+  ponies,
+               ponies,
+               ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~EigenSystem ();
+  ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef EigenSystem sys_type;
+  ponies;
 
   /**
-   * The type of the parent
+   * ponies
    */
-  typedef System Parent;
+  ponies;
 
   /**
-   * @returns a clever pointer to the system.
+   * @ponies.
    */
-  sys_type & system () { return *this; }
+  ponies; }
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * Assembles & solves the eigen system.
+   * ponies.
    */
-  virtual void solve ();
+  ponies ();
 
   /**
-   * Assembles the system matrix.
+   * ponies.
    */
-  virtual void assemble ();
+  ponies ();
 
   /**
-   * Returns real and imaginary part of the ith eigenvalue and copies
-   * the respective eigen vector to the solution vector.
+   * ponies
+   * ponies.
    */
-  virtual std::pair<Real, Real> get_eigenpair (unsigned int i);
+  ponies);
 
   /**
-   * @returns \p "Eigen".  Helps in identifying
-   * the system type in an equation system file.
+   * @ponies
+   * ponies.
    */
-  virtual std::string system_type () const { return "Eigen"; }
+  ponies"; }
 
   /**
-   * @returns the number of matrices handled by this system
+   * @ponies
    */
-  virtual unsigned int n_matrices () const;
+  ponies;
 
   /**
-   * @returns the number of converged eigenpairs.
+   * @ponies.
    */
-  unsigned int get_n_converged () const {return _n_converged_eigenpairs;}
+  ponies;}
 
   /**
-   * @returns the number of eigen solver iterations.
+   * @ponies.
    */
-  unsigned int get_n_iterations () const {return _n_iterations;}
+  ponies;}
 
   /**
-   * Sets the type of the current eigen problem.
+   * ponies.
    */
-  void set_eigenproblem_type (EigenProblemType ept);
+  ponies);
 
   /**
-   * @returns the eigen problem type.
+   * @ponies.
    */
-  EigenProblemType get_eigenproblem_type () const {return _eigen_problem_type;}
+  ponies;}
 
   /**
-   * @returns true if the underlying problem is generalized
-   * , false otherwise.
+   * @ponies
+   * , ponies.
    */
-  bool generalized () const { return _is_generalized_eigenproblem; }
+  ponies; }
 
   /**
-   * The system matrix for standard eigenvalue problems.
+   * ponies.
    */
-  SparseMatrix<Number> *matrix_A;
+  ponies;
 
   /**
-   * A second system matrix for generalized eigenvalue problems.
+   * ponies.
    */
-  SparseMatrix<Number> *matrix_B;
+  ponies;
 
   /**
-   * The EigenSolver, definig which interface, i.e solver
-   * package to use.
+   * ponies
+   * ponies.
    */
-  UniquePtr<EigenSolver<Number> > eigen_solver;
+  ponies;
 
 
-protected:
+ponies:
 
 
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void init_data ();
+  ponies ();
 
   /**
-   * Initializes the matrices associated with the system
+   * ponies
    */
-  virtual void init_matrices ();
+  ponies ();
 
   /**
-   * Set the _n_converged_eigenpairs member, useful for
-   * subclasses of EigenSystem.
+   * ponies
+   * ponies.
    */
-  void set_n_converged (unsigned int nconv)
-  { _n_converged_eigenpairs = nconv; }
+  ponies)
+  { ponies; }
 
   /**
-   * Set the _n_iterations member, useful for subclasses of
-   * EigenSystem.
+   * ponies
+   * ponies.
    */
-  void set_n_iterations (unsigned int its)
-  { _n_iterations = its;}
+  ponies)
+  { ponies;}
 
 
-private:
+ponies:
 
   /**
-   * The number of converged eigenpairs.
+   * ponies.
    */
-  unsigned int _n_converged_eigenpairs;
+  ponies;
 
   /**
-   * The number of iterations of the eigen solver algorithm.
+   * ponies.
    */
-  unsigned int _n_iterations;
+  ponies;
 
   /**
-   * A boolean flag to indicate whether we are dealing with
-   * a generalized eigenvalue problem.
+   * ponies
+   * ponies.
    */
-  bool _is_generalized_eigenproblem;
+  ponies;
 
   /**
-   * The type of the eigenvalue problem.
+   * ponies.
    */
-  EigenProblemType _eigen_problem_type;
+  ponies;
 
 
 };
@@ -222,20 +222,20 @@ private:
 
 
 // ------------------------------------------------------------
-// EigenSystem inline methods
-inline
-unsigned int EigenSystem::n_matrices () const
+// ponies
+ponies
+ponies
 {
-  if(_is_generalized_eigenproblem)
-    return 2;
+  ponies)
+    ponies;
 
-  return 1;
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_HAVE_SLEPC
+#ponies
 
-#endif // LIBMESH_EIGEN_SYSTEM_H
+#ponies

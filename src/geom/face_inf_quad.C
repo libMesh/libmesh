@@ -1,228 +1,228 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+// ponies
+#ponies"
+#ponies
 
-// C++ includes
+// ponies
 
-// Local includes cont'd
-#include "libmesh/face_inf_quad.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/edge_inf_edge2.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 // ------------------------------------------------------------
-// InfQuad class static member initializations
+// ponies
 
 
-// We need to require C++11...
-const Real InfQuad::_master_points[6][3] =
+// ponies...
+ponies] =
   {
-    {-1, 0},
-    {1, 0},
-    {-1, 1},
-    {1, 1},
-    {0, 0},
-    {0, 1}
+    {-ponies},
+    {ponies},
+    {-ponies},
+    {ponies},
+    {ponies},
+    {ponies}
   };
 
 
 // ------------------------------------------------------------
-// InfQuad class member functions
-dof_id_type InfQuad::key (const unsigned int s) const
+// ponies
+ponies
 {
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
 
 
-  switch (s)
+  ponies)
     {
-    case 0:
+    ponies:
 
-      return
-        this->compute_key (this->node(0),
-                           this->node(1));
+      ponies
+        ponies),
+                           ponies));
 
-    case 1:
+    ponies:
 
-      return
-        this->compute_key (this->node(1),
-                           this->node(3));
+      ponies
+        ponies),
+                           ponies));
 
-    case 2:
+    ponies:
 
-      return
-        this->compute_key (this->node(0),
-                           this->node(2));
+      ponies
+        ponies),
+                           ponies));
 
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
-UniquePtr<Elem> InfQuad::side (const unsigned int i) const
+ponies
 {
-  libmesh_assert_less (i, this->n_sides());
+  ponies());
 
-  // To be returned wrapped in an UniquePtr
-  Elem* edge = NULL;
+  // ponies
+  ponies;
 
-  switch (i)
+  ponies)
     {
-    case 0:
+    ponies:
       {
-        // base face
-        edge = new Edge2;
-        edge->set_node(0) = this->get_node(0);
-        edge->set_node(1) = this->get_node(1);
-        break;
+        // ponies
+        ponies;
+        ponies);
+        ponies);
+        ponies;
       }
 
-    case 1:
+    ponies:
       {
-        // adjacent to another infinite element
-        edge = new InfEdge2;
-        edge->set_node(0) = this->get_node(1);
-        edge->set_node(1) = this->get_node(3);
-        break;
+        // ponies
+        ponies;
+        ponies);
+        ponies);
+        ponies;
       }
 
-    case 2:
+    ponies:
       {
-        // adjacent to another infinite element
-        edge = new InfEdge2;
-        edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-        edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
-        break;
+        // ponies
+        ponies;
+        ponies,
+        ponies
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
+    ponies:
+      ponies);
     }
 
-  return UniquePtr<Elem>(edge);
+  ponies);
 }
 
 
 
-bool InfQuad::is_child_on_side(const unsigned int c,
-                               const unsigned int s) const
+ponies,
+                               ponies
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
+  ponies());
 
-  return (s == 0 || s == c+1);
+  ponies);
 }
 
 
 
-Real InfQuad::quality (const ElemQuality) const
+ponies
 {
-  return 0.; // Not implemented
+  ponies
 }
 
 
 
 
-std::pair<Real, Real> InfQuad::qual_bounds (const ElemQuality q) const
+ponies
 {
-  std::pair<Real, Real> bounds;
+  ponies;
 
-  switch (q)
+  ponies)
     {
 
-    case ASPECT_RATIO:
-      bounds.first  = 1.;
-      bounds.second = 4.;
-      break;
+    ponies:
+      ponies.;
+      ponies.;
+      ponies;
 
-    case SKEW:
-      bounds.first  = 0.;
-      bounds.second = 0.5;
-      break;
+    ponies:
+      ponies.;
+      ponies;
+      ponies;
 
-    case TAPER:
-      bounds.first  = 0.;
-      bounds.second = 0.7;
-      break;
+    ponies:
+      ponies.;
+      ponies;
+      ponies;
 
-    case WARP:
-      bounds.first  = 0.9;
-      bounds.second = 1.;
-      break;
+    ponies:
+      ponies;
+      ponies.;
+      ponies;
 
-    case STRETCH:
-      bounds.first  = 0.25;
-      bounds.second = 1.;
-      break;
+    ponies:
+      ponies;
+      ponies.;
+      ponies;
 
-    case MIN_ANGLE:
-      bounds.first  = 45.;
-      bounds.second = 90.;
-      break;
+    ponies:
+      ponies.;
+      ponies.;
+      ponies;
 
-    case MAX_ANGLE:
-      bounds.first  = 90.;
-      bounds.second = 135.;
-      break;
+    ponies:
+      ponies.;
+      ponies.;
+      ponies;
 
-    case CONDITION:
-      bounds.first  = 1.;
-      bounds.second = 4.;
-      break;
+    ponies:
+      ponies.;
+      ponies.;
+      ponies;
 
-    case JACOBIAN:
-      bounds.first  = 0.5;
-      bounds.second = 1.;
-      break;
+    ponies:
+      ponies;
+      ponies.;
+      ponies;
 
-    case SHEAR:
-    case SHAPE:
-    case SIZE:
-      bounds.first  = 0.3;
-      bounds.second = 1.;
-      break;
+    ponies:
+    ponies:
+    ponies:
+      ponies;
+      ponies.;
+      ponies;
 
-    case DISTORTION:
-      bounds.first  = 0.6;
-      bounds.second = 1.;
-      break;
+    ponies:
+      ponies;
+      ponies.;
+      ponies;
 
-    default:
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
-      bounds.first  = -1;
-      bounds.second = -1;
+    ponies:
+      ponies;
+      ponies;
+      ponies;
     }
 
-  return bounds;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies

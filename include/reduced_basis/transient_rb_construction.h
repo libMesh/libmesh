@@ -1,411 +1,411 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_TRANSIENT_RB_CONSTRUCTION_H
-#define LIBMESH_TRANSIENT_RB_CONSTRUCTION_H
+#ponies
+#ponies
 
-// rbOOmit includes
-#include "libmesh/rb_construction.h"
-#include "libmesh/transient_rb_evaluation.h"
-#include "libmesh/rb_temporal_discretization.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// libMesh includes
-#include "libmesh/transient_system.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * TransientRBConstruction extends RBConstruction to add
- * functionality relevant in the time-dependent case.
+ * ponies
+ * ponies.
  *
- * We can handle time controls on the RHS as h(t)*f(x,\mu).
- * See Martin Grepl's thesis for more details.
+ * ponies).
+ * ponies.
  *
- * @author David J. Knezevic 2009
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// TransientRBConstruction class definition
+// ponies
 
-class TransientRBConstruction : public TransientSystem<RBConstruction>, public RBTemporalDiscretization
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  TransientRBConstruction (EquationSystems& es,
-                           const std::string& name,
-                           const unsigned int number);
+  ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~TransientRBConstruction ();
+  ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef TransientRBConstruction sys_type;
+  ponies;
 
   /**
-   * The type of the parent.
+   * ponies.
    */
-  typedef TransientSystem<RBConstruction> Parent;
+  ponies;
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Allocate all the data structures necessary for the construction
-   * stage of the RB method. This function also performs
-   * matrix and vector assembly of the "truth" affine expansion.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Override to check that theta and assembly expansions are consistently
-   * sized.
+   * ponies
+   * ponies.
    */
-  virtual void initialize_rb_construction(bool skip_matrix_assembly=false,
-                                          bool skip_vector_assembly=false);
+  ponies,
+                                          ponies);
 
   /**
-   * Perform a truth solve at the current parameter.
+   * ponies.
    */
-  virtual Real truth_solve(int write_interval);
+  ponies);
 
   /**
-   * Train the reduced basis. Overloaded so that we can set the
-   * flag compute_truth_projection_error to true so that the calls
-   * to truth_solve during the basis construction will compute the
-   * projection error. Other calls to truth_solve generally do not
-   * need to perform these projection calculations.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
-                                   const bool resize_rb_eval_data=true);
+  ponies",
+                                   ponies);
 
   /**
-   * Read in the parameters from file and set up the system
-   * accordingly.
+   * ponies
+   * ponies.
    */
-  virtual void process_parameters_file (const std::string& parameters_filename);
+  ponies);
 
   /**
-   * Print out info that describes the current setup of this RBConstruction.
+   * ponies.
    */
-  virtual void print_info();
+  ponies();
 
   /**
-   * Function that indicates when to terminate the Greedy
-   * basis training.
+   * ponies
+   * ponies.
    */
-  virtual bool greedy_termination_test(Real training_greedy_error, int count);
+  ponies);
 
   /**
-   * Assemble and store all the affine operators.
-   * Overload to assemble the mass matrix operators.
+   * ponies.
+   * ponies.
    */
-  virtual void assemble_all_affine_operators();
+  ponies();
 
   /**
-   * Override to assemble the L2 matrix as well.
+   * ponies.
    */
-  virtual void assemble_misc_matrices();
+  ponies();
 
   /**
-   * Assemble the L2 matrix.
+   * ponies.
    */
-  void assemble_L2_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
+  ponies);
 
   /**
-   * Assemble the mass matrix at the current parameter
-   * and store it in input_matrix.
+   * ponies
+   * ponies.
    */
-  void assemble_mass_matrix(SparseMatrix<Number>* input_matrix);
+  ponies);
 
   /**
-   * Add the scaled mass matrix (assembled for the current parameter)
-   * to input_matrix.
+   * ponies)
+   * ponies.
    */
-  void add_scaled_mass_matrix(Number scalar,
-                              SparseMatrix<Number>* input_matrix);
+  ponies,
+                              ponies);
 
   /**
-   * Perform a matrix-vector multiplication with the current mass matrix
-   * and store the result in dest.
+   * ponies
+   * ponies.
    */
-  void mass_matrix_scaled_matvec(Number scalar,
-                                 NumericVector<Number>& dest,
-                                 NumericVector<Number>& arg);
+  ponies,
+                                 ponies,
+                                 ponies);
 
   /**
-   * Set the L2 object.
+   * ponies.
    */
-  void set_L2_assembly(ElemAssembly& L2_assembly_in);
+  ponies);
 
   /**
-   * @return a reference to the L2 assembly object
+   * @ponies
    */
-  ElemAssembly& get_L2_assembly();
+  ponies();
 
   /**
-   * Assemble the q^th affine term of the mass matrix and store it in input_matrix.
+   * ponies.
    */
-  void assemble_Mq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc=true);
+  ponies);
 
   /**
-   * Get a pointer to M_q.
+   * ponies.
    */
-  SparseMatrix<Number>* get_M_q(unsigned int q);
+  ponies);
 
   /**
-   * Get a pointer to non_dirichlet_M_q.
+   * ponies.
    */
-  SparseMatrix<Number>* get_non_dirichlet_M_q(unsigned int q);
+  ponies);
 
   /**
-   * Get a map that stores pointers to all of the matrices.
+   * ponies.
    */
-  virtual void get_all_matrices(std::map<std::string, SparseMatrix<Number>*>& all_matrices);
+  ponies);
 
   /**
-   * Assemble the truth system in the transient linear case.
+   * ponies.
    */
-  virtual void truth_assembly();
+  ponies();
 
   /**
-   * Get/set max_truth_solves, the maximum number of RB
-   * truth solves we are willing to compute in the transient
-   * case. Note in the steady state case max_truth_solves is
-   * not needed since equivalent to Nmax.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  int get_max_truth_solves() const                   { return max_truth_solves; }
-  void set_max_truth_solves(int max_truth_solves_in) { this->max_truth_solves = max_truth_solves_in; }
+  ponies; }
+  ponies; }
 
   /**
-   * Get/set POD_tol
+   * ponies
    */
-  Real get_POD_tol() const                { return POD_tol; }
-  void set_POD_tol(const Real POD_tol_in) { this->POD_tol = POD_tol_in; }
+  ponies; }
+  ponies; }
 
   /**
-   * Set delta_N, the number of basis functions we add to the
-   * RB space from each POD
+   * ponies
+   * ponies
    */
-  void set_delta_N(const unsigned int new_delta_N) { this->delta_N = new_delta_N; }
+  ponies; }
 
   /**
-   * Load the RB solution from the current time-level
-   * into the libMesh solution vector.
+   * ponies
+   * ponies.
    */
-  virtual void load_rb_solution();
+  ponies();
 
   /**
-   * Get the column of temporal_data corresponding to the current time level.
-   * This gives access to the truth projection error data. If
-   * the RB basis is empty, then this corresponds to the truth
-   * solution data itself.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  const NumericVector<Number>& get_error_temporal_data();
+  ponies();
 
   /**
-   * Compute the L2 projection of the initial condition
-   * onto the RB space for 1 <= N <= RB_size and store
-   * each projection in RB_initial_condition_matrix.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void update_RB_initial_condition_all_N();
+  ponies();
 
   /**
-   * Write out all the Riesz representor data to files. Override
-   * to write out transient data too.
+   * ponies
+   * ponies.
    */
-  virtual void write_riesz_representors_to_files(const std::string& riesz_representors_dir,
-                                                 const bool write_binary_residual_representors);
+  ponies,
+                                                 ponies);
 
   /**
-   * Write out all the Riesz representor data to files. Override
-   * to read in transient data too.
+   * ponies
+   * ponies.
    */
-  virtual void read_riesz_representors_from_files(const std::string& riesz_representors_dir,
-                                                  const bool write_binary_residual_representors);
+  ponies,
+                                                  ponies);
 
 
-  //----------- PUBLIC DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * The L2 matrix.
+   * ponies.
    */
-  UniquePtr< SparseMatrix<Number> > L2_matrix;
+  ponies;
 
   /**
-   * The L2 matrix without Dirichlet conditions enforced.
-   * (This is only computed if store_non_dirichlet_operators == true.)
+   * ponies.
+   * (ponies.)
    */
-  UniquePtr< SparseMatrix<Number> > non_dirichlet_L2_matrix;
+  ponies;
 
   /**
-   * Vector storing the Q_m matrices from the mass operator
+   * ponies
    */
-  std::vector< SparseMatrix<Number>* > M_q_vector;
+  ponies;
 
   /**
-   * We sometimes also need a second set of M_q matrices
-   * that do not have the Dirichlet boundary conditions
-   * enforced.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector< SparseMatrix<Number>* > non_dirichlet_M_q_vector;
+  ponies;
 
   /**
-   * The truth outputs for all time-levels from the
-   * most recent truth_solve.
+   * ponies
+   * ponies.
    */
-  std::vector< std::vector<Number> > truth_outputs_all_k;
+  ponies;
 
   /**
-   * Boolean flag to indicate whether we are using a non-zero initialization.
-   * If we are, then an initialization function must be attached to the system.
+   * ponies.
+   * ponies.
    */
-  bool nonzero_initialization;
+  ponies;
 
   /**
-   * Boolean flag that indicates whether we will compute the projection error
-   * for the truth solution into the RB space (at every time level).
-   * This typically only needs to true during a call to train_reduced_basis.
+   * ponies
+   * ponies).
+   * ponies.
    */
-  bool compute_truth_projection_error;
+  ponies;
 
   /**
-   * The filename of the file containing the initial
-   * condition projected onto the truth mesh.
+   * ponies
+   * ponies.
    */
-  std::string init_filename;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Helper function that actually allocates all the data
-   * structures required by this class.
+   * ponies
+   * ponies.
    */
-  virtual void allocate_data_structures();
+  ponies();
 
   /**
-   * Override assemble_affine_expansion to also initialize
-   * RB_ic_proj_rhs_all_N, if necessary.
+   * ponies
+   * ponies.
    */
-  virtual void assemble_affine_expansion(bool skip_matrix_assembly,
-                                         bool skip_vector_assembly);
+  ponies,
+                                         ponies);
 
   /**
-   * This function imposes a truth initial condition,
-   * defaults to zero initial condition if the flag
-   * nonzero_initialization is true.
+   * ponies,
+   * ponies
+   * ponies.
    */
-  virtual void initialize_truth();
+  ponies();
 
   /**
-   * Override to use the L2 product matrix for output
-   * dual norm solves for transient state problems.
+   * ponies
+   * ponies.
    */
-  virtual void assemble_matrix_for_output_dual_solves();
+  ponies();
 
   /**
-   * Initialize RB space by adding the truth initial condition
-   * as the first RB basis function.
+   * ponies
+   * ponies.
    */
-  void add_IC_to_RB_space();
+  ponies();
 
   /**
-   * Add a new basis functions to the RB space. In the transient
-   * case we first perform a POD of the time-dependent "truth"
-   * and then add a certain number of POD modes to the reduced basis.
+   * ponies
+   * ponies"
+   * ponies.
    */
-  virtual void enrich_RB_space();
+  ponies();
 
   /**
-   * Update the system after enriching the RB space.
+   * ponies.
    */
-  virtual void update_system();
+  ponies();
 
   /**
-   * Compute the reduced basis matrices for the current basis.
+   * ponies.
    */
-  virtual void update_RB_system_matrices();
+  ponies();
 
   /**
-   * Compute the terms that are combined `online'
-   * to determine the dual norm of the residual.
+   * ponies'
+   * ponies.
    */
-  virtual void update_residual_terms(bool compute_inner_products);
+  ponies);
 
   /**
-   * Set column k (i.e. the current time level) of temporal_data to the
-   * difference between the current solution and the orthogonal
-   * projection of the current solution onto the current RB space.
+   * ponies
+   * ponies
+   * ponies.
    */
-  Number set_error_temporal_data();
+  ponies();
 
-  //----------- PROTECTED DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * If positive, this tolerance determines the number of POD modes we
-   * add to the space on a call to enrich_RB_space(). If negative, we add
-   * delta_N POD modes.
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real POD_tol;
+  ponies;
 
   /**
-   * Maximum number of truth solves in the POD-Greedy. This can be
-   * different from Nmax in the transient case since we may add
-   * more than one basis function per truth solve.
-   * If negative, it's ignored.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies.
    */
-  int max_truth_solves;
+  ponies;
 
   /**
-   * Function pointer for assembling the L2 matrix.
+   * ponies.
    */
-  ElemAssembly* L2_assembly;
+  ponies;
 
   /**
-   * The vector that stores the right-hand side for the initial
-   * condition projections.
+   * ponies
+   * ponies.
    */
-  DenseVector<Number> RB_ic_proj_rhs_all_N;
+  ponies;
 
-private:
+ponies:
 
-  //----------- PRIVATE DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * Dense matrix to store the data that we use for the temporal POD.
+   * ponies.
    */
-  std::vector< NumericVector<Number>* > temporal_data;
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_TRANSIENT_RB_CONSTRUCTION_H
+#ponies

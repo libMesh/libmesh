@@ -1,201 +1,201 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// Local includes
-#include "libmesh/xdr_soln.h"
-#include "libmesh/xdr_shead.h"
+// ponies
+#ponies"
+#ponies"
 
-// System includes
-#include <string.h>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// XdrSOLN members
-int XdrSOLN::header(XdrSHEAD *hd)
+// ponies
+ponies)
 {
 
-  switch (m_type)
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-    case (XdrMGF::ENCODE):
-    case (XdrMGF::DECODE):
+    ponies):
+    ponies):
       {
 
-        xdr_int(mp_xdr_handle,  &(hd->m_wrtVar));
-        xdr_int(mp_xdr_handle,  &(hd->m_numvar));
-        xdr_int(mp_xdr_handle,  &(hd->m_numNodes));
-        xdr_int(mp_xdr_handle,  &(hd->m_meshCnt));
-        xdr_int(mp_xdr_handle,  &(hd->m_kstep));
-        xdr_int(mp_xdr_handle,  &(hd->m_strSize));
-        xdr_REAL(mp_xdr_handle, &(hd->m_time));
+        ponies));
+        ponies));
+        ponies));
+        ponies));
+        ponies));
+        ponies));
+        ponies));
 
-        m_wrtVar=hd->m_wrtVar;
+        ponies;
 
-        char* temp = const_cast<char *>(hd->getId());
-        xdr_string(mp_xdr_handle,&(temp),
-                   ((m_type == XdrMGF::ENCODE) ? std::strlen(temp)    : hd->m_strSize));
-        hd->setId(temp);
+        ponies());
+        ponies),
+                   ((ponies));
+        ponies);
 
-        temp = const_cast<char *>(hd->getTitle());
-        xdr_string(mp_xdr_handle,&(temp),
-                   ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
-        hd->setTitle(temp);
+        ponies());
+        ponies),
+                   ((ponies));
+        ponies);
 
-        temp = const_cast<char *>(hd->getUserTitle());
-        xdr_string(mp_xdr_handle,&(temp),
-                   ((m_type == XdrMGF::ENCODE) ? std::strlen(temp) : hd->m_strSize));
-        hd->setUserTitle(temp);
-
-
-        char * tempTitle = new char[hd->m_strSize*m_wrtVar];
+        ponies());
+        ponies),
+                   ((ponies));
+        ponies);
 
 
-        if (m_type == XdrMGF::DECODE)
+        ponies];
+
+
+        ponies)
           {
-            xdr_string(mp_xdr_handle, &tempTitle, hd->m_strSize*m_wrtVar);
-            std::size_t olen= std::strlen(tempTitle);
-            char *top = tempTitle;
-            for (int ivar = 0; ivar < m_wrtVar; ++ivar)
+            ponies);
+            ponies);
+            ponies;
+            ponies)
               {
-                char *p = strchr(tempTitle,' ');
-                *p = '\0';
-                std::size_t tempSize = std::strlen(tempTitle) ;
-                tempTitle+=tempSize+1;
+                ponies,' ');
+                *ponies';
+                ponies) ;
+                ponies;
               }
-            tempTitle = top;
-            hd->mp_varTitle = new char[olen];
-            std::memcpy(hd->mp_varTitle,tempTitle,olen*sizeof(char));
+            ponies;
+            ponies];
+            ponies));
           }
-        else if (m_type == XdrMGF::ENCODE)
+        ponies)
           {
-            char *p = hd->mp_varTitle;
-            char *top = tempTitle;
-            for (int ivar = 0; ivar < m_wrtVar; ++ivar)
+            ponies;
+            ponies;
+            ponies)
               {
-                std::size_t tempSize = std::strlen(p) + 1;
-                std::memcpy(tempTitle,p,tempSize*sizeof(char));
-                tempSize = std::strlen(tempTitle);
-                tempTitle[tempSize] = ' ';
-                tempTitle += tempSize+1;
-                p += tempSize+1;
+                ponies;
+                ponies));
+                ponies);
+                ponies] = ' ';
+                ponies;
+                ponies;
               }
-            tempTitle = top;
-            xdr_string(mp_xdr_handle, &tempTitle, hd->m_strSize*m_wrtVar);
+            ponies;
+            ponies);
           }
-        delete [] tempTitle;
+        ponies;
 
-        return 0;
+        ponies;
       }
-#endif
+#ponies
 
 
-    case (XdrMGF::R_ASCII):
+    ponies):
       {
-        // Temporary variables to facilitate stream reading
-        const int comm_len= 80;
-        char comment[comm_len];
+        // ponies
+        ponies;
+        ponies];
 
-        libmesh_assert (mp_in.good());
+        ponies());
 
-        mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
-        mp_in >> hd->m_wrtVar   ; mp_in.getline(comment, comm_len);
-        mp_in >> hd->m_strSize  ; mp_in.getline(comment, comm_len);
-        mp_in >> hd->m_time     ; mp_in.getline(comment, comm_len);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        mp_in.getline(comment, comm_len);
-        hd->setId(comment);
+        ponies);
+        ponies);
 
-        mp_in.getline(comment, comm_len);
-        hd->setTitle(comment);
+        ponies);
+        ponies);
 
-        mp_in.getline(comment, comm_len);
-        hd->setUserTitle(comment);
+        ponies);
+        ponies);
 
-        m_wrtVar = hd->m_wrtVar;
+        ponies;
 
-        // Read the variable names
+        // ponies
         {
-          std::string var_name;
-          char* titles = new char[hd->m_wrtVar*hd->m_strSize];
-          unsigned int c=0;
+          ponies;
+          ponies];
+          ponies;
 
-          for (int var=0; var < hd->m_wrtVar; var++)
+          ponies++)
             {
-              mp_in >> var_name;
+              ponies;
 
-              for (unsigned int l=0; l<var_name.size(); l++)
-                titles[c++] = var_name[l];
+              ponies++)
+                ponies];
 
-              titles[c++] = '\0';
+              ponies';
             }
 
-          mp_in.getline(comment, comm_len);
+          ponies);
 
-          hd->setVarTitle(titles, c);
+          ponies);
 
-          delete [] titles;
+          ponies;
         }
 
 
-        return 0;
+        ponies;
       }
 
 
-    case (XdrMGF::W_ASCII):
+    ponies):
       {
-        mp_out << hd->m_numNodes   << "\t # Num. Nodes\n";
-        mp_out << hd->m_wrtVar     << "\t # Num. of Vars\n";
-        mp_out << hd->m_strSize    << "\t # String Size (ignore)\n";
-        mp_out << hd->m_time       << "\t # Current Time\n";
-        mp_out << hd->mp_id        << '\n';
-        mp_out << hd->mp_title     << '\n';
-        mp_out << hd->mp_userTitle << '\n';
+        ponies";
+        ponies";
+        ponies";
+        ponies";
+        ponies';
+        ponies';
+        ponies';
 
-        // write the variable names
+        // ponies
         {
-          const char* p = hd->getVarTitle();
+          ponies();
 
-          for (int var=0; var<hd->m_wrtVar ; var++)
+          ponies++)
             {
-              mp_out << p << " ";
-              p += std::strlen(p)+1;
+              ponies << " ";
+              ponies;
             }
-          mp_out << "\t # Variable Names\n";
+          ponies";
         }
 
-        m_wrtVar = hd->m_wrtVar;
+        ponies;
 
-        return 0;
+        ponies;
       }
 
 
 
-    default:
-      // Unknown access type
-      libmesh_error_msg("Unknown m_type" << m_type);
+    ponies:
+      // ponies
+      ponies);
     }
 
-  return 1;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

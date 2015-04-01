@@ -1,71 +1,71 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_THETA_H
-#define LIBMESH_RB_THETA_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-class RBParameters;
+ponies;
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * RBTheta provides a default functor class with which
- * to define the parameter-dependent functions required
- * for the PDE decomposition employed by the Reduced
- * Basis method.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
-class RBTheta : public ReferenceCountedObject<RBTheta>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  RBTheta () {}
+  ponies () {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBTheta () {}
+  ponies () {}
 
   /**
-   * Evaluate the functor object for the given parameter.
-   * Default implementation is to return 1, overload
-   * to provide problem dependent behavior.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual Number evaluate(const RBParameters& ) { return 1.; }
+  ponies.; }
 
 };
 
 }
 
-#endif // LIBMESH_RB_THETA_H
+#ponies

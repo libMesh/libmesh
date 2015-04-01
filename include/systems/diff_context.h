@@ -1,599 +1,599 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DIFF_CONTEXT_H
-#define LIBMESH_DIFF_CONTEXT_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_submatrix.h"
-#include "libmesh/dense_subvector.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/id_types.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <map>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-template <typename T> class NumericVector;
-class System;
+// ponies
+ponies;
+ponies;
 
 /**
- * This class provides all data required for a physics package
- * (e.g. a DifferentiableSystem subclass) to perform local element
- * residual and jacobian integrations.
+ * ponies
+ * (ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2009
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DifferentiableSystem class definition
+// ponies
 
-class DiffContext
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  explicit
-  DiffContext (const System &);
+  ponies
+  ponies &);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~DiffContext ();
+  ponies ();
 
   /**
-   * Gives derived classes the opportunity to reinitialize data (FE objects in
-   * FEMSystem, for example) needed for an interior integration at a new point
-   * within a timestep
+   * ponies
+   * ponies
+   * ponies
    */
-  virtual void elem_reinit(Real /* theta */) {}
+  ponies */) {}
 
   /**
-   * Gives derived classes the opportunity to reinitialize data needed
-   * for a side integration at a new point within a timestep
+   * ponies
+   * ponies
    */
-  virtual void elem_side_reinit(Real /* theta */) {}
+  ponies */) {}
 
   /**
-   * Gives derived classes the opportunity to reinitialize data needed
-   * for an edge integration at a new point within a timestep
+   * ponies
+   * ponies
    */
-  virtual void elem_edge_reinit(Real /* theta */) {}
+  ponies */) {}
 
   /**
-   * Gives derived classes the opportunity to reinitialize data needed
-   * for nonlocal calculations at a new point within a timestep
+   * ponies
+   * ponies
    */
-  virtual void nonlocal_reinit(Real /* theta */) {}
+  ponies */) {}
 
   /**
-   * Number of variables in solution.
+   * ponies.
    */
-  unsigned int n_vars() const
-  { return cast_int<unsigned int>(_dof_indices_var.size()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Accessor for associated system.
+   * ponies.
    */
-  const System& get_system() const
-  { return _system; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for element solution.
+   * ponies.
    */
-  const DenseVector<Number>& get_elem_solution() const
-  { return _elem_solution; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element solution.
+   * ponies.
    */
-  DenseVector<Number>& get_elem_solution()
-  { return _elem_solution; }
+  ponies()
+  { ponies; }
 
   /**
-   * Accessor for element solution of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  const DenseSubVector<Number>& get_elem_solution( unsigned int var ) const
+  ponies
   {
-    libmesh_assert_greater(_elem_subsolutions.size(), var);
-    libmesh_assert(_elem_subsolutions[var]);
-    return *(_elem_subsolutions[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Accessor for element solution of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  DenseSubVector<Number>& get_elem_solution( unsigned int var )
+  ponies )
   {
-    libmesh_assert_greater(_elem_subsolutions.size(), var);
-    libmesh_assert(_elem_subsolutions[var]);
-    return *(_elem_subsolutions[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Accessor for element solution rate of change w.r.t. time.
+   * ponies.
    */
-  const DenseVector<Number>& get_elem_solution_rate() const
-  { return _elem_solution_rate; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element solution rate of change w.r.t.
-   * time.
+   * ponies.
+   * ponies.
    */
-  DenseVector<Number>& get_elem_solution_rate()
-  { return _elem_solution_rate; }
+  ponies()
+  { ponies; }
 
   /**
-   * Accessor for element solution rate for a particular variable
-   * corresponding to the variable index argument.
+   * ponies
+   * ponies.
    */
-  const DenseSubVector<Number>& get_elem_solution_rate( unsigned int var ) const
+  ponies
   {
-    libmesh_assert_greater(_elem_subsolution_rates.size(), var);
-    libmesh_assert(_elem_subsolution_rates[var]);
-    return *(_elem_subsolution_rates[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Accessor for element solution rate for a particular variable
-   * corresponding to the variable index argument.
+   * ponies
+   * ponies.
    */
-  DenseSubVector<Number>& get_elem_solution_rate( unsigned int var )
+  ponies )
   {
-    libmesh_assert_greater(_elem_subsolution_rates.size(), var);
-    libmesh_assert(_elem_subsolution_rates[var]);
-    return *(_elem_subsolution_rates[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
 
   /**
-   * Accessor for element fixed solution.
+   * ponies.
    */
-  const DenseVector<Number>& get_elem_fixed_solution() const
-  { return _elem_fixed_solution; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element fixed solution.
+   * ponies.
    */
-  DenseVector<Number>& get_elem_fixed_solution()
-  { return _elem_fixed_solution; }
+  ponies()
+  { ponies; }
 
   /**
-   * Accessor for element fixed solution of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  const DenseSubVector<Number>& get_elem_fixed_solution( unsigned int var ) const
+  ponies
   {
-    libmesh_assert_greater(_elem_fixed_subsolutions.size(), var);
-    libmesh_assert(_elem_fixed_subsolutions[var]);
-    return *(_elem_fixed_subsolutions[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Accessor for element fixed solution of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  DenseSubVector<Number>& get_elem_fixed_solution( unsigned int var )
+  ponies )
   {
-    libmesh_assert_greater(_elem_fixed_subsolutions.size(), var);
-    libmesh_assert(_elem_fixed_subsolutions[var]);
-    return *(_elem_fixed_subsolutions[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Const accessor for element residual.
+   * ponies.
    */
-  const DenseVector<Number>& get_elem_residual() const
-  { return _elem_residual; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element residual.
+   * ponies.
    */
-  DenseVector<Number>& get_elem_residual()
-  { return _elem_residual; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for element residual of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  const DenseSubVector<Number>& get_elem_residual( unsigned int var ) const
+  ponies
   {
-    libmesh_assert_greater(_elem_subresiduals.size(), var);
-    libmesh_assert(_elem_subresiduals[var]);
-    return *(_elem_subresiduals[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Non-const accessor for element residual of a particular variable corresponding
-   * to the variable index argument.
+   * ponies
+   * ponies.
    */
-  DenseSubVector<Number>& get_elem_residual( unsigned int var )
+  ponies )
   {
-    libmesh_assert_greater(_elem_subresiduals.size(), var);
-    libmesh_assert(_elem_subresiduals[var]);
-    return *(_elem_subresiduals[var]);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Const accessor for element Jacobian.
+   * ponies.
    */
-  const DenseMatrix<Number>& get_elem_jacobian() const
-  { return _elem_jacobian; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element Jacobian.
+   * ponies.
    */
-  DenseMatrix<Number>& get_elem_jacobian()
-  { return _elem_jacobian; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for element Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  const DenseSubMatrix<Number>& get_elem_jacobian( unsigned int var1, unsigned int var2 ) const
+  ponies
   {
-    libmesh_assert_greater(_elem_subjacobians.size(), var1);
-    libmesh_assert_greater(_elem_subjacobians[var1].size(), var2);
-    libmesh_assert(_elem_subjacobians[var1][var2]);
-    return *(_elem_subjacobians[var1][var2]);
+    ponies);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Non-const accessor for element Jacobian of particular variables corresponding
-   * to the variable index arguments.
+   * ponies
+   * ponies.
    */
-  DenseSubMatrix<Number>& get_elem_jacobian( unsigned int var1, unsigned int var2 )
+  ponies )
   {
-    libmesh_assert_greater(_elem_subjacobians.size(), var1);
-    libmesh_assert_greater(_elem_subjacobians[var1].size(), var2);
-    libmesh_assert(_elem_subjacobians[var1][var2]);
-    return *(_elem_subjacobians[var1][var2]);
+    ponies);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Const accessor for QoI vector.
+   * ponies.
    */
-  const std::vector<Number>& get_qois() const
-  { return _elem_qoi; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for QoI vector.
+   * ponies.
    */
-  std::vector<Number>& get_qois()
-  { return _elem_qoi; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for QoI derivatives.
+   * ponies.
    */
-  const std::vector<DenseVector<Number> > & get_qoi_derivatives() const
-  { return _elem_qoi_derivative; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for QoI derivatives.
+   * ponies.
    */
-  std::vector<DenseVector<Number> > & get_qoi_derivatives()
-  { return _elem_qoi_derivative; }
+  ponies()
+  { ponies; }
 
   /**
-   * Const accessor for QoI derivative of a particular qoi and variable corresponding
-   * to the index arguments.
+   * ponies
+   * ponies.
    */
-  const DenseSubVector<Number>& get_qoi_derivatives( unsigned int qoi, unsigned int var ) const
+  ponies
   {
-    libmesh_assert_greater(_elem_qoi_subderivatives.size(), qoi);
-    libmesh_assert_greater(_elem_qoi_subderivatives[qoi].size(), var);
-    libmesh_assert(_elem_qoi_subderivatives[qoi][var]);
-    return *(_elem_qoi_subderivatives[qoi][var]);
+    ponies);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Non-const accessor for QoI derivative of a particular qoi and variable corresponding
-   * to the index arguments.
+   * ponies
+   * ponies.
    */
-  DenseSubVector<Number>& get_qoi_derivatives( unsigned int qoi, unsigned int var )
+  ponies )
   {
-    libmesh_assert_greater(_elem_qoi_subderivatives.size(), qoi);
-    libmesh_assert_greater(_elem_qoi_subderivatives[qoi].size(), var);
-    libmesh_assert(_elem_qoi_subderivatives[qoi][var]);
-    return *(_elem_qoi_subderivatives[qoi][var]);
+    ponies);
+    ponies);
+    ponies]);
+    ponies]);
   }
 
   /**
-   * Accessor for element dof indices
+   * ponies
    */
-  const std::vector<dof_id_type>& get_dof_indices() const
-  { return _dof_indices; }
+  ponies
+  { ponies; }
 
   /**
-   * Non-const accessor for element dof indices
+   * ponies
    */
-  std::vector<dof_id_type>& get_dof_indices()
-  { return _dof_indices; }
+  ponies()
+  { ponies; }
 
   /**
-   * Accessor for element dof indices of a particular variable corresponding
-   * to the index argument.
+   * ponies
+   * ponies.
    */
-  const std::vector<dof_id_type>& get_dof_indices( unsigned int var ) const
+  ponies
   {
-    libmesh_assert_greater(_dof_indices_var.size(), var);
-    return _dof_indices_var[var];
+    ponies);
+    ponies];
   }
 
   /**
-   * Accessor for element dof indices of a particular variable corresponding
-   * to the index argument.
+   * ponies
+   * ponies.
    */
-  std::vector<dof_id_type>& get_dof_indices( unsigned int var )
+  ponies )
   {
-    libmesh_assert_greater(_dof_indices_var.size(), var);
-    return _dof_indices_var[var];
+    ponies);
+    ponies];
   }
 
   /**
-   * Accessor for the time variable stored in the system class.
+   * ponies.
    */
-  Real get_system_time() const
-  { return system_time; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for the time for which the current nonlinear_solution is defined.
+   * ponies.
    */
-  Real get_time() const
-  { return time; }
+  ponies
+  { ponies; }
 
   /**
-   * Set the time for which the current nonlinear_solution is defined.
+   * ponies.
    */
-  void set_time( Real time_in )
-  { time = time_in; }
+  ponies )
+  { ponies; }
 
   /**
-   * The derivative of the current elem_solution w.r.t. the unknown
-   * solution.  Corresponding Jacobian contributions should be
-   * multiplied by this amount, or may be skipped if
-   * get_elem_solution_derivative() is 0.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real get_elem_solution_derivative() const
-  { return elem_solution_derivative; }
+  ponies
+  { ponies; }
 
   /**
-   * The derivative of the current elem_solution_rate w.r.t. the
-   * unknown solution.  Corresponding Jacobian contributions should be
-   * multiplied by this amount, or may be skipped if
-   * get_elem_solution_rate_derivative() is 0.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real get_elem_solution_rate_derivative() const
-  { return elem_solution_rate_derivative; }
+  ponies
+  { ponies; }
 
   /**
-   * The derivative of the current fixed_elem_solution w.r.t. the
-   * unknown solution.  Corresponding Jacobian contributions should be
-   * multiplied by this amount, or may be skipped if
-   * get_fixed_elem_solution_derivative() is 0.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real get_fixed_solution_derivative() const
-  { return fixed_solution_derivative; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for querying whether we need to do a primal
-   * or adjoint solve
+   * ponies
+   * ponies
    */
-  bool is_adjoint() const
-  { return _is_adjoint; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for setting whether we need to do a primal
-   * or adjoint solve
+   * ponies
+   * ponies
    */
-  bool& is_adjoint()
-  { return _is_adjoint; }
+  ponies()
+  { ponies; }
 
   /**
-   * For time-dependent problems, this is the time t for which the current
-   * nonlinear_solution is defined.
-   * FIXME - this needs to be tweaked mid-timestep by all transient solvers!
+   * ponies
+   * ponies.
+   * ponies!
    */
-  Real time;
+  ponies;
 
   /**
-   * This is the time stored in the System class at the time this context
-   * was created, i.e. the time at the beginning of the current timestep.
-   * This value gets set in the constructor and unlike DiffContext::time,
-   * is not tweaked mid-timestep by transient solvers: it remains equal
-   * to the value it was assigned at construction.
+   * ponies
+   * ponies.
+   * ponies,
+   * ponies
+   * ponies.
    */
-  const Real system_time;
+  ponies;
 
   /**
-   * The derivative of elem_solution with respect to the current
-   * nonlinear solution.
+   * ponies
+   * ponies.
    */
-  Real elem_solution_derivative;
+  ponies;
 
   /**
-   * The derivative of elem_solution_rate with respect to the current
-   * nonlinear solution, for use by systems with non default
-   * mass_residual terms.
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real elem_solution_rate_derivative;
+  ponies;
 
   /**
-   * The derivative of elem_fixed_solution with respect to the nonlinear
-   * solution, for use by systems constructing jacobians with
-   * elem_fixed_solution based methods
+   * ponies
+   * ponies
+   * ponies
    */
-  Real fixed_solution_derivative;
+  ponies;
 
   /**
-   * Points the _deltat member of this class at a timestep value
-   * stored in the creating System, for example DiffSystem::deltat
+   * ponies
+   * ponies
    */
-  void set_deltat_pointer(Real* dt);
+  ponies);
 
   /**
-   * Returns the value currently pointed to by this class's _deltat
-   * member
+   * ponies
+   * ponies
    */
-  Real get_deltat_value();
+  ponies();
 
   /**
-   * Adds a vector to the map of localized vectors. We can later evaluate interior_values,
-   * interior_gradients and side_values for these fields these vectors represent.
+   * ponies,
+   * ponies.
    */
-  void add_localized_vector (NumericVector<Number> & localized_vector, const System & sys);
+  ponies);
 
   /**
-   * Typedef for the localized_vectors iterator
+   * ponies
    */
-  typedef std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::iterator localized_vectors_iterator;
+  ponies;
 
   /**
-   * Return a reference to DenseVector localization of localized_vector
-   * contained in the _localized_vectors map
+   * ponies
+   * ponies
    */
-  DenseVector<Number> & get_localized_vector (const NumericVector<Number> & localized_vector);
+  ponies);
 
   /**
-   * const accessible version of get_localized_vector function
+   * ponies
    */
-  const DenseVector<Number> & get_localized_vector (const NumericVector<Number> & localized_vector) const;
+  ponies;
 
   /**
-   * Return a reference to DenseSubVector localization of localized_vector at variable var
-   * contained in the _localized_vectors map
+   * ponies
+   * ponies
    */
-  DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var);
+  ponies);
 
   /**
-   * const accessible version of get_localized_subvector function
+   * ponies
    */
-  const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var) const;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Contains pointers to vectors the user has asked to be localized, keyed with
-   * pairs of element localized versions of that vector and per variable views
+   * ponies
+   * ponies
    */
 
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > _localized_vectors;
+  ponies;
 
   /**
-   * Element by element components of nonlinear_solution
-   * as adjusted by a time_solver
+   * ponies
+   * ponies
    */
-  DenseVector<Number> _elem_solution;
-  std::vector<DenseSubVector<Number> *> _elem_subsolutions;
+  ponies;
+  ponies;
 
   /**
-   * Element by element components of du/dt
-   * as adjusted by a time_solver
+   * ponies
+   * ponies
    */
-  DenseVector<Number> _elem_solution_rate;
-  std::vector<DenseSubVector<Number> *> _elem_subsolution_rates;
+  ponies;
+  ponies;
 
   /**
-   * Element by element components of nonlinear_solution
-   * at a fixed point in a timestep, for optional use by e.g.
-   * stabilized methods
+   * ponies
+   * ponies.
+   * ponies
    */
-  DenseVector<Number> _elem_fixed_solution;
-  std::vector<DenseSubVector<Number> *> _elem_fixed_subsolutions;
+  ponies;
+  ponies;
 
   /**
-   * Element residual vector
+   * ponies
    */
-  DenseVector<Number> _elem_residual;
+  ponies;
 
   /**
-   * Element jacobian: derivatives of elem_residual with respect to
-   * elem_solution
+   * ponies
+   * ponies
    */
-  DenseMatrix<Number> _elem_jacobian;
+  ponies;
 
   /**
-   * Element quantity of interest contributions
+   * ponies
    */
-  std::vector<Number> _elem_qoi;
+  ponies;
 
   /**
-   * Element quantity of interest derivative contributions
+   * ponies
    */
-  std::vector<DenseVector<Number> > _elem_qoi_derivative;
-  std::vector<std::vector<DenseSubVector<Number> *> > _elem_qoi_subderivatives;
+  ponies;
+  ponies;
 
   /**
-   * Element residual subvectors and Jacobian submatrices
+   * ponies
    */
-  std::vector<DenseSubVector<Number> *> _elem_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_subjacobians;
+  ponies;
+  ponies;
 
   /**
-   * Global Degree of freedom index lists
+   * ponies
    */
-  std::vector<dof_id_type> _dof_indices;
-  std::vector<std::vector<dof_id_type> > _dof_indices_var;
+  ponies;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Default NULL, can optionally be used to point to a timestep value
-   * in the System-derived class responsible for creating this DiffContext.
+   * ponies
+   * ponies.
    *
-   * In DiffSystem's build_context() function, is assigned to point to
-   * the deltat member of that class.
+   * ponies
+   * ponies.
    *
-   * Accessible via public get_deltat()/set_deltat() methods of this class.
+   * ponies.
    *
-   * Always test for NULL before using!
+   * ponies!
    */
-  Real* _deltat;
+  ponies;
 
   /**
-   * A reference to the system this context is constructed with
+   * ponies
    */
-  const System& _system;
+  ponies;
 
   /**
-   * Is this context to be used for a primal or adjoint solve?
+   * ponies?
    */
-  bool _is_adjoint;
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_DIFF_CONTEXT_H
+#ponies

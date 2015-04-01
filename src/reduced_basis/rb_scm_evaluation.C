@@ -1,579 +1,579 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// Configuration data
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
-// Currently, the RBSCMEvaluation should only be available
-// if SLEPc support is enabled.
-#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+// ponies
+// ponies.
+#ponies)
 
-// rbOOmit includes
-#include "libmesh/rb_scm_evaluation.h"
+// ponies
+#ponies"
 
-// libMesh includes
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/sparse_matrix.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/getpot.h"
-#include "libmesh/parallel.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/xdr_cxx.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// For creating a directory
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-// glpk includes
-#include <glpk.h>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-RBSCMEvaluation::RBSCMEvaluation (const Parallel::Communicator &comm_in) :
-  ParallelObject(comm_in)
+ponies) :
+  ponies)
 {
-  // Clear SCM data vectors
-  B_min.clear();
-  B_max.clear();
-  C_J.clear();
-  C_J_stability_vector.clear();
-  SCM_UB_vectors.clear();
+  // ponies
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
 }
 
-RBSCMEvaluation::~RBSCMEvaluation ()
+ponies ()
 {
 }
 
-void RBSCMEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in)
+ponies)
 {
-  rb_theta_expansion = &rb_theta_expansion_in;
+  ponies;
 }
 
-RBThetaExpansion& RBSCMEvaluation::get_rb_theta_expansion()
+ponies()
 {
-  if(!rb_theta_expansion)
-    libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
+  ponies)
+    ponies");
 
-  return *rb_theta_expansion;
+  ponies;
 }
 
-void RBSCMEvaluation::set_C_J_stability_constraint(unsigned int j, Real stability_const_in)
+ponies)
 {
-  if(j >= C_J_stability_vector.size())
-    libmesh_error_msg("Error: Input parameter j is too large in set_C_J_stability_constraint.");
+  ponies())
+    ponies.");
 
-  // we assume that C_J_stability_vector is resized elsewhere
-  // to be the same size as C_J.
-  libmesh_assert_equal_to (C_J_stability_vector.size(), C_J.size());
+  // ponies
+  // ponies.
+  ponies());
 
-  C_J_stability_vector[j] = stability_const_in;
+  ponies;
 }
 
-Real RBSCMEvaluation::get_C_J_stability_constraint(unsigned int j) const
+ponies
 {
-  if(j >= C_J_stability_vector.size())
-    libmesh_error_msg("Error: Input parameter j is too large in get_C_J_stability_constraint.");
+  ponies())
+    ponies.");
 
-  return C_J_stability_vector[j];
+  ponies];
 }
 
-void RBSCMEvaluation::set_SCM_UB_vector(unsigned int j, unsigned int q, Real y_q)
+ponies)
 {
-  // First make sure that j <= J
-  if(j >= SCM_UB_vectors.size())
-    libmesh_error_msg("Error: We must have j < J in set_SCM_UB_vector.");
+  // ponies
+  ponies())
+    ponies.");
 
-  // Next make sure that q <= Q_a or Q_a_hat
-  if(q >= SCM_UB_vectors[0].size())
-    libmesh_error_msg("Error: q is too large in set_SCM_UB_vector.");
+  // ponies
+  ponies())
+    ponies.");
 
-  SCM_UB_vectors[j][q] = y_q;
+  ponies;
 }
 
-Real RBSCMEvaluation::get_SCM_UB_vector(unsigned int j, unsigned int q)
+ponies)
 {
-  // First make sure that j <= J
-  if(j >= SCM_UB_vectors.size())
-    libmesh_error_msg("Error: We must have j < J in get_SCM_UB_vector.");
+  // ponies
+  ponies())
+    ponies.");
 
-  if(q >= SCM_UB_vectors[0].size())
-    libmesh_error_msg("Error: q is too large in get_SCM_UB_vector.");
+  ponies())
+    ponies.");
 
-  return SCM_UB_vectors[j][q];
+  ponies];
 }
 
-const RBParameters& RBSCMEvaluation::get_C_J_entry(unsigned int j)
+ponies)
 {
-  if(j >= C_J.size())
-    libmesh_error_msg("Error: Input parameter j is too large in get_C_J.");
+  ponies())
+    ponies.");
 
-  return C_J[j];
+  ponies];
 }
 
-Real RBSCMEvaluation::get_B_min(unsigned int q) const
+ponies
 {
-  if(q >= B_min.size())
-    libmesh_error_msg("Error: q is too large in get_B_min.");
+  ponies())
+    ponies.");
 
-  return B_min[q];
+  ponies];
 }
 
 
-Real RBSCMEvaluation::get_B_max(unsigned int q) const
+ponies
 {
-  if(q >= B_max.size())
-    libmesh_error_msg("Error: q is too large in get_B_max.");
+  ponies())
+    ponies.");
 
-  return B_max[q];
+  ponies];
 }
 
-void RBSCMEvaluation::set_B_min(unsigned int q, Real B_min_val)
+ponies)
 {
-  if(q >= B_min.size())
-    libmesh_error_msg("Error: q is too large in set_B_min.");
+  ponies())
+    ponies.");
 
-  B_min[q] = B_min_val;
+  ponies;
 }
 
-void RBSCMEvaluation::set_B_max(unsigned int q, Real B_max_val)
+ponies)
 {
-  if(q >= B_max.size())
-    libmesh_error_msg("Error: q is too large in set_B_max.");
+  ponies())
+    ponies.");
 
-  B_max[q] = B_max_val;
+  ponies;
 }
 
-Real RBSCMEvaluation::get_SCM_LB()
+ponies()
 {
-  START_LOG("get_SCM_LB()", "RBSCMEvaluation");
+  ponies");
 
-  // Initialize the LP
-  glp_prob *lp;
-  lp = glp_create_prob();
-  glp_set_obj_dir(lp,GLP_MIN);
+  // ponies
+  ponies;
+  ponies();
+  ponies);
 
-  // Add columns to the LP: corresponds to
-  // the variables y_1,...y_Q_a.
-  // These are the same for each \mu in the SCM
-  // training set, hence can do this up front.
-  glp_add_cols(lp,rb_theta_expansion->get_n_A_terms());
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
+  ponies());
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
+  ponies++)
     {
-      if(B_max[q] < B_min[q]) // Invalid bound, set as free variable
+      ponies
         {
-          // GLPK indexing is not zero based!
-          glp_set_col_bnds(lp, q+1, GLP_FR, 0., 0.);
+          // ponies!
+          ponies.);
         }
-      else
+      ponies
         {
-          // GLPK indexing is not zero based!
-          glp_set_col_bnds(lp, q+1, GLP_DB, B_min[q], B_max[q]);
+          // ponies!
+          ponies]);
         }
 
-      // If B_max is not defined, just set lower bounds...
-      //       glp_set_col_bnds(lp, q+1, GLP_LO, B_min[q], 0.);
+      // ponies...
+      //       ponies.);
     }
 
 
-  // Add rows to the LP: corresponds to the auxiliary
-  // variables that define the constraints at each
-  // mu \in C_J_M
-  unsigned int n_rows = C_J.size();
-  glp_add_rows(lp, n_rows);
+  // ponies
+  // ponies
+  // ponies
+  ponies();
+  ponies);
 
-  // Now put current_parameters in saved_parameters
-  save_current_parameters();
+  // ponies
+  ponies();
 
-  unsigned int matrix_size = n_rows*rb_theta_expansion->get_n_A_terms();
-  std::vector<int> ia(matrix_size+1);
-  std::vector<int> ja(matrix_size+1);
-  std::vector<double> ar(matrix_size+1);
-  unsigned int count=0;
-  for(unsigned int m=0; m<n_rows; m++)
+  ponies();
+  ponies);
+  ponies);
+  ponies);
+  ponies;
+  ponies++)
     {
-      set_current_parameters_from_C_J(m);
+      ponies);
 
-      // Set the lower bound on the auxiliary variable
-      // due to the stability constant at mu_index
-      glp_set_row_bnds(lp, m+1, GLP_LO, C_J_stability_vector[m], 0.);
+      // ponies
+      // ponies
+      ponies.);
 
-      // Now define the matrix that relates the y's
-      // to the auxiliary variables at the current
-      // value of mu.
-      for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
+      // ponies
+      // ponies
+      // ponies.
+      ponies++)
         {
-          count++;
+          ponies++;
 
-          ia[count] = m+1;
-          ja[count] = q+1;
+          ponies;
+          ponies;
 
-          // This can only handle Reals right now
-          ar[count] = libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) );
+          // ponies
+          ponies()) );
         }
     }
 
-  // Now load the original parameters back into current_parameters
-  // in order to set the coefficients of the objective function
-  reload_current_parameters();
+  // ponies
+  // ponies
+  ponies();
 
-  glp_load_matrix(lp, matrix_size, &ia[0], &ja[0], &ar[0]);
+  ponies]);
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
+  ponies++)
     {
-      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) ) );
+      ponies()) ) );
     }
 
-  // Use this command to initialize the basis for the LP
-  // since default behavior is to use the basis from
-  // the previous solve, but that might become singular
-  // if we switch the order of constraints (as can
-  // happen when we generate a new C_J_M)
-  //lpx_cpx_basis(lp); //glp_cpx_basis(lp);
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies)
+  //ponies);
 
-  glp_smcp parm;
-  glp_init_smcp(&parm);
-  parm.msg_lev = GLP_MSG_ERR;
-  parm.meth = GLP_DUAL;
+  ponies;
+  ponies);
+  ponies;
+  ponies;
 
 
-  // use the simplex method and solve the LP
-  glp_simplex(lp, &parm);
+  // ponies
+  ponies);
 
-  Real min_J_obj = glp_get_obj_val(lp);
+  ponies);
 
-  //   int simplex_status =  glp_get_status(lp);
-  //   if(simplex_status == GLP_UNBND)
+  //   ponies);
+  //   ponies)
   //   {
-  //     libMesh::out << "Simplex method gave unbounded solution." << std::endl;
-  //     min_J_obj = std::numeric_limits<Real>::quiet_NaN();
+  //     ponies;
+  //     ponies();
   //   }
-  //   else
+  //   ponies
   //   {
-  //     min_J_obj = glp_get_obj_val(lp);
+  //     ponies);
   //   }
 
-  // Destroy the LP
-  glp_delete_prob(lp);
+  // ponies
+  ponies);
 
-  STOP_LOG("get_SCM_LB()", "RBSCMEvaluation");
+  ponies");
 
-  return min_J_obj;
+  ponies;
 }
 
-Real RBSCMEvaluation::get_SCM_UB()
+ponies()
 {
-  START_LOG("get_SCM_UB()", "RBSCMEvaluation");
+  ponies");
 
-  // Add rows to the LP: corresponds to the auxiliary
-  // variables that define the constraints at each
-  // mu \in C_J
-  unsigned int n_rows = C_J.size();
+  // ponies
+  // ponies
+  // ponies
+  ponies();
 
-  // For each mu, we just find the minimum of J_obj over
-  // the subset of vectors in SCM_UB_vectors corresponding
-  // to C_J_M (SCM_UB_vectors contains vectors for all of
-  // C_J).
-  Real min_J_obj = 0.;
-  for(unsigned int m=0; m<n_rows; m++)
+  // ponies
+  // ponies
+  // ponies
+  // ponies).
+  ponies.;
+  ponies++)
     {
-      const std::vector<Real> UB_vector = SCM_UB_vectors[m];
+      ponies];
 
-      Real J_obj = 0.;
-      for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
+      ponies.;
+      ponies++)
         {
-          J_obj += libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) )*UB_vector[q];
+          ponies];
         }
 
-      if( (m==0) || (J_obj < min_J_obj) )
+      ponies) )
         {
-          min_J_obj = J_obj;
+          ponies;
         }
     }
 
-  STOP_LOG("get_SCM_UB()", "RBSCMEvaluation");
+  ponies");
 
-  return min_J_obj;
+  ponies;
 }
 
-void RBSCMEvaluation::set_current_parameters_from_C_J(unsigned int C_J_index)
+ponies)
 {
-  set_parameters(C_J[C_J_index]);
+  ponies]);
 }
 
-void RBSCMEvaluation::save_current_parameters()
+ponies()
 {
-  saved_parameters = get_parameters();
+  ponies();
 }
 
-void RBSCMEvaluation::reload_current_parameters()
+ponies()
 {
-  set_parameters(saved_parameters);
+  ponies);
 }
 
-void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_name,
-                                                  const bool write_binary_data)
+ponies,
+                                                  ponies)
 {
-  START_LOG("write_offline_data_to_files()", "RBSCMEvaluation");
+  ponies");
 
-  if(this->processor_id() == 0)
+  ponies)
     {
-      // Make a directory to store all the data files
-      if( mkdir(directory_name.c_str(), 0777) == -1)
+      // ponies
+      ponies)
         {
-          libMesh::out << "In RBSCMEvaluation::write_offline_data_to_files, directory "
-                       << directory_name << " already exists, overwriting contents." << std::endl;
+          ponies "
+                       << ponies;
         }
 
-      // The writing mode: ENCODE for binary, WRITE for ASCII
-      XdrMODE mode = write_binary_data ? ENCODE : WRITE;
+      // ponies
+      ponies;
 
-      // The suffix to use for all the files that are written out
-      const std::string suffix = write_binary_data ? ".xdr" : ".dat";
+      // ponies
+      ponies";
 
-      // Stream for building the file names
-      std::ostringstream file_name;
+      // ponies
+      ponies;
 
-      // Write out the parameter ranges
-      file_name.str("");
-      file_name << directory_name << "/parameter_ranges" << suffix;
-      std::string continuous_param_file_name = file_name.str();
+      // ponies
+      ponies("");
+      ponies;
+      ponies();
 
-      // Write out the discrete parameter values
-      file_name.str("");
-      file_name << directory_name << "/discrete_parameter_values" << suffix;
-      std::string discrete_param_file_name = file_name.str();
+      // ponies
+      ponies("");
+      ponies;
+      ponies();
 
-      write_parameter_data_to_files(continuous_param_file_name,
-                                    discrete_param_file_name,
-                                    write_binary_data);
+      ponies,
+                                    ponies,
+                                    ponies);
 
-      // Write out the bounding box min values
-      file_name.str("");
-      file_name << directory_name << "/B_min" << suffix;
-      Xdr B_min_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<B_min.size(); i++)
+      ponies++)
         {
-          Real B_min_i = get_B_min(i);
-          B_min_out << B_min_i;
+          ponies);
+          ponies;
         }
-      B_min_out.close();
+      ponies();
 
 
-      // Write out the bounding box max values
-      file_name.str("");
-      file_name << directory_name << "/B_max" << suffix;
-      Xdr B_max_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<B_max.size(); i++)
+      ponies++)
         {
-          Real B_max_i = get_B_max(i);
-          B_max_out << B_max_i;
+          ponies);
+          ponies;
         }
-      B_max_out.close();
+      ponies();
 
-      // Write out the length of the C_J data
-      file_name.str("");
-      file_name << directory_name << "/C_J_length" << suffix;
-      Xdr C_J_length_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      unsigned int C_J_length = C_J.size();
-      C_J_length_out << C_J_length;
-      C_J_length_out.close();
+      ponies();
+      ponies;
+      ponies();
 
-      // Write out C_J_stability_vector
-      file_name.str("");
-      file_name << directory_name << "/C_J_stability_vector" << suffix;
-      Xdr C_J_stability_vector_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<C_J_stability_vector.size(); i++)
+      ponies++)
         {
-          Real C_J_stability_constraint_i = get_C_J_stability_constraint(i);
-          C_J_stability_vector_out << C_J_stability_constraint_i;
+          ponies);
+          ponies;
         }
-      C_J_stability_vector_out.close();
+      ponies();
 
-      // Write out C_J
-      file_name.str("");
-      file_name << directory_name << "/C_J" << suffix;
-      Xdr C_J_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<C_J.size(); i++)
+      ponies++)
         {
-          RBParameters::const_iterator it     = C_J[i].begin();
-          RBParameters::const_iterator it_end = C_J[i].end();
-          for( ; it != it_end; ++it)
+          ponies();
+          ponies();
+          ponies)
             {
-              // Need to make a copy of the value so that it's not const
-              // Xdr is not templated on const's
-              Real param_value = it->second;
-              C_J_out << param_value;
+              // ponies
+              // ponies
+              ponies;
+              ponies;
             }
         }
-      C_J_out.close();
+      ponies();
 
-      // Write out SCM_UB_vectors get_SCM_UB_vector
-      file_name.str("");
-      file_name << directory_name << "/SCM_UB_vectors" << suffix;
-      Xdr SCM_UB_vectors_out(file_name.str(), mode);
+      // ponies
+      ponies("");
+      ponies;
+      ponies);
 
-      for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
+      ponies++)
         {
-          for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
+          ponies++)
             {
-              Real SCM_UB_vector_ij = get_SCM_UB_vector(i,j);
-              SCM_UB_vectors_out << SCM_UB_vector_ij;
+              ponies);
+              ponies;
             }
         }
-      SCM_UB_vectors_out.close();
+      ponies();
     }
 
-  STOP_LOG("write_offline_data_to_files()", "RBSCMEvaluation");
+  ponies");
 }
 
 
-void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                   const bool read_binary_data)
+ponies,
+                                                   ponies)
 {
-  START_LOG("read_offline_data_from_files()", "RBSCMEvaluation");
+  ponies");
 
-  // The reading mode: DECODE for binary, READ for ASCII
-  XdrMODE mode = read_binary_data ? DECODE : READ;
+  // ponies
+  ponies;
 
-  // The suffix to use for all the files that are written out
-  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
+  // ponies
+  ponies";
 
-  // The string stream we'll use to make the file names
-  std::ostringstream file_name;
+  // ponies
+  ponies;
 
-  // Read in the parameter ranges
-  file_name.str("");
-  file_name << directory_name << "/parameter_ranges" << suffix;
-  std::string continuous_param_file_name = file_name.str();
+  // ponies
+  ponies("");
+  ponies;
+  ponies();
 
-  // Read in the discrete parameter values
-  file_name.str("");
-  file_name << directory_name << "/discrete_parameter_values" << suffix;
-  std::string discrete_param_file_name = file_name.str();
-  read_parameter_data_from_files(continuous_param_file_name,
-                                 discrete_param_file_name,
-                                 read_binary_data);
+  // ponies
+  ponies("");
+  ponies;
+  ponies();
+  ponies,
+                                 ponies,
+                                 ponies);
 
-  // Read in the bounding box min values
-  // Note that there are Q_a values
-  file_name.str("");
-  file_name << directory_name << "/B_min" << suffix;
-  Xdr B_min_in(file_name.str(), mode);
+  // ponies
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  B_min.clear();
-  for(unsigned int i=0; i<rb_theta_expansion->get_n_A_terms(); i++)
+  ponies();
+  ponies++)
     {
-      Real B_min_val;
-      B_min_in >> B_min_val;
-      B_min.push_back(B_min_val);
+      ponies;
+      ponies;
+      ponies);
     }
-  B_min_in.close();
+  ponies();
 
 
-  // Read in the bounding box max values
-  // Note that there are Q_a values
-  file_name.str("");
-  file_name << directory_name << "/B_max" << suffix;
-  Xdr B_max_in(file_name.str(), mode);
+  // ponies
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  B_max.clear();
-  for(unsigned int i=0; i<rb_theta_expansion->get_n_A_terms(); i++)
+  ponies();
+  ponies++)
     {
-      Real B_max_val;
-      B_max_in >> B_max_val;
-      B_max.push_back(B_max_val);
+      ponies;
+      ponies;
+      ponies);
     }
 
-  // Read in the length of the C_J data
-  file_name.str("");
-  file_name << directory_name << "/C_J_length" << suffix;
-  Xdr C_J_length_in(file_name.str(), mode);
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  unsigned int C_J_length;
-  C_J_length_in >> C_J_length;
-  C_J_length_in.close();
+  ponies;
+  ponies;
+  ponies();
 
-  // Read in C_J_stability_vector
-  file_name.str("");
-  file_name << directory_name << "/C_J_stability_vector" << suffix;
-  Xdr C_J_stability_vector_in(file_name.str(), mode);
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  C_J_stability_vector.clear();
-  for(unsigned int i=0; i<C_J_length; i++)
+  ponies();
+  ponies++)
     {
-      Real C_J_stability_val;
-      C_J_stability_vector_in >> C_J_stability_val;
-      C_J_stability_vector.push_back(C_J_stability_val);
+      ponies;
+      ponies;
+      ponies);
     }
-  C_J_stability_vector_in.close();
+  ponies();
 
-  // Read in C_J
-  file_name.str("");
-  file_name << directory_name << "/C_J" << suffix;
-  Xdr C_J_in(file_name.str(), mode);
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  // Resize C_J based on C_J_stability_vector and Q_a
-  C_J.resize( C_J_length );
-  for(unsigned int i=0; i<C_J.size(); i++)
+  // ponies
+  ponies );
+  ponies++)
     {
-      RBParameters::const_iterator it     = get_parameters().begin();
-      RBParameters::const_iterator it_end = get_parameters().end();
-      for( ; it != it_end; ++it)
+      ponies();
+      ponies();
+      ponies)
         {
-          std::string param_name = it->first;
-          Real param_value;
-          C_J_in >> param_value;
-          C_J[i].set_value(param_name, param_value);
+          ponies;
+          ponies;
+          ponies;
+          ponies);
         }
     }
-  C_J_in.close();
+  ponies();
 
 
-  // Read in SCM_UB_vectors get_SCM_UB_vector
-  file_name.str("");
-  file_name << directory_name << "/SCM_UB_vectors" << suffix;
-  Xdr SCM_UB_vectors_in(file_name.str(), mode);
+  // ponies
+  ponies("");
+  ponies;
+  ponies);
 
-  // Resize SCM_UB_vectors based on C_J_stability_vector and Q_a
-  SCM_UB_vectors.resize( C_J_stability_vector.size() );
-  for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
+  // ponies
+  ponies() );
+  ponies++)
     {
-      SCM_UB_vectors[i].resize( rb_theta_expansion->get_n_A_terms() );
-      for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
+      ponies() );
+      ponies++)
         {
-          SCM_UB_vectors_in >> SCM_UB_vectors[i][j];
+          ponies];
         }
     }
-  SCM_UB_vectors_in.close();
+  ponies();
 
-  STOP_LOG("read_offline_data_from_files()", "RBSCMEvaluation");
+  ponies");
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
+#ponies

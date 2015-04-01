@@ -1,268 +1,268 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// Local includes
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+// ponies
+// ponies
+// ponies
 
 
-// Local includes cont'd
-#include "libmesh/face_inf_quad4.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/side.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/edge_inf_edge2.h"
 
-namespace libMesh
+// ponies
+#ponies"
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// InfQuad4 class static member initializations
-const unsigned int InfQuad4::side_nodes_map[3][2] =
+// ponies
+ponies] =
   {
-    {0, 1}, // Side 0
-    {1, 3}, // Side 1
-    {0, 2}  // Side 2
+    {ponies
+    {ponies
+    {ponies
   };
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-const float InfQuad4::_embedding_matrix[2][4][4] =
+ponies] =
   {
-    // embedding matrix for child 0
+    // ponies
     {
-      // 0    1    2    3rd parent node
-      {1.0, 0.0, 0.0, 0.0}, // 0th child node
-      {0.5, 0.5, 0.0, 0.0}, // 1
-      {0.0, 0.0, 1.0, 0.0}, // 2
-      {0.0, 0.0, 0.5, 0.5}  // 3
+      // ponies
+      {ponies
+      {ponies
+      {ponies
+      {ponies
     },
 
-    // embedding matrix for child 1
+    // ponies
     {
-      // 0    1    2    3
-      {0.5, 0.5, 0.0, 0.0}, // 0
-      {0.0, 1.0, 0.0, 0.0}, // 1
-      {0.0, 0.0, 0.5, 0.5}, // 2
-      {0.0, 0.0, 0.0, 1.0}  // 3
+      // ponies
+      {ponies
+      {ponies
+      {ponies
+      {ponies
     }
   };
 
-#endif
+#ponies
 
 
 // ------------------------------------------------------------
-// InfQuad4 class member functions
+// ponies
 
-bool InfQuad4::is_vertex(const unsigned int i) const
+ponies
 {
-  if (i < 2)
-    return true;
-  return false;
+  ponies)
+    ponies;
+  ponies;
 }
 
-bool InfQuad4::is_edge(const unsigned int i) const
+ponies
 {
-  if (i < 2)
-    return false;
-  return true;
+  ponies)
+    ponies;
+  ponies;
 }
 
-bool InfQuad4::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool InfQuad4::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+ponies,
+                               ponies
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
-bool InfQuad4::contains_point (const Point& p, Real tol) const
+ponies
 {
   /*
-   * make use of the fact that infinite elements do not
-   * live inside the envelope.  Use a fast scheme to
-   * check whether point \p p is inside or outside
-   * our relevant part of the envelope.  Note that
-   * this is not exclusive: the point may be outside
-   * the envelope, but contained in another infinite element.
-   * Therefore, if the distance is greater, do fall back
-   * to the scheme of using FEInterface::inverse_map().
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies().
    */
-  const Point my_origin (this->origin());
+  ponies());
 
   /*
-   * determine the minimal distance of the base from the origin
-   * use size_sq() instead of size(), it is slightly faster
+   * ponies
+   * ponies
    */
-  const Real min_distance_sq = std::min((Point(this->point(0)-my_origin)).size_sq(),
-                                        (Point(this->point(1)-my_origin)).size_sq());
+  ponies(),
+                                        (ponies());
 
   /*
-   * work with 1% allowable deviation.  Can still fall
-   * back to the InfFE::inverse_map()
+   * ponies
+   * ponies()
    */
-  const Real conservative_p_dist_sq = 1.01 * (Point(p-my_origin).size_sq());
+  ponies());
 
-  if (conservative_p_dist_sq < min_distance_sq)
+  ponies)
     {
       /*
-       * the physical point is definitely not contained
-       * in the element, return false.
+       * ponies
+       * ponies.
        */
-      return false;
+      ponies;
     }
-  else
+  ponies
     {
       /*
-       * cannot say anything, fall back to the FEInterface::inverse_map()
+       * ponies()
        *
-       * Declare a basic FEType.  Will use default in the base,
-       * and something else (not important) in radial direction.
+       * ponies,
+       * ponies.
        */
-      FEType fe_type(default_order());
+      ponies());
 
-      const Point mapped_point = FEInterface::inverse_map(dim(),
-                                                          fe_type,
-                                                          this,
-                                                          p,
-                                                          tol,
-                                                          false);
+      ponies(),
+                                                          ponies,
+                                                          ponies,
+                                                          ponies,
+                                                          ponies,
+                                                          ponies);
 
-      return FEInterface::on_reference_element(mapped_point, this->type(), tol);
+      ponies);
     }
 }
 
 
 
 
-UniquePtr<Elem> InfQuad4::build_side (const unsigned int i,
-                                      bool proxy) const
+ponies,
+                                      ponies
 {
-  // libmesh_assert_less (i, this->n_sides());
+  // ponies());
 
-  if (proxy)
+  ponies)
     {
-      switch (i)
+      ponies)
         {
-          // base
-        case 0:
-          return UniquePtr<Elem>(new Side<Edge2,InfQuad4>(this,i));
+          // ponies
+        ponies:
+          ponies));
 
-          // ifem edges
-        case 1:
-        case 2:
-          return UniquePtr<Elem>(new Side<InfEdge2,InfQuad4>(this,i));
+          // ponies
+        ponies:
+        ponies:
+          ponies));
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
     }
 
-  else
+  ponies
     {
-      // Create NULL pointer to be initialized, returned later.
-      Elem* edge = NULL;
+      // ponies.
+      ponies;
 
-      switch (i)
+      ponies)
         {
-        case 0:
+        ponies:
           {
-            edge = new Edge2;
-            edge->set_node(0) = this->get_node(0);
-            edge->set_node(1) = this->get_node(1);
-            break;
+            ponies;
+            ponies);
+            ponies);
+            ponies;
           }
 
-        case 1:
+        ponies:
           {
-            // adjacent to another infinite element
-            edge = new InfEdge2;
-            edge->set_node(0) = this->get_node(1);
-            edge->set_node(1) = this->get_node(3);
-            break;
+            // ponies
+            ponies;
+            ponies);
+            ponies);
+            ponies;
           }
 
-        case 2:
+        ponies:
           {
-            // adjacent to another infinite element
-            edge = new InfEdge2;
-            edge->set_node(0) = this->get_node(0);
-            edge->set_node(1) = this->get_node(2);
-            break;
+            // ponies
+            ponies;
+            ponies);
+            ponies);
+            ponies;
           }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
 
-      edge->subdomain_id() = this->subdomain_id();
-      return UniquePtr<Elem>(edge);
+      ponies();
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  ponies!");
+  ponies>();
 }
 
 
-void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const
+ponies),
+                            ponies,
+                            ponies
 {
-  libmesh_assert_less (sf, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies());
+  ponies);
 
-  conn.resize(4);
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(3)+1;
-        conn[3] = this->node(2)+1;
-        return;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
       }
-    case VTK:
+    ponies:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(3);
-        conn[3] = this->node(2);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
       }
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies

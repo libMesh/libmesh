@@ -1,291 +1,291 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/cell_tet.h"
-#include "libmesh/cell_tet4.h"
-#include "libmesh/face_tri3.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 // ------------------------------------------------------------
-// Tet class static member initializations
+// ponies
 
 
-// We need to require C++11...
-const Real Tet::_master_points[10][3] =
+// ponies...
+ponies] =
   {
-    {0, 0, 0},
-    {1, 0, 0},
-    {0, 1, 0},
-    {0, 0, 1},
-    {0.5, 0, 0},
-    {0.5, 0.5, 0},
-    {0, 0.5, 0},
-    {0, 0, 0.5},
-    {0.5, 0, 0.5},
-    {0, 0.5, 0.5}
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies},
+    {ponies}
   };
 
 
 
 
 // ------------------------------------------------------------
-// Tet class member functions
-dof_id_type Tet::key (const unsigned int s) const
+// ponies
+ponies
 {
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
 
-  switch (s)
+  ponies)
     {
-    case 0:
-      return
-        this->compute_key (this->node(0),
-                           this->node(2),
-                           this->node(1));
+    ponies:
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    case 1:
-      return
-        this->compute_key (this->node(0),
-                           this->node(1),
-                           this->node(3));
+    ponies:
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    case 2:
-      return
-        this->compute_key (this->node(1),
-                           this->node(2),
-                           this->node(3));
+    ponies:
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    case 3:
-      return
-        this->compute_key (this->node(2),
-                           this->node(0),
-                           this->node(3));
+    ponies:
+      ponies
+        ponies),
+                           ponies),
+                           ponies));
 
-    default:
-      libmesh_error_msg("Invalid side s = " << s);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
-UniquePtr<Elem> Tet::side (const unsigned int i) const
+ponies
 {
-  libmesh_assert_less (i, this->n_sides());
+  ponies());
 
-  Elem* face = new Tri3;
+  ponies;
 
-  switch (i)
+  ponies)
     {
-    case 0:
+    ponies:
       {
-        face->set_node(0) = this->get_node(0);
-        face->set_node(1) = this->get_node(2);
-        face->set_node(2) = this->get_node(1);
-        break;
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
-    case 1:
+    ponies:
       {
-        face->set_node(0) = this->get_node(0);
-        face->set_node(1) = this->get_node(1);
-        face->set_node(2) = this->get_node(3);
-        break;
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
-    case 2:
+    ponies:
       {
-        face->set_node(0) = this->get_node(1);
-        face->set_node(1) = this->get_node(2);
-        face->set_node(2) = this->get_node(3);
-        break;
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
-    case 3:
+    ponies:
       {
-        face->set_node(0) = this->get_node(2);
-        face->set_node(1) = this->get_node(0);
-        face->set_node(2) = this->get_node(3);
-        break;
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
-    default:
-      libmesh_error_msg("Invalid side i = " << i);
+    ponies:
+      ponies);
     }
 
-  return UniquePtr<Elem>(face);
+  ponies);
 }
 
 
-void Tet::select_diagonal (const Diagonal diag) const
+ponies
 {
-  libmesh_assert_equal_to (_diagonal_selection, INVALID_DIAG);
-  _diagonal_selection = diag;
+  ponies);
+  ponies;
 }
 
 
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
 
-bool Tet::is_child_on_side_helper(const unsigned int c,
-                                  const unsigned int s,
-                                  const unsigned int checked_nodes[][3]) const
+ponies,
+                                  ponies,
+                                  ponies
 {
-  libmesh_assert_less (c, this->n_children());
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
+  ponies());
 
-  // For the 4 vertices, child c touches vertex c, so we can return
-  // true if that vertex is on side s
-  for (unsigned int i = 0; i != 3; ++i)
-    if (Tet4::side_nodes_map[s][i] == c)
-      return true;
+  // ponies
+  // ponies
+  ponies)
+    ponies)
+      ponies;
 
-  // If we are a "vertex child" and we didn't already return true,
-  // we must not be on the side in question
-  if (c < 4)
-    return false;
+  // ponies,
+  // ponies
+  ponies)
+    ponies;
 
-  // For the 4 non-vertex children, the child ordering depends on the
-  // diagonal selection.  We'll let the embedding matrix figure that
-  // out: if this child has three nodes that don't depend on the
-  // position of the node_facing_side[s], then we're on side s.  Which
-  // three nodes those are depends on the subclass, so their responsibility
-  // is to call this function with the proper check_nodes array
-  const unsigned int node_facing_side[4] = {3, 2, 0, 1};
-  const unsigned int n = node_facing_side[s];
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  ponies};
+  ponies];
 
-  // Add up the absolute values of the entries of the embedding matrix for the
-  // nodes opposite node n.  If it is equal to zero, then the child in question is
-  // on side s, so return true.
-  Real embedding_sum = 0.;
-  for (unsigned i=0; i<3; ++i)
-    embedding_sum += std::abs(this->embedding_matrix(c, checked_nodes[n][i], n));
+  // ponies
+  // ponies
+  // ponies.
+  ponies.;
+  ponies)
+    ponies));
 
-  return ( std::abs(embedding_sum) < 1.e-3 );
+  ponies );
 }
 
-#else
+#ponies
 
-bool Tet::is_child_on_side_helper(const unsigned int /*c*/,
-                                  const unsigned int /*s*/,
-                                  const unsigned int /*checked_nodes*/[][3]) const
+ponies*/,
+                                  ponies*/,
+                                  ponies
 {
-  libmesh_not_implemented();
-  return false;
+  ponies();
+  ponies;
 }
 
-#endif //LIBMESH_ENABLE_AMR
+#ponies
 
 
 
 
-void Tet::choose_diagonal() const
+ponies
 {
-  // Check for uninitialized diagonal selection
-  if (this->_diagonal_selection==INVALID_DIAG)
+  // ponies
+  ponies)
     {
-      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
-      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
-      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+      ponies();
+      ponies();
+      ponies();
 
-      this->_diagonal_selection=DIAG_02_13;
+      ponies;
 
-      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+      ponies)
         {
-          if (diag_01_23 < diag_03_12)
-            this->_diagonal_selection=DIAG_01_23;
+          ponies)
+            ponies;
 
-          else
-            this->_diagonal_selection=DIAG_03_12;
+          ponies
+            ponies;
         }
     }
 }
 
 
 
-bool Tet::is_edge_on_side(const unsigned int e,
-                          const unsigned int s) const
+ponies,
+                          ponies
 {
-  libmesh_assert_less (e, this->n_edges());
-  libmesh_assert_less (s, this->n_sides());
+  ponies());
+  ponies());
 
-  return (is_node_on_side(Tet4::edge_nodes_map[e][0],s) &&
-          is_node_on_side(Tet4::edge_nodes_map[e][1],s));
+  ponies) &&
+          ponies));
 }
 
 
 
-Real Tet::quality(const ElemQuality q) const
+ponies
 {
-  return Elem::quality(q); // Not implemented
+  ponies
 }
 
 
 
 
-std::pair<Real, Real> Tet::qual_bounds (const ElemQuality q) const
+ponies
 {
-  std::pair<Real, Real> bounds;
+  ponies;
 
-  switch (q)
+  ponies)
     {
 
-    case ASPECT_RATIO_BETA:
-    case ASPECT_RATIO_GAMMA:
-      bounds.first  = 1.;
-      bounds.second = 3.;
-      break;
+    ponies:
+    ponies:
+      ponies.;
+      ponies.;
+      ponies;
 
-    case SIZE:
-    case SHAPE:
-      bounds.first  = 0.2;
-      bounds.second = 1.;
-      break;
+    ponies:
+    ponies:
+      ponies;
+      ponies.;
+      ponies;
 
-    case CONDITION:
-      bounds.first  = 1.;
-      bounds.second = 3.;
-      break;
+    ponies:
+      ponies.;
+      ponies.;
+      ponies;
 
-    case DISTORTION:
-      bounds.first  = 0.6;
-      bounds.second = 1.;
-      break;
+    ponies:
+      ponies;
+      ponies.;
+      ponies;
 
-    case JACOBIAN:
-      bounds.first  = 0.5;
-      bounds.second = 1.414;
-      break;
+    ponies:
+      ponies;
+      ponies;
+      ponies;
 
-    default:
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
-      bounds.first  = -1;
-      bounds.second = -1;
+    ponies:
+      ponies;
+      ponies;
+      ponies;
     }
 
-  return bounds;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

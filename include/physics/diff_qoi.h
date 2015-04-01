@@ -1,178 +1,178 @@
 
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DIFF_QOI_H
-#define LIBMESH_DIFF_QOI_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/diff_context.h"
-#include "libmesh/qoi_set.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/parallel.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class provides a specific system class.  It aims
- * to generalize any system, linear or nonlinear, which
- * provides both a residual and a Jacobian.
+ * ponies
+ * ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2006
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DifferentiableQoI class definition
+// ponies
 
-class DifferentiableQoI
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  DifferentiableQoI ();
+  ponies ();
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~DifferentiableQoI () {}
+  ponies () {}
 
   /**
-   * Initialize system qoi. By default, does nothing in order to maintain backward
-   * compatibility for FEMSystem applications that control qoi.
+   * ponies
+   * ponies.
    */
-  virtual void init_qoi( std::vector<Number>& /*sys_qoi*/){}
+  ponies*/){}
 
   /**
-   * Clear all the data structures associated with
-   * the QoI.
+   * ponies
+   * ponies.
    */
-  virtual void clear_qoi () {}
+  ponies () {}
 
   /**
-   * If \p assemble_qoi_sides is true (it is false by default), the
-   * assembly loop for a quantity of interest or its derivatives will
-   * loop over domain boundary sides.  To add domain interior sides,
-   * also set assemble_qoi_internal_sides to true.
+   * ponies
+   * ponies
+   * ponies,
+   * ponies.
    */
-  bool assemble_qoi_sides;
+  ponies;
 
   /**
-   * If \p assemble_qoi_internal_sides is true (it is false by
-   * default), the assembly loop for a quantity of interest or its
-   * derivatives will loop over element sides which do not fall on
-   * domain boundaries.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool assemble_qoi_internal_sides;
+  ponies;
 
   /**
-   * If \p assemble_qoi_elements is false (it is true by default), the
-   * assembly loop for a quantity of interest or its derivatives will
-   * skip computing on mesh elements, and will only compute on mesh
-   * sides.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool assemble_qoi_elements;
+  ponies;
 
   /**
-   * Does any work that needs to be done on \p elem in a quantity of
-   * interest assembly loop, outputting to elem_qoi.
+   * ponies
+   * ponies.
    *
-   * Only qois included in the supplied \p QoISet need to be
-   * assembled.
+   * ponies
+   * ponies.
    */
-  virtual void element_qoi (DiffContext&,
-                            const QoISet&)
+  ponies&,
+                            ponies&)
   {}
 
   /**
-   * Does any work that needs to be done on \p elem in a quantity of
-   * interest derivative assembly loop, outputting to
-   * elem_qoi_derivative
+   * ponies
+   * ponies
+   * ponies
    *
-   * Only qois included in the supplied \p QoISet need their
-   * derivatives assembled.
+   * ponies
+   * ponies.
    */
-  virtual void element_qoi_derivative (DiffContext&,
-                                       const QoISet&)
+  ponies&,
+                                       ponies&)
   {}
 
   /**
-   * Does any work that needs to be done on \p side of \p elem in a
-   * quantity of interest assembly loop, outputting to elem_qoi.
+   * ponies
+   * ponies.
    *
-   * Only qois included in the supplied \p QoISet need to be
-   * assembled.
+   * ponies
+   * ponies.
    */
-  virtual void side_qoi (DiffContext&,
-                         const QoISet&)
+  ponies&,
+                         ponies&)
   {}
 
   /**
-   * Does any work that needs to be done on \p side of \p elem in a
-   * quantity of interest derivative assembly loop, outputting to
-   * elem_qoi_derivative.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Only qois included in the supplied \p QoISet need their
-   * derivatives assembled.
+   * ponies
+   * ponies.
    */
-  virtual void side_qoi_derivative (DiffContext&,
-                                    const QoISet&)
+  ponies&,
+                                    ponies&)
   {}
 
   /**
-   * Prepares the result of a build_context() call for use.
+   * ponies.
    *
-   * Most FEMSystem-based problems will need to reimplement this in order to
-   * call FE::get_*() as their particular QoI requires.
+   * ponies
+   * ponies.
    */
-  virtual void init_context(DiffContext &) {}
+  ponies &) {}
 
   /**
-   * Copy of this object. User should override to copy any needed state.
+   * ponies.
    */
-  virtual UniquePtr<DifferentiableQoI> clone() =0;
+  ponies;
 
   /**
-   * Method to combine thread-local qois. By default, simply sums thread qois.
+   * ponies.
    */
-  virtual void thread_join( std::vector<Number>& qoi, const std::vector<Number>& other_qoi,
-                            const QoISet& qoi_indices );
+  ponies,
+                            ponies );
 
   /**
-   * Method to populate system qoi data structure with process-local qoi. By default, simply
-   * sums process qois into system qoi.
+   * ponies
+   * ponies.
    */
-  virtual void parallel_op(const Parallel::Communicator &communicator,
-                           std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
-                           const QoISet& qoi_indices );
+  ponies,
+                           ponies,
+                           ponies );
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_DIFF_QOI_H
+#ponies

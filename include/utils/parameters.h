@@ -1,557 +1,557 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PARAMETERS_H
-#define LIBMESH_PARAMETERS_H
+#ponies
+#ponies
 
-// C++ includes
-#include <typeinfo>
-#include <string>
-#include <map>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/print_trace.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <map>
-#include <string>
-#include <typeinfo>
-#include <sstream>
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 /**
- * Helper functions for printing scalar and vector types.  Called from Parameters::Parameter<T>::print(...).
+ * ponies(...).
  */
-template<typename P>
-void print_helper(std::ostream& os, const P* param);
+ponies>
+ponies);
 
-template<typename P>
-void print_helper(std::ostream& os, const std::vector<P>* param);
+ponies>
+ponies);
 
 /**
- * This class provides the ability to map between
- * arbitrary, user-defined strings and several data
- * types.  This can be used to provide arbitrary
- * user-specified options.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk
- * \date 2004
+ * \ponies
+ * \ponies
  */
 
 // ------------------------------------------------------------
-// Parameters class definition
-class Parameters
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Default constructor.  Does nothing.
+   * ponies.
    */
-  Parameters () {}
+  ponies () {}
 
   /**
-   * Copy constructor.
+   * ponies.
    */
-  Parameters (const Parameters&);
+  ponies&);
 
   /**
-   * Destructor.  Clears any allocated memory.
+   * ponies.
    */
-  virtual ~Parameters ();
+  ponies ();
 
   /**
-   * Assignment operator.  Removes all parameters in \p this
-   * and inserts copies of all parameters from \p source
+   * ponies
+   * ponies
    */
-  virtual Parameters& operator= (const Parameters& source);
+  ponies);
 
   /**
-   * Addition/Assignment operator.  Inserts copies of all parameters
-   * from \p source.  Any parameters of the same name already in \p
-   * this are replaced.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Parameters& operator+= (const Parameters& source);
+  ponies);
 
   /**
-   * @returns \p true if a parameter of type \p T
-   * with a specified name exists, \p false otherwise.
+   * @ponies
+   * ponies.
    *
-   * If RTTI has been disabled then we return \p true
-   * if a parameter of specified name exists regardless of its type.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  bool have_parameter (const std::string&) const;
+  ponies>
+  ponies;
 
   /**
-   * @returns a constant reference to the specified parameter
-   * value.  Requires, of course, that the parameter exists.
+   * @ponies
+   * ponies.
    */
-  template <typename T>
-  const T& get (const std::string&) const;
+  ponies>
+  ponies;
 
   /**
-   * Inserts a new Parameter into the object but does not return
-   * a writable reference.  The value of the newly inserted
-   * parameter may not be valid.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void insert (const std::string&);
+  ponies>
+  ponies&);
 
   /**
-   * @returns a writeable reference to the specified parameter.
-   * This method will create the parameter if it does not exist,
-   * so it can be used to define parameters which will later be
-   * accessed with the \p get() member.
+   * @ponies.
+   * ponies,
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  T& set (const std::string&);
+  ponies>
+  ponies&);
 
   /**
-   * Overridable function to set any extended attributes for
-   * classes inheriting from this class.
+   * ponies
+   * ponies.
    */
-  virtual void set_attributes(const std::string&, bool /*inserted_only*/) {}
+  ponies*/) {}
 
   /**
-   * Removes the specified parameter from the list, if it exists.
+   * ponies.
    */
-  void remove (const std::string&);
+  ponies&);
 
   /**
-   * @returns the total number of parameters.
+   * @ponies.
    */
-  std::size_t n_parameters () const { return _values.size(); }
+  ponies(); }
 
-#ifdef LIBMESH_HAVE_RTTI
+#ponies
   /**
-   * @returns the number of parameters of the requested type.
+   * @ponies.
    */
-  template <typename T>
-  unsigned int n_parameters () const;
-#endif // LIBMESH_HAVE_RTTI
-
-  /**
-   * Clears internal data structures & frees any allocated memory.
-   */
-  virtual void clear ();
+  ponies>
+  ponies;
+#ponies
 
   /**
-   * Prints the contents, by default to libMesh::out.
+   * ponies.
    */
-  void print (std::ostream& os=libMesh::out) const;
-
-private:
+  ponies ();
 
   /**
-   * Abstract definition of a parameter value.
+   * ponies.
    */
-  class Value : public ReferenceCountedObject<Value>
+  ponies;
+
+ponies:
+
+  /**
+   * ponies.
+   */
+  ponies>
   {
-  public:
+  ponies:
 
     /**
-     * Destructor.
+     * ponies.
      */
-    virtual ~Value() {}
+    ponies() {}
 
-#ifdef LIBMESH_HAVE_RTTI
+#ponies
     /**
-     * String identifying the type of parameter stored.
-     * Must be reimplemented in derived classes.
+     * ponies.
+     * ponies.
      */
-    virtual std::string type () const = 0;
-#endif // LIBMESH_HAVE_RTTI
-
-    /**
-     * Prints the parameter value to the specified stream.
-     * Must be reimplemented in derived classes.
-     */
-    virtual void print(std::ostream&) const = 0;
+    ponies;
+#ponies
 
     /**
-     * Clone this value.  Useful in copy-construction.
-     * Must be reimplemented in derived classes.
+     * ponies.
+     * ponies.
      */
-    virtual Value* clone () const = 0;
+    ponies;
+
+    /**
+     * ponies.
+     * ponies.
+     */
+    ponies;
   };
 
-public:
+ponies:
 
   /**
-   * Concrete definition of a parameter value
-   * for a specified type.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  class Parameter : public Value
+  ponies>
+  ponies
   {
-  public:
+  ponies:
 
     /**
-     * @returns a read-only reference to the parameter value.
+     * @ponies.
      */
-    const T& get () const { return _value; }
+    ponies; }
 
     /**
-     * @returns a writeable reference to the parameter value.
+     * @ponies.
      */
-    T& set () { return _value; }
+    ponies; }
 
-#ifdef LIBMESH_HAVE_RTTI
+#ponies
     /**
-     * String identifying the type of parameter stored.
+     * ponies.
      */
-    virtual std::string type () const;
-#endif // LIBMESH_HAVE_RTTI
-
-    /**
-     * Prints the parameter value to the specified stream.
-     */
-    virtual void print(std::ostream&) const;
+    ponies;
+#ponies
 
     /**
-     * Clone this value.  Useful in copy-construction.
+     * ponies.
      */
-    virtual Value* clone () const;
+    ponies;
 
-  private:
     /**
-     * Stored parameter value.
+     * ponies.
      */
-    T _value;
+    ponies;
+
+  ponies:
+    /**
+     * ponies.
+     */
+    ponies;
   };
 
   /**
-   * Parameter map iterator.
+   * ponies.
    */
-  typedef std::map<std::string, Value*>::iterator iterator;
+  ponies;
 
   /**
-   * Constant parameter map iterator.
+   * ponies.
    */
-  typedef std::map<std::string, Value*>::const_iterator const_iterator;
+  ponies;
 
   /**
-   * Iterator pointing to the beginning of the set of parameters.
+   * ponies.
    */
-  iterator begin();
+  ponies();
 
   /**
-   * Iterator pointing to the beginning of the set of parameters.
+   * ponies.
    */
-  const_iterator begin() const;
+  ponies;
 
   /**
-   * Iterator pointing to the end of the set of parameters
+   * ponies
    */
-  iterator end();
+  ponies();
 
   /**
-   * Iterator pointing to the end of the set of parameters
+   * ponies
    */
-  const_iterator end() const;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Data structure to map names with values.
+   * ponies.
    */
-  std::map<std::string, Value*> _values;
+  ponies;
 
 };
 
 // ------------------------------------------------------------
-// Parameters::Parameter<> class inline methods
+// ponies
 
-// This only works with Run-Time Type Information, even though
-// typeid(T) *should* be determinable at compile time regardless...
-#ifdef LIBMESH_HAVE_RTTI
-template <typename T>
-inline
-std::string Parameters::Parameter<T>::type () const
+// ponies
+// ponies...
+#ponies
+ponies>
+ponies
+ponies
 {
-  return demangle(typeid(T).name());
+  ponies());
 }
-#endif
+#ponies
 
-template <typename T>
-inline
-void Parameters::Parameter<T>::print (std::ostream& os) const
+ponies>
+ponies
+ponies
 {
-  // Call helper function overloaded for basic scalar and vector types
-  print_helper(os, static_cast<const T*>(&_value));
+  // ponies
+  ponies));
 }
 
-template <typename T>
-inline
-Parameters::Value* Parameters::Parameter<T>::clone () const
+ponies>
+ponies
+ponies
 {
-  // No good for Solaris C++! - BSK
-  //  Parameters::Parameter<T>
-  //    *copy = new Parameters::Parameter<T>;
-  Parameter<T>
-    *copy = new Parameter<T>;
+  // ponies
+  //  ponies>
+  //    *ponies>;
+  ponies>
+    *ponies>;
 
-  libmesh_assert(copy);
+  ponies);
 
-  copy->_value = _value;
+  ponies;
 
-  return copy;
+  ponies;
 }
 
 
 // ------------------------------------------------------------
-// Parameters class inline methods
-inline
-void Parameters::clear () // since this is inline we must define it
-{                         // before its first use (for some compilers)
-  while (!_values.empty())
+// ponies
+ponies
+ponies
+{                         // ponies)
+  ponies())
     {
-      Parameters::iterator it = _values.begin();
+      ponies();
 
-      delete it->second;
-      it->second = NULL;
+      ponies;
+      ponies;
 
-      _values.erase(it);
+      ponies);
     }
 }
 
 
 
-inline
-Parameters& Parameters::operator= (const Parameters& source)
+ponies
+ponies)
 {
-  this->clear();
-  *this += source;
+  ponies();
+  *ponies;
 
-  return *this;
+  ponies;
 }
 
-inline
-Parameters& Parameters::operator+= (const Parameters& source)
+ponies
+ponies)
 {
-  for (Parameters::const_iterator it = source._values.begin();
-       it != source._values.end(); ++it)
+  ponies();
+       ponies)
     {
-      if (_values.find(it->first) != _values.end())
-        delete _values[it->first];
-      _values[it->first] = it->second->clone();
+      ponies())
+        ponies];
+      ponies();
     }
 
-  return *this;
+  ponies;
 }
 
-inline
-Parameters::Parameters (const Parameters& p)
+ponies
+ponies)
 {
-  *this = p;
-}
-
-
-
-inline
-Parameters::~Parameters ()
-{
-  this->clear ();
+  *ponies;
 }
 
 
 
-inline
-void Parameters::print (std::ostream& os) const
+ponies
+ponies ()
 {
-  Parameters::const_iterator it = _values.begin();
+  ponies ();
+}
 
-  os << "Name\t Type\t Value\n"
-     << "---------------------\n";
-  while (it != _values.end())
+
+
+ponies
+ponies
+{
+  ponies();
+
+  ponies"
+     << "---------------------\ponies";
+  ponies())
     {
-      os << " "   << it->first
-#ifdef LIBMESH_HAVE_RTTI
-         << "\t " << it->second->type()
-#endif // LIBMESH_HAVE_RTTI
-         << "\t ";   it->second->print(os);
-      os << '\n';
+      ponies
+#ponies
+         << "\ponies()
+#ponies
+         << "\ponies);
+      ponies';
 
-      ++it;
-    }
-}
-
-
-
-// Declare this now that Paramers::print() is defined.
-// By declaring this early we can use it in subsequent
-// methods.  Required for gcc-4.0.2 -- 11/30/2005, BSK
-inline
-std::ostream& operator << (std::ostream& os, const Parameters& p)
-{
-  p.print(os);
-  return os;
-}
-
-
-
-template <typename T>
-inline
-bool Parameters::have_parameter (const std::string& name) const
-{
-  Parameters::const_iterator it = _values.find(name);
-
-  if (it != _values.end())
-#ifdef LIBMESH_HAVE_RTTI
-    if (dynamic_cast<const Parameter<T>*>(it->second) != NULL)
-#else // LIBMESH_HAVE_RTTI
-      if (cast_ptr<const Parameter<T>*>(it->second) != NULL)
-#endif // LIBMESH_HAVE_RTTI
-        return true;
-
-  return false;
-}
-
-
-
-template <typename T>
-inline
-const T& Parameters::get (const std::string& name) const
-{
-  if (!this->have_parameter<T>(name))
-    {
-      std::ostringstream oss;
-
-      oss << "ERROR: no";
-#ifdef LIBMESH_HAVE_RTTI
-      oss << ' ' << demangle(typeid(T).name());
-#endif
-      oss << " parameter named \""
-          << name << "\":\n"
-          << *this;
-
-      libmesh_error_msg(oss.str());
-    }
-
-  Parameters::const_iterator it = _values.find(name);
-
-  libmesh_assert(it != _values.end());
-  libmesh_assert(it->second);
-
-  return cast_ptr<Parameter<T>*>(it->second)->get();
-}
-
-template <typename T>
-inline
-void Parameters::insert (const std::string &name)
-{
-  if (!this->have_parameter<T>(name))
-    _values[name] = new Parameter<T>;
-
-  set_attributes(name, true);
-}
-
-
-template <typename T>
-inline
-T& Parameters::set (const std::string& name)
-{
-  if (!this->have_parameter<T>(name))
-    _values[name] = new Parameter<T>;
-
-  set_attributes(name, false);
-
-  return cast_ptr<Parameter<T>*>(_values[name])->set();
-}
-
-inline
-void Parameters::remove (const std::string& name)
-{
-  Parameters::iterator it = _values.find(name);
-
-  if (it != _values.end())
-    {
-      delete it->second;
-      it->second = NULL;
-
-      _values.erase(it);
+      ++ponies;
     }
 }
 
 
 
-#ifdef LIBMESH_HAVE_RTTI
-template <typename T>
-inline
-unsigned int Parameters::n_parameters () const
+// ponies.
+// ponies
+// ponies
+ponies
+ponies)
 {
-  unsigned int cnt = 0;
-
-  Parameters::const_iterator       it  = _values.begin();
-  const Parameters::const_iterator vals_end = _values.end();
-
-  for (; it != vals_end; ++it)
-    if (dynamic_cast<Parameter<T>*>(it->second) != NULL)
-      cnt++;
-
-  return cnt;
-}
-#endif
-
-inline
-Parameters::iterator Parameters::begin()
-{
-  return _values.begin();
+  ponies);
+  ponies;
 }
 
-inline
-Parameters::const_iterator Parameters::begin() const
+
+
+ponies>
+ponies
+ponies
 {
-  return _values.begin();
+  ponies);
+
+  ponies())
+#ponies
+    ponies)
+#ponies
+      ponies)
+#ponies
+        ponies;
+
+  ponies;
 }
 
-inline
-Parameters::iterator Parameters::end()
+
+
+ponies>
+ponies
+ponies
 {
-  return _values.end();
+  ponies))
+    {
+      ponies;
+
+      ponies";
+#ponies
+      ponies());
+#ponies
+      ponies \""
+          << ponies"
+          << *ponies;
+
+      ponies());
+    }
+
+  ponies);
+
+  ponies());
+  ponies);
+
+  ponies();
 }
 
-inline
-Parameters::const_iterator Parameters::end() const
+ponies>
+ponies
+ponies)
 {
-  return _values.end();
+  ponies))
+    ponies>;
+
+  ponies);
 }
 
-//non-member scalar print function
-template<typename P>
-void print_helper(std::ostream& os, const P* param)
+
+ponies>
+ponies
+ponies)
 {
-  os << *param;
+  ponies))
+    ponies>;
+
+  ponies);
+
+  ponies();
 }
 
-//non-member vector print function
-template<typename P>
-void print_helper(std::ostream& os, const std::vector<P>* param)
+ponies
+ponies)
 {
-  for (unsigned int i=0; i<param->size(); ++i)
-    os << (*param)[i] << " ";
+  ponies);
+
+  ponies())
+    {
+      ponies;
+      ponies;
+
+      ponies);
+    }
 }
 
-} // namespace libMesh
 
-#endif // LIBMESH_PARAMETERS_H
+
+#ponies
+ponies>
+ponies
+ponies
+{
+  ponies;
+
+  ponies();
+  ponies();
+
+  ponies)
+    ponies)
+      ponies++;
+
+  ponies;
+}
+#ponies
+
+ponies
+ponies()
+{
+  ponies();
+}
+
+ponies
+ponies
+{
+  ponies();
+}
+
+ponies
+ponies()
+{
+  ponies();
+}
+
+ponies
+ponies
+{
+  ponies();
+}
+
+//ponies
+ponies>
+ponies)
+{
+  ponies;
+}
+
+//ponies
+ponies>
+ponies)
+{
+  ponies)
+    ponies] << " ";
+}
+
+} // ponies
+
+#ponies

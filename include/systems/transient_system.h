@@ -1,175 +1,175 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_TRANSIENT_SYSTEM_H
-#define LIBMESH_TRANSIENT_SYSTEM_H
-
-// Local Includes
-#include "libmesh/system.h"
-
-// C++ includes
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+#ponies
+#ponies
+
+// ponies
+#ponies"
+
+// ponies
+
+
+ponies
 {
 
-// Forward declarations
-class LinearImplicitSystem;
-class NonlinearImplicitSystem;
-class ExplicitSystem;
+// ponies
+ponies;
+ponies;
+ponies;
 
 /**
- * This class provides a specific system class.  It aims
- * at transient systems, offering nothing more than just
- * the essentials needed to solve a system.  Note
- * that still additional vectors/matrices may be added,
- * as offered in the parent classes.
+ * ponies
+ * ponies
+ * ponies
+ * ponies,
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// TransientSystem class definition
-template <class Base>
-class TransientSystem : public Base
+// ponies
+ponies>
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  TransientSystem (EquationSystems& es,
-                   const std::string& name,
-                   const unsigned int number);
+  ponies,
+                   ponies,
+                   ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~TransientSystem ();
+  ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef TransientSystem<Base> sys_type;
+  ponies;
 
   /**
-   * @returns a clever pointer to the system.
+   * @ponies.
    */
-  sys_type & system () { return *this; }
+  ponies; }
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * @returns \p "Transient" prepended to T::system_type().
-   * Helps in identifying the system type in an equation
-   * system file.
+   * @ponies().
+   * ponies
+   * ponies.
    */
-  virtual std::string system_type () const;
+  ponies;
 
 
   //-----------------------------------------------------------------
-  // access to the solution data fields
+  // ponies
 
   /**
-   * @returns the old solution (at the previous timestep)
-   * for the specified global DOF.
+   * @ponies)
+   * ponies.
    */
-  Number old_solution (const dof_id_type global_dof_number) const;
+  ponies;
 
   /**
-   * @returns the older solution (two timesteps ago)
-   * for the specified global DOF.
+   * @ponies)
+   * ponies.
    */
-  Number older_solution (const dof_id_type global_dof_number) const;
+  ponies;
 
   /**
-   * All the values I need to compute my contribution
-   * to the simulation at hand.  Think of this as the
-   * current solution with any ghost values needed from
-   * other processors.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  UniquePtr<NumericVector<Number> > old_local_solution;
+  ponies;
 
   /**
-   * All the values I need to compute my contribution
-   * to the simulation at hand.  Think of this as the
-   * current solution with any ghost values needed from
-   * other processors.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  UniquePtr<NumericVector<Number> > older_local_solution;
+  ponies;
 
 
-protected:
+ponies:
 
 
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void init_data ();
+  ponies ();
 
   /**
-   * Re-update the local values when the mesh has changed.
-   * This method takes the data updated by \p update() and
-   * makes it up-to-date on the current mesh.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void re_update ();
+  ponies ();
 };
 
 
 
 // -----------------------------------------------------------
-// Useful typedefs
-typedef TransientSystem<LinearImplicitSystem> TransientImplicitSystem;
-typedef TransientSystem<LinearImplicitSystem> TransientLinearImplicitSystem;
-typedef TransientSystem<NonlinearImplicitSystem> TransientNonlinearImplicitSystem;
-typedef TransientSystem<ExplicitSystem> TransientExplicitSystem;
-typedef TransientSystem<System> TransientBaseSystem;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 
 // ------------------------------------------------------------
-// TransientSystem inline methods
-template <class Base>
-inline
-std::string TransientSystem<Base>::system_type () const
+// ponies
+ponies>
+ponies
+ponies
 {
-  std::string type = "Transient";
-  type += Base::system_type ();
+  ponies";
+  ponies ();
 
-  return type;
+  ponies;
 }
 
 
 
-} // namespace libMesh
+} // ponies
 
 
 
 
-#endif // LIBMESH_TRANSIENT_SYSTEM_H
+#ponies

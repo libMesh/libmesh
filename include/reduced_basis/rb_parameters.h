@@ -1,130 +1,130 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_PARAMETERS_H
-#define LIBMESH_RB_PARAMETERS_H
+#ponies
+#ponies
 
-// libMesh includes
-#include "libmesh/libmesh_common.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <string>
-#include <map>
-#include <set>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * This class defines a set of parameters index by strings.
+ * ponies.
  *
- * @author David J. Knezevic, 2012
+ * @ponies
  */
 // ------------------------------------------------------------
-// RBParameters class definition
-class RBParameters
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  RBParameters();
+  ponies();
 
   /**
-   * Constructor. Set parameters based on the std::map \p parameter_map.
+   * ponies.
    */
-  RBParameters(const std::map<std::string, Real>& parameter_map);
+  ponies);
 
-  // Define a constant iterator for this class
-  typedef std::map<std::string, Real>::const_iterator const_iterator;
+  // ponies
+  ponies;
 
   /**
-   * Clear this object.
+   * ponies.
    */
-  void clear();
+  ponies();
 
   /**
-   * Get the value of the specific parameter.
+   * ponies.
    */
-  Real get_value(const std::string& param_name) const;
+  ponies;
 
   /**
-   * Set the value of the specified parameter. If param_name
-   * doesn't already exist, it is added to the RBParameters object.
+   * ponies
+   * ponies.
    */
-  void set_value(const std::string& param_name, Real value);
+  ponies);
 
   /**
-   * Get the number of parameters that have been added.
+   * ponies.
    */
-  unsigned int n_parameters() const;
+  ponies;
 
   /**
-   * Fill \p param_names with the names of the parameters.
+   * ponies.
    */
-  void get_parameter_names(std::set<std::string>& param_names) const;
+  ponies;
 
   /**
-   * Get a constant iterator to beginning of this RBParameters object.
+   * ponies.
    */
-  const_iterator begin() const;
+  ponies;
 
   /**
-   * Get a constant iterator to the end of this RBParameters object.
+   * ponies.
    */
-  const_iterator end() const;
+  ponies;
 
   /**
-   * Two RBParameters are equal if they have the same _parameters map.
+   * ponies.
    */
-  bool operator== (const RBParameters& rhs) const;
+  ponies;
 
   /**
-   * @return !(*this == rhs).
+   * @ponies).
    */
-  bool operator!= (const RBParameters& node) const;
+  ponies;
 
   /**
-   * Get a string that specifies the contents of this RBParameters object.
-   * \p precision specifies the number of digits of precision we use
-   * in scientific notation in the string.
+   * ponies.
+   * \ponies
+   * ponies.
    */
-  std::string get_string(unsigned int precision=6) const;
+  ponies;
 
   /**
-   * Print the parameters.
+   * ponies.
    */
-  void print() const;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * The map that stores the actual parameters, indexed by names.
+   * ponies.
    */
-  std::map<std::string, Real> _parameters;
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_RB_PARAMETERS_H
+#ponies

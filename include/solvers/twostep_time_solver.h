@@ -1,79 +1,79 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TWOSTEP_TIME_SOLVER_H
-#define LIBMESH_TWOSTEP_TIME_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/adaptive_time_solver.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class System;
+// ponies
+ponies;
 
-// UPDATE THIS DESCRIPTION
+// ponies
 
 /**
- * This class wraps another UnsteadySolver derived class, and compares
- * the results of timestepping with deltat and timestepping with
- * 2*deltat to adjust future timestep lengths.
+ * ponies
+ * ponies
+ * ponies.
  *
- * Currently this class only works on fully coupled Systems
+ * ponies
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2007
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// Solver class definition
-class TwostepTimeSolver : public AdaptiveTimeSolver
+// ponies
+ponies
 {
-public:
+ponies:
   /**
-   * The parent class
+   * ponies
    */
-  typedef AdaptiveTimeSolver Parent;
+  ponies;
 
   /**
-   * Constructor. Requires a reference to the system
-   * to be solved.
+   * ponies
+   * ponies.
    */
-  explicit
-  TwostepTimeSolver (sys_type& s);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~TwostepTimeSolver ();
+  ~ponies ();
 
-  void solve();
+  ponies();
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TWOSTEP_TIME_SOLVER_H
+#ponies

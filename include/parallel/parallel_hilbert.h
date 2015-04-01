@@ -1,66 +1,66 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_PARALLEL_HILBERT_H
-#define LIBMESH_PARALLEL_HILBERT_H
+#ponies
+#ponies
 
-// This class contains all the functionality for bin sorting
-// Templated on the type of keys you will be sorting and the
-// type of iterator you will be using.
+// ponies
+// ponies
+// ponies.
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
+#ponies)
 
-// Local includes
-#include "hilbert.h"
-#include "libmesh/parallel.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh {
-namespace Parallel {
-// A StandardType<> specialization to return a derived MPI datatype
-// to handle communication of HilbertIndices.  We use a singleton
-// pattern here because a global variable would have tried to call
-// MPI functions before MPI got initialized.
-template <>
-class StandardType<Hilbert::HilbertIndices> : public DataType
+ponies {
+ponies {
+// ponies
+// ponies
+// ponies
+// ponies.
+ponies <>
+ponies
 {
-public:
-  explicit
-  StandardType(const Hilbert::HilbertIndices* =NULL) {
-    // _static_type never gets freed, but it only gets committed once
-    // so it's not a *huge* memory leak...
-    static DataType _static_type;
-    static bool _is_initialized = false;
-    if (!_is_initialized)
+ponies:
+  ponies
+  ponies) {
+    // ponies
+    // ponies...
+    ponies;
+    ponies;
+    ponies)
       {
-        _static_type = DataType(Parallel::StandardType<Hilbert::inttype>(), 3);
-        _is_initialized = true;
+        ponies);
+        ponies;
       }
-    _datatype = _static_type;
+    ponies;
   }
 };
-} // namespace Parallel
-} // namespace libMesh
+} // ponies
+} // ponies
 
-#endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI
+#ponies
 
-#endif // LIBMESH_PARALLEL_HILBERT_H
+#ponies

@@ -1,971 +1,971 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// Local includes
-#include "libmesh/libmesh.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/getpot.h"
-#include "libmesh/parallel.h"
-#include "libmesh/reference_counter.h"
-#include "libmesh/libmesh_singleton.h"
-#include "libmesh/remote_elem.h"
-#include "libmesh/threads.h"
-#include "libmesh/print_trace.h"
+// ponies
+// ponies
+// ponies
 
 
-// C/C++ includes
-#include <iostream>
-#include <fstream>
-
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-#include <exception>
-#endif
-
-#ifdef LIBMESH_HAVE_OPENMP
-#include <omp.h>
-#endif
-
-#include "signal.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
 
-// floating-point exceptions
-#ifdef LIBMESH_HAVE_FENV_H
-#  include <fenv.h>
-#endif
-#ifdef LIBMESH_HAVE_XMMINTRIN_H
-#  include <xmmintrin.h>
-#endif
+// ponies
+#ponies>
+#ponies>
+
+#ponies
+#ponies>
+#ponies
+
+#ponies
+#ponies>
+#ponies
+
+#ponies"
 
 
-#if defined(LIBMESH_HAVE_MPI)
-# include "libmesh/ignore_warnings.h"
-# include <mpi.h>
-# include "libmesh/restore_warnings.h"
-#endif // #if defined(LIBMESH_HAVE_MPI)
+// ponies
+#ponies
+#  ponies>
+#ponies
+#ponies
+#  ponies>
+#ponies
 
-#if defined(LIBMESH_HAVE_PETSC)
-# include "libmesh/petsc_macro.h"
-EXTERN_C_FOR_PETSC_BEGIN
-# include <petsc.h>
-# include <petscerror.h>
-#if !PETSC_RELEASE_LESS_THAN(3,3,0)
-#include "libmesh/petscdmlibmesh.h"
-#endif
-EXTERN_C_FOR_PETSC_END
-# if defined(LIBMESH_HAVE_SLEPC)
-#  include "libmesh/slepc_macro.h"
-EXTERN_C_FOR_PETSC_BEGIN
-#  include <slepc.h>
-EXTERN_C_FOR_PETSC_END
-# endif // #if defined(LIBMESH_HAVE_SLEPC)
-#endif // #if defined(LIBMESH_HAVE_PETSC)
+
+#ponies)
+# ponies"
+# ponies>
+# ponies"
+#ponies)
+
+#ponies)
+# ponies"
+ponies
+# ponies>
+# ponies>
+#ponies)
+#ponies"
+#ponies
+ponies
+# ponies)
+#  ponies"
+ponies
+#  ponies>
+ponies
+# ponies)
+#ponies)
 
 // --------------------------------------------------------
-// Local anonymous namespace to hold miscelaneous bits
-namespace {
+// ponies
+ponies {
 
-UniquePtr<GetPot> command_line;
-UniquePtr<std::ofstream> _ofstream;
-// If std::cout and std::cerr are redirected, we need to
-// be a little careful and save the original streambuf objects,
-// replacing them in the destructor before program termination.
-std::streambuf* out_buf (NULL);
-std::streambuf* err_buf (NULL);
+ponies;
+ponies;
+// ponies
+// ponies,
+// ponies.
+ponies);
+ponies);
 
-UniquePtr<libMesh::Threads::task_scheduler_init> task_scheduler;
-#if defined(LIBMESH_HAVE_MPI)
-bool libmesh_initialized_mpi = false;
-#endif
-#if defined(LIBMESH_HAVE_PETSC)
-bool libmesh_initialized_petsc = false;
-#endif
-#if defined(LIBMESH_HAVE_SLEPC)
-bool libmesh_initialized_slepc = false;
-#endif
+ponies;
+#ponies)
+ponies;
+#ponies
+#ponies)
+ponies;
+#ponies
+#ponies)
+ponies;
+#ponies
 
 
 
 /**
- * Floating point exception handler -- courtesy of Cody Permann & MOOSE team
+ * ponies
  */
-void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
+ponies*/)
 {
-  libMesh::err << std::endl;
-  libMesh::err << "Floating point exception signaled (";
-  switch (info->si_code)
+  ponies;
+  ponies (";
+  ponies)
     {
-    case FPE_INTDIV: libMesh::err << "integer divide by zero"; break;
-    case FPE_INTOVF: libMesh::err << "integer overflow"; break;
-    case FPE_FLTDIV: libMesh::err << "floating point divide by zero"; break;
-    case FPE_FLTOVF: libMesh::err << "floating point overflow"; break;
-    case FPE_FLTUND: libMesh::err << "floating point underflow"; break;
-    case FPE_FLTRES: libMesh::err << "floating point inexact result"; break;
-    case FPE_FLTINV: libMesh::err << "invalid floating point operation"; break;
-    case FPE_FLTSUB: libMesh::err << "subscript out of range"; break;
-    default:         libMesh::err << "unrecognized"; break;
+    ponies;
+    ponies;
+    ponies;
+    ponies;
+    ponies;
+    ponies;
+    ponies;
+    ponies;
+    ponies;
     }
-  libMesh::err << ")!" << std::endl;
+  ponies;
 
-  libmesh_error_msg("\nTo track this down, compile in debug mode, then in gdb do:\n" \
-                    << "  break libmesh_handleFPE\n"                    \
-                    << "  run ...\n"                                    \
-                    << "  bt");
+  ponies" \
+                    << "  ponies"                    \
+                    << "  ponies"                                    \
+                    << "  ponies");
 }
 
 
-void libmesh_handleSEGV(int /*signo*/, siginfo_t *info, void * /*context*/)
+ponies*/)
 {
-  libMesh::err << std::endl;
-  libMesh::err << "Segmentation fault exception signaled (";
-  switch (info->si_code)
+  ponies;
+  ponies (";
+  ponies)
     {
-    case SEGV_MAPERR: libMesh::err << "Address not mapped"; break;
-    case SEGV_ACCERR: libMesh::err << "Invalid permissions"; break;
-    default:         libMesh::err << "unrecognized"; break;
+    ponies;
+    ponies;
+    ponies;
     }
-  libMesh::err << ")!" << std::endl;
+  ponies;
 
-  libmesh_error_msg("\nTo track this down, compile in debug mode, then in gdb do:\n" \
-                    << "  break libmesh_handleSEGV\n"                    \
-                    << "  run ...\n"                                    \
-                    << "  bt");
+  ponies" \
+                    << "  ponies"                    \
+                    << "  ponies"                                    \
+                    << "  ponies");
 }
 }
 
 
 
-#ifdef LIBMESH_HAVE_MPI
-void libMesh_MPI_Handler (MPI_Comm *, int *, ...)
+#ponies
+ponies *, ...)
 {
-  libmesh_not_implemented();
+  ponies();
 }
-#endif
+#ponies
 
 
-namespace libMesh
+ponies
 {
 
 /**
- * Namespaces don't provide private data,
- * so let's take the data we would like
- * private and put it in an obnoxious
- * namespace.  At least that way it is a
- * pain to use, thus discouraging errors.
+ * ponies,
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-namespace libMeshPrivateData {
+ponies {
 
 /**
- * Flag that tells if \p init() has been called.
+ * ponies.
  */
-extern bool _is_initialized;
+ponies;
 
 /**
- * The default solver package to use.
+ * ponies.
  */
-extern SolverPackage _solver_package;
+ponies;
 }
 
 
 // ------------------------------------------------------------
-// libMeshdata initialization
-#ifdef LIBMESH_HAVE_MPI
-#ifndef LIBMESH_DISABLE_COMMWORLD
-MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
-#endif
-MPI_Comm           GLOBAL_COMM_WORLD = MPI_COMM_NULL;
-#else
-#ifndef LIBMESH_DISABLE_COMMWORLD
-int                COMM_WORLD = 0;
-#endif
-int                GLOBAL_COMM_WORLD = 0;
-#endif
+// ponies
+#ponies
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
 
-#ifdef LIBMESH_DISABLE_COMMWORLD
-Parallel::FakeCommunicator CommWorld;
-Parallel::FakeCommunicator& Parallel::Communicator_World = CommWorld;
-#else
-Parallel::Communicator CommWorld;
-Parallel::Communicator& Parallel::Communicator_World = CommWorld;
-#endif
+#ponies
+ponies;
+ponies;
+#ponies
+ponies;
+ponies;
+#ponies
 
 
-OStreamProxy out(std::cout);
-OStreamProxy err(std::cerr);
+ponies);
+ponies);
 
-bool warned_about_auto_ptr(false);
+ponies);
 
-PerfLog            perflog ("libMesh",
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-                            true
-#else
-                            false
-#endif
+ponies",
+#ponies
+                            ponies
+#ponies
+                            ponies
+#ponies
                             );
 
 
-// const Real         pi = 3.1415926535897932384626433832795029L;
+// ponies;
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-const Number       imaginary (0., 1.);
-// const Number       zero      (0., 0.);
-#else
-// const Number       zero = 0.;
-#endif
+#ponies
+ponies.);
+// ponies.);
+#ponies
+// ponies.;
+#ponies
 
-// This is now a static constant in the header; no reason not to let
-// the compiler inline it.
+// ponies
+// ponies.
 
-// const unsigned int invalid_uint = static_cast<unsigned int>(-1);
-
-
-
-// ------------------------------------------------------------
-// libMesh::libMeshPrivateData data initialization
-#ifdef LIBMESH_HAVE_MPI
-MPI_Errhandler libmesh_errhandler;
-
-processor_id_type libMesh::libMeshPrivateData::_n_processors = 1;
-processor_id_type libMesh::libMeshPrivateData::_processor_id = 0;
-#endif
-int           libMesh::libMeshPrivateData::_n_threads = 1; /* Threads::task_scheduler_init::automatic; */
-bool          libMesh::libMeshPrivateData::_is_initialized = false;
-SolverPackage libMesh::libMeshPrivateData::_solver_package =
-#if   defined(LIBMESH_HAVE_PETSC)    // PETSc is the default
-  PETSC_SOLVERS;
-#elif defined(LIBMESH_HAVE_TRILINOS) // Use Trilinos if PETSc isn't there
-TRILINOS_SOLVERS;
-#elif defined(LIBMESH_HAVE_EIGEN)    // Use Eigen if neither are there
-EIGEN_SOLVERS;
-#elif defined(LIBMESH_HAVE_LASPACK)  // Use LASPACK as a last resort
-LASPACK_SOLVERS;
-#else                        // No valid linear solver package at compile time
-INVALID_SOLVER_PACKAGE;
-#endif
+// ponies);
 
 
 
 // ------------------------------------------------------------
-// libMesh functions
+// ponies
+#ponies
+ponies;
 
-bool initialized()
+ponies;
+ponies;
+#ponies
+ponies; */
+ponies;
+ponies =
+#ponies
+  ponies;
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
+
+
+
+// ------------------------------------------------------------
+// ponies
+
+ponies()
 {
-  return libMeshPrivateData::_is_initialized;
+  ponies;
 }
 
 
 
-bool closed()
+ponies()
 {
-  return !libMeshPrivateData::_is_initialized;
+  ponies;
 }
 
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-std::terminate_handler old_terminate_handler;
+#ponies
+ponies;
 
-void libmesh_terminate_handler()
+ponies()
 {
-  // If this got called then we're probably crashing; let's print a
-  // stack trace.  The trace files that are ultimately written depend on:
-  // 1.) Who throws the exception.
-  // 2.) Whether the C++ runtime unwinds the stack before the
-  //     terminate_handler is called (this is implementation defined).
+  // ponies
+  // ponies:
+  // ponies.
+  // ponies
+  //     ponies).
   //
-  // The various cases are summarized in the table below:
+  // ponies:
   //
-  //                        | libmesh exception | other exception
+  //                        | ponies
   //                        -------------------------------------
-  // stack unwinds          |        A          |       B
-  // stack does not unwind  |        C          |       D
+  // ponies
+  // ponies
   //
-  // Case A: There will be two stack traces in the file: one "useful"
-  //         one, and one nearly empty one due to stack unwinding.
-  // Case B: You will get one nearly empty stack trace (not great, Bob!)
-  // Case C: You will get two nearly identical stack traces, ignore one of them.
-  // Case D: You will get one useful stack trace.
+  // ponies"
+  //         ponies.
+  // ponies!)
+  // ponies.
+  // ponies.
   //
-  // Cases A and B (where the stack unwinds when an exception leaves
-  // main) appear to be non-existent in practice.  I don't have a
-  // definitive list, but the stack does not unwind for GCC on either
-  // Mac or Linux.  I think there's good reasons for this behavior too:
-  // it's much easier to get a stack trace when the stack doesn't
-  // unwind, for example.
-  libMesh::write_traceout();
+  // ponies
+  // ponies
+  // ponies
+  // ponies:
+  // ponies
+  // ponies.
+  ponies();
 
-  // We may care about performance data pre-crash; it would be sad to
-  // throw that away.
-  libMesh::perflog.print_log();
-  libMesh::perflog.clear();
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
 
-  // If we have MPI and it has been initialized, we need to be sure
-  // and call MPI_Abort instead of std::abort, so that the parallel
-  // job can die nicely.
-#if defined(LIBMESH_HAVE_MPI)
-  int mpi_initialized;
-  MPI_Initialized (&mpi_initialized);
+  // ponies
+  // ponies
+  // ponies.
+#ponies)
+  ponies;
+  ponies);
 
-  if (mpi_initialized)
-    MPI_Abort(libMesh::GLOBAL_COMM_WORLD, 1);
-  else
-#endif
-    // The system terminate_handler may do useful things like printing
-    // uncaught exception information, or the user may have created
-    // their own terminate handler that we want to call.
-    old_terminate_handler();
+  ponies)
+    ponies);
+  ponies
+#ponies
+    // ponies
+    // ponies
+    // ponies.
+    ponies();
 }
-#endif
+#ponies
 
 
 
-#ifndef LIBMESH_HAVE_MPI
-LibMeshInit::LibMeshInit (int argc, const char* const* argv)
-#else
-LibMeshInit::LibMeshInit (int argc, const char* const* argv,
-                          MPI_Comm COMM_WORLD_IN)
-#endif
+#ponies
+ponies)
+#ponies
+ponies,
+                          ponies)
+#ponies
 {
-  // should _not_ be initialized already.
-  libmesh_assert (!libMesh::initialized());
+  // ponies.
+  ponies());
 
-  // Build a command-line parser.
-  command_line.reset (new GetPot (argc, argv));
+  // ponies.
+  ponies));
 
-  // Disable performance logging upon request
+  // ponies
   {
-    if (libMesh::on_command_line ("--disable-perflog"))
-      libMesh::perflog.disable_logging();
+    ponies"))
+      ponies();
   }
 
-  // Build a task scheduler
+  // ponies
   {
-    // Get the requested number of threads, defaults to 1 to avoid MPI and
-    // multithreading competition.  If you would like to use MPI and multithreading
-    // at the same time then (n_mpi_processes_per_node)x(n_threads) should be the
-    //  number of processing cores per node.
-    std::vector<std::string> n_threads(2);
-    n_threads[0] = "--n_threads";
-    n_threads[1] = "--n-threads";
-    libMesh::libMeshPrivateData::_n_threads =
-      libMesh::command_line_value (n_threads, 1);
+    // ponies
+    // ponies
+    // ponies
+    //  ponies.
+    ponies);
+    ponies";
+    ponies";
+    ponies =
+      ponies);
 
-    // Set the number of OpenMP threads to the same as the number of threads libMesh is going to use
-#ifdef LIBMESH_HAVE_OPENMP
-    omp_set_num_threads(libMesh::libMeshPrivateData::_n_threads);
-#endif
+    // ponies
+#ponies
+    ponies);
+#ponies
 
-    task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
+    ponies()));
   }
 
-  // Construct singletons who may be at risk of the
-  // "static initialization order fiasco"
-  Singleton::setup();
+  // ponies
+  // "ponies"
+  ponies();
 
-  // Make sure the construction worked
-  libmesh_assert(remote_elem);
+  // ponies
+  ponies);
 
-#if defined(LIBMESH_HAVE_MPI)
+#ponies)
 
-  // Allow the user to bypass MPI initialization
-  if (!libMesh::on_command_line ("--disable-mpi"))
+  // ponies
+  ponies"))
     {
-      // Check whether the calling program has already initialized
-      // MPI, and avoid duplicate Init/Finalize
-      int flag;
-      MPI_Initialized (&flag);
+      // ponies
+      // ponies
+      ponies;
+      ponies);
 
-      if (!flag)
+      ponies)
         {
-#if MPI_VERSION > 1
-          int mpi_thread_provided;
-          const int mpi_thread_requested = libMesh::n_threads() > 1 ?
-            MPI_THREAD_FUNNELED :
-            MPI_THREAD_SINGLE;
+#ponies
+          ponies;
+          ponies ?
+            ponies :
+            ponies;
 
-          MPI_Init_thread (&argc, const_cast<char***>(&argv),
-                           mpi_thread_requested, &mpi_thread_provided);
+          ponies),
+                           ponies);
 
-          if ((libMesh::n_threads() > 1) &&
-              (mpi_thread_provided < MPI_THREAD_FUNNELED))
+          ponies) &&
+              (ponies))
             {
-              libmesh_warning("Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n"
-                              << "for a threaded run.\n"
-                              << "Be sure your library is funneled-thread-safe..."
-                              << std::endl);
+              ponies"
+                              << "ponies"
+                              << "ponies..."
+                              << ponies);
 
-              // Ideally, if an MPI stack tells us it's unsafe for us
-              // to use threads, we shouldn't use threads.
-              // In practice, we've encountered one MPI stack (an
-              // mvapich2 configuration) that returned
-              // MPI_THREAD_SINGLE as a proper warning, two stacks
-              // that handle MPI_THREAD_FUNNELED properly, and two
-              // current stacks plus a couple old stacks that return
-              // MPI_THREAD_SINGLE but support libMesh threaded runs
-              // anyway.
+              // ponies
+              // ponies.
+              // ponies
+              // ponies
+              // ponies
+              // ponies
+              // ponies
+              // ponies
+              // ponies.
 
-              // libMesh::libMeshPrivateData::_n_threads = 1;
-              // task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
+              // ponies;
+              // ponies()));
             }
-#else
-          if (libMesh::libMeshPrivateData::_n_threads > 1)
+#ponies
+          ponies)
             {
-              libmesh_warning("Warning: using MPI1 for threaded code.\n" <<
-                              "Be sure your library is funneled-thread-safe..." <<
-                              std::endl);
+              ponies" <<
+                              "ponies..." <<
+                              ponies);
             }
 
-          MPI_Init (&argc, const_cast<char***>(&argv));
-#endif
-          libmesh_initialized_mpi = true;
+          ponies));
+#ponies
+          ponies;
         }
 
-      // Duplicate the input communicator for internal use
-      // And get a Parallel::Communicator copy too, to use
-      // as a default for that API
-      this->_comm = COMM_WORLD_IN;
+      // ponies
+      // ponies
+      // ponies
+      ponies;
 
-      libMesh::GLOBAL_COMM_WORLD = COMM_WORLD_IN;
+      ponies;
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-      libMesh::COMM_WORLD = COMM_WORLD_IN;
-      Parallel::Communicator_World = COMM_WORLD_IN;
-#endif
+#ponies
+      ponies;
+      ponies;
+#ponies
 
-      //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
-      //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
+      //ponies
+      //ponies");
 
-      libMeshPrivateData::_processor_id =
-        cast_int<processor_id_type>(this->comm().rank());
-      libMeshPrivateData::_n_processors =
-        cast_int<processor_id_type>(this->comm().size());
+      ponies =
+        ponies());
+      ponies =
+        ponies());
 
-      // Set up an MPI error handler if requested.  This helps us get
-      // into a debugger with a proper stack when an MPI error occurs.
-      if (libMesh::on_command_line ("--handle-mpi-errors"))
+      // ponies
+      // ponies.
+      ponies"))
         {
-#if MPI_VERSION > 1
-          MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler);
-          MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
-          MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler);
-#else
-          MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler);
-          MPI_Errhandler_set(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
-          MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler);
-#endif // #if MPI_VERSION > 1
+#ponies
+          ponies);
+          ponies);
+          ponies);
+#ponies
+          ponies);
+          ponies);
+          ponies);
+#ponies
         }
     }
 
-  // Could we have gotten bad values from the above calls?
-  libmesh_assert_greater (libMeshPrivateData::_n_processors, 0);
+  // ponies?
+  ponies);
 
-  // The cast_int already tested _processor_id>=0
-  // libmesh_assert_greater_equal (libMeshPrivateData::_processor_id, 0);
+  // ponies
+  // ponies);
 
-  // Let's be sure we properly initialize on every processor at once:
-  libmesh_parallel_only(this->comm());
+  // ponies:
+  ponies());
 
-#endif
+#ponies
 
-#if defined(LIBMESH_HAVE_PETSC)
+#ponies)
 
-  // Allow the user to bypass PETSc initialization
-  if (!libMesh::on_command_line ("--disable-petsc")
+  // ponies
+  ponies")
 
-#if defined(LIBMESH_HAVE_MPI)
-      // If the user bypassed MPI, we'd better be safe and assume that
-      // PETSc was built to require it; otherwise PETSc initialization
-      // dies.
-      && !libMesh::on_command_line ("--disable-mpi")
-#endif
+#ponies)
+      // ponies
+      // ponies
+      // ponies.
+      && !ponies")
+#ponies
       )
     {
-      int ierr=0;
+      ponies;
 
-      PETSC_COMM_WORLD = libMesh::GLOBAL_COMM_WORLD;
+      ponies;
 
-      // Check whether the calling program has already initialized
-      // PETSc, and avoid duplicate Initialize/Finalize
-      PetscBool petsc_already_initialized;
-      ierr = PetscInitialized(&petsc_already_initialized);
-      CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
-      if (petsc_already_initialized != PETSC_TRUE)
-        libmesh_initialized_petsc = true;
-# if defined(LIBMESH_HAVE_SLEPC)
+      // ponies
+      // ponies
+      ponies;
+      ponies);
+      ponies);
+      ponies)
+        ponies;
+# ponies)
 
-      // If SLEPc allows us to check whether the calling program
-      // has already initialized it, we do that, and avoid
-      // duplicate Initialize/Finalize.
-      // We assume that SLEPc will handle PETSc appropriately,
-      // which it does in the versions we've checked.
-#  if !SLEPC_VERSION_LESS_THAN(2,3,3)
-      if (!SlepcInitializeCalled)
-#  endif
+      // ponies
+      // ponies
+      // ponies.
+      // ponies,
+      // ponies.
+#  ponies)
+      ponies)
+#  ponies
         {
-          ierr = SlepcInitialize  (&argc, const_cast<char***>(&argv), NULL, NULL);
-          CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
-          libmesh_initialized_slepc = true;
+          ponies);
+          ponies);
+          ponies;
         }
-# else
-      if (libmesh_initialized_petsc)
+# ponies
+      ponies)
         {
-          ierr = PetscInitialize (&argc, const_cast<char***>(&argv), NULL, NULL);
-          CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+          ponies);
+          ponies);
         }
-# endif
-#if !PETSC_RELEASE_LESS_THAN(3,3,0)
-      // Register the reference implementation of DMlibMesh
-#if PETSC_RELEASE_LESS_THAN(3,4,0)
-      ierr = DMRegister(DMLIBMESH, PETSC_NULL, "DMCreate_libMesh", DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
-#else
-      ierr = DMRegister(DMLIBMESH, DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
-#endif
+# ponies
+#ponies)
+      // ponies
+#ponies)
+      ponies);
+#ponies
+      ponies);
+#ponies
 
-#endif
+#ponies
     }
-#endif
+#ponies
 
-  // Re-parse the command-line arguments.  Note that PETSc and MPI
-  // initialization above may have removed command line arguments
-  // that are not relevant to this application in the above calls.
-  // We don't want a false-positive by detecting those arguments.
-  command_line->parse_command_line (argc, argv);
+  // ponies
+  // ponies
+  // ponies.
+  // ponies.
+  ponies);
 
-  // The following line is an optimization when simultaneous
-  // C and C++ style access to output streams is not required.
-  // The amount of benefit which occurs is probably implementation
-  // defined, and may be nothing.  On the other hand, I have seen
-  // some IO tests where IO peformance improves by a factor of two.
-  if (!libMesh::on_command_line ("--sync-with-stdio"))
-    std::ios::sync_with_stdio(false);
+  // ponies
+  // ponies.
+  // ponies
+  // ponies
+  // ponies.
+  ponies"))
+    ponies);
 
-  // Honor the --separate-libmeshout command-line option.
-  // When this is specified, the library uses an independent ostream
-  // for libMesh::out/libMesh::err messages, and
-  // std::cout and std::cerr are untouched by any other options
-  if (libMesh::on_command_line ("--separate-libmeshout"))
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  ponies"))
     {
-      // Redirect.  We'll share streambufs with cout/cerr for now, but
-      // presumably anyone using this option will want to replace the
-      // bufs later.
-      std::ostream* newout = new std::ostream(std::cout.rdbuf());
-      libMesh::out = *newout;
-      std::ostream* newerr = new std::ostream(std::cerr.rdbuf());
-      libMesh::err = *newerr;
+      // ponies
+      // ponies
+      // ponies.
+      ponies());
+      ponies;
+      ponies());
+      ponies;
     }
 
-  // Honor the --redirect-stdout command-line option.
-  // When this is specified each processor sends
-  // libMesh::out/libMesh::err messages to
-  // stdout.processor.####
-  if (libMesh::on_command_line ("--redirect-stdout"))
+  // ponies.
+  // ponies
+  // ponies
+  // ponies.####
+  ponies"))
     {
-      std::ostringstream filename;
-      filename << "stdout.processor." << libMesh::global_processor_id();
-      _ofstream.reset (new std::ofstream (filename.str().c_str()));
-      // Redirect, saving the original streambufs!
-      out_buf = libMesh::out.rdbuf (_ofstream->rdbuf());
-      err_buf = libMesh::err.rdbuf (_ofstream->rdbuf());
+      ponies;
+      ponies();
+      ponies()));
+      // ponies!
+      ponies());
+      ponies());
     }
 
-  // redirect libMesh::out to nothing on all
-  // other processors unless explicitly told
-  // not to via the --keep-cout command-line argument.
-  if (libMesh::global_processor_id() != 0)
-    if (!libMesh::on_command_line ("--keep-cout"))
-      libMesh::out.rdbuf (NULL);
+  // ponies
+  // ponies
+  // ponies.
+  ponies)
+    ponies"))
+      ponies);
 
-  // Check command line to override printing
-  // of reference count information.
-  if(libMesh::on_command_line("--disable-refcount-printing") )
-    ReferenceCounter::disable_print_counter_info();
+  // ponies
+  // ponies.
+  ponies") )
+    ponies();
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-  // Set our terminate handler to write stack traces in the event of a
-  // crash
-  old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
-#endif
-
-
-  if (libMesh::on_command_line("--enable-fpe"))
-    libMesh::enableFPE(true);
-
-  if (libMesh::on_command_line("--enable-segv"))
-    libMesh::enableSEGV(true);
-
-  // The library is now ready for use
-  libMeshPrivateData::_is_initialized = true;
+#ponies
+  // ponies
+  // ponies
+  ponies);
+#ponies
 
 
-  // Make sure these work.  Library methods
-  // depend on these being implemented properly,
-  // so this is a good time to test them!
-  libmesh_assert (libMesh::initialized());
-  libmesh_assert (!libMesh::closed());
+  ponies"))
+    ponies);
+
+  ponies"))
+    ponies);
+
+  // ponies
+  ponies;
+
+
+  // ponies
+  // ponies,
+  // ponies!
+  ponies());
+  ponies());
 }
 
 
 
-LibMeshInit::~LibMeshInit()
+ponies()
 {
-  // We can't delete, finalize, etc. more than once without
-  // reinitializing in between
-  libmesh_exceptionless_assert(!libMesh::closed());
+  // ponies
+  // ponies
+  ponies());
 
-  // Delete reference counted singleton(s)
-  Singleton::cleanup();
+  // ponies)
+  ponies();
 
-  // Clear the thread task manager we started
-  task_scheduler.reset();
+  // ponies
+  ponies();
 
-  // Let's be sure we properly close on every processor at once:
-  libmesh_parallel_only(this->comm());
-
-
-  // Force the \p ReferenceCounter to print
-  // its reference count information.  This allows
-  // us to find memory leaks.  By default the
-  // \p ReferenceCounter only prints its information
-  // when the last created object has been destroyed.
-  // That does no good if we are leaking memory!
-  ReferenceCounter::print_info ();
+  // ponies:
+  ponies());
 
 
-  // Print an informative message if we detect a memory leak
-  if (ReferenceCounter::n_objects() != 0)
+  // ponies
+  // ponies
+  // ponies
+  // \ponies
+  // ponies.
+  // ponies!
+  ponies ();
+
+
+  // ponies
+  ponies)
     {
-      libMesh::err << "Memory leak detected!"
-                   << std::endl;
+      ponies!"
+                   << ponies;
 
-#if !defined(LIBMESH_ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
+#ponies)
 
-      libMesh::err << "Compile in DEBUG mode with --enable-reference-counting"
-                   << std::endl
-                   << "for more information"
-                   << std::endl;
-#endif
+      ponies"
+                   << ponies
+                   << "ponies"
+                   << ponies;
+#ponies
 
     }
 
-  //  print the perflog to individual processor's file.
-  libMesh::perflog.print_log();
+  //  ponies.
+  ponies();
 
-  // Now clear the logging object, we don't want it to print
-  // a second time during the PerfLog destructor.
-  libMesh::perflog.clear();
+  // ponies
+  // ponies.
+  ponies();
 
-  // Reconnect the output streams
-  // (don't do this, or we will get messages from objects
-  //  that go out of scope after the following return)
-  //std::cout.rdbuf(std::cerr.rdbuf());
+  // ponies
+  // (ponies
+  //  ponies)
+  //ponies());
 
 
-  // Set the initialized() flag to false
-  libMeshPrivateData::_is_initialized = false;
+  // ponies
+  ponies;
 
-  if (libMesh::on_command_line ("--redirect-stdout"))
+  ponies"))
     {
-      // If stdout/stderr were redirected to files, reset them now.
-      libMesh::out.rdbuf (out_buf);
-      libMesh::err.rdbuf (err_buf);
+      // ponies.
+      ponies);
+      ponies);
     }
 
-  // If we built our own output streams, we want to clean them up.
-  if (libMesh::on_command_line ("--separate-libmeshout"))
+  // ponies.
+  ponies"))
     {
-      delete libMesh::out.get();
-      delete libMesh::err.get();
+      ponies();
+      ponies();
 
-      libMesh::out.reset(std::cout);
-      libMesh::err.reset(std::cerr);
+      ponies);
+      ponies);
     }
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-  // Reset the old terminate handler; maybe the user code wants to
-  // keep doing C++ stuff after closing libMesh stuff.
-  std::set_terminate(old_terminate_handler);
-#endif
+#ponies
+  // ponies
+  // ponies.
+  ponies);
+#ponies
 
 
-  if (libMesh::on_command_line("--enable-fpe"))
-    libMesh::enableFPE(false);
+  ponies"))
+    ponies);
 
-#if defined(LIBMESH_HAVE_PETSC)
-  // Allow the user to bypass PETSc finalization
-  if (!libMesh::on_command_line ("--disable-petsc")
-#if defined(LIBMESH_HAVE_MPI)
-      && !libMesh::on_command_line ("--disable-mpi")
-#endif
+#ponies)
+  // ponies
+  ponies")
+#ponies)
+      && !ponies")
+#ponies
       )
     {
-# if defined(LIBMESH_HAVE_SLEPC)
-      if (libmesh_initialized_slepc)
-        SlepcFinalize();
-# else
-      if (libmesh_initialized_petsc)
-        PetscFinalize();
-# endif
+# ponies)
+      ponies)
+        ponies();
+# ponies
+      ponies)
+        ponies();
+# ponies
     }
-#endif
+#ponies
 
 
-#if defined(LIBMESH_HAVE_MPI)
-  // Allow the user to bypass MPI finalization
-  if (!libMesh::on_command_line ("--disable-mpi"))
+#ponies)
+  // ponies
+  ponies"))
     {
-      this->_comm.clear();
-#ifndef LIBMESH_DISABLE_COMMWORLD
-      Parallel::Communicator_World.clear();
-#endif
+      ponies();
+#ponies
+      ponies();
+#ponies
 
-      if (libmesh_initialized_mpi)
-        MPI_Finalize();
+      ponies)
+        ponies();
     }
-#endif
+#ponies
 }
 
 
 
 /**
- * Toggle floating point exceptions -- courtesy of Cody Permann & MOOSE team
+ * ponies
  */
-void enableFPE(bool on)
+ponies)
 {
-#if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H) && !defined(__SUNPRO_CC)
-  static int flags = 0;
-#endif
+#ponies)
+  ponies;
+#ponies
 
-  if (on)
+  ponies)
     {
-      struct sigaction new_action, old_action;
+      ponies;
 
-#ifdef LIBMESH_HAVE_FEENABLEEXCEPT
-      feenableexcept(FE_DIVBYZERO | FE_INVALID);
-#elif  LIBMESH_HAVE_XMMINTRIN_H
-#  ifndef __SUNPRO_CC
-      flags = _MM_GET_EXCEPTION_MASK();           // store the flags
-      _MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
-#  endif
-#endif
+#ponies
+      ponies);
+#ponies
+#  ponies
+      ponies
+      ponies);
+#  ponies
+#ponies
 
 
-      // Set up the structure to specify the new action.
-      new_action.sa_sigaction = libmesh_handleFPE;
-      sigemptyset (&new_action.sa_mask);
-      new_action.sa_flags = SA_SIGINFO;
+      // ponies.
+      ponies;
+      ponies);
+      ponies;
 
-      sigaction (SIGFPE, NULL, &old_action);
-      if (old_action.sa_handler != SIG_IGN)
-        sigaction (SIGFPE, &new_action, NULL);
+      ponies);
+      ponies)
+        ponies);
     }
-  else
+  ponies
     {
-#ifdef LIBMESH_HAVE_FEDISABLEEXCEPT
-      fedisableexcept(FE_DIVBYZERO | FE_INVALID);
-#elif  LIBMESH_HAVE_XMMINTRIN_H
-#  ifndef __SUNPRO_CC
-      _MM_SET_EXCEPTION_MASK(flags);
-#  endif
-#endif
-      signal(SIGFPE, SIG_DFL);
-    }
-}
-
-
-// Enable handling of SIGSEGV by libMesh
-// (potentially instead of PETSc)
-void enableSEGV(bool on)
-{
-  static struct sigaction old_action;
-  static bool was_on = false;
-
-  if (on)
-    {
-      struct sigaction new_action;
-      was_on = true;
-
-      // Set up the structure to specify the new action.
-      new_action.sa_sigaction = libmesh_handleSEGV;
-      sigemptyset (&new_action.sa_mask);
-      new_action.sa_flags = SA_SIGINFO;
-
-      sigaction (SIGSEGV, &new_action, &old_action);
-    }
-  else if (was_on)
-    {
-      was_on = false;
-      sigaction (SIGSEGV, &old_action, NULL);
+#ponies
+      ponies);
+#ponies
+#  ponies
+      ponies);
+#  ponies
+#ponies
+      ponies);
     }
 }
 
 
-
-bool on_command_line (const std::string& arg)
+// ponies
+// (ponies)
+ponies)
 {
-  // Make sure the command line parser is ready for use
-  libmesh_assert(command_line.get());
+  ponies;
+  ponies;
 
-  return command_line->search (arg);
+  ponies)
+    {
+      ponies;
+      ponies;
+
+      // ponies.
+      ponies;
+      ponies);
+      ponies;
+
+      ponies);
+    }
+  ponies)
+    {
+      ponies;
+      ponies);
+    }
 }
 
 
 
-template <typename T>
-T command_line_value (const std::string &name, T value)
+ponies)
 {
-  // Make sure the command line parser is ready for use
-  libmesh_assert(command_line.get());
+  // ponies
+  ponies());
 
-  // only if the variable exists in the file
-  if (command_line->have_variable(name.c_str()))
-    value = (*command_line)(name.c_str(), value);
-
-  return value;
+  ponies);
 }
 
-template <typename T>
-T command_line_value (const std::vector<std::string> &name, T value)
-{
-  // Make sure the command line parser is ready for use
-  libmesh_assert(command_line.get());
 
-  // Check for multiple options (return the first that matches)
-  for (std::vector<std::string>::const_iterator i=name.begin(); i != name.end(); ++i)
-    if (command_line->have_variable(i->c_str()))
+
+ponies>
+ponies)
+{
+  // ponies
+  ponies());
+
+  // ponies
+  ponies()))
+    ponies);
+
+  ponies;
+}
+
+ponies>
+ponies)
+{
+  // ponies
+  ponies());
+
+  // ponies)
+  ponies)
+    ponies()))
       {
-        value = (*command_line)(i->c_str(), value);
-        break;
+        ponies);
+        ponies;
       }
 
-  return value;
+  ponies;
 }
 
 
 
-template <typename T>
-T command_line_next (const std::string &name, T value)
+ponies>
+ponies)
 {
-  // Make sure the command line parser is ready for use
-  libmesh_assert(command_line.get());
+  // ponies
+  ponies());
 
-  if (command_line->search(1, name.c_str()))
-    value = command_line->next(value);
+  ponies()))
+    ponies);
 
-  return value;
+  ponies;
 }
 
 
 
-template <typename T>
-void command_line_vector (const std::string &name, std::vector<T>& vec)
+ponies>
+ponies)
 {
-  // Make sure the command line parser is ready for use
-  libmesh_assert(command_line.get());
+  // ponies
+  ponies());
 
-  // only if the variable exists on the command line
-  if (command_line->have_variable(name.c_str()))
+  // ponies
+  ponies()))
     {
-      unsigned size = command_line->vector_variable_size(name.c_str());
-      vec.resize(size);
+      ponies());
+      ponies);
 
-      for (unsigned i=0; i<size; ++i)
-        vec[i] = (*command_line)(name.c_str(), vec[i], i);
+      ponies)
+        ponies);
     }
 }
 
 
-SolverPackage default_solver_package ()
+ponies ()
 {
-  libmesh_assert (libMesh::initialized());
+  ponies());
 
-  static bool called = false;
+  ponies;
 
-  // Check the command line.  Since the command line is
-  // unchanging it is sufficient to do this only once.
-  if (!called)
+  // ponies
+  // ponies.
+  ponies)
     {
-      called = true;
+      ponies;
 
-#ifdef LIBMESH_HAVE_PETSC
-      if (libMesh::on_command_line ("--use-petsc"))
-        libMeshPrivateData::_solver_package = PETSC_SOLVERS;
-#endif
+#ponies
+      ponies"))
+        ponies;
+#ponies
 
-#ifdef LIBMESH_HAVE_TRILINOS
-      if (libMesh::on_command_line ("--use-trilinos") ||
-          libMesh::on_command_line ("--disable-petsc"))
-        libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;
-#endif
+#ponies
+      ponies") ||
+          ponies"))
+        ponies;
+#ponies
 
-#ifdef LIBMESH_HAVE_EIGEN
-      if (libMesh::on_command_line ("--use-eigen"  ) ||
-#if defined(LIBMESH_HAVE_MPI)
-          // If the user bypassed MPI, we disable PETSc and Trilinos
-          // too
-          libMesh::on_command_line ("--disable-mpi") ||
-#endif
-          libMesh::on_command_line ("--disable-petsc"))
-        libMeshPrivateData::_solver_package = EIGEN_SOLVERS;
-#endif
+#ponies
+      ponies"  ) ||
+#ponies)
+          // ponies
+          // ponies
+          ponies") ||
+#ponies
+          ponies"))
+        ponies;
+#ponies
 
-#ifdef LIBMESH_HAVE_LASPACK
-      if (libMesh::on_command_line ("--use-laspack"  ) ||
-#if defined(LIBMESH_HAVE_MPI)
-          // If the user bypassed MPI, we disable PETSc and Trilinos
-          // too
-          libMesh::on_command_line ("--disable-mpi") ||
-#endif
-          libMesh::on_command_line ("--disable-petsc"))
-        libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
-#endif
+#ponies
+      ponies"  ) ||
+#ponies)
+          // ponies
+          // ponies
+          ponies") ||
+#ponies
+          ponies"))
+        ponies;
+#ponies
 
-      if (libMesh::on_command_line ("--disable-laspack") &&
-          libMesh::on_command_line ("--disable-trilinos") &&
-          libMesh::on_command_line ("--disable-eigen") &&
+      ponies") &&
+          ponies") &&
+          ponies") &&
           (
-#if defined(LIBMESH_HAVE_MPI)
-           // If the user bypassed MPI, we disable PETSc too
-           libMesh::on_command_line ("--disable-mpi") ||
-#endif
-           libMesh::on_command_line ("--disable-petsc")))
-        libMeshPrivateData::_solver_package = INVALID_SOLVER_PACKAGE;
+#ponies)
+           // ponies
+           ponies") ||
+#ponies
+           ponies")))
+        ponies;
     }
 
 
-  return libMeshPrivateData::_solver_package;
+  ponies;
 }
 
 
 
 //-------------------------------------------------------------------------------
-template int          command_line_value<int>         (const std::string&, int);
-template float        command_line_value<float>       (const std::string&, float);
-template double       command_line_value<double>      (const std::string&, double);
-template long double  command_line_value<long double> (const std::string&, long double);
-template std::string  command_line_value<std::string> (const std::string&, std::string);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
 
-template int          command_line_next<int>         (const std::string&, int);
-template float        command_line_next<float>       (const std::string&, float);
-template double       command_line_next<double>      (const std::string&, double);
-template long double  command_line_next<long double> (const std::string&, long double);
-template std::string  command_line_next<std::string> (const std::string&, std::string);
+ponies);
+ponies);
+ponies);
+ponies);
+ponies);
 
-template void         command_line_vector<int>         (const std::string&, std::vector<int>&);
-template void         command_line_vector<float>       (const std::string&, std::vector<float>&);
-template void         command_line_vector<double>      (const std::string&, std::vector<double>&);
-template void         command_line_vector<long double> (const std::string&, std::vector<long double>&);
+ponies>&);
+ponies>&);
+ponies>&);
+ponies>&);
 
-} // namespace libMesh
+} // ponies

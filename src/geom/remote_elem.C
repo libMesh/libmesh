@@ -1,85 +1,85 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// Local includes
-#include "libmesh/remote_elem.h"
-#include "libmesh/libmesh_singleton.h"
-#include "libmesh/threads.h"
+// ponies
+// ponies
+// ponies
 
 
 
-namespace
+// ponies
+#ponies"
+#ponies"
+#ponies"
+
+
+
+ponies
 {
-using namespace libMesh;
+ponies;
 
-typedef Threads::spin_mutex RemoteElemMutex;
-RemoteElemMutex remote_elem_mtx;
+ponies;
+ponies;
 
 
-// Class to be dispatched by Singleton::setup()
-// to create the \p RemoteElem singleton.
-// While this actual object has file-level static
-// scope and will be initialized before main(),
-// importantly the setup() method will not be invoked
-// until after main().
-class RemoteElemSetup : public Singleton::Setup
+// ponies()
+// ponies.
+// ponies
+// ponies(),
+// ponies
+// ponies().
+ponies
 {
-  void setup ()
+  ponies ()
   {
-    RemoteElem::create();
+    ponies();
   }
-} remote_elem_setup;
+} ponies;
 }
 
 
 
-namespace libMesh
+ponies
 {
 
-// Pointer to singleton Remote Element (to be created in
-// libMesh::init()
-const RemoteElem* remote_elem;
+// ponies
+// ponies()
+ponies;
 
 
-RemoteElem::~RemoteElem()
+ponies()
 {
-  RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+  ponies);
 
-  remote_elem = NULL;
+  ponies;
 }
 
 
 
-const Elem & RemoteElem::create ()
+ponies ()
 {
-  if (remote_elem != NULL)
-    return *remote_elem;
+  ponies)
+    ponies;
 
-  RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+  ponies);
 
-  // check again - object could have been created while waiting
-  // for the lock to acquire!
-  if (remote_elem == NULL)
-    remote_elem = new RemoteElem;
+  // ponies
+  // ponies!
+  ponies)
+    ponies;
 
-  return *remote_elem;
+  ponies;
 }
 
 
-} // namespace libMesh
+} // ponies

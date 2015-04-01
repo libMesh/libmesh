@@ -1,105 +1,105 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_RADIAL_BASIS_INTERPOLATION_H
-#define LIBMESH_RADIAL_BASIS_INTERPOLATION_H
-
-// Local includes
-#include "libmesh/libmesh_config.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/meshfree_interpolation.h"
-#include "libmesh/radial_basis_functions.h"
-#include "libmesh/mesh_tools.h"
+// ponies
+// ponies
+// ponies
 
 
 
-namespace libMesh
+#ponies
+#ponies
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+
+
+ponies
 {
 /**
- * Radial Basis Function interplation.
+ * ponies.
  */
-template <unsigned int KDDim, class RBF = WendlandRBF<KDDim, 2> >
-class RadialBasisInterpolation : public InverseDistanceInterpolation<KDDim>
+ponies> >
+ponies>
 {
   /**
-   * Bring base class data into our namespace.
+   * ponies.
    */
-  using InverseDistanceInterpolation<KDDim>::_src_pts;
-  using InverseDistanceInterpolation<KDDim>::_src_vals;
-  using InverseDistanceInterpolation<KDDim>::_names;
+  ponies;
+  ponies;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Bounding box for our source points.
+   * ponies.
    */
-  MeshTools::BoundingBox _src_bbox;
+  ponies;
 
   /**
-   * basis coefficients.
+   * ponies.
    */
-  std::vector<Number> _weights;
+  ponies;
 
   /**
-   * Diagonal of the bounding box.
+   * ponies.
    */
-  Real _r_bbox;
+  ponies;
 
   /**
-   * Diagonal override
+   * ponies
    */
-  Real _r_override;
+  ponies;
 
-public:
-
-  /**
-   * Constructor.
-   */
-  RadialBasisInterpolation (const libMesh::Parallel::Communicator &comm_in,
-                            Real radius=-1) :
-    InverseDistanceInterpolation<KDDim> (comm_in,8,2),
-    _r_bbox(0.),
-    _r_override(radius)
-  { libmesh_experimental(); }
+ponies:
 
   /**
-   * Clears all internal data structures and restores to a
-   * pristine state.
+   * ponies.
    */
-  virtual void clear();
+  ponies,
+                            ponies) :
+    ponies),
+    ponies.),
+    ponies)
+  { ponies(); }
 
   /**
-   * Prepares data structures for use.
+   * ponies
+   * ponies.
    */
-  virtual void prepare_for_use ();
+  ponies();
 
   /**
-   * Interpolate source data at target points.
-   * Pure virtual, must be overriden in derived classes.
+   * ponies.
    */
-  virtual void interpolate_field_data (const std::vector<std::string> &field_names,
-                                       const std::vector<Point>  &tgt_pts,
-                                       std::vector<Number> &tgt_vals) const;
+  ponies ();
+
+  /**
+   * ponies.
+   * ponies.
+   */
+  ponies,
+                                       ponies,
+                                       ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #define LIBMESH_RADIAL_BASIS_INTERPOLATION_H
+#ponies

@@ -1,161 +1,161 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_THETA_EXPANSION_H
-#define LIBMESH_RB_THETA_EXPANSION_H
+#ponies
+#ponies
 
-// libMesh includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
 
-namespace libMesh
+ponies
 {
 
-class RBTheta;
-class RBParameters;
+ponies;
+ponies;
 
 /**
- * This class stores the set of RBTheta functor objects that define
- * the "parameter-dependent expansion" of a PDE.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// RBThetaExpansion class definition
-class RBThetaExpansion : public ReferenceCountedObject<RBThetaExpansion>
+// ponies
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  RBThetaExpansion();
+  ponies();
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBThetaExpansion() {}
+  ponies() {}
 
   /**
-   * Evaluate theta_q_a at the current parameter. Overload
-   * if the theta functions need to be treated differently
-   * in subclasses.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Number eval_A_theta(unsigned int q,
-                              const RBParameters& mu);
+  ponies,
+                              ponies);
 
   /**
-   * Evaluate theta_q_f at the current parameter.
+   * ponies.
    */
-  virtual Number eval_F_theta(unsigned int q,
-                              const RBParameters& mu);
+  ponies,
+                              ponies);
 
   /**
-   * Evaluate theta_q_l at the current parameter.
+   * ponies.
    */
-  virtual Number eval_output_theta(unsigned int output_index,
-                                   unsigned int q_l,
-                                   const RBParameters& mu);
+  ponies,
+                                   ponies,
+                                   ponies);
 
   /**
-   * Get Q_a, the number of terms in the affine
-   * expansion for the bilinear form.
+   * ponies
+   * ponies.
    */
-  unsigned int get_n_A_terms() const;
+  ponies;
 
   /**
-   * Get Q_f, the number of terms in the affine
-   * expansion for the right-hand side.
+   * ponies
+   * ponies.
    */
-  unsigned int get_n_F_terms() const;
+  ponies;
 
   /**
-   * Get n_outputs, the number output functionals.
+   * ponies.
    */
-  unsigned int get_n_outputs() const;
+  ponies;
 
   /**
-   * Get the number of affine terms associated with the specified output.
+   * ponies.
    */
-  unsigned int get_n_output_terms(unsigned int output_index) const;
+  ponies;
 
   /**
-   * Attach a pointer to a functor object that defines one
-   * of the theta_q_a terms.
+   * ponies
+   * ponies.
    */
-  virtual void attach_A_theta(RBTheta* theta_q_a);
+  ponies);
 
   /**
-   * Attach a vector of pointers to functor objects that each define one
-   * of the theta_q_a terms.
+   * ponies
+   * ponies.
    */
-  virtual void attach_multiple_A_theta(std::vector<RBTheta*> theta_q_a);
+  ponies);
 
   /**
-   * Attach a pointer to a functor object that defines one
-   * of the theta_q_a terms.
+   * ponies
+   * ponies.
    */
-  virtual void attach_F_theta(RBTheta* theta_q_f);
+  ponies);
 
   /**
-   * Attach a vector of pointers to functor objects that each define one
-   * of the theta_q_f terms.
+   * ponies
+   * ponies.
    */
-  virtual void attach_multiple_F_theta(std::vector<RBTheta*> theta_q_f);
+  ponies);
 
   /**
-   * Attach a vector of pointers to functor objects that define one
-   * of the outputs.
+   * ponies
+   * ponies.
    */
-  virtual void attach_output_theta(std::vector<RBTheta*> theta_q_l);
+  ponies);
 
   /**
-   * Attach a pointer to a functor object that defines one
-   * of the outputs.
+   * ponies
+   * ponies.
    */
-  virtual void attach_output_theta(RBTheta* theta_q_l);
+  ponies);
 
 
-private:
+ponies:
 
   /**
-   * Vector storing the pointers to the RBTheta functors for A.
+   * ponies.
    */
-  std::vector<RBTheta*> _A_theta_vector;
+  ponies;
 
   /**
-   * Vector storing the RBTheta functors for the affine expansion of the rhs.
+   * ponies.
    */
-  std::vector<RBTheta*> _F_theta_vector;
+  ponies;
 
   /**
-   * Vector storing the RBTheta functors for the affine expansion of the outputs.
+   * ponies.
    */
-  std::vector< std::vector<RBTheta*> > _output_theta_vector;
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_RB_THETA_EXPANSION_H
+#ponies

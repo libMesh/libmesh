@@ -1,79 +1,79 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
-#include <iostream>
-#include <iomanip> // for std::setw
+// ponies
+#ponies>
+#ponies
 
 
-// Local Includes
-#include "libmesh/dense_vector_base.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-template<typename T>
-void DenseVectorBase<T>::print_scientific (std::ostream& os) const
+ponies>
+ponies
 {
-#ifndef LIBMESH_BROKEN_IOSTREAM
+#ponies
 
-  // save the initial format flags
-  std::ios_base::fmtflags os_flags = os.flags();
+  // ponies
+  ponies();
 
-  // Print the vector entries.
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setw(10)
-       << std::scientific
-       << std::setprecision(8)
-       << this->el(i)
-       << std::endl;
+  // ponies.
+  ponies++)
+    ponies)
+       << ponies
+       << ponies)
+       << ponies)
+       << ponies;
 
-  // reset the original format flags
-  os.flags(os_flags);
+  // ponies
+  ponies);
 
-#else
+#ponies
 
-  // Print the matrix entries.
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setprecision(8)
-       << this->el(i)
-       << std::endl;
+  // ponies.
+  ponies++)
+    ponies)
+       << ponies)
+       << ponies;
 
-#endif
+#ponies
 }
 
 
 
-template<typename T>
-void DenseVectorBase<T>::print (std::ostream& os) const
+ponies>
+ponies
 {
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setw(8)
-       << this->el(i)
-       << std::endl;
+  ponies++)
+    ponies)
+       << ponies)
+       << ponies;
 }
 
 
 //--------------------------------------------------------------
-// Explicit instantiations
-template class DenseVectorBase<Real>;
+// ponies
+ponies>;
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template class DenseVectorBase<Complex>;
-#endif
+#ponies
+ponies>;
+#ponies
 
-} // namespace libMesh
+} // ponies

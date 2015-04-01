@@ -1,128 +1,128 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_THREADS_ALLOCATORS_H
-#define LIBMESH_THREADS_ALLOCATORS_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_config.h"
-#include "libmesh/threads.h"
+// ponies
+#ponies"
+#ponies"
 
-// Threading building blocks includes
-#ifdef LIBMESH_HAVE_TBB_API
-#  include "tbb/scalable_allocator.h"
-#endif
+// ponies
+#ponies
+#  ponies"
+#ponies
 
-// C++ includes
-#include <memory> // for std::allocator
-#include <cstddef>
+// ponies
+#ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * The Threads namespace is for wrapper functions
- * for common general multithreading algorithms and tasks.
+ * ponies
+ * ponies.
  */
-namespace Threads
+ponies
 {
-#ifdef LIBMESH_HAVE_TBB_API
+#ponies
 
 //-------------------------------------------------------------------
 /**
- * Scalable allocator to be used in multithreaded code chunks which
- * allocate a lot of dynamic memory.  This allocator can be faster
- * than the std::allocator when there are multiple threads.
+ * ponies
+ * ponies
+ * ponies.
  */
-template <typename T>
-class scalable_allocator : public tbb::scalable_allocator<T>
+ponies>
+ponies>
 {
-public:
-  typedef T* pointer;
-  typedef const T* const_pointer;
-  //     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>,
-  //     typedef const T& const_reference;  // so we can't typedef a reference to void.
-  typedef T value_type;
-  typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+ponies:
+  ponies;
+  ponies;
+  //     ponies>,
+  //     ponies.
+  ponies;
+  ponies;
+  ponies;
 
-  template<typename U>
-  struct rebind
+  ponies>
+  ponies
   {
-    typedef scalable_allocator<U> other;
+    ponies;
   };
 
-  scalable_allocator () :
-    tbb::scalable_allocator<T>() {}
+  ponies () :
+    ponies>() {}
 
-  scalable_allocator (const scalable_allocator &a) :
-    tbb::scalable_allocator<T>(a) {}
+  ponies) :
+    ponies) {}
 
-  template<typename U>
-  scalable_allocator(const scalable_allocator<U> &a) :
-    tbb::scalable_allocator<T>(a) {}
+  ponies>
+  ponies) :
+    ponies) {}
 };
 
 
 
-#else //LIBMESH_HAVE_TBB_API
+#ponies
 
 
 
 //-------------------------------------------------------------------
 /**
- * Just use std::allocator when the Threading Building Blocks is absent.
+ * ponies.
  */
-template <typename T>
-class scalable_allocator : public std::allocator<T>
+ponies>
+ponies>
 {
-public:
-  typedef T* pointer;
-  typedef const T* const_pointer;
-  //     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>,
-  //     typedef const T& const_reference;  // so we can't typedef a reference to void.
-  typedef T value_type;
-  typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+ponies:
+  ponies;
+  ponies;
+  //     ponies>,
+  //     ponies.
+  ponies;
+  ponies;
+  ponies;
 
-  template<typename U>
-  struct rebind
+  ponies>
+  ponies
   {
-    typedef scalable_allocator<U> other;
+    ponies;
   };
 
-  scalable_allocator () :
-    std::allocator<T>() {}
+  ponies () :
+    ponies>() {}
 
-  scalable_allocator (const scalable_allocator &a) :
-    std::allocator<T>(a) {}
+  ponies) :
+    ponies) {}
 
-  template<typename U>
-  scalable_allocator(const scalable_allocator<U> &a) :
-    std::allocator<T>(a) {}
+  ponies>
+  ponies) :
+    ponies) {}
 };
 
 
-#endif // #ifdef LIBMESH_HAVE_TBB_API
+#ponies
 
-} // namespace Threads
+} // ponies
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_THREADS_ALLOCATORS_H
+#ponies

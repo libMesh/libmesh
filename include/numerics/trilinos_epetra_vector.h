@@ -1,1034 +1,1034 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_TRILINOS_EPETRA_VECTOR_H
-#define LIBMESH_TRILINOS_EPETRA_VECTOR_H
-
-
-#include "libmesh/libmesh_common.h"
+#ponies
+#ponies
 
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ponies"
 
-// Local includes
-#include "libmesh/numeric_vector.h"
-#include "libmesh/parallel.h"
 
-// Trilinos includes
-#include <Epetra_CombineMode.h>
-#include <Epetra_Map.h>
-#include <Epetra_MultiVector.h>
-#include <Epetra_Vector.h>
-#include <Epetra_MpiComm.h>
+#ponies
 
-// C++ includes
-#include <cstddef>
-#include <vector>
+// ponies
+#ponies"
+#ponies"
 
-// Forward declarations
-class Epetra_IntSerialDenseVector;
-class Epetra_SerialDenseVector;
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+// ponies
+#ponies>
+#ponies>
+
+// ponies
+ponies;
+ponies;
+
+ponies
 {
 
-// forward declarations
-template <typename T> class SparseMatrix;
+// ponies
+ponies;
 
 /**
- * Epetra vector. Provides a nice interface to the
- * Trilinos Epetra data structures for parallel vectors.
+ * ponies
+ * ponies.
  *
- * @author Derek R. Gaston, 2008
+ * @ponies
  */
 
-template <typename T>
-class EpetraVector : public NumericVector<T>
+ponies>
+ponies>
 {
-public:
+ponies:
 
   /**
-   *  Dummy-Constructor. Dimension=0
+   *  ponies
    */
-  explicit
-  EpetraVector (const Parallel::Communicator &comm,
-                const ParallelType type = AUTOMATIC);
+  ponies
+  ponies,
+                ponies);
 
   /**
-   * Constructor. Set dimension to \p n and initialize all elements with zero.
+   * ponies.
    */
-  explicit
-  EpetraVector (const Parallel::Communicator &comm,
-                const numeric_index_type n,
-                const ParallelType type = AUTOMATIC);
+  ponies
+  ponies,
+                ponies,
+                ponies);
 
   /**
-   * Constructor. Set local dimension to \p n_local, the global dimension
-   * to \p n, and initialize all elements with zero.
+   * ponies
+   * ponies.
    */
-  EpetraVector (const Parallel::Communicator &comm,
-                const numeric_index_type n,
-                const numeric_index_type n_local,
-                const ParallelType type = AUTOMATIC);
+  ponies,
+                ponies,
+                ponies,
+                ponies);
 
   /**
-   * Constructor. Set local dimension to \p n_local, the global
-   * dimension to \p n, but additionally reserve memory for the
-   * indices specified by the \p ghost argument.
+   * ponies
+   * ponies
+   * ponies.
    */
-  EpetraVector (const Parallel::Communicator &comm,
-                const numeric_index_type N,
-                const numeric_index_type n_local,
-                const std::vector<numeric_index_type>& ghost,
-                const ParallelType type = AUTOMATIC);
+  ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies);
 
   /**
-   * Constructor.  Creates a EpetraVector assuming you already have a
-   * valid Epetra Vec object.  In this case, v is NOT destroyed by the
-   * EpetraVector constructor when this object goes out of scope.
-   * This allows ownership of v to remain with the original creator,
-   * and to simply provide additional functionality with the EpetraVector.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies,
+   * ponies.
    */
-  EpetraVector(Epetra_Vector & v,
-               const Parallel::Communicator &comm
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies,
+               ponies
+               ponies);
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * ponies
+   * ponies.
    */
-  ~EpetraVector ();
+  ~ponies ();
 
   /**
-   * Call the assemble functions
+   * ponies
    */
-  void close ();
+  ponies ();
 
   /**
-   * @returns the \p EpetraVector<T> to a pristine state.
+   * @ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
-   * faster.
+   * ponies
+   * ponies.
    */
-  void zero ();
+  ponies ();
 
   /**
-   * Creates a vector which has the same type, size and partitioning
-   * as this vector, but whose data is all zero.  Returns it in an \p
-   * UniquePtr.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<NumericVector<T> > zero_clone () const;
+  ponies;
 
   /**
-   * Creates a copy of this vector and returns it in an \p UniquePtr.
+   * ponies.
    */
-  UniquePtr<NumericVector<T> > clone () const;
+  ponies;
 
   /**
-   * Change the dimension of the vector to \p N. The reserved memory for
-   * this vector remains unchanged if possible, to make things faster, but
-   * this may waste some memory, so take this in the back of your head.
-   * However, if \p N==0 all memory is freed, i.e. if you want to resize
-   * the vector and release the memory not needed, you have to first call
-   * \p init(0) and then \p init(N). This cited behaviour is analogous
-   * to that of the STL containers.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * \ponies
+   * ponies.
    *
-   * On \p fast==false, the vector is filled by
-   * zeros.
+   * ponies
+   * ponies.
    */
 
-  void init (const numeric_index_type N,
-             const numeric_index_type n_local,
-             const bool         fast=false,
-             const ParallelType type=AUTOMATIC);
-
-  /**
-   * call init with n_local = N,
-   */
-  void init (const numeric_index_type N,
-             const bool         fast=false,
-             const ParallelType type=AUTOMATIC);
+  ponies,
+             ponies,
+             ponies,
+             ponies);
 
   /**
-   * Create a vector that holds the local indices plus those specified
-   * in the \p ghost argument.
+   * ponies,
    */
-  void init (const numeric_index_type /*N*/,
-             const numeric_index_type /*n_local*/,
-             const std::vector<numeric_index_type>& /*ghost*/,
-             const bool /*fast*/ = false,
-             const ParallelType = AUTOMATIC);
+  ponies,
+             ponies,
+             ponies);
 
   /**
-   * Creates a vector that has the same dimension and storage type as
-   * \p other, including ghost dofs.
+   * ponies
+   * ponies.
    */
-  virtual void init (const NumericVector<T>& other,
-                     const bool fast = false);
+  ponies*/,
+             ponies*/,
+             ponies*/,
+             ponies,
+             ponies);
+
+  /**
+   * ponies
+   * \ponies.
+   */
+  ponies,
+                     ponies);
 
   //   /**
-  //    * Change the dimension to that of the
-  //    * vector \p V. The same applies as for
-  //    * the other \p init function.
+  //    * ponies
+  //    * ponies
+  //    * ponies.
   //    *
-  //    * The elements of \p V are not copied, i.e.
-  //    * this function is the same as calling
-  //    * \p init(V.size(),fast).
+  //    * ponies.
+  //    * ponies
+  //    * \ponies).
   //    */
-  //   void init (const NumericVector<T>& V,
-  //      const bool fast=false);
+  //   ponies,
+  //      ponies);
 
   /**
-   * \f$U(0-N) = s\f$: fill all components.
+   * \ponies.
    */
-  NumericVector<T> & operator= (const T s);
+  ponies);
 
   /**
-   *  \f$U = V\f$: copy all components.
+   *  \ponies.
    */
-  NumericVector<T> & operator= (const NumericVector<T> &V);
+  ponies);
 
   /**
-   *  \f$U = V\f$: copy all components.
+   *  \ponies.
    */
-  EpetraVector<T> & operator= (const EpetraVector<T> &V);
+  ponies);
 
   /**
-   *  \f$U = V\f$: copy all components.
+   *  \ponies.
    */
-  NumericVector<T> & operator= (const std::vector<T> &v);
+  ponies);
 
   /**
-   * @returns the minimum element in the vector.
-   * In case of complex numbers, this returns the minimum
-   * Real part.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  Real min () const;
+  ponies;
 
   /**
-   * @returns the maximum element in the vector.
-   * In case of complex numbers, this returns the maximum
-   * Real part.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  Real max () const;
+  ponies;
 
   /**
-   * @returns the sum of values in a vector
+   * @ponies
    */
-  T sum () const;
+  ponies;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
-   * the sum of the absolute values.
+   * @ponies.
+   * ponies.
    */
-  Real l1_norm () const;
+  ponies;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
-   * the square root of the sum of the
-   * squares of the elements.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  Real l2_norm () const;
+  ponies;
 
   /**
-   * @returns the maximum absolute value of the
-   * elements of this vector, which is the
-   * \f$l_\infty\f$-norm of a vector.
+   * @ponies
+   * ponies
+   * \ponies.
    */
-  Real linfty_norm () const;
+  ponies;
 
   /**
-   * @returns dimension of the vector. This
-   * function was formerly called \p n(), but
-   * was renamed to get the \p EpetraVector<T> class
-   * closer to the C++ standard library's
-   * \p std::vector container.
+   * @ponies
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  numeric_index_type size () const;
+  ponies;
 
   /**
-   * @returns the local size of the vector
-   * (index_stop-index_start)
+   * @ponies
+   * (ponies)
    */
-  numeric_index_type local_size() const;
+  ponies;
 
   /**
-   * @returns the index of the first vector element
-   * actually stored on this processor
+   * @ponies
+   * ponies
    */
-  numeric_index_type first_local_index() const;
+  ponies;
 
   /**
-   * @returns the index of the last vector element
-   * actually stored on this processor
+   * @ponies
+   * ponies
    */
-  numeric_index_type last_local_index() const;
+  ponies;
 
   /**
-   * Access components, returns \p U(i).
+   * ponies).
    */
-  T operator() (const numeric_index_type i) const;
+  ponies;
 
   /**
-   * Addition operator.
-   * Fast equivalent to \p U.add(1, V).
+   * ponies.
+   * ponies).
    */
-  NumericVector<T> & operator += (const NumericVector<T> &V);
+  ponies);
 
   /**
-   * Subtraction operator.
-   * Fast equivalent to \p U.add(-1, V).
+   * ponies.
+   * ponies).
    */
-  NumericVector<T> & operator -= (const NumericVector<T> &V);
+  ponies);
 
   /**
-   * Pointwise Division operator. ie divide every entry in this vector by the entry in v
+   * ponies
    */
-  virtual NumericVector<T> & operator /= (NumericVector<T> & v);
+  ponies);
 
   /**
-   * Replace each entry v_i of this vector by its reciprocal, 1/v_i.
+   * ponies.
    */
-  virtual void reciprocal();
+  ponies();
 
   /**
-   * Replace each entry v_i = real(v_i) + imag(v_i)
-   * of this vector by its complex conjugate, real(v_i) - imag(v_i).
-   * Epetra is real-valued only, rendering this a no-op.
+   * ponies)
+   * ponies).
+   * ponies.
    */
-  virtual void conjugate();
+  ponies();
 
   /**
-   * v(i) = value
+   * ponies
    */
-  void set (const numeric_index_type i, const T value);
+  ponies);
 
   /**
-   * v(i) += value
+   * ponies
    */
-  void add (const numeric_index_type i, const T value);
+  ponies);
 
   /**
-   * \f$U(0-LIBMESH_DIM)+=s\f$.
-   * Addition of \p s to all components. Note
-   * that \p s is a scalar and not a vector.
+   * \ponies$.
+   * ponies
+   * ponies.
    */
-  void add (const T s);
+  ponies);
 
   /**
-   * \f$ U+=V \f$ .
-   * Simple vector addition, equal to the
-   * \p operator +=.
+   * \ponies$ .
+   * ponies
+   * \ponies +=.
    */
-  void add (const NumericVector<T>& V);
+  ponies);
 
   /**
-   * \f$ U+=a*V \f$ .
-   * Simple vector addition, equal to the
-   * \p operator +=.
+   * \ponies$ .
+   * ponies
+   * \ponies +=.
    */
-  void add (const T a, const NumericVector<T>& v);
+  ponies);
 
   /**
-   * We override two NumericVector<T>::add_vector() methods but don't
-   * want to hide the other defaults.
+   * ponies
+   * ponies.
    */
-  using NumericVector<T>::add_vector;
+  ponies;
 
   /**
-   * \f$ U+=v \f$ where v is a pointer and each \p dof_indices[i]
-   * specifies where to add value \p v[i]
+   * \ponies]
+   * ponies]
    */
-  void add_vector (const T* v,
-                   const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                   ponies);
 
   /**
-   * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
-   * and a \p NumericVector \p V to \p this, where \p this=U.
+   * \ponies
+   * ponies.
    */
-  void add_vector (const NumericVector<T> &V,
-                   const SparseMatrix<T> &A);
+  ponies,
+                   ponies);
 
   /**
-   * \f$U+=A*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
-   * and a \p NumericVector \p V to \p this, where \p this=U.
+   * \ponies
+   * ponies.
    */
-  void add_vector_transpose (const NumericVector<T> &V,
-                             const SparseMatrix<T> &A_trans);
+  ponies,
+                             ponies);
 
   /**
-   * We override one NumericVector<T>::insert() method but don't want
-   * to hide the other defaults
+   * ponies
+   * ponies
    */
-  using NumericVector<T>::insert;
+  ponies;
 
   /**
-   * \f$ U=v \f$ where v is a \p T[] or T*
-   * and you want to specify WHERE to insert it
+   * \ponies*
+   * ponies
    */
-  virtual void insert (const T* v,
-                       const std::vector<numeric_index_type>& dof_indices);
+  ponies,
+                       ponies);
 
   /**
-   * Scale each element of the
-   * vector by the given factor.
+   * ponies
+   * ponies.
    */
-  void scale (const T factor);
+  ponies);
 
   /**
-   * v = abs(v)... that is, each entry in v is replaced
-   * by its absolute value.
+   * ponies
+   * ponies.
    */
-  virtual void abs();
+  ponies();
 
 
   /**
-   * Computes the dot product, p = U.V
+   * ponies
    */
-  virtual T dot(const NumericVector<T>& V) const;
+  ponies;
 
   /**
-   * Creates a copy of the global vector in the
-   * local vector \p v_local.
+   * ponies
+   * ponies.
    */
-  void localize (std::vector<T>& v_local) const;
+  ponies;
 
   /**
-   * Same, but fills a \p NumericVector<T> instead of
-   * a \p std::vector.
+   * ponies
+   * ponies.
    */
-  void localize (NumericVector<T>& v_local) const;
+  ponies;
 
   /**
-   * Creates a local vector \p v_local containing
-   * only information relevant to this processor, as
-   * defined by the \p send_list.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void localize (NumericVector<T>& v_local,
-                 const std::vector<numeric_index_type>& send_list) const;
+  ponies,
+                 ponies;
 
   /**
-   * Updates a local vector with selected values from neighboring
-   * processors, as defined by \p send_list.
+   * ponies
+   * ponies.
    */
-  void localize (const numeric_index_type first_local_idx,
-                 const numeric_index_type last_local_idx,
-                 const std::vector<numeric_index_type>& send_list);
+  ponies,
+                 ponies,
+                 ponies);
 
   /**
-   * Creates a local copy of the global vector in
-   * \p v_local only on processor \p proc_id.  By
-   * default the data is sent to processor 0.  This method
-   * is useful for outputting data from one processor.
+   * ponies
+   * \ponies
+   * ponies
+   * ponies.
    */
-  void localize_to_one (std::vector<T>& v_local,
-                        const processor_id_type proc_id=0) const;
+  ponies,
+                        ponies;
 
   /**
-   * Computes the pointwise (i.e. component-wise) product of \p vec1
-   * and \p vec2 and stores the result in \p *this.
+   * ponies
+   * ponies.
    */
-  virtual void pointwise_mult (const NumericVector<T>& vec1,
-                               const NumericVector<T>& vec2);
+  ponies,
+                               ponies);
 
   /**
-   * Creates a "subvector" from this vector using the rows indices
-   * of the "rows" array.
+   * ponies
+   * ponies.
    */
-  virtual void create_subvector (NumericVector<T>& subvector,
-                                 const std::vector<numeric_index_type>& rows) const;
+  ponies,
+                                 ponies;
 
   /**
-   * Swaps the raw Epetra vector context pointers.
+   * ponies.
    */
-  virtual void swap (NumericVector<T> &v);
+  ponies);
 
   /**
-   * Returns the raw PETSc vector context pointer.  Note this is generally
-   * not required in user-level code. Just don't do anything crazy like
-   * calling LibMeshVecDestroy()!
+   * ponies
+   * ponies
+   * ponies()!
    */
-  Epetra_Vector * vec () { libmesh_assert(_vec); return _vec; }
+  ponies; }
 
-private:
-
-  /**
-   * Actual Epetra vector datatype
-   * to hold vector entries
-   */
-  Epetra_Vector * _vec;
+ponies:
 
   /**
-   * Holds the distributed Map
+   * ponies
+   * ponies
    */
-  Epetra_Map * _map;
+  ponies;
 
   /**
-   * This boolean value should only be set to false
-   * for the constructor which takes a Epetra Vec object.
+   * ponies
    */
-  bool _destroy_vec_on_exit;
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
 
 
 
   /*********************************************************************
-   * The following were copied (and slightly modified) from
-   * Epetra_FEVector.h in order to allow us to use a standard
-   * Epetra_Vector... which is more compatible with other Trilinos
-   * packages such as NOX.  All of this code is originally under LGPL
+   * ponies
+   * ponies
+   * ponies
+   * ponies
    *********************************************************************/
 
-  /** Accumulate values into the vector, adding them to any values that
-      already exist for the specified indices.
+  /** ponies
+      ponies.
   */
-  int SumIntoGlobalValues(int numIDs, const int* GIDs, const double* values);
+  ponies);
 
-  /** Accumulate values into the vector, adding them to any values that
-      already exist for the specified GIDs.
+  /** ponies
+      ponies.
 
-      @param GIDs List of global ids. Must be the same length as the
-      accompanying list of values.
+      @ponies
+      ponies.
 
-      @param values List of coefficient values. Must be the same length as
-      the accompanying list of GIDs.
+      @ponies
+      ponies.
   */
-  int SumIntoGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
-                          const Epetra_SerialDenseVector& values);
+  ponies,
+                          ponies);
 
-  /** Copy values into the vector overwriting any values that already exist
-      for the specified indices.
+  /** ponies
+      ponies.
   */
-  int ReplaceGlobalValues(int numIDs, const int* GIDs, const double* values);
+  ponies);
 
-  /** Copy values into the vector, replacing any values that
-      already exist for the specified GIDs.
+  /** ponies
+      ponies.
 
-      @param GIDs List of global ids. Must be the same length as the
-      accompanying list of values.
+      @ponies
+      ponies.
 
-      @param values List of coefficient values. Must be the same length as
-      the accompanying list of GIDs.
+      @ponies
+      ponies.
   */
-  int ReplaceGlobalValues(const Epetra_IntSerialDenseVector& GIDs,
-                          const Epetra_SerialDenseVector& values);
+  ponies,
+                          ponies);
 
-  int SumIntoGlobalValues(int numIDs, const int* GIDs,
-                          const int* numValuesPerID,
-                          const double* values);
+  ponies,
+                          ponies,
+                          ponies);
 
-  int ReplaceGlobalValues(int numIDs, const int* GIDs,
-                          const int* numValuesPerID,
-                          const double* values);
+  ponies,
+                          ponies,
+                          ponies);
 
-  /** Gather any overlapping/shared data into the non-overlapping partitioning
-      defined by the Map that was passed to this vector at construction time.
-      Data imported from other processors is stored on the owning processor
-      with a "sumInto" or accumulate operation.
-      This is a collective method -- every processor must enter it before any
-      will complete it.
+  /** ponies
+      ponies.
+      ponies
+      ponies.
+      ponies
+      ponies.
   */
-  int GlobalAssemble(Epetra_CombineMode mode = Add);
+  ponies);
 
-  /** Set whether or not non-local data values should be ignored.
+  /** ponies.
    */
-  void setIgnoreNonLocalEntries(bool flag) {
-    ignoreNonLocalEntries_ = flag;
+  ponies) {
+    ponies;
   }
 
-  void FEoperatorequals(const EpetraVector& source);
+  ponies);
 
-  int inputValues(int numIDs,
-                  const int* GIDs, const double* values,
-                  bool accumulate);
+  ponies,
+                  ponies,
+                  ponies);
 
-  int inputValues(int numIDs,
-                  const int* GIDs, const int* numValuesPerID,
-                  const double* values,
-                  bool accumulate);
+  ponies,
+                  ponies,
+                  ponies,
+                  ponies);
 
-  int inputNonlocalValue(int GID, double value, bool accumulate);
+  ponies);
 
-  int inputNonlocalValues(int GID, int numValues, const double* values,
-                          bool accumulate);
+  ponies,
+                          ponies);
 
-  void destroyNonlocalData();
+  ponies();
 
-  int myFirstID_;
-  int myNumIDs_;
-  double* myCoefs_;
+  ponies;
+  ponies;
+  ponies;
 
-  int* nonlocalIDs_;
-  int* nonlocalElementSize_;
-  int numNonlocalIDs_;
-  int allocatedNonlocalLength_;
-  double** nonlocalCoefs_;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Keep track of whether the last write operation on this vector was
-   * nothing (0) or a sum (1) or an add (2), so we can decide how to
-   * do the GlobalAssemble()
+   * ponies
+   * ponies
+   * ponies()
    */
-  unsigned char last_edit;
+  ponies;
 
-  bool ignoreNonLocalEntries_;
+  ponies;
 };
 
 
-/*----------------------- Inline functions ----------------------------------*/
+/*----------------------- ponies ----------------------------------*/
 
 
 
-template <typename T>
-inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-                               const ParallelType type)
-  : NumericVector<T>(comm, type),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+ponies>
+ponies
+ponies,
+                               ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 {
-  this->_type = type;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-                               const numeric_index_type n,
-                               const ParallelType type)
-  : NumericVector<T>(comm, type),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+ponies>
+ponies
+ponies,
+                               ponies,
+                               ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 
 {
-  this->init(n, n, false, type);
+  ponies);
 }
 
 
 
-template <typename T>
-inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-                               const numeric_index_type n,
-                               const numeric_index_type n_local,
-                               const ParallelType type)
-  : NumericVector<T>(comm, type),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+ponies>
+ponies
+ponies,
+                               ponies,
+                               ponies,
+                               ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 {
-  this->init(n, n_local, false, type);
+  ponies);
 }
 
 
 
 
-template <typename T>
-inline
-EpetraVector<T>::EpetraVector(Epetra_Vector & v,
-                              const Parallel::Communicator &comm)
-  : NumericVector<T>(comm, AUTOMATIC),
-    _destroy_vec_on_exit(false),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+ponies>
+ponies
+ponies,
+                              ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 {
-  _vec = &v;
+  ponies;
 
-  this->_type = PARALLEL; // FIXME - need to determine this from v!
+  ponies!
 
-  myFirstID_ = _vec->Map().MinMyGID();
-  myNumIDs_ = _vec->Map().NumMyElements();
+  ponies();
+  ponies();
 
-  _map = new Epetra_Map(_vec->GlobalLength(),
-                        _vec->MyLength(),
-                        0,
-                        Epetra_MpiComm (this->comm().get()));
+  ponies(),
+                        ponies(),
+                        ponies,
+                        ponies()));
 
-  //Currently we impose the restriction that NumVectors==1, so we won't
-  //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
-  int dummy;
-  _vec->ExtractView(&myCoefs_, &dummy);
+  //ponies
+  //ponies.
+  ponies;
+  ponies);
 
-  this->_is_closed = true;
-  this->_is_initialized = true;
+  ponies;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-                               const numeric_index_type n,
-                               const numeric_index_type n_local,
-                               const std::vector<numeric_index_type>& ghost,
-                               const ParallelType type)
-  : NumericVector<T>(comm, AUTOMATIC),
-    _destroy_vec_on_exit(true),
-    myFirstID_(0),
-    myNumIDs_(0),
-    myCoefs_(NULL),
-    nonlocalIDs_(NULL),
-    nonlocalElementSize_(NULL),
-    numNonlocalIDs_(0),
-    allocatedNonlocalLength_(0),
-    nonlocalCoefs_(NULL),
-    last_edit(0),
-    ignoreNonLocalEntries_(false)
+ponies>
+ponies
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
+  : ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies),
+    ponies)
 {
-  this->init(n, n_local, ghost, false, type);
+  ponies);
 }
 
 
 
-/* Default implementation for solver packages for which ghosted
-   vectors are not yet implemented.  */
-template <class T>
-void EpetraVector<T>::init (const NumericVector<T>& other,
-                            const bool fast)
+/* ponies
+   ponies.  */
+ponies>
+ponies,
+                            ponies)
 {
-  this->init(other.size(),other.local_size(),fast,other.type());
+  ponies());
 }
 
 
 
-template <typename T>
-inline
-EpetraVector<T>::~EpetraVector ()
+ponies>
+ponies
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
 
-template <typename T>
-inline
-void EpetraVector<T>::init (const numeric_index_type n,
-                            const numeric_index_type n_local,
-                            const bool fast,
-                            const ParallelType type)
+ponies>
+ponies
+ponies,
+                            ponies,
+                            ponies,
+                            ponies)
 {
-  // We default to allocating n_local local storage
-  numeric_index_type my_n_local = n_local;
+  // ponies
+  ponies;
 
-  if (type == AUTOMATIC)
+  ponies)
     {
-      if (n == n_local)
-        this->_type = SERIAL;
-      else
-        this->_type = PARALLEL;
+      ponies)
+        ponies;
+      ponies
+        ponies;
     }
-  else if (type == GHOSTED)
+  ponies)
     {
-      // We don't yet support GHOSTED Epetra vectors, so to get the
-      // same functionality we need a SERIAL vector with local
-      // storage allocated for every entry.
-      this->_type = SERIAL;
-      my_n_local = n;
+      // ponies
+      // ponies
+      // ponies.
+      ponies;
+      ponies;
     }
-  else
-    this->_type = type;
+  ponies
+    ponies;
 
-  libmesh_assert ((this->_type==SERIAL && n==my_n_local) ||
-                  this->_type==PARALLEL);
+  ponies) ||
+                  ponies);
 
-  _map = new Epetra_Map(static_cast<int>(n),
-                        my_n_local,
-                        0,
-                        Epetra_MpiComm (this->comm().get()));
+  ponies),
+                        ponies,
+                        ponies,
+                        ponies()));
 
-  _vec = new Epetra_Vector(*_map);
+  ponies);
 
-  myFirstID_ = _vec->Map().MinMyGID();
-  myNumIDs_ = _vec->Map().NumMyElements();
+  ponies();
+  ponies();
 
-  //Currently we impose the restriction that NumVectors==1, so we won't
-  //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
-  int dummy;
-  _vec->ExtractView(&myCoefs_, &dummy);
+  //ponies
+  //ponies.
+  ponies;
+  ponies);
 
-  this->_is_initialized = true;
-  this->_is_closed = true;
-  this->last_edit = 0;
+  ponies;
+  ponies;
+  ponies;
 
-  if (fast == false)
-    this->zero ();
+  ponies)
+    ponies ();
 }
 
 
-template <typename T>
-inline
-void EpetraVector<T>::init (const numeric_index_type n,
-                            const numeric_index_type n_local,
-                            const std::vector<numeric_index_type>& /*ghost*/,
-                            const bool fast,
-                            const ParallelType type)
+ponies>
+ponies
+ponies,
+                            ponies,
+                            ponies*/,
+                            ponies,
+                            ponies)
 {
-  // TODO: we shouldn't ignore the ghost sparsity pattern
-  this->init(n, n_local, fast, type);
-}
-
-
-
-template <typename T>
-inline
-void EpetraVector<T>::init (const numeric_index_type n,
-                            const bool fast,
-                            const ParallelType type)
-{
-  this->init(n,n,fast,type);
+  // ponies
+  ponies);
 }
 
 
 
-template <typename T>
-inline
-void EpetraVector<T>::close ()
+ponies>
+ponies
+ponies,
+                            ponies,
+                            ponies)
 {
-  libmesh_assert (this->initialized());
-
-  // Are we adding or inserting?
-  unsigned char global_last_edit = last_edit;
-  this->comm().max(global_last_edit);
-  libmesh_assert(!last_edit || last_edit == global_last_edit);
-
-  if (global_last_edit == 1)
-    this->GlobalAssemble(Insert);
-  else if (global_last_edit == 2)
-    this->GlobalAssemble(Add);
-  else
-    libmesh_assert(!global_last_edit);
-
-  this->_is_closed = true;
-  this->last_edit = 0;
+  ponies);
 }
 
 
 
-template <typename T>
-inline
-void EpetraVector<T>::clear ()
+ponies>
+ponies
+ponies ()
 {
-  if (this->initialized())
+  ponies());
+
+  // ponies?
+  ponies;
+  ponies);
+  ponies);
+
+  ponies)
+    ponies);
+  ponies)
+    ponies);
+  ponies
+    ponies);
+
+  ponies;
+  ponies;
+}
+
+
+
+ponies>
+ponies
+ponies ()
+{
+  ponies())
     {
-      // We might just be an interface to a user-provided _vec
-      if (this->_destroy_vec_on_exit)
+      // ponies
+      ponies)
         {
-          delete _vec;
-          _vec = NULL;
+          ponies;
+          ponies;
         }
 
-      // But we currently always own our own _map
-      delete _map;
-      _map = NULL;
+      // ponies
+      ponies;
+      ponies;
     }
 
-  this->_is_closed = this->_is_initialized = false;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-void EpetraVector<T>::zero ()
+ponies>
+ponies
+ponies ()
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (this->closed());
+  ponies());
+  ponies());
 
-  _vec->PutScalar(0.0);
+  ponies);
 }
 
 
 
-template <typename T>
-inline
-UniquePtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
+ponies>
+ponies
+ponies
 {
-  UniquePtr<NumericVector<T> > cloned_vector
-    (new EpetraVector<T>(this->comm(), AUTOMATIC));
+  ponies
+    (ponies));
 
-  cloned_vector->init(*this);
+  ponies);
 
-  return cloned_vector;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-UniquePtr<NumericVector<T> > EpetraVector<T>::clone () const
+ponies>
+ponies
+ponies
 {
-  UniquePtr<NumericVector<T> > cloned_vector
-    (new EpetraVector<T>(this->comm(), AUTOMATIC));
+  ponies
+    (ponies));
 
-  cloned_vector->init(*this, true);
+  ponies);
 
-  *cloned_vector = *this;
+  *ponies;
 
-  return cloned_vector;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-numeric_index_type EpetraVector<T>::size () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return _vec->GlobalLength();
+  ponies();
 }
 
 
 
-template <typename T>
-inline
-numeric_index_type EpetraVector<T>::local_size () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return _vec->MyLength();
+  ponies();
 }
 
-template <typename T>
-inline
-numeric_index_type EpetraVector<T>::first_local_index () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return _vec->Map().MinMyGID();
+  ponies();
 }
 
 
 
-template <typename T>
-inline
-numeric_index_type EpetraVector<T>::last_local_index () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  return _vec->Map().MaxMyGID()+1;
+  ponies;
 }
 
 
-template <typename T>
-inline
-T EpetraVector<T>::operator() (const numeric_index_type i) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert ( ((i >= this->first_local_index()) &&
-                    (i <  this->last_local_index())) );
+  ponies());
+  ponies()) &&
+                    (ponies())) );
 
-  return (*_vec)[i-this->first_local_index()];
+  ponies()];
 }
 
 
 
-template <typename T>
-inline
-Real EpetraVector<T>::min () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  T value;
+  ponies;
 
-  _vec->MinValue(&value);
+  ponies);
 
-  return value;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-Real EpetraVector<T>::max() const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->initialized());
+  ponies());
 
-  T value;
+  ponies;
 
-  _vec->MaxValue(&value);
+  ponies);
 
-  return value;
+  ponies;
 }
 
 
 
-template <typename T>
-inline
-void EpetraVector<T>::swap (NumericVector<T> &other)
+ponies>
+ponies
+ponies)
 {
-  NumericVector<T>::swap(other);
+  ponies);
 
-  EpetraVector<T>& v = cast_ref<EpetraVector<T>&>(other);
+  ponies);
 
-  std::swap(_vec, v._vec);
-  std::swap(_map, v._map);
-  std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
-  std::swap(myFirstID_, v.myFirstID_);
-  std::swap(myNumIDs_, v.myNumIDs_);
-  std::swap(myCoefs_, v.myCoefs_);
-  std::swap(nonlocalIDs_, v.nonlocalIDs_);
-  std::swap(nonlocalElementSize_, v.nonlocalElementSize_);
-  std::swap(numNonlocalIDs_, v.numNonlocalIDs_);
-  std::swap(allocatedNonlocalLength_, v.allocatedNonlocalLength_);
-  std::swap(nonlocalCoefs_, v.nonlocalCoefs_);
-  std::swap(last_edit, v.last_edit);
-  std::swap(ignoreNonLocalEntries_, v.ignoreNonLocalEntries_);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef HAVE_EPETRA
-#endif // LIBMESH_TRILINOS_EPETRA_VECTOR_H
+#ponies
+#ponies

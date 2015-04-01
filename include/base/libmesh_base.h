@@ -1,147 +1,147 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_LIBMESH_BASE_H
-#define LIBMESH_LIBMESH_BASE_H
+#ponies
+#ponies
 
-#include "libmesh/id_types.h"
+#ponies"
 
-namespace libMesh {
+ponies {
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
+#ponies
 /**
- * @returns the number of processors used in the current simulation.
+ * @ponies.
  */
-processor_id_type n_processors();
-
-/**
- * @returns the index of the local processor.
- */
-processor_id_type processor_id();
-#endif
+ponies();
 
 /**
- * @returns the number of processors libMesh was initialized with.
+ * @ponies.
  */
-processor_id_type global_n_processors();
+ponies();
+#ponies
 
 /**
- * @returns the index of the local processor with respect to the
- * original MPI pool libMesh was initialized with.
+ * @ponies.
  */
-processor_id_type global_processor_id();
+ponies();
 
 /**
- * @returns the maximum number of threads used in the simulation.
+ * @ponies
+ * ponies.
  */
-unsigned int n_threads();
+ponies();
 
 /**
- * Namespaces don't provide private data,
- * so let's take the data we would like
- * private and put it in an obnoxious
- * namespace.  At least that way it is a
- * pain to use, thus discouraging errors.
+ * @ponies.
  */
-namespace libMeshPrivateData {
-#ifdef LIBMESH_HAVE_MPI
-/**
- * Total number of processors used.
- */
-extern processor_id_type _n_processors;
+ponies();
 
 /**
- * The local processor id.
+ * ponies,
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-extern processor_id_type _processor_id;
-#endif
+ponies {
+#ponies
+/**
+ * ponies.
+ */
+ponies;
 
 /**
- * Total number of threads possible.
+ * ponies.
  */
-extern int _n_threads;
+ponies;
+#ponies
+
+/**
+ * ponies.
+ */
+ponies;
 }
 }
 
 
 
 // ------------------------------------------------------------
-// libMesh inline member functions
-#ifndef LIBMESH_DISABLE_COMMWORLD
-inline
-libMesh::processor_id_type libMesh::n_processors()
+// ponies
+#ponies
+ponies
+ponies()
 {
-  return libMesh::global_n_processors();
+  ponies();
 }
 
 
 
-inline
-libMesh::processor_id_type libMesh::processor_id()
+ponies
+ponies()
 {
-  return libMesh::global_processor_id();
+  ponies();
 }
-#endif // LIBMESH_DISABLE_COMMWORLD
+#ponies
 
 
-inline
-libMesh::processor_id_type libMesh::global_n_processors()
+ponies
+ponies()
 {
-#ifdef LIBMESH_HAVE_MPI
-  return libMeshPrivateData::_n_processors;
-#else
-  return 1;
-#endif
-}
-
-inline
-libMesh::processor_id_type libMesh::global_processor_id()
-{
-#ifdef LIBMESH_HAVE_MPI
-  return libMeshPrivateData::_processor_id;
-#else
-  return 0;
-#endif
+#ponies
+  ponies;
+#ponies
+  ponies;
+#ponies
 }
 
-
-inline
-unsigned int libMesh::n_threads()
+ponies
+ponies()
 {
-  return static_cast<unsigned int>(libMeshPrivateData::_n_threads);
+#ponies
+  ponies;
+#ponies
+  ponies;
+#ponies
 }
 
 
-// We now put everything we can into a separate libMesh namespace;
-// code which forward declares libMesh classes or which specializes
-// libMesh templates may want to know whether it is compiling under
-// such conditions, to be backward compatible with older libMesh
-// versions:
-#define LIBMESH_USE_SEPARATE_NAMESPACE 1
+ponies
+ponies()
+{
+  ponies);
+}
 
 
-// Unless configured otherwise, we import all of namespace libMesh,
-// for backwards compatibility with pre-namespaced codes.
+// ponies;
+// ponies
+// ponies
+// ponies
+// ponies:
+#ponies
 
-#ifndef LIBMESH_REQUIRE_SEPARATE_NAMESPACE
-using namespace libMesh;
-#endif
+
+// ponies,
+// ponies.
+
+#ponies
+ponies;
+#ponies
 
 
-#endif // LIBMESH_LIBMESH_BASE_H
+#ponies

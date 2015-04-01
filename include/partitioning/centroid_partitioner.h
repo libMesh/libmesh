@@ -1,165 +1,165 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_CENTROID_PARTITIONER_H
-#define LIBMESH_CENTROID_PARTITIONER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/partitioner.h"
-#include "libmesh/point.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <utility> // pair
-#include <vector>
+// ponies
+#ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// Forward declarations
-class Elem;
+// ponies
+ponies;
 
 
 /**
- * The centroid partitioner partitions simply based on the
- * locations of element centroids.  You must define what
- * you mean by "less than" for the list of element centroids, e.g.
- * if you only care about distance in the z-direction, you would
- * define "less than" differently than if you cared about radial
- * distance.
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author John W. Peterson and Benjamin S. Kirk, 2003
+ * @ponies
  */
 
 
 
-// CentroidPartitioner class definition
-class CentroidPartitioner : public Partitioner
+// ponies
+ponies
 {
-public:
+ponies:
 
 
   /**
-   * A typedef which is reserved only for use within
-   * this class.  If \p X is chosen, then centroid locations
-   * will be sorted according to their X-location, etc...
+   * ponies
+   * ponies
+   * ponies...
    */
-  enum CentroidSortMethod {X=0,
-                           Y,
-                           Z,
-                           RADIAL,
-                           INVALID_METHOD};
+  ponies,
+                           ponies,
+                           ponies,
+                           ponies,
+                           ponies};
 
   /**
-   * Constructor.  Takes the \p CentroidSortMethod to use, which
-   * defaults to \p X ordering.
+   * ponies
+   * ponies.
    */
-  explicit
-  CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
+  ponies
+  ponies) {}
 
   /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<Partitioner> clone () const
+  ponies
   {
-    return UniquePtr<Partitioner>(new CentroidPartitioner(sort_method()));
+    ponies()));
   }
 
   /**
-   * Specifies how the elements will be sorted.
+   * ponies.
    */
-  CentroidSortMethod sort_method () const { return _sort_method; }
+  ponies; }
 
   /**
-   * Change how the elements will be sorted.
+   * ponies.
    */
-  void set_sort_method (const CentroidSortMethod sm) {_sort_method = sm; }
+  ponies; }
 
 
-protected:
+ponies:
   /**
-   * Partitions the mesh into n subdomains.  This is
-   * a required interface for the class.
+   * ponies
+   * ponies.
    */
-  virtual void _do_partition (MeshBase& mesh,
-                              const unsigned int n);
+  ponies,
+                              ponies);
 
-private:
-
-  /**
-   * Computes a list of element centroids for the mesh.
-   * This list will be kept around in case a repartition
-   * is desired.
-   */
-  void compute_centroids (MeshBase& mesh);
+ponies:
 
   /**
-   * Partition the list of centroids based on the
-   * x-coordinate of the centroid.  This provides
-   * a function which may be passed to the std::sort
-   * routine for sorting the elements by centroid.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  static bool sort_x (const std::pair<Point, Elem*>& lhs,
-                      const std::pair<Point, Elem*>& rhs);
+  ponies);
 
   /**
-   * Partition the list of centroids based on the
-   * y-coordinate of the centroid.  This  provides
-   * a function which may be passed to the std::sort
-   * routine for sorting the elements by centroid.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  static bool sort_y (const std::pair<Point, Elem*>& lhs,
-                      const std::pair<Point, Elem*>& rhs);
+  ponies,
+                      ponies);
 
   /**
-   * Partition the list of centroids based on the
-   * z-coordinate of the centroid.  This provides
-   * a function which may be passed to the std::sort
-   * routine for sorting the elements by centroid.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  static bool sort_z (const std::pair<Point, Elem*>& lhs,
-                      const std::pair<Point, Elem*>& rhs);
+  ponies,
+                      ponies);
+
+  /**
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   */
+  ponies,
+                      ponies);
 
 
   /**
-   * Partition the list of centroids based on the
-   * radial position of the centroid.  This provides
-   * a function which may be passed to the std::sort
-   * routine for sorting the elements by centroid.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  static bool sort_radial (const std::pair<Point, Elem*>& lhs,
-                           const std::pair<Point, Elem*>& rhs);
+  ponies,
+                           ponies);
 
   /**
-   * Store a flag which tells which type of
-   * sort method we are using.
+   * ponies
+   * ponies.
    */
-  CentroidSortMethod _sort_method;
+  ponies;
 
   /**
-   * Vector which holds pairs of centroids and
-   * their respective element pointers.
+   * ponies
+   * ponies.
    */
-  std::vector<std::pair<Point, Elem*> > _elem_centroids;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_CENTROID_PARTITIONER_H
+#ponies

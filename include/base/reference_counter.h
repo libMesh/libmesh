@@ -1,156 +1,156 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_REFERENCE_COUNTER_H
-#define LIBMESH_REFERENCE_COUNTER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_config.h"
-#include "libmesh/threads.h"
-#include "libmesh/libmesh.h" // libMesh::on_command_line
+// ponies
+#ponies"
+#ponies"
+#ponies
 
-// C++ includes
-#include <iostream>
-#include <string>
-#include <map>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * This is the base class for enabling reference counting.  It
- * should not be used by the user, thus it has a private constructor.
+ * ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk, 2002-2007
+ * \ponies
  */
 
 // ------------------------------------------------------------
-// ReferenceCounter class definition
-class ReferenceCounter
+// ponies
+ponies
 {
-protected:
+ponies:
 
   /**
-   * Constructor. Protected so that you cannont
-   * instantiate a \p ReferenceCounter, only derive
-   * from it.
+   * ponies
+   * ponies
+   * ponies.
    */
-  ReferenceCounter ();
+  ponies ();
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~ReferenceCounter ();
+  ~ponies ();
 
   /**
-   * Gets a string containing the reference information.
+   * ponies.
    */
-  static std::string get_info ();
+  ponies ();
 
   /**
-   * Prints the reference information, by default to \p libMesh::out.
+   * ponies.
    */
-  static void print_info (std::ostream& out = libMesh::out);
+  ponies);
 
   /**
-   * Prints the number of outstanding (created, but not yet
-   * destroyed) objects.
+   * ponies
+   * ponies.
    */
-  static unsigned int n_objects ()
-  { return _n_objects; }
+  ponies ()
+  { ponies; }
 
   /**
-   * Methods to enable/disable the reference counter output
-   * from print_info()
+   * ponies
+   * ponies()
    */
-  static void enable_print_counter_info();
-  static void disable_print_counter_info();
+  ponies();
+  ponies();
 
 
-protected:
+ponies:
 
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#ponies)
 
   /**
-   * Increments the construction counter. Should be called in
-   * the constructor of any derived class that will be
-   * reference counted.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void increment_constructor_count (const std::string& name);
+  ponies);
 
   /**
-   * Increments the destruction counter. Should be called in
-   * the destructor of any derived class that will be
-   * reference counted.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void increment_destructor_count (const std::string& name);
+  ponies);
 
   /**
-   * Data structure to log the information.  The log is
-   * identified by the class name.
+   * ponies
+   * ponies.
    */
-  typedef std::map<std::string, std::pair<unsigned int,
-                                          unsigned int> > Counts;
+  ponies,
+                                          ponies;
 
   /**
-   * Actually holds the data.
+   * ponies.
    */
-  static Counts _counts;
+  ponies;
 
-#endif
-
-  /**
-   * The number of objects.  Print the reference count
-   * information when the number returns to 0.
-   */
-  static Threads::atomic<unsigned int> _n_objects;
+#ponies
 
   /**
-   * Mutual exclusion object to enable thread-safe reference counting.
+   * ponies
+   * ponies.
    */
-  static Threads::spin_mutex _mutex;
+  ponies;
 
   /**
-   * Flag to control whether reference count information
-   * is printed when print_info is called.
+   * ponies.
    */
-  static bool _enable_print_counter;
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// ReferenceCounter class inline methods
-inline ReferenceCounter::ReferenceCounter()
+// ponies
+ponies()
 {
-  ++_n_objects;
+  ++ponies;
 }
 
 
 
-inline ReferenceCounter::~ReferenceCounter()
+ponies()
 {
-  --_n_objects;
+  --ponies;
 }
 
 
@@ -158,32 +158,32 @@ inline ReferenceCounter::~ReferenceCounter()
 
 
 
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-inline
-void ReferenceCounter::increment_constructor_count (const std::string& name)
+#ponies)
+ponies
+ponies)
 {
-  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-  std::pair<unsigned int, unsigned int>& p = _counts[name];
+  ponies);
+  ponies];
 
-  p.first++;
+  ponies++;
 }
-#endif
+#ponies
 
 
 
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
-inline
-void ReferenceCounter::increment_destructor_count (const std::string& name)
+#ponies)
+ponies
+ponies)
 {
-  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-  std::pair<unsigned int, unsigned int>& p = _counts[name];
+  ponies);
+  ponies];
 
-  p.second++;
+  ponies++;
 }
-#endif
+#ponies
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_REFERENCE_COUNTER_H
+#ponies

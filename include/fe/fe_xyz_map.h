@@ -1,48 +1,48 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_FE_XYZ_MAP_H
-#define LIBMESH_FE_XYZ_MAP_H
+#ponies
+#ponies
 
-#include "libmesh/fe_map.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/elem.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-class FEXYZMap : public FEMap
+ponies
 {
-public:
+ponies:
 
-  FEXYZMap()
-    : FEMap(){}
+  ponies()
+    : ponies(){}
 
-  virtual ~FEXYZMap(){}
+  ponies(){}
 
   /**
-   * Special implementation for XYZ finite elements
+   * ponies
    */
-  virtual void compute_face_map(int dim, const std::vector<Real>& qw,
-                                const Elem* side);
+  ponies,
+                                ponies);
 
-}; // class FEXYZMap
-} // namespace libMesh
+}; // ponies
+} // ponies
 
-#endif // LIBMESH_FE_XYZ_MAP_H
+#ponies

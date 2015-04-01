@@ -1,1352 +1,1352 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// C++ includes
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
 
 
-namespace libMesh
+// ponies
+#ponies"
+#ponies
+
+#ponies"
+#ponies"
+
+
+ponies
 {
 
 
 
-template <>
-Real FE<3,BERNSTEIN>::shape(const ElemType,
-                            const Order,
-                            const unsigned int,
-                            const Point&)
+ponies <>
+ponies,
+                            ponies,
+                            ponies,
+                            ponies&)
 {
-  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge and face orientation is needed.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,BERNSTEIN>::shape(const Elem* elem,
-                            const Order order,
-                            const unsigned int i,
-                            const Point& p)
+ponies <>
+ponies,
+                            ponies,
+                            ponies,
+                            ponies)
 {
 
-#if LIBMESH_DIM == 3
+#ponies
 
-  libmesh_assert(elem);
-  const ElemType type = elem->type();
+  ponies);
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // 1st order Bernstein.
-    case FIRST:
+      // ponies.
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            // Bernstein shape functions on the tetrahedron.
-          case TET4:
-          case TET10:
+            // ponies.
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              // Area coordinates
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              // ponies
+              ponies);
+              ponies);
+              ponies);
+              ponies;
 
-              switch(i)
+              ponies)
                 {
-                case  0:  return zeta0;
-                case  1:  return zeta1;
-                case  2:  return zeta2;
-                case  3:  return zeta3;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
 
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX20:
-          case HEX27:
+            // ponies.
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 8);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta));
+              ponies)*
+                      ponies)*
+                      ponies));
             }
 
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
+          ponies:
+            ponies);
           }
       }
 
 
 
 
-    case SECOND:
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            // Bernstein shape functions on the tetrahedron.
-          case TET10:
+            // ponies.
+          ponies:
             {
-              libmesh_assert_less (i, 10);
+              ponies);
 
-              // Area coordinates
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
+              // ponies
+              ponies);
+              ponies);
+              ponies);
+              ponies;
 
-              switch(i)
+              ponies)
                 {
-                case  0:  return zeta0*zeta0;
-                case  1:  return zeta1*zeta1;
-                case  2:  return zeta2*zeta2;
-                case  3:  return zeta3*zeta3;
-                case  4:  return 2.*zeta0*zeta1;
-                case  5:  return 2.*zeta1*zeta2;
-                case  6:  return 2.*zeta0*zeta2;
-                case  7:  return 2.*zeta3*zeta0;
-                case  8:  return 2.*zeta1*zeta3;
-                case  9:  return 2.*zeta2*zeta3;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
+                ponies;
 
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
                 }
             }
 
-            // Bernstein shape functions on the 20-noded hexahedral.
-          case HEX20:
+            // ponies.
+          ponies:
             {
-              libmesh_assert_less (i, 20);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0      1      2      3      4      5      6      7      8      9      10     11     12     13     14     15     16     17     18     19  20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0,     1,     1,     0,     0,     1,     1,     0,     2,     1,     2,     0,     0,     1,     1,     0,     2,     1,     2,     0,  2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0,     0,     1,     1,     0,     0,     1,     1,     0,     2,     1,     2,     0,     0,     1,     1,     0,     2,     1,     2,  2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0,     0,     0,     0,     1,     1,     1,     1,     0,     0,     0,     0,     2,     2,     2,     2,     1,     1,     1,     1,  0, 2, 2, 2, 2, 1, 2};
-              //To compute the hex20 shape functions the original shape functions for hex27 are used.
-              //scalx[i] tells how often the original x-th shape function has to be added to the original i-th shape function
-              //to compute the new i-th shape function for hex20
-              //example: B_0^HEX20 = B_0^HEX27 - 0.25*B_20^HEX27 - 0.25*B_21^HEX27 + 0*B_22^HEX27 + 0*B_23^HEX27 - 0.25*B_24^HEX27 + 0*B_25^HEX27 - 0.25*B_26^HEX27
-              //         B_0^HEX20 = B_0^HEX27 + scal20[0]*B_20^HEX27 + scal21[0]*B_21^HEX27 + ...
-              static const Real scal20[] =     {-0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5,   0,     0,     0,     0,     0,     0,     0,     0};
-              static const Real scal21[] =     {-0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0};
-              static const Real scal22[] =     {0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0};
-              static const Real scal23[] =     {0,     0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0};
-              static const Real scal24[] =     {-0.25, 0,     0,     -0.25, -0.25, 0,     0,     -0.25, 0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0,     0.5};
-              static const Real scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
-              static const Real scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
+              //ponies.
+              //ponies
+              //ponies
+              //ponies
+              //         ponies + ...
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
 
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta)
-                      +scal20[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[20], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[20], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[20], zeta)
-                      +scal21[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[21], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[21], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[21], zeta)
-                      +scal22[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[22], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[22], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[22], zeta)
-                      +scal23[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[23], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[23], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[23], zeta)
-                      +scal24[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[24], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[24], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[24], zeta)
-                      +scal25[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[25], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[25], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[25], zeta)
-                      +scal26[i]*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[26], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[26], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[26], zeta));
+              ponies)*
+                      ponies)*
+                      ponies)
+                      +ponies]*
+                      ponies)*
+                      ponies)*
+                      ponies)
+                      +ponies]*
+                      ponies)*
+                      ponies)*
+                      ponies)
+                      +ponies]*
+                      ponies)*
+                      ponies)*
+                      ponies)
+                      +ponies]*
+                      ponies)*
+                      ponies)*
+                      ponies)
+                      +ponies]*
+                      ponies)*
+                      ponies)*
+                      ponies)
+                      +ponies]*
+                      ponies)*
+                      ponies)*
+                      ponies)
+                      +ponies]*
+                      ponies)*
+                      ponies)*
+                      ponies));
             }
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX27:
+            // ponies.
+          ponies:
             {
-              libmesh_assert_less (i, 27);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta));
+              ponies)*
+                      ponies)*
+                      ponies));
             }
 
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
+          ponies:
+            ponies);
           }
 
       }
 
 
 
-      // 3rd-order Bernstein.
-    case THIRD:
+      // ponies.
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            //     // Bernstein shape functions on the tetrahedron.
-            //   case TET10:
+            //     // ponies.
+            //   ponies:
             //     {
-            //       libmesh_assert_less (i, 20);
+            //       ponies);
 
-            //       // Area coordinates
-            //       const Real zeta1 = p(0);
-            //       const Real zeta2 = p(1);
-            //       const Real zeta3 = p(2);
-            //       const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-
-
-            //       unsigned int shape=i;
-
-            //       // handle the edge orientation
-
-            //       if ((i== 4||i== 5) && elem->node(0) > elem->node(1))shape= 9-i;   //Edge 0
-            //       if ((i== 6||i== 7) && elem->node(1) > elem->node(2))shape=13-i;   //Edge 1
-            //       if ((i== 8||i== 9) && elem->node(0) > elem->node(2))shape=17-i;   //Edge 2
-            //       if ((i==10||i==11) && elem->node(0) > elem->node(3))shape=21-i;   //Edge 3
-            //       if ((i==12||i==13) && elem->node(1) > elem->node(3))shape=25-i;   //Edge 4
-            //       if ((i==14||i==15) && elem->node(2) > elem->node(3))shape=29-i;   //Edge 5
-
-            //       // No need to handle face orientation in 3rd order.
+            //       // ponies
+            //       ponies);
+            //       ponies);
+            //       ponies);
+            //       ponies;
 
 
-            //       switch(shape)
+            //       ponies;
+
+            //       // ponies
+
+            //       ponies
+            //       ponies
+            //       ponies
+            //       ponies
+            //       ponies
+            //       ponies
+
+            //       // ponies.
+
+
+            //       ponies)
             // {
-            //   //point function
-            // case  0:  return zeta0*zeta0*zeta0;
-            // case  1:  return zeta1*zeta1*zeta1;
-            // case  2:  return zeta2*zeta2*zeta2;
-            // case  3:  return zeta3*zeta3*zeta3;
+            //   //ponies
+            // ponies;
+            // ponies;
+            // ponies;
+            // ponies;
 
-            //   //edge functions
-            // case  4:  return 3.*zeta0*zeta0*zeta1;
-            // case  5:  return 3.*zeta1*zeta1*zeta0;
+            //   //ponies
+            // ponies;
+            // ponies;
 
-            // case  6:  return 3.*zeta1*zeta1*zeta2;
-            // case  7:  return 3.*zeta2*zeta2*zeta1;
+            // ponies;
+            // ponies;
 
-            // case  8:  return 3.*zeta0*zeta0*zeta2;
-            // case  9:  return 3.*zeta2*zeta2*zeta0;
+            // ponies;
+            // ponies;
 
-            // case 10:  return 3.*zeta0*zeta0*zeta3;
-            // case 11:  return 3.*zeta3*zeta3*zeta0;
+            // ponies;
+            // ponies;
 
-            // case 12:  return 3.*zeta1*zeta1*zeta3;
-            // case 13:  return 3.*zeta3*zeta3*zeta1;
+            // ponies;
+            // ponies;
 
-            // case 14:  return 3.*zeta2*zeta2*zeta3;
-            // case 15:  return 3.*zeta3*zeta3*zeta2;
+            // ponies;
+            // ponies;
 
-            //   //face functions
-            // case 16:  return 6.*zeta0*zeta1*zeta2;
-            // case 17:  return 6.*zeta0*zeta1*zeta3;
-            // case 18:  return 6.*zeta1*zeta2*zeta3;
-            // case 19:  return 6.*zeta2*zeta0*zeta3;
+            //   //ponies
+            // ponies;
+            // ponies;
+            // ponies;
+            // ponies;
 
-            // default:
-            // libmesh_error_msg("Invalid shape function index i = " << i);
+            // ponies:
+            // ponies);
             // }
             //     }
 
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX27:
+            // ponies.
+          ponies:
             {
-              libmesh_assert_less (i, 64);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi    = p(0);
-              const Real eta   = p(1);
-              const Real zeta  = p(2);
-              Real xi_mapped   = p(0);
-              Real eta_mapped  = p(1);
-              Real zeta_mapped = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
-              //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
+              // ponies
+              // ponies
+              // ponies!
+              //  ponies
+              //  ponies
+              ponies};
+              ponies};
+              ponies};
 
 
 
-              // handle the edge orientation
+              // ponies
               {
-                // Edge 0
-                if ( (i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 1
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(2)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 2
-                else if ((i0[i] >= 2) && (i1[i] == 1) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(2)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 3
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(3)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 4
-                else if ((i0[i] == 0) && (i1[i] == 0) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 5
-                else if ((i0[i] == 1) && (i1[i] == 0) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 6
-                else if ((i0[i] == 1) && (i1[i] == 1) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(2) != std::min(elem->point(2), elem->point(6)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 7
-                else if ((i0[i] == 0) && (i1[i] == 1) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 8
-                else if ((i0[i] >=2 ) && (i1[i] == 0) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(5)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 9
-                else if ((i0[i] == 1) && (i1[i] >=2 ) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 10
-                else if ((i0[i] >=2 ) && (i1[i] == 1) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(7) != std::min(elem->point(7), elem->point(6)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 11
-                else if ((i0[i] == 0) && (i1[i] >=2 ) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(7)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
               }
 
 
-              // handle the face orientation
+              // ponies
               {
-                // Face 0
-                if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(0),
-                                                                       elem->point(3))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(3) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
-                        {
-                          // Case 3
-                          xi_mapped  = -eta;
-                          eta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = xi;
-                          eta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(1) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped  = eta;
-                            eta_mapped = -xi;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped  = -xi;
-                            eta_mapped = eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 1
-                else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(0),
-                                                     std::min(elem->point(1),
-                                                              std::min(elem->point(5),
-                                                                       elem->point(4))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(1) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
-                        {
-                          // Case 3
-                          xi_mapped   = zeta;
-                          zeta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = -xi;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(4) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped   = xi;
-                            zeta_mapped = -zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 2
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(5))));
-                    if (elem->point(1) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
-                        {
-                          // Case 3
-                          eta_mapped  = zeta;
-                          zeta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = -eta;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(5) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+                        ponies)))
                           {
-                            // Case 7
-                            eta_mapped  = -zeta;
-                            zeta_mapped = eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            eta_mapped   = eta;
-                            zeta_mapped = -zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 3
-                else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(2),
-                                                     std::min(elem->point(3),
-                                                              std::min(elem->point(7),
-                                                                       elem->point(6))));
-                    if (elem->point(3) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
-                        {
-                          // Case 3
-                          xi_mapped   = -zeta;
-                          zeta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = xi;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(2) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped   = zeta;
-                            zeta_mapped = -xi;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 4
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(3),
-                                                     std::min(elem->point(0),
-                                                              std::min(elem->point(4),
-                                                                       elem->point(7))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(4) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
-                        {
-                          // Case 3
-                          eta_mapped  = -zeta;
-                          zeta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = eta;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(3) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+                        ponies)))
                           {
-                            // Case 7
-                            eta_mapped   = zeta;
-                            zeta_mapped = -eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            eta_mapped  = -eta;
-                            zeta_mapped = zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 5
-                else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(4),
-                                                     std::min(elem->point(5),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(7))));
-                    if (elem->point(4) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
-                        {
-                          // Case 3
-                          xi_mapped  = eta;
-                          eta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = -xi;
-                          eta_mapped = eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(7) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped  = -eta;
-                            eta_mapped = xi;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped  = xi;
-                            eta_mapped = eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
               }
 
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta_mapped));
+              ponies)*
+                      ponies)*
+                      ponies));
             }
 
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
-          } //case HEX27
+          ponies:
+            ponies);
+          } //ponies
 
-      }//case THIRD
+      }//ponies
 
 
-      // 4th-order Bernstein.
-    case FOURTH:
+      // ponies.
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX27:
+            // ponies.
+          ponies:
             {
-              libmesh_assert_less (i, 125);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi    = p(0);
-              const Real eta   = p(1);
-              const Real zeta  = p(2);
-              Real xi_mapped   = p(0);
-              Real eta_mapped  = p(1);
-              Real zeta_mapped = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
-              //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4};
+              // ponies
+              // ponies
+              // ponies!
+              //  ponies
+              //  ponies
+              ponies};
+              ponies};
+              ponies};
 
 
 
-              // handle the edge orientation
+              // ponies
               {
-                // Edge 0
-                if ( (i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 1
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(2)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 2
-                else if ((i0[i] >= 2) && (i1[i] == 1) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(2)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 3
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] == 0))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(3)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 4
-                else if ((i0[i] == 0) && (i1[i] == 0) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 5
-                else if ((i0[i] == 1) && (i1[i] == 0) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 6
-                else if ((i0[i] == 1) && (i1[i] == 1) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(2) != std::min(elem->point(2), elem->point(6)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 7
-                else if ((i0[i] == 0) && (i1[i] == 1) && (i2[i] >=2 ))
+                // ponies
+                ponies ))
                   {
-                    if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
-                      zeta_mapped = -zeta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 8
-                else if ((i0[i] >=2 ) && (i1[i] == 0) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(5)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 9
-                else if ((i0[i] == 1) && (i1[i] >=2 ) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 10
-                else if ((i0[i] >=2 ) && (i1[i] == 1) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(7) != std::min(elem->point(7), elem->point(6)))
-                      xi_mapped = -xi;
+                    ponies)))
+                      ponies;
                   }
-                // Edge 11
-                else if ((i0[i] == 0) && (i1[i] >=2 ) && (i2[i] == 1))
+                // ponies
+                ponies))
                   {
-                    if (elem->point(4) != std::min(elem->point(4), elem->point(7)))
-                      eta_mapped = -eta;
+                    ponies)))
+                      ponies;
                   }
               }
 
 
-              // handle the face orientation
+              // ponies
               {
-                // Face 0
-                if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(0),
-                                                                       elem->point(3))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(3) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
-                        {
-                          // Case 3
-                          xi_mapped  = -eta;
-                          eta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = xi;
-                          eta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(1) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped  = eta;
-                            eta_mapped = -xi;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped  = -xi;
-                            eta_mapped = eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 1
-                else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(0),
-                                                     std::min(elem->point(1),
-                                                              std::min(elem->point(5),
-                                                                       elem->point(4))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(1) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
-                        {
-                          // Case 3
-                          xi_mapped   = zeta;
-                          zeta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = -xi;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(4) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped   = xi;
-                            zeta_mapped = -zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 2
-                else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(1),
-                                                     std::min(elem->point(2),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(5))));
-                    if (elem->point(1) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(2) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
-                        {
-                          // Case 3
-                          eta_mapped  = zeta;
-                          zeta_mapped = -eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = -eta;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(5) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+                        ponies)))
                           {
-                            // Case 7
-                            eta_mapped  = -zeta;
-                            zeta_mapped = eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            eta_mapped   = eta;
-                            zeta_mapped = -zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 3
-                else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(2),
-                                                     std::min(elem->point(3),
-                                                              std::min(elem->point(7),
-                                                                       elem->point(6))));
-                    if (elem->point(3) == min_point)
-                      if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped   = xi;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped   = zeta;
-                          zeta_mapped = xi;
-                        }
-
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
-                        {
-                          // Case 3
-                          xi_mapped   = -zeta;
-                          zeta_mapped = xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped   = xi;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped   = -xi;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped   = -zeta;
-                          zeta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(2) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped   = zeta;
-                            zeta_mapped = -xi;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped   = -xi;
-                            zeta_mapped = zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 4
-                else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(3),
-                                                     std::min(elem->point(0),
-                                                              std::min(elem->point(4),
-                                                                       elem->point(7))));
-                    if (elem->point(0) == min_point)
-                      if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          eta_mapped  = eta;
-                          zeta_mapped = zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          eta_mapped  = zeta;
-                          zeta_mapped = eta;
-                        }
-
-                    else if (elem->point(4) == min_point)
-                      if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
-                        {
-                          // Case 3
-                          eta_mapped  = -zeta;
-                          zeta_mapped = eta;
-                        }
-                      else
-                        {
-                          // Case 4
-                          eta_mapped  = eta;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(7) == min_point)
-                      if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          eta_mapped  = -eta;
-                          zeta_mapped = -zeta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          eta_mapped  = -zeta;
-                          zeta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(3) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+                        ponies)))
                           {
-                            // Case 7
-                            eta_mapped   = zeta;
-                            zeta_mapped = -eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            eta_mapped  = -eta;
-                            zeta_mapped = zeta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
 
 
-                // Face 5
-                else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
+                // ponies
+                ponies))
                   {
-                    const Point min_point = std::min(elem->point(4),
-                                                     std::min(elem->point(5),
-                                                              std::min(elem->point(6),
-                                                                       elem->point(7))));
-                    if (elem->point(4) == min_point)
-                      if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
+                    ponies),
+                                                     ponies),
+                                                              ponies),
+                                                                       ponies))));
+                    ponies)
+                      ponies)))
                         {
-                          // Case 1
-                          xi_mapped  = xi;
-                          eta_mapped = eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 2
-                          xi_mapped  = eta;
-                          eta_mapped = xi;
-                        }
-
-                    else if (elem->point(5) == min_point)
-                      if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
-                        {
-                          // Case 3
-                          xi_mapped  = eta;
-                          eta_mapped = -xi;
-                        }
-                      else
-                        {
-                          // Case 4
-                          xi_mapped  = -xi;
-                          eta_mapped = eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(6) == min_point)
-                      if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
+                    ponies)
+                      ponies)))
                         {
-                          // Case 5
-                          xi_mapped  = -xi;
-                          eta_mapped = -eta;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
-                      else
+                      ponies
                         {
-                          // Case 6
-                          xi_mapped  = -eta;
-                          eta_mapped = -xi;
+                          // ponies
+                          ponies;
+                          ponies;
                         }
 
-                    else if (elem->point(7) == min_point)
+                    ponies)
+                      ponies)))
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+                      ponies
+                        {
+                          // ponies
+                          ponies;
+                          ponies;
+                        }
+
+                    ponies)
                       {
-                        if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+                        ponies)))
                           {
-                            // Case 7
-                            xi_mapped  = -eta;
-                            eta_mapped = xi;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
-                        else
+                        ponies
                           {
-                            // Case 8
-                            xi_mapped  = xi;
-                            eta_mapped = eta;
+                            // ponies
+                            ponies;
+                            ponies;
                           }
                       }
                   }
@@ -1355,988 +1355,988 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
               }
 
 
-              return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], xi_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], eta_mapped)*
-                      FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], zeta_mapped));
+              ponies)*
+                      ponies)*
+                      ponies));
             }
 
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-    default:
-      libmesh_error_msg("Invalid totalorder = " << totalorder);
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
 
-template <>
-Real FE<3,BERNSTEIN>::shape_deriv(const ElemType,
-                                  const Order,
-                                  const unsigned int,
-                                  const unsigned int,
-                                  const Point& )
+ponies <>
+ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies& )
 {
-  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge and face orientation is needed.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
-                                  const Order order,
-                                  const unsigned int i,
-                                  const unsigned int j,
-                                  const Point& p)
+ponies <>
+ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies)
 {
 
-#if LIBMESH_DIM == 3
-  libmesh_assert(elem);
-  const ElemType type = elem->type();
+#ponies
+  ponies);
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  libmesh_assert_less (j, 3);
+  ponies);
 
-  switch (totalorder)
+  ponies)
     {
-      // 1st order Bernstein.
-    case FIRST:
+      // ponies.
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // Bernstein shape functions on the tetrahedron.
-          case TET4:
-          case TET10:
+            // ponies.
+          ponies:
+          ponies:
             {
-              // I have been lazy here and am using finite differences
-              // to compute the derivatives!
-              const Real eps = 1.e-6;
+              // ponies
+              // ponies!
+              ponies;
 
-              libmesh_assert_less (i, 4);
-              libmesh_assert_less (j, 3);
+              ponies);
+              ponies);
 
 
-              switch (j)
+              ponies)
                 {
-                  //  d()/dxi
-                case 0:
+                  //  ponies
+                ponies:
                   {
-                    const Point pp(p(0)+eps, p(1), p(2));
-                    const Point pm(p(0)-eps, p(1), p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
 
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1)+eps, p(2));
-                    const Point pm(p(0), p(1)-eps, p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                  // d()/dzeta
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1), p(2)+eps);
-                    const Point pm(p(0), p(1), p(2)-eps);
+                    ponies);
+                    ponies);
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                default:
-                  libmesh_error_msg("Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
 
 
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX20:
-          case HEX27:
+            // ponies.
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 8);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
-                  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d()/deta
-                case 1:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d()/dzeta
-                case 2:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
+          ponies:
+            ponies);
           }
       }
 
 
 
 
-    case SECOND:
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // Bernstein shape functions on the tetrahedron.
-          case TET10:
+            // ponies.
+          ponies:
             {
-              // I have been lazy here and am using finite differences
-              // to compute the derivatives!
-              const Real eps = 1.e-6;
+              // ponies
+              // ponies!
+              ponies;
 
-              libmesh_assert_less (i, 10);
-              libmesh_assert_less (j, 3);
+              ponies);
+              ponies);
 
 
-              switch (j)
+              ponies)
                 {
-                  //  d()/dxi
-                case 0:
+                  //  ponies
+                ponies:
                   {
-                    const Point pp(p(0)+eps, p(1), p(2));
-                    const Point pm(p(0)-eps, p(1), p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
 
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1)+eps, p(2));
-                    const Point pm(p(0), p(1)-eps, p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                  // d()/dzeta
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1), p(2)+eps);
-                    const Point pm(p(0), p(1), p(2)-eps);
+                    ponies);
+                    ponies);
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                default:
-                  libmesh_error_msg("Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX20:
+            // ponies.
+          ponies:
             {
-              libmesh_assert_less (i, 20);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-              static const Real scal20[] =     {-0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5,   0,     0,     0,     0,     0,     0,     0,     0};
-              static const Real scal21[] =     {-0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0};
-              static const Real scal22[] =     {0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0};
-              static const Real scal23[] =     {0,     0,     -0.25, -0.25, 0,     0,     -0.25, -0.25, 0,     0,     0.5,   0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0};
-              static const Real scal24[] =     {-0.25, 0,     0,     -0.25, -0.25, 0,     0,     -0.25, 0,     0,     0,     0.5,   0.5,   0,     0,     0.5,   0,     0,     0,     0.5};
-              static const Real scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
-              static const Real scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
-                  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta)
-                          +scal20[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[20], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[20],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[20],    zeta)
-                          +scal21[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[21], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[21],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[21],    zeta)
-                          +scal22[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[22], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[22],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[22],    zeta)
-                          +scal23[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[23], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[23],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[23],    zeta)
-                          +scal24[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[24], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[24],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[24],    zeta)
-                          +scal25[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[25], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[25],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[25],    zeta)
-                          +scal26[i]*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[26], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[26],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[26],    zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d()/deta
-                case 1:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta)
-                          +scal20[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[20],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[20], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[20],    zeta)
-                          +scal21[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[21],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[21], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[21],    zeta)
-                          +scal22[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[22],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[22], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[22],    zeta)
-                          +scal23[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[23],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[23], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[23],    zeta)
-                          +scal24[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[24],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[24], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[24],    zeta)
-                          +scal25[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[25],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[25], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[25],    zeta)
-                          +scal26[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[26],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[26], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[26],    zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d()/dzeta
-                case 2:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta)
-                          +scal20[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[20],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[20],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[20], 0, zeta)
-                          +scal21[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[21],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[21],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[21], 0, zeta)
-                          +scal22[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[22],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[22],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[22], 0, zeta)
-                          +scal23[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[23],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[23],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[23], 0, zeta)
-                          +scal24[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[24],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[24],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[24], 0, zeta)
-                          +scal25[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[25],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[25],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[25], 0, zeta)
-                          +scal26[i]*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[26],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[26],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[26], 0, zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies)
+                          +ponies]*
+                          ponies)*
+                          ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX27:
+            // ponies.
+          ponies:
             {
-              libmesh_assert_less (i, 27);
+              ponies);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
+              // ponies
+              ponies);
+              ponies);
+              ponies);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
+              // ponies
+              // ponies
+              // ponies!
+              //                                ponies
+              ponies};
+              ponies};
+              ponies};
 
-              switch (j)
+              ponies)
                 {
-                  // d()/dxi
-                case 0:
-                  return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d()/deta
-                case 1:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],     xi)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                  // d()/dzeta
-                case 2:
-                  return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi)*
-                          FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta)*
-                          FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta));
+                  // ponies
+                ponies:
+                  ponies)*
+                          ponies)*
+                          ponies));
 
-                default:
-                  libmesh_error_msg("Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
+          ponies:
+            ponies);
           }
       }
 
 
 
-      // 3rd-order Bernstein.
-    case THIRD:
+      // ponies.
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            //     // Bernstein shape functions derivatives.
-            //   case TET10:
+            //     // ponies.
+            //   ponies:
             //     {
-            //       // I have been lazy here and am using finite differences
-            //       // to compute the derivatives!
-            //       const Real eps = 1.e-6;
+            //       // ponies
+            //       // ponies!
+            //       ponies;
 
-            //       libmesh_assert_less (i, 20);
-            //       libmesh_assert_less (j, 3);
+            //       ponies);
+            //       ponies);
 
-            // switch (j)
+            // ponies)
             // {
-            //   //  d()/dxi
-            // case 0:
+            //   //  ponies
+            // ponies:
             //   {
-            //     const Point pp(p(0)+eps, p(1), p(2));
-            //     const Point pm(p(0)-eps, p(1), p(2));
+            //     ponies));
+            //     ponies));
 
-            //     return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-            //     FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+            //     ponies) -
+            //     ponies;
             //   }
 
-            //   // d()/deta
-            // case 1:
+            //   // ponies
+            // ponies:
             //   {
-            //     const Point pp(p(0), p(1)+eps, p(2));
-            //     const Point pm(p(0), p(1)-eps, p(2));
+            //     ponies));
+            //     ponies));
 
-            //     return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-            //     FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+            //     ponies) -
+            //     ponies;
             //   }
-            //   // d()/dzeta
-            // case 2:
+            //   // ponies
+            // ponies:
             //   {
-            //     const Point pp(p(0), p(1), p(2)+eps);
-            //     const Point pm(p(0), p(1), p(2)-eps);
+            //     ponies);
+            //     ponies);
 
-            //     return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-            //     FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+            //     ponies) -
+            //     ponies;
             //   }
-            // default:
-            // libmesh_error_msg("Invalid derivative index j = " << j);
+            // ponies:
+            // ponies);
             // }
 
 
             //     }
 
 
-            // Bernstein shape functions on the hexahedral.
-          case HEX27:
+            // ponies.
+          ponies:
             {
-              // I have been lazy here and am using finite differences
-              // to compute the derivatives!
-              const Real eps = 1.e-6;
+              // ponies
+              // ponies!
+              ponies;
 
-              libmesh_assert_less (i, 64);
-              libmesh_assert_less (j, 3);
+              ponies);
+              ponies);
 
-              switch (j)
+              ponies)
                 {
-                  //  d()/dxi
-                case 0:
+                  //  ponies
+                ponies:
                   {
-                    const Point pp(p(0)+eps, p(1), p(2));
-                    const Point pm(p(0)-eps, p(1), p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
 
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1)+eps, p(2));
-                    const Point pm(p(0), p(1)-eps, p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                  // d()/dzeta
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1), p(2)+eps);
-                    const Point pm(p(0), p(1), p(2)-eps);
+                    ponies);
+                    ponies);
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                default:
-                  libmesh_error_msg("Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
 
             }
 
-            //       // Compute hex shape functions as a tensor-product
-            //       const Real xi    = p(0);
-            //       const Real eta   = p(1);
-            //       const Real zeta  = p(2);
-            //       Real xi_mapped   = p(0);
-            //       Real eta_mapped  = p(1);
-            //       Real zeta_mapped = p(2);
+            //       // ponies
+            //       ponies);
+            //       ponies);
+            //       ponies);
+            //       ponies);
+            //       ponies);
+            //       ponies);
 
-            //       // The only way to make any sense of this
-            //       // is to look at the mgflo/mg2/mgf documentation
-            //       // and make the cut-out cube!
-            //       //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
-            //       //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63
-            //       static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3};
-            //       static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 2, 3, 2, 2, 3, 3, 0, 0, 0, 0, 2, 3, 2, 3, 1, 1, 1, 1, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
-            //       static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
+            //       // ponies
+            //       // ponies
+            //       // ponies!
+            //       //  ponies
+            //       //  ponies
+            //       ponies};
+            //       ponies};
+            //       ponies};
 
 
 
-            //       // handle the edge orientation
+            //       // ponies
             //       {
-            // // Edge 0
-            // if ((i1[i] == 0) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 1
-            // else if ((i0[i] == 1) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 2
-            // else if ((i1[i] == 1) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 3
-            // else if ((i0[i] == 0) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 4
-            // else if ((i0[i] == 0) && (i1[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(0) != std::min(elem->node(0), elem->node(4)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 5
-            // else if ((i0[i] == 1) && (i1[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(1) != std::min(elem->node(1), elem->node(5)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 6
-            // else if ((i0[i] == 1) && (i1[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(2) != std::min(elem->node(2), elem->node(6)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 7
-            // else if ((i0[i] == 0) && (i1[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(3) != std::min(elem->node(3), elem->node(7)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 8
-            // else if ((i1[i] == 0) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(4) != std::min(elem->node(4), elem->node(5)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 9
-            // else if ((i0[i] == 1) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(5) != std::min(elem->node(5), elem->node(6)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 10
-            // else if ((i1[i] == 1) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(7) != std::min(elem->node(7), elem->node(6)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 11
-            // else if ((i0[i] == 0) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(4) != std::min(elem->node(4), elem->node(7)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
             //       }
 
 
-            //       // handle the face orientation
+            //       // ponies
             //       {
-            // // Face 0
-            // if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(1),
-            //    std::min(elem->node(2),
-            //     std::min(elem->node(0),
-            //      elem->node(3))));
-            //     if (elem->node(0) == min_node)
-            //       if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped  = xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped  = eta;
-            //   eta_mapped = xi;
-            // }
-
-            //     else if (elem->node(3) == min_node)
-            //       if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
-            // {
-            //   // Case 3
-            //   xi_mapped  = -eta;
-            //   eta_mapped = xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped  = xi;
-            //   eta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(2) == min_node)
-            //       if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped  = -xi;
-            //   eta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped  = -eta;
-            //   eta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(1) == min_node)
-            //       if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped  = eta;
-            //   eta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped  = -xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 1
-            // else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(0),
-            //    std::min(elem->node(1),
-            //     std::min(elem->node(5),
-            //      elem->node(4))));
-            //     if (elem->node(0) == min_node)
-            //       if (elem->node(1) == std::min(elem->node(1), elem->node(4)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped   = xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = xi;
-            // }
-
-            //     else if (elem->node(1) == min_node)
-            //       if (elem->node(5) == std::min(elem->node(5), elem->node(0)))
-            // {
-            //   // Case 3
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = -xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(5) == min_node)
-            //       if (elem->node(4) == std::min(elem->node(4), elem->node(1)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped   = -zeta;
-            //   zeta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(4) == min_node)
-            //       if (elem->node(0) == std::min(elem->node(0), elem->node(5)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped   = xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 2
-            // else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(1),
-            //    std::min(elem->node(2),
-            //     std::min(elem->node(6),
-            //      elem->node(5))));
-            //     if (elem->node(1) == min_node)
-            //       if (elem->node(2) == std::min(elem->node(2), elem->node(5)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   eta_mapped  = eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   eta_mapped  = zeta;
-            //   zeta_mapped = eta;
-            // }
-
-            //     else if (elem->node(2) == min_node)
-            //       if (elem->node(6) == std::min(elem->node(6), elem->node(1)))
-            // {
-            //   // Case 3
-            //   eta_mapped  = zeta;
-            //   zeta_mapped = -eta;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(6) == min_node)
-            //       if (elem->node(5) == std::min(elem->node(5), elem->node(2)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(5) == min_node)
-            //       if (elem->node(1) == std::min(elem->node(1), elem->node(6)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   eta_mapped   = eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 3
-            // else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(2),
-            //    std::min(elem->node(3),
-            //     std::min(elem->node(7),
-            //      elem->node(6))));
-            //     if (elem->node(3) == min_node)
-            //       if (elem->node(2) == std::min(elem->node(2), elem->node(7)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped   = xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = xi;
-            // }
-
-            //     else if (elem->node(7) == min_node)
-            //       if (elem->node(3) == std::min(elem->node(3), elem->node(6)))
-            // {
-            //   // Case 3
-            //   xi_mapped   = -zeta;
-            //   zeta_mapped = xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped   = xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(6) == min_node)
-            //       if (elem->node(7) == std::min(elem->node(7), elem->node(2)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped   = -zeta;
-            //   zeta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(2) == min_node)
-            //       if (elem->node(6) == std::min(elem->node(3), elem->node(6)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 4
-            // else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(3),
-            //    std::min(elem->node(0),
-            //     std::min(elem->node(4),
-            //      elem->node(7))));
-            //     if (elem->node(0) == min_node)
-            //       if (elem->node(3) == std::min(elem->node(3), elem->node(4)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   eta_mapped  = eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   eta_mapped  = zeta;
-            //   zeta_mapped = eta;
-            // }
-
-            //     else if (elem->node(4) == min_node)
-            //       if (elem->node(0) == std::min(elem->node(0), elem->node(7)))
-            // {
-            //   // Case 3
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = eta;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   eta_mapped  = eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(7) == min_node)
-            //       if (elem->node(4) == std::min(elem->node(4), elem->node(3)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(3) == min_node)
-            //       if (elem->node(7) == std::min(elem->node(7), elem->node(0)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   eta_mapped   = zeta;
-            //   zeta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 5
-            // else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(4),
-            //    std::min(elem->node(5),
-            //     std::min(elem->node(6),
-            //      elem->node(7))));
-            //     if (elem->node(4) == min_node)
-            //       if (elem->node(5) == std::min(elem->node(5), elem->node(7)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped  = xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped  = eta;
-            //   eta_mapped = xi;
-            // }
-
-            //     else if (elem->node(5) == min_node)
-            //       if (elem->node(6) == std::min(elem->node(6), elem->node(4)))
-            // {
-            //   // Case 3
-            //   xi_mapped  = eta;
-            //   eta_mapped = -xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped  = -xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(6) == min_node)
-            //       if (elem->node(7) == std::min(elem->node(7), elem->node(5)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped  = -xi;
-            //   eta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped  = -eta;
-            //   eta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(7) == min_node)
-            //       if (elem->node(4) == std::min(elem->node(4), elem->node(6)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped  = -eta;
-            //   eta_mapped = xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped  = xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
@@ -2345,572 +2345,572 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 
 
 
-            //       libmesh_assert_less (j, 3);
+            //       ponies);
 
-            //       switch (j)
+            //       ponies)
             // {
-            //   // d()/dxi
-            // case 0:
-            //   return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta_mapped));
+            //   // ponies
+            // ponies:
+            //   ponies)*
+            //   ponies)*
+            //   ponies));
 
-            //   // d()/deta
-            // case 1:
-            //   return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi_mapped)*
-            //   FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta_mapped));
+            //   // ponies
+            // ponies:
+            //   ponies)*
+            //   ponies)*
+            //   ponies));
 
-            //   // d()/dzeta
-            // case 2:
-            //   return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta_mapped)*
-            //   FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta_mapped));
+            //   // ponies
+            // ponies:
+            //   ponies)*
+            //   ponies)*
+            //   ponies));
 
-            // default:
-            // libmesh_error_msg("Invalid derivative index j = " << j);
+            // ponies:
+            // ponies);
             // }
             //     }
 
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
+          ponies:
+            ponies);
           }
       }
 
-      // 4th-order Bernstein.
-    case FOURTH:
+      // ponies.
+    ponies:
       {
-        switch (type)
+        ponies)
           {
 
-            // Bernstein shape functions derivatives on the hexahedral.
-          case HEX27:
+            // ponies.
+          ponies:
             {
-              const Real eps = 1.e-6;
+              ponies;
 
-              libmesh_assert_less (i, 125);
-              libmesh_assert_less (j, 3);
+              ponies);
+              ponies);
 
-              switch (j)
+              ponies)
                 {
-                  //  d()/dxi
-                case 0:
+                  //  ponies
+                ponies:
                   {
-                    const Point pp(p(0)+eps, p(1), p(2));
-                    const Point pm(p(0)-eps, p(1), p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
 
-                  // d()/deta
-                case 1:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1)+eps, p(2));
-                    const Point pm(p(0), p(1)-eps, p(2));
+                    ponies));
+                    ponies));
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                  // d()/dzeta
-                case 2:
+                  // ponies
+                ponies:
                   {
-                    const Point pp(p(0), p(1), p(2)+eps);
-                    const Point pm(p(0), p(1), p(2)-eps);
+                    ponies);
+                    ponies);
 
-                    return (FE<3,BERNSTEIN>::shape(elem, order, i, pp) -
-                            FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
+                    ponies) -
+                            ponies;
                   }
-                default:
-                  libmesh_error_msg("Invalid derivative index j = " << j);
+                ponies:
+                  ponies);
                 }
             }
 
-            //       // Compute hex shape functions as a tensor-product
-            //       const Real xi    = p(0);
-            //       const Real eta   = p(1);
-            //       const Real zeta  = p(2);
-            //       Real xi_mapped   = p(0);
-            //       Real eta_mapped  = p(1);
-            //       Real zeta_mapped = p(2);
+            //       // ponies
+            //       ponies);
+            //       ponies);
+            //       ponies);
+            //       ponies);
+            //       ponies);
+            //       ponies);
 
-            //       // The only way to make any sense of this
-            //       // is to look at the mgflo/mg2/mgf documentation
-            //       // and make the cut-out cube!
-            //       //  Nodes                         0  1  2  3  4  5  6  7  8  8  9  9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 26 26 26 26
-            //       //  DOFS                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 18 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 60 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-            //       static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4};
-            //       static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-            //       static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 2, 2, 2, 3, 3, 3, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4};
+            //       // ponies
+            //       // ponies
+            //       // ponies!
+            //       //  ponies
+            //       //  ponies
+            //       ponies};
+            //       ponies};
+            //       ponies};
 
 
 
-            //       // handle the edge orientation
+            //       // ponies
             //       {
-            // // Edge 0
-            // if ((i1[i] == 0) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(0) != std::min(elem->node(0), elem->node(1)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 1
-            // else if ((i0[i] == 1) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(1) != std::min(elem->node(1), elem->node(2)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 2
-            // else if ((i1[i] == 1) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(3) != std::min(elem->node(3), elem->node(2)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 3
-            // else if ((i0[i] == 0) && (i2[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(0) != std::min(elem->node(0), elem->node(3)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 4
-            // else if ((i0[i] == 0) && (i1[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(0) != std::min(elem->node(0), elem->node(4)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 5
-            // else if ((i0[i] == 1) && (i1[i] == 0))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(1) != std::min(elem->node(1), elem->node(5)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 6
-            // else if ((i0[i] == 1) && (i1[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(2) != std::min(elem->node(2), elem->node(6)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 7
-            // else if ((i0[i] == 0) && (i1[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(3) != std::min(elem->node(3), elem->node(7)))
-            //       zeta_mapped = -zeta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 8
-            // else if ((i1[i] == 0) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(4) != std::min(elem->node(4), elem->node(5)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 9
-            // else if ((i0[i] == 1) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(5) != std::min(elem->node(5), elem->node(6)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 10
-            // else if ((i1[i] == 1) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(7) != std::min(elem->node(7), elem->node(6)))
-            //       xi_mapped = -xi;
+            //     ponies)))
+            //       ponies;
             //   }
-            // // Edge 11
-            // else if ((i0[i] == 0) && (i2[i] == 1))
+            // // ponies
+            // ponies))
             //   {
-            //     if (elem->node(4) != std::min(elem->node(4), elem->node(7)))
-            //       eta_mapped = -eta;
+            //     ponies)))
+            //       ponies;
             //   }
             //       }
 
 
-            //       // handle the face orientation
+            //       // ponies
             //       {
-            // // Face 0
-            // if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(1),
-            //    std::min(elem->node(2),
-            //     std::min(elem->node(0),
-            //      elem->node(3))));
-            //     if (elem->node(0) == min_node)
-            //       if (elem->node(1) == std::min(elem->node(1), elem->node(3)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped  = xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped  = eta;
-            //   eta_mapped = xi;
-            // }
-
-            //     else if (elem->node(3) == min_node)
-            //       if (elem->node(0) == std::min(elem->node(0), elem->node(2)))
-            // {
-            //   // Case 3
-            //   xi_mapped  = -eta;
-            //   eta_mapped = xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped  = xi;
-            //   eta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(2) == min_node)
-            //       if (elem->node(3) == std::min(elem->node(3), elem->node(1)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped  = -xi;
-            //   eta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped  = -eta;
-            //   eta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(1) == min_node)
-            //       if (elem->node(2) == std::min(elem->node(2), elem->node(0)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped  = eta;
-            //   eta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped  = -xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 1
-            // else if ((i1[i] == 0) && (i0[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(0),
-            //    std::min(elem->node(1),
-            //     std::min(elem->node(5),
-            //      elem->node(4))));
-            //     if (elem->node(0) == min_node)
-            //       if (elem->node(1) == std::min(elem->node(1), elem->node(4)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped   = xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = xi;
-            // }
-
-            //     else if (elem->node(1) == min_node)
-            //       if (elem->node(5) == std::min(elem->node(5), elem->node(0)))
-            // {
-            //   // Case 3
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = -xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(5) == min_node)
-            //       if (elem->node(4) == std::min(elem->node(4), elem->node(1)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped   = -zeta;
-            //   zeta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(4) == min_node)
-            //       if (elem->node(0) == std::min(elem->node(0), elem->node(5)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped   = xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 2
-            // else if ((i0[i] == 1) && (i1[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(1),
-            //    std::min(elem->node(2),
-            //     std::min(elem->node(6),
-            //      elem->node(5))));
-            //     if (elem->node(1) == min_node)
-            //       if (elem->node(2) == std::min(elem->node(2), elem->node(5)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   eta_mapped  = eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   eta_mapped  = zeta;
-            //   zeta_mapped = eta;
-            // }
-
-            //     else if (elem->node(2) == min_node)
-            //       if (elem->node(6) == std::min(elem->node(6), elem->node(1)))
-            // {
-            //   // Case 3
-            //   eta_mapped  = zeta;
-            //   zeta_mapped = -eta;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(6) == min_node)
-            //       if (elem->node(5) == std::min(elem->node(5), elem->node(2)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(5) == min_node)
-            //       if (elem->node(1) == std::min(elem->node(1), elem->node(6)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   eta_mapped   = eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 3
-            // else if ((i1[i] == 1) && (i0[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(2),
-            //    std::min(elem->node(3),
-            //     std::min(elem->node(7),
-            //      elem->node(6))));
-            //     if (elem->node(3) == min_node)
-            //       if (elem->node(2) == std::min(elem->node(2), elem->node(7)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped   = xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = xi;
-            // }
-
-            //     else if (elem->node(7) == min_node)
-            //       if (elem->node(3) == std::min(elem->node(3), elem->node(6)))
-            // {
-            //   // Case 3
-            //   xi_mapped   = -zeta;
-            //   zeta_mapped = xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped   = xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(6) == min_node)
-            //       if (elem->node(7) == std::min(elem->node(7), elem->node(2)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped   = -zeta;
-            //   zeta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(2) == min_node)
-            //       if (elem->node(6) == std::min(elem->node(3), elem->node(6)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped   = zeta;
-            //   zeta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped   = -xi;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 4
-            // else if ((i0[i] == 0) && (i1[i] >= 2) && (i2[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(3),
-            //    std::min(elem->node(0),
-            //     std::min(elem->node(4),
-            //      elem->node(7))));
-            //     if (elem->node(0) == min_node)
-            //       if (elem->node(3) == std::min(elem->node(3), elem->node(4)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   eta_mapped  = eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   eta_mapped  = zeta;
-            //   zeta_mapped = eta;
-            // }
-
-            //     else if (elem->node(4) == min_node)
-            //       if (elem->node(0) == std::min(elem->node(0), elem->node(7)))
-            // {
-            //   // Case 3
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = eta;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   eta_mapped  = eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(7) == min_node)
-            //       if (elem->node(4) == std::min(elem->node(4), elem->node(3)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = -zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   eta_mapped  = -zeta;
-            //   zeta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(3) == min_node)
-            //       if (elem->node(7) == std::min(elem->node(7), elem->node(0)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   eta_mapped   = zeta;
-            //   zeta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   eta_mapped  = -eta;
-            //   zeta_mapped = zeta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
 
-            // // Face 5
-            // else if ((i2[i] == 1) && (i0[i] >= 2) && (i1[i] >= 2))
+            // // ponies
+            // ponies))
             //   {
-            //     const unsigned int min_node = std::min(elem->node(4),
-            //    std::min(elem->node(5),
-            //     std::min(elem->node(6),
-            //      elem->node(7))));
-            //     if (elem->node(4) == min_node)
-            //       if (elem->node(5) == std::min(elem->node(5), elem->node(7)))
+            //     ponies),
+            //    ponies),
+            //     ponies),
+            //      ponies))));
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 1
-            //   xi_mapped  = xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 2
-            //   xi_mapped  = eta;
-            //   eta_mapped = xi;
-            // }
-
-            //     else if (elem->node(5) == min_node)
-            //       if (elem->node(6) == std::min(elem->node(6), elem->node(4)))
-            // {
-            //   // Case 3
-            //   xi_mapped  = eta;
-            //   eta_mapped = -xi;
-            // }
-            //       else
-            // {
-            //   // Case 4
-            //   xi_mapped  = -xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(6) == min_node)
-            //       if (elem->node(7) == std::min(elem->node(7), elem->node(5)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 5
-            //   xi_mapped  = -xi;
-            //   eta_mapped = -eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 6
-            //   xi_mapped  = -eta;
-            //   eta_mapped = -xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
 
-            //     else if (elem->node(7) == min_node)
-            //       if (elem->node(4) == std::min(elem->node(4), elem->node(6)))
+            //     ponies)
+            //       ponies)))
             // {
-            //   // Case 7
-            //   xi_mapped  = -eta;
-            //   eta_mapped = xi;
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
-            //       else
+            //       ponies
             // {
-            //   // Case 8
-            //   xi_mapped  = xi;
-            //   eta_mapped = eta;
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+
+            //     ponies)
+            //       ponies)))
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
+            // }
+            //       ponies
+            // {
+            //   // ponies
+            //   ponies;
+            //   ponies;
             // }
             //   }
 
@@ -2919,92 +2919,92 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 
 
 
-            //       libmesh_assert_less (j, 3);
+            //       ponies);
 
-            //       switch (j)
+            //       ponies)
             // {
-            //   // d()/dxi
-            // case 0:
-            //   return (FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i0[i], 0, xi_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta_mapped));
+            //   // ponies
+            // ponies:
+            //   ponies)*
+            //   ponies)*
+            //   ponies));
 
-            //   // d()/deta
-            // case 1:
-            //   return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi_mapped)*
-            //   FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[i], 0, eta_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i2[i],    zeta_mapped));
+            //   // ponies
+            // ponies:
+            //   ponies)*
+            //   ponies)*
+            //   ponies));
 
-            //   // d()/dzeta
-            // case 2:
-            //   return (FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i0[i],    xi_mapped)*
-            //   FE<1,BERNSTEIN>::shape      (EDGE3, totalorder, i1[i],    eta_mapped)*
-            //   FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta_mapped));
+            //   // ponies
+            // ponies:
+            //   ponies)*
+            //   ponies)*
+            //   ponies));
 
-            // default:
-            //   libmesh_error_msg("Invalid derivative index j = " << j);
+            // ponies:
+            //   ponies);
             // }
             //    }
 
 
-          default:
-            libmesh_error_msg("Invalid element type = " << type);
+          ponies:
+            ponies);
           }
       }
 
 
-    default:
-      libmesh_error_msg("Invalid totalorder = " << totalorder);
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,BERNSTEIN>::shape_second_deriv(const ElemType,
-                                         const Order,
-                                         const unsigned int,
-                                         const unsigned int,
-                                         const Point&)
+ponies <>
+ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies&)
 {
-  static bool warning_given = false;
+  ponies;
 
-  if (!warning_given)
-    libMesh::err << "Second derivatives for Bernstein elements "
-                 << "are not yet implemented!"
-                 << std::endl;
+  ponies)
+    ponies "
+                 << "ponies!"
+                 << ponies;
 
-  warning_given = true;
-  return 0.;
+  ponies;
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem*,
-                                         const Order,
-                                         const unsigned int,
-                                         const unsigned int,
-                                         const Point&)
+ponies <>
+ponies*,
+                                         ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies&)
 {
-  static bool warning_given = false;
+  ponies;
 
-  if (!warning_given)
-    libMesh::err << "Second derivatives for Bernstein elements "
-                 << "are not yet implemented!"
-                 << std::endl;
+  ponies)
+    ponies "
+                 << "ponies!"
+                 << ponies;
 
-  warning_given = true;
-  return 0.;
+  ponies;
+  ponies.;
 }
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+#ponies

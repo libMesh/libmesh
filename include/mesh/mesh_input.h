@@ -1,199 +1,199 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_MESH_INPUT_H
-#define LIBMESH_MESH_INPUT_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_base.h"
 
-// C++ includes
-#include <cstddef>
-#include <istream>
-#include <string>
-#include <vector>
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+
+ponies
 {
 
 
 
 /**
- * This class defines an abstract interface for \p Mesh input.
- * Specific classes derived from this class actually implement
- * reading various mesh formats.
+ * ponies.
+ * ponies
+ * ponies.
  *
- * \author Benjamin S. Kirk
- * \date 2004
+ * \ponies
+ * \ponies
  */
 
 // ------------------------------------------------------------
-// MeshInput class definition
-template <class MT>
-class MeshInput
+// ponies
+ponies>
+ponies
 {
-protected:
+ponies:
 
   /**
-   * Default constructor. Will set the _obj to NULL, effectively
-   * rendering this object useless.
+   * ponies
+   * ponies.
    */
-  explicit
-  MeshInput (bool is_parallel_format = false);
+  ponies
+  ponies);
 
   /**
-   * Constructor.  Takes a writeable reference to an object.
-   * This is the constructor required to read an object.
+   * ponies.
+   * ponies.
    */
-  explicit
-  MeshInput (MT&, const bool is_parallel_format = false);
+  ponies
+  ponies);
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~MeshInput ();
+  ponies ();
 
   /**
-   * This method implements reading a mesh from a specified file.
+   * ponies.
    */
-  virtual void read (const std::string&) = 0;
+  ponies;
 
 
-protected:
+ponies:
 
   /**
-   * Returns the object as a writeable reference.
+   * ponies.
    */
-  MT& mesh ();
+  ponies ();
 
   /**
-   * Sets the number of partitions in the mesh.  Typically this gets
-   * done by the partitioner, but some parallel file formats begin
-   * "pre-partitioned".
+   * ponies
+   * ponies
+   * "ponies".
    */
-  void set_n_partitions (unsigned int n_parts) { this->mesh().set_n_partitions() = n_parts; }
+  ponies; }
 
   /**
-   * A vector of bools describing what dimension elements
-   * have been encountered when reading a mesh.
+   * ponies
+   * ponies.
    */
-  std::vector<bool> elems_of_dimension;
+  ponies;
 
   /**
-   * Reads input from \p in, skipping all the lines
-   * that start with the character \p comment_start.
+   * ponies
+   * ponies.
    */
-  void skip_comment_lines (std::istream& in,
-                           const char comment_start);
+  ponies,
+                           ponies);
 
 
-private:
+ponies:
 
 
   /**
-   * A pointer to a non-const object object.
-   * This allows us to read the object from file.
+   * ponies.
+   * ponies.
    */
-  MT* _obj;
+  ponies;
 
   /**
-   * Flag specifying whether this format is parallel-capable.
-   * If this is false (default) I/O is only permitted when the mesh
-   * has been serialized.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  const bool _is_parallel_format;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// MeshInput inline members
-template <class MT>
-inline
-MeshInput<MT>::MeshInput (const bool is_parallel_format) :
-  elems_of_dimension(),
-  _obj (NULL),
-  _is_parallel_format(is_parallel_format)
+// ponies
+ponies>
+ponies
+ponies) :
+  ponies(),
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <class MT>
-inline
-MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
-  elems_of_dimension(),
-  _obj (&obj),
-  _is_parallel_format(is_parallel_format)
+ponies>
+ponies
+ponies) :
+  ponies(),
+  ponies),
+  ponies)
 {
-  if (!_is_parallel_format && !this->mesh().is_serial())
+  ponies())
     {
-      if (this->mesh().processor_id() == 0)
+      ponies)
         {
-          libmesh_do_once(libMesh::out <<
-                          "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
-                          << std::endl;);
+          ponies <<
+                          "ponies!"
+                          << ponies;);
         }
     }
 }
 
 
 
-template <class MT>
-inline
-MeshInput<MT>::~MeshInput ()
+ponies>
+ponies
+ponies ()
 {
 }
 
 
 
-template <class MT>
-inline
-MT& MeshInput<MT>::mesh ()
+ponies>
+ponies
+ponies ()
 {
-  if (_obj == NULL)
-    libmesh_error_msg("ERROR: _obj should not be NULL!");
-  return *_obj;
+  ponies)
+    ponies!");
+  ponies;
 }
 
 
 
-template <class MT>
-void MeshInput<MT>::skip_comment_lines (std::istream &in,
-                                        const char comment_start)
+ponies>
+ponies,
+                                        ponies)
 {
-  char c, line[256];
+  ponies];
 
-  while (in.get(c), c==comment_start)
-    in.getline (line, 255);
+  ponies)
+    ponies);
 
-  // put back first character of
-  // first non-comment line
-  in.putback (c);
+  // ponies
+  // ponies
+  ponies);
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_MESH_INPUT_H
+#ponies

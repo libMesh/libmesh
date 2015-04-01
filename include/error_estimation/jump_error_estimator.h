@@ -1,168 +1,168 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_JUMP_ERROR_ESTIMATOR_H
-#define LIBMESH_JUMP_ERROR_ESTIMATOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/dense_vector.h"
-#include "libmesh/error_estimator.h"
-#include "libmesh/fe_base.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <string>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class Point;
-class Elem;
+// ponies
+ponies;
+ponies;
 
 
 
 
 
 /**
- * This abstract base class implements utility functions for error estimators
- * which are based on integrated jumps between elements.
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner, 2006
+ * @ponies
  */
-class JumpErrorEstimator : public ErrorEstimator
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  JumpErrorEstimator()
-    : ErrorEstimator(),
-      scale_by_n_flux_faces(false),
-      integrate_boundary_sides(false),
-      fine_elem(NULL), coarse_elem(NULL),
-      fine_error(0), coarse_error(0),
-      fine_side(libMesh::invalid_uint),
-      var(libMesh::invalid_uint),
-      fe_fine(), fe_coarse() {}
+  ponies()
+    : ponies(),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies),
+      ponies() {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~JumpErrorEstimator() {}
+  ponies() {}
 
 
   /**
-   * This function uses the derived class's jump error
-   * estimate formula to estimate the error on each cell.
-   * The estimated error is output in the vector
-   * \p error_per_cell
+   * ponies
+   * ponies.
+   * ponies
+   * \ponies
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
-                               bool estimate_parent_error = false);
+  ponies,
+                               ponies,
+                               ponies,
+                               ponies);
 
   /**
-   * This boolean flag allows you to scale the error indicator
-   * result for each element by the number of "flux faces" the element
-   * actually has.  This tends to weight more evenly cells which are
-   * on the boundaries and thus have fewer contributions to their flux.
-   * The value is initialized to false, simply set it to true if you
-   * want to use the feature.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  bool scale_by_n_flux_faces;
+  ponies;
 
-protected:
+ponies:
   /**
-   * A utility function to reinit the finite element data on elements sharing a
-   * side
+   * ponies
+   * ponies
    */
-  void reinit_sides();
-
-  /**
-   * A utility function to correctly increase n_flux_faces for the coarse element
-   */
-  float coarse_n_flux_faces_increment();
+  ponies();
 
   /**
-   * An initialization function, to give derived classes a chance to
-   * request specific data from the FE objects
+   * ponies
    */
-  virtual void initialize(const System& system,
-                          ErrorVector& error_per_cell,
-                          bool estimate_parent_error);
+  ponies();
 
   /**
-   * The function, to be implemented by derived classes, which calculates an error
-   * term on an internal side
+   * ponies
+   * ponies
    */
-  virtual void internal_side_integration() = 0;
+  ponies,
+                          ponies,
+                          ponies);
 
   /**
-   * The function, to be implemented by derived classes, which calculates an error
-   * term on a boundary side
-   * Returns true if the flux bc function is in fact defined on the current side
+   * ponies
+   * ponies
    */
-  virtual bool boundary_side_integration() { return false; }
+  ponies;
 
   /**
-   * A boolean flag, by default false, to be set to true if integrations
-   * with boundary_side_integration() should be performed
+   * ponies
+   * ponies
+   * ponies
    */
-  bool integrate_boundary_sides;
+  ponies; }
 
   /**
-   * The fine and coarse elements sharing a face
+   * ponies
+   * ponies
    */
-  const Elem *fine_elem, *coarse_elem;
+  ponies;
 
   /**
-   * The fine and coarse error values to be set by each side_integration();
+   * ponies
    */
-  Real fine_error, coarse_error;
+  ponies;
 
   /**
-   * Which side of the fine element is this?
+   * ponies();
    */
-  unsigned int fine_side;
+  ponies;
 
   /**
-   * The variable number currently being evaluated
+   * ponies?
    */
-  unsigned int var;
+  ponies;
 
   /**
-   * The local degree of freedom values on fine and coarse elements
+   * ponies
    */
-  DenseVector<Number> Ufine, Ucoarse;
+  ponies;
 
   /**
-   * The finite element objects for fine and coarse elements
+   * ponies
    */
-  UniquePtr<FEBase> fe_fine, fe_coarse;
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_JUMP_ERROR_ESTIMATOR_H
+#ponies

@@ -1,300 +1,300 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_CONSTRUCTION_BASE_H
-#define LIBMESH_RB_CONSTRUCTION_BASE_H
+#ponies
+#ponies
 
-// rbOOmit includes
-#include "libmesh/rb_parametrized.h"
-#include "libmesh/rb_theta_expansion.h"
-#include "libmesh/rb_theta.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// libMesh includes
-#include "libmesh/system.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/linear_solver.h"
-#include "libmesh/perf_log.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <set>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * This is the base class for the Construction stage
- * of the certified reduced basis (RB) method.
- * We template the Base class so that we can derive from
- * the appropriate libMesh System type (e.g. LinearImplicitSystem
- * for standard reduced basis, EigenSystem for SCM)
- * at compile time.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies)
+ * ponies.
  *
- * @author David J. Knezevic, 2009
+ * @ponies
  */
 
 
 // ------------------------------------------------------------
-// RBConstructionBase class definition
-template<class Base>
-class RBConstructionBase : public Base, public RBParametrized
+// ponies
+ponies>
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  RBConstructionBase (EquationSystems& es,
-                      const std::string& name,
-                      const unsigned int number);
+  ponies,
+                      ponies,
+                      ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBConstructionBase ();
+  ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef RBConstructionBase<Base> sys_type;
+  ponies;
 
   /**
-   * @returns a clever pointer to the system.
+   * @ponies.
    */
-  sys_type & system () { return *this; }
+  ponies; }
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Get the total number of training samples.
+   * ponies.
    */
-  numeric_index_type get_n_training_samples() const;
+  ponies;
 
   /**
-   * Get the total number of training samples local to this processor.
+   * ponies.
    */
-  numeric_index_type get_local_n_training_samples() const;
+  ponies;
 
   /**
-   * Get the first local index of the training parameters.
+   * ponies.
    */
-  numeric_index_type get_first_local_training_index() const;
+  ponies;
 
   /**
-   * Get the last local index of the training parameters.
+   * ponies.
    */
-  numeric_index_type get_last_local_training_index() const;
+  ponies;
 
   /**
-   * Initialize the parameter ranges and indicate whether deterministic
-   * or random training parameters should be used and whether or
-   * not we want the parameters to be scaled logarithmically.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void initialize_training_parameters(const RBParameters& mu_min,
-                                              const RBParameters& mu_max,
-                                              unsigned int n_training_parameters,
-                                              std::map<std::string, bool> log_param_scale,
-                                              bool deterministic=true);
+  ponies,
+                                              ponies,
+                                              ponies,
+                                              ponies,
+                                              ponies);
 
   /**
-   * Overwrite the training parameters with new_training_set.
+   * ponies.
    */
-  virtual void load_training_set(std::map< std::string, std::vector<Number> >& new_training_set);
+  ponies);
 
   /**
-   * Changes the current PC (and iterative solver, if desired) in the
-   * passed-in LinearSolver object to an alternative solver specified
-   * by the alternative_solver string stored in this class.  You might
-   * use this to e.g. switch to a sparse direct solver for the multiple
-   * RHS solves executed during the update_residual_terms function.
-   * The return strings are names of the original PC and KSP objects,
-   * you can reset these using the reset_alternative_solver() function below.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies,
+   * ponies.
    */
-  std::pair<std::string,std::string> set_alternative_solver(UniquePtr<LinearSolver<Number> >& ls);
+  ponies);
 
   /**
-   * Resets the PC (and iterative solver, if desired) in the passed-in
-   * LinearSolver object to the values specified in the pair of strings
-   * passed as the second argument.  If the "alternative_solver" string,
-   * defined below, is "unchanged", this function does nothing.
+   * ponies
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void reset_alternative_solver(UniquePtr<LinearSolver<Number> >& ls,
-                                const std::pair<std::string,std::string>& orig);
+  ponies,
+                                ponies);
 
   /**
-   * Broadcasts parameters on processor proc_id
-   * to all processors.
+   * ponies
+   * ponies.
    */
-  void broadcast_parameters(unsigned int proc_id);
+  ponies);
 
   /**
-   * Set the seed that is used to randomly generate training parameters.
+   * ponies.
    */
-  void set_training_random_seed(unsigned int seed);
+  ponies);
 
   /**
-   * In some cases we only want to allow discrete parameter values, instead
-   * of parameters that may take any value in a specified interval.
-   * Here we provide a method to set the d
-   * Set the discrete values for parameter \p mu that are allowed in the
-   * training set. This must be called before the training set is generated.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
 
   /**
-   * Set the name of the parameter that we will generate deterministic training parameters for.
-   * Defaults to "NONE".
+   * ponies.
+   * ponies".
    */
-  void set_deterministic_training_parameter_name(const std::string& name);
+  ponies);
 
   /**
-   * Get the name of the parameter that we will generate deterministic training parameters for.
+   * ponies.
    */
-  const std::string& get_deterministic_training_parameter_name() const;
+  ponies;
 
   /**
-   * Set the number of times each sample of the deterministic training parameter is repeated.
+   * ponies.
    */
-  void set_deterministic_training_parameter_repeats(unsigned int repeats);
+  ponies);
 
   /**
-   * Get the number of times each sample of the deterministic training parameter is repeated.
+   * ponies.
    */
-  unsigned int get_deterministic_training_parameter_repeats() const;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void init_data ();
+  ponies ();
 
   /**
-   * Return the RBParameters in index \p index of training set.
+   * ponies.
    */
-  RBParameters get_params_from_training_set(unsigned int index);
+  ponies);
 
   /**
-   * Set parameters to the RBParameters stored in index \p index of the training set.
+   * ponies.
    */
-  void set_params_from_training_set(unsigned int index);
+  ponies);
 
   /**
-   * Load the specified training parameter and then broadcast to all processors.
+   * ponies.
    */
-  virtual void set_params_from_training_set_and_broadcast(unsigned int index);
+  ponies);
 
   /**
-   * Static function to return the error pair (index,error)
-   * that is corresponds to the largest error on all
-   * processors.
+   * ponies)
+   * ponies
+   * ponies.
    */
-  static void get_global_max_error_pair(const Parallel::Communicator &communicator,
-                                        std::pair<unsigned int, Real>& error_pair);
+  ponies,
+                                        ponies);
 
   /**
-   * Static helper function for generating a randomized set of parameters.
+   * ponies.
    */
-  static void generate_training_parameters_random(const Parallel::Communicator &communicator,
-                                                  std::map<std::string, bool> log_param_scale,
-                                                  std::map< std::string, NumericVector<Number>* >& training_parameters_in,
-                                                  unsigned int n_training_samples_in,
-                                                  const RBParameters& min_parameters,
-                                                  const RBParameters& max_parameters,
-                                                  int training_parameters_random_seed=-1,
-                                                  bool serial_training_set=false);
+  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies);
 
   /**
-   * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
-   * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
+   * ponies
+   * ponies.
    */
-  static void generate_training_parameters_deterministic(const Parallel::Communicator &communicator,
-                                                         std::map<std::string, bool> log_param_scale,
-                                                         std::map< std::string, NumericVector<Number>* >& training_parameters_in,
-                                                         unsigned int n_training_samples_in,
-                                                         const RBParameters& min_parameters,
-                                                         const RBParameters& max_parameters,
-                                                         bool serial_training_set=false);
+  ponies,
+                                                         ponies,
+                                                         ponies,
+                                                         ponies,
+                                                         ponies,
+                                                         ponies,
+                                                         ponies);
 
 
-  //----------- PROTECTED DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * This boolean flag indicates whether or not the training set should
-   * be the same on all processors. By default it is false, but in the
-   * case of the Empirical Interpolation Method (RBEIMConstruction),
-   * for example, we need the training set to be identical on all processors.
+   * ponies
+   * ponies
+   * ponies),
+   * ponies.
    */
-  bool serial_training_set;
+  ponies;
 
   /**
-   * We keep an extra temporary vector that is useful for
-   * performing inner products (avoids unnecessary memory
-   * allocation/deallocation).
+   * ponies
+   * ponies
+   * ponies).
    */
-  UniquePtr< NumericVector<Number> > inner_product_storage_vector;
+  ponies;
 
   /**
-   * Set this string to specify an alternative solver used in the set_alternative_solver()
-   * function above.  Currently-supported values are:
-   * .) unchanged, to continue using the default truth solve solver
-   * .) amg, to use the BoomerAMG from Hypre (NOT for indefinite problems!)
-   * .) mumps, to use a sparse direct solver
-   * Note1: mumps and amg will only be available if PETSc has been compiled with them.
-   * Note2: RBConstruction::process_parameters_file() is responsible for reading in this value ("rb_alternative_solver")
-   *        from file for RBConstruction-derived subclasses
-   * Note3: RBSCMSystem::process_parameters_file() reads this value ("scm_alternative_solver")
-   *        for RBSCMSystem-derived subclasses
+   * ponies()
+   * ponies:
+   * .) ponies
+   * .) ponies!)
+   * .) ponies
+   * ponies.
+   * ponies")
+   *        ponies
+   * ponies")
+   *        ponies
    */
-  std::string alternative_solver;
+  ponies;
 
 
-private:
+ponies:
 
   /**
-   * Boolean flag to indicate whether or not the
-   * parameter ranges have been initialized.
+   * ponies
+   * ponies.
    */
-  bool training_parameters_initialized;
+  ponies;
 
   /**
-   * The training samples.
+   * ponies.
    */
-  std::map< std::string, NumericVector<Number>* > training_parameters;
+  ponies;
 
   /**
-   * If < 0, use std::time() * processor_id() to seed the random
-   * number generator for the training parameters (default).  If
-   * >= 0, use the provided value * processor_id() as the random
-   * number generator seed.
+   * ponies
+   * ponies
+   * >= ponies
+   * ponies.
    */
-  int training_parameters_random_seed;
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_RB_CONSTRUCTION_BASE_H
+#ponies

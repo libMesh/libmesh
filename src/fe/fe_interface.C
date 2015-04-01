@@ -1,1407 +1,1407 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/fe_interface.h"
-#include "libmesh/elem.h"
-#include "libmesh/fe.h"
-#include "libmesh/fe_compute_data.h"
-#include "libmesh/dof_map.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 //------------------------------------------------------------
-//FEInterface class members
-FEInterface::FEInterface()
+//ponies
+ponies()
 {
-  libmesh_error_msg("ERROR: Do not define an object of this type.");
+  ponies.");
 }
 
 
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-#define fe_family_switch(dim, func_and_args, prefix, suffix)            \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies
+#ponies)            \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case BERNSTEIN:                                                   \
-        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
-      case SZABAB:                                                      \
-        prefix FE<dim,SZABAB>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                     \
+        ponies                    \
+      ponies:                                                  \
+        ponies                 \
+      ponies:                                               \
+        ponies              \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                 \
+        ponies                \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                   \
+        ponies                  \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                         \
+        ponies                         \
+      ponies:                                                 \
+        ponies);                               \
+        ponies                  \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while (0)
+  } ponies)
 
-#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix)   \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies)   \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case BERNSTEIN:                                                   \
-        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
-      case SZABAB:                                                      \
-        prefix FE<dim,SZABAB>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                     \
+        ponies                    \
+      ponies:                                                  \
+        ponies                 \
+      ponies:                                               \
+        ponies              \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                \
+        ponies                 \
+      ponies:                                                 \
+        ponies                \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                   \
+        ponies                  \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                         \
+        ponies                         \
+      ponies:                                                 \
+        ponies);                               \
+        ponies                  \
+      ponies:                                                 \
+        ponies                  \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while (0)
+  } ponies)
 
-#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix)  \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies)  \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case BERNSTEIN:                                                   \
-        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
-      case SZABAB:                                                      \
-        prefix FE<dim,SZABAB>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      case LAGRANGE_VEC:                                                \
-      case NEDELEC_ONE:                                                 \
-        libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                     \
+        ponies                    \
+      ponies:                                                  \
+        ponies                 \
+      ponies:                                               \
+        ponies              \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                 \
+        ponies                \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                   \
+        ponies                  \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                         \
+        ponies                         \
+      ponies:                                                 \
+        ponies);                               \
+        ponies                  \
+      ponies:                                                \
+      ponies:                                                 \
+        ponies"); \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while(0)
+  } ponies)
 
 
-#define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies) \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      case HERMITE:                                                     \
-      case HIERARCHIC:                                                  \
-      case L2_HIERARCHIC:                                               \
-      case LAGRANGE:                                                    \
-      case L2_LAGRANGE:                                                 \
-      case MONOMIAL:                                                    \
-      case SCALAR:                                                      \
-      case BERNSTEIN:                                                   \
-      case SZABAB:                                                      \
-      case XYZ:                                                         \
-      case SUBDIVISION:                                                 \
-        libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::shape"); \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                \
+        ponies                 \
+      ponies:                                                 \
+        ponies                  \
+      ponies:                                                     \
+      ponies:                                                  \
+      ponies:                                               \
+      ponies:                                                    \
+      ponies:                                                 \
+      ponies:                                                    \
+      ponies:                                                      \
+      ponies:                                                   \
+      ponies:                                                      \
+      ponies:                                                         \
+      ponies:                                                 \
+        ponies"); \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while(0)
+  } ponies)
 
-#else
-#define fe_family_switch(dim, func_and_args, prefix, suffix)            \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies
+#ponies)            \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                     \
+        ponies                    \
+      ponies:                                                  \
+        ponies                 \
+      ponies:                                               \
+        ponies              \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                 \
+        ponies                \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                         \
+        ponies                         \
+      ponies:                                                 \
+        ponies);                               \
+        ponies                  \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while (0)
+  } ponies)
 
-#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix)   \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies)   \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                     \
+        ponies                    \
+      ponies:                                                  \
+        ponies                 \
+      ponies:                                               \
+        ponies              \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                \
+        ponies                 \
+      ponies:                                                 \
+        ponies                \
+      ponies:                                                    \
+        ponies                   \
+      ponies:                                                      \
+        ponies                     \
+      ponies:                                                         \
+        ponies                         \
+      ponies:                                                 \
+        ponies);                               \
+        ponies                  \
+      ponies:                                                 \
+        ponies                  \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while (0)
+  } ponies)
 
-#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix)  \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies)  \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix  FE<dim,CLOUGH>::func_and_args suffix                    \
-      case HERMITE:                                                     \
-        prefix  FE<dim,HERMITE>::func_and_args suffix                   \
-      case HIERARCHIC:                                                  \
-        prefix  FE<dim,HIERARCHIC>::func_and_args suffix                \
-      case L2_HIERARCHIC:                                               \
-        prefix  FE<dim,L2_HIERARCHIC>::func_and_args suffix             \
-      case LAGRANGE:                                                    \
-        prefix  FE<dim,LAGRANGE>::func_and_args suffix                  \
-      case L2_LAGRANGE:                                                 \
-        prefix  FE<dim,L2_LAGRANGE>::func_and_args suffix               \
-      case MONOMIAL:                                                    \
-        prefix  FE<dim,MONOMIAL>::func_and_args suffix                  \
-      case SCALAR:                                                      \
-        prefix  FE<dim,SCALAR>::func_and_args suffix                    \
-      case XYZ:                                                         \
-        prefix  FEXYZ<dim>::func_and_args suffix                        \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix  FE<2,SUBDIVISION>::func_and_args suffix                 \
-      case LAGRANGE_VEC:                                                \
-      case NEDELEC_ONE:                                                 \
-        libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                      \
+        ponies                    \
+      ponies:                                                     \
+        ponies                   \
+      ponies:                                                  \
+        ponies                \
+      ponies:                                               \
+        ponies             \
+      ponies:                                                    \
+        ponies                  \
+      ponies:                                                 \
+        ponies               \
+      ponies:                                                    \
+        ponies                  \
+      ponies:                                                      \
+        ponies                    \
+      ponies:                                                         \
+        ponies                        \
+      ponies:                                                 \
+        ponies);                               \
+        ponies                 \
+      ponies:                                                \
+      ponies:                                                 \
+        ponies"); \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while(0)
+  } ponies)
 
 
-#define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
+#ponies) \
+  ponies {                                                                  \
+    ponies)                                                \
       {                                                                 \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      case HERMITE:                                                     \
-      case HIERARCHIC:                                                  \
-      case L2_HIERARCHIC:                                               \
-      case LAGRANGE:                                                    \
-      case L2_LAGRANGE:                                                 \
-      case MONOMIAL:                                                    \
-      case SCALAR:                                                      \
-      case XYZ:                                                         \
-      case SUBDIVISION:                                                 \
-        libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args"); \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
+      ponies:                                                \
+        ponies                 \
+      ponies:                                                 \
+        ponies                  \
+      ponies:                                                     \
+      ponies:                                                  \
+      ponies:                                               \
+      ponies:                                                    \
+      ponies:                                                 \
+      ponies:                                                    \
+      ponies:                                                      \
+      ponies:                                                         \
+      ponies:                                                 \
+        ponies"); \
+      ponies:                                                          \
+        ponies);      \
       }                                                                 \
-  } while(0)
-#endif
+  } ponies)
+#ponies
 
 
-#define fe_switch(func_and_args)                        \
-  do {                                                  \
-    switch (dim)                                        \
+#ponies)                        \
+  ponies {                                                  \
+    ponies)                                        \
       {                                                 \
-        /* 0D */                                        \
-      case 0:                                           \
-        fe_family_switch (0, func_and_args, return, ;); \
-        /* 1D */                                        \
-      case 1:                                           \
-        fe_family_switch (1, func_and_args, return, ;); \
-        /* 2D */                                        \
-      case 2:                                           \
-        fe_family_switch (2, func_and_args, return, ;); \
-        /* 3D */                                        \
-      case 3:                                           \
-        fe_family_switch (3, func_and_args, return, ;); \
-      default:                                          \
-        libmesh_error_msg("Invalid dim = " << dim);     \
+        /* ponies */                                        \
+      ponies:                                           \
+        ponies, ;); \
+        /* ponies */                                        \
+      ponies:                                           \
+        ponies, ;); \
+        /* ponies */                                        \
+      ponies:                                           \
+        ponies, ;); \
+        /* ponies */                                        \
+      ponies:                                           \
+        ponies, ;); \
+      ponies:                                          \
+        ponies);     \
       }                                                 \
-  } while (0)
+  } ponies)
 
-#define fe_with_vec_switch(func_and_args)                               \
-  do {                                                                  \
-    switch (dim)                                                        \
+#ponies)                               \
+  ponies {                                                                  \
+    ponies)                                                        \
       {                                                                 \
-        /* 0D */                                                        \
-      case 0:                                                           \
-        fe_family_with_vec_switch (0, func_and_args, return, ;);        \
-        /* 1D */                                                        \
-      case 1:                                                           \
-        fe_family_with_vec_switch (1, func_and_args, return, ;);        \
-        /* 2D */                                                        \
-      case 2:                                                           \
-        fe_family_with_vec_switch (2, func_and_args, return, ;);        \
-        /* 3D */                                                        \
-      case 3:                                                           \
-        fe_family_with_vec_switch (3, func_and_args, return, ;);        \
-      default:                                                          \
-        libmesh_error_msg("Invalid dim = " << dim);                     \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies, ;);        \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies, ;);        \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies, ;);        \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies, ;);        \
+      ponies:                                                          \
+        ponies);                     \
       }                                                                 \
-  } while (0)
+  } ponies)
 
 
-#define void_fe_switch(func_and_args)                           \
-  do {                                                          \
-    switch (dim)                                                \
+#ponies)                           \
+  ponies {                                                          \
+    ponies)                                                \
       {                                                         \
-        /* 0D */                                                \
-      case 0:                                                   \
-        fe_family_switch (0, func_and_args, ;, ; return;);      \
-        /* 1D */                                                \
-      case 1:                                                   \
-        fe_family_switch (1, func_and_args, ;, ; return;);      \
-        /* 2D */                                                \
-      case 2:                                                   \
-        fe_family_switch (2, func_and_args, ;, ; return;);      \
-        /* 3D */                                                \
-      case 3:                                                   \
-        fe_family_switch (3, func_and_args, ;, ; return;);      \
-      default:                                                  \
-        libmesh_error_msg("Invalid dim = " << dim);             \
+        /* ponies */                                                \
+      ponies:                                                   \
+        ponies;);      \
+        /* ponies */                                                \
+      ponies:                                                   \
+        ponies;);      \
+        /* ponies */                                                \
+      ponies:                                                   \
+        ponies;);      \
+        /* ponies */                                                \
+      ponies:                                                   \
+        ponies;);      \
+      ponies:                                                  \
+        ponies);             \
       }                                                         \
-  } while (0)
+  } ponies)
 
-#define void_fe_with_vec_switch(func_and_args)                          \
-  do {                                                                  \
-    switch (dim)                                                        \
+#ponies)                          \
+  ponies {                                                                  \
+    ponies)                                                        \
       {                                                                 \
-        /* 0D */                                                        \
-      case 0:                                                           \
-        fe_family_with_vec_switch (0, func_and_args, ;, ; return;);     \
-        /* 1D */                                                        \
-      case 1:                                                           \
-        fe_family_with_vec_switch (1, func_and_args, ;, ; return;);     \
-        /* 2D */                                                        \
-      case 2:                                                           \
-        fe_family_with_vec_switch (2, func_and_args, ;, ; return;);     \
-        /* 3D */                                                        \
-      case 3:                                                           \
-        fe_family_with_vec_switch (3, func_and_args, ;, ; return;);     \
-      default:                                                          \
-        libmesh_error_msg("Invalid dim = " << dim);                     \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies;);     \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies;);     \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies;);     \
+        /* ponies */                                                        \
+      ponies:                                                           \
+        ponies;);     \
+      ponies:                                                          \
+        ponies);                     \
       }                                                                 \
-  } while (0)
+  } ponies)
 
 
 
-unsigned int FEInterface::n_shape_functions(const unsigned int dim,
-                                            const FEType& fe_t,
-                                            const ElemType t)
+ponies,
+                                            ponies,
+                                            ponies)
 {
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
   /*
-   * Since the FEType, stored in DofMap/(some System child), has to
-   * be the _same_ for InfFE and FE, we have to catch calls
-   * to infinite elements through the element type.
+   * ponies
+   * ponies
+   * ponies.
    */
 
-  if ( is_InfFE_elem(t) )
-    return ifem_n_shape_functions(dim, fe_t, t);
+  ponies) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  fe_with_vec_switch(n_shape_functions(t, o));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
 
-unsigned int FEInterface::n_dofs(const unsigned int dim,
-                                 const FEType& fe_t,
-                                 const ElemType t)
+ponies,
+                                 ponies,
+                                 ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(t) )
-    return ifem_n_dofs(dim, fe_t, t);
+  ponies) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  fe_with_vec_switch(n_dofs(t, o));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
-unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
-                                         const FEType& fe_t,
-                                         const ElemType t,
-                                         const unsigned int n)
+ponies,
+                                         ponies,
+                                         ponies,
+                                         ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(t) )
-    return ifem_n_dofs_at_node(dim, fe_t, t, n);
+  ponies) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  fe_with_vec_switch(n_dofs_at_node(t, o, n));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
 
-unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
-                                          const FEType& fe_t,
-                                          const ElemType t)
+ponies,
+                                          ponies,
+                                          ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(t) )
-    return ifem_n_dofs_per_elem(dim, fe_t, t);
+  ponies) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  fe_with_vec_switch(n_dofs_per_elem(t, o));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
-void FEInterface::dofs_on_side(const Elem* const elem,
-                               const unsigned int dim,
-                               const FEType& fe_t,
-                               unsigned int s,
-                               std::vector<unsigned int>& di)
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  const Order o = fe_t.order;
+  ponies;
 
-  void_fe_with_vec_switch(dofs_on_side(elem, o, s, di));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
+  ponies!");
 }
 
 
 
-void FEInterface::dofs_on_edge(const Elem* const elem,
-                               const unsigned int dim,
-                               const FEType& fe_t,
-                               unsigned int e,
-                               std::vector<unsigned int>& di)
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  const Order o = fe_t.order;
+  ponies;
 
-  void_fe_with_vec_switch(dofs_on_edge(elem, o, e, di));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
+  ponies!");
 }
 
 
 
 
-void FEInterface::nodal_soln(const unsigned int dim,
-                             const FEType& fe_t,
-                             const Elem* elem,
-                             const std::vector<Number>& elem_soln,
-                             std::vector<Number>&       nodal_soln)
+ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(elem->type()) )
+  ponies()) )
     {
-      ifem_nodal_soln(dim, fe_t, elem, elem_soln, nodal_soln);
-      return;
+      ponies);
+      ponies;
     }
 
-#endif
+#ponies
 
-  const Order order = fe_t.order;
+  ponies;
 
-  void_fe_with_vec_switch(nodal_soln(elem, order, elem_soln, nodal_soln));
+  ponies));
 }
 
 
 
 
-Point FEInterface::map(unsigned int dim,
-                       const FEType& fe_t,
-                       const Elem* elem,
-                       const Point& p)
+ponies,
+                       ponies,
+                       ponies,
+                       ponies)
 {
-  fe_with_vec_switch(map(elem, p));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return Point();
+  ponies!");
+  ponies();
 }
 
 
 
 
 
-Point FEInterface::inverse_map (const unsigned int dim,
-                                const FEType& fe_t,
-                                const Elem* elem,
-                                const Point& p,
-                                const Real tolerance,
-                                const bool secure)
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(elem->type()) )
-    return ifem_inverse_map(dim, fe_t, elem, p,tolerance, secure);
+  ponies()) )
+    ponies);
 
-#endif
+#ponies
 
-  fe_with_vec_switch(inverse_map(elem, p, tolerance, secure));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return Point();
+  ponies!");
+  ponies();
 }
 
 
 
 
-void FEInterface::inverse_map (const unsigned int dim,
-                               const FEType& fe_t,
-                               const Elem* elem,
-                               const std::vector<Point>& physical_points,
-                               std::vector<Point>&       reference_points,
-                               const Real tolerance,
-                               const bool secure)
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  const std::size_t n_pts = physical_points.size();
+  ponies();
 
-  // Resize the vector
-  reference_points.resize(n_pts);
+  // ponies
+  ponies);
 
-  if (n_pts == 0)
+  ponies)
     {
-      libMesh::err << "WARNING: empty vector physical_points!"
-                   << std::endl;
-      libmesh_here();
-      return;
+      ponies!"
+                   << ponies;
+      ponies();
+      ponies;
     }
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(elem->type()) )
+  ponies()) )
     {
-      ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points, tolerance, secure);
-      return;
-      // libmesh_not_implemented();
+      ponies);
+      ponies;
+      // ponies();
     }
 
-#endif
+#ponies
 
-  void_fe_with_vec_switch(inverse_map(elem, physical_points, reference_points, tolerance, secure));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
+  ponies!");
 }
 
 
 
-bool FEInterface::on_reference_element(const Point& p,
-                                       const ElemType t,
-                                       const Real eps)
+ponies,
+                                       ponies,
+                                       ponies)
 {
-  return FEBase::on_reference_element(p,t,eps);
+  ponies);
 }
 
 
 
 
-Real FEInterface::shape(const unsigned int dim,
-                        const FEType& fe_t,
-                        const ElemType t,
-                        const unsigned int i,
-                        const Point& p)
+ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(t) )
-    return ifem_shape(dim, fe_t, t, i, p);
+  ponies) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  fe_switch(shape(t,o,i,p));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-Real FEInterface::shape(const unsigned int dim,
-                        const FEType& fe_t,
-                        const Elem* elem,
-                        const unsigned int i,
-                        const Point& p)
+ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( elem && is_InfFE_elem(elem->type()) )
-    return ifem_shape(dim, fe_t, elem, i, p);
+  ponies()) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  fe_switch(shape(elem,o,i,p));
+  ponies));
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-template<>
-void FEInterface::shape<Real>(const unsigned int dim,
-                              const FEType& fe_t,
-                              const ElemType t,
-                              const unsigned int i,
-                              const Point& p,
-                              Real& phi)
+ponies<>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( is_InfFE_elem(t) )
-    phi = ifem_shape(dim, fe_t, t, i, p);
+  ponies) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  switch(dim)
+  ponies)
     {
-    case 0:
-      fe_scalar_vec_error_switch(0, shape(t,o,i,p), phi = , ; break;);
-      break;
-    case 1:
-      fe_scalar_vec_error_switch(1, shape(t,o,i,p), phi = , ; break;);
-      break;
-    case 2:
-      fe_scalar_vec_error_switch(2, shape(t,o,i,p), phi = , ; break;);
-      break;
-    case 3:
-      fe_scalar_vec_error_switch(3, shape(t,o,i,p), phi = , ; break;);
-      break;
-    default:
-      libmesh_error_msg("Invalid dimension = " << dim);
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies);
     }
 
-  return;
+  ponies;
 }
 
-template<>
-void FEInterface::shape<Real>(const unsigned int dim,
-                              const FEType& fe_t,
-                              const Elem* elem,
-                              const unsigned int i,
-                              const Point& p,
-                              Real& phi)
+ponies<>
+ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies,
+                              ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( elem && is_InfFE_elem(elem->type()) )
-    phi = ifem_shape(dim, fe_t, elem, i, p);
+  ponies()) )
+    ponies);
 
-#endif
+#ponies
 
-  const Order o = fe_t.order;
+  ponies;
 
-  switch(dim)
+  ponies)
     {
-    case 0:
-      fe_scalar_vec_error_switch(0, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    case 1:
-      fe_scalar_vec_error_switch(1, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    case 2:
-      fe_scalar_vec_error_switch(2, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    case 3:
-      fe_scalar_vec_error_switch(3, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    default:
-      libmesh_error_msg("Invalid dimension = " << dim);
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies);
     }
 
-  return;
+  ponies;
 }
 
-template<>
-void FEInterface::shape<RealGradient>(const unsigned int dim,
-                                      const FEType& fe_t,
-                                      const ElemType t,
-                                      const unsigned int i,
-                                      const Point& p,
-                                      RealGradient& phi)
+ponies<>
+ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies)
 {
-  const Order o = fe_t.order;
+  ponies;
 
-  switch(dim)
+  ponies)
     {
-    case 0:
-      fe_vector_scalar_error_switch(0, shape(t,o,i,p), phi = , ; break;);
-      break;
-    case 1:
-      fe_vector_scalar_error_switch(1, shape(t,o,i,p), phi = , ; break;);
-      break;
-    case 2:
-      fe_vector_scalar_error_switch(2, shape(t,o,i,p), phi = , ; break;);
-      break;
-    case 3:
-      fe_vector_scalar_error_switch(3, shape(t,o,i,p), phi = , ; break;);
-      break;
-    default:
-      libmesh_error_msg("Invalid dimension = " << dim);
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies);
     }
 
-  return;
+  ponies;
 }
 
-template<>
-void FEInterface::shape<RealGradient>(const unsigned int dim,
-                                      const FEType& fe_t,
-                                      const Elem* elem,
-                                      const unsigned int i,
-                                      const Point& p,
-                                      RealGradient& phi)
+ponies<>
+ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies)
 {
-  const Order o = fe_t.order;
+  ponies;
 
-  switch(dim)
+  ponies)
     {
-    case 0:
-      fe_vector_scalar_error_switch(0, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    case 1:
-      fe_vector_scalar_error_switch(1, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    case 2:
-      fe_vector_scalar_error_switch(2, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    case 3:
-      fe_vector_scalar_error_switch(3, shape(elem,o,i,p), phi = , ; break;);
-      break;
-    default:
-      libmesh_error_msg("Invalid dimension = " << dim);
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies;);
+      ponies;
+    ponies:
+      ponies);
     }
 
-  return;
+  ponies;
 }
 
-void FEInterface::compute_data(const unsigned int dim,
-                               const FEType& fe_t,
-                               const Elem* elem,
-                               FEComputeData& data)
+ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-  if ( elem && is_InfFE_elem(elem->type()) )
+  ponies()) )
     {
-      data.init();
-      ifem_compute_data(dim, fe_t, elem, data);
-      return;
+      ponies();
+      ponies);
+      ponies;
     }
 
-#endif
+#ponies
 
-  FEType p_refined = fe_t;
-  p_refined.order = static_cast<Order>(p_refined.order + elem->p_level());
+  ponies;
+  ponies());
 
-  const unsigned int n_dof = n_dofs (dim, p_refined, elem->type());
-  const Point&       p     = data.p;
-  data.shape.resize(n_dof);
+  ponies());
+  ponies;
+  ponies);
 
-  // set default values for all the output fields
-  data.init();
+  // ponies
+  ponies();
 
-  for (unsigned int n=0; n<n_dof; n++)
-    data.shape[n] = shape(dim, p_refined, elem, n, p);
+  ponies++)
+    ponies);
 
-  return;
+  ponies;
 }
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-void FEInterface::compute_constraints (DofConstraints &constraints,
-                                       DofMap &dof_map,
-                                       const unsigned int variable_number,
-                                       const Elem* elem)
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  const FEType& fe_t = dof_map.variable_type(variable_number);
+  ponies);
 
-  switch (elem->dim())
+  ponies())
     {
-    case 0:
-    case 1:
+    ponies:
+    ponies:
       {
-        // No constraints in 0D/1D.
-        return;
+        // ponies.
+        ponies;
       }
 
 
-    case 2:
+    ponies:
       {
-        switch (fe_t.family)
+        ponies)
           {
-          case CLOUGH:
-            FE<2,CLOUGH>::compute_constraints (constraints,
-                                               dof_map,
-                                               variable_number,
-                                               elem); return;
+          ponies:
+            ponies,
+                                               ponies,
+                                               ponies,
+                                               ponies;
 
-          case HERMITE:
-            FE<2,HERMITE>::compute_constraints (constraints,
-                                                dof_map,
-                                                variable_number,
-                                                elem); return;
+          ponies:
+            ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies;
 
-          case LAGRANGE:
-            FE<2,LAGRANGE>::compute_constraints (constraints,
-                                                 dof_map,
-                                                 variable_number,
-                                                 elem); return;
+          ponies:
+            ponies,
+                                                 ponies,
+                                                 ponies,
+                                                 ponies;
 
-          case HIERARCHIC:
-            FE<2,HIERARCHIC>::compute_constraints (constraints,
-                                                   dof_map,
-                                                   variable_number,
-                                                   elem); return;
+          ponies:
+            ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies;
 
-          case L2_HIERARCHIC:
-            FE<2,L2_HIERARCHIC>::compute_constraints (constraints,
-                                                      dof_map,
-                                                      variable_number,
-                                                      elem); return;
+          ponies:
+            ponies,
+                                                      ponies,
+                                                      ponies,
+                                                      ponies;
 
-          case LAGRANGE_VEC:
-            FE<2,LAGRANGE_VEC>::compute_constraints (constraints,
-                                                     dof_map,
-                                                     variable_number,
-                                                     elem); return;
+          ponies:
+            ponies,
+                                                     ponies,
+                                                     ponies,
+                                                     ponies;
 
 
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            FE<2,SZABAB>::compute_constraints (constraints,
-                                               dof_map,
-                                               variable_number,
-                                               elem); return;
+#ponies
+          ponies:
+            ponies,
+                                               ponies,
+                                               ponies,
+                                               ponies;
 
-          case BERNSTEIN:
-            FE<2,BERNSTEIN>::compute_constraints (constraints,
-                                                  dof_map,
-                                                  variable_number,
-                                                  elem); return;
+          ponies:
+            ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies;
 
-#endif
-          default:
-            return;
+#ponies
+          ponies:
+            ponies;
           }
       }
 
 
-    case 3:
+    ponies:
       {
-        switch (fe_t.family)
+        ponies)
           {
-          case HERMITE:
-            FE<3,HERMITE>::compute_constraints (constraints,
-                                                dof_map,
-                                                variable_number,
-                                                elem); return;
+          ponies:
+            ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies;
 
-          case LAGRANGE:
-            FE<3,LAGRANGE>::compute_constraints (constraints,
-                                                 dof_map,
-                                                 variable_number,
-                                                 elem); return;
+          ponies:
+            ponies,
+                                                 ponies,
+                                                 ponies,
+                                                 ponies;
 
-          case HIERARCHIC:
-            FE<3,HIERARCHIC>::compute_constraints (constraints,
-                                                   dof_map,
-                                                   variable_number,
-                                                   elem); return;
+          ponies:
+            ponies,
+                                                   ponies,
+                                                   ponies,
+                                                   ponies;
 
-          case L2_HIERARCHIC:
-            FE<3,L2_HIERARCHIC>::compute_constraints (constraints,
-                                                      dof_map,
-                                                      variable_number,
-                                                      elem); return;
+          ponies:
+            ponies,
+                                                      ponies,
+                                                      ponies,
+                                                      ponies;
 
-          case LAGRANGE_VEC:
-            FE<3,LAGRANGE_VEC>::compute_constraints (constraints,
-                                                     dof_map,
-                                                     variable_number,
-                                                     elem); return;
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            FE<3,SZABAB>::compute_constraints (constraints,
-                                               dof_map,
-                                               variable_number,
-                                               elem); return;
+          ponies:
+            ponies,
+                                                     ponies,
+                                                     ponies,
+                                                     ponies;
+#ponies
+          ponies:
+            ponies,
+                                               ponies,
+                                               ponies,
+                                               ponies;
 
-          case BERNSTEIN:
-            FE<3,BERNSTEIN>::compute_constraints (constraints,
-                                                  dof_map,
-                                                  variable_number,
-                                                  elem); return;
+          ponies:
+            ponies,
+                                                  ponies,
+                                                  ponies,
+                                                  ponies;
 
-#endif
-          default:
-            return;
+#ponies
+          ponies:
+            ponies;
           }
       }
 
 
-    default:
-      libmesh_error_msg("Invalid dimension = " << elem->dim());
+    ponies:
+      ponies());
     }
 }
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
 
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
-void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
-                                                DofMap &dof_map,
-                                                const PeriodicBoundaries &boundaries,
-                                                const MeshBase &mesh,
-                                                const PointLocatorBase* point_locator,
-                                                const unsigned int variable_number,
-                                                const Elem* elem)
+ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies,
+                                                ponies)
 {
-  // No element-specific optimizations currently exist
-  FEBase::compute_periodic_constraints (constraints,
-                                        dof_map,
-                                        boundaries,
-                                        mesh,
-                                        point_locator,
-                                        variable_number,
-                                        elem);
+  // ponies
+  ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies);
 }
 
-#endif // #ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
 
 
-unsigned int FEInterface::max_order(const FEType& fe_t,
-                                    const ElemType& el_t)
+ponies,
+                                    ponies)
 {
-  // Yeah, I know, infinity is much larger than 11, but our
-  // solvers don't seem to like high degree polynomials, and our
-  // quadrature rules and number_lookups tables
-  // need to go up higher.
-  const unsigned int unlimited = 11;
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies;
 
-  // If we used 0 as a default, then elements missing from this
-  // table (e.g. infinite elements) would be considered broken.
-  const unsigned int unknown = unlimited;
+  // ponies
+  // ponies.
+  ponies;
 
-  switch (fe_t.family)
+  ponies)
     {
-    case LAGRANGE:
-    case L2_LAGRANGE: // TODO: L2_LAGRANGE can have higher "max_order" than LAGRANGE
-    case LAGRANGE_VEC:
-      switch (el_t)
+    ponies:
+    ponies
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-          return 3;
-        case TRI3:
-          return 1;
-        case TRI6:
-          return 2;
-        case QUAD4:
-          return 1;
-        case QUAD8:
-        case QUAD9:
-          return 2;
-        case TET4:
-          return 1;
-        case TET10:
-          return 2;
-        case HEX8:
-          return 1;
-        case HEX20:
-        case HEX27:
-          return 2;
-        case PRISM6:
-          return 1;
-        case PRISM15:
-        case PRISM18:
-          return 2;
-        case PYRAMID5:
-          return 1;
-        case PYRAMID13:
-        case PYRAMID14:
-          return 2;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case MONOMIAL:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-        case TRI3:
-        case TRI6:
-        case QUAD4:
-        case QUAD8:
-        case QUAD9:
-        case TET4:
-        case TET10:
-        case HEX8:
-        case HEX20:
-        case HEX27:
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return unlimited;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-    case BERNSTEIN:
-      switch (el_t)
+      ponies;
+#ponies
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-          return unlimited;
-        case TRI3:
-          return 0;
-        case TRI6:
-          return 6;
-        case QUAD4:
-          return 0;
-        case QUAD8:
-        case QUAD9:
-          return unlimited;
-        case TET4:
-          return 1;
-        case TET10:
-          return 2;
-        case HEX8:
-          return 0;
-        case HEX20:
-          return 2;
-        case HEX27:
-          return 4;
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return 0;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case SZABAB:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-          return 7;
-        case TRI3:
-          return 0;
-        case TRI6:
-          return 7;
-        case QUAD4:
-          return 0;
-        case QUAD8:
-        case QUAD9:
-          return 7;
-        case TET4:
-        case TET10:
-        case HEX8:
-        case HEX20:
-        case HEX27:
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return 0;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-#endif
-    case XYZ:
-      switch (el_t)
+      ponies;
+#ponies
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-        case TRI3:
-        case TRI6:
-        case QUAD4:
-        case QUAD8:
-        case QUAD9:
-        case TET4:
-        case TET10:
-        case HEX8:
-        case HEX20:
-        case HEX27:
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return unlimited;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case CLOUGH:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-          return 3;
-        case EDGE4:
-        case TRI3:
-          return 0;
-        case TRI6:
-          return 3;
-        case QUAD4:
-        case QUAD8:
-        case QUAD9:
-        case TET4:
-        case TET10:
-        case HEX8:
-        case HEX20:
-        case HEX27:
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return 0;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case HERMITE:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-          return unlimited;
-        case EDGE4:
-        case TRI3:
-        case TRI6:
-          return 0;
-        case QUAD4:
-          return 3;
-        case QUAD8:
-        case QUAD9:
-          return unlimited;
-        case TET4:
-        case TET10:
-          return 0;
-        case HEX8:
-          return 3;
-        case HEX20:
-        case HEX27:
-          return unlimited;
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return 0;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case HIERARCHIC:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-          return unlimited;
-        case TRI3:
-          return 1;
-        case TRI6:
-          return unlimited;
-        case QUAD4:
-          return 1;
-        case QUAD8:
-        case QUAD9:
-          return unlimited;
-        case TET4:
-        case TET10:
-          return 0;
-        case HEX8:
-        case HEX20:
-          return 1;
-        case HEX27:
-          return unlimited;
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return 0;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case L2_HIERARCHIC:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case EDGE2:
-        case EDGE3:
-        case EDGE4:
-          return unlimited;
-        case TRI3:
-          return 1;
-        case TRI6:
-          return unlimited;
-        case QUAD4:
-          return 1;
-        case QUAD8:
-        case QUAD9:
-          return unlimited;
-        case TET4:
-        case TET10:
-          return 0;
-        case HEX8:
-        case HEX20:
-          return 1;
-        case HEX27:
-          return unlimited;
-        case PRISM6:
-        case PRISM15:
-        case PRISM18:
-        case PYRAMID5:
-        case PYRAMID13:
-        case PYRAMID14:
-          return 0;
-        default:
-          return unknown;
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case SUBDIVISION:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case TRI3SUBDIVISION:
-          return unlimited;
-        default:
-          return unknown;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    case NEDELEC_ONE:
-      switch (el_t)
+      ponies;
+    ponies:
+      ponies)
         {
-        case TRI6:
-        case QUAD8:
-        case QUAD9:
-        case HEX20:
-        case HEX27:
-          return 1;
-        default:
-          return 0;
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies;
+        ponies:
+          ponies;
         }
-      break;
-    default:
-      return 0;
-      break;
+      ponies;
+    ponies:
+      ponies;
+      ponies;
     }
 }
 
 
 
-bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
+ponies)
 {
-  switch (fe_t.family)
+  ponies)
     {
-    case LAGRANGE:
-    case L2_LAGRANGE:
-    case MONOMIAL:
-    case L2_HIERARCHIC:
-    case XYZ:
-    case SUBDIVISION:
-    case LAGRANGE_VEC:
-    case NEDELEC_ONE:
-      return false;
-    case CLOUGH:
-    case HERMITE:
-    case HIERARCHIC:
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-    case BERNSTEIN:
-    case SZABAB:
-#endif
-    default:
-      return true;
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+    ponies:
+    ponies:
+#ponies
+    ponies:
+    ponies:
+#ponies
+    ponies:
+      ponies;
     }
 }
 
-FEFieldType FEInterface::field_type( const FEType& fe_type )
+ponies )
 {
-  return FEInterface::field_type( fe_type.family );
+  ponies );
 }
 
-FEFieldType FEInterface::field_type( const FEFamily& fe_family )
+ponies )
 {
-  switch (fe_family)
+  ponies)
     {
-    case LAGRANGE_VEC:
-    case NEDELEC_ONE:
-      return TYPE_VECTOR;
-    default:
-      return TYPE_SCALAR;
+    ponies:
+    ponies:
+      ponies;
+    ponies:
+      ponies;
     }
 }
 
-unsigned int FEInterface::n_vec_dim( const MeshBase& mesh, const FEType& fe_type )
+ponies )
 {
-  switch (fe_type.family)
+  ponies)
     {
-      //FIXME: We currently assume that the number of vector components is tied
-      //       to the mesh dimension. This will break for mixed-dimension meshes.
-    case LAGRANGE_VEC:
-    case NEDELEC_ONE:
-      return mesh.mesh_dimension();
-    default:
-      return 1;
+      //ponies
+      //       ponies.
+    ponies:
+    ponies:
+      ponies();
+    ponies:
+      ponies;
     }
 }
 
-} // namespace libMesh
+} // ponies

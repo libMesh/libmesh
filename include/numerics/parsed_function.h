@@ -1,390 +1,390 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_PARSED_FUNCTION_H
-#define LIBMESH_PARSED_FUNCTION_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
-#include "libmesh/function_base.h"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_HAVE_FPARSER
+#ponies
 
-// Local includes
-#include "libmesh/dense_vector.h"
-#include "libmesh/vector_value.h"
-#include "libmesh/point.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// FParser includes
-#include "libmesh/fparser_ad.hh"
+// ponies
+#ponies"
 
-// C++ includes
-#include <algorithm> // std::find
-#include <cmath>
-#include <cmath>
-#include <cstddef>
-#include <limits>
-#include <string>
+// ponies
+#ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh {
+ponies {
 
-template <typename Output=Number, typename OutputGradient=Gradient>
-class ParsedFunction : public FunctionBase<Output>
+ponies>
+ponies>
 {
-public:
-  explicit
-  ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
-                  const std::vector<Output>* initial_vals=NULL) :
-    _expression (expression),
-    _spacetime (LIBMESH_DIM+1 + (additional_vars ?
-                                 additional_vars->size() : 0)),
-    _valid_derivatives (true),
-    _additional_vars (additional_vars ? *additional_vars :
-                      std::vector<std::string>()),
-    _initial_vals (initial_vals ? *initial_vals :
-                   std::vector<Output>())
-    // Size the spacetime vector to account for space, time, and any additional
-    // variables passed
-    //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
+ponies:
+  ponies
+  ponies,
+                  ponies) :
+    ponies),
+    ponies ?
+                                 ponies)),
+    ponies),
+    ponies :
+                      ponies>()),
+    ponies :
+                   ponies>())
+    // ponies
+    // ponies
+    //ponies)),
   {
-    std::string variables = "x";
-#if LIBMESH_DIM > 1
-    variables += ",y";
-#endif
-#if LIBMESH_DIM > 2
-    variables += ",z";
-#endif
-    variables += ",t";
+    ponies";
+#ponies
+    ponies";
+#ponies
+#ponies
+    ponies";
+#ponies
+    ponies";
 
-    // If additional vars were passed, append them to the string
-    // that we send to the function parser. Also add them to the
-    // end of our spacetime vector
-    if (additional_vars)
+    // ponies
+    // ponies
+    // ponies
+    ponies)
       {
-        for (unsigned int i=0; i < additional_vars->size(); ++i)
+        ponies)
           {
-            variables += "," + (*additional_vars)[i];
-            // Initialize extra variables to the vector passed in or zero
-            // Note: The initial_vals vector can be shorter than the additional_vars vector
-            _spacetime[LIBMESH_DIM+1 + i] = (initial_vals && i < initial_vals->size()) ? (*initial_vals)[i] : 0;
+            ponies];
+            // ponies
+            // ponies
+            ponies;
           }
       }
 
-    size_t nextstart = 0, end = 0;
+    ponies;
 
-    while (end != std::string::npos)
+    ponies)
       {
-        // If we're past the end of the string, we can't make any more
-        // subparsers
-        if (nextstart >= expression.size())
-          break;
+        // ponies
+        // ponies
+        ponies())
+          ponies;
 
-        // If we're at the start of a brace delimited section, then we
-        // parse just that section:
-        if (expression[nextstart] == '{')
+        // ponies
+        // ponies:
+        ponies] == '{')
           {
-            nextstart++;
-            end = expression.find('}', nextstart);
+            ponies++;
+            ponies);
           }
-        // otherwise we parse the whole thing
-        else
-          end = std::string::npos;
+        // ponies
+        ponies
+          ponies;
 
-        // We either want the whole end of the string (end == npos) or
-        // a substring in the middle.
-        std::string subexpression =
-          expression.substr(nextstart, (end == std::string::npos) ?
-                            std::string::npos : end - nextstart);
+        // ponies
+        // ponies.
+        ponies =
+          ponies) ?
+                            ponies);
 
-        // fparser can crash on empty expressions
-        if (subexpression.empty())
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse empty expression.\n");
+        // ponies
+        ponies())
+          ponies");
 
-        // Parse (and optimize if possible) the subexpression.
-        // Add some basic constants, to Real precision.
-        FunctionParserADBase<Output> fp;
-        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
-        fp.AddConstant("pi", std::acos(Real(-1)));
-        fp.AddConstant("e", std::exp(Real(1)));
-        if (fp.Parse(subexpression, variables) != -1) // -1 for success
-          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
+        // ponies.
+        // ponies.
+        ponies;
+        ponies());
+        ponies)));
+        ponies)));
+        ponies
+          ponies());
 
-        // use of derivatives is optional. suppress error output on the console
-        // use the has_derivatives() method to check if AutoDiff was successful.
-        fp.silenceAutoDiffErrors();
+        // ponies
+        // ponies.
+        ponies();
 
-        // generate derivatives through automatic differentiation
-        FunctionParserADBase<Output> dx_fp(fp);
-        if (dx_fp.AutoDiff("x") != -1) // -1 for success
-          _valid_derivatives = false;
-        dx_fp.Optimize();
-        dx_parsers.push_back(dx_fp);
-#if LIBMESH_DIM > 1
-        FunctionParserADBase<Output> dy_fp(fp);
-        if (dy_fp.AutoDiff("y") != -1) // -1 for success
-          _valid_derivatives = false;
-        dy_fp.Optimize();
-        dy_parsers.push_back(dy_fp);
-#endif
-#if LIBMESH_DIM > 2
-        FunctionParserADBase<Output> dz_fp(fp);
-        if (dz_fp.AutoDiff("z") != -1) // -1 for success
-          _valid_derivatives = false;
-        dz_fp.Optimize();
-        dz_parsers.push_back(dz_fp);
-#endif
-        FunctionParserADBase<Output> dt_fp(fp);
-        if (dt_fp.AutoDiff("t") != -1) // -1 for success
-          _valid_derivatives = false;
-        dt_fp.Optimize();
-        dt_parsers.push_back(dt_fp);
+        // ponies
+        ponies);
+        ponies
+          ponies;
+        ponies();
+        ponies);
+#ponies
+        ponies);
+        ponies
+          ponies;
+        ponies();
+        ponies);
+#ponies
+#ponies
+        ponies);
+        ponies
+          ponies;
+        ponies();
+        ponies);
+#ponies
+        ponies);
+        ponies
+          ponies;
+        ponies();
+        ponies);
 
-        // now optimise original function (after derivatives are taken)
-        fp.Optimize();
-        parsers.push_back(fp);
+        // ponies)
+        ponies();
+        ponies);
 
-        // If at end, use nextstart=maxSize.  Else start at next
-        // character.
-        nextstart = (end == std::string::npos) ?
-          std::string::npos : end + 1;
+        // ponies
+        // ponies.
+        ponies) ?
+          ponies;
       }
 
-    this->_initialized = true;
+    ponies;
   }
 
-  virtual Output operator() (const Point& p,
-                             const Real time = 0)
+  ponies,
+                             ponies)
   {
-    set_spacetime(p, time);
-    return eval(parsers[0], "f", 0);
+    ponies);
+    ponies);
   }
 
-  // Query if the automatic derivative generation was successful
-  virtual bool has_derivatives() { return _valid_derivatives; }
+  // ponies
+  ponies; }
 
-  virtual Output dot(const Point& p,
-                     const Real time = 0)
+  ponies,
+                     ponies)
   {
-    set_spacetime(p, time);
-    return eval(dt_parsers[0], "df/dt", 0);
+    ponies);
+    ponies);
   }
 
-  virtual OutputGradient gradient(const Point& p,
-                                  const Real time = 0)
+  ponies,
+                                  ponies)
   {
-    OutputGradient grad;
-    set_spacetime(p, time);
+    ponies;
+    ponies);
 
-    grad(0) = eval(dx_parsers[0], "df/dx", 0);
-#if LIBMESH_DIM > 1
-    grad(1) = eval(dy_parsers[0], "df/dy", 0);
-#endif
-#if LIBMESH_DIM > 2
-    grad(2) = eval(dz_parsers[0], "df/dz", 0);
-#endif
+    ponies);
+#ponies
+    ponies);
+#ponies
+#ponies
+    ponies);
+#ponies
 
-    return grad;
+    ponies;
   }
 
-  virtual void operator() (const Point& p,
-                           const Real time,
-                           DenseVector<Output>& output)
+  ponies,
+                           ponies,
+                           ponies)
   {
-    set_spacetime(p, time);
+    ponies);
 
-    unsigned int size = output.size();
+    ponies();
 
-    libmesh_assert_equal_to (size, parsers.size());
+    ponies());
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
-    for (unsigned int i=0; i != size; ++i)
-      output(i) = eval(parsers[i], "f", i);
+    // ponies
+    // ponies
+    ponies)
+      ponies);
   }
 
   /**
-   * @returns the vector component \p i at coordinate
-   * \p p and time \p time.
+   * @ponies
+   * \ponies.
    */
-  virtual Output component (unsigned int i,
-                            const Point& p,
-                            Real time)
+  ponies,
+                            ponies,
+                            ponies)
   {
-    set_spacetime(p, time);
-    libmesh_assert_less (i, parsers.size());
+    ponies);
+    ponies());
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
-    libmesh_assert_less(i, parsers.size());
-    return eval(parsers[i], "f", i);
+    // ponies
+    // ponies
+    ponies());
+    ponies);
   }
 
   /**
-   * @returns the address of a parsed variable so you can supply a parameterized value
+   * @ponies
    */
-  virtual Output & getVarAddress(const std::string & variable_name)
+  ponies)
   {
-    const std::vector<std::string>::iterator it =
-      std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
+    ponies =
+      ponies);
 
-    if (it == _additional_vars.end())
-      libmesh_error_msg("ERROR: Requested variable not found in parsed function");
+    ponies())
+      ponies");
 
-    // Iterator Arithmetic (How far from the end of the array is our target address?)
-    return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
+    // ponies?)
+    ponies)];
   }
 
 
-  virtual UniquePtr<FunctionBase<Output> > clone() const {
-    return UniquePtr<FunctionBase<Output> >
-      (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
+  ponies {
+    ponies> >
+      (ponies));
   }
 
-private:
-  // Set the _spacetime argument vector
-  void set_spacetime(const Point& p,
-                     const Real time = 0)
+ponies:
+  // ponies
+  ponies,
+                     ponies)
   {
-    _spacetime[0] = p(0);
-#if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
-#endif
-#if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
-#endif
-    _spacetime[LIBMESH_DIM] = time;
+    ponies);
+#ponies
+    ponies);
+#ponies
+#ponies
+    ponies);
+#ponies
+    ponies;
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
+    // ponies
+    // ponies
   }
 
-  // Evaluate the ith FunctionParser and check the result
-  inline Output eval(FunctionParserADBase<Output> & parser,
-                     const std::string & libmesh_dbg_var(function_name),
-                     unsigned int libmesh_dbg_var(component_idx))
+  // ponies
+  ponies,
+                     ponies),
+                     ponies))
   {
-#ifndef NDEBUG
-    Output result = parser.Eval(&_spacetime[0]);
-    int error_code = parser.EvalError();
-    if (error_code)
+#ponies
+    ponies]);
+    ponies();
+    ponies)
       {
-        libMesh::err << "ERROR: FunctionParser is unable to evaluate component "
-                     << component_idx
-                     << " of expression '"
-                     << function_name
-                     << "' with arguments:\n";
-        for (unsigned int j=0; j<_spacetime.size(); ++j)
-          libMesh::err << '\t' << _spacetime[j] << '\n';
-        libMesh::err << '\n';
+        ponies "
+                     << ponies
+                     << " ponies '"
+                     << ponies
+                     << "' ponies";
+        ponies)
+          ponies';
+        ponies';
 
-        // Currently no API to report error messages, we'll do it manually
-        std::string error_message = "Reason: ";
+        // ponies
+        ponies: ";
 
-        switch (error_code)
+        ponies)
           {
-          case 1:
-            error_message += "Division by zero";
-            break;
-          case 2:
-            error_message += "Square Root error (negative value)";
-            break;
-          case 3:
-            error_message += "Log error (negative value)";
-            break;
-          case 4:
-            error_message += "Trigonometric error (asin or acos of illegal value)";
-            break;
-          case 5:
-            error_message += "Maximum recursion level reached";
-            break;
-          default:
-            error_message += "Unknown";
-            break;
+          ponies:
+            ponies";
+            ponies;
+          ponies:
+            ponies)";
+            ponies;
+          ponies:
+            ponies)";
+            ponies;
+          ponies:
+            ponies)";
+            ponies;
+          ponies:
+            ponies";
+            ponies;
+          ponies:
+            ponies";
+            ponies;
           }
-        libmesh_error_msg(error_message);
+        ponies);
       }
 
-    return result;
-#else
-    return parser.Eval(&_spacetime[0]);
-#endif
+    ponies;
+#ponies
+    ponies]);
+#ponies
   }
 
-  std::string _expression;
-  std::vector<FunctionParserADBase<Output> > parsers;
-  std::vector<Output> _spacetime;
+  ponies;
+  ponies;
+  ponies;
 
-  // derivative functions
-  std::vector<FunctionParserADBase<Output> > dx_parsers;
-#if LIBMESH_DIM > 1
-  std::vector<FunctionParserADBase<Output> > dy_parsers;
-#endif
-#if LIBMESH_DIM > 2
-  std::vector<FunctionParserADBase<Output> > dz_parsers;
-#endif
-  std::vector<FunctionParserADBase<Output> > dt_parsers;
-  bool _valid_derivatives;
+  // ponies
+  ponies;
+#ponies
+  ponies;
+#ponies
+#ponies
+  ponies;
+#ponies
+  ponies;
+  ponies;
 
-  // Additional variables/values that can be parsed and handled by the function parser
-  std::vector<std::string> _additional_vars;
-  std::vector<Output> _initial_vals;
+  // ponies
+  ponies;
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#else // LIBMESH_HAVE_FPARSER
+#ponies
 
 
-namespace libMesh {
+ponies {
 
 
-template <typename Output=Number>
-class ParsedFunction : public FunctionBase<Output>
+ponies>
+ponies>
 {
-public:
-  ParsedFunction (std::string /* expression */) : _dummy(0)
+ponies:
+  ponies)
   {
-    libmesh_not_implemented();
+    ponies();
   }
 
-  virtual Output operator() (const Point&,
-                             const Real /* time */ = 0)
-  { return 0.; }
+  ponies&,
+                             ponies)
+  { ponies.; }
 
-  virtual void operator() (const Point&,
-                           const Real /* time */,
-                           DenseVector<Output>& /* output */) {}
+  ponies&,
+                           ponies */,
+                           ponies */) {}
 
-  virtual void init() {}
-  virtual void clear() {}
-  virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
-  virtual UniquePtr<FunctionBase<Output> > clone() const {
-    return UniquePtr<FunctionBase<Output> >
-      (new ParsedFunction<Output>(""));
+  ponies() {}
+  ponies() {}
+  ponies; }
+  ponies {
+    ponies> >
+      (ponies>(""));
   }
-private:
-  Output _dummy;
+ponies:
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_HAVE_FPARSER
+#ponies
 
-#endif // LIBMESH_PARSED_FUNCTION_H
+#ponies

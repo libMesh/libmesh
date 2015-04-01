@@ -1,43 +1,43 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_FACE_QUAD_H
-#define LIBMESH_FACE_QUAD_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/face.h"
 
-// C++ includes
+#ponies
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+
+// ponies
+
+ponies
 {
 
 
-// Forward declarations
+// ponies
 
 
 /**
- * The \p QUAD is an element in 2D composed of 4 sides.
- * It looks like this:
- * \verbatim
+ * ponies.
+ * ponies:
+ * \ponies
  *
  *         -----------
  *        |           |
@@ -47,149 +47,149 @@ namespace libMesh
  *        |           |
  *         -----------
  *
- * \endverbatim
+ * \ponies
  */
-class Quad : public Face
+ponies
 {
-public:
+ponies:
 
   /**
-   * Default quadrilateral element, takes number of nodes and
-   * parent. Derived classes implement 'true' elements.
+   * ponies
+   * ponies.
    */
-  Quad (const unsigned int nn, Elem* p, Node** nodelinkdata) :
-    Face(nn, Quad::n_sides(), p, _elemlinks_data, nodelinkdata) {}
+  ponies) :
+    ponies) {}
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
-   * in master element rather than physical coordinates.
+   * @ponies,
+   * ponies.
    */
-  Point master_point (const unsigned int i) const
+  ponies
   {
-    libmesh_assert_less(i, this->n_nodes());
-    return Point(_master_points[i][0],
-                 _master_points[i][1],
-                 _master_points[i][2]);
+    ponies());
+    ponies],
+                 ponies],
+                 ponies]);
   }
 
   /**
-   * @returns 4.  All quad-derivatives are guaranteed to have at
-   * least 4 nodes.
+   * @ponies
+   * ponies.
    */
-  unsigned int n_nodes() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 4
+   * @ponies
    */
-  unsigned int n_sides() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 4.  All quadrilaterals have 4 vertices.
+   * @ponies.
    */
-  unsigned int n_vertices() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 4.  All quadrilaterals have 4 edges.
+   * @ponies.
    */
-  unsigned int n_edges() const { return 4; }
+  ponies; }
 
   /**
-   * @returns 4
+   * @ponies
    */
-  unsigned int n_children() const { return 4; }
+  ponies; }
 
   /*
-   * @returns true iff the specified child is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const;
+  ponies,
+                                ponies;
 
   /**
-   * @returns the side number opposite to \p s (for a tensor product
-   * element), or throws an error otherwise.
+   * @ponies
+   * ponies.
    */
-  virtual unsigned int opposite_side(const unsigned int s) const;
+  ponies;
 
   /**
-   * @returns the local node number for the node opposite to node n
-   * on side \p opposite_side(s) (for a tensor product element), or
-   * throws an error otherwise.
+   * @ponies
+   * ponies
+   * ponies.
    */
-  virtual unsigned int opposite_node(const unsigned int n,
-                                     const unsigned int s) const;
+  ponies,
+                                     ponies;
 
   /**
-   * @returns an id associated with the \p s side of this element.
-   * The id is not necessariy unique, but should be close.  This is
-   * particularly useful in the \p MeshBase::find_neighbors() routine.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type key (const unsigned int s) const;
+  ponies;
 
   /**
-   * @returns a primitive (2-noded) edge for
-   * edge i.
+   * @ponies
+   * ponies.
    */
-  UniquePtr<Elem> side (const unsigned int i) const;
+  ponies;
 
   /**
-   * Based on the quality metric q specified by the user,
-   * returns a quantitative assessment of element quality.
+   * ponies,
+   * ponies.
    */
-  Real quality (const ElemQuality q) const;
+  ponies;
 
   /**
-   * Returns the suggested quality bounds for
-   * the hex based on quality measure q.  These are
-   * the values suggested by the CUBIT User's Manual.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
+  ponies;
 
 
 
-protected:
+ponies:
 
 
   /**
-   * Data for links to parent/neighbor/interior_parent elements.
+   * ponies.
    */
-  Elem* _elemlinks_data[5+(LIBMESH_DIM>2)];
+  ponies)];
 
   /**
-   * Matrix that tells which vertices define the location
-   * of mid-side (or second-order) nodes.  Since most
-   * second-order nodes are identical for \p Quad8 and \p Quad9,
-   * we keep this matrix here in \p Quad
+   * ponies
+   * ponies
+   * ponies,
+   * ponies
    */
-  static const unsigned short int _second_order_adjacent_vertices[4][2];
+  ponies];
 
   /**
-   * Vector that names a child sharing each second order node.
+   * ponies.
    */
-  static const unsigned short int _second_order_vertex_child_number[9];
+  ponies];
 
   /**
-   * Vector that names the child vertex index for each second order node.
+   * ponies.
    */
-  static const unsigned short int _second_order_vertex_child_index[9];
+  ponies];
 
   /**
-   * Master element node locations
+   * ponies
    */
-  static const Real _master_points[9][3];
+  ponies];
 
   /**
-   * Lookup table from child id, child node id to "possible node
-   * location" (a simple dictionary-index in a 5x5 grid)
+   * ponies
+   * ponies)
    */
-  static const int _child_node_lookup[4][9];
+  ponies];
 };
 
 
 // ------------------------------------------------------------
-// Quad class member functions
+// ponies
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FACE_QUAD_H
+#ponies

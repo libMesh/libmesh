@@ -1,424 +1,424 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// Local includes
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
-#include "libmesh/fe_interface.h"
-#include "libmesh/inf_fe.h"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 //------------------------------------------------------------
-//FEInterface class members handling calls to InfFE
+//ponies
 
 
 
-unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
-                                                 const FEType& fe_t,
-                                                 const ElemType t)
+ponies,
+                                                 ponies,
+                                                 ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       /*
-       * Since InfFE<Dim,T_radial,T_map>::n_shape_functions(...)
-       * is actually independent of T_radial and T_map, we can use
-       * just any T_radial and T_map
+       * ponies(...)
+       * ponies
+       * ponies
        */
-      return InfFE<1,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
+      ponies);
 
-      // 2D
-    case 2:
-      return InfFE<2,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
+      // ponies
+    ponies:
+      ponies);
 
-      // 3D
-    case 3:
-      return InfFE<3,JACOBI_20_00,CARTESIAN>::n_shape_functions(fe_t, t);
+      // ponies
+    ponies:
+      ponies);
 
-    default:
-      libmesh_error_msg("Unsupported dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
 
-unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
-                                      const FEType& fe_t,
-                                      const ElemType t)
+ponies,
+                                      ponies,
+                                      ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       /*
-       * Since InfFE<Dim,T_radial,T_map>::n_dofs(...)
-       * is actually independent of T_radial and T_map, we can use
-       * just any T_radial and T_map
+       * ponies(...)
+       * ponies
+       * ponies
        */
-      return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
+      ponies);
 
-      // 2D
-    case 2:
-      return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
+      // ponies
+    ponies:
+      ponies);
 
-      // 3D
-    case 3:
-      return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs(fe_t, t);
+      // ponies
+    ponies:
+      ponies);
 
-    default:
-      libmesh_error_msg("Unsupported dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
-unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
-                                              const FEType& fe_t,
-                                              const ElemType t,
-                                              const unsigned int n)
+ponies,
+                                              ponies,
+                                              ponies,
+                                              ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       /*
-       * Since InfFE<Dim,T_radial,T_map>::n_dofs_at_node(...)
-       * is actually independent of T_radial and T_map, we can use
-       * just any T_radial and T_map
+       * ponies(...)
+       * ponies
+       * ponies
        */
-      return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
+      ponies);
 
-      // 2D
-    case 2:
-      return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
+      // ponies
+    ponies:
+      ponies);
 
-      // 3D
-    case 3:
-      return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_at_node(fe_t, t, n);
+      // ponies
+    ponies:
+      ponies);
 
-    default:
-      libmesh_error_msg("Unsupported dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
 
-unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
-                                               const FEType& fe_t,
-                                               const ElemType t)
+ponies,
+                                               ponies,
+                                               ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       /*
-       * Since InfFE<Dim,T_radial,T_map>::n_dofs(...)
-       * is actually independent of T_radial and T_map, we can use
-       * just any T_radial and T_map
+       * ponies(...)
+       * ponies
+       * ponies
        */
-      return InfFE<1,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
+      ponies);
 
-      // 2D
-    case 2:
-      return InfFE<2,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
+      // ponies
+    ponies:
+      ponies);
 
-      // 3D
-    case 3:
-      return InfFE<3,JACOBI_20_00,CARTESIAN>::n_dofs_per_elem(fe_t, t);
+      // ponies
+    ponies:
+      ponies);
 
-    default:
-      libmesh_error_msg("Unsupported dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  ponies!");
+  ponies;
 }
 
 
 
 
-void FEInterface::ifem_nodal_soln(const unsigned int dim,
-                                  const FEType& fe_t,
-                                  const Elem* elem,
-                                  const std::vector<Number>& elem_soln,
-                                  std::vector<Number>& nodal_soln)
+ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies,
+                                  ponies)
 {
-  switch (dim)
+  ponies)
     {
 
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            libmesh_error_msg("ERROR: INFINTE_MAP is not a valid shape family for radial approximation.");
+          ponies:
+            ponies.");
 
-          case JACOBI_20_00:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<1,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case JACOBI_30_00:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<1,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case LEGENDRE:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<1,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case LAGRANGE:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<1,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
 
-        break;
+        ponies;
       }
 
 
 
 
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            libmesh_error_msg("ERROR: INFINTE_MAP is not a valid shape family for radial approximation.");
+          ponies:
+            ponies.");
 
-          case JACOBI_20_00:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<2,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case JACOBI_30_00:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<2,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case LEGENDRE:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<2,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case LAGRANGE:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<2,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
 
-        break;
+        ponies;
       }
 
 
 
 
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            libmesh_error_msg("ERROR: INFINTE_MAP is not a valid shape family for radial approximation.");
+          ponies:
+            ponies.");
 
-          case JACOBI_20_00:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<3,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case JACOBI_30_00:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<3,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case LEGENDRE:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<3,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
-          case LAGRANGE:
+          ponies:
             {
-              switch (fe_t.inf_map)
+              ponies)
                 {
-                case CARTESIAN:
+                ponies:
                   {
-                    InfFE<3,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-                    break;
+                    ponies);
+                    ponies;
                   }
-                default:
-                  libmesh_error_msg("ERROR: Spherical & Ellipsoidal IFEMs not implemented.");
+                ponies:
+                  ponies.");
                 }
-              break;
+              ponies;
             }
 
 
 
-          default:
-            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
 
-        break;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
+    ponies:
+      ponies);
     }
 }
 
@@ -428,494 +428,494 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 
 
 
-Point FEInterface::ifem_inverse_map (const unsigned int dim,
-                                     const FEType& fe_t,
-                                     const Elem* elem,
-                                     const Point& p,
-                                     const Real tolerance,
-                                     const bool secure)
+ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (fe_t.inf_map)
+        ponies)
           {
-          case CARTESIAN:
-            return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
+          ponies:
+            ponies);
 
-          case SPHERICAL:
-          case ELLIPSOIDAL:
-            libmesh_not_implemented_msg("ERROR: Spherical and Ellipsoidal IFEMs not (yet) implemented.");
+          ponies:
+          ponies:
+            ponies.");
 
             /*
-              case SPHERICAL:
-              return InfFE<1,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+              ponies:
+              ponies);
 
-              case ELLIPSOIDAL:
-              return InfFE<1,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+              ponies:
+              ponies);
             */
 
-          default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (fe_t.inf_map)
+        ponies)
           {
-          case CARTESIAN:
-            return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
+          ponies:
+            ponies);
 
-          case SPHERICAL:
-          case ELLIPSOIDAL:
-            libmesh_not_implemented_msg("ERROR: Spherical and Ellipsoidal IFEMs not (yet) implemented.");
+          ponies:
+          ponies:
+            ponies.");
 
             /*
-              case SPHERICAL:
-              return InfFE<2,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+              ponies:
+              ponies);
 
-              case ELLIPSOIDAL:
-              return InfFE<2,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+              ponies:
+              ponies);
             */
 
-          default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (fe_t.inf_map)
+        ponies)
           {
-          case CARTESIAN:
-            return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
+          ponies:
+            ponies);
 
-          case SPHERICAL:
-          case ELLIPSOIDAL:
-            libmesh_not_implemented_msg("ERROR: Spherical and Ellipsoidal IFEMs not (yet) implemented.");
+          ponies:
+          ponies:
+            ponies.");
 
             /*
-              case SPHERICAL:
-              return InfFE<3,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+              ponies:
+              ponies);
 
-              case ELLIPSOIDAL:
-              return InfFE<3,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+              ponies:
+              ponies);
             */
 
-          default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+          ponies:
+            ponies);
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  Point pt;
-  return pt;
+  ponies!");
+  ponies;
+  ponies;
 }
 
 
 
-void FEInterface::ifem_inverse_map (const unsigned int dim,
-                                    const FEType& fe_t,
-                                    const Elem* elem,
-                                    const std::vector<Point>& physical_points,
-                                    std::vector<Point>&       reference_points,
-                                    const Real tolerance,
-                                    const bool secure)
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (fe_t.inf_map)
+        ponies)
           {
-          case CARTESIAN:
-            InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
-            return;
+          ponies:
+            ponies);
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (fe_t.inf_map)
+        ponies)
           {
-          case CARTESIAN:
-            InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
-            return;
+          ponies:
+            ponies);
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (fe_t.inf_map)
+        ponies)
           {
-          case CARTESIAN:
-            InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
-            return;
+          ponies:
+            ponies);
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+          ponies:
+            ponies);
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
+    ponies:
+      ponies);
     }
 }
 
 
 
 
-bool FEInterface::ifem_on_reference_element(const Point& p,
-                                            const ElemType t,
-                                            const Real eps)
+ponies,
+                                            ponies,
+                                            ponies)
 {
-  return FEBase::on_reference_element(p,t,eps);
+  ponies);
 }
 
 
 
 
-Real FEInterface::ifem_shape(const unsigned int dim,
-                             const FEType& fe_t,
-                             const ElemType t,
-                             const unsigned int i,
-                             const Point& p)
+ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
             /*
-             * For no derivatives (and local coordinates, as
-             * given in \p p) the infinite element shapes
-             * are independent of mapping type
+             * ponies
+             * ponies
+             * ponies
              */
-          case INFINITE_MAP:
-            return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_20_00:
-            return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_30_00:
-            return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case LEGENDRE:
-            return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case LAGRANGE:
-            return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_20_00:
-            return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_30_00:
-            return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case LEGENDRE:
-            return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case LAGRANGE:
-            return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_20_00:
-            return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_30_00:
-            return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case LEGENDRE:
-            return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          case LAGRANGE:
-            return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
 
-Real FEInterface::ifem_shape(const unsigned int dim,
-                             const FEType& fe_t,
-                             const Elem* elem,
-                             const unsigned int i,
-                             const Point& p)
+ponies,
+                             ponies,
+                             ponies,
+                             ponies,
+                             ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
             /*
-             * For no derivatives (and local coordinates, as
-             * given in \p p) the infinite element shapes
-             * are independent of mapping type
+             * ponies
+             * ponies
+             * ponies
              */
-          case INFINITE_MAP:
-            return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_20_00:
-            return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_30_00:
-            return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case LEGENDRE:
-            return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case LAGRANGE:
-            return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_20_00:
-            return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_30_00:
-            return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case LEGENDRE:
-            return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case LAGRANGE:
-            return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
       }
 
 
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_20_00:
-            return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case JACOBI_30_00:
-            return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case LEGENDRE:
-            return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          case LAGRANGE:
-            return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+          ponies:
+            ponies);
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
       }
 
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
 
-void FEInterface::ifem_compute_data(const unsigned int dim,
-                                    const FEType& fe_t,
-                                    const Elem* elem,
-                                    FEComputeData& data)
+ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies)
 {
-  switch (dim)
+  ponies)
     {
-      // 1D
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
             /*
-             * For no derivatives (and local coordinates, as
-             * given in \p p) the infinite element shapes
-             * are independent of mapping type
+             * ponies
+             * ponies
+             * ponies
              */
-          case INFINITE_MAP:
-            InfFE<1,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case JACOBI_20_00:
-            InfFE<1,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case JACOBI_30_00:
-            InfFE<1,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case LEGENDRE:
-            InfFE<1,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case LAGRANGE:
-            InfFE<1,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
 
-        break;
+        ponies;
       }
 
 
-      // 2D
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            InfFE<2,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case JACOBI_20_00:
-            InfFE<2,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case JACOBI_30_00:
-            InfFE<2,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case LEGENDRE:
-            InfFE<2,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case LAGRANGE:
-            InfFE<2,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
 
-        break;
+        ponies;
       }
 
 
-      // 3D
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (fe_t.radial_family)
+        ponies)
           {
-          case INFINITE_MAP:
-            InfFE<3,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case JACOBI_20_00:
-            InfFE<3,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case JACOBI_30_00:
-            InfFE<3,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case LEGENDRE:
-            InfFE<3,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          case LAGRANGE:
-            InfFE<3,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-            break;
+          ponies:
+            ponies);
+            ponies;
 
-          default:
-            libmesh_error_msg("Invalid radial family = " << fe_t.radial_family);
+          ponies:
+            ponies);
           }
 
-        break;
+        ponies;
       }
 
 
-    default:
-      libmesh_error_msg("Invalid dim = " << dim);
-      break;
+    ponies:
+      ponies);
+      ponies;
     }
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies

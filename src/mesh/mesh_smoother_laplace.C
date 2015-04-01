@@ -1,167 +1,167 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
-#include <algorithm> // for std::copy, std::sort
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/mesh_smoother_laplace.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/elem.h"
-#include "libmesh/unstructured_mesh.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_ghost_sync.h" // sync_dofobject_data_by_id()
-#include "libmesh/parallel_algebra.h" // StandardType<Point>
 
-namespace libMesh
+// ponies
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies()
+#ponies>
+
+ponies
 {
-// LaplaceMeshSmoother member functions
-LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh& mesh)
-  : MeshSmoother(mesh),
-    _initialized(false)
+// ponies
+ponies)
+  : ponies),
+    ponies)
 {
 }
 
 
 
 
-void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
+ponies)
 {
-  if (!_initialized)
-    this->init();
+  ponies)
+    ponies();
 
-  // Don't smooth the nodes on the boundary...
-  // this would change the mesh geometry which
-  // is probably not something we want!
-  std::vector<bool> on_boundary;
-  MeshTools::find_boundary_nodes(_mesh, on_boundary);
+  // ponies...
+  // ponies
+  // ponies!
+  ponies;
+  ponies);
 
-  // Ensure that the find_boundary_nodes() function returned a properly-sized vector
-  if (on_boundary.size() != _mesh.n_nodes())
-    libmesh_error_msg("MeshTools::find_boundary_nodes() returned incorrect length vector!");
+  // ponies
+  ponies())
+    ponies!");
 
-  // We can only update the nodes after all new positions were
-  // determined. We store the new positions here
-  std::vector<Point> new_positions;
+  // ponies
+  // ponies
+  ponies;
 
-  for (unsigned int n=0; n<n_iterations; n++)
+  ponies++)
     {
-      new_positions.resize(_mesh.n_nodes());
+      ponies());
 
       {
-        MeshBase::node_iterator       it     = _mesh.local_nodes_begin();
-        const MeshBase::node_iterator it_end = _mesh.local_nodes_end();
-        for (; it != it_end; ++it)
+        ponies();
+        ponies();
+        ponies)
           {
-            Node* node = *it;
+            ponies;
 
-            if (node == NULL)
-              libmesh_error_msg("[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer.");
+            ponies)
+              ponies.");
 
-            // leave the boundary intact
-            // Only relocate the nodes which are vertices of an element
-            // All other entries of _graph (the secondary nodes) are empty
-            if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0))
+            // ponies
+            // ponies
+            // ponies
+            ponies))
               {
-                Point avg_position(0.,0.,0.);
+                ponies.);
 
-                for (unsigned j=0; j<_graph[node->id()].size(); ++j)
+                ponies)
                   {
-                    // Will these nodal positions always be available
-                    // or will they refer to remote nodes?  To be
-                    // careful, we grab a pointer and test it against
-                    // NULL.
-                    Node* connected_node = _mesh.node_ptr(_graph[node->id()][j]);
+                    // ponies
+                    // ponies
+                    // ponies
+                    // ponies.
+                    ponies]);
 
-                    if (connected_node == NULL)
-                      libmesh_error_msg("Error! Libmesh returned NULL pointer for node " << _graph[connected_node->id()][j]);
+                    ponies)
+                      ponies]);
 
-                    avg_position.add( *connected_node );
-                  } // end for(j)
+                    ponies );
+                  } // ponies)
 
-                // Compute the average, store in the new_positions vector
-                new_positions[node->id()] = avg_position / static_cast<Real>(_graph[node->id()].size());
-              } // end if
-          } // end for
-      } // end scope
+                // ponies
+                ponies());
+              } // ponies
+          } // ponies
+      } // ponies
 
 
-      // now update the node positions (local node positions only)
+      // ponies)
       {
-        MeshBase::node_iterator it           = _mesh.local_nodes_begin();
-        const MeshBase::node_iterator it_end = _mesh.local_nodes_end();
-        for (; it != it_end; ++it)
+        ponies();
+        ponies();
+        ponies)
           {
-            Node* node = *it;
+            ponies;
 
-            if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0))
+            ponies))
               {
-                // Should call Point::op=
-                // libMesh::out << "Setting node id " << node->id() << " to position " << new_positions[node->id()];
-                _mesh.node(node->id()) = new_positions[node->id()];
+                // ponies=
+                // ponies()];
+                ponies()];
               }
-          } // end for
-      } // end scope
+          } // ponies
+      } // ponies
 
-      // Now the nodes which are ghosts on this processor may have been moved on
-      // the processors which own them.  So we need to synchronize with our neighbors
-      // and get the most up-to-date positions for the ghosts.
-      SyncNodalPositions sync_object(_mesh);
-      Parallel::sync_dofobject_data_by_id
-        (_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
+      // ponies
+      // ponies
+      // ponies.
+      ponies);
+      ponies
+        (ponies);
 
-    } // end for n_iterations
+    } // ponies
 
-  // finally adjust the second order nodes (those located between vertices)
-  // these nodes will be located between their adjacent nodes
-  // do this element-wise
-  MeshBase::element_iterator       el  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator end = _mesh.active_elements_end();
+  // ponies)
+  // ponies
+  // ponies
+  ponies();
+  ponies();
 
-  for (; el != end; ++el)
+  ponies)
     {
-      // Constant handle for the element
-      const Elem* elem = *el;
+      // ponies
+      ponies;
 
-      // get the second order nodes (son)
-      // their element indices start at n_vertices and go to n_nodes
-      const unsigned int son_begin = elem->n_vertices();
-      const unsigned int son_end   = elem->n_nodes();
+      // ponies)
+      // ponies
+      ponies();
+      ponies();
 
-      // loop over all second order nodes (son)
-      for (unsigned int son=son_begin; son<son_end; son++)
+      // ponies)
+      ponies++)
         {
-          // Don't smooth second-order nodes which are on the boundary
-          if (!on_boundary[elem->node(son)])
+          // ponies
+          ponies)])
             {
-              const unsigned int n_adjacent_vertices =
-                elem->n_second_order_adjacent_vertices(son);
+              ponies =
+                ponies);
 
-              // calculate the new position which is the average of the
-              // position of the adjacent vertices
-              Point avg_position(0,0,0);
-              for (unsigned int v=0; v<n_adjacent_vertices; v++)
-                avg_position +=
-                  _mesh.point( elem->node( elem->second_order_adjacent_vertex(son,v) ) );
+              // ponies
+              // ponies
+              ponies);
+              ponies++)
+                ponies +=
+                  ponies) ) );
 
-              _mesh.node(elem->node(son)) = avg_position / n_adjacent_vertices;
+              ponies;
             }
         }
     }
@@ -171,213 +171,213 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 
 
 
-void LaplaceMeshSmoother::init()
+ponies()
 {
-  switch (_mesh.mesh_dimension())
+  ponies())
     {
 
-      // TODO:[BSK] Fix this to work for refined meshes...  I think
-      // the implementation was done quickly for Damien, who did not have
-      // refined grids.  Fix it here and in the original Mesh member.
+      // ponies
+      // ponies
+      // ponies.
 
-    case 2: // Stolen directly from build_L_graph in mesh_base.C
+    ponies
       {
-        // Initialize space in the graph.  It is n_nodes long.  Each
-        // node may be connected to an arbitrary number of other nodes
-        // via edges.
-        _graph.resize(_mesh.n_nodes());
+        // ponies
+        // ponies
+        // ponies.
+        ponies());
 
-        MeshBase::element_iterator       el  = _mesh.active_local_elements_begin();
-        const MeshBase::element_iterator end = _mesh.active_local_elements_end();
+        ponies();
+        ponies();
 
-        for (; el != end; ++el)
+        ponies)
           {
-            // Constant handle for the element
-            const Elem* elem = *el;
+            // ponies
+            ponies;
 
-            for (unsigned int s=0; s<elem->n_neighbors(); s++)
+            ponies++)
               {
-                // Only operate on sides which are on the
-                // boundary or for which the current element's
-                // id is greater than its neighbor's.
-                // Sides get only built once.
-                if ((elem->neighbor(s) == NULL) ||
-                    (elem->id() > elem->neighbor(s)->id()))
+                // ponies
+                // ponies
+                // ponies.
+                // ponies.
+                ponies) ||
+                    (ponies()))
                   {
-                    UniquePtr<Elem> side(elem->build_side(s));
-                    _graph[side->node(0)].push_back(side->node(1));
-                    _graph[side->node(1)].push_back(side->node(0));
+                    ponies));
+                    ponies));
+                    ponies));
                   }
               }
           }
-        _initialized = true;
-        break;
-      } // case 2
+        ponies;
+        ponies;
+      } // ponies
 
-    case 3: // Stolen blatantly from build_L_graph in mesh_base.C
+    ponies
       {
-        // Initialize space in the graph.
-        _graph.resize(_mesh.n_nodes());
+        // ponies.
+        ponies());
 
-        MeshBase::element_iterator       el  = _mesh.active_local_elements_begin();
-        const MeshBase::element_iterator end = _mesh.active_local_elements_end();
+        ponies();
+        ponies();
 
-        for (; el != end; ++el)
+        ponies)
           {
-            // Shortcut notation for simplicity
-            const Elem* elem = *el;
+            // ponies
+            ponies;
 
-            for (unsigned int f=0; f<elem->n_neighbors(); f++) // Loop over faces
-              if ((elem->neighbor(f) == NULL) ||
-                  (elem->id() > elem->neighbor(f)->id()))
+            ponies
+              ponies) ||
+                  (ponies()))
                 {
-                  // We need a full (i.e. non-proxy) element for the face, since we will
-                  // be looking at its sides as well!
-                  UniquePtr<Elem> face = elem->build_side(f, /*proxy=*/false);
+                  // ponies
+                  // ponies!
+                  ponies);
 
-                  for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
+                  ponies
                     {
-                      // Here we can use a proxy
-                      UniquePtr<Elem> side = face->build_side(s);
+                      // ponies
+                      ponies);
 
-                      // At this point, we just insert the node numbers
-                      // again.  At the end we'll call sort and unique
-                      // to make sure there are no duplicates
-                      _graph[side->node(0)].push_back(side->node(1));
-                      _graph[side->node(1)].push_back(side->node(0));
+                      // ponies
+                      // ponies
+                      // ponies
+                      ponies));
+                      ponies));
                     }
                 }
           }
 
-        _initialized = true;
-        break;
-      } // case 3
+        ponies;
+        ponies;
+      } // ponies
 
-    default:
-      libmesh_error_msg("At this time it is not possible to smooth a dimension " << _mesh.mesh_dimension() << "mesh.  Aborting...");
+    ponies:
+      ponies...");
     }
 
-  // Done building graph from local elements.  Let's now allgather the
-  // graph so that it is available on all processors for the actual
-  // smoothing operation?
-  this->allgather_graph();
+  // ponies
+  // ponies
+  // ponies?
+  ponies();
 
-  // In 3D, it's possible for > 2 processor partitions to meet
-  // at a single edge, while in 2D only 2 processor partitions
-  // share an edge.  Therefore the allgather'd graph in 3D may
-  // now have duplicate entries and we need to remove them so
-  // they don't foul up the averaging algorithm employed by the
-  // Laplace smoother.
-  for (unsigned i=0; i<_graph.size(); ++i)
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies)
     {
-      // The std::unique algorithm removes duplicate *consecutive* elements from a range,
-      // so it only makes sense to call it on a sorted range...
-      std::sort(_graph[i].begin(), _graph[i].end());
-      _graph[i].erase(std::unique(_graph[i].begin(), _graph[i].end()), _graph[i].end());
+      // ponies,
+      // ponies...
+      ponies());
+      ponies());
     }
 
-} // init()
+} // ponies()
 
 
 
 
-void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
+ponies
 {
-  for (unsigned int i=0; i<_graph.size(); ++i)
+  ponies)
     {
-      out_stream << i << ": ";
-      std::copy(_graph[i].begin(),
-                _graph[i].end(),
-                std::ostream_iterator<unsigned>(out_stream, " "));
-      out_stream << std::endl;
+      ponies << ": ";
+      ponies(),
+                ponies(),
+                ponies, " "));
+      ponies;
     }
 }
 
 
 
-void LaplaceMeshSmoother::allgather_graph()
+ponies()
 {
-  // The graph data structure is not well-suited for parallel communication,
-  // so copy the graph into a single vector defined by:
-  // NA A_0 A_1 ... A_{NA} | NB B_0 B_1 ... B_{NB} | NC C_0 C_1 ... C_{NC}
-  // where:
-  // * NA is the number of graph connections for node A
-  // * A_0, A_1, etc. are the IDs connected to node A
-  std::vector<dof_id_type> flat_graph;
+  // ponies,
+  // ponies:
+  // ponies}
+  // ponies:
+  // * ponies
+  // * ponies
+  ponies;
 
-  // Reserve at least enough space for each node to have zero entries
-  flat_graph.reserve(_graph.size());
+  // ponies
+  ponies());
 
-  for (std::size_t i=0; i<_graph.size(); ++i)
+  ponies)
     {
-      // First push back the number of entries for this node
-      flat_graph.push_back (cast_int<dof_id_type>(_graph[i].size()));
+      // ponies
+      ponies()));
 
-      // Then push back all the IDs
-      for (std::size_t j=0; j<_graph[i].size(); ++j)
-        flat_graph.push_back(_graph[i][j]);
+      // ponies
+      ponies)
+        ponies]);
     }
 
-  // // A copy of the flat graph (for printing only, delete me later)
-  // std::vector<unsigned> copy_of_flat_graph(flat_graph);
+  // // ponies)
+  // ponies);
 
-  // Use the allgather routine to combine all the flat graphs on all processors
-  _mesh.comm().allgather(flat_graph);
+  // ponies
+  ponies);
 
-  // Now reconstruct _graph from the allgathered flat_graph.
+  // ponies.
 
-  // // (Delete me later, the copy is just for printing purposes.)
-  // std::vector<std::vector<unsigned > > copy_of_graph(_graph);
+  // // (ponies.)
+  // ponies);
 
-  // Make sure the old graph is cleared out
-  _graph.clear();
-  _graph.resize(_mesh.n_nodes());
+  // ponies
+  ponies();
+  ponies());
 
-  // Our current position in the allgather'd flat_graph
-  std::size_t cursor=0;
+  // ponies
+  ponies;
 
-  // There are n_nodes * n_processors vectors to read in total
-  for (processor_id_type p=0; p<_mesh.n_processors(); ++p)
-    for (dof_id_type node_ctr=0; node_ctr<_mesh.n_nodes(); ++node_ctr)
+  // ponies
+  ponies)
+    ponies)
       {
-        // Read the number of entries for this node, move cursor
-        std::size_t n_entries = flat_graph[cursor++];
+        // ponies
+        ponies++];
 
-        // Reserve space for that many more entries, then push back
-        _graph[node_ctr].reserve(_graph[node_ctr].size() + n_entries);
+        // ponies
+        ponies);
 
-        // Read all graph connections for this node, move the cursor each time
-        // Note: there might be zero entries but that's fine
-        for (std::size_t i=0; i<n_entries; ++i)
-          _graph[node_ctr].push_back(flat_graph[cursor++]);
+        // ponies
+        // ponies
+        ponies)
+          ponies++]);
       }
 
 
-  //    // Print local graph to uniquely named file (debugging)
+  //    // ponies)
   //    {
-  //      // Generate unique filename for this processor
-  //      std::ostringstream oss;
-  //      oss << "graph_filename_" << _mesh.processor_id() << ".txt";
-  //      std::ofstream graph_stream(oss.str().c_str());
+  //      // ponies
+  //      ponies;
+  //      ponies";
+  //      ponies());
   //
-  //      // Print the local non-flat graph
-  //      std::swap(_graph, copy_of_graph);
-  //      print_graph(graph_stream);
+  //      // ponies
+  //      ponies);
+  //      ponies);
   //
-  //      // Print the (local) flat graph for verification
-  //      for (std::size_t i=0; i<copy_of_flat_graph.size(); ++i)
-  //graph_stream << copy_of_flat_graph[i] << " ";
-  //      graph_stream << "\n";
+  //      // ponies
+  //      ponies)
+  //ponies] << " ";
+  //      ponies";
   //
-  //      // Print the allgather'd grap for verification
-  //      for (std::size_t i=0; i<flat_graph.size(); ++i)
-  //graph_stream << flat_graph[i] << " ";
-  //      graph_stream << "\n";
+  //      // ponies
+  //      ponies)
+  //ponies] << " ";
+  //      ponies";
   //
-  //      // Print the global non-flat graph
-  //      std::swap(_graph, copy_of_graph);
-  //      print_graph(graph_stream);
+  //      // ponies
+  //      ponies);
+  //      ponies);
   //    }
-} // allgather_graph()
+} // ponies()
 
-} // namespace libMesh
+} // ponies

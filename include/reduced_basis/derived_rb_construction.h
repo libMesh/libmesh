@@ -1,179 +1,179 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_DERIVED_RB_CONSTRUCTION_H
-#define LIBMESH_DERIVED_RB_CONSTRUCTION_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/dense_vector.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/fem_context.h"
-#include "libmesh/linear_implicit_system.h"
-#include "libmesh/rb_construction.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * DerivedRBConstruction implements the Construction
- * stage for the "two-level" Reduced Basis method.
- * In this context we obtain our "derived" basis functions
- * from a reference reduced basis approximation.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2009
+ * @ponies
  */
 
-template<class Base>
-class DerivedRBConstruction : public Base
+ponies>
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  DerivedRBConstruction (EquationSystems& es,
-                         const std::string& name,
-                         const unsigned int number);
+  ponies,
+                         ponies,
+                         ponies);
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef DerivedRBConstruction<Base> sys_type;
+  ponies;
 
   /**
-   * @returns a clever pointer to the system.
+   * @ponies.
    */
-  sys_type & system () { return *this; }
+  ponies; }
 
   /**
-   * @returns a string indicating the type of the system.
+   * @ponies.
    */
-  virtual std::string system_type () const;
+  ponies;
 
   /**
-   * Overload truth_solve so that it computes the
-   * associated Unter RB solution.
+   * ponies
+   * ponies.
    */
-  virtual Real truth_solve(int plot_solution);
+  ponies);
 
   /**
-   * Overload train_reduced_basis to generate residual terms wrt truth
-   * once the Greedy finishes.
+   * ponies
+   * ponies.
    */
-  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
-                                   const bool resize_rb_eval_data=true);
+  ponies",
+                                   ponies);
 
   /**
-   * Set the uber_system's current_parameters to
-   * match unter_system's current_parameters. We
-   * require a virtual function here in case the
-   * unter system has fewer parameters than the uber
-   * system, for example.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void set_uber_current_parameters();
+  ponies();
 
   /**
-   * Build a new DerivedRBEvaluation object.
+   * ponies.
    */
-  virtual UniquePtr<RBEvaluation> build_rb_evaluation(const Parallel::Communicator &comm
-                                                      LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                                                      ponies);
 
   /**
-   * Load the RB solution from the most recent solve
-   * into the libMesh solution vector.
+   * ponies
+   * ponies.
    */
-  virtual void load_rb_solution();
+  ponies();
 
   /**
-   * Load the i^th derived basis function into vec.
+   * ponies.
    */
-  virtual void load_basis_function(unsigned int i);
+  ponies);
 
   /**
-   * This function recomputes all the residual terms in order
-   * to allow evaluation of the residual wrt the truth space.
-   * Useful if we have performed the greedy algorithm with
-   * respect to the uber space and need to replace with truth
-   * residual terms.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void generate_residual_terms_wrt_truth();
+  ponies();
 
 
-  //----------- PUBLIC DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * The name of the uber RB system, i.e. the RB system
-   * we use to develop the derived RB system.
+   * ponies
+   * ponies.
    */
-  std::string uber_system_name;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Get a copy of the specific derived basis function.
+   * ponies.
    */
-  DenseVector<Number> get_derived_basis_function(unsigned int i);
+  ponies);
 
   /**
-   * Add a new basis function to the RB space. Overload
-   * for uber-unter style enrichment, i.e. this function
-   * is independent of the number of degrees of freedom
-   * in the truth finite element discretization.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void enrich_RB_space();
+  ponies();
 
   /**
-   * Compute the reduced basis matrices for the current basis.
-   * This operation is based on the uber system and hence is
-   * independent of the number of degrees of freedom
-   * in the truth finite element discretization.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void update_RB_system_matrices();
+  ponies();
 
   /**
-   * Compute the RHS terms that are combined `online'
-   * to determine the dual norm of the residual. Overloaded
-   * here for the two-stage RB method.
+   * ponies'
+   * ponies
+   * ponies.
    */
-  virtual void compute_Fq_representor_innerprods(bool compute_inner_products=true);
+  ponies);
 
   /**
-   * Compute the terms that are combined `online'
-   * to determine the dual norm of the residual. Overload
-   * here so that we perform an update based on the uber
-   * system.
+   * ponies'
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void update_residual_terms(bool compute_inner_products=true);
+  ponies);
 
-private:
+ponies:
 
 };
 
-// And introduce convenient typedefs
-typedef DerivedRBConstruction<RBConstruction> SteadyDerivedRBConstruction;
+// ponies
+ponies;
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_DERIVED_RB_CONSTRUCTION_H
+#ponies

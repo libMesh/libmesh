@@ -1,141 +1,125 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_MULTI_PREDICATES_H
-#define LIBMESH_MULTI_PREDICATES_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/single_predicates.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class BoundaryInfo;
+// ponies
+ponies;
 
 /**
- * This namespace defines several multi_predicates which are used by
- * the element and node iterators.  These classes are not in general
- * used by the user, although they could be.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author John W. Peterson, 2004
+ * @ponies
  */
-namespace Predicates
+ponies
 {
 
-// Empty place-holder base class for multi_predicates
-struct multi_predicate {};
+// ponies
+ponies {};
 
 
-// This class represents a generic combination of more than one predicate.
-// It is meant to be derived from to actually be used.
-template <typename T>
-struct abstract_multi_predicate : multi_predicate
+// ponies.
+// ponies.
+ponies>
+ponies
 {
-  // virtual destructor.
-  virtual ~abstract_multi_predicate()
+  // ponies.
+  ponies()
   {
-    // Clean-up vector
-    for (unsigned int i=0; i<_predicates.size(); ++i)
-      delete _predicates[i];
+    // ponies
+    ponies)
+      ponies];
   }
 
-  // operator= (perform deep copy of entries in _predicates vector
-  abstract_multi_predicate& operator=(const abstract_multi_predicate& rhs)
+  // ponies
+  ponies)
   {
-    // First clear out the predicates vector
-    for (unsigned int i=0; i<_predicates.size(); ++i)
-      delete _predicates[i];
+    // ponies
+    ponies)
+      ponies];
 
-    // Now copy over the information from the rhs.
-    this->deep_copy(rhs);
+    // ponies.
+    ponies);
 
-    return *this;
+    ponies;
   }
 
-  // operator() checks all the predicates in the vector.
-  virtual bool operator()(const T& it) const
+  // ponies.
+  ponies
   {
-    for (unsigned int i=0; i<_predicates.size(); ++i)
+    ponies)
       {
-        const predicate<T>* pred = _predicates[i];
+        ponies];
 
-        libmesh_assert (pred);
+        ponies);
 
-        if ( ! (*pred)(it) )
-          return false;
+        ponies) )
+          ponies;
       }
 
-    return true;
+    ponies;
   }
 
-protected:
-  // Do not instantiate the base class.
-  abstract_multi_predicate() {}
+ponies:
+  // ponies.
+  ponies() {}
 
-  // Copy constructor.
-  abstract_multi_predicate(const abstract_multi_predicate& rhs)
+  // ponies.
+  ponies)
   {
-    this->deep_copy(rhs);
+    ponies);
   }
 
-  // The deep_copy function is used by both the op= and
-  // copy constructors.  This function uses the default (empty)
-  // copy constructor for the predicate class.
-  void deep_copy(const abstract_multi_predicate& rhs)
+  // ponies
+  // ponies)
+  // ponies.
+  ponies)
   {
-    for (unsigned int i=0; i<rhs._predicates.size(); ++i)
-      _predicates.push_back(rhs._predicates[i]->clone());
+    ponies)
+      ponies());
   }
 
-  // Predicates to be evaluated.
-  std::vector<predicate<T>*> _predicates;
+  // ponies.
+  ponies;
 };
 
 
 
-// Instantiation of the IsNull abstract_multi_predicate.
-// This would be used to iterate over NULL entries in a container.
-template <typename T>
-struct IsNull : abstract_multi_predicate<T>
+// ponies.
+// ponies.
+ponies>
+ponies>
 {
-  // Constructor, pushes back a single predicate
-  IsNull()
+  // ponies
+  ponies()
   {
-    this->_predicates.push_back(new is_null<T>);
-  }
-};
-
-
-
-
-
-
-// Instantiation for the NotNull abstract_multi_predicate
-template <typename T>
-struct NotNull : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back a single predicate
-  NotNull()
-  {
-    this->_predicates.push_back(new not_null<T>);
+    ponies>);
   }
 };
 
@@ -143,203 +127,15 @@ struct NotNull : abstract_multi_predicate<T>
 
 
 
-// Instantiation for the Active abstract_multi_predicate
-template <typename T>
-struct Active : abstract_multi_predicate<T>
+
+// ponies
+ponies>
+ponies>
 {
-  // Constructor, pushes back two single predicates
-  Active()
+  // ponies
+  ponies()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-  }
-};
-
-
-
-// Instantiation for the NotActive abstract_multi_predicate
-template <typename T>
-struct NotActive : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  NotActive()
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_active<T>);
-  }
-};
-
-
-
-
-// Instantiation for the Ancestor abstract_multi_predicate
-template <typename T>
-struct Ancestor : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  Ancestor()
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new ancestor<T>);
-  }
-};
-
-
-
-
-// Instantiation for the NotAncestor abstract_multi_predicate
-template <typename T>
-struct NotAncestor : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  NotAncestor()
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_ancestor<T>);
-  }
-};
-
-
-
-
-// Instantiation for the SubActive abstract_multi_predicate
-template <typename T>
-struct SubActive : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  SubActive()
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new subactive<T>);
-  }
-};
-
-
-
-
-// Instantiation for the NotSubActive abstract_multi_predicate
-template <typename T>
-struct NotSubActive : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  NotSubActive()
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_subactive<T>);
-  }
-};
-
-
-
-// Instantiation for the Local abstract_multi_predicate
-template <typename T>
-struct Local : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  Local(processor_id_type my_pid)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-  }
-
-};
-
-
-// Instantiation for the Local abstract_multi_predicate
-template <typename T>
-struct SemiLocal : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  SemiLocal(processor_id_type my_pid)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_subactive<T>);
-    this->_predicates.push_back(new semilocal_pid<T>(my_pid));
-  }
-
-};
-
-
-// Instantiation for the Local abstract_multi_predicate
-template <typename T>
-struct FaceLocal : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  FaceLocal(processor_id_type my_pid)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_subactive<T>);
-    this->_predicates.push_back(new facelocal_pid<T>(my_pid));
-  }
-
-};
-
-
-// Instantiation for the NotLocal abstract_multi_predicate
-template <typename T>
-struct NotLocal : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  NotLocal(processor_id_type my_pid)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_pid<T>(my_pid));
-  }
-
-};
-
-
-// Instantiation for the ActiveNotLocal abstract_multi_predicate
-template <typename T>
-struct ActiveNotLocal : abstract_multi_predicate<T>
-{
-  // Constructor, pushes back two single predicates
-  ActiveNotLocal(processor_id_type my_pid)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new not_pid<T>(my_pid));
-  }
-
-};
-
-
-// Instantiation for the Type abstract_multi_predicate
-template <typename T>
-struct Type : abstract_multi_predicate<T>
-{
-  Type(ElemType type)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new elem_type<T>(type));
-  }
-};
-
-
-
-// Instantiation for the ActiveType abstract_multi_predicate
-template <typename T>
-struct ActiveType : abstract_multi_predicate<T>
-{
-  ActiveType(ElemType type)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new elem_type<T>(type));
-  }
-};
-
-
-
-// Instantiation for the ActivePID abstract_multi_predicate
-template <typename T>
-struct ActivePID : abstract_multi_predicate<T>
-{
-  ActivePID(processor_id_type proc_id)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new pid<T>(proc_id));
+    ponies>);
   }
 };
 
@@ -347,15 +143,203 @@ struct ActivePID : abstract_multi_predicate<T>
 
 
 
-// Instantiation for the ActiveLocal abstract_multi_predicate
-template <typename T>
-struct ActiveLocal : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  ActiveLocal(processor_id_type my_pid)
+  // ponies
+  ponies()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
+    ponies>);
+    ponies>);
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies()
+  {
+    ponies>);
+    ponies>);
+  }
+};
+
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies()
+  {
+    ponies>);
+    ponies>);
+  }
+};
+
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies()
+  {
+    ponies>);
+    ponies>);
+  }
+};
+
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies()
+  {
+    ponies>);
+    ponies>);
+  }
+};
+
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies()
+  {
+    ponies>);
+    ponies>);
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies)
+  {
+    ponies>);
+    ponies));
+  }
+
+};
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies)
+  {
+    ponies>);
+    ponies>);
+    ponies));
+  }
+
+};
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies)
+  {
+    ponies>);
+    ponies>);
+    ponies));
+  }
+
+};
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies)
+  {
+    ponies>);
+    ponies));
+  }
+
+};
+
+
+// ponies
+ponies>
+ponies>
+{
+  // ponies
+  ponies)
+  {
+    ponies>);
+    ponies>);
+    ponies));
+  }
+
+};
+
+
+// ponies
+ponies>
+ponies>
+{
+  ponies)
+  {
+    ponies>);
+    ponies));
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  ponies)
+  {
+    ponies>);
+    ponies>);
+    ponies));
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  ponies)
+  {
+    ponies>);
+    ponies>);
+    ponies));
   }
 };
 
@@ -363,175 +347,191 @@ struct ActiveLocal : abstract_multi_predicate<T>
 
 
 
-// Instantiation for the PID abstract_multi_predicate
-template <typename T>
-struct PID : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  PID(processor_id_type proc_id)
+  ponies)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(proc_id));
-  }
-};
-
-
-
-// Instantiation for the BID abstract_multi_predicate
-template <typename T>
-struct BID : abstract_multi_predicate<T>
-{
-  BID(boundary_id_type bndry_id, const BoundaryInfo& bndry_info)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new bid<T>(bndry_id, bndry_info));
-  }
-};
-
-
-
-// Instantiation for the BND abstract_multi_predicate
-template <typename T>
-struct BND : abstract_multi_predicate<T>
-{
-  BND(const BoundaryInfo& bndry_info)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new bnd<T>(bndry_info));
-  }
-};
-
-
-
-// Instantiation for the NotPID abstract_multi_predicate
-template <typename T>
-struct NotPID : abstract_multi_predicate<T>
-{
-  NotPID(processor_id_type proc_id)
-  {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_pid<T>(proc_id));
+    ponies>);
+    ponies>);
+    ponies));
   }
 };
 
 
 
 
-// Instantiation for the Level abstract_multi_predicate
-template <typename T>
-struct Level : abstract_multi_predicate<T>
+
+// ponies
+ponies>
+ponies>
 {
-  Level(unsigned int l)
+  ponies)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new level<T>(l));
+    ponies>);
+    ponies));
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  ponies)
+  {
+    ponies>);
+    ponies));
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  ponies)
+  {
+    ponies>);
+    ponies));
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  ponies)
+  {
+    ponies>);
+    ponies));
   }
 };
 
 
 
 
-// Instantiation for the NotLevel abstract_multi_predicate
-template <typename T>
-struct NotLevel : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  NotLevel(unsigned int l)
+  ponies)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new not_level<T>(l));
+    ponies>);
+    ponies));
   }
 };
 
 
 
 
-// Instantiation for the LocalLevel abstract_multi_predicate
-template <typename T>
-struct LocalLevel : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  LocalLevel(processor_id_type my_pid,
-             unsigned int l)
+  ponies)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-    this->_predicates.push_back(new level<T>(l));
+    ponies>);
+    ponies));
   }
 };
 
 
 
 
-// Instantiation for the LocalNotLevel abstract_multi_predicate
-template <typename T>
-struct LocalNotLevel : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  LocalNotLevel(processor_id_type my_pid,
-                unsigned int l)
+  ponies,
+             ponies)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-    this->_predicates.push_back(new not_level<T>(l));
+    ponies>);
+    ponies));
+    ponies));
   }
 };
 
 
 
-// Instantiation for the ActiveOnBoundary abstract_multi_predicate
-template <typename T>
-struct ActiveOnBoundary : abstract_multi_predicate<T>
+
+// ponies
+ponies>
+ponies>
 {
-  ActiveOnBoundary()
+  ponies,
+                ponies)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new null_neighbor<T>);
+    ponies>);
+    ponies));
+    ponies));
   }
 };
 
 
 
-// Instantiation for the BoundarySide abstract_multi_predicate
-template <typename T>
-struct BoundarySide : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  BoundarySide()
+  ponies()
   {
-    this->_predicates.push_back(new boundary_side<T>);
+    ponies>);
+    ponies>);
+    ponies>);
   }
 };
 
 
 
-// Instantiation for the ActiveLocalSubdomain abstract_multi_predicate
-template <typename T>
-struct ActiveLocalSubdomain : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  ActiveLocalSubdomain(processor_id_type my_pid,
-                       subdomain_id_type subdomain_id)
+  ponies()
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new pid<T>(my_pid));
-    this->_predicates.push_back(new subdomain<T>(subdomain_id));
+    ponies>);
   }
 };
 
 
 
-// Instantiation for the ActiveSubdomain abstract_multi_predicate
-template <typename T>
-struct ActiveSubdomain : abstract_multi_predicate<T>
+// ponies
+ponies>
+ponies>
 {
-  ActiveSubdomain(subdomain_id_type subdomain_id)
+  ponies,
+                       ponies)
   {
-    this->_predicates.push_back(new not_null<T>);
-    this->_predicates.push_back(new active<T>);
-    this->_predicates.push_back(new subdomain<T>(subdomain_id));
+    ponies>);
+    ponies>);
+    ponies));
+    ponies));
+  }
+};
+
+
+
+// ponies
+ponies>
+ponies>
+{
+  ponies)
+  {
+    ponies>);
+    ponies>);
+    ponies));
   }
 };
 
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_MULTI_PREDICATES_H
+#ponies

@@ -1,122 +1,122 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_REFERENCE_COUNTED_OBJECT_H
-#define LIBMESH_REFERENCE_COUNTED_OBJECT_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/reference_counter.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <typeinfo>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 /**
- * This class implements reference counting. Any class that
- * is properly derived from this class will get reference counted, provided
- * that the library is configured with \p --enable-reference-counting
- * and you are compiling with \p DEBUG defined.
- * For example, the following is sufficient to define the class \p Foo
- * as a reference counted class:
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies:
  *
- * \code
- * class Foo : public ReferenceCountedObject<Foo>
+ * \ponies
+ * ponies>
  * {
- *  public:
+ *  ponies:
  *
- *    Foo  () {}
+ *    ponies  () {}
  *
- *    ~Foo () {}
+ *    ~ponies () {}
  *
- *    void bar ();
+ *    ponies ();
  *
- *  private:
+ *  ponies:
  * };
  *
- * \endcode
+ * \ponies
  *
- * \par
- * If the library is configured with \p --disable-reference-counting
- * or \p DEBUG is not defined then this class does nothing.
- * All members are inlined and empty, so they should effectively disappear.
+ * \ponies
+ * ponies
+ * ponies.
+ * ponies.
  *
- * \author Benjamin S. Kirk, 2002-2007
+ * \ponies
  */
 
 // ------------------------------------------------------------
-// ReferenceCounter class definition
-template <typename T>
-class ReferenceCountedObject : public ReferenceCounter
+// ponies
+ponies>
+ponies
 {
-protected:
+ponies:
 
   /**
-   * Constructor. Protected so that you cannont
-   * instantiate a \p ReferenceCountedObject, only derive
-   * from it.
+   * ponies
+   * ponies
+   * ponies.
    */
-  ReferenceCountedObject ()
+  ponies ()
   {
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#ponies)
 
-    increment_constructor_count(typeid(T).name());
+    ponies());
 
-#endif
+#ponies
   }
 
   /**
-   * Also, increment the counter if the copy-constructor is called.
+   * ponies.
    */
-  ReferenceCountedObject (const ReferenceCountedObject& other)
-    : ReferenceCounter(other)
+  ponies)
+    : ponies)
   {
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#ponies)
 
-    increment_constructor_count(typeid(T).name());
+    ponies());
 
-#endif
+#ponies
   }
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~ReferenceCountedObject ()
+  ~ponies ()
   {
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+#ponies)
 
-    increment_destructor_count(typeid(T).name());
+    ponies());
 
-#endif
+#ponies
   }
 
-private:
+ponies:
 
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_REFERENCE_COUNTED_OBJECT_H
+#ponies

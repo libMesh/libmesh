@@ -1,214 +1,214 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_CELL_PRISM15_H
-#define LIBMESH_CELL_PRISM15_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/cell_prism.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 
 
 /**
- * The \p Prism15 is an element in 3D composed of 15 nodes.
- * It is numbered like this:
- * \verbatim
- * PRISM15:
- *              5
- *              o
+ * ponies.
+ * ponies:
+ * \ponies
+ * ponies:
+ *              ponies
+ *              ponies
  *             /:\
  *            / : \
  *           /  :  \
  *          /   :   \
- *      14 o    :    o 13
+ *      ponies
  *        /     :     \
  *       /      :      \
- *      /       o 11    \
- *   3 /        :        \4
- *    o---------o---------o
- *    |         :12       |
+ *      /       ponies    \
+ *   ponies
+ *    ponies
+ *    |         :ponies       |
  *    |         :         |
  *    |         :         |
- *    |         o         |
- *    |        .2.        |
+ *    |         ponies         |
+ *    |        .ponies.        |
  *    |       .   .       |
- *  9 o      .     .      o 10
+ *  ponies
  *    |     .       .     |
- *    |  8 o         o 7  |
+ *    |  ponies  |
  *    |   .           .   |
  *    |  .             .  |
  *    | .               . |
  *    |.                 .|
- *    o---------o---------o
- *    0         6         1
+ *    ponies
+ *    ponies
  *
- * \endverbatim
+ * \ponies
  */
-class Prism15 : public Prism
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  By default this element has no parent.
+   * ponies.
    */
-  explicit
-  Prism15  (Elem* p=NULL);
+  ponies
+  ponies);
 
   /**
-   * @returns \p PRISM15
+   * @ponies
    */
-  ElemType     type () const   { return PRISM15; }
+  ponies; }
 
   /**
-   * @returns 15
+   * @ponies
    */
-  unsigned int n_nodes() const { return 15; }
+  ponies; }
 
   /**
-   * @returns 1
+   * @ponies
    */
-  unsigned int n_sub_elem() const { return 1; }
+  ponies; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @ponies.
    */
-  virtual bool is_vertex(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @ponies.
    */
-  virtual bool is_edge(const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @ponies.
    */
-  virtual bool is_face(const unsigned int i) const;
+  ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+   * @ponies
+   * ponies
    */
-  virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const;
+  ponies,
+                               ponies;
 
   /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @ponies
+   * ponies
    */
-  virtual bool has_affine_map () const;
+  ponies;
 
   /**
-   * @returns SECOND
+   * @ponies
    */
-  Order default_order() const { return SECOND; }
+  ponies; }
 
   /**
-   * Builds a \p QUAD8 or \p TRI6 built coincident with face i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_side (const unsigned int i,
-                              bool proxy) const;
+  ponies,
+                              ponies;
 
   /**
-   * Builds a \p EDGE3 or \p INFEDGE2 coincident with edge i.
-   * The \p UniquePtr<Elem> handles the memory aspect.
+   * ponies.
+   * ponies.
    */
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  ponies;
 
-  virtual void connectivity(const unsigned int sc,
-                            const IOPackage iop,
-                            std::vector<dof_id_type>& conn) const;
+  ponies,
+                            ponies,
+                            ponies;
   /**
-   * @returns 2 for all \p n
+   * @ponies
    */
-  unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-  { return 2; }
-
-  /**
-   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
-   * that defines the \f$ n^{th} \f$ second-order node.
-   * Note that \p n is counted as depicted above, \f$ 6 \le n < 15 \f$.
-   */
-  unsigned short int second_order_adjacent_vertex (const unsigned int n,
-                                                   const unsigned int v) const;
+  ponies
+  { ponies; }
 
   /**
-   * @returns the child number \p c and element-local index \p v of the
-   * \f$ n^{th} \f$ second-order node on the parent element.  Note that
-   * the return values are always less \p this->n_children() and
-   * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
-   * to \p * this->n_vertices().  For linear elements this returns 0,0.
-   * On refined second order elements, the return value will satisfy
-   * \p this->get_node(n)==this->child(c)->get_node(v)
+   * @ponies
+   * ponies.
+   * ponies$.
    */
-  virtual std::pair<unsigned short int, unsigned short int>
-  second_order_child_vertex (const unsigned int n) const;
+  ponies,
+                                                   ponies;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * @ponies
+   * \ponies
+   * ponies
+   * \ponies
+   * ponies.
+   * ponies
+   * \ponies)
    */
-  static const unsigned int side_nodes_map[5][8];
+  ponies>
+  ponies;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
+   * ponies
+   * ponies.
    */
-  static const unsigned int edge_nodes_map[9][3];
-
-
-protected:
+  ponies];
 
   /**
-   * Data for links to nodes
+   * ponies
+   * ponies.
    */
-  Node* _nodelinks_data[15];
+  ponies];
 
 
-
-#ifdef LIBMESH_ENABLE_AMR
+ponies:
 
   /**
-   * Matrix used to create the elements children.
+   * ponies
    */
-  float embedding_matrix (const unsigned int,
-                          const unsigned int,
-                          const unsigned int) const
-  { libmesh_not_implemented(); return 0.; }
+  ponies];
 
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
-#endif
+
+#ponies
+
+  /**
+   * ponies.
+   */
+  ponies,
+                          ponies,
+                          ponies
+  { ponies.; }
+
+  ponies;
+
+#ponies
 
 
 };
@@ -216,14 +216,14 @@ protected:
 
 
 // ------------------------------------------------------------
-// Prism15 class member functions
-inline
-Prism15::Prism15(Elem* p) :
-  Prism(Prism15::n_nodes(), p, _nodelinks_data)
+// ponies
+ponies
+ponies) :
+  ponies)
 {
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_CELL_PRISM15_H
+#ponies

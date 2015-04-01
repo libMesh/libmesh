@@ -1,33 +1,33 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_SERIAL_MESH_H
-#define LIBMESH_SERIAL_MESH_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/unstructured_mesh.h"
-#include "libmesh/boundary_info.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <cstddef>
+// ponies   -----------------------------------
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
@@ -36,430 +36,430 @@ namespace libMesh
 
 
 /**
- * The \p SerialMesh class is derived from the \p MeshBase class,
- * and currently represents the default Mesh implementation.
- * Most methods for this class are found in MeshBase, and most
- * implementation details are found in UnstructuredMesh.
+ * ponies,
+ * ponies.
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// Mesh class definition
-class SerialMesh : public UnstructuredMesh
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  explicit
-  SerialMesh (const Parallel::Communicator &comm_in,
-              unsigned char dim=1);
+  ponies
+  ponies,
+              ponies);
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
+#ponies
   /**
-   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  explicit
-  SerialMesh (unsigned char dim=1);
-#endif
+  ponies
+  ponies);
+#ponies
 
 
   /**
-   * Copy-constructor.  This should be able to take a
-   * serial or parallel mesh.
+   * ponies
+   * ponies.
    */
-  SerialMesh (const UnstructuredMesh& other_mesh);
+  ponies);
 
   /**
-   * Copy-constructor, possibly specialized for a
-   * serial mesh.
+   * ponies
+   * ponies.
    */
-  SerialMesh (const SerialMesh& other_mesh);
+  ponies);
 
   /**
-   * Virtual copy-constructor, creates a copy of this mesh
+   * ponies
    */
-  virtual UniquePtr<MeshBase> clone () const
-  { return UniquePtr<MeshBase>(new SerialMesh(*this)); }
+  ponies
+  { ponies)); }
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~SerialMesh();
+  ponies();
 
   /**
-   * Clear all internal data.
+   * ponies.
    */
-  virtual void clear();
+  ponies();
 
   /**
-   * Remove NULL elements from arrays
+   * ponies
    */
-  virtual void renumber_nodes_and_elements ();
+  ponies ();
 
-  virtual dof_id_type n_nodes () const
-  { return cast_int<dof_id_type>(_nodes.size()); }
+  ponies
+  { ponies()); }
 
-  virtual dof_id_type parallel_n_nodes () const
-  { return cast_int<dof_id_type>(_nodes.size()); }
+  ponies
+  { ponies()); }
 
-  virtual dof_id_type max_node_id () const
-  { return cast_int<dof_id_type>(_nodes.size()); }
+  ponies
+  { ponies()); }
 
-  virtual void reserve_nodes (const dof_id_type nn)
-  { _nodes.reserve (nn); }
+  ponies)
+  { ponies); }
 
-  virtual dof_id_type n_elem () const
-  { return cast_int<dof_id_type>(_elements.size()); }
+  ponies
+  { ponies()); }
 
-  virtual dof_id_type parallel_n_elem () const
-  { return cast_int<dof_id_type>(_elements.size()); }
+  ponies
+  { ponies()); }
 
-  virtual dof_id_type n_active_elem () const;
+  ponies;
 
-  virtual dof_id_type max_elem_id ()  const
-  { return cast_int<dof_id_type>(_elements.size()); }
+  ponies
+  { ponies()); }
 
-  virtual void reserve_elem (const dof_id_type ne) { _elements.reserve (ne); }
+  ponies); }
 
-  // SerialMesh has no caches to update
-  virtual void update_parallel_id_counts () {}
+  // ponies
+  ponies () {}
 
-  virtual const Point& point (const dof_id_type i) const ;
-  virtual const Node&  node  (const dof_id_type i) const ;
-  virtual Node& node (const dof_id_type i) ;
-  virtual const Node* node_ptr (const dof_id_type i) const ;
-  virtual Node* node_ptr (const dof_id_type i) ;
-  virtual const Node* query_node_ptr (const dof_id_type i) const ;
-  virtual Node* query_node_ptr (const dof_id_type i) ;
-  virtual const Elem* elem (const dof_id_type i) const ;
-  virtual Elem* elem (const dof_id_type i) ;
-  virtual const Elem* query_elem (const dof_id_type i) const ;
-  virtual Elem* query_elem (const dof_id_type i) ;
+  ponies ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
+  ponies ;
+  ponies) ;
 
   /**
-   * functions for adding /deleting nodes elements.
+   * ponies.
    */
-  virtual Node* add_point (const Point& p,
-                           const dof_id_type id =
-                           DofObject::invalid_id,
-                           const processor_id_type proc_id =
-                           DofObject::invalid_processor_id);
-  virtual Node* add_node (Node* n) ;
+  ponies,
+                           ponies =
+                           ponies,
+                           ponies =
+                           ponies);
+  ponies) ;
 
   /**
-   * Insert \p Node \p n into the Mesh at a location consistent with
-   * n->id(), allocating extra storage if necessary.  Throws an error if:
-   * .) n==NULL
-   * .) n->id() == DofObject::invalid_id
-   * .) A node already exists in position n->id().
+   * ponies
+   * ponies:
+   * .) ponies
+   * .) ponies
+   * .) ponies().
    *
-   * This function differs from the SerialMesh::add_node() function,
-   * which is only capable of appending nodes at the end of the nodes
-   * storage.
+   * ponies,
+   * ponies
+   * ponies.
    */
-  virtual Node* insert_node(Node* n);
+  ponies);
 
-  virtual void delete_node (Node* n) ;
-  virtual void renumber_node (dof_id_type old_id, dof_id_type new_id);
-  virtual Elem* add_elem (Elem* e) ;
-  virtual Elem* insert_elem (Elem* e) ;
-  virtual void delete_elem (Elem* e) ;
-  virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id);
+  ponies) ;
+  ponies);
+  ponies) ;
+  ponies) ;
+  ponies) ;
+  ponies);
 
   /**
-   * There is no reason for a user to ever call this function.
+   * ponies.
    *
-   * This function restores a previously broken element/node numbering such that
-   * \p mesh.node(n)->id() == n.
+   * ponies
+   * \ponies.
    */
-  virtual void fix_broken_node_and_element_numbering ();
+  ponies ();
 
   /**
-   * Stitch \p other_mesh to this mesh so that this mesh is the union of the two meshes.
-   * \p this_mesh_boundary and \p other_mesh_boundary are used to specify a dim-1 dimensional
-   * surface on which we seek to merge any "overlapping" nodes, where we use the parameter
-   * \p tol as a relative tolerance (relative to the smallest edge length on the surfaces
-   * being stitched) to determine whether or not nodes are overlapping.
-   * If \p clear_stitched_boundary_ids==true, this function clears boundary_info IDs in this
-   * mesh associated \p this_mesh_boundary and \p other_mesh_boundary.
-   * If \p use_binary_search is true, we use an optimized "sort then binary search" algorithm
-   * for finding matching nodes. Otherwise we use a N^2 algorithm (which can be more reliable
-   * at dealing with slightly misaligned meshes).
-   * If \p enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
-   * nodes on the specified boundaries don't match the number of nodes that were merged.
-   * This is a helpful error check in some cases.
-   * If \p skip_find_neighbors is true, a faster stitching method is used, where the lists of
-   * neighbors for each elements are copied as well and patched, without calling the time-consuming
-   * find_neighbors() function.
+   * ponies.
+   * \ponies
+   * ponies
+   * \ponies
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies).
+   * ponies
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void stitch_meshes (SerialMesh& other_mesh,
-                      boundary_id_type this_mesh_boundary,
-                      boundary_id_type other_mesh_boundary,
-                      Real tol=TOLERANCE,
-                      bool clear_stitched_boundary_ids=false,
-                      bool verbose=true,
-                      bool use_binary_search=true,
-                      bool enforce_all_nodes_match_on_boundaries=false);
+  ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies,
+                      ponies);
 
   /**
-   * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
+   * ponies.
    */
-  void stitch_surfaces (boundary_id_type boundary_id_1,
-                        boundary_id_type boundary_id_2,
-                        Real tol=TOLERANCE,
-                        bool clear_stitched_boundary_ids=false,
-                        bool verbose=true,
-                        bool use_binary_search=true,
-                        bool enforce_all_nodes_match_on_boundaries=false);
+  ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies);
 
-public:
+ponies:
   /**
-   * Elem iterator accessor functions.
+   * ponies.
    */
-  element_iterator elements_begin ();
-  element_iterator elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator active_elements_begin ();
-  element_iterator active_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator ancestor_elements_begin ();
-  element_iterator ancestor_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator subactive_elements_begin ();
-  element_iterator subactive_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_active_elements_begin ();
-  element_iterator not_active_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_ancestor_elements_begin ();
-  element_iterator not_ancestor_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_subactive_elements_begin ();
-  element_iterator not_subactive_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator local_elements_begin ();
-  element_iterator local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator semilocal_elements_begin ();
-  element_iterator semilocal_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator facelocal_elements_begin ();
-  element_iterator facelocal_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator not_local_elements_begin ();
-  element_iterator not_local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator active_local_elements_begin ();
-  element_iterator active_local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator active_not_local_elements_begin ();
-  element_iterator active_not_local_elements_end   ();
+  ponies ();
+  ponies   ();
 
-  element_iterator level_elements_begin (unsigned int level);
-  element_iterator level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator not_level_elements_begin (unsigned int level);
-  element_iterator not_level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator local_level_elements_begin (unsigned int level);
-  element_iterator local_level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator local_not_level_elements_begin (unsigned int level);
-  element_iterator local_not_level_elements_end   (unsigned int level);
+  ponies);
+  ponies);
 
-  element_iterator pid_elements_begin (processor_id_type proc_id);
-  element_iterator pid_elements_end   (processor_id_type proc_id);
+  ponies);
+  ponies);
 
-  element_iterator type_elements_begin (ElemType type);
-  element_iterator type_elements_end   (ElemType type);
+  ponies);
+  ponies);
 
-  element_iterator active_type_elements_begin (ElemType type);
-  element_iterator active_type_elements_end   (ElemType type);
+  ponies);
+  ponies);
 
-  element_iterator active_pid_elements_begin (processor_id_type proc_id);
-  element_iterator active_pid_elements_end   (processor_id_type proc_id);
+  ponies);
+  ponies);
 
-  element_iterator unpartitioned_elements_begin ();
-  element_iterator unpartitioned_elements_end ();
+  ponies ();
+  ponies ();
 
-  element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id);
-  element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id);
+  ponies);
+  ponies);
 
-  element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id);
-  element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id);
-
-  /**
-   * const Elem iterator accessor functions.
-   */
-  const_element_iterator elements_begin() const;
-  const_element_iterator elements_end()   const;
-
-  const_element_iterator active_elements_begin() const;
-  const_element_iterator active_elements_end()   const;
-
-  const_element_iterator ancestor_elements_begin() const;
-  const_element_iterator ancestor_elements_end()   const;
-
-  const_element_iterator subactive_elements_begin() const;
-  const_element_iterator subactive_elements_end()   const;
-
-  const_element_iterator not_active_elements_begin() const;
-  const_element_iterator not_active_elements_end()   const;
-
-  const_element_iterator not_ancestor_elements_begin() const;
-  const_element_iterator not_ancestor_elements_end()   const;
-
-  const_element_iterator not_subactive_elements_begin() const;
-  const_element_iterator not_subactive_elements_end()   const;
-
-  const_element_iterator local_elements_begin () const;
-  const_element_iterator local_elements_end   () const;
-
-  const_element_iterator semilocal_elements_begin () const;
-  const_element_iterator semilocal_elements_end   () const;
-
-  const_element_iterator facelocal_elements_begin () const;
-  const_element_iterator facelocal_elements_end   () const;
-
-  const_element_iterator not_local_elements_begin () const;
-  const_element_iterator not_local_elements_end   () const;
-
-  const_element_iterator active_local_elements_begin () const;
-  const_element_iterator active_local_elements_end   () const;
-
-  const_element_iterator active_not_local_elements_begin () const;
-  const_element_iterator active_not_local_elements_end   () const;
-
-  const_element_iterator level_elements_begin (unsigned int level) const;
-  const_element_iterator level_elements_end   (unsigned int level) const;
-
-  const_element_iterator not_level_elements_begin (unsigned int level) const;
-  const_element_iterator not_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator local_level_elements_begin (unsigned int level) const;
-  const_element_iterator local_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator local_not_level_elements_begin (unsigned int level) const;
-  const_element_iterator local_not_level_elements_end   (unsigned int level) const;
-
-  const_element_iterator pid_elements_begin (processor_id_type proc_id) const;
-  const_element_iterator pid_elements_end   (processor_id_type proc_id) const;
-
-  const_element_iterator type_elements_begin (ElemType type) const;
-  const_element_iterator type_elements_end   (ElemType type) const;
-
-  const_element_iterator active_type_elements_begin (ElemType type) const;
-  const_element_iterator active_type_elements_end   (ElemType type) const;
-
-  const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const;
-  const_element_iterator active_pid_elements_end   (processor_id_type proc_id) const;
-
-  const_element_iterator unpartitioned_elements_begin () const;
-  const_element_iterator unpartitioned_elements_end () const;
-
-  const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
-  const_element_iterator active_local_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
-
-  const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const;
-  const_element_iterator active_subdomain_elements_end   (subdomain_id_type subdomain_id) const;
-
-
-
-
-
+  ponies);
+  ponies);
 
   /**
-   * non-const Node iterator accessor functions.
+   * ponies.
    */
-  node_iterator nodes_begin();
-  node_iterator nodes_end();
-  node_iterator active_nodes_begin();
-  node_iterator active_nodes_end();
-  node_iterator local_nodes_begin  ();
-  node_iterator local_nodes_end    ();
-  node_iterator pid_nodes_begin (processor_id_type proc_id);
-  node_iterator pid_nodes_end   (processor_id_type proc_id);
-  node_iterator bid_nodes_begin (boundary_id_type bndry_id);
-  node_iterator bid_nodes_end   (boundary_id_type bndry_id);
-  node_iterator bnd_nodes_begin ();
-  node_iterator bnd_nodes_end ();
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+  ponies;
+  ponies;
+
+
+
+
+
 
   /**
-   * const Node iterator accessor functions.
+   * ponies.
    */
-  const_node_iterator nodes_begin() const;
-  const_node_iterator nodes_end()   const;
-  const_node_iterator active_nodes_begin() const;
-  const_node_iterator active_nodes_end()   const;
-  const_node_iterator local_nodes_begin  () const;
-  const_node_iterator local_nodes_end    () const;
-  const_node_iterator pid_nodes_begin (processor_id_type proc_id) const;
-  const_node_iterator pid_nodes_end   (processor_id_type proc_id) const;
-  const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const;
-  const_node_iterator bid_nodes_end   (boundary_id_type bndry_id) const;
-  const_node_iterator bnd_nodes_begin () const;
-  const_node_iterator bnd_nodes_end () const;
-
-protected:
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  /**
-   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
-   * if the library has been configured with unique_id support.
-   */
-  virtual void assign_unique_ids();
-#endif
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies  ();
+  ponies    ();
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies ();
+  ponies ();
 
   /**
-   * The verices (spatial coordinates) of the mesh.
+   * ponies.
    */
-  std::vector<Node*> _nodes;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+
+ponies:
+
+#ponies
+  /**
+   * ponies)
+   * ponies.
+   */
+  ponies();
+#ponies
 
   /**
-   * The elements in the mesh.
+   * ponies.
    */
-  std::vector<Elem*> _elements;
-
-private:
+  ponies;
 
   /**
-   * Helper function for stitch_meshes and stitch_surfaces
-   * that does the mesh stitching.
+   * ponies.
    */
-  void stitching_helper (SerialMesh* other_mesh,
-                         boundary_id_type boundary_id_1,
-                         boundary_id_type boundary_id_2,
-                         Real tol,
-                         bool clear_stitched_boundary_ids,
-                         bool verbose,
-                         bool use_binary_search,
-                         bool enforce_all_nodes_match_on_boundaries,
-                         bool skip_find_neighbors);
+  ponies;
+
+ponies:
 
   /**
-   * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Elem*>.
+   * ponies
+   * ponies.
    */
-  typedef std::vector<Elem*>::iterator             elem_iterator_imp;
-  typedef std::vector<Elem*>::const_iterator const_elem_iterator_imp;
+  ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies);
 
   /**
-   * Typedefs for the container implementation.  In this case,
-   * it's just a std::vector<Node*>.
+   * ponies,
+   * ponies*>.
    */
-  typedef std::vector<Node*>::iterator             node_iterator_imp;
-  typedef std::vector<Node*>::const_iterator const_node_iterator_imp;
+  ponies;
+  ponies;
+
+  /**
+   * ponies,
+   * ponies*>.
+   */
+  ponies;
+  ponies;
 };
 
 
 
-} // namespace libMesh
+} // ponies
 
 
 
-#endif // LIBMESH_SERIAL_MESH_H
+#ponies

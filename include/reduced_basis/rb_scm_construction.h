@@ -1,247 +1,247 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_SCM_CONSTRUCTION_H
-#define LIBMESH_RB_SCM_CONSTRUCTION_H
+#ponies
+#ponies
 
-// Configuration data
-#include "libmesh/libmesh_config.h"
+// ponies
+#ponies"
 
-// Currently, the RBSCMConstruction is only usable
-// if SLEPc is enabled.
-#if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
+// ponies
+// ponies.
+#ponies)
 
-// rbOOmit includes
-#include "libmesh/rb_construction_base.h"
-#include "libmesh/rb_scm_evaluation.h"
+// ponies
+#ponies"
+#ponies"
 
-// libMesh includes
-#include "libmesh/condensed_eigen_system.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * RBSCMConstruction implements the the Successive Constraint Method (SCM)
- * for computing rigorous lower bounds for stability constants.
+ * ponies)
+ * ponies.
  *
- * @author David J. Knezevic 2009
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// RBSCMConstruction class definition
+// ponies
 
-class RBSCMConstruction : public RBConstructionBase<CondensedEigenSystem>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  RBSCMConstruction (EquationSystems& es,
-                     const std::string& name_in,
-                     const unsigned int number_in);
+  ponies,
+                     ponies,
+                     ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBSCMConstruction ();
+  ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef RBSCMConstruction sys_type;
+  ponies;
 
   /**
-   * The type of the parent.
+   * ponies.
    */
-  typedef RBConstructionBase<CondensedEigenSystem> Parent;
+  ponies;
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Set the RBSCMEvaluation object.
+   * ponies.
    */
-  void set_rb_scm_evaluation(RBSCMEvaluation& rb_scm_eval_in);
+  ponies);
 
   /**
-   * Get a reference to the RBSCMEvaluation object.
+   * ponies.
    */
-  RBSCMEvaluation& get_rb_scm_evaluation();
+  ponies();
 
   /**
-   * Get a reference to the RBThetaExpansion object.
+   * ponies.
    */
-  RBThetaExpansion& get_rb_theta_expansion();
+  ponies();
 
   /**
-   * Clear and resize the SCM data vectors. Overload
-   * in subclass as necessary.
+   * ponies
+   * ponies.
    */
-  virtual void resize_SCM_vectors ();
+  ponies ();
 
   /**
-   * Read in the parameters from file specified by \p parameters_filename
-   * and set the this system's member variables accordingly.
+   * ponies
+   * ponies.
    */
-  virtual void process_parameters_file(const std::string& parameters_filename);
+  ponies);
 
   /**
-   * Print out info that describes the current setup of this RBSCMConstruction.
+   * ponies.
    */
-  virtual void print_info();
+  ponies();
 
   /**
-   * This function is called before truth eigensolves in
-   * compute_SCM_bounding_box and evaluate_stability_constant.
-   * Overload it to set specific properties to optimize
-   * eigensolver performance. The argument refers to
-   * the operator index in compute_SCM_bounding_box;
-   * a negative value of the argument indicates we are
-   * not performing a bounding box solve.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies;
+   * ponies
+   * ponies.
    */
-  virtual void set_eigensolver_properties(int ) { }
+  ponies ) { }
 
   /**
-   * Set the name of the associated RB system --- we need
-   * this to load the (symmetrized) affine operators.
+   * ponies
+   * ponies.
    */
-  void set_RB_system_name(const std::string& new_name)
-  { RB_system_name = new_name; }
+  ponies)
+  { ponies; }
 
   /**
-   * Get/set SCM_training_tolerance: tolerance for SCM greedy.
+   * ponies.
    */
-  Real get_SCM_training_tolerance() const                         { return SCM_training_tolerance; }
-  void set_SCM_training_tolerance(Real SCM_training_tolerance_in) { this->SCM_training_tolerance = SCM_training_tolerance_in; }
+  ponies; }
+  ponies; }
 
   /**
-   * Perform the SCM greedy algorithm to develop a lower bound
-   * over the training set.
+   * ponies
+   * ponies.
    */
-  virtual void perform_SCM_greedy();
+  ponies();
 
   /**
-   * Attach the deflation space defined by the specified vector, can
-   * be useful in solving constrained eigenvalue problems.
+   * ponies
+   * ponies.
    *
-   * This function is called at the start of perform_SCM_greedy and by
-   * default is does nothing. Overload in subclass to attach a specific
-   * vector.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void attach_deflation_space() {}
+  ponies() {}
 
-protected:
+ponies:
 
   /**
-   * Add the scaled symmetrized affine matrix from the
-   * associated RBSystem to matrix_A.
+   * ponies
+   * ponies.
    */
-  virtual void add_scaled_symm_Aq(unsigned int q_a, Number scalar);
+  ponies);
 
   /**
-   * Copy over the matrix to store in matrix_B,
-   * usually this is the mass or inner-product
-   * matrix, but needs to be implemented in subclass.
+   * ponies,
+   * ponies
+   * ponies.
    */
-  virtual void load_matrix_B() ;
+  ponies() ;
 
   /**
-   * Compute the SCM bounding box.
+   * ponies.
    */
-  virtual void compute_SCM_bounding_box();
+  ponies();
 
   /**
-   * Compute the stability constant for current_parameters
-   * by solving a generalized eigenvalue problem over the
-   * truth space.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void evaluate_stability_constant();
+  ponies();
 
   /**
-   * Enrich C_J by adding the element of SCM_training_samples
-   * that has the largest gap between alpha_LB and alpha_LB.
+   * ponies
+   * ponies.
    */
-  virtual void enrich_C_J(unsigned int new_C_J_index);
+  ponies);
 
   /**
-   * Compute upper and lower bounds for each SCM training point.
-   * Return a pair containing the maximum SCM error, and the
-   * index of the parameter in the training set at which the max
-   * error is achieved.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual std::pair<unsigned int,Real> compute_SCM_bounds_on_training_set();
+  ponies();
 
   /**
-   * Compute the inner product between two vectors using the system's
-   * matrix_B.
+   * ponies
+   * ponies.
    */
-  Number B_inner_product(const NumericVector<Number>& v, const NumericVector<Number>& w) const;
+  ponies;
 
   /**
-   * Compute the inner product between two vectors using
-   * matrix Aq.
+   * ponies
+   * ponies.
    */
-  Number Aq_inner_product(unsigned int q,
-                          const NumericVector<Number>& v,
-                          const NumericVector<Number>& w);
+  ponies,
+                          ponies,
+                          ponies);
 
   /**
-   * Helper function which provides an error
-   * indicator to be used in the SCM greedy.
-   * Overload in subclasses to specialize behavior.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  virtual Real SCM_greedy_error_indicator(Real LB, Real UB) { return fabs(UB-LB)/fabs(UB); }
+  ponies); }
 
-  //----------- PROTECTED DATA MEMBERS -----------//
+  //----------- ponies -----------//
 
   /**
-   * Tolerance which controls when to terminate the SCM Greedy.
+   * ponies.
    */
-  Real SCM_training_tolerance;
+  ponies;
 
   /**
-   * The name of the associated RB system.
+   * ponies.
    */
-  std::string RB_system_name;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * The current RBSCMEvaluation object we are using to
-   * perform the Evaluation stage of the SCM.
+   * ponies
+   * ponies.
    */
-  RBSCMEvaluation* rb_scm_eval;
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
+#ponies
 
-#endif // LIBMESH_RB_SCM_CONSTRUCTION_H
+#ponies

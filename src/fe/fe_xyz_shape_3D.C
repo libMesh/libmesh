@@ -1,1438 +1,1438 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// C++ inlcludes
-
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+// ponies
+// ponies
 
 
+// ponies
+
+// ponies
+#ponies"
+#ponies"
 
 
-// Anonymous namespace for persistant variables.
-// This allows us to determine when the centroid needs
-// to be recalculated.
-namespace
+
+
+// ponies.
+// ponies
+// ponies.
+ponies
 {
-using namespace libMesh;
+ponies;
 
-static dof_id_type old_elem_id = DofObject::invalid_id;
-static Point centroid;
-static Point max_distance;
+ponies;
+ponies;
+ponies;
 }
 
 
-namespace libMesh
+ponies
 {
 
 
-template <>
-Real FE<3,XYZ>::shape(const ElemType,
-                      const Order,
-                      const unsigned int,
-                      const Point&)
+ponies <>
+ponies,
+                      ponies,
+                      ponies,
+                      ponies&)
 {
-  libmesh_error_msg("XYZ polynomials require the element because the centroid is needed.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,XYZ>::shape(const Elem* elem,
-                      const Order libmesh_dbg_var(order),
-                      const unsigned int i,
-                      const Point& point_in)
+ponies <>
+ponies,
+                      ponies),
+                      ponies,
+                      ponies)
 {
-#if LIBMESH_DIM == 3
-  libmesh_assert(elem);
+#ponies
+  ponies);
 
-  // Only recompute the centroid if the element
-  // has changed from the last one we computed.
-  // This avoids repeated centroid calculations
-  // when called in succession with the same element.
-  if (elem->id() != old_elem_id)
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
+  ponies)
     {
-      centroid = elem->centroid();
-      old_elem_id = elem->id();
-      max_distance = Point(0.,0.,0.);
-      for (unsigned int p = 0; p < elem->n_nodes(); p++)
-        for (unsigned int d = 0; d < 3; d++)
+      ponies();
+      ponies();
+      ponies.);
+      ponies++)
+        ponies++)
           {
-            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-            max_distance(d) = std::max(distance, max_distance(d));
+            ponies));
+            ponies));
           }
     }
 
-  // Using static globals for old_elem_id, etc. will fail
-  // horribly with more than one thread.
-  libmesh_assert_equal_to (libMesh::n_threads(), 1);
+  // ponies
+  // ponies.
+  ponies);
 
-  const Real x  = point_in(0);
-  const Real y  = point_in(1);
-  const Real z  = point_in(2);
-  const Real xc = centroid(0);
-  const Real yc = centroid(1);
-  const Real zc = centroid(2);
-  const Real distx = max_distance(0);
-  const Real disty = max_distance(1);
-  const Real distz = max_distance(2);
-  const Real dx = (x - xc)/distx;
-  const Real dy = (y - yc)/disty;
-  const Real dz = (z - zc)/distz;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies;
+  ponies;
+  ponies;
 
-#ifndef NDEBUG
-  // totalorder is only used in the assertion below, so
-  // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = order + elem->p_level();
-#endif
-  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-                       (static_cast<unsigned int>(totalorder)+2)*
-                       (static_cast<unsigned int>(totalorder)+3)/6);
+#ponies
+  // ponies
+  // ponies.
+  ponies();
+#ponies
+  ponies)*
+                       (ponies)*
+                       (ponies);
 
-  // monomials. since they are hierarchic we only need one case block.
-  switch (i)
+  // ponies.
+  ponies)
     {
-      // constant
-    case 0:
-      return 1.;
+      // ponies
+    ponies:
+      ponies.;
 
-      // linears
-    case 1:
-      return dx;
+      // ponies
+    ponies:
+      ponies;
 
-    case 2:
-      return dy;
+    ponies:
+      ponies;
 
-    case 3:
-      return dz;
+    ponies:
+      ponies;
 
-      // quadratics
-    case 4:
-      return dx*dx;
+      // ponies
+    ponies:
+      ponies;
 
-    case 5:
-      return dx*dy;
+    ponies:
+      ponies;
 
-    case 6:
-      return dy*dy;
+    ponies:
+      ponies;
 
-    case 7:
-      return dx*dz;
+    ponies:
+      ponies;
 
-    case 8:
-      return dz*dy;
+    ponies:
+      ponies;
 
-    case 9:
-      return dz*dz;
+    ponies:
+      ponies;
 
-      // cubics
-    case 10:
-      return dx*dx*dx;
+      // ponies
+    ponies:
+      ponies;
 
-    case 11:
-      return dx*dx*dy;
+    ponies:
+      ponies;
 
-    case 12:
-      return dx*dy*dy;
+    ponies:
+      ponies;
 
-    case 13:
-      return dy*dy*dy;
+    ponies:
+      ponies;
 
-    case 14:
-      return dx*dx*dz;
+    ponies:
+      ponies;
 
-    case 15:
-      return dx*dy*dz;
+    ponies:
+      ponies;
 
-    case 16:
-      return dy*dy*dz;
+    ponies:
+      ponies;
 
-    case 17:
-      return dx*dz*dz;
+    ponies:
+      ponies;
 
-    case 18:
-      return dy*dz*dz;
+    ponies:
+      ponies;
 
-    case 19:
-      return dz*dz*dz;
+    ponies:
+      ponies;
 
-      // quartics
-    case 20:
-      return dx*dx*dx*dx;
+      // ponies
+    ponies:
+      ponies;
 
-    case 21:
-      return dx*dx*dx*dy;
+    ponies:
+      ponies;
 
-    case 22:
-      return dx*dx*dy*dy;
+    ponies:
+      ponies;
 
-    case 23:
-      return dx*dy*dy*dy;
+    ponies:
+      ponies;
 
-    case 24:
-      return dy*dy*dy*dy;
+    ponies:
+      ponies;
 
-    case 25:
-      return dx*dx*dx*dz;
+    ponies:
+      ponies;
 
-    case 26:
-      return dx*dx*dy*dz;
+    ponies:
+      ponies;
 
-    case 27:
-      return dx*dy*dy*dz;
+    ponies:
+      ponies;
 
-    case 28:
-      return dy*dy*dy*dz;
+    ponies:
+      ponies;
 
-    case 29:
-      return dx*dx*dz*dz;
+    ponies:
+      ponies;
 
-    case 30:
-      return dx*dy*dz*dz;
+    ponies:
+      ponies;
 
-    case 31:
-      return dy*dy*dz*dz;
+    ponies:
+      ponies;
 
-    case 32:
-      return dx*dz*dz*dz;
+    ponies:
+      ponies;
 
-    case 33:
-      return dy*dz*dz*dz;
+    ponies:
+      ponies;
 
-    case 34:
-      return dz*dz*dz*dz;
+    ponies:
+      ponies;
 
-    default:
-      unsigned int o = 0;
-      for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-      unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-      unsigned int block=o, nz = 0;
-      for (; block < i2; block += (o-nz+1)) { nz++; }
-      const unsigned int nx = block - i2;
-      const unsigned int ny = o - nx - nz;
-      Real val = 1.;
-      for (unsigned int index=0; index != nx; index++)
-        val *= dx;
-      for (unsigned int index=0; index != ny; index++)
-        val *= dy;
-      for (unsigned int index=0; index != nz; index++)
-        val *= dz;
-      return val;
+    ponies:
+      ponies;
+      ponies++) { }
+      ponies);
+      ponies;
+      ponies++; }
+      ponies;
+      ponies;
+      ponies.;
+      ponies++)
+        ponies;
+      ponies++)
+        ponies;
+      ponies++)
+        ponies;
+      ponies;
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,XYZ>::shape_deriv(const ElemType,
-                            const Order,
-                            const unsigned int,
-                            const unsigned int,
-                            const Point&)
+ponies <>
+ponies,
+                            ponies,
+                            ponies,
+                            ponies,
+                            ponies&)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,XYZ>::shape_deriv(const Elem* elem,
-                            const Order libmesh_dbg_var(order),
-                            const unsigned int i,
-                            const unsigned int j,
-                            const Point& point_in)
+ponies <>
+ponies,
+                            ponies),
+                            ponies,
+                            ponies,
+                            ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
-  libmesh_assert(elem);
-  libmesh_assert_less (j, 3);
+  ponies);
+  ponies);
 
-  // Only recompute the centroid if the element
-  // has changed from the last one we computed.
-  // This avoids repeated centroid calculations
-  // when called in succession with the same element.
-  if (elem->id() != old_elem_id)
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
+  ponies)
     {
-      centroid = elem->centroid();
-      old_elem_id = elem->id();
-      max_distance = Point(0.,0.,0.);
-      for (unsigned int p = 0; p < elem->n_nodes(); p++)
-        for (unsigned int d = 0; d < 3; d++)
+      ponies();
+      ponies();
+      ponies.);
+      ponies++)
+        ponies++)
           {
-            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-            max_distance(d) = std::max(distance, max_distance(d));
+            ponies));
+            ponies));
           }
     }
 
-  // Using static globals for old_elem_id, etc. will fail
-  // horribly with more than one thread.
-  libmesh_assert_equal_to (libMesh::n_threads(), 1);
+  // ponies
+  // ponies.
+  ponies);
 
-  const Real x  = point_in(0);
-  const Real y  = point_in(1);
-  const Real z  = point_in(2);
-  const Real xc = centroid(0);
-  const Real yc = centroid(1);
-  const Real zc = centroid(2);
-  const Real distx = max_distance(0);
-  const Real disty = max_distance(1);
-  const Real distz = max_distance(2);
-  const Real dx = (x - xc)/distx;
-  const Real dy = (y - yc)/disty;
-  const Real dz = (z - zc)/distz;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies;
+  ponies;
+  ponies;
 
-#ifndef NDEBUG
-  // totalorder is only used in the assertion below, so
-  // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
-#endif
-  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-                       (static_cast<unsigned int>(totalorder)+2)*
-                       (static_cast<unsigned int>(totalorder)+3)/6);
+#ponies
+  // ponies
+  // ponies.
+  ponies());
+#ponies
+  ponies)*
+                       (ponies)*
+                       (ponies);
 
-  switch (j)
+  ponies)
     {
-      // d()/dx
-    case 0:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linear
-          case 1:
-            return 1./distx;
+            // ponies
+          ponies:
+            ponies;
 
-          case 2:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 3:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 2.*dx/distx;
+            // ponies
+          ponies:
+            ponies;
 
-          case 5:
-            return dy/distx;
+          ponies:
+            ponies;
 
-          case 6:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 7:
-            return dz/distx;
+          ponies:
+            ponies;
 
-          case 8:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 3.*dx*dx/distx;
+            // ponies
+          ponies:
+            ponies;
 
-          case 11:
-            return 2.*dx*dy/distx;
+          ponies:
+            ponies;
 
-          case 12:
-            return dy*dy/distx;
+          ponies:
+            ponies;
 
-          case 13:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 14:
-            return 2.*dx*dz/distx;
+          ponies:
+            ponies;
 
-          case 15:
-            return dy*dz/distx;
+          ponies:
+            ponies;
 
-          case 16:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 17:
-            return dz*dz/distx;
+          ponies:
+            ponies;
 
-          case 18:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 19:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 4.*dx*dx*dx/distx;
+            // ponies
+          ponies:
+            ponies;
 
-          case 21:
-            return 3.*dx*dx*dy/distx;
+          ponies:
+            ponies;
 
-          case 22:
-            return 2.*dx*dy*dy/distx;
+          ponies:
+            ponies;
 
-          case 23:
-            return dy*dy*dy/distx;
+          ponies:
+            ponies;
 
-          case 24:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 25:
-            return 3.*dx*dx*dz/distx;
+          ponies:
+            ponies;
 
-          case 26:
-            return 2.*dx*dy*dz/distx;
+          ponies:
+            ponies;
 
-          case 27:
-            return dy*dy*dz/distx;
+          ponies:
+            ponies;
 
-          case 28:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 29:
-            return 2.*dx*dz*dz/distx;
+          ponies:
+            ponies;
 
-          case 30:
-            return dy*dz*dz/distx;
+          ponies:
+            ponies;
 
-          case 31:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 32:
-            return dz*dz*dz/distx;
+          ponies:
+            ponies;
 
-          case 33:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 34:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx;
-            for (unsigned int index=1; index < nx; index++)
-              val *= dx;
-            for (unsigned int index=0; index != ny; index++)
-              val *= dy;
-            for (unsigned int index=0; index != nz; index++)
-              val *= dz;
-            return val/distx;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d()/dy
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linear
-          case 1:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 2:
-            return 1./disty;
+          ponies:
+            ponies;
 
-          case 3:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 5:
-            return dx/disty;
+          ponies:
+            ponies;
 
-          case 6:
-            return 2.*dy/disty;
+          ponies:
+            ponies;
 
-          case 7:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 8:
-            return dz/disty;
+          ponies:
+            ponies;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return dx*dx/disty;
+          ponies:
+            ponies;
 
-          case 12:
-            return 2.*dx*dy/disty;
+          ponies:
+            ponies;
 
-          case 13:
-            return 3.*dy*dy/disty;
+          ponies:
+            ponies;
 
-          case 14:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 15:
-            return dx*dz/disty;
+          ponies:
+            ponies;
 
-          case 16:
-            return 2.*dy*dz/disty;
+          ponies:
+            ponies;
 
-          case 17:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 18:
-            return dz*dz/disty;
+          ponies:
+            ponies;
 
-          case 19:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 21:
-            return dx*dx*dx/disty;
+          ponies:
+            ponies;
 
-          case 22:
-            return 2.*dx*dx*dy/disty;
+          ponies:
+            ponies;
 
-          case 23:
-            return 3.*dx*dy*dy/disty;
+          ponies:
+            ponies;
 
-          case 24:
-            return 4.*dy*dy*dy/disty;
+          ponies:
+            ponies;
 
-          case 25:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 26:
-            return dx*dx*dz/disty;
+          ponies:
+            ponies;
 
-          case 27:
-            return 2.*dx*dy*dz/disty;
+          ponies:
+            ponies;
 
-          case 28:
-            return 3.*dy*dy*dz/disty;
+          ponies:
+            ponies;
 
-          case 29:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 30:
-            return dx*dz*dz/disty;
+          ponies:
+            ponies;
 
-          case 31:
-            return 2.*dy*dz*dz/disty;
+          ponies:
+            ponies;
 
-          case 32:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 33:
-            return dz*dz*dz/disty;
+          ponies:
+            ponies;
 
-          case 34:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = ny;
-            for (unsigned int index=0; index != nx; index++)
-              val *= dx;
-            for (unsigned int index=1; index < ny; index++)
-              val *= dy;
-            for (unsigned int index=0; index != nz; index++)
-              val *= dz;
-            return val/disty;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d()/dz
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-            // linear
-          case 1:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 2:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 3:
-            return 1./distz;
+          ponies:
+            ponies;
 
-            // quadratic
-          case 4:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 5:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 6:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 7:
-            return dx/distz;
+          ponies:
+            ponies;
 
-          case 8:
-            return dy/distz;
+          ponies:
+            ponies;
 
-          case 9:
-            return 2.*dz/distz;
+          ponies:
+            ponies;
 
-            // cubic
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 12:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 13:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 14:
-            return dx*dx/distz;
+          ponies:
+            ponies;
 
-          case 15:
-            return dx*dy/distz;
+          ponies:
+            ponies;
 
-          case 16:
-            return dy*dy/distz;
+          ponies:
+            ponies;
 
-          case 17:
-            return 2.*dx*dz/distz;
+          ponies:
+            ponies;
 
-          case 18:
-            return 2.*dy*dz/distz;
+          ponies:
+            ponies;
 
-          case 19:
-            return 3.*dz*dz/distz;
+          ponies:
+            ponies;
 
-            // quartics
-          case 20:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 21:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 22:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 23:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 24:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 25:
-            return dx*dx*dx/distz;
+          ponies:
+            ponies;
 
-          case 26:
-            return dx*dx*dy/distz;
+          ponies:
+            ponies;
 
-          case 27:
-            return dx*dy*dy/distz;
+          ponies:
+            ponies;
 
-          case 28:
-            return dy*dy*dy/distz;
+          ponies:
+            ponies;
 
-          case 29:
-            return 2.*dx*dx*dz/distz;
+          ponies:
+            ponies;
 
-          case 30:
-            return 2.*dx*dy*dz/distz;
+          ponies:
+            ponies;
 
-          case 31:
-            return 2.*dy*dy*dz/distz;
+          ponies:
+            ponies;
 
-          case 32:
-            return 3.*dx*dz*dz/distz;
+          ponies:
+            ponies;
 
-          case 33:
-            return 3.*dy*dz*dz/distz;
+          ponies:
+            ponies;
 
-          case 34:
-            return 4.*dz*dz*dz/distz;
+          ponies:
+            ponies;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nz;
-            for (unsigned int index=0; index != nx; index++)
-              val *= dx;
-            for (unsigned int index=0; index != ny; index++)
-              val *= dy;
-            for (unsigned int index=1; index < nz; index++)
-              val *= dz;
-            return val/distz;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-    default:
-      libmesh_error_msg("Invalid j = " << j);
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,XYZ>::shape_second_deriv(const ElemType,
-                                   const Order,
-                                   const unsigned int,
-                                   const unsigned int,
-                                   const Point&)
+ponies <>
+ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies&)
 {
-  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
-                                   const Order libmesh_dbg_var(order),
-                                   const unsigned int i,
-                                   const unsigned int j,
-                                   const Point& point_in)
+ponies <>
+ponies,
+                                   ponies),
+                                   ponies,
+                                   ponies,
+                                   ponies)
 {
-#if LIBMESH_DIM == 3
+#ponies
 
-  libmesh_assert(elem);
-  libmesh_assert_less (j, 6);
+  ponies);
+  ponies);
 
-  // Only recompute the centroid if the element
-  // has changed from the last one we computed.
-  // This avoids repeated centroid calculations
-  // when called in succession with the same element.
-  if (elem->id() != old_elem_id)
+  // ponies
+  // ponies.
+  // ponies
+  // ponies.
+  ponies)
     {
-      centroid = elem->centroid();
-      old_elem_id = elem->id();
-      max_distance = Point(0.,0.,0.);
-      for (unsigned int p = 0; p < elem->n_nodes(); p++)
-        for (unsigned int d = 0; d < 3; d++)
+      ponies();
+      ponies();
+      ponies.);
+      ponies++)
+        ponies++)
           {
-            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-            max_distance(d) = std::max(distance, max_distance(d));
+            ponies));
+            ponies));
           }
     }
 
-  // Using static globals for old_elem_id, etc. will fail
-  // horribly with more than one thread.
-  libmesh_assert_equal_to (libMesh::n_threads(), 1);
+  // ponies
+  // ponies.
+  ponies);
 
-  const Real x  = point_in(0);
-  const Real y  = point_in(1);
-  const Real z  = point_in(2);
-  const Real xc = centroid(0);
-  const Real yc = centroid(1);
-  const Real zc = centroid(2);
-  const Real distx = max_distance(0);
-  const Real disty = max_distance(1);
-  const Real distz = max_distance(2);
-  const Real dx = (x - xc)/distx;
-  const Real dy = (y - yc)/disty;
-  const Real dz = (z - zc)/distz;
-  const Real dist2x = pow(distx,2.);
-  const Real dist2y = pow(disty,2.);
-  const Real dist2z = pow(distz,2.);
-  const Real distxy = distx * disty;
-  const Real distxz = distx * distz;
-  const Real distyz = disty * distz;
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+  ponies;
+  ponies;
+  ponies;
+  ponies.);
+  ponies.);
+  ponies.);
+  ponies;
+  ponies;
+  ponies;
 
-#ifndef NDEBUG
-  // totalorder is only used in the assertion below, so
-  // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
-#endif
-  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-                       (static_cast<unsigned int>(totalorder)+2)*
-                       (static_cast<unsigned int>(totalorder)+3)/6);
+#ponies
+  // ponies
+  // ponies.
+  ponies());
+#ponies
+  ponies)*
+                       (ponies)*
+                       (ponies);
 
-  // monomials. since they are hierarchic we only need one case block.
-  switch (j)
+  // ponies.
+  ponies)
     {
-      // d^2()/dx^2
-    case 0:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 2./dist2x;
+            // ponies
+          ponies:
+            ponies;
 
-          case 5:
-          case 6:
-          case 7:
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 6.*dx/dist2x;
+            // ponies
+          ponies:
+            ponies;
 
-          case 11:
-            return 2.*dy/dist2x;
+          ponies:
+            ponies;
 
-          case 12:
-          case 13:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 14:
-            return 2.*dz/dist2x;
+          ponies:
+            ponies;
 
-          case 15:
-          case 16:
-          case 17:
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 12.*dx*dx/dist2x;
+            // ponies
+          ponies:
+            ponies;
 
-          case 21:
-            return 6.*dx*dy/dist2x;
+          ponies:
+            ponies;
 
-          case 22:
-            return 2.*dy*dy/dist2x;
+          ponies:
+            ponies;
 
-          case 23:
-          case 24:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 25:
-            return 6.*dx*dz/dist2x;
+          ponies:
+            ponies;
 
-          case 26:
-            return 2.*dy*dz/dist2x;
+          ponies:
+            ponies;
 
-          case 27:
-          case 28:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 29:
-            return 2.*dz*dz/dist2x;
+          ponies:
+            ponies;
 
-          case 30:
-          case 31:
-          case 32:
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx * (nx - 1);
-            for (unsigned int index=2; index < nx; index++)
-              val *= dx;
-            for (unsigned int index=0; index != ny; index++)
-              val *= dy;
-            for (unsigned int index=0; index != nz; index++)
-              val *= dz;
-            return val/dist2x;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d^2()/dxdy
-    case 1:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 5:
-            return 1./distxy;
+          ponies:
+            ponies;
 
-          case 6:
-          case 7:
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 11:
-            return 2.*dx/distxy;
+          ponies:
+            ponies;
 
-          case 12:
-            return 2.*dy/distxy;
+          ponies:
+            ponies;
 
-          case 13:
-          case 14:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 15:
-            return dz/distxy;
+          ponies:
+            ponies;
 
-          case 16:
-          case 17:
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-            return 0.;
+            // ponies
+          ponies:
+            ponies.;
 
-          case 21:
-            return 3.*dx*dx/distxy;
+          ponies:
+            ponies;
 
-          case 22:
-            return 4.*dx*dy/distxy;
+          ponies:
+            ponies;
 
-          case 23:
-            return 3.*dy*dy/distxy;
+          ponies:
+            ponies;
 
-          case 24:
-          case 25:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 26:
-            return 2.*dx*dz/distxy;
+          ponies:
+            ponies;
 
-          case 27:
-            return 2.*dy*dz/distxy;
+          ponies:
+            ponies;
 
-          case 28:
-          case 29:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 30:
-            return dz*dz/distxy;
+          ponies:
+            ponies;
 
-          case 31:
-          case 32:
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx * ny;
-            for (unsigned int index=1; index < nx; index++)
-              val *= dx;
-            for (unsigned int index=1; index < ny; index++)
-              val *= dy;
-            for (unsigned int index=0; index != nz; index++)
-              val *= dz;
-            return val/distxy;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d^2()/dy^2
-    case 2:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-          case 5:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 6:
-            return 2./dist2y;
+          ponies:
+            ponies;
 
-          case 7:
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-          case 11:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 12:
-            return 2.*dx/dist2y;
-          case 13:
-            return 6.*dy/dist2y;
+          ponies:
+            ponies;
+          ponies:
+            ponies;
 
-          case 14:
-          case 15:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 16:
-            return 2.*dz/dist2y;
+          ponies:
+            ponies;
 
-          case 17:
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-          case 21:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+            ponies.;
 
-          case 22:
-            return 2.*dx*dx/dist2y;
+          ponies:
+            ponies;
 
-          case 23:
-            return 6.*dx*dy/dist2y;
+          ponies:
+            ponies;
 
-          case 24:
-            return 12.*dy*dy/dist2y;
+          ponies:
+            ponies;
 
-          case 25:
-          case 26:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 27:
-            return 2.*dx*dz/dist2y;
+          ponies:
+            ponies;
 
-          case 28:
-            return 6.*dy*dz/dist2y;
+          ponies:
+            ponies;
 
-          case 29:
-          case 30:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          case 31:
-            return 2.*dz*dz/dist2y;
+          ponies:
+            ponies;
 
-          case 32:
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = ny * (ny - 1);
-            for (unsigned int index=0; index != nx; index++)
-              val *= dx;
-            for (unsigned int index=2; index < ny; index++)
-              val *= dy;
-            for (unsigned int index=0; index != nz; index++)
-              val *= dz;
-            return val/dist2y;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-      // d^2()/dxdz
-    case 3:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-          case 5:
-          case 6:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 7:
-            return 1./distxz;
+          ponies:
+            ponies;
 
-          case 8:
-          case 9:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-          case 11:
-          case 12:
-          case 13:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 14:
-            return 2.*dx/distxz;
+          ponies:
+            ponies;
 
-          case 15:
-            return dy/distxz;
+          ponies:
+            ponies;
 
-          case 16:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 17:
-            return 2.*dz/distxz;
+          ponies:
+            ponies;
 
-          case 18:
-          case 19:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-          case 21:
-          case 22:
-          case 23:
-          case 24:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 25:
-            return 3.*dx*dx/distxz;
+          ponies:
+            ponies;
 
-          case 26:
-            return 2.*dx*dy/distxz;
+          ponies:
+            ponies;
 
-          case 27:
-            return dy*dy/distxz;
+          ponies:
+            ponies;
 
-          case 28:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 29:
-            return 4.*dx*dz/distxz;
+          ponies:
+            ponies;
 
-          case 30:
-            return 2.*dy*dz/distxz;
+          ponies:
+            ponies;
 
-          case 31:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 32:
-            return 3.*dz*dz/distxz;
+          ponies:
+            ponies;
 
-          case 33:
-          case 34:
-            return 0.;
+          ponies:
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nx * nz;
-            for (unsigned int index=1; index < nx; index++)
-              val *= dx;
-            for (unsigned int index=0; index != ny; index++)
-              val *= dy;
-            for (unsigned int index=1; index < nz; index++)
-              val *= dz;
-            return val/distxz;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
-      // d^2()/dydz
-    case 4:
+      // ponies
+    ponies:
       {
-        switch (i)
+        ponies)
           {
-            // constant
-          case 0:
+            // ponies
+          ponies:
 
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-            // quadratic
-          case 4:
-          case 5:
-          case 6:
-          case 7:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 8:
-            return 1./distyz;
+          ponies:
+            ponies;
 
-          case 9:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // cubic
-          case 10:
-          case 11:
-          case 12:
-          case 13:
-          case 14:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 15:
-            return dx/distyz;
+          ponies:
+            ponies;
 
-          case 16:
-            return 2.*dy/distyz;
+          ponies:
+            ponies;
 
-          case 17:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 18:
-            return 2.*dz/distyz;
+          ponies:
+            ponies;
 
-          case 19:
-            return 0.;
+          ponies:
+            ponies.;
 
-            // quartics
-          case 20:
-          case 21:
-          case 22:
-          case 23:
-          case 24:
-          case 25:
-            return 0.;
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
 
-          case 26:
-            return dx*dx/distyz;
+          ponies:
+            ponies;
 
-          case 27:
-            return 2.*dx*dy/distyz;
+          ponies:
+            ponies;
 
-          case 28:
-            return 3.*dy*dy/distyz;
+          ponies:
+            ponies;
 
-          case 29:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 30:
-            return 2.*dx*dz/distyz;
+          ponies:
+            ponies;
 
-          case 31:
-            return 4.*dy*dz/distyz;
+          ponies:
+            ponies;
 
-          case 32:
-            return 0.;
+          ponies:
+            ponies.;
 
-          case 33:
-            return 3.*dz*dz/distyz;
+          ponies:
+            ponies;
 
-          case 34:
-            return 0.;
+          ponies:
+            ponies.;
 
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = ny * nz;
-            for (unsigned int index=0; index != nx; index++)
-              val *= dx;
-            for (unsigned int index=1; index < ny; index++)
-              val *= dy;
-            for (unsigned int index=1; index < nz; index++)
-              val *= dz;
-            return val/distyz;
-          }
-      }
-
-
-      // d^2()/dz^2
-    case 5:
-      {
-        switch (i)
-          {
-            // constant
-          case 0:
-
-            // linear
-          case 1:
-          case 2:
-          case 3:
-            return 0.;
-
-            // quadratic
-          case 4:
-          case 5:
-          case 6:
-          case 7:
-          case 8:
-            return 0.;
-
-          case 9:
-            return 2./dist2z;
-
-            // cubic
-          case 10:
-          case 11:
-          case 12:
-          case 13:
-          case 14:
-          case 15:
-          case 16:
-            return 0.;
-
-          case 17:
-            return 2.*dx/dist2z;
-
-          case 18:
-            return 2.*dy/dist2z;
-
-          case 19:
-            return 6.*dz/dist2z;
-
-            // quartics
-          case 20:
-          case 21:
-          case 22:
-          case 23:
-          case 24:
-          case 25:
-          case 26:
-          case 27:
-          case 28:
-            return 0.;
-
-          case 29:
-            return 2.*dx*dx/dist2z;
-
-          case 30:
-            return 2.*dx*dy/dist2z;
-
-          case 31:
-            return 2.*dy*dy/dist2z;
-
-          case 32:
-            return 6.*dx*dz/dist2z;
-
-          case 33:
-            return 6.*dy*dz/dist2z;
-
-          case 34:
-            return 12.*dz*dz/dist2z;
-
-          default:
-            unsigned int o = 0;
-            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
-            for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
-            Real val = nz * (nz - 1);
-            for (unsigned int index=0; index != nx; index++)
-              val *= dx;
-            for (unsigned int index=0; index != ny; index++)
-              val *= dy;
-            for (unsigned int index=2; index < nz; index++)
-              val *= dz;
-            return val/dist2z;
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
           }
       }
 
 
-    default:
-      libmesh_error_msg("Invalid j = " << j);
+      // ponies
+    ponies:
+      {
+        ponies)
+          {
+            // ponies
+          ponies:
+
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
+
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
+
+          ponies:
+            ponies;
+
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+
+            // ponies
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+          ponies:
+            ponies.;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+
+          ponies:
+            ponies;
+            ponies++) { }
+            ponies);
+            ponies;
+            ponies++; }
+            ponies;
+            ponies;
+            ponies);
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies++)
+              ponies;
+            ponies;
+          }
+      }
+
+
+    ponies:
+      ponies);
     }
 
-#endif
+#ponies
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-} // namespace libMesh
+} // ponies

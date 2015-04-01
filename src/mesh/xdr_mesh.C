@@ -1,357 +1,357 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// Local includes
-#include "libmesh/xdr_mesh.h"
-#include "libmesh/xdr_mhead.h"
-#include "libmesh/enum_elem_type.h" // for ElemType
+// ponies
+#ponies"
+#ponies"
+#ponies
 
-namespace libMesh
+ponies
 {
 
 // ------------------------------------------------------------
-// XdrMESH members
-int XdrMESH::header(XdrMHEAD *hd)
+// ponies
+ponies)
 {
-  // Temporary variables to facilitate stream reading
-  const int comm_len= 256;
-  char comment[comm_len];
+  // ponies
+  ponies;
+  ponies];
 
-  switch (m_type)
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-    case (XdrMGF::DECODE):
-    case (XdrMGF::ENCODE):
+    ponies):
+    ponies):
       {
-        xdr_int(mp_xdr_handle, &(hd->m_numel));
-        xdr_int(mp_xdr_handle, &(hd->m_numNodes));
-        xdr_int(mp_xdr_handle, &(hd->m_sumWghts));
-        xdr_int(mp_xdr_handle, &(hd->m_numBCs));
-        xdr_int(mp_xdr_handle, &(hd->m_strSize));
-        break;
+        ponies));
+        ponies));
+        ponies));
+        ponies));
+        ponies));
+        ponies;
       }
 
-#endif
+#ponies
 
-    case (XdrMGF::W_ASCII):
+    ponies):
       {
-        mp_out << hd->m_numel    << "\t # Num. Elements\n";
-        mp_out << hd->m_numNodes << "\t # Num. Nodes\n";
-        mp_out << hd->m_sumWghts << "\t # Sum of Element Weights\n";
-        mp_out << hd->m_numBCs   << "\t # Num. Boundary Conds.\n";
-        mp_out << hd->m_strSize  << "\t # String Size (ignore)\n";
-        break;
+        ponies";
+        ponies";
+        ponies";
+        ponies";
+        ponies";
+        ponies;
       }
 
-    case (XdrMGF::R_ASCII):
+    ponies):
       {
-        libmesh_assert (mp_in.good());
+        ponies());
 
-        mp_in >> hd->m_numel    ; mp_in.getline(comment, comm_len);
-        mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);
-        mp_in >> hd->m_sumWghts ; mp_in.getline(comment, comm_len);
-        mp_in >> hd->m_numBCs   ; mp_in.getline(comment, comm_len);
-        mp_in >> hd->m_strSize  ; mp_in.getline(comment, comm_len);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
 
-        libmesh_assert(mp_in.good());
+        ponies());
 
-        break;
+        ponies;
       }
 
-    default:
-      // Unknown access type
-      libmesh_error_msg("Unknown m_type" << m_type);
+    ponies:
+      // ponies
+      ponies);
     }
 
-  // Let's write the augmented header information
-  // before we write the title and id string
+  // ponies
+  // ponies
 
-  // Both DEAL and LIBM style files have augmented headers.
-  if ((orig_flag == 0) || (orig_flag == 2))
+  // ponies.
+  ponies))
     {
 
-      switch (m_type)
+      ponies)
         {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        case (XdrMGF::ENCODE):
-        case (XdrMGF::DECODE):
+        ponies):
+        ponies):
           {
-            // this used to be 0.  How did that work?
-            unsigned int temp_n_blocks = hd->get_n_blocks();
-            xdr_u_int(mp_xdr_handle, &temp_n_blocks);
-            hd->set_n_blocks(temp_n_blocks);
+            // ponies?
+            ponies();
+            ponies);
+            ponies);
 
-            // The number of blocks (i.e. the number of element types)
-            // for any mesh must always
-            // be at least 1.
-            libmesh_assert_not_equal_to (hd->get_n_blocks(), 0);
-            break;
+            // ponies)
+            // ponies
+            // ponies.
+            ponies);
+            ponies;
           }
 
-#endif
+#ponies
 
-        case (XdrMGF::W_ASCII):
+        ponies):
           {
-            mp_out << hd->get_n_blocks() << "\t # Num. Element Blocks.\n";
-            break;
+            ponies";
+            ponies;
           }
 
-        case (XdrMGF::R_ASCII):
+        ponies):
           {
-            libmesh_assert (mp_in.good());
-            unsigned int temp_n_blocks=0;
-            mp_in >> temp_n_blocks;
-            hd->set_n_blocks(temp_n_blocks);
-            mp_in.getline(comment, comm_len);
-            break;
+            ponies());
+            ponies;
+            ponies;
+            ponies);
+            ponies);
+            ponies;
           }
 
-        default:
-          // Unknown access type
-          libmesh_error_msg("Unknown m_type" << m_type);
+        ponies:
+          // ponies
+          ponies);
         }
 
 
-      std::vector<ElemType> et;
-      hd->get_block_elt_types(et);
+      ponies;
+      ponies);
 
 
-      // Note:  If DECODING or READING, allocate space in the vector
-      if ((m_type == DECODE) || (m_type == R_ASCII))
-        et.resize(hd->get_n_blocks());
+      // ponies
+      ponies))
+        ponies());
 
 
-      switch (m_type)
+      ponies)
         {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        case (XdrMGF::ENCODE):
-        case (XdrMGF::DECODE):
+        ponies):
+        ponies):
           {
-            xdr_vector(mp_xdr_handle,
-                       (char *) &et[0],
-                       cast_int<unsigned int>(et.size()),
-                       sizeof(unsigned int),
-                       (xdrproc_t) xdr_u_int);
-            break;
+            ponies,
+                       (ponies],
+                       ponies()),
+                       ponies),
+                       (ponies);
+            ponies;
           }
 
-#endif
+#ponies
 
-        case (XdrMGF::W_ASCII):
+        ponies):
           {
-            for (unsigned int i=0; i<hd->get_n_blocks(); i++)
-              mp_out << et[i] << " ";
+            ponies++)
+              ponies] << " ";
 
-            mp_out << "\t # Element types in each block.\n";
-            break;
+            ponies";
+            ponies;
           }
 
-        case (XdrMGF::R_ASCII):
+        ponies):
           {
-            libmesh_assert (mp_in.good());
+            ponies());
 
-            for (unsigned int i=0; i<hd->get_n_blocks(); i++)
+            ponies++)
               {
-                // convoluted way of doing it to
-                // satisfy icc
-                unsigned int type;
+                // ponies
+                // ponies
+                ponies;
 
-                mp_in >> type ;
+                ponies ;
 
-                et[i] = static_cast<ElemType>(type) ;
+                ponies) ;
               }
-            mp_in.getline(comment, comm_len);
-            break;
+            ponies);
+            ponies;
           }
 
-        default:
-          // Unknown access type
-          libmesh_error_msg("Unknown m_type" << m_type);
+        ponies:
+          // ponies
+          ponies);
         }
 
 
 
-      // Note:  If DECODING or READING, you need to set the value
-      // in the header data structure.
-      if ((m_type == DECODE) || (m_type == R_ASCII))
-        hd->set_block_elt_types(et);
+      // ponies
+      // ponies.
+      ponies))
+        ponies);
 
 
-      std::vector<unsigned int> neeb;
-      hd->get_num_elem_each_block(neeb);
+      ponies;
+      ponies);
 
-      // If DECODING or READING, allocate space for the vector
-      if ((m_type == DECODE) || (m_type == R_ASCII))
-        neeb.resize( hd->get_n_blocks()*(this->get_num_levels()+1) );
+      // ponies
+      ponies))
+        ponies) );
 
-      switch (m_type)
+      ponies)
         {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-        case (XdrMGF::ENCODE):
-        case (XdrMGF::DECODE):
+        ponies):
+        ponies):
           {
-            xdr_vector(mp_xdr_handle,
-                       (char *) &neeb[0],
-                       cast_int<unsigned int>(neeb.size()),
-                       sizeof(unsigned int),
-                       (xdrproc_t) xdr_u_int);
+            ponies,
+                       (ponies],
+                       ponies()),
+                       ponies),
+                       (ponies);
           }
 
-#endif
+#ponies
 
-        case (XdrMGF::W_ASCII):
+        ponies):
           {
-            for (unsigned int i=0; i<neeb.size(); i++)
-              mp_out << neeb[i] << " ";
+            ponies++)
+              ponies] << " ";
 
-            mp_out << "\t # Num. of elements in each block at each level.\n";
-            break;
+            ponies";
+            ponies;
           }
 
-        case (XdrMGF::R_ASCII):
+        ponies):
           {
 
-            // We will treat this line as containing
-            // 1.) The number of elements in each block OR
-            // 2.) The number of elements at each level in each block
-            // Therefore, we don't know a-priori how many ints to read.
+            // ponies
+            // ponies
+            // ponies
+            // ponies.
 
-            // Get the full line from the stream up to the newline
-            mp_in.getline(comment, comm_len);
+            // ponies
+            ponies);
 
-            // Construct a char buffer to hold the tokens as we
-            // process them, and construct a std::string object and
-            // a std::stringstream object for tokenizing this line.
-            char token[comm_len];
-            std::string s_temp(comment);
-            std::stringstream ss(s_temp);
+            // ponies
+            // ponies
+            // ponies.
+            ponies];
+            ponies);
+            ponies);
 
-            // Resize the neeb vector to zero so we can push back
-            // values onto it.  Note that we are using a tokenizer
-            // scheme again here to read the line, but it's not entirely
-            // necessary since we know the size neeb should have.
-            neeb.resize(0);
+            // ponies
+            // ponies
+            // ponies
+            // ponies.
+            ponies);
 
-            // Process the tokens one at a time
-            while (ss >> token)
+            // ponies
+            ponies)
               {
-                // If you reach the hash, the rest of the line is a comment,
-                // so quit reading.
-                if (token[0] == '#')
-                  break;
+                // ponies,
+                // ponies.
+                ponies] == '#')
+                  ponies;
 
-                // If you reach an alphabetic character, this is an error
-                if (!isdigit(token[0]))
-                  libmesh_error_msg("Error: Unrecognized character detected.");
+                // ponies
+                ponies]))
+                  ponies.");
 
-                // Otherwise, add the value to the neeb vector
-                neeb.push_back( std::atoi(token) );
+                // ponies
+                ponies) );
               }
 
-            // Be sure you have the right number of entries in neeb
-            libmesh_assert_equal_to (neeb.size(), (hd->get_n_blocks() * (this->get_num_levels()+1)));
+            // ponies
+            ponies)));
 
-            break;
+            ponies;
           }
 
-        default:
-          // Unknown access type
-          libmesh_error_msg("Unknown m_type" << m_type);
+        ponies:
+          // ponies
+          ponies);
         }
 
-      if ((m_type == DECODE) || (m_type == R_ASCII))
-        hd->set_num_elem_each_block(neeb);
+      ponies))
+        ponies);
     }
 
-  else if (orig_flag == 1) // MGF originator
+  ponies
     {
     }
-  else  // Unknown Originator!
-    libmesh_error_msg("Unknown orig_flag " << orig_flag);
+  ponies!
+    ponies);
 
 
 
 
-  // Write the ID and TITLE strings (can be safely ignored)
-  switch (m_type)
+  // ponies)
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-    case (XdrMGF::ENCODE):
-    case (XdrMGF::DECODE):
+    ponies):
+    ponies):
       {
-        char* temp = hd->cpyString(hd->getId());
-        xdr_string(mp_xdr_handle, &temp,
-                   ((m_type == XdrMGF::ENCODE) ?
-                    cast_int<unsigned int>(std::strlen(temp)) :
-                    hd->m_strSize));
-        hd->setId(temp);
-        delete [] temp;
+        ponies());
+        ponies,
+                   ((ponies) ?
+                    ponies)) :
+                    ponies));
+        ponies);
+        ponies;
 
-        temp = hd->cpyString(hd->getTitle());
+        ponies());
 
-        xdr_string(mp_xdr_handle, &temp,
-                   ((m_type == XdrMGF::ENCODE) ?
-                    cast_int<unsigned int>(std::strlen(temp)) :
-                    hd->m_strSize));
-        hd->setTitle(temp);
-        delete [] temp;
-        break;
+        ponies,
+                   ((ponies) ?
+                    ponies)) :
+                    ponies));
+        ponies);
+        ponies;
+        ponies;
       }
 
-#endif
+#ponies
 
-    case (XdrMGF::W_ASCII):
+    ponies):
       {
-        mp_out << hd->mp_id    << '\n';
-        mp_out << hd->mp_title << '\n';
-        break;
+        ponies';
+        ponies';
+        ponies;
       }
 
-    case (XdrMGF::R_ASCII):
+    ponies):
       {
-        libmesh_assert (mp_in.good());
+        ponies());
 
-        mp_in.getline(comment, comm_len);
-        hd->setId(comment);
+        ponies);
+        ponies);
 
-        libmesh_assert (mp_in.good());
+        ponies());
 
-        mp_in.getline(comment, comm_len);
-        hd->setTitle(comment);
+        ponies);
+        ponies);
 
-        break;
+        ponies;
       }
 
-    default:
-      // Unknown access type
-      libmesh_error_msg("Unknown m_type" << m_type);
+    ponies:
+      // ponies
+      ponies);
     }
 
-  return 1;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

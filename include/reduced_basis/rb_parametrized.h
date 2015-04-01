@@ -1,244 +1,244 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_PARAMETRIZED_H
-#define LIBMESH_RB_PARAMETRIZED_H
+#ponies
+#ponies
 
-// rbOOmit includes
-#include "libmesh/rb_parameters.h"
+// ponies
+#ponies"
 
-// libMesh includes
-#include "libmesh/reference_counted_object.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * This class defines basic functionality of
- * a parametrized object.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 // ------------------------------------------------------------
-// RBParametrized class definition
-class RBParametrized : public ReferenceCountedObject<RBParametrized>
+// ponies
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  RBParametrized ();
+  ponies ();
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~RBParametrized ();
+  ponies ();
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Initialize the parameter ranges and set current_parameters.
+   * ponies.
    */
-  void initialize_parameters(const RBParameters& mu_min_in,
-                             const RBParameters& mu_max_in,
-                             const std::map< std::string, std::vector<Real> >& discrete_parameter_values);
+  ponies,
+                             ponies,
+                             ponies);
 
   /**
-   * Initialize the parameter ranges and set current_parameters.
+   * ponies.
    */
-  void initialize_parameters(const RBParametrized& rb_parametrized);
+  ponies);
 
   /**
-   * Get the number of parameters.
+   * ponies.
    */
-  unsigned int get_n_params() const;
+  ponies;
 
   /**
-   * Get the number of continuous parameters.
+   * ponies.
    */
-  unsigned int get_n_continuous_params() const;
+  ponies;
 
   /**
-   * Get the number of discrete parameters.
+   * ponies.
    */
-  unsigned int get_n_discrete_params() const;
+  ponies;
 
   /**
-   * Get a set that stores the parameter names.
+   * ponies.
    */
-  std::set<std::string> get_parameter_names() const;
+  ponies;
 
   /**
-   * Get the current parameters.
+   * ponies.
    */
-  const RBParameters& get_parameters() const;
+  ponies;
 
   /**
-   * Set the current parameters to \p params
+   * ponies
    */
-  void set_parameters(const RBParameters& params);
+  ponies);
 
   /**
-   * Get an RBParameters object that specifies the minimum allowable value
-   * for each parameter.
+   * ponies
+   * ponies.
    */
-  const RBParameters& get_parameters_min() const;
+  ponies;
 
   /**
-   * Get an RBParameters object that specifies the maximum allowable value
-   * for each parameter.
+   * ponies
+   * ponies.
    */
-  const RBParameters& get_parameters_max() const;
+  ponies;
 
   /**
-   * Get minimum allowable value of parameter \p param_name.
+   * ponies.
    */
-  Real get_parameter_min(const std::string& param_name) const;
+  ponies;
 
   /**
-   * Get maximum allowable value of parameter \p param_name.
+   * ponies.
    */
-  Real get_parameter_max(const std::string& param_name) const;
+  ponies;
 
   /**
-   * Print the current parameters.
+   * ponies.
    */
-  void print_parameters() const;
+  ponies;
 
   /**
-   * Write out the parameter ranges to files.
+   * ponies.
    */
-  void write_parameter_data_to_files(const std::string& continuous_param_file_name,
-                                     const std::string& discrete_param_file_name,
-                                     const bool write_binary_data);
+  ponies,
+                                     ponies,
+                                     ponies);
 
   /**
-   * Read in the parameter ranges from files.
+   * ponies.
    */
-  void read_parameter_data_from_files(const std::string& continuous_param_file_name,
-                                      const std::string& discrete_param_file_name,
-                                      const bool read_binary_data);
+  ponies,
+                                      ponies,
+                                      ponies);
 
   /**
-   * Is parameter \p mu_name discrete?
+   * ponies?
    */
-  bool is_discrete_parameter(const std::string& mu_name) const;
+  ponies;
 
   /**
-   * Get a const reference to the discrete parameter values.
+   * ponies.
    */
-  const std::map< std::string, std::vector<Real> >& get_discrete_parameter_values() const;
+  ponies;
 
   /**
-   * Print out all the discrete parameter values.
+   * ponies.
    */
-  void print_discrete_parameter_values() const;
+  ponies;
 
   /**
-   * Helper function that returns the closest entry to \p value from
-   * \p list_of_values.
+   * ponies
+   * \ponies.
    */
-  static Real get_closest_value(Real value, const std::vector<Real>& list_of_values);
+  ponies);
 
   /**
-   * Public boolean to toggle verbose mode.
+   * ponies.
    */
-  bool verbose_mode;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Write out the parameter ranges to file.
+   * ponies.
    */
-  void write_parameter_ranges_to_file(const std::string& file_name,
-                                      const bool write_binary);
+  ponies,
+                                      ponies);
 
   /**
-   * Write out the discrete parameter values to file.
+   * ponies.
    */
-  void write_discrete_parameter_values_to_file(const std::string& file_name,
-                                               const bool write_binary_data);
+  ponies,
+                                               ponies);
 
   /**
-   * Read in the parameter ranges from file. Initialize parameters
-   * to the "minimum" parameter values.
+   * ponies
+   * ponies.
    */
-  void read_parameter_ranges_from_file(const std::string& file_name,
-                                       const bool read_binary,
-                                       RBParameters& param_min,
-                                       RBParameters& param_max);
+  ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies);
 
   /**
-   * Read in the discrete parameter values from file, if we have any.
+   * ponies.
    */
-  void read_discrete_parameter_values_from_file(const std::string& file_name,
-                                                const bool read_binary_data,
-                                                std::map< std::string, std::vector<Real> >& discrete_parameter_values_in);
+  ponies,
+                                                ponies,
+                                                ponies);
 
   /**
-   * Helper function to check that \p params is valid.
+   * ponies.
    */
-  bool valid_params(const RBParameters& params);
+  ponies);
 
   /**
-   * Helper function to check if the specified value
-   * is in the list of values (within a tolerance given
-   * by \p tol).
+   * ponies
+   * ponies
+   * ponies).
    */
-  static bool is_value_in_list(Real value, const std::vector<Real>& list_of_values, Real tol);
+  ponies);
 
-  //--------------- PRIVATE DATA MEMBERS ---------------//
-
-  /**
-   * Flag indicating whether the parameters have been initialized.
-   */
-  bool parameters_initialized;
+  //--------------- ponies ---------------//
 
   /**
-   * Vector storing the current parameters.
+   * ponies.
    */
-  RBParameters parameters;
+  ponies;
 
   /**
-   * Vectors that define the ranges (min and max) for the parameters.
+   * ponies.
    */
-  RBParameters parameters_min;
-  RBParameters parameters_max;
+  ponies;
 
   /**
-   * Map that defines the allowable values of any discrete parameters.
+   * ponies.
    */
-  std::map< std::string, std::vector<Real> > _discrete_parameter_values;
+  ponies;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_RB_PARAMETRIZED_H
+#ponies

@@ -1,70 +1,70 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/fe_transformation_base.h"
-#include "libmesh/h1_fe_transformation.h"
-#include "libmesh/hcurl_fe_transformation.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-template< typename OutputShape >
-UniquePtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::build( const FEType& fe_type )
+ponies >
+ponies )
 {
-  switch (fe_type.family)
+  ponies)
     {
-      // H1 Conforming Elements
-    case LAGRANGE:
-    case HIERARCHIC:
-    case BERNSTEIN:
-    case SZABAB:
-    case CLOUGH: // PB: Really H2
-    case HERMITE: // PB: Really H2
-    case SUBDIVISION:
-    case LAGRANGE_VEC:
-    case MONOMIAL: // PB: Shouldn't this be L2 conforming?
-    case XYZ: // PB: Shouldn't this be L2 conforming?
-    case L2_HIERARCHIC: // PB: Shouldn't this be L2 conforming?
-    case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
-    case JACOBI_20_00: // PB: For infinite elements...
-    case JACOBI_30_00: // PB: For infinite elements...
-      return UniquePtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
+      // ponies
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies
+    ponies
+    ponies:
+    ponies:
+    ponies?
+    ponies?
+    ponies?
+    ponies?
+    ponies...
+    ponies...
+      ponies>);
 
-      // HCurl Conforming Elements
-    case NEDELEC_ONE:
-      return UniquePtr<FETransformationBase<OutputShape> >(new HCurlFETransformation<OutputShape>);
+      // ponies
+    ponies:
+      ponies>);
 
-      // HDiv Conforming Elements
-      // L2 Conforming Elements
+      // ponies
+      // ponies
 
-      // Other...
-    case SCALAR:
-      // Should never need this for SCALARs
-      return UniquePtr<FETransformationBase<OutputShape> >(new H1FETransformation<OutputShape>);
+      // ponies...
+    ponies:
+      // ponies
+      ponies>);
 
-    default:
-      libmesh_error_msg("Unknown family = " << fe_type.family);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<FETransformationBase<OutputShape> >();
+  ponies!");
+  ponies> >();
 }
 
-template class FETransformationBase<Real>;
-template class FETransformationBase<RealGradient>;
+ponies>;
+ponies>;
 
-} // namespace libMesh
+} // ponies

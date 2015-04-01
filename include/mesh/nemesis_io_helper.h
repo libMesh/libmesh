@@ -1,655 +1,655 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_NEMESIS_IO_HELPER_H
-#define LIBMESH_NEMESIS_IO_HELPER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
+#ponies)
 
-// Local headers
-#include "libmesh/exodusII_io_helper.h"
+// ponies
+#ponies"
 
-// C++ headers
-#include <set>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// The Nemesis API header file.  Should already be
-// correctly extern C'd but it doesn't hurt :)
-namespace Nemesis {
-extern "C" {
-  // this include guard gets set by exodus, but we included it
-  // in a namespace, so nemesis will not properly resolve e.g.
-  // ex_entity_id in the global namespace.  undefine the guard
-  // to get ne_nemesisI.h to properly include the typedefs
-#  ifdef EXODUS_II_HDR
-#    undef EXODUS_II_HDR
-#  endif
-#  include "ne_nemesisI.h"
+// ponies
+// ponies :)
+ponies {
+ponies" {
+  // ponies
+  // ponies.
+  // ponies
+  // ponies
+#  ponies
+#    ponies
+#  ponies
+#  ponies"
 }
 }
 
 
 /**
- * This is the \p Nemesis_IO_Helper class.  Think of it as
- * a big struct with storage for all the stuff one might
- * want to pull from a Nemesis file.  Derived from
- * ExodusII_IO_Helper object, since Nemesis is based on
- * the same file format.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author John W. Peterson, 2008.
+ * @ponies.
  */
-class Nemesis_IO_Helper : public ExodusII_IO_Helper
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor.
+   * ponies.
    */
-  explicit
-  Nemesis_IO_Helper(const ParallelObject &parent,
-                    bool verbose=false, bool single_precision=false);
+  ponies
+  ponies,
+                    ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~Nemesis_IO_Helper();
+  ponies();
 
   /**
-   * Reading functions.  These just allocate memory for you and call the Nemesis
-   * routines of the same name.  They also handle error checking for the Nemesis
-   * return value.  Be careful calling these at random, some depend on others
-   * being called first...
-   */
-
-  /**
-   * Fills: num_nodes_global, num_elems_global, num_elem_blks_global,
-   * num_node_sets_global, num_side_sets_global
-   * Call after: read_header()
-   * Call before: Any other get_* function from this class
-   */
-  void get_init_global();
-
-  /**
-   * Fills: global_sideset_ids, num_global_side_counts, num_global_side_df_counts
-   * Call after: get_init_global()
-   */
-  void get_ss_param_global();
-  void get_ns_param_global();
-  void get_eb_info_global();
-  void get_init_info();
-  void get_loadbal_param();
-  void get_elem_map();
-  void get_node_map();
-  void get_cmap_params();
-  void get_node_cmap();
-  void get_elem_cmap();
-
-  /**
-   * Writing functions.
+   * ponies
+   * ponies
+   * ponies
+   * ponies...
    */
 
   /**
-   * Writes basic info about the partitioning to file
-   * .) num_proc - number of processors
-   * .) num_proc_in_file - number of processors in the current file - generally equal to 1
-   * .) ftype = "s" for scalar load-balance file, "p" for parallel file
+   * ponies,
+   * ponies
+   * ponies()
+   * ponies
    */
-  void put_init_info(unsigned num_proc,
-                     unsigned num_proc_in_file,
-                     const char* ftype);
+  ponies();
 
   /**
-   * Writes global information including:
-   * .) global number of nodes
-   * .) global number of elems
-   * .) global number of element blocks
-   * .) global number of node sets
-   * .) global number of side sets
+   * ponies
+   * ponies()
    */
-  void put_init_global(dof_id_type num_nodes_global,
-                       dof_id_type num_elems_global,
-                       unsigned num_elem_blks_global,
-                       unsigned num_node_sets_global,
-                       unsigned num_side_sets_global);
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
 
   /**
-   * Writes global block information to the file
-   * .) global_elem_blk_ids - list of block IDs for all blocks present in the mesh
-   * .) global_elem_blk_cnts - number of elements in each block for the global mesh
+   * ponies.
+   */
+
+  /**
+   * ponies
+   * .) ponies
+   * .) ponies
+   * .) ponies
+   */
+  ponies,
+                     ponies,
+                     ponies);
+
+  /**
+   * ponies:
+   * .) ponies
+   * .) ponies
+   * .) ponies
+   * .) ponies
+   * .) ponies
+   */
+  ponies,
+                       ponies,
+                       ponies,
+                       ponies,
+                       ponies);
+
+  /**
+   * ponies
+   * .) ponies
+   * .) ponies
    *
-   * Must be called after put_init_global().
+   * ponies().
    */
-  void put_eb_info_global(std::vector<int>& global_elem_blk_ids,
-                          std::vector<int>& global_elem_blk_cnts);
+  ponies,
+                          ponies);
 
   /**
-   * This function writes information about global node sets.
-   * .) global_nodeset_ids - vector of global node set IDs
-   * .) num_global_node_counts - vector of global node counts contained in each global node set
-   * .) num_global_df_count - vector of global distribution factors in each global node set
+   * ponies.
+   * .) ponies
+   * .) ponies
+   * .) ponies
    *
-   * Must be called after put_init_global()
+   * ponies()
    */
-  void put_ns_param_global(std::vector<int>& global_nodeset_ids,
-                           std::vector<int>& num_global_node_counts,
-                           std::vector<int>& num_global_node_df_counts);
+  ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * This function writes information about global side sets.
-   * .) global_sideset_ids - vector of global side set IDs
-   * .) num_global_side_counts - vector of global side counts contained in each global side set
-   * .) num_global_df_count - vector of global distribution factors in each global side set
+   * ponies.
+   * .) ponies
+   * .) ponies
+   * .) ponies
    *
-   * Must be called after put_init_global()
+   * ponies()
    */
-  void put_ss_param_global(std::vector<int>& global_sideset_ids,
-                           std::vector<int>& num_global_side_counts,
-                           std::vector<int>& num_global_side_df_counts);
+  ponies,
+                           ponies,
+                           ponies);
 
 
 
   /**
-   * Writes load balance parameters, some of which are described below:
-   * .) num_internal_nodes - nodes "wholly" owned by the current processor
-   * .) num_border_nodes - nodes local to a processor but residing in an element
-   *                       which also has nodes on other processors
-   * .) num_external_nodes - nodes that reside on other processors but whose element
-   *                         "partially" resides on the current processor --
-   *                          we assert this should be zero on reading!
-   * .) num_border_elems - elements local to this processor but whose nodes reside
-   *                       on other processors as well.
-   * .) processor - ID of the processor for which information is to be written
+   * ponies:
+   * .) ponies
+   * .) ponies
+   *                       ponies
+   * .) ponies
+   *                         "ponies --
+   *                          ponies!
+   * .) ponies
+   *                       ponies.
+   * .) ponies
    */
-  void put_loadbal_param(unsigned num_internal_nodes,
-                         unsigned num_border_nodes,
-                         unsigned num_external_nodes,
-                         unsigned num_internal_elems,
-                         unsigned num_border_elems,
-                         unsigned num_node_cmaps,
-                         unsigned num_elem_cmaps);
+  ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies,
+                         ponies);
 
   /**
-   * Outputs initial information for communication maps.
-   * Note: the order of the arguments specified in the Nemsis
-   * User's Manual is *wrong*.  The correct order is
-   * (ids, counts, ids, counts).
-   * Must be called after put_loadbal_param().
+   * ponies.
+   * ponies
+   * ponies
+   * (ponies).
+   * ponies().
    */
-  void put_cmap_params(std::vector<int>& node_cmap_ids,
-                       std::vector<int>& node_cmap_node_cnts,
-                       std::vector<int>& elem_cmap_ids,
-                       std::vector<int>& elem_cmap_elem_cnts);
+  ponies,
+                       ponies,
+                       ponies,
+                       ponies);
 
   /**
-   * Outputs *all* of the nodal communication maps for this processor.  Internally,
-   * this function loops over all communication maps and calls
-   * Nemesis::ne_put_node_cmap() for each one.
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * .) node_cmap_node_ids = Nodal IDs of the FEM nodes in this communication map
-   * .) node_cmap_proc_ids = processor IDs associated with each of the nodes in node_ids
+   * .) ponies
+   * .) ponies
    *
-   * In the Nemesis file, these all appeart to be written to the same chunks of data:
-   * n_comm_nids and n_comm_proc, but don't rely on these names...
+   * ponies:
+   * ponies...
    *
-   * Note: this class contains vector<vectors>:
-   * node_cmap_node_ids
-   * node_cmap_proc_ids
-   * which can be used when calling this function.
+   * ponies>:
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Must be called after put_cmap_params().
+   * ponies().
    */
-  void put_node_cmap(std::vector<std::vector<int> >& node_cmap_node_ids,
-                     std::vector<std::vector<int> >& node_cmap_proc_ids);
+  ponies,
+                     ponies);
 
   /**
-   * Outputs IDs of internal, border, and external nodes.
-   * LibMesh asserts that the number of external nodes is zero in the
-   * Nemesis files it reads
+   * ponies.
+   * ponies
+   * ponies
    */
-  void put_node_map(std::vector<int>& node_mapi,
-                    std::vector<int>& node_mapb,
-                    std::vector<int>& node_mape);
+  ponies,
+                    ponies,
+                    ponies);
 
   /**
-   * Writes information about elemental communication map.
+   * ponies.
    *
-   * Note: this class contains vector<vectors>:
-   * elem_cmap_elem_ids
-   * elem_cmap_side_ids
-   * elem_cmap_proc_ids
+   * ponies>:
+   * ponies
+   * ponies
+   * ponies
    *
-   * Must be called after put_cmap_params().
+   * ponies().
    */
-  void put_elem_cmap(std::vector<std::vector<int> >& elem_cmap_elem_ids,
-                     std::vector<std::vector<int> >& elem_cmap_side_ids,
-                     std::vector<std::vector<int> >& elem_cmap_proc_ids);
+  ponies,
+                     ponies,
+                     ponies);
 
   /**
-   * Outputs IDs of internal and border elements.
+   * ponies.
    *
-   * Must be called after ne_put_loadbal_param().
+   * ponies().
    */
-  void put_elem_map(std::vector<int>& elem_mapi,
-                    std::vector<int>& elem_mapb);
+  ponies,
+                    ponies);
 
   /**
-   * Writes the specified number of coordinate values starting at the specified
-   * index.
+   * ponies
+   * ponies.
    */
-  void put_n_coord(unsigned start_node_num,
-                   unsigned num_nodes,
-                   std::vector<Real>& x_coor,
-                   std::vector<Real>& y_coor,
-                   std::vector<Real>& z_coor);
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies);
 
 
   /**
-   * This function is specialized from ExodusII_IO_Helper to write only the
-   * nodal coordinates stored on the local piece of the Mesh.
+   * ponies
+   * ponies.
    */
-  virtual void write_nodal_coordinates(const MeshBase & mesh, bool use_discontinuous=false);
+  ponies);
 
   /**
-   * This function is specialized to write the connectivity.
+   * ponies.
    */
-  virtual void write_elements(const MeshBase & mesh, bool use_discontinuous=false);
+  ponies);
 
   /**
-   * Writes the sidesets for this processor.
+   * ponies.
    */
-  virtual void write_sidesets(const MeshBase & mesh);
+  ponies);
 
   /**
-   * Writes the nodesets for this processor.
+   * ponies.
    */
-  virtual void write_nodesets(const MeshBase & mesh);
+  ponies);
 
   /**
-   * This function is specialized from ExodusII_IO_Helper to create the
-   * nodal coordinates stored on the local piece of the Mesh.
+   * ponies
+   * ponies.
    */
-  virtual void create(std::string filename);
+  ponies);
 
   /**
-   * Specialization of the initialize function from ExodusII_IO_Helper that
-   * also writes global initial data to file.
+   * ponies
+   * ponies.
    */
-  virtual void initialize(std::string title, const MeshBase & mesh, bool use_discontinuous=false);
+  ponies);
 
   /**
-   * Takes a solution vector containing the solution for all variables and outputs it to the files
+   * ponies
    */
-  void write_nodal_solution(const std::vector<Number>& values,
-                            const std::vector<std::string>& names,
-                            int timestep);
+  ponies,
+                            ponies,
+                            ponies);
 
   /**
-   * Given base_filename, foo.e, constructs the Nemesis filename
-   * foo.e.X.Y, where X=n. CPUs and Y=processor ID
+   * ponies
+   * ponies
    */
-  std::string construct_nemesis_filename(const std::string& base_filename);
+  ponies);
 
   /**
-   * Member data
+   * ponies
    */
 
   /**
-   * All (?) Nemesis functions return an int.  If it's negative that signals an error!
-   * Internally, we use the ExodusII_IO_Helper::check_err() function to check for errors.
+   * ponies!
+   * ponies.
    */
-  int nemesis_err_flag;
+  ponies;
 
   /**
-   * Global initial information.  The names are self-explanatory
-   * for the most part.  Used with Nemesis::ne_get_init_global().
+   * ponies
+   * ponies().
    */
-  int num_nodes_global;
-  int num_elems_global;
-  int num_elem_blks_global;
-  int num_node_sets_global;
-  int num_side_sets_global;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * The number of processors for which the NEMESIS I file was created.
-   * To be used with Nemesis::ne_get_init_info().
+   * ponies.
+   * ponies().
    */
-  int num_proc;
+  ponies;
 
   /**
-   * The number of processors for which the NEMESIS I file stores information.
-   * This is generally equal to 1 (1 CPU/file) at least for the splitting Derek gave us.
-   * To be used with Nemesis::ne_get_init_info().
+   * ponies.
+   * ponies.
+   * ponies().
    */
-  int num_proc_in_file;
+  ponies;
 
   /**
-   * The type of file to be written. Either 's', for a scalar
-   * load-balance file, or 'p' for a parallel file.
-   * To be used with Nemesis::ne_get_init_info().
+   * ponies
+   * ponies.
+   * ponies().
    */
-  char ftype;
+  ponies;
 
   /**
-   * Containers for reading global sideset (boundary conditions) information.  Each vector will
-   * eventually have num_side_sets_global entries, and be used in calls to
-   * Nemesis::ne_get_ss_param_global().
+   * ponies
+   * ponies
+   * ponies().
    *
-   * It's an error to call ne_get_ss_param_global when num_side_sets_global==0
+   * ponies
    */
-  std::vector<int> global_sideset_ids;
-  std::vector<int> num_global_side_counts;
-  std::vector<int> num_global_side_df_counts;
+  ponies;
+  ponies;
+  ponies;
 
 
   /**
-   * Containers for reading global nodeset information.  One vector entry per nodeset.
-   * Each vector will eventually have num_node_sets_global entries, and
-   * will be used in calls to Nemesis::ne_get_ns_param_global().
+   * ponies.
+   * ponies
+   * ponies().
    *
-   * It's an error to call ne_get_ns_param_global when num_node_sets_global==0
+   * ponies
    */
-  std::vector<int> global_nodeset_ids;
-  std::vector<int> num_global_node_counts;
-  std::vector<int> num_global_node_df_counts;
+  ponies;
+  ponies;
+  ponies;
 
 
   /**
-   * Read the global element block IDs and counts.  These vectors will
-   * eventually have num_elem_blks_global entries.  To be used with
-   * Nemesis::ne_get_eb_info_global().
+   * ponies
+   * ponies
+   * ponies().
    */
-  std::vector<int> global_elem_blk_ids;
-  std::vector<int> global_elem_blk_cnts;
+  ponies;
+  ponies;
 
   /**
-   * libMesh numbered node ids attached to local elems.
+   * ponies.
    */
-  std::set<int> nodes_attached_to_local_elems;
+  ponies;
 
   /**
-   * Map of subdomains to element numbers.
+   * ponies.
    */
-  std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
+  ponies;
 
   /**
-   * This is the block connectivity, i.e. for each subdomain (block) there
-   * is an element connectivity list. This map associates the block ID to that vector.
+   * ponies
+   * ponies.
    */
-  std::map<int, std::vector<int> > block_id_to_elem_connectivity;
+  ponies;
 
   /**
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies.
    */
 
   /**
-   * The number of FEM nodes contained in FEM elements wholly owned by the current processor.
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies.
+   * ponies.
    */
-  int num_internal_nodes;
+  ponies;
 
   /**
-   * The number of FEM nodes local to a processor but residing in an
-   * element which also has FEM nodes on other processors.
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  int num_border_nodes;
+  ponies;
 
   /**
-   * The number of FEM nodes that reside on another processor but
-   * whose element partially resides on the current processor.
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  int num_external_nodes;
+  ponies;
 
   /**
-   * The number of internal FEM elements. Elements local to this processor.
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies.
+   * ponies.
    */
-  int num_internal_elems;
+  ponies;
 
   /**
-   * The number of border FEM elements. Elements local to this
-   * processor but whose FEM nodes reside on other processors as well.
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  int num_border_elems;
+  ponies;
 
   /**
-   * The number of nodal communication maps for this processor. (One
-   * per neighboring proc?)
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies
+   * ponies?)
+   * ponies.
    */
-  int num_node_cmaps;
+  ponies;
 
   /**
-   * The number of elemental communication maps for this
-   * processor. (One per neighboring proc?)
-   * To be used with the Nemesis::ne_get_loadbal_param() routine.
+   * ponies
+   * ponies?)
+   * ponies.
    */
-  int num_elem_cmaps;
-
-
-
-  /**
-   * Vector which stores internal element IDs.  Will have length
-   * num_internal_elems.
-   * To be used with Nemesis::ne_get_elem_map().
-   */
-  std::vector<int> elem_mapi;
-
-  /**
-   * Vector which stores border element IDs.  Will have length
-   * num_border_elems.
-   * To be used with Nemesis::ne_get_elem_map().
-   */
-  std::vector<int> elem_mapb;
+  ponies;
 
 
 
   /**
-   * Vector which stores internal node IDs.  Will have length
-   * num_internal_nodes.
-   * To be used with Nemesis::ne_get_node_map().
+   * ponies
+   * ponies.
+   * ponies().
    */
-  std::vector<int> node_mapi;
+  ponies;
 
   /**
-   * Vector which stores border node IDs.  Will have length
-   * num_border_nodes.
-   * To be used with Nemesis::ne_get_node_map().
+   * ponies
+   * ponies.
+   * ponies().
    */
-  std::vector<int> node_mapb;
+  ponies;
 
-  /**
-   * Vector which stores external node IDs.  Will have length
-   * num_external_nodes.
-   * To be used with Nemesis::ne_get_node_map().
-   */
-  std::vector<int> node_mape;
 
 
   /**
-   * Vectors for storing the communication map parameters.
-   * Each will eventually have length num_node_cmaps OR
-   * num_elem_cmaps as appropriate.
-   * For use with Nemesis::ne_get_cmap_params().
+   * ponies
+   * ponies.
+   * ponies().
    */
-  std::vector<int> node_cmap_ids;
-  std::vector<int> node_cmap_node_cnts;
-  std::vector<int> elem_cmap_ids;
-  std::vector<int> elem_cmap_elem_cnts;
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   * ponies().
+   */
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   * ponies().
+   */
+  ponies;
 
 
   /**
-   * 2 vectors of vectors for storing the node communication IDs for this processor.
-   * There will be num_node_cmaps rows, row i will have node_cmap_node_cnts[i] entries.
-   * To be used with Nemesis::ne_get_node_cmap().
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies().
+   */
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+
+
+  /**
+   * ponies.
+   * ponies.
+   * ponies().
    *
-   * Remark: node_cmap_proc_ids is a vector, all entries of which are = node_cmap_ids[i]
-   * Not sure what the point of that is...
+   * ponies]
+   * ponies...
    */
-  std::vector<std::vector<int> > node_cmap_node_ids;
-  std::vector<std::vector<int> > node_cmap_proc_ids;
+  ponies;
+  ponies;
 
 
   /**
-   * 3 vectors of vectors for storing element communication IDs for this processor.
-   * There will be num_elem_cmaps rows, row i will have elem_cmap_elem_cnts[i] entries.
-   * To be used with Nemesis::ne_get_elem_cmap().
+   * ponies.
+   * ponies.
+   * ponies().
    */
-  std::vector<std::vector<int> > elem_cmap_elem_ids;
-  std::vector<std::vector<int> > elem_cmap_side_ids;
-  std::vector<std::vector<int> > elem_cmap_proc_ids;
+  ponies;
+  ponies;
+  ponies;
 
 
-private:
+ponies:
   /**
-   * This map keeps track of the number of elements in each subdomain
-   * (block) for *this* processor.
+   * ponies
+   * (ponies.
    */
-  std::map<subdomain_id_type, unsigned> local_subdomain_counts;
-
-  /**
-   * The set which will eventually contain the IDs of "border nodes".  These are nodes
-   * that lie on the boundary between one or more processors.
-   */
-  std::set<unsigned> border_node_ids;
+  ponies;
 
   /**
-   * Another map to store sets of intersections with each other processor
-   * (other than ourself, of course).  A node which appears in one of these
-   * vectors belongs to element owned by at least this processor and one other.
+   * ponies
+   * ponies.
    */
-  std::map<unsigned, std::set<unsigned> > proc_nodes_touched_intersections;
+  ponies;
 
   /**
-   * Typedef for an iterator into the data structure above.
+   * ponies
+   * (ponies
+   * ponies.
    */
-  typedef std::map<unsigned, std::set<unsigned> >::iterator proc_nodes_touched_iterator;
+  ponies;
 
   /**
-   * Map between processor ID and (element,side) pairs bordering that processor ID.
+   * ponies.
    */
-  std::map<unsigned, std::set<std::pair<unsigned,unsigned> > > proc_border_elem_sets;
+  ponies;
 
   /**
-   * Typedef for an iterator into the data structure above.
+   * ponies.
    */
-  typedef std::map<unsigned, std::set<std::pair<unsigned,unsigned> > >::iterator proc_border_elem_sets_iterator;
+  ponies;
 
   /**
-   * A set of internal node IDs for this processor.
+   * ponies.
    */
-  std::set<unsigned> internal_node_ids;
+  ponies;
 
   /**
-   * A set of internal elem IDs for this processor.
+   * ponies.
    */
-  std::set<unsigned> internal_elem_ids;
+  ponies;
 
   /**
-   * A set of border elem IDs for this processor.
+   * ponies.
    */
-  std::set<unsigned> border_elem_ids;
+  ponies;
 
   /**
-   * This function uses global communication routines to determine the
-   * number of element blocks across the entire mesh.
+   * ponies.
    */
-  void compute_num_global_elem_blocks(const MeshBase& pmesh);
+  ponies;
 
   /**
-   * This function uses global communication routines to determine the
-   * number of nodesets across the entire mesh.
+   * ponies
+   * ponies.
    */
-  void compute_num_global_nodesets(const MeshBase& pmesh);
+  ponies);
 
   /**
-   * This function uses global communication routines to determine the
-   * number of sidesets across the entire mesh.
+   * ponies
+   * ponies.
    */
-  void compute_num_global_sidesets(const MeshBase& pmesh);
+  ponies);
 
   /**
-   * This function builds the libmesh -> exodus and exodus -> libmesh
-   * node and element maps.  These maps allow us to have a consistent
-   * numbering scheme within an Exodus file, given an existing globally
-   * consistent numbering scheme from LibMesh.
+   * ponies
+   * ponies.
    */
-  void build_element_and_node_maps(const MeshBase& pmesh);
+  ponies);
 
   /**
-   * This function constructs the set of border node IDs present
-   * on the current mesh.  These are nodes which live on the "border"
-   * between elements which live on different processors.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void compute_border_node_ids(const MeshBase& pmesh);
+  ponies);
 
   /**
-   * This function constructs the set of border and internal element IDs
-   * and internal node IDs present on the current mesh.
+   * ponies
+   * ponies"
+   * ponies.
    */
-  void compute_internal_and_border_elems_and_internal_nodes(const MeshBase& pmesh);
+  ponies);
 
   /**
-   * This function determines the communication map parameters
-   * which will eventually be written to file
+   * ponies
+   * ponies.
    */
-  void compute_communication_map_parameters();
+  ponies);
 
   /**
-   * Compute the node communcation maps (really just pack vectors)
-   * in preparation for writing them to file.
+   * ponies
+   * ponies
    */
-  void compute_node_communication_maps();
+  ponies();
 
   /**
-   * Compute the node maps (really just pack vectors) which
-   * map the nodes to internal, border, and external nodes in
-   * the file.
+   * ponies)
+   * ponies.
    */
-  void compute_node_maps();
+  ponies();
 
   /**
-   * This function computes element communication maps (really
-   * just packs vectors) in preparation for writing them to file.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void compute_elem_communication_maps();
+  ponies();
 
   /**
-   * This function computes element maps (really just packs vectors)
-   * which map the elements to internal and border elements.
+   * ponies
+   * ponies.
    */
-  void compute_element_maps();
+  ponies();
 
   /**
-   * This function writes exodus-specific initialization information.
-   * This information is slightly different when you are working with
-   * Nemesis, as it depends on some global information being known.
+   * ponies)
+   * ponies.
    */
-  void write_exodus_initialization_info(const MeshBase& pmesh,
-                                        const std::string& title);
+  ponies();
+
+  /**
+   * ponies.
+   * ponies
+   * ponies.
+   */
+  ponies,
+                                        ponies);
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
-#endif // LIBMESH_NEMESIS_IO_HELPER_H
+#ponies)
+#ponies

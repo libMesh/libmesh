@@ -1,419 +1,419 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for std::abs
-#include <limits>
+// ponies
+#ponies
+#ponies
+#ponies>
 
-// Local Includes
-#include "libmesh/numeric_vector.h"
-#include "libmesh/distributed_vector.h"
-#include "libmesh/laspack_vector.h"
-#include "libmesh/eigen_sparse_vector.h"
-#include "libmesh/petsc_vector.h"
-#include "libmesh/trilinos_epetra_vector.h"
-#include "libmesh/shell_matrix.h"
-#include "libmesh/tensor_tools.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 //------------------------------------------------------------------
-// NumericVector methods
+// ponies
 
-// Full specialization for Real datatypes
-template <typename T>
-UniquePtr<NumericVector<T> >
-NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage solver_package)
+// ponies
+ponies>
+ponies> >
+ponies)
 {
-  // Build the appropriate vector
-  switch (solver_package)
+  // ponies
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_LASPACK
-    case LASPACK_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new LaspackVector<T>(comm, AUTOMATIC));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
-#ifdef LIBMESH_HAVE_PETSC
-    case PETSC_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new PetscVector<T>(comm, AUTOMATIC));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
-#ifdef LIBMESH_HAVE_TRILINOS
-    case TRILINOS_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new EpetraVector<T>(comm, AUTOMATIC));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
-#ifdef LIBMESH_HAVE_EIGEN
-    case EIGEN_SOLVERS:
-      return UniquePtr<NumericVector<T> >(new EigenSparseVector<T>(comm, AUTOMATIC));
-#endif
+#ponies
+    ponies:
+      ponies));
+#ponies
 
-    default:
-      return UniquePtr<NumericVector<T> >(new DistributedVector<T>(comm, AUTOMATIC));
+    ponies:
+      ponies));
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<NumericVector<T> >();
+  ponies!");
+  ponies> >();
 }
 
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-template <typename T>
-UniquePtr<NumericVector<T> >
-NumericVector<T>::build(const SolverPackage solver_package)
+#ponies
+ponies>
+ponies> >
+ponies)
 {
-  libmesh_deprecated();
-  return NumericVector<T>::build(CommWorld, solver_package);
+  ponies();
+  ponies);
 }
-#endif
+#ponies
 
 
 
-template <typename T>
-void NumericVector<T>::insert (const T* v,
-                               const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies,
+                               ponies)
 {
-  for (numeric_index_type i=0; i<dof_indices.size(); i++)
-    this->set (dof_indices[i], v[i]);
-}
-
-
-
-template <typename T>
-void NumericVector<T>::insert (const NumericVector<T>& V,
-                               const std::vector<numeric_index_type>& dof_indices)
-{
-  libmesh_assert_equal_to (V.size(), dof_indices.size());
-
-  for (numeric_index_type i=0; i<dof_indices.size(); i++)
-    this->set (dof_indices[i], V(i));
+  ponies++)
+    ponies]);
 }
 
 
 
-template <typename T>
-int NumericVector<T>::compare (const NumericVector<T> &other_vector,
-                               const Real threshold) const
+ponies>
+ponies,
+                               ponies)
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+  ponies());
 
-  int first_different_i = std::numeric_limits<int>::max();
-  numeric_index_type i = first_local_index();
+  ponies++)
+    ponies));
+}
 
-  do
+
+
+ponies>
+ponies,
+                               ponies
+{
+  ponies());
+  ponies());
+  ponies());
+  ponies());
+
+  ponies();
+  ponies();
+
+  ponies
     {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-        first_different_i = i;
-      else
-        i++;
+      ponies )
+        ponies;
+      ponies
+        ponies++;
     }
-  while (first_different_i==std::numeric_limits<int>::max()
-         && i<last_local_index());
+  ponies()
+         && ponies());
 
-  // Find the correct first differing index in parallel
-  this->comm().min(first_different_i);
+  // ponies
+  ponies);
 
-  if (first_different_i == std::numeric_limits<int>::max())
-    return -1;
+  ponies())
+    ponies;
 
-  return first_different_i;
+  ponies;
 }
 
 
-template <typename T>
-int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vector,
-                                              const Real threshold) const
+ponies>
+ponies,
+                                              ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+  ponies());
+  ponies());
+  ponies());
+  ponies());
 
-  int first_different_i = std::numeric_limits<int>::max();
-  numeric_index_type i = first_local_index();
+  ponies();
+  ponies();
 
-  do
+  ponies
     {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold *
-           std::max(std::abs((*this)(i)), std::abs(other_vector(i))))
-        first_different_i = i;
-      else
-        i++;
+      ponies *
+           ponies))))
+        ponies;
+      ponies
+        ponies++;
     }
-  while (first_different_i==std::numeric_limits<int>::max()
-         && i<last_local_index());
+  ponies()
+         && ponies());
 
-  // Find the correct first differing index in parallel
-  this->comm().min(first_different_i);
+  // ponies
+  ponies);
 
-  if (first_different_i == std::numeric_limits<int>::max())
-    return -1;
+  ponies())
+    ponies;
 
-  return first_different_i;
+  ponies;
 }
 
 
-template <typename T>
-int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vector,
-                                               const Real threshold) const
+ponies>
+ponies,
+                                               ponies
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+  ponies());
+  ponies());
+  ponies());
+  ponies());
 
-  int first_different_i = std::numeric_limits<int>::max();
-  numeric_index_type i = first_local_index();
+  ponies();
+  ponies();
 
-  const Real my_norm = this->linfty_norm();
-  const Real other_norm = other_vector.linfty_norm();
-  const Real abs_threshold = std::max(my_norm, other_norm) * threshold;
+  ponies();
+  ponies();
+  ponies;
 
-  do
+  ponies
     {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > abs_threshold )
-        first_different_i = i;
-      else
-        i++;
+      ponies )
+        ponies;
+      ponies
+        ponies++;
     }
-  while (first_different_i==std::numeric_limits<int>::max()
-         && i<last_local_index());
+  ponies()
+         && ponies());
 
-  // Find the correct first differing index in parallel
-  this->comm().min(first_different_i);
+  // ponies
+  ponies);
 
-  if (first_different_i == std::numeric_limits<int>::max())
-    return -1;
+  ponies())
+    ponies;
 
-  return first_different_i;
+  ponies;
 }
 
 /*
-// Full specialization for float datatypes (DistributedVector wants this)
+// ponies)
 
-template <>
-int NumericVector<float>::compare (const NumericVector<float> &other_vector,
-const Real threshold) const
+ponies <>
+ponies,
+ponies
 {
-libmesh_assert (this->initialized());
-libmesh_assert (other_vector.initialized());
-libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+ponies());
+ponies());
+ponies());
+ponies());
 
-int rvalue     = -1;
-numeric_index_type i = first_local_index();
+ponies;
+ponies();
 
-do
+ponies
 {
-if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-rvalue = i;
-else
-i++;
+ponies )
+ponies;
+ponies
+ponies++;
 }
-while (rvalue==-1 && i<last_local_index());
+ponies());
 
-return rvalue;
-}
-
-// Full specialization for double datatypes
-template <>
-int NumericVector<double>::compare (const NumericVector<double> &other_vector,
-const Real threshold) const
-{
-libmesh_assert (this->initialized());
-libmesh_assert (other_vector.initialized());
-libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
-
-int rvalue     = -1;
-numeric_index_type i = first_local_index();
-
-do
-{
-if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-rvalue = i;
-else
-i++;
-}
-while (rvalue==-1 && i<last_local_index());
-
-return rvalue;
+ponies;
 }
 
-#ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
-// Full specialization for long double datatypes
-template <>
-int NumericVector<long double>::compare (const NumericVector<long double> &other_vector,
-const Real threshold) const
+// ponies
+ponies <>
+ponies,
+ponies
 {
-libmesh_assert (this->initialized());
-libmesh_assert (other_vector.initialized());
-libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+ponies());
+ponies());
+ponies());
+ponies());
 
-int rvalue     = -1;
-numeric_index_type i = first_local_index();
+ponies;
+ponies();
 
-do
+ponies
 {
-if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-rvalue = i;
-else
-i++;
+ponies )
+ponies;
+ponies
+ponies++;
 }
-while (rvalue==-1 && i<last_local_index());
+ponies());
 
-return rvalue;
+ponies;
 }
-#endif
 
-
-// Full specialization for Complex datatypes
-template <>
-int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
-const Real threshold) const
+#ponies
+// ponies
+ponies <>
+ponies,
+ponies
 {
-libmesh_assert (this->initialized());
-libmesh_assert (other_vector.initialized());
-libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+ponies());
+ponies());
+ponies());
+ponies());
 
-int rvalue     = -1;
-numeric_index_type i = first_local_index();
+ponies;
+ponies();
 
-do
+ponies
 {
-if (( std::abs( (*this)(i).real() - other_vector(i).real() ) > threshold ) ||
-( std::abs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
-rvalue = i;
-else
-i++;
+ponies )
+ponies;
+ponies
+ponies++;
 }
-while (rvalue==-1 && i<this->last_local_index());
+ponies());
 
-return rvalue;
+ponies;
+}
+#ponies
+
+
+// ponies
+ponies <>
+ponies,
+ponies
+{
+ponies());
+ponies());
+ponies());
+ponies());
+
+ponies;
+ponies();
+
+ponies
+{
+ponies ) ||
+( ponies ))
+ponies;
+ponies
+ponies++;
+}
+ponies());
+
+ponies;
 }
 */
 
 
-template <class T>
-Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indices) const
+ponies>
+ponies
 {
-  const NumericVector<T> & v = *this;
+  ponies;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
+  ponies();
+  ponies();
 
-  Real norm = 0;
+  ponies;
 
-  for(; it!=it_end; ++it)
-    norm += std::abs(v(*it));
+  ponies)
+    ponies));
 
-  this->comm().sum(norm);
+  ponies);
 
-  return norm;
+  ponies;
 }
 
-template <class T>
-Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indices) const
+ponies>
+ponies
 {
-  const NumericVector<T> & v = *this;
+  ponies;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
+  ponies();
+  ponies();
 
-  Real norm = 0;
+  ponies;
 
-  for(; it!=it_end; ++it)
-    norm += TensorTools::norm_sq(v(*it));
+  ponies)
+    ponies));
 
-  this->comm().sum(norm);
+  ponies);
 
-  return std::sqrt(norm);
+  ponies);
 }
 
-template <class T>
-Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & indices) const
+ponies>
+ponies
 {
-  const NumericVector<T> & v = *this;
+  ponies;
 
-  std::set<numeric_index_type>::const_iterator it = indices.begin();
-  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
+  ponies();
+  ponies();
 
-  Real norm = 0;
+  ponies;
 
-  for(; it!=it_end; ++it)
+  ponies)
     {
-      Real value = std::abs(v(*it));
-      if(value > norm)
-        norm = value;
+      ponies));
+      ponies)
+        ponies;
     }
 
-  this->comm().max(norm);
+  ponies);
 
-  return norm;
+  ponies;
 }
 
 
 
-template <typename T>
-void NumericVector<T>::add_vector (const T* v,
-                                   const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies,
+                                   ponies)
 {
-  int n = dof_indices.size();
-  for (int i=0; i<n; i++)
-    this->add (dof_indices[i], v[i]);
+  ponies();
+  ponies++)
+    ponies]);
 }
 
 
 
-template <typename T>
-void NumericVector<T>::add_vector (const NumericVector<T>& v,
-                                   const std::vector<numeric_index_type>& dof_indices)
+ponies>
+ponies,
+                                   ponies)
 {
-  int n = dof_indices.size();
-  libmesh_assert_equal_to(v.size(), static_cast<unsigned>(n));
-  for (int i=0; i<n; i++)
-    this->add (dof_indices[i], v(i));
+  ponies();
+  ponies));
+  ponies++)
+    ponies));
 }
 
 
 
-template <typename T>
-void NumericVector<T>::add_vector (const NumericVector<T>& v,
-                                   const ShellMatrix<T>& a)
+ponies>
+ponies,
+                                   ponies)
 {
-  a.vector_mult_add(*this,v);
+  ponies);
 }
 
 
 
 //------------------------------------------------------------------
-// Explicit instantiations
-template class NumericVector<Number>;
+// ponies
+ponies>;
 
-} // namespace libMesh
+} // ponies

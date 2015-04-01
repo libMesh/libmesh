@@ -1,107 +1,107 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef DTKADAPTER_H
-#define DTKADAPTER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_DTK
+#ponies
 
-#include "libmesh/dtk_evaluator.h"
+#ponies"
 
-#include <DTK_MeshManager.hpp>
-#include <DTK_MeshContainer.hpp>
-#include <DTK_MeshTraits.hpp>
-#include <DTK_MeshTraitsFieldAdapter.hpp>
-#include <DTK_FieldManager.hpp>
-#include <DTK_FieldContainer.hpp>
-#include <DTK_FieldEvaluator.hpp>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-#include <Teuchos_RCP.hpp>
-#include <Teuchos_ArrayRCP.hpp>
+#ponies>
+#ponies>
 
-namespace libMesh {
+ponies {
 
-class DTKAdapter
+ponies
 {
-public:
-  DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, EquationSystems & in_es);
+ponies:
+  ponies);
 
-  typedef DataTransferKit::MeshContainer<int>                                  MeshContainerType;
-  typedef DataTransferKit::FieldContainer<double>                              FieldContainerType;
-  typedef DataTransferKit::MeshTraits<MeshContainerType>::global_ordinal_type  GlobalOrdinal;
-  typedef DataTransferKit::FieldEvaluator<GlobalOrdinal,FieldContainerType>    EvaluatorType;
-  typedef Teuchos::RCP<EvaluatorType>                                          RCP_Evaluator;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
 
-  Teuchos::RCP<DataTransferKit::MeshManager<MeshContainerType> > get_mesh_manager() { return mesh_manager; }
-  RCP_Evaluator get_variable_evaluator(std::string var_name);
-  Teuchos::RCP<DataTransferKit::FieldManager<MeshContainerType> > get_target_coords() { return target_coords; }
-  Teuchos::RCP<DataTransferKit::FieldManager<FieldContainerType> > get_values_to_fill(std::string var_name);
+  ponies; }
+  ponies);
+  ponies; }
+  ponies);
 
   /**
-   * After computing values for a variable in this EquationSystems
-   * we need to take those values and put them in the actual solution vector.
+   * ponies
+   * ponies.
    */
-  void update_variable_values(std::string var_name);
+  ponies);
 
-protected:
+ponies:
   /**
-   * Small helper function for finding the system containing the variable.
+   * ponies.
    *
-   * Note that this implies that variable names are unique across all systems!
+   * ponies!
    */
-  System * find_sys(std::string var_name);
+  ponies);
 
   /**
-   * Helper that returns the DTK ElementTopology for a given Elem
+   * ponies
    */
-  DataTransferKit::DTK_ElementTopology get_element_topology(const Elem * elem);
+  ponies);
 
   /**
-   * Helper function that fills the std::set with all of the node numbers of
-   * nodes connected to local elements.
+   * ponies
+   * ponies.
    */
-  void get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes);
+  ponies);
 
-  Teuchos::RCP<const Teuchos::Comm<int> > comm;
-  EquationSystems & es;
-  const MeshBase & mesh;
-  unsigned int dim;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
-  unsigned int num_local_nodes;
-  Teuchos::ArrayRCP<int> vertices;
+  ponies;
+  ponies;
 
-  Teuchos::RCP<DataTransferKit::MeshManager<MeshContainerType> > mesh_manager;
-  RCP_Evaluator field_evaluator;
-  Teuchos::RCP<DataTransferKit::FieldManager<MeshContainerType> > target_coords;
+  ponies;
+  ponies;
+  ponies;
 
-  /// Map of variable names to arrays to be filled by a transfer
-  std::map<std::string, Teuchos::RCP<DataTransferKit::FieldManager<FieldContainerType> > > values_to_fill;
+  /// ponies
+  ponies;
 
-  /// Map of variable names to RCP_Evaluator objects
-  std::map<std::string, RCP_Evaluator> evaluators;
+  /// ponies
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#ponies
 
-#endif // #define DTKADAPTER_H
+#ponies

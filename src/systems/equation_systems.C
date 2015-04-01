@@ -1,448 +1,448 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// System includes
-#include <sstream>
+// ponies
+#ponies>
 
-// Local Includes
-#include "libmesh/explicit_system.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/frequency_system.h"
-#include "libmesh/linear_implicit_system.h"
-#include "libmesh/mesh_refinement.h"
-#include "libmesh/newmark_system.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/rb_construction.h"
-#include "libmesh/transient_rb_construction.h"
-#include "libmesh/eigen_system.h"
-#include "libmesh/parallel.h"
-#include "libmesh/transient_system.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/elem.h"
-#include "libmesh/libmesh_logging.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// Include the systems before this one to avoid
-// overlapping forward declarations.
-#include "libmesh/equation_systems.h"
+// ponies
+// ponies.
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
+// ponies
 
 
 
 
 // ------------------------------------------------------------
-// EquationSystems class implementation
-EquationSystems::EquationSystems (MeshBase& m, MeshData* mesh_data) :
-  ParallelObject (m),
-  _mesh          (m),
-  _mesh_data     (mesh_data)
+// ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies)
 {
-  // Set default parameters
-  this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
-  this->parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
+  // ponies
+  ponies;
+  ponies;
 }
 
 
 
-EquationSystems::~EquationSystems ()
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
 
-void EquationSystems::clear ()
+ponies ()
 {
-  // Clear any additional parameters
-  parameters.clear ();
+  // ponies
+  ponies ();
 
-  // clear the systems.  We must delete them
-  // since we newed them!
-  while (!_systems.empty())
+  // ponies
+  // ponies!
+  ponies())
     {
-      system_iterator pos = _systems.begin();
+      ponies();
 
-      System *sys = pos->second;
-      delete sys;
-      sys = NULL;
+      ponies;
+      ponies;
+      ponies;
 
-      _systems.erase (pos);
+      ponies);
     }
 }
 
 
 
-void EquationSystems::init ()
+ponies ()
 {
-  const unsigned int n_sys = this->n_systems();
+  ponies();
 
-  libmesh_assert_not_equal_to (n_sys, 0);
+  ponies);
 
-  // Distribute the mesh if possible
-  if (this->n_processors() > 1)
-    _mesh.delete_remote_elements();
+  // ponies
+  ponies)
+    ponies();
 
-  // Tell all the \p DofObject entities how many systems
-  // there are.
+  // ponies
+  // ponies.
   {
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+    ponies();
+    ponies();
 
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_systems(n_sys);
+    ponies)
+      (*ponies);
 
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
+    ponies();
+    ponies();
 
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_systems(n_sys);
+    ponies)
+      (*ponies);
   }
 
-  for (unsigned int i=0; i != this->n_systems(); ++i)
-    this->get_system(i).init();
+  ponies)
+    ponies();
 
-#ifdef LIBMESH_ENABLE_AMR
-  MeshRefinement mesh_refine(_mesh);
-  mesh_refine.clean_refinement_flags();
-#endif
+#ponies
+  ponies);
+  ponies();
+#ponies
 }
 
 
 
-void EquationSystems::reinit ()
+ponies ()
 {
-  parallel_object_only();
+  ponies();
 
-  const unsigned int n_sys = this->n_systems();
-  libmesh_assert_not_equal_to (n_sys, 0);
+  ponies();
+  ponies);
 
-  // We may have added new systems since our last
-  // EquationSystems::(re)init call
-  bool _added_new_systems = false;
-  for (unsigned int i=0; i != n_sys; ++i)
-    if (!this->get_system(i).is_initialized())
-      _added_new_systems = true;
+  // ponies
+  // ponies
+  ponies;
+  ponies)
+    ponies())
+      ponies;
 
-  if (_added_new_systems)
+  ponies)
     {
-      // Our DofObjects will need space for the additional systems
-      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-      const MeshBase::node_iterator node_end = _mesh.nodes_end();
+      // ponies
+      ponies();
+      ponies();
 
-      for ( ; node_it != node_end; ++node_it)
-        (*node_it)->set_n_systems(n_sys);
+      ponies)
+        (*ponies);
 
-      MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.elements_end();
+      ponies();
+      ponies();
 
-      for ( ; elem_it != elem_end; ++elem_it)
-        (*elem_it)->set_n_systems(n_sys);
+      ponies)
+        (*ponies);
 
-      // And any new systems will need initialization
-      for (unsigned int i=0; i != n_sys; ++i)
-        if (!this->get_system(i).is_initialized())
-          this->get_system(i).init();
+      // ponies
+      ponies)
+        ponies())
+          ponies();
     }
 
-#ifdef DEBUG
-  // Make sure all the \p DofObject entities know how many systems
-  // there are.
+#ponies
+  // ponies
+  // ponies.
   {
-    // All the nodes
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+    // ponies
+    ponies();
+    ponies();
 
-    for ( ; node_it != node_end; ++node_it)
+    ponies)
       {
-        Node *node = *node_it;
-        libmesh_assert_equal_to (node->n_systems(), this->n_systems());
+        ponies;
+        ponies());
       }
 
-    // All the elements
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
+    // ponies
+    ponies();
+    ponies();
 
-    for ( ; elem_it != elem_end; ++elem_it)
+    ponies)
       {
-        Elem *elem = *elem_it;
-        libmesh_assert_equal_to (elem->n_systems(), this->n_systems());
+        ponies;
+        ponies());
       }
   }
-#endif
+#ponies
 
-  // Localize each system's vectors
-  for (unsigned int i=0; i != this->n_systems(); ++i)
-    this->get_system(i).re_update();
+  // ponies
+  ponies)
+    ponies();
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-  bool dof_constraints_created = false;
-  bool mesh_changed = false;
+  ponies;
+  ponies;
 
-  // FIXME: For backwards compatibility, assume
-  // refine_and_coarsen_elements or refine_uniformly have already
-  // been called
+  // ponies
+  // ponies
+  // ponies
   {
-    for (unsigned int i=0; i != this->n_systems(); ++i)
+    ponies)
       {
-        System &sys = this->get_system(i);
+        ponies);
 
-        // Even if the system doesn't have any variables in it we want
-        // consistent behavior; e.g. distribute_dofs should have the
-        // opportunity to count up zero dofs on each processor.
+        // ponies
+        // ponies
+        // ponies.
         //
-        // Who's been adding zero-var systems anyway, outside of my
-        // unit tests? - RHS
-        // if(!sys.n_vars())
-        // continue;
+        // ponies
+        // ponies
+        // ponies())
+        // ponies;
 
-        sys.get_dof_map().distribute_dofs(_mesh);
+        ponies);
 
-        // Recreate any hanging node constraints
-        sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
+        // ponies
+        ponies);
 
-        // Apply any user-defined constraints
-        sys.user_constrain();
+        // ponies
+        ponies();
 
-        // Expand any recursive constraints
-        sys.get_dof_map().process_constraints(_mesh);
+        // ponies
+        ponies);
 
-        // And clean up the send_list before we use it again
-        sys.get_dof_map().prepare_send_list();
+        // ponies
+        ponies();
 
-        sys.prolong_vectors();
+        ponies();
       }
-    mesh_changed = true;
-    dof_constraints_created = true;
+    ponies;
+    ponies;
   }
 
-  // FIXME: Where should the user set maintain_level_one now??
-  // Don't override previous settings, for now
+  // ponies??
+  // ponies
 
-  MeshRefinement mesh_refine(_mesh);
+  ponies);
 
-  mesh_refine.face_level_mismatch_limit() = false;
+  ponies;
 
-  // Try to coarsen the mesh, then restrict each system's vectors
-  // if necessary
-  if (mesh_refine.coarsen_elements())
+  // ponies
+  // ponies
+  ponies())
     {
-      for (unsigned int i=0; i != this->n_systems(); ++i)
+      ponies)
         {
-          System &sys = this->get_system(i);
-          if (!dof_constraints_created)
+          ponies);
+          ponies)
             {
-              sys.get_dof_map().distribute_dofs(_mesh);
-              sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
-              sys.user_constrain();
-              sys.get_dof_map().process_constraints(_mesh);
-              sys.get_dof_map().prepare_send_list();
+              ponies);
+              ponies);
+              ponies();
+              ponies);
+              ponies();
 
             }
-          sys.restrict_vectors();
+          ponies();
         }
-      mesh_changed = true;
-      dof_constraints_created = true;
+      ponies;
+      ponies;
     }
 
-  // Once vectors are all restricted, we can delete
-  // children of coarsened elements
-  if (mesh_changed)
-    this->get_mesh().contract();
+  // ponies
+  // ponies
+  ponies)
+    ponies();
 
-  // Try to refine the mesh, then prolong each system's vectors
-  // if necessary
-  if (mesh_refine.refine_elements())
+  // ponies
+  // ponies
+  ponies())
     {
-      for (unsigned int i=0; i != this->n_systems(); ++i)
+      ponies)
         {
-          System &sys = this->get_system(i);
-          if (!dof_constraints_created)
+          ponies);
+          ponies)
             {
-              sys.get_dof_map().distribute_dofs(_mesh);
-              sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
-              sys.user_constrain();
-              sys.get_dof_map().process_constraints(_mesh);
-              sys.get_dof_map().prepare_send_list();
+              ponies);
+              ponies);
+              ponies();
+              ponies);
+              ponies();
 
             }
-          sys.prolong_vectors();
+          ponies();
         }
-      mesh_changed = true;
-      // dof_constraints_created = true;
+      ponies;
+      // ponies;
     }
 
-  // If the mesh has changed, systems will need to create new dof
-  // constraints and update their global solution vectors
-  if (mesh_changed)
+  // ponies
+  // ponies
+  ponies)
     {
-      for (unsigned int i=0; i != this->n_systems(); ++i)
-        this->get_system(i).reinit();
+      ponies)
+        ponies();
     }
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 }
 
 
 
-void EquationSystems::allgather ()
+ponies ()
 {
-  // A serial mesh means nothing needs to be done
-  if (_mesh.is_serial())
-    return;
+  // ponies
+  ponies())
+    ponies;
 
-  const unsigned int n_sys = this->n_systems();
+  ponies();
 
-  libmesh_assert_not_equal_to (n_sys, 0);
+  ponies);
 
-  // Gather the mesh
-  _mesh.allgather();
+  // ponies
+  ponies();
 
-  // Tell all the \p DofObject entities how many systems
-  // there are.
+  // ponies
+  // ponies.
   {
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+    ponies();
+    ponies();
 
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_systems(n_sys);
+    ponies)
+      (*ponies);
 
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
+    ponies();
+    ponies();
 
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_systems(n_sys);
+    ponies)
+      (*ponies);
   }
 
-  // And distribute each system's dofs
-  for (unsigned int i=0; i != this->n_systems(); ++i)
+  // ponies
+  ponies)
     {
-      System &sys = this->get_system(i);
-      DofMap &dof_map = sys.get_dof_map();
-      dof_map.distribute_dofs(_mesh);
+      ponies);
+      ponies();
+      ponies);
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-      // The user probably won't need constraint equations or the
-      // send_list after an allgather, but let's keep it in consistent
-      // shape just in case.
-      dof_map.create_dof_constraints(_mesh, sys.time);
-      sys.user_constrain();
-      dof_map.process_constraints(_mesh);
-#endif
-      dof_map.prepare_send_list();
+#ponies
+      // ponies
+      // ponies
+      // ponies.
+      ponies);
+      ponies();
+      ponies);
+#ponies
+      ponies();
     }
 }
 
 
 
 
-void EquationSystems::update ()
+ponies ()
 {
-  START_LOG("update()","EquationSystems");
+  ponies");
 
-  // Localize each system's vectors
-  for (unsigned int i=0; i != this->n_systems(); ++i)
-    this->get_system(i).update();
+  // ponies
+  ponies)
+    ponies();
 
-  STOP_LOG("update()","EquationSystems");
+  ponies");
 }
 
 
 
-System & EquationSystems::add_system (const std::string& sys_type,
-                                      const std::string& name)
+ponies,
+                                      ponies)
 {
-  // If the user already built a system with this name, we'll
-  // trust them and we'll use it.  That way they can pre-add
-  // non-standard derived system classes, and if their restart file
-  // has some non-standard sys_type we won't throw an error.
-  if (_systems.count(name))
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies))
     {
-      return this->get_system(name);
+      ponies);
     }
-  // Build a basic System
-  else if (sys_type == "Basic")
-    this->add_system<System> (name);
+  // ponies
+  ponies")
+    ponies);
 
-  // Build a Newmark system
-  else if (sys_type == "Newmark")
-    this->add_system<NewmarkSystem> (name);
+  // ponies
+  ponies")
+    ponies);
 
-  // Build an Explicit system
-  else if ((sys_type == "Explicit"))
-    this->add_system<ExplicitSystem> (name);
+  // ponies
+  ponies"))
+    ponies);
 
-  // Build an Implicit system
-  else if ((sys_type == "Implicit") ||
-           (sys_type == "Steady"  ))
-    this->add_system<ImplicitSystem> (name);
+  // ponies
+  ponies") ||
+           (ponies"  ))
+    ponies);
 
-  // build a transient implicit linear system
-  else if ((sys_type == "Transient") ||
-           (sys_type == "TransientImplicit") ||
-           (sys_type == "TransientLinearImplicit"))
-    this->add_system<TransientLinearImplicitSystem> (name);
+  // ponies
+  ponies") ||
+           (ponies") ||
+           (ponies"))
+    ponies);
 
-  // build a transient implicit nonlinear system
-  else if (sys_type == "TransientNonlinearImplicit")
-    this->add_system<TransientNonlinearImplicitSystem> (name);
+  // ponies
+  ponies")
+    ponies);
 
-  // build a transient explicit system
-  else if (sys_type == "TransientExplicit")
-    this->add_system<TransientExplicitSystem> (name);
+  // ponies
+  ponies")
+    ponies);
 
-  // build a linear implicit system
-  else if (sys_type == "LinearImplicit")
-    this->add_system<LinearImplicitSystem> (name);
+  // ponies
+  ponies")
+    ponies);
 
-  // build a nonlinear implicit system
-  else if (sys_type == "NonlinearImplicit")
-    this->add_system<NonlinearImplicitSystem> (name);
+  // ponies
+  ponies")
+    ponies);
 
-  // build a Reduced Basis Construction system
-  else if (sys_type == "RBConstruction")
-    this->add_system<RBConstruction> (name);
+  // ponies
+  ponies")
+    ponies);
 
-  // build a transient Reduced Basis Construction system
-  else if (sys_type == "TransientRBConstruction")
-    this->add_system<TransientRBConstruction> (name);
+  // ponies
+  ponies")
+    ponies);
 
-#ifdef LIBMESH_HAVE_SLEPC
-  // build an eigen system
-  else if (sys_type == "Eigen")
-    this->add_system<EigenSystem> (name);
-#endif
+#ponies
+  // ponies
+  ponies")
+    ponies);
+#ponies
 
-#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  // build a frequency system
-  else if (sys_type == "Frequency")
-    this->add_system<FrequencySystem> (name);
-#endif
+#ponies)
+  // ponies
+  ponies")
+    ponies);
+#ponies
 
-  else
-    libmesh_error_msg("ERROR: Unknown system type: " << sys_type);
+  ponies
+    ponies);
 
-  // Return a reference to the new system
-  //return (*this)(name);
-  return this->get_system(name);
+  // ponies
+  //ponies);
+  ponies);
 }
 
 
@@ -450,880 +450,880 @@ System & EquationSystems::add_system (const std::string& sys_type,
 
 
 
-void EquationSystems::delete_system (const std::string& name)
+ponies)
 {
-  libmesh_deprecated();
+  ponies();
 
-  if (!_systems.count(name))
-    libmesh_error_msg("ERROR: no system named " << name);
+  ponies))
+    ponies);
 
-  delete _systems[name];
+  ponies];
 
-  _systems.erase (name);
+  ponies);
 }
 
 
 
-void EquationSystems::solve ()
+ponies ()
 {
-  libmesh_assert (this->n_systems());
+  ponies());
 
-  for (unsigned int i=0; i != this->n_systems(); ++i)
-    this->get_system(i).solve();
+  ponies)
+    ponies();
 }
 
 
 
-void EquationSystems::sensitivity_solve (const ParameterVector& parameters_in)
+ponies)
 {
-  libmesh_assert (this->n_systems());
+  ponies());
 
-  for (unsigned int i=0; i != this->n_systems(); ++i)
-    this->get_system(i).sensitivity_solve(parameters_in);
+  ponies)
+    ponies);
 }
 
 
 
-void EquationSystems::adjoint_solve (const QoISet& qoi_indices)
+ponies)
 {
-  libmesh_assert (this->n_systems());
+  ponies());
 
-  for (unsigned int i=this->n_systems(); i != 0; --i)
-    this->get_system(i-1).adjoint_solve(qoi_indices);
+  ponies)
+    ponies);
 }
 
 
 
-void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
-                                            const FEType *type,
-                                            const std::set<std::string>* system_names) const
+ponies,
+                                            ponies,
+                                            ponies
 {
-  libmesh_assert (this->n_systems());
+  ponies());
 
-  unsigned int var_num=0;
+  ponies;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  ponies();
+  ponies();
 
-  // Need to size var_names by scalar variables plus all the
-  // vector components for all the vector variables
-  //Could this be replaced by a/some convenience methods?[PB]
+  // ponies
+  // ponies
+  //ponies]
   {
-    unsigned int n_scalar_vars = 0;
-    unsigned int n_vector_vars = 0;
+    ponies;
+    ponies;
 
-    for (; pos != end; ++pos)
+    ponies)
       {
-        // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
-        if (!use_current_system)
-          use_current_system = system_names->count(pos->first);
-        if (!use_current_system)
-          continue;
+        // ponies
+        ponies);
+        ponies)
+          ponies);
+        ponies)
+          ponies;
 
-        for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+        ponies++)
           {
-            if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-                TYPE_VECTOR )
-              n_vector_vars++;
-            else
-              n_scalar_vars++;
+            ponies)) ==
+                ponies )
+              ponies++;
+            ponies
+              ponies++;
           }
       }
 
-    // Here, we're assuming the number of vector components is the same
-    // as the mesh dimension. Will break for mixed dimension meshes.
-    unsigned int dim = this->get_mesh().mesh_dimension();
-    unsigned int nv = n_scalar_vars + dim*n_vector_vars;
+    // ponies
+    // ponies.
+    ponies();
+    ponies;
 
-    // We'd better not have more than dim*his->n_vars() (all vector variables)
-    libmesh_assert_less_equal ( nv, dim*this->n_vars() );
+    // ponies)
+    ponies() );
 
-    // Here, we're assuming the number of vector components is the same
-    // as the mesh dimension. Will break for mixed dimension meshes.
+    // ponies
+    // ponies.
 
-    var_names.resize( nv );
+    ponies );
   }
 
-  // reset
-  pos = _systems.begin();
+  // ponies
+  ponies();
 
-  for (; pos != end; ++pos)
+  ponies)
     {
-      // Check current system is listed in system_names, and skip pos if not
-      bool use_current_system = (system_names == NULL);
-      if (!use_current_system)
-        use_current_system = system_names->count(pos->first);
-      if (!use_current_system)
-        continue;
+      // ponies
+      ponies);
+      ponies)
+        ponies);
+      ponies)
+        ponies;
 
-      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+      ponies++)
         {
-          std::string var_name = pos->second->variable_name(vn);
-          FEType fe_type = pos->second->variable_type(vn);
+          ponies);
+          ponies);
 
-          unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
+          ponies);
 
-          // Filter on the type if requested
-          if (type == NULL || (type && *type == fe_type))
+          // ponies
+          ponies))
             {
-              if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+              ponies )
                 {
-                  switch(n_vec_dim)
+                  ponies)
                     {
-                    case 0:
-                    case 1:
-                      var_names[var_num++] = var_name;
-                      break;
-                    case 2:
-                      var_names[var_num++] = var_name+"_x";
-                      var_names[var_num++] = var_name+"_y";
-                      break;
-                    case 3:
-                      var_names[var_num++] = var_name+"_x";
-                      var_names[var_num++] = var_name+"_y";
-                      var_names[var_num++] = var_name+"_z";
-                      break;
-                    default:
-                      libmesh_error_msg("Invalid dim in build_variable_names");
+                    ponies:
+                    ponies:
+                      ponies;
+                      ponies;
+                    ponies:
+                      ponies";
+                      ponies";
+                      ponies;
+                    ponies:
+                      ponies";
+                      ponies";
+                      ponies";
+                      ponies;
+                    ponies:
+                      ponies");
                     }
                 }
-              else
-                var_names[var_num++] = var_name;
+              ponies
+                ponies;
             }
         }
     }
-  // Now resize again in case we filtered any names
-  var_names.resize(var_num);
+  // ponies
+  ponies);
 }
 
 
 
-void EquationSystems::build_solution_vector (std::vector<Number>&,
-                                             const std::string&,
-                                             const std::string&) const
+ponies>&,
+                                             ponies&,
+                                             ponies
 {
-  //TODO:[BSK] re-implement this from the method below
-  libmesh_not_implemented();
+  //ponies
+  ponies();
 
-  //   // Get a reference to the named system
-  //   const System& system = this->get_system(system_name);
+  //   // ponies
+  //   ponies);
 
-  //   // Get the number associated with the variable_name we are passed
-  //   const unsigned short int variable_num = system.variable_number(variable_name);
+  //   // ponies
+  //   ponies);
 
-  //   // Get the dimension of the current mesh
-  //   const unsigned int dim = _mesh.mesh_dimension();
+  //   // ponies
+  //   ponies();
 
-  //   // If we're on processor 0, allocate enough memory to hold the solution.
-  //   // Since we're only looking at one variable, there will be one solution value
-  //   // for each node in the mesh.
-  //   if (_mesh.processor_id() == 0)
-  //     soln.resize(_mesh.n_nodes());
+  //   // ponies.
+  //   // ponies
+  //   // ponies.
+  //   ponies)
+  //     ponies());
 
-  //   // Vector to hold the global solution from all processors
-  //   std::vector<Number> sys_soln;
+  //   // ponies
+  //   ponies;
 
-  //   // Update the global solution from all processors
-  //   system.update_global_solution (sys_soln, 0);
+  //   // ponies
+  //   ponies);
 
-  //   // Temporary vector to store the solution on an individual element.
-  //   std::vector<Number>       elem_soln;
+  //   // ponies.
+  //   ponies;
 
-  //   // The FE solution interpolated to the nodes
-  //   std::vector<Number>       nodal_soln;
+  //   // ponies
+  //   ponies;
 
-  //   // The DOF indices for the element
-  //   std::vector<dof_id_type> dof_indices;
+  //   // ponies
+  //   ponies;
 
-  //   // Determine the finite/infinite element type used in this system
-  //   const FEType& fe_type    = system.variable_type(variable_num);
+  //   // ponies
+  //   ponies);
 
-  //   // Define iterators to iterate over all the elements of the mesh
-  //   const_active_elem_iterator       it (_mesh.elements_begin());
-  //   const const_active_elem_iterator end(_mesh.elements_end());
+  //   // ponies
+  //   ponies());
+  //   ponies());
 
-  //   // Loop over elements
-  //   for ( ; it != end; ++it)
+  //   // ponies
+  //   ponies)
   //     {
-  //       // Convenient shortcut to the element pointer
-  //       const Elem* elem = *it;
+  //       // ponies
+  //       ponies;
 
-  //       // Fill the dof_indices vector for this variable
-  //       system.get_dof_map().dof_indices(elem,
-  //        dof_indices,
-  //        variable_num);
+  //       // ponies
+  //       ponies,
+  //        ponies,
+  //        ponies);
 
-  //       // Resize the element solution vector to fit the
-  //       // dof_indices for this element.
-  //       elem_soln.resize(dof_indices.size());
+  //       // ponies
+  //       // ponies.
+  //       ponies());
 
-  //       // Transfer the system solution to the element
-  //       // solution by mapping it through the dof_indices vector.
-  //       for (unsigned int i=0; i<dof_indices.size(); i++)
-  // elem_soln[i] = sys_soln[dof_indices[i]];
+  //       // ponies
+  //       // ponies.
+  //       ponies++)
+  // ponies]];
 
-  //       // Using the FE interface, compute the nodal_soln
-  //       // for the current elemnt type given the elem_soln
-  //       FEInterface::nodal_soln (dim,
-  //        fe_type,
-  //        elem,
-  //        elem_soln,
-  //        nodal_soln);
+  //       // ponies
+  //       // ponies
+  //       ponies,
+  //        ponies,
+  //        ponies,
+  //        ponies,
+  //        ponies);
 
-  //       // Sanity check -- make sure that there are the same number
-  //       // of entries in the nodal_soln as there are nodes in the
-  //       // element!
-  //       libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
+  //       // ponies
+  //       // ponies
+  //       // ponies!
+  //       ponies());
 
-  //       // Copy the nodal solution over into the correct place in
-  //       // the global soln vector which will be returned to the user.
-  //       for (unsigned int n=0; n<elem->n_nodes(); n++)
-  // soln[elem->node(n)] = nodal_soln[n];
+  //       // ponies
+  //       // ponies.
+  //       ponies++)
+  // ponies];
   //     }
 }
 
 
 
 
-void EquationSystems::build_solution_vector (std::vector<Number>& soln,
-                                             const std::set<std::string>* system_names) const
+ponies,
+                                             ponies
 {
-  START_LOG("build_solution_vector()", "EquationSystems");
+  ponies");
 
-  // This function must be run on all processors at once
-  parallel_object_only();
+  // ponies
+  ponies();
 
-  libmesh_assert (this->n_systems());
+  ponies());
 
-  const unsigned int dim = _mesh.mesh_dimension();
-  const dof_id_type nn   = _mesh.n_nodes();
+  ponies();
+  ponies();
 
-  // We'd better have a contiguous node numbering
-  libmesh_assert_equal_to (nn, _mesh.max_node_id());
+  // ponies
+  ponies());
 
-  // allocate storage to hold
-  // (number_of_nodes)*(number_of_variables) entries.
-  // We have to differentiate between between scalar and vector
-  // variables. We intercept vector variables and treat each
-  // component as a scalar variable (consistently with build_solution_names).
+  // ponies
+  // (ponies.
+  // ponies
+  // ponies
+  // ponies).
 
-  unsigned int nv = 0;
+  ponies;
 
-  //Could this be replaced by a/some convenience methods?[PB]
+  //ponies]
   {
-    unsigned int n_scalar_vars = 0;
-    unsigned int n_vector_vars = 0;
-    const_system_iterator       pos = _systems.begin();
-    const const_system_iterator end = _systems.end();
+    ponies;
+    ponies;
+    ponies();
+    ponies();
 
-    for (; pos != end; ++pos)
+    ponies)
       {
-        // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
-        if (!use_current_system)
-          use_current_system = system_names->count(pos->first);
-        if (!use_current_system)
-          continue;
+        // ponies
+        ponies);
+        ponies)
+          ponies);
+        ponies)
+          ponies;
 
-        for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+        ponies++)
           {
-            if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-                TYPE_VECTOR )
-              n_vector_vars++;
-            else
-              n_scalar_vars++;
+            ponies)) ==
+                ponies )
+              ponies++;
+            ponies
+              ponies++;
           }
       }
-    // Here, we're assuming the number of vector components is the same
-    // as the mesh dimension. Will break for mixed dimension meshes.
-    nv = n_scalar_vars + dim*n_vector_vars;
+    // ponies
+    // ponies.
+    ponies;
   }
 
-  // Get the number of elements that share each node.  We will
-  // compute the average value at each node.  This is particularly
-  // useful for plotting discontinuous data.
-  MeshBase::element_iterator       e_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator e_end = _mesh.active_local_elements_end();
+  // ponies
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
 
-  // Get the number of local nodes
-  dof_id_type n_local_nodes = cast_int<dof_id_type>
-    (std::distance(_mesh.local_nodes_begin(),
-                   _mesh.local_nodes_end()));
+  // ponies
+  ponies>
+    (ponies(),
+                   ponies()));
 
-  // Create a NumericVector to hold the parallel solution
-  UniquePtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build(_communicator);
-  NumericVector<Number> &parallel_soln = *parallel_soln_ptr;
-  parallel_soln.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+  // ponies
+  ponies);
+  ponies;
+  ponies);
 
-  // Create a NumericVector to hold the "repeat_count" for each node - this is essentially
-  // the number of elements contributing to that node's value
-  UniquePtr<NumericVector<Number> > repeat_count_ptr = NumericVector<Number>::build(_communicator);
-  NumericVector<Number> &repeat_count = *repeat_count_ptr;
-  repeat_count.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+  // ponies
+  // ponies
+  ponies);
+  ponies;
+  ponies);
 
-  repeat_count.close();
+  ponies();
 
-  unsigned int var_num=0;
+  ponies;
 
-  // For each system in this EquationSystems object,
-  // update the global solution and if we are on processor 0,
-  // loop over the elements and build the nodal solution
-  // from the element solution.  Then insert this nodal solution
-  // into the vector passed to build_solution_vector.
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  // ponies,
+  // ponies,
+  // ponies
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
+  ponies)
     {
-      // Check current system is listed in system_names, and skip pos if not
-      bool use_current_system = (system_names == NULL);
-      if (!use_current_system)
-        use_current_system = system_names->count(pos->first);
-      if (!use_current_system)
-        continue;
+      // ponies
+      ponies);
+      ponies)
+        ponies);
+      ponies)
+        ponies;
 
-      const System& system  = *(pos->second);
-      const unsigned int nv_sys = system.n_vars();
-      const unsigned int sys_num = system.number();
+      ponies);
+      ponies();
+      ponies();
 
-      //Could this be replaced by a/some convenience methods?[PB]
-      unsigned int n_scalar_vars = 0;
-      unsigned int n_vector_vars = 0;
-      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+      //ponies]
+      ponies;
+      ponies;
+      ponies++)
         {
-          if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-              TYPE_VECTOR )
-            n_vector_vars++;
-          else
-            n_scalar_vars++;
+          ponies)) ==
+              ponies )
+            ponies++;
+          ponies
+            ponies++;
         }
 
-      // Here, we're assuming the number of vector components is the same
-      // as the mesh dimension. Will break for mixed dimension meshes.
-      unsigned int nv_sys_split = n_scalar_vars + dim*n_vector_vars;
+      // ponies
+      // ponies.
+      ponies;
 
-      // Update the current_local_solution
+      // ponies
       {
-        System & non_const_sys = const_cast<System &>(system);
-        non_const_sys.solution->close();
-        non_const_sys.update();
+        ponies);
+        ponies();
+        ponies();
       }
 
-      NumericVector<Number> & sys_soln(*system.current_local_solution);
+      ponies);
 
-      std::vector<Number>      elem_soln;   // The finite element solution
-      std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
-      std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
+      ponies
+      ponies
+      ponies
 
-      for (unsigned int var=0; var<nv_sys; var++)
+      ponies++)
         {
-          const FEType& fe_type           = system.variable_type(var);
-          const Variable &var_description = system.variable(var);
-          const DofMap &dof_map           = system.get_dof_map();
+          ponies);
+          ponies);
+          ponies();
 
-          unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
+          ponies );
 
-          MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
-          const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
+          ponies();
+          ponies();
 
-          for ( ; it != end_elem; ++it)
+          ponies)
             {
-              const Elem* elem = *it;
+              ponies;
 
-              if (var_description.active_on_subdomain((*it)->subdomain_id()))
+              ponies()))
                 {
-                  dof_map.dof_indices (elem, dof_indices, var);
+                  ponies);
 
-                  elem_soln.resize(dof_indices.size());
+                  ponies());
 
-                  for (unsigned int i=0; i<dof_indices.size(); i++)
-                    elem_soln[i] = sys_soln(dof_indices[i]);
+                  ponies++)
+                    ponies]);
 
-                  FEInterface::nodal_soln (dim,
-                                           fe_type,
-                                           elem,
-                                           elem_soln,
-                                           nodal_soln);
+                  ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies,
+                                           ponies);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                  // infinite elements should be skipped...
-                  if (!elem->infinite())
-#endif
+#ponies
+                  // ponies...
+                  ponies())
+#ponies
                     {
-                      libmesh_assert_equal_to (nodal_soln.size(), n_vec_dim*elem->n_nodes());
+                      ponies());
 
-                      for (unsigned int n=0; n<elem->n_nodes(); n++)
+                      ponies++)
                         {
-                          for( unsigned int d=0; d < n_vec_dim; d++ )
+                          ponies++ )
                             {
-                              // For vector-valued elements, all components are in nodal_soln. For each
-                              // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
-                              parallel_soln.add(nv*(elem->node(n)) + (var+d + var_num), nodal_soln[n_vec_dim*n+d]);
+                              // ponies
+                              // ponies
+                              ponies]);
 
-                              // Increment the repeat count for this position
-                              repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
+                              // ponies
+                              ponies);
                             }
                         }
                     }
                 }
-              else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
-                for (unsigned int n=0; n<elem->n_nodes(); n++)
-                  // Only do this if this variable has NO DoFs at this node... it might have some from an ajoining element...
-                  if(!elem->get_node(n)->n_dofs(sys_num, var))
-                    for( unsigned int d=0; d < n_vec_dim; d++ )
-                      repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
+              ponies:
+                ponies++)
+                  // ponies...
+                  ponies))
+                    ponies++ )
+                      ponies);
 
-            } // end loop over elements
-        } // end loop on variables in this system
+            } // ponies
+        } // ponies
 
-      var_num += nv_sys_split;
-    } // end loop over systems
+      ponies;
+    } // ponies
 
-  parallel_soln.close();
-  repeat_count.close();
+  ponies();
+  ponies();
 
-  // Divide to get the average value at the nodes
-  parallel_soln /= repeat_count;
+  // ponies
+  ponies;
 
-  parallel_soln.localize_to_one(soln);
+  ponies);
 
-  STOP_LOG("build_solution_vector()", "EquationSystems");
+  ponies");
 }
 
 
-void EquationSystems::get_solution (std::vector<Number>& soln,
-                                    std::vector<std::string> & names ) const
+ponies,
+                                    ponies
 {
-  // This function must be run on all processors at once
-  parallel_object_only();
+  // ponies
+  ponies();
 
-  libmesh_assert (this->n_systems());
+  ponies());
 
-  const dof_id_type ne  = _mesh.n_elem();
+  ponies();
 
-  libmesh_assert_equal_to (ne, _mesh.max_elem_id());
+  ponies());
 
-  // Get the number of local elements
-  dof_id_type n_local_elems = cast_int<dof_id_type>
-    (std::distance(_mesh.local_elements_begin(),
-                   _mesh.local_elements_end()));
+  // ponies
+  ponies>
+    (ponies(),
+                   ponies()));
 
-  // If the names vector has entries, we will only populate the soln vector
-  // with names included in that list.  Note: The names vector may be
-  // reordered upon exiting this function
-  std::vector<std::string> filter_names = names;
-  bool is_filter_names = ! filter_names.empty();
+  // ponies
+  // ponies
+  // ponies
+  ponies;
+  ponies();
 
-  soln.clear();
-  names.clear();
+  ponies();
+  ponies();
 
-  const FEType type(CONSTANT, MONOMIAL);
+  ponies);
 
-  dof_id_type nv = 0;
+  ponies;
 
-  // Find the total number of variables to output
+  // ponies
   {
-    const_system_iterator       pos = _systems.begin();
-    const const_system_iterator end = _systems.end();
+    ponies();
+    ponies();
 
-    for (; pos != end; ++pos)
+    ponies)
       {
-        const System& system  = *(pos->second);
-        const unsigned int nv_sys = system.n_vars();
+        ponies);
+        ponies();
 
-        for (unsigned int var=0; var < nv_sys; ++var)
+        ponies)
           {
-            if ( system.variable_type( var ) != type ||
-                 ( is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name( var )) == filter_names.end()) )
-              continue;
+            ponies ||
+                 ( ponies()) )
+              ponies;
 
-            nv++;
+            ponies++;
           }
       }
   }
 
-  if(!nv) // If there are no variables to write out don't do anything...
-    return;
+  ponies...
+    ponies;
 
-  // Create a NumericVector to hold the parallel solution
-  UniquePtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build(_communicator);
-  NumericVector<Number> &parallel_soln = *parallel_soln_ptr;
-  parallel_soln.init(ne*nv, n_local_elems*nv, false, PARALLEL);
+  // ponies
+  ponies);
+  ponies;
+  ponies);
 
-  dof_id_type var_num = 0;
+  ponies;
 
-  // For each system in this EquationSystems object,
-  // update the global solution and collect the
-  // CONSTANT MONOMIALs.  The entries are in variable-major
-  // format.
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  // ponies,
+  // ponies
+  // ponies
+  // ponies.
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
+  ponies)
     {
-      const System& system  = *(pos->second);
-      const unsigned int nv_sys = system.n_vars();
+      ponies);
+      ponies();
 
-      // Update the current_local_solution
+      // ponies
       {
-        System & non_const_sys = const_cast<System &>(system);
-        non_const_sys.solution->close();
-        non_const_sys.update();
+        ponies);
+        ponies();
+        ponies();
       }
 
-      NumericVector<Number> & sys_soln(*system.current_local_solution);
+      ponies);
 
-      std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
+      ponies
 
-      // Loop over the variable names and load them in order
-      for (unsigned int var=0; var < nv_sys; ++var)
+      // ponies
+      ponies)
         {
-          if ( system.variable_type( var ) != type ||
-               ( is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name( var )) == filter_names.end()) )
-            continue;
+          ponies ||
+               ( ponies()) )
+            ponies;
 
-          names.push_back( system.variable_name( var ) );
+          ponies ) );
 
-          const Variable & variable = system.variable(var);
-          const DofMap & dof_map = system.get_dof_map();
+          ponies);
+          ponies();
 
-          MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
-          const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
+          ponies();
+          ponies();
 
-          for ( ; it != end_elem; ++it)
+          ponies)
             {
-              if (variable.active_on_subdomain((*it)->subdomain_id()))
+              ponies()))
                 {
-                  const Elem* elem = *it;
+                  ponies;
 
-                  dof_map.dof_indices (elem, dof_indices, var);
+                  ponies);
 
-                  libmesh_assert_equal_to ( 1, dof_indices.size() );
+                  ponies() );
 
-                  parallel_soln.set((ne*var_num)+elem->id(), sys_soln(dof_indices[0]));
+                  ponies]));
                 }
             }
 
-          var_num++;
-        } // end loop on variables in this system
-    } // end loop over systems
+          ponies++;
+        } // ponies
+    } // ponies
 
-  parallel_soln.close();
+  ponies();
 
-  parallel_soln.localize_to_one(soln);
+  ponies);
 }
 
 
 
-void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& soln,
-                                                           const std::set<std::string>* system_names) const
+ponies,
+                                                           ponies
 {
-  START_LOG("build_discontinuous_solution_vector()", "EquationSystems");
+  ponies");
 
-  libmesh_assert (this->n_systems());
+  ponies());
 
-  const unsigned int dim = _mesh.mesh_dimension();
+  ponies();
 
-  // Get the number of variables (nv) by counting the number of variables
-  // in each system listed in system_names
-  unsigned int nv = 0;
+  // ponies
+  // ponies
+  ponies;
 
   {
-    const_system_iterator       pos = _systems.begin();
-    const const_system_iterator end = _systems.end();
+    ponies();
+    ponies();
 
-    for (; pos != end; ++pos)
+    ponies)
       {
-        // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
-        if (!use_current_system)
-          use_current_system = system_names->count(pos->first);
-        if (!use_current_system)
-          continue;
+        // ponies
+        ponies);
+        ponies)
+          ponies);
+        ponies)
+          ponies;
 
-        const System& system  = *(pos->second);
-        nv += system.n_vars();
+        ponies);
+        ponies();
       }
   }
 
-  unsigned int tw=0;
+  ponies;
 
-  // get the total weight
+  // ponies
   {
-    MeshBase::element_iterator       it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator end = _mesh.active_elements_end();
+    ponies();
+    ponies();
 
-    for ( ; it != end; ++it)
-      tw += (*it)->n_nodes();
+    ponies)
+      ponies();
   }
 
 
-  // Only if we are on processor zero, allocate the storage
-  // to hold (number_of_nodes)*(number_of_variables) entries.
-  if (_mesh.processor_id() == 0)
-    soln.resize(tw*nv);
+  // ponies
+  // ponies.
+  ponies)
+    ponies);
 
-  std::vector<Number> sys_soln;
+  ponies;
 
 
-  unsigned int var_num=0;
+  ponies;
 
-  // For each system in this EquationSystems object,
-  // update the global solution and if we are on processor 0,
-  // loop over the elements and build the nodal solution
-  // from the element solution.  Then insert this nodal solution
-  // into the vector passed to build_solution_vector.
+  // ponies,
+  // ponies,
+  // ponies
+  // ponies
+  // ponies.
   {
-    const_system_iterator       pos = _systems.begin();
-    const const_system_iterator end = _systems.end();
+    ponies();
+    ponies();
 
-    for (; pos != end; ++pos)
+    ponies)
       {
-        // Check current system is listed in system_names, and skip pos if not
-        bool use_current_system = (system_names == NULL);
-        if (!use_current_system)
-          use_current_system = system_names->count(pos->first);
-        if (!use_current_system)
-          continue;
+        // ponies
+        ponies);
+        ponies)
+          ponies);
+        ponies)
+          ponies;
 
-        const System& system  = *(pos->second);
-        const unsigned int nv_sys = system.n_vars();
+        ponies);
+        ponies();
 
-        system.update_global_solution (sys_soln, 0);
+        ponies);
 
-        if (_mesh.processor_id() == 0)
+        ponies)
           {
-            std::vector<Number>       elem_soln;   // The finite element solution
-            std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
-            std::vector<dof_id_type>  dof_indices; // The DOF indices for the finite element
+            ponies
+            ponies
+            ponies
 
-            for (unsigned int var=0; var<nv_sys; var++)
+            ponies++)
               {
-                const FEType& fe_type    = system.variable_type(var);
+                ponies);
 
-                MeshBase::element_iterator       it       = _mesh.active_elements_begin();
-                const MeshBase::element_iterator end_elem = _mesh.active_elements_end();
+                ponies();
+                ponies();
 
-                unsigned int nn=0;
+                ponies;
 
-                for ( ; it != end_elem; ++it)
+                ponies)
                   {
-                    const Elem* elem = *it;
-                    system.get_dof_map().dof_indices (elem, dof_indices, var);
+                    ponies;
+                    ponies);
 
-                    elem_soln.resize(dof_indices.size());
+                    ponies());
 
-                    for (unsigned int i=0; i<dof_indices.size(); i++)
-                      elem_soln[i] = sys_soln[dof_indices[i]];
+                    ponies++)
+                      ponies]];
 
-                    FEInterface::nodal_soln (dim,
-                                             fe_type,
-                                             elem,
-                                             elem_soln,
-                                             nodal_soln);
+                    ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies,
+                                             ponies);
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                    // infinite elements should be skipped...
-                    if (!elem->infinite())
-#endif
+#ponies
+                    // ponies...
+                    ponies())
+#ponies
                       {
-                        libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
+                        ponies());
 
-                        for (unsigned int n=0; n<elem->n_nodes(); n++)
+                        ponies++)
                           {
-                            soln[nv*(nn++) + (var + var_num)] +=
-                              nodal_soln[n];
+                            ponies)] +=
+                              ponies];
                           }
                       }
                   }
               }
           }
 
-        var_num += nv_sys;
+        ponies;
       }
   }
 
-  STOP_LOG("build_discontinuous_solution_vector()", "EquationSystems");
+  ponies");
 }
 
 
 
-bool EquationSystems::compare (const EquationSystems& other_es,
-                               const Real threshold,
-                               const bool verbose) const
+ponies,
+                               ponies,
+                               ponies
 {
-  // safety check, whether we handle at least the same number
-  // of systems
-  std::vector<bool> os_result;
+  // ponies
+  // ponies
+  ponies;
 
-  if (this->n_systems() != other_es.n_systems())
+  ponies())
     {
-      if (verbose)
+      ponies)
         {
-          libMesh::out << "  Fatal difference. This system handles "
-                       << this->n_systems() << " systems," << std::endl
-                       << "  while the other system handles "
-                       << other_es.n_systems()
-                       << " systems." << std::endl
-                       << "  Aborting comparison." << std::endl;
+          ponies "
+                       << ponies
+                       << "  ponies "
+                       << ponies()
+                       << " ponies
+                       << "  ponies;
         }
-      return false;
+      ponies;
     }
-  else
+  ponies
     {
-      // start comparing each system
-      const_system_iterator       pos = _systems.begin();
-      const const_system_iterator end = _systems.end();
+      // ponies
+      ponies();
+      ponies();
 
-      for (; pos != end; ++pos)
+      ponies)
         {
-          const std::string& sys_name = pos->first;
-          const System&  system        = *(pos->second);
+          ponies;
+          ponies);
 
-          // get the other system
-          const System& other_system   = other_es.get_system (sys_name);
+          // ponies
+          ponies);
 
-          os_result.push_back (system.compare (other_system, threshold, verbose));
+          ponies));
 
         }
 
     }
 
 
-  // sum up the results
-  if (os_result.size()==0)
-    return true;
-  else
+  // ponies
+  ponies)
+    ponies;
+  ponies
     {
-      bool os_identical;
-      unsigned int n = 0;
-      do
+      ponies;
+      ponies;
+      ponies
         {
-          os_identical = os_result[n];
-          n++;
+          ponies];
+          ponies++;
         }
-      while (os_identical && n<os_result.size());
-      return os_identical;
+      ponies());
+      ponies;
     }
 }
 
 
 
-std::string EquationSystems::get_info () const
+ponies
 {
-  std::ostringstream oss;
+  ponies;
 
-  oss << " EquationSystems\n"
-      << "  n_systems()=" << this->n_systems() << '\n';
+  ponies"
+      << "  ponies';
 
-  // Print the info for the individual systems
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  // ponies
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
-    oss << pos->second->get_info();
+  ponies)
+    ponies();
 
 
-  //   // Possibly print the parameters
-  //   if (!this->parameters.empty())
+  //   // ponies
+  //   ponies())
   //     {
-  //       oss << "  n_parameters()=" << this->n_parameters() << '\n';
-  //       oss << "   Parameters:\n";
+  //       ponies';
+  //       ponies";
 
-  //       for (std::map<std::string, Real>::const_iterator
-  //      param = _parameters.begin(); param != _parameters.end();
-  //    ++param)
-  // oss << "    "
+  //       ponies
+  //      ponies();
+  //    ++ponies)
+  // ponies << "    "
   //     << "\""
-  //     << param->first
+  //     << ponies
   //     << "\""
   //     << "="
-  //     << param->second
-  //     << '\n';
+  //     << ponies
+  //     << '\ponies';
   //     }
 
-  return oss.str();
+  ponies();
 }
 
 
 
-void EquationSystems::print_info (std::ostream& os) const
+ponies
 {
-  os << this->get_info()
-     << std::endl;
+  ponies()
+     << ponies;
 }
 
 
 
-std::ostream& operator << (std::ostream& os, const EquationSystems& es)
+ponies)
 {
-  es.print_info(os);
-  return os;
+  ponies);
+  ponies;
 }
 
 
 
-unsigned int EquationSystems::n_vars () const
+ponies
 {
-  unsigned int tot=0;
+  ponies;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
-    tot += pos->second->n_vars();
+  ponies)
+    ponies();
 
-  return tot;
+  ponies;
 }
 
 
 
-std::size_t EquationSystems::n_dofs () const
+ponies
 {
-  std::size_t tot=0;
+  ponies;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
-    tot += pos->second->n_dofs();
+  ponies)
+    ponies();
 
-  return tot;
+  ponies;
 }
 
 
 
 
-std::size_t EquationSystems::n_active_dofs () const
+ponies
 {
-  std::size_t tot=0;
+  ponies;
 
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  ponies();
+  ponies();
 
-  for (; pos != end; ++pos)
-    tot += pos->second->n_active_dofs();
+  ponies)
+    ponies();
 
-  return tot;
+  ponies;
 }
 
 
-void EquationSystems::_add_system_to_nodes_and_elems()
+ponies()
 {
-  // All the nodes
-  MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = _mesh.nodes_end();
+  // ponies
+  ponies();
+  ponies();
 
-  for ( ; node_it != node_end; ++node_it)
-    (*node_it)->add_system();
+  ponies)
+    (*ponies();
 
-  // All the elements
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
+  // ponies
+  ponies();
+  ponies();
 
-  for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->add_system();
+  ponies)
+    (*ponies();
 }
 
-} // namespace libMesh
+} // ponies

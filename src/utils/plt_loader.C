@@ -1,103 +1,103 @@
-// Copyright (C) 2002-2007  Benjamin S. Kirk
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#include "libmesh/plt_loader.h"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 //---------------------------------------------------------
-// PltLoader static data
-const unsigned int PltLoader::NNodes[4] = {3, 4, 4, 8};
+// ponies
+ponies};
 
 
 
 //-----------------------------------------------------------------------------
-// PltLoader members
-void PltLoader::clear ()
+// ponies
+ponies ()
 {
-  // clear vectors & strings.  Using .erase() for strings instead of .clear()
-  // since GCC 2.95.3 does not support .clear().
-  _version.erase();
-  _title.erase();
+  // ponies()
+  // ponies().
+  ponies();
+  ponies();
 
-  _var_names.clear();
-  _var_types.clear();
-  _zone_types.clear();
-  _zone_names.clear();
-  _zone_pack.clear();
-  _imax.clear();
-  _jmax.clear();
-  _kmax.clear();
-  _data.clear();
-  _conn.clear();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
+  ponies();
 
-  // reinitialize
-  _is_foreign = false;
-  _n_vars     = 0;
-  _n_zones    = 0;
+  // ponies
+  ponies;
+  ponies;
+  ponies;
 }
 
 
 
-void PltLoader::set_n_vars (const unsigned int nv)
+ponies)
 {
-  _n_vars = nv;
+  ponies;
 
-  _var_types.resize (this->n_vars());
-  _var_names.resize (this->n_vars());
+  ponies());
+  ponies());
 
-  // Default to float data
-  std::fill (_var_types.begin(), _var_types.end(), 1);
+  // ponies
+  ponies);
 
-  // If the number of zones is set, resize the data.
-  if (this->n_zones())
+  // ponies.
+  ponies())
     {
-      _data.resize  (this->n_zones());
+      ponies());
 
-      for (unsigned int z=0; z<this->n_zones(); z++)
-        _data[z].resize  (this->n_vars());
+      ponies++)
+        ponies());
     }
 }
 
 
 
-void PltLoader::set_n_zones (const unsigned int nz)
+ponies)
 {
-  _n_zones = nz;
+  ponies;
 
-  _zone_types.resize (this->n_zones());
-  _zone_names.resize (this->n_zones());
-  _zone_pack.resize  (this->n_zones());
+  ponies());
+  ponies());
+  ponies());
 
-  _imax.resize (this->n_zones());
-  _jmax.resize (this->n_zones());
-  _kmax.resize (this->n_zones());
+  ponies());
+  ponies());
+  ponies());
 
-  _data.resize (this->n_zones());
-  _conn.resize        (this->n_zones());
+  ponies());
+  ponies());
 
-  // If the number of variables are set, resize the data.
-  if (this->n_vars())
-    for (unsigned int z=0; z<this->n_zones(); z++)
-      _data[z].resize (this->n_vars());
+  // ponies.
+  ponies())
+    ponies++)
+      ponies());
 }
 
-} // namespace libMesh
+} // ponies

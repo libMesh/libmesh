@@ -1,720 +1,720 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_FE_BASE_H
-#define LIBMESH_FE_BASE_H
-
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
-#include "libmesh/compare_types.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/fe_abstract.h"
-#include "libmesh/fe_transformation_base.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/point.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/tensor_tools.h"
-#include "libmesh/type_n_tensor.h"
-#include "libmesh/vector_value.h"
-
-// C++ includes
-#include <cstddef>
-#include <vector>
+// ponies
+// ponies
+// ponies
 
 
-namespace libMesh
+
+#ponies
+#ponies
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies
+#ponies>
+#ponies>
+
+
+ponies
 {
 
 
-// forward declarations
-template <typename T> class DenseMatrix;
-template <typename T> class DenseVector;
-class BoundaryInfo;
-class DofConstraints;
-class DofMap;
-class Elem;
-class MeshBase;
-template <typename T> class NumericVector;
-class QBase;
-template <typename T> class FETransformationBase;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-class NodeConstraints;
-#endif
+#ponies
+ponies;
+#ponies
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-class PeriodicBoundaries;
-class PointLocatorBase;
-#endif
+#ponies
+ponies;
+ponies;
+#ponies
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-class InfFE;
-#endif
+#ponies
+ponies>
+ponies;
+#ponies
 
 /**
- * This class forms the foundation from which generic finite
- * elements may be derived.  In the current implementation the
- * templated derived class \p FE offers a wide variety of commonly
- * used finite element concepts.  Check there for details.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * Use the \p FEGenericBase<OutputType>::build() method to create an
- * object of any of the derived classes which is compatible with
- * OutputType.
+ * ponies
+ * ponies
+ * ponies.
  *
- * Note that the amount of virtual members is kept to a minimum,
- * and the sophisticated template scheme of \p FE is quite
- * likely to offer acceptably fast code.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * All calls to static members of the \p FE classes should be
- * requested through the \p FEInterface.  This interface class
- * offers sort-of runtime polymorphism for the templated finite
- * element classes.  Even internal library classes, like \p DofMap,
- * request the number of dof's through this interface class.
- * Note that this also enables the co-existence of various
- * element-based schemes.
- * This class is well 'at the heart' of the library, so
- * things in here should better remain unchanged.
+ * ponies
+ * ponies
+ * ponies
+ * ponies,
+ * ponies.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2002
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// FEBase class definition
-template <typename OutputType>
-class FEGenericBase : public FEAbstract
+// ponies
+ponies>
+ponies
 {
-protected:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required data
-   * structures.  Protected so that this base class
-   * cannot be explicitly instantiated.
+   * ponies
+   * ponies
+   * ponies.
    */
-  FEGenericBase (const unsigned int dim,
-                 const FEType& fet);
+  ponies,
+                 ponies);
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~FEGenericBase();
+  ponies();
 
   /**
-   * Builds a specific finite element type.  A \p
-   * UniquePtr<FEGenericBase> is returned to prevent a memory leak. This
-   * way the user need not remember to delete the object.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The build call will fail if the OutputType of this class is not
-   * compatible with the output required for the requested \p type
+   * ponies
+   * ponies
    */
-  static UniquePtr<FEGenericBase> build (const unsigned int dim,
-                                         const FEType& type);
+  ponies,
+                                         ponies);
 
   /**
-   * Convenient typedefs for gradients of output, hessians of output,
-   * and potentially-complex-valued versions of same.
+   * ponies,
+   * ponies.
    */
-  typedef OutputType                                                      OutputShape;
-  typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
-  typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
-  typedef typename TensorTools::DecrementRank<OutputShape>::type          OutputDivergence;
-  typedef typename TensorTools::MakeNumber<OutputShape>::type             OutputNumber;
-  typedef typename TensorTools::IncrementRank<OutputNumber>::type         OutputNumberGradient;
-  typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
-  typedef typename TensorTools::DecrementRank<OutputNumber>::type         OutputNumberDivergence;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
   /**
-   * Builds a specific infinite element type.  A \p
-   * UniquePtr<FEGenericBase> is returned to prevent a memory leak. This
-   * way the user need not remember to delete the object.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The build call will fail if the OutputShape of this class is not
-   * compatible with the output required for the requested \p type
+   * ponies
+   * ponies
    */
-  static UniquePtr<FEGenericBase> build_InfFE (const unsigned int dim,
-                                               const FEType& type);
+  ponies,
+                                               ponies);
 
-#endif
+#ponies
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
   /**
-   * Computes the constraint matrix contributions (for
-   * non-conforming adapted meshes) corresponding to
-   * variable number \p var_number, using generic
-   * projections.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  static void compute_proj_constraints (DofConstraints &constraints,
-                                        DofMap &dof_map,
-                                        const unsigned int variable_number,
-                                        const Elem* elem);
+  ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies);
 
   /**
-   * Creates a local projection on \p coarse_elem, based on the
-   * DoF values in \p global_vector for it's children.
+   * ponies
+   * ponies.
    */
 
-  static void coarsened_dof_values(const NumericVector<Number> &global_vector,
-                                   const DofMap &dof_map,
-                                   const Elem *coarse_elem,
-                                   DenseVector<Number> &coarse_dofs,
-                                   const unsigned int var,
-                                   const bool use_old_dof_indices = false);
+  ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies);
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-#ifdef LIBMESH_ENABLE_PERIODIC
+#ponies
 
   /**
-   * Computes the constraint matrix contributions (for
-   * meshes with periodic boundary conditions) corresponding to
-   * variable number \p var_number, using generic projections.
+   * ponies
+   * ponies
+   * ponies.
    */
-  static void compute_periodic_constraints (DofConstraints &constraints,
-                                            DofMap &dof_map,
-                                            const PeriodicBoundaries &boundaries,
-                                            const MeshBase& mesh,
-                                            const PointLocatorBase* point_locator,
-                                            const unsigned int variable_number,
-                                            const Elem* elem);
+  ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies,
+                                            ponies);
 
-#endif // LIBMESH_ENABLE_PERIODIC
+#ponies
 
   /**
-   * @returns the shape function values at the quadrature points
-   * on the element.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_phi() const
-  { libmesh_assert(!calculations_started || calculate_phi);
-    calculate_phi = true; return phi; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputGradient> >& get_dphi() const
-  { libmesh_assert(!calculations_started || calculate_dphi);
-    calculate_dphi = calculate_dphiref = true; return dphi; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the curl of the shape function at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_curl_phi() const
-  { libmesh_assert(!calculations_started || calculate_curl_phi);
-    calculate_curl_phi = calculate_dphiref = true; return curl_phi; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the divergence of the shape function at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputDivergence> >& get_div_phi() const
-  { libmesh_assert(!calculations_started || calculate_div_phi);
-    calculate_div_phi = calculate_dphiref = true; return div_phi; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function x-derivative at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidx() const
-  { libmesh_assert(!calculations_started || calculate_dphi);
-    calculate_dphi = calculate_dphiref = true; return dphidx; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function y-derivative at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidy() const
-  { libmesh_assert(!calculations_started || calculate_dphi);
-    calculate_dphi = calculate_dphiref = true; return dphidy; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function z-derivative at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidz() const
-  { libmesh_assert(!calculations_started || calculate_dphi);
-    calculate_dphi = calculate_dphiref = true; return dphidz; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function xi-derivative at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidxi() const
-  { libmesh_assert(!calculations_started || calculate_dphiref);
-    calculate_dphiref = true; return dphidxi; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function eta-derivative at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphideta() const
-  { libmesh_assert(!calculations_started || calculate_dphiref);
-    calculate_dphiref = true; return dphideta; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function zeta-derivative at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_dphidzeta() const
-  { libmesh_assert(!calculations_started || calculate_dphiref);
-    calculate_dphiref = true; return dphidzeta; }
+  ponies
+  { ponies);
+    ponies; }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputTensor> >& get_d2phi() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phi; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidx2() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidx2; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxdy() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidxdy; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxdz() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidxdz; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidy2() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi =  calculate_dphiref = true; return d2phidy2; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidydz() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidydz; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points.
+   * @ponies
+   * ponies.
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidz2() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidz2; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points, in reference coordinates
+   * @ponies
+   * ponies
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxi2() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidxi2; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points, in reference coordinates
+   * @ponies
+   * ponies
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxideta() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidxideta; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points, in reference coordinates
+   * @ponies
+   * ponies
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidxidzeta() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidxidzeta; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points, in reference coordinates
+   * @ponies
+   * ponies
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phideta2() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phideta2; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points, in reference coordinates
+   * @ponies
+   * ponies
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidetadzeta() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidetadzeta; }
+  ponies
+  { ponies);
+    ponies; }
 
   /**
-   * @returns the shape function second derivatives at the quadrature
-   * points, in reference coordinates
+   * @ponies
+   * ponies
    */
-  const std::vector<std::vector<OutputShape> >& get_d2phidzeta2() const
-  { libmesh_assert(!calculations_started || calculate_d2phi);
-    calculate_d2phi = calculate_dphiref = true; return d2phidzeta2; }
+  ponies
+  { ponies);
+    ponies; }
 
-#endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
   /**
-   * @returns the global first derivative of the phase term
-   * which is used in infinite elements, evaluated at the
-   * quadrature points.
+   * @ponies
+   * ponies
+   * ponies.
    *
-   * In case of the general finite element class \p FE this
-   * field is initialized to all zero, so that the variational
-   * formulation for an @e infinite element returns correct element
-   * matrices for a mesh using both finite and infinite elements.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  const std::vector<OutputGradient>& get_dphase() const
-  { return dphase; }
+  ponies
+  { ponies; }
 
 
   /**
-   * @returns the multiplicative weight at each quadrature point.
-   * This weight is used for certain infinite element weak
-   * formulations, so that @e weighted Sobolev spaces are
-   * used for the trial function space.  This renders the
-   * variational form easily computable.
+   * @ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * In case of the general finite element class \p FE this
-   * field is initialized to all ones, so that the variational
-   * formulation for an @e infinite element returns correct element
-   * matrices for a mesh using both finite and infinite elements.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  const std::vector<Real>& get_Sobolev_weight() const
-  { return weight; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns the first global derivative of the multiplicative
-   * weight at each quadrature point. See \p get_Sobolev_weight()
-   * for details.  In case of \p FE initialized to all zero.
+   * @ponies
+   * ponies()
+   * ponies.
    */
-  const std::vector<RealGradient>& get_Sobolev_dweight() const
-  { return dweight; }
+  ponies
+  { ponies; }
 
-#endif
+#ponies
 
 
   /**
-   * Prints the value of each shape function at each quadrature point.
+   * ponies.
    */
-  void print_phi(std::ostream& os) const;
+  ponies;
 
   /**
-   * Prints the value of each shape function's derivative
-   * at each quadrature point.
+   * ponies
+   * ponies.
    */
-  void print_dphi(std::ostream& os) const;
+  ponies;
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Prints the value of each shape function's second derivatives
-   * at each quadrature point.
+   * ponies
+   * ponies.
    */
-  void print_d2phi(std::ostream& os) const;
+  ponies;
 
-#endif
-
-
-protected:
+#ponies
 
 
+ponies:
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+
+#ponies
 
   /**
-   * Initialize the data fields for the base of an
-   * an infinite element.  Implement this in the derived
-   * class \p FE<Dim,T>.
+   * ponies
+   * ponies
+   * ponies>.
    */
-  virtual void init_base_shape_functions(const std::vector<Point>& qp,
-                                         const Elem* e) = 0;
+  ponies,
+                                         ponies;
 
-#endif
+#ponies
 
   /**
-   * After having updated the jacobian and the transformation
-   * from local to global coordinates in \p FEAbstract::compute_map(),
-   * the first derivatives of the shape functions are
-   * transformed to global coordinates, giving \p dphi,
-   * \p dphidx, \p dphidy, and \p dphidz. This method
-   * should rarely be re-defined in derived classes, but
-   * still should be usable for children. Therefore, keep
-   * it protected.
+   * ponies
+   * ponies(),
+   * ponies
+   * ponies,
+   * \ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void compute_shape_functions(const Elem* elem, const std::vector<Point>& qp);
+  ponies);
 
   /**
-   * Object that handles computing shape function values, gradients, etc
-   * in the physical domain.
+   * ponies
+   * ponies.
    */
-  UniquePtr<FETransformationBase<OutputType> > _fe_trans;
+  ponies;
 
   /**
-   * Shape function values.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   phi;
+  ponies;
 
   /**
-   * Shape function derivative values.
+   * ponies.
    */
-  std::vector<std::vector<OutputGradient> >  dphi;
+  ponies;
 
   /**
-   * Shape function curl values. Only defined for vector types.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> > curl_phi;
+  ponies;
 
   /**
-   * Shape function divergence values. Only defined for vector types.
+   * ponies.
    */
-  std::vector<std::vector<OutputDivergence> > div_phi;
+  ponies;
 
   /**
-   * Shape function derivatives in the xi direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   dphidxi;
+  ponies;
 
   /**
-   * Shape function derivatives in the eta direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   dphideta;
+  ponies;
 
   /**
-   * Shape function derivatives in the zeta direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   dphidzeta;
+  ponies;
 
   /**
-   * Shape function derivatives in the x direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   dphidx;
+  ponies;
 
   /**
-   * Shape function derivatives in the y direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   dphidy;
+  ponies;
 
   /**
-   * Shape function derivatives in the z direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   dphidz;
+  ponies;
 
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Shape function second derivative values.
+   * ponies.
    */
-  std::vector<std::vector<OutputTensor> >  d2phi;
+  ponies;
 
   /**
-   * Shape function second derivatives in the xi direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidxi2;
+  ponies;
 
   /**
-   * Shape function second derivatives in the xi-eta direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidxideta;
+  ponies;
 
   /**
-   * Shape function second derivatives in the xi-zeta direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidxidzeta;
+  ponies;
 
   /**
-   * Shape function second derivatives in the eta direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phideta2;
+  ponies;
 
   /**
-   * Shape function second derivatives in the eta-zeta direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidetadzeta;
+  ponies;
 
   /**
-   * Shape function second derivatives in the zeta direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidzeta2;
+  ponies;
 
   /**
-   * Shape function second derivatives in the x direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidx2;
+  ponies;
 
   /**
-   * Shape function second derivatives in the x-y direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidxdy;
+  ponies;
 
   /**
-   * Shape function second derivatives in the x-z direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidxdz;
+  ponies;
 
   /**
-   * Shape function second derivatives in the y direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidy2;
+  ponies;
 
   /**
-   * Shape function second derivatives in the y-z direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidydz;
+  ponies;
 
   /**
-   * Shape function second derivatives in the z direction.
+   * ponies.
    */
-  std::vector<std::vector<OutputShape> >   d2phidz2;
+  ponies;
 
-#endif
+#ponies
 
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
   //--------------------------------------------------------------
-  /* protected members for infinite elements, which are accessed
-   * from the outside through some inline functions
+  /* ponies
+   * ponies
    */
 
 
   /**
-   * Used for certain @e infinite element families:
-   * the first derivatives of the phase term in global coordinates,
-   * over @e all quadrature points.
+   * ponies:
+   * ponies,
+   * ponies.
    */
-  std::vector<OutputGradient> dphase;
+  ponies;
 
   /**
-   * Used for certain @e infinite element families:
-   * the global derivative of the additional radial weight \f$ 1/{r^2} \f$,
-   * over @e all quadrature points.
+   * ponies:
+   * ponies$,
+   * ponies.
    */
-  std::vector<RealGradient> dweight;
+  ponies;
 
   /**
-   * Used for certain @e infinite element families:
-   * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
-   * over @e all quadrature points.
+   * ponies:
+   * ponies,
+   * ponies.
    */
-  std::vector<Real>  weight;
+  ponies;
 
-#endif
+#ponies
 
-private:
+ponies:
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#ponies
 
   /**
-   * Make all \p InfFE<Dim,T_radial,T_map> classes friends
-   * so that they can safely used \p FE<Dim-1,T_base> through
-   * a \p FEGenericBase* as base approximation.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
-  friend class InfFE;
+  ponies>
+  ponies;
 
-#endif
+#ponies
 
 
 };
 
 
-// Typedefs for convenience and backwards compatibility
-typedef FEGenericBase<Real> FEBase;
-typedef FEGenericBase<RealGradient> FEVectorBase;
+// ponies
+ponies;
+ponies;
 
 
 
 
 // ------------------------------------------------------------
-// FEGenericBase class inline members
-template <typename OutputType>
-inline
-FEGenericBase<OutputType>::FEGenericBase(const unsigned int d,
-                                         const FEType& fet) :
-  FEAbstract(d,fet),
-  _fe_trans( FETransformationBase<OutputType>::build(fet) ),
-  phi(),
-  dphi(),
-  curl_phi(),
-  div_phi(),
-  dphidxi(),
-  dphideta(),
-  dphidzeta(),
-  dphidx(),
-  dphidy(),
-  dphidz()
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  ,d2phi(),
-  d2phidxi2(),
-  d2phidxideta(),
-  d2phidxidzeta(),
-  d2phideta2(),
-  d2phidetadzeta(),
-  d2phidzeta2(),
-  d2phidx2(),
-  d2phidxdy(),
-  d2phidxdz(),
-  d2phidy2(),
-  d2phidydz(),
-  d2phidz2()
-#endif
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  ,dphase(),
-  dweight(),
-  weight()
-#endif
+// ponies
+ponies>
+ponies
+ponies,
+                                         ponies) :
+  ponies),
+  ponies) ),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies()
+#ponies
+  ,ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies(),
+  ponies()
+#ponies
+#ponies
+  ,ponies(),
+  ponies(),
+  ponies()
+#ponies
 {
 }
 
 
 
-template <typename OutputType>
-inline
-FEGenericBase<OutputType>::~FEGenericBase()
+ponies>
+ponies
+ponies()
 {
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FE_BASE_H
+#ponies

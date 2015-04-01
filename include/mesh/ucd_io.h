@@ -1,151 +1,151 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_UCD_IO_H
-#define LIBMESH_UCD_IO_H
+#ponies
+#ponies
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_input.h"
-#include "libmesh/mesh_output.h"
-#include "libmesh/boundary_info.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class MeshBase;
+// ponies
+ponies;
 
 
 
 /**
- * This class implements reading & writing meshes in the AVS's UCD format.
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2004
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// UCDIO class definition
-class UCDIO : public MeshInput<MeshBase>,
-              public MeshOutput<MeshBase>
+// ponies
+ponies>,
+              ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
-   * This is the constructor required to read a mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  UCDIO (MeshBase&);
+  ponies
+  ponies&);
 
   /**
-   * Constructor.  Takes a reference to a constant mesh object.
-   * This constructor will only allow us to write the mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  UCDIO (const MeshBase&);
+  ponies
+  ponies&);
 
   /**
-   * This method implements reading a mesh from a specified file
-   * in UCD format.
+   * ponies
+   * ponies.
    */
-  virtual void read (const std::string& );
+  ponies& );
 
   /**
-   * This method implements writing a mesh to a specified file
-   * in UCD format.
+   * ponies
+   * ponies.
    */
-  virtual void write (const std::string& );
+  ponies& );
 
   /**
-   * This method implements writing a mesh and solution to a specified file
-   * in UCD format. This is internally called by MeshOutput::write_equation_systems
+   * ponies
+   * ponies
    */
-  virtual void write_nodal_data(const std::string& fname,
-                                const std::vector<Number>&soln,
-                                const std::vector<std::string>& names);
+  ponies,
+                                ponies,
+                                ponies);
 
 
-private:
+ponies:
 
   /**
-   * The actual implementation of the read function.
-   * The public read interface simply decides which
-   * type of stream to pass the implementation.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void read_implementation (std::istream& in_stream);
+  ponies);
 
   /**
-   * The actual implementation of the write function.
-   * The public write interface simply decides which
-   * type of stream to pass the implementation.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void write_implementation (std::ostream& out_stream);
+  ponies);
 
   /**
-   * Write UCD format header
+   * ponies
    */
-  void write_header(std::ostream& out, const MeshBase& mesh,
-                    dof_id_type n_elems, unsigned int n_vars );
+  ponies,
+                    ponies );
 
   /**
-   * Write node information
+   * ponies
    */
-  void write_nodes(std::ostream& out, const MeshBase& mesh);
+  ponies);
 
   /**
-   * Write element information
+   * ponies
    */
-  void write_interior_elems(std::ostream& out, const MeshBase& mesh);
+  ponies);
 
   /**
-   * Writes all nodal solution variables
+   * ponies
    */
-  void write_soln(std::ostream& out, const MeshBase& mesh,
-                  const std::vector<std::string>& names,
-                  const std::vector<Number>&soln);
+  ponies,
+                  ponies,
+                  ponies);
 
 };
 
 
 
 // ------------------------------------------------------------
-// UCDIO inline members
-inline
-UCDIO::UCDIO (MeshBase& mesh) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh)
+// ponies
+ponies
+ponies) :
+  ponies),
+  ponies)
 {
 }
 
 
 
-inline
-UCDIO::UCDIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase> (mesh)
+ponies
+ponies) :
+  ponies)
 {
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_UCD_IO_H
+#ponies

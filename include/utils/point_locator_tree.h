@@ -1,183 +1,183 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_POINT_LOCATOR_TREE_H
-#define LIBMESH_POINT_LOCATOR_TREE_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/point_locator_base.h"
-#include "libmesh/tree_base.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// Forward Declarations
-class MeshBase;
-class Point;
-class Elem;
+// ponies
+ponies;
+ponies;
+ponies;
 
 
 /**
- * This is a point locator.  It locates points in space
- * using a tree: given a mesh they return the element
- * and local coordinates for a given point in global coordinates.
- * Use \p PointLocatorBase::build() to create objects of this
- * type at run time.
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
- * @author Daniel Dreyer, 2003
+ * @ponies
  */
-class PointLocatorTree : public PointLocatorBase
+ponies
 {
-public:
+ponies:
   /**
-   * Constructor.  Needs the \p mesh in which the points
-   * should be located.  Optionally takes a master
-   * interpolator.  This master helps in saving memory
-   * by reducing the number of trees in use.  Only the
-   * master locator holds a  tree, the others simply
-   * use the master's tree.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  PointLocatorTree (const MeshBase& mesh,
-                    const PointLocatorBase* master = NULL);
+  ponies,
+                    ponies);
 
 
   /**
-   * Constructor.  Needs the \p mesh in which the points
-   * should be located.  Allows the user to specify the
-   * method to use when building the tree.
-   * Optionally takes a master interpolator.
-   * This master helps in saving memory
-   * by reducing the number of trees in use.  Only the
-   * master locator holds a  tree, the others simply
-   * use the master's tree. Allows the user to specify
-   * the build type.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  PointLocatorTree (const MeshBase& mesh,
-                    const Trees::BuildType build_type,
-                    const PointLocatorBase* master = NULL);
+  ponies,
+                    ponies,
+                    ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~PointLocatorTree ();
+  ~ponies ();
 
   /**
-   * Clears the locator.  This function frees dynamic memory with "delete".
+   * ponies".
    */
-  virtual void clear();
+  ponies();
 
   /**
-   * Initializes the locator, so that the \p operator() methods can
-   * be used.  This function allocates dynamic memory with "new".
+   * ponies
+   * ponies".
    */
-  void init(Trees::BuildType build_type);
+  ponies);
 
   /**
-   * Initializes the locator, so that the \p operator() methods can
-   * be used.  This function allocates dynamic memory with "new".
+   * ponies
+   * ponies".
    */
-  virtual void init();
+  ponies();
 
   /**
-   * Locates the element in which the point with global coordinates
-   * \p p is located, optionally restricted to a set of allowed subdomains.
-   * The mutable _element member is used to cache
-   * the result and allow it to be used during the next call to
-   * operator().
+   * ponies
+   * \ponies.
+   * ponies
+   * ponies
+   * ponies().
    */
-  virtual const Elem* operator() (const Point& p, const std::set<subdomain_id_type> *allowed_subdomains = NULL) const;
+  ponies;
 
   /**
-   * As a fallback option, it's helpful to be able to do a linear
-   * search over the entire mesh. This can be used if operator()
-   * fails to find an element that contains \p p, for example.
-   * Optionally specify a "close to point" tolerance to use in
-   * the linear search.
-   * Return NULL if no element is found.
+   * ponies
+   * ponies()
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  const Elem* perform_linear_search(const Point& p,
-                                    const std::set<subdomain_id_type> *allowed_subdomains,
-                                    bool use_close_to_point,
-                                    Real close_to_point_tolerance=TOLERANCE) const;
+  ponies,
+                                    ponies,
+                                    ponies,
+                                    ponies;
 
   /**
-   * Enables out-of-mesh mode.  In this mode, if asked to find a point
-   * that is contained in no mesh at all, the point locator will
-   * return a NULL pointer instead of crashing.  Per default, this
-   * mode is off.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void enable_out_of_mesh_mode ();
+  ponies ();
 
   /**
-   * Disables out-of-mesh mode (default).  If asked to find a point
-   * that is contained in no mesh at all, the point locator will now
-   * crash.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void disable_out_of_mesh_mode ();
+  ponies ();
 
   /**
-   * Set the target bin size.
+   * ponies.
    */
-  void set_target_bin_size(unsigned int target);
+  ponies);
 
   /**
-   * Get the target bin size.
+   * ponies.
    */
-  unsigned int get_target_bin_size() const;
+  ponies;
 
-protected:
+ponies:
   /**
-   * Pointer to our tree.  The tree is built at run-time
-   * through \p init().  For servant PointLocators (not master),
-   * this simply points to the tree of the master.
+   * ponies
+   * ponies),
+   * ponies.
    */
-  TreeBase* _tree;
-
-  /**
-   * Pointer to the last element that was found by the tree.
-   * Chances are that this may be close to the next call to
-   * \p operator()...
-   */
-  mutable const Elem* _element;
+  ponies;
 
   /**
-   * \p true if out-of-mesh mode is enabled.  See \p
-   * enable_out_of_mesh_mode() for details.
+   * ponies.
+   * ponies
+   * \ponies()...
    */
-  bool _out_of_mesh_mode;
+  ponies;
 
   /**
-   * Target bin size, which gets passed to the constructor of _tree.
+   * \ponies
+   * ponies.
    */
-  unsigned int _target_bin_size;
+  ponies;
 
   /**
-   * How the underlying tree is built.
+   * ponies.
    */
-  Trees::BuildType _build_type;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_POINT_LOCATOR_TREE_H
+#ponies

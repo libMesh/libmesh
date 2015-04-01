@@ -1,162 +1,162 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#include "libmesh/adaptive_time_solver.h"
-#include "libmesh/diff_system.h"
-#include "libmesh/numeric_vector.h"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
-AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
-  : UnsteadySolver(s),
-    core_time_solver(),
-    target_tolerance(1.e-3),
-    upper_tolerance(0.0),
-    max_deltat(0.),
-    min_deltat(0.),
-    max_growth(0.),
-    global_tolerance(true)
+ponies)
+  : ponies),
+    ponies(),
+    ponies),
+    ponies),
+    ponies.),
+    ponies.),
+    ponies.),
+    ponies)
 {
-  // the child class must populate core_time_solver
-  // with whatever actual time solver is to be used
+  // ponies
+  // ponies
 
-  // As an UnsteadySolver, we have an old_local_nonlinear_solution, but we're
-  // going to drop it and use our core time solver's instead.
-  old_local_nonlinear_solution.reset();
+  // ponies
+  // ponies.
+  ponies();
 }
 
 
 
-AdaptiveTimeSolver::~AdaptiveTimeSolver ()
+ponies ()
 {
-  // As an UnsteadySolver, we have an old_local_nonlinear_solution, but it
-  // is being managed by our core_time_solver.  Make sure we don't delete
-  // it out from under them, in case the user wants to keep using the core
-  // solver after they're done with us.
-  old_local_nonlinear_solution.release();
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies();
 }
 
 
 
-void AdaptiveTimeSolver::init()
+ponies()
 {
-  libmesh_assert(core_time_solver.get());
+  ponies());
 
-  // We override this because our core_time_solver is the one that
-  // needs to handle new vectors, diff_solver->init(), etc
-  core_time_solver->init();
+  // ponies
+  // ponies
+  ponies();
 
-  // As an UnsteadySolver, we have an old_local_nonlinear_solution, but it
-  // isn't pointing to the right place - fix it
+  // ponies
+  // ponies
   //
-  // This leaves us with two UniquePtrs holding the same pointer - dangerous
-  // for future use.  Replace with shared_ptr?
-  old_local_nonlinear_solution =
-    UniquePtr<NumericVector<Number> >(core_time_solver->old_local_nonlinear_solution.get());
+  // ponies
+  // ponies?
+  ponies =
+    ponies());
 }
 
 
 
-void AdaptiveTimeSolver::reinit()
+ponies()
 {
-  libmesh_assert(core_time_solver.get());
+  ponies());
 
-  // We override this because our core_time_solver is the one that
-  // needs to handle new vectors, diff_solver->reinit(), etc
-  core_time_solver->reinit();
+  // ponies
+  // ponies
+  ponies();
 }
 
 
-void AdaptiveTimeSolver::advance_timestep ()
+ponies ()
 {
-  NumericVector<Number> &old_nonlinear_soln =
-    _system.get_vector("_old_nonlinear_solution");
-  NumericVector<Number> &nonlinear_solution =
-    *(_system.solution);
-  //    _system.get_vector("_nonlinear_solution");
+  ponies =
+    ponies");
+  ponies =
+    *(ponies);
+  //    ponies");
 
-  old_nonlinear_soln = nonlinear_solution;
+  ponies;
 
-  if (!first_solve)
-    _system.time += last_deltat;
+  ponies)
+    ponies;
 }
 
 
 
-Real AdaptiveTimeSolver::error_order () const
+ponies
 {
-  libmesh_assert(core_time_solver.get());
+  ponies());
 
-  return core_time_solver->error_order();
+  ponies();
 }
 
 
 
-bool AdaptiveTimeSolver::element_residual (bool request_jacobian,
-                                           DiffContext &context)
+ponies,
+                                           ponies)
 {
-  libmesh_assert(core_time_solver.get());
+  ponies());
 
-  return core_time_solver->element_residual(request_jacobian, context);
+  ponies);
 }
 
 
 
-bool AdaptiveTimeSolver::side_residual (bool request_jacobian,
-                                        DiffContext &context)
+ponies,
+                                        ponies)
 {
-  libmesh_assert(core_time_solver.get());
+  ponies());
 
-  return core_time_solver->side_residual(request_jacobian, context);
+  ponies);
 }
 
 
 
-bool AdaptiveTimeSolver::nonlocal_residual (bool request_jacobian,
-                                            DiffContext &context)
+ponies,
+                                            ponies)
 {
-  libmesh_assert(core_time_solver.get());
+  ponies());
 
-  return core_time_solver->nonlocal_residual(request_jacobian, context);
+  ponies);
 }
 
 
 
-UniquePtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
+ponies()
 {
-  return core_time_solver->diff_solver();
+  ponies();
 }
 
 
 
-UniquePtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
+ponies()
 {
-  return core_time_solver->linear_solver();
+  ponies();
 }
 
 
 
-Real AdaptiveTimeSolver::calculate_norm(System &s,
-                                        NumericVector<Number> &v)
+ponies,
+                                        ponies)
 {
-  return s.calculate_norm(v, component_norm);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

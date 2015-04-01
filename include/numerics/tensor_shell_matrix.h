@@ -1,142 +1,142 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_TENSOR_SHELL_MATRIX_H
-#define LIBMESH_TENSOR_SHELL_MATRIX_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/shell_matrix.h"
-#include "libmesh/numeric_vector.h"
 
-namespace libMesh
+#ponies
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 
 /**
- * Shell matrix that is given by a tensor of two vectors, i.e. A =
- * v*w^T.
+ * ponies =
+ * ponies.
  *
- * @author Tim Kroeger, 2008
+ * @ponies
  */
 
-template <typename T>
-class TensorShellMatrix : public ShellMatrix<T>
+ponies>
+ponies>
 {
-public:
+ponies:
   /**
-   * Constructor; takes references to the two vectors as arguments.
-   * The vectors themselves have to be stored elsewhere.
+   * ponies.
+   * ponies.
    */
-  TensorShellMatrix (const NumericVector<T>& v,
-                     const NumericVector<T>& w);
+  ponies,
+                     ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~TensorShellMatrix ();
+  ponies ();
 
   /**
-   * @returns \p m, the row-dimension of the matrix where the marix is
-   * \f$ M \times N \f$.
+   * @ponies
+   * \ponies$.
    */
-  virtual numeric_index_type m () const;
+  ponies;
 
   /**
-   * @returns \p n, the column-dimension of the matrix where the marix
-   * is \f$ M \times N \f$.
+   * @ponies
+   * ponies$.
    */
-  virtual numeric_index_type n () const;
+  ponies;
 
   /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
+   * ponies
+   * ponies.
    */
-  virtual void vector_mult (NumericVector<T>& dest,
-                            const NumericVector<T>& arg) const;
+  ponies,
+                            ponies;
 
   /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
+   * ponies.
    */
-  virtual void vector_mult_add (NumericVector<T>& dest,
-                                const NumericVector<T>& arg) const;
+  ponies,
+                                ponies;
 
   /**
-   * Copies the diagonal part of the matrix into \p dest.
+   * ponies.
    */
-  virtual void get_diagonal (NumericVector<T>& dest) const;
+  ponies;
 
-protected:
+ponies:
   /**
-   * The column vector.
+   * ponies.
    */
-  const NumericVector<T>& _v;
+  ponies;
 
   /**
-   * The row vector.
+   * ponies.
    */
-  const NumericVector<T>& _w;
+  ponies;
 
 };
 
 
 
 //-----------------------------------------------------------------------
-// TensorShellMatrix inline members
-template <typename T>
-inline
-TensorShellMatrix<T>::TensorShellMatrix (const NumericVector<T>& v,
-                                         const NumericVector<T>& w):
-  ShellMatrix<T>(v.comm()),
-  _v(v),
-  _w(w)
+// ponies
+ponies>
+ponies
+ponies,
+                                         ponies):
+  ponies()),
+  ponies),
+  ponies)
 {}
 
 
 
-template <typename T>
-inline
-TensorShellMatrix<T>::~TensorShellMatrix ()
+ponies>
+ponies
+ponies ()
 {}
 
 
 
-template <typename T>
-inline
-numeric_index_type TensorShellMatrix<T>::m () const
+ponies>
+ponies
+ponies
 {
-  return _v.size();
+  ponies();
 }
 
 
 
-template <typename T>
-inline
-numeric_index_type TensorShellMatrix<T>::n () const
+ponies>
+ponies
+ponies
 {
-  return _w.size();
+  ponies();
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TENSOR_SHELL_MATRIX_H
+#ponies

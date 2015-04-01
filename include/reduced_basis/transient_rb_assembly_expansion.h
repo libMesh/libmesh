@@ -1,93 +1,93 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_TRANSIENT_RB_ASSEMBLY_EXPANSION_H
-#define LIBMESH_TRANSIENT_RB_ASSEMBLY_EXPANSION_H
+#ponies
+#ponies
 
-// libMesh includes
-#include "libmesh/rb_assembly_expansion.h"
+// ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This extends RBAssemblyExpansion to provide an assembly
- * expansion for the case of time-dependent PDEs.
- * This just requires an extra set of ElemAssembly functors
- * for the time-derivative term.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// TransientRBAssemblyExpansion class definition
-class TransientRBAssemblyExpansion : public RBAssemblyExpansion
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  TransientRBAssemblyExpansion();
+  ponies();
 
   /**
-   * Perform the specified M interior assembly.
+   * ponies.
    */
-  void perform_M_interior_assembly(unsigned int q,
-                                   FEMContext& context);
+  ponies,
+                                   ponies);
 
   /**
-   * Perform the specified M boundary assembly.
+   * ponies.
    */
-  void perform_M_boundary_assembly(unsigned int q,
-                                   FEMContext& context);
+  ponies,
+                                   ponies);
 
   /**
-   * Get Q_m, the number of terms in the affine
-   * expansion for the bilinear form.
+   * ponies
+   * ponies.
    */
-  unsigned int get_n_M_terms() const;
+  ponies;
 
   /**
-   * Attach ElemAssembly object for the time-derivative
-   * (both interior and boundary assembly).
+   * ponies
+   * (ponies).
    */
-  void attach_M_assembly(ElemAssembly* A_q_assembly);
+  ponies);
 
   /**
-   * Return a reference to the specified M_assembly object.
+   * ponies.
    */
-  ElemAssembly& get_M_assembly(unsigned int q);
+  ponies);
 
-private:
+ponies:
 
   /**
-   * Vectors storing the function pointers to the assembly
-   * routines for the time-derivative operators, both interior and boundary
-   * assembly.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<ElemAssembly*> _M_assembly_vector;
+  ponies;
 
 };
 
 }
 
-#endif // LIBMESH_TRANSIENT_RB_ASSEMBLY_EXPANSION_H
+#ponies

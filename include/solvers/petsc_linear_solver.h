@@ -1,407 +1,407 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_PETSC_LINEAR_SOLVER_H
-#define LIBMESH_PETSC_LINEAR_SOLVER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_PETSC
+#ponies
 
-#include "libmesh/petsc_macro.h"
+#ponies"
 
 /**
- * Petsc include files.
+ * ponies.
  */
 
-EXTERN_C_FOR_PETSC_BEGIN
-#if PETSC_VERSION_LESS_THAN(2,2,0)
-#  include <petscsles.h>
-#else
-#  include <petscksp.h>
-#endif
-EXTERN_C_FOR_PETSC_END
+ponies
+#ponies)
+#  ponies>
+#ponies
+#  ponies>
+#ponies
+ponies
 
-// Local includes
-#include "libmesh/linear_solver.h"
+// ponies
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
 
 //--------------------------------------------------------------------
-// Functions with C linkage to pass to PETSc.  PETSc will call these
-// methods as needed for preconditioning
+// ponies
+// ponies
 //
-// Since they must have C linkage they have no knowledge of a namespace.
-// Give them an obscure name to avoid namespace pollution.
-extern "C"
+// ponies.
+// ponies.
+ponies"
 {
-  // Older versions of PETSc do not have the different int typedefs.
-  // On 64-bit machines, PetscInt may actually be a long long int.
-  // This change occurred in Petsc-2.2.1.
-#if PETSC_VERSION_LESS_THAN(2,2,1)
-  typedef int PetscErrorCode;
-  typedef int PetscInt;
-#endif
+  // ponies.
+  // ponies.
+  // ponies.
+#ponies)
+  ponies;
+  ponies;
+#ponies
 
-#if PETSC_RELEASE_LESS_THAN(3,0,1)
+#ponies)
   /**
-   * This function is called by PETSc to initialize the preconditioner.
-   * ctx will hold the Preconditioner.
+   * ponies.
+   * ponies.
    */
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx);
+  ponies);
 
   /**
-   * This function is called by PETSc to acctually apply the preconditioner.
-   * ctx will hold the Preconditioner.
+   * ponies.
+   * ponies.
    */
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(void *ctx, Vec x, Vec y);
-#else
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC);
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(PC, Vec x, Vec y);
-#endif
-} // end extern "C"
+  ponies);
+#ponies
+  ponies);
+  ponies);
+#ponies
+} // ponies"
 
 
-namespace libMesh
+ponies
 {
 
-// forward declarations
-template <typename T> class PetscMatrix;
+// ponies
+ponies;
 
 /**
- * This class provides an interface to PETSc
- * iterative solvers that is compatible with the \p libMesh
- * \p LinearSolver<>
+ * ponies
+ * ponies
+ * \ponies<>
  *
- * @author Benjamin Kirk, 2002-2007
+ * @ponies
  */
 
-template <typename T>
-class PetscLinearSolver : public LinearSolver<T>
+ponies>
+ponies>
 {
-public:
+ponies:
   /**
-   *  Constructor. Initializes Petsc data structures
+   *  ponies
    */
-  PetscLinearSolver (const libMesh::Parallel::Communicator &comm_in
-                     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                     ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~PetscLinearSolver ();
+  ~ponies ();
 
   /**
-   * Release all memory and clear data structures.
+   * ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * Initialize data structures if not done so already.
-   * Assigns a name, which is turned into an underscore-separated
-   * prefix for the underlying KSP object.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void init (const char *name = NULL);
+  ponies);
 
   /**
-   * Initialize data structures if not done so already plus much more
+   * ponies
    */
-  void init (PetscMatrix<T>* matrix, const char *name = NULL);
+  ponies);
 
   /**
-   * Apply names to the system to be solved.  This sets an option
-   * prefix from the system name and sets field names from the
-   * system's variable names.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Since field names are applied to DoF numberings, this method must
-   * be called again after any System reinit.
+   * ponies
+   * ponies.
    */
-  virtual void init_names (const System&);
+  ponies&);
 
   /**
-   * After calling this method, all successive solves will be
-   * restricted to the given set of dofs, which must contain local
-   * dofs on each processor only and not contain any duplicates.  This
-   * mode can be disabled by calling this method with \p dofs being a
-   * \p NULL pointer.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  virtual void restrict_solve_to (const std::vector<unsigned int>* const dofs,
-                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+  ponies,
+                                  ponies);
 
   /**
-   * Call the Petsc solver.  It calls the method below, using the
-   * same matrix for the system and preconditioner matrices.
+   * ponies
+   * ponies.
    */
-  std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix_in,
-         NumericVector<T> &solution_in,
-         NumericVector<T> &rhs_in,
-         const double tol,
-         const unsigned int m_its)
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies)
   {
-    return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
+    ponies);
   }
 
 
   /**
-   * Call the Petsc solver.  It calls the method below, using the
-   * same matrix for the system and preconditioner matrices.
+   * ponies
+   * ponies.
    */
-  std::pair<unsigned int, Real>
-  adjoint_solve (SparseMatrix<T>  &matrix_in,
-                 NumericVector<T> &solution_in,
-                 NumericVector<T> &rhs_in,
-                 const double tol,
-                 const unsigned int m_its);
+  ponies>
+  ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies);
 
 
   /**
-   * This method allows you to call a linear solver while specifying
-   * the matrix to use as the (left) preconditioning matrix.  Note
-   * that the linear solver will not compute a preconditioner in this
-   * case, and will instead premultiply by the matrix you provide.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * In PETSc, this is accomplished by calling
+   * ponies
    *
-   * PCSetType(_pc, PCMAT);
+   * ponies);
    *
-   * before invoking KSPSolve().  Note: this functionality is not implemented
-   * in the LinearSolver class since there is not a built-in analog
-   * to this method for LasPack -- You could probably implement it by hand
-   * if you wanted.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::pair<unsigned int, Real>
-  solve (SparseMatrix<T>  &matrix,
-         SparseMatrix<T>  &preconditioner,
-         NumericVector<T> &solution,
-         NumericVector<T> &rhs,
-         const double tol,
-         const unsigned int m_its);
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * This function solves a system whose matrix is a shell matrix.
+   * ponies.
    */
-  std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
-         const double tol,
-         const unsigned int m_its);
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * This function solves a system whose matrix is a shell matrix, but
-   * a sparse matrix is used as preconditioning matrix, this allowing
-   * other preconditioners than JACOBI.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real>
-  solve (const ShellMatrix<T>& shell_matrix,
-         const SparseMatrix<T>& precond_matrix,
-         NumericVector<T>& solution_in,
-         NumericVector<T>& rhs_in,
-         const double tol,
-         const unsigned int m_its);
+  ponies>
+  ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies,
+         ponies);
 
   /**
-   * Returns the raw PETSc preconditioner context pointer.  This allows
-   * you to specify the PCShellSetApply() and PCShellSetSetUp() functions
-   * if you desire.  Just don't do anything crazy like calling PCDestroy()!
+   * ponies
+   * ponies
+   * ponies()!
    */
-  PC pc() { this->init(); return _pc; }
+  ponies; }
 
   /**
-   * Returns the raw PETSc ksp context pointer.  This is useful if
-   * you are for example setting a custom convergence test with
-   * KSPSetConvergenceTest().
+   * ponies
+   * ponies
+   * ponies().
    */
-  KSP ksp() { this->init(); return _ksp; }
+  ponies; }
 
   /**
-   * Fills the input vector with the sequence of residual norms
-   * from the latest iterative solve.
+   * ponies
+   * ponies.
    */
-  void get_residual_history(std::vector<double>& hist);
+  ponies);
 
   /**
-   * Returns just the initial residual for the solve just
-   * completed with this interface.  Use this method instead
-   * of the one above if you just want the starting residual
-   * and not the entire history.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real get_initial_residual();
+  ponies();
 
   /**
-   * Returns the solver's convergence flag
+   * ponies
    */
-  virtual LinearConvergenceReason get_converged_reason() const;
+  ponies;
 
-private:
+ponies:
 
   /**
-   * Tells PETSC to use the user-specified solver stored in
-   * \p _solver_type
+   * ponies
+   * \ponies
    */
-  void set_petsc_solver_type ();
+  ponies ();
 
   /**
-   * Internal function if shell matrix mode is used.
+   * ponies.
    */
-  static PetscErrorCode _petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest);
+  ponies);
 
   /**
-   * Internal function if shell matrix mode is used.
+   * ponies.
    */
-  static PetscErrorCode _petsc_shell_matrix_mult_add(Mat mat, Vec arg, Vec add, Vec dest);
+  ponies);
 
   /**
-   * Internal function if shell matrix mode is used.
+   * ponies.
    */
-  static PetscErrorCode _petsc_shell_matrix_get_diagonal(Mat mat, Vec dest);
+  ponies);
 
-  // SLES removed from >= PETSc 2.2.0
-#if PETSC_VERSION_LESS_THAN(2,2,0)
+  // ponies
+#ponies)
 
   /**
-   * Linear solver context
+   * ponies
    */
-  SLES _sles;
+  ponies;
 
-#endif
-
-  /**
-   * Preconditioner context
-   */
-  PC _pc;
+#ponies
 
   /**
-   * Krylov subspace context
+   * ponies
    */
-  KSP _ksp;
+  ponies;
 
   /**
-   * PETSc index set containing the dofs on which to solve (\p NULL
-   * means solve on all dofs).
+   * ponies
    */
-  IS _restrict_solve_to_is;
+  ponies;
 
   /**
-   * PETSc index set, complement to \p _restrict_solve_to_is.  This
-   * will be created on demand by the method \p
-   * _create_complement_is().
+   * ponies
+   * ponies).
    */
-  IS _restrict_solve_to_is_complement;
+  ponies;
 
   /**
-   * Internal method that returns the local size of \p
-   * _restrict_solve_to_is.
+   * ponies
+   * ponies
+   * ponies().
    */
-  PetscInt _restrict_solve_to_is_local_size(void)const;
+  ponies;
 
   /**
-   * Creates \p _restrict_solve_to_is_complement to contain all
-   * indices that are local in \p vec_in, except those that are
-   * contained in \p _restrict_solve_to_is.
+   * ponies
+   * ponies.
    */
-  void _create_complement_is (const NumericVector<T> &vec_in);
+  ponies;
 
   /**
-   * If restrict-solve-to-subset mode is active, this member decides
-   * what happens with the dofs outside the subset.
+   * ponies
+   * ponies
+   * ponies.
    */
-  SubsetSolveMode _subset_solve_mode;
+  ponies);
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies;
 
 };
 
 
-/*----------------------- functions ----------------------------------*/
-template <typename T>
-inline
-PetscLinearSolver<T>::PetscLinearSolver(const libMesh::Parallel::Communicator &comm_in) :
-  LinearSolver<T>(comm_in),
-  _restrict_solve_to_is(NULL),
-  _restrict_solve_to_is_complement(NULL),
-  _subset_solve_mode(SUBSET_ZERO)
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
-  if (this->n_processors() == 1)
-    this->_preconditioner_type = ILU_PRECOND;
-  else
-    this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+  ponies)
+    ponies;
+  ponies
+    ponies;
 }
 
 
 
-template <typename T>
-inline
-PetscLinearSolver<T>::~PetscLinearSolver ()
+ponies>
+ponies
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
 
 
-template <typename T>
-inline PetscInt
-PetscLinearSolver<T>::
-_restrict_solve_to_is_local_size(void)const
+ponies>
+ponies
+ponies>::
+ponies
 {
-  libmesh_assert(_restrict_solve_to_is);
+  ponies);
 
-  PetscInt s;
-  int ierr = ISGetLocalSize(_restrict_solve_to_is,&s);
-  LIBMESH_CHKERRABORT(ierr);
+  ponies;
+  ponies);
+  ponies);
 
-  return s;
+  ponies;
 }
 
 
 
-template <typename T>
-void
-PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-                                             // unnamed to avoid compiler "unused parameter" warning
-#else
-                                             vec_in
-#endif
+ponies>
+ponies
+ponies> &
+#ponies)
+                                             // ponies
+#ponies
+                                             ponies
+#ponies
                                              )
 {
-  libmesh_assert(_restrict_solve_to_is);
-#if PETSC_VERSION_LESS_THAN(3,0,0)
-  // No ISComplement in PETSc 2.3.3
-  libmesh_not_implemented();
-#else
-  if(_restrict_solve_to_is_complement==NULL)
+  ponies);
+#ponies)
+  // ponies
+  ponies();
+#ponies
+  ponies)
     {
-      int ierr = ISComplement(_restrict_solve_to_is,
-                              vec_in.first_local_index(),
-                              vec_in.last_local_index(),
-                              &_restrict_solve_to_is_complement);
-      LIBMESH_CHKERRABORT(ierr);
+      ponies,
+                              ponies(),
+                              ponies(),
+                              &ponies);
+      ponies);
     }
-#endif
+#ponies
 }
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // LIBMESH_PETSC_LINEAR_SOLVER_H
+#ponies
+#ponies

@@ -1,1002 +1,1002 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_FEM_CONTEXT_H
-#define LIBMESH_FEM_CONTEXT_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/diff_context.h"
-#include "libmesh/id_types.h"
-#include "libmesh/fe_type.h"
-#include "libmesh/fe_base.h"
-#include "libmesh/vector_value.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-#include "libmesh/tensor_value.h"
-#endif
+#ponies
+#ponies"
+#ponies
 
-// C++ includes
-#include <map>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class BoundaryInfo;
-class Elem;
-template <typename T> class FEGenericBase;
-typedef FEGenericBase<Real> FEBase;
-class QBase;
-class Point;
-template <typename T> class NumericVector;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 /**
- * This class provides all data required for a physics package
- * (e.g. an FEMSystem subclass) to perform local element residual
- * and jacobian integrations.
+ * ponies
+ * (ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2009
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// FEMContext class definition
+// ponies
 
-class FEMContext : public DiffContext
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Allocates some but fills no data structures.
+   * ponies.
    */
-  explicit
-  FEMContext (const System &sys);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~FEMContext ();
+  ponies ();
 
   /**
-   * Reports if the boundary id is found on the current side
+   * ponies
    */
-  bool has_side_boundary_id(boundary_id_type id) const;
+  ponies;
 
   /**
-   * Lists the boundary ids found on the current side
+   * ponies
    */
-  std::vector<boundary_id_type> side_boundary_ids() const;
+  ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Number interior_value(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element side.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Number side_value(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the physical
-   * point \p p on the current element.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Number point_value(unsigned int var, const Point &p) const;
+  ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Gradient interior_gradient(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element side.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Gradient side_gradient(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the physical
-   * point \p p on the current element.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Gradient point_gradient(unsigned int var, const Point &p) const;
+  ponies;
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
   /**
-   * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Tensor interior_hessian(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element side.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Tensor side_hessian(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the hessian of the solution variable \p var at the physical
-   * point \p p on the current element.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Tensor point_hessian(unsigned int var, const Point &p) const;
+  ponies;
 
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Number fixed_interior_value(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Number fixed_side_value(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the value of the fixed_solution variable \p var at the physical
-   * point \p p on the current element.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Number fixed_point_value(unsigned int var, const Point &p) const;
+  ponies;
 
   /**
-   * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Gradient fixed_interior_gradient(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Gradient fixed_side_gradient(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the gradient of the fixed_solution variable \p var at the physical
-   * point \p p on the current element.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Gradient fixed_point_gradient(unsigned int var, const Point &p) const;
+  ponies;
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
   /**
-   * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Tensor fixed_interior_hessian(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Tensor fixed_side_hessian(unsigned int var, unsigned int qp) const;
+  ponies;
 
   /**
-   * Returns the hessian of the fixed_solution variable \p var at the physical
-   * point \p p on the current element.
-   * This API currently present for backward compatibility.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Tensor fixed_point_hessian (unsigned int var, const Point &p) const;
+  ponies;
 
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Accessor for interior finite element object for variable var for
-   * the largest dimension in the mesh. If you have lower dimensional elements
-   * in the mesh and need to query for those FE objects, use the alternative
-   * get_element_fe method.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  template<typename OutputShape>
-  void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
-  { this->get_element_fe<OutputShape>(var,fe,this->get_dim()); }
+  ponies>
+  ponies
+  { ponies()); }
 
   /**
-   * Accessor for interior finite element object for scalar-valued variable var
-   * for the largest dimension in the mesh. If you have lower dimensional elements
-   * in the mesh and need to query for those FE objects, use the alternative
-   * get_element_fe method.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  FEBase* get_element_fe( unsigned int var ) const
-  { return this->get_element_fe(var,this->get_dim()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Accessor for interior finite element object for variable var for
-   * dimension dim.
+   * ponies
+   * ponies.
    */
-  template<typename OutputShape>
-  void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
-                       unsigned char dim ) const;
+  ponies>
+  ponies,
+                       ponies;
 
   /**
-   * Accessor for interior finite element object for scalar-valued variable var for
-   * dimension dim.
+   * ponies
+   * ponies.
    */
-  FEBase* get_element_fe( unsigned int var, unsigned char dim ) const;
+  ponies;
 
   /**
-   * Accessor for edge/face (2D/3D) finite element object for variable var
-   * for the largest dimension in the mesh. If you have lower dimensional elements
-   * in the mesh and need to query for those FE objects, use the alternative
-   * get_side_fe method.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  template<typename OutputShape>
-  void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
-  { this->get_side_fe<OutputShape>(var,fe,this->get_dim()); }
+  ponies>
+  ponies
+  { ponies()); }
 
   /**
-   * Accessor for side finite element object for scalar-valued variable var
-   * for the largest dimension in the mesh. If you have lower dimensional elements
-   * in the mesh and need to query for those FE objects, use the alternative
-   * get_side_fe method.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  FEBase* get_side_fe( unsigned int var ) const
-  { return this->get_side_fe(var,this->get_dim()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Accessor for edge/face (2D/3D) finite element object for variable var
-   * for dimension dim.
+   * ponies
+   * ponies.
    */
-  template<typename OutputShape>
-  void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
-                    unsigned char dim ) const;
+  ponies>
+  ponies,
+                    ponies;
 
   /**
-   * Accessor for side finite element object for scalar-valued variable var
-   * for dimension dim.
+   * ponies
+   * ponies.
    */
-  FEBase* get_side_fe( unsigned int var, unsigned char dim ) const;
+  ponies;
 
   /**
-   * Accessor for edge (3D only!) finite element object for variable var.
+   * ponies.
    */
-  template<typename OutputShape>
-  void get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+  ponies>
+  ponies;
 
   /**
-   * Accessor for edge (3D only!) finite element object for scalar-valued variable var.
+   * ponies.
    */
-  FEBase* get_edge_fe( unsigned int var ) const;
+  ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_value(unsigned int var, unsigned int qp,
-                      OutputType& u) const;
+  ponies>
+  ponies,
+                      ponies;
 
   /**
-   * Fills a vector of values of the _system_vector at the all the quadrature
-   * points in the current element interior.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_values(unsigned int var, const NumericVector<Number> & _system_vector,
-                       std::vector<OutputType>& interior_values_vector) const;
+  ponies>
+  ponies,
+                       ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element side. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void side_value(unsigned int var, unsigned int qp,
-                  OutputType& u) const;
+  ponies>
+  ponies,
+                  ponies;
 
   /**
-   * Fills a vector of values of the _system_vector at the all the quadrature
-   * points on the current element side.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void side_values(unsigned int var, const NumericVector<Number> & _system_vector,
-                   std::vector<OutputType>& side_values_vector) const;
+  ponies>
+  ponies,
+                   ponies;
 
   /**
-   * Returns the value of the solution variable \p var at the physical
-   * point \p p on the current element. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void point_value(unsigned int var, const Point &p,
-                   OutputType& u) const;
+  ponies>
+  ponies,
+                   ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_gradient(unsigned int var, unsigned int qp,
-                         OutputType& du) const;
+  ponies>
+  ponies,
+                         ponies;
 
   /**
-   * Fills a vector with the gradient of the solution variable \p var at all the quadrature
-   * points in the current element interior. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_gradients(unsigned int var, const NumericVector<Number> & _system_vector,
-                          std::vector<OutputType>& interior_gradients_vector) const;
+  ponies>
+  ponies,
+                          ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element side. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void side_gradient(unsigned int var, unsigned int qp,
-                     OutputType & du) const;
+  ponies>
+  ponies,
+                     ponies;
 
   /**
-   * Fills a vector with the gradient of the solution variable \p var at all the quadrature
-   * points on the current element side. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void side_gradients(unsigned int var, const NumericVector<Number> & _system_vector,
-                      std::vector<OutputType>& side_gradients_vector) const;
+  ponies>
+  ponies,
+                      ponies;
 
   /**
-   * Returns the gradient of the solution variable \p var at the physical
-   * point \p p on the current element. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void point_gradient(unsigned int var, const Point &p,
-                      OutputType& grad_u) const;
+  ponies>
+  ponies,
+                      ponies;
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
   /**
-   * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_hessian(unsigned int var, unsigned int qp,
-                        OutputType& d2u) const;
+  ponies>
+  ponies,
+                        ponies;
 
   /**
-   * Fills a vector of hessians of the _system_vector at the all the
-   * quadrature points in the current element interior. This is the
-   * preferred API.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_hessians(unsigned int var, const NumericVector<Number> & _system_vector,
-                         std::vector<OutputType>& d2u_vals) const;
+  ponies>
+  ponies,
+                         ponies;
 
   /**
-   * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element side. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void side_hessian(unsigned int var, unsigned int qp,
-                    OutputType& d2u) const;
+  ponies>
+  ponies,
+                    ponies;
 
   /**
-   * Fills a vector of hessians of the _system_vector at the all the
-   * quadrature points on the current element side.  This is the
-   * preferred API.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void side_hessians(unsigned int var, const NumericVector<Number> & _system_vector,
-                     std::vector<OutputType>& d2u_vals) const;
+  ponies>
+  ponies,
+                     ponies;
 
   /**
-   * Returns the hessian of the solution variable \p var at the physical
-   * point \p p on the current element. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void point_hessian(unsigned int var, const Point &p,
-                     OutputType& hess_u) const;
+  ponies>
+  ponies,
+                     ponies;
 
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Returns the time derivative (rate) of the solution variable
-   * \p var at the quadrature point \p qp on the current element
-   * interior.
+   * ponies
+   * \ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_rate(unsigned int var, unsigned int qp,
-                     OutputType& u) const;
+  ponies>
+  ponies,
+                     ponies;
 
   /**
-   * Returns the time derivative (rate) of the solution variable
-   * \p var at the quadrature point \p qp on the current element side.
+   * ponies
+   * \ponies.
    */
-  template<typename OutputType>
-  void side_rate(unsigned int var, unsigned int qp,
-                 OutputType& u) const;
+  ponies>
+  ponies,
+                 ponies;
 
   /**
-   * Returns the time derivative (rate) of the solution variable
-   * \p var at the physical point \p p on the current element.
+   * ponies
+   * \ponies.
    */
-  template<typename OutputType>
-  void point_rate(unsigned int var, const Point &p,
-                  OutputType& u) const;
+  ponies>
+  ponies,
+                  ponies;
 
   /**
-   * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_interior_value(unsigned int var, unsigned int qp,
-                            OutputType& u) const;
+  ponies>
+  ponies,
+                            ponies;
 
   /**
-   * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_side_value(unsigned int var, unsigned int qp,
-                        OutputType& u) const;
+  ponies>
+  ponies,
+                        ponies;
 
   /**
-   * Returns the value of the fixed_solution variable \p var at the physical
-   * point \p p on the current element. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_point_value(unsigned int var, const Point &p,
-                         OutputType& u) const;
+  ponies>
+  ponies,
+                         ponies;
 
   /**
-   * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_interior_gradient(unsigned int var, unsigned int qp,
-                               OutputType& grad_u) const;
+  ponies>
+  ponies,
+                               ponies;
 
   /**
-   * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_side_gradient(unsigned int var, unsigned int qp,
-                           OutputType& grad_u) const;
+  ponies>
+  ponies,
+                           ponies;
 
   /**
-   * Returns the gradient of the fixed_solution variable \p var at the physical
-   * point \p p on the current element. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_point_gradient(unsigned int var, const Point &p,
-                            OutputType& grad_u) const;
+  ponies>
+  ponies,
+                            ponies;
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
   /**
-   * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_interior_hessian(unsigned int var, unsigned int qp,
-                              OutputType& hess_u) const;
+  ponies>
+  ponies,
+                              ponies;
 
   /**
-   * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_side_hessian(unsigned int var, unsigned int qp,
-                          OutputType& hess_u) const;
+  ponies>
+  ponies,
+                          ponies;
 
   /**
-   * Returns the hessian of the fixed_solution variable \p var at the physical
-   * point \p p on the current element. This is the preferred API.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void fixed_point_hessian(unsigned int var, const Point &p,
-                           OutputType& hess_u) const;
+  ponies>
+  ponies,
+                           ponies;
 
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ponies
 
   /**
-   * Returns the curl of the solution variable \p var at the physical
-   * point \p p on the current element.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_curl(unsigned int var, unsigned int qp,
-                     OutputType& curl_u) const;
+  ponies>
+  ponies,
+                     ponies;
 
   /**
-   * Returns the curl of the solution variable \p var at the physical
-   * point \p p on the current element.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void point_curl(unsigned int var, const Point &p,
-                  OutputType& curl_u) const;
+  ponies>
+  ponies,
+                  ponies;
 
   /**
-   * Returns the divergence of the solution variable \p var at the physical
-   * point \p p on the current element.
+   * ponies
+   * ponies.
    */
-  template<typename OutputType>
-  void interior_div(unsigned int var, unsigned int qp,
-                    OutputType& div_u) const;
+  ponies>
+  ponies,
+                    ponies;
 
   /**
-   * Reinitialize all my FEM context data on a given
-   * element for the given system
+   * ponies
+   * ponies
    */
-  //  virtual void reinit(const FEMSystem&, Elem*);
+  //  ponies*);
 
-  // should be protected:
+  // ponies:
   /**
-   * Reinitialize Elem and FE objects if necessary for integration at a new
-   * point in time: specifically, handle moving elements in moving mesh
-   * schemes.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void elem_reinit(Real theta);
+  ponies);
 
   /**
-   * Reinitialize Elem and side FE objects if necessary for integration at a
-   * new point in time: specifically, handle moving elements in moving mesh
-   * schemes.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void elem_side_reinit(Real theta);
+  ponies);
 
   /**
-   * Reinitialize Elem and edge FE objects if necessary for
-   * integration at a new point in time: specifically, handle moving
-   * elements in moving mesh schemes.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void elem_edge_reinit(Real theta);
+  ponies);
 
   /**
-   * Gives derived classes the opportunity to reinitialize data needed
-   * for nonlocal calculations at a new point within a timestep
+   * ponies
+   * ponies
    */
-  virtual void nonlocal_reinit(Real theta);
+  ponies);
 
   /**
-   * Reinitializes local data vectors/matrices on the current geometric element
+   * ponies
    */
-  virtual void pre_fe_reinit(const System&, const Elem *e);
+  ponies);
 
   /**
-   * Reinitializes interior FE objects on the current geometric element
+   * ponies
    */
-  void elem_fe_reinit();
+  ponies();
 
   /**
-   * Reinitializes side FE objects on the current geometric element
+   * ponies
    */
-  virtual void side_fe_reinit();
+  ponies();
 
   /**
-   * Reinitializes edge FE objects on the current geometric element
+   * ponies
    */
-  void edge_fe_reinit();
+  ponies();
 
   /**
-   * Accessor for element interior quadrature rule for the dimension of the
-   * current _elem.
+   * ponies
+   * ponies.
    */
-  const QBase& get_element_qrule() const
-  { return this->get_element_qrule(this->get_elem_dim()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Accessor for element side quadrature rule for the dimension of the
-   * current _elem.
+   * ponies
+   * ponies.
    */
-  const QBase& get_side_qrule() const
-  { return this->get_side_qrule(this->get_elem_dim()); }
+  ponies
+  { ponies()); }
 
   /**
-   * Accessor for element interior quadrature rule.
+   * ponies.
    */
-  const QBase& get_element_qrule( unsigned char dim ) const
-  { libmesh_assert(_element_qrule[dim]);
-    return *(this->_element_qrule[dim]); }
+  ponies
+  { ponies]);
+    ponies]); }
 
   /**
-   * Accessor for element side quadrature rule.
+   * ponies.
    */
-  const QBase& get_side_qrule( unsigned char dim ) const
-  { libmesh_assert(_side_qrule[dim]);
-    return *(this->_side_qrule[dim]); }
+  ponies
+  { ponies]);
+    ponies]); }
 
   /**
-   * Accessor for element edge quadrature rule.
+   * ponies.
    */
-  const QBase& get_edge_qrule() const
-  { return *(this->_edge_qrule); }
+  ponies
+  { ponies); }
 
   /**
-   * Tells the FEMContext that system \p sys contains the
-   * isoparametric Lagrangian variables which correspond to the
-   * coordinates of mesh nodes, in problems where the mesh itself is
-   * expected to move in time.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * This should be set automatically if the FEMPhysics requires it.
+   * ponies.
    */
-  virtual void set_mesh_system(System* sys)
-  { this->_mesh_sys = sys; }
+  ponies)
+  { ponies; }
 
   /**
-   * Accessor for moving mesh System
+   * ponies
    */
-  const System* get_mesh_system() const
-  { return this->_mesh_sys; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for moving mesh System
+   * ponies
    */
-  System* get_mesh_system()
-  { return this->_mesh_sys; }
+  ponies()
+  { ponies; }
 
   /**
-   * Accessor for x-variable of moving mesh System
+   * ponies
    */
-  unsigned int get_mesh_x_var() const
-  { return _mesh_x_var; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for x-variable of moving mesh System
+   * ponies
    *
-   * This should be set automatically if the FEMPhysics requires it.
+   * ponies.
    */
-  void set_mesh_x_var(unsigned int x_var)
-  { _mesh_x_var = x_var; }
+  ponies)
+  { ponies; }
 
   /**
-   * Accessor for y-variable of moving mesh System
+   * ponies
    */
-  unsigned int get_mesh_y_var() const
-  { return _mesh_y_var; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for y-variable of moving mesh System
+   * ponies
    *
-   * This should be set automatically if the FEMPhysics requires it.
+   * ponies.
    */
-  void set_mesh_y_var(unsigned int y_var)
-  { _mesh_y_var = y_var; }
+  ponies)
+  { ponies; }
 
   /**
-   * Accessor for z-variable of moving mesh System
+   * ponies
    */
-  unsigned int get_mesh_z_var() const
-  { return _mesh_z_var; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for z-variable of moving mesh System
+   * ponies
    *
-   * This should be set automatically if the FEMPhysics requires it.
+   * ponies.
    */
-  void set_mesh_z_var(unsigned int z_var)
-  { _mesh_z_var = z_var; }
+  ponies)
+  { ponies; }
 
   /**
-   * Test for current Elem object
+   * ponies
    */
-  bool has_elem() const
-  { return (this->_elem != NULL); }
+  ponies
+  { ponies); }
 
   /**
-   * Accessor for current Elem object
+   * ponies
    */
-  const Elem& get_elem() const
-  { libmesh_assert(this->_elem);
-    return *(this->_elem); }
+  ponies
+  { ponies);
+    ponies); }
 
   /**
-   * Accessor for current Elem object
+   * ponies
    */
-  Elem& get_elem()
-  { libmesh_assert(this->_elem);
-    return *(const_cast<Elem*>(this->_elem)); }
+  ponies()
+  { ponies);
+    ponies)); }
 
   /**
-   * Accessor for current side of Elem object
+   * ponies
    */
-  unsigned char get_side() const
-  { return side; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for current edge of Elem object
+   * ponies
    */
-  unsigned char get_edge() const
-  { return edge; }
+  ponies
+  { ponies; }
 
   /**
-   * Accessor for cached mesh dimension. This is the largest dimension
-   * of the elements in the mesh. For the dimension of this->_elem, use
-   * get_elem_dim();
+   * ponies
+   * ponies
+   * ponies();
    */
-  unsigned char get_dim() const
-  { return this->_dim; }
+  ponies
+  { ponies; }
 
   /**
-   * Returns the dimension of this->_elem. For mixed dimension meshes, this
-   * may be different from get_dim().
+   * ponies
+   * ponies().
    */
-  unsigned char get_elem_dim() const
-  { return _elem_dim; }
+  ponies
+  { ponies; }
 
   /**
-   * @returns set of dimensions of elements present in the mesh at
-   * context initialization.
+   * @ponies
+   * ponies.
    */
-  const std::set<unsigned char>& elem_dimensions() const
-  { return _elem_dims; }
+  ponies
+  { ponies; }
 
   /**
-   * Uses the coordinate data specified by mesh_*_position configuration
-   * to set the geometry of \p elem to the value it would take after a fraction
-   * \p theta of a timestep.
+   * ponies
+   * ponies
+   * \ponies.
    */
-  void elem_position_set(Real theta);
+  ponies);
 
   /**
-   * Uses the geometry of \p elem to set the coordinate data specified
-   * by mesh_*_position configuration.
+   * ponies
+   * ponies.
    */
-  void elem_position_get();
+  ponies();
 
   /**
-   * System from which to acquire moving mesh information
+   * ponies
    */
-  System *_mesh_sys;
+  ponies;
 
   /**
-   * Variables from which to acquire moving mesh information
+   * ponies
    */
-  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
+  ponies;
 
   /**
-   * Current side for side_* to examine
+   * ponies
    */
-  unsigned char side;
+  ponies;
 
   /**
-   * Current edge for edge_* to examine
+   * ponies
    */
-  unsigned char edge;
+  ponies;
 
-protected:
+ponies:
 
   /**
-   * Helper function to reduce some code duplication in the *_point_* methods.
+   * ponies.
    */
-  template<typename OutputShape>
-  UniquePtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe, const Point &p ) const;
+  ponies>
+  ponies;
 
   /**
-   * Helper function to promote accessor usage
+   * ponies
    */
-  void set_elem( const Elem* e );
+  ponies );
 
-  // gcc-3.4, oracle 12.3 require this typedef to be public
-  // in order to use it in a return type
-public:
+  // ponies
+  // ponies
+ponies:
 
   /**
-   * Helper typedef to simplify refactoring
+   * ponies
    */
-  typedef const DenseSubVector<Number>& (DiffContext::*diff_subsolution_getter)(unsigned int) const;
+  ponies;
 
-protected:
+ponies:
   /**
-   * Helper function to reduce some code duplication in the
-   * *interior_value methods.
+   * ponies
+   * *ponies.
    */
-  template<typename OutputType,
-           diff_subsolution_getter subsolution_getter>
-  void some_interior_value(unsigned int var, unsigned int qp, OutputType& u) const;
-
-  /**
-   * Helper function to reduce some code duplication in the
-   * *interior_gradient methods.
-   */
-  template<typename OutputType,
-           diff_subsolution_getter subsolution_getter>
-  void some_interior_gradient(unsigned int var, unsigned int qp, OutputType& u) const;
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  /**
-   * Helper function to reduce some code duplication in the
-   * *interior_hessian methods.
-   */
-  template<typename OutputType,
-           diff_subsolution_getter subsolution_getter>
-  void some_interior_hessian(unsigned int var, unsigned int qp, OutputType& u) const;
-#endif
+  ponies,
+           ponies>
+  ponies;
 
   /**
-   * Helper function to reduce some code duplication in the
-   * *side_value methods.
+   * ponies
+   * *ponies.
    */
-  template<typename OutputType,
-           diff_subsolution_getter subsolution_getter>
-  void some_side_value(unsigned int var, unsigned int qp, OutputType& u) const;
+  ponies,
+           ponies>
+  ponies;
 
+#ponies
+  /**
+   * ponies
+   * *ponies.
+   */
+  ponies,
+           ponies>
+  ponies;
+#ponies
 
   /**
-   * Finite element objects for each variable's interior, sides and edges.
-   * We store FE objects for each element dimension present in the mesh,
-   * except for edge_fe which only applies to 3D elements.
+   * ponies
+   * *ponies.
    */
-  std::vector<std::map<FEType, FEAbstract*> > _element_fe;
-  std::vector<std::map<FEType, FEAbstract*> > _side_fe;
-  std::map<FEType, FEAbstract*> _edge_fe;
+  ponies,
+           ponies>
+  ponies;
 
 
   /**
-   * Pointers to the same finite element objects, but indexed
-   * by variable number. We store FE objects for each element dimension
-   * present in the mesh, except for edge_fe_var which only applies
-   * for 3D elements.
+   * ponies.
+   * ponies,
+   * ponies.
    */
-  std::vector<std::vector<FEAbstract*> > _element_fe_var;
-  std::vector<std::vector<FEAbstract*> > _side_fe_var;
-  std::vector<FEAbstract*> _edge_fe_var;
+  ponies;
+  ponies;
+  ponies;
+
 
   /**
-   * Saved reference to BoundaryInfo on the mesh for this System.
-   * Used to answer boundary id requests.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  const BoundaryInfo& _boundary_info;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * Current element for element_* to examine
+   * ponies.
+   * ponies.
    */
-  const Elem *_elem;
+  ponies;
 
   /**
-   * Cached dimension of largest dimension element in this mesh
+   * ponies
    */
-  unsigned char _dim;
+  ponies;
 
   /**
-   * Cached dimension of this->_elem.
+   * ponies
    */
-  unsigned char _elem_dim;
+  ponies;
 
   /**
-   * Cached dimensions of elements in the mesh, plus dimension 0 if
-   * SCALAR variables are in use.
+   * ponies.
    */
-  std::set<unsigned char> _elem_dims;
+  ponies;
 
   /**
-   * Quadrature rule for element interior.
-   * The FEM context will try to find a quadrature rule that
-   * correctly integrates all variables. We prepare quadrature
-   * rules for each element dimension in the mesh.
+   * ponies
+   * ponies.
    */
-  std::vector<QBase*> _element_qrule;
+  ponies;
 
   /**
-   * Quadrature rules for element sides
-   * The FEM context will try to find a quadrature rule that
-   * correctly integrates all variables. We prepare quadrature
-   * rules for each element dimension in the mesh.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<QBase*> _side_qrule;
+  ponies;
 
   /**
-   * Quadrature rules for element edges.  If the FEM context is told
-   * to prepare for edge integration on 3D elements, it will try to
-   * find a quadrature rule that correctly integrates all variables.
-   * Because edge rules only apply to 3D elements, we don't need to
-   * worry about multiple dimensions
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  QBase *_edge_qrule;
+  ponies;
 
-private:
   /**
-   * Uses the coordinate data specified by mesh_*_position configuration
-   * to set the geometry of \p elem to the value it would take after a fraction
-   * \p theta of a timestep.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   */
+  ponies;
+
+ponies:
+  /**
+   * ponies
+   * ponies
+   * \ponies.
    *
-   * This does the work of elem_position_set, but isn't safe to call
-   * without _mesh_sys/etc. defined first.
+   * ponies
+   * ponies.
    */
-  void _do_elem_position_set(Real theta);
+  ponies);
 
   /**
-   * Update the time in the context object for the given value of
-   * theta, based on the values of "time" and "deltat" stored in the
-   * system which created this context.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void _update_time_from_system(Real theta);
+  ponies);
 };
 
 
 
 // ------------------------------------------------------------
-// FEMContext inline methods
+// ponies
 
-inline
-void FEMContext::elem_position_set(Real theta)
+ponies
+ponies)
 {
-  if (_mesh_sys)
-    this->_do_elem_position_set(theta);
+  ponies)
+    ponies);
 }
 
-template<typename OutputShape>
-inline
-void FEMContext::get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
-                                 unsigned char dim ) const
+ponies>
+ponies
+ponies,
+                                 ponies
 {
-  libmesh_assert( !_element_fe_var[dim].empty() );
-  libmesh_assert_less ( var, (_element_fe_var[dim].size() ) );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_element_fe_var[dim][var] ) );
+  ponies() );
+  ponies() ) );
+  ponies] ) );
 }
 
-inline
-FEBase* FEMContext::get_element_fe( unsigned int var, unsigned char dim ) const
+ponies
+ponies
 {
-  libmesh_assert( !_element_fe_var[dim].empty() );
-  libmesh_assert_less ( var, (_element_fe_var[dim].size() ) );
-  return cast_ptr<FEBase*>( (_element_fe_var[dim][var] ) );
+  ponies() );
+  ponies() ) );
+  ponies] ) );
 }
 
-template<typename OutputShape>
-inline
-void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe,
-                              unsigned char dim ) const
+ponies>
+ponies
+ponies,
+                              ponies
 {
-  libmesh_assert( !_side_fe_var[dim].empty() );
-  libmesh_assert_less ( var, (_side_fe_var[dim].size() ) );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( (_side_fe_var[dim][var] ) );
+  ponies() );
+  ponies() ) );
+  ponies] ) );
 }
 
-inline
-FEBase* FEMContext::get_side_fe( unsigned int var, unsigned char dim ) const
+ponies
+ponies
 {
-  libmesh_assert( !_side_fe_var[dim].empty() );
-  libmesh_assert_less ( var, (_side_fe_var[dim].size() ) );
-  return cast_ptr<FEBase*>( (_side_fe_var[dim][var] ) );
+  ponies() );
+  ponies() ) );
+  ponies] ) );
 }
 
-template<typename OutputShape>
-inline
-void FEMContext::get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_less ( var, _edge_fe_var.size() );
-  fe = cast_ptr<FEGenericBase<OutputShape>*>( _edge_fe_var[var] );
+  ponies() );
+  ponies] );
 }
 
-inline
-FEBase* FEMContext::get_edge_fe( unsigned int var ) const
+ponies
+ponies
 {
-  libmesh_assert_less ( var, _edge_fe_var.size() );
-  return cast_ptr<FEBase*>( _edge_fe_var[var] );
+  ponies() );
+  ponies] );
 }
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FEM_CONTEXT_H
+#ponies

@@ -1,149 +1,149 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-// C++ includes
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/system_subset_by_subdomain.h"
-#include "libmesh/system.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/parallel.h"
 
-namespace libMesh
+// ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+ponies
 {
 // ------------------------------------------------------------
-// SubdomainSelection implementation
-SystemSubsetBySubdomain::SubdomainSelection::
-SubdomainSelection (void)
+// ponies
+ponies::
+ponies)
 {
 }
 
-SystemSubsetBySubdomain::SubdomainSelection::
-~SubdomainSelection (void)
+ponies::
+~ponies)
 {
 }
 
-SystemSubsetBySubdomain::SubdomainSelectionByList::
-SubdomainSelectionByList (const std::set<subdomain_id_type>& list):
-  _list(list)
+ponies::
+ponies):
+  ponies)
 {
 }
 
-bool
-SystemSubsetBySubdomain::SubdomainSelectionByList::
-operator()(const subdomain_id_type& subdomain_id)const
+ponies
+ponies::
+ponies
 {
-  return _list.find(subdomain_id)!=_list.end();
+  ponies();
 }
 
 // ------------------------------------------------------------
-// SystemSubsetBySubdomain implementation
+// ponies
 
-SystemSubsetBySubdomain::
-SystemSubsetBySubdomain (const System& system,
-                         const SubdomainSelection& subdomain_selection,
-                         const std::set<unsigned int>* const var_nums):
-  SystemSubset(system),
-  ParallelObject(system),
-  _var_nums(),
-  _dof_ids()
+ponies::
+ponies,
+                         ponies,
+                         ponies):
+  ponies),
+  ponies),
+  ponies(),
+  ponies()
 {
-  this->set_var_nums(var_nums);
-  this->init(subdomain_selection);
+  ponies);
+  ponies);
 }
 
-SystemSubsetBySubdomain::
-SystemSubsetBySubdomain (const System& system,
-                         const std::set<subdomain_id_type>& subdomain_ids,
-                         const std::set<unsigned int>* const var_nums):
-  SystemSubset(system),
-  ParallelObject(system),
-  _var_nums(),
-  _dof_ids()
+ponies::
+ponies,
+                         ponies,
+                         ponies):
+  ponies),
+  ponies),
+  ponies(),
+  ponies()
 {
-  this->set_var_nums(var_nums);
-  this->init(subdomain_ids);
+  ponies);
+  ponies);
 }
 
-SystemSubsetBySubdomain::
-~SystemSubsetBySubdomain (void)
+ponies::
+~ponies)
 {
 }
 
-const std::vector<unsigned int>&
-SystemSubsetBySubdomain::
-dof_ids(void)const
+ponies>&
+ponies::
+ponies
 {
-  return _dof_ids;
+  ponies;
 }
 
-void
-SystemSubsetBySubdomain::
-set_var_nums (const std::set<unsigned int>* const var_nums)
+ponies
+ponies::
+ponies)
 {
-  _var_nums.clear();
-  if(var_nums!=NULL)
+  ponies();
+  ponies)
     {
-      _var_nums = *var_nums;
+      ponies;
     }
-  else
+  ponies
     {
-      for(unsigned int i=0; i<_system.n_vars(); i++)
+      ponies++)
         {
-          _var_nums.insert(i);
+          ponies);
         }
     }
 }
 
-void
-SystemSubsetBySubdomain::
-init (const SubdomainSelection& subdomain_selection)
+ponies
+ponies::
+ponies)
 {
-  _dof_ids.clear();
+  ponies();
 
-  std::vector<std::vector<dof_id_type> > dof_ids_per_processor(this->n_processors());
+  ponies());
 
-  const DofMap & dof_map = _system.get_dof_map();
-  std::vector<dof_id_type> dof_indices;
+  ponies();
+  ponies;
 
-  const MeshBase& mesh = _system.get_mesh();
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-  for ( ; el != end_el; ++el)
+  ponies();
+  ponies();
+  ponies();
+  ponies)
     {
-      const Elem* elem = *el;
-      if(subdomain_selection(elem->subdomain_id()))
+      ponies;
+      ponies()))
         {
-          std::set<unsigned int>::const_iterator it = _var_nums.begin();
-          const std::set<unsigned int>::const_iterator itEnd = _var_nums.end();
-          for (; it!=itEnd; ++it)
+          ponies();
+          ponies();
+          ponies)
             {
-              dof_map.dof_indices (elem, dof_indices, *it);
-              for(size_t i=0; i<dof_indices.size(); i++)
+              ponies);
+              ponies++)
                 {
-                  const dof_id_type dof = dof_indices[i];
-                  for(processor_id_type proc=0; proc<this->n_processors(); proc++)
+                  ponies];
+                  ponies++)
                     {
-                      if((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
+                      ponies)))
                         {
-                          dof_ids_per_processor[proc].push_back(dof);
+                          ponies);
                         }
                     }
                 }
@@ -151,54 +151,54 @@ init (const SubdomainSelection& subdomain_selection)
         }
     }
 
-  /* Distribute information among processors.  */
-  std::vector<Parallel::Request> request_per_processor(this->n_processors());
-  for(unsigned int proc=0; proc<this->n_processors(); proc++)
+  /* ponies.  */
+  ponies());
+  ponies++)
     {
-      if(proc!=this->processor_id())
+      ponies())
         {
-          this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
+          ponies]);
         }
     }
-  for(unsigned int proc=0; proc<this->n_processors(); proc++)
+  ponies++)
     {
-      std::vector<dof_id_type> received_dofs;
-      if(proc==this->processor_id())
+      ponies;
+      ponies())
         {
-          received_dofs = dof_ids_per_processor[proc];
+          ponies];
         }
-      else
+      ponies
         {
-          this->comm().receive(proc,received_dofs);
+          ponies);
         }
-      for(unsigned int i=0; i<received_dofs.size(); i++)
+      ponies++)
         {
-          _dof_ids.push_back(received_dofs[i]);
+          ponies]);
         }
     }
 
-  /* Sort and unique the vector (using the same mechanism as in \p
-     DofMap::prepare_send_list()).  */
-  std::sort(_dof_ids.begin(), _dof_ids.end());
-  std::vector<unsigned int>::iterator new_end = std::unique (_dof_ids.begin(), _dof_ids.end());
-  std::vector<unsigned int> (_dof_ids.begin(), new_end).swap (_dof_ids);
+  /* ponies
+     ponies()).  */
+  ponies());
+  ponies());
+  ponies);
 
-  /* Wait for sends to be complete.  */
-  for(unsigned int proc=0; proc<this->n_processors(); proc++)
+  /* ponies.  */
+  ponies++)
     {
-      if(proc!=this->processor_id())
+      ponies())
         {
-          request_per_processor[proc].wait();
+          ponies();
         }
     }
 }
 
-void
-SystemSubsetBySubdomain::
-init (const std::set<subdomain_id_type>& subdomain_ids)
+ponies
+ponies::
+ponies)
 {
-  SubdomainSelectionByList selection(subdomain_ids);
-  this->init(selection);
+  ponies);
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

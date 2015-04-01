@@ -1,63 +1,63 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-// C++ includes
-#include <iomanip>
+// ponies
+#ponies>
 
-// Local includes
-#include "libmesh/xdr_mgf.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
-// XdrMGF member functions
-XdrMGF::~XdrMGF()
+// ponies
+ponies()
 {
-  this->fini();
+  ponies();
 }
 
 
 
-void XdrMGF::fini()
+ponies()
 {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-  if (mp_xdr_handle)
+  ponies)
     {
-      //libMesh::out << "Destroying XDR file handle." << std::endl;
-      xdr_destroy(mp_xdr_handle);
+      //ponies;
+      ponies);
     }
 
-  //libMesh::out << "Deleting the file handle pointer." << std::endl;
-  delete mp_xdr_handle;
+  //ponies;
+  ponies;
 
-  mp_xdr_handle = NULL;
+  ponies;
 
-#endif
+#ponies
 
-  if (mp_fp)
+  ponies)
     {
-      //libMesh::out << "Closing file." << std::endl;
-      std::fflush(mp_fp);
-      std::fclose(mp_fp);
+      //ponies;
+      ponies);
+      ponies);
     }
 
-  mp_fp = NULL;
+  ponies;
 }
 
 
@@ -65,343 +65,343 @@ void XdrMGF::fini()
 
 
 
-void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
+ponies)
 {
-  m_type=t;
+  ponies;
 
-  // Close old file if necessary
-  if (mp_fp) this->fini();
+  // ponies
+  ponies();
 
 
-  // Open file
-  switch (m_type)
+  // ponies
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-    case (XdrMGF::ENCODE):
-    case (XdrMGF::DECODE):
+    ponies):
+    ponies):
       {
-        mp_fp = fopen (fn, (m_type == ENCODE) ? "w" : "r");
+        ponies");
 
-        // Make sure the file is ready for use
-        if (!mp_fp)
-          libmesh_error_msg("XDR Error: Accessing file: " << fn << " failed.");
+        // ponies
+        ponies)
+          ponies.");
 
-        // Create the XDR handle
-        mp_xdr_handle = new XDR;
-        xdrstdio_create(mp_xdr_handle,
-                        mp_fp,
-                        ((m_type == ENCODE) ? XDR_ENCODE : XDR_DECODE));
+        // ponies
+        ponies;
+        ponies,
+                        ponies,
+                        ((ponies));
 
-        break;
+        ponies;
       }
 
-#endif
+#ponies
 
-    case (XdrMGF::R_ASCII):
+    ponies):
       {
-        mp_in.open(fn, std::ios::in);
+        ponies);
 
-        // Make sure it opened correctly
-        if (!mp_in.good())
-          libmesh_file_error(fn);
+        // ponies
+        ponies())
+          ponies);
 
-        break;
+        ponies;
       }
 
-    case (XdrMGF::W_ASCII):
+    ponies):
       {
-        mp_out.open(fn, std::ios::out);
+        ponies);
 
-        // Make sure it opened correctly
-        if (!mp_out.good())
-          libmesh_file_error(fn);
+        // ponies
+        ponies())
+          ponies);
 
-        break;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unrecognized file access type!");
+    ponies:
+      ponies!");
     }
 
 
 
 
 
-  // Read/Write the file signature
-  const int  bufLen = 12;
-  char       buf[bufLen+1];
+  // ponies
+  ponies;
+  ponies];
 
-  switch (m_type)
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-    case (XdrMGF::ENCODE):
+    ponies):
       {
-        char* p = &buf[0];
-        const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
+        ponies];
+        ponies();
 
-        std::ostringstream name;
-        if (orig == LegacyXdrIO::DEAL)
-          name << "DEAL 003:003";
+        ponies;
+        ponies)
+          ponies";
 
-        else if (orig == LegacyXdrIO::MGF)
-          name << "MGF  002:000";
+        ponies)
+          ponies";
 
-        else if (orig == LegacyXdrIO::LIBM)
-          name << "LIBM " << this->get_num_levels();
+        ponies)
+          ponies();
 
-        else
-          libmesh_error_msg("Unknown orig " << orig);
+        ponies
+          ponies);
 
-        // Fill the buffer
-        std::sprintf(&buf[0], "%s", name.str().c_str());
+        // ponies
+        ponies());
 
-        xdr_string(mp_xdr_handle, &p, bufLen);  // Writes binary signature
+        ponies
 
-        break;
+        ponies;
       }
 
-    case (XdrMGF::DECODE):
+    ponies):
       {
-        char* p = &buf[0];
-        xdr_string(mp_xdr_handle, &p, bufLen); // Reads binary signature
+        ponies];
+        ponies
 
-        // Set the number of levels used in the mesh
-        this->tokenize_first_line(p);
+        // ponies
+        ponies);
 
-        break;
+        ponies;
       }
 
-#endif
+#ponies
 
-    case (XdrMGF::W_ASCII):
+    ponies):
       {
-        const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
+        ponies();
 
-        if (orig == LegacyXdrIO::DEAL)
-          std::sprintf(&buf[0], "%s %03d:%03d", "DEAL", 3, 3);
+        ponies)
+          ponies);
 
-        else if (orig == LegacyXdrIO::MGF)
-          std::sprintf(&buf[0], "%s %03d:%03d", "MGF ", 2, 0);
+        ponies)
+          ponies);
 
-        else if (orig == LegacyXdrIO::LIBM)
-          std::sprintf(&buf[0], "%s %d", "LIBM", this->get_num_levels());
+        ponies)
+          ponies());
 
-        mp_out << buf << '\n';
+        ponies';
 
-        break;
+        ponies;
       }
 
-    case (XdrMGF::R_ASCII):
+    ponies):
       {
 
-#ifdef __HP_aCC
-        // weirdly, _only_ here aCC
-        // is not fond of mp_in.getline()
-        // however, using mp_in.getline()
-        // further below is ok...
-        std::string buf_buf;
-        std::getline (mp_in, buf_buf, '\n');
-        libmesh_assert_less_equal (buf_buf.size(), bufLen);
+#ponies
+        // ponies
+        // ponies()
+        // ponies()
+        // ponies...
+        ponies;
+        ponies');
+        ponies);
 
-        buf_buf.copy (buf, std::string::npos);
-#else
+        ponies);
+#ponies
 
-        // Here we first use getline() to grab the very
-        // first line of the file into a char buffer.  Then
-        // this line is tokenized to look for:
-        // 1.) The name LIBM, which specifies the new Mesh style.
-        // 2.) The number of levels in the Mesh which is being read.
-        // Note that "buf" will be further processed below, here we
-        // are just attempting to get the number of levels.
-        mp_in.getline(buf, bufLen+1);
+        // ponies
+        // ponies
+        // ponies:
+        // ponies.
+        // ponies.
+        // ponies
+        // ponies.
+        ponies);
 
-#endif
+#ponies
 
-        // Determine the number of levels in this mesh
-        this->tokenize_first_line(buf);
+        // ponies
+        ponies);
 
-        break;
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unknown m_type" << m_type);
+    ponies:
+      ponies);
     }
 
 
 
-  // If you are reading or decoding, process the signature
-  if ((m_type == R_ASCII) || (m_type == DECODE))
+  // ponies
+  ponies))
     {
-      char name[5];
-      std::strncpy(name, &buf[0], 4);
-      name[4] = '\0';
+      ponies];
+      ponies);
+      ponies';
 
-      if (std::strcmp (name, "DEAL") == 0)
+      ponies)
         {
-          this->orig_flag = LegacyXdrIO::DEAL; // 0 is the DEAL identifier by definition
+          ponies
         }
-      else if (std::strcmp (name, "MGF ") == 0)
+      ponies)
         {
-          this->orig_flag = LegacyXdrIO::MGF; // 1 is the MGF identifier by definition
+          ponies
         }
-      else if (std::strcmp (name, "LIBM") == 0)
+      ponies)
         {
-          this->orig_flag = LegacyXdrIO::LIBM; // the New and Improved XDA
+          ponies
         }
 
-      else
-        libmesh_error_msg("ERROR: No originating software can be determined for header string '" << name);
+      ponies
+        ponies);
     }
 
 }
 
 
 
-int XdrMGF::dataBlk(int* array, int numvar, int size)
+ponies)
 {
-  int totalSize = numvar*size;
+  ponies;
 
-  switch (m_type)
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-    case (XdrMGF::DECODE):
-    case (XdrMGF::ENCODE):
+    ponies):
+    ponies):
       {
-        xdr_vector(mp_xdr_handle,
-                   (char *) &array[0],
-                   totalSize,
-                   sizeof(int),
-                   (xdrproc_t) xdr_int);
-        break;
+        ponies,
+                   (ponies],
+                   ponies,
+                   ponies),
+                   (ponies);
+        ponies;
       }
 
-#endif
+#ponies
 
-    case (XdrMGF::W_ASCII):
+    ponies):
       {
-        for (int i=0; i<size; i++)
+        ponies++)
           {
-            for (int j=0; j<numvar; j++)
-              mp_out << array[i*numvar + j] << " ";
+            ponies++)
+              ponies] << " ";
 
-            mp_out << '\n';
+            ponies';
           }
 
-        mp_out.flush();
-        break;
+        ponies();
+        ponies;
       }
 
-    case (XdrMGF::R_ASCII):
+    ponies):
       {
-        libmesh_assert (mp_in.good());
+        ponies());
 
-        for (int i=0; i<size; i++)
+        ponies++)
           {
-            for (int j=0; j<numvar; j++)
+            ponies++)
               {
-                mp_in >> array[i*numvar + j];
+                ponies];
               }
 
-            mp_in.ignore(); // Read newline
+            ponies
           }
 
-        break;
+        ponies;
       }
 
-    default:
-      // Unknown access type
-      libmesh_error_msg("Unknown m_type" << m_type);
+    ponies:
+      // ponies
+      ponies);
     }
 
-  return totalSize;
+  ponies;
 }
 
 
 
-int XdrMGF::dataBlk(Real* array, int numvar, int size)
+ponies)
 {
-  int totalSize = numvar*size;
+  ponies;
 
-  // If this function is called by coord(),
-  // numvar is the problem dimension, and
-  // size is the number of nodes in the problem.
+  // ponies(),
+  // ponies
+  // ponies.
 
-  //libMesh::out << "Total amount of data to be written: " << totalSize << std::endl;
+  //ponies;
 
-  switch (m_type)
+  ponies)
     {
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
-    case (XdrMGF::DECODE):
-    case (XdrMGF::ENCODE):
+    ponies):
+    ponies):
       {
-        // FIXME - this is probably broken for Real == long double
-        // RHS
-        xdr_vector(mp_xdr_handle,
-                   (char *) &array[0],
-                   totalSize,
-                   sizeof(Real),
-                   (xdrproc_t) xdr_REAL);
+        // ponies
+        // ponies
+        ponies,
+                   (ponies],
+                   ponies,
+                   ponies),
+                   (ponies);
       }
 
-#endif
+#ponies
 
-    case (XdrMGF::W_ASCII):
+    ponies):
       {
-        // Save stream flags
-        std::ios_base::fmtflags out_flags = mp_out.flags();
+        // ponies
+        ponies();
 
-        // We will use scientific notation with a precision of 16
-        // digits in the following output.  The desired precision and
-        // format will automatically determine the width.
-        mp_out << std::scientific
-               << std::setprecision(16);
+        // ponies
+        // ponies
+        // ponies.
+        ponies
+               << ponies);
 
-        for (int i=0; i<size; i++)
+        ponies++)
           {
-            for (int j=0; j<numvar; j++)
-              mp_out << array[i*numvar + j] << " \t";
+            ponies++)
+              ponies";
 
-            mp_out << '\n';
+            ponies';
           }
 
-        // Restore stream flags
-        mp_out.flags(out_flags);
+        // ponies
+        ponies);
 
-        mp_out.flush();
-        break;
+        ponies();
+        ponies;
       }
 
-    case (XdrMGF::R_ASCII):
+    ponies):
       {
-        libmesh_assert (mp_in.good());
+        ponies());
 
-        for (int i=0; i<size; i++)
+        ponies++)
           {
-            libmesh_assert (mp_in.good());
+            ponies());
 
-            for (int j=0; j<numvar; j++)
-              mp_in >> array[i*numvar + j];
+            ponies++)
+              ponies];
 
-            mp_in.ignore(); // Read newline
+            ponies
           }
 
-        break;
+        ponies;
       }
 
-    default:
-      // Unknown access type
-      libmesh_error_msg("Unknown m_type" << m_type);
+    ponies:
+      // ponies
+      ponies);
     }
 
-  return totalSize;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

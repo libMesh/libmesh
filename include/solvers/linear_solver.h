@@ -1,346 +1,346 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_LINEAR_SOLVER_H
-#define LIBMESH_LINEAR_SOLVER_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/enum_convergence_flags.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_solver_type.h"
-#include "libmesh/enum_preconditioner_type.h"
-#include "libmesh/enum_subset_solve_mode.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/parallel_object.h"
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// forward declarations
-template <typename T> class SparseMatrix;
-template <typename T> class NumericVector;
-template <typename T> class ShellMatrix;
-template <typename T> class Preconditioner;
-class System;
+// ponies
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 /**
- * This class provides a uniform interface for linear solvers.  This base
- * class is overloaded to provide linear solvers from different packages
- * like PETSC or LASPACK.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin Kirk, 2003
+ * @ponies
  */
 
-template <typename T>
-class LinearSolver : public ReferenceCountedObject<LinearSolver<T> >,
-                     public ParallelObject
+ponies>
+ponies> >,
+                     ponies
 {
-public:
+ponies:
 
   /**
-   *  Constructor. Initializes Solver data structures
+   *  ponies
    */
-  LinearSolver (const libMesh::Parallel::Communicator &comm_in
-                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~LinearSolver ();
+  ponies ();
 
   /**
-   * Builds a \p LinearSolver using the linear solver package specified by
-   * \p solver_package
+   * ponies
+   * \ponies
    */
-  static UniquePtr<LinearSolver<T> > build(const libMesh::Parallel::Communicator &comm_in,
-                                           const SolverPackage solver_package = libMesh::default_solver_package());
+  ponies,
+                                           ponies());
 
   /**
-   * @returns true if the data structures are
-   * initialized, false otherwise.
+   * @ponies
+   * ponies.
    */
-  bool initialized () const { return _is_initialized; }
+  ponies; }
 
   /**
-   * Release all memory and clear data structures.
+   * ponies.
    */
-  virtual void clear () {}
+  ponies () {}
 
   /**
-   * Initialize data structures if not done so already.
-   * May assign a name to the solver in some implementations
+   * ponies.
+   * ponies
    */
-  virtual void init (const char* name = NULL) = 0;
+  ponies;
 
   /**
-   * Apply names to the system to be solved.  For most packages this
-   * is a no-op; for PETSc this sets an option prefix from the system
-   * name and sets field names from the system's variable names.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Since field names are applied to DoF numberings, this method must
-   * be called again after any System reinit.
+   * ponies
+   * ponies.
    */
-  virtual void init_names (const System&) {}
+  ponies&) {}
 
   /**
-   * Returns the type of solver to use.
+   * ponies.
    */
-  SolverType solver_type () const { return _solver_type; }
+  ponies; }
 
   /**
-   * Sets the type of solver to use.
+   * ponies.
    */
-  void set_solver_type (const SolverType st)
-  { _solver_type = st; }
+  ponies)
+  { ponies; }
 
   /**
-   * Returns the type of preconditioner to use.
+   * ponies.
    */
-  PreconditionerType preconditioner_type () const;
+  ponies;
 
   /**
-   * Sets the type of preconditioner to use.
+   * ponies.
    */
-  void set_preconditioner_type (const PreconditionerType pct);
+  ponies);
 
   /**
-   * Attaches a Preconditioner object to be used
+   * ponies
    */
-  void attach_preconditioner(Preconditioner<T> * preconditioner);
+  ponies);
 
-  virtual void reuse_preconditioner(bool );
+  ponies );
 
-  bool get_same_preconditioner();
+  ponies();
 
   /**
-   * After calling this method, all successive solves will be
-   * restricted to the given set of dofs, which must contain local
-   * dofs on each processor only and not contain any duplicates.  This
-   * mode can be disabled by calling this method with \p dofs being a
-   * \p NULL pointer.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * \ponies.
    */
-  virtual void restrict_solve_to (const std::vector<unsigned int>* const dofs,
-                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+  ponies,
+                                  ponies);
 
   /**
-   * This function calls the solver
-   * "_solver_type" preconditioned with the
-   * "_preconditioner_type" preconditioner.  Note that this method
-   * will compute the preconditioner from the system matrix.
+   * ponies
+   * "ponies
+   * "ponies
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
-                                               NumericVector<T>&, // Solution vector
-                                               NumericVector<T>&, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+  ponies
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
 
   /**
-   * Function to solve the adjoint system. Note that this method
-   * will compute the preconditioner from the system matrix. This is not a pure virtual
-   * function and is defined linear_solver.C
+   * ponies
+   * ponies
+   * ponies
    */
-  virtual std::pair<unsigned int, Real> adjoint_solve (SparseMatrix<T>&,  // System Matrix
-                                                       NumericVector<T>&, // Solution vector
-                                                       NumericVector<T>&, // RHS vector
-                                                       const double,      // Stopping tolerance
-                                                       const unsigned int); // N. Iterations
+  ponies
+                                                       ponies
+                                                       ponies
+                                                       ponies
+                                                       ponies
 
   /**
-   * This function calls the solver
-   * "_solver_type" preconditioned with the
-   * "_preconditioner_type" preconditioner.
+   * ponies
+   * "ponies
+   * "ponies.
    */
-  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
-                                               SparseMatrix<T>&,  // Preconditioning Matrix
-                                               NumericVector<T>&, // Solution vector
-                                               NumericVector<T>&, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+  ponies
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
 
   /**
-   * This function calls the solver "_solver_type" preconditioned with
-   * the "_preconditioner_type" preconditioner.  The preconditioning
-   * matrix is used if it is provided, or the system matrix is used if
-   * \p precond_matrix is null
+   * ponies
+   * ponies
+   * ponies
+   * \ponies
    */
-  std::pair<unsigned int, Real> solve (SparseMatrix<T>& matrix,
-                                       SparseMatrix<T>* precond_matrix,
-                                       NumericVector<T>&, // Solution vector
-                                       NumericVector<T>&, // RHS vector
-                                       const double,      // Stopping tolerance
-                                       const unsigned int); // N. Iterations
-
-
-
-  /**
-   * This function solves a system whose matrix is a shell matrix.
-   */
-  virtual std::pair<unsigned int, Real> solve (const ShellMatrix<T>& shell_matrix,
-                                               NumericVector<T>&, // Solution vector
-                                               NumericVector<T>&, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+  ponies,
+                                       ponies,
+                                       ponies
+                                       ponies
+                                       ponies
+                                       ponies
 
 
 
   /**
-   * This function solves a system whose matrix is a shell matrix, but
-   * a sparse matrix is used as preconditioning matrix, this allowing
-   * other preconditioners than JACOBI.
+   * ponies.
    */
-  virtual std::pair<unsigned int, Real> solve (const ShellMatrix<T>& shell_matrix,
-                                               const SparseMatrix<T>& precond_matrix,
-                                               NumericVector<T>&, // Solution vector
-                                               NumericVector<T>&, // RHS vector
-                                               const double,      // Stopping tolerance
-                                               const unsigned int) = 0; // N. Iterations
+  ponies,
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
+
 
 
   /**
-   * This function solves a system whose matrix is a shell matrix, but
-   * an optional sparse matrix may be used as preconditioning matrix.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::pair<unsigned int, Real> solve (const ShellMatrix<T>& matrix,
-                                       const SparseMatrix<T>* precond_matrix,
-                                       NumericVector<T>&, // Solution vector
-                                       NumericVector<T>&, // RHS vector
-                                       const double,      // Stopping tolerance
-                                       const unsigned int); // N. Iterations
+  ponies,
+                                               ponies,
+                                               ponies
+                                               ponies
+                                               ponies
+                                               ponies
 
 
   /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
+   * ponies
+   * ponies.
    */
-  virtual void print_converged_reason() const;
-
-  /**
-   * Returns the solver's convergence flag
-   */
-  virtual LinearConvergenceReason get_converged_reason() const = 0;
-
-protected:
+  ponies,
+                                       ponies,
+                                       ponies
+                                       ponies
+                                       ponies
+                                       ponies
 
 
   /**
-   * Enum stating which type of iterative solver to use.
+   * ponies
+   * ponies.
    */
-  SolverType _solver_type;
+  ponies;
 
   /**
-   * Enum statitng with type of preconditioner to use.
+   * ponies
    */
-  PreconditionerType _preconditioner_type;
+  ponies;
+
+ponies:
+
 
   /**
-   * Flag indicating if the data structures have been initialized.
+   * ponies.
    */
-  bool _is_initialized;
+  ponies;
 
   /**
-   * Holds the Preconditioner object to be used for the linear solves.
+   * ponies.
    */
-  Preconditioner<T> * _preconditioner;
+  ponies;
 
   /**
-   * Boolean flag to indicate whether we want to use an identical
-   * preconditioner to the previous solve. This can save
-   * substantial work in the cases where the system matrix is
-   * the same for successive solves.
+   * ponies.
    */
-  bool same_preconditioner;
+  ponies;
+
+  /**
+   * ponies.
+   */
+  ponies;
+
+  /**
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   */
+  ponies;
 
 };
 
 
 
 
-/*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator &comm_in) :
-  ParallelObject       (comm_in),
-  _solver_type         (GMRES),
-  _preconditioner_type (ILU_PRECOND),
-  _is_initialized      (false),
-  _preconditioner      (NULL),
-  same_preconditioner  (false)
+/*----------------------- ponies ----------------------------------*/
+ponies>
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-template <typename T>
-inline
-LinearSolver<T>::~LinearSolver ()
+ponies>
+ponies
+ponies ()
 {
-  this->clear ();
+  ponies ();
 }
 
-template <typename T>
-inline
-bool LinearSolver<T>::get_same_preconditioner()
+ponies>
+ponies
+ponies()
 {
-  return same_preconditioner;
+  ponies;
 }
 
-template <typename T>
-inline
-std::pair<unsigned int, Real>
-LinearSolver<T>::solve (SparseMatrix<T>&   mat,
-                        SparseMatrix<T>*   pc_mat,
-                        NumericVector<T>&  sol,
-                        NumericVector<T>&  rhs,
-                        const double       tol,
-                        const unsigned int n_iter)
+ponies>
+ponies
+ponies>
+ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies)
 {
-  if (pc_mat)
-    return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);
-  else
-    return this->solve(mat, sol, rhs, tol, n_iter);
+  ponies)
+    ponies);
+  ponies
+    ponies);
 }
 
 
-template <typename T>
-inline
-std::pair<unsigned int, Real>
-LinearSolver<T>::solve (const ShellMatrix<T>&  mat,
-                        const SparseMatrix<T>* pc_mat,
-                        NumericVector<T>&      sol,
-                        NumericVector<T>&      rhs,
-                        const double           tol,
-                        const unsigned int     n_iter)
+ponies>
+ponies
+ponies>
+ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies,
+                        ponies)
 {
-  if (pc_mat)
-    return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);
-  else
-    return this->solve(mat, sol, rhs, tol, n_iter);
+  ponies)
+    ponies);
+  ponies
+    ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_LINEAR_SOLVER_H
+#ponies

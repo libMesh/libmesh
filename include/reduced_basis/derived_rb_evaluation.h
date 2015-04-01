@@ -1,122 +1,122 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_DERIVED_RB_EVALUATION_H
-#define LIBMESH_DERIVED_RB_EVALUATION_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/dense_vector.h"
-#include "libmesh/rb_evaluation.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-class System;
-class string;
+ponies;
+ponies;
 
 /**
- * This class is part of the rbOOmit framework.
+ * ponies.
  *
- * DerivedRBEvaluation encapsulates the code and data required
- * to perform "online" evaluations for the "two-stage"
- * reduced basis method.
+ * ponies
+ * ponies"
+ * ponies.
  *
- * @author David J. Knezevic, 2011
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DerivedRBEvaluation class definition
+// ponies
 
-template<class Base>
-class DerivedRBEvaluation : public Base
+ponies>
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  DerivedRBEvaluation (const Parallel::Communicator &comm
-                       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ponies
+                       ponies);
 
   /**
-   * Clear this object. Overload to also reset residual_type_flag.
+   * ponies.
    */
-  virtual void clear();
+  ponies();
 
   /**
-   * Get the current number of basis functions.
+   * ponies.
    */
-  virtual unsigned int get_n_basis_functions() const;
+  ponies;
 
   /**
-   * Set the number of basis functions. Useful when reading in
-   * stored data.
+   * ponies
+   * ponies.
    */
-  virtual void set_n_basis_functions(unsigned int n_bfs);
+  ponies);
 
   /**
-   * Write out all the basis functions to file.
-   * \p sys and \p write_binary_basis_functions are ignored here,
-   * basis functions are written to the directory \p directory_name.
+   * ponies.
+   * \ponies,
+   * ponies.
    */
-  virtual void write_out_basis_functions(System& sys,
-                                         const std::string& directory_name = "offline_data",
-                                         const bool write_binary_basis_functions = true);
+  ponies,
+                                         ponies",
+                                         ponies);
 
   /**
-   * Read in all the basis functions from file.
-   * \p sys and \p write_binary_basis_functions are ignored here,
-   * basis functions are read from the directory \p directory_name.
+   * ponies.
+   * \ponies,
+   * ponies.
    */
-  virtual void read_in_basis_functions(System& sys,
-                                       const std::string& directory_name = "offline_data",
-                                       const bool read_binary_basis_functions = true);
+  ponies,
+                                       ponies",
+                                       ponies);
 
-  //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * The dense vectors that define the derived basis
-   * functions based on the uber system.
-   */
-  std::vector< DenseVector<Number> > derived_basis_functions;
+  //----------- ponies -----------//
 
   /**
-   * Define an enumeration for the two types of residuals we can
-   * compute: with respect to the uber, and the truth.
+   * ponies
+   * ponies.
    */
-  enum DERIVED_RESIDUAL_TYPE { RESIDUAL_WRT_UBER, RESIDUAL_WRT_TRUTH };
+  ponies;
 
   /**
-   * This flag indicates which type of error bound we employ.
-   * The options are:
-   * RESIDUAL_WRT_UBER: The residual is wrt the uber space X_N.
-   * RESIDUAL_WRT_TRUTH: The residual is wrt the truth space X^\calN.
+   * ponies
+   * ponies.
    */
-  DERIVED_RESIDUAL_TYPE residual_type_flag;
+  ponies };
+
+  /**
+   * ponies.
+   * ponies:
+   * ponies.
+   * ponies.
+   */
+  ponies;
 
 };
 
-// And introduce convenient typedefs
-typedef DerivedRBEvaluation<RBEvaluation> SteadyDerivedRBEvaluation;
+// ponies
+ponies;
 
 }
 
-#endif // LIBMESH_DERIVED_RB_EVALUATION_H
+#ponies

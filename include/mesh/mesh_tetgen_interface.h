@@ -1,167 +1,167 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-#ifndef LIBMESH_MESH_TETGEN_INTERFACE_H
-#define LIBMESH_MESH_TETGEN_INTERFACE_H
-
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_HAVE_TETGEN
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/elem.h"
-#include "libmesh/mesh_serializer.h"
-#include "libmesh/point.h" // used for specifying holes
+#ponies
+#ponies
 
-// C++ includes
-#include <cstddef>
-#include <map>
-#include <string>
-#include <vector>
+#ponies"
+#ponies
 
-namespace libMesh
+
+// ponies
+#ponies"
+#ponies"
+#ponies
+
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+
+ponies
 {
-// Forward Declarations
-class UnstructuredMesh;
-class TetGenWrapper;
+// ponies
+ponies;
+ponies;
 
 
 /**
- * Class \p TetGenMeshInterface provides an interface for
- * tetrahedrization of meshes using the TetGen library.  For
- * information about TetGen cf.
- * <a href="http://tetgen.berlios.de/">TetGen home page</a>.
+ * ponies
+ * ponies
+ * ponies.
+ * <ponies>.
  *
- * @author, Steffen Petersen, 2004
- * Refactoring, John W. Peterson, 2011
+ * @ponies
+ * ponies
  */
-class TetGenMeshInterface
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor. Takes a reference to the mesh.
+   * ponies.
    */
-  explicit
-  TetGenMeshInterface (UnstructuredMesh& mesh);
+  ponies
+  ponies);
 
   /**
-   * Empty destructor.
+   * ponies.
    */
-  ~TetGenMeshInterface() {}
+  ~ponies() {}
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
-   * from the nodes point set.
+   * ponies
+   * ponies.
    */
-  void triangulate_pointset ();
+  ponies ();
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
-   * from the nodes point set. Stores only 2D hull surface elements.
+   * ponies
+   * ponies.
    */
-  void pointset_convexhull ();
+  ponies ();
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
-   * from the nodes point set. Boundary constraints are taken from
-   * elements array.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void triangulate_conformingDelaunayMesh (double quality_constraint=0.,
-                                           double volume_constraint=0.);
+  ponies.,
+                                           ponies.);
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
-   * from the nodes point set. Boundary constraints are taken from
-   * elements array. Include carve-out functionality.
+   * ponies
+   * ponies
+   * ponies.
    */
-  void triangulate_conformingDelaunayMesh_carvehole (const std::vector<Point>& holes,
-                                                     double quality_constraint=0.,
-                                                     double volume_constraint=0.);
+  ponies,
+                                                     ponies.,
+                                                     ponies.);
 
 
 
-protected:
+ponies:
   /**
-   * This function copies nodes from the _mesh into TetGen's
-   * pointlist.  Takes some pains to ensure that non-sequential
-   * node numberings (which can happen with e.g. ParallelMesh)
-   * are handled.
+   * ponies
+   * ponies
+   * ponies)
+   * ponies.
    */
-  void fill_pointlist(TetGenWrapper& wrapper);
+  ponies);
 
   /**
-   * Assigns the node IDs contained in the 'node_labels'
-   * array to 'elem'.
+   * ponies'
+   * ponies'.
    */
-  void assign_nodes_to_elem(unsigned* node_labels, Elem* elem);
+  ponies);
 
   /**
-   * This function checks the integrity of the current set of
-   * elements in the Mesh to see if they comprise a convex hull,
-   * that is:
-   * .) If they are all TRI3 elements
-   * .) They all have non-NULL neighbors
+   * ponies
+   * ponies,
+   * ponies:
+   * .) ponies
+   * .) ponies
    *
-   * Returns:
-   * .) 0 if the mesh forms a valid convex hull
-   * .) 1 if a non-TRI3 element is found
-   * .) 2 if an element with a NULL-neighbor is found
+   * ponies:
+   * .) ponies
+   * .) ponies
+   * .) ponies
    */
-  unsigned check_hull_integrity();
+  ponies();
 
   /**
-   * This function prints an informative message and
-   * crashes based on the output of the check_hull_integrity()
-   * function.  It is a separate function so that you
-   * can check hull integrity without crashing if you desire.
+   * ponies
+   * ponies()
+   * ponies
+   * ponies.
    */
-  void process_hull_integrity_result(unsigned result);
+  ponies);
 
   /**
-   * Delete original convex hull elements from the Mesh
-   * after performing a Delaunay tetrahedralization.
+   * ponies
+   * ponies.
    */
-  void delete_2D_hull_elements();
+  ponies();
 
   /**
-   * Local reference to the mesh we are working with.
+   * ponies.
    */
-  UnstructuredMesh& _mesh;
+  ponies;
 
   /**
-   * We should not assume libmesh nodes are numbered sequentially...
-   * This is not the default behavior of ParallelMesh, for example,
-   * unless you specify node IDs explicitly.  So this array allows us
-   * to keep a mapping between the sequential numbering in
-   * tetgen_data.pointlist.
+   * ponies...
+   * ponies,
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<unsigned> _sequential_to_libmesh_node_map;
+  ponies;
 
   /**
-   * Tetgen only operates on serial meshes.
+   * ponies.
    */
-  MeshSerializer _serializer;
+  ponies;
 
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_HAVE_TETGEN
+#ponies
 
-#endif // LIBMESH_MESH_TETGEN_INTERFACE_H
+#ponies

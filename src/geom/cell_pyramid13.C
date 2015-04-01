@@ -1,335 +1,335 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/side.h"
-#include "libmesh/cell_pyramid13.h"
-#include "libmesh/edge_edge3.h"
-#include "libmesh/face_tri6.h"
-#include "libmesh/face_quad8.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 // ------------------------------------------------------------
-// Pyramid13 class static member initializations
-const unsigned int Pyramid13::side_nodes_map[5][8] =
+// ponies
+ponies] =
   {
-    {0, 1, 4, 5, 10,  9, 99, 99}, // Side 0 (front)
-    {1, 2, 4, 6, 11, 10, 99, 99}, // Side 1 (right)
-    {2, 3, 4, 7, 12, 11, 99, 99}, // Side 2 (back)
-    {3, 0, 4, 8,  9, 12, 99, 99}, // Side 3 (left)
-    {0, 3, 2, 1,  8,  7,  6,  5}  // Side 4 (base)
+    {ponies)
+    {ponies)
+    {ponies)
+    {ponies)
+    {ponies)
   };
 
-const unsigned int Pyramid13::edge_nodes_map[8][3] =
+ponies] =
   {
-    {0, 1,  5}, // Edge 0
-    {1, 2,  6}, // Edge 1
-    {2, 3,  7}, // Edge 2
-    {0, 3,  8}, // Edge 3
-    {0, 4,  9}, // Edge 4
-    {1, 4, 10}, // Edge 5
-    {2, 4, 11}, // Edge 6
-    {3, 4, 12}  // Edge 7
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
   };
 
 
 
 // ------------------------------------------------------------
-// Pyramid13 class member functions
+// ponies
 
-bool Pyramid13::is_vertex(const unsigned int i) const
+ponies
 {
-  if (i < 5)
-    return true;
-  return false;
+  ponies)
+    ponies;
+  ponies;
 }
 
 
 
-bool Pyramid13::is_edge(const unsigned int i) const
+ponies
 {
-  if (i < 5)
-    return false;
-  return true;
+  ponies)
+    ponies;
+  ponies;
 }
 
 
 
-bool Pyramid13::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
 
 
-bool Pyramid13::is_node_on_side(const unsigned int n,
-                                const unsigned int s) const
+ponies,
+                                ponies
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 8; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
-bool Pyramid13::is_node_on_edge(const unsigned int n,
-                                const unsigned int e) const
+ponies,
+                                ponies
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
-}
-
-
-
-bool Pyramid13::has_affine_map() const
-{
-  // TODO: If the base is a parallelogram and all the triangular faces are planar,
-  // the map should be linear, but I need to test this theory...
-  return false;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
 
 
-UniquePtr<Elem> Pyramid13::build_side (const unsigned int i, bool proxy) const
+ponies
 {
-  libmesh_assert_less (i, this->n_sides());
+  // ponies,
+  // ponies...
+  ponies;
+}
 
-  if (proxy)
+
+
+ponies
+{
+  ponies());
+
+  ponies)
     {
-      switch (i)
+      ponies)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-          return UniquePtr<Elem>(new Side<Tri6,Pyramid13>(this,i));
+        ponies:
+        ponies:
+        ponies:
+        ponies:
+          ponies));
 
-        case 4:
-          return UniquePtr<Elem>(new Side<Quad8,Pyramid13>(this,i));
+        ponies:
+          ponies));
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
     }
 
-  else
+  ponies
     {
-      // Create NULL pointer to be initialized, returned later.
-      Elem* face = NULL;
+      // ponies.
+      ponies;
 
-      switch (i)
+      ponies)
         {
-        case 0:  // triangular face 1
+        ponies
           {
-            face = new Tri6;
+            ponies;
 
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(5);
-            face->set_node(4) = this->get_node(10);
-            face->set_node(5) = this->get_node(9);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 1:  // triangular face 2
+        ponies
           {
-            face = new Tri6;
+            ponies;
 
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(6);
-            face->set_node(4) = this->get_node(11);
-            face->set_node(5) = this->get_node(10);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 2:  // triangular face 3
+        ponies
           {
-            face = new Tri6;
+            ponies;
 
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(7);
-            face->set_node(4) = this->get_node(12);
-            face->set_node(5) = this->get_node(11);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 3:  // triangular face 4
+        ponies
           {
-            face = new Tri6;
+            ponies;
 
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(8);
-            face->set_node(4) = this->get_node(9);
-            face->set_node(5) = this->get_node(12);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        case 4:  // the quad face at z=0
+        ponies
           {
-            face = new Quad8;
+            ponies;
 
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(2);
-            face->set_node(3) = this->get_node(1);
-            face->set_node(4) = this->get_node(8);
-            face->set_node(5) = this->get_node(7);
-            face->set_node(6) = this->get_node(6);
-            face->set_node(7) = this->get_node(5);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies);
 
-            break;
+            ponies;
           }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
 
-      face->subdomain_id() = this->subdomain_id();
-      return UniquePtr<Elem>(face);
+      ponies();
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  ponies!");
+  ponies>();
 }
 
 
 
-UniquePtr<Elem> Pyramid13::build_edge (const unsigned int i) const
+ponies
 {
-  libmesh_assert_less (i, this->n_edges());
+  ponies());
 
-  return UniquePtr<Elem>(new SideEdge<Edge3,Pyramid13>(this,i));
+  ponies));
 }
 
 
 
-void Pyramid13::connectivity(const unsigned int libmesh_dbg_var(sc),
-                             const IOPackage iop,
-                             std::vector<dof_id_type>& /*conn*/) const
+ponies),
+                             ponies,
+                             ponies
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies);
+  ponies());
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        // TODO
-        libmesh_not_implemented();
+        // ponies
+        ponies();
       }
 
-    case VTK:
+    ponies:
       {
-        // TODO
-        libmesh_not_implemented();
+        // ponies
+        ponies();
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
 
 
-unsigned int Pyramid13::n_second_order_adjacent_vertices (const unsigned int n) const
+ponies
 {
-  switch (n)
+  ponies)
     {
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-      return 2;
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+      ponies;
 
-    default:
-      libmesh_error_msg("Invalid node n = " << n);
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return libMesh::invalid_uint;
+  ponies!");
+  ponies;
 }
 
 
-unsigned short int Pyramid13::second_order_adjacent_vertex (const unsigned int n,
-                                                            const unsigned int v) const
+ponies,
+                                                            ponies
 {
-  libmesh_assert_greater_equal (n, this->n_vertices());
-  libmesh_assert_less (n, this->n_nodes());
+  ponies());
+  ponies());
 
-  switch (n)
+  ponies)
     {
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
+    ponies:
       {
-        libmesh_assert_less (v, 2);
+        ponies);
 
-        // This is the analog of the static, const arrays
-        // {Hex,Prism,Tet10}::_second_order_adjacent_vertices
-        // defined in the respective source files...
-        unsigned short node_list[8][2] =
+        // ponies
+        // {ponies
+        // ponies...
+        ponies] =
           {
-            {0,1},
-            {1,2},
-            {2,3},
-            {0,3},
-            {0,4},
-            {1,4},
-            {2,4},
-            {3,4}
+            {ponies},
+            {ponies},
+            {ponies},
+            {ponies},
+            {ponies},
+            {ponies},
+            {ponies},
+            {ponies}
           };
 
-        return node_list[n-5][v];
+        ponies];
       }
 
-    default:
-      libmesh_error_msg("Invalid n = " << n);
+    ponies:
+      ponies);
 
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return static_cast<unsigned short int>(-1);
+  ponies!");
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies

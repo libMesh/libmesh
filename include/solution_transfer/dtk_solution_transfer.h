@@ -1,80 +1,80 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef DTKSOLUTIONTRANSFER_H
-#define DTKSOLUTIONTRANSFER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
+#ponies"
 
-#ifdef LIBMESH_HAVE_DTK
+#ponies
 
-#include "libmesh/solution_transfer.h"
-#include "libmesh/dtk_adapter.h"
+#ponies"
+#ponies"
 
-// Trilinos
-#include <Teuchos_CommHelpers.hpp>
-#include <Teuchos_DefaultComm.hpp>
+// ponies
+#ponies>
+#ponies>
 
-// DTK
-#include <DTK_SharedDomainMap.hpp>
+// ponies
+#ponies>
 
-#include <string>
+#ponies>
 
-namespace libMesh {
+ponies {
 
 /**
- * Implementation of a SolutionTransfer object that uses the DataTransferKit (https://github.com/CNERG/DataTransferKit) to transfer variables back and forth between systems.
+ * ponies.
  */
-class DTKSolutionTransfer : public SolutionTransfer
+ponies
 {
-public:
-  DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm
-                      LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
-  virtual ~DTKSolutionTransfer();
+ponies:
+  ponies
+                      ponies);
+  ponies();
 
   /**
-   * Transfer the values of a variable to another.
+   * ponies.
    *
-   * This is meant for transferring values from one EquationSystems to another
-   * even in the case of having different meshes.
+   * ponies
+   * ponies.
    *
-   * Note that the first time this function is called for one combination of EquationSystems
-   * a lot of setup and caching is done.  Subsequent transfers between the same EquationSystems
-   * will be _much_ faster.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void transfer(const Variable & from_var, const Variable & to_var);
+  ponies);
 
-protected:
-  typedef DataTransferKit::SharedDomainMap<DTKAdapter::MeshContainerType,DTKAdapter::MeshContainerType> shared_domain_map_type;
+ponies:
+  ponies;
 
-  /// COMM_WORLD for now
-  Teuchos::RCP<const Teuchos::Comm<int> > comm_default;
+  /// ponies
+  ponies;
 
-  /// The DTKAdapter associated with each EquationSystems
-  std::map<EquationSystems *, DTKAdapter *> adapters;
+  /// ponies
+  ponies;
 
-  /// The dtk shared domain maps for pairs of EquationSystems (from, to)
-  std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type * > dtk_maps;
+  /// ponies)
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_HAVE_DTK
+#ponies
 
-#endif // #define DTKSOLUTIONTRANSFER_H
+#ponies

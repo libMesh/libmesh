@@ -1,869 +1,869 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_MESH_REFINEMENT_H
-#define LIBMESH_MESH_REFINEMENT_H
+// ponies
+// ponies
+// ponies
 
 
 
-#include "libmesh/libmesh_config.h"
+#ponies
+#ponies
 
-#ifdef LIBMESH_ENABLE_AMR
 
-// Local Includes -----------------------------------
-#include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh.h" // libMesh::invalid_uint
-#include "libmesh/topology_map.h"
-#include "libmesh/elem.h"
-#include "libmesh/point_locator_base.h"
-#include "libmesh/parallel_object.h"
 
-// C++ Includes   -----------------------------------
-#include <vector>
+#ponies"
 
-namespace libMesh
+#ponies
+
+// ponies -----------------------------------
+#ponies"
+#ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies   -----------------------------------
+#ponies>
+
+ponies
 {
 
-// Forward Declarations -----------------------------
-class MeshBase;
-class Point;
-class Node;
-class ErrorVector;
-class PeriodicBoundaries;
+// ponies -----------------------------
+ponies;
+ponies;
+ponies;
+ponies;
+ponies;
 
 
 
 /**
- * This is the \p MeshRefinement class.  This class implements
- * adaptive mesh refinement algorithms for a \p MeshBase.
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2002-2007.
+ * @ponies.
  */
 
 
 // ------------------------------------------------------------
-// MeshRefinement class definition
-class MeshRefinement : public ParallelObject
+// ponies
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  explicit
-  MeshRefinement (MeshBase& mesh);
+  ponies
+  ponies);
 
-private:
-  // Both the copy ctor and the assignment operator are
-  // declared private but not implemented.  This is the
-  // standard practice to prevent them from being used.
-  MeshRefinement (const MeshRefinement&);
-  MeshRefinement& operator=(const MeshRefinement&);
+ponies:
+  // ponies
+  // ponies
+  // ponies.
+  ponies&);
+  ponies&);
 
-public:
+ponies:
 
   /**
-   * Abstract base class to be used for user-specified
-   * element flagging.  This can be used instead of or to
-   * augment traditional error indicator based refinement.
-   * This simply provides a base class that can be derived
-   * from and then passed to the
-   * \p flag_elements_by () method.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * \ponies.
    */
-  class ElementFlagging
+  ponies
   {
-  public:
+  ponies:
     /**
-     * Destructor.  Virtual because we will have virtual functions.
+     * ponies.
      */
-    virtual ~ElementFlagging () {}
+    ponies () {}
 
     /**
-     * Callback function to be used for marking elements for refinement.
+     * ponies.
      */
-    virtual void flag_elements () = 0;
+    ponies;
   };
 
   /**
-   * Sets the \p PeriodicBoundaries pointer.
+   * ponies.
    */
-  void set_periodic_boundaries_ptr(PeriodicBoundaries * pb_ptr);
+  ponies);
 
   /**
-   * Destructor. Deletes all the elements that are currently stored.
+   * ponies.
    */
-  ~MeshRefinement ();
+  ~ponies ();
 
   /**
-   * Deletes all the data that are currently stored.
+   * ponies.
    */
-  void clear ();
+  ponies ();
 
   /**
-   * Flags elements for coarsening and refinement based on
-   * the computed error passed in \p error_per_cell.  The two
-   * fractions \p refine_fraction and \p coarsen_fraction must be in
-   * \f$ [0,1] \f$.
+   * ponies
+   * ponies
+   * ponies
+   * \ponies$.
    *
-   * All the function arguments except error_per_cell
-   * have been deprecated, and will be removed in
-   * future libMesh releases - to control these parameters,
-   * set the corresponding member variables.
+   * ponies
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
-                                        const Real refine_fraction  = 0.3,
-                                        const Real coarsen_fraction = 0.0,
-                                        const unsigned int max_level = libMesh::invalid_uint);
+  ponies,
+                                        ponies,
+                                        ponies,
+                                        ponies);
 
   /**
-   * Flags elements for coarsening and refinement based on
-   * the computed error passed in \p error_per_cell.  This method refines
-   * the worst elements with errors greater than
-   * \p absolute_global_tolerance / n_active_elem, flagging at most
-   * \p refine_fraction * n_active_elem
-   * It coarsens elements with errors less than
-   * \p coarsen_threshold * \p global_tolerance / n_active_elem,
-   * flagging at most
-   * \p coarsen_fraction * n_active_elem
+   * ponies
+   * ponies
+   * ponies
+   * \ponies
+   * \ponies
+   * ponies
+   * \ponies,
+   * ponies
+   * \ponies
    *
-   * The three fractions \p refine_fraction \p coarsen_fraction and
-   * \p coarsen_threshold should be in \f$ [0,1] \f$.
+   * ponies
+   * \ponies$.
    */
-  void flag_elements_by_error_tolerance (const ErrorVector& error_per_cell);
+  ponies);
 
   /**
-   * Flags elements for coarsening and refinement based on
-   * the computed error passed in \p error_per_cell.  This method attempts to
-   * produce a mesh with slightly more than \p nelem_target active elements,
-   * trading element refinement for element coarsening when their error
-   * ratios exceed \p coarsen_threshold.  It flags no more than
-   * \p refine_fraction * n_elem elements for refinement and flags no
-   * more than \p coarsen_fraction * n_elem elements for coarsening.
-   * This method returns true if it has done all the AMR/C it can do
-   * in a single step, or false if further adaptive steps may be required
-   * to produce a mesh with a narrow error distribution and the right
-   * number of elements.
+   * ponies
+   * ponies
+   * ponies,
+   * ponies
+   * ponies
+   * \ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool flag_elements_by_nelem_target (const ErrorVector& error_per_cell);
+  ponies);
 
   /**
-   * Flags elements for coarsening and refinement based on
-   * the computed error passed in \p error_per_cell.  This method picks
-   * the top \p refine_fraction * \p n_elem elements for refinement and
-   * the bottom \p coarsen_fraction * \p n_elem elements for coarsening.
-   * The two fractions \p refine_fraction and \p coarsen_fraction must be
-   * in \f$ [0,1] \f$.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies$.
    *
-   * All the function arguments except error_per_cell
-   * have been deprecated, and will be removed in
-   * future libMesh releases - to control these parameters,
-   * set the corresponding member variables.
+   * ponies
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void flag_elements_by_elem_fraction (const ErrorVector& error_per_cell,
-                                       const Real refine_fraction  = 0.3,
-                                       const Real coarsen_fraction = 0.0,
-                                       const unsigned int max_level = libMesh::invalid_uint);
+  ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies);
 
   /**
-   * Flags elements for coarsening and refinement based on
-   * the computed error passed in \p error_per_cell.  This method picks
-   * the top \p refine_fraction * \p stddev + \p mean elements for refinement
-   * and the bottom \p mean - \p coarsen_fraction * \p stddev elements for
-   * coarsening. The two fractions \p refine_fraction and \p coarsen_fraction
-   * must be in \f$ [0,1] \f$.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies$.
    *
-   * All the function arguments except error_per_cell
-   * have been deprecated, and will be removed in
-   * future libMesh releases - to control these parameters,
-   * set the corresponding member variables.
+   * ponies
+   * ponies
+   * ponies,
+   * ponies.
    */
-  void flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
-                                     const Real refine_fraction  = 1.0,
-                                     const Real coarsen_fraction = 0.0,
-                                     const unsigned int max_level = libMesh::invalid_uint);
+  ponies,
+                                     ponies,
+                                     ponies,
+                                     ponies);
 
   /**
-   * Flag elements based on a function object.  The class \p ElementFlagging
-   * defines a mechanism for implementing refinement strategies.
+   * ponies
+   * ponies.
    */
-  void flag_elements_by (ElementFlagging &element_flagging);
+  ponies);
 
   /**
-   * Takes a mesh whose elements are flagged for h refinement and coarsening,
-   * and switches those flags to request p refinement and coarsening instead.
+   * ponies,
+   * ponies.
    */
-  void switch_h_to_p_refinement();
+  ponies();
 
   /**
-   * Takes a mesh whose elements are flagged for h refinement and coarsening,
-   * and adds flags to request p refinement and coarsening of the same elements.
+   * ponies,
+   * ponies.
    */
-  void add_p_to_h_refinement();
+  ponies();
 
   /**
-   * Refines and coarsens user-requested elements. Will also
-   * refine/coarsen additional elements to satisy level-one rule.
-   * It is possible that for a given set of refinement flags there
-   * is actually no change upon calling this member function.  Consequently,
-   * this function returns \p true if the mesh actually changed (hence
-   * data needs to be projected) and \p false otherwise.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * ponies
+   * ponies.
    */
-  bool refine_and_coarsen_elements (const bool maintain_level_one=true);
+  ponies);
 
   /**
-   * Only coarsens the user-requested elements. Some elements
-   * will not be coarsened to satisfy the level one rule.
-   * It is possible that for a given set of refinement flags there
-   * is actually no change upon calling this member function.  Consequently,
-   * this function returns \p true if the mesh actually changed (hence
-   * data needs to be projected) and \p false otherwise.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * ponies
+   * ponies.
    */
-  bool coarsen_elements (const bool maintain_level_one=true);
+  ponies);
 
   /**
-   * Only refines the user-requested elements.
-   * It is possible that for a given set of refinement flags there
-   * is actually no change upon calling this member function.  Consequently,
-   * this function returns \p true if the mesh actually changed (hence
-   * data needs to be projected) and \p false otherwise.
+   * ponies.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * The argument \p maintain_level_one is now deprecated; use the option
-   * face_level_mismatch_limit() instead.
+   * ponies
+   * ponies.
    */
-  bool refine_elements (const bool maintain_level_one=true);
+  ponies);
 
   /**
-   * Uniformly refines the mesh \p n times.
+   * ponies.
    */
-  void uniformly_refine (unsigned int n=1);
+  ponies);
 
   /**
-   * Attempts to uniformly coarsen the mesh \p n times.
+   * ponies.
    */
-  void uniformly_coarsen (unsigned int n=1);
+  ponies);
 
   /**
-   * Uniformly p refines the mesh \p n times.
+   * ponies.
    */
-  void uniformly_p_refine (unsigned int n=1);
+  ponies);
 
   /**
-   * Attempts to uniformly p coarsen the mesh \p n times.
+   * ponies.
    */
-  void uniformly_p_coarsen (unsigned int n=1);
+  ponies);
 
   /**
-   * Sets the refinement flag to \p Elem::DO_NOTHING
-   * for each element in the mesh.
+   * ponies
+   * ponies.
    */
-  void clean_refinement_flags ();
+  ponies ();
 
   /**
-   * Returns true if and only if the mesh is level one smooth
-   * Returns false otherwise
-   * Aborts the program if libmesh_assert_yes is true and
-   * the mesh is not level one smooth
+   * ponies
+   * ponies
+   * ponies
+   * ponies
    */
-  bool test_level_one (bool libmesh_assert_yes = false);
+  ponies);
 
   /**
-   * Returns true if and only if the mesh has no elements
-   * flagged to be coarsened or refined
-   * Returns false otherwise
-   * Aborts the program if libmesh_assert_yes is true and
-   * the mesh has flagged elements
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies
    */
-  bool test_unflagged (bool libmesh_assert_yes = false);
+  ponies);
 
   /**
-   * Add a node to the mesh.  The node should be node n of child c of
-   * parent Elem parent.  The function returns a pointer to a suitable
-   * existing node, or creates a new node and returns a pointer to it
-   * if necessary.
-   * The processor_id is assigned to any newly created node.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies.
    */
-  Node* add_node (const Elem& parent,
-                  unsigned int child,
-                  unsigned int node,
-                  processor_id_type proc_id);
+  ponies,
+                  ponies,
+                  ponies,
+                  ponies);
 
   /**
-   * Adds the element \p elem to the mesh.
+   * ponies.
    */
-  Elem* add_elem (Elem* elem);
+  ponies);
 
   /**
-   * @returns a constant reference to the \p MeshBase object associated
-   * with this object.
+   * @ponies
+   * ponies.
    */
-  const MeshBase& get_mesh () const { return _mesh; }
+  ponies; }
 
   /**
-   * @returns a writeable reference to the \p MeshBase object associated
-   * with this object.
+   * @ponies
+   * ponies.
    */
-  MeshBase&       get_mesh ()       { return _mesh; }
+  ponies; }
 
   /**
-   * If \p coarsen_by_parents is true, complete groups of sibling elements
-   * (elements with the same parent) will be flagged for coarsening.
-   * This should make the coarsening more likely to occur as requested.
+   * ponies
+   * (ponies.
+   * ponies.
    *
-   * \p coarsen_by_parents is true by default.
+   * \ponies.
    */
-  bool& coarsen_by_parents();
+  ponies();
 
   /**
-   * The \p refine_fraction sets either a desired target or a desired
-   * maximum number of elements to flag for refinement, depending on which
-   * flag_elements_by method is called.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p refine_fraction must be in \f$ [0,1] \f$, and is 0.3 by default.
+   * \ponies.
    */
-  Real& refine_fraction();
+  ponies();
 
   /**
-   * The \p coarsen_fraction sets either a desired target or a desired
-   * maximum number of elements to flag for coarsening, depending on which
-   * flag_elements_by method is called.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p coarsen_fraction must be in \f$ [0,1] \f$, and is 0 by default.
+   * \ponies.
    */
-  Real& coarsen_fraction();
+  ponies();
 
   /**
-   * The \p max_h_level is the greatest refinement level an element should
-   * reach.
+   * ponies
+   * ponies.
    *
-   * \p max_h_level is unlimited (libMesh::invalid_uint) by default
+   * \ponies
    */
-  unsigned int& max_h_level();
+  ponies();
 
   /**
-   * The \p coarsen_threshold provides hysteresis in AMR/C strategies.
-   * Refinement of elements with error estimate E will be done even
-   * at the expense of coarsening elements whose children's accumulated
-   * error does not exceed \p coarsen_threshold * E.
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p coarsen_threshold must be in \f$ [0,1] \f$, and is 0.1 by default.
+   * \ponies.
    */
-  Real& coarsen_threshold();
+  ponies();
 
   /**
-   * If \p nelem_target is set to a nonzero value, methods like
-   * flag_elements_by_nelem_target() will attempt to keep the number
-   * of active elements in the mesh close to nelem_target.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p nelem_target is 0 by default.
+   * \ponies.
    */
-  dof_id_type& nelem_target();
+  ponies();
 
   /**
-   * If \p absolute_global_tolerance is set to a nonzero value, methods
-   * like flag_elements_by_global_tolerance() will attempt to reduce
-   * the global error of the mesh (defined as the square root of the
-   * sum of the squares of the errors on active elements) to below
-   * this tolerance.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p absolute_global_tolerance is 0 by default.
+   * \ponies.
    */
-  Real& absolute_global_tolerance();
+  ponies();
 
   /**
-   * If \p face_level_mismatch_limit is set to a nonzero value, then
-   * refinement and coarsening will produce meshes in which the
-   * refinement level of two face neighbors will not differ by more than
-   * that limit.  If \p face_level_mismatch_limit is 0, then level
-   * differences will be unlimited.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p face_level_mismatch_limit is 1 by default.  Currently the only
-   * supported options are 0 and 1.
+   * \ponies
+   * ponies.
    */
-  unsigned char& face_level_mismatch_limit();
+  ponies();
 
   /**
-   * If \p edge_level_mismatch_limit is set to a nonzero value, then
-   * refinement and coarsening will produce meshes in which the
-   * refinement level of two edge neighbors will not differ by more than
-   * that limit.  If \p edge_level_mismatch_limit is 0, then level
-   * differences will be unlimited.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p edge_level_mismatch_limit is 0 by default.
+   * \ponies.
    */
-  unsigned char& edge_level_mismatch_limit();
+  ponies();
 
   /**
-   * If \p node_level_mismatch_limit is set to a nonzero value, then
-   * refinement and coarsening will produce meshes in which the
-   * refinement level of two nodal neighbors will not differ by more than
-   * that limit.  If \p node_level_mismatch_limit is 0, then level
-   * differences will be unlimited.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * \p node_level_mismatch_limit is 0 by default.
+   * \ponies.
    */
-  unsigned char& node_level_mismatch_limit();
+  ponies();
 
   /**
-   * Copy refinement flags on ghost elements from their
-   * local processors.  Return true if any flags changed.
+   * ponies
+   * ponies.
    */
-  bool make_flags_parallel_consistent ();
+  ponies ();
 
   /**
-   * Returns the state of the _enforce_mismatch_limit_prior_to_refinement flag.
-   * Defaults to false.
-   * Deprecated - use enforce_mismatch_limit_prior_to_refinement() instead.
+   * ponies.
+   * ponies.
+   * ponies.
    */
-  bool get_enforce_mismatch_limit_prior_to_refinement();
+  ponies();
 
   /**
-   * Set _enforce_mismatch_limit_prior_to_refinement option.
-   * Defaults to false.
-   * Deprecated - use enforce_mismatch_limit_prior_to_refinement() instead.
+   * ponies.
+   * ponies.
+   * ponies.
    */
-  void set_enforce_mismatch_limit_prior_to_refinement(bool enforce);
+  ponies);
 
   /**
-   * Get/set the _enforce_mismatch_limit_prior_to_refinement flag.
-   * The default value for this flag is false.
+   * ponies.
+   * ponies.
    */
-  bool& enforce_mismatch_limit_prior_to_refinement();
+  ponies();
 
-private:
+ponies:
 
   /**
-   * Coarsens user-requested elements.  Both coarsen_elements
-   * and refine_elements used to be in the public interface for the
-   * MeshRefinement object.  Unfortunately, without proper
-   * preparation (make_refinement_compatible, make_coarsening_compatible)
-   * at least coarsen_elements() did not work alone.  By making them
-   * private, we signal to the user that they are not part of the
-   * interface.
+   * ponies
+   * ponies
+   * ponies
+   * ponies)
+   * ponies
+   * ponies
+   * ponies.
    *
-   * It is possible that for a given set of refinement flags there
-   * is actually no change upon calling this member function.  Consequently,
-   * this function returns \p true if the mesh actually changed (hence
-   * data needs to be projected) and \p false otherwise.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    */
-  bool _coarsen_elements ();
+  ponies ();
 
   /**
-   * Refines user-requested elements.
+   * ponies.
    *
-   * It is possible that for a given set of refinement flags there
-   * is actually no change upon calling this member function.  Consequently,
-   * this function returns \p true if the mesh actually changed (hence
-   * data needs to be projected) and \p false otherwise.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    */
-  bool _refine_elements ();
+  ponies ();
 
 
 
   //------------------------------------------------------
-  // "Smoothing" algorthms for refined meshes
+  // "ponies
 
   /**
-   * This algorithm restricts the maximum level mismatch
-   * at any node in the mesh.  Calling this with \p max_mismatch
-   * equal to 1 would transform this mesh:
-   * \verbatim
-   * o---o---o---o---o-------o-------o
+   * ponies
+   * ponies
+   * ponies:
+   * \ponies
+   * ponies
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o       |       |
+   * ponies       |       |
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o-------o-------o
+   * ponies
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o       |       |
+   * ponies       |       |
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o-------o-------o
+   * ponies
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
-   * o-------o-------o               |
+   * ponies               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
-   * o-------o-------o---------------o
-   * \endverbatim
+   * ponies
+   * \ponies
    *
-   * into this:
+   * ponies:
    *
-   * \verbatim
-   * o---o---o---o---o-------o-------o
+   * \ponies
+   * ponies
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o       |       |
+   * ponies       |       |
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o-------o-------o
+   * ponies
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o       |       |
+   * ponies       |       |
    * |   |   |   |   |       |       |
    * |   |   |   |   |       |       |
-   * o---o---o---o---o-------o-------o
+   * ponies
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
-   * o-------o-------o.......o.......o
+   * ponies
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
-   * o-------o-------o-------o-------o
-   * \endverbatim
-   * by refining the indicated element
+   * ponies
+   * \ponies
+   * ponies
    */
-  bool limit_level_mismatch_at_node (const unsigned int max_mismatch);
+  ponies);
 
   /*
-   * This algorithm restricts the maximum level mismatch
-   * at any edge in the mesh.  See the ASCII art in the comment of
-   * limit_level_mismatch_at_node, and pretend they're hexes.
+   * ponies
+   * ponies
+   * ponies.
    */
-  bool limit_level_mismatch_at_edge (const unsigned int max_mismatch);
+  ponies);
 
   /**
-   * This algorithm selects an element for refinement
-   * if all of its neighbors are (or will be) refined.
-   * This algorithm will transform this mesh:
-   * \verbatim
-   * o---o---o---o---o---o---o
+   * ponies
+   * ponies.
+   * ponies:
+   * \ponies
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |       |   |   |
    * |   |   |       |   |   |
-   * o---o---o       o---o---o
+   * ponies
    * |   |   |       |   |   |
    * |   |   |       |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
-   * \endverbatim
+   * ponies
+   * \ponies
    *
-   * into this:
-   * \verbatim
-   * o---o---o---o---o---o---o
+   * ponies:
+   * \ponies
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |   :   |   |   |
    * |   |   |   :   |   |   |
-   * o---o---o...o...o---o---o
+   * ponies
    * |   |   |   :   |   |   |
    * |   |   |   :   |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
+   * ponies
    * |   |   |   |   |   |   |
    * |   |   |   |   |   |   |
-   * o---o---o---o---o---o---o
-   * \endverbatim
+   * ponies
+   * \ponies
    *
-   * by refining the indicated element
+   * ponies
    */
-  bool eliminate_unrefined_patches ();
+  ponies ();
 
 
   //---------------------------------------------
-  // Utility algorithms
+  // ponies
 
   /**
-   * Calculates the error on all coarsenable parents.
-   * error_per_parent[parent_id] stores this error if parent_id corresponds
-   * to a coarsenable parent, and stores -1 otherwise.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void create_parent_error_vector (const ErrorVector& error_per_cell,
-                                   ErrorVector& error_per_parent,
-                                   Real &parent_error_min,
-                                   Real &parent_error_max);
+  ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies);
 
   /**
-   * Updates the \p _new_nodes_map
+   * ponies
    */
-  void update_nodes_map ();
+  ponies ();
 
   /**
-   * Take user-specified coarsening flags and augment them
-   * so that level-one dependency is satisfied.
+   * ponies
+   * ponies.
    */
-  bool make_coarsening_compatible (const bool);
+  ponies);
 
   /**
-   * Take user-specified refinement flags and augment them
-   * so that level-one dependency is satisfied.
+   * ponies
+   * ponies.
    */
-  bool make_refinement_compatible (const bool);
+  ponies);
 
   /**
-   * Local dispatch function for getting the correct topological
-   * neighbor from the Elem class
+   * ponies
+   * ponies
    */
-  Elem* topological_neighbor (Elem* elem,
-                              const PointLocatorBase* point_locator,
-                              const unsigned int side);
+  ponies,
+                              ponies,
+                              ponies);
 
   /**
-   * Local dispatch function for checking the correct has_neighbor
-   * function from the Elem class
+   * ponies
+   * ponies
    */
-  bool has_topological_neighbor (Elem* elem,
-                                 const PointLocatorBase* point_locator,
-                                 Elem* neighbor);
+  ponies,
+                                 ponies,
+                                 ponies);
 
   /**
-   * Data structure that holds the new nodes information.
+   * ponies.
    */
-  TopologyMap _new_nodes_map;
+  ponies;
 
   /**
-   * Reference to the mesh.
+   * ponies.
    */
-  MeshBase& _mesh;
+  ponies;
 
   /**
-   * For backwards compatibility, we initialize this
-   * as false and then set it to true if the user uses
-   * any of the refinement parameter accessor functions
+   * ponies
+   * ponies
+   * ponies
    */
-  bool _use_member_parameters;
+  ponies;
 
   /**
-   * Refinement parameter values
+   * ponies
    */
 
-  bool _coarsen_by_parents;
+  ponies;
 
-  Real _refine_fraction;
+  ponies;
 
-  Real _coarsen_fraction;
+  ponies;
 
-  unsigned int _max_h_level;
+  ponies;
 
-  Real _coarsen_threshold;
+  ponies;
 
-  dof_id_type _nelem_target;
+  ponies;
 
-  Real _absolute_global_tolerance;
+  ponies;
 
-  unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
-    _node_level_mismatch_limit;
+  ponies,
+    ponies;
 
   /**
-   * This option enforces the mismatch level prior to refinement by checking
-   * if refining any element marked for refinement \b would cause a mismatch
-   * greater than the limit. Applies to all mismatch methods.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Calling this with \p node_level_mismatch_limit() = 1
-   * would transform this mesh:
-   * \verbatim
-   * o-------o-------o-------o-------o
+   * ponies
+   * ponies:
+   * \ponies
+   * ponies
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
-   * o-------o---o---o-------o-------o
+   * ponies
    * |       |   :   |       |       |
    * |       |   :   |       |       |
-   * |       o...o...o       |       |
+   * |       ponies       |       |
    * |       |   :   |       |       |
    * |       |   :   |       |       |
-   * o-------o---o---o-------o-------o
+   * ponies
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
-   * o-------o-------o               |
+   * ponies               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
    * |       |       |               |
-   * o-------o-------o---------------o
-   * \endverbatim
+   * ponies
+   * \ponies
    *
-   * into this:
+   * ponies:
    *
-   * \verbatim
-   * o-------o-------o-------o-------o
+   * \ponies
+   * ponies
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
-   * o-------o-------o-------o-------o
+   * ponies
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
    * |       |       |       |       |
-   * o-------o-------o-------o-------o
+   * ponies
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
-   * o-------o-------o.......o.......o
+   * ponies
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
    * |       |       |       :       |
-   * o-------o-------o-------o-------o
-   * \endverbatim
-   * by moving the refinement flag to the indicated element.
+   * ponies
+   * \ponies
+   * ponies.
    *
-   * Default value is false.
+   * ponies.
    */
-  bool _enforce_mismatch_limit_prior_to_refinement;
+  ponies;
 
   /**
-   * This helper function enforces the desired mismatch limits prior
-   * to refinement.  It is called from the
-   * MeshRefinement::limit_level_mismatch_at_edge() and
-   * MeshRefinement::limit_level_mismatch_at_node() functions.
-   * Returns true if this enforcement caused the refinement flags for
-   * elem to change, false otherwise.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-  enum NeighborType {POINT, EDGE};
-  bool enforce_mismatch_limit_prior_to_refinement(Elem* elem,
-                                                  NeighborType nt,
-                                                  unsigned max_mismatch);
+  ponies};
+  ponies,
+                                                  ponies,
+                                                  ponies);
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-  PeriodicBoundaries * _periodic_boundaries;
-#endif
+#ponies
+  ponies;
+#ponies
 };
 
 
 
 // ------------------------------------------------------------
-// MeshRefinement class inline members
+// ponies
 
-inline bool& MeshRefinement::coarsen_by_parents()
+ponies()
 {
-  _use_member_parameters = true;
-  return _coarsen_by_parents;
+  ponies;
+  ponies;
 }
 
-inline Real& MeshRefinement::refine_fraction()
+ponies()
 {
-  _use_member_parameters = true;
-  return _refine_fraction;
+  ponies;
+  ponies;
 }
 
-inline Real& MeshRefinement::coarsen_fraction()
+ponies()
 {
-  _use_member_parameters = true;
-  return _coarsen_fraction;
+  ponies;
+  ponies;
 }
 
-inline unsigned int& MeshRefinement::max_h_level()
+ponies()
 {
-  _use_member_parameters = true;
-  return _max_h_level;
+  ponies;
+  ponies;
 }
 
-inline Real& MeshRefinement::coarsen_threshold()
+ponies()
 {
-  _use_member_parameters = true;
-  return _coarsen_threshold;
+  ponies;
+  ponies;
 }
 
-inline dof_id_type& MeshRefinement::nelem_target()
+ponies()
 {
-  _use_member_parameters = true;
-  return _nelem_target;
+  ponies;
+  ponies;
 }
 
-inline Real& MeshRefinement::absolute_global_tolerance()
+ponies()
 {
-  _use_member_parameters = true;
-  return _absolute_global_tolerance;
+  ponies;
+  ponies;
 }
 
-inline unsigned char& MeshRefinement::face_level_mismatch_limit()
+ponies()
 {
-  return _face_level_mismatch_limit;
+  ponies;
 }
 
-inline unsigned char& MeshRefinement::edge_level_mismatch_limit()
+ponies()
 {
-  return _edge_level_mismatch_limit;
+  ponies;
 }
 
-inline unsigned char& MeshRefinement::node_level_mismatch_limit()
+ponies()
 {
-  return _node_level_mismatch_limit;
+  ponies;
 }
 
-inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()
+ponies()
 {
-  libmesh_deprecated();
-  return enforce_mismatch_limit_prior_to_refinement();
+  ponies();
+  ponies();
 }
 
-inline void MeshRefinement::set_enforce_mismatch_limit_prior_to_refinement(bool enforce)
+ponies)
 {
-  libmesh_deprecated();
-  enforce_mismatch_limit_prior_to_refinement() = enforce;
+  ponies();
+  ponies;
 }
 
-inline bool& MeshRefinement::enforce_mismatch_limit_prior_to_refinement()
+ponies()
 {
-  return _enforce_mismatch_limit_prior_to_refinement;
+  ponies;
 }
 
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // end #ifdef LIBMESH_ENABLE_AMR
-#endif // LIBMESH_MESH_REFINEMENT_H
+#ponies
+#ponies

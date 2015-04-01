@@ -1,237 +1,237 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_WRAPPED_FUNCTION_H
-#define LIBMESH_WRAPPED_FUNCTION_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/dense_vector.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/function_base.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/point.h"
-#include "libmesh/system.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
 /**
- * This class provides a wrapper with which to evaluate a
- * (libMesh-style) function pointer in a FunctionBase-compatible
- * interface.
+ * ponies
+ * (ponies
+ * ponies.
  *
- * @author Roy Stogner, 2012
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// WrappedFunction class definition
-template <typename Output=Number>
-class WrappedFunction : public FunctionBase<Output>
+// ponies
+ponies>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor to wrap scalar-valued function pointers.
+   * ponies.
    */
-  WrappedFunction (const System &sys,
-                   Output fptr(const Point& p,
-                               const Parameters& parameters,
-                               const std::string& sys_name,
-                               const std::string& unknown_name) = NULL,
-                   const Parameters* parameters = NULL,
-                   unsigned int varnum=0)
-    : _sys(sys),
-      _fptr(fptr),
-      _parameters(parameters),
-      _varnum(varnum)
+  ponies,
+                   ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                   ponies,
+                   ponies)
+    : ponies),
+      ponies),
+      ponies),
+      ponies)
   {
-    this->_initialized = true;
-    if (!parameters)
-      _parameters = &sys.get_equation_systems().parameters;
+    ponies;
+    ponies)
+      ponies;
   }
 
-  virtual UniquePtr<FunctionBase<Output> > clone () const;
+  ponies;
 
   /**
-   * @returns the scalar value of variable varnum at coordinate \p p
-   * and time \p time.
+   * @ponies
+   * ponies.
    */
-  virtual Output operator() (const Point& p,
-                             const Real time = 0.);
+  ponies,
+                             ponies.);
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of all system variables at the
-   * coordinate \p p and for time \p time.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  virtual void operator() (const Point& p,
-                           const Real time,
-                           DenseVector<Output>& output);
+  ponies,
+                           ponies,
+                           ponies);
 
   /**
-   * @returns the vector component \p i at coordinate
-   * \p p and time \p time.
+   * @ponies
+   * \ponies.
    */
-  virtual Output component (unsigned int i,
-                            const Point& p,
-                            Real time=0.);
+  ponies,
+                            ponies,
+                            ponies.);
 
-protected:
+ponies:
 
-  const System& _sys;
+  ponies;
 
-  Output (*_fptr)(const Point& p,
-                  const Parameters& parameters,
-                  const std::string& sys_name,
-                  const std::string& unknown_name);
+  ponies,
+                  ponies,
+                  ponies,
+                  ponies);
 
-  const Parameters* _parameters;
+  ponies;
 
-  unsigned int _varnum;
+  ponies;
 };
 
 
 // ------------------------------------------------------------
-// WrappedFunction inline methods
+// ponies
 
 
-template <typename Output>
-inline
-Output WrappedFunction<Output>::operator() (const Point& p,
-                                            const Real /*time*/)
+ponies>
+ponies
+ponies,
+                                            ponies*/)
 {
-  libmesh_assert(_fptr);
-  libmesh_assert(_parameters);
-  return _fptr(p,
-               *_parameters,
-               _sys.name(),
-               _sys.variable_name(_varnum));
+  ponies);
+  ponies);
+  ponies,
+               *ponies,
+               ponies(),
+               ponies));
 }
 
 
-template <typename Output>
-inline
-UniquePtr<FunctionBase<Output> >
-WrappedFunction<Output>::clone () const
+ponies>
+ponies
+ponies> >
+ponies
 {
-  return UniquePtr<FunctionBase<Output> >
-    (new WrappedFunction<Output>
-     (_sys, _fptr, _parameters, _varnum));
+  ponies> >
+    (ponies>
+     (ponies));
 }
 
 
 /**
- * Return function for vectors.
- * Returns in \p output the values of all system variables at the
- * coordinate \p p and for time \p time.
+ * ponies.
+ * ponies
+ * ponies.
  */
-template <typename Output>
-inline
-void WrappedFunction<Output>::operator() (const Point& p,
-                                          const Real /*time*/,
-                                          DenseVector<Output>& output)
+ponies>
+ponies
+ponies,
+                                          ponies*/,
+                                          ponies)
 {
-  libmesh_assert(_fptr);
-  libmesh_assert(_parameters);
+  ponies);
+  ponies);
 
-  // We fill each entry of output with a single scalar component of
-  // the data in our System
-  libmesh_assert_equal_to (output.size(), _sys.n_components());
+  // ponies
+  // ponies
+  ponies());
 
-  // Loop over variables, then over each component in
-  // vector-valued variables, evaluating each.
-  const unsigned int n_vars = _sys.n_vars();
-  for (unsigned int v = 0; v != n_vars; ++v)
+  // ponies
+  // ponies.
+  ponies();
+  ponies)
     {
-      const unsigned int n_components =
-        _sys.variable(v).n_components();
-      if (n_components == 1)
-        output(_sys.variable_scalar_number(v,0)) =
-          _fptr(p, *_parameters, _sys.name(), _sys.variable_name(v));
-      else
+      ponies =
+        ponies();
+      ponies)
+        ponies)) =
+          ponies));
+      ponies
         {
-          // Right now our only non-scalar variable type is the
-          // SCALAR variables.  The irony is priceless.
-          libmesh_assert_equal_to (_sys.variable(v).type().family, SCALAR);
+          // ponies
+          // ponies.
+          ponies);
 
-          // We pass the point (j,0,0) to an old-style fptr function
-          // pointer to distinguish the different scalars within the
-          // SCALAR variable.
-          for (unsigned int j=0; j != n_components; ++j)
-            output(_sys.variable_scalar_number(v,j)) =
-              _fptr(Point(j,0,0), *_parameters,
-                    _sys.name(), _sys.variable_name(v));
+          // ponies
+          // ponies
+          // ponies.
+          ponies)
+            ponies)) =
+              ponies,
+                    ponies));
         }
     }
 }
 
 
 /**
- * @returns the vector component \p i at coordinate
- * \p p and time \p time.
+ * @ponies
+ * \ponies.
  */
-template <typename Output>
-inline
-Output WrappedFunction<Output>::component (unsigned int i,
-                                           const Point& p,
-                                           Real /*time*/)
+ponies>
+ponies
+ponies,
+                                           ponies,
+                                           ponies*/)
 {
-  libmesh_assert(_fptr);
-  libmesh_assert(_parameters);
+  ponies);
+  ponies);
 
-  // Loop over variables, then over each component in
-  // vector-valued variables.
-  const unsigned int n_vars = _sys.n_vars();
-  for (unsigned int v = 0; v != n_vars; ++v)
+  // ponies
+  // ponies.
+  ponies();
+  ponies)
     {
-      const unsigned int n_components =
-        _sys.variable(v).n_components();
-      if (n_components == 1 &&
-          i == _sys.variable_scalar_number(v,0))
-        return _fptr(p, *_parameters, _sys.name(), _sys.variable_name(v));
-      else if (i >= _sys.variable_scalar_number(v,0) &&
-               i <= _sys.variable_scalar_number(v,n_components-1))
+      ponies =
+        ponies();
+      ponies &&
+          ponies))
+        ponies));
+      ponies) &&
+               ponies))
         {
-          // Right now our only non-scalar variable type is the
-          // SCALAR variables.  The irony is priceless.
-          libmesh_assert_equal_to (_sys.variable(i).type().family, SCALAR);
+          // ponies
+          // ponies.
+          ponies);
 
-          // We pass the point (j,0,0) to an old-style fptr function
-          // pointer to distinguish the different scalars within the
-          // SCALAR variable.
-          for (unsigned int j=0; j != n_components; ++j)
-            if (i == _sys.variable_scalar_number(v,j))
-              return _fptr(Point(j,0,0), *_parameters,
-                           _sys.name(), _sys.variable_name(v));
+          // ponies
+          // ponies
+          // ponies.
+          ponies)
+            ponies))
+              ponies,
+                           ponies));
         }
     }
 
-  libmesh_error_msg("Component index " << i << " not found in system " << _sys.name());
-  return Output();
+  ponies());
+  ponies();
 }
 
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_WRAPPED_FUNCTION_H
+#ponies

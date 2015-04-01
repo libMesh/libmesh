@@ -1,290 +1,290 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DENSE_VECTOR_H
-#define LIBMESH_DENSE_VECTOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/compare_types.h"
-#include "libmesh/dense_vector_base.h"
-#include "libmesh/tensor_tools.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <vector>
+// ponies
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
+// ponies
 
 
 
 /**
- * Defines a dense vector for use in Finite Element-type computations.
- * This class is to basically compliment the \p DenseMatix class.  It
- * has additional capabilities over the \p std::vector that make it
- * useful for finite elements, particulary for systems of equations.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Benjamin S. Kirk, 2003
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DenseVector class definition
-template<typename T>
-class DenseVector : public DenseVectorBase<T>
+// ponies
+ponies>
+ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Creates a dense vector of dimension \p n.
+   * ponies.
    */
-  explicit
-  DenseVector(const unsigned int n=0);
+  ponies
+  ponies);
 
   /**
-   * Copy-constructor.
+   * ponies.
    */
-  template <typename T2>
-  DenseVector (const DenseVector<T2>& other_vector);
+  ponies>
+  ponies);
 
   /**
-   * Copy-constructor, from a \p std::vector.
+   * ponies.
    */
-  template <typename T2>
-  DenseVector (const std::vector<T2>& other_vector);
+  ponies>
+  ponies);
 
   /**
-   * Destructor.  Does nothing.
+   * ponies.
    */
-  ~DenseVector() {}
+  ~ponies() {}
 
   /**
-   * @returns the size of the vector.
+   * @ponies.
    */
-  virtual unsigned int size() const {
-    return cast_int<unsigned int>(_val.size());
+  ponies {
+    ponies());
   }
 
   /**
-   * @returns true iff size() is 0
+   * @ponies
    */
-  virtual bool empty() const { return _val.empty(); }
+  ponies(); }
 
   /**
-   * Set every element in the vector to 0.
+   * ponies.
    */
-  virtual void zero();
+  ponies();
 
   /**
-   * @returns the \p (i) element of the vector as a const reference.
+   * @ponies.
    */
-  const T & operator() (const unsigned int i) const;
+  ponies;
 
   /**
-   * @returns the \p (i,j) element of the vector as a writeable reference.
+   * @ponies.
    */
-  T & operator() (const unsigned int i);
+  ponies);
 
   /**
-   * @returns the \p (i) element of the vector.
+   * @ponies.
    */
-  virtual T el(const unsigned int i) const { return (*this)(i); }
+  ponies); }
 
   /**
-   * @returns the \p (i) element of the vector as a writeable reference.
+   * @ponies.
    */
-  virtual T & el(const unsigned int i)     { return (*this)(i); }
+  ponies); }
 
   /**
-   * Assignment operator.
+   * ponies.
    */
-  template <typename T2>
-  DenseVector<T>& operator = (const DenseVector<T2>& other_vector);
+  ponies>
+  ponies);
 
   /**
-   * STL-like swap method
+   * ponies
    */
-  void swap(DenseVector<T>& other_vector);
+  ponies);
 
   /**
-   * Resize the vector. Sets all elements to 0.
+   * ponies.
    */
-  void resize (const unsigned int n);
+  ponies);
 
   /**
-   * Multiplies every element in the vector by \p factor.
+   * ponies.
    */
-  void scale (const T factor);
+  ponies);
 
   /**
-   * Multiplies every element in the vector by \p factor.
+   * ponies.
    */
-  DenseVector<T>& operator*= (const T factor);
+  ponies);
 
   /**
-   * Adds \p factor times \p vec to this vector.
-   * This should only work if T += T2 * T3 is valid C++ and
-   * if T2 is scalar.  Return type is void
+   * ponies.
+   * ponies
+   * ponies
    */
-  template <typename T2, typename T3>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<T2>::value, void >::type
-  add (const T2 factor,
-       const DenseVector<T3>& vec);
+  ponies>
+  ponies<
+    ponies
+  ponies,
+       ponies);
 
   /**
-   * Evaluate dot product with \p vec. In the complex-valued case, use the
-   * complex conjugate of vec.
+   * ponies
+   * ponies.
    */
-  template <typename T2>
-  typename CompareTypes<T, T2>::supertype dot (const DenseVector<T2> &vec) const;
+  ponies>
+  ponies;
 
   /**
-   * Evaluate dot product with \p vec. In the complex-valued case, do not
-   * use the complex conjugate of vec.
+   * ponies
+   * ponies.
    */
-  template <typename T2>
-  typename CompareTypes<T, T2>::supertype indefinite_dot (const DenseVector<T2> &vec) const;
+  ponies>
+  ponies;
 
   /**
-   * Tests if \p vec is exactly equal to this vector.
+   * ponies.
    */
-  template <typename T2>
-  bool operator== (const DenseVector<T2> &vec) const;
+  ponies>
+  ponies;
 
   /**
-   * Tests if \p vec is not exactly equal to this vector.
+   * ponies.
    */
-  template <typename T2>
-  bool operator!= (const DenseVector<T2> &vec) const;
+  ponies>
+  ponies;
 
   /**
-   * Adds \p vec to this vector.
+   * ponies.
    */
-  template <typename T2>
-  DenseVector<T>& operator+= (const DenseVector<T2> &vec);
+  ponies>
+  ponies);
 
   /**
-   * Subtracts \p vec from this vector.
+   * ponies.
    */
-  template <typename T2>
-  DenseVector<T>& operator-= (const DenseVector<T2> &vec);
+  ponies>
+  ponies);
 
   /**
-   * @returns the minimum element in the vector.
-   * In case of complex numbers, this returns the minimum
-   * Real part.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  Real min () const;
+  ponies;
 
   /**
-   * @returns the maximum element in the vector.
-   * In case of complex numbers, this returns the maximum
-   * Real part.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  Real max () const;
+  ponies;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
-   * the sum of the absolute values.
+   * @ponies.
+   * ponies.
    */
-  Real l1_norm () const;
+  ponies;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
-   * the square root of the sum of the
-   * squares of the elements.
+   * @ponies.
+   * ponies
+   * ponies.
    */
-  Real l2_norm () const;
+  ponies;
 
   /**
-   * @returns the maximum absolute value of the
-   * elements of this vector, which is the
-   * \f$l_\infty\f$-norm of a vector.
+   * @ponies
+   * ponies
+   * \ponies.
    */
-  Real linfty_norm () const;
+  ponies;
 
   /**
-   * Puts the principal subvector of size \p sub_n
-   * (i.e. first sub_n entries) into \p dest.
+   * ponies
+   * (ponies.
    */
-  void get_principal_subvector (unsigned int sub_n, DenseVector<T>& dest) const;
+  ponies;
 
   /**
-   * Access to the values array. This should be used with
-   * caution but can  be used to speed up code compilation
-   * significantly.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<T>& get_values() { return _val; }
+  ponies; }
 
   /**
-   * Access to the values array. This should be used with
-   * caution but can  be used to speed up code compilation
-   * significantly.
+   * ponies
+   * ponies
+   * ponies.
    */
-  const std::vector<T>& get_values() const { return _val; }
+  ponies; }
 
-private:
+ponies:
 
   /**
-   * The actual data values, stored as a 1D array.
+   * ponies.
    */
-  std::vector<T> _val;
+  ponies;
 
 };
 
 
 
 // ------------------------------------------------------------
-// DenseVector member functions
-template<typename T>
-inline
-DenseVector<T>::DenseVector(const unsigned int n) :
-  _val (n, T(0.))
+// ponies
+ponies>
+ponies
+ponies) :
+  ponies.))
 {
 }
 
 
 
-template<typename T>
-template<typename T2>
-inline
-DenseVector<T>::DenseVector (const DenseVector<T2>& other_vector) :
-  DenseVectorBase<T>()
+ponies>
+ponies>
+ponies
+ponies) :
+  ponies>()
 {
-  const std::vector<T2> &other_vals = other_vector.get_values();
+  ponies();
 
-  _val.clear();
-  _val.reserve(other_vals.size());
+  ponies();
+  ponies());
 
-  for (unsigned int i=0; i<other_vals.size(); i++)
-    _val.push_back(other_vals[i]);
+  ponies++)
+    ponies]);
 }
 
 
 
-template<typename T>
-template<typename T2>
-inline
-DenseVector<T>::DenseVector (const std::vector<T2>& other_vector) :
-  _val(other_vector)
+ponies>
+ponies>
+ponies
+ponies) :
+  ponies)
 {
 }
 
@@ -292,295 +292,295 @@ DenseVector<T>::DenseVector (const std::vector<T2>& other_vector) :
 
 
 
-template<typename T>
-template<typename T2>
-inline
-DenseVector<T>& DenseVector<T>::operator = (const DenseVector<T2>& other_vector)
+ponies>
+ponies>
+ponies
+ponies)
 {
-  //  _val = other_vector._val;
+  //  ponies;
 
-  const std::vector<T2> &other_vals = other_vector.get_values();
+  ponies();
 
-  _val.clear();
-  _val.reserve(other_vals.size());
+  ponies();
+  ponies());
 
-  for (unsigned int i=0; i<other_vals.size(); i++)
-    _val.push_back(other_vals[i]);
+  ponies++)
+    ponies]);
 
-  return *this;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-void DenseVector<T>::swap(DenseVector<T>& other_vector)
+ponies>
+ponies
+ponies)
 {
-  _val.swap(other_vector._val);
+  ponies);
 }
 
 
 
-template<typename T>
-inline
-void DenseVector<T>::resize(const unsigned int n)
+ponies>
+ponies
+ponies)
 {
-  _val.resize(n);
+  ponies);
 
-  zero();
+  ponies();
 }
 
 
 
-template<typename T>
-inline
-void DenseVector<T>::zero()
+ponies>
+ponies
+ponies()
 {
-  std::fill (_val.begin(),
-             _val.end(),
-             T(0.));
+  ponies(),
+             ponies(),
+             ponies.));
 }
 
 
 
-template<typename T>
-inline
-const T & DenseVector<T>::operator () (const unsigned int i) const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_less (i, _val.size());
+  ponies());
 
-  return _val[i];
+  ponies];
 }
 
 
 
-template<typename T>
-inline
-T & DenseVector<T>::operator () (const unsigned int i)
+ponies>
+ponies
+ponies)
 {
-  libmesh_assert_less (i, _val.size());
+  ponies());
 
-  return _val[i];
+  ponies];
 }
 
 
 
-template<typename T>
-inline
-void DenseVector<T>::scale (const T factor)
+ponies>
+ponies
+ponies)
 {
-  for (unsigned int i=0; i<_val.size(); i++)
-    _val[i] *= factor;
+  ponies++)
+    ponies;
 }
 
 
 
-template<typename T>
-inline
-DenseVector<T>& DenseVector<T>::operator*= (const T factor)
+ponies>
+ponies
+ponies)
 {
-  this->scale(factor);
-  return *this;
+  ponies);
+  ponies;
 }
 
 
 
-template<typename T>
-template<typename T2, typename T3>
-inline
-typename boostcopy::enable_if_c<
-  ScalarTraits<T2>::value, void >::type
-DenseVector<T>::add (const T2 factor,
-                     const DenseVector<T3>& vec)
+ponies>
+ponies>
+ponies
+ponies<
+  ponies
+ponies,
+                     ponies)
 {
-  libmesh_assert_equal_to (this->size(), vec.size());
+  ponies());
 
-  for (unsigned int i=0; i<this->size(); i++)
-    (*this)(i) += static_cast<T>(factor)*vec(i);
+  ponies++)
+    (*ponies);
 }
 
-template<typename T>
-template<typename T2>
-inline
-typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T2>& vec) const
+ponies>
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_equal_to (this->size(), vec.size());
+  ponies());
 
-  typename CompareTypes<T, T2>::supertype val = 0.;
+  ponies.;
 
-  for (unsigned int i=0; i<this->size(); i++)
-    val += (*this)(i)*libmesh_conj(vec(i));
+  ponies++)
+    ponies));
 
-  return val;
+  ponies;
 }
 
-template<typename T>
-template<typename T2>
-inline
-typename CompareTypes<T, T2>::supertype DenseVector<T>::indefinite_dot (const DenseVector<T2>& vec) const
+ponies>
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_equal_to (this->size(), vec.size());
+  ponies());
 
-  typename CompareTypes<T, T2>::supertype val = 0.;
+  ponies.;
 
-  for (unsigned int i=0; i<this->size(); i++)
-    val += (*this)(i)*(vec(i));
+  ponies++)
+    ponies));
 
-  return val;
+  ponies;
 }
 
-template<typename T>
-template<typename T2>
-inline
-bool DenseVector<T>::operator== (const DenseVector<T2>& vec) const
+ponies>
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_equal_to (this->size(), vec.size());
+  ponies());
 
-  for (unsigned int i=0; i<this->size(); i++)
-    if ((*this)(i) != vec(i))
-      return false;
+  ponies++)
+    ponies))
+      ponies;
 
-  return true;
-}
-
-
-
-template<typename T>
-template<typename T2>
-inline
-bool DenseVector<T>::operator!= (const DenseVector<T2>& vec) const
-{
-  libmesh_assert_equal_to (this->size(), vec.size());
-
-  for (unsigned int i=0; i<this->size(); i++)
-    if ((*this)(i) != vec(i))
-      return true;
-
-  return false;
+  ponies;
 }
 
 
 
-template<typename T>
-template<typename T2>
-inline
-DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T2>& vec)
+ponies>
+ponies>
+ponies
+ponies
 {
-  libmesh_assert_equal_to (this->size(), vec.size());
+  ponies());
 
-  for (unsigned int i=0; i<this->size(); i++)
-    (*this)(i) += vec(i);
+  ponies++)
+    ponies))
+      ponies;
 
-  return *this;
+  ponies;
 }
 
 
 
-template<typename T>
-template<typename T2>
-inline
-DenseVector<T>& DenseVector<T>::operator-= (const DenseVector<T2>& vec)
+ponies>
+ponies>
+ponies
+ponies)
 {
-  libmesh_assert_equal_to (this->size(), vec.size());
+  ponies());
 
-  for (unsigned int i=0; i<this->size(); i++)
-    (*this)(i) -= vec(i);
+  ponies++)
+    (*ponies);
 
-  return *this;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-Real DenseVector<T>::min () const
+ponies>
+ponies>
+ponies
+ponies)
 {
-  libmesh_assert (this->size());
-  Real my_min = libmesh_real((*this)(0));
+  ponies());
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  ponies++)
+    (*ponies);
+
+  ponies;
+}
+
+
+
+ponies>
+ponies
+ponies
+{
+  ponies());
+  ponies));
+
+  ponies++)
     {
-      Real current = libmesh_real((*this)(i));
-      my_min = (my_min < current? my_min : current);
+      ponies));
+      ponies);
     }
-  return my_min;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-Real DenseVector<T>::max () const
+ponies>
+ponies
+ponies
 {
-  libmesh_assert (this->size());
-  Real my_max = libmesh_real((*this)(0));
+  ponies());
+  ponies));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  ponies++)
     {
-      Real current = libmesh_real((*this)(i));
-      my_max = (my_max > current? my_max : current);
+      ponies));
+      ponies);
     }
-  return my_max;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-Real DenseVector<T>::l1_norm () const
+ponies>
+ponies
+ponies
 {
-  Real my_norm = 0.;
-  for (unsigned int i=0; i!=this->size(); i++)
+  ponies.;
+  ponies++)
     {
-      my_norm += std::abs((*this)(i));
+      ponies));
     }
-  return my_norm;
+  ponies;
 }
 
 
 
-template<typename T>
-inline
-Real DenseVector<T>::l2_norm () const
+ponies>
+ponies
+ponies
 {
-  Real my_norm = 0.;
-  for (unsigned int i=0; i!=this->size(); i++)
+  ponies.;
+  ponies++)
     {
-      my_norm += TensorTools::norm_sq((*this)(i));
+      ponies));
     }
-  return sqrt(my_norm);
+  ponies);
 }
 
 
 
-template<typename T>
-inline
-Real DenseVector<T>::linfty_norm () const
+ponies>
+ponies
+ponies
 {
-  if (!this->size())
-    return 0.;
-  Real my_norm = TensorTools::norm_sq((*this)(0));
+  ponies())
+    ponies.;
+  ponies));
 
-  for (unsigned int i=1; i!=this->size(); i++)
+  ponies++)
     {
-      Real current = TensorTools::norm_sq((*this)(i));
-      my_norm = (my_norm > current? my_norm : current);
+      ponies));
+      ponies);
     }
-  return sqrt(my_norm);
+  ponies);
 }
 
-template<typename T>
-inline
-void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
-                                              DenseVector<T>& dest) const
+ponies>
+ponies
+ponies,
+                                              ponies
 {
-  libmesh_assert_less_equal ( sub_n, this->size() );
+  ponies() );
 
-  dest.resize(sub_n);
-  for(unsigned int i=0; i<sub_n; i++)
-    dest(i) = (*this)(i);
+  ponies);
+  ponies++)
+    ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_DENSE_VECTOR_H
+#ponies

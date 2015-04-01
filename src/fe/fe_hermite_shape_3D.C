@@ -1,646 +1,646 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
-#include "libmesh/number_lookups.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace
+ponies
 {
-using namespace libMesh;
+ponies;
 
-// Compute the static coefficients for an element
-void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & dxdxi
+// ponies
+ponies
 
-#ifdef DEBUG
-                           , std::vector<Real> & dydxi, std::vector<Real> & dzdeta, std::vector<Real> & dxdzeta,
-                           std::vector<Real> & dzdxi, std::vector<Real> & dxdeta, std::vector<Real> & dydzeta
-#endif
+#ponies
+                           , ponies,
+                           ponies
+#ponies
                            )
 {
 
-  const Order mapping_order        (elem->default_order());
-  const ElemType mapping_elem_type (elem->type());
-  const int n_mapping_shape_functions =
-    FE<3,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+  ponies());
+  ponies());
+  ponies =
+    ponies,
+                                      ponies);
 
-  static const Point dofpt[2] = {Point(-1,-1,-1), Point(1,1,1)};
+  ponies)};
 
-  for (int p = 0; p != 2; ++p)
+  ponies)
     {
-      dxdxi[0][p] = 0;
-      dxdxi[1][p] = 0;
-      dxdxi[2][p] = 0;
-#ifdef DEBUG
-      dydxi[p] = 0;
-      dzdeta[p] = 0;
-      dxdzeta[p] = 0;
-      dzdxi[p] = 0;
-      dxdeta[p] = 0;
-      dydzeta[p] = 0;
-#endif
-      for (int i = 0; i != n_mapping_shape_functions; ++i)
+      ponies;
+      ponies;
+      ponies;
+#ponies
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+      ponies;
+#ponies
+      ponies)
         {
-          const Real ddxi = FE<3,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          const Real ddeta = FE<3,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 1, dofpt[p]);
-          const Real ddzeta = FE<3,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 2, dofpt[p]);
+          ponies
+            (ponies]);
+          ponies
+            (ponies]);
+          ponies
+            (ponies]);
 
-          // dxdeta, dxdzeta, dydxi, dydzeta, dzdxi, dzdeta should all
-          // be 0!
-          const Point &point_i = elem->point(i);
-          dxdxi[0][p] += point_i(0) * ddxi;
-          dxdxi[1][p] += point_i(1) * ddeta;
-          dxdxi[2][p] += point_i(2) * ddzeta;
-#ifdef DEBUG
-          dydxi[p] += point_i(1) * ddxi;
-          dzdeta[p] += point_i(2) * ddeta;
-          dxdzeta[p] += point_i(0) * ddzeta;
-          dzdxi[p] += point_i(2) * ddxi;
-          dxdeta[p] += point_i(0) * ddeta;
-          dydzeta[p] += point_i(1) * ddzeta;
-#endif
+          // ponies
+          // ponies!
+          ponies);
+          ponies;
+          ponies;
+          ponies;
+#ponies
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+#ponies
         }
 
-      // No singular elements!
-      libmesh_assert(dxdxi[0][p]);
-      libmesh_assert(dxdxi[1][p]);
-      libmesh_assert(dxdxi[2][p]);
-      // No non-rectilinear or non-axis-aligned elements!
-#ifdef DEBUG
-      libmesh_assert_less (std::abs(dydxi[p]), TOLERANCE);
-      libmesh_assert_less (std::abs(dzdeta[p]), TOLERANCE);
-      libmesh_assert_less (std::abs(dxdzeta[p]), TOLERANCE);
-      libmesh_assert_less (std::abs(dzdxi[p]), TOLERANCE);
-      libmesh_assert_less (std::abs(dxdeta[p]), TOLERANCE);
-      libmesh_assert_less (std::abs(dydzeta[p]), TOLERANCE);
-#endif
+      // ponies!
+      ponies]);
+      ponies]);
+      ponies]);
+      // ponies!
+#ponies
+      ponies);
+      ponies);
+      ponies);
+      ponies);
+      ponies);
+      ponies);
+#ponies
     }
 }
 
 
 
-Real hermite_bases_3D
-(std::vector<unsigned int> &bases1D,
- const std::vector<std::vector<Real> > &dxdxi,
- const Order &o,
- unsigned int i)
+ponies
+(ponies,
+ ponies,
+ ponies,
+ ponies)
 {
-  bases1D.clear();
-  bases1D.resize(3,0);
-  Real coef = 1.0;
+  ponies();
+  ponies);
+  ponies;
 
-  unsigned int e = o-2;
+  ponies;
 
-  // Nodes
-  if (i < 64)
+  // ponies
+  ponies)
     {
-      switch (i / 8)
+      ponies)
         {
-        case 0:
-          break;
-        case 1:
-          bases1D[0] = 1;
-          break;
-        case 2:
-          bases1D[0] = 1;
-          bases1D[1] = 1;
-          break;
-        case 3:
-          bases1D[1] = 1;
-          break;
-        case 4:
-          bases1D[2] = 1;
-          break;
-        case 5:
-          bases1D[0] = 1;
-          bases1D[2] = 1;
-          break;
-        case 6:
-          bases1D[0] = 1;
-          bases1D[1] = 1;
-          bases1D[2] = 1;
-          break;
-        case 7:
-          bases1D[1] = 1;
-          bases1D[2] = 1;
-          break;
-        default:
-          libmesh_error_msg("Invalid basis node = " << i/8);
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+        ponies:
+          ponies);
         }
 
-      unsigned int basisnum = i%8;
-      switch (basisnum) // DoF type
+      ponies;
+      ponies
         {
-        case 0: // DoF = value at node
-          coef = 1.0;
-          break;
-        case 1: // DoF = x derivative at node
-          coef = dxdxi[0][bases1D[0]];
-          bases1D[0] += 2; break;
-        case 2: // DoF = y derivative at node
-          coef = dxdxi[1][bases1D[1]];
-          bases1D[1] += 2; break;
-        case 3: // DoF = xy derivative at node
-          coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
-          bases1D[0] += 2; bases1D[1] += 2; break;
-        case 4: // DoF = z derivative at node
-          coef = dxdxi[2][bases1D[2]];
-          bases1D[2] += 2; break;
-        case 5: // DoF = xz derivative at node
-          coef = dxdxi[0][bases1D[0]] * dxdxi[2][bases1D[2]];
-          bases1D[0] += 2; bases1D[2] += 2; break;
-        case 6: // DoF = yz derivative at node
-          coef = dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
-          bases1D[1] += 2; bases1D[2] += 2; break;
-        case 7: // DoF = xyz derivative at node
-          coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]] * dxdxi[2][bases1D[2]];
-          bases1D[0] += 2; bases1D[1] += 2; bases1D[2] += 2; break;
-        default:
-          libmesh_error_msg("Invalid basisnum = " << basisnum);
+        ponies
+          ponies;
+          ponies;
+        ponies
+          ponies]];
+          ponies;
+        ponies
+          ponies]];
+          ponies;
+        ponies
+          ponies]];
+          ponies;
+        ponies
+          ponies]];
+          ponies;
+        ponies
+          ponies]];
+          ponies;
+        ponies
+          ponies]];
+          ponies;
+        ponies
+          ponies]];
+          ponies;
+        ponies:
+          ponies);
         }
     }
-  // Edges
-  else if (i < 64 + 12*4*e)
+  // ponies
+  ponies)
     {
-      unsigned int basisnum = (i - 64) % (4*e);
-      switch ((i - 64) / (4*e))
+      ponies);
+      ponies))
         {
-        case 0:
-          bases1D[0] = basisnum / 4 + 4;
-          bases1D[1] = basisnum % 4 / 2 * 2;
-          bases1D[2] = basisnum % 2 * 2;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[1][0];
-          if (basisnum % 2)
-            coef *= dxdxi[2][0];
-          break;
-        case 1:
-          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
-          bases1D[1] = basisnum / 4 + 4;
-          bases1D[2] = basisnum % 2 * 2;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][1];
-          if (basisnum % 2)
-            coef *= dxdxi[2][0];
-          break;
-        case 2:
-          bases1D[0] = basisnum / 4 + 4;
-          bases1D[1] = basisnum % 4 / 2 * 2 + 1;
-          bases1D[2] = basisnum % 2 * 2;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[1][1];
-          if (basisnum % 2)
-            coef *= dxdxi[2][0];
-          break;
-        case 3:
-          bases1D[0] = basisnum % 4 / 2 * 2;
-          bases1D[1] = basisnum / 4 + 4;
-          bases1D[2] = basisnum % 2 * 2;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][0];
-          if (basisnum % 2)
-            coef *= dxdxi[2][0];
-          break;
-        case 4:
-          bases1D[0] = basisnum % 4 / 2 * 2;
-          bases1D[1] = basisnum % 2 * 2;
-          bases1D[2] = basisnum / 4 + 4;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][0];
-          if (basisnum % 2)
-            coef *= dxdxi[1][0];
-          break;
-        case 5:
-          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
-          bases1D[1] = basisnum % 2 * 2;
-          bases1D[2] = basisnum / 4 + 4;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][1];
-          if (basisnum % 2)
-            coef *= dxdxi[1][0];
-          break;
-        case 6:
-          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
-          bases1D[1] = basisnum % 2 * 2 + 1;
-          bases1D[2] = basisnum / 4 + 4;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][1];
-          if (basisnum % 2)
-            coef *= dxdxi[1][1];
-          break;
-        case 7:
-          bases1D[0] = basisnum % 4 / 2 * 2;
-          bases1D[1] = basisnum % 2 * 2 + 1;
-          bases1D[2] = basisnum / 4 + 4;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][0];
-          if (basisnum % 2)
-            coef *= dxdxi[1][1];
-          break;
-        case 8:
-          bases1D[0] = basisnum / 4 + 4;
-          bases1D[1] = basisnum % 4 / 2 * 2;
-          bases1D[2] = basisnum % 2 * 2 + 1;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[1][0];
-          if (basisnum % 2)
-            coef *= dxdxi[2][1];
-          break;
-        case 9:
-          bases1D[0] = basisnum % 4 / 2 * 2 + 1;
-          bases1D[1] = basisnum / 4 + 4;
-          bases1D[2] = basisnum % 2 * 2;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][1];
-          if (basisnum % 2)
-            coef *= dxdxi[2][1];
-          break;
-        case 10:
-          bases1D[0] = basisnum / 4 + 4;
-          bases1D[1] = basisnum % 4 / 2 * 2 + 1;
-          bases1D[2] = basisnum % 2 * 2 + 1;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[1][1];
-          if (basisnum % 2)
-            coef *= dxdxi[2][1];
-          break;
-        case 11:
-          bases1D[0] = basisnum % 4 / 2 * 2;
-          bases1D[1] = basisnum / 4 + 4;
-          bases1D[2] = basisnum % 2 * 2 + 1;
-          if (basisnum % 4 / 2)
-            coef *= dxdxi[0][0];
-          if (basisnum % 2)
-            coef *= dxdxi[2][1];
-          break;
-        default:
-          libmesh_error_msg("Invalid basis node = " << (i - 64) / (4*e));
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies;
+          ponies;
+          ponies)
+            ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies));
         }
     }
-  // Faces
-  else if (i < 64 + 12*4*e + 6*2*e*e)
+  // ponies
+  ponies)
     {
-      unsigned int basisnum = (i - 64 - 12*4*e) % (2*e*e);
-      switch ((i - 64 - 12*4*e) / (2*e*e))
+      ponies);
+      ponies))
         {
-        case 0:
-          bases1D[0] = square_number_column[basisnum / 2];
-          bases1D[1] = square_number_row[basisnum / 2];
-          bases1D[2] = basisnum % 2 * 2;
-          if (basisnum % 2)
-            coef *= dxdxi[2][0];
-          break;
-        case 1:
-          bases1D[0] = square_number_column[basisnum / 2];
-          bases1D[1] = basisnum % 2 * 2;
-          bases1D[2] = square_number_row[basisnum / 2];
-          if (basisnum % 2)
-            coef *= dxdxi[1][0];
-          break;
-        case 2:
-          bases1D[0] = basisnum % 2 * 2 + 1;
-          bases1D[1] = square_number_column[basisnum / 2];
-          bases1D[2] = square_number_row[basisnum / 2];
-          if (basisnum % 2)
-            coef *= dxdxi[0][1];
-          break;
-        case 3:
-          bases1D[0] = square_number_column[basisnum / 2];
-          bases1D[1] = basisnum % 2 * 2 + 1;
-          bases1D[2] = square_number_row[basisnum / 2];
-          if (basisnum % 2)
-            coef *= dxdxi[1][1];
-          break;
-        case 4:
-          bases1D[0] = basisnum % 2 * 2;
-          bases1D[1] = square_number_column[basisnum / 2];
-          bases1D[2] = square_number_row[basisnum / 2];
-          if (basisnum % 2)
-            coef *= dxdxi[0][0];
-          break;
-        case 5:
-          bases1D[0] = square_number_column[basisnum / 2];
-          bases1D[1] = square_number_row[basisnum / 2];
-          bases1D[2] = basisnum % 2 * 2 + 1;
-          if (basisnum % 2)
-            coef *= dxdxi[2][1];
-          break;
-        default:
-          libmesh_error_msg("Invalid basis node = " << (i - 64 - 12*4*e) / (2*e*e));
+        ponies:
+          ponies];
+          ponies];
+          ponies;
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies];
+          ponies;
+          ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies];
+          ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies];
+          ponies;
+          ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies;
+          ponies];
+          ponies];
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies];
+          ponies];
+          ponies;
+          ponies)
+            ponies];
+          ponies;
+        ponies:
+          ponies));
         }
     }
-  // Interior
-  else
+  // ponies
+  ponies
     {
-      unsigned int basisnum = i - 64 - 12*4*e;
-      bases1D[0] = cube_number_column[basisnum] + 4;
-      bases1D[1] = cube_number_row[basisnum] + 4;
-      bases1D[2] = cube_number_page[basisnum] + 4;
+      ponies;
+      ponies;
+      ponies;
+      ponies;
     }
 
-  // No singular elements
-  libmesh_assert(coef);
-  return coef;
+  // ponies
+  ponies);
+  ponies;
 }
 
 
-} // end anonymous namespace
+} // ponies
 
 
-namespace libMesh
+ponies
 {
 
 
-template <>
-Real FE<3,HERMITE>::shape(const ElemType,
-                          const Order,
-                          const unsigned int,
-                          const Point&)
+ponies <>
+ponies,
+                          ponies,
+                          ponies,
+                          ponies&)
 {
-  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,HERMITE>::shape(const Elem* elem,
-                          const Order order,
-                          const unsigned int i,
-                          const Point& p)
+ponies <>
+ponies,
+                          ponies,
+                          ponies,
+                          ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
+  ponies));
 
-#ifdef DEBUG
-  std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);
-  std::vector<Real> dzdxi(2), dxdeta(2), dydzeta(2);
-#endif //DEBUG
+#ponies
+  ponies);
+  ponies);
+#ponies
 
-  hermite_compute_coefs(elem, dxdxi
-#ifdef DEBUG
-                        , dydxi, dzdeta, dxdzeta, dzdxi, dxdeta, dydzeta
-#endif
+  ponies
+#ponies
+                        , ponies
+#ponies
                         );
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // 3rd-order tricubic Hermite functions
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case HEX8:
-          case HEX20:
-          case HEX27:
+          ponies:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 64);
+              ponies);
 
-              std::vector<unsigned int> bases1D;
+              ponies;
 
-              Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
+              ponies);
 
-              return coef *
-                FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
-                FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
+              ponies *
+                ponies)) *
+                ponies)) *
+                ponies));
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,HERMITE>::shape_deriv(const ElemType,
-                                const Order,
-                                const unsigned int,
-                                const unsigned int,
-                                const Point&)
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies&)
 {
-  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
-                                const Order order,
-                                const unsigned int i,
-                                const unsigned int j,
-                                const Point& p)
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies)
 {
-  libmesh_assert(elem);
-  libmesh_assert (j == 0 || j == 1 || j == 2);
+  ponies);
+  ponies);
 
-  std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
+  ponies));
 
-#ifdef DEBUG
-  std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);
-  std::vector<Real> dzdxi(2), dxdeta(2), dydzeta(2);
-#endif //DEBUG
+#ponies
+  ponies);
+  ponies);
+#ponies
 
-  hermite_compute_coefs(elem, dxdxi
-#ifdef DEBUG
-                        , dydxi, dzdeta, dxdzeta, dzdxi, dxdeta, dydzeta
-#endif
+  ponies
+#ponies
+                        , ponies
+#ponies
                         );
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // 3rd-order tricubic Hermite functions
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case HEX8:
-          case HEX20:
-          case HEX27:
+          ponies:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 64);
+              ponies);
 
-              std::vector<unsigned int> bases1D;
+              ponies;
 
-              Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
+              ponies);
 
-              switch (j) // Derivative type
+              ponies
                 {
-                case 0:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
-                  break;
-                case 1:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
-                  break;
-                case 2:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[2],p(2));
-                  break;
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies);
                 }
 
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
-                                       const Order order,
-                                       const unsigned int i,
-                                       const unsigned int j,
-                                       const Point& p)
+ponies <>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
+  ponies));
 
-#ifdef DEBUG
-  std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);
-  std::vector<Real> dzdxi(2), dxdeta(2), dydzeta(2);
-#endif //DEBUG
+#ponies
+  ponies);
+  ponies);
+#ponies
 
-  hermite_compute_coefs(elem, dxdxi
-#ifdef DEBUG
-                        , dydxi, dzdeta, dxdzeta, dzdxi, dxdeta, dydzeta
-#endif
+  ponies
+#ponies
+                        , ponies
+#ponies
                         );
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // 3rd-order tricubic Hermite functions
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-          case HEX8:
-          case HEX20:
-          case HEX27:
+          ponies:
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 64);
+              ponies);
 
-              std::vector<unsigned int> bases1D;
+              ponies;
 
-              Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
+              ponies);
 
-              switch (j) // Derivative type
+              ponies
                 {
-                case 0:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
-                  break;
-                case 1:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
-                  break;
-                case 2:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
-                  break;
-                case 3:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[2],p(2));
-                  break;
-                case 4:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape_deriv(bases1D[2],p(2));
-                  break;
-                case 5:
-                  return coef *
-                    FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                    FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
-                    FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[2],p(2));
-                  break;
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies *
+                    ponies)) *
+                    ponies)) *
+                    ponies));
+                  ponies;
+                ponies:
+                  ponies);
                 }
 
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-} // namespace libMesh
+} // ponies

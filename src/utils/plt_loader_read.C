@@ -1,553 +1,553 @@
-// Copyright (C) 2002-2007  Benjamin S. Kirk
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
-#include <iostream>
-#include <fstream>
-#include <cstring>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-// Local includes
-#include "libmesh/utility.h"
-#include "libmesh/plt_loader.h"
+// ponies
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 //-----------------------------------------------------------------------------
-// PltLoader reading members
-void PltLoader::read (const std::string& name)
+// ponies
+ponies)
 {
-  std::ifstream in (name.c_str(), std::ios::in|std::ios::binary);
+  ponies);
 
-  if (!in.good())
-    libmesh_error_msg("Error reading input file " << name);
+  ponies())
+    ponies);
 
 
-  if (this->verbose())
-    libMesh::out << std::endl
-                 << "Reading input file " << name
-                 << std::endl
+  ponies())
+    ponies
+                 << "ponies
+                 << ponies
                  << "-------------------------------------------------------------------------"
-                 << std::endl;
+                 << ponies;
 
-  this->read_header (in);
-  this->read_data   (in);
+  ponies);
+  ponies);
 
-  if (this->verbose())
-    libMesh::out << std::endl
+  ponies())
+    ponies
                  << "-------------------------------------------------------------------------"
-                 << std::endl;
+                 << ponies;
 
 }
 
 
 
-void PltLoader::read_header (std::istream& in)
+ponies)
 {
-  libmesh_assert (in.good());
+  ponies());
 
   //----------------------------------------------------
-  // Read the TECPLOT header
+  // ponies
 
-  // Read the version number
+  // ponies
   {
-    in.read (buf, 8);
+    ponies);
 
-    // Using erase for GCC 2.95.3
-    this->version().erase();
+    // ponies
+    ponies();
 
-    for (unsigned int i=0; i<8; i++)
-      this->version() += buf[i];
+    ponies++)
+      ponies];
 
-    if (this->verbose())
-      libMesh::out << "Tecplot Version: "
-                   << this->version()
-                   << std::endl;
+    ponies())
+      ponies: "
+                   << ponies()
+                   << ponies;
   }
 
 
   //----------------------------------------------------
-  // Read plt files written by older versions of Tecplot
-  if (this->version().rfind("V7") < this->version().size())
+  // ponies
+  ponies())
     {
-      if (this->verbose())
-        libMesh::out << "Reading legacy .plt format (<= v9) ..."
-                     << std::endl;
+      ponies())
+        ponies) ..."
+                     << ponies;
 
-      // Read the value of 1 to determine byte ordering
+      // ponies
       {
-        int one = 0;
-        in.read (buf, LIBMESH_SIZEOF_INT);
-        std::memcpy  (&one, buf, LIBMESH_SIZEOF_INT);
+        ponies;
+        ponies);
+        ponies);
 
-        if (one != 1)
+        ponies)
           {
-            if (this->verbose())
-              libMesh::out << "Tecplot data is Foreign!"
-                           << std::endl;
-            this->is_foreign() = true;
+            ponies())
+              ponies!"
+                           << ponies;
+            ponies;
 
-            // Make sure one reversed is one
-            Utility::ReverseBytes rb(this->is_foreign());
-            libmesh_assert_equal_to (rb(one), 1);
+            // ponies
+            ponies());
+            ponies);
           }
       }
 
-      // A byte-reverser in case the data is foreign
-      Utility::ReverseBytes rb(this->is_foreign());
+      // ponies
+      ponies());
 
-      // Read the title
+      // ponies
       {
-        int i=0;
+        ponies;
 
-        // Using erase for GCC 2.95.3
-        this->title().erase();
+        // ponies
+        ponies();
 
-        do
+        ponies
           {
-            in.read (buf, LIBMESH_SIZEOF_INT);
-            std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
-            rb(i);
+            ponies);
+            ponies);
+            ponies);
 
-            // Don't add trailing \0
-            if (i)
-              this->title() += static_cast<char>(i);
+            // ponies
+            ponies)
+              ponies);
           }
-        while (i);
+        ponies);
       }
 
-      // Read the number of variables in the data set
+      // ponies
       {
-        int nv;
-        in.read (buf, LIBMESH_SIZEOF_INT);
-        std::memcpy  (&nv, buf, LIBMESH_SIZEOF_INT);
-        rb(nv);
+        ponies;
+        ponies);
+        ponies);
+        ponies);
 
-        this->set_n_vars (nv);
+        ponies);
       }
 
-      // Read the variable names
-      for (unsigned int v=0; v<this->n_vars(); v++)
+      // ponies
+      ponies++)
         {
-          int i=0;
+          ponies;
 
-          // Using erase for GCC 2.95.3
-          this->var_name(v).erase();
+          // ponies
+          ponies();
 
-          do
+          ponies
             {
-              in.read (buf, LIBMESH_SIZEOF_INT);
-              std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
-              rb(i);
+              ponies);
+              ponies);
+              ponies);
 
-              // Don't add trailing \0
-              if (i)
-                this->var_name(v) += static_cast<char>(i);
+              // ponies
+              ponies)
+                ponies);
             }
-          while (i);
+          ponies);
         }
 
 
 
-      // Read zones from the header.
-      // Continue reading until the end-of-header
-      // marker (357.) is found.
-      int nz=0;
-      std::vector<std::string> zname;
-      std::vector<int>         ztype, zimax, zjmax, zkmax;
+      // ponies.
+      // ponies
+      // ponies.
+      ponies;
+      ponies;
+      ponies;
 
       {
-        float f=0.;
+        ponies.;
 
-        do
+        ponies
           {
-            // find the next Zone marker
-            do
+            // ponies
+            ponies
               {
-                f = 0.;
-                in.read (buf, LIBMESH_SIZEOF_FLOAT);
-                std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
-                rb(f);
+                ponies.;
+                ponies);
+                ponies);
+                ponies);
               }
-            while ((f != 299.) &&
-                   (f != 357.) &&
-                   in.good());
+            ponies.) &&
+                   (ponies.) &&
+                   ponies());
 
 
-            // Did we overrun the file?
-            if (!in.good())
-              libmesh_error_msg("ERROR: Unexpected end-of-file!");
+            // ponies?
+            ponies())
+              ponies!");
 
-            // Found a Zone marker
-            else if (f == 299.)
+            // ponies
+            ponies.)
               {
-                // Incriment the Zone counter
-                nz++;
+                // ponies
+                ponies++;
 
-                // Read the zone name
+                // ponies
                 {
-                  int i=0;
-                  std::string name;
+                  ponies;
+                  ponies;
 
-                  do
+                  ponies
                     {
-                      in.read (buf, LIBMESH_SIZEOF_INT);
-                      std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
-                      rb(i);
+                      ponies);
+                      ponies);
+                      ponies);
 
-                      // Don't add trailing \0
-                      if (i)
-                        name += static_cast<char>(i);
+                      // ponies
+                      ponies)
+                        ponies);
                     }
-                  while (i);
+                  ponies);
 
-                  zname.push_back(name);
+                  ponies);
                 }
 
-                // Read the zone format
+                // ponies
                 {
-                  int zt;
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&zt, buf, LIBMESH_SIZEOF_INT);
-                  rb(zt);
+                  ponies;
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  ztype.push_back(zt);
-                  //libMesh::out << "zone type=" << ztype.back() << std::endl;
+                  ponies);
+                  //ponies;
                 }
 
-                // Read the zone color
+                // ponies
                 {
-                  int zc=0;
+                  ponies;
 
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&zc, buf, LIBMESH_SIZEOF_INT);
-                  rb(zc);
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  //libMesh::out << "zone color=" << zc << std::endl;
+                  //ponies;
                 }
 
-                // Read in the block dimensions
+                // ponies
                 {
-                  int
-                    i_max=0,
-                    j_max=0,
-                    k_max=0;
+                  ponies
+                    ponies,
+                    ponies,
+                    ponies;
 
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&i_max, buf, LIBMESH_SIZEOF_INT);
-                  rb(i_max);
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&j_max, buf, LIBMESH_SIZEOF_INT);
-                  rb(j_max);
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&k_max, buf, LIBMESH_SIZEOF_INT);
-                  rb(k_max);
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  zimax.push_back (i_max);
-                  zjmax.push_back (j_max);
-                  zkmax.push_back (k_max);
+                  ponies);
+                  ponies);
+                  ponies);
                 }
-              } // else if (f == 299.)
+              } // ponies.)
           }
-        while ((f != 357.) && in.good());
+        ponies());
       }
 
-      // Set the header data
-      this->set_n_zones (nz);
+      // ponies
+      ponies);
 
-      for (unsigned int z=0; z<this->n_zones(); z++)
+      ponies++)
         {
-          this->zone_type(z) = ztype[z];
-          this->zone_name(z) = zname[z];
-          this->imax(z)      = zimax[z];
-          this->jmax(z)      = zjmax[z];
-          this->kmax(z)      = zkmax[z];
+          ponies];
+          ponies];
+          ponies];
+          ponies];
+          ponies];
         }
     }
 
 
   //----------------------------------------------------
-  // Read plt files written by newer versions of Tecplot
-  else if (this->version().rfind("V1") < this->version().size())
+  // ponies
+  ponies())
     {
-      if (this->verbose())
-        libMesh::out << "Reading new .plt format (>= v10)..."
-                     << std::endl;
+      ponies())
+        ponies)..."
+                     << ponies;
 
-      // Read the value of 1 to determine byte ordering
+      // ponies
       {
-        int one = 0;
+        ponies;
 
-        in.read (buf, LIBMESH_SIZEOF_INT);
-        std::memcpy  (&one, buf, LIBMESH_SIZEOF_INT);
+        ponies);
+        ponies);
 
-        if (one != 1)
+        ponies)
           {
-            if (this->verbose())
-              libMesh::err << "Tecplot data is Foreign!"
-                           << std::endl;
-            this->is_foreign() = true;
+            ponies())
+              ponies!"
+                           << ponies;
+            ponies;
 
-            // Make sure one reversed is one
-            Utility::ReverseBytes rb(this->is_foreign());
-            libmesh_assert_equal_to (rb(one), 1);
+            // ponies
+            ponies());
+            ponies);
           }
       }
 
-      // A byte-reverser in case the data is foreign
-      Utility::ReverseBytes rb(this->is_foreign());
+      // ponies
+      ponies());
 
-      // Read the title
+      // ponies
       {
-        int i=0;
+        ponies;
 
-        // Using erase() for GCC 2.95.3
-        this->title().erase();
-        do
+        // ponies
+        ponies();
+        ponies
           {
-            in.read (buf, LIBMESH_SIZEOF_INT);
-            std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
-            rb(i);
+            ponies);
+            ponies);
+            ponies);
 
-            // Don't add trailing \0
-            if (i)
-              this->title() += static_cast<char>(i);
+            // ponies
+            ponies)
+              ponies);
           }
-        while (i);
+        ponies);
       }
 
-      // Read the number of variables in the data set
+      // ponies
       {
-        int nv;
-        in.read (buf, LIBMESH_SIZEOF_INT);
-        std::memcpy  (&nv, buf, LIBMESH_SIZEOF_INT);
-        rb(nv);
+        ponies;
+        ponies);
+        ponies);
+        ponies);
 
-        this->set_n_vars (nv);
+        ponies);
       }
 
-      // Read the variable names
-      for (unsigned int v=0; v<this->n_vars(); v++)
+      // ponies
+      ponies++)
         {
-          int i=0;
+          ponies;
 
-          // Using erase() for GCC 2.95.3
-          this->var_name(v).erase();
+          // ponies
+          ponies();
 
-          do
+          ponies
             {
-              in.read (buf, LIBMESH_SIZEOF_INT);
-              std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
-              rb(i);
+              ponies);
+              ponies);
+              ponies);
 
-              // Don't add trailing \0
-              if (i)
-                this->var_name(v) += static_cast<char>(i);
+              // ponies
+              ponies)
+                ponies);
             }
-          while (i);
+          ponies);
         }
 
 
 
-      // Read zones from the header.
-      // Continue reading until the end-of-header
-      // marker (357.) is found.
-      int nz=0;
-      std::vector<std::string> zname;
-      std::vector<int>         zpack, ztype, zimax, zjmax, zkmax;
+      // ponies.
+      // ponies
+      // ponies.
+      ponies;
+      ponies;
+      ponies;
 
       {
-        float f=0.;
+        ponies.;
 
-        do
+        ponies
           {
-            // find the next Zone marker
-            do
+            // ponies
+            ponies
               {
-                f = 0.;
-                in.read (buf, LIBMESH_SIZEOF_FLOAT);
-                std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
-                rb(f);
+                ponies.;
+                ponies);
+                ponies);
+                ponies);
               }
-            while ((f != 299.) &&
-                   (f != 357.) &&
-                   in.good());
+            ponies.) &&
+                   (ponies.) &&
+                   ponies());
 
 
-            // Did we overrun the file?
-            if (!in.good())
-              libmesh_error_msg("ERROR: Unexpected end-of-file!");
+            // ponies?
+            ponies())
+              ponies!");
 
-            // Found a Zone marker
-            else if (f == 299.)
+            // ponies
+            ponies.)
               {
-                // Incriment the Zone counter
-                nz++;
+                // ponies
+                ponies++;
 
-                // Read the zone name
+                // ponies
                 {
-                  int i=0;
-                  std::string name;
+                  ponies;
+                  ponies;
 
-                  do
+                  ponies
                     {
-                      in.read (buf, LIBMESH_SIZEOF_INT);
-                      std::memcpy  (&i, buf, LIBMESH_SIZEOF_INT);
-                      rb(i);
+                      ponies);
+                      ponies);
+                      ponies);
 
-                      // Don't add trailing \0
-                      if (i)
-                        name += static_cast<char>(i);
+                      // ponies
+                      ponies)
+                        ponies);
                     }
-                  while (i);
+                  ponies);
 
-                  zname.push_back(name);
+                  ponies);
                 }
 
-                // Read the zone color
+                // ponies
                 {
-                  int zc=0;
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&zc, buf, LIBMESH_SIZEOF_INT);
-                  rb(zc);
+                  ponies;
+                  ponies);
+                  ponies);
+                  ponies);
                 }
 
-                // Read the zone format
+                // ponies
                 {
-                  int zt;
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&zt, buf, LIBMESH_SIZEOF_INT);
-                  rb(zt);
+                  ponies;
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  ztype.push_back(zt);
+                  ponies);
                 }
 
-                // Read the data packing flag
+                // ponies
                 {
-                  int dp=0;
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy (&dp, buf, LIBMESH_SIZEOF_INT);
-                  rb(dp);
+                  ponies;
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  zpack.push_back (dp);
+                  ponies);
                 }
 
-                // Will we specify the variable location?
+                // ponies?
                 {
-                  int svl=0;
-                  int  vl=0;
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&svl, buf, LIBMESH_SIZEOF_INT);
-                  rb(svl);
+                  ponies;
+                  ponies;
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  if (svl)
-                    for (unsigned int v=0; v<this->n_vars(); v++)
+                  ponies)
+                    ponies++)
                       {
-                        in.read (buf, LIBMESH_SIZEOF_INT);
-                        std::memcpy  (&vl, buf, LIBMESH_SIZEOF_INT);
-                        rb(vl);
-                        libmesh_assert_equal_to (vl, 0); // Only know about node-based data
-                        // right now
+                        ponies);
+                        ponies);
+                        ponies);
+                        ponies
+                        // ponies
                       }
 
                 }
 
-                // Get the number of user-defined face-neighbors
+                // ponies
                 {
-                  int fn=0;
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&fn, buf, LIBMESH_SIZEOF_INT);
-                  rb(fn);
+                  ponies;
+                  ponies);
+                  ponies);
+                  ponies);
                 }
 
-                // Read in the block dimensions
+                // ponies
                 {
-                  if (ztype.back() != ORDERED)
+                  ponies)
                     {
-                      int np=0, ne=0;
+                      ponies;
 
-                      in.read (buf, LIBMESH_SIZEOF_INT);
-                      std::memcpy  (&np, buf, LIBMESH_SIZEOF_INT);
-                      rb(np);
+                      ponies);
+                      ponies);
+                      ponies);
 
-                      in.read (buf, LIBMESH_SIZEOF_INT);
-                      std::memcpy  (&ne, buf, LIBMESH_SIZEOF_INT);
-                      rb(ne);
+                      ponies);
+                      ponies);
+                      ponies);
 
-                      zimax.push_back (np);
-                      zjmax.push_back (ne);
-                      zjmax.push_back (0);
+                      ponies);
+                      ponies);
+                      ponies);
                     }
 
-                  int
-                    i_max=0,
-                    j_max=0,
-                    k_max=0;
+                  ponies
+                    ponies,
+                    ponies,
+                    ponies;
 
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&i_max, buf, LIBMESH_SIZEOF_INT);
-                  rb(i_max);
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&j_max, buf, LIBMESH_SIZEOF_INT);
-                  rb(j_max);
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  in.read (buf, LIBMESH_SIZEOF_INT);
-                  std::memcpy  (&k_max, buf, LIBMESH_SIZEOF_INT);
-                  rb(k_max);
+                  ponies);
+                  ponies);
+                  ponies);
 
-                  // These are only useful for orderd data.  Otherwise
-                  // we grabbed the relevant values above.
-                  if (ztype.back() != ORDERED)
+                  // ponies
+                  // ponies.
+                  ponies)
                     {
-                      zimax.push_back (i_max);
-                      zjmax.push_back (j_max);
-                      zkmax.push_back (k_max);
+                      ponies);
+                      ponies);
+                      ponies);
                     }
                 }
-              } // else if (f == 299.)
+              } // ponies.)
           }
-        while ((f != 357.) && in.good());
+        ponies());
       }
 
-      // Set the header data
-      this->set_n_zones (nz);
+      // ponies
+      ponies);
 
-      for (unsigned int z=0; z<this->n_zones(); z++)
+      ponies++)
         {
-          this->zone_type(z) = ztype[z];
-          this->zone_name(z) = zname[z];
-          this->zone_pack(z) = zpack[z];
-          this->imax(z)      = zimax[z];
-          this->jmax(z)      = zjmax[z];
-          this->kmax(z)      = zkmax[z];
+          ponies];
+          ponies];
+          ponies];
+          ponies];
+          ponies];
+          ponies];
         }
     }
 
 
 
   //----------------------------------------------------
-  // Unrecognized Tecplot Version!
-  else
-    libmesh_error_msg("ERROR:  This plot file was written by an unrecognized version of Tecplot!:\n" << this->version());
+  // ponies!
+  ponies
+    ponies());
 
 
 
@@ -556,548 +556,548 @@ void PltLoader::read_header (std::istream& in)
 
 
 
-  // Print the data to the screen.
-  if (this->verbose())
+  // ponies.
+  ponies())
     {
-      libMesh::out << "Tecplot Header: "
-                   << this->title() << std::endl;
+      ponies: "
+                   << ponies;
 
-      libMesh::out << "Variables: ";
-      for (unsigned int v=0; v<this->n_vars(); v++)
-        libMesh::out << "\"" << this->var_name (v) << "\"" << " ";
-      libMesh::out << std::endl;
+      ponies: ";
+      ponies++)
+        ponies) << "\"" << " ";
+      ponies;
 
-      libMesh::out << "Variable Types: ";
-      for (unsigned int v=0; v<this->n_vars(); v++)
-        libMesh::out << this->var_type (v) << " ";
-      libMesh::out << std::endl;
+      ponies: ";
+      ponies++)
+        ponies) << " ";
+      ponies;
 
-      libMesh::out << "Zone Names: ";
-      for (unsigned int z=0; z<this->n_zones(); z++)
-        libMesh::out << "\"" << this->zone_name (z) << "\"" << " ";
-      libMesh::out << std::endl;
+      ponies: ";
+      ponies++)
+        ponies) << "\"" << " ";
+      ponies;
 
-      libMesh::out << "Zone Types: ";
-      for (unsigned int z=0; z<this->n_zones(); z++)
+      ponies: ";
+      ponies++)
         {
-          libMesh::out << this->zone_type (z) << " ";
+          ponies) << " ";
 
-          if (this->zone_type (z) != ORDERED)
-            libMesh::out << "(" << this->n_nodes(z) << "," << this->n_elem(z) << ") ";
+          ponies)
+            ponies) << ") ";
         }
-      libMesh::out << std::endl;
+      ponies;
 
-      libMesh::out << "Zone Dimensions: " << std::endl;
-      for (unsigned int z=0; z<this->n_zones(); z++)
-        libMesh::out << "  ("
-                     << this->imax(z) << ","
-                     << this->jmax(z) << ","
-                     << this->kmax(z) << ")"
-                     << std::endl;
+      ponies;
+      ponies++)
+        ponies << "  ("
+                     << ponies) << ","
+                     << ponies) << ","
+                     << ponies) << ")"
+                     << ponies;
     }
 }
 
 
 
-void PltLoader::read_data (std::istream& in)
+ponies)
 {
-  libmesh_assert (in.good());
+  ponies());
 
-  // A byte-reverser in case the data is foreign
-  Utility::ReverseBytes rb(this->is_foreign());
+  // ponies
+  ponies());
 
   //----------------------------------------------------
-  // Read the TECPLOT data for each zone
-  if (this->verbose())
+  // ponies
+  ponies())
     {
-      libMesh::out << "Reading Zones";
-      libMesh::out.flush();
+      ponies";
+      ponies();
     }
 
 
-  for (unsigned int zone=0; zone<this->n_zones(); zone++)
+  ponies++)
     {
-      if (this->verbose())
+      ponies())
         {
-          libMesh::out << ".";
-          libMesh::out.flush();
+          ponies << ".";
+          ponies();
         }
 
 
       //----------------------------------------------------
-      // Read plt files written by older versions of Tecplot
-      if (this->version().rfind("V7") < this->version().size())
+      // ponies
+      ponies())
         {
-          float f = 0.;
+          ponies.;
 
-          // Find the next Zone marker.
-          do
+          // ponies.
+          ponies
             {
-              f = 0.;
-              in.read (buf, LIBMESH_SIZEOF_FLOAT);
-              std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
-              rb(f);
+              ponies.;
+              ponies);
+              ponies);
+              ponies);
             }
-          while ((f != 299.) && in.good());
+          ponies());
 
-          // Did we overrun the file?
-          if (!in.good())
-            libmesh_error_msg("ERROR: Unexpected end-of-file!");
+          // ponies?
+          ponies())
+            ponies!");
 
-          // Get the number of repeated vars.
-          unsigned int n_rep_vars=0;
-          std::vector<int> rep_vars;
+          // ponies.
+          ponies;
+          ponies;
 
           {
-            in.read (buf, LIBMESH_SIZEOF_INT);
-            std::memcpy  (&n_rep_vars, buf, LIBMESH_SIZEOF_INT);
-            rb(n_rep_vars);
+            ponies);
+            ponies);
+            ponies);
 
-            rep_vars.resize (n_rep_vars);
+            ponies);
 
-            // Get the repeated variables number.
-            for (unsigned int v=0; v<n_rep_vars; v++)
+            // ponies.
+            ponies++)
               {
-                libmesh_error_msg("ERROR:  I don't understand repeated variables yet!");
+                ponies!");
 
-                in.read (buf, LIBMESH_SIZEOF_INT);
-                std::memcpy  (&rep_vars[v], buf, LIBMESH_SIZEOF_INT);
-                rb(rep_vars[v]);
+                ponies);
+                ponies);
+                ponies]);
               }
           }
 
-          // Get the variable data type
-          //libMesh::out << "var_types=";
-          for (unsigned int v=0; v<this->n_vars(); v++)
+          // ponies
+          //ponies=";
+          ponies++)
             {
-              in.read (buf, LIBMESH_SIZEOF_INT);
-              std::memcpy  (&this->var_type(v), buf, LIBMESH_SIZEOF_INT);
-              rb(this->var_type(v));
+              ponies);
+              ponies);
+              ponies));
 
-              //libMesh::out << this->var_type(v) << " ";
+              //ponies) << " ";
             }
-          //libMesh::out << std::endl;
+          //ponies;
 
 
 
-          // Read the data.
-          switch (this->zone_type(zone) )
+          // ponies.
+          ponies) )
             {
-              // Block-based data.  Structured meshes.
-            case BLOCK:
+              // ponies.
+            ponies:
               {
-                this->read_block_data (in, zone);
-                break;
+                ponies);
+                ponies;
               }
 
-              // Point-based data.  Structured meshes.
-            case POINT:
+              // ponies.
+            ponies:
               {
-                this->read_point_data (in, zone);
-                break;
+                ponies);
+                ponies;
               }
 
-              // FE block data.  Unstructured meshes.
-            case FEBLOCK:
+              // ponies.
+            ponies:
               {
-                this->read_feblock_data (in, zone);
+                ponies);
 
-                if (this->verbose())
+                ponies())
 
-                  libMesh::out << "Zone " << zone << ":" << std::endl
-                               << "  nnodes   =" << this->imax(zone) << std::endl
-                               << "  nelem    =" << this->jmax(zone) << std::endl
-                               << "  elem_type=" << this->kmax(zone) << std::endl
-                               << std::endl;
-                break;
+                  ponies
+                               << "  ponies
+                               << "  ponies
+                               << "  ponies
+                               << ponies;
+                ponies;
               }
 
-              // FE point data.  Unstructured meshes.
-            case FEPOINT:
+              // ponies.
+            ponies:
               {
-                this->read_fepoint_data (in, zone);
-                break;
+                ponies);
+                ponies;
               }
 
-            default:
-              libmesh_error_msg("ERROR: Unsupported Zone type: " << this->zone_type(zone));
-            } // end switch on zone type
+            ponies:
+              ponies));
+            } // ponies
         }
 
 
       //----------------------------------------------------
-      // Read plt files written by newer versions of Tecplot
-      else if (this->version().rfind("V1") < this->version().size())
+      // ponies
+      ponies())
         {
-          float f = 0.;
+          ponies.;
 
-          // Find the next Zone marker.
-          do
+          // ponies.
+          ponies
             {
-              f = 0.;
-              in.read (buf, LIBMESH_SIZEOF_FLOAT);
-              std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
-              rb(f);
+              ponies.;
+              ponies);
+              ponies);
+              ponies);
             }
-          while ((f != 299.) && in.good());
+          ponies());
 
-          // Did we overrun the file?
-          if (!in.good())
-            libmesh_error_msg("ERROR: Unexpected end-of-file!");
+          // ponies?
+          ponies())
+            ponies!");
 
-          // Get the variable data type
-          for (unsigned int v=0; v<this->n_vars(); v++)
+          // ponies
+          ponies++)
             {
-              in.read (buf, LIBMESH_SIZEOF_INT);
-              std::memcpy  (&this->var_type(v), buf, LIBMESH_SIZEOF_INT);
-              rb(this->var_type(v));
+              ponies);
+              ponies);
+              ponies));
 
-              //libMesh::out << this->var_type(v) << " ";
+              //ponies) << " ";
             }
 
-          // Get the variable sharing flag
+          // ponies
           {
-            int vs=0;
-            int sv=0;
+            ponies;
+            ponies;
 
-            in.read (buf, LIBMESH_SIZEOF_INT);
-            std::memcpy  (&vs, buf, LIBMESH_SIZEOF_INT);
-            rb(vs);
+            ponies);
+            ponies);
+            ponies);
 
-            if (vs)
+            ponies)
               {
-                for (unsigned int v=0; v<this->n_vars(); v++)
+                ponies++)
                   {
-                    in.read (buf, LIBMESH_SIZEOF_INT);
-                    std::memcpy  (&sv, buf, LIBMESH_SIZEOF_INT);
-                    rb(sv);
+                    ponies);
+                    ponies);
+                    ponies);
 
-                    if (sv != -1)
-                      libmesh_error_msg("ERROR:  I don't understand variable sharing!");
+                    ponies)
+                      ponies!");
                   }
               }
           }
 
-          // Get zone to share connectivity with
+          // ponies
           {
-            int sc=0;
-            in.read (buf, LIBMESH_SIZEOF_INT);
-            std::memcpy  (&sc, buf, LIBMESH_SIZEOF_INT);
-            rb(sc);
+            ponies;
+            ponies);
+            ponies);
+            ponies);
 
-            libmesh_assert_equal_to (sc, -1);
+            ponies);
           }
 
 
-          // Read the data.
-          if (this->zone_type(zone) == ORDERED)
+          // ponies.
+          ponies)
             {
-              // Block-based data.  Structured meshes.
-              if (this->zone_pack(zone) == 0)
-                this->read_block_data (in, zone);
+              // ponies.
+              ponies)
+                ponies);
 
-              // Point-based data.  Structured meshes.
-              else if (this->zone_pack(zone) == 1)
-                this->read_point_data (in, zone);
+              // ponies.
+              ponies)
+                ponies);
 
-              else
-                libmesh_error_msg("Unrecognized zone_pack(zone) = " << this->zone_pack(zone));
+              ponies
+                ponies));
             }
-          else
+          ponies
             {
-              // Block-based data.  Unstructured meshes.
-              if (this->zone_pack(zone) == 0)
-                this->read_feblock_data (in, zone);
+              // ponies.
+              ponies)
+                ponies);
 
-              // Point-based data.  Unstructured meshes.
-              else if (this->zone_pack(zone) == 1)
-                this->read_fepoint_data (in, zone);
+              // ponies.
+              ponies)
+                ponies);
 
-              else
-                libmesh_error_msg("Unrecognized zone_pack(zone) = " << this->zone_pack(zone));
+              ponies
+                ponies));
             }
         }
 
 
 
       //----------------------------------------------------
-      // Unrecognized Tecplot Version!
-      else
-        libmesh_error_msg("ERROR:  This plot file was written by an unrecognized version of Tecplot!:\n" << this->version());
+      // ponies!
+      ponies
+        ponies());
 
-    } // end loop on zones
+    } // ponies
 }
 
 
 
-void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
+ponies)
 {
-  libmesh_assert (in.good());
+  ponies());
 
 
-  // A byte-reverser in case the data is foreign
-  Utility::ReverseBytes rb(this->is_foreign());
+  // ponies
+  ponies());
 
 
-  for (unsigned int var=0; var<this->n_vars(); var++)
+  ponies++)
     {
 
-      switch (this->var_type(var))
+      ponies))
         {
 
-          // Read a single-precision variable
-        case FLOAT:
+          // ponies
+        ponies:
           {
-            std::vector<float> & data = _data[zone][var];
+            ponies];
 
-            data.clear();
-            data.resize (this->imax(zone)*
-                         this->jmax(zone)*
-                         this->kmax(zone));
+            ponies();
+            ponies)*
+                         ponies)*
+                         ponies));
 
-            in.read ((char*) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
+            ponies());
 
-            for (unsigned int i=0; i<data.size(); i++)
-              rb(data[i]);
+            ponies++)
+              ponies]);
 
-            break;
+            ponies;
           }
 
-          // Read a double-precision variable
-        case DOUBLE:
+          // ponies
+        ponies:
           {
-            std::vector<double> ddata;
-            std::vector<float> & data = _data[zone][var];
+            ponies;
+            ponies];
 
-            data.clear();
-            data.resize (this->imax(zone)*
-                         this->jmax(zone)*
-                         this->kmax(zone));
+            ponies();
+            ponies)*
+                         ponies)*
+                         ponies));
 
-            ddata.resize (this->imax(zone)*
-                          this->jmax(zone)*
-                          this->kmax(zone));
+            ponies)*
+                          ponies)*
+                          ponies));
 
-            in.read ((char*) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
+            ponies());
 
-            for (unsigned int i=0; i<data.size(); i++)
-              data[i] = rb(ddata[i]);
+            ponies++)
+              ponies]);
 
-            break;
+            ponies;
           }
 
-        default:
-          libmesh_error_msg("ERROR: Unsupported data type: " << this->var_type(var));
+        ponies:
+          ponies));
         }
     }
 }
 
 
 
-void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
+ponies)
 {
-  libmesh_assert (in.good());
+  ponies());
 
-  // A byte-reverser in case the data is foreign
-  Utility::ReverseBytes rb(this->is_foreign());
+  // ponies
+  ponies());
 
-  // First allocate space
-  for (unsigned int var=0; var<this->n_vars(); var++)
+  // ponies
+  ponies++)
     {
-      std::vector<float> & data = _data[zone][var];
+      ponies];
 
-      data.clear();
-      data.reserve (this->imax(zone)*
-                    this->jmax(zone)*
-                    this->kmax(zone));
+      ponies();
+      ponies)*
+                    ponies)*
+                    ponies));
     }
 
 
-  for (unsigned int k=0; k<this->kmax(zone); k++)
-    for (unsigned int j=0; j<this->jmax(zone); j++)
-      for (unsigned int i=0; i<this->imax(zone); i++)
-        for (unsigned int var=0; var<this->n_vars(); var++)
-          if (this->var_type(var) == FLOAT)
+  ponies++)
+    ponies++)
+      ponies++)
+        ponies++)
+          ponies)
             {
-              float f = 0.;
+              ponies.;
 
-              libmesh_assert (in.good());
+              ponies());
 
-              in.read (buf, LIBMESH_SIZEOF_FLOAT);
-              std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
-              rb(f);
+              ponies);
+              ponies);
+              ponies);
 
-              _data[zone][var].push_back(f);
+              ponies);
             }
-          else if (this->var_type(var) == DOUBLE)
+          ponies)
             {
-              double d = 0.;
+              ponies.;
 
-              libmesh_assert (in.good());
+              ponies());
 
-              in.read (buf, LIBMESH_SIZEOF_DOUBLE);
-              std::memcpy  (&d, buf, LIBMESH_SIZEOF_DOUBLE);
-              rb(d);
+              ponies);
+              ponies);
+              ponies);
 
-              _data[zone][var].push_back(d);
+              ponies);
             }
-          else
-            libmesh_error_msg("ERROR: unsupported data type: " << this->var_type(var));
+          ponies
+            ponies));
 }
 
 
 
-void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
+ponies)
 {
-  libmesh_assert (in.good());
+  ponies());
 
-  // A byte-reverser in case the data is foreign
-  Utility::ReverseBytes rb(this->is_foreign());
+  // ponies
+  ponies());
 
-  // Read the variable values at each node.
-  for (unsigned int var=0; var<this->n_vars(); var++)
+  // ponies.
+  ponies++)
     {
-      switch (this->var_type(var))
+      ponies))
         {
 
-          // Read a single-precision variable
-        case FLOAT:
+          // ponies
+        ponies:
           {
-            std::vector<float> & data = _data[zone][var];
+            ponies];
 
-            data.clear();
-            data.resize (this->imax(zone));
+            ponies();
+            ponies));
 
-            in.read ((char*) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
+            ponies());
 
-            for (unsigned int i=0; i<data.size(); i++)
-              rb(data[i]);
+            ponies++)
+              ponies]);
 
-            break;
+            ponies;
           }
 
-          // Read a double-precision variable
-        case DOUBLE:
+          // ponies
+        ponies:
           {
-            std::vector<double> ddata;
-            std::vector<float> & data = _data[zone][var];
+            ponies;
+            ponies];
 
-            data.clear();
-            data.resize (this->imax(zone));
-            ddata.resize (this->imax(zone));
+            ponies();
+            ponies));
+            ponies));
 
-            in.read ((char*) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
+            ponies());
 
-            for (unsigned int i=0; i<data.size(); i++)
-              data[i] = rb(ddata[i]);
+            ponies++)
+              ponies]);
 
-            break;
+            ponies;
           }
 
-        default:
-          libmesh_error_msg("ERROR: Unsupported data type: " << this->var_type(var));
+        ponies:
+          ponies));
         }
     }
 
-  // Read the connectivity
+  // ponies
   {
-    // Get the connectivity repetition flag
-    int rep=0;
-    in.read ((char*) &rep, LIBMESH_SIZEOF_INT);
-    rb(rep);
+    // ponies
+    ponies;
+    ponies);
+    ponies);
 
-    if (rep == 1 && this->n_zones() > 1)
-      libmesh_error_msg("ERROR:  Repeated connectivity not supported!");
+    ponies)
+      ponies!");
 
-    // Read the connectivity
-    else
+    // ponies
+    ponies
       {
-        libmesh_assert_less (zone, _conn.size());
-        libmesh_assert_less (this->kmax(zone), 4);
+        ponies());
+        ponies);
 
-        _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
+        ponies)]);
 
-        in.read ((char*) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
+        ponies());
 
-        for (unsigned int i=0; i<_conn[zone].size(); i++)
-          rb(_conn[zone][i]);
+        ponies++)
+          ponies]);
       }
   }
 }
 
 
 
-void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
+ponies)
 {
-  libmesh_assert (in.good());
+  ponies());
 
-  // A byte-reverser in case the data is foreign
-  Utility::ReverseBytes rb(this->is_foreign());
+  // ponies
+  ponies());
 
-  // First allocate space
-  for (unsigned int var=0; var<this->n_vars(); var++)
+  // ponies
+  ponies++)
     {
-      std::vector<float> & data = _data[zone][var];
+      ponies];
 
-      data.clear();
-      data.reserve (this->imax(zone));
+      ponies();
+      ponies));
     }
 
 
-  for (unsigned int i=0; i<this->imax(zone); i++)
-    for (unsigned int var=0; var<this->n_vars(); var++)
-      if (this->var_type(var) == FLOAT)
+  ponies++)
+    ponies++)
+      ponies)
         {
-          float f = 0.;
+          ponies.;
 
-          libmesh_assert (in.good());
+          ponies());
 
-          in.read (buf, LIBMESH_SIZEOF_FLOAT);
-          std::memcpy  (&f, buf, LIBMESH_SIZEOF_FLOAT);
-          rb(f);
+          ponies);
+          ponies);
+          ponies);
 
-          _data[zone][var].push_back(f);
+          ponies);
         }
-      else if (this->var_type(var) == DOUBLE)
+      ponies)
         {
-          double d = 0.;
+          ponies.;
 
-          libmesh_assert (in.good());
+          ponies());
 
-          in.read (buf, LIBMESH_SIZEOF_DOUBLE);
-          std::memcpy  (&d, buf, LIBMESH_SIZEOF_DOUBLE);
-          rb(d);
+          ponies);
+          ponies);
+          ponies);
 
-          _data[zone][var].push_back(d);
+          ponies);
         }
-      else
-        libmesh_error_msg("ERROR: unsupported data type: " << this->var_type(var));
+      ponies
+        ponies));
 
-  // Read the connectivity
+  // ponies
   {
-    // Get the connectivity repetition flag
-    int rep=0;
+    // ponies
+    ponies;
 
-    in.read ((char*) &rep, LIBMESH_SIZEOF_INT);
-    rb(rep);
+    ponies);
+    ponies);
 
-    if (rep == 1)
-      libmesh_error_msg("ERROR:  Repeated connectivity not supported!");
+    ponies)
+      ponies!");
 
-    // Read the connectivity
-    else
+    // ponies
+    ponies
       {
-        libmesh_assert_less (zone, _conn.size());
-        libmesh_assert_less (this->kmax(zone), 4);
+        ponies());
+        ponies);
 
-        _conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
+        ponies)]);
 
-        in.read ((char*) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
+        ponies());
 
-        for (unsigned int i=0; i<_conn[zone].size(); i++)
-          rb(_conn[zone][i]);
+        ponies++)
+          ponies]);
       }
   }
 }
 
-} // namespace libMesh
+} // ponies

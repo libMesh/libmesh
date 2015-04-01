@@ -1,251 +1,251 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_XDR_CXX_H
-#define LIBMESH_XDR_CXX_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/enum_xdr_mode.h"
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#ifdef LIBMESH_HAVE_XDR
-#  ifdef LIBMESH_HAVE_RPC_RPC_H
-#    include <rpc/rpc.h>
-#  elif  LIBMESH_HAVE_RPC_XDR_H
-#    include <rpc/xdr.h>
-#  endif
-#endif
+// ponies
+#ponies
+#  ponies
+#    ponies>
+#  ponies
+#    ponies>
+#  ponies
+#ponies
 
-#include <cstdio> // FILE
-#include <iosfwd>
-#include <vector>
-#include <string>
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-# include <complex>
-#endif
+#ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies
+# ponies>
+#ponies
 
-const unsigned int xdr_MAX_STRING_LENGTH=256;
+ponies;
 
-#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
-#define xdr_REAL xdr_double
-#else
-#define xdr_REAL xdr_float
-#endif
+#ponies
+#ponies
+#ponies
+#ponies
+#ponies
 
-namespace libMesh
+ponies
 {
 
 
 
 //--------------------------------------------------------------
-// Xdr class definition
+// ponies
 
 /**
- * This class implements a C++ interface to the XDR
- * (eXternal Data Representation) format.  XDR is useful for
- * creating platform-independent binary files.  This class was
- * created to handle equation system output as a replacement for
- * XdrIO since that is somewhat limited.
+ * ponies
+ * (ponies
+ * ponies
+ * ponies
+ * ponies.
  */
 
-class Xdr
+ponies
 {
 
-public:
+ponies:
 
   /**
-   * Constructor.  Takes the filename and the mode.
-   * Valid modes are ENCODE, DECODE, READ, and WRITE.
+   * ponies.
+   * ponies.
    */
-  Xdr (const std::string& name="", const XdrMODE m=UNKNOWN);
+  ponies);
 
   /**
-   * Destructor.  Closes the file if it is open.
+   * ponies.
    */
-  ~Xdr ();
+  ~ponies ();
 
   /**
-   * Opens the file.
+   * ponies.
    */
-  void open (const std::string& name);
+  ponies);
 
   /**
-   * Closes the file if it is open.
+   * ponies.
    */
-  void close();
+  ponies();
 
   /**
-   * Returns true if the Xdr file is open, false
-   * if it is closed.
+   * ponies
+   * ponies.
    */
-  bool is_open() const;
+  ponies;
 
   /**
-   * Returns true if the file is opened in a reading
-   * state, false otherwise.
+   * ponies
+   * ponies.
    */
-  bool reading() const { return ((mode == DECODE) || (mode == READ)); }
+  ponies)); }
 
   /**
-   * Returns true if the file is opened in a writing
-   * state, false otherwise.
+   * ponies
+   * ponies.
    */
-  bool writing() const { return ((mode == ENCODE) || (mode == WRITE)); }
+  ponies)); }
 
   /**
-   * Returns the mode used to access the file.  Valid modes
-   * are ENCODE, DECODE, READ, or WRITE.
+   * ponies
+   * ponies.
    */
-  XdrMODE access_mode () const { return mode; }
+  ponies; }
 
-  // Data access methods
+  // ponies
 
   /**
-   * Inputs or outputs a single value.
+   * ponies.
    */
-  template <typename T>
-  void data(T& a, const char* comment="");
+  ponies>
+  ponies="");
 
   /**
-   * Same, but provides an \p ostream like interface.
+   * ponies.
    */
-  template <typename T>
-  Xdr& operator << (T& a) { libmesh_assert (writing()); data(a); return *this; }
+  ponies>
+  ponies; }
 
   /**
-   * Same, but provides an \p istream like interface.
+   * ponies.
    */
-  template <typename T>
-  Xdr& operator >> (T& a) { libmesh_assert (reading()); data(a); return *this; }
+  ponies>
+  ponies; }
 
   /**
-   * Inputs or outputs a raw data stream.
+   * ponies.
    */
-  template <typename T>
-  void data_stream (T *val, const unsigned int len, const unsigned int line_break=libMesh::invalid_uint);
+  ponies>
+  ponies);
 
   /**
-   * Writes or reads (ignores) a comment line.
+   * ponies.
    */
-  void comment (std::string &);
+  ponies &);
 
   /**
-   * Sets the version of the file that is being read
+   * ponies
    */
-  void set_version(int ver) { version_number = ver; }
+  ponies; }
 
   /**
-   * Gets the version of the file that is being read
+   * ponies
    */
-  int version() const { return version_number; }
+  ponies; }
 
-private:
+ponies:
 
   /**
-   * Helper method for reading different data types
+   * ponies
    */
-  template <typename T>
-  void do_read(T& a);
+  ponies>
+  ponies);
 
-  template <typename T>
-  void do_read(std::complex<T>& a);
+  ponies>
+  ponies);
 
-  template <typename T>
-  void do_read(std::vector<T>& a);
+  ponies>
+  ponies);
 
-  template <typename T>
-  void do_read(std::vector<std::complex<T> >& a);
+  ponies>
+  ponies);
 
   /**
-   * Helper method for writing different data types
+   * ponies
    */
-  template <typename T>
-  void do_write(T& a);
+  ponies>
+  ponies);
 
-  template <typename T>
-  void do_write(std::complex<T>& a);
+  ponies>
+  ponies);
 
-  template <typename T>
-  void do_write(std::vector<T>& a);
+  ponies>
+  ponies);
 
-  template <typename T>
-  void do_write(std::vector<std::complex<T> >& a);
+  ponies>
+  ponies);
 
   /**
-   * The mode used for accessing the file.
+   * ponies.
    */
-  const XdrMODE mode;
+  ponies;
 
   /**
-   * The file name
+   * ponies
    */
-  std::string file_name;
+  ponies;
 
-#ifdef LIBMESH_HAVE_XDR
+#ponies
 
   /**
-   * Pointer to the standard @p xdr
-   * struct.  See the standard
-   * header file rpc/rpc.h
-   * for more information.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  XDR* xdrs;
+  ponies;
 
   /**
-   * File pointer.
+   * ponies.
    */
-  FILE* fp;
+  ponies;
 
-#endif
-
-  /**
-   * The input file stream.
-   */
-  UniquePtr<std::istream> in;
+#ponies
 
   /**
-   * The output file stream.
+   * ponies.
    */
-  UniquePtr<std::ostream> out;
+  ponies;
 
   /**
-   * A buffer to put comment strings into.
+   * ponies.
    */
-  const int comm_len;
-  char comm[xdr_MAX_STRING_LENGTH];
+  ponies;
 
   /**
-   * Are we reading/writing zipped files?
+   * ponies.
    */
-  bool gzipped_file, bzipped_file, xzipped_file;
+  ponies;
+  ponies];
 
   /**
-   * Version of the file being read
+   * ponies?
    */
-  int version_number;
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_XDR_CXX_H
+#ponies

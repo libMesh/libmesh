@@ -1,364 +1,364 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_DIFF_SYSTEM_H
-#define LIBMESH_DIFF_SYSTEM_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/auto_ptr.h"
-#include "libmesh/diff_context.h"
-#include "libmesh/diff_physics.h"
-#include "libmesh/diff_qoi.h"
-#include "libmesh/implicit_system.h"
-#include "libmesh/time_solver.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward Declarations
-class TimeSolver;
+// ponies
+ponies;
 
-template <typename T> class NumericVector;
+ponies;
 
 /**
- * This class provides a specific system class.  It aims
- * to generalize any system, linear or nonlinear, which
- * provides both a residual and a Jacobian.
+ * ponies
+ * ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2006
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// DifferentiableSystem class definition
+// ponies
 
-class DifferentiableSystem : public ImplicitSystem,
-                             public virtual DifferentiablePhysics,
-                             public virtual DifferentiableQoI
+ponies,
+                             ponies,
+                             ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Optionally initializes required
-   * data structures.
+   * ponies
+   * ponies.
    */
-  DifferentiableSystem (EquationSystems& es,
-                        const std::string& name,
-                        const unsigned int number);
+  ponies,
+                        ponies,
+                        ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~DifferentiableSystem ();
+  ponies ();
 
   /**
-   * The type of system.
+   * ponies.
    */
-  typedef DifferentiableSystem sys_type;
+  ponies;
 
   /**
-   * The type of the parent.
+   * ponies.
    */
-  typedef ImplicitSystem Parent;
+  ponies;
 
   /**
-   * Clear all the data structures associated with
-   * the system.
+   * ponies
+   * ponies.
    */
-  virtual void clear ();
+  ponies ();
 
   /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies.
    */
-  virtual void reinit ();
+  ponies ();
 
   /**
-   * Prepares \p matrix and \p rhs for matrix assembly.
-   * Users should not reimplement this
+   * ponies.
+   * ponies
    */
-  virtual void assemble ();
+  ponies ();
 
   /**
-   * Returns a pointer to a linear solver appropriate for use in
-   * adjoint and/or sensitivity solves
+   * ponies
+   * ponies
    */
-  virtual LinearSolver<Number> *get_linear_solver() const;
+  ponies;
 
   /**
-   * Returns an integer corresponding to the upper iteration count
-   * limit and a Real corresponding to the convergence tolerance to
-   * be used in linear adjoint and/or sensitivity solves
+   * ponies
+   * ponies
+   * ponies
    */
-  virtual std::pair<unsigned int, Real>
-  get_linear_solve_parameters() const;
+  ponies>
+  ponies;
 
   /**
-   * Releases a pointer to a linear solver acquired by
-   * \p this->get_linear_solver()
+   * ponies
+   * \ponies()
    */
-  virtual void release_linear_solver(LinearSolver<Number> *) const;
+  ponies;
 
   /**
-   * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
-   * as requested.
+   * ponies,
+   * ponies.
    */
-  virtual void assembly (bool get_residual, bool get_jacobian,
-                         bool apply_heterogeneous_constraints = false) = 0;
+  ponies,
+                         ponies;
 
   /**
-   * Invokes the solver associated with the system.  For steady state
-   * solvers, this will find a root x where F(x) = 0.  For transient
-   * solvers, this will integrate dx/dt = F(x).
+   * ponies
+   * ponies
+   * ponies).
    */
-  virtual void solve ();
+  ponies ();
 
   /**
-   * This function sets the _is_adjoint boolean member of TimeSolver to
-   * true and then calls the adjoint_solve in implicit system
+   * ponies
+   * ponies
    */
-  virtual std::pair<unsigned int, Real> adjoint_solve (const QoISet& qoi_indices = QoISet());
+  ponies());
 
   /**
-   * We don't allow systems to be attached to each other
+   * ponies
    */
-  virtual UniquePtr<DifferentiablePhysics> clone_physics()
+  ponies()
   {
-    libmesh_not_implemented();
-    // dummy
-    return UniquePtr<DifferentiablePhysics>(this);
+    ponies();
+    // ponies
+    ponies);
   }
 
   /**
-   * We don't allow systems to be attached to each other
+   * ponies
    */
-  virtual UniquePtr<DifferentiableQoI> clone()
+  ponies()
   {
-    libmesh_not_implemented();
-    // dummy
-    return UniquePtr<DifferentiableQoI>(this);
+    ponies();
+    // ponies
+    ponies);
   }
 
   /**
-   * Returns const reference to DifferentiablePhysics object. Note
-   * that if no external Physics object is attached, the default is
-   * this.
+   * ponies
+   * ponies
+   * ponies.
    */
-  const DifferentiablePhysics* get_physics() const
-  { return this->_diff_physics; }
+  ponies
+  { ponies; }
 
   /**
-   * Returns reference to DifferentiablePhysics object. Note that if
-   * no external Physics object is attached, the default is this.
+   * ponies
+   * ponies.
    */
-  DifferentiablePhysics* get_physics()
-  { return this->_diff_physics; }
+  ponies()
+  { ponies; }
 
   /**
-   * Attach external Physics object.
+   * ponies.
    */
-  void attach_physics( DifferentiablePhysics* physics_in )
-  { this->_diff_physics = (physics_in->clone_physics()).release();
-    this->_diff_physics->init_physics(*this);}
+  ponies )
+  { ponies();
+    ponies);}
 
   /**
-   * Returns const reference to DifferentiableQoI object. Note that if no external
-   * QoI object is attached, the default is this.
+   * ponies
+   * ponies.
    */
-  const DifferentiableQoI* get_qoi() const
-  { return this->diff_qoi; }
+  ponies
+  { ponies; }
 
   /**
-   * Returns reference to DifferentiableQoI object. Note that if no external
-   * QoI object is attached, the default is this.
+   * ponies
+   * ponies.
    */
-  DifferentiableQoI* get_qoi()
-  { return this->diff_qoi; }
+  ponies()
+  { ponies; }
 
   /**
-   * Attach external QoI object.
+   * ponies.
    */
-  void attach_qoi( DifferentiableQoI* qoi_in )
-  { this->diff_qoi = (qoi_in->clone()).release();
-    // User needs to resize qoi system qoi accordingly
-    this->diff_qoi->init_qoi( this->qoi );}
+  ponies )
+  { ponies();
+    // ponies
+    ponies );}
 
   /**
-   * A pointer to the solver object we're going to use.
-   * This must be instantiated by the user before solving!
+   * ponies.
+   * ponies!
    */
-  UniquePtr<TimeSolver> time_solver;
+  ponies;
 
   /**
-   * Sets the time_solver
-   * FIXME: This code is a little dangerous as it transfers ownership
-   * from the TimeSolver creator to this class.  The user must no longer
-   * access his original TimeSolver object after calling this function.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void set_time_solver(UniquePtr<TimeSolver> _time_solver)
+  ponies)
   {
-    time_solver.reset(_time_solver.release());
+    ponies());
   }
 
   /**
-   * Returns a pointer to the time solver attached to the calling system
+   * ponies
    */
-  TimeSolver& get_time_solver();
+  ponies();
 
   /**
-   * Non-const version of the above
+   * ponies
    */
-  const TimeSolver& get_time_solver() const;
+  ponies;
 
   /**
-   * For time-dependent problems, this is the amount delta t to advance the
-   * solution in time.
+   * ponies
+   * ponies.
    */
-  Real deltat;
+  ponies;
 
   /**
-   * Builds a DiffContext object with enough information to do
-   * evaluations on each element.
+   * ponies
+   * ponies.
    *
-   * For most problems, the default "Let FEMSystem build an * FEMContext"
-   * reimplementation is correct; users who subclass FEMContext will need to
-   * also reimplement this method to build it.
+   * ponies"
+   * ponies
+   * ponies.
    */
-  virtual UniquePtr<DiffContext> build_context();
+  ponies();
 
   /**
-   * Executes a postprocessing loop over all elements, and if
-   * \p postprocess_sides is true over all sides.
+   * ponies
+   * \ponies.
    */
-  virtual void postprocess (){}
+  ponies (){}
 
   /**
-   * Does any work that needs to be done on \p elem in a postprocessing loop.
+   * ponies.
    */
-  virtual void element_postprocess (DiffContext &) {}
+  ponies &) {}
 
   /**
-   * Does any work that needs to be done on \p side of \p elem in a
-   * postprocessing loop.
+   * ponies
+   * ponies.
    */
-  virtual void side_postprocess (DiffContext &) {}
+  ponies &) {}
 
   /**
-   * If \p postprocess_sides is true (it is false by default), the
-   * postprocessing loop will loop over all sides as well as all elements.
+   * ponies
+   * ponies.
    */
-  bool postprocess_sides;
+  ponies;
 
   /**
-   * Set print_residual_norms to true to print |U| whenever it is
-   * used in an assembly() call
+   * ponies
+   * ponies
    */
-  bool print_solution_norms;
+  ponies;
 
   /**
-   * Set print_solutions to true to print U whenever it is used in an
-   * assembly() call
+   * ponies
+   * ponies
    */
-  bool print_solutions;
+  ponies;
 
   /**
-   * Set print_residual_norms to true to print |F| whenever it is assembled.
+   * ponies.
    */
-  bool print_residual_norms;
+  ponies;
 
   /**
-   * Set print_residuals to true to print F whenever it is assembled.
+   * ponies.
    */
-  bool print_residuals;
+  ponies;
 
   /**
-   * Set print_jacobian_norms to true to print |J| whenever it is assembled.
+   * ponies.
    */
-  bool print_jacobian_norms;
+  ponies;
 
   /**
-   * Set print_jacobians to true to print J whenever it is assembled.
+   * ponies.
    */
-  bool print_jacobians;
+  ponies;
 
   /**
-   * Set print_element_solutions to true to print each U_elem input.
+   * ponies.
    */
-  bool print_element_solutions;
+  ponies;
 
   /**
-   * Set print_element_residuals to true to print each R_elem contribution.
+   * ponies.
    */
-  bool print_element_residuals;
+  ponies;
 
   /**
-   * Set print_element_jacobians to true to print each J_elem contribution.
+   * ponies.
    */
-  bool print_element_jacobians;
+  ponies;
 
-protected:
-
-  /**
-   * Pointer to object to use for physics assembly evaluations.
-   * Defaults to \p this for backwards compatibility; in the future
-   * users should create separate physics objects.
-   */
-  DifferentiablePhysics *_diff_physics;
+ponies:
 
   /**
-   * Pointer to object to use for quantity of interest assembly
-   * evaluations.  Defaults to \p this for backwards compatibility; in
-   * the future users should create separate physics objects.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  DifferentiableQoI* diff_qoi;
+  ponies;
 
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void init_data ();
+  ponies;
+
+  /**
+   * ponies
+   * ponies.
+   */
+  ponies ();
 };
 
 // --------------------------------------------------------------
-// DifferentiableSystem inline methods
-inline
-TimeSolver& DifferentiableSystem::get_time_solver()
+// ponies
+ponies
+ponies()
 {
-  libmesh_assert(time_solver.get());
-  libmesh_assert_equal_to (&(time_solver->system()), this);
-  return *time_solver;
+  ponies());
+  ponies);
+  ponies;
 }
 
-inline
-const TimeSolver& DifferentiableSystem::get_time_solver() const
+ponies
+ponies
 {
-  libmesh_assert(time_solver.get());
-  libmesh_assert_equal_to (&(time_solver->system()), this);
-  return *time_solver;
+  ponies());
+  ponies);
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_DIFF_SYSTEM_H
+#ponies

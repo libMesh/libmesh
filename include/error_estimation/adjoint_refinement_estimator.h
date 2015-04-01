@@ -1,147 +1,147 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H
-#define LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/error_estimator.h"
-#include "libmesh/libmesh.h"
-#include "libmesh/qoi_set.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class implements a ``brute force'' goal-oriented error
- * estimator which computes an estimate of error in a quantity of
- * interest based on the residual of the current coarse grid primal
- * solution as weighted against an adjoint solution on a uniformly
- * refined (in h and/or p, for an arbitrary number of levels) grid.
+ * ponies
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner, 2009.
+ * @ponies.
  */
-class AdjointRefinementEstimator : public ErrorEstimator
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Sets the most common default parameter values.
+   * ponies.
    */
-  AdjointRefinementEstimator() :
-    ErrorEstimator(),
-    number_h_refinements(1),
-    number_p_refinements(0),
-    _qoi_set(QoISet())
+  ponies() :
+    ponies(),
+    ponies),
+    ponies),
+    ponies())
   {
-    // We're not actually going to use error_norm; our norms are
-    // absolute values of QoI error.
-    error_norm = INVALID_NORM;
+    // ponies
+    // ponies.
+    ponies;
   }
 
   /**
-   * Destructor.
+   * ponies.
    */
-  ~AdjointRefinementEstimator() {}
+  ~ponies() {}
 
   /**
-   * Access to the QoISet (default: weight all QoIs equally) to use
-   * when computing errors
+   * ponies
+   * ponies
    */
-  QoISet &qoi_set() { return _qoi_set; }
+  ponies; }
 
   /**
-   * Access to the QoISet (default: weight all QoIs equally) to use
-   * when computing errors
+   * ponies
+   * ponies
    */
-  const QoISet &qoi_set() const { return _qoi_set; }
+  ponies; }
 
   /**
-   * This function does uniform refinements and an adjoint
-   * solve to get an adjoint solution on each cell,
-   * then estimates the error by finding the weighted residual
-   * of the coarse solution with the fine adjoint solution.
+   * ponies
+   * ponies,
+   * ponies
+   * ponies.
    *
-   * system.solve() and system.assembly() must be called, and so
-   * should have no side effects.
+   * ponies
+   * ponies.
    *
-   * Only the provided system is solved on the refined mesh;
-   * we don't support adjoint solves on loosely coupled
-   * collections of Systems.
+   * ponies;
+   * ponies
+   * ponies.
    *
-   * The estimated error is output in the vector
-   * \p error_per_cell
+   * ponies
+   * \ponies
    */
-  virtual void estimate_error (const System& system,
-                               ErrorVector& error_per_cell,
-                               const NumericVector<Number>* solution_vector = NULL,
-                               bool estimate_parent_error = false);
+  ponies,
+                               ponies,
+                               ponies,
+                               ponies);
 
   /**
-   * This is an accessor function to access the computed global
-   * QoI error estimates
+   * ponies
+   * ponies
    */
-  Number &get_global_QoI_error_estimate(unsigned int qoi_index)
+  ponies)
   {
-    return computed_global_QoI_errors[qoi_index];
+    ponies];
   }
 
   /**
-   * How many h refinements to perform to get the fine grid
+   * ponies
    */
-  unsigned char number_h_refinements;
+  ponies;
 
   /**
-   * How many p refinements to perform to get the fine grid
+   * ponies
    */
-  unsigned char number_p_refinements;
+  ponies;
 
-protected:
+ponies:
 
-  /* A vector to hold the computed global QoI error estimate */
-  std::vector<Number> computed_global_QoI_errors;
+  /* ponies */
+  ponies;
 
   /* /\** */
-  /*  * The code for estimate_error and both estimate_errors versions is very */
-  /*  * similar, so we use the same function for all three */
+  /*  * ponies */
+  /*  * ponies */
   /*  *\/ */
-  /* virtual void _estimate_error (const EquationSystems *equation_systems, */
-  /*                               const System* system, */
-  /* ErrorVector* error_per_cell, */
-  /*         std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell, */
-  /*         const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL, */
-  /* bool estimate_parent_error = false); */
+  /* ponies, */
+  /*                               ponies, */
+  /* ponies, */
+  /*         ponies, */
+  /*         ponies, */
+  /* ponies); */
 
   /**
-   * A QoISet to handle cases with multiple QoIs available
+   * ponies
    */
-  QoISet _qoi_set;
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-#endif // LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H
+#ponies

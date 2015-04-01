@@ -1,1248 +1,1248 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-#ifndef LIBMESH_PARALLEL_H
-#define LIBMESH_PARALLEL_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h" // libmesh_assert, cast_int
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/auto_ptr.h"
+// ponies
+#ponies
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <climits>
-#include <iterator>
-#include <limits>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 
-// Macro to identify and debug functions which should only be called in
-// parallel on every processor at once
+// ponies
+// ponies
 
-#undef parallel_only
-#ifndef NDEBUG
-#define parallel_only() do {                                            \
-    libmesh_deprecated();                                               \
-    libmesh_assert(CommWorld.verify(std::string(__FILE__).size()));     \
-    libmesh_assert(CommWorld.verify(std::string(__FILE__)));            \
-    libmesh_assert(CommWorld.verify(__LINE__)); } while (0)
-#else
-#define parallel_only()  ((void) 0)
-#endif
+#ponies
+#ponies
+#ponies {                                            \
+    ponies();                                               \
+    ponies()));     \
+    ponies)));            \
+    ponies)
+#ponies
+#ponies)
+#ponies
 
-#undef libmesh_parallel_only
-#ifndef NDEBUG
-#define libmesh_parallel_only(comm_obj) do {                            \
-    libmesh_assert((comm_obj).verify(std::string(__FILE__).size()));    \
-    libmesh_assert((comm_obj).verify(std::string(__FILE__)));           \
-    libmesh_assert((comm_obj).verify(__LINE__)); } while (0)
-#else
-#define libmesh_parallel_only(comm_obj)  ((void) 0)
-#endif
+#ponies
+#ponies
+#ponies {                            \
+    ponies()));    \
+    ponies)));           \
+    ponies)
+#ponies
+#ponies)
+#ponies
 
-// Macro to identify and debug functions which should only be called in
-// parallel on every processor at once
+// ponies
+// ponies
 
-#undef parallel_only_on
-#ifndef NDEBUG
-#define parallel_only_on(comm_arg) do {                                 \
-    libmesh_deprecated();                                               \
-    libmesh_assert(CommWorld.verify(std::string(__FILE__).size(), comm_arg)); \
-    libmesh_assert(CommWorld.verify(std::string(__FILE__), comm_arg));  \
-    libmesh_assert(CommWorld.verify(__LINE__), comm_arg); } while (0)
-#else
-#define parallel_only_on(comm_arg)  ((void) 0)
-#endif
+#ponies
+#ponies
+#ponies {                                 \
+    ponies();                                               \
+    ponies)); \
+    ponies));  \
+    ponies)
+#ponies
+#ponies)
+#ponies
 
-#undef libmesh_parallel_only_on
-#ifndef NDEBUG
-#define libmesh_parallel_only_on(comm_obj,comm_arg) do {                \
-    libmesh_assert(comm_obj.verify(std::string(__FILE__).size(), comm_arg)); \
-    libmesh_assert(comm_obj.verify(std::string(__FILE__), comm_arg));   \
-    libmesh_assert(comm_obj.verify(__LINE__), comm_arg); } while (0)
-#else
-#define libmesh_parallel_only_on(comm_obj,comm_arg)  ((void) 0)
-#endif
+#ponies
+#ponies
+#ponies {                \
+    ponies)); \
+    ponies));   \
+    ponies)
+#ponies
+#ponies)
+#ponies
 
 /**
- * The Parallel namespace is for wrapper functions
- * for common general parallel synchronization tasks.
+ * ponies
+ * ponies.
  *
- * For MPI 1.1 compatibility, temporary buffers are used
- * instead of MPI 2's MPI_IN_PLACE
+ * ponies
+ * ponies
  */
-namespace Parallel
+ponies
 {
 //-------------------------------------------------------------------
 /**
- * Forward declarations of classes we will define later.
+ * ponies.
  */
-class Communicator;
-class DataType;
-class Request;
-class Status;
+ponies;
+ponies;
+ponies;
+ponies;
 
-#ifdef LIBMESH_HAVE_MPI
+#ponies
 //-------------------------------------------------------------------
 /**
- * Data types for communication
+ * ponies
  */
-typedef MPI_Datatype data_type;
+ponies;
 
 /**
- * Request object for non-blocking I/O
+ * ponies
  */
-typedef MPI_Request request;
+ponies;
 
 /**
- * Status object for querying messages
+ * ponies
  */
-typedef MPI_Status status;
+ponies;
 
 /**
- * Communicator object for talking with subsets of processors
+ * ponies
  */
-typedef MPI_Comm communicator;
+ponies;
 
 /**
- * Templated function to return the appropriate MPI datatype
- * for use with built-in C types when combined with an int
+ * ponies
+ * ponies
  */
-template <typename T>
-inline data_type dataplusint_type();
+ponies>
+ponies();
 
 /**
- * Types combined with an int
+ * ponies
  */
-template <typename T>
-class DataPlusInt
+ponies>
+ponies
 {
-public:
-  T val;
-  int rank;
+ponies:
+  ponies;
+  ponies;
 };
 
 /**
- * Accept from any source
+ * ponies
  */
-const unsigned int any_source =
-  static_cast<unsigned int>(MPI_ANY_SOURCE);
+ponies =
+  ponies);
 
 
-#else
+#ponies
 
-// These shouldn't actually be needed, but must be
-// unique types for function overloading to work
-// properly.
-struct data_type    { /* unsigned int t; */ };
-struct request      { /* unsigned int r; */ };
-struct status       { /* unsigned int s; */ };
-typedef int communicator; // Must match petsc-nompi definition
+// ponies
+// ponies
+// ponies.
+ponies; */ };
+ponies; */ };
+ponies; */ };
+ponies
 
-const unsigned int any_source=0;
-#endif // LIBMESH_HAVE_MPI
+ponies;
+#ponies
 
 
 
 //-------------------------------------------------------------------
 /**
- * Encapsulates the MPI tag integers.
+ * ponies.
  */
-class MessageTag
+ponies
 {
-public:
+ponies:
 
   /**
-   * Invalid tag, to allow for default construction.
+   * ponies.
    */
-  static const int invalid_tag = INT_MIN;
+  ponies;
 
   /**
-   * Explicit constructor, to discourage using "magic numbers"
-   * as tags.  Communicator::get_unique_tag is recommended instead.
+   * ponies"
+   * ponies.
    */
-  explicit MessageTag(int tagvalue = invalid_tag)
-    : _tagvalue(tagvalue), _comm(NULL) {}
+  ponies)
+    : ponies) {}
 
   /**
-   * Copy constructor.  Helps Communicator do reference counting on
-   * unique tags
+   * ponies
+   * ponies
    */
-  MessageTag(const MessageTag& other);
+  ponies);
 
   /**
-   * Destructor.  Helps Communicator do reference counting on unique
-   * tags
+   * ponies
+   * ponies
    */
-  ~MessageTag();
+  ~ponies();
 
-  int value() const {
-    return _tagvalue;
+  ponies {
+    ponies;
   }
 
-private:
-  int _tagvalue;
-  const Communicator *_comm;
+ponies:
+  ponies;
+  ponies;
 
-  // Constructor for reference-counted unique tags
-  MessageTag(int tagvalue, const Communicator *comm)
-    : _tagvalue(tagvalue), _comm(comm) {}
+  // ponies
+  ponies)
+    : ponies) {}
 
-  // Let Communicator handle the reference counting
-  friend class Communicator;
+  // ponies
+  ponies;
 };
 
 
 //-------------------------------------------------------------------
 /**
- * Default message tag ids
+ * ponies
  */
-#ifdef LIBMESH_HAVE_MPI
-const MessageTag any_tag = MessageTag(MPI_ANY_TAG);
-#else
-const MessageTag any_tag = MessageTag(-1);
-#endif
+#ponies
+ponies);
+#ponies
+ponies);
+#ponies
 
-const MessageTag no_tag = MessageTag(0);
+ponies);
 
 
 //-------------------------------------------------------------------
 /**
- * Encapsulates the MPI_Datatype.
+ * ponies.
  */
-class DataType
+ponies
 {
-public:
-  DataType () : _datatype() {}
+ponies:
+  ponies() {}
 
-  DataType (const DataType &other) :
-    _datatype(other._datatype)
+  ponies) :
+    ponies)
   {}
 
-  DataType (const data_type &type) :
-    _datatype(type)
+  ponies) :
+    ponies)
   {}
 
-#ifdef LIBMESH_HAVE_MPI
-  DataType (const DataType &other, unsigned int count)
+#ponies
+  ponies)
   {
-    MPI_Type_contiguous(count, other._datatype, &_datatype);
-    this->commit();
+    ponies);
+    ponies();
   }
-#else
-  DataType (const DataType &, unsigned int)
+#ponies
+  ponies)
   {
   }
-#endif
+#ponies
 
-  DataType & operator = (const DataType &other)
-  { _datatype = other._datatype; return *this; }
+  ponies)
+  { ponies; }
 
-  DataType & operator = (const data_type &type)
-  { _datatype = type; return *this; }
+  ponies)
+  { ponies; }
 
-  operator const data_type & () const
-  { return _datatype; }
+  ponies
+  { ponies; }
 
-  operator data_type & ()
-  { return _datatype; }
+  ponies & ()
+  { ponies; }
 
-  //     operator data_type const * () const
-  //     { return &_datatype; }
+  //     ponies
+  //     { ponies; }
 
-  //     operator data_type * ()
-  //     { return &_datatype; }
+  //     ponies * ()
+  //     { ponies; }
 
-  void commit ()
+  ponies ()
   {
-#ifdef LIBMESH_HAVE_MPI
-    MPI_Type_commit (&_datatype);
-#endif
-  }
-
-  void free ()
-  {
-#ifdef LIBMESH_HAVE_MPI
-    MPI_Type_free (&_datatype);
-#endif
+#ponies
+    ponies);
+#ponies
   }
 
-protected:
+  ponies ()
+  {
+#ponies
+    ponies);
+#ponies
+  }
 
-  data_type _datatype;
+ponies:
+
+  ponies;
 };
 
 
 //-------------------------------------------------------------------
 
-#ifdef LIBMESH_HAVE_CXX11
-// A C++03-compatible replacement for std::false_type
-struct false_type
+#ponies
+// ponies
+ponies
 {
-  static const bool value = false;
-  typedef bool value_type;
-  typedef false_type type;
-  operator value_type() const { return value; }
+  ponies;
+  ponies;
+  ponies;
+  ponies; }
 };
 
-// Templated helper class to be used with static_assert.
-template<typename T>
-struct dependent_false : false_type
+// ponies.
+ponies>
+ponies
 {};
-#endif
+#ponies
 
 /**
- * Templated class to provide the appropriate MPI datatype
- * for use with built-in C types or simple C++ constructions.
+ * ponies
+ * ponies.
  *
- * More complicated data types may need to provide a pointer-to-T so
- * that we can use MPI_Address without constructing a new T.
+ * ponies
+ * ponies.
  */
-template <typename T>
-class StandardType : public DataType
+ponies>
+ponies
 {
-#ifdef LIBMESH_HAVE_CXX11
-  // Get a slightly better compiler diagnostic if we have C++11
-  static_assert(dependent_false<T>::value,
-                "Only specializations of StandardType may be used, did you forget to include a header file (e.g. parallel_algebra.h)?");
-#endif
+#ponies
+  // ponies
+  ponies,
+                "ponies)?");
+#ponies
 
   /*
-   * The unspecialized class is useless, so we make its constructor
-   * private to catch mistakes at compile-time rather than link-time.
-   * Specializations should have a public constructor of the same
-   * form.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies.
    */
-private:
-  StandardType(const T* example = NULL);
+ponies:
+  ponies);
 };
 
 /*
- * The unspecialized class gives default, lowest-common-denominator
- * attributes, for values which can't be used with Parallel min/max.
- * Specialized classes can set this to true, and should define
- * the lowest and highest values possible for the type.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
-template<typename T>
-struct Attributes
+ponies>
+ponies
 {
-  static const bool has_min_max = false;
-  static void set_lowest(T&) {}
-  static void set_highest(T&) {}
+  ponies;
+  ponies&) {}
+  ponies&) {}
 };
 
 
 
 //-------------------------------------------------------------------
 /**
- * Encapsulates the MPI_Status struct.  Allows the source and size
- * of the message to be determined.
+ * ponies
+ * ponies.
  */
-class Status
+ponies
 {
-public:
-  Status ();
+ponies:
+  ponies ();
 
-  explicit Status (const data_type &type);
+  ponies);
 
-  explicit Status (const status &status);
+  ponies);
 
-  Status (const status    &status,
-          const data_type &type);
+  ponies,
+          ponies);
 
-  Status (const Status &status);
+  ponies);
 
-  Status (const Status    &status,
-          const data_type &type);
+  ponies,
+          ponies);
 
-  status * get() { return &_status; }
+  ponies; }
 
-  status const * get() const { return &_status; }
+  ponies; }
 
-  int source () const;
+  ponies;
 
-  int tag () const;
+  ponies;
 
-  data_type& datatype () { return _datatype; }
+  ponies; }
 
-  const data_type& datatype () const { return _datatype; }
+  ponies; }
 
-  unsigned int size (const data_type &type) const;
+  ponies;
 
-  unsigned int size () const;
+  ponies;
 
-private:
+ponies:
 
-  status    _status;
-  data_type _datatype;
+  ponies;
+  ponies;
 };
 
 
 //-------------------------------------------------------------------
 /**
- * A class that can be subclassed to allow other code to
- * perform work after a MPI_Wait succeeds
+ * ponies
+ * ponies
  */
-struct PostWaitWork {
-  virtual ~PostWaitWork() {}
+ponies {
+  ponies() {}
 
-  virtual void run() {}
+  ponies() {}
 };
 
 
 //-------------------------------------------------------------------
 /**
- * Encapsulates the MPI_Request
+ * ponies
  */
-class Request
+ponies
 {
-public:
-  Request ();
+ponies:
+  ponies ();
 
-  Request (const request &r);
+  ponies);
 
-  Request (const Request &other);
+  ponies);
 
-  void cleanup();
+  ponies();
 
-  Request & operator = (const Request &other);
+  ponies);
 
-  Request & operator = (const request &r);
+  ponies);
 
-  ~Request ();
+  ~ponies ();
 
-  request* get() { return &_request; }
+  ponies; }
 
-  const request* get() const { return &_request; }
+  ponies; }
 
-  Status wait ();
+  ponies ();
 
-  bool test ();
+  ponies ();
 
-  bool test (status &status);
+  ponies);
 
-  void add_prior_request(const Request& req);
+  ponies);
 
-  void add_post_wait_work(PostWaitWork* work);
+  ponies);
 
-private:
-  request _request;
+ponies:
+  ponies;
 
-  // Breaking non-blocking sends into multiple requests can require chaining
-  // multiple requests into a single Request
-  UniquePtr<Request> _prior_request;
+  // ponies
+  // ponies
+  ponies;
 
-  // post_wait_work->first is a vector of work to do after a wait
-  // finishes; post_wait_work->second is a reference count so that
-  // Request objects will behave roughly like a shared_ptr and be
-  // usable in STL containers
-  std::pair<std::vector <PostWaitWork* >, unsigned int>* post_wait_work;
+  // ponies
+  // ponies
+  // ponies
+  // ponies
+  ponies;
 };
 
 /**
- * Wait for a non-blocking send or receive to finish
+ * ponies
  */
-inline Status wait (Request &r) { return r.wait(); }
+ponies(); }
 
 /**
- * Wait for a non-blocking send or receive to finish
+ * ponies
  */
-inline void wait (std::vector<Request> &r)
-{ for (unsigned int i=0; i<r.size(); i++) r[i].wait(); }
+ponies)
+{ ponies(); }
 
 
 /**
- * Define the data type to be used for data arrays whne encoding
- * a potentially-variable-size object of type T.
+ * ponies
+ * ponies.
  */
-template <typename T>
-struct BufferType;
+ponies>
+ponies;
 
 /**
- * Encoding non-const T* always uses the same buffer type as
- * encoding const T*, so other classes only have to specialize the
- * latter.
+ * ponies
+ * ponies
+ * ponies.
  */
-template <typename T>
-struct BufferType<T*> {
-  typedef typename BufferType<const T*>::type type;
+ponies>
+ponies*> {
+  ponies;
 };
 
 /**
- * Encode a potentially-variable-size object at the end of a data
- * array.
+ * ponies
+ * ponies.
  *
- * Parallel::pack() has no default implementation, and must be
- * specialized for each class which is to be communicated via packed
- * ranges.
+ * ponies
+ * ponies
+ * ponies.
  */
-template <typename T, typename buffertype, typename Context>
-void pack(const T* object,
-          typename std::vector<buffertype>& data,
-          const Context* context);
+ponies>
+ponies,
+          ponies,
+          ponies);
 
 /**
- * Output the number of integers required to encode a
- * potentially-variable-size object into a data array.
+ * ponies
+ * ponies.
  *
- * Parallel::packable_size() has no default implementation, and must
- * be specialized for each class which is to be communicated via
- * packed ranges.
+ * ponies
+ * ponies
+ * ponies.
  */
-template <typename T, typename Context>
-unsigned int packable_size(const T*, const Context*);
+ponies>
+ponies*);
 
 /**
- * Output the number of integers that were used to encode the next
- * variable-size object in the data array.
+ * ponies
+ * ponies.
  *
- * Parallel::packed_size() has no default implementation, and must
- * be specialized for each class which is to be communicated via
- * packed ranges.
+ * ponies
+ * ponies
+ * ponies.
  *
- * The output of this method should be based *only* on the data
- * array; the T* argument is solely for function specialization.
+ * ponies
+ * ponies.
  */
-template <typename T, typename BufferIter>
-unsigned int packed_size(const T*,
-                         BufferIter);
+ponies>
+ponies*,
+                         ponies);
 
 /**
- * Decode a potentially-variable-size object from a subsequence of a
- * data array.
+ * ponies
+ * ponies.
  *
- * Parallel::unpack() has no default implementation, and must be
- * specialized for each class which is to be communicated via packed
- * ranges.
+ * ponies
+ * ponies
+ * ponies.
  */
-template <typename T, typename BufferIter, typename Context>
-void unpack(BufferIter in, T** out, Context* ctx);
+ponies>
+ponies);
 
 /**
- * Decode a range of potentially-variable-size objects from a data
- * array.
+ * ponies
+ * ponies.
  */
-template <typename Context, typename buffertype, typename OutputIter>
-inline void unpack_range (const typename std::vector<buffertype>& buffer,
-                          Context *context,
-                          OutputIter out);
+ponies>
+ponies,
+                          ponies,
+                          ponies);
 
 /**
- * Encode a range of potentially-variable-size objects to a data
- * array.
+ * ponies
+ * ponies.
  */
-template <typename Context, typename buffertype, typename Iter>
-inline Iter pack_range (const Context *context,
-                        Iter range_begin,
-                        const Iter range_end,
-                        typename std::vector<buffertype>& buffer);
+ponies>
+ponies,
+                        ponies,
+                        ponies,
+                        ponies);
 
 /**
- * Return the total buffer size needed to encode a range of
- * potentially-variable-size objects to a data array.
+ * ponies
+ * ponies.
  */
-template <typename Context, typename Iter>
-inline std::size_t packed_range_size (const Context *context,
-                                      Iter range_begin,
-                                      const Iter range_end);
+ponies>
+ponies,
+                                      ponies,
+                                      ponies);
 
 //-------------------------------------------------------------------
 /**
- * Encapsulates the MPI_Comm object.  Allows the size of the group
- * and this process's position in the group to be determined.
+ * ponies
+ * ponies.
  *
- * Methods of this object are the preferred way to perform
- * distributed-memory parallel operations.
+ * ponies
+ * ponies.
  */
-class Communicator
+ponies
 {
-  // Basic operations:
-public:
+  // ponies:
+ponies:
 
   /**
-   * Default Constructor.
+   * ponies.
    */
-  Communicator ();
+  ponies ();
 
   /*
-   * Constructor from MPI_Comm
+   * ponies
    */
-  explicit Communicator (const communicator &comm);
+  ponies);
 
   /*
-   * NON-VIRTUAL destructor
+   * ponies
    */
-  ~Communicator ();
+  ~ponies ();
 
   /*
-   * Create a new communicator between some subset of \p this
+   * ponies
    */
-  void split(int color, int key, Communicator &target) const;
+  ponies;
 
   /*
-   * Create a new duplicate of \p this communicator
+   * ponies
    */
-  void duplicate(const Communicator &comm);
+  ponies);
 
   /*
-   * Create a new duplicate of an MPI communicator
+   * ponies
    */
-  void duplicate(const communicator &comm);
+  ponies);
 
-  communicator& get() { return _communicator; }
+  ponies; }
 
-  const communicator& get() const { return _communicator; }
+  ponies; }
 
   /**
-   * Get a tag that is unique to this Communicator.  Note that if
-   * people are also using magic numbers or copying communicators
-   * around then we can't guarantee the tag is unique to this
-   * MPI_Comm.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  MessageTag get_unique_tag(int tagvalue) const;
+  ponies;
 
   /**
-   * Reference an already-acquired tag, so that we know it will
-   * be dereferenced multiple times before we can re-release it.
+   * ponies
+   * ponies.
    */
-  void reference_unique_tag(int tagvalue) const;
+  ponies;
 
   /**
-   * Dereference an already-acquired tag, and see if we can
-   * re-release it.
+   * ponies
+   * ponies.
    */
-  void dereference_unique_tag(int tagvalue) const;
+  ponies;
 
   /**
-   * Free and reset this communicator
+   * ponies
    */
-  void clear();
+  ponies();
 
-  Communicator& operator= (const communicator &comm);
+  ponies);
 
-  unsigned int rank() const { return _rank; }
+  ponies; }
 
-  unsigned int size() const { return _size; }
+  ponies; }
 
   /**
-   * Whether to use default or synchronous sends?
+   * ponies?
    */
-  enum SendMode { DEFAULT=0, SYNCHRONOUS };
+  ponies };
 
-private:
+ponies:
 
-  // Don't use the copy constructor, just copy by reference or
-  // pointer - it's too hard to keep a common used_tag_values if
-  // each communicator is shared by more than one Communicator
-  explicit Communicator (const Communicator &);
+  // ponies
+  // ponies
+  // ponies
+  ponies &);
 
   /**
-   * Utility function for setting our member variables from an MPI
-   * communicator
+   * ponies
+   * ponies
    */
-  void assign(const communicator &comm);
+  ponies);
 
-  communicator  _communicator;
-  unsigned int  _rank, _size;
-  SendMode _send_mode;
+  ponies;
+  ponies;
+  ponies;
 
-  // mutable used_tag_values - not thread-safe, but then Parallel::
-  // isn't thread-safe in general.
-  mutable std::map<int, unsigned int> used_tag_values;
-  bool          _I_duped_it;
+  // ponies::
+  // ponies.
+  ponies;
+  ponies;
 
-  // Communication operations:
-public:
+  // ponies:
+ponies:
 
   /**
-   * Explicitly sets the \p SendMode type used for send operations.
+   * ponies.
    */
-  void send_mode (const SendMode sm) { _send_mode = sm; }
+  ponies; }
 
   /**
-   * Gets the user-requested SendMode.
+   * ponies.
    */
-  SendMode send_mode() const { return _send_mode; }
+  ponies; }
 
   /**
-   * Pause execution until all processors reach a certain point.
+   * ponies.
    */
-  void barrier () const;
+  ponies;
 
   /**
-   * Verify that a local variable has the same value on all processors.
-   * Containers must have the same value in every entry.
+   * ponies.
+   * ponies.
    */
-  template <typename T>
-  bool verify(const T &r) const;
+  ponies>
+  ponies;
 
   /**
-   * Verify that a local pointer points to the same value on all
-   * processors where it is not NULL.
-   * Containers must have the same value in every entry.
+   * ponies
+   * ponies.
+   * ponies.
    */
-  template <typename T>
-  bool semiverify(const T *r) const;
+  ponies>
+  ponies;
 
   /**
-   * Take a local variable and replace it with the minimum of it's values
-   * on all processors.  Containers are replaced element-wise.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void min(T &r) const;
+  ponies>
+  ponies;
 
   /**
-   * Take a local variable and replace it with the minimum of it's values
-   * on all processors, returning the minimum rank of a processor
-   * which originally held the minimum value.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void minloc(T &r,
-              unsigned int &min_id) const;
+  ponies>
+  ponies,
+              ponies;
 
   /**
-   * Take a vector of local variables and replace each entry with the minimum
-   * of it's values on all processors.  Set each \p min_id entry to
-   * the minimum rank where a corresponding minimum was found.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void minloc(std::vector<T> &r,
-              std::vector<unsigned int> &min_id) const;
+  ponies>
+  ponies,
+              ponies;
 
   /**
-   * Take a local variable and replace it with the maximum of it's values
-   * on all processors.  Containers are replaced element-wise.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void max(T &r) const;
+  ponies>
+  ponies;
 
   /**
-   * Take a local variable and replace it with the maximum of it's values
-   * on all processors, returning the minimum rank of a processor
-   * which originally held the maximum value.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void maxloc(T &r,
-              unsigned int &max_id) const;
+  ponies>
+  ponies,
+              ponies;
 
   /**
-   * Take a vector of local variables and replace each entry with the maximum
-   * of it's values on all processors.  Set each \p min_id entry to
-   * the minimum rank where a corresponding maximum was found.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void maxloc(std::vector<T> &r,
-              std::vector<unsigned int> &max_id) const;
+  ponies>
+  ponies,
+              ponies;
 
   /**
-   * Take a local variable and replace it with the sum of it's values
-   * on all processors.  Containers are replaced element-wise.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void sum(T &r) const;
+  ponies>
+  ponies;
 
   /**
-   * Take a container of local variables on each processor, and
-   * collect their union over all processors, replacing the set on
-   * processor 0.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void set_union(T &data, const unsigned int root_id) const;
+  ponies>
+  ponies;
 
   /**
-   * Take a container of local variables on each processor, and
-   * replace it with their union over all processors.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  void set_union(T &data) const;
+  ponies>
+  ponies;
 
   /**
-   * Blocking message probe.  Allows information about a message to be
-   * examined before the message is actually received.
+   * ponies
+   * ponies.
    */
-  status probe (const unsigned int src_processor_id,
-                const MessageTag &tag=any_tag) const;
+  ponies,
+                ponies;
 
   /**
-   * Blocking-send to one processor with data-defined type.
+   * ponies.
    */
-  template <typename T>
-  void send (const unsigned int dest_processor_id,
-             T &buf,
-             const MessageTag &tag=no_tag) const;
+  ponies>
+  ponies,
+             ponies,
+             ponies;
 
   /**
-   * Nonblocking-send to one processor with data-defined type.
+   * ponies.
    */
-  template <typename T>
-  void send (const unsigned int dest_processor_id,
-             T &buf,
-             Request &req,
-             const MessageTag &tag=no_tag) const;
+  ponies>
+  ponies,
+             ponies,
+             ponies,
+             ponies;
 
   /**
-   * Blocking-send to one processor with user-defined type.
+   * ponies.
    */
-  template <typename T>
-  void send (const unsigned int dest_processor_id,
-             T &buf,
-             const DataType &type,
-             const MessageTag &tag=no_tag) const;
+  ponies>
+  ponies,
+             ponies,
+             ponies,
+             ponies;
 
   /**
-   * Nonblocking-send to one processor with user-defined type.
+   * ponies.
    */
-  template <typename T>
-  void send (const unsigned int dest_processor_id,
-             T &buf,
-             const DataType &type,
-             Request &req,
-             const MessageTag &tag=no_tag) const;
+  ponies>
+  ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies;
 
   /**
-   * Blocking-receive from one processor with data-defined type.
+   * ponies.
    */
-  template <typename T>
-  Status receive (const unsigned int dest_processor_id,
-                  T &buf,
-                  const MessageTag &tag=any_tag) const;
+  ponies>
+  ponies,
+                  ponies,
+                  ponies;
 
   /**
-   * Nonblocking-receive from one processor with data-defined type.
+   * ponies.
    */
-  template <typename T>
-  void receive (const unsigned int dest_processor_id,
-                T &buf,
-                Request &req,
-                const MessageTag &tag=any_tag) const;
+  ponies>
+  ponies,
+                ponies,
+                ponies,
+                ponies;
 
   /**
-   * Blocking-receive from one processor with user-defined type.
+   * ponies.
    */
-  template <typename T>
-  Status receive (const unsigned int dest_processor_id,
-                  T &buf,
-                  const DataType &type,
-                  const MessageTag &tag=any_tag) const;
+  ponies>
+  ponies,
+                  ponies,
+                  ponies,
+                  ponies;
 
   /**
-   * Nonblocking-receive from one processor with user-defined type.
+   * ponies.
    */
-  template <typename T>
-  void receive (const unsigned int dest_processor_id,
-                T &buf,
-                const DataType &type,
-                Request &req,
-                const MessageTag &tag=any_tag) const;
+  ponies>
+  ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies;
 
   /**
-   * Blocking-send range-of-pointers to one processor.  This
-   * function does not send the raw pointers, but rather constructs
-   * new objects at the other end whose contents match the objects
-   * pointed to by the sender.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * void Parallel::pack(const T*, vector<int>& data, const Context*)
-   * is used to serialize type T onto the end of a data vector.
+   * ponies*)
+   * ponies.
    *
-   * unsigned int Parallel::packable_size(const T*, const Context*) is
-   * used to allow data vectors to reserve memory, and for additional
-   * error checking
+   * ponies
+   * ponies
+   * ponies
    */
-  template <typename Context, typename Iter>
-  void send_packed_range (const unsigned int dest_processor_id,
-                          const Context *context,
-                          Iter range_begin,
-                          const Iter range_end,
-                          const MessageTag &tag=no_tag) const;
+  ponies>
+  ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies;
 
   /**
-   * Nonblocking-send range-of-pointers to one processor.  This
-   * function does not send the raw pointers, but rather constructs
-   * new objects at the other end whose contents match the objects
-   * pointed to by the sender.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * void Parallel::pack(const T*, vector<int>& data, const Context*)
-   * is used to serialize type T onto the end of a data vector.
+   * ponies*)
+   * ponies.
    *
-   * unsigned int Parallel::packable_size(const T*, const Context*) is
-   * used to allow data vectors to reserve memory, and for additional
-   * error checking
+   * ponies
+   * ponies
+   * ponies
    */
-  template <typename Context, typename Iter>
-  void send_packed_range (const unsigned int dest_processor_id,
-                          const Context *context,
-                          Iter range_begin,
-                          const Iter range_end,
-                          Request &req,
-                          const MessageTag &tag=no_tag) const;
+  ponies>
+  ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies;
 
   /**
-   * Blocking-receive range-of-pointers from one processor.  This
-   * function does not receive raw pointers, but rather constructs new
-   * objects whose contents match the objects pointed to by the
-   * sender.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The objects will be of type
-   * T = iterator_traits<OutputIter>::value_type.
+   * ponies
+   * ponies.
    *
-   * Using std::back_inserter as the output iterator allows receive to
-   * fill any container type.  Using libMesh::null_output_iterator
-   * allows the receive to be dealt with solely by Parallel::unpack(),
-   * for objects whose unpack() is written so as to not leak memory
-   * when used in this fashion.
+   * ponies
+   * ponies
+   * ponies(),
+   * ponies
+   * ponies.
    *
-   * A future version of this method should be created to preallocate
-   * memory when receiving vectors...
+   * ponies
+   * ponies...
    *
-   * void Parallel::unpack(vector<int>::iterator in, T** out, Context*)
-   * is used to unserialize type T, typically into a new
-   * heap-allocated object whose pointer is returned as *out.
+   * ponies*)
+   * ponies
+   * ponies.
    *
-   * unsigned int Parallel::packed_size(const T*,
-   *                                    vector<int>::const_iterator)
-   * is used to advance to the beginning of the next object's data.
+   * ponies*,
+   *                                    ponies)
+   * ponies.
    */
-  template <typename Context, typename OutputIter>
-  void receive_packed_range (const unsigned int dest_processor_id,
-                             Context *context,
-                             OutputIter out,
-                             const MessageTag &tag=any_tag) const;
+  ponies>
+  ponies,
+                             ponies,
+                             ponies,
+                             ponies;
 
   /**
-   * Nonblocking-receive range-of-pointers from one processor.
-   * Not yet implemented.
+   * ponies.
+   * ponies.
    */
-  // template <typename Context, typename OutputIter>
-  // void receive_packed_range (const unsigned int dest_processor_id,
-  //                            Context *context,
-  //                            OutputIter out,
-  //                            Request &req,
-  //                            const MessageTag &tag=any_tag) const;
+  // ponies>
+  // ponies,
+  //                            ponies,
+  //                            ponies,
+  //                            ponies,
+  //                            ponies;
 
   /**
-   * Send data \p send to one processor while simultaneously receiving
-   * other data \p recv from a (potentially different) processor.
+   * ponies
+   * ponies.
    */
-  template <typename T1, typename T2>
-  void send_receive(const unsigned int dest_processor_id,
-                    T1 &send,
-                    const unsigned int source_processor_id,
-                    T2 &recv,
-                    const MessageTag &send_tag = no_tag,
-                    const MessageTag &recv_tag = any_tag) const;
+  ponies>
+  ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies;
 
   /**
-   * Send a range-of-pointers to one processor while simultaneously receiving
-   * another range from a (potentially different) processor.  This
-   * function does not send or receive raw pointers, but rather constructs
-   * new objects at each receiver whose contents match the objects
-   * pointed to by the sender.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The objects being sent will be of type
-   * T1 = iterator_traits<RangeIter>::value_type, and the objects
-   * being received will be of type
-   * T2 = iterator_traits<OutputIter>::value_type
+   * ponies
+   * ponies
+   * ponies
+   * ponies
    *
-   * void Parallel::pack(const T1*, vector<int>& data, const Context1*)
-   * is used to serialize type T1 onto the end of a data vector.
+   * ponies*)
+   * ponies.
    *
-   * Using std::back_inserter as the output iterator allows
-   * send_receive to fill any container type.  Using
-   * libMesh::null_output_iterator allows the receive to be dealt with
-   * solely by Parallel::unpack(), for objects whose unpack() is
-   * written so as to not leak memory when used in this fashion.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * A future version of this method should be created to preallocate
-   * memory when receiving vectors...
+   * ponies
+   * ponies...
    *
-   * void Parallel::unpack(vector<int>::iterator in, T2** out, Context*)
-   * is used to unserialize type T2, typically into a new
-   * heap-allocated object whose pointer is returned as *out.
+   * ponies*)
+   * ponies
+   * ponies.
    *
-   * unsigned int Parallel::packable_size(const T1*, const Context1*)
-   * is used to allow data vectors to reserve memory, and for
-   * additional error checking.
+   * ponies*)
+   * ponies
+   * ponies.
    *
-   * unsigned int Parallel::packed_size(const T2*,
-   *                                    vector<int>::const_iterator)
-   * is used to advance to the beginning of the next object's data.
+   * ponies*,
+   *                                    ponies)
+   * ponies.
    */
-  template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
-  void send_receive_packed_range(const unsigned int dest_processor_id,
-                                 const Context1* context1,
-                                 RangeIter send_begin,
-                                 const RangeIter send_end,
-                                 const unsigned int source_processor_id,
-                                 Context2* context2,
-                                 OutputIter out,
-                                 const MessageTag &send_tag = no_tag,
-                                 const MessageTag &recv_tag = any_tag) const;
+  ponies>
+  ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies,
+                                 ponies;
 
   /**
-   * Send data \p send to one processor while simultaneously receiving
-   * other data \p recv from a (potentially different) processor, using
-   * a user-specified MPI Dataype.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T1, typename T2>
-  void send_receive(const unsigned int dest_processor_id,
-                    T1 &send,
-                    const DataType &type1,
-                    const unsigned int source_processor_id,
-                    T2 &recv,
-                    const DataType &type2,
-                    const MessageTag &send_tag = no_tag,
-                    const MessageTag &recv_tag = any_tag) const;
+  ponies>
+  ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies;
 
   /**
-   * Take a vector of length comm.size(), and on processor root_id fill in
-   * recv[processor_id] = the value of send on processor processor_id
+   * ponies
+   * ponies
    */
-  template <typename T>
-  inline void gather(const unsigned int root_id,
-                     T send,
-                     std::vector<T> &recv) const;
+  ponies>
+  ponies,
+                     ponies,
+                     ponies;
 
   /**
-   * Take a vector of local variables and expand it on processor root_id
-   * to include values from all processors
+   * ponies
+   * ponies
    *
-   * This handles the case where the lengths of the vectors may vary.
-   * Specifically, this function transforms this:
-   * \verbatim
-   * Processor 0: [ ... N_0 ]
-   * Processor 1: [ ....... N_1 ]
+   * ponies.
+   * ponies:
+   * \ponies
+   * ponies ]
+   * ponies ]
    * ...
-   * Processor M: [ .. N_M]
-   * \endverbatim
+   * ponies]
+   * \ponies
    *
-   * into this:
+   * ponies:
    *
-   * \verbatim
-   * [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
-   * \endverbatim
+   * \ponies
+   * [ [ ... ponies] ]
+   * \ponies
    *
-   * on processor root_id. This function is collective and therefore
-   * must be called by all processors in the Communicator.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  inline void gather(const unsigned int root_id,
-                     std::vector<T> &r) const;
+  ponies>
+  ponies,
+                     ponies;
 
   /**
-   * Take a vector of length \p this->size(), and fill in
-   * \p recv[processor_id] = the value of \p send on that processor
+   * ponies
+   * \ponies
    */
-  template <typename T>
-  inline void allgather(T send,
-                        std::vector<T> &recv) const;
+  ponies>
+  ponies,
+                        ponies;
 
 
   /**
-   * Take a vector of local variables and expand it to include
-   * values from all processors. By default, each processor is
-   * allowed to have its own unique input buffer length. If
-   * it is known that all processors have the same input sizes
-   * additional communication can be avoided.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Specifically, this function transforms this:
-   * \verbatim
-   * Processor 0: [ ... N_0 ]
-   * Processor 1: [ ....... N_1 ]
+   * ponies:
+   * \ponies
+   * ponies ]
+   * ponies ]
    * ...
-   * Processor M: [ .. N_M]
-   * \endverbatim
+   * ponies]
+   * \ponies
    *
-   * into this:
+   * ponies:
    *
-   * \verbatim
-   * [ [ ... N_0 ] [ ....... N_1 ] ... [ .. N_M] ]
-   * \endverbatim
+   * \ponies
+   * [ [ ... ponies] ]
+   * \ponies
    *
-   * on each processor. This function is collective and therefore
-   * must be called by all processors in the Communicator.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  inline void allgather(std::vector<T> &r,
-                        const bool identical_buffer_sizes = false) const;
+  ponies>
+  ponies,
+                        ponies;
 
   //-------------------------------------------------------------------
   /**
-   * Take a range of local variables, combine it with ranges from all
-   * processors, and write the output to the output iterator on rank root.
+   * ponies
+   * ponies.
    */
-  template <typename Context, typename Iter, typename OutputIter>
-  inline void gather_packed_range (const unsigned int root_id,
-                                   Context *context,
-                                   Iter range_begin,
-                                   const Iter range_end,
-                                   OutputIter out) const;
+  ponies>
+  ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies,
+                                   ponies;
 
   /**
-   * Take a range of local variables, combine it with ranges from all
-   * processors, and write the output to the output iterator.
+   * ponies
+   * ponies.
    */
-  template <typename Context, typename Iter, typename OutputIter>
-  inline void allgather_packed_range (Context *context,
-                                      Iter range_begin,
-                                      const Iter range_end,
-                                      OutputIter out) const;
+  ponies>
+  ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies;
 
   /**
-   * Effectively transposes the input vector across all processors.
-   * The jth entry on processor i is replaced with the ith entry
-   * from processor j.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  inline void alltoall(std::vector<T> &r) const;
+  ponies>
+  ponies;
 
   /**
-   * Take a local value and broadcast it to all processors.
-   * Optionally takes the \p root_id processor, which specifies
-   * the processor initiating the broadcast.
-   * If \p data is a vector, the user is responsible for resizing it
-   * on all processors, except in the case when \p data is a vector
-   * of strings.
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  template <typename T>
-  inline void broadcast(T &data, const unsigned int root_id=0) const;
+  ponies>
+  ponies;
 
   /**
-   * Blocking-broadcast range-of-pointers to one processor.  This
-   * function does not send the raw pointers, but rather constructs
-   * new objects at the other end whose contents match the objects
-   * pointed to by the sender.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * void Parallel::pack(const T*, vector<int>& data, const Context*)
-   * is used to serialize type T onto the end of a data vector.
+   * ponies*)
+   * ponies.
    *
-   * unsigned int Parallel::packable_size(const T*, const Context*) is
-   * used to allow data vectors to reserve memory, and for additional
-   * error checking
+   * ponies
+   * ponies
+   * ponies
    *
-   * unsigned int Parallel::packed_size(const T*,
-   *                                    vector<int>::const_iterator)
-   * is used to advance to the beginning of the next object's data.
+   * ponies*,
+   *                                    ponies)
+   * ponies.
    */
-  template <typename Context, typename OutputContext, typename Iter, typename OutputIter>
-  inline void broadcast_packed_range (const Context *context1,
-                                      Iter range_begin,
-                                      const Iter range_end,
-                                      OutputContext *context2,
-                                      OutputIter out,
-                                      const unsigned int root_id = 0) const;
+  ponies>
+  ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies;
 
   /**
-   * C++ doesn't let us partially specialize functions (we're really
-   * just doing operator overloading on them), so more-specialized
-   * versions of the functions above need to be redeclared.  We'll
-   * do so in a separate file so that users don't have to look at
-   * the redundancy.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-#include "libmesh/parallel_communicator_specializations"
+#ponies"
 
-}; // class Communicator
+}; // ponies
 
-// FakeCommunicator for debugging inappropriate CommWorld uses
-class FakeCommunicator
+// ponies
+ponies
 {
-  operator Communicator& ()
+  ponies& ()
   {
-    libmesh_not_implemented();
-    static Communicator temp;
-    return temp;
+    ponies();
+    ponies;
+    ponies;
   }
 };
 
-// PostWaitWork specialization for copying from temporary to
-// output containers
-template <typename Container, typename OutputIter>
-struct PostWaitCopyBuffer : public PostWaitWork {
-  PostWaitCopyBuffer(const Container& buffer, const OutputIter out)
-    : _buf(buffer), _out(out) {}
+// ponies
+// ponies
+ponies>
+ponies {
+  ponies)
+    : ponies) {}
 
-  virtual void run() { std::copy(_buf.begin(), _buf.end(), _out); }
+  ponies); }
 
-private:
-  const Container& _buf;
-  OutputIter _out;
+ponies:
+  ponies;
+  ponies;
 };
 
-// PostWaitWork specialization for unpacking received buffers.
-template <typename Container, typename Context, typename OutputIter>
-struct PostWaitUnpackBuffer : public PostWaitWork {
-  PostWaitUnpackBuffer(const Container& buffer, Context *context, OutputIter out) :
-    _buf(buffer), _context(context), _out(out) {}
+// ponies.
+ponies>
+ponies {
+  ponies) :
+    ponies) {}
 
-  virtual void run() { Parallel::unpack_range(_buf, _context, _out); }
+  ponies); }
 
-private:
-  const Container& _buf;
-  Context *_context;
-  OutputIter _out;
+ponies:
+  ponies;
+  ponies;
+  ponies;
 };
 
 
-// PostWaitWork specialization for freeing no-longer-needed buffers.
-template <typename Container>
-struct PostWaitDeleteBuffer : public PostWaitWork {
-  PostWaitDeleteBuffer(Container* buffer) : _buf(buffer) {}
+// ponies.
+ponies>
+ponies {
+  ponies) {}
 
-  virtual void run() { delete _buf; }
+  ponies; }
 
-private:
-  Container* _buf;
+ponies:
+  ponies;
 };
 
-} // namespace Parallel
+} // ponies
 
   /**
-   * The default libMesh communicator.
+   * ponies.
    *
-   * If this communicator is disabled, we also disable it as a default
-   * argument to functions which accept a default communicator
-   * argument.  This should expose implicit uses of the default
-   * communicator as compile-time rather than run-time errors.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * The macro LIBMESH_CAN_DEFAULT_TO_COMMWORLD effects this
-   * functionality; it is empty (and so leaves arguments with no
-   * default value) if the default is disabled, and it sets something
-   * equal to the default otherwise.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-#ifdef LIBMESH_DISABLE_COMMWORLD
-extern Parallel::FakeCommunicator CommWorld;
-#define LIBMESH_CAN_DEFAULT_TO_COMMWORLD
-#else
-extern Parallel::Communicator CommWorld;
-#define LIBMESH_CAN_DEFAULT_TO_COMMWORLD = libMesh::CommWorld
-#endif
+#ponies
+ponies;
+#ponies
+#ponies
+ponies;
+#ponies
+#ponies
 
-} // namespace libMesh
+} // ponies
 
-// Define all the implementations separately; users might want to look
-// through this file for APIs, and it's long enough already.
+// ponies
+// ponies.
 
-#include "libmesh/parallel_implementation.h"
+#ponies"
 
-#endif // LIBMESH_PARALLEL_H
+#ponies

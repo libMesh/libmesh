@@ -1,52 +1,52 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/node_elem.h"
+// ponies
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
-// Forward declarations
+// ponies
 
 
-void NodeElem::connectivity(const unsigned int,
-                            const IOPackage,
-                            std::vector<dof_id_type>&) const
+ponies,
+                            ponies,
+                            ponies
 {
-  libmesh_not_implemented();
+  ponies();
 }
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-const float NodeElem::_embedding_matrix[1][1][1] =
+ponies] =
   {
-    // embedding matrix for child 0
+    // ponies
     {
-      // 0
-      {1.0}, // 0
+      // ponies
+      {ponies
     }
   };
 
-#endif
+#ponies
 
-} // namespace libMesh
+} // ponies

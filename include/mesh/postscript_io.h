@@ -1,151 +1,151 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_POSTSCRIPT_IO_H
-#define LIBMESH_POSTSCRIPT_IO_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_output.h"
-//#include "libmesh/dense_matrix.h"
-#include "libmesh/point.h"
+// ponies
+#ponies"
+#ponies"
+//#ponies"
+#ponies"
 
-// C++ includes
-#include <fstream>
-#include <sstream>
-#include <vector>
+// ponies
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class MeshBase;
-class Elem;
+// ponies
+ponies;
+ponies;
 
 /**
- * This class implements writing 2D meshes in Postscript.  It borrows
- * several ideas from, and is a more simple-minded version of, the
- * DataOutBase::write_eps() function from Deal II.  Only output is
- * supported here, and only the Mesh (none of the data) is written.
- * The main use I imagined for this class is creating nice Mesh
- * images for publications, since I didn't find/don't know of a free
- * visualization program which would do this.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies.
  *
- * @author John W. Peterson, 2008
+ * @ponies
  */
-class PostscriptIO : public MeshOutput<MeshBase>
+ponies>
 {
-public:
+ponies:
   /**
-   * Constructor.
+   * ponies.
    */
-  explicit
-  PostscriptIO (const MeshBase& mesh);
+  ponies
+  ponies);
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~PostscriptIO ();
+  ponies ();
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * ponies.
    */
-  virtual void write (const std::string& );
+  ponies& );
 
   /**
-   * Controls greyscale shading of cells.  By default this value
-   * is 0.0 (which actually corresponds to black) and this indicates
-   * "no shading" i.e. only mesh lines will be drawn.  Any other
-   * value in (0,1] will cause the cells to be grey-shaded to some
-   * degree, with higher values being lighter.  A value of 0.75
-   * gives decent results.
+   * ponies
+   * ponies
+   * "ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real shade_value;
+  ponies;
 
   /**
-   * Control the thickness of the lines used.  0.5 is a reasonable default
-   * for printed images, but you may need to decrease this value (or
-   * choose it adaptively) when there are very slim cells present in
-   * the mesh.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  Real line_width;
+  ponies;
 
   /**
-   * Draws an element with Bezier curves
+   * ponies
    */
-  void plot_quadratic_elem(const Elem* elem);
+  ponies);
 
   /**
-   * Draws an element with straight lines
+   * ponies
    */
-  void plot_linear_elem(const Elem* elem);
+  ponies);
 
-private:
+ponies:
   /**
-   * Given a quadratic edge Elem which lies in the x-y plane,
-   * computes the Bezier coefficients.  These may be passed to
-   * the Postscript routine "curveto".
+   * ponies,
+   * ponies
+   * ponies".
    */
-  void _compute_edge_bezier_coeffs(const Elem* elem);
-
-  /**
-   * Coefficients of the transformation from physical-space
-   * edge coordinates to Bezier basis coefficients.  Transforms
-   * x and y separately.
-   */
-  //DenseMatrix<float> _M;
-  static const float _bezier_transform[3][3];
+  ponies);
 
   /**
-   * Vector containing 3 points corresponding to Bezier coefficients,
-   * as computed by _compute_edge_bezier_coeffs.
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::vector<Point> _bezier_coeffs;
+  //ponies;
+  ponies];
 
   /**
-   * Amount to add to every (x,y) point to place it in Postscript coordinates.
+   * ponies,
+   * ponies.
    */
-  Point _offset;
+  ponies;
 
   /**
-   * Amount by which to stretch each point to place it in Postscript coordinates.
+   * ponies.
    */
-  Real _scale;
+  ponies;
 
   /**
-   * A point object used for temporary calculations
+   * ponies.
    */
-  Point _current_point;
+  ponies;
 
   /**
-   * Drawing style-independent data for a single cell.  This can be
-   * used as a temporary buffer for storing data which may be sent to
-   * the output stream multiple times.
+   * ponies
    */
-  std::ostringstream _cell_string;
+  ponies;
 
   /**
-   * Output file stream which will be opened when the file name is known
+   * ponies
+   * ponies
+   * ponies.
    */
-  std::ofstream _out;
+  ponies;
+
+  /**
+   * ponies
+   */
+  ponies;
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_POSTSCRIPT_IO_H
+#ponies

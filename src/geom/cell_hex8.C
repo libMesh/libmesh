@@ -1,422 +1,422 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/side.h"
-#include "libmesh/cell_hex8.h"
-#include "libmesh/edge_edge2.h"
-#include "libmesh/face_quad4.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-namespace libMesh
+ponies
 {
 
 
 
 
 // ------------------------------------------------------------
-// Hex8 class static member initializations
-const unsigned int Hex8::side_nodes_map[6][4] =
+// ponies
+ponies] =
   {
-    {0, 3, 2, 1}, // Side 0
-    {0, 1, 5, 4}, // Side 1
-    {1, 2, 6, 5}, // Side 2
-    {2, 3, 7, 6}, // Side 3
-    {3, 0, 4, 7}, // Side 4
-    {4, 5, 6, 7}  // Side 5
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
   };
 
-const unsigned int Hex8::edge_nodes_map[12][2] =
+ponies] =
   {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {2, 3}, // Side 2
-    {0, 3}, // Side 3
-    {0, 4}, // Side 4
-    {1, 5}, // Side 5
-    {2, 6}, // Side 6
-    {3, 7}, // Side 7
-    {4, 5}, // Side 8
-    {5, 6}, // Side 9
-    {6, 7}, // Side 10
-    {4, 7}  // Side 11
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
+    {ponies
   };
 
 
 // ------------------------------------------------------------
-// Hex8 class member functions
+// ponies
 
-bool Hex8::is_vertex(const unsigned int) const
+ponies
 {
-  return true;
+  ponies;
 }
 
-bool Hex8::is_edge(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Hex8::is_face(const unsigned int) const
+ponies
 {
-  return false;
+  ponies;
 }
 
-bool Hex8::is_node_on_side(const unsigned int n,
-                           const unsigned int s) const
+ponies,
+                           ponies
 {
-  libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
-bool Hex8::is_node_on_edge(const unsigned int n,
-                           const unsigned int e) const
+ponies,
+                           ponies
 {
-  libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
-}
-
-
-
-bool Hex8::has_affine_map() const
-{
-  // Make sure x-edge endpoints are affine
-  Point v = this->point(1) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(2) - this->point(3)) ||
-      !v.relative_fuzzy_equals(this->point(5) - this->point(4)) ||
-      !v.relative_fuzzy_equals(this->point(6) - this->point(7)))
-    return false;
-  // Make sure xz-faces are identical parallelograms
-  v = this->point(4) - this->point(0);
-  if (!v.relative_fuzzy_equals(this->point(7) - this->point(3)))
-    return false;
-  // If all the above checks out, the map is affine
-  return true;
+  ponies());
+  ponies)
+    ponies)
+      ponies;
+  ponies;
 }
 
 
 
-UniquePtr<Elem> Hex8::build_side (const unsigned int i,
-                                  bool proxy) const
+ponies
 {
-  libmesh_assert_less (i, this->n_sides());
+  // ponies
+  ponies);
+  ponies)) ||
+      !ponies)) ||
+      !ponies)))
+    ponies;
+  // ponies
+  ponies);
+  ponies)))
+    ponies;
+  // ponies
+  ponies;
+}
 
-  if (proxy)
-    return UniquePtr<Elem>(new Side<Quad4,Hex8>(this,i));
 
-  else
+
+ponies,
+                                  ponies
+{
+  ponies());
+
+  ponies)
+    ponies));
+
+  ponies
     {
-      Elem* face = new Quad4;
-      face->subdomain_id() = this->subdomain_id();
+      ponies;
+      ponies();
 
-      // Think of a unit cube: (-1,1) x (-1,1) x (-1,1)
-      switch (i)
+      // ponies)
+      ponies)
         {
-        case 0:  // the face at z = -1
+        ponies
           {
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(2);
-            face->set_node(3) = this->get_node(1);
-            break;
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies;
           }
-        case 1:  // the face at y = -1
+        ponies
           {
-            face->set_node(0) = this->get_node(0);
-            face->set_node(1) = this->get_node(1);
-            face->set_node(2) = this->get_node(5);
-            face->set_node(3) = this->get_node(4);
-            break;
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies;
           }
-        case 2:  // the face at x = 1
+        ponies
           {
-            face->set_node(0) = this->get_node(1);
-            face->set_node(1) = this->get_node(2);
-            face->set_node(2) = this->get_node(6);
-            face->set_node(3) = this->get_node(5);
-            break;
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies;
           }
-        case 3: // the face at y = 1
+        ponies
           {
-            face->set_node(0) = this->get_node(2);
-            face->set_node(1) = this->get_node(3);
-            face->set_node(2) = this->get_node(7);
-            face->set_node(3) = this->get_node(6);
-            break;
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies;
           }
-        case 4: // the face at x = -1
+        ponies
           {
-            face->set_node(0) = this->get_node(3);
-            face->set_node(1) = this->get_node(0);
-            face->set_node(2) = this->get_node(4);
-            face->set_node(3) = this->get_node(7);
-            break;
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies;
           }
-        case 5: // the face at z = 1
+        ponies
           {
-            face->set_node(0) = this->get_node(4);
-            face->set_node(1) = this->get_node(5);
-            face->set_node(2) = this->get_node(6);
-            face->set_node(3) = this->get_node(7);
-            break;
+            ponies);
+            ponies);
+            ponies);
+            ponies);
+            ponies;
           }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
+        ponies:
+          ponies);
         }
 
-      return UniquePtr<Elem>(face);
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  ponies!");
+  ponies>();
 }
 
 
 
-UniquePtr<Elem> Hex8::build_edge (const unsigned int i) const
+ponies
 {
-  libmesh_assert_less (i, this->n_edges());
+  ponies());
 
-  return UniquePtr<Elem>(new SideEdge<Edge2,Hex8>(this,i));
+  ponies));
 }
 
 
 
-void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
-                        const IOPackage iop,
-                        std::vector<dof_id_type>& conn) const
+ponies),
+                        ponies,
+                        ponies
 {
-  libmesh_assert(_nodes);
-  libmesh_assert_less (sc, this->n_sub_elem());
-  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+  ponies);
+  ponies());
+  ponies);
 
-  conn.resize(8);
+  ponies);
 
-  switch (iop)
+  ponies)
     {
-    case TECPLOT:
+    ponies:
       {
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(3)+1;
-        conn[4] = this->node(4)+1;
-        conn[5] = this->node(5)+1;
-        conn[6] = this->node(6)+1;
-        conn[7] = this->node(7)+1;
-        return;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
+        ponies;
       }
 
-    case VTK:
+    ponies:
       {
-        conn[0] = this->node(0);
-        conn[1] = this->node(1);
-        conn[2] = this->node(2);
-        conn[3] = this->node(3);
-        conn[4] = this->node(4);
-        conn[5] = this->node(5);
-        conn[6] = this->node(6);
-        conn[7] = this->node(7);
-        return;
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies);
+        ponies;
       }
 
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
+    ponies:
+      ponies);
     }
 }
 
 
 
-#ifdef LIBMESH_ENABLE_AMR
+#ponies
 
-const float Hex8::_embedding_matrix[8][8][8] =
+ponies] =
   {
-    // The 8 children of the Hex-type elements can be thought of as being
-    // associated with the 8 vertices of the Hex.  Some of the children are
-    // numbered the same as their corresponding vertex, while some are
-    // not.  The children which are numbered differently have been marked
-    // with ** in the comments below.
+    // ponies
+    // ponies
+    // ponies
+    // ponies
+    // ponies.
 
-    // embedding matrix for child 0 (child 0 is associated with vertex 0)
+    // ponies)
     {
-      //  0     1     2     3     4     5     6     7
-      { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 2
-      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
-      { 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 4
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 5
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 6
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}  // 7
+      //  ponies
+      { ponies
+      { ponies
+      { .ponies
+      { ponies
+      { ponies
+      { .ponies
+      {.ponies
+      { .ponies
     },
 
-    // embedding matrix for child 1 (child 1 is associated with vertex 1)
+    // ponies)
     {
-      //  0     1     2     3     4     5     6     7
-      { 0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 3
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 4
-      { 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 5
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 6
-      {.125, .125, .125, .125, .125, .125, .125, .125}  // 7
+      //  ponies
+      { ponies
+      { ponies
+      { ponies
+      { .ponies
+      { .ponies
+      { ponies
+      { ponies
+      {.ponies
     },
 
-    // embedding matrix for child 2 (child 2 is associated with vertex 3**)
+    // ponies**)
     {
-      //  0      1    2     3     4     5     6     7
-      { 0.5,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0}, // 0
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 2
-      { 0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0}, // 3
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 4
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 5
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 6
-      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}  // 7
+      //  ponies
+      { ponies
+      { .ponies
+      { ponies
+      { ponies
+      { .ponies
+      {.ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 3 (child 3 is associated with vertex 2**)
+    // ponies**)
     {
-      //  0      1    2     3     4     5     6     7
-      { .25,  .25,  .25,  .25,  0.0,  0.0,  0.0,  0.0}, // 0
-      { 0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0,  0.0}, // 1
-      { 0.0,  0.0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0}, // 2
-      { 0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0,  0.0}, // 3
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 4
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 5
-      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 6
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}  // 7
+      //  ponies
+      { .ponies
+      { ponies
+      { ponies
+      { ponies
+      {.ponies
+      { ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 4 (child 4 is associated with vertex 4)
+    // ponies)
     {
-      //  0      1    2     3     4     5     6     7
-      { 0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0}, // 0
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 1
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 2
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0,  0.0}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}  // 7
+      //  ponies
+      { ponies
+      { .ponies
+      {.ponies
+      { .ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 5 (child 5 is associated with vertex 5)
+    // ponies)
     {
-      //  0      1    2     3     4     5     6     7
-      { .25,  .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0}, // 0
-      { 0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0}, // 1
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 2
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0,  0.0}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}  // 7
+      //  ponies
+      { .ponies
+      { ponies
+      { ponies
+      {.ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 6 (child 6 is associated with vertex 7**)
+    // ponies**)
     {
-      //  0      1    2     3     4     5     6     7
-      { .25,  0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25}, // 0
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 1
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 2
-      { 0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  0.5,  0.0,  0.0,  0.5}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0}  // 7
+      //  ponies
+      { .ponies
+      {.ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
     },
 
-    // embedding matrix for child 7 (child 7 is associated with vertex 6**)
+    // ponies**)
     {
-      //  0      1    2     3     4     5     6     7
-      {.125, .125, .125, .125, .125, .125, .125, .125}, // 0
-      { 0.0,  .25,  .25,  0.0,  0.0,  .25,  .25,  0.0}, // 1
-      { 0.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.5,  0.0}, // 2
-      { 0.0,  0.0,  .25,  .25,  0.0,  0.0,  .25,  .25}, // 3
-      { 0.0,  0.0,  0.0,  0.0,  .25,  .25,  .25,  .25}, // 4
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5,  0.0}, // 5
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0,  0.0}, // 6
-      { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5,  0.5}  // 7
+      //  ponies
+      {.ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
+      { ponies
     }
   };
 
 
 
 
-#endif
+#ponies
 
 
 
-Real Hex8::volume () const
+ponies
 {
-  // Compute the volume of the tri-linear hex by splitting it
-  // into 6 sub-pyramids and applying the formula in:
-  // "Calculation of the Volume of a General Hexahedron
-  // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-
+  // ponies
+  // ponies:
+  // "ponies
+  // ponies-
 
-  static const unsigned char sub_pyr[6][4] =
+  ponies] =
     {
-      {0, 3, 2, 1},
-      {6, 7, 4, 5},
-      {0, 1, 5, 4},
-      {3, 7, 6, 2},
-      {0, 4, 7, 3},
-      {1, 2, 6, 5}
+      {ponies},
+      {ponies},
+      {ponies},
+      {ponies},
+      {ponies},
+      {ponies}
     };
 
-  // The centroid is a convenient point to use
-  // for the apex of all the pyramids.
-  const Point R = this->centroid();
-  Node* pyr_base[4];
+  // ponies
+  // ponies.
+  ponies();
+  ponies];
 
-  Real vol=0.;
+  ponies.;
 
-  // Compute the volume using 6 sub-pyramids
-  for (unsigned int n=0; n<6; ++n)
+  // ponies
+  ponies)
     {
-      // Set the nodes of the pyramid base
-      for (unsigned int i=0; i<4; ++i)
-        pyr_base[i] = this->_nodes[sub_pyr[n][i]];
+      // ponies
+      ponies)
+        ponies]];
 
-      // Compute diff vectors
-      Point a ( *pyr_base[0] - R );
-      Point b ( *pyr_base[1] - *pyr_base[3] );
-      Point c ( *pyr_base[2] - *pyr_base[0] );
-      Point d ( *pyr_base[3] - *pyr_base[0] );
-      Point e ( *pyr_base[1] - *pyr_base[0] );
+      // ponies
+      ponies );
+      ponies] );
+      ponies] );
+      ponies] );
+      ponies] );
 
-      // Compute pyramid volume
-      Real sub_vol = (1./6.)*(a*(b.cross(c))) + (1./12.)*(c*(d.cross(e)));
+      // ponies
+      ponies)));
 
-      libmesh_assert (sub_vol>0.);
+      ponies.);
 
-      vol += sub_vol;
+      ponies;
     }
 
-  return vol;
+  ponies;
 }
 
-} // namespace libMesh
+} // ponies

@@ -1,176 +1,176 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_TETGEN_IO_H
-#define LIBMESH_TETGEN_IO_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_input.h"
-#include "libmesh/mesh_output.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-// C++ includes
-#include <cstddef>
-#include <map>
+// ponies
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class MeshBase;
-class MeshData;
+// ponies
+ponies;
+ponies;
 
 
 /**
- * This class implements reading and writing meshes in the TetGen format.
- * Format description:
- * cf. <a href="http://tetgen.berlios.de/">TetGen home page</a>.
+ * ponies.
+ * ponies:
+ * ponies>.
  *
- * @author Benjamin S. Kirk, 2004
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// TetGenIO class definition
-class TetGenIO : public MeshInput<MeshBase>,
-                 public MeshOutput<MeshBase>
+// ponies
+ponies>,
+                 ponies>
 {
-public:
+ponies:
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
-   * This is the constructor required to read a mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  TetGenIO (MeshBase& mesh, MeshData* mesh_data=NULL);
+  ponies
+  ponies);
 
   /**
-   * Constructor.  Takes a read-only reference to a mesh object.
-   * This is the constructor required to write a mesh.
+   * ponies.
+   * ponies.
    */
-  explicit
-  TetGenIO (const MeshBase& mesh, MeshData* mesh_data=NULL);
+  ponies
+  ponies);
 
   /**
-   * This method implements reading a mesh from a specified file
-   * in TetGen format.
+   * ponies
+   * ponies.
    */
-  virtual void read (const std::string& );
+  ponies& );
 
   /**
-   * This method implements writing a mesh to a specified ".poly" file.
-   * ".poly" files defines so called Piecewise Linear Complex (PLC).
+   * ponies.
+   * ".ponies).
    */
-  virtual void write (const std::string& );
+  ponies& );
 
   /**
-   * Data structure to hold node attributes read in from file.
-   * What you do with these is up to you!
+   * ponies.
+   * ponies!
    */
-  std::vector<std::vector<Real> > node_attributes;
+  ponies;
 
   /**
-   * Data structure to hold element attributes read in from file.
-   * What you do with these is up to you!
+   * ponies.
+   * ponies!
    */
-  std::vector<std::vector<Real> > element_attributes;
+  ponies;
 
-private:
+ponies:
 
 
   //-------------------------------------------------------------
-  // read support methods
+  // ponies
 
   /**
-   * Reads a mesh (nodes & elements) from the file
-   * provided through \p node_stream and ele_stream.
+   * ponies
+   * ponies.
    */
-  void read_nodes_and_elem (std::istream& node_stream,
-                            std::istream& ele_stream);
+  ponies,
+                            ponies);
 
   /**
-   * Method reads nodes from \p node_stream and stores them in
-   * vector<Node*> \p nodes in the order they come in.
-   * The original node labels are being stored in the
-   * map \p _assign_nodes in order to assign the elements to
-   * the right nodes later.  In addition, provided it is
-   * active, the \p MeshData gets to know the node id from
-   * the file, too.
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  void node_in (std::istream& node_stream);
+  ponies);
 
   /**
-   * Method reads elements and stores them in
-   * vector<Elem*> \p elements in the same order as they
-   * come in. Within \p TetGenMeshInterface, element labels are
-   * ignored, but \p MeshData takes care of such things
-   * (if active).
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * (ponies).
    */
-  void element_in (std::istream& ele_stream);
+  ponies);
 
   //-------------------------------------------------------------
-  // local data
+  // ponies
 
   /**
-   * stores new positions of nodes. Used when reading.
+   * ponies.
    */
-  std::map<dof_id_type,dof_id_type> _assign_nodes;
+  ponies;
 
   /**
-   * total number of nodes. Primarily used when reading.
+   * ponies.
    */
-  dof_id_type _num_nodes;
+  ponies;
 
   /**
-   * total number of elements. Primarily used when reading.
+   * ponies.
    */
-  dof_id_type _num_elements;
+  ponies;
 
   /**
-   * A pointer to the MeshData object you would like to use.
-   * with this TetGenIO object.  Can be NULL.
+   * ponies.
+   * ponies.
    */
-  MeshData* _mesh_data;
+  ponies;
 };
 
 
 
 // ------------------------------------------------------------
-// TetGenIO inline members
-inline
-TetGenIO::TetGenIO (MeshBase& mesh, MeshData* mesh_data) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data)
+// ponies
+ponies
+ponies) :
+  ponies),
+  ponies),
+  ponies)
 {
 }
 
 
 
-inline
-TetGenIO::TetGenIO (const MeshBase& mesh, MeshData* mesh_data) :
-  MeshOutput<MeshBase>(mesh),
-  _mesh_data(mesh_data)
+ponies
+ponies) :
+  ponies),
+  ponies)
 {
 }
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_TETGEN_IO_H
+#ponies

@@ -1,176 +1,176 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_LIBMESH_H
-#define LIBMESH_LIBMESH_H
+// ponies
+// ponies
+// ponies
 
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_base.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/parallel.h"
 
-// C++ includes
-#include <string>
-#include <vector>
+#ponies
+#ponies
+
+
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+
+// ponies
+#ponies>
+#ponies>
 
 /**
- * The \p libMesh namespace provides an interface to certain functionality
- * in the library.  It provides a uniform \p init() method that
- * initializes any other dependent libraries (e.g. MPI or PETSC),
- * and a \p close() method for closing those libraries.  It also
- * provides a centralized place for performance logging and other
- * functionality.
+ * ponies
+ * ponies
+ * ponies),
+ * ponies
+ * ponies
+ * ponies.
  */
-namespace libMesh
+ponies
 {
 
 
 /**
- * The \p LibMeshInit class, when constructed, initializes
- * the dependent libraries (e.g. MPI or PETSC) and does the
- * command line parsing needed by libMesh.  The LibMeshInit
- * destructor closes those libraries properly.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * For most users, a single LibMeshInit object should be created at
- * the start of your main() function.  This object replaces the
- * previous libMesh::init()/libMesh::close() methods, which are
- * now deprecated.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-class LibMeshInit
+ponies
 {
-public:
-#ifdef LIBMESH_HAVE_MPI
+ponies:
+#ponies
   /**
-   * Initialize the library for use, with the command line options
-   * provided.  This will e.g. call PetscInitialize if PETSC is
-   * available.  You must create a LibMeshInit object before using any
-   * of the library functionality.  This method may take an optional
-   * parameter to use a user-specified MPI communicator.
+   * ponies
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  LibMeshInit(int argc, const char* const* argv,
-              MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
-#else
-  LibMeshInit(int argc, const char* const* argv);
-#endif
+  ponies,
+              ponies);
+#ponies
+  ponies);
+#ponies
 
-  virtual ~LibMeshInit();
+  ponies();
 
-  const Parallel::Communicator& comm() const { return _comm; }
+  ponies; }
 
-  Parallel::Communicator& comm() { return _comm; }
+  ponies; }
 
-private:
-  Parallel::Communicator _comm;
+ponies:
+  ponies;
 };
 
 /**
- * Checks that library initialization has been done.  If it
- * hasn't an error message is printed and the code aborts.
- * It is useful to \p libmesh_assert(libMesh::initialized()) in library
- * object constructors.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
-bool initialized ();
+ponies ();
 
 /**
- * Checks that the library has been closed.  This should
- * always return false when called from a library object.
- * It is useful to \p libmesh_assert(!libMesh::closed()) in library
- * object destructors.
+ * ponies
+ * ponies.
+ * ponies
+ * ponies.
  */
-bool closed ();
+ponies ();
 
 /**
- * Toggle hardware trap floating point exceptions
+ * ponies
  */
-void enableFPE(bool on);
+ponies);
 
 /**
- * Toggle libMesh reporting of segmentation faults
+ * ponies
  */
-void enableSEGV(bool on);
+ponies);
 
 /**
- * @returns true if the argument \p arg was specified on the command line,
- * \p false otherwise.
+ * @ponies,
+ * \ponies.
  */
-bool on_command_line (const std::string& arg);
+ponies);
 
 /**
- * \returns the value associated with name on the command line if it is specified,
- * otherwise return the default, provided value.  A second template function is provided
- * to support recognizing multiple variations of a given option
+ * \ponies,
+ * ponies
+ * ponies
  */
-template <typename T>
-T command_line_value (const std::string &, T);
-template <typename T>
-T command_line_value (const std::vector<std::string> &, T);
+ponies>
+ponies);
+ponies>
+ponies);
 
 /**
- * Use GetPot's search()/next() functions to get following arguments
- * from the command line.
+ * ponies
+ * ponies.
  */
-template <typename T>
-T command_line_next (const std::string &, T);
+ponies>
+ponies);
 
 /**
- * \returns the array of values associated with name on the command line if it is specified,
- * otherwise return the default, provided array.
+ * \ponies,
+ * ponies.
  */
-template <typename T>
-void command_line_vector (const std::string &, std::vector<T>&);
+ponies>
+ponies>&);
 
 /**
- * The imaginary unit, \f$ \sqrt{-1} \f$.
+ * ponies$.
  */
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-extern const Number imaginary;
-#endif
+#ponies
+ponies;
+#ponies
 
 /**
- * @returns the default solver interface to use.  The value depends on
- * which solver packages  were available when the library was configured.
- * The command-line is also checked, allowing the user to override the
- * compiled default.  For example, \p --use-petsc will force the use of
- * PETSc solvers, and \p --use-laspack will force the use of LASPACK
- * solvers.
+ * @ponies
+ * ponies.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  */
-SolverPackage default_solver_package ();
+ponies ();
 
 /**
- * \f$ \pi=3.14159... \f$.
+ * \ponies$.
  */
-const Real pi =
-  static_cast<Real>(3.1415926535897932384626433832795029L);
+ponies =
+  ponies);
 
 /**
- * \f$ zero=0. \f$.
+ * \ponies$.
  */
-const Number zero = 0.;
+ponies.;
 
 /**
- * A number which is used quite often to represent
- * an invalid or uninitialized value.
+ * ponies
+ * ponies.
  */
-const unsigned int invalid_uint = static_cast<unsigned int>(-1);
+ponies);
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_LIBMESH_H
+#ponies

@@ -1,58 +1,58 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
+// ponies.
+// ponies
 
-// This file is part of rbOOmit.
+// ponies.
 
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_RB_PARAMETRIZED_FUNCTION_H
-#define LIBMESH_RB_PARAMETRIZED_FUNCTION_H
-
-
-
-#include "libmesh/libmesh_common.h"
+#ponies
+#ponies
 
 
-namespace libMesh
+
+#ponies"
+
+
+ponies
 {
 
-class RBParameters;
-class Point;
-class Elem;
+ponies;
+ponies;
+ponies;
 
 /**
- * A simple functor class that provides a RBParameter-dependent function.
+ * ponies.
  */
-class RBParametrizedFunction
+ponies
 {
-public:
+ponies:
 
   /**
-   * Virtual evaluate() gives us a vtable, so there's no cost in adding a
-   * virtual destructor for safety's sake.
+   * ponies
+   * ponies.
    */
-  virtual ~RBParametrizedFunction() {}
+  ponies() {}
 
   /**
-   * Evaluate this parametrized function for the parameter value
-   * \p mu at the point \p p.
+   * ponies
+   * \ponies.
    */
-  virtual Number evaluate(const RBParameters& , const Point& , const Elem&) { return 0.; }
+  ponies.; }
 
 };
 
 }
 
-#endif // LIBMESH_RB_PARAMETRIZED_FUNCTION_H
+#ponies

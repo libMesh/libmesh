@@ -1,147 +1,147 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_MESH_GENERATION_H
-#define LIBMESH_MESH_GENERATION_H
+#ponies
+#ponies
 
-// Local Includes -----------------------------------
-// #include "libmesh/libmesh_common.h" // needed for Real
-#include "libmesh/libmesh.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/mesh_triangle_interface.h"
-#include "libmesh/vector_value.h"
+// ponies -----------------------------------
+// #ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <cstddef>
-#include <vector>
+// ponies   -----------------------------------
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
-// forward declarations
-class MeshBase;
-class UnstructuredMesh;
+// ponies
+ponies;
+ponies;
 
 
 
 // ------------------------------------------------------------
-// MeshTools::Generation namespace
-namespace MeshTools
+// ponies
+ponies
 {
 /**
- * Tools for \p Mesh generation.
+ * ponies.
  *
- * \author Benjamin S. Kirk
- * \date 2004
+ * \ponies
+ * \ponies
  */
-namespace Generation
+ponies
 {
 /**
- * Builds a \f$ nx \times ny \times nz \f$ (elements) cube.
- * Defaults to a unit cube (or line in 1D, square in 2D),
- * but the dimensions can be specified through the optional
- * arguments.
+ * ponies.
+ * ponies),
+ * ponies
+ * ponies.
  *
- * Boundary ids are set to be equal to the side indexing on a
- * master hex
+ * ponies
+ * ponies
  */
-void build_cube (UnstructuredMesh& mesh,
-                 const unsigned int nx=0,
-                 const unsigned int ny=0,
-                 const unsigned int nz=0,
-                 const Real xmin=0., const Real xmax=1.,
-                 const Real ymin=0., const Real ymax=1.,
-                 const Real zmin=0., const Real zmax=1.,
-                 const ElemType type=INVALID_ELEM,
-                 const bool gauss_lobatto_grid=false);
+ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies.,
+                 ponies.,
+                 ponies.,
+                 ponies,
+                 ponies);
 
 /**
- * A specialized \p build_cube() for 0D meshes.  The resulting
- * mesh is a single NodeElem suitable for ODE tests
+ * ponies
+ * ponies
  */
-void build_point (UnstructuredMesh& mesh,
-                  const ElemType type=INVALID_ELEM,
-                  const bool gauss_lobatto_grid=false);
+ponies,
+                  ponies,
+                  ponies);
 
 /**
- * A specialized \p build_cube() for 1D meshes
+ * ponies
  *
- * Boundary ids are set to be equal to the side indexing on a
- * master edge
+ * ponies
+ * ponies
  */
-void build_line (UnstructuredMesh& mesh,
-                 const unsigned int nx,
-                 const Real xmin=0., const Real xmax=1.,
-                 const ElemType type=INVALID_ELEM,
-                 const bool gauss_lobatto_grid=false);
+ponies,
+                 ponies,
+                 ponies.,
+                 ponies,
+                 ponies);
 
 /**
- * A specialized \p build_cube() for 2D meshes.
+ * ponies.
  *
- * Boundary ids are set to be equal to the side indexing on a
- * master quad
+ * ponies
+ * ponies
  */
-void build_square (UnstructuredMesh& mesh,
-                   const unsigned int nx,
-                   const unsigned int ny,
-                   const Real xmin=0., const Real xmax=1.,
-                   const Real ymin=0., const Real ymax=1.,
-                   const ElemType type=INVALID_ELEM,
-                   const bool gauss_lobatto_grid=false);
+ponies,
+                   ponies,
+                   ponies,
+                   ponies.,
+                   ponies.,
+                   ponies,
+                   ponies);
 
 /**
- * Meshes a spherical or mapped-spherical domain.
+ * ponies.
  */
-void build_sphere (UnstructuredMesh& mesh,
-                   const Real rad=1,
-                   const unsigned int nr=2,
-                   const ElemType type=INVALID_ELEM,
-                   const unsigned int n_smooth=2,
-                   const bool flat=true);
+ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies);
 
 /**
- * Meshes the tensor product of a 1D and a 1D-or-2D domain.
+ * ponies.
  */
-void build_extrusion (UnstructuredMesh& mesh,
-                      const MeshBase& cross_section,
-                      const unsigned int nz,
-                      RealVectorValue extrusion_vector);
+ponies,
+                      ponies,
+                      ponies,
+                      ponies);
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#ponies
 /**
- * Meshes a rectangular (2D) region (with or without holes) with a
- * Delaunay triangulation.  This function internally calls the
- * triangle library written by J.R. Shewchuk.
+ * ponies
+ * ponies
+ * ponies.
  */
-void build_delaunay_square(UnstructuredMesh& mesh,
-                           const unsigned int nx, // num. of elements in x-dir
-                           const unsigned int ny, // num. of elements in y-dir
-                           const Real xmin, const Real xmax,
-                           const Real ymin, const Real ymax,
-                           const ElemType type,
-                           const std::vector<TriangleInterface::Hole*>* holes=NULL);
-#endif // #define LIBMESH_HAVE_TRIANGLE
+ponies,
+                           ponies
+                           ponies
+                           ponies,
+                           ponies,
+                           ponies,
+                           ponies);
+#ponies
 
-} // end namespace Meshtools::Generation
-} // end namespace MeshTools
+} // ponies
+} // ponies
 
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_MESH_GENERATION_H
+#ponies

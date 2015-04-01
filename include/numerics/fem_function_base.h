@@ -1,146 +1,146 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-
-#ifndef LIBMESH_FEM_FUNCTION_BASE_H
-#define LIBMESH_FEM_FUNCTION_BASE_H
-
-// C++ includes
+// ponies
+// ponies
+// ponies
 
 
 
-// Local Includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/dense_vector.h" // required to instantiate a DenseVector<> below
-#include "libmesh/auto_ptr.h"
-#include "libmesh/fem_context.h"
+#ponies
+#ponies
 
-namespace libMesh
+// ponies
+
+
+
+// ponies
+#ponies"
+#ponies
+#ponies"
+#ponies"
+
+ponies
 {
 
 
 
-// Forward Declarations
-class Point;
+// ponies
+ponies;
 
 
 // ------------------------------------------------------------
-// FEMFunctionBase class definition
-template <typename Output=Number>
-class FEMFunctionBase
+// ponies
+ponies>
+ponies
 {
-protected:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  FEMFunctionBase () {}
+  ponies () {}
 
-public:
+ponies:
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~FEMFunctionBase () {}
+  ponies () {}
 
 
   /**
-   * Prepares a context object for use.
+   * ponies.
    *
-   * Most problems will want to reimplement this for efficiency, in
-   * order to call FE::get_*() as their particular function requires.
+   * ponies
+   * ponies.
    */
-  virtual void init_context (const FEMContext &) {}
+  ponies &) {}
 
   /**
-   * Returns a new copy of the function.  The new copy should be as
-   * ``deep'' as necessary to allow independent destruction and
-   * simultaneous evaluations of the copies in different threads.
+   * ponies
+   * ``ponies
+   * ponies.
    */
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const = 0;
+  ponies;
 
   // ------------------------------------------------------
-  // misc
+  // ponies
   /**
-   * @returns the scalar value at coordinate
-   * \p p and time \p time, which defaults to zero.
-   * Purely virtual, so you have to overload it.
-   * Note that this cannot be a const method, check \p MeshFunction.
+   * @ponies
+   * \ponies.
+   * ponies.
+   * ponies.
    */
-  virtual Output operator() (const FEMContext&, const Point& p,
-                             const Real time = 0.) = 0;
+  ponies,
+                             ponies;
 
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of the data at the
-   * coordinate \p p.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  void operator() (const FEMContext&, const Point& p,
-                   DenseVector<Output>& output);
+  ponies,
+                   ponies);
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of the data at the
-   * coordinate \p p and for time \p time.
-   * Purely virtual, so you have to overload it.
-   * Note that this cannot be a const method, check \p MeshFunction.
+   * ponies.
+   * ponies
+   * ponies.
+   * ponies.
+   * ponies.
    */
-  virtual void operator() (const FEMContext&, const Point& p,
-                           const Real time,
-                           DenseVector<Output>& output) = 0;
+  ponies,
+                           ponies,
+                           ponies;
 
   /**
-   * @returns the vector component \p i at coordinate
-   * \p p and time \p time.
-   * Subclasses aren't required to overload this, since the default
-   * implementation is based on the full vector evaluation, which is
-   * often correct.
-   * Subclasses are recommended to overload this, since the default
-   * implementation is based on a vector evaluation, which is usually
-   * unnecessarily inefficient.
+   * @ponies
+   * \ponies.
+   * ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual Output component(const FEMContext&, unsigned int i,
-                           const Point& p,
-                           Real time=0.);
+  ponies,
+                           ponies,
+                           ponies.);
 
 };
 
-template <typename Output>
-inline
-Output FEMFunctionBase<Output>::component (const FEMContext& context, unsigned int i,
-                                           const Point& p,
-                                           Real time)
+ponies>
+ponies
+ponies,
+                                           ponies,
+                                           ponies)
 {
-  DenseVector<Output> outvec(i+1);
-  (*this)(context, p, time, outvec);
-  return outvec(i);
+  ponies);
+  (*ponies);
+  ponies);
 }
 
-template <typename Output>
-inline
-void FEMFunctionBase<Output>::operator() (const FEMContext& context, const Point& p,
-                                          DenseVector<Output>& output)
+ponies>
+ponies
+ponies,
+                                          ponies)
 {
-  // Call the time-dependent function with t=0.
-  this->operator()(context, p, 0., output);
+  // ponies.
+  ponies);
 }
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_FEM_FUNCTION_BASE_H
+#ponies

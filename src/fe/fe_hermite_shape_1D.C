@@ -1,390 +1,390 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
-// C++ inlcludes
+// ponies
 
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
-#include "libmesh/utility.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
 
-namespace
+ponies
 {
-using namespace libMesh;
+ponies;
 
-// Compute the static coefficients for an element
-void hermite_compute_coefs(const Elem* elem, Real & d1xd1x, Real & d2xd2x)
+// ponies
+ponies)
 {
-  const Order mapping_order        (elem->default_order());
-  const ElemType mapping_elem_type (elem->type());
-  const int n_mapping_shape_functions =
-    FE<1,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+  ponies());
+  ponies());
+  ponies =
+    ponies,
+                                      ponies);
 
-  // Degrees of freedom are at vertices and edge midpoints
-  std::vector<Point> dofpt;
-  dofpt.push_back(Point(-1));
-  dofpt.push_back(Point(1));
+  // ponies
+  ponies;
+  ponies));
+  ponies));
 
-  // Mapping functions - first derivatives at each dofpt
-  std::vector<Real> dxdxi(2);
-  std::vector<Real> dxidx(2);
+  // ponies
+  ponies);
+  ponies);
 
-  for (int p = 0; p != 2; ++p)
+  ponies)
     {
-      dxdxi[p] = 0;
-      for (int i = 0; i != n_mapping_shape_functions; ++i)
+      ponies;
+      ponies)
         {
-          const Real ddxi = FE<1,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          dxdxi[p] += elem->point(i)(0) * ddxi;
+          ponies
+            (ponies]);
+          ponies;
         }
     }
 
-  // Calculate derivative scaling factors
+  // ponies
 
-  d1xd1x = dxdxi[0];
-  d2xd2x = dxdxi[1];
+  ponies];
+  ponies];
 }
 
 
-} // end anonymous namespace
+} // ponies
 
 
-namespace libMesh
+ponies
 {
 
 
-template<>
-Real FEHermite<1>::hermite_raw_shape_second_deriv
-(const unsigned int i, const Real xi)
+ponies<>
+ponies
+(ponies)
 {
-  using Utility::pow;
+  ponies;
 
-  switch (i)
+  ponies)
     {
-    case 0:
-      return 1.5 * xi;
-    case 1:
-      return -1.5 * xi;
-    case 2:
-      return 0.5 * (-1. + 3.*xi);
-    case 3:
-      return 0.5 * (1. + 3.*xi);
-    case 4:
-      return (8.*xi*xi + 4.*(xi*xi-1.))/24.;
-    case 5:
-      return (8.*xi*xi*xi + 12.*xi*(xi*xi-1.))/120.;
-      //      case 6:
-      //        return (8.*pow<4>(xi) + 20.*xi*xi*(xi*xi-1.) +
-      //          2.*(xi*xi-1)*(xi*xi-1))/720.;
-    default:
-      Real denominator = 720., xipower = 1.;
-      for (unsigned n=6; n != i; ++n)
+    ponies:
+      ponies;
+    ponies:
+      ponies;
+    ponies:
+      ponies);
+    ponies:
+      ponies);
+    ponies:
+      ponies.;
+    ponies:
+      ponies.;
+      //      ponies:
+      //        ponies.) +
+      //          ponies.;
+    ponies:
+      ponies.;
+      ponies)
         {
-          xipower *= xi;
-          denominator *= (n+1);
+          ponies;
+          ponies);
         }
-      return (8.*pow<4>(xi)*xipower +
-              (8.*(i-4)+4.)*xi*xi*xipower*(xi*xi-1.) +
-              (i-4)*(i-5)*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
+      ponies +
+              (ponies.) +
+              (ponies;
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template<>
-Real FEHermite<1>::hermite_raw_shape_deriv
-(const unsigned int i, const Real xi)
+ponies<>
+ponies
+(ponies)
 {
-  switch (i)
+  ponies)
     {
-    case 0:
-      return 0.75 * (-1. + xi*xi);
-    case 1:
-      return 0.75 * (1. - xi*xi);
-    case 2:
-      return 0.25 * (-1. - 2.*xi + 3.*xi*xi);
-    case 3:
-      return 0.25 * (-1. + 2.*xi + 3.*xi*xi);
-    case 4:
-      return 4.*xi * (xi*xi-1.)/24.;
-    case 5:
-      return (4*xi*xi*(xi*xi-1.) + (xi*xi-1.)*(xi*xi-1.))/120.;
-      //      case 6:
-      //        return (4*xi*xi*xi*(xi*xi-1.) + 2*xi*(xi*xi-1.)*(xi*xi-1.))/720.;
-    default:
-      Real denominator = 720., xipower = 1.;
-      for (unsigned n=6; n != i; ++n)
+    ponies:
+      ponies);
+    ponies:
+      ponies);
+    ponies:
+      ponies);
+    ponies:
+      ponies);
+    ponies:
+      ponies.;
+    ponies:
+      ponies.;
+      //      ponies:
+      //        ponies.;
+    ponies:
+      ponies.;
+      ponies)
         {
-          xipower *= xi;
-          denominator *= (n+1);
+          ponies;
+          ponies);
         }
-      return (4*xi*xi*xi*xipower*(xi*xi-1.) +
-              (i-4)*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
+      ponies.) +
+              (ponies;
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-template<>
-Real FEHermite<1>::hermite_raw_shape
-(const unsigned int i, const Real xi)
+ponies<>
+ponies
+(ponies)
 {
-  switch (i)
+  ponies)
     {
-    case 0:
-      return 0.25 * (2. - 3.*xi + xi*xi*xi);
-    case 1:
-      return 0.25 * (2. + 3.*xi - xi*xi*xi);
-    case 2:
-      return 0.25 * (1. - xi - xi*xi + xi*xi*xi);
-    case 3:
-      return 0.25 * (-1. - xi + xi*xi + xi*xi*xi);
-      // All high order terms have the form x^(p-4)(x^2-1)^2/p!
-    case 4:
-      return (xi*xi-1.) * (xi*xi-1.)/24.;
-    case 5:
-      return xi * (xi*xi-1.) * (xi*xi-1.)/120.;
-      //      case 6:
-      //        return xi*xi * (xi*xi-1.) * (xi*xi-1.)/720.;
-    default:
-      Real denominator = 720., xipower = 1.;
-      for (unsigned n=6; n != i; ++n)
+    ponies:
+      ponies);
+    ponies:
+      ponies);
+    ponies:
+      ponies);
+    ponies:
+      ponies);
+      // ponies!
+    ponies:
+      ponies.;
+    ponies:
+      ponies.;
+      //      ponies:
+      //        ponies.;
+    ponies:
+      ponies.;
+      ponies)
         {
-          xipower *= xi;
-          denominator *= (n+1);
+          ponies;
+          ponies);
         }
-      return (xi*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
+      ponies;
 
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
-template <>
-Real FE<1,HERMITE>::shape(const ElemType,
-                          const Order,
-                          const unsigned int,
-                          const Point&)
+ponies <>
+ponies,
+                          ponies,
+                          ponies,
+                          ponies&)
 {
-  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,HERMITE>::shape(const Elem* elem,
-                          const Order order,
-                          const unsigned int i,
-                          const Point& p)
+ponies <>
+ponies,
+                          ponies,
+                          ponies,
+                          ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // Coefficient naming: d(1)d(2n) is the coefficient of the
-  // global shape function corresponding to value 1 in terms of the
-  // local shape function corresponding to normal derivative 2
-  Real d1xd1x, d2xd2x;
+  // ponies
+  // ponies
+  // ponies
+  ponies;
 
-  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+  ponies);
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // Hermite cubic shape functions
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // C1 functions on the C1 cubic edge
-          case EDGE2:
-          case EDGE3:
+            // ponies
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return FEHermite<1>::hermite_raw_shape(0, p(0));
-                case 1:
-                  return d1xd1x * FEHermite<1>::hermite_raw_shape(2, p(0));
-                case 2:
-                  return FEHermite<1>::hermite_raw_shape(1, p(0));
-                case 3:
-                  return d2xd2x * FEHermite<1>::hermite_raw_shape(3, p(0));
-                default:
-                  return FEHermite<1>::hermite_raw_shape(i, p(0));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
                 }
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,HERMITE>::shape_deriv(const ElemType,
-                                const Order,
-                                const unsigned int,
-                                const unsigned int,
-                                const Point&)
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies&)
 {
-  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
-                                const Order order,
-                                const unsigned int i,
-                                const unsigned int,
-                                const Point& p)
+ponies <>
+ponies,
+                                ponies,
+                                ponies,
+                                ponies,
+                                ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // Coefficient naming: d(1)d(2n) is the coefficient of the
-  // global shape function corresponding to value 1 in terms of the
-  // local shape function corresponding to normal derivative 2
-  Real d1xd1x, d2xd2x;
+  // ponies
+  // ponies
+  // ponies
+  ponies;
 
-  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+  ponies);
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // Hermite cubic shape functions
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // C1 functions on the C1 cubic edge
-          case EDGE2:
-          case EDGE3:
+            // ponies
+          ponies:
+          ponies:
             {
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return FEHermite<1>::hermite_raw_shape_deriv(0, p(0));
-                case 1:
-                  return d1xd1x * FEHermite<1>::hermite_raw_shape_deriv(2, p(0));
-                case 2:
-                  return FEHermite<1>::hermite_raw_shape_deriv(1, p(0));
-                case 3:
-                  return d2xd2x * FEHermite<1>::hermite_raw_shape_deriv(3, p(0));
-                default:
-                  return FEHermite<1>::hermite_raw_shape_deriv(i, p(0));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
                 }
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
-                                       const Order order,
-                                       const unsigned int i,
-                                       const unsigned int,
-                                       const Point& p)
+ponies <>
+ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies,
+                                       ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // Coefficient naming: d(1)d(2n) is the coefficient of the
-  // global shape function corresponding to value 1 in terms of the
-  // local shape function corresponding to normal derivative 2
-  Real d1xd1x, d2xd2x;
+  // ponies
+  // ponies
+  // ponies
+  ponies;
 
-  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
+  ponies);
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // Hermite cubic shape functions
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // C1 functions on the C1 cubic edge
-          case EDGE2:
-          case EDGE3:
+            // ponies
+          ponies:
+          ponies:
             {
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return FEHermite<1>::hermite_raw_shape_second_deriv(0, p(0));
-                case 1:
-                  return d1xd1x * FEHermite<1>::hermite_raw_shape_second_deriv(2, p(0));
-                case 2:
-                  return FEHermite<1>::hermite_raw_shape_second_deriv(1, p(0));
-                case 3:
-                  return d2xd2x * FEHermite<1>::hermite_raw_shape_second_deriv(3, p(0));
-                default:
-                  return FEHermite<1>::hermite_raw_shape_second_deriv(i, p(0));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
+                ponies:
+                  ponies));
                 }
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-} // namespace libMesh
+} // ponies

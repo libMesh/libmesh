@@ -1,389 +1,389 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-// C++ inlcludes
-
-// Local includes
-#include "libmesh/fe.h"
-#include "libmesh/elem.h"
+// ponies
+// ponies
+// ponies
 
 
-// Anonymous namespace for persistant variables.
-// This allows us to cache the global-to-local mapping transformation
-// This should also screw up multithreading royally
-namespace
+// ponies
+
+// ponies
+#ponies"
+#ponies"
+
+
+// ponies.
+// ponies
+// ponies
+ponies
 {
-using namespace libMesh;
+ponies;
 
-static dof_id_type old_elem_id = DofObject::invalid_id;
-// Coefficient naming: d(1)d(2n) is the coefficient of the
-// global shape function corresponding to value 1 in terms of the
-// local shape function corresponding to normal derivative 2
-static Real d1xd1x, d2xd2x;
+ponies;
+// ponies
+// ponies
+// ponies
+ponies;
 
-Real clough_raw_shape_second_deriv(const unsigned int basis_num,
-                                   const unsigned int deriv_type,
-                                   const Point& p);
-Real clough_raw_shape_deriv(const unsigned int basis_num,
-                            const unsigned int deriv_type,
-                            const Point& p);
-Real clough_raw_shape(const unsigned int basis_num,
-                      const Point& p);
+ponies,
+                                   ponies,
+                                   ponies);
+ponies,
+                            ponies,
+                            ponies);
+ponies,
+                      ponies);
 
 
-// Compute the static coefficients for an element
-void clough_compute_coefs(const Elem* elem)
+// ponies
+ponies)
 {
-  // Using static globals for old_elem_id, etc. will fail
-  // horribly with more than one thread.
-  libmesh_assert_equal_to (libMesh::n_threads(), 1);
+  // ponies
+  // ponies.
+  ponies);
 
-  // Coefficients are cached from old elements
-  if (elem->id() == old_elem_id)
-    return;
+  // ponies
+  ponies)
+    ponies;
 
-  old_elem_id = elem->id();
+  ponies();
 
-  const Order mapping_order        (elem->default_order());
-  const ElemType mapping_elem_type (elem->type());
-  const int n_mapping_shape_functions =
-    FE<1,LAGRANGE>::n_shape_functions(mapping_elem_type,
-                                      mapping_order);
+  ponies());
+  ponies());
+  ponies =
+    ponies,
+                                      ponies);
 
-  // Degrees of freedom are at vertices and edge midpoints
-  std::vector<Point> dofpt;
-  dofpt.push_back(Point(0));
-  dofpt.push_back(Point(1));
+  // ponies
+  ponies;
+  ponies));
+  ponies));
 
-  // Mapping functions - first derivatives at each dofpt
-  std::vector<Real> dxdxi(2);
-  std::vector<Real> dxidx(2);
+  // ponies
+  ponies);
+  ponies);
 
-  for (int p = 0; p != 2; ++p)
+  ponies)
     {
-      for (int i = 0; i != n_mapping_shape_functions; ++i)
+      ponies)
         {
-          const Real ddxi = FE<1,LAGRANGE>::shape_deriv
-            (mapping_elem_type, mapping_order, i, 0, dofpt[p]);
-          dxdxi[p] += dofpt[p](0) * ddxi;
+          ponies
+            (ponies]);
+          ponies;
         }
     }
 
-  // Calculate derivative scaling factors
+  // ponies
 
-  d1xd1x = dxdxi[0];
-  d2xd2x = dxdxi[1];
+  ponies];
+  ponies];
 }
 
 
-// Return shape function second derivatives on the unit interval
-Real clough_raw_shape_second_deriv(const unsigned int basis_num,
-                                   const unsigned int deriv_type,
-                                   const Point& p)
+// ponies
+ponies,
+                                   ponies,
+                                   ponies)
 {
-  Real xi = p(0);
+  ponies);
 
-  switch (deriv_type)
+  ponies)
     {
 
-      // second derivative in xi-xi direction
-    case 0:
-      switch (basis_num)
+      // ponies
+    ponies:
+      ponies)
         {
-        case 0:
-          return -6 + 12*xi;
-        case 1:
-          return 6 - 12*xi;
-        case 2:
-          return -4 + 6*xi;
-        case 3:
-          return -2 + 6*xi;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
 
-        default:
-          libmesh_error_msg("Invalid shape function index i = " <<
-                            basis_num);
+        ponies:
+          ponies = " <<
+                            ponies);
         }
 
-    default:
-      libmesh_error_msg("Invalid shape function derivative j = " <<
-                        deriv_type);
+    ponies:
+      ponies = " <<
+                        ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-Real clough_raw_shape_deriv(const unsigned int basis_num,
-                            const unsigned int deriv_type,
-                            const Point& p)
+ponies,
+                            ponies,
+                            ponies)
 {
-  Real xi = p(0);
+  ponies);
 
-  switch (deriv_type)
+  ponies)
     {
-    case 0:
-      switch (basis_num)
+    ponies:
+      ponies)
         {
-        case 0:
-          return -6*xi + 6*xi*xi;
-        case 1:
-          return 6*xi - 6*xi*xi;
-        case 2:
-          return 1 - 4*xi + 3*xi*xi;
-        case 3:
-          return -2*xi + 3*xi*xi;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
+        ponies:
+          ponies;
 
-        default:
-          libmesh_error_msg("Invalid shape function index i = " <<
-                            basis_num);
+        ponies:
+          ponies = " <<
+                            ponies);
         }
 
-    default:
-      libmesh_error_msg("Invalid shape function derivative j = " <<
-                        deriv_type);
+    ponies:
+      ponies = " <<
+                        ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-Real clough_raw_shape(const unsigned int basis_num,
-                      const Point& p)
+ponies,
+                      ponies)
 {
-  Real xi = p(0);
+  ponies);
 
-  switch (basis_num)
+  ponies)
     {
-    case 0:
-      return 1 - 3*xi*xi + 2*xi*xi*xi;
-    case 1:
-      return 3*xi*xi - 2*xi*xi*xi;
-    case 2:
-      return xi - 2*xi*xi + xi*xi*xi;
-    case 3:
-      return -xi*xi + xi*xi*xi;
+    ponies:
+      ponies;
+    ponies:
+      ponies;
+    ponies:
+      ponies;
+    ponies:
+      ponies;
 
-    default:
-      libmesh_error_msg("Invalid shape function index i = " <<
-                        basis_num);
+    ponies:
+      ponies = " <<
+                        ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
-} // end anonymous namespace
+} // ponies
 
 
-namespace libMesh
+ponies
 {
 
 
-template <>
-Real FE<1,CLOUGH>::shape(const ElemType,
-                         const Order,
-                         const unsigned int,
-                         const Point&)
+ponies <>
+ponies,
+                         ponies,
+                         ponies,
+                         ponies&)
 {
-  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,CLOUGH>::shape(const Elem* elem,
-                         const Order order,
-                         const unsigned int i,
-                         const Point& p)
+ponies <>
+ponies,
+                         ponies,
+                         ponies,
+                         ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  clough_compute_coefs(elem);
+  ponies);
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // 3rd-order C1 cubic element
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // C1 functions on the C1 cubic edge
-          case EDGE2:
-          case EDGE3:
+            // ponies
+          ponies:
+          ponies:
             {
-              libmesh_assert_less (i, 4);
+              ponies);
 
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return clough_raw_shape(0, p);
-                case 1:
-                  return clough_raw_shape(1, p);
-                case 2:
-                  return d1xd1x * clough_raw_shape(2, p);
-                case 3:
-                  return d2xd2x * clough_raw_shape(3, p);
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
                 }
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,CLOUGH>::shape_deriv(const ElemType,
-                               const Order,
-                               const unsigned int,
-                               const unsigned int,
-                               const Point&)
+ponies <>
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies&)
 {
-  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
-  return 0.;
+  ponies.");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
-                               const Order order,
-                               const unsigned int i,
-                               const unsigned int j,
-                               const Point& p)
+ponies <>
+ponies,
+                               ponies,
+                               ponies,
+                               ponies,
+                               ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  clough_compute_coefs(elem);
+  ponies);
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // 3rd-order C1 cubic element
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // C1 functions on the C1 cubic edge
-          case EDGE2:
-          case EDGE3:
+            // ponies
+          ponies:
+          ponies:
             {
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return clough_raw_shape_deriv(0, j, p);
-                case 1:
-                  return clough_raw_shape_deriv(1, j, p);
-                case 2:
-                  return d1xd1x * clough_raw_shape_deriv(2, j, p);
-                case 3:
-                  return d2xd2x * clough_raw_shape_deriv(3, j, p);
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
                 }
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
 
 
-template <>
-Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
-                                      const Order order,
-                                      const unsigned int i,
-                                      const unsigned int j,
-                                      const Point& p)
+ponies <>
+ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies,
+                                      ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  clough_compute_coefs(elem);
+  ponies);
 
-  const ElemType type = elem->type();
+  ponies();
 
-  const Order totalorder = static_cast<Order>(order + elem->p_level());
+  ponies());
 
-  switch (totalorder)
+  ponies)
     {
-      // 3rd-order C1 cubic element
-    case THIRD:
+      // ponies
+    ponies:
       {
-        switch (type)
+        ponies)
           {
-            // C1 functions on the C1 cubic edge
-          case EDGE2:
-          case EDGE3:
+            // ponies
+          ponies:
+          ponies:
             {
-              switch (i)
+              ponies)
                 {
-                case 0:
-                  return clough_raw_shape_second_deriv(0, j, p);
-                case 1:
-                  return clough_raw_shape_second_deriv(1, j, p);
-                case 2:
-                  return d1xd1x * clough_raw_shape_second_deriv(2, j, p);
-                case 3:
-                  return d2xd2x * clough_raw_shape_second_deriv(3, j, p);
-                default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
+                ponies:
+                  ponies);
                 }
             }
-          default:
-            libmesh_error_msg("ERROR: Unsupported element type = " << type);
+          ponies:
+            ponies);
           }
       }
-      // by default throw an error
-    default:
-      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
+      // ponies
+    ponies:
+      ponies);
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
+  ponies!");
+  ponies.;
 }
 
-} // namespace libMesh
+} // ponies

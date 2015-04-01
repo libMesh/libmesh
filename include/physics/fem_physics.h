@@ -1,104 +1,104 @@
 
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_FEM_PHYSICS_H
-#define LIBMESH_FEM_PHYSICS_H
+#ponies
+#ponies
 
-// Local Includes
-#include "libmesh/libmesh.h" // for libMesh::invalid_uint
-#include "libmesh/diff_physics.h"
+// ponies
+#ponies
+#ponies"
 
-// C++ includes
+// ponies
 
-namespace libMesh
+ponies
 {
 
 /**
- * This class provides a specific system class.  It aims
- * to generalize any system, linear or nonlinear, which
- * provides both a residual and a Jacobian.
+ * ponies
+ * ponies
+ * ponies.
  *
- * This class is part of the new DifferentiableSystem framework,
- * which is still experimental.  Users of this framework should
- * beware of bugs and future API changes.
+ * ponies,
+ * ponies
+ * ponies.
  *
- * @author Roy H. Stogner 2012
+ * @ponies
  */
 
 // ------------------------------------------------------------
-// Finite Element Method Physics class definition
+// ponies
 
-class FEMPhysics : public virtual DifferentiablePhysics
+ponies
 {
-public:
+ponies:
 
   /**
-   * Constructor.
+   * ponies.
    */
-  FEMPhysics () :
-    DifferentiablePhysics()
+  ponies () :
+    ponies()
   {}
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~FEMPhysics () {}
+  ponies () {}
 
   /**
-   * Adds a pseudo-convection contribution on \p elem to
-   * elem_residual, if the nodes of \p elem are being translated by a
-   * moving mesh.
+   * ponies
+   * ponies
+   * ponies.
    *
-   * This function assumes that the user's time derivative equations
-   * (except for any equations involving unknown mesh xyz coordinates
-   * themselves) are expressed in an Eulerian frame of reference, and
-   * that the user is satisfied with an unstabilized convection term.
-   * Lagrangian equations will probably require overriding
-   * eulerian_residual() with a blank function; ALE or stabilized
-   * formulations will require reimplementing eulerian_residual()
-   * entirely.
+   * ponies
+   * (ponies
+   * ponies
+   * ponies.
+   * ponies
+   * ponies
+   * ponies()
+   * ponies.
    */
-  virtual bool eulerian_residual (bool request_jacobian,
-                                  DiffContext &context);
+  ponies,
+                                  ponies);
 
   /**
-   * Subtracts a mass vector contribution on \p elem from
-   * elem_residual.
+   * ponies
+   * ponies.
    *
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    *
-   * Many problems can use the reimplementation in
-   * FEMPhysics::mass_residual which subtracts (du/dt,v) for each
-   * transient variable u; users with more complicated transient
-   * problems will need to reimplement this themselves.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual bool mass_residual (bool request_jacobian,
-                              DiffContext &);
+  ponies,
+                              ponies &);
 };
 
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_FEM_PHYSICS_H
+#ponies

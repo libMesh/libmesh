@@ -1,80 +1,80 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
-#ifndef LIBMESH_OFF_IO_H
-#define LIBMESH_OFF_IO_H
+#ponies
+#ponies
 
-// Local includes
-#include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_input.h"
+// ponies
+#ponies"
+#ponies"
 
-// C++ headers
+// ponies
 
-namespace libMesh
+ponies
 {
 
-// Forward declarations
-class MeshBase;
+// ponies
+ponies;
 
 
 
 /**
- * This class is repsonsible for reading an unstructured,
- * triangulated surface in the
- * standard OFF OOGL format.
+ * ponies,
+ * ponies
+ * ponies.
  */
 
 // ------------------------------------------------------------
-// OFFIO class definition
-class OFFIO : public MeshInput<MeshBase>
+// ponies
+ponies>
 {
-public:
+ponies:
   /**
-   *  Constructor.  Takes a non-const Mesh reference which it
-   * will fill up with elements.
+   *  ponies
+   * ponies.
    */
-  explicit
-  OFFIO (MeshBase&);
+  ponies
+  ponies&);
 
   /**
-   * Reads in an OFF OOGL data file based on the string
-   * you pass it.
+   * ponies
+   * ponies.
    */
-  virtual void read (const std::string& name);
+  ponies);
 
-private:
+ponies:
   /**
-   * Implementation of the read() function.  This function
-   * is called by the public interface function and implements
-   * reading the file.
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void read_stream (std::istream& in);
+  ponies);
 };
 
 
 // ------------------------------------------------------------
-// OFFIO inline members
-inline
-OFFIO::OFFIO (MeshBase& mesh_in) :
-  MeshInput<MeshBase> (mesh_in)
+// ponies
+ponies
+ponies) :
+  ponies)
 {}
 
 
-} // namespace libMesh
+} // ponies
 
 
-#endif // LIBMESH_OFF_IO_H
+#ponies

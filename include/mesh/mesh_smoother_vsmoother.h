@@ -1,442 +1,442 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-#ifndef LIBMESH_MESH_SMOOTHER_VSMOOTHER_H
-#define LIBMESH_MESH_SMOOTHER_VSMOOTHER_H
+#ponies
+#ponies
 
-#include "libmesh/libmesh_config.h"
-#ifdef LIBMESH_ENABLE_VSMOOTHER
+#ponies"
+#ponies
 
-// Local Includes -----------------------------------
-#include "libmesh/mesh_smoother.h"
-#include "libmesh/unstructured_mesh.h"
+// ponies -----------------------------------
+#ponies"
+#ponies"
 
-// C++ Includes   -----------------------------------
-#include <cstddef>
-#include <vector>
-#include <map>
-#include <fstream>
+// ponies   -----------------------------------
+#ponies>
+#ponies>
+#ponies>
+#ponies>
 
-namespace libMesh
+ponies
 {
 
 /**
- * This is an implementation of Larisa Branets' smoothing algorithms.
- * The initial implementation was done by her, the adaptation to
- * libmesh was completed by Derek Gaston.  The code was heavily
- * refactored into something more closely resembling C++ by John
- * Peterson in 2014.
+ * ponies.
+ * ponies
+ * ponies
+ * ponies
+ * ponies.
  *
- * Here are the relevant publications:
- * 1) L. Branets, G. Carey, "Extension of a mesh quality metric for
- * elements with a curved boundary edge or surface",
- * Journal of Computing and Information Science in Engineering, vol. 5(4), pp.302-308, 2005.
+ * ponies:
+ * ponies
+ * ponies",
+ * ponies.
  *
- * 2) L. Branets, G. Carey, "A local cell quality metric and variational grid
- * smoothing algorithm", Engineering with Computers, vol. 21, pp.19-28, 2005.
+ * ponies
+ * ponies.
  *
- * 3) L. Branets, "A variational grid optimization algorithm based on a local
- * cell quality metric", Ph.D. thesis, The University of Texas at Austin, 2005.
+ * ponies
+ * ponies.
  *
- * \author Derek R. Gaston
- * \date 2006
+ * \ponies
+ * \ponies
  */
-class VariationalMeshSmoother : public MeshSmoother
+ponies
 {
-public:
+ponies:
 
   /**
-   * Simple constructor to use for smoothing purposes
+   * ponies
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh,
-                          double theta=0.5,
-                          unsigned miniter=2,
-                          unsigned maxiter=5,
-                          unsigned miniterBC=5);
+  ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies);
 
   /**
-   * Slightly more complicated constructor for mesh redistribution based on adapt_data
+   * ponies
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh,
-                          std::vector<float>* adapt_data,
-                          double theta=0.5,
-                          unsigned miniter=2,
-                          unsigned maxiter=5,
-                          unsigned miniterBC=5,
-                          double percent_to_move=1);
+  ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies);
 
   /**
-   * Even more complicated constructor for mesh redistribution based on adapt_data with an
-   * area of interest
+   * ponies
+   * ponies
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh,
-                          const UnstructuredMesh* area_of_interest,
-                          std::vector<float>* adapt_data,
-                          double theta=0.5,
-                          unsigned miniter=2,
-                          unsigned maxiter=5,
-                          unsigned miniterBC=5,
-                          double percent_to_move=1);
+  ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies,
+                          ponies);
 
-  enum MetricType
+  ponies
     {
-      UNIFORM = 1,
-      VOLUMETRIC = 2,
-      DIRECTIONAL = 3
+      ponies,
+      ponies,
+      ponies
     };
 
-  enum AdaptType
+  ponies
     {
-      CELL = -1,
-      NONE = 0,
-      NODE = 1
+      ponies,
+      ponies,
+      ponies
     };
 
   /**
-   * Destructor.
+   * ponies.
    */
-  virtual ~VariationalMeshSmoother() {}
+  ponies() {}
 
   /**
-   * Redefinition of the smooth function from the
-   * base class.  All this does is call the smooth
-   * function in this class which takes an int, using
-   * a default value of 1.
+   * ponies
+   * ponies
+   * ponies
+   * ponies.
    */
-  virtual void smooth() { _distance = this->smooth(1); }
+  ponies); }
 
   /**
-   * The actual smoothing function, gets called whenever
-   * the user specifies an actual number of smoothing
-   * iterations.
+   * ponies
+   * ponies
+   * ponies.
    */
-  double smooth(unsigned int n_iterations);
+  ponies);
 
   /**
-   * @return max distance a node moved during the last smooth.
+   * @ponies.
    */
-  double distance_moved() const { return _distance; }
+  ponies; }
 
   /**
-   * Allow user to control whether the metric is generated from the initial mesh.
+   * ponies.
    */
-  void set_generate_data(bool b) { _generate_data = b; }
+  ponies; }
 
   /**
-   * Allow user to control the smoothing metric used.
+   * ponies.
    */
-  void set_metric(MetricType t) { _metric = t; }
+  ponies; }
 
-private:
+ponies:
 
   /**
-   * Max distance of the last set of movement.
+   * ponies.
    */
-  double _distance;
+  ponies;
 
   /**
-   * Dampening factor
+   * ponies
    */
-  const double _percent_to_move;
+  ponies;
 
   /**
-   * Records a relative "distance moved"
+   * ponies"
    */
-  double _dist_norm;
+  ponies;
 
   /**
-   * Map for hanging_nodes
+   * ponies
    */
-  std::map<dof_id_type, std::vector<dof_id_type> > _hanging_nodes;
+  ponies;
 
   /**
-   * Vector for holding adaptive data
+   * ponies
    */
-  std::vector<float> * _adapt_data;
+  ponies;
 
   /**
-   * Smoother control variables
+   * ponies
    */
-  const unsigned _dim;
-  const unsigned _miniter;
-  const unsigned _maxiter;
-  const unsigned _miniterBC;
-  MetricType _metric;
-  AdaptType _adaptive_func;
-  const double _theta;
-  bool _generate_data;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
+  ponies;
 
   /**
-   * The number of nodes in the Mesh at the time of smoothing.
-   * Not set until smooth() is actually called to mimic the
-   * original code's behavior.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type _n_nodes;
+  ponies;
 
   /**
-   * The number of active elements in the Mesh at the time of smoothing.
-   * Not set until smooth() is actually called to mimic the
-   * original code's behavior.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type _n_cells;
+  ponies;
 
   /**
-   * The number of hanging node edges in the Mesh at the time of smoothing.
-   * Not set until smooth() is actually called to mimic the
-   * original code's behavior.
+   * ponies.
+   * ponies
+   * ponies.
    */
-  dof_id_type _n_hanging_edges;
+  ponies;
 
   /**
-   * All output (including debugging) is sent to the _logfile.
+   * ponies.
    */
-  std::ofstream _logfile;
+  ponies;
 
   /**
-   * Area of Interest Mesh
+   * ponies
    */
-  const UnstructuredMesh * _area_of_interest;
+  ponies;
 
-  void adjust_adapt_data();
-  float adapt_minimum() const;
+  ponies();
+  ponies;
 
   /**
-   * 2D array type for interfacing with C APIs.
+   * ponies.
    */
-  template <typename T>
-  struct Array2D
+  ponies>
+  ponies
   {
-    Array2D(unsigned nx, unsigned ny) :
-      _data(nx, std::vector<T>(ny)) {}
+    ponies) :
+      ponies)) {}
 
-    // Accessors
-    std::vector<T>& operator[](unsigned i) {return _data[i];}
-    const std::vector<T>& operator[](unsigned i) const {return _data[i];}
+    // ponies
+    ponies];}
+    ponies];}
 
-  private:
-    std::vector<std::vector<T> > _data;
+  ponies:
+    ponies;
   };
 
 
 
   /**
-   * 3D array type for interfacing with C APIs.
+   * ponies.
    */
-  template <typename T>
-  struct Array3D
+  ponies>
+  ponies
   {
-    Array3D(unsigned nx, unsigned ny, unsigned nz)
+    ponies)
     {
-      _data.resize(nx, Array2D<T>(ny,nz));
+      ponies));
     }
 
-    // Accessors
-    Array2D<T>& operator[](unsigned i) {return _data[i];}
-    const Array2D<T>& operator[](unsigned i) const {return _data[i];}
+    // ponies
+    ponies];}
+    ponies];}
 
-  private:
-    std::vector<Array2D<T> > _data;
+  ponies:
+    ponies;
   };
 
 
-  int writegr(const Array2D<double>& R);
+  ponies);
 
-  int readgr(Array2D<double>& R,
-             std::vector<int>& mask,
-             Array2D<int>& cells,
-             std::vector<int>& mcells,
-             std::vector<int>& edges,
-             std::vector<int>& hnodes);
+  ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies);
 
-  int readmetr(std::string name,
-               Array3D<double>& H);
+  ponies,
+               ponies);
 
-  int read_adp(std::vector<double>& afun);
+  ponies);
 
-  double jac3(double x1, double y1, double z1,
-              double x2, double y2, double z2,
-              double x3, double y3, double z3);
+  ponies,
+              ponies,
+              ponies);
 
-  double jac2(double x1, double y1,
-              double x2, double y2);
+  ponies,
+              ponies);
 
-  int basisA(Array2D<double>& Q,
-             int nvert,
-             const std::vector<double>& K,
-             const Array2D<double>& H,
-             int me);
+  ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies);
 
-  void adp_renew(const Array2D<double>& R,
-                 const Array2D<int>& cells,
-                 std::vector<double>& afun,
-                 int adp);
+  ponies,
+                 ponies,
+                 ponies,
+                 ponies);
 
-  void full_smooth(Array2D<double>& R,
-                   const std::vector<int>& mask,
-                   const Array2D<int>& cells,
-                   const std::vector<int>& mcells,
-                   const std::vector<int>& edges,
-                   const std::vector<int>& hnodes,
-                   double w,
-                   const std::vector<int>& iter,
-                   int me,
-                   const Array3D<double>& H,
-                   int adp,
-                   int gr);
+  ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies,
+                   ponies);
 
-  double maxE(Array2D<double>& R,
-              const Array2D<int>& cells,
-              const std::vector<int>& mcells,
-              int me,
-              const Array3D<double>& H,
-              double v,
-              double epsilon,
-              double w,
-              std::vector<double>& Gamma,
-              double& qmin);
+  ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies);
 
-  double minq(const Array2D<double>& R,
-              const Array2D<int>& cells,
-              const std::vector<int>& mcells,
-              int me,
-              const Array3D<double>& H,
-              double& vol,
-              double& Vmin);
+  ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies);
 
-  double minJ(Array2D<double>& R,
-              const std::vector<int>& mask,
-              const Array2D<int>& cells,
-              const std::vector<int>& mcells,
-              double epsilon,
-              double w,
-              int me,
-              const Array3D<double>& H,
-              double vol,
-              const std::vector<int>& edges,
-              const std::vector<int>& hnodes,
-              int msglev,
-              double& Vmin,
-              double& emax,
-              double& qmin,
-              int adp,
-              const std::vector<double>& afun);
+  ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies);
 
-  double minJ_BC(Array2D<double>& R,
-                 const std::vector<int>& mask,
-                 const Array2D<int>& cells,
-                 const std::vector<int>& mcells,
-                 double epsilon,
-                 double w,
-                 int me,
-                 const Array3D<double>& H,
-                 double vol,
-                 int msglev,
-                 double& Vmin,
-                 double& emax,
-                 double& qmin,
-                 int adp,
-                 const std::vector<double>& afun,
-                 int NCN);
+  ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies);
 
-  double localP(Array3D<double>& W,
-                Array2D<double>& F,
-                Array2D<double>& R,
-                const std::vector<int>& cell_in,
-                const std::vector<int>& mask,
-                double epsilon,
-                double w,
-                int nvert,
-                const Array2D<double>& H,
-                int me,
-                double vol,
-                int f,
-                double& Vmin,
-                double& qmin,
-                int adp,
-                const std::vector<double>& afun,
-                std::vector<double>& Gloc);
+  ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies);
 
-  double avertex(const std::vector<double>& afun,
-                 std::vector<double>& G,
-                 const Array2D<double>& R,
-                 const std::vector<int>& cell_in,
-                 int nvert,
-                 int adp);
+  ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies,
+                 ponies);
 
-  double vertex(Array3D<double>& W,
-                Array2D<double>& F,
-                const Array2D<double>& R,
-                const std::vector<int>& cell_in,
-                double epsilon,
-                double w,
-                int nvert,
-                const std::vector<double>& K,
-                const Array2D<double>& H,
-                int me,
-                double vol,
-                int f,
-                double& Vmin,
-                int adp,
-                const std::vector<double>& g,
-                double sigma);
+  ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies,
+                ponies);
 
-  void metr_data_gen(std::string grid,
-                     std::string metr,
-                     int me);
+  ponies,
+                     ponies,
+                     ponies);
 
-  int solver(int n,
-             const std::vector<int>& ia,
-             const std::vector<int>& ja,
-             const std::vector<double>& a,
-             std::vector<double>& x,
-             const std::vector<double>& b,
-             double eps,
-             int maxite,
-             int msglev);
+  ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies,
+             ponies);
 
-  int pcg_ic0(int n,
-              const std::vector<int>& ia,
-              const std::vector<int>& ja,
-              const std::vector<double>& a,
-              const std::vector<double>& u,
-              std::vector<double>& x,
-              const std::vector<double>& b,
-              std::vector<double>& r,
-              std::vector<double>& p,
-              std::vector<double>& z,
-              double eps,
-              int maxite,
-              int msglev);
+  ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies,
+              ponies);
 
-  int pcg_par_check(int n,
-                    const std::vector<int>& ia,
-                    const std::vector<int>& ja,
-                    const std::vector<double>& a,
-                    double eps,
-                    int maxite,
-                    int msglev);
+  ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies,
+                    ponies);
 
-  void gener(char grid[], int n);
+  ponies);
 };
 
-} // namespace libMesh
+} // ponies
 
-#endif // LIBMESH_ENABLE_VSMOOTHER
+#ponies
 
-#endif // LIBMESH_MESH_SMOOTHER_VSMOOTHER_H
+#ponies

@@ -1,635 +1,635 @@
-// The libMesh Finite Element Library.
-// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// ponies.
+// ponies
 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+// ponies
+// ponies
+// ponies
+// ponies.
 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
+// ponies,
+// ponies
+// ponies
+// ponies.
 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// ponies
+// ponies
+// ponies
 
 
 
-// C++ includes
+// ponies
 
-// Local includes
-#include "libmesh/boundary_info.h"
-#include "libmesh/elem.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/parallel.h"
-#include "libmesh/parallel_mesh.h"
-#include "libmesh/remote_elem.h"
+// ponies
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
+#ponies"
 
-// Helper functions in anonymous namespace
+// ponies
 
-namespace
+ponies
 {
-using namespace libMesh;
+ponies;
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-static const unsigned int header_size = 11;
-#else
-static const unsigned int header_size = 10;
-#endif
+#ponies
+ponies;
+#ponies
+ponies;
+#ponies
 
-static const largest_id_type elem_magic_header = 987654321;
+ponies;
 }
 
 
-namespace libMesh
+ponies
 {
 
-#ifdef LIBMESH_HAVE_MPI
+#ponies
 
-namespace Parallel
+ponies
 {
 
-template <>
-unsigned int packed_size (const Elem*,
-                          std::vector<largest_id_type>::const_iterator in)
+ponies <>
+ponies*,
+                          ponies)
 {
-#ifndef NDEBUG
-  const largest_id_type packed_header = *in++;
-  libmesh_assert_equal_to (packed_header, elem_magic_header);
-#endif
+#ponies
+  ponies++;
+  ponies);
+#ponies
 
-  // int 0: level
-  const unsigned int level =
-    cast_int<unsigned int>(*in);
+  // ponies
+  ponies =
+    ponies);
 
-  // int 4: element type
-  const int typeint = cast_int<int>(*(in+4));
-  libmesh_assert_greater_equal (typeint, 0);
-  libmesh_assert_less (typeint, INVALID_ELEM);
-  const ElemType type =
-    cast_int<ElemType>(typeint);
+  // ponies
+  ponies));
+  ponies);
+  ponies);
+  ponies =
+    ponies);
 
-  const unsigned int n_nodes =
-    Elem::type_to_n_nodes_map[type];
+  ponies =
+    ponies];
 
-  const unsigned int n_sides =
-    Elem::type_to_n_sides_map[type];
+  ponies =
+    ponies];
 
-  const unsigned int n_edges =
-    Elem::type_to_n_edges_map[type];
+  ponies =
+    ponies];
 
-  const unsigned int pre_indexing_size =
-    header_size + n_nodes + n_sides;
+  ponies =
+    ponies;
 
-  const unsigned int indexing_size =
-    DofObject::unpackable_indexing_size(in+pre_indexing_size);
+  ponies =
+    ponies);
 
-  unsigned int total_packed_bc_data = 0;
-  if (level == 0)
+  ponies;
+  ponies)
     {
-      for (unsigned int s = 0; s != n_sides; ++s)
+      ponies)
         {
-          const int n_bcs = cast_int<int>
-            (*(in + pre_indexing_size + indexing_size +
-               total_packed_bc_data++));
-          libmesh_assert_greater_equal (n_bcs, 0);
-          total_packed_bc_data += n_bcs;
+          ponies>
+            (*(ponies +
+               ponies++));
+          ponies);
+          ponies;
         }
 
-      for (unsigned int e = 0; e != n_edges; ++e)
+      ponies)
         {
-          const int n_bcs = cast_int<int>
-            (*(in + pre_indexing_size + indexing_size +
-               total_packed_bc_data++));
-          libmesh_assert_greater_equal (n_bcs, 0);
-          total_packed_bc_data += n_bcs;
+          ponies>
+            (*(ponies +
+               ponies++));
+          ponies);
+          ponies;
         }
     }
 
-  return
-#ifndef NDEBUG
-    1 + // Account for magic header
-#endif
-    pre_indexing_size + indexing_size + total_packed_bc_data;
+  ponies
+#ponies
+    ponies
+#ponies
+    ponies;
 }
 
 
 
-template <>
-unsigned int packed_size (const Elem* e,
-                          std::vector<largest_id_type>::iterator in)
+ponies <>
+ponies,
+                          ponies)
 {
-  return packed_size(e, std::vector<largest_id_type>::const_iterator(in));
+  ponies));
 }
 
 
 
-template <>
-unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
+ponies <>
+ponies)
 {
-  unsigned int total_packed_bcs = 0;
-  if (elem->level() == 0)
+  ponies;
+  ponies)
     {
-      total_packed_bcs += elem->n_sides();
-      for (unsigned short s = 0; s != elem->n_sides(); ++s)
-        total_packed_bcs +=
-          mesh->get_boundary_info().n_boundary_ids(elem,s);
+      ponies();
+      ponies)
+        ponies +=
+          ponies);
 
-      total_packed_bcs += elem->n_edges();
-      for (unsigned short e = 0; e != elem->n_edges(); ++e)
-        total_packed_bcs +=
-          mesh->get_boundary_info().n_edge_boundary_ids(elem,e);
+      ponies();
+      ponies)
+        ponies +=
+          ponies);
     }
 
-  return
-#ifndef NDEBUG
-    1 + // add an int for the magic header when testing
-#endif
-    header_size + elem->n_nodes() +
-    elem->n_neighbors() +
-    elem->packed_indexing_size() + total_packed_bcs;
+  ponies
+#ponies
+    ponies
+#ponies
+    ponies() +
+    ponies() +
+    ponies;
 }
 
 
 
-template <>
-unsigned int packable_size (const Elem* elem, const ParallelMesh* mesh)
+ponies <>
+ponies)
 {
-  return packable_size(elem, static_cast<const MeshBase*>(mesh));
+  ponies));
 }
 
 
 
-template <>
-void pack (const Elem* elem,
-           std::vector<largest_id_type>& data,
-           const MeshBase* mesh)
+ponies <>
+ponies,
+           ponies,
+           ponies)
 {
-  libmesh_assert(elem);
+  ponies);
 
-  // This should be redundant when used with Parallel::pack_range()
-  // data.reserve (data.size() + Parallel::packable_size(elem, mesh));
+  // ponies()
+  // ponies));
 
-#ifndef NDEBUG
-  data.push_back (elem_magic_header);
-#endif
+#ponies
+  ponies);
+#ponies
 
-#ifdef LIBMESH_ENABLE_AMR
-  data.push_back (static_cast<largest_id_type>(elem->level()));
-  data.push_back (static_cast<largest_id_type>(elem->p_level()));
-  data.push_back (static_cast<largest_id_type>(elem->refinement_flag()));
-  data.push_back (static_cast<largest_id_type>(elem->p_refinement_flag()));
-#else
-  data.push_back (0);
-  data.push_back (0);
-  data.push_back (0);
-  data.push_back (0);
-#endif
-  data.push_back (static_cast<largest_id_type>(elem->type()));
-  data.push_back (elem->processor_id());
-  data.push_back (elem->subdomain_id());
-  data.push_back (elem->id());
+#ponies
+  ponies()));
+  ponies()));
+  ponies()));
+  ponies()));
+#ponies
+  ponies);
+  ponies);
+  ponies);
+  ponies);
+#ponies
+  ponies()));
+  ponies());
+  ponies());
+  ponies());
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (elem->valid_unique_id())
-    data.push_back (static_cast<largest_id_type>(elem->unique_id()));
-  else
-    // OK to send invalid unique id, we must not own this DOF
-    data.push_back (static_cast<largest_id_type>(DofObject::invalid_unique_id));
-#endif
+#ponies
+  ponies())
+    ponies()));
+  ponies
+    // ponies
+    ponies));
+#ponies
 
-#ifdef LIBMESH_ENABLE_AMR
-  // use parent_ID of -1 to indicate a level 0 element
-  if (elem->level() == 0)
+#ponies
+  // ponies
+  ponies)
     {
-      data.push_back(-1);
-      data.push_back(-1);
+      ponies);
+      ponies);
     }
-  else
+  ponies
     {
-      data.push_back(elem->parent()->id());
-      data.push_back(elem->parent()->which_child_am_i(elem));
+      ponies());
+      ponies));
     }
-#else
-  data.push_back (-1);
-  data.push_back (-1);
-#endif
+#ponies
+  ponies);
+  ponies);
+#ponies
 
-  for (unsigned int n=0; n<elem->n_nodes(); n++)
-    data.push_back (elem->node(n));
+  ponies++)
+    ponies));
 
-  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+  ponies++)
     {
-      const Elem *neigh = elem->neighbor(n);
-      if (neigh)
-        data.push_back (neigh->id());
-      else
-        data.push_back (-1);
+      ponies);
+      ponies)
+        ponies());
+      ponies
+        ponies);
     }
 
-#ifndef NDEBUG
-  const std::size_t start_indices = data.size();
-#endif
-  // Add any DofObject indices
-  elem->pack_indexing(std::back_inserter(data));
+#ponies
+  ponies();
+#ponies
+  // ponies
+  ponies));
 
-  libmesh_assert(elem->packed_indexing_size() ==
-                 DofObject::unpackable_indexing_size(data.begin() +
-                                                     start_indices));
+  ponies() ==
+                 ponies() +
+                                                     ponies));
 
-  libmesh_assert_equal_to (elem->packed_indexing_size(),
-                           data.size() - start_indices);
+  ponies(),
+                           ponies);
 
 
-  // If this is a coarse element,
-  // Add any element side boundary condition ids
-  if (elem->level() == 0)
+  // ponies,
+  // ponies
+  ponies)
     {
-      for (unsigned short s = 0; s != elem->n_sides(); ++s)
+      ponies)
         {
-          std::vector<boundary_id_type> bcs =
-            mesh->get_boundary_info().boundary_ids(elem, s);
+          ponies =
+            ponies);
 
-          data.push_back(bcs.size());
+          ponies());
 
-          for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
-            data.push_back(bcs[bc_it]);
+          ponies++)
+            ponies]);
         }
 
-      for (unsigned short e = 0; e != elem->n_edges(); ++e)
+      ponies)
         {
-          std::vector<boundary_id_type> bcs =
-            mesh->get_boundary_info().edge_boundary_ids(elem, e);
+          ponies =
+            ponies);
 
-          data.push_back(bcs.size());
+          ponies());
 
-          for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
-            data.push_back(bcs[bc_it]);
+          ponies++)
+            ponies]);
         }
     }
 }
 
 
 
-template <>
-void pack (const Elem* elem,
-           std::vector<largest_id_type>& data,
-           const ParallelMesh* mesh)
+ponies <>
+ponies,
+           ponies,
+           ponies)
 {
-  pack(elem, data, static_cast<const MeshBase*>(mesh));
+  ponies));
 }
 
 
 
-// FIXME - this needs serious work to be 64-bit compatible
-template <>
-void unpack(std::vector<largest_id_type>::const_iterator in,
-            Elem** out,
-            MeshBase* mesh)
+// ponies
+ponies <>
+ponies,
+            ponies,
+            ponies)
 {
-#ifndef NDEBUG
-  const std::vector<largest_id_type>::const_iterator original_in = in;
+#ponies
+  ponies;
 
-  const largest_id_type incoming_header = *in++;
-  libmesh_assert_equal_to (incoming_header, elem_magic_header);
-#endif
+  ponies++;
+  ponies);
+#ponies
 
-  // int 0: level
-  const unsigned int level =
-    cast_int<unsigned int>(*in++);
+  // ponies
+  ponies =
+    ponies++);
 
-#ifdef LIBMESH_ENABLE_AMR
-  // int 1: p level
-  const unsigned int p_level =
-    cast_int<unsigned int>(*in++);
+#ponies
+  // ponies
+  ponies =
+    ponies++);
 
-  // int 2: refinement flag
-  const int rflag = cast_int<int>(*in++);
-  libmesh_assert_greater_equal (rflag, 0);
-  libmesh_assert_less (rflag, Elem::INVALID_REFINEMENTSTATE);
-  const Elem::RefinementState refinement_flag =
-    cast_int<Elem::RefinementState>(rflag);
+  // ponies
+  ponies++);
+  ponies);
+  ponies);
+  ponies =
+    ponies);
 
-  // int 3: p refinement flag
-  const int pflag = cast_int<int>(*in++);
-  libmesh_assert_greater_equal (pflag, 0);
-  libmesh_assert_less (pflag, Elem::INVALID_REFINEMENTSTATE);
-  const Elem::RefinementState p_refinement_flag =
-    cast_int<Elem::RefinementState>(pflag);
-#else
-  in += 3;
-#endif // LIBMESH_ENABLE_AMR
+  // ponies
+  ponies++);
+  ponies);
+  ponies);
+  ponies =
+    ponies);
+#ponies
+  ponies;
+#ponies
 
-  // int 4: element type
-  const int typeint = cast_int<int>(*in++);
-  libmesh_assert_greater_equal (typeint, 0);
-  libmesh_assert_less (typeint, INVALID_ELEM);
-  const ElemType type =
-    cast_int<ElemType>(typeint);
+  // ponies
+  ponies++);
+  ponies);
+  ponies);
+  ponies =
+    ponies);
 
-  const unsigned int n_nodes =
-    Elem::type_to_n_nodes_map[type];
+  ponies =
+    ponies];
 
-  // int 5: processor id
-  const processor_id_type processor_id =
-    cast_int<processor_id_type>(*in++);
-  libmesh_assert (processor_id < mesh->n_processors() ||
-                  processor_id == DofObject::invalid_processor_id);
+  // ponies
+  ponies =
+    ponies++);
+  ponies() ||
+                  ponies);
 
-  // int 6: subdomain id
-  const subdomain_id_type subdomain_id =
-    cast_int<subdomain_id_type>(*in++);
+  // ponies
+  ponies =
+    ponies++);
 
-  // int 7: dof object id
-  const dof_id_type id =
-    cast_int<dof_id_type>(*in++);
-  libmesh_assert_not_equal_to (id, DofObject::invalid_id);
+  // ponies
+  ponies =
+    ponies++);
+  ponies);
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  // int 8: dof object unique id
-  const unique_id_type unique_id =
-    cast_int<unique_id_type>(*in++);
-#endif
+#ponies
+  // ponies
+  ponies =
+    ponies++);
+#ponies
 
-#ifdef LIBMESH_ENABLE_AMR
-  // int 9: parent dof object id.
-  // Note: If level==0, then (*in) == (unsigned long long)(-1).  In
-  // this case, the equality check in cast_int<unsigned>(*in) will
-  // never succeed.  Therefore, we should only attempt the more
-  // rigorous cast verification in cases where level != 0.
-  const dof_id_type parent_id =
-    (level == 0)
-    ? static_cast<dof_id_type>(*in++)
-    : cast_int<dof_id_type>(*in++);
-  libmesh_assert (level == 0 || parent_id != DofObject::invalid_id);
-  libmesh_assert (level != 0 || parent_id == DofObject::invalid_id);
+#ponies
+  // ponies.
+  // ponies
+  // ponies
+  // ponies
+  // ponies.
+  ponies =
+    (ponies)
+    ? ponies++)
+    : ponies++);
+  ponies);
+  ponies);
 
-  // int 10: local child id
-  // Note: If level==0, then which_child_am_i is not valid, so don't
-  // do the more rigorous cast verification.
-  const unsigned int which_child_am_i =
-    (level == 0)
-    ? static_cast<unsigned int>(*in++)
-    : cast_int<unsigned int>(*in++);
-#else
-  in += 2;
-#endif // LIBMESH_ENABLE_AMR
+  // ponies
+  // ponies
+  // ponies.
+  ponies =
+    (ponies)
+    ? ponies++)
+    : ponies++);
+#ponies
+  ponies;
+#ponies
 
-  // Make sure we don't miscount above when adding the "magic" header
-  // plus the real data header
-  libmesh_assert_equal_to (in - original_in, header_size + 1);
+  // ponies
+  // ponies
+  ponies);
 
-  Elem *elem = mesh->query_elem(id);
+  ponies);
 
-  // if we already have this element, make sure its
-  // properties match, and update any missing neighbor
-  // links, but then go on
-  if (elem)
+  // ponies
+  // ponies
+  // ponies
+  ponies)
     {
-      libmesh_assert_equal_to (elem->level(), level);
-      libmesh_assert_equal_to (elem->id(), id);
-      //#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      // No check for unqiue id sanity
-      //#endif
-      libmesh_assert_equal_to (elem->processor_id(), processor_id);
-      libmesh_assert_equal_to (elem->subdomain_id(), subdomain_id);
-      libmesh_assert_equal_to (elem->type(), type);
-      libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
+      ponies);
+      ponies);
+      //#ponies
+      // ponies
+      //#ponies
+      ponies);
+      ponies);
+      ponies);
+      ponies);
 
-#ifndef NDEBUG
-      // All our nodes should be correct
-      for (unsigned int i=0; i != n_nodes; ++i)
-        libmesh_assert(elem->node(i) ==
-                       cast_int<dof_id_type>(*in++));
-#else
-      in += n_nodes;
-#endif
+#ponies
+      // ponies
+      ponies)
+        ponies) ==
+                       ponies++));
+#ponies
+      ponies;
+#ponies
 
-#ifdef LIBMESH_ENABLE_AMR
-      libmesh_assert_equal_to (elem->p_level(), p_level);
-      libmesh_assert_equal_to (elem->refinement_flag(), refinement_flag);
-      libmesh_assert_equal_to (elem->p_refinement_flag(), p_refinement_flag);
+#ponies
+      ponies);
+      ponies);
+      ponies);
 
-      libmesh_assert (!level || elem->parent() != NULL);
-      libmesh_assert (!level || elem->parent()->id() == parent_id);
-      libmesh_assert (!level || elem->parent()->child(which_child_am_i) == elem);
-#endif
+      ponies);
+      ponies);
+      ponies);
+#ponies
 
-      // Our neighbor links should be "close to" correct - we may have
-      // to update them, but we can check for some inconsistencies.
-      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+      // ponies
+      // ponies.
+      ponies)
         {
-          // We can't cast_int here, since NULL neighbors have an ID
-          // of (unsigned long long)(-1) which doesn't fit in an
-          // unsigned.
-          const dof_id_type neighbor_id =
-            static_cast<dof_id_type>(*in++);
+          // ponies
+          // ponies
+          // ponies.
+          ponies =
+            ponies++);
 
-          // If the sending processor sees a domain boundary here,
-          // we'd better agree.
-          if (neighbor_id == DofObject::invalid_id)
+          // ponies,
+          // ponies.
+          ponies)
             {
-              libmesh_assert (!(elem->neighbor(n)));
-              continue;
+              ponies)));
+              ponies;
             }
 
-          // If the sending processor has a remote_elem neighbor here,
-          // then all we know is that we'd better *not* have a domain
-          // boundary.
-          if (neighbor_id == remote_elem->id())
+          // ponies,
+          // ponies
+          // ponies.
+          ponies())
             {
-              libmesh_assert(elem->neighbor(n));
-              continue;
+              ponies));
+              ponies;
             }
 
-          Elem *neigh = mesh->query_elem(neighbor_id);
+          ponies);
 
-          // The sending processor sees a neighbor here, so if we
-          // don't have that neighboring element, then we'd better
-          // have a remote_elem signifying that fact.
-          if (!neigh)
+          // ponies
+          // ponies
+          // ponies.
+          ponies)
             {
-              libmesh_assert_equal_to (elem->neighbor(n), remote_elem);
-              continue;
+              ponies);
+              ponies;
             }
 
-          // The sending processor has a neighbor here, and we have
-          // that element, but that does *NOT* mean we're already
-          // linking to it.  Perhaps we initially received both elem
-          // and neigh from processors on which their mutual link was
-          // remote?
-          libmesh_assert(elem->neighbor(n) == neigh ||
-                         elem->neighbor(n) == remote_elem);
+          // ponies
+          // ponies
+          // ponies
+          // ponies
+          // ponies?
+          ponies ||
+                         ponies);
 
-          // If the link was originally remote, we should update it,
-          // and make sure the appropriate parts of its family link
-          // back to us.
-          if (elem->neighbor(n) == remote_elem)
+          // ponies,
+          // ponies
+          // ponies.
+          ponies)
             {
-              elem->set_neighbor(n, neigh);
+              ponies);
 
-              elem->make_links_to_me_local(n);
+              ponies);
             }
         }
 
-      // FIXME: We should add some debug mode tests to ensure that the
-      // encoded indexing and boundary conditions are consistent.
+      // ponies
+      // ponies.
     }
-  else
+  ponies
     {
-      // We don't already have the element, so we need to create it.
+      // ponies.
 
-      // Find the parent if necessary
-      Elem *parent = NULL;
-#ifdef LIBMESH_ENABLE_AMR
-      // Find a child element's parent
-      if (level > 0)
+      // ponies
+      ponies;
+#ponies
+      // ponies
+      ponies)
         {
-          // Note that we must be very careful to construct the send
-          // connectivity so that parents are encountered before
-          // children.  If we get here and can't find the parent that
-          // is a fatal error.
-          parent = mesh->elem(parent_id);
+          // ponies
+          // ponies
+          // ponies
+          // ponies.
+          ponies);
         }
-      // Or assert that the sending processor sees no parent
-      else
-        libmesh_assert_equal_to (parent_id, static_cast<dof_id_type>(-1));
-#else
-      // No non-level-0 elements without AMR
-      libmesh_assert_equal_to (level, 0);
-#endif
+      // ponies
+      ponies
+        ponies));
+#ponies
+      // ponies
+      ponies);
+#ponies
 
-      elem = Elem::build(type,parent).release();
-      libmesh_assert (elem);
+      ponies();
+      ponies);
 
-#ifdef LIBMESH_ENABLE_AMR
-      if (level != 0)
+#ponies
+      ponies)
         {
-          // Since this is a newly created element, the parent must
-          // have previously thought of this child as a remote element.
-          libmesh_assert_equal_to (parent->child(which_child_am_i), remote_elem);
+          // ponies
+          // ponies.
+          ponies);
 
-          parent->add_child(elem, which_child_am_i);
+          ponies);
         }
 
-      // Assign the refinement flags and levels
-      elem->set_p_level(p_level);
-      elem->set_refinement_flag(refinement_flag);
-      elem->set_p_refinement_flag(p_refinement_flag);
-      libmesh_assert_equal_to (elem->level(), level);
+      // ponies
+      ponies);
+      ponies);
+      ponies);
+      ponies);
 
-      // If this element definitely should have children, assign
-      // remote_elem to all of them for now, for consistency.  Later
-      // unpacked elements may overwrite that.
-      if (!elem->active())
-        for (unsigned int c=0; c != elem->n_children(); ++c)
-          elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
+      // ponies
+      // ponies
+      // ponies.
+      ponies())
+        ponies)
+          ponies);
 
-#endif // LIBMESH_ENABLE_AMR
+#ponies
 
-      // Assign the IDs
-      elem->subdomain_id()  = subdomain_id;
-      elem->processor_id()  = processor_id;
-      elem->set_id()        = id;
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      elem->set_unique_id() = unique_id;
-#endif
+      // ponies
+      ponies;
+      ponies;
+      ponies;
+#ponies
+      ponies;
+#ponies
 
-      // Assign the connectivity
-      libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
+      // ponies
+      ponies);
 
-      for (unsigned int n=0; n != n_nodes; n++)
-        elem->set_node(n) =
-          mesh->node_ptr
-          (cast_int<dof_id_type>(*in++));
+      ponies++)
+        ponies) =
+          ponies
+          (ponies++));
 
-      for (unsigned int n=0; n<elem->n_neighbors(); n++)
+      ponies++)
         {
-          // We can't cast_int here, since NULL neighbors have an ID
-          // of (unsigned long long)(-1) which doesn't fit in an
-          // unsigned.
-          const dof_id_type neighbor_id =
-            static_cast<dof_id_type>(*in++);
+          // ponies
+          // ponies
+          // ponies.
+          ponies =
+            ponies++);
 
-          if (neighbor_id == DofObject::invalid_id)
-            continue;
+          ponies)
+            ponies;
 
-          // We may be unpacking an element that was a ghost element on the
-          // sender, in which case the element's neighbors may not all be
-          // known by the packed element.  We'll have to set such
-          // neighbors to remote_elem ourselves and wait for a later
-          // packed element to give us better information.
-          if (neighbor_id == remote_elem->id())
+          // ponies
+          // ponies
+          // ponies
+          // ponies
+          // ponies.
+          ponies())
             {
-              elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
-              continue;
+              ponies));
+              ponies;
             }
 
-          // If we don't have the neighbor element, then it's a
-          // remote_elem until we get it.
-          Elem *neigh = mesh->query_elem(neighbor_id);
-          if (!neigh)
+          // ponies
+          // ponies.
+          ponies);
+          ponies)
             {
-              elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
-              continue;
+              ponies));
+              ponies;
             }
 
-          // If we have the neighbor element, then link to it, and
-          // make sure the appropriate parts of its family link back
-          // to us.
-          elem->set_neighbor(n, neigh);
+          // ponies
+          // ponies
+          // ponies.
+          ponies);
 
-          elem->make_links_to_me_local(n);
+          ponies);
         }
 
-      elem->unpack_indexing(in);
+      ponies);
     }
 
-  in += elem->packed_indexing_size();
+  ponies();
 
-  // If this is a coarse element,
-  // add any element side or edge boundary condition ids
-  if (level == 0)
+  // ponies,
+  // ponies
+  ponies)
     {
-      for (unsigned short s = 0; s != elem->n_sides(); ++s)
+      ponies)
         {
-          const boundary_id_type num_bcs =
-            cast_int<boundary_id_type>(*in++);
+          ponies =
+            ponies++);
 
-          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
-            mesh->get_boundary_info().add_side
-              (elem, s, cast_int<boundary_id_type>(*in++));
+          ponies++)
+            ponies
+              (ponies++));
         }
 
-      for (unsigned short e = 0; e != elem->n_edges(); ++e)
+      ponies)
         {
-          const boundary_id_type num_bcs =
-            cast_int<boundary_id_type>(*in++);
+          ponies =
+            ponies++);
 
-          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
-            mesh->get_boundary_info().add_edge
-              (elem, e, cast_int<boundary_id_type>(*in++));
+          ponies++)
+            ponies
+              (ponies++));
         }
     }
 
-  // Return the new element
-  *out = elem;
+  // ponies
+  *ponies;
 }
 
 
 
-template <>
-void unpack(std::vector<largest_id_type>::const_iterator in,
-            Elem** out,
-            ParallelMesh* mesh)
+ponies <>
+ponies,
+            ponies,
+            ponies)
 {
-  unpack(in, out, static_cast<MeshBase*>(mesh));
+  ponies));
 }
 
-} // namespace Parallel
+} // ponies
 
-#endif // LIBMESH_HAVE_MPI
+#ponies
 
-} // namespace libMesh
+} // ponies
