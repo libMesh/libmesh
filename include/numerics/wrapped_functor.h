@@ -56,9 +56,9 @@ public:
     : _func(func.clone())
   { }
 
-  virtual AutoPtr<FEMFunctionBase<Output> > clone () const
+  virtual UniquePtr<FEMFunctionBase<Output> > clone () const
   {
-    return AutoPtr<FEMFunctionBase<Output> >
+    return UniquePtr<FEMFunctionBase<Output> >
       (new WrappedFunctor<Output> (*_func));
   }
 
@@ -94,7 +94,7 @@ public:
 
 protected:
 
-  AutoPtr<FunctionBase<Output> > _func;
+  UniquePtr<FunctionBase<Output> > _func;
 };
 
 
