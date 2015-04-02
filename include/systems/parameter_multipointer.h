@@ -86,6 +86,12 @@ public:
 
   void push_back (T* new_ptr) { _ptrs.push_back(new_ptr); }
 
+  /**
+   * Returns the number of data associated with this parameter.
+   * Useful for testing if the multipointer is empty/invalid.
+   */
+  std::size_t size() const { return _ptrs.size(); }
+
 private:
   std::vector<T*> _ptrs;
 };
