@@ -51,6 +51,12 @@ public:
   ParameterMultiPointer(T * param_ptr) : _ptrs(1, param_ptr) {}
 
   /**
+   * A simple reseater won't work with a multipointer
+   */
+  virtual ParameterAccessor<T> &
+  operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
+
+  /**
    * Setter: change the value of the parameter we access.
    */
   virtual void set (const T & new_value)

@@ -69,7 +69,8 @@ public:
    * This is included for backward compatibility, but will be
    * deprecated in some classes and not implemented in others.
    */
-  virtual void operator= (T * /* new_ptr */) { libmesh_error(); }
+  virtual ParameterAccessor<T> &
+  operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
 
   /**
    * Proxy: for backward compatibility, we allow codes to treat a
