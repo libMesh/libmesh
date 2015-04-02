@@ -12,7 +12,7 @@ noinst_HEADERS =  \
         parallel/parallel_conversion_utils.h \
         parallel/parallel_hilbert.h \
         partitioning/parmetis_helper.h
- 
+
 # These are the headers we actually want to install and make available
 # to a user.  Consider these the public interface of libMesh.
 # will get installed into '$(prefix)/include/libmesh'
@@ -369,6 +369,7 @@ include_HEADERS =  \
         systems/newmark_system.h \
         systems/nonlinear_implicit_system.h \
         systems/parameter_accessor.h \
+        systems/parameter_multipointer.h \
         systems/parameter_pointer.h \
         systems/parameter_vector.h \
         systems/qoi_set.h \

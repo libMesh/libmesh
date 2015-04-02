@@ -365,6 +365,7 @@ BUILT_SOURCES = \
         newmark_system.h \
         nonlinear_implicit_system.h \
         parameter_accessor.h \
+        parameter_multipointer.h \
         parameter_pointer.h \
         parameter_vector.h \
         qoi_set.h \
@@ -1573,6 +1574,9 @@ nonlinear_implicit_system.h: $(top_srcdir)/include/systems/nonlinear_implicit_sy
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_accessor.h: $(top_srcdir)/include/systems/parameter_accessor.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parameter_multipointer.h: $(top_srcdir)/include/systems/parameter_multipointer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_pointer.h: $(top_srcdir)/include/systems/parameter_pointer.h
