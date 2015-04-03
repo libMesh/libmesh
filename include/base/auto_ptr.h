@@ -15,53 +15,55 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef LIBMESH_AUTO_PTR_H
-#define LIBMESH_AUTO_PTR_H
+#ifndef LIBMESH_UNIQUE_PTR_H
+#define LIBMESH_UNIQUE_PTR_H
 
 #include "libmesh/libmesh_config.h"
 #include "libmesh_common.h" // for libmesh_deprecated()
 
-// LibMesh's AutoPtr is now libmesh_deprecated(), just like the
+// LibMesh's UniquePtr is now libmesh_deprecated(), just like the
 // std::auto_ptr it is based on.
 //
-// New library code should use the UniquePtr typedef (which will
-// eventually be a C++11 alias declaration).  LibMesh's UniquePtr is
-// one of:
+// New library code should use the UniquePtr class. 
+// LibMesh's UniquePtr is one of:
 // 1.) std::unique_ptr
 // 2.) Howard Hinnant's C++03 compatible boost::unique_ptr
-// 3.) The deprecated libMesh AutoPtr
+// 3.) The deprecated libMesh UniquePtr
 // in that order, depending on what your compiler supports.  If you
 // are using a compiler that cannot compile Howard Hinnant's
 // unique_ptr implementation, you should probably think about
 // upgrading.
-#ifdef LIBMESH_ENABLE_UNIQUE_PTR
-#ifdef LIBMESH_HAVE_CXX11_UNIQUE_PTR
+
+#if defined(LIBMESH_ENABLE_UNIQUE_PTR) && defined(LIBMESH_HAVE_CXX11_UNIQUE_PTR)
 #  include <memory>
-#  define UniquePtr std::unique_ptr
-#elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
+namespace libMesh
+{
+  template<typename T>
+  using UniquePtr = std::unique_ptr<T>;
+}
+#elif defined(LIBMESH_ENABLE_UNIQUE_PTR) && defined(LIBMESH_HAVE_HINNANT_UNIQUE_PTR)
 #  include "libmesh/unique_ptr.hpp"
-#  define UniquePtr boost::unique_ptr
+// ... and see the definition of libMesh::UniquePtr therein.
 #else
-#  define UniquePtr libMesh::AutoPtr
-#endif
-#else
-// libMesh was configured with --disable-unique-ptr, so we'll use
-// libMesh's AutoPtr class instead.
-#define UniquePtr libMesh::AutoPtr
-#endif
+// libMesh was configured with --disable-unique-ptr, 
+// or neither of std::unique_ptr and boost::unique_ptr are supported,
+// so we'll use libMesh's old implementation instead.
+// Note that this class was previously named AutoPtr. For backward compatibility a
+#define AutoPtr UniquePtr
+// is provided
 
 namespace libMesh
 {
 
 /**
- *  A wrapper class to provide AutoPtr with reference semantics.  For
- *  example, an AutoPtr can be assigned (or constructed from) the result of
- *  a function which returns an AutoPtr by value.
+ *  A wrapper class to provide UniquePtr with reference semantics.  For
+ *  example, an UniquePtr can be assigned (or constructed from) the result of
+ *  a function which returns an UniquePtr by value.
  *
- *  All the AutoPtrRef stuff should happen behind the scenes.
+ *  All the UniquePtrRef stuff should happen behind the scenes.
  */
 template<typename Tp1>
-struct AutoPtrRef
+struct UniquePtrRef
 {
   /**
    * The actual pointer.
@@ -72,7 +74,7 @@ struct AutoPtrRef
    * Constructor.
    */
   explicit
-  AutoPtrRef(Tp1* p)
+  UniquePtrRef(Tp1* p)
     : _ptr(p) {}
 };
 
@@ -82,18 +84,18 @@ struct AutoPtrRef
  *
  *  The Standard says:
  *  <pre>
- *  An @c AutoPtr owns the object it holds a pointer to.  Copying an
- *  @c AutoPtr copies the pointer and transfers ownership to the destination.
- *  If more than one @c AutoPtr owns the same object at the same time the
+ *  An @c UniquePtr owns the object it holds a pointer to.  Copying an
+ *  @c UniquePtr copies the pointer and transfers ownership to the destination.
+ *  If more than one @c UniquePtr owns the same object at the same time the
  *  behavior of the program is undefined.
  *
- *  The uses of @c AutoPtr include providing temporary exception-safety for
+ *  The uses of @c UniquePtr include providing temporary exception-safety for
  *  dynamically allocated memory, passing ownership of dynamically allocated
  *  memory to a function, and returning dynamically allocated memory from a
- *  function.  @c AutoPtr does not meet the CopyConstructible and Assignable
+ *  function.  @c UniquePtr does not meet the CopyConstructible and Assignable
  *  requirements for Standard Library <a href="tables.html#65">container</a>
  *  elements and thus instantiating a Standard Library container with an
- *  @c AutoPtr results in undefined behavior.
+ *  @c UniquePtr results in undefined behavior.
  *  </pre>
  *  Quoted from [20.4.5]/3.
  *
@@ -101,7 +103,7 @@ struct AutoPtrRef
  * function as a replacement for \p std::auto_ptr<>.  Unfortunately
  * the \p std::auto_ptr<> is not particularly portable since various
  * compilers implement various revisions of the standard.  Using
- * \p AutoPtr<> instead of \p std::auto_ptr<> allows for easy
+ * \p UniquePtr<> instead of \p std::auto_ptr<> allows for easy
  * portability.
  *
  * The following are the original copyright declarations distributed with this class:
@@ -145,7 +147,7 @@ struct AutoPtrRef
  * purpose.  It is provided "as is" without express or implied warranty.
  */
 template<typename Tp>
-class AutoPtr
+class UniquePtr
 {
 private:
 
@@ -161,35 +163,35 @@ public:
   typedef Tp element_type;
 
   /**
-   *  @brief  An %AutoPtr is usually constructed from a raw pointer.
+   *  @brief  An %UniquePtr is usually constructed from a raw pointer.
    *  @param  p  A pointer (defaults to NULL).
    *
    *  This object now @e owns the object pointed to by @a p.
    */
   explicit
-  AutoPtr(element_type* p = 0)
+  UniquePtr(element_type* p = 0)
     : _ptr(p)
   {
     // Note: we can't call libmesh_deprecated() here, since global
-    // AutoPtr variables are sometimes created before the libMesh::out
+    // UniquePtr variables are sometimes created before the libMesh::out
     // stream is ready.
   }
 
   /**
-   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
-   *  @param  a  Another %AutoPtr of the same type.
+   *  @brief  An %UniquePtr can be constructed from another %UniquePtr.
+   *  @param  a  Another %UniquePtr of the same type.
    *
    *  This object now @e owns the object previously owned by @a a, which has
    *  given up ownsership.
    */
-  AutoPtr(AutoPtr& a)
+  UniquePtr(UniquePtr& a)
     : _ptr(a.release())
   {
   }
 
   /**
-   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
-   *  @param  a  Another %AutoPtr of a different but related type.
+   *  @brief  An %UniquePtr can be constructed from another %UniquePtr.
+   *  @param  a  Another %UniquePtr of a different but related type.
    *
    *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
@@ -197,29 +199,29 @@ public:
    *  given up ownsership.
    */
   template<typename Tp1>
-  AutoPtr(AutoPtr<Tp1>& a)
+  UniquePtr(UniquePtr<Tp1>& a)
     : _ptr(a.release())
   {
   }
 
   /**
-   *  @brief  %AutoPtr assignment operator.
-   *  @param  a  Another %AutoPtr of the same type.
+   *  @brief  %UniquePtr assignment operator.
+   *  @param  a  Another %UniquePtr of the same type.
    *
    *  This object now @e owns the object previously owned by @a a, which has
    *  given up ownsership.  The object that this one @e used to own and
    *  track has been deleted.
    */
-  AutoPtr&
-  operator=(AutoPtr& a)
+  UniquePtr&
+  operator=(UniquePtr& a)
   {
     reset(a.release());
     return *this;
   }
 
   /**
-   *  @brief  %AutoPtr assignment operator.
-   *  @param  a  Another %AutoPtr of a different but related type.
+   *  @brief  %UniquePtr assignment operator.
+   *  @param  a  Another %UniquePtr of a different but related type.
    *
    *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
@@ -228,15 +230,15 @@ public:
    *  track has been deleted.
    */
   template <typename Tp1>
-  AutoPtr&
-  operator=(AutoPtr<Tp1>& a)
+  UniquePtr&
+  operator=(UniquePtr<Tp1>& a)
   {
     reset(a.release());
     return *this;
   }
 
   /**
-   *  When the %AutoPtr goes out of scope, the object it owns is deleted.
+   *  When the %UniquePtr goes out of scope, the object it owns is deleted.
    *  If it no longer owns anything (i.e., @c get() is @c NULL), then this
    *  has no effect.
    *
@@ -247,13 +249,13 @@ public:
    *  prohibited.  [17.4.3.6]/2
    *  @endif maint
    */
-  ~AutoPtr()
+  ~UniquePtr()
   {
     if (!libMesh::warned_about_auto_ptr)
       {
         libMesh::warned_about_auto_ptr = true;
-        libMesh::out << "*** Warning, AutoPtr is deprecated and will be removed in a future library version! "
-                     << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;
+        libMesh::out << "*** Warning, UniquePtr is deprecated and will be removed in a future library version! "
+                     << __FILE__ << ", line " << __LINE__ << ", compiled " << __LIBMESH_DATE__ << " at " << __LIBMESH_TIME__ << " ***" << std::endl;
       }
     delete _ptr;
   }
@@ -261,7 +263,7 @@ public:
   /**
    *  @brief  Smart pointer dereferencing.
    *
-   *  If this %AutoPtr no longer owns anything, then this operation will
+   *  If this %UniquePtr no longer owns anything, then this operation will
    *  crash.  (For a smart pointer, "no longer owns anything" is the same as
    *  being a null pointer, and you know what happens when you dereference
    *  one of those...)
@@ -286,7 +288,7 @@ public:
    *  situations such as passing to a function which only accepts a raw
    *  pointer.
    *
-   *  @note  This %AutoPtr still owns the memory.
+   *  @note  This %UniquePtr still owns the memory.
    */
   element_type*
   get() const  { return _ptr; }
@@ -299,7 +301,7 @@ public:
    *  situations such as passing to a function which only accepts a raw
    *  pointer.
    *
-   *  @note  This %AutoPtr no longer owns the memory.  When this object
+   *  @note  This %UniquePtr no longer owns the memory.  When this object
    *  goes out of scope, nothing will happen.
    */
   element_type*
@@ -330,25 +332,26 @@ public:
   /** @{
    *  @brief  Automatic conversions
    *
-   *  These operations convert an %AutoPtr into and from an AutoPtrRef
+   *  These operations convert an %UniquePtr into and from an UniquePtrRef
    *  automatically as needed.  This allows constructs such as
    *  @code
-   *    AutoPtr<Derived>  func_returning_AutoPtr(.....);
+   *    UniquePtr<Derived>  func_returning_UniquePtr(.....);
    *    ...
-   *    AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
+   *    UniquePtr<Base> ptr = func_returning_UniquePtr(.....);
    *  @endcode
+   *  @}
    */
-  AutoPtr(AutoPtrRef<element_type> ref)
+  UniquePtr(UniquePtrRef<element_type> ref)
     : _ptr(ref._ptr) {}
 
   /**
-   * op= for AutoPtr.  Allows you to write:
+   * op= for UniquePtr.  Allows you to write:
    * @code
-   * AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
+   * UniquePtr<Base> ptr = func_returning_UniquePtr(.....);
    * @endcode
    */
-  AutoPtr&
-  operator=(AutoPtrRef<element_type> ref)
+  UniquePtr&
+  operator=(UniquePtrRef<element_type> ref)
   {
     if (ref._ptr != this->get())
       {
@@ -359,22 +362,24 @@ public:
   }
 
   /**
-   * op() for AutoPtrRef<Tp1>.  Calls the release member.
+   * op() for UniquePtrRef<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
-  operator AutoPtrRef<Tp1>()
-  { return AutoPtrRef<Tp1>(this->release()); }
+  operator UniquePtrRef<Tp1>()
+  { return UniquePtrRef<Tp1>(this->release()); }
 
   /**
-   * op() for AutoPtr<Tp1>.  Calls the release member.
+   * op() for UniquePtr<Tp1>.  Calls the release member.
    */
   template<typename Tp1>
-  operator AutoPtr<Tp1>()
-  { return AutoPtr<Tp1>(this->release()); }
+  operator UniquePtr<Tp1>()
+  { return UniquePtr<Tp1>(this->release()); }
 };
 
-
+// Define AutoPtr for backward compatibility
 
 } // namespace libMesh
 
-#endif // LIBMESH_AUTO_PTR_H
+#endif // UniquePtr
+
+#endif // LIBMESH_UNIQUE_PTR_H

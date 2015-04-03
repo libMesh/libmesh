@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// unique_ptr.hpp header file
+// UniquePtr.hpp header file
 //
 // Copyright 2009 Howard Hinnant, Ion Gazta&ntilde;aga.
 // Distributed under the Boost Software License, Version 1.0. (See
@@ -13,18 +13,18 @@
 //   reference http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-active.html
 //   for any pending issues against this specification.
 
-#ifndef UNIQUE_PTR_HPP
-#define UNIQUE_PTR_HPP
+#ifndef HINNANT_UNIQUE_PTR_HPP
+#define HINNANT_UNIQUE_PTR_HPP
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/if.hpp>
 
-namespace boost
+namespace libMesh
 {
 
-namespace detail_unique_ptr
+namespace detail_UniquePtr
 {
 
 typedef char one;
@@ -73,13 +73,13 @@ struct identity
     typedef T type;
 };
 
-}  // detail_unique_ptr
+}  // detail_UniquePtr
 
 template <class T>
 inline
 typename enable_if_c
 <
-    !detail_unique_ptr::is_convertible<T, detail_unique_ptr::rv<T> >::value,
+    !detail_UniquePtr::is_convertible<T, detail_UniquePtr::rv<T> >::value,
     T&
 >::type
 move(T& t)
@@ -91,7 +91,7 @@ template <class T>
 inline
 typename enable_if_c
 <
-    !detail_unique_ptr::is_convertible<T, detail_unique_ptr::rv<T> >::value,
+    !detail_UniquePtr::is_convertible<T, detail_UniquePtr::rv<T> >::value,
     const T&
 >::type
 move(const T& t)
@@ -103,12 +103,12 @@ template <class T>
 inline
 typename enable_if_c
 <
-    detail_unique_ptr::is_convertible<T, detail_unique_ptr::rv<T> >::value,
+    detail_UniquePtr::is_convertible<T, detail_UniquePtr::rv<T> >::value,
     T
 >::type
 move(T& t)
 {
-    return T(detail_unique_ptr::rv<T>(t));
+    return T(detail_UniquePtr::rv<T>(t));
 }
 
 template <class T>
@@ -118,7 +118,7 @@ typename enable_if_c
     is_reference<T>::value,
     T
 >::type
-forward(typename detail_unique_ptr::identity<T>::type t)
+forward(typename detail_UniquePtr::identity<T>::type t)
 {
     return t;
 }
@@ -130,7 +130,7 @@ typename enable_if_c
     !is_reference<T>::value,
     T
 >::type
-forward(typename detail_unique_ptr::identity<T>::type& t)
+forward(typename detail_UniquePtr::identity<T>::type& t)
 {
     return move(t);
 }
@@ -142,16 +142,16 @@ typename enable_if_c
     !is_reference<T>::value,
     T
 >::type
-forward(const typename detail_unique_ptr::identity<T>::type& t)
+forward(const typename detail_UniquePtr::identity<T>::type& t)
 {
     return move(const_cast<T&>(t));
 }
 
-namespace detail_unique_ptr {
+namespace detail_UniquePtr {
 
 // A move-aware but stripped-down compressed_pair which only optimizes storage for T2
 template <class T1, class T2, bool = is_empty<T2>::value>
-class unique_ptr_storage
+class UniquePtr_storage
 {
     T1 t1_;
     T2 t2_;
@@ -159,17 +159,17 @@ class unique_ptr_storage
     typedef typename add_reference<T2>::type T2_reference;
     typedef typename add_reference<const T2>::type T2_const_reference;
 
-    unique_ptr_storage(const unique_ptr_storage&);
-    unique_ptr_storage& operator=(const unique_ptr_storage&);
+    UniquePtr_storage(const UniquePtr_storage&);
+    UniquePtr_storage& operator=(const UniquePtr_storage&);
 public:
-    operator rv<unique_ptr_storage>() {return rv<unique_ptr_storage>(*this);}
+    operator rv<UniquePtr_storage>() {return rv<UniquePtr_storage>(*this);}
 
-    unique_ptr_storage() : t1_(), t2_() {}
+    UniquePtr_storage() : t1_(), t2_() {}
 
-    explicit unique_ptr_storage(T1 t1)
+    explicit UniquePtr_storage(T1 t1)
         : t1_(move(t1)), t2_() {}
 
-    unique_ptr_storage(T1 t1, T2 t2)
+    UniquePtr_storage(T1 t1, T2 t2)
         : t1_(move(t1)), t2_(forward<T2>(t2)) {}
 
           T1& first()       {return t1_;}
@@ -180,23 +180,23 @@ public:
 };
 
 template <class T1, class T2>
-class unique_ptr_storage<T1, T2, true>
+class UniquePtr_storage<T1, T2, true>
     : private T2
 {
     T1 t1_;
     typedef T2 t2_;
 
-    unique_ptr_storage(const unique_ptr_storage&);
-    unique_ptr_storage& operator=(const unique_ptr_storage&);
+    UniquePtr_storage(const UniquePtr_storage&);
+    UniquePtr_storage& operator=(const UniquePtr_storage&);
 public:
-    operator rv<unique_ptr_storage>() {return rv<unique_ptr_storage>(*this);}
+    operator rv<UniquePtr_storage>() {return rv<UniquePtr_storage>(*this);}
 
-    unique_ptr_storage() : t1_() {}
+    UniquePtr_storage() : t1_() {}
 
-    explicit unique_ptr_storage(T1 t1)
+    explicit UniquePtr_storage(T1 t1)
         : t1_(move(t1)) {}
 
-    unique_ptr_storage(T1 t1, T2 t2)
+    UniquePtr_storage(T1 t1, T2 t2)
         : t2_(move(t2)), t1_(move(t1)) {}
 
           T1& first()       {return t1_;}
@@ -209,14 +209,14 @@ public:
 template <class T1, class T2, bool b>
 inline
 void
-swap(unique_ptr_storage<T1, T2, b>& x, unique_ptr_storage<T1, T2, b>& y)
+swap(UniquePtr_storage<T1, T2, b>& x, UniquePtr_storage<T1, T2, b>& y)
 {
     using std::swap;
     swap(x.first(), y.first());
     swap(x.second(), y.second());
 }
 
-}  // detail_unique_ptr
+}  // detail_UniquePtr
 
 template <class T>
 struct default_delete
@@ -224,7 +224,7 @@ struct default_delete
     default_delete() {}
     template <class U>
         default_delete(const default_delete<U>&,
-            typename enable_if_c<detail_unique_ptr::is_convertible<U*, T*>::value>::type* = 0)
+            typename enable_if_c<detail_UniquePtr::is_convertible<U*, T*>::value>::type* = 0)
         {}
 
     void operator()(T* ptr) const
@@ -248,7 +248,7 @@ private:
     template <class U> void operator()(U*) const;
 };
 
-namespace detail_unique_ptr
+namespace detail_UniquePtr
 {
 
 namespace pointer_type_imp
@@ -289,61 +289,61 @@ struct pointer_type
         typename boost::remove_reference<D>::type>::type type;
 };
 
-}  // detail_unique_ptr
+}  // detail_UniquePtr
 
 template <class T, class D = default_delete<T> >
-class unique_ptr
+class UniquePtr
 {
 public:
     typedef T element_type;
     typedef D deleter_type;
-    typedef typename detail_unique_ptr::pointer_type<element_type, deleter_type>::type pointer;
+    typedef typename detail_UniquePtr::pointer_type<element_type, deleter_type>::type pointer;
 
 private:
-    detail_unique_ptr::unique_ptr_storage<pointer, deleter_type> ptr_;
+    detail_UniquePtr::UniquePtr_storage<pointer, deleter_type> ptr_;
 
     typedef typename add_reference<deleter_type>::type deleter_reference;
     typedef typename add_reference<const deleter_type>::type deleter_const_reference;
 
     struct nat {int for_bool_;};
 
-    unique_ptr(unique_ptr&);
-    unique_ptr& operator=(unique_ptr&);
+    UniquePtr(UniquePtr&);
+    UniquePtr& operator=(UniquePtr&);
 
 public:
-    operator detail_unique_ptr::rv<unique_ptr>() {return detail_unique_ptr::rv<unique_ptr>(*this);}
-    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
-    unique_ptr& operator=(detail_unique_ptr::rv<unique_ptr> r)
+    operator detail_UniquePtr::rv<UniquePtr>() {return detail_UniquePtr::rv<UniquePtr>(*this);}
+    UniquePtr(detail_UniquePtr::rv<UniquePtr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
+    UniquePtr& operator=(detail_UniquePtr::rv<UniquePtr> r)
     {
         reset(r->release());
         ptr_.second() = move(r->get_deleter());
         return *this;
     }
 
-    unique_ptr()
+    UniquePtr()
         {
             BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
             BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
         }
 
-    explicit unique_ptr(pointer p)
+    explicit UniquePtr(pointer p)
         : ptr_(p)
         {
             BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
             BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
         }
 
-    unique_ptr(pointer p, typename mpl::if_<is_reference<D>,
+    UniquePtr(pointer p, typename mpl::if_<is_reference<D>,
                           volatile typename remove_reference<D>::type&, D>::type d)
         : ptr_(move(p), forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
 
     template <class U, class E>
-        unique_ptr(unique_ptr<U, E> u,
+        UniquePtr(UniquePtr<U, E> u,
             typename enable_if_c
                 <
                 !boost::is_array<U>::value &&
-                detail_unique_ptr::is_convertible<typename unique_ptr<U>::pointer, pointer>::value &&
-                detail_unique_ptr::is_convertible<E, deleter_type>::value &&
+                detail_UniquePtr::is_convertible<typename UniquePtr<U>::pointer, pointer>::value &&
+                detail_UniquePtr::is_convertible<E, deleter_type>::value &&
                 (
                     !is_reference<deleter_type>::value ||
                      is_same<deleter_type, E>::value
@@ -351,17 +351,17 @@ public:
                 >::type* = 0)
             : ptr_(u.release(), forward<D>(forward<E>(u.get_deleter()))) {}
 
-    ~unique_ptr() {reset();}
+    ~UniquePtr() {reset();}
 
-    unique_ptr& operator=(int nat::*)
+    UniquePtr& operator=(int nat::*)
     {
         reset();
         return *this;
     }
 
     template <class U, class E>
-        unique_ptr&
-        operator=(unique_ptr<U, E> u)
+        UniquePtr&
+        operator=(UniquePtr<U, E> u)
         {
             reset(u.release());
             ptr_.second() = move(u.get_deleter());
@@ -390,56 +390,56 @@ public:
         return tmp;
     }
 
-    void swap(unique_ptr& u) {detail_unique_ptr::swap(ptr_, u.ptr_);}
+    void swap(UniquePtr& u) {detail_UniquePtr::swap(ptr_, u.ptr_);}
 };
 
 template <class T, class D>
-class unique_ptr<T[], D>
+class UniquePtr<T[], D>
 {
 public:
     typedef T element_type;
     typedef D deleter_type;
-    typedef typename detail_unique_ptr::pointer_type<element_type, deleter_type>::type pointer;
+    typedef typename detail_UniquePtr::pointer_type<element_type, deleter_type>::type pointer;
 
 private:
-    detail_unique_ptr::unique_ptr_storage<pointer, deleter_type> ptr_;
+    detail_UniquePtr::UniquePtr_storage<pointer, deleter_type> ptr_;
 
     typedef typename add_reference<deleter_type>::type deleter_reference;
     typedef typename add_reference<const deleter_type>::type deleter_const_reference;
 
     struct nat {int for_bool_;};
 
-    unique_ptr(unique_ptr&);
-    unique_ptr& operator=(unique_ptr&);
+    UniquePtr(UniquePtr&);
+    UniquePtr& operator=(UniquePtr&);
 
 public:
-    operator detail_unique_ptr::rv<unique_ptr>() {return detail_unique_ptr::rv<unique_ptr>(*this);}
-    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
-    unique_ptr& operator=(detail_unique_ptr::rv<unique_ptr> r)
+    operator detail_UniquePtr::rv<UniquePtr>() {return detail_UniquePtr::rv<UniquePtr>(*this);}
+    UniquePtr(detail_UniquePtr::rv<UniquePtr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
+    UniquePtr& operator=(detail_UniquePtr::rv<UniquePtr> r)
     {
         reset(r->release());
         ptr_.second() = move(r->get_deleter());
         return *this;
     }
 
-    unique_ptr()
+    UniquePtr()
         {
             BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
             BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
         }
 
-    explicit unique_ptr(pointer p)
+    explicit UniquePtr(pointer p)
         : ptr_(p)
         {
             BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
             BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
         }
 
-    unique_ptr(pointer p, typename mpl::if_<is_reference<D>,
+    UniquePtr(pointer p, typename mpl::if_<is_reference<D>,
                           volatile typename remove_reference<D>::type&, D>::type d)
         : ptr_(move(p), forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
 
-    ~unique_ptr() {reset();}
+    ~UniquePtr() {reset();}
 
     T& operator[](size_t i) const {return get()[i];}
     pointer get() const {return ptr_.first();}
@@ -462,22 +462,22 @@ public:
         return tmp;
     }
 
-    void swap(unique_ptr& u) {detail_unique_ptr::swap(ptr_, u.ptr_);}
+    void swap(UniquePtr& u) {detail_UniquePtr::swap(ptr_, u.ptr_);}
 private:
     template <class U>
-        explicit unique_ptr(U,
-            typename enable_if_c<detail_unique_ptr::is_convertible<U, pointer>::value>::type* = 0);
+        explicit UniquePtr(U,
+            typename enable_if_c<detail_UniquePtr::is_convertible<U, pointer>::value>::type* = 0);
 
     template <class U>
-        unique_ptr(U, typename mpl::if_<is_reference<D>,
+        UniquePtr(U, typename mpl::if_<is_reference<D>,
                           volatile typename remove_reference<D>::type&, D>::type,
-                          typename enable_if_c<detail_unique_ptr::is_convertible<U, pointer>::value>::type* = 0);
+                          typename enable_if_c<detail_UniquePtr::is_convertible<U, pointer>::value>::type* = 0);
 };
 
 template<class T, class D>
 inline
 void
-swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
+swap(UniquePtr<T, D>& x, UniquePtr<T, D>& y)
 {
     x.swap(y);
 }
@@ -485,7 +485,7 @@ swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y)
 template<class T1, class D1, class T2, class D2>
 inline
 bool
-operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+operator==(const UniquePtr<T1, D1>& x, const UniquePtr<T2, D2>& y)
 {
     return x.get() == y.get();
 }
@@ -493,7 +493,7 @@ operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 template<class T1, class D1, class T2, class D2>
 inline
 bool
-operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+operator!=(const UniquePtr<T1, D1>& x, const UniquePtr<T2, D2>& y)
 {
     return !(x == y);
 }
@@ -501,7 +501,7 @@ operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 template<class T1, class D1, class T2, class D2>
 inline
 bool
-operator<(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+operator<(const UniquePtr<T1, D1>& x, const UniquePtr<T2, D2>& y)
 {
     return x.get() < y.get();
 }
@@ -509,7 +509,7 @@ operator<(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 template<class T1, class D1, class T2, class D2>
 inline
 bool
-operator<=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+operator<=(const UniquePtr<T1, D1>& x, const UniquePtr<T2, D2>& y)
 {
     return !(y < x);
 }
@@ -517,7 +517,7 @@ operator<=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 template<class T1, class D1, class T2, class D2>
 inline
 bool
-operator>(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+operator>(const UniquePtr<T1, D1>& x, const UniquePtr<T2, D2>& y)
 {
     return y < x;
 }
@@ -525,11 +525,11 @@ operator>(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
 template<class T1, class D1, class T2, class D2>
 inline
 bool
-operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y)
+operator>=(const UniquePtr<T1, D1>& x, const UniquePtr<T2, D2>& y)
 {
     return !(x < y);
 }
 
-}  // boost
+}  // libMesh
 
-#endif  // UNIQUE_PTR_HPP
+#endif  // HINNANT_UNIQUE_PTR_HPP
