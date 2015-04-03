@@ -467,10 +467,6 @@ void TransientRBConstruction::truth_assembly()
         temp_vec->scale( get_control(get_time_step())*trans_theta_expansion.eval_F_theta(q_f,mu) );
         rhs->add(*temp_vec);
       }
-    //    zero_dirichlet_dofs_on_rhs();
-
-    if(constrained_problem)
-      matrix->add(1., *constraint_matrix);
 
   }
 
@@ -574,10 +570,6 @@ Real TransientRBConstruction::truth_solve(int write_interval)
   if(compute_truth_projection_error)
     set_error_temporal_data();
 
-  // The truth solve may require a different LHS matrix each time
-  // hence make sure we don't reuse_preconditioner.
-  linear_solver->reuse_preconditioner(false);
-
   for(unsigned int time_level=1; time_level<=n_time_steps; time_level++)
     {
       set_time_step(time_level);
@@ -586,17 +578,18 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 
       // We assume that the truth assembly has been attached to the system
       truth_assembly();
-      solve();
 
-      if(reuse_preconditioner)
-        {
-          // The matrix doesn't change at each timestep, so we
-          // can set reuse_preconditioner == true
-          linear_solver->reuse_preconditioner(true);
-        }
+      // truth_assembly assembles into matrix and rhs, so use those for the solve
+      solve_for_matrix_and_rhs(*get_linear_solver(), *matrix, *rhs);
+
+      // The matrix doesn't change at each timestep, so we
+      // can set reuse_preconditioner == true
+      linear_solver->reuse_preconditioner(true);
 
       if (assert_convergence)
-        check_convergence();
+      {
+        check_convergence(*get_linear_solver());
+      }
 
       // Now compute the truth outputs
       for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
@@ -632,6 +625,9 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 #endif
         }
     }
+
+  // Set reuse_preconditioner back to false for subsequent solves.
+  linear_solver->reuse_preconditioner(false);
 
   // Get the L2 norm of the truth solution at time-level _K
   // Useful for normalizing our true error data
@@ -969,16 +965,9 @@ void TransientRBConstruction::update_system()
   update_RB_initial_condition_all_N();
 }
 
-void TransientRBConstruction::assemble_matrix_for_output_dual_solves()
+SparseMatrix<Number>& TransientRBConstruction::get_matrix_for_output_dual_solves()
 {
-  // By default we use the L2 matrix for transient problems
-
-  {
-    matrix->zero();
-    matrix->close();
-    matrix->add(1., *L2_matrix);
-  }
-
+  return *L2_matrix;
 }
 
 void TransientRBConstruction::load_rb_solution()
@@ -1086,21 +1075,6 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  {
-    matrix->zero();
-    matrix->add(1., *inner_product_matrix);
-    if(constrained_problem)
-      matrix->add(1., *constraint_matrix);
-  }
-
-  if(reuse_preconditioner)
-    {
-      // reuse_preconditioner should already by true due to
-      // Parent::update_residual_terms, but let's set it
-      // here again anyway.
-      linear_solver->reuse_preconditioner(true);
-    }
-
   for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
       for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
@@ -1117,17 +1091,18 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
 
           rhs->zero();
           M_q_vector[q_m]->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
-          //      zero_dirichlet_dofs_on_rhs();
-
-          solution->zero();
 
           if (!is_quiet())
             libMesh::out << "Starting solve i="
                          << i << " in TransientRBConstruction::update_residual_terms() at "
                          << Utility::get_timestamp() << std::endl;
-          solve();
+
+          solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
+
           if (assert_convergence)
-            check_convergence();
+          {
+            check_convergence(*inner_product_solver);
+          }
 
           if (!is_quiet())
             {

@@ -190,15 +190,9 @@ void RBEIMConstruction::initialize_rb_construction(bool skip_matrix_assembly,
                                     vars);
   _mesh_function->init();
 
-  // Load up the inner product matrix
-  // We only need one matrix in this class, so we
-  // can set matrix to inner_product_matrix here
-  {
-    matrix->zero();
-    matrix->close();
-    matrix->add(1., *inner_product_matrix);
-  }
-
+  // inner_product_solver performs solves with the same matrix every time
+  // hence we can set reuse_preconditioner(true).
+  inner_product_solver->reuse_preconditioner(true);
 }
 
 Real RBEIMConstruction::train_reduced_basis(const std::string& directory_name,
@@ -469,12 +463,6 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 {
   START_LOG("truth_solve()", "RBEIMConstruction");
 
-  //  matrix should have been set to inner_product_matrix during initialization
-  //  {
-  //    matrix->zero();
-  //    matrix->add(1., *inner_product_matrix);
-  //  }
-
   int training_parameters_found_index = -1;
   if( _parametrized_functions_in_training_set_initialized )
     {
@@ -558,16 +546,12 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
       // Solve to find the best fit, then solution stores the truth representation
       // of the function to be approximated
-      solve();
-      if (assert_convergence)
-        check_convergence();
+      solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
 
-      if(reuse_preconditioner)
-        {
-          // After we've done a solve we can now reuse the preconditioner
-          // because the matrix is not changing
-          linear_solver->reuse_preconditioner(true);
-        }
+      if (assert_convergence)
+      {
+        check_convergence(*inner_product_solver);
+      }
     }
 
   if(plot_solution > 0)
