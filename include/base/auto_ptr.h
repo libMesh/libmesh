@@ -376,8 +376,6 @@ public:
   { return UniquePtr<Tp1>(this->release()); }
 };
 
-// Define AutoPtr for backward compatibility
-
 } // namespace libMesh
 
 #endif // UniquePtr
