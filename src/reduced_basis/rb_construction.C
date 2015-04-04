@@ -57,13 +57,9 @@ RBConstruction::RBConstruction (EquationSystems& es,
                                 const unsigned int number_in)
   : Parent(es, name_in, number_in),
     inner_product_solver(LinearSolver<Number>::build(es.comm())),
-    original_linear_solver(NULL),
-    use_inner_product_solver(true),
+    extra_linear_solver(NULL),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
-    constraint_matrix(SparseMatrix<Number>::build(es.comm())),
-    constrained_problem(false),
-    reuse_preconditioner(true),
     use_relative_bound_in_greedy(false),
     exit_on_repeated_greedy_parameters(true),
     write_data_during_training(false),
@@ -71,17 +67,15 @@ RBConstruction::RBConstruction (EquationSystems& es,
     impose_internal_fluxes(false),
     compute_RB_inner_product(false),
     store_non_dirichlet_operators(false),
-    enforce_constraints_exactly(false),
     use_empty_rb_solve_in_greedy(true),
     Fq_representor_innerprods_computed(false),
     Nmax(0),
     delta_N(1),
     quiet_mode(true),
     output_dual_innerprods_computed(false),
-    assert_convergence(false),
+    assert_convergence(true),
     rb_eval(NULL),
     inner_product_assembly(NULL),
-    constraint_assembly(NULL),
     training_tolerance(-1.)
 {
   // set assemble_before_solve flag to false
@@ -161,6 +155,45 @@ std::string RBConstruction::system_type () const
   return "RBConstruction";
 }
 
+void RBConstruction::solve_for_matrix_and_rhs(
+  LinearSolver<Number>& input_solver,
+  SparseMatrix<Number>& input_matrix,
+  NumericVector<Number>& input_rhs)
+{
+  // This is similar to LinearImplicitSysmte::solve()
+
+  // Get a reference to the EquationSystems
+  const EquationSystems& es =
+    this->get_equation_systems();
+
+  // If the linear solver hasn't been initialized, we do so here.
+  input_solver.init();
+
+  // Get the user-specifiied linear solver tolerance
+  const Real tol  =
+    es.parameters.get<Real>("linear solver tolerance");
+
+  // Get the user-specified maximum # of linear solver iterations
+  const unsigned int maxits =
+    es.parameters.get<unsigned int>("linear solver maximum iterations");
+
+  // Solve the linear system.  Several cases:
+  std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
+
+  // It's good practice to clear the solution vector first since it can
+  // affect convergence of iterative solvers
+  solution->zero();
+  rval = input_solver.solve (input_matrix, *solution, input_rhs, tol, maxits);
+
+  // Store the number of linear iterations required to
+  // solve and the final residual.
+  _n_linear_iterations   = rval.first;
+  _final_linear_residual = rval.second;
+
+  // Update the system after the solve
+  this->update();
+}
+
 void RBConstruction::set_rb_evaluation(RBEvaluation& rb_eval_in)
 {
   rb_eval = &rb_eval_in;
@@ -193,8 +226,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   const bool deterministic_training = infile("deterministic_training",false);
   const std::string alternative_solver_in =
     infile("rb_alternative_solver",alternative_solver);
-  const bool reuse_preconditioner_in = infile("reuse_preconditioner",
-                                              reuse_preconditioner);
   const bool use_relative_bound_in_greedy_in = infile("use_relative_bound_in_greedy",
                                                       use_relative_bound_in_greedy);
   const bool write_data_during_training_in = infile("write_data_during_training",
@@ -262,7 +293,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   set_rb_construction_parameters(n_training_samples,
                                  deterministic_training,
                                  alternative_solver_in,
-                                 reuse_preconditioner_in,
                                  use_relative_bound_in_greedy_in,
                                  write_data_during_training_in,
                                  training_parameters_random_seed_in,
@@ -279,7 +309,6 @@ void RBConstruction::set_rb_construction_parameters(
                                                     unsigned int n_training_samples_in,
                                                     bool deterministic_training_in,
                                                     std::string alternative_solver_in,
-                                                    bool reuse_preconditioner_in,
                                                     bool use_relative_bound_in_greedy_in,
                                                     bool write_data_during_training_in,
                                                     unsigned int training_parameters_random_seed_in,
@@ -298,14 +327,6 @@ void RBConstruction::set_rb_construction_parameters(
   // "mumps" -- Use the sparse
   //update_residual_terms_solver = infile("update_residual_terms_solver",update_residual_terms_solver);
   alternative_solver = alternative_solver_in;
-
-  // Tell the system that it is constrained (i.e. we want to use
-  // the Stokes inner product matrix to compute Riesz representors)
-  constrained_problem = (constraint_assembly != NULL);
-
-  // Tell the system to reuse the preconditioner on consecutive
-  // Offline solves to update residual data
-  reuse_preconditioner = reuse_preconditioner_in;
 
   // Tell the system whether or not to use a relative error bound
   // in the Greedy algorithm
@@ -344,7 +365,6 @@ void RBConstruction::print_info()
   // Print out info that describes the current setup
   libMesh::out << std::endl << "RBConstruction parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
-  libMesh::out << "constrained_problem: " << constrained_problem << std::endl;
   libMesh::out << "Nmax: " << Nmax << std::endl;
   if(training_tolerance > 0.)
     libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
@@ -375,7 +395,6 @@ void RBConstruction::print_info()
     }
   print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
-  libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
@@ -426,19 +445,6 @@ ElemAssembly& RBConstruction::get_inner_product_assembly()
   return *inner_product_assembly;
 }
 
-void RBConstruction::set_constraint_assembly(ElemAssembly& constraint_assembly_in)
-{
-  constraint_assembly = &constraint_assembly_in;
-}
-
-ElemAssembly& RBConstruction::get_constraint_assembly()
-{
-  if(!constraint_assembly)
-    libmesh_error_msg("Error: constraint_assembly hasn't been initialized yet");
-
-  return *constraint_assembly;
-}
-
 void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number>& vector)
 {
   const DofMap& dof_map = get_dof_map();
@@ -470,6 +476,15 @@ void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
   // Perform the initialization
   allocate_data_structures();
   assemble_affine_expansion(skip_matrix_assembly, skip_vector_assembly);
+
+  // inner_product_solver performs solves with the same matrix every time
+  // hence we can set reuse_preconditioner(true).
+  inner_product_solver->reuse_preconditioner(true);
+
+  // The primary solver is used for truth solves and other solves that
+  // require different matrices, so set reuse_preconditioner(false).
+  get_linear_solver()->reuse_preconditioner(false);
+
 }
 
 void RBConstruction::assemble_affine_expansion(bool skip_matrix_assembly,
@@ -525,13 +540,6 @@ void RBConstruction::allocate_data_structures()
     dof_map.attach_matrix(*inner_product_matrix);
     inner_product_matrix->init();
     inner_product_matrix->zero();
-
-    if(this->constrained_problem)
-      {
-        dof_map.attach_matrix(*constraint_matrix);
-        constraint_matrix->init();
-        constraint_matrix->zero();
-      }
 
     for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
       {
@@ -823,9 +831,6 @@ void RBConstruction::truth_assembly()
         temp_vec->scale( get_rb_theta_expansion().eval_F_theta(q_f, mu) );
         rhs->add(*temp_vec);
       }
-
-    if(constrained_problem)
-      matrix->add(1., *constraint_matrix);
   }
 
   this->matrix->close();
@@ -843,17 +848,6 @@ void RBConstruction::assemble_inner_product_matrix(SparseMatrix<Number>* input_m
                                NULL,
                                false, /* symmetrize */
                                apply_dof_constraints);
-}
-
-void RBConstruction::assemble_constraint_matrix(SparseMatrix<Number>* input_matrix)
-{
-  input_matrix->zero();
-  add_scaled_matrix_and_vector(1., constraint_assembly, input_matrix, NULL);
-}
-
-void RBConstruction::assemble_and_add_constraint_matrix(SparseMatrix<Number>* input_matrix)
-{
-  add_scaled_matrix_and_vector(1., constraint_assembly, input_matrix, NULL);
 }
 
 void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dof_constraints)
@@ -904,12 +898,6 @@ void RBConstruction::assemble_misc_matrices()
     {
       libMesh::out << "Assembling non-Dirichlet inner product matrix" << std::endl;
       assemble_inner_product_matrix(non_dirichlet_inner_product_matrix.get(), /* apply_dof_constraints = */ false);
-    }
-
-  if( constrained_problem )
-    {
-      libMesh::out << "Assembling constraint matrix" << std::endl;
-      assemble_constraint_matrix(constraint_matrix.get());
     }
 }
 
@@ -1155,15 +1143,22 @@ Real RBConstruction::truth_solve(int plot_solution)
 
   truth_assembly();
 
-  // The truth solve may require a different LHS matrix each time
-  // hence make sure we don't reuse_preconditioner.
-  linear_solver->reuse_preconditioner(false);
+  // truth_assembly assembles into matrix and rhs, so use those for the solve
+  if(extra_linear_solver)
+  {
+    // If extra_linear_solver has been initialized, then we use it for the
+    // truth solves.
+    solve_for_matrix_and_rhs(*extra_linear_solver, *matrix, *rhs);
+  }
+  else
+  {
+    solve_for_matrix_and_rhs(*get_linear_solver(), *matrix, *rhs);
+  }
 
-  // Safer to zero the solution first, especially when using iterative solvers
-  solution->zero();
-  solve();
   if (assert_convergence)
-    check_convergence();
+  {
+    check_convergence(*get_linear_solver());
+  }
 
   const RBParameters& mu = get_parameters();
 
@@ -1259,21 +1254,7 @@ void RBConstruction::update_system()
 
   libMesh::out << "Updating RB residual terms" << std::endl;
 
-  if(use_inner_product_solver)
-    {
-      // Switch to inner_product_solver
-      original_linear_solver = this->linear_solver.release();
-      this->linear_solver.reset(inner_product_solver.release());
-    }
-
   update_residual_terms();
-
-  if(use_inner_product_solver)
-    {
-      // Switch back to original_linear_solver
-      inner_product_solver.reset(this->linear_solver.release());
-      this->linear_solver.reset(original_linear_solver);
-    }
 }
 
 Real RBConstruction::get_RB_error_bound()
@@ -1293,13 +1274,6 @@ Real RBConstruction::get_RB_error_bound()
 
 void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
 {
-  if(use_inner_product_solver)
-    {
-      // Switch to inner_product_solver
-      original_linear_solver = this->linear_solver.release();
-      this->linear_solver.reset(inner_product_solver.release());
-    }
-
   // Compute the basis independent terms
   Fq_representor_innerprods_computed = false;
   compute_Fq_representor_innerprods(compute_inner_products);
@@ -1311,13 +1285,6 @@ void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
   update_residual_terms(compute_inner_products);
 
   delta_N = saved_delta_N;
-
-  if(use_inner_product_solver)
-    {
-      // Switch back to original_linear_solver
-      inner_product_solver.reset(this->linear_solver.release());
-      this->linear_solver.reset(original_linear_solver);
-    }
 }
 
 Real RBConstruction::compute_max_error_bound()
@@ -1472,28 +1439,6 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  {
-    matrix->zero();
-    matrix->add(1., *inner_product_matrix);
-    if(constrained_problem)
-      matrix->add(1., *constraint_matrix);
-  }
-
-  if(reuse_preconditioner)
-    {
-      if(use_inner_product_solver)
-        {
-          // If we're using inner_product_solver, then we
-          // can reuse the preconditioner
-          linear_solver->reuse_preconditioner(true);
-        }
-      else
-        {
-          // For the first solve, make sure we generate a new preconditioner
-          linear_solver->reuse_preconditioner(false);
-        }
-    }
-
   for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
     {
       for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
@@ -1511,24 +1456,19 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
           rhs->zero();
           get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
           rhs->scale(-1.);
-          //      zero_dirichlet_dofs_on_rhs();
 
-          solution->zero();
           if (!is_quiet())
             {
               libMesh::out << "Starting solve [q_a][i]=[" << q_a <<"]["<< i << "] in RBConstruction::update_residual_terms() at "
                            << Utility::get_timestamp() << std::endl;
             }
 
-          solve();
-
-          if(reuse_preconditioner)
-            {
-              linear_solver->reuse_preconditioner(true);
-            }
+          solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
 
           if (assert_convergence)
-            check_convergence();
+          {
+            check_convergence(*inner_product_solver);
+          }
 
           if (!is_quiet())
             {
@@ -1590,16 +1530,9 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
   STOP_LOG("update_residual_terms()", "RBConstruction");
 }
 
-void RBConstruction::assemble_matrix_for_output_dual_solves()
+SparseMatrix<Number>& RBConstruction::get_matrix_for_output_dual_solves()
 {
-  // By default we use the inner product matrix for steady problems
-
-  {
-    matrix->zero();
-    matrix->close();
-    matrix->add(1., *inner_product_matrix);
-  }
-
+  return *inner_product_matrix;
 }
 
 void RBConstruction::compute_output_dual_innerprods()
@@ -1631,48 +1564,31 @@ void RBConstruction::compute_output_dual_innerprods()
           L_q_representor[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
         }
 
-      // Don't use inner_product_solver here since
-      // assemble_matrix_for_output_dual_solves may not
-      // give us the inner product matrix.
-      linear_solver->reuse_preconditioner(false);
-
       for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
         {
-          // If constrained_problem, we need to reassemble to add the constraint part back in
-          if( (n==0) || constrained_problem)
-            {
-              assemble_matrix_for_output_dual_solves();
-
-              if(constrained_problem)
-                {
-                  matrix->add(1., *constraint_matrix);
-                }
-            }
-
           for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
             {
               rhs->zero();
               rhs->add(1., *get_output_vector(n,q_l));
-              //        zero_dirichlet_dofs_on_rhs();
-
-              solution->zero();
 
               if (!is_quiet())
                 libMesh::out << "Starting solve n=" << n << ", q_l=" << q_l
                              << " in RBConstruction::compute_output_dual_innerprods() at "
                              << Utility::get_timestamp() << std::endl;
 
-              solve();
+              // Use the main linear solver here instead of the inner_product solver, since
+              // get_matrix_for_output_dual_solves() may not return the inner product matrix.
+              solve_for_matrix_and_rhs(*get_linear_solver(), get_matrix_for_output_dual_solves(), *rhs);
 
-              if(reuse_preconditioner)
-                {
-                  // After we do a solve, tell PETSc we want to reuse the preconditioner
-                  // since the system matrix is not changing.
-                  linear_solver->reuse_preconditioner(true);
-                }
+              // We possibly perform multiple solves here with the same matrix, hence
+              // set reuse_preconditioner(true) (and set it back to false again below
+              // at the end of this function).
+              linear_solver->reuse_preconditioner(true);
 
               if (assert_convergence)
-                check_convergence();
+              {
+                check_convergence(*get_linear_solver());
+              }
 
               if (!is_quiet())
                 {
@@ -1688,14 +1604,10 @@ void RBConstruction::compute_output_dual_innerprods()
               *L_q_representor[q_l] = *solution;
             }
 
-          // Get rid of the constraint part of the matrix before computing inner products
-          if(constrained_problem)
-            assemble_matrix_for_output_dual_solves();
-
           unsigned int q=0;
           for(unsigned int q_l1=0; q_l1<get_rb_theta_expansion().get_n_output_terms(n); q_l1++)
             {
-              matrix->vector_mult(*inner_product_storage_vector, *L_q_representor[q_l1]);
+              get_matrix_for_output_dual_solves().vector_mult(*inner_product_storage_vector, *L_q_representor[q_l1]);
 
               for(unsigned int q_l2=q_l1; q_l2<get_rb_theta_expansion().get_n_output_terms(n); q_l2++)
                 {
@@ -1717,6 +1629,8 @@ void RBConstruction::compute_output_dual_innerprods()
             }
         }
 
+      linear_solver->reuse_preconditioner(false);
+
       output_dual_innerprods_computed = true;
 
       STOP_LOG("compute_output_dual_innerprods()", "RBConstruction");
@@ -1728,41 +1642,12 @@ void RBConstruction::compute_output_dual_innerprods()
 
 void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_products)
 {
+
   // Skip calculations if we've already computed the Fq_representors
   if(!Fq_representor_innerprods_computed)
     {
       // Only log if we get to here
       START_LOG("compute_Fq_representor_innerprods()", "RBConstruction");
-
-      {
-        matrix->zero();
-        matrix->close();
-        matrix->add(1., *inner_product_matrix);
-        if(constrained_problem)
-          matrix->add(1., *constraint_matrix);
-      }
-
-      if(use_inner_product_solver)
-        {
-          // Switch to inner_product_solver
-          original_linear_solver = this->linear_solver.release();
-          this->linear_solver.reset(inner_product_solver.release());
-        }
-
-      if(reuse_preconditioner)
-        {
-          if(use_inner_product_solver)
-            {
-              // If we're using inner_product_solver, then we
-              // can reuse the preconditioner
-              linear_solver->reuse_preconditioner(true);
-            }
-          else
-            {
-              // For the first solve, make sure we generate a new preconditioner
-              linear_solver->reuse_preconditioner(false);
-            }
-        }
 
       for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
         {
@@ -1777,26 +1662,18 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
 
           rhs->zero();
           rhs->add(1., *get_Fq(q_f));
-          //      zero_dirichlet_dofs_on_rhs();
-
-          solution->zero();
 
           if (!is_quiet())
             libMesh::out << "Starting solve q_f=" << q_f
                          << " in RBConstruction::update_residual_terms() at "
                          << Utility::get_timestamp() << std::endl;
 
-          solve();
-
-          if(reuse_preconditioner)
-            {
-              // After we do a solve, tell PETSc we want to reuse the preconditioner
-              // since the system matrix is not changing.
-              linear_solver->reuse_preconditioner(true);
-            }
+          solve_for_matrix_and_rhs(*inner_product_solver, *inner_product_matrix, *rhs);
 
           if (assert_convergence)
-            check_convergence();
+          {
+            check_convergence(*inner_product_solver);
+          }
 
           if (!is_quiet())
             {
@@ -1810,13 +1687,6 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
             }
 
           *Fq_representor[q_f] = *solution;
-        }
-
-      if(use_inner_product_solver)
-        {
-          // Switch back to original_linear_solver
-          inner_product_solver.reset(this->linear_solver.release());
-          this->linear_solver.reset(original_linear_solver);
         }
 
       if (compute_inner_products)
@@ -2269,12 +2139,16 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
   STOP_LOG("read_riesz_representors_from_files()", "RBConstruction");
 }
 
-void RBConstruction::check_convergence()
+void RBConstruction::check_convergence(LinearSolver<Number>& input_solver)
 {
   libMesh::LinearConvergenceReason conv_flag;
-  conv_flag = get_linear_solver()->get_converged_reason();
+
+  conv_flag = input_solver.get_converged_reason();
+
   if (conv_flag < 0)
+  {
     libmesh_error_msg("Error, conv_flag < 0!");
+  }
 }
 
 bool RBConstruction::get_convergence_assertion_flag() const

@@ -326,10 +326,10 @@ protected:
   virtual void initialize_truth();
 
   /**
-   * Override to use the L2 product matrix for output
+   * Override to return the L2 product matrix for output
    * dual norm solves for transient state problems.
    */
-  virtual void assemble_matrix_for_output_dual_solves();
+  virtual SparseMatrix<Number>& get_matrix_for_output_dual_solves();
 
   /**
    * Initialize RB space by adding the truth initial condition

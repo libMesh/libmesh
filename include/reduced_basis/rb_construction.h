@@ -77,6 +77,15 @@ public:
   typedef RBConstruction sys_type;
 
   /**
+   * Assembles & solves the linear system A*x=b for the specified
+   * matrix \p input_matrix and right-hand side \p rhs.
+   */
+  virtual void solve_for_matrix_and_rhs (
+    LinearSolver<Number>& input_solver,
+    SparseMatrix<Number>& input_matrix,
+    NumericVector<Number>& input_rhs);
+
+  /**
    * Set the RBEvaluation object.
    */
   void set_rb_evaluation(RBEvaluation& rb_eval_in);
@@ -297,16 +306,6 @@ public:
   void assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dof_constraints=true);
 
   /**
-   * Assemble the constraint matrix and store it in input_matrix.
-   */
-  void assemble_constraint_matrix(SparseMatrix<Number>* input_matrix);
-
-  /**
-   * Assemble the constraint matrix and add it to input_matrix.
-   */
-  void assemble_and_add_constraint_matrix(SparseMatrix<Number>* input_matrix);
-
-  /**
    * Assemble the q^th affine matrix and store it in input_matrix.
    */
   void assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dof_constraints=true);
@@ -365,7 +364,6 @@ public:
                                       unsigned int n_training_samples_in,
                                       bool deterministic_training_in,
                                       std::string alternative_solver_in,
-                                      bool reuse_preconditioner_in,
                                       bool use_relative_bound_in_greedy_in,
                                       bool write_data_during_training_in,
                                       unsigned int training_parameters_random_seed_in,
@@ -409,16 +407,6 @@ public:
   ElemAssembly& get_inner_product_assembly();
 
   /**
-   * Set the rb_assembly_expansion object.
-   */
-  void set_constraint_assembly(ElemAssembly& constraint_assembly_in);
-
-  /**
-   * @return a reference to the constraint assembly object
-   */
-  ElemAssembly& get_constraint_assembly();
-
-  /**
    * It is sometimes useful to be able to zero vector entries
    * that correspond to constrained dofs.
    */
@@ -455,16 +443,12 @@ public:
   UniquePtr< LinearSolver<Number> > inner_product_solver;
 
   /**
-   * We also need a pointer to store the original linear solver in
-   * case we switch to inner_product_solver.
+   * Also, we store a pointer to an extra linear solver. This can be
+   * useful if we want to pass in the linear solver from somewhere
+   * else. For example, if a solver is already primed elsewhere
+   * then it can be more efficient to use that solver.
    */
-  LinearSolver<Number> *original_linear_solver;
-
-  /**
-   * Boolean flag to indicate whether we use inner_product_solver or
-   * not.
-   */
-  bool use_inner_product_solver;
+  LinearSolver<Number>* extra_linear_solver;
 
   /**
    * The inner product matrix.
@@ -476,12 +460,6 @@ public:
    * (This is only computed if store_non_dirichlet_operators == true.)
    */
   UniquePtr< SparseMatrix<Number> > non_dirichlet_inner_product_matrix;
-
-  /**
-   * The constraint matrix, e.g. the pressure matrix entries
-   * in a Stokes problem.
-   */
-  UniquePtr< SparseMatrix<Number> > constraint_matrix;
 
   /**
    * Vector storing the truth output values from the most
@@ -511,18 +489,6 @@ public:
    * are stored in RBEvaluation.
    */
   std::vector<Number> Fq_representor_innerprods;
-
-  /**
-   * Boolean flag to indicate whether this is a constrained problem
-   * (e.g. Stokes) or not.
-   */
-  bool constrained_problem;
-
-  /**
-   * Boolean flag to indicate whether we reuse the preconditioner
-   * on consecutive Offline solves for updating residual data.
-   */
-  bool reuse_preconditioner;
 
   /**
    * Boolean flag to indicate whether we use an absolute or
@@ -576,14 +542,6 @@ public:
   bool store_non_dirichlet_operators;
 
   /**
-   * Public member variable which we use to determine whether or
-   * not we enforce hanging-dof and/or periodic constraints exactly.
-   * This is primarily important in nonlinear problems where we may
-   * "undersolve" Newton iterates for the sake of efficiency.
-   */
-  bool enforce_constraints_exactly;
-
-  /**
    * A boolean flag to indicate whether or not we initialize the
    * Greedy algorithm by performing rb_solves on the training set
    * with an "empty" (i.e. N=0) reduced basis space.
@@ -619,11 +577,11 @@ protected:
   virtual UniquePtr<DGFEMContext> build_context();
 
   /**
-   * Define the matrix assembly for the output residual dual
+   * Return the matrix for the output residual dual
    * norm solves. By default we use the inner product matrix
    * for steady state problems.
    */
-  virtual void assemble_matrix_for_output_dual_solves();
+  virtual SparseMatrix<Number>& get_matrix_for_output_dual_solves();
 
   /**
    * Function that indicates when to terminate the Greedy
@@ -751,7 +709,7 @@ protected:
    * Check if the linear solver reports convergence.
    * Throw an error when that is not the case.
    */
-  void check_convergence();
+  void check_convergence(LinearSolver<Number>& input_solver);
 
   //----------- PROTECTED DATA MEMBERS -----------//
 
