@@ -1149,16 +1149,23 @@ Real RBConstruction::truth_solve(int plot_solution)
     // If extra_linear_solver has been initialized, then we use it for the
     // truth solves.
     solve_for_matrix_and_rhs(*extra_linear_solver, *matrix, *rhs);
+
+    if (assert_convergence)
+    {
+      check_convergence(*extra_linear_solver);
+    }
   }
   else
   {
     solve_for_matrix_and_rhs(*get_linear_solver(), *matrix, *rhs);
+
+    if (assert_convergence)
+    {
+      check_convergence(*get_linear_solver());
+    }
   }
 
-  if (assert_convergence)
-  {
-    check_convergence(*get_linear_solver());
-  }
+
 
   const RBParameters& mu = get_parameters();
 
