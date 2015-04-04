@@ -224,8 +224,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
-  const std::string alternative_solver_in =
-    infile("rb_alternative_solver",alternative_solver);
   const bool use_relative_bound_in_greedy_in = infile("use_relative_bound_in_greedy",
                                                       use_relative_bound_in_greedy);
   const bool write_data_during_training_in = infile("write_data_during_training",
@@ -292,7 +290,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // Set the parameters that have been read in
   set_rb_construction_parameters(n_training_samples,
                                  deterministic_training,
-                                 alternative_solver_in,
                                  use_relative_bound_in_greedy_in,
                                  write_data_during_training_in,
                                  training_parameters_random_seed_in,
@@ -308,7 +305,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 void RBConstruction::set_rb_construction_parameters(
                                                     unsigned int n_training_samples_in,
                                                     bool deterministic_training_in,
-                                                    std::string alternative_solver_in,
                                                     bool use_relative_bound_in_greedy_in,
                                                     bool write_data_during_training_in,
                                                     unsigned int training_parameters_random_seed_in,
@@ -320,14 +316,6 @@ void RBConstruction::set_rb_construction_parameters(
                                                     std::map< std::string, std::vector<Real> > discrete_parameter_values_in,
                                                     std::map<std::string,bool> log_scaling_in)
 {
-  // String which selects an alternate pc/solver combo for the update_residual_terms solves.
-  // Possible values are:
-  // "unchanged" -- use whatever we were using for truth solves
-  // "amg" -- Use Boomeramg from Hypre.  DO NOT use on indefinite (Stokes) problems
-  // "mumps" -- Use the sparse
-  //update_residual_terms_solver = infile("update_residual_terms_solver",update_residual_terms_solver);
-  alternative_solver = alternative_solver_in;
-
   // Tell the system whether or not to use a relative error bound
   // in the Greedy algorithm
   use_relative_bound_in_greedy = use_relative_bound_in_greedy_in;
@@ -1636,6 +1624,11 @@ void RBConstruction::compute_output_dual_innerprods()
             }
         }
 
+      // We may not need to use linear_solver again (e.g. this would happen if we use
+      // extra_linear_solver for the truth_solves). As a result, let's clear linear_solver
+      // to release any memory it may be taking up. If we do need it again, it will
+      // be initialized when necessary.
+      linear_solver->clear();
       linear_solver->reuse_preconditioner(false);
 
       output_dual_innerprods_computed = true;

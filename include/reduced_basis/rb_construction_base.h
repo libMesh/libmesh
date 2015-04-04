@@ -124,26 +124,6 @@ public:
   virtual void load_training_set(std::map< std::string, std::vector<Number> >& new_training_set);
 
   /**
-   * Changes the current PC (and iterative solver, if desired) in the
-   * passed-in LinearSolver object to an alternative solver specified
-   * by the alternative_solver string stored in this class.  You might
-   * use this to e.g. switch to a sparse direct solver for the multiple
-   * RHS solves executed during the update_residual_terms function.
-   * The return strings are names of the original PC and KSP objects,
-   * you can reset these using the reset_alternative_solver() function below.
-   */
-  std::pair<std::string,std::string> set_alternative_solver(UniquePtr<LinearSolver<Number> >& ls);
-
-  /**
-   * Resets the PC (and iterative solver, if desired) in the passed-in
-   * LinearSolver object to the values specified in the pair of strings
-   * passed as the second argument.  If the "alternative_solver" string,
-   * defined below, is "unchanged", this function does nothing.
-   */
-  void reset_alternative_solver(UniquePtr<LinearSolver<Number> >& ls,
-                                const std::pair<std::string,std::string>& orig);
-
-  /**
    * Broadcasts parameters on processor proc_id
    * to all processors.
    */
@@ -255,20 +235,6 @@ protected:
    * allocation/deallocation).
    */
   UniquePtr< NumericVector<Number> > inner_product_storage_vector;
-
-  /**
-   * Set this string to specify an alternative solver used in the set_alternative_solver()
-   * function above.  Currently-supported values are:
-   * .) unchanged, to continue using the default truth solve solver
-   * .) amg, to use the BoomerAMG from Hypre (NOT for indefinite problems!)
-   * .) mumps, to use a sparse direct solver
-   * Note1: mumps and amg will only be available if PETSc has been compiled with them.
-   * Note2: RBConstruction::process_parameters_file() is responsible for reading in this value ("rb_alternative_solver")
-   *        from file for RBConstruction-derived subclasses
-   * Note3: RBSCMSystem::process_parameters_file() reads this value ("scm_alternative_solver")
-   *        for RBSCMSystem-derived subclasses
-   */
-  std::string alternative_solver;
 
 
 private:
