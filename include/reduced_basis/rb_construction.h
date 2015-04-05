@@ -363,7 +363,6 @@ public:
   void set_rb_construction_parameters(
                                       unsigned int n_training_samples_in,
                                       bool deterministic_training_in,
-                                      std::string alternative_solver_in,
                                       bool use_relative_bound_in_greedy_in,
                                       bool write_data_during_training_in,
                                       unsigned int training_parameters_random_seed_in,
