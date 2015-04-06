@@ -6,6 +6,8 @@
 #include "libmesh/rb_eim_evaluation.h"
 #include "assembly.h"
 
+using libMesh::UniquePtr;
+
 // A simple subclass of RBEIMEvaluation. Overload
 // evaluate_parametrized_function to define the
 // function that we "empirically" interpolate.
