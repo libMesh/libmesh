@@ -217,17 +217,8 @@ void EquationSystems::reinit ()
 
         sys.get_dof_map().distribute_dofs(_mesh);
 
-        // Recreate any hanging node constraints
-        sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
-
-        // Apply any user-defined constraints
-        sys.user_constrain();
-
-        // Expand any recursive constraints
-        sys.get_dof_map().process_constraints(_mesh);
-
-        // And clean up the send_list before we use it again
-        sys.get_dof_map().prepare_send_list();
+        // Recreate any user or internal constraints
+        sys.reinit_constraints();
 
         sys.prolong_vectors();
       }
@@ -252,10 +243,7 @@ void EquationSystems::reinit ()
           if (!dof_constraints_created)
             {
               sys.get_dof_map().distribute_dofs(_mesh);
-              sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
-              sys.user_constrain();
-              sys.get_dof_map().process_constraints(_mesh);
-              sys.get_dof_map().prepare_send_list();
+              sys.reinit_constraints();
 
             }
           sys.restrict_vectors();
@@ -279,11 +267,7 @@ void EquationSystems::reinit ()
           if (!dof_constraints_created)
             {
               sys.get_dof_map().distribute_dofs(_mesh);
-              sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
-              sys.user_constrain();
-              sys.get_dof_map().process_constraints(_mesh);
-              sys.get_dof_map().prepare_send_list();
-
+              sys.reinit_constraints();
             }
           sys.prolong_vectors();
         }
@@ -339,14 +323,10 @@ void EquationSystems::allgather ()
       DofMap &dof_map = sys.get_dof_map();
       dof_map.distribute_dofs(_mesh);
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
       // The user probably won't need constraint equations or the
       // send_list after an allgather, but let's keep it in consistent
       // shape just in case.
-      dof_map.create_dof_constraints(_mesh, sys.time);
-      sys.user_constrain();
-      dof_map.process_constraints(_mesh);
-#endif
+      sys.reinit_constraints();
       dof_map.prepare_send_list();
     }
 }
