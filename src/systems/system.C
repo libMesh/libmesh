@@ -411,9 +411,11 @@ void System::reinit ()
 
 void System::reinit_constraints()
 {
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   get_dof_map().create_dof_constraints(_mesh, this->time);
   user_constrain();
   get_dof_map().process_constraints(_mesh);
+#endif
   get_dof_map().prepare_send_list();
 }
 
