@@ -134,7 +134,9 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // adjoint Dirichlet conditions.
 
   // Solve the adjoint problem(s) on the coarse FE space
-  system.adjoint_solve(_qoi_set);
+  // Only if the user didn't already solve it for us
+  if (!system.is_adjoint_already_solved())
+     system.adjoint_solve(_qoi_set);
 
 
   // Loop over all the adjoint problems and, if any have heterogenous
