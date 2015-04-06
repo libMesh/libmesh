@@ -28,7 +28,7 @@
 // LibMesh's UniquePtr is one of:
 // 1.) std::unique_ptr
 // 2.) Howard Hinnant's C++03 compatible boost::unique_ptr
-// 3.) The deprecated libMesh UniquePtr
+// 3.) The deprecated libMesh AutoPtr
 // in that order, depending on what your compiler supports.  If you
 // are using a compiler that cannot compile Howard Hinnant's
 // unique_ptr implementation, you should probably think about
@@ -254,7 +254,7 @@ public:
     if (!libMesh::warned_about_auto_ptr)
       {
         libMesh::warned_about_auto_ptr = true;
-        libMesh::out << "*** Warning, UniquePtr is deprecated and will be removed in a future library version! "
+        libMesh::out << "*** Warning, AutoPtr is deprecated and will be removed in a future library version! "
                      << __FILE__ << ", line " << __LINE__ << ", compiled " << __LIBMESH_DATE__ << " at " << __LIBMESH_TIME__ << " ***" << std::endl;
       }
     delete _ptr;
