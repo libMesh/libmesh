@@ -108,6 +108,9 @@ public:
     return computed_global_QoI_errors[qoi_index];
   }
 
+  virtual ErrorEstimatorType type() const
+  { return ADJOINT_REFINEMENT;}
+
   /**
    * How many h refinements to perform to get the fine grid
    */

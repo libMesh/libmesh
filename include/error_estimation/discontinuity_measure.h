@@ -72,6 +72,9 @@ public:
                                                                const Point& p,
                                                                const std::string& var_name));
 
+  virtual ErrorEstimatorType type() const
+  { return DISCONTINUITY_MEASURE;}
+
 protected:
 
   /**

@@ -112,6 +112,9 @@ public:
                        const NumericVector<Number>* solution_vector = NULL,
                        bool estimate_parent_error = false);
 
+  virtual ErrorEstimatorType type() const
+  { return ADJOINT_RESIDUAL;}
+
 protected:
 
   /**

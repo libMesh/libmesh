@@ -93,6 +93,9 @@ public:
 
   void set_patch_reuse (bool );
 
+  virtual ErrorEstimatorType type() const
+  { return PATCH_RECOVERY;}
+
 protected:
 
   /**
