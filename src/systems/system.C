@@ -256,18 +256,8 @@ void System::init_data ()
   // Distribute the degrees of freedom on the mesh
   _dof_map->distribute_dofs (mesh);
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-
-  // Recreate any hanging node constraints
-  _dof_map->create_dof_constraints(mesh);
-
-  // Apply any user-defined constraints
-  this->user_constrain();
-
-  // Expand any recursive constraints
-  _dof_map->process_constraints(mesh);
-
-#endif
+  // Recreate any user or internal constraints
+  this->reinit_constraints();
 
   // And clean up the send_list before we first use it
   _dof_map->prepare_send_list();
@@ -411,9 +401,11 @@ void System::reinit ()
 
 void System::reinit_constraints()
 {
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
   get_dof_map().create_dof_constraints(_mesh, this->time);
   user_constrain();
   get_dof_map().process_constraints(_mesh);
+#endif
   get_dof_map().prepare_send_list();
 }
 
