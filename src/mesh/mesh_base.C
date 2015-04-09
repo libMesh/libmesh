@@ -117,8 +117,9 @@ MeshBase::~MeshBase()
 
 unsigned int MeshBase::mesh_dimension() const
 {
-  libmesh_assert(!_elem_dims.empty());
-  return cast_int<unsigned int>(*_elem_dims.rbegin());
+  if (!_elem_dims.empty())
+    return cast_int<unsigned int>(*_elem_dims.rbegin());
+  return 0;
 }
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
