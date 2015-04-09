@@ -258,11 +258,6 @@ protected:
   sys_type& _system;
 
   /**
-   * Serial vector of _system.get_vector("_old_nonlinear_solution")
-   */
-  UniquePtr<NumericVector<Number> > old_local_nonlinear_solution;
-
-  /**
    * An UniquePtr to a SolutionHistory object. Default is
    * NoSolutionHistory, which the user can override by declaring a
    * different kind of SolutionHistory in the application
