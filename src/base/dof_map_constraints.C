@@ -1036,6 +1036,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // We might get constraint equations from AMR hanging nodes in 2D/3D
   // or from boundary conditions in any dimension
   const bool possible_local_constraints = false
+    || !mesh.n_elem()
 #ifdef LIBMESH_ENABLE_AMR
     || mesh.mesh_dimension() > 1
 #endif
