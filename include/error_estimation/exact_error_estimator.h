@@ -185,6 +185,9 @@ public:
                                const NumericVector<Number>* solution_vector = NULL,
                                bool estimate_parent_error = false);
 
+  virtual ErrorEstimatorType type() const
+  { return EXACT;}
+
 private:
 
   /**

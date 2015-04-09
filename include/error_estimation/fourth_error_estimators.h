@@ -60,6 +60,9 @@ public:
    */
   ~LaplacianErrorEstimator() {}
 
+  virtual ErrorEstimatorType type() const
+  { return LAPLACIAN;}
+
 protected:
 
   /**

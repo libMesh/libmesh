@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel.h"
 #include "libmesh/system_norm.h"
+#include "libmesh/enum_error_estimator_type.h"
 
 // C++ includes
 #include <cstddef>
@@ -125,6 +126,11 @@ public:
                                 ErrorMap& errors_per_cell,
                                 const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
                                 bool estimate_parent_error = false);
+
+  /**
+   * Returns the type for the ErrorEstimator subclass.
+   */
+  virtual ErrorEstimatorType type() const = 0;
 
   /**
    * When estimating the error in a single system, the \p error_norm

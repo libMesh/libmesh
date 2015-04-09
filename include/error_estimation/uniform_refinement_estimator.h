@@ -107,6 +107,9 @@ public:
                                 const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
                                 bool estimate_parent_error = false);
 
+  virtual ErrorEstimatorType type() const
+  { return UNIFORM_REFINEMENT;}
+
   /**
    * How many h refinements to perform to get the fine grid
    */
