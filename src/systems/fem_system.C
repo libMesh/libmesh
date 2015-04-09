@@ -476,6 +476,9 @@ public:
         }
 #endif
 
+    if (have_some_heterogenous_qoi_bc)
+      _sys.init_context(_femcontext);
+
     for (ConstElemRange::const_iterator elem_it = range.begin();
          elem_it != range.end(); ++elem_it)
       {
@@ -609,6 +612,9 @@ public:
             have_some_heterogenous_qoi_bc = true;
           }
 #endif
+
+    if (have_some_heterogenous_qoi_bc)
+      _sys.init_context(_femcontext);
 
     for (ConstElemRange::const_iterator elem_it = range.begin();
          elem_it != range.end(); ++elem_it)
