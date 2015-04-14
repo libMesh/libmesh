@@ -787,7 +787,7 @@ protected:
 private:
   /**
    * A helper function used by FEMap::compute_single_point_map() to
-   * second derivatives of the inverse map.
+   * compute second derivatives of the inverse map.
    */
   void compute_inverse_map_second_derivs(unsigned p);
 };

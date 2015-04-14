@@ -1107,9 +1107,8 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
     dzeta(0.,            0.,            0.);
 
   // In 2D, we have xx, xy, and yy second derivatives
-  valid_indices.insert(0);
-  valid_indices.insert(1);
-  valid_indices.insert(3);
+  const unsigned tmp[3] = {0,1,3};
+  valid_indices.insert(tmp, tmp+3);
 
 #elif LIBMESH_DIM==3
   RealTensor
@@ -1131,12 +1130,8 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
     dzeta(dzetadx_map[p], dzetady_map[p], dzetadz_map[p]);
 
   // In 3D, we have xx, xy, xz, yy, yz, and zz second derivatives
-  valid_indices.insert(0);
-  valid_indices.insert(1);
-  valid_indices.insert(2);
-  valid_indices.insert(3);
-  valid_indices.insert(4);
-  valid_indices.insert(5);
+  const unsigned tmp[6] = {0,1,2,3,4,5};
+  valid_indices.insert(tmp, tmp+6);
 
 #endif
 
@@ -1146,7 +1141,7 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
   for (unsigned s=0; s<3; ++s)
     for (unsigned t=s; t<3; ++t)
       {
-        if (std::find(valid_indices.begin(), valid_indices.end(), ctr) != valid_indices.end())
+        if (valid_indices.count(ctr))
           {
             RealVectorValue
               v1(dxi(s)*dxi(t),
