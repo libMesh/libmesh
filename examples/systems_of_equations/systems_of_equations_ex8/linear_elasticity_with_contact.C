@@ -151,7 +151,7 @@ void LinearElasticityWithContact::move_mesh(
 
   // Localize input_solution so that we have the data to move all
   // elements (not just elements local to this processor).
-  AutoPtr< NumericVector<Number> > localized_input_solution =
+  UniquePtr< NumericVector<Number> > localized_input_solution =
     NumericVector<Number>::build(input_solution.comm());
   localized_input_solution->init (
     input_solution.size(), false, SERIAL);
@@ -247,15 +247,15 @@ void LinearElasticityWithContact::residual_and_jacobian (
   DofMap& dof_map = _sys.get_dof_map();
 
   FEType fe_type = dof_map.variable_type(u_var);
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
-  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
   QGauss qface (dim-1, fe_type.default_quadrature_order());
   fe_face->attach_quadrature_rule (&qface);
 
-  AutoPtr<FEBase> fe_neighbor_face (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe_neighbor_face (FEBase::build(dim, fe_type));
   fe_neighbor_face->attach_quadrature_rule (&qface);
 
   const std::vector<Real>& JxW = fe->get_JxW();
@@ -273,7 +273,7 @@ void LinearElasticityWithContact::residual_and_jacobian (
   // 2. Compute and store all contact forces.
   // 3. Augment the sparsity pattern.
   {
-    AutoPtr<MeshBase> mesh_clone = mesh.clone();
+    UniquePtr<MeshBase> mesh_clone = mesh.clone();
     move_mesh(*mesh_clone, soln);
 
     _augment_sparsity.clear_contact_element_map();
@@ -340,7 +340,7 @@ void LinearElasticityWithContact::residual_and_jacobian (
                       if( mesh_clone->get_boundary_info().has_boundary_id
                             (other_elem, other_side, other_surface_id) )
                       {
-                        AutoPtr<Elem> other_side_elem = other_elem->build_side(other_side);
+                        UniquePtr<Elem> other_side_elem = other_elem->build_side(other_side);
 
                         // Define a plane based on the normal at the centroid of other_side_elem
                         // and check where line_point + s * line_direction (s \in R) intersects
@@ -753,7 +753,7 @@ void LinearElasticityWithContact::compute_stresses()
 
   const DofMap& dof_map = _sys.get_dof_map();
   FEType fe_type = dof_map.variable_type(u_var);
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
