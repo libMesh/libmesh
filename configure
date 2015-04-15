@@ -6699,6 +6699,10 @@ else
     // at compile time.
     constexpr int multiply (int x, int y) { return x * y; }
 
+    // A minimally-conforming C++11 compiler must support alias declarations
+    template <typename T>
+    using MyCheck = check<T>;
+
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
   ax_cv_cxx_compile_cxx11=yes
@@ -6748,6 +6752,10 @@ else
     // const int val = multiply(10, 10);
     // at compile time.
     constexpr int multiply (int x, int y) { return x * y; }
+
+    // A minimally-conforming C++11 compiler must support alias declarations
+    template <typename T>
+    using MyCheck = check<T>;
 
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
@@ -6807,6 +6815,10 @@ else
     // const int val = multiply(10, 10);
     // at compile time.
     constexpr int multiply (int x, int y) { return x * y; }
+
+    // A minimally-conforming C++11 compiler must support alias declarations
+    template <typename T>
+    using MyCheck = check<T>;
 
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :

@@ -59,6 +59,10 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
     // const int val = multiply(10, 10);
     // at compile time.
     constexpr int multiply (int x, int y) { return x * y; }
+
+    // A minimally-conforming C++11 compiler must support alias declarations
+    template <typename T>
+    using MyCheck = check<T>;
 ]])
 
 AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
