@@ -30,6 +30,8 @@
 #include "libmesh/fe_map.h"
 #include "libmesh/fe_xyz_map.h"
 #include "libmesh/mesh_subdivision_support.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
 namespace libMesh
 {
@@ -340,6 +342,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         dxyzdxi_map[p].zero();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         d2xyzdxi2_map[p].zero();
+        // Inverse map second derivatives
+        d2xidxyz2_map[p].assign(6, 0.);
 #endif
 
         // compute x, dx, d2x at the quadrature point
@@ -393,6 +397,77 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         JxW[p] = jac[p]*qw[p];
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+#if LIBMESH_DIM == 1
+        // Compute inverse map second derivatives for 1D-element-living-in-1D case
+        this->compute_inverse_map_second_derivs(p);
+#elif LIBMESH_DIM == 2
+        // Compute inverse map second derivatives for 1D-element-living-in-2D case
+        // See JWP notes for details
+
+        // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi}
+        Real numer =
+          dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
+          dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1);
+
+        // denom = (x_xi)^2 + (y_xi)^2 must be >= 0.0
+        Real denom =
+          dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
+          dxyzdxi_map[p](1)*dxyzdxi_map[p](1);
+
+        if (denom <= 0.0)
+          libmesh_error_msg("Encountered invalid 1D element!");
+
+        // xi_{x x}
+        d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
+
+        // xi_{x y}
+        d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
+
+        // xi_{y y}
+        d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
+
+#elif LIBMESH_DIM == 3
+        // Compute inverse map second derivatives for 1D-element-living-in-3D case
+        // See JWP notes for details
+
+        // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi} + z_xi*z_{xi xi}
+        Real numer =
+          dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
+          dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1) +
+          dxyzdxi_map[p](2)*d2xyzdxi2_map[p](2);
+
+        // denom = (x_xi)^2 + (y_xi)^2 + (z_xi)^2 must be >= 0.0
+        Real denom =
+          dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
+          dxyzdxi_map[p](1)*dxyzdxi_map[p](1) +
+          dxyzdxi_map[p](2)*dxyzdxi_map[p](2);
+
+        if (denom <= 0.0)
+          libmesh_error_msg("Encountered invalid 1D element!");
+
+        // xi_{x x}
+        d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
+
+        // xi_{x y}
+        d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
+
+        // xi_{x z}
+        d2xidxyz2_map[p][2] = -numer * dxidx_map[p]*dxidz_map[p] / denom;
+
+        // xi_{y y}
+        d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
+
+        // xi_{y z}
+        d2xidxyz2_map[p][4] = -numer * dxidy_map[p]*dxidz_map[p] / denom;
+
+        // xi_{z z}
+        d2xidxyz2_map[p][5] = -numer * dxidz_map[p]*dxidz_map[p] / denom;
+#endif
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
         // done computing the map
         break;
       }
@@ -414,6 +489,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         d2xyzdxi2_map[p].zero();
         d2xyzdxideta_map[p].zero();
         d2xyzdeta2_map[p].zero();
+        // Inverse map second derivatives
+        d2xidxyz2_map[p].assign(6, 0.);
+        d2etadxyz2_map[p].assign(6, 0.);
 #endif
 
 
@@ -469,7 +547,10 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
 
         dxidz_map[p] = detadz_map[p] = 0.;
-#else
+
+        this->compute_inverse_map_second_derivs(p);
+
+#else // LIBMESH_DIM == 3
 
         const Real dz_dxi = dzdxi_map(p),
           dz_deta = dzdeta_map(p);
@@ -533,7 +614,76 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
         detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
 
-#endif
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        // Compute inverse map second derivative values for
+        // 2D-element-living-in-3D case.  We pursue a least-squares
+        // solution approach for this "non-square" case, see JWP notes
+        // for details.
+
+        // A = [ x_{xi xi} x_{eta eta} ]
+        //     [ y_{xi xi} y_{eta eta} ]
+        //     [ z_{xi xi} z_{eta eta} ]
+        DenseMatrix<Real> A(3,2);
+        A(0,0) = d2xyzdxi2_map[p](0);  A(0,1) = d2xyzdeta2_map[p](0);
+        A(1,0) = d2xyzdxi2_map[p](1);  A(1,1) = d2xyzdeta2_map[p](1);
+        A(2,0) = d2xyzdxi2_map[p](2);  A(2,1) = d2xyzdeta2_map[p](2);
+
+        // J^T, the transpose of the Jacobian matrix
+        DenseMatrix<Real> JT(2,3);
+        JT(0,0) = dx_dxi;   JT(0,1) = dy_dxi;   JT(0,2) = dz_dxi;
+        JT(1,0) = dx_deta;  JT(1,1) = dy_deta;  JT(1,2) = dz_deta;
+
+        // (J^T J)^(-1), this has already been computed for us above...
+        DenseMatrix<Real> JTJinv(2,2);
+        JTJinv(0,0) = g11inv;  JTJinv(0,1) = g12inv;
+        JTJinv(1,0) = g21inv;  JTJinv(1,1) = g22inv;
+
+        // Some helper variables
+        RealVectorValue
+          dxi  (dxidx_map[p],   dxidy_map[p],   dxidz_map[p]),
+          deta (detadx_map[p],  detady_map[p],  detadz_map[p]);
+
+        // To be filled in below
+        DenseVector<Real> tmp1(2);
+        DenseVector<Real> tmp2(3);
+        DenseVector<Real> tmp3(2);
+
+        // For (s,t) in {(x,x), (x,y), (x,z), (y,y), (y,z), (z,z)}, compute the
+        // vector of inverse map second derivatives [xi_{s t}, eta_{s t}]
+        unsigned ctr=0;
+        for (unsigned s=0; s<3; ++s)
+          for (unsigned t=s; t<3; ++t)
+            {
+              // Construct tmp1 = [xi_s*xi_t, eta_s*eta_t]
+              tmp1(0) = dxi(s)*dxi(t);
+              tmp1(1) = deta(s)*deta(t);
+
+              // Compute tmp2 = A * tmp1
+              A.vector_mult(tmp2, tmp1);
+
+              // Compute scalar value "alpha"
+              Real alpha = dxi(s)*deta(t) + deta(s)*dxi(t);
+
+              // Compute tmp2 <- tmp2 + alpha * x_{xi eta}
+              for (unsigned i=0; i<3; ++i)
+                tmp2(i) += alpha*d2xyzdxideta_map[p](i);
+
+              // Compute tmp3 = J^T * tmp2
+              JT.vector_mult(tmp3, tmp2);
+
+              // Compute tmp1 = (J^T J)^(-1) * tmp3.  tmp1 is available for us to reuse.
+              JTJinv.vector_mult(tmp1, tmp3);
+
+              // Fill in appropriate entries, don't forget to multiply by -1!
+              d2xidxyz2_map[p][ctr]  = -tmp1(0);
+              d2etadxyz2_map[p][ctr] = -tmp1(1);
+
+              // Increment the counter
+              ctr++;
+            }
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+#endif // LIBMESH_DIM == 3
         // done computing the map
         break;
       }
@@ -560,6 +710,10 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         d2xyzdeta2_map[p].zero();
         d2xyzdetadzeta_map[p].zero();
         d2xyzdzeta2_map[p].zero();
+        // Inverse map second derivatives
+        d2xidxyz2_map[p].assign(6, 0.);
+        d2etadxyz2_map[p].assign(6, 0.);
+        d2zetadxyz2_map[p].assign(6, 0.);
 #endif
 
 
@@ -635,6 +789,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
         dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
 
+        this->compute_inverse_map_second_derivs(p);
+
         // done computing the map
         break;
       }
@@ -656,6 +812,12 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
   dxidz_map.resize(n_qp); // ... or 3D
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   d2xyzdxi2_map.resize(n_qp);
+
+  // Inverse map second derivatives
+  d2xidxyz2_map.resize(n_qp);
+  for (unsigned i=0; i<d2xidxyz2_map.size(); ++i)
+    d2xidxyz2_map[i].assign(6, 0.);
+
 #endif
   if (dim > 1)
     {
@@ -666,6 +828,11 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       d2xyzdxideta_map.resize(n_qp);
       d2xyzdeta2_map.resize(n_qp);
+
+      // Inverse map second derivatives
+      d2etadxyz2_map.resize(n_qp);
+      for (unsigned i=0; i<d2etadxyz2_map.size(); ++i)
+        d2etadxyz2_map[i].assign(6, 0.);
 #endif
       if (dim > 2)
         {
@@ -677,6 +844,11 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
           d2xyzdxidzeta_map.resize(n_qp);
           d2xyzdetadzeta_map.resize(n_qp);
           d2xyzdzeta2_map.resize(n_qp);
+
+          // Inverse map second derivatives
+          d2zetadxyz2_map.resize(n_qp);
+          for (unsigned i=0; i<d2zetadxyz2_map.size(); ++i)
+            d2zetadxyz2_map[i].assign(6, 0.);
 #endif
         }
     }
@@ -880,6 +1052,124 @@ void FEMap::print_xyz(std::ostream& os) const
 {
   for (unsigned int i=0; i<xyz.size(); ++i)
     os << " [" << i << "]: " << xyz[i];
+}
+
+
+
+void FEMap::compute_inverse_map_second_derivs(unsigned p)
+{
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // Only certain second derivatives are valid depending on the
+  // dimension...
+  std::set<unsigned> valid_indices;
+
+  // Construct J^{-1}, A, and B matrices (see JWP's notes for details)
+  // for cases in which the element dimension matches LIBMESH_DIM.
+#if LIBMESH_DIM==1
+  RealTensor
+    Jinv(dxidx_map[p],  0.,  0.,
+         0.,            0.,  0.,
+         0.,            0.,  0.),
+
+    A(d2xyzdxi2_map[p](0), 0., 0.,
+      0.,                  0., 0.,
+      0.,                  0., 0.),
+
+    B(0., 0., 0.,
+      0., 0., 0.,
+      0., 0., 0.);
+
+  RealVectorValue
+    dxi  (dxidx_map[p], 0., 0.),
+    deta (0.,           0., 0.),
+    dzeta(0.,           0., 0.);
+
+  // In 1D, we have only the xx second derivative
+  valid_indices.insert(0);
+
+#elif LIBMESH_DIM==2
+  RealTensor
+    Jinv(dxidx_map[p],  dxidy_map[p],  0.,
+         detadx_map[p], detady_map[p], 0.,
+         0.,            0.,            0.),
+
+    A(d2xyzdxi2_map[p](0), d2xyzdeta2_map[p](0), 0.,
+      d2xyzdxi2_map[p](1), d2xyzdeta2_map[p](1), 0.,
+      0.,                  0.,                   0.),
+
+    B(d2xyzdxideta_map[p](0), 0., 0.,
+      d2xyzdxideta_map[p](1), 0., 0.,
+      0.,                     0., 0.);
+
+  RealVectorValue
+    dxi  (dxidx_map[p],  dxidy_map[p],  0.),
+    deta (detadx_map[p], detady_map[p], 0.),
+    dzeta(0.,            0.,            0.);
+
+  // In 2D, we have xx, xy, and yy second derivatives
+  const unsigned tmp[3] = {0,1,3};
+  valid_indices.insert(tmp, tmp+3);
+
+#elif LIBMESH_DIM==3
+  RealTensor
+    Jinv(dxidx_map[p],   dxidy_map[p],   dxidz_map[p],
+         detadx_map[p],  detady_map[p],  detadz_map[p],
+         dzetadx_map[p], dzetady_map[p], dzetadz_map[p]),
+
+    A(d2xyzdxi2_map[p](0), d2xyzdeta2_map[p](0), d2xyzdzeta2_map[p](0),
+      d2xyzdxi2_map[p](1), d2xyzdeta2_map[p](1), d2xyzdzeta2_map[p](1),
+      d2xyzdxi2_map[p](2), d2xyzdeta2_map[p](2), d2xyzdzeta2_map[p](2)),
+
+    B(d2xyzdxideta_map[p](0), d2xyzdxidzeta_map[p](0), d2xyzdetadzeta_map[p](0),
+      d2xyzdxideta_map[p](1), d2xyzdxidzeta_map[p](1), d2xyzdetadzeta_map[p](1),
+      d2xyzdxideta_map[p](2), d2xyzdxidzeta_map[p](2), d2xyzdetadzeta_map[p](2));
+
+  RealVectorValue
+    dxi  (dxidx_map[p],   dxidy_map[p],   dxidz_map[p]),
+    deta (detadx_map[p],  detady_map[p],  detadz_map[p]),
+    dzeta(dzetadx_map[p], dzetady_map[p], dzetadz_map[p]);
+
+  // In 3D, we have xx, xy, xz, yy, yz, and zz second derivatives
+  const unsigned tmp[6] = {0,1,2,3,4,5};
+  valid_indices.insert(tmp, tmp+6);
+
+#endif
+
+  // For (s,t) in {(x,x), (x,y), (x,z), (y,y), (y,z), (z,z)}, compute the
+  // vector of inverse map second derivatives [xi_{s t}, eta_{s t}, zeta_{s t}]
+  unsigned ctr=0;
+  for (unsigned s=0; s<3; ++s)
+    for (unsigned t=s; t<3; ++t)
+      {
+        if (valid_indices.count(ctr))
+          {
+            RealVectorValue
+              v1(dxi(s)*dxi(t),
+                 deta(s)*deta(t),
+                 dzeta(s)*dzeta(t)),
+
+              v2(dxi(s)*deta(t) + deta(s)*dxi(t),
+                 dxi(s)*dzeta(t) + dzeta(s)*dxi(t),
+                 deta(s)*dzeta(t) + dzeta(s)*deta(t));
+
+            // Compute the inverse map second derivatives
+            RealVectorValue v3 = -Jinv*(A*v1 + B*v2);
+
+            // Store them in the appropriate locations in the class data structures
+            d2xidxyz2_map[p][ctr] = v3(0);
+
+            if (LIBMESH_DIM > 1)
+              d2etadxyz2_map[p][ctr] = v3(1);
+
+            if (LIBMESH_DIM > 2)
+              d2zetadxyz2_map[p][ctr] = v3(2);
+          }
+
+        // Increment the counter
+        ctr++;
+      }
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 
 
