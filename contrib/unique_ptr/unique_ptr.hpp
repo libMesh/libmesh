@@ -132,7 +132,7 @@ typename enable_if_c
 >::type
 forward(typename detail_unique_ptr::identity<T>::type& t)
 {
-    return move(t);
+    return boost::move(t);
 }
 
 template <class T>
@@ -144,7 +144,7 @@ typename enable_if_c
 >::type
 forward(const typename detail_unique_ptr::identity<T>::type& t)
 {
-    return move(const_cast<T&>(t));
+    return boost::move(const_cast<T&>(t));
 }
 
 namespace detail_unique_ptr {
@@ -167,10 +167,10 @@ public:
     unique_ptr_storage() : t1_(), t2_() {}
 
     explicit unique_ptr_storage(T1 t1)
-        : t1_(move(t1)), t2_() {}
+        : t1_(boost::move(t1)), t2_() {}
 
     unique_ptr_storage(T1 t1, T2 t2)
-        : t1_(move(t1)), t2_(forward<T2>(t2)) {}
+        : t1_(boost::move(t1)), t2_(boost::forward<T2>(t2)) {}
 
           T1& first()       {return t1_;}
     const T1& first() const {return t1_;}
@@ -194,10 +194,10 @@ public:
     unique_ptr_storage() : t1_() {}
 
     explicit unique_ptr_storage(T1 t1)
-        : t1_(move(t1)) {}
+        : t1_(boost::move(t1)) {}
 
     unique_ptr_storage(T1 t1, T2 t2)
-        : t2_(move(t2)), t1_(move(t1)) {}
+        : t2_(boost::move(t2)), t1_(boost::move(t1)) {}
 
           T1& first()       {return t1_;}
     const T1& first() const {return t1_;}
@@ -321,11 +321,11 @@ private:
 
 public:
     operator detail_unique_ptr::rv<unique_ptr>() {return detail_unique_ptr::rv<unique_ptr>(*this);}
-    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
+    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), boost::forward<deleter_type>(r->get_deleter())) {}
     unique_ptr& operator=(detail_unique_ptr::rv<unique_ptr> r)
     {
         reset(r->release());
-        ptr_.second() = move(r->get_deleter());
+        ptr_.second() = boost::move(r->get_deleter());
         return *this;
     }
 
@@ -344,7 +344,7 @@ public:
 
     unique_ptr(pointer p, typename mpl::if_<is_reference<D>,
                           volatile typename remove_reference<D>::type&, D>::type d)
-        : ptr_(move(p), forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
+        : ptr_(boost::move(p), boost::forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
 
     template <class U, class E>
         unique_ptr(unique_ptr<U, E> u,
@@ -358,7 +358,7 @@ public:
                      is_same<deleter_type, E>::value
                 )
                 >::type* = 0)
-            : ptr_(u.release(), forward<D>(forward<E>(u.get_deleter()))) {}
+          : ptr_(u.release(), boost::forward<D>(boost::forward<E>(u.get_deleter()))) {}
 
     ~unique_ptr() {reset();}
 
@@ -373,7 +373,7 @@ public:
         operator=(unique_ptr<U, E> u)
         {
             reset(u.release());
-            ptr_.second() = move(u.get_deleter());
+            ptr_.second() = boost::move(u.get_deleter());
             return *this;
         }
 
@@ -423,11 +423,11 @@ private:
 
 public:
     operator detail_unique_ptr::rv<unique_ptr>() {return detail_unique_ptr::rv<unique_ptr>(*this);}
-    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
+    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), boost::forward<deleter_type>(r->get_deleter())) {}
     unique_ptr& operator=(detail_unique_ptr::rv<unique_ptr> r)
     {
         reset(r->release());
-        ptr_.second() = move(r->get_deleter());
+        ptr_.second() = boost::move(r->get_deleter());
         return *this;
     }
 
@@ -446,7 +446,7 @@ public:
 
     unique_ptr(pointer p, typename mpl::if_<is_reference<D>,
                           volatile typename remove_reference<D>::type&, D>::type d)
-        : ptr_(move(p), forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
+        : ptr_(boost::move(p), boost::forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
 
     ~unique_ptr() {reset();}
 
