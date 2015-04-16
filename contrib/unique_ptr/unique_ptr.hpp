@@ -291,6 +291,15 @@ struct pointer_type
 
 }  // detail_unique_ptr
 
+#ifdef LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
+} // namespace boost
+
+namespace libMesh {
+
+// Note: Bring in boost namespace
+using namespace ::boost;
+#endif
+
 template <class T, class D = default_delete<T> >
 class unique_ptr
 {
@@ -473,6 +482,15 @@ private:
                           volatile typename remove_reference<D>::type&, D>::type,
                           typename enable_if_c<detail_unique_ptr::is_convertible<U, pointer>::value>::type* = 0);
 };
+
+#ifdef LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
+} // namespace libMesh
+
+
+namespace boost {
+
+using libMesh::unique_ptr;
+#endif
 
 template<class T, class D>
 inline
