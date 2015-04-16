@@ -36,18 +36,32 @@
 // upgrading.
 #ifdef LIBMESH_ENABLE_UNIQUE_PTR
 #ifdef LIBMESH_HAVE_CXX11_UNIQUE_PTR
+// If C++11 std::unique_ptr is available, alias declarations are also
+// guaranteed to be available.
 #  include <memory>
-#  define UniquePtr std::unique_ptr
+namespace libMesh
+{
+  template<typename T>
+  using UniquePtr = std::unique_ptr<T>;
+}
 #elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
+// In libmesh, we modify the unique_ptr.hpp file slightly to place the
+// boost::unique_ptr type into the libMesh namespace.  This
+// allows for properly namespaced code, i.e. libMesh::UniquePtr, to
+// work correctly.  We've used #ifdefs to cleanly separate our changes
+// from the original unique_ptr.hpp file.
+#  ifndef LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
+#  define LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
+#  endif
 #  include "libmesh/unique_ptr.hpp"
-#  define UniquePtr boost::unique_ptr
+#  define UniquePtr unique_ptr
 #else
-#  define UniquePtr libMesh::AutoPtr
+#  define UniquePtr AutoPtr
 #endif
 #else
 // libMesh was configured with --disable-unique-ptr, so we'll use
 // libMesh's AutoPtr class instead.
-#define UniquePtr libMesh::AutoPtr
+#define UniquePtr AutoPtr
 #endif
 
 namespace libMesh
