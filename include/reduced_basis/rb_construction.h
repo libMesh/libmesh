@@ -512,13 +512,6 @@ public:
   bool write_data_during_training;
 
   /**
-   * Boolean flag to indicate whether we require a Dirichlet boundary
-   * condition on internal mesh dofs. This is useful for example in problems
-   * with subdomain-only-variables.
-   */
-  bool impose_internal_dirichlet_BCs;
-
-  /**
    * Boolean flag to indicate whether we impose "fluxes"
    * (i.e. element boundary contributions to the weak form)
    * on internal element boundaries in the assembly routines.
