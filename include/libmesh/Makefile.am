@@ -288,8 +288,6 @@ BUILT_SOURCES = \
         quadrature_rules.h \
         quadrature_simpson.h \
         quadrature_trap.h \
-        derived_rb_construction.h \
-        derived_rb_evaluation.h \
         rb_assembly_expansion.h \
         rb_construction.h \
         rb_construction_base.h \
@@ -1344,12 +1342,6 @@ quadrature_simpson.h: $(top_srcdir)/include/quadrature/quadrature_simpson.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_trap.h: $(top_srcdir)/include/quadrature/quadrature_trap.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-derived_rb_construction.h: $(top_srcdir)/include/reduced_basis/derived_rb_construction.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-derived_rb_evaluation.h: $(top_srcdir)/include/reduced_basis/derived_rb_evaluation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 rb_assembly_expansion.h: $(top_srcdir)/include/reduced_basis/rb_assembly_expansion.h

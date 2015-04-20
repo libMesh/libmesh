@@ -390,8 +390,6 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_trap_1D.C \
 	src/quadrature/quadrature_trap_2D.C \
 	src/quadrature/quadrature_trap_3D.C \
-	src/reduced_basis/derived_rb_construction.C \
-	src/reduced_basis/derived_rb_evaluation.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
@@ -406,7 +404,6 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_scm_evaluation.C \
 	src/reduced_basis/rb_temporal_discretization.C \
 	src/reduced_basis/rb_theta_expansion.C \
-	src/reduced_basis/steady_derived_rb_construction.C \
 	src/reduced_basis/transient_rb_assembly_expansion.C \
 	src/reduced_basis/transient_rb_construction.C \
 	src/reduced_basis/transient_rb_evaluation.C \
@@ -784,8 +781,6 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_trap_1D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_trap_2D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_trap_3D.lo \
-	src/reduced_basis/libmesh_dbg_la-derived_rb_construction.lo \
-	src/reduced_basis/libmesh_dbg_la-derived_rb_evaluation.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_construction.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_construction_base.lo \
@@ -800,7 +795,6 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_scm_evaluation.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_temporal_discretization.lo \
 	src/reduced_basis/libmesh_dbg_la-rb_theta_expansion.lo \
-	src/reduced_basis/libmesh_dbg_la-steady_derived_rb_construction.lo \
 	src/reduced_basis/libmesh_dbg_la-transient_rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_dbg_la-transient_rb_construction.lo \
 	src/reduced_basis/libmesh_dbg_la-transient_rb_evaluation.lo \
@@ -1102,8 +1096,6 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_trap_1D.C \
 	src/quadrature/quadrature_trap_2D.C \
 	src/quadrature/quadrature_trap_3D.C \
-	src/reduced_basis/derived_rb_construction.C \
-	src/reduced_basis/derived_rb_evaluation.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
@@ -1118,7 +1110,6 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_scm_evaluation.C \
 	src/reduced_basis/rb_temporal_discretization.C \
 	src/reduced_basis/rb_theta_expansion.C \
-	src/reduced_basis/steady_derived_rb_construction.C \
 	src/reduced_basis/transient_rb_assembly_expansion.C \
 	src/reduced_basis/transient_rb_construction.C \
 	src/reduced_basis/transient_rb_evaluation.C \
@@ -1495,8 +1486,6 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/quadrature/libmesh_devel_la-quadrature_trap_1D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_trap_2D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_trap_3D.lo \
-	src/reduced_basis/libmesh_devel_la-derived_rb_construction.lo \
-	src/reduced_basis/libmesh_devel_la-derived_rb_evaluation.lo \
 	src/reduced_basis/libmesh_devel_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_devel_la-rb_construction.lo \
 	src/reduced_basis/libmesh_devel_la-rb_construction_base.lo \
@@ -1511,7 +1500,6 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/reduced_basis/libmesh_devel_la-rb_scm_evaluation.lo \
 	src/reduced_basis/libmesh_devel_la-rb_temporal_discretization.lo \
 	src/reduced_basis/libmesh_devel_la-rb_theta_expansion.lo \
-	src/reduced_basis/libmesh_devel_la-steady_derived_rb_construction.lo \
 	src/reduced_basis/libmesh_devel_la-transient_rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_devel_la-transient_rb_construction.lo \
 	src/reduced_basis/libmesh_devel_la-transient_rb_evaluation.lo \
@@ -1810,8 +1798,6 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_trap_1D.C \
 	src/quadrature/quadrature_trap_2D.C \
 	src/quadrature/quadrature_trap_3D.C \
-	src/reduced_basis/derived_rb_construction.C \
-	src/reduced_basis/derived_rb_evaluation.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
@@ -1826,7 +1812,6 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_scm_evaluation.C \
 	src/reduced_basis/rb_temporal_discretization.C \
 	src/reduced_basis/rb_theta_expansion.C \
-	src/reduced_basis/steady_derived_rb_construction.C \
 	src/reduced_basis/transient_rb_assembly_expansion.C \
 	src/reduced_basis/transient_rb_construction.C \
 	src/reduced_basis/transient_rb_evaluation.C \
@@ -2203,8 +2188,6 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_trap_1D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_trap_2D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_trap_3D.lo \
-	src/reduced_basis/libmesh_oprof_la-derived_rb_construction.lo \
-	src/reduced_basis/libmesh_oprof_la-derived_rb_evaluation.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_construction.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_construction_base.lo \
@@ -2219,7 +2202,6 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_scm_evaluation.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_temporal_discretization.lo \
 	src/reduced_basis/libmesh_oprof_la-rb_theta_expansion.lo \
-	src/reduced_basis/libmesh_oprof_la-steady_derived_rb_construction.lo \
 	src/reduced_basis/libmesh_oprof_la-transient_rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_oprof_la-transient_rb_construction.lo \
 	src/reduced_basis/libmesh_oprof_la-transient_rb_evaluation.lo \
@@ -2518,8 +2500,6 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_trap_1D.C \
 	src/quadrature/quadrature_trap_2D.C \
 	src/quadrature/quadrature_trap_3D.C \
-	src/reduced_basis/derived_rb_construction.C \
-	src/reduced_basis/derived_rb_evaluation.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
@@ -2534,7 +2514,6 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_scm_evaluation.C \
 	src/reduced_basis/rb_temporal_discretization.C \
 	src/reduced_basis/rb_theta_expansion.C \
-	src/reduced_basis/steady_derived_rb_construction.C \
 	src/reduced_basis/transient_rb_assembly_expansion.C \
 	src/reduced_basis/transient_rb_construction.C \
 	src/reduced_basis/transient_rb_evaluation.C \
@@ -2911,8 +2890,6 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/quadrature/libmesh_opt_la-quadrature_trap_1D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_trap_2D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_trap_3D.lo \
-	src/reduced_basis/libmesh_opt_la-derived_rb_construction.lo \
-	src/reduced_basis/libmesh_opt_la-derived_rb_evaluation.lo \
 	src/reduced_basis/libmesh_opt_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_opt_la-rb_construction.lo \
 	src/reduced_basis/libmesh_opt_la-rb_construction_base.lo \
@@ -2927,7 +2904,6 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/reduced_basis/libmesh_opt_la-rb_scm_evaluation.lo \
 	src/reduced_basis/libmesh_opt_la-rb_temporal_discretization.lo \
 	src/reduced_basis/libmesh_opt_la-rb_theta_expansion.lo \
-	src/reduced_basis/libmesh_opt_la-steady_derived_rb_construction.lo \
 	src/reduced_basis/libmesh_opt_la-transient_rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_opt_la-transient_rb_construction.lo \
 	src/reduced_basis/libmesh_opt_la-transient_rb_evaluation.lo \
@@ -3225,8 +3201,6 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_trap_1D.C \
 	src/quadrature/quadrature_trap_2D.C \
 	src/quadrature/quadrature_trap_3D.C \
-	src/reduced_basis/derived_rb_construction.C \
-	src/reduced_basis/derived_rb_evaluation.C \
 	src/reduced_basis/rb_assembly_expansion.C \
 	src/reduced_basis/rb_construction.C \
 	src/reduced_basis/rb_construction_base.C \
@@ -3241,7 +3215,6 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/reduced_basis/rb_scm_evaluation.C \
 	src/reduced_basis/rb_temporal_discretization.C \
 	src/reduced_basis/rb_theta_expansion.C \
-	src/reduced_basis/steady_derived_rb_construction.C \
 	src/reduced_basis/transient_rb_assembly_expansion.C \
 	src/reduced_basis/transient_rb_construction.C \
 	src/reduced_basis/transient_rb_evaluation.C \
@@ -3618,8 +3591,6 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/quadrature/libmesh_prof_la-quadrature_trap_1D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_trap_2D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_trap_3D.lo \
-	src/reduced_basis/libmesh_prof_la-derived_rb_construction.lo \
-	src/reduced_basis/libmesh_prof_la-derived_rb_evaluation.lo \
 	src/reduced_basis/libmesh_prof_la-rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_prof_la-rb_construction.lo \
 	src/reduced_basis/libmesh_prof_la-rb_construction_base.lo \
@@ -3634,7 +3605,6 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/reduced_basis/libmesh_prof_la-rb_scm_evaluation.lo \
 	src/reduced_basis/libmesh_prof_la-rb_temporal_discretization.lo \
 	src/reduced_basis/libmesh_prof_la-rb_theta_expansion.lo \
-	src/reduced_basis/libmesh_prof_la-steady_derived_rb_construction.lo \
 	src/reduced_basis/libmesh_prof_la-transient_rb_assembly_expansion.lo \
 	src/reduced_basis/libmesh_prof_la-transient_rb_construction.lo \
 	src/reduced_basis/libmesh_prof_la-transient_rb_evaluation.lo \
@@ -4905,8 +4875,6 @@ libmesh_SOURCES = \
         src/quadrature/quadrature_trap_1D.C \
         src/quadrature/quadrature_trap_2D.C \
         src/quadrature/quadrature_trap_3D.C \
-        src/reduced_basis/derived_rb_construction.C \
-        src/reduced_basis/derived_rb_evaluation.C \
         src/reduced_basis/rb_assembly_expansion.C \
         src/reduced_basis/rb_construction.C \
         src/reduced_basis/rb_construction_base.C \
@@ -4921,7 +4889,6 @@ libmesh_SOURCES = \
         src/reduced_basis/rb_scm_evaluation.C \
         src/reduced_basis/rb_temporal_discretization.C \
         src/reduced_basis/rb_theta_expansion.C \
-        src/reduced_basis/steady_derived_rb_construction.C \
         src/reduced_basis/transient_rb_assembly_expansion.C \
         src/reduced_basis/transient_rb_construction.C \
         src/reduced_basis/transient_rb_evaluation.C \
@@ -6144,12 +6111,6 @@ src/reduced_basis/$(am__dirstamp):
 src/reduced_basis/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/reduced_basis/$(DEPDIR)
 	@: > src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_dbg_la-derived_rb_construction.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_dbg_la-derived_rb_evaluation.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_dbg_la-rb_assembly_expansion.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -6190,9 +6151,6 @@ src/reduced_basis/libmesh_dbg_la-rb_temporal_discretization.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_dbg_la-rb_theta_expansion.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_dbg_la-steady_derived_rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_dbg_la-transient_rb_assembly_expansion.lo:  \
@@ -7185,12 +7143,6 @@ src/quadrature/libmesh_devel_la-quadrature_trap_2D.lo:  \
 src/quadrature/libmesh_devel_la-quadrature_trap_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_devel_la-derived_rb_construction.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_devel_la-derived_rb_evaluation.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_devel_la-rb_assembly_expansion.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -7231,9 +7183,6 @@ src/reduced_basis/libmesh_devel_la-rb_temporal_discretization.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_devel_la-rb_theta_expansion.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_devel_la-steady_derived_rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_devel_la-transient_rb_assembly_expansion.lo:  \
@@ -8204,12 +8153,6 @@ src/quadrature/libmesh_oprof_la-quadrature_trap_2D.lo:  \
 src/quadrature/libmesh_oprof_la-quadrature_trap_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_oprof_la-derived_rb_construction.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_oprof_la-derived_rb_evaluation.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_oprof_la-rb_assembly_expansion.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -8250,9 +8193,6 @@ src/reduced_basis/libmesh_oprof_la-rb_temporal_discretization.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_oprof_la-rb_theta_expansion.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_oprof_la-steady_derived_rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_oprof_la-transient_rb_assembly_expansion.lo:  \
@@ -9222,12 +9162,6 @@ src/quadrature/libmesh_opt_la-quadrature_trap_2D.lo:  \
 src/quadrature/libmesh_opt_la-quadrature_trap_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_opt_la-derived_rb_construction.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_opt_la-derived_rb_evaluation.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_opt_la-rb_assembly_expansion.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -9268,9 +9202,6 @@ src/reduced_basis/libmesh_opt_la-rb_temporal_discretization.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_opt_la-rb_theta_expansion.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_opt_la-steady_derived_rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_opt_la-transient_rb_assembly_expansion.lo:  \
@@ -10238,12 +10169,6 @@ src/quadrature/libmesh_prof_la-quadrature_trap_2D.lo:  \
 src/quadrature/libmesh_prof_la-quadrature_trap_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_prof_la-derived_rb_construction.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_prof_la-derived_rb_evaluation.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_prof_la-rb_assembly_expansion.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
@@ -10284,9 +10209,6 @@ src/reduced_basis/libmesh_prof_la-rb_temporal_discretization.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_prof_la-rb_theta_expansion.lo:  \
-	src/reduced_basis/$(am__dirstamp) \
-	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/libmesh_prof_la-steady_derived_rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/libmesh_prof_la-transient_rb_assembly_expansion.lo:  \
@@ -12534,8 +12456,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_trap_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_trap_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_trap_3D.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_construction.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_construction_base.Plo@am__quote@
@@ -12550,13 +12470,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_scm_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_temporal_discretization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-steady_derived_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-transient_rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-transient_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-transient_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-transient_rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_construction.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_construction_base.Plo@am__quote@
@@ -12571,13 +12488,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_scm_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_temporal_discretization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-steady_derived_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-transient_rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-transient_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-transient_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_devel_la-transient_rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_construction.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_construction_base.Plo@am__quote@
@@ -12592,13 +12506,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_scm_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_temporal_discretization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-steady_derived_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-transient_rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-transient_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-transient_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-transient_rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_construction.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_construction_base.Plo@am__quote@
@@ -12613,13 +12524,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_scm_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_temporal_discretization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-steady_derived_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-transient_rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-transient_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-transient_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_opt_la-transient_rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_construction.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_construction_base.Plo@am__quote@
@@ -12634,7 +12542,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_scm_evaluation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_temporal_discretization.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_theta_expansion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-steady_derived_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-transient_rb_assembly_expansion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-transient_rb_construction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/reduced_basis/$(DEPDIR)/libmesh_prof_la-transient_rb_evaluation.Plo@am__quote@
@@ -15276,20 +15183,6 @@ src/quadrature/libmesh_dbg_la-quadrature_trap_3D.lo: src/quadrature/quadrature_t
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_trap_3D.lo `test -f 'src/quadrature/quadrature_trap_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_trap_3D.C
 
-src/reduced_basis/libmesh_dbg_la-derived_rb_construction.lo: src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_dbg_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_construction.C' object='src/reduced_basis/libmesh_dbg_la-derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_dbg_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-
-src/reduced_basis/libmesh_dbg_la-derived_rb_evaluation.lo: src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-derived_rb_evaluation.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_evaluation.Tpo -c -o src/reduced_basis/libmesh_dbg_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_evaluation.Tpo src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-derived_rb_evaluation.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_evaluation.C' object='src/reduced_basis/libmesh_dbg_la-derived_rb_evaluation.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_dbg_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-
 src/reduced_basis/libmesh_dbg_la-rb_assembly_expansion.lo: src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_dbg_la-rb_assembly_expansion.lo `test -f 'src/reduced_basis/rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_assembly_expansion.Tpo src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-rb_assembly_expansion.Plo
@@ -15387,13 +15280,6 @@ src/reduced_basis/libmesh_dbg_la-rb_theta_expansion.lo: src/reduced_basis/rb_the
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_theta_expansion.C' object='src/reduced_basis/libmesh_dbg_la-rb_theta_expansion.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_dbg_la-rb_theta_expansion.lo `test -f 'src/reduced_basis/rb_theta_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_theta_expansion.C
-
-src/reduced_basis/libmesh_dbg_la-steady_derived_rb_construction.lo: src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-steady_derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-steady_derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_dbg_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-steady_derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-steady_derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/steady_derived_rb_construction.C' object='src/reduced_basis/libmesh_dbg_la-steady_derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_dbg_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
 
 src/reduced_basis/libmesh_dbg_la-transient_rb_assembly_expansion.lo: src/reduced_basis/transient_rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_dbg_la-transient_rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_dbg_la-transient_rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_dbg_la-transient_rb_assembly_expansion.lo `test -f 'src/reduced_basis/transient_rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/transient_rb_assembly_expansion.C
@@ -18195,20 +18081,6 @@ src/quadrature/libmesh_devel_la-quadrature_trap_3D.lo: src/quadrature/quadrature
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_trap_3D.lo `test -f 'src/quadrature/quadrature_trap_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_trap_3D.C
 
-src/reduced_basis/libmesh_devel_la-derived_rb_construction.lo: src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_devel_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_construction.C' object='src/reduced_basis/libmesh_devel_la-derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_devel_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-
-src/reduced_basis/libmesh_devel_la-derived_rb_evaluation.lo: src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-derived_rb_evaluation.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_evaluation.Tpo -c -o src/reduced_basis/libmesh_devel_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_evaluation.Tpo src/reduced_basis/$(DEPDIR)/libmesh_devel_la-derived_rb_evaluation.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_evaluation.C' object='src/reduced_basis/libmesh_devel_la-derived_rb_evaluation.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_devel_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-
 src/reduced_basis/libmesh_devel_la-rb_assembly_expansion.lo: src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_devel_la-rb_assembly_expansion.lo `test -f 'src/reduced_basis/rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_assembly_expansion.Tpo src/reduced_basis/$(DEPDIR)/libmesh_devel_la-rb_assembly_expansion.Plo
@@ -18306,13 +18178,6 @@ src/reduced_basis/libmesh_devel_la-rb_theta_expansion.lo: src/reduced_basis/rb_t
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_theta_expansion.C' object='src/reduced_basis/libmesh_devel_la-rb_theta_expansion.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_devel_la-rb_theta_expansion.lo `test -f 'src/reduced_basis/rb_theta_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_theta_expansion.C
-
-src/reduced_basis/libmesh_devel_la-steady_derived_rb_construction.lo: src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-steady_derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-steady_derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_devel_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_devel_la-steady_derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_devel_la-steady_derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/steady_derived_rb_construction.C' object='src/reduced_basis/libmesh_devel_la-steady_derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_devel_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
 
 src/reduced_basis/libmesh_devel_la-transient_rb_assembly_expansion.lo: src/reduced_basis/transient_rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_devel_la-transient_rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_devel_la-transient_rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_devel_la-transient_rb_assembly_expansion.lo `test -f 'src/reduced_basis/transient_rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/transient_rb_assembly_expansion.C
@@ -21114,20 +20979,6 @@ src/quadrature/libmesh_oprof_la-quadrature_trap_3D.lo: src/quadrature/quadrature
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_trap_3D.lo `test -f 'src/quadrature/quadrature_trap_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_trap_3D.C
 
-src/reduced_basis/libmesh_oprof_la-derived_rb_construction.lo: src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_oprof_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_construction.C' object='src/reduced_basis/libmesh_oprof_la-derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_oprof_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-
-src/reduced_basis/libmesh_oprof_la-derived_rb_evaluation.lo: src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-derived_rb_evaluation.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_evaluation.Tpo -c -o src/reduced_basis/libmesh_oprof_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_evaluation.Tpo src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-derived_rb_evaluation.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_evaluation.C' object='src/reduced_basis/libmesh_oprof_la-derived_rb_evaluation.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_oprof_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-
 src/reduced_basis/libmesh_oprof_la-rb_assembly_expansion.lo: src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_oprof_la-rb_assembly_expansion.lo `test -f 'src/reduced_basis/rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_assembly_expansion.Tpo src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-rb_assembly_expansion.Plo
@@ -21225,13 +21076,6 @@ src/reduced_basis/libmesh_oprof_la-rb_theta_expansion.lo: src/reduced_basis/rb_t
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_theta_expansion.C' object='src/reduced_basis/libmesh_oprof_la-rb_theta_expansion.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_oprof_la-rb_theta_expansion.lo `test -f 'src/reduced_basis/rb_theta_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_theta_expansion.C
-
-src/reduced_basis/libmesh_oprof_la-steady_derived_rb_construction.lo: src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-steady_derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-steady_derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_oprof_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-steady_derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-steady_derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/steady_derived_rb_construction.C' object='src/reduced_basis/libmesh_oprof_la-steady_derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_oprof_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
 
 src/reduced_basis/libmesh_oprof_la-transient_rb_assembly_expansion.lo: src/reduced_basis/transient_rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_oprof_la-transient_rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_oprof_la-transient_rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_oprof_la-transient_rb_assembly_expansion.lo `test -f 'src/reduced_basis/transient_rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/transient_rb_assembly_expansion.C
@@ -24033,20 +23877,6 @@ src/quadrature/libmesh_opt_la-quadrature_trap_3D.lo: src/quadrature/quadrature_t
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_trap_3D.lo `test -f 'src/quadrature/quadrature_trap_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_trap_3D.C
 
-src/reduced_basis/libmesh_opt_la-derived_rb_construction.lo: src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_opt_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_construction.C' object='src/reduced_basis/libmesh_opt_la-derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_opt_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-
-src/reduced_basis/libmesh_opt_la-derived_rb_evaluation.lo: src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-derived_rb_evaluation.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_evaluation.Tpo -c -o src/reduced_basis/libmesh_opt_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_evaluation.Tpo src/reduced_basis/$(DEPDIR)/libmesh_opt_la-derived_rb_evaluation.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_evaluation.C' object='src/reduced_basis/libmesh_opt_la-derived_rb_evaluation.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_opt_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-
 src/reduced_basis/libmesh_opt_la-rb_assembly_expansion.lo: src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_opt_la-rb_assembly_expansion.lo `test -f 'src/reduced_basis/rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_assembly_expansion.Tpo src/reduced_basis/$(DEPDIR)/libmesh_opt_la-rb_assembly_expansion.Plo
@@ -24144,13 +23974,6 @@ src/reduced_basis/libmesh_opt_la-rb_theta_expansion.lo: src/reduced_basis/rb_the
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_theta_expansion.C' object='src/reduced_basis/libmesh_opt_la-rb_theta_expansion.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_opt_la-rb_theta_expansion.lo `test -f 'src/reduced_basis/rb_theta_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_theta_expansion.C
-
-src/reduced_basis/libmesh_opt_la-steady_derived_rb_construction.lo: src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-steady_derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-steady_derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_opt_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_opt_la-steady_derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_opt_la-steady_derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/steady_derived_rb_construction.C' object='src/reduced_basis/libmesh_opt_la-steady_derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_opt_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
 
 src/reduced_basis/libmesh_opt_la-transient_rb_assembly_expansion.lo: src/reduced_basis/transient_rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_opt_la-transient_rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_opt_la-transient_rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_opt_la-transient_rb_assembly_expansion.lo `test -f 'src/reduced_basis/transient_rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/transient_rb_assembly_expansion.C
@@ -26952,20 +26775,6 @@ src/quadrature/libmesh_prof_la-quadrature_trap_3D.lo: src/quadrature/quadrature_
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_trap_3D.lo `test -f 'src/quadrature/quadrature_trap_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_trap_3D.C
 
-src/reduced_basis/libmesh_prof_la-derived_rb_construction.lo: src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_prof_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_construction.C' object='src/reduced_basis/libmesh_prof_la-derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_prof_la-derived_rb_construction.lo `test -f 'src/reduced_basis/derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_construction.C
-
-src/reduced_basis/libmesh_prof_la-derived_rb_evaluation.lo: src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-derived_rb_evaluation.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_evaluation.Tpo -c -o src/reduced_basis/libmesh_prof_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_evaluation.Tpo src/reduced_basis/$(DEPDIR)/libmesh_prof_la-derived_rb_evaluation.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/derived_rb_evaluation.C' object='src/reduced_basis/libmesh_prof_la-derived_rb_evaluation.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_prof_la-derived_rb_evaluation.lo `test -f 'src/reduced_basis/derived_rb_evaluation.C' || echo '$(srcdir)/'`src/reduced_basis/derived_rb_evaluation.C
-
 src/reduced_basis/libmesh_prof_la-rb_assembly_expansion.lo: src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_prof_la-rb_assembly_expansion.lo `test -f 'src/reduced_basis/rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_assembly_expansion.Tpo src/reduced_basis/$(DEPDIR)/libmesh_prof_la-rb_assembly_expansion.Plo
@@ -27063,13 +26872,6 @@ src/reduced_basis/libmesh_prof_la-rb_theta_expansion.lo: src/reduced_basis/rb_th
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/rb_theta_expansion.C' object='src/reduced_basis/libmesh_prof_la-rb_theta_expansion.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_prof_la-rb_theta_expansion.lo `test -f 'src/reduced_basis/rb_theta_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/rb_theta_expansion.C
-
-src/reduced_basis/libmesh_prof_la-steady_derived_rb_construction.lo: src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-steady_derived_rb_construction.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-steady_derived_rb_construction.Tpo -c -o src/reduced_basis/libmesh_prof_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/reduced_basis/$(DEPDIR)/libmesh_prof_la-steady_derived_rb_construction.Tpo src/reduced_basis/$(DEPDIR)/libmesh_prof_la-steady_derived_rb_construction.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/reduced_basis/steady_derived_rb_construction.C' object='src/reduced_basis/libmesh_prof_la-steady_derived_rb_construction.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/reduced_basis/libmesh_prof_la-steady_derived_rb_construction.lo `test -f 'src/reduced_basis/steady_derived_rb_construction.C' || echo '$(srcdir)/'`src/reduced_basis/steady_derived_rb_construction.C
 
 src/reduced_basis/libmesh_prof_la-transient_rb_assembly_expansion.lo: src/reduced_basis/transient_rb_assembly_expansion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/reduced_basis/libmesh_prof_la-transient_rb_assembly_expansion.lo -MD -MP -MF src/reduced_basis/$(DEPDIR)/libmesh_prof_la-transient_rb_assembly_expansion.Tpo -c -o src/reduced_basis/libmesh_prof_la-transient_rb_assembly_expansion.lo `test -f 'src/reduced_basis/transient_rb_assembly_expansion.C' || echo '$(srcdir)/'`src/reduced_basis/transient_rb_assembly_expansion.C

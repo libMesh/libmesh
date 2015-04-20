@@ -318,8 +318,6 @@ libmesh_SOURCES =  \
         src/quadrature/quadrature_trap_1D.C \
         src/quadrature/quadrature_trap_2D.C \
         src/quadrature/quadrature_trap_3D.C \
-        src/reduced_basis/derived_rb_construction.C \
-        src/reduced_basis/derived_rb_evaluation.C \
         src/reduced_basis/rb_assembly_expansion.C \
         src/reduced_basis/rb_construction.C \
         src/reduced_basis/rb_construction_base.C \
@@ -334,7 +332,6 @@ libmesh_SOURCES =  \
         src/reduced_basis/rb_scm_evaluation.C \
         src/reduced_basis/rb_temporal_discretization.C \
         src/reduced_basis/rb_theta_expansion.C \
-        src/reduced_basis/steady_derived_rb_construction.C \
         src/reduced_basis/transient_rb_assembly_expansion.C \
         src/reduced_basis/transient_rb_construction.C \
         src/reduced_basis/transient_rb_evaluation.C \
