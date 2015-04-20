@@ -45,16 +45,16 @@ namespace libMesh
   using UniquePtr = std::unique_ptr<T>;
 }
 #elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
-// In libmesh, we modify the unique_ptr.hpp file slightly to place the
-// boost::unique_ptr type into the libMesh namespace.  This
-// allows for properly namespaced code, i.e. libMesh::UniquePtr, to
-// work correctly.  We've used #ifdefs to cleanly separate our changes
-// from the original unique_ptr.hpp file.
-#  ifndef LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
-#  define LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
-#  endif
+// As per Roy's suggestion, use a combination of a macro and a 'using'
+// statement to make libMesh's UniquePtr type equivalent to the
+// boost::unique_ptr implementation of Howard Hinnant.
 #  include "libmesh/unique_ptr.hpp"
 #  define UniquePtr unique_ptr
+namespace libMesh
+{
+// Declare that we are using boost's unique_ptr type
+using boost::unique_ptr;
+}
 #else
 #  define UniquePtr AutoPtr
 #endif
