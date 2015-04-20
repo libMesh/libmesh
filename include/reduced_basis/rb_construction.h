@@ -759,12 +759,6 @@ private:
   ElemAssembly* inner_product_assembly;
 
   /**
-   * Function pointer for assembling the constraint
-   * matrix.
-   */
-  ElemAssembly* constraint_assembly;
-
-  /**
    * Vector storing the Q_a matrices from the affine expansion
    */
   std::vector< SparseMatrix<Number>* > Aq_vector;
