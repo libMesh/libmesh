@@ -40,6 +40,7 @@ using libMesh::RBThetaExpansion;
 using libMesh::RBAssemblyExpansion;
 using libMesh::DirichletBoundary;
 using libMesh::Real;
+using libMesh::UniquePtr;
 
 // local include
 #include "assembly.h"

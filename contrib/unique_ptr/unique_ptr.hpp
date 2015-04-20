@@ -132,7 +132,7 @@ typename enable_if_c
 >::type
 forward(typename detail_unique_ptr::identity<T>::type& t)
 {
-    return move(t);
+    return boost::move(t);
 }
 
 template <class T>
@@ -144,7 +144,7 @@ typename enable_if_c
 >::type
 forward(const typename detail_unique_ptr::identity<T>::type& t)
 {
-    return move(const_cast<T&>(t));
+    return boost::move(const_cast<T&>(t));
 }
 
 namespace detail_unique_ptr {
@@ -167,10 +167,10 @@ public:
     unique_ptr_storage() : t1_(), t2_() {}
 
     explicit unique_ptr_storage(T1 t1)
-        : t1_(move(t1)), t2_() {}
+        : t1_(boost::move(t1)), t2_() {}
 
     unique_ptr_storage(T1 t1, T2 t2)
-        : t1_(move(t1)), t2_(forward<T2>(t2)) {}
+        : t1_(boost::move(t1)), t2_(boost::forward<T2>(t2)) {}
 
           T1& first()       {return t1_;}
     const T1& first() const {return t1_;}
@@ -194,10 +194,10 @@ public:
     unique_ptr_storage() : t1_() {}
 
     explicit unique_ptr_storage(T1 t1)
-        : t1_(move(t1)) {}
+        : t1_(boost::move(t1)) {}
 
     unique_ptr_storage(T1 t1, T2 t2)
-        : t2_(move(t2)), t1_(move(t1)) {}
+        : t2_(boost::move(t2)), t1_(boost::move(t1)) {}
 
           T1& first()       {return t1_;}
     const T1& first() const {return t1_;}
@@ -291,19 +291,27 @@ struct pointer_type
 
 }  // detail_unique_ptr
 
-template <class T, class D = default_delete<T> >
+#ifdef LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
+} // namespace boost
+
+namespace libMesh {
+
+#endif
+
+template <class T, class D = boost::default_delete<T> >
 class unique_ptr
 {
 public:
     typedef T element_type;
     typedef D deleter_type;
-    typedef typename detail_unique_ptr::pointer_type<element_type, deleter_type>::type pointer;
+    typedef typename boost::detail_unique_ptr::pointer_type<element_type, deleter_type>::type pointer;
 
 private:
-    detail_unique_ptr::unique_ptr_storage<pointer, deleter_type> ptr_;
+    boost::detail_unique_ptr::unique_ptr_storage<pointer, deleter_type> ptr_;
 
-    typedef typename add_reference<deleter_type>::type deleter_reference;
-    typedef typename add_reference<const deleter_type>::type deleter_const_reference;
+    typedef typename boost::add_reference<deleter_type>::type deleter_reference;
+    typedef typename boost::add_reference<const deleter_type>::type deleter_const_reference;
+    typedef typename boost::detail_unique_ptr::rv<unique_ptr> rv;
 
     struct nat {int for_bool_;};
 
@@ -311,45 +319,45 @@ private:
     unique_ptr& operator=(unique_ptr&);
 
 public:
-    operator detail_unique_ptr::rv<unique_ptr>() {return detail_unique_ptr::rv<unique_ptr>(*this);}
-    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
-    unique_ptr& operator=(detail_unique_ptr::rv<unique_ptr> r)
+    operator rv() {return rv(*this);}
+    unique_ptr(rv r) : ptr_(r->release(), boost::forward<deleter_type>(r->get_deleter())) {}
+    unique_ptr& operator=(rv r)
     {
         reset(r->release());
-        ptr_.second() = move(r->get_deleter());
+        ptr_.second() = boost::move(r->get_deleter());
         return *this;
     }
 
     unique_ptr()
         {
-            BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
-            BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_reference<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_pointer<deleter_type>::value);
         }
 
     explicit unique_ptr(pointer p)
         : ptr_(p)
         {
-            BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
-            BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_reference<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_pointer<deleter_type>::value);
         }
 
-    unique_ptr(pointer p, typename mpl::if_<is_reference<D>,
-                          volatile typename remove_reference<D>::type&, D>::type d)
-        : ptr_(move(p), forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
+    unique_ptr(pointer p, typename boost::mpl::if_<boost::is_reference<D>,
+               volatile typename boost::remove_reference<D>::type&, D>::type d)
+      : ptr_(boost::move(p), boost::forward<D>(const_cast<typename boost::add_reference<D>::type>(d))) {}
 
     template <class U, class E>
         unique_ptr(unique_ptr<U, E> u,
-            typename enable_if_c
+                   typename boost::enable_if_c
                 <
                 !boost::is_array<U>::value &&
-                detail_unique_ptr::is_convertible<typename unique_ptr<U>::pointer, pointer>::value &&
-                detail_unique_ptr::is_convertible<E, deleter_type>::value &&
+                boost::detail_unique_ptr::is_convertible<typename unique_ptr<U>::pointer, pointer>::value &&
+                boost::detail_unique_ptr::is_convertible<E, deleter_type>::value &&
                 (
-                    !is_reference<deleter_type>::value ||
-                     is_same<deleter_type, E>::value
+                    !boost::is_reference<deleter_type>::value ||
+                    boost::is_same<deleter_type, E>::value
                 )
                 >::type* = 0)
-            : ptr_(u.release(), forward<D>(forward<E>(u.get_deleter()))) {}
+          : ptr_(u.release(), boost::forward<D>(boost::forward<E>(u.get_deleter()))) {}
 
     ~unique_ptr() {reset();}
 
@@ -364,11 +372,11 @@ public:
         operator=(unique_ptr<U, E> u)
         {
             reset(u.release());
-            ptr_.second() = move(u.get_deleter());
+            ptr_.second() = boost::move(u.get_deleter());
             return *this;
         }
 
-    typename add_reference<T>::type operator*() const {return *get();}
+    typename boost::add_reference<T>::type operator*() const {return *get();}
     pointer operator->() const {return get();}
     pointer get() const {return ptr_.first();}
     deleter_reference       get_deleter()       {return ptr_.second();}
@@ -390,7 +398,7 @@ public:
         return tmp;
     }
 
-    void swap(unique_ptr& u) {detail_unique_ptr::swap(ptr_, u.ptr_);}
+    void swap(unique_ptr& u) {boost::detail_unique_ptr::swap(ptr_, u.ptr_);}
 };
 
 template <class T, class D>
@@ -399,13 +407,14 @@ class unique_ptr<T[], D>
 public:
     typedef T element_type;
     typedef D deleter_type;
-    typedef typename detail_unique_ptr::pointer_type<element_type, deleter_type>::type pointer;
+    typedef typename boost::detail_unique_ptr::pointer_type<element_type, deleter_type>::type pointer;
 
 private:
-    detail_unique_ptr::unique_ptr_storage<pointer, deleter_type> ptr_;
+    boost::detail_unique_ptr::unique_ptr_storage<pointer, deleter_type> ptr_;
 
-    typedef typename add_reference<deleter_type>::type deleter_reference;
-    typedef typename add_reference<const deleter_type>::type deleter_const_reference;
+    typedef typename boost::add_reference<deleter_type>::type deleter_reference;
+    typedef typename boost::add_reference<const deleter_type>::type deleter_const_reference;
+    typedef typename boost::detail_unique_ptr::rv<unique_ptr> rv;
 
     struct nat {int for_bool_;};
 
@@ -413,31 +422,31 @@ private:
     unique_ptr& operator=(unique_ptr&);
 
 public:
-    operator detail_unique_ptr::rv<unique_ptr>() {return detail_unique_ptr::rv<unique_ptr>(*this);}
-    unique_ptr(detail_unique_ptr::rv<unique_ptr> r) : ptr_(r->release(), forward<deleter_type>(r->get_deleter())) {}
-    unique_ptr& operator=(detail_unique_ptr::rv<unique_ptr> r)
+    operator rv() {return rv(*this);}
+    unique_ptr(rv r) : ptr_(r->release(), boost::forward<deleter_type>(r->get_deleter())) {}
+    unique_ptr& operator=(rv r)
     {
         reset(r->release());
-        ptr_.second() = move(r->get_deleter());
+        ptr_.second() = boost::move(r->get_deleter());
         return *this;
     }
 
     unique_ptr()
         {
-            BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
-            BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_reference<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_pointer<deleter_type>::value);
         }
 
     explicit unique_ptr(pointer p)
         : ptr_(p)
         {
-            BOOST_STATIC_ASSERT(!is_reference<deleter_type>::value);
-            BOOST_STATIC_ASSERT(!is_pointer<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_reference<deleter_type>::value);
+            BOOST_STATIC_ASSERT(!boost::is_pointer<deleter_type>::value);
         }
 
-    unique_ptr(pointer p, typename mpl::if_<is_reference<D>,
-                          volatile typename remove_reference<D>::type&, D>::type d)
-        : ptr_(move(p), forward<D>(const_cast<typename add_reference<D>::type>(d))) {}
+  unique_ptr(pointer p, typename boost::mpl::if_<boost::is_reference<D>,
+             volatile typename boost::remove_reference<D>::type&, D>::type d)
+    : ptr_(boost::move(p), boost::forward<D>(const_cast<typename boost::add_reference<D>::type>(d))) {}
 
     ~unique_ptr() {reset();}
 
@@ -462,17 +471,26 @@ public:
         return tmp;
     }
 
-    void swap(unique_ptr& u) {detail_unique_ptr::swap(ptr_, u.ptr_);}
+    void swap(unique_ptr& u) {boost::detail_unique_ptr::swap(ptr_, u.ptr_);}
 private:
     template <class U>
         explicit unique_ptr(U,
-            typename enable_if_c<detail_unique_ptr::is_convertible<U, pointer>::value>::type* = 0);
+                            typename boost::enable_if_c<boost::detail_unique_ptr::is_convertible<U, pointer>::value>::type* = 0);
 
     template <class U>
-        unique_ptr(U, typename mpl::if_<is_reference<D>,
-                          volatile typename remove_reference<D>::type&, D>::type,
-                          typename enable_if_c<detail_unique_ptr::is_convertible<U, pointer>::value>::type* = 0);
+    unique_ptr(U, typename boost::mpl::if_<boost::is_reference<D>,
+               volatile typename boost::remove_reference<D>::type&, D>::type,
+               typename boost::enable_if_c<boost::detail_unique_ptr::is_convertible<U, pointer>::value>::type* = 0);
 };
+
+#ifdef LIBMESH_IS_COMPILING_HINNANT_UNIQUE_PTR
+} // namespace libMesh
+
+
+namespace boost {
+
+using libMesh::unique_ptr;
+#endif
 
 template<class T, class D>
 inline

@@ -28,6 +28,7 @@
 using libMesh::DirichletBoundary;
 using libMesh::RBConstruction;
 using libMesh::RBEvaluation;
+using libMesh::UniquePtr;
 
 // A simple subclass of RBEvaluation.
 class SimpleRBEvaluation : public RBEvaluation
