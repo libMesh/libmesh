@@ -2284,18 +2284,27 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
   switch (et)
     {
     case EDGE2:
+    case EDGE3:
       {
         // full_ordered not relevant
         return EDGE3;
       }
 
+    case EDGE4:
+      {
+        // full_ordered not relevant
+        return EDGE4;
+      }
+
     case TRI3:
+    case TRI6:
       {
         // full_ordered not relevant
         return TRI6;
       }
 
     case QUAD4:
+    case QUAD8:
       {
         if (full_ordered)
           return QUAD9;
@@ -2303,13 +2312,21 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
           return QUAD8;
       }
 
+    case QUAD9:
+      {
+        // full_ordered not relevant
+        return QUAD9;
+      }
+
     case TET4:
+    case TET10:
       {
         // full_ordered not relevant
         return TET10;
       }
 
     case HEX8:
+    case HEX20:
       {
         // see below how this correlates with INFHEX8
         if (full_ordered)
@@ -2318,7 +2335,14 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
           return HEX20;
       }
 
+    case HEX27:
+      {
+        // full_ordered not relevant
+        return HEX27;
+      }
+
     case PRISM6:
+    case PRISM15:
       {
         if (full_ordered)
           return PRISM18;
@@ -2326,14 +2350,25 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
           return PRISM15;
       }
 
+    case PRISM18:
+      {
+        // full_ordered not relevant
+        return PRISM18;
+      }
+
     case PYRAMID5:
+    case PYRAMID13:
       {
         if (full_ordered)
           return PYRAMID14;
         else
           return PYRAMID13;
+      }
 
-        return INVALID_ELEM;
+    case PYRAMID14:
+      {
+        // full_ordered not relevant
+        return PYRAMID14;
       }
 
 
@@ -2347,12 +2382,14 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
       }
 
     case INFQUAD4:
+    case INFQUAD6:
       {
         // full_ordered not relevant
         return INFQUAD6;
       }
 
     case INFHEX8:
+    case INFHEX16:
       {
         /*
          * Note that this matches with \p Hex8:
@@ -2366,7 +2403,14 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
           return INFHEX16;
       }
 
+    case INFHEX18:
+      {
+        // full_ordered not relevant
+        return INFHEX18;
+      }
+
     case INFPRISM6:
+    case INFPRISM12:
       {
         // full_ordered not relevant
         return INFPRISM12;
@@ -2377,8 +2421,8 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
 
     default:
       {
-        // second-order element
-        return INVALID_ELEM;
+        // what did we miss?
+        libmesh_error();
       }
     }
 }
