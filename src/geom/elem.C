@@ -1798,6 +1798,43 @@ Elem::parent_bracketing_nodes(unsigned int child,
   // embedding matrix yet, let's do so now.
   if (cached_bracketing_nodes[em_vers].size() < nc)
     {
+      // If we're a second-order element but we're not a full-order
+      // element, then some of our bracketing nodes may not exist
+      // except on the equivalent full-order element.  Let's build an
+      // equivalent full-order element and make a copy of its cache to
+      // use.
+      if (this->default_order() != FIRST &&
+          second_order_equivalent_type
+            (this->type(), /*full_ordered=*/ true) !=
+          this->type())
+        {
+          // Check that we really are the non-full-order type
+          libmesh_assert_equal_to
+            (second_order_equivalent_type (this->type(), false),
+             this->type());
+
+          // Build the full-order type
+          ElemType full_type = 
+            second_order_equivalent_type
+              (this->type(), /*full_ordered=*/ true);
+          UniquePtr<Elem> full_elem = Elem::build(full_type);
+
+          // This won't work for elements with multiple
+          // embedding_matrix versions, but every such element is full
+          // order anyways.
+          libmesh_assert_equal_to(em_vers, 0);
+
+          // Make sure its cache has been built
+          full_elem->parent_bracketing_nodes(0,0);
+
+          // Copy its cache
+          cached_bracketing_nodes =
+            full_elem->_get_bracketing_node_cache();
+
+          // Now we don't need to build the cache ourselves.
+          return cached_bracketing_nodes[em_vers][child][child_node];
+        }
+
       cached_bracketing_nodes[em_vers].resize(nc);
 
       const unsigned int nn = this->n_nodes();
@@ -1941,7 +1978,73 @@ Elem::bracketing_nodes(unsigned int child,
     this->parent_bracketing_nodes(child,child_node);
 
   for (unsigned int i = 0; i != pbc.size(); ++i)
-    returnval.push_back(std::make_pair(this->node(pbc[i].first), this->node(pbc[i].second)));
+    {
+      if (pbc[i].first < this->n_nodes() &&
+          pbc[i].second < this->n_nodes())
+        returnval.push_back(std::make_pair(this->node(pbc[i].first), this->node(pbc[i].second)));
+      else
+        {
+          // We must be on a non-full-order higher order element...
+          libmesh_assert_not_equal_to(this->default_order(), FIRST);
+          libmesh_assert_not_equal_to
+            (second_order_equivalent_type (this->type(), true),
+             this->type());
+          libmesh_assert_equal_to
+            (second_order_equivalent_type (this->type(), false),
+             this->type());
+
+          // And that's a shame, because this is a nasty search:
+
+          // Build the full-order type
+          ElemType full_type = 
+            second_order_equivalent_type
+              (this->type(), /*full_ordered=*/ true);
+          UniquePtr<Elem> full_elem = Elem::build(full_type);
+
+          dof_id_type pt1 = DofObject::invalid_id;
+          dof_id_type pt2 = DofObject::invalid_id;
+
+          // Find the bracketing nodes by figuring out what
+          // already-created children will have them.
+
+          // This only doesn't break horribly because we add children
+          // and nodes in straightforward + hierarchical orders...
+          for (unsigned int c=0; c <= child; ++c)
+            for (unsigned int n=0; n != this->n_nodes_in_child(c); ++n)
+              {
+                if (c == child && n == child_node)
+                  break;
+
+                if (pbc[i].first == full_elem->as_parent_node(c,n))
+                  {
+                    // We should be consistent
+                    if (pt1 != DofObject::invalid_id)
+                      libmesh_assert_equal_to
+                        (pt1, this->child(c)->node(n));
+
+                    pt1 = this->child(c)->node(n);
+                  }
+
+                if (pbc[i].second == full_elem->as_parent_node(c,n))
+                  {
+                    // We should be consistent
+                    if (pt2 != DofObject::invalid_id)
+                      libmesh_assert_equal_to
+                        (pt2, this->child(c)->node(n));
+
+                    pt2 = this->child(c)->node(n);
+                  }
+              }
+
+          // We should always find all bracketing nodes by the time
+          // we query them (again, because of the child & node add
+          // order)
+          libmesh_assert_not_equal_to (pt1, DofObject::invalid_id);
+          libmesh_assert_not_equal_to (pt2, DofObject::invalid_id);
+
+          returnval.push_back(std::make_pair(pt1, pt2));
+        }
+    }
 
   return returnval;
 }
