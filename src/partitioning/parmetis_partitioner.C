@@ -56,9 +56,9 @@ const unsigned int MIN_ELEM_PER_PROC = 4;
 
 // ------------------------------------------------------------
 // ParmetisPartitioner implementation
-ParmetisPartitioner::ParmetisPartitioner() :
+ParmetisPartitioner::ParmetisPartitioner()
 #ifdef LIBMESH_HAVE_PARMETIS
-  _pmetis(new ParmetisHelper)
+ :  _pmetis(new ParmetisHelper)
 #endif
 {}
 
