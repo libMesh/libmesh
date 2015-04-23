@@ -58,6 +58,8 @@ void TopologyMap::add_node(const Node& mid_node,
 {
   const dof_id_type mid_node_id = mid_node.id();
 
+  libmesh_assert_not_equal_to(mid_node_id, DofObject::invalid_id);
+
   for (unsigned int i=0; i != bracketing_nodes.size(); ++i)
     {
       const dof_id_type id1 = bracketing_nodes[i].first;
@@ -92,20 +94,22 @@ dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_ty
       const dof_id_type upper_id = std::max(bracketing_nodes[i].first,
                                             bracketing_nodes[i].second);
 
-      // If we're debugging let's make sure our map is consistent
-#ifndef NDEBUG
-      if (new_node_id != DofObject::invalid_id)
+      const dof_id_type possible_new_node_id =
+        this->find(lower_id, upper_id);
+
+      if (possible_new_node_id != DofObject::invalid_id)
         {
-          const dof_id_type other_new_node_id =
-            this->find(lower_id, upper_id);
+          // If we found a node already, but we're still here, it's to
+          // debug map consistency: we'd better always find the same
+          // node
+          if (new_node_id != DofObject::invalid_id)
+            libmesh_assert_equal_to (new_node_id, possible_new_node_id);
 
-          libmesh_assert_equal_to (new_node_id, other_new_node_id);
+          new_node_id = possible_new_node_id;
         }
-#endif
 
-      new_node_id = this->find(lower_id, upper_id);
-
-      // If we're not debugging we can quit as soon as we find a node
+      // If we're not debugging map consistency then we can quit as
+      // soon as we find a node
 #ifdef NDEBUG
       if (new_node_id != DofObject::invalid_id)
         break;
