@@ -1891,7 +1891,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
 
   // Convert to second-order elements if the user requested it.
-  if (Elem::second_order_equivalent_type(type) == INVALID_ELEM)
+  if (Elem::build(type)->default_order() != FIRST)
     {
       // type is already a second-order, determine if it is the
       // "full-ordered" second-order element, or the "serendipity"
