@@ -25,6 +25,9 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
 
+// C++ ----------------------------------------------
+#include <vector>
+
 namespace libMesh
 {
 
