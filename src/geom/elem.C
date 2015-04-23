@@ -63,6 +63,7 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/reference_elem.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/threads.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 #include "libmesh/mesh.h"
@@ -72,6 +73,9 @@
 
 namespace libMesh
 {
+
+Threads::spin_mutex parent_indices_mutex;
+Threads::spin_mutex parent_bracketing_nodes_mutex;
 
 const subdomain_id_type Elem::invalid_subdomain_id = std::numeric_limits<subdomain_id_type>::max();
 
@@ -1727,6 +1731,11 @@ unsigned int Elem::as_parent_node (unsigned int child,
     cached_parent_indices = this->_get_parent_indices_cache();
 
   unsigned int em_vers = this->embedding_matrix_version();
+
+  // We may be updating the cache on one thread, and while that
+  // happens we can't safely access the cache from other threads.
+  Threads::spin_mutex::scoped_lock lock(parent_indices_mutex);
+
   if (em_vers >= cached_parent_indices.size())
     cached_parent_indices.resize(em_vers+1);
 
@@ -1788,6 +1797,10 @@ Elem::parent_bracketing_nodes(unsigned int child,
     cached_bracketing_nodes = this->_get_bracketing_node_cache();
 
   const unsigned int em_vers = this->embedding_matrix_version();
+
+  // We may be updating the cache on one thread, and while that
+  // happens we can't safely access the cache from other threads.
+  Threads::spin_mutex::scoped_lock lock(parent_bracketing_nodes_mutex);
 
   if (cached_bracketing_nodes.size() <= em_vers)
     cached_bracketing_nodes.resize(em_vers+1);
