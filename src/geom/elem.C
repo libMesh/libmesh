@@ -2036,13 +2036,26 @@ Elem::bracketing_nodes(unsigned int child,
                   }
               }
 
-          // We should always find all bracketing nodes by the time
+          // We should *usually* find all bracketing nodes by the time
           // we query them (again, because of the child & node add
           // order)
-          libmesh_assert_not_equal_to (pt1, DofObject::invalid_id);
-          libmesh_assert_not_equal_to (pt2, DofObject::invalid_id);
+          //
+          // The exception is if we're a HEX20, in which case we will
+          // find pairs of vertex nodes and edge nodes bracketing the
+          // new central node but we *won't* find the pairs of face
+          // nodes which we would have had on a HEX27.  In that case
+          // we'll still have enough bracketing nodes for a
+          // topological lookup, but we won't be able to make the
+          // following assertions.
+          if (this->type() != HEX20)
+            {
+              libmesh_assert_not_equal_to (pt1, DofObject::invalid_id);
+              libmesh_assert_not_equal_to (pt2, DofObject::invalid_id);
+            }
 
-          returnval.push_back(std::make_pair(pt1, pt2));
+          if (pt1 != DofObject::invalid_id &&
+              pt2 != DofObject::invalid_id)
+            returnval.push_back(std::make_pair(pt1, pt2));
         }
     }
 
