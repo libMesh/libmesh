@@ -1837,8 +1837,17 @@ Elem::parent_bracketing_nodes(unsigned int child,
           // order anyways.
           libmesh_assert_equal_to(em_vers, 0);
 
-          // Make sure its cache has been built
+          // Make sure its cache has been built.  We temporarily
+          // release our mutex lock so that the inner call can
+          // re-acquire it.
+          lock.release();
           full_elem->parent_bracketing_nodes(0,0);
+
+          // And then we need to lock again, so that if someone *else*
+          // grabbed our lock before we did we don't risk accessing
+          // cached_bracketing_nodes while they're working on it.
+          // Threading is hard.
+          lock.acquire(parent_bracketing_nodes_mutex);
 
           // Copy its cache
           cached_bracketing_nodes =
