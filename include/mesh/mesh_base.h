@@ -444,12 +444,18 @@ public:
    * To add an element locally, set e->processor_id() before adding it.
    * To ensure a specific element id, call e->set_id() before adding it;
    * only do this in parallel if you are manually keeping ids consistent.
+   *
+   * Users should call MeshBase::prepare_for_use() after elements are
+   * added to and/or deleted from the mesh.
    */
   virtual Elem* add_elem (Elem* e) = 0;
 
   /**
    * Insert elem \p e to the element array, preserving its id
    * and replacing/deleting any existing element with the same id.
+   *
+   * Users should call MeshBase::prepare_for_use() after elements are
+   * added to and/or deleted from the mesh.
    */
   virtual Elem* insert_elem (Elem* e) = 0;
 
@@ -458,6 +464,9 @@ public:
    * method may produce isolated nodes, i.e. nodes not connected
    * to any element.  This method must be implemented in derived classes
    * in such a way that it does not invalidate element iterators.
+   *
+   * Users should call MeshBase::prepare_for_use() after elements are
+   * added to and/or deleted from the mesh.
    */
   virtual void delete_elem (Elem* e) = 0;
 
