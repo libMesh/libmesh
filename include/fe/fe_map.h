@@ -48,17 +48,19 @@ public:
                                       const Elem* elem);
 
   /**
-   * Compute the jacobian and some other additional
-   * data fields at the single point with index p.
-   * Takes the integration weights as input, along
-   * with a pointer to the element and a list of
-   * points that contribute to the element.
+   * Compute the jacobian and some other additional data fields at the
+   * single point with index p.  Takes the integration weights as
+   * input, along with a pointer to the element and a list of points
+   * that contribute to the element.  Also takes a boolean flag
+   * telling whether the element has an affine map to enable various
+   * optimizations.
    */
   void compute_single_point_map(const unsigned int dim,
                                 const std::vector<Real>& qw,
                                 const Elem* elem,
                                 unsigned int p,
-                                const std::vector<Node*>& elem_nodes);
+                                const std::vector<Node*>& elem_nodes,
+                                bool elem_is_affine);
 
   /**
    * Compute the jacobian and some other additional
