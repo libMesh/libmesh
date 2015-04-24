@@ -502,6 +502,10 @@ void MeshBase::cache_elem_dims()
   // This requires an inspection on every processor
   parallel_object_only();
 
+  // Need to clear _elem_dims first in case all elements of a
+  // particular dimension have been deleted.
+  _elem_dims.clear();
+
   const_element_iterator el  = this->active_local_elements_begin();
   const_element_iterator end = this->active_local_elements_end();
 
