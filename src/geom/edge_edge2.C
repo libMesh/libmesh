@@ -30,14 +30,14 @@ const float Edge2::_embedding_matrix[2][2][2] =
   {
     // embedding matrix for child 0
     {
-      // 0    1    2
+      // 0    1
       {1.0, 0.0}, // 0
       {0.5, 0.5}  // 1
     },
 
     // embedding matrix for child 1
     {
-      // 0    1    2
+      // 0    1
       {0.5, 0.5}, // 0
       {0.0, 1.0}  // 1
     }
