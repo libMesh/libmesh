@@ -708,7 +708,7 @@ void FESubdivision::reinit(const Elem* elem,
   shapes_on_quadrature = true;
 
   // Compute the map for this element.
-  this->_fe_map->compute_map (this->dim, this->qrule->get_weights(), elem);
+  this->_fe_map->compute_map (this->dim, this->qrule->get_weights(), elem, this->calculate_d2phi);
 
   STOP_LOG("reinit()", "FESubdivision");
 }

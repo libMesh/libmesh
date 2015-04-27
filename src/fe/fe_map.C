@@ -316,7 +316,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                                      const Elem* elem,
                                      unsigned int p,
                                      const std::vector<Node*>& elem_nodes,
-                                     bool elem_is_affine)
+                                     bool compute_second_derivatives)
 {
   libmesh_assert(elem);
   libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
@@ -400,7 +400,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-        if (!elem_is_affine)
+        if (compute_second_derivatives)
           {
 #if LIBMESH_DIM == 1
         // Compute inverse map second derivatives for 1D-element-living-in-1D case
@@ -468,7 +468,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         // xi_{z z}
         d2xidxyz2_map[p][5] = -numer * dxidz_map[p]*dxidz_map[p] / denom;
 #endif
-          } // !elem_is_affine
+          } // compute_second_derivatives
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -552,7 +552,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         dxidz_map[p] = detadz_map[p] = 0.;
 
-        if (!elem_is_affine)
+        if (compute_second_derivatives)
           this->compute_inverse_map_second_derivs(p);
 
 #else // LIBMESH_DIM == 3
@@ -621,7 +621,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-        if (!elem_is_affine)
+        if (compute_second_derivatives)
           {
         // Compute inverse map second derivative values for
         // 2D-element-living-in-3D case.  We pursue a least-squares
@@ -799,7 +799,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
         dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
 
-        if (!elem_is_affine)
+        if (compute_second_derivatives)
           this->compute_inverse_map_second_derivs(p);
 
         // done computing the map
@@ -890,7 +890,7 @@ void FEMap::compute_affine_map( const unsigned int dim,
     elem_nodes[i] = elem->get_node(i);
 
   // Compute map at quadrature point 0
-  this->compute_single_point_map(dim, qw, elem, 0, elem_nodes, /*elem_is_affine=*/true);
+  this->compute_single_point_map(dim, qw, elem, 0, elem_nodes, /*compute_second_derivatives=*/false);
 
   // Compute xyz at all other quadrature points
   for (unsigned int p=1; p<n_qp; p++)
@@ -1000,7 +1000,8 @@ void FEMap::compute_null_map( const unsigned int dim,
 
 void FEMap::compute_map(const unsigned int dim,
                         const std::vector<Real>& qw,
-                        const Elem* elem)
+                        const Elem* elem,
+                        bool calculate_d2phi)
 {
   if (!elem)
     {
@@ -1043,7 +1044,7 @@ void FEMap::compute_map(const unsigned int dim,
 
   // Compute map at all quadrature points
   for (unsigned int p=0; p!=n_qp; p++)
-    this->compute_single_point_map(dim, qw, elem, p, elem_nodes, /*elem_is_affine=*/false);
+    this->compute_single_point_map(dim, qw, elem, p, elem_nodes, calculate_d2phi);
 
   // Stop logging the map computation.
   STOP_LOG("compute_map()", "FEMap");

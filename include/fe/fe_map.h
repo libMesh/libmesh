@@ -52,15 +52,14 @@ public:
    * single point with index p.  Takes the integration weights as
    * input, along with a pointer to the element and a list of points
    * that contribute to the element.  Also takes a boolean flag
-   * telling whether the element has an affine map to enable various
-   * optimizations.
+   * telling whether second derivatives should actually be computed.
    */
   void compute_single_point_map(const unsigned int dim,
                                 const std::vector<Real>& qw,
                                 const Elem* elem,
                                 unsigned int p,
                                 const std::vector<Node*>& elem_nodes,
-                                bool elem_is_affine);
+                                bool compute_second_derivatives);
 
   /**
    * Compute the jacobian and some other additional
@@ -85,10 +84,14 @@ public:
    * Compute the jacobian and some other additional
    * data fields. Takes the integration weights
    * as input, along with a pointer to the element.
+   * Also takes a boolean parameter indicating whether second
+   * derivatives need to be calculated, allowing us to potentially
+   * skip unnecessary, expensive computations.
    */
   virtual void compute_map(const unsigned int dim,
                            const std::vector<Real>& qw,
-                           const Elem* elem);
+                           const Elem* elem,
+                           bool calculate_d2phi);
 
   /**
    * Same as compute_map, but for a side.  Useful for boundary integration.
