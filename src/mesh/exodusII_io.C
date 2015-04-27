@@ -426,11 +426,14 @@ void ExodusII_IO::copy_nodal_solution(System& system,
       if (!node)
         libmesh_error_msg("Error! Mesh returned NULL pointer for node " << i);
 
-      dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
+      if (node->n_comp(system.number(), var_num) > 0)
+        {
+          dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
 
-      // If the dof_index is local to this processor, set the value
-      if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-        system.solution->set (dof_index, exio_helper->nodal_var_values[i]);
+          // If the dof_index is local to this processor, set the value
+          if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
+            system.solution->set (dof_index, exio_helper->nodal_var_values[i]);
+        }
     }
 
   system.solution->close();
