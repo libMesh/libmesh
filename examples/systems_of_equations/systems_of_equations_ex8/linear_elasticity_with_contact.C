@@ -21,7 +21,9 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/petsc_matrix.h"
-#include "petscmat.h"
+#ifdef LIBMESH_HAVE_PETSC
+#  include "petscmat.h"
+#endif
 #include LIBMESH_INCLUDE_UNORDERED_SET
 
 // The nonlinear solver and system we will be using
@@ -453,8 +455,12 @@ void LinearElasticityWithContact::residual_and_jacobian (
     dof_map.clear_sparsity();
     dof_map.compute_sparsity(mesh);
 
+#ifdef LIBMESH_HAVE_PETSC
     PetscMatrix<Number>* petsc_jacobian = cast_ptr<PetscMatrix<Number>*>(jacobian);
     petsc_jacobian->update_preallocation_and_zero();
+#else
+    libmesh_error();
+#endif
   }
 
   if(residual)
