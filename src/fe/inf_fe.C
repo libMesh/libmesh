@@ -220,7 +220,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       // each and every new element), throw radial and base part together
       this->combine_base_radial (inf_elem);
 
-      this->_fe_map->compute_map (this->dim,_total_qrule_weights, inf_elem);
+      this->_fe_map->compute_map (this->dim, _total_qrule_weights, inf_elem, this->calculate_d2phi);
 
       // Compute the shape functions and the derivatives
       // at all quadrature points.
@@ -258,12 +258,12 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       // weights
       if (weights != NULL)
         {
-          this->_fe_map->compute_map (this->dim, *weights, inf_elem);
+          this->_fe_map->compute_map (this->dim, *weights, inf_elem, this->calculate_d2phi);
         }
       else
         {
           std::vector<Real> dummy_weights (pts->size(), 1.);
-          this->_fe_map->compute_map (this->dim, dummy_weights, inf_elem);
+          this->_fe_map->compute_map (this->dim, dummy_weights, inf_elem, this->calculate_d2phi);
         }
 
       // finally compute the ifem shapes
