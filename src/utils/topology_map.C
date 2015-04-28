@@ -138,6 +138,8 @@ dof_id_type TopologyMap::find(dof_id_type bracket_node1,
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
+
 void TopologyMap::fill(const MeshBase& mesh)
 {
   // Populate the nodes map
@@ -169,6 +171,13 @@ void TopologyMap::fill(const MeshBase& mesh)
         }
     }
 }
+
+#else
+
+// no-op without AMR
+void TopologyMap::fill(const MeshBase&) {}
+
+#endif
 
 
 
