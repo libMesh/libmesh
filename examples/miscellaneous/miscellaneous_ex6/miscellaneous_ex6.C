@@ -214,6 +214,9 @@ void tetrahedralize_domain(const Parallel::Communicator& comm)
 
   // Finally, write out the result
   mesh.write("hole_3D.e");
+#else
+  // Avoid compiler warnings
+  libmesh_ignore(comm);
 #endif // LIBMESH_HAVE_TETGEN
 }
 
@@ -327,5 +330,10 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
           }
       }
   }
+#else
+  // Avoid compiler warnings
+  libmesh_ignore(mesh);
+  libmesh_ignore(lower_limit);
+  libmesh_ignore(upper_limit);
 #endif // LIBMESH_HAVE_TETGEN
 }

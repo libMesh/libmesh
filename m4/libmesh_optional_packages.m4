@@ -375,12 +375,18 @@ fi
 
 
 # -------------------------------------------------------------
-# TetGen -- enabled by default
+# TetGen -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
-CONFIGURE_TETGEN
-if (test $enabletetgen = yes); then
-  libmesh_contrib_INCLUDES="$TETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+if (test $enablestrictlgpl = yes) ; then
+  AC_MSG_RESULT([<<< Tetgen support is disabled, configure with --disable-strict-lgpl to enable it >>>])
+  enabletetgen=no;
+else
+  CONFIGURE_TETGEN
+  if (test $enabletetgen = yes); then
+    libmesh_contrib_INCLUDES="$TETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
 AM_CONDITIONAL(LIBMESH_ENABLE_TETGEN, test x$enabletetgen = xyes)
 AC_CONFIG_FILES([contrib/tetgen/Makefile])
 # -------------------------------------------------------------

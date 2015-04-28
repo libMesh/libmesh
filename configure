@@ -34105,8 +34105,13 @@ fi
 
 
 # -------------------------------------------------------------
-# TetGen -- enabled by default
+# TetGen -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
+if (test $enablestrictlgpl = yes) ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Tetgen support is disabled, configure with --disable-strict-lgpl to enable it >>>" >&5
+$as_echo "<<< Tetgen support is disabled, configure with --disable-strict-lgpl to enable it >>>" >&6; }
+  enabletetgen=no;
+else
 
   # Check whether --enable-tetgen was given.
 if test "${enable_tetgen+set}" = set; then :
@@ -34139,9 +34144,11 @@ $as_echo "<<< Configuring library with Tetgen support >>>" >&6; }
 
 
 
-if (test $enabletetgen = yes); then
-  libmesh_contrib_INCLUDES="$TETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+  if (test $enabletetgen = yes); then
+    libmesh_contrib_INCLUDES="$TETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
  if test x$enabletetgen = xyes; then
   LIBMESH_ENABLE_TETGEN_TRUE=
   LIBMESH_ENABLE_TETGEN_FALSE='#'
