@@ -231,9 +231,11 @@ public:
 
   /**
    * Reads elemental values for the variable 'elemental_var_name' at the
-   * specified timestep into the 'elem_var_values' array.
+   * specified timestep into the 'elem_var_value_map' which is passed in.
    */
-  void read_elemental_var_values(std::string elemental_var_name, int time_step);
+  void read_elemental_var_values(std::string elemental_var_name,
+                                 int time_step,
+                                 std::map<dof_id_type, Real> & elem_var_value_map);
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
