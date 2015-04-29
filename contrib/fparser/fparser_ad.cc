@@ -333,13 +333,17 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
     case cFloor:
     case cCeil:
     case cTrunc:
+      throw RefuseToTakeCrazyDerivativeException;
+
+    // we gloss over the single undifferentiable point here
+
     case cEqual:
     case cNEqual:
     case cLess:
     case cLessOrEq:
     case cGreater:
     case cGreaterOrEq:
-      throw RefuseToTakeCrazyDerivativeException;
+      return CodeTreeAD(CodeTreeImmed(Value_t(0)));
 
     // these opcodes will never appear in the tree when building with keep_powi == false
     // they will be replaced by cPow, cMul, cDiv etc.:
