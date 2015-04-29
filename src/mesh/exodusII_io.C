@@ -473,11 +473,14 @@ void ExodusII_IO::copy_elemental_solution(System& system,
       if (!elem)
         libmesh_error_msg("Error! Mesh returned NULL pointer for elem " << it->first);
 
-      dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
+      if (elem->n_comp(system.number(), var_num) > 0)
+        {
+          dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
 
-      // If the dof_index is local to this processor, set the value
-      if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-        system.solution->set (dof_index, it->second);
+          // If the dof_index is local to this processor, set the value
+          if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
+            system.solution->set (dof_index, it->second);
+        }
     }
 
   system.solution->close();
