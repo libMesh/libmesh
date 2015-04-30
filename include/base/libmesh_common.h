@@ -267,15 +267,6 @@ extern bool warned_about_auto_ptr;
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
 
-#define libmesh_assert(asserted)  ((void) 0)
-#define libmesh_exceptionless_assert(asserted)  ((void) 0)
-#define libmesh_assert_equal_to(expr1,expr2)  ((void) 0)
-#define libmesh_assert_not_equal_to(expr1,expr2)  ((void) 0)
-#define libmesh_assert_less(expr1,expr2)  ((void) 0)
-#define libmesh_assert_greater(expr1,expr2)  ((void) 0)
-#define libmesh_assert_less_equal(expr1,expr2)  ((void) 0)
-#define libmesh_assert_greater_equal(expr1,expr2)  ((void) 0)
-
 #define libmesh_assert_msg(asserted, msg)  ((void) 0)
 #define libmesh_exceptionless_assert_msg(asserted, msg)  ((void) 0)
 #define libmesh_assert_equal_to_msg(expr1,expr2, msg)  ((void) 0)
@@ -284,7 +275,6 @@ extern bool warned_about_auto_ptr;
 #define libmesh_assert_greater_msg(expr1,expr2, msg)  ((void) 0)
 #define libmesh_assert_less_equal_msg(expr1,expr2, msg)  ((void) 0)
 #define libmesh_assert_greater_equal_msg(expr1,expr2, msg)  ((void) 0)
-
 
 #else
 
@@ -343,6 +333,7 @@ extern bool warned_about_auto_ptr;
       libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while(0)
+#endif
 
 
 #define libmesh_assert(asserted)                                        \
@@ -368,8 +359,6 @@ extern bool warned_about_auto_ptr;
 
 #define libmesh_assert_greater_equal(expr1,expr2)                       \
   libmesh_assert_greater_equal_msg(expr1,expr2, "")
-
-#endif
 
 // The libmesh_error() macro prints a message and throws a LogicError
 // exception
