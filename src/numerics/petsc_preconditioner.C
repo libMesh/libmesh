@@ -250,12 +250,8 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
 #endif
 
   // Let the commandline override stuff
-  // FIXME: Unless we are doing AMG???
-  if (preconditioner_type != AMG_PRECOND)
-    {
-      ierr = PCSetFromOptions(pc);
-      CHKERRABORT(comm,ierr);
-    }
+  ierr = PCSetFromOptions(pc);
+  CHKERRABORT(comm,ierr);
 }
 
 
