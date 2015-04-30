@@ -267,31 +267,16 @@ extern bool warned_about_auto_ptr;
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
 
-#define libmesh_assert(asserted)  ((void) 0)
-#define libmesh_exceptionless_assert(asserted)  ((void) 0)
 #define libmesh_assert_msg(asserted, msg)  ((void) 0)
-#define libmesh_assert_equal_to(expr1,expr2)  ((void) 0)
-#define libmesh_assert_not_equal_to(expr1,expr2)  ((void) 0)
-#define libmesh_assert_less(expr1,expr2)  ((void) 0)
-#define libmesh_assert_greater(expr1,expr2)  ((void) 0)
-#define libmesh_assert_less_equal(expr1,expr2)  ((void) 0)
-#define libmesh_assert_greater_equal(expr1,expr2)  ((void) 0)
+#define libmesh_exceptionless_assert_msg(asserted, msg)  ((void) 0)
+#define libmesh_assert_equal_to_msg(expr1,expr2, msg)  ((void) 0)
+#define libmesh_assert_not_equal_to_msg(expr1,expr2, msg)  ((void) 0)
+#define libmesh_assert_less_msg(expr1,expr2, msg)  ((void) 0)
+#define libmesh_assert_greater_msg(expr1,expr2, msg)  ((void) 0)
+#define libmesh_assert_less_equal_msg(expr1,expr2, msg)  ((void) 0)
+#define libmesh_assert_greater_equal_msg(expr1,expr2, msg)  ((void) 0)
 
 #else
-
-#define libmesh_assert(asserted)                                        \
-  do {                                                                  \
-    if (!(asserted)) {                                                  \
-      libMesh::err << "Assertion `" #asserted "' failed." << std::endl; \
-      libmesh_error();                                                  \
-    } } while(0)
-
-#define libmesh_exceptionless_assert(asserted)                          \
-  do {                                                                  \
-    if (!(asserted)) {                                                  \
-      libMesh::err << "Assertion `" #asserted "' failed." << std::endl; \
-      libmesh_exceptionless_error();                                    \
-    } } while(0)
 
 #define libmesh_assert_msg(asserted, msg)                               \
   do {                                                                  \
@@ -300,49 +285,80 @@ extern bool warned_about_auto_ptr;
       libmesh_error_msg(msg);                                           \
     } } while(0)
 
-#define libmesh_assert_equal_to(expr1,expr2)                            \
+#define libmesh_exceptionless_assert_msg(asserted, msg)                 \
+  do {                                                                  \
+    if (!(asserted)) {                                                  \
+      libMesh::err << "Assertion `" #asserted "' failed." << std::endl; \
+      libmesh_exceptionless_error();                                    \
+    } } while(0)
+
+#define libmesh_assert_equal_to_msg(expr1,expr2, msg)                   \
   do {                                                                  \
     if (!(expr1 == expr2)) {                                            \
-      libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
+      libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while(0)
 
-#define libmesh_assert_not_equal_to(expr1,expr2)                        \
+#define libmesh_assert_not_equal_to_msg(expr1,expr2, msg)               \
   do {                                                                  \
     if (!(expr1 != expr2)) {                                            \
-      libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
+      libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while(0)
 
-#define libmesh_assert_less(expr1,expr2)                                \
+#define libmesh_assert_less_msg(expr1,expr2, msg)                       \
   do {                                                                  \
     if (!(expr1 < expr2)) {                                             \
-      libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
+      libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while(0)
 
-#define libmesh_assert_greater(expr1,expr2)                             \
+#define libmesh_assert_greater_msg(expr1,expr2, msg)                    \
   do {                                                                  \
     if (!(expr1 > expr2)) {                                             \
-      libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
+      libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while(0)
 
-#define libmesh_assert_less_equal(expr1,expr2)                          \
+#define libmesh_assert_less_equal_msg(expr1,expr2, msg)                 \
   do {                                                                  \
     if (!(expr1 <= expr2)) {                                            \
-      libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
+      libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while(0)
 
-#define libmesh_assert_greater_equal(expr1,expr2)                       \
+#define libmesh_assert_greater_equal_msg(expr1,expr2, msg)              \
   do {                                                                  \
     if (!(expr1 >= expr2)) {                                            \
-      libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
+      libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << '\n' << msg << std::endl; \
       libmesh_error();                                                  \
     } } while(0)
-
 #endif
+
+
+#define libmesh_assert(asserted)                                        \
+  libmesh_assert_msg(asserted, "")
+
+#define libmesh_exceptionless_assert(asserted)                          \
+  libmesh_exceptionless_assert_msg(asserted, "")
+
+#define libmesh_assert_equal_to(expr1,expr2)                            \
+  libmesh_assert_equal_to_msg(expr1,expr2, "")
+
+#define libmesh_assert_not_equal_to(expr1,expr2)                        \
+  libmesh_assert_not_equal_to_msg(expr1,expr2, "")
+
+#define libmesh_assert_less(expr1,expr2)                                \
+  libmesh_assert_less_msg(expr1,expr2, "")
+
+#define libmesh_assert_greater(expr1,expr2)                             \
+  libmesh_assert_greater_msg(expr1,expr2, "")
+
+#define libmesh_assert_less_equal(expr1,expr2)                          \
+  libmesh_assert_less_equal_msg(expr1,expr2, "")
+
+#define libmesh_assert_greater_equal(expr1,expr2)                       \
+  libmesh_assert_greater_equal_msg(expr1,expr2, "")
 
 // The libmesh_error() macro prints a message and throws a LogicError
 // exception
@@ -355,18 +371,6 @@ extern bool warned_about_auto_ptr;
 //
 // The libmesh_convergence_failure() macro
 // throws a ConvergenceFailure exception
-#define libmesh_error()                                                 \
-  do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
-    LIBMESH_THROW(libMesh::LogicError());                               \
-  } while(0)
-
-#define libmesh_exceptionless_error()                                   \
-  do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
-    std::terminate();                                                   \
-  } while(0)
-
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
@@ -374,11 +378,18 @@ extern bool warned_about_auto_ptr;
     LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
-#define libmesh_not_implemented()                                       \
+#define libmesh_error()                                                 \
+  libmesh_error_msg("")
+
+#define libmesh_exceptionless_error_msg(msg)                                          \
   do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
-    LIBMESH_THROW(libMesh::NotImplemented());                           \
+    libMesh::err << msg << std::endl;                                   \
+    std::terminate();                                                   \
   } while(0)
+
+#define libmesh_exceptionless_error()                                   \
+  libmesh_exceptionless_error_msg("")
 
 #define libmesh_not_implemented_msg(msg)                                \
   do {                                                                  \
@@ -387,18 +398,18 @@ extern bool warned_about_auto_ptr;
     LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
-#define libmesh_file_error(filename)                                    \
-  do {                                                                  \
-    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
-    LIBMESH_THROW(libMesh::FileError(filename));                        \
-  } while(0)
+#define libmesh_not_implemented()                                       \
+  libmesh_not_implemented_msg("")
 
 #define libmesh_file_error_msg(filename, msg)                           \
   do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __LIBMESH_DATE__, __LIBMESH_TIME__); \
-  libMesh:err << msg << std::endl;                                      \
+    libMesh::err << msg << std::endl;                                      \
     LIBMESH_THROW(libMesh::FileError(filename));                        \
   } while(0)
+
+#define libmesh_file_error(filename)                                    \
+  libmesh_file_error_msg(filename,"")
 
 #define libmesh_convergence_failure()                   \
   do {                                                  \
