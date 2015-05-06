@@ -383,8 +383,28 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         if (jac[p] <= 0.)
           {
-            elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+            // Don't call print_info() recursively if we're already
+            // failing.  print_info() calls Elem::volume() which may
+            // call FE::reinit() and trigger the same failure again.
+            static bool failing = false;
+            if (!failing)
+              {
+                failing = true;
+                elem->print_info();
+                libmesh_error_msg("ERROR: negative Jacobian " \
+                                  << jac[p] \
+                                  << " at point " \
+                                  << xyz[p] \
+                                  << " in element " \
+                                  << elem->id());
+              }
+            else
+              {
+                // We were already failing when we called this, so just
+                // stop the current computation and return with
+                // incomplete results.
+                return;
+              }
           }
 
         // The inverse Jacobian entries also come from the
@@ -424,8 +444,23 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         if (denom <= 0.0)
           {
-            elem->print_info();
-            libmesh_error_msg("Encountered invalid 1D element!");
+            // Don't call print_info() recursively if we're already
+            // failing.  print_info() calls Elem::volume() which may
+            // call FE::reinit() and trigger the same failure again.
+            static bool failing = false;
+            if (!failing)
+              {
+                failing = true;
+                elem->print_info();
+                libmesh_error_msg("Encountered invalid 1D element!");
+              }
+            else
+              {
+                // We were already failing when we called this, so just
+                // stop the current computation and return with
+                // incomplete results.
+                return;
+              }
           }
 
         // xi_{x x}
@@ -455,8 +490,23 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         if (denom <= 0.0)
           {
-            elem->print_info();
-            libmesh_error_msg("Encountered invalid 1D element!");
+            // Don't call print_info() recursively if we're already
+            // failing.  print_info() calls Elem::volume() which may
+            // call FE::reinit() and trigger the same failure again.
+            static bool failing = false;
+            if (!failing)
+              {
+                failing = true;
+                elem->print_info();
+                libmesh_error_msg("Encountered invalid 1D element!");
+              }
+            else
+              {
+                // We were already failing when we called this, so just
+                // stop the current computation and return with
+                // incomplete results.
+                return;
+              }
           }
 
         // xi_{x x}
@@ -547,8 +597,28 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         if (jac[p] <= 0.)
           {
-            elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+            // Don't call print_info() recursively if we're already
+            // failing.  print_info() calls Elem::volume() which may
+            // call FE::reinit() and trigger the same failure again.
+            static bool failing = false;
+            if (!failing)
+              {
+                failing = true;
+                elem->print_info();
+                libmesh_error_msg("ERROR: negative Jacobian " \
+                                  << jac[p] \
+                                  << " at point " \
+                                  << xyz[p] \
+                                  << " in element " \
+                                  << elem->id());
+              }
+            else
+              {
+                // We were already failing when we called this, so just
+                // stop the current computation and return with
+                // incomplete results.
+                return;
+              }
           }
 
         JxW[p] = jac[p]*qw[p];
@@ -612,8 +682,28 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         if (det <= 0.)
           {
-            elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << det << " in element " << elem->id());
+            // Don't call print_info() recursively if we're already
+            // failing.  print_info() calls Elem::volume() which may
+            // call FE::reinit() and trigger the same failure again.
+            static bool failing = false;
+            if (!failing)
+              {
+                failing = true;
+                elem->print_info();
+                libmesh_error_msg("ERROR: negative Jacobian " \
+                                  << det \
+                                  << " at point " \
+                                  << xyz[p] \
+                                  << " in element " \
+                                  << elem->id());
+              }
+            else
+              {
+                // We were already failing when we called this, so just
+                // stop the current computation and return with
+                // incomplete results.
+                return;
+              }
           }
 
         const Real inv_det = 1./det;
@@ -795,8 +885,28 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         if (jac[p] <= 0.)
           {
-            elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+            // Don't call print_info() recursively if we're already
+            // failing.  print_info() calls Elem::volume() which may
+            // call FE::reinit() and trigger the same failure again.
+            static bool failing = false;
+            if (!failing)
+              {
+                failing = true;
+                elem->print_info();
+                libmesh_error_msg("ERROR: negative Jacobian " \
+                                  << jac[p] \
+                                  << " at point " \
+                                  << xyz[p] \
+                                  << " in element " \
+                                  << elem->id());
+              }
+            else
+              {
+                // We were already failing when we called this, so just
+                // stop the current computation and return with
+                // incomplete results.
+                return;
+              }
           }
 
         JxW[p] = jac[p]*qw[p];
