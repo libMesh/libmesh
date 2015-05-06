@@ -384,7 +384,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (jac[p] <= 0.)
           {
             elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+            libmesh_error_msg("ERROR: negative Jacobian " << jac[p] << " at point " << xyz[p] << " in element " << elem->id());
           }
 
         // The inverse Jacobian entries also come from the
@@ -548,7 +548,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (jac[p] <= 0.)
           {
             elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+            libmesh_error_msg("ERROR: negative Jacobian " << jac[p] << " at point " << xyz[p] << " in element " << elem->id());
           }
 
         JxW[p] = jac[p]*qw[p];
@@ -613,7 +613,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (det <= 0.)
           {
             elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << det << " in element " << elem->id());
+            libmesh_error_msg("ERROR: negative Jacobian " << det << " at point " << xyz[p] << " in element " << elem->id());
           }
 
         const Real inv_det = 1./det;
@@ -796,7 +796,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (jac[p] <= 0.)
           {
             elem->print_info();
-            libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
+            libmesh_error_msg("ERROR: negative Jacobian " << jac[p] << " at point " << xyz[p] << " in element " << elem->id());
           }
 
         JxW[p] = jac[p]*qw[p];
