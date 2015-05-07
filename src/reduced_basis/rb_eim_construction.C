@@ -318,7 +318,11 @@ void RBEIMConstruction::enrich_RB_space()
             {
               Number value = context.interior_value(var, qp);
 
-              if( std::abs(value) > std::abs(optimal_value) )
+              // Note: We require ">=" instead of ">" on the next line to handle
+              // the case where the function is identically zero. In that case, if
+              // we have ">" then the if-block is never entered and we fail the
+              // assert below.
+              if( std::abs(value) >= std::abs(optimal_value) )
                 {
                   FEBase* elem_fe = NULL;
                   context.get_element_fe( var, elem_fe );
