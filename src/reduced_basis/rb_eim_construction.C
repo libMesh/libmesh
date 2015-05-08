@@ -290,9 +290,11 @@ void RBEIMConstruction::enrich_RB_space()
   // the "EIM residual") has maximum absolute value
   // by looping over the mesh
   Point optimal_point;
-  Number optimal_value = 0.;
-  unsigned int optimal_var;
-  dof_id_type optimal_elem_id = 0;
+
+  // Initialize optimal_value to be negative so that it definitely gets updated.
+  Number optimal_value = -1.;
+  unsigned int optimal_var = 0;
+  dof_id_type optimal_elem_id = DofObject::invalid_id;
 
   // Compute truth representation via projection
   MeshBase& mesh = this->get_mesh();
@@ -316,9 +318,9 @@ void RBEIMConstruction::enrich_RB_space()
 
           for(unsigned int qp=0; qp<n_qpoints; qp++)
             {
-              Number value = context.interior_value(var, qp);
+              Number value = std::abs(context.interior_value(var, qp));
 
-              if( std::abs(value) > std::abs(optimal_value) )
+              if( value > optimal_value )
                 {
                   FEBase* elem_fe = NULL;
                   context.get_element_fe( var, elem_fe );
@@ -332,7 +334,7 @@ void RBEIMConstruction::enrich_RB_space()
         }
     }
 
-  Real global_abs_value = std::abs(optimal_value);
+  Real global_abs_value = optimal_value;
   unsigned int proc_ID_index;
   this->comm().maxloc(global_abs_value, proc_ID_index);
 
@@ -343,6 +345,9 @@ void RBEIMConstruction::enrich_RB_space()
   this->comm().broadcast(optimal_var, proc_ID_index);
   this->comm().broadcast(optimal_value, proc_ID_index);
   this->comm().broadcast(optimal_elem_id, proc_ID_index);
+
+  // In debug mode, assert that we found an optimal_elem_id
+  libmesh_assert_not_equal_to(optimal_elem_id, DofObject::invalid_id);
 
   // Scale the solution
   solution->scale(1./optimal_value);
