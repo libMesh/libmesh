@@ -290,11 +290,12 @@ void RBEIMConstruction::enrich_RB_space()
   // the "EIM residual") has maximum absolute value
   // by looping over the mesh
   Point optimal_point;
-
-  // Initialize optimal_value to be negative so that it definitely gets updated.
-  Number optimal_value = -1.;
+  Number optimal_value = 0.;
   unsigned int optimal_var = 0;
   dof_id_type optimal_elem_id = DofObject::invalid_id;
+
+  // Initialize largest_abs_value to be negative so that it definitely gets updated.
+  Real largest_abs_value = -1.;
 
   // Compute truth representation via projection
   MeshBase& mesh = this->get_mesh();
@@ -318,25 +319,28 @@ void RBEIMConstruction::enrich_RB_space()
 
           for(unsigned int qp=0; qp<n_qpoints; qp++)
             {
-              Number value = std::abs(context.interior_value(var, qp));
+              Number value = context.interior_value(var, qp);
+              Real abs_value = std::abs(value);
 
-              if( value > optimal_value )
+              if( abs_value > largest_abs_value )
                 {
-                  FEBase* elem_fe = NULL;
-                  context.get_element_fe( var, elem_fe );
                   optimal_value = value;
-                  optimal_point = elem_fe->get_xyz()[qp];
+                  largest_abs_value = abs_value;
                   optimal_var = var;
                   optimal_elem_id = (*el)->id();
+
+                  FEBase* elem_fe = NULL;
+                  context.get_element_fe( var, elem_fe );
+                  optimal_point = elem_fe->get_xyz()[qp];
                 }
 
             }
         }
     }
 
-  Real global_abs_value = optimal_value;
+  // Find out which processor has the largest of the abs values
   unsigned int proc_ID_index;
-  this->comm().maxloc(global_abs_value, proc_ID_index);
+  this->comm().maxloc(largest_abs_value, proc_ID_index);
 
   // Broadcast the optimal point from proc_ID_index
   this->comm().broadcast(optimal_point, proc_ID_index);
