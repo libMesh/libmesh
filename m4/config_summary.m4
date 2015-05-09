@@ -147,6 +147,7 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$netcdfversion" != "xno"); then
   echo '     'version....................... : $netcdfversion
   fi
+  echo '  'nlopt............................ : $enablenlopt
   echo '  'openmp........................... : $enableopenmp
   echo '  'parmetis......................... : $enableparmetis
   echo '  'petsc............................ : $enablepetsc

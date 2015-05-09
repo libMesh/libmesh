@@ -198,6 +198,41 @@ EOF
   	AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)
         fi
 
+        # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
+        AC_MSG_CHECKING(for TAO support via PETSc)
+        AC_LANG_PUSH([C])
+
+        # Save the original CFLAGS contents
+        saveCFLAGS="$CFLAGS"
+
+        # Append PETSc include paths to the CFLAGS variables
+        CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
+
+        AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+        @%:@include <petsctao.h>
+        static char help[]="";
+
+        int main(int argc, char **argv)
+        {
+          Tao tao;
+          PetscInitialize(&argc, &argv, (char*)0,help);
+          TaoCreate(PETSC_COMM_WORLD,&tao);
+          TaoDestroy(&tao);
+          PetscFinalize();
+          return 0;
+        }
+        ]])],[
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_PETSC_TAO, 1, [Flag indicating whether or not the Toolkit for Advanced Optimization (TAO) is available via PETSc])
+        ],[
+          AC_MSG_RESULT(no)
+        ])
+
+        # Return C flags to their original state.
+        CFLAGS="$saveCFLAGS"
+
+        AC_LANG_POP([C])
+
     else
         # PETSc config failed.  Try MPI, unless directed otherwise
 	if (test "$enablempi" != no); then
