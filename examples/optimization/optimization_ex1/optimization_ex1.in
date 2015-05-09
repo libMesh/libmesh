@@ -1,0 +1,21 @@
+n_elem = 10
+approx_order = SECOND
+fe_family = LAGRANGE
+
+# If you have installed NLopt (http://ab-initio.mit.edu/wiki/index.php/NLopt) and
+# libmesh has been properly configured to use it, you can uncomment the following
+# line to use NLopt solvers instead of PETSc/Tao.
+# The following NLopt algorithms converge for this example in the
+# number of iterations shown:
+# LD_SLSQP                   44
+# LD_MMA                     >128
+# LD_CCSAQ                   >128
+# LD_LBFGS                   21
+# LD_TNEWTON                 57
+# LD_TNEWTON_RESTART         50
+# LD_TNEWTON_PRECOND         44
+# LD_TNEWTON_PRECOND_RESTART 43
+# LD_AUGLAG                  >128
+# LD_VAR1                    23
+# LD_VAR2                    23
+# optimization_solver_type = NLOPT_SOLVERS
