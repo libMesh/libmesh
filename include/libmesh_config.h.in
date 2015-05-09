@@ -348,6 +348,9 @@
 /* Flag indicating whether the library will be compiled with Netcdf support */
 #undef HAVE_NETCDF
 
+/* Flag indicating whether the library will be compiled with NLOPT support */
+#undef HAVE_NLOPT
+
 /* Flag indicating whether the library shall be compiled to use the Nox solver
    collection */
 #undef HAVE_NOX
@@ -364,6 +367,10 @@
 
 /* Flag indicating whether or not PETSc was compiled with Hypre support */
 #undef HAVE_PETSC_HYPRE
+
+/* Flag indicating whether or not the Toolkit for Advanced Optimization (TAO)
+   is available via PETSc */
+#undef HAVE_PETSC_TAO
 
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD

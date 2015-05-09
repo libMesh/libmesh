@@ -86,8 +86,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/mpi.m4 \
 	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
 	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
-	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
-	$(top_srcdir)/m4/precision.m4 \
+	$(top_srcdir)/m4/nlopt.m4 $(top_srcdir)/m4/parmetis.m4 \
+	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/precision.m4 \
 	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
 	$(top_srcdir)/m4/sanitize.m4 $(top_srcdir)/m4/sfc.m4 \
 	$(top_srcdir)/m4/slepc.m4 $(top_srcdir)/m4/sstream.m4 \
@@ -327,6 +327,8 @@ MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
+NLOPT_INCLUDE = @NLOPT_INCLUDE@
+NLOPT_LIBRARY = @NLOPT_LIBRARY@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
@@ -829,8 +831,10 @@ include_HEADERS = \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
         solvers/newton_solver.h \
+        solvers/nlopt_optimization_solver.h \
         solvers/no_solution_history.h \
         solvers/nonlinear_solver.h \
+        solvers/optimization_solver.h \
         solvers/petsc_auto_fieldsplit.h \
         solvers/petsc_diff_solver.h \
         solvers/petsc_linear_solver.h \
@@ -841,6 +845,7 @@ include_HEADERS = \
         solvers/solution_history.h \
         solvers/solver.h \
         solvers/steady_solver.h \
+        solvers/tao_optimization_solver.h \
         solvers/time_solver.h \
         solvers/trilinos_aztec_linear_solver.h \
         solvers/trilinos_nox_nonlinear_solver.h \
@@ -862,6 +867,7 @@ include_HEADERS = \
         systems/linear_implicit_system.h \
         systems/newmark_system.h \
         systems/nonlinear_implicit_system.h \
+        systems/optimization_system.h \
         systems/parameter_accessor.h \
         systems/parameter_multipointer.h \
         systems/parameter_pointer.h \

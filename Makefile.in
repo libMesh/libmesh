@@ -126,8 +126,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/mpi.m4 \
 	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
 	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
-	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
-	$(top_srcdir)/m4/precision.m4 \
+	$(top_srcdir)/m4/nlopt.m4 $(top_srcdir)/m4/parmetis.m4 \
+	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/precision.m4 \
 	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
 	$(top_srcdir)/m4/sanitize.m4 $(top_srcdir)/m4/sfc.m4 \
 	$(top_srcdir)/m4/slepc.m4 $(top_srcdir)/m4/sstream.m4 \
@@ -424,14 +424,18 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
-	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
+	src/solvers/newton_solver.C \
+	src/solvers/nlopt_optimization_solver.C \
+	src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C \
+	src/solvers/optimization_solver.C \
 	src/solvers/petsc_auto_fieldsplit.C \
 	src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_linear_solver.C \
 	src/solvers/petsc_nonlinear_solver.C \
 	src/solvers/petscdmlibmesh.C src/solvers/petscdmlibmeshimpl.C \
 	src/solvers/slepc_eigen_solver.C src/solvers/steady_solver.C \
+	src/solvers/tao_optimization_solver.C \
 	src/solvers/time_solver.C \
 	src/solvers/trilinos_aztec_linear_solver.C \
 	src/solvers/trilinos_nox_nonlinear_solver.C \
@@ -448,6 +452,7 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/linear_implicit_system.C \
 	src/systems/newmark_system.C \
 	src/systems/nonlinear_implicit_system.C \
+	src/systems/optimization_system.C \
 	src/systems/parameter_vector.C src/systems/qoi_set.C \
 	src/systems/steady_system.C src/systems/system.C \
 	src/systems/system_io.C src/systems/system_projection.C \
@@ -819,8 +824,10 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/solvers/libmesh_dbg_la-linear_solver.lo \
 	src/solvers/libmesh_dbg_la-memory_solution_history.lo \
 	src/solvers/libmesh_dbg_la-newton_solver.lo \
+	src/solvers/libmesh_dbg_la-nlopt_optimization_solver.lo \
 	src/solvers/libmesh_dbg_la-no_solution_history.lo \
 	src/solvers/libmesh_dbg_la-nonlinear_solver.lo \
+	src/solvers/libmesh_dbg_la-optimization_solver.lo \
 	src/solvers/libmesh_dbg_la-petsc_auto_fieldsplit.lo \
 	src/solvers/libmesh_dbg_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_dbg_la-petsc_linear_solver.lo \
@@ -829,6 +836,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/solvers/libmesh_dbg_la-petscdmlibmeshimpl.lo \
 	src/solvers/libmesh_dbg_la-slepc_eigen_solver.lo \
 	src/solvers/libmesh_dbg_la-steady_solver.lo \
+	src/solvers/libmesh_dbg_la-tao_optimization_solver.lo \
 	src/solvers/libmesh_dbg_la-time_solver.lo \
 	src/solvers/libmesh_dbg_la-trilinos_aztec_linear_solver.lo \
 	src/solvers/libmesh_dbg_la-trilinos_nox_nonlinear_solver.lo \
@@ -850,6 +858,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/systems/libmesh_dbg_la-linear_implicit_system.lo \
 	src/systems/libmesh_dbg_la-newmark_system.lo \
 	src/systems/libmesh_dbg_la-nonlinear_implicit_system.lo \
+	src/systems/libmesh_dbg_la-optimization_system.lo \
 	src/systems/libmesh_dbg_la-parameter_vector.lo \
 	src/systems/libmesh_dbg_la-qoi_set.lo \
 	src/systems/libmesh_dbg_la-steady_system.lo \
@@ -1130,14 +1139,18 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
-	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
+	src/solvers/newton_solver.C \
+	src/solvers/nlopt_optimization_solver.C \
+	src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C \
+	src/solvers/optimization_solver.C \
 	src/solvers/petsc_auto_fieldsplit.C \
 	src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_linear_solver.C \
 	src/solvers/petsc_nonlinear_solver.C \
 	src/solvers/petscdmlibmesh.C src/solvers/petscdmlibmeshimpl.C \
 	src/solvers/slepc_eigen_solver.C src/solvers/steady_solver.C \
+	src/solvers/tao_optimization_solver.C \
 	src/solvers/time_solver.C \
 	src/solvers/trilinos_aztec_linear_solver.C \
 	src/solvers/trilinos_nox_nonlinear_solver.C \
@@ -1154,6 +1167,7 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/linear_implicit_system.C \
 	src/systems/newmark_system.C \
 	src/systems/nonlinear_implicit_system.C \
+	src/systems/optimization_system.C \
 	src/systems/parameter_vector.C src/systems/qoi_set.C \
 	src/systems/steady_system.C src/systems/system.C \
 	src/systems/system_io.C src/systems/system_projection.C \
@@ -1524,8 +1538,10 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/solvers/libmesh_devel_la-linear_solver.lo \
 	src/solvers/libmesh_devel_la-memory_solution_history.lo \
 	src/solvers/libmesh_devel_la-newton_solver.lo \
+	src/solvers/libmesh_devel_la-nlopt_optimization_solver.lo \
 	src/solvers/libmesh_devel_la-no_solution_history.lo \
 	src/solvers/libmesh_devel_la-nonlinear_solver.lo \
+	src/solvers/libmesh_devel_la-optimization_solver.lo \
 	src/solvers/libmesh_devel_la-petsc_auto_fieldsplit.lo \
 	src/solvers/libmesh_devel_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_devel_la-petsc_linear_solver.lo \
@@ -1534,6 +1550,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/solvers/libmesh_devel_la-petscdmlibmeshimpl.lo \
 	src/solvers/libmesh_devel_la-slepc_eigen_solver.lo \
 	src/solvers/libmesh_devel_la-steady_solver.lo \
+	src/solvers/libmesh_devel_la-tao_optimization_solver.lo \
 	src/solvers/libmesh_devel_la-time_solver.lo \
 	src/solvers/libmesh_devel_la-trilinos_aztec_linear_solver.lo \
 	src/solvers/libmesh_devel_la-trilinos_nox_nonlinear_solver.lo \
@@ -1555,6 +1572,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/systems/libmesh_devel_la-linear_implicit_system.lo \
 	src/systems/libmesh_devel_la-newmark_system.lo \
 	src/systems/libmesh_devel_la-nonlinear_implicit_system.lo \
+	src/systems/libmesh_devel_la-optimization_system.lo \
 	src/systems/libmesh_devel_la-parameter_vector.lo \
 	src/systems/libmesh_devel_la-qoi_set.lo \
 	src/systems/libmesh_devel_la-steady_system.lo \
@@ -1832,14 +1850,18 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
-	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
+	src/solvers/newton_solver.C \
+	src/solvers/nlopt_optimization_solver.C \
+	src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C \
+	src/solvers/optimization_solver.C \
 	src/solvers/petsc_auto_fieldsplit.C \
 	src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_linear_solver.C \
 	src/solvers/petsc_nonlinear_solver.C \
 	src/solvers/petscdmlibmesh.C src/solvers/petscdmlibmeshimpl.C \
 	src/solvers/slepc_eigen_solver.C src/solvers/steady_solver.C \
+	src/solvers/tao_optimization_solver.C \
 	src/solvers/time_solver.C \
 	src/solvers/trilinos_aztec_linear_solver.C \
 	src/solvers/trilinos_nox_nonlinear_solver.C \
@@ -1856,6 +1878,7 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/linear_implicit_system.C \
 	src/systems/newmark_system.C \
 	src/systems/nonlinear_implicit_system.C \
+	src/systems/optimization_system.C \
 	src/systems/parameter_vector.C src/systems/qoi_set.C \
 	src/systems/steady_system.C src/systems/system.C \
 	src/systems/system_io.C src/systems/system_projection.C \
@@ -2226,8 +2249,10 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/solvers/libmesh_oprof_la-linear_solver.lo \
 	src/solvers/libmesh_oprof_la-memory_solution_history.lo \
 	src/solvers/libmesh_oprof_la-newton_solver.lo \
+	src/solvers/libmesh_oprof_la-nlopt_optimization_solver.lo \
 	src/solvers/libmesh_oprof_la-no_solution_history.lo \
 	src/solvers/libmesh_oprof_la-nonlinear_solver.lo \
+	src/solvers/libmesh_oprof_la-optimization_solver.lo \
 	src/solvers/libmesh_oprof_la-petsc_auto_fieldsplit.lo \
 	src/solvers/libmesh_oprof_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_oprof_la-petsc_linear_solver.lo \
@@ -2236,6 +2261,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/solvers/libmesh_oprof_la-petscdmlibmeshimpl.lo \
 	src/solvers/libmesh_oprof_la-slepc_eigen_solver.lo \
 	src/solvers/libmesh_oprof_la-steady_solver.lo \
+	src/solvers/libmesh_oprof_la-tao_optimization_solver.lo \
 	src/solvers/libmesh_oprof_la-time_solver.lo \
 	src/solvers/libmesh_oprof_la-trilinos_aztec_linear_solver.lo \
 	src/solvers/libmesh_oprof_la-trilinos_nox_nonlinear_solver.lo \
@@ -2257,6 +2283,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/systems/libmesh_oprof_la-linear_implicit_system.lo \
 	src/systems/libmesh_oprof_la-newmark_system.lo \
 	src/systems/libmesh_oprof_la-nonlinear_implicit_system.lo \
+	src/systems/libmesh_oprof_la-optimization_system.lo \
 	src/systems/libmesh_oprof_la-parameter_vector.lo \
 	src/systems/libmesh_oprof_la-qoi_set.lo \
 	src/systems/libmesh_oprof_la-steady_system.lo \
@@ -2534,14 +2561,18 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
-	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
+	src/solvers/newton_solver.C \
+	src/solvers/nlopt_optimization_solver.C \
+	src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C \
+	src/solvers/optimization_solver.C \
 	src/solvers/petsc_auto_fieldsplit.C \
 	src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_linear_solver.C \
 	src/solvers/petsc_nonlinear_solver.C \
 	src/solvers/petscdmlibmesh.C src/solvers/petscdmlibmeshimpl.C \
 	src/solvers/slepc_eigen_solver.C src/solvers/steady_solver.C \
+	src/solvers/tao_optimization_solver.C \
 	src/solvers/time_solver.C \
 	src/solvers/trilinos_aztec_linear_solver.C \
 	src/solvers/trilinos_nox_nonlinear_solver.C \
@@ -2558,6 +2589,7 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/linear_implicit_system.C \
 	src/systems/newmark_system.C \
 	src/systems/nonlinear_implicit_system.C \
+	src/systems/optimization_system.C \
 	src/systems/parameter_vector.C src/systems/qoi_set.C \
 	src/systems/steady_system.C src/systems/system.C \
 	src/systems/system_io.C src/systems/system_projection.C \
@@ -2928,8 +2960,10 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/solvers/libmesh_opt_la-linear_solver.lo \
 	src/solvers/libmesh_opt_la-memory_solution_history.lo \
 	src/solvers/libmesh_opt_la-newton_solver.lo \
+	src/solvers/libmesh_opt_la-nlopt_optimization_solver.lo \
 	src/solvers/libmesh_opt_la-no_solution_history.lo \
 	src/solvers/libmesh_opt_la-nonlinear_solver.lo \
+	src/solvers/libmesh_opt_la-optimization_solver.lo \
 	src/solvers/libmesh_opt_la-petsc_auto_fieldsplit.lo \
 	src/solvers/libmesh_opt_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_opt_la-petsc_linear_solver.lo \
@@ -2938,6 +2972,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/solvers/libmesh_opt_la-petscdmlibmeshimpl.lo \
 	src/solvers/libmesh_opt_la-slepc_eigen_solver.lo \
 	src/solvers/libmesh_opt_la-steady_solver.lo \
+	src/solvers/libmesh_opt_la-tao_optimization_solver.lo \
 	src/solvers/libmesh_opt_la-time_solver.lo \
 	src/solvers/libmesh_opt_la-trilinos_aztec_linear_solver.lo \
 	src/solvers/libmesh_opt_la-trilinos_nox_nonlinear_solver.lo \
@@ -2959,6 +2994,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/systems/libmesh_opt_la-linear_implicit_system.lo \
 	src/systems/libmesh_opt_la-newmark_system.lo \
 	src/systems/libmesh_opt_la-nonlinear_implicit_system.lo \
+	src/systems/libmesh_opt_la-optimization_system.lo \
 	src/systems/libmesh_opt_la-parameter_vector.lo \
 	src/systems/libmesh_opt_la-qoi_set.lo \
 	src/systems/libmesh_opt_la-steady_system.lo \
@@ -3235,14 +3271,18 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
-	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
+	src/solvers/newton_solver.C \
+	src/solvers/nlopt_optimization_solver.C \
+	src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C \
+	src/solvers/optimization_solver.C \
 	src/solvers/petsc_auto_fieldsplit.C \
 	src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_linear_solver.C \
 	src/solvers/petsc_nonlinear_solver.C \
 	src/solvers/petscdmlibmesh.C src/solvers/petscdmlibmeshimpl.C \
 	src/solvers/slepc_eigen_solver.C src/solvers/steady_solver.C \
+	src/solvers/tao_optimization_solver.C \
 	src/solvers/time_solver.C \
 	src/solvers/trilinos_aztec_linear_solver.C \
 	src/solvers/trilinos_nox_nonlinear_solver.C \
@@ -3259,6 +3299,7 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/linear_implicit_system.C \
 	src/systems/newmark_system.C \
 	src/systems/nonlinear_implicit_system.C \
+	src/systems/optimization_system.C \
 	src/systems/parameter_vector.C src/systems/qoi_set.C \
 	src/systems/steady_system.C src/systems/system.C \
 	src/systems/system_io.C src/systems/system_projection.C \
@@ -3629,8 +3670,10 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/solvers/libmesh_prof_la-linear_solver.lo \
 	src/solvers/libmesh_prof_la-memory_solution_history.lo \
 	src/solvers/libmesh_prof_la-newton_solver.lo \
+	src/solvers/libmesh_prof_la-nlopt_optimization_solver.lo \
 	src/solvers/libmesh_prof_la-no_solution_history.lo \
 	src/solvers/libmesh_prof_la-nonlinear_solver.lo \
+	src/solvers/libmesh_prof_la-optimization_solver.lo \
 	src/solvers/libmesh_prof_la-petsc_auto_fieldsplit.lo \
 	src/solvers/libmesh_prof_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_prof_la-petsc_linear_solver.lo \
@@ -3639,6 +3682,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/solvers/libmesh_prof_la-petscdmlibmeshimpl.lo \
 	src/solvers/libmesh_prof_la-slepc_eigen_solver.lo \
 	src/solvers/libmesh_prof_la-steady_solver.lo \
+	src/solvers/libmesh_prof_la-tao_optimization_solver.lo \
 	src/solvers/libmesh_prof_la-time_solver.lo \
 	src/solvers/libmesh_prof_la-trilinos_aztec_linear_solver.lo \
 	src/solvers/libmesh_prof_la-trilinos_nox_nonlinear_solver.lo \
@@ -3660,6 +3704,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/systems/libmesh_prof_la-linear_implicit_system.lo \
 	src/systems/libmesh_prof_la-newmark_system.lo \
 	src/systems/libmesh_prof_la-nonlinear_implicit_system.lo \
+	src/systems/libmesh_prof_la-optimization_system.lo \
 	src/systems/libmesh_prof_la-parameter_vector.lo \
 	src/systems/libmesh_prof_la-qoi_set.lo \
 	src/systems/libmesh_prof_la-steady_system.lo \
@@ -4299,6 +4344,8 @@ MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
+NLOPT_INCLUDE = @NLOPT_INCLUDE@
+NLOPT_LIBRARY = @NLOPT_LIBRARY@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
@@ -4913,8 +4960,10 @@ libmesh_SOURCES = \
         src/solvers/linear_solver.C \
         src/solvers/memory_solution_history.C \
         src/solvers/newton_solver.C \
+        src/solvers/nlopt_optimization_solver.C \
         src/solvers/no_solution_history.C \
         src/solvers/nonlinear_solver.C \
+        src/solvers/optimization_solver.C \
         src/solvers/petsc_auto_fieldsplit.C \
         src/solvers/petsc_diff_solver.C \
         src/solvers/petsc_linear_solver.C \
@@ -4923,6 +4972,7 @@ libmesh_SOURCES = \
         src/solvers/petscdmlibmeshimpl.C \
         src/solvers/slepc_eigen_solver.C \
         src/solvers/steady_solver.C \
+        src/solvers/tao_optimization_solver.C \
         src/solvers/time_solver.C \
         src/solvers/trilinos_aztec_linear_solver.C \
         src/solvers/trilinos_nox_nonlinear_solver.C \
@@ -4944,6 +4994,7 @@ libmesh_SOURCES = \
         src/systems/linear_implicit_system.C \
         src/systems/newmark_system.C \
         src/systems/nonlinear_implicit_system.C \
+        src/systems/optimization_system.C \
         src/systems/parameter_vector.C \
         src/systems/qoi_set.C \
         src/systems/steady_system.C \
@@ -6237,10 +6288,16 @@ src/solvers/libmesh_dbg_la-memory_solution_history.lo:  \
 src/solvers/libmesh_dbg_la-newton_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_dbg_la-nlopt_optimization_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-nonlinear_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_dbg_la-optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-petsc_auto_fieldsplit.lo:  \
@@ -6265,6 +6322,9 @@ src/solvers/libmesh_dbg_la-slepc_eigen_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-steady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_dbg_la-tao_optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-time_solver.lo:  \
@@ -6333,6 +6393,9 @@ src/systems/libmesh_dbg_la-newmark_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_dbg_la-nonlinear_implicit_system.lo:  \
+	src/systems/$(am__dirstamp) \
+	src/systems/$(DEPDIR)/$(am__dirstamp)
+src/systems/libmesh_dbg_la-optimization_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_dbg_la-parameter_vector.lo:  \
@@ -7257,10 +7320,16 @@ src/solvers/libmesh_devel_la-memory_solution_history.lo:  \
 src/solvers/libmesh_devel_la-newton_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_devel_la-nlopt_optimization_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-nonlinear_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_devel_la-optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-petsc_auto_fieldsplit.lo:  \
@@ -7285,6 +7354,9 @@ src/solvers/libmesh_devel_la-slepc_eigen_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-steady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_devel_la-tao_optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-time_solver.lo:  \
@@ -7348,6 +7420,9 @@ src/systems/libmesh_devel_la-newmark_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_devel_la-nonlinear_implicit_system.lo:  \
+	src/systems/$(am__dirstamp) \
+	src/systems/$(DEPDIR)/$(am__dirstamp)
+src/systems/libmesh_devel_la-optimization_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_devel_la-parameter_vector.lo:  \
@@ -8267,10 +8342,16 @@ src/solvers/libmesh_oprof_la-memory_solution_history.lo:  \
 src/solvers/libmesh_oprof_la-newton_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_oprof_la-nlopt_optimization_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-nonlinear_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_oprof_la-optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-petsc_auto_fieldsplit.lo:  \
@@ -8295,6 +8376,9 @@ src/solvers/libmesh_oprof_la-slepc_eigen_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-steady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_oprof_la-tao_optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-time_solver.lo:  \
@@ -8358,6 +8442,9 @@ src/systems/libmesh_oprof_la-newmark_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_oprof_la-nonlinear_implicit_system.lo:  \
+	src/systems/$(am__dirstamp) \
+	src/systems/$(DEPDIR)/$(am__dirstamp)
+src/systems/libmesh_oprof_la-optimization_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_oprof_la-parameter_vector.lo:  \
@@ -9276,10 +9363,16 @@ src/solvers/libmesh_opt_la-memory_solution_history.lo:  \
 src/solvers/libmesh_opt_la-newton_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_opt_la-nlopt_optimization_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-nonlinear_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_opt_la-optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-petsc_auto_fieldsplit.lo:  \
@@ -9304,6 +9397,9 @@ src/solvers/libmesh_opt_la-slepc_eigen_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-steady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_opt_la-tao_optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-time_solver.lo:  \
@@ -9366,6 +9462,9 @@ src/systems/libmesh_opt_la-newmark_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_opt_la-nonlinear_implicit_system.lo:  \
+	src/systems/$(am__dirstamp) \
+	src/systems/$(DEPDIR)/$(am__dirstamp)
+src/systems/libmesh_opt_la-optimization_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_opt_la-parameter_vector.lo:  \
@@ -10283,10 +10382,16 @@ src/solvers/libmesh_prof_la-memory_solution_history.lo:  \
 src/solvers/libmesh_prof_la-newton_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_prof_la-nlopt_optimization_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-nonlinear_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_prof_la-optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-petsc_auto_fieldsplit.lo:  \
@@ -10311,6 +10416,9 @@ src/solvers/libmesh_prof_la-slepc_eigen_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-steady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_prof_la-tao_optimization_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-time_solver.lo:  \
@@ -10374,6 +10482,9 @@ src/systems/libmesh_prof_la-newmark_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_prof_la-nonlinear_implicit_system.lo:  \
+	src/systems/$(am__dirstamp) \
+	src/systems/$(DEPDIR)/$(am__dirstamp)
+src/systems/libmesh_prof_la-optimization_system.lo:  \
 	src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/libmesh_prof_la-parameter_vector.lo:  \
@@ -12602,8 +12713,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-nlopt_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-nonlinear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-petsc_auto_fieldsplit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-petsc_linear_solver.Plo@am__quote@
@@ -12612,6 +12725,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-petscdmlibmeshimpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-slepc_eigen_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-steady_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-tao_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-trilinos_aztec_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-trilinos_nox_nonlinear_solver.Plo@am__quote@
@@ -12628,8 +12742,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-nlopt_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-nonlinear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-petsc_auto_fieldsplit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-petsc_linear_solver.Plo@am__quote@
@@ -12638,6 +12754,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-petscdmlibmeshimpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-slepc_eigen_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-steady_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-tao_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-trilinos_aztec_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-trilinos_nox_nonlinear_solver.Plo@am__quote@
@@ -12654,8 +12771,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-nlopt_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-nonlinear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-petsc_auto_fieldsplit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-petsc_linear_solver.Plo@am__quote@
@@ -12664,6 +12783,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-petscdmlibmeshimpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-slepc_eigen_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-steady_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-tao_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-trilinos_aztec_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-trilinos_nox_nonlinear_solver.Plo@am__quote@
@@ -12680,8 +12800,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-nlopt_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-nonlinear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-petsc_auto_fieldsplit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-petsc_linear_solver.Plo@am__quote@
@@ -12690,6 +12812,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-petscdmlibmeshimpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-slepc_eigen_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-steady_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-tao_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-trilinos_aztec_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-trilinos_nox_nonlinear_solver.Plo@am__quote@
@@ -12706,8 +12829,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-nlopt_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-nonlinear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-petsc_auto_fieldsplit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-petsc_linear_solver.Plo@am__quote@
@@ -12716,6 +12841,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-petscdmlibmeshimpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-slepc_eigen_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-steady_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-tao_optimization_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-trilinos_aztec_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-trilinos_nox_nonlinear_solver.Plo@am__quote@
@@ -12737,6 +12863,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_dbg_la-linear_implicit_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_dbg_la-newmark_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_dbg_la-nonlinear_implicit_system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_dbg_la-optimization_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_dbg_la-parameter_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_dbg_la-qoi_set.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_dbg_la-steady_system.Plo@am__quote@
@@ -12762,6 +12889,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_devel_la-linear_implicit_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_devel_la-newmark_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_devel_la-nonlinear_implicit_system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_devel_la-optimization_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_devel_la-parameter_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_devel_la-qoi_set.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_devel_la-steady_system.Plo@am__quote@
@@ -12787,6 +12915,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_oprof_la-linear_implicit_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_oprof_la-newmark_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_oprof_la-nonlinear_implicit_system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_oprof_la-optimization_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_oprof_la-parameter_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_oprof_la-qoi_set.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_oprof_la-steady_system.Plo@am__quote@
@@ -12812,6 +12941,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_opt_la-linear_implicit_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_opt_la-newmark_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_opt_la-nonlinear_implicit_system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_opt_la-optimization_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_opt_la-parameter_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_opt_la-qoi_set.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_opt_la-steady_system.Plo@am__quote@
@@ -12837,6 +12967,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_prof_la-linear_implicit_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_prof_la-newmark_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_prof_la-nonlinear_implicit_system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_prof_la-optimization_system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_prof_la-parameter_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_prof_la-qoi_set.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/systems/$(DEPDIR)/libmesh_prof_la-steady_system.Plo@am__quote@
@@ -15449,6 +15580,13 @@ src/solvers/libmesh_dbg_la-newton_solver.lo: src/solvers/newton_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 
+src/solvers/libmesh_dbg_la-nlopt_optimization_solver.lo: src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-nlopt_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-nlopt_optimization_solver.Tpo -c -o src/solvers/libmesh_dbg_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-nlopt_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-nlopt_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nlopt_optimization_solver.C' object='src/solvers/libmesh_dbg_la-nlopt_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+
 src/solvers/libmesh_dbg_la-no_solution_history.lo: src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Tpo -c -o src/solvers/libmesh_dbg_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Plo
@@ -15462,6 +15600,13 @@ src/solvers/libmesh_dbg_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nonlinear_solver.C' object='src/solvers/libmesh_dbg_la-nonlinear_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
+
+src/solvers/libmesh_dbg_la-optimization_solver.lo: src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-optimization_solver.Tpo -c -o src/solvers/libmesh_dbg_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/optimization_solver.C' object='src/solvers/libmesh_dbg_la-optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
 
 src/solvers/libmesh_dbg_la-petsc_auto_fieldsplit.lo: src/solvers/petsc_auto_fieldsplit.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-petsc_auto_fieldsplit.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-petsc_auto_fieldsplit.Tpo -c -o src/solvers/libmesh_dbg_la-petsc_auto_fieldsplit.lo `test -f 'src/solvers/petsc_auto_fieldsplit.C' || echo '$(srcdir)/'`src/solvers/petsc_auto_fieldsplit.C
@@ -15518,6 +15663,13 @@ src/solvers/libmesh_dbg_la-steady_solver.lo: src/solvers/steady_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/steady_solver.C' object='src/solvers/libmesh_dbg_la-steady_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-steady_solver.lo `test -f 'src/solvers/steady_solver.C' || echo '$(srcdir)/'`src/solvers/steady_solver.C
+
+src/solvers/libmesh_dbg_la-tao_optimization_solver.lo: src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-tao_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-tao_optimization_solver.Tpo -c -o src/solvers/libmesh_dbg_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-tao_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-tao_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/tao_optimization_solver.C' object='src/solvers/libmesh_dbg_la-tao_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
 
 src/solvers/libmesh_dbg_la-time_solver.lo: src/solvers/time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-time_solver.Tpo -c -o src/solvers/libmesh_dbg_la-time_solver.lo `test -f 'src/solvers/time_solver.C' || echo '$(srcdir)/'`src/solvers/time_solver.C
@@ -15665,6 +15817,13 @@ src/systems/libmesh_dbg_la-nonlinear_implicit_system.lo: src/systems/nonlinear_i
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/nonlinear_implicit_system.C' object='src/systems/libmesh_dbg_la-nonlinear_implicit_system.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_dbg_la-nonlinear_implicit_system.lo `test -f 'src/systems/nonlinear_implicit_system.C' || echo '$(srcdir)/'`src/systems/nonlinear_implicit_system.C
+
+src/systems/libmesh_dbg_la-optimization_system.lo: src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_dbg_la-optimization_system.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_dbg_la-optimization_system.Tpo -c -o src/systems/libmesh_dbg_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/systems/$(DEPDIR)/libmesh_dbg_la-optimization_system.Tpo src/systems/$(DEPDIR)/libmesh_dbg_la-optimization_system.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/optimization_system.C' object='src/systems/libmesh_dbg_la-optimization_system.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_dbg_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
 
 src/systems/libmesh_dbg_la-parameter_vector.lo: src/systems/parameter_vector.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_dbg_la-parameter_vector.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_dbg_la-parameter_vector.Tpo -c -o src/systems/libmesh_dbg_la-parameter_vector.lo `test -f 'src/systems/parameter_vector.C' || echo '$(srcdir)/'`src/systems/parameter_vector.C
@@ -18347,6 +18506,13 @@ src/solvers/libmesh_devel_la-newton_solver.lo: src/solvers/newton_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 
+src/solvers/libmesh_devel_la-nlopt_optimization_solver.lo: src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-nlopt_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-nlopt_optimization_solver.Tpo -c -o src/solvers/libmesh_devel_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-nlopt_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-nlopt_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nlopt_optimization_solver.C' object='src/solvers/libmesh_devel_la-nlopt_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+
 src/solvers/libmesh_devel_la-no_solution_history.lo: src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Tpo -c -o src/solvers/libmesh_devel_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Plo
@@ -18360,6 +18526,13 @@ src/solvers/libmesh_devel_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nonlinear_solver.C' object='src/solvers/libmesh_devel_la-nonlinear_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
+
+src/solvers/libmesh_devel_la-optimization_solver.lo: src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-optimization_solver.Tpo -c -o src/solvers/libmesh_devel_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/optimization_solver.C' object='src/solvers/libmesh_devel_la-optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
 
 src/solvers/libmesh_devel_la-petsc_auto_fieldsplit.lo: src/solvers/petsc_auto_fieldsplit.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-petsc_auto_fieldsplit.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-petsc_auto_fieldsplit.Tpo -c -o src/solvers/libmesh_devel_la-petsc_auto_fieldsplit.lo `test -f 'src/solvers/petsc_auto_fieldsplit.C' || echo '$(srcdir)/'`src/solvers/petsc_auto_fieldsplit.C
@@ -18416,6 +18589,13 @@ src/solvers/libmesh_devel_la-steady_solver.lo: src/solvers/steady_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/steady_solver.C' object='src/solvers/libmesh_devel_la-steady_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-steady_solver.lo `test -f 'src/solvers/steady_solver.C' || echo '$(srcdir)/'`src/solvers/steady_solver.C
+
+src/solvers/libmesh_devel_la-tao_optimization_solver.lo: src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-tao_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-tao_optimization_solver.Tpo -c -o src/solvers/libmesh_devel_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-tao_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-tao_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/tao_optimization_solver.C' object='src/solvers/libmesh_devel_la-tao_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
 
 src/solvers/libmesh_devel_la-time_solver.lo: src/solvers/time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-time_solver.Tpo -c -o src/solvers/libmesh_devel_la-time_solver.lo `test -f 'src/solvers/time_solver.C' || echo '$(srcdir)/'`src/solvers/time_solver.C
@@ -18563,6 +18743,13 @@ src/systems/libmesh_devel_la-nonlinear_implicit_system.lo: src/systems/nonlinear
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/nonlinear_implicit_system.C' object='src/systems/libmesh_devel_la-nonlinear_implicit_system.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_devel_la-nonlinear_implicit_system.lo `test -f 'src/systems/nonlinear_implicit_system.C' || echo '$(srcdir)/'`src/systems/nonlinear_implicit_system.C
+
+src/systems/libmesh_devel_la-optimization_system.lo: src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_devel_la-optimization_system.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_devel_la-optimization_system.Tpo -c -o src/systems/libmesh_devel_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/systems/$(DEPDIR)/libmesh_devel_la-optimization_system.Tpo src/systems/$(DEPDIR)/libmesh_devel_la-optimization_system.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/optimization_system.C' object='src/systems/libmesh_devel_la-optimization_system.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_devel_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
 
 src/systems/libmesh_devel_la-parameter_vector.lo: src/systems/parameter_vector.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_devel_la-parameter_vector.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_devel_la-parameter_vector.Tpo -c -o src/systems/libmesh_devel_la-parameter_vector.lo `test -f 'src/systems/parameter_vector.C' || echo '$(srcdir)/'`src/systems/parameter_vector.C
@@ -21245,6 +21432,13 @@ src/solvers/libmesh_oprof_la-newton_solver.lo: src/solvers/newton_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 
+src/solvers/libmesh_oprof_la-nlopt_optimization_solver.lo: src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-nlopt_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-nlopt_optimization_solver.Tpo -c -o src/solvers/libmesh_oprof_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_oprof_la-nlopt_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_oprof_la-nlopt_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nlopt_optimization_solver.C' object='src/solvers/libmesh_oprof_la-nlopt_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+
 src/solvers/libmesh_oprof_la-no_solution_history.lo: src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-no_solution_history.Tpo -c -o src/solvers/libmesh_oprof_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_oprof_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_oprof_la-no_solution_history.Plo
@@ -21258,6 +21452,13 @@ src/solvers/libmesh_oprof_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nonlinear_solver.C' object='src/solvers/libmesh_oprof_la-nonlinear_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
+
+src/solvers/libmesh_oprof_la-optimization_solver.lo: src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-optimization_solver.Tpo -c -o src/solvers/libmesh_oprof_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_oprof_la-optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_oprof_la-optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/optimization_solver.C' object='src/solvers/libmesh_oprof_la-optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
 
 src/solvers/libmesh_oprof_la-petsc_auto_fieldsplit.lo: src/solvers/petsc_auto_fieldsplit.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-petsc_auto_fieldsplit.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-petsc_auto_fieldsplit.Tpo -c -o src/solvers/libmesh_oprof_la-petsc_auto_fieldsplit.lo `test -f 'src/solvers/petsc_auto_fieldsplit.C' || echo '$(srcdir)/'`src/solvers/petsc_auto_fieldsplit.C
@@ -21314,6 +21515,13 @@ src/solvers/libmesh_oprof_la-steady_solver.lo: src/solvers/steady_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/steady_solver.C' object='src/solvers/libmesh_oprof_la-steady_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-steady_solver.lo `test -f 'src/solvers/steady_solver.C' || echo '$(srcdir)/'`src/solvers/steady_solver.C
+
+src/solvers/libmesh_oprof_la-tao_optimization_solver.lo: src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-tao_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-tao_optimization_solver.Tpo -c -o src/solvers/libmesh_oprof_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_oprof_la-tao_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_oprof_la-tao_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/tao_optimization_solver.C' object='src/solvers/libmesh_oprof_la-tao_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
 
 src/solvers/libmesh_oprof_la-time_solver.lo: src/solvers/time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-time_solver.Tpo -c -o src/solvers/libmesh_oprof_la-time_solver.lo `test -f 'src/solvers/time_solver.C' || echo '$(srcdir)/'`src/solvers/time_solver.C
@@ -21461,6 +21669,13 @@ src/systems/libmesh_oprof_la-nonlinear_implicit_system.lo: src/systems/nonlinear
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/nonlinear_implicit_system.C' object='src/systems/libmesh_oprof_la-nonlinear_implicit_system.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_oprof_la-nonlinear_implicit_system.lo `test -f 'src/systems/nonlinear_implicit_system.C' || echo '$(srcdir)/'`src/systems/nonlinear_implicit_system.C
+
+src/systems/libmesh_oprof_la-optimization_system.lo: src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_oprof_la-optimization_system.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_oprof_la-optimization_system.Tpo -c -o src/systems/libmesh_oprof_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/systems/$(DEPDIR)/libmesh_oprof_la-optimization_system.Tpo src/systems/$(DEPDIR)/libmesh_oprof_la-optimization_system.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/optimization_system.C' object='src/systems/libmesh_oprof_la-optimization_system.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_oprof_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
 
 src/systems/libmesh_oprof_la-parameter_vector.lo: src/systems/parameter_vector.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_oprof_la-parameter_vector.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_oprof_la-parameter_vector.Tpo -c -o src/systems/libmesh_oprof_la-parameter_vector.lo `test -f 'src/systems/parameter_vector.C' || echo '$(srcdir)/'`src/systems/parameter_vector.C
@@ -24143,6 +24358,13 @@ src/solvers/libmesh_opt_la-newton_solver.lo: src/solvers/newton_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 
+src/solvers/libmesh_opt_la-nlopt_optimization_solver.lo: src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-nlopt_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-nlopt_optimization_solver.Tpo -c -o src/solvers/libmesh_opt_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-nlopt_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-nlopt_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nlopt_optimization_solver.C' object='src/solvers/libmesh_opt_la-nlopt_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+
 src/solvers/libmesh_opt_la-no_solution_history.lo: src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Tpo -c -o src/solvers/libmesh_opt_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Plo
@@ -24156,6 +24378,13 @@ src/solvers/libmesh_opt_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nonlinear_solver.C' object='src/solvers/libmesh_opt_la-nonlinear_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
+
+src/solvers/libmesh_opt_la-optimization_solver.lo: src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-optimization_solver.Tpo -c -o src/solvers/libmesh_opt_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/optimization_solver.C' object='src/solvers/libmesh_opt_la-optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
 
 src/solvers/libmesh_opt_la-petsc_auto_fieldsplit.lo: src/solvers/petsc_auto_fieldsplit.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-petsc_auto_fieldsplit.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-petsc_auto_fieldsplit.Tpo -c -o src/solvers/libmesh_opt_la-petsc_auto_fieldsplit.lo `test -f 'src/solvers/petsc_auto_fieldsplit.C' || echo '$(srcdir)/'`src/solvers/petsc_auto_fieldsplit.C
@@ -24212,6 +24441,13 @@ src/solvers/libmesh_opt_la-steady_solver.lo: src/solvers/steady_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/steady_solver.C' object='src/solvers/libmesh_opt_la-steady_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-steady_solver.lo `test -f 'src/solvers/steady_solver.C' || echo '$(srcdir)/'`src/solvers/steady_solver.C
+
+src/solvers/libmesh_opt_la-tao_optimization_solver.lo: src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-tao_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-tao_optimization_solver.Tpo -c -o src/solvers/libmesh_opt_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-tao_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-tao_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/tao_optimization_solver.C' object='src/solvers/libmesh_opt_la-tao_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
 
 src/solvers/libmesh_opt_la-time_solver.lo: src/solvers/time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-time_solver.Tpo -c -o src/solvers/libmesh_opt_la-time_solver.lo `test -f 'src/solvers/time_solver.C' || echo '$(srcdir)/'`src/solvers/time_solver.C
@@ -24359,6 +24595,13 @@ src/systems/libmesh_opt_la-nonlinear_implicit_system.lo: src/systems/nonlinear_i
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/nonlinear_implicit_system.C' object='src/systems/libmesh_opt_la-nonlinear_implicit_system.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_opt_la-nonlinear_implicit_system.lo `test -f 'src/systems/nonlinear_implicit_system.C' || echo '$(srcdir)/'`src/systems/nonlinear_implicit_system.C
+
+src/systems/libmesh_opt_la-optimization_system.lo: src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_opt_la-optimization_system.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_opt_la-optimization_system.Tpo -c -o src/systems/libmesh_opt_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/systems/$(DEPDIR)/libmesh_opt_la-optimization_system.Tpo src/systems/$(DEPDIR)/libmesh_opt_la-optimization_system.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/optimization_system.C' object='src/systems/libmesh_opt_la-optimization_system.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_opt_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
 
 src/systems/libmesh_opt_la-parameter_vector.lo: src/systems/parameter_vector.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_opt_la-parameter_vector.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_opt_la-parameter_vector.Tpo -c -o src/systems/libmesh_opt_la-parameter_vector.lo `test -f 'src/systems/parameter_vector.C' || echo '$(srcdir)/'`src/systems/parameter_vector.C
@@ -27041,6 +27284,13 @@ src/solvers/libmesh_prof_la-newton_solver.lo: src/solvers/newton_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 
+src/solvers/libmesh_prof_la-nlopt_optimization_solver.lo: src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-nlopt_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-nlopt_optimization_solver.Tpo -c -o src/solvers/libmesh_prof_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_prof_la-nlopt_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_prof_la-nlopt_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nlopt_optimization_solver.C' object='src/solvers/libmesh_prof_la-nlopt_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-nlopt_optimization_solver.lo `test -f 'src/solvers/nlopt_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/nlopt_optimization_solver.C
+
 src/solvers/libmesh_prof_la-no_solution_history.lo: src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-no_solution_history.Tpo -c -o src/solvers/libmesh_prof_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_prof_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_prof_la-no_solution_history.Plo
@@ -27054,6 +27304,13 @@ src/solvers/libmesh_prof_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/nonlinear_solver.C' object='src/solvers/libmesh_prof_la-nonlinear_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
+
+src/solvers/libmesh_prof_la-optimization_solver.lo: src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-optimization_solver.Tpo -c -o src/solvers/libmesh_prof_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_prof_la-optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_prof_la-optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/optimization_solver.C' object='src/solvers/libmesh_prof_la-optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-optimization_solver.lo `test -f 'src/solvers/optimization_solver.C' || echo '$(srcdir)/'`src/solvers/optimization_solver.C
 
 src/solvers/libmesh_prof_la-petsc_auto_fieldsplit.lo: src/solvers/petsc_auto_fieldsplit.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-petsc_auto_fieldsplit.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-petsc_auto_fieldsplit.Tpo -c -o src/solvers/libmesh_prof_la-petsc_auto_fieldsplit.lo `test -f 'src/solvers/petsc_auto_fieldsplit.C' || echo '$(srcdir)/'`src/solvers/petsc_auto_fieldsplit.C
@@ -27110,6 +27367,13 @@ src/solvers/libmesh_prof_la-steady_solver.lo: src/solvers/steady_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/steady_solver.C' object='src/solvers/libmesh_prof_la-steady_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-steady_solver.lo `test -f 'src/solvers/steady_solver.C' || echo '$(srcdir)/'`src/solvers/steady_solver.C
+
+src/solvers/libmesh_prof_la-tao_optimization_solver.lo: src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-tao_optimization_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-tao_optimization_solver.Tpo -c -o src/solvers/libmesh_prof_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_prof_la-tao_optimization_solver.Tpo src/solvers/$(DEPDIR)/libmesh_prof_la-tao_optimization_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/tao_optimization_solver.C' object='src/solvers/libmesh_prof_la-tao_optimization_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-tao_optimization_solver.lo `test -f 'src/solvers/tao_optimization_solver.C' || echo '$(srcdir)/'`src/solvers/tao_optimization_solver.C
 
 src/solvers/libmesh_prof_la-time_solver.lo: src/solvers/time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-time_solver.Tpo -c -o src/solvers/libmesh_prof_la-time_solver.lo `test -f 'src/solvers/time_solver.C' || echo '$(srcdir)/'`src/solvers/time_solver.C
@@ -27257,6 +27521,13 @@ src/systems/libmesh_prof_la-nonlinear_implicit_system.lo: src/systems/nonlinear_
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/nonlinear_implicit_system.C' object='src/systems/libmesh_prof_la-nonlinear_implicit_system.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_prof_la-nonlinear_implicit_system.lo `test -f 'src/systems/nonlinear_implicit_system.C' || echo '$(srcdir)/'`src/systems/nonlinear_implicit_system.C
+
+src/systems/libmesh_prof_la-optimization_system.lo: src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_prof_la-optimization_system.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_prof_la-optimization_system.Tpo -c -o src/systems/libmesh_prof_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/systems/$(DEPDIR)/libmesh_prof_la-optimization_system.Tpo src/systems/$(DEPDIR)/libmesh_prof_la-optimization_system.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/systems/optimization_system.C' object='src/systems/libmesh_prof_la-optimization_system.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/systems/libmesh_prof_la-optimization_system.lo `test -f 'src/systems/optimization_system.C' || echo '$(srcdir)/'`src/systems/optimization_system.C
 
 src/systems/libmesh_prof_la-parameter_vector.lo: src/systems/parameter_vector.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/systems/libmesh_prof_la-parameter_vector.lo -MD -MP -MF src/systems/$(DEPDIR)/libmesh_prof_la-parameter_vector.Tpo -c -o src/systems/libmesh_prof_la-parameter_vector.lo `test -f 'src/systems/parameter_vector.C' || echo '$(srcdir)/'`src/systems/parameter_vector.C

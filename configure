@@ -711,6 +711,10 @@ HDF5_LIBS
 HDF5_CPPFLAGS
 HDF5_CFLAGS
 HDF5_DIR
+LIBMESH_ENABLE_NLOPT_FALSE
+LIBMESH_ENABLE_NLOPT_TRUE
+NLOPT_LIBRARY
+NLOPT_INCLUDE
 LIBMESH_ENABLE_GLPK_FALSE
 LIBMESH_ENABLE_GLPK_TRUE
 GLPK_LIBRARY
@@ -1160,6 +1164,9 @@ with_eigen_include
 enable_glpk
 with_glpk_include
 with_glpk_lib
+enable_nlopt
+with_nlopt_include
+with_nlopt_lib
 enable_hdf5
 with_hdf5
 enable_netcdf
@@ -1935,6 +1942,7 @@ Optional Features:
   --disable-vtk           build without VTK file I/O support
   --disable-eigen         build without Eigen linear algebra support
   --disable-glpk          build without GLPK support
+  --disable-nlopt         build without NLOPT support
   --disable-hdf5          build without HDF5 support
   --disable-netcdf        build without netCDF binary I/O
   --disable-exodus        build without ExodusII API support
@@ -2007,6 +2015,9 @@ Optional Packages:
   --with-glpk-include=PATH
                           Specify the path for GLPK header files
   --with-glpk-lib=PATH    Specify the path for GLPK libs
+  --with-nlopt-include=PATH
+                          Specify the path for NLOPT header files
+  --with-nlopt-lib=PATH   Specify the path for NLOPT libs
   --with-hdf5=DIR         root directory of HDF5 installation (default =
                           HDF5_DIR)
   --with-fparser=<release|none|devel>
@@ -30582,6 +30593,65 @@ $as_echo "#define HAVE_PETSC_HYPRE 1" >>confdefs.h
 $as_echo "<<< Configuring library with Hypre support >>>" >&6; }
         fi
 
+        # PETSc >= 3.5.0 should have TAO built-in, we don't currently support any other type of TAO installation.
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TAO support via PETSc" >&5
+$as_echo_n "checking for TAO support via PETSc... " >&6; }
+        ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+        # Save the original CFLAGS contents
+        saveCFLAGS="$CFLAGS"
+
+        # Append PETSc include paths to the CFLAGS variables
+        CFLAGS="$saveCFLAGS $PETSCINCLUDEDIRS"
+
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <petsctao.h>
+        static char help[]="";
+
+        int main(int argc, char **argv)
+        {
+          Tao tao;
+          PetscInitialize(&argc, &argv, (char*)0,help);
+          TaoCreate(PETSC_COMM_WORLD,&tao);
+          TaoDestroy(&tao);
+          PetscFinalize();
+          return 0;
+        }
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_PETSC_TAO 1" >>confdefs.h
+
+
+else
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+        # Return C flags to their original state.
+        CFLAGS="$saveCFLAGS"
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
     else
         # PETSc config failed.  Try MPI, unless directed otherwise
 	if (test "$enablempi" != no); then
@@ -35392,6 +35462,215 @@ fi
 # -------------------------------------------------------------
 
 
+# -------------------------------------------------------------
+# NLOPT -- A library of nonlinear optimization routines.
+# -------------------------------------------------------------
+
+  # Check whether --enable-nlopt was given.
+if test "${enable_nlopt+set}" = set; then :
+  enableval=$enable_nlopt; case "${enableval}" in
+                  yes)  enablenlopt=yes ;;
+                  no)  enablenlopt=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-nlopt" "$LINENO" 5 ;;
+                 esac
+else
+  enablenlopt=$enableoptional
+fi
+
+
+
+  if (test $enablenlopt = yes); then
+    # User-specific include path
+
+# Check whether --with-nlopt-include was given.
+if test "${with_nlopt_include+set}" = set; then :
+  withval=$with_nlopt_include; withnloptinc=$withval
+else
+  withnloptinc=no
+fi
+
+
+    # User-specific library path
+
+# Check whether --with-nlopt-lib was given.
+if test "${with_nlopt_lib+set}" = set; then :
+  withval=$with_nlopt_lib; withnloptlib=$withval
+else
+  withnloptlib=no
+fi
+
+
+    # Use NLOPT_DIR/include if it exists.
+    if (test $withnloptinc != no); then
+      NLOPT_INC="$withnloptinc"
+    elif test "x$NLOPT_DIR" != x -a -f $NLOPT_DIR/include/nlopt.h; then
+      NLOPT_INC="$NLOPT_DIR/include"
+    else
+      NLOPT_INC=""
+    fi
+
+    # Use NLOPT_DIR/lib if it exists.
+    if (test $withnloptlib != no); then
+      NLOPT_LIB="$withnloptlib"
+    elif test "x$NLOPT_DIR" != x; then
+      NLOPT_LIB="$NLOPT_DIR/lib"
+    else
+      NLOPT_LIB=""
+    fi
+
+    # Initialize Makefile/config.h substitution variables
+    NLOPT_INCLUDE=""
+    NLOPT_LIBRARY=""
+
+    if (test $enablenlopt = yes); then
+      NLOPT_INCLUDE="-I$NLOPT_INC"
+      NLOPT_LIBRARY="-L$NLOPT_LIB -lnlopt"
+
+      # Try to compile and link a trivial nlopt test code.
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for valid nlopt installation" >&5
+$as_echo_n "checking for valid nlopt installation... " >&6; }
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+      # Save the original CFLAGS and LIBS contents
+      saveCFLAGS="$CFLAGS"
+      saveLIBS="$LIBS"
+
+      # Append nlopt include paths to the CFLAGS variables
+      CFLAGS="$saveCFLAGS $NLOPT_INCLUDE"
+      LIBS="$saveLIBS $NLOPT_LIBRARY -lm"
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <math.h>
+#include <nlopt.h>
+#include <stdio.h>
+
+double myfunc(unsigned n, const double *x, double *grad, void *my_func_data)
+{
+if (grad) {
+  grad[0] = 0.0;
+  grad[1] = 0.5 / sqrt(x[1]);
+ }
+ return sqrt(x[1]);
+}
+
+typedef struct
+{
+  double a, b;
+} my_constraint_data;
+
+double myconstraint(unsigned n, const double *x, double *grad, void *data)
+{
+  my_constraint_data *d = (my_constraint_data *) data;
+  double a = d->a, b = d->b;
+  if (grad) {
+    grad[0] = 3 * a * (a*x[0] + b) * (a*x[0] + b);
+    grad[1] = -1.0;
+  }
+  return ((a*x[0] + b) * (a*x[0] + b) * (a*x[0] + b) - x[1]);
+}
+
+int
+main ()
+{
+
+double lb[2] = { -HUGE_VAL, 0 }; /* lower bounds */
+nlopt_opt opt;
+
+opt = nlopt_create(NLOPT_LD_MMA, 2); /* algorithm and dimensionality */
+nlopt_set_lower_bounds(opt, lb);
+nlopt_set_min_objective(opt, myfunc, NULL);
+
+my_constraint_data data[2] = { {2,0}, {-1,1} };
+nlopt_add_inequality_constraint(opt, myconstraint, &data[0], 1e-8);
+nlopt_add_inequality_constraint(opt, myconstraint, &data[1], 1e-8);
+nlopt_set_xtol_rel(opt, 1e-4);
+double x[2] = { 1.234, 5.678 };  /* some initial guess */
+double minf; /* the minimum objective value, upon return */
+
+if (nlopt_optimize(opt, x, &minf) < 0) {
+  printf("nlopt failed!\n");
+}
+else {
+  printf("found minimum at f(%g,%g) = %0.10g\n", x[0], x[1], minf);
+}
+nlopt_destroy(opt);
+return 0;
+
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+             enablenlopt=yes
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+             enablenlopt=no
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+      # Return CFLAGS and LIBS to their original states.
+      CFLAGS="$saveCFLAGS"
+      LIBS="$saveLIBS"
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+      # If linking a test program succeeded, continue.
+      if (test x$enablenlopt = xyes); then
+
+        # add the NLOPT_LIB dir to the linker run path if it is a directory
+        if (test "x$RPATHFLAG" != "x" -a -d $NLOPT_LIB); then
+          NLOPT_LIBRARY="${RPATHFLAG}${NLOPT_LIB} $NLOPT_LIBRARY"
+        fi
+
+
+$as_echo "#define HAVE_NLOPT 1" >>confdefs.h
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NLOPT support >>>" >&5
+$as_echo "<<< Configuring library with NLOPT support >>>" >&6; }
+      fi
+    fi
+  fi
+
+  # Substitute the substitution variables
+
+
+
+if (test x$enablenlopt = xyes); then
+  libmesh_optional_INCLUDES="$NLOPT_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$NLOPT_LIBRARY $libmesh_optional_LIBS"
+fi
+ if test x$enablenlopt = xyes; then
+  LIBMESH_ENABLE_NLOPT_TRUE=
+  LIBMESH_ENABLE_NLOPT_FALSE='#'
+else
+  LIBMESH_ENABLE_NLOPT_TRUE='#'
+  LIBMESH_ENABLE_NLOPT_FALSE=
+fi
+
+# -------------------------------------------------------------
+
+
 
 # --------------------------------------------------------------
 # HDF5 -- enabled by default
@@ -36779,7 +37058,7 @@ $as_echo "#define BUILD_DATE __DATE__ \" \" __TIME__" >>confdefs.h
 
 # Each example gets a makefile
 if (test "x$enableexamples" = "xyes"); then
-   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/adjoints/adjoints_ex5/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/fem_system/fem_system_ex2/Makefile examples/solution_transfer/solution_transfer_ex1/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/miscellaneous/miscellaneous_ex8/Makefile examples/miscellaneous/miscellaneous_ex9/Makefile examples/miscellaneous/miscellaneous_ex10/Makefile examples/miscellaneous/miscellaneous_ex11/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/subdomains/subdomains_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/systems_of_equations/systems_of_equations_ex7/Makefile examples/systems_of_equations/systems_of_equations_ex8/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/vector_fe/vector_fe_ex4/Makefile examples/Makefile"
+   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/adjoints/adjoints_ex5/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/fem_system/fem_system_ex2/Makefile examples/solution_transfer/solution_transfer_ex1/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/miscellaneous/miscellaneous_ex8/Makefile examples/miscellaneous/miscellaneous_ex9/Makefile examples/miscellaneous/miscellaneous_ex10/Makefile examples/miscellaneous/miscellaneous_ex11/Makefile examples/optimization/optimization_ex1/Makefile examples/optimization/optimization_ex2/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/subdomains/subdomains_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/systems_of_equations/systems_of_equations_ex7/Makefile examples/systems_of_equations/systems_of_equations_ex8/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/vector_fe/vector_fe_ex4/Makefile examples/Makefile"
 
 fi
 
@@ -37093,6 +37372,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_GLPK_TRUE}" && test -z "${LIBMESH_ENABLE_GLPK_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_GLPK\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_NLOPT_TRUE}" && test -z "${LIBMESH_ENABLE_NLOPT_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NLOPT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_HDF5_TRUE}" && test -z "${LIBMESH_ENABLE_HDF5_FALSE}"; then
@@ -38396,6 +38679,8 @@ do
     "examples/miscellaneous/miscellaneous_ex9/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex9/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex10/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex10/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex11/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex11/Makefile" ;;
+    "examples/optimization/optimization_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/optimization/optimization_ex1/Makefile" ;;
+    "examples/optimization/optimization_ex2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/optimization/optimization_ex2/Makefile" ;;
     "examples/subdomains/subdomains_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/subdomains/subdomains_ex1/Makefile" ;;
     "examples/subdomains/subdomains_ex2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/subdomains/subdomains_ex2/Makefile" ;;
     "examples/subdomains/subdomains_ex3/Makefile") CONFIG_FILES="$CONFIG_FILES examples/subdomains/subdomains_ex3/Makefile" ;;
@@ -40629,6 +40914,7 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$netcdfversion" != "xno"); then
   echo '     'version....................... : $netcdfversion
   fi
+  echo '  'nlopt............................ : $enablenlopt
   echo '  'openmp........................... : $enableopenmp
   echo '  'parmetis......................... : $enableparmetis
   echo '  'petsc............................ : $enablepetsc

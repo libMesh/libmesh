@@ -100,8 +100,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/mpi.m4 \
 	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
 	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
-	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
-	$(top_srcdir)/m4/precision.m4 \
+	$(top_srcdir)/m4/nlopt.m4 $(top_srcdir)/m4/parmetis.m4 \
+	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/precision.m4 \
 	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
 	$(top_srcdir)/m4/sanitize.m4 $(top_srcdir)/m4/sfc.m4 \
 	$(top_srcdir)/m4/slepc.m4 $(top_srcdir)/m4/sstream.m4 \
@@ -272,6 +272,8 @@ MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
+NLOPT_INCLUDE = @NLOPT_INCLUDE@
+NLOPT_LIBRARY = @NLOPT_LIBRARY@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
@@ -538,11 +540,13 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	eigen_sparse_linear_solver.h eigen_time_solver.h \
 	euler2_solver.h euler_solver.h laspack_linear_solver.h \
 	linear.h linear_solver.h memory_solution_history.h \
-	newton_solver.h no_solution_history.h nonlinear_solver.h \
+	newton_solver.h nlopt_optimization_solver.h \
+	no_solution_history.h nonlinear_solver.h optimization_solver.h \
 	petsc_auto_fieldsplit.h petsc_diff_solver.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h slepc_eigen_solver.h slepc_macro.h \
-	solution_history.h solver.h steady_solver.h time_solver.h \
+	solution_history.h solver.h steady_solver.h \
+	tao_optimization_solver.h time_solver.h \
 	trilinos_aztec_linear_solver.h trilinos_nox_nonlinear_solver.h \
 	twostep_time_solver.h unsteady_solver.h \
 	condensed_eigen_system.h continuation_system.h \
@@ -550,22 +554,23 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	elem_assembly.h equation_systems.h explicit_system.h \
 	fem_context.h fem_system.h frequency_system.h \
 	implicit_system.h linear_implicit_system.h newmark_system.h \
-	nonlinear_implicit_system.h parameter_accessor.h \
-	parameter_multipointer.h parameter_pointer.h \
-	parameter_vector.h qoi_set.h sensitivity_data.h \
-	steady_system.h system.h system_norm.h system_subset.h \
-	system_subset_by_subdomain.h transient_system.h \
-	compare_types.h error_vector.h hashword.h ignore_warnings.h \
-	location_maps.h mapvector.h null_output_iterator.h \
-	number_lookups.h ostream_proxy.h parameters.h perf_log.h \
-	perfmon.h plt_loader.h point_locator_base.h \
-	point_locator_list.h point_locator_tree.h pool_allocator.h \
-	restore_warnings.h statistics.h string_to_enum.h timestamp.h \
-	topology_map.h tree.h tree_base.h tree_node.h utility.h \
-	vectormap.h xdr_cxx.h parallel_communicator_specializations \
-	$(am__append_1) $(am__append_3) $(am__append_5) \
-	$(am__append_7) $(am__append_9) $(am__append_11) \
-	$(am__append_13) libmesh_config.h
+	nonlinear_implicit_system.h optimization_system.h \
+	parameter_accessor.h parameter_multipointer.h \
+	parameter_pointer.h parameter_vector.h qoi_set.h \
+	sensitivity_data.h steady_system.h system.h system_norm.h \
+	system_subset.h system_subset_by_subdomain.h \
+	transient_system.h compare_types.h error_vector.h hashword.h \
+	ignore_warnings.h location_maps.h mapvector.h \
+	null_output_iterator.h number_lookups.h ostream_proxy.h \
+	parameters.h perf_log.h perfmon.h plt_loader.h \
+	point_locator_base.h point_locator_list.h point_locator_tree.h \
+	pool_allocator.h restore_warnings.h statistics.h \
+	string_to_enum.h timestamp.h topology_map.h tree.h tree_base.h \
+	tree_node.h utility.h vectormap.h xdr_cxx.h \
+	parallel_communicator_specializations $(am__append_1) \
+	$(am__append_3) $(am__append_5) $(am__append_7) \
+	$(am__append_9) $(am__append_11) $(am__append_13) \
+	libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) $(am__append_14) libmesh_config.h
@@ -1775,10 +1780,16 @@ memory_solution_history.h: $(top_srcdir)/include/solvers/memory_solution_history
 newton_solver.h: $(top_srcdir)/include/solvers/newton_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+nlopt_optimization_solver.h: $(top_srcdir)/include/solvers/nlopt_optimization_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 no_solution_history.h: $(top_srcdir)/include/solvers/no_solution_history.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nonlinear_solver.h: $(top_srcdir)/include/solvers/nonlinear_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+optimization_solver.h: $(top_srcdir)/include/solvers/optimization_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_auto_fieldsplit.h: $(top_srcdir)/include/solvers/petsc_auto_fieldsplit.h
@@ -1809,6 +1820,9 @@ solver.h: $(top_srcdir)/include/solvers/solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 steady_solver.h: $(top_srcdir)/include/solvers/steady_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+tao_optimization_solver.h: $(top_srcdir)/include/solvers/tao_optimization_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 time_solver.h: $(top_srcdir)/include/solvers/time_solver.h
@@ -1872,6 +1886,9 @@ newmark_system.h: $(top_srcdir)/include/systems/newmark_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nonlinear_implicit_system.h: $(top_srcdir)/include/systems/nonlinear_implicit_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+optimization_system.h: $(top_srcdir)/include/systems/optimization_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_accessor.h: $(top_srcdir)/include/systems/parameter_accessor.h
