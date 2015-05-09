@@ -31,6 +31,8 @@ SUBDIRS = \
 	miscellaneous/miscellaneous_ex9 \
 	miscellaneous/miscellaneous_ex10 \
 	miscellaneous/miscellaneous_ex11 \
+	optimization/optimization_ex1 \
+	optimization/optimization_ex2 \
 	subdomains/subdomains_ex1 \
 	subdomains/subdomains_ex2 \
 	subdomains/subdomains_ex3 \
