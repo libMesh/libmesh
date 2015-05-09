@@ -524,6 +524,7 @@ void init_solverpackage_type_to_enum ()
       solverpackage_type_to_enum["LASPACK_SOLVERS"  ]=LASPACK_SOLVERS;
       solverpackage_type_to_enum["SLEPC_SOLVERS"    ]=SLEPC_SOLVERS;
       solverpackage_type_to_enum["EIGEN_SOLVERS"    ]=EIGEN_SOLVERS;
+      solverpackage_type_to_enum["NLOPT_SOLVERS"    ]=NLOPT_SOLVERS;
       solverpackage_type_to_enum["INVALID_SOLVER_PACKAGE" ]=INVALID_SOLVER_PACKAGE;
     }
 }
