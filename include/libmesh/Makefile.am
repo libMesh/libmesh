@@ -330,8 +330,10 @@ BUILT_SOURCES = \
         linear_solver.h \
         memory_solution_history.h \
         newton_solver.h \
+        nlopt_optimization_solver.h \
         no_solution_history.h \
         nonlinear_solver.h \
+        optimization_solver.h \
         petsc_auto_fieldsplit.h \
         petsc_diff_solver.h \
         petsc_linear_solver.h \
@@ -342,6 +344,7 @@ BUILT_SOURCES = \
         solution_history.h \
         solver.h \
         steady_solver.h \
+        tao_optimization_solver.h \
         time_solver.h \
         trilinos_aztec_linear_solver.h \
         trilinos_nox_nonlinear_solver.h \
@@ -363,6 +366,7 @@ BUILT_SOURCES = \
         linear_implicit_system.h \
         newmark_system.h \
         nonlinear_implicit_system.h \
+        optimization_system.h \
         parameter_accessor.h \
         parameter_multipointer.h \
         parameter_pointer.h \
@@ -1470,10 +1474,16 @@ memory_solution_history.h: $(top_srcdir)/include/solvers/memory_solution_history
 newton_solver.h: $(top_srcdir)/include/solvers/newton_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+nlopt_optimization_solver.h: $(top_srcdir)/include/solvers/nlopt_optimization_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 no_solution_history.h: $(top_srcdir)/include/solvers/no_solution_history.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nonlinear_solver.h: $(top_srcdir)/include/solvers/nonlinear_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+optimization_solver.h: $(top_srcdir)/include/solvers/optimization_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_auto_fieldsplit.h: $(top_srcdir)/include/solvers/petsc_auto_fieldsplit.h
@@ -1504,6 +1514,9 @@ solver.h: $(top_srcdir)/include/solvers/solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 steady_solver.h: $(top_srcdir)/include/solvers/steady_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+tao_optimization_solver.h: $(top_srcdir)/include/solvers/tao_optimization_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 time_solver.h: $(top_srcdir)/include/solvers/time_solver.h
@@ -1567,6 +1580,9 @@ newmark_system.h: $(top_srcdir)/include/systems/newmark_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 nonlinear_implicit_system.h: $(top_srcdir)/include/systems/nonlinear_implicit_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+optimization_system.h: $(top_srcdir)/include/systems/optimization_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parameter_accessor.h: $(top_srcdir)/include/systems/parameter_accessor.h
