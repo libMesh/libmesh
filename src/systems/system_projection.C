@@ -1466,6 +1466,12 @@ void ProjectVector::operator()(const ConstElemRange &range) const
           // dofs.
           // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
           //  continue;
+
+          // Continuing in the !has_dofs case should work with user-added
+          // elements and shouldn't be a false positive otherwise.
+          if (!elem->old_dof_object)
+            continue;
+
           const Elem* parent = elem->parent();
 
           // Per-subdomain variables don't need to be projected on
@@ -1829,6 +1835,12 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
       // dofs.
       // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
       //  continue;
+
+      // Continuing in the !has_dofs case should work with user-added
+      // elements and shouldn't be a false positive otherwise.
+      if (!elem->old_dof_object)
+        continue;
+
       const Elem* parent = elem->parent();
 
       if (elem->refinement_flag() == Elem::JUST_REFINED)
