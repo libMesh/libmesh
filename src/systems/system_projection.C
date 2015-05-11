@@ -1467,9 +1467,12 @@ void ProjectVector::operator()(const ConstElemRange &range) const
           // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
           //  continue;
 
-          // Continuing in the !has_dofs case should work with user-added
-          // elements and shouldn't be a false positive otherwise.
-          if (!elem->old_dof_object)
+          // Examining refinement flags instead should distinguish
+          // between refinement-added and user-added elements lacking
+          // old_dof_object
+          if (!elem->old_dof_object &&
+              elem->refinement_flag() != Elem::JUST_REFINED &&
+              elem->refinement_flag() != Elem::JUST_COARSENED)
             continue;
 
           const Elem* parent = elem->parent();
@@ -1836,9 +1839,12 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
       // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
       //  continue;
 
-      // Continuing in the !has_dofs case should work with user-added
-      // elements and shouldn't be a false positive otherwise.
-      if (!elem->old_dof_object)
+      // Examining refinement flags instead should distinguish
+      // between refinement-added and user-added elements lacking
+      // old_dof_object
+      if (!elem->old_dof_object &&
+          elem->refinement_flag() != Elem::JUST_REFINED &&
+          elem->refinement_flag() != Elem::JUST_COARSENED)
         continue;
 
       const Elem* parent = elem->parent();
