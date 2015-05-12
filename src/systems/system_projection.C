@@ -1466,6 +1466,15 @@ void ProjectVector::operator()(const ConstElemRange &range) const
           // dofs.
           // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
           //  continue;
+
+          // Examining refinement flags instead should distinguish
+          // between refinement-added and user-added elements lacking
+          // old_dof_object
+          if (!elem->old_dof_object &&
+              elem->refinement_flag() != Elem::JUST_REFINED &&
+              elem->refinement_flag() != Elem::JUST_COARSENED)
+            continue;
+
           const Elem* parent = elem->parent();
 
           // Per-subdomain variables don't need to be projected on
@@ -1829,6 +1838,15 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
       // dofs.
       // if (!elem->old_dof_object || !elem->old_dof_object->has_dofs(system.number()))
       //  continue;
+
+      // Examining refinement flags instead should distinguish
+      // between refinement-added and user-added elements lacking
+      // old_dof_object
+      if (!elem->old_dof_object &&
+          elem->refinement_flag() != Elem::JUST_REFINED &&
+          elem->refinement_flag() != Elem::JUST_COARSENED)
+        continue;
+
       const Elem* parent = elem->parent();
 
       if (elem->refinement_flag() == Elem::JUST_REFINED)

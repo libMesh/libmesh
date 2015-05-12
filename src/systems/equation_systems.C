@@ -163,7 +163,12 @@ void EquationSystems::reinit ()
           this->get_system(i).init();
     }
 
-#ifdef DEBUG
+
+// We used to assert that all nodes and elements *already* had
+// n_systems() properly set; however this is false in the case where
+// user code has manually added nodes and/or elements to an
+// already-initialized system.
+
   // Make sure all the \p DofObject entities know how many systems
   // there are.
   {
@@ -174,7 +179,7 @@ void EquationSystems::reinit ()
     for ( ; node_it != node_end; ++node_it)
       {
         Node *node = *node_it;
-        libmesh_assert_equal_to (node->n_systems(), this->n_systems());
+        node->set_n_systems(this->n_systems());
       }
 
     // All the elements
@@ -184,10 +189,9 @@ void EquationSystems::reinit ()
     for ( ; elem_it != elem_end; ++elem_it)
       {
         Elem *elem = *elem_it;
-        libmesh_assert_equal_to (elem->n_systems(), this->n_systems());
+        elem->set_n_systems(this->n_systems());
       }
   }
-#endif
 
   // Localize each system's vectors
   for (unsigned int i=0; i != this->n_systems(); ++i)
