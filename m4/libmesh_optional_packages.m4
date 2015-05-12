@@ -491,6 +491,18 @@ AM_CONDITIONAL(LIBMESH_ENABLE_GLPK, test x$enableglpk = xyes)
 # -------------------------------------------------------------
 
 
+# -------------------------------------------------------------
+# NLOPT -- A library of nonlinear optimization routines.
+# -------------------------------------------------------------
+CONFIGURE_NLOPT
+if (test x$enablenlopt = xyes); then
+  libmesh_optional_INCLUDES="$NLOPT_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$NLOPT_LIBRARY $libmesh_optional_LIBS"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_NLOPT, test x$enablenlopt = xyes)
+# -------------------------------------------------------------
+
+
 
 # --------------------------------------------------------------
 # HDF5 -- enabled by default

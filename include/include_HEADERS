@@ -334,8 +334,10 @@ include_HEADERS =  \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
         solvers/newton_solver.h \
+        solvers/nlopt_optimization_solver.h \
         solvers/no_solution_history.h \
         solvers/nonlinear_solver.h \
+        solvers/optimization_solver.h \
         solvers/petsc_auto_fieldsplit.h \
         solvers/petsc_diff_solver.h \
         solvers/petsc_linear_solver.h \
@@ -346,6 +348,7 @@ include_HEADERS =  \
         solvers/solution_history.h \
         solvers/solver.h \
         solvers/steady_solver.h \
+        solvers/tao_optimization_solver.h \
         solvers/time_solver.h \
         solvers/trilinos_aztec_linear_solver.h \
         solvers/trilinos_nox_nonlinear_solver.h \
@@ -367,6 +370,7 @@ include_HEADERS =  \
         systems/linear_implicit_system.h \
         systems/newmark_system.h \
         systems/nonlinear_implicit_system.h \
+        systems/optimization_system.h \
         systems/parameter_accessor.h \
         systems/parameter_multipointer.h \
         systems/parameter_pointer.h \

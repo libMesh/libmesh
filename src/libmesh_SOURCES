@@ -356,8 +356,10 @@ libmesh_SOURCES =  \
         src/solvers/linear_solver.C \
         src/solvers/memory_solution_history.C \
         src/solvers/newton_solver.C \
+        src/solvers/nlopt_optimization_solver.C \
         src/solvers/no_solution_history.C \
         src/solvers/nonlinear_solver.C \
+        src/solvers/optimization_solver.C \
         src/solvers/petsc_auto_fieldsplit.C \
         src/solvers/petsc_diff_solver.C \
         src/solvers/petsc_linear_solver.C \
@@ -366,6 +368,7 @@ libmesh_SOURCES =  \
         src/solvers/petscdmlibmeshimpl.C \
         src/solvers/slepc_eigen_solver.C \
         src/solvers/steady_solver.C \
+        src/solvers/tao_optimization_solver.C \
         src/solvers/time_solver.C \
         src/solvers/trilinos_aztec_linear_solver.C \
         src/solvers/trilinos_nox_nonlinear_solver.C \
@@ -387,6 +390,7 @@ libmesh_SOURCES =  \
         src/systems/linear_implicit_system.C \
         src/systems/newmark_system.C \
         src/systems/nonlinear_implicit_system.C \
+        src/systems/optimization_system.C \
         src/systems/parameter_vector.C \
         src/systems/qoi_set.C \
         src/systems/steady_system.C \
