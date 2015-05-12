@@ -179,7 +179,7 @@ AC_ARG_ENABLE(unordered-containers,
 # Determine which of std::hash, std::tr1::hash, or __gnu_cxx::hash is available
 ACX_BEST_HASH
 
-AC_CHECK_HEADERS(dlfcn.h)
+AX_CXX_DLOPEN
 AX_CXX_GCC_ABI_DEMANGLE
 AX_CXX_GLIBC_BACKTRACE
 
