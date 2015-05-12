@@ -71,9 +71,4 @@ AC_DEFUN([AX_CXX_DLOPEN],
 
     AC_LANG_POP([C++])
   fi
-
-  dnl Set preprocessor macro if the test code succeeded
-  if (test "$ac_cv_cxx_dlopen" = yes); then
-    AC_DEFINE(HAVE_DLOPEN, 1, [define if the compiler supports dlopen/dlsym/dlclose])
-  fi
 ])

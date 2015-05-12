@@ -57,7 +57,11 @@ AC_DEFUN([CONFIGURE_FPARSER],
         AC_MSG_RESULT(<<< Configuring library with fparser support (release version) >>>)
       fi
 
-      dnl JIT requires dlopen, use the result of the AX_CXX_DLOPEN test (dlopen.m4)
+      dnl According to the autoconf docs, "the third argument must have no
+      dnl side effects except for setting the variable cache-id"
+      AC_CACHE_CHECK([for dlopen support], [ac_cv_cxx_dlopen], AX_CXX_DLOPEN)
+
+      dnl JIT requires dlopen, use the result of the AX_CXX_DLOPEN test.
       if (test "$ac_cv_cxx_dlopen" = yes); then
         AC_DEFINE(HAVE_FPARSER_JIT, 1, [Flag indicating whether FPARSER will be built with JIT compilation enabled])
         AC_MSG_RESULT(<<< Configuring library with fparser JIT compilation support >>>)

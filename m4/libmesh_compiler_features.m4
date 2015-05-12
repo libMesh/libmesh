@@ -180,6 +180,12 @@ AC_ARG_ENABLE(unordered-containers,
 ACX_BEST_HASH
 
 AX_CXX_DLOPEN
+
+dnl Set preprocessor macro if the test code succeeded
+if (test "$ac_cv_cxx_dlopen" = yes); then
+  AC_DEFINE(HAVE_DLOPEN, 1, [define if the compiler supports dlopen/dlsym/dlclose])
+fi
+
 AX_CXX_GCC_ABI_DEMANGLE
 AX_CXX_GLIBC_BACKTRACE
 
