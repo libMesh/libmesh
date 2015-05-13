@@ -57,15 +57,19 @@ AC_DEFUN([CONFIGURE_FPARSER],
         AC_MSG_RESULT(<<< Configuring library with fparser support (release version) >>>)
       fi
 
-      AC_SEARCH_LIBS([dlopen], [dl dld], [
+      dnl According to the autoconf docs, "the third argument must have no
+      dnl side effects except for setting the variable cache-id"
+      AC_CACHE_CHECK([for dlopen support], [ac_cv_cxx_dlopen], AX_CXX_DLOPEN)
+
+      dnl JIT requires dlopen, use the result of the AX_CXX_DLOPEN test.
+      if (test "$ac_cv_cxx_dlopen" = yes); then
         AC_DEFINE(HAVE_FPARSER_JIT, 1, [Flag indicating whether FPARSER will be built with JIT compilation enabled])
         AC_MSG_RESULT(<<< Configuring library with fparser JIT compilation support >>>)
         enablefparserjit=yes
-      ], [
-        AC_DEFINE(HAVE_FPARSER_JIT, 0, [Flag indicating whether FPARSER will be built with JIT compilation enabled])
+      else
         AC_MSG_RESULT(<<< dlopen() not found, configuring library without fparser JIT compilation support >>>)
         enablefparserjit=no
-      ])
+      fi
 
       # This define in libmesh_config.h is used internally in fparser.hh and various source files
       if (test $enablefparserdebugging = yes); then

@@ -222,6 +222,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* define if the compiler supports dlopen/dlsym/dlclose */
+#undef HAVE_DLOPEN
+
 /* Flag indicating whether the library shall be compiled to use the
    DataTransferKit */
 #undef HAVE_DTK

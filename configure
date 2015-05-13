@@ -27573,17 +27573,158 @@ fi
 
 
 
-for ac_header in dlfcn.h
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "dlfcn.h" "ac_cv_header_dlfcn_h" "$ac_includes_default"
-if test "x$ac_cv_header_dlfcn_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_DLFCN_H 1
+
+  ac_cv_cxx_dlopen=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing dlopen" >&5
+$as_echo_n "checking for library containing dlopen... " >&6; }
+if ${ac_cv_search_dlopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen ();
+int
+main ()
+{
+return dlopen ();
+  ;
+  return 0;
+}
 _ACEOF
+for ac_lib in '' dl dld; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_dlopen=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_dlopen+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_dlopen+:} false; then :
+
+else
+  ac_cv_search_dlopen=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_dlopen" >&5
+$as_echo "$ac_cv_search_dlopen" >&6; }
+ac_res=$ac_cv_search_dlopen
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+      ac_cv_cxx_dlopen=yes
+
+else
+
+      ac_cv_cxx_dlopen=no
 
 fi
 
-done
+
+    if (test "$ac_cv_cxx_dlopen" = yes); then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the c++ compiler supports dlopen/dlsym/dlclose" >&5
+$as_echo_n "checking whether the c++ compiler supports dlopen/dlsym/dlclose... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+       #include <stddef.h> // NULL
+       #include <dlfcn.h>
+
+int
+main ()
+{
+
+       // Try all possible ways of naming libraries.  dlopen() will search
+       // in system-dependent paths if these names do not contain forward
+       // slashes.
+       const unsigned n_names = 2;
+       const char * lib_names[n_names] = {"libm.so", "libm.dylib"};
+
+       // To catch the output of dlopen
+       void * handle = NULL;
+
+       for (unsigned i=0; i<n_names; ++i)
+         {
+           // Math library, surely every system has it?
+           handle = dlopen(lib_names[i], RTLD_LAZY);
+
+           if (handle)
+             break;
+         }
+
+       if (!handle)
+         return 1;
+
+       // dlsym() returns the address of the code or data location
+       // specified by the null-terminated character string symbol.
+       void * address = dlsym(handle, "cos");
+
+       if (!address)
+         return 1;
+
+       /* int closed_ok = */ dlclose(handle);
+
+       return 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      ac_cv_cxx_dlopen=yes
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      ac_cv_cxx_dlopen=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  fi
+
+
+if (test "$ac_cv_cxx_dlopen" = yes); then
+
+$as_echo "#define HAVE_DLOPEN 1" >>confdefs.h
+
+fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports GCC C++ ABI name demangling" >&5
 $as_echo_n "checking whether the compiler supports GCC C++ ABI name demangling... " >&6; }
@@ -36536,7 +36677,15 @@ $as_echo "#define HAVE_FPARSER_DEVEL 0" >>confdefs.h
 $as_echo "<<< Configuring library with fparser support (release version) >>>" >&6; }
       fi
 
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing dlopen" >&5
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen support" >&5
+$as_echo_n "checking for dlopen support... " >&6; }
+if ${ac_cv_cxx_dlopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ac_cv_cxx_dlopen=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing dlopen" >&5
 $as_echo_n "checking for library containing dlopen... " >&6; }
 if ${ac_cv_search_dlopen+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -36590,24 +36739,111 @@ ac_res=$ac_cv_search_dlopen
 if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
+      ac_cv_cxx_dlopen=yes
+
+else
+
+      ac_cv_cxx_dlopen=no
+
+fi
+
+
+    if (test "$ac_cv_cxx_dlopen" = yes); then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the c++ compiler supports dlopen/dlsym/dlclose" >&5
+$as_echo_n "checking whether the c++ compiler supports dlopen/dlsym/dlclose... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+       #include <stddef.h> // NULL
+       #include <dlfcn.h>
+
+int
+main ()
+{
+
+       // Try all possible ways of naming libraries.  dlopen() will search
+       // in system-dependent paths if these names do not contain forward
+       // slashes.
+       const unsigned n_names = 2;
+       const char * lib_namesn_names = {"libm.so", "libm.dylib"};
+
+       // To catch the output of dlopen
+       void * handle = NULL;
+
+       for (unsigned i=0; i<n_names; ++i)
+         {
+           // Math library, surely every system has it?
+           handle = dlopen(lib_namesi, RTLD_LAZY);
+
+           if (handle)
+             break;
+         }
+
+       if (!handle)
+         return 1;
+
+       // dlsym() returns the address of the code or data location
+       // specified by the null-terminated character string symbol.
+       void * address = dlsym(handle, "cos");
+
+       if (!address)
+         return 1;
+
+       /* int closed_ok = */ dlclose(handle);
+
+       return 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      ac_cv_cxx_dlopen=yes
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      ac_cv_cxx_dlopen=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+  fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_dlopen" >&5
+$as_echo "$ac_cv_cxx_dlopen" >&6; }
+
+            if (test "$ac_cv_cxx_dlopen" = yes); then
 
 $as_echo "#define HAVE_FPARSER_JIT 1" >>confdefs.h
 
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with fparser JIT compilation support >>>" >&5
 $as_echo "<<< Configuring library with fparser JIT compilation support >>>" >&6; }
         enablefparserjit=yes
-
-else
-
-
-$as_echo "#define HAVE_FPARSER_JIT 0" >>confdefs.h
-
+      else
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< dlopen() not found" >&5
 $as_echo "<<< dlopen() not found" >&6; }
         enablefparserjit=no
-
-fi
-
+      fi
 
       # This define in libmesh_config.h is used internally in fparser.hh and various source files
       if (test $enablefparserdebugging = yes); then
