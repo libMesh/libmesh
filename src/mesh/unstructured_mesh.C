@@ -649,7 +649,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
               new_node_numbers[old_elem->node(n)] = n_new_nodes;
 
               // Add this node to the new mesh
-              new_mesh.add_point (old_elem->point(n));
+              new_mesh.add_point (old_elem->point(n), n_new_nodes);
 
               // Increment the new node counter
               n_new_nodes++;
