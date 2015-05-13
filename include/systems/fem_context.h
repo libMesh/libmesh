@@ -812,16 +812,27 @@ protected:
    * *interior_value methods.
    */
   template<typename OutputType,
+           void (FEMContext::*fe_getter)
+             (unsigned int,
+              FEGenericBase<typename TensorTools::MakeReal<OutputType>::type> *&)
+             const,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_value(unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_value(unsigned int var, unsigned int qp, OutputType& u) const;
 
   /**
    * Helper function to reduce some code duplication in the
    * *interior_gradient methods.
    */
   template<typename OutputType,
+           void (FEMContext::*fe_getter)
+             (unsigned int,
+              FEGenericBase
+                <typename TensorTools::MakeReal
+                  <typename TensorTools::DecrementRank
+                    <OutputType>::type>::type> *&)
+             const,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_gradient(unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_gradient(unsigned int var, unsigned int qp, OutputType& u) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -829,18 +840,17 @@ protected:
    * *interior_hessian methods.
    */
   template<typename OutputType,
+           void (FEMContext::*fe_getter)
+             (unsigned int,
+              FEGenericBase
+                <typename TensorTools::MakeReal
+                  <typename TensorTools::DecrementRank
+                    <typename TensorTools::DecrementRank
+                      <OutputType>::type>::type>::type> *&)
+             const,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_hessian(unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_hessian(unsigned int var, unsigned int qp, OutputType& u) const;
 #endif
-
-  /**
-   * Helper function to reduce some code duplication in the
-   * *side_value methods.
-   */
-  template<typename OutputType,
-           diff_subsolution_getter subsolution_getter>
-  void some_side_value(unsigned int var, unsigned int qp, OutputType& u) const;
-
 
   /**
    * Finite element objects for each variable's interior, sides and edges.
