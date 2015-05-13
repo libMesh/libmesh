@@ -137,7 +137,6 @@ util_tree_grammar_parser_SOURCES   = \
                                  fpoptimizer/rangeestimation.hh \
                                  fpoptimizer/logic_boolgroups.hh \
                                  fpoptimizer/logic_powoperations.hh \
-                                 util/cpp_compress.hh \
                                  fpconfig.hh \
                                  lib/functional.hh \
                                  lib/crc32.hh \
@@ -149,6 +148,8 @@ util_tree_grammar_parser_SOURCES   = \
                                  extrasrc/fp_opcode_add.inc \
                                  fparser_gmpint.hh extrasrc/fp_identifier_parser.inc
 
+                                 # util/cpp_compress.hh
+
   util_bytecoderules_parser_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
   util_bytecoderules_parser_SOURCES  = util/bytecoderules_parser.cc
 
@@ -157,15 +158,15 @@ util_tree_grammar_parser_SOURCES   = \
   # of that file rather than treating it as a built source.
   # util_make_function_name_parser_SOURCES  = util/make_function_name_parser.cc util/cpp_compress.cc
 
-  util_cpp_compress_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
-  util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
+#  util_cpp_compress_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
+#  util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 
 
 # when doing 'make clean' we need to remove the generated sources
 CLEANFILES += fpoptimizer/grammar_data.cc
 # in case they weren't conditionally cleaned:
 DISTCLEANFILES += util/bytecoderules_parser
-DISTCLEANFILES += util/cpp_compress
+# DISTCLEANFILES += util/cpp_compress
 DISTCLEANFILES += util/tree_grammar_parser
 
 
@@ -173,14 +174,12 @@ DISTCLEANFILES += util/tree_grammar_parser
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
-		util/bytecoderules_header.txt \
-		util/cpp_compress
+		util/bytecoderules_header.txt
 	@echo "Creating system-specific Bytecode in "$@" ..."
 	@$(MKDIR_P) extrasrc
 	@cat $(srcdir)/util/bytecoderules_header.txt > $@
 	@util/bytecoderules_parser \
 		< $(srcdir)/util/bytecoderules.dat \
-		| util/cpp_compress \
 		>> $@
 
 BUILT_SOURCES += extrasrc/fp_opcode_add.inc
@@ -195,7 +194,7 @@ if FPARSER_DEVEL
   # for installation
   noinst_PROGRAMS           += util/tree_grammar_parser
   noinst_PROGRAMS           += util/bytecoderules_parser
-  noinst_PROGRAMS           += util/cpp_compress
+  # noinst_PROGRAMS           += util/cpp_compress
   # noinst_PROGRAMS           += util/make_function_name_parser
 
   pkg_sources += $(FPOPTIMIZER_CC_FILES)
