@@ -185,15 +185,10 @@ std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 
 
 template<typename OutputType,
-         void (FEMContext::*fe_getter)
-           (unsigned int,
-            FEGenericBase<typename TensorTools::MakeReal<OutputType>::type> *&)
-           const,
+         typename FEMContext::FENeeded<OutputType>::value_getter fe_getter,
          FEMContext::diff_subsolution_getter subsolution_getter>
 void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType& u) const
 {
-  typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
-
   // Get local-to-global dof index lookup
   libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -203,11 +198,12 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType& u) co
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape>* fe = NULL;
+  typename FENeeded<OutputType>::value_base* fe = NULL;
   (this->*fe_getter)( var, fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<OutputShape> > &phi = fe->get_phi();
+  const std::vector<std::vector
+    <typename FENeeded<OutputType>::value_shape> > &phi = fe->get_phi();
 
   // Accumulate solution value
   u = 0.;
@@ -219,18 +215,10 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType& u) co
 
 
 template<typename OutputType,
-         void (FEMContext::*fe_getter)
-           (unsigned int,
-            FEGenericBase<typename TensorTools::MakeReal<
-              typename TensorTools::DecrementRank<OutputType>::type>::type> *&)
-           const,
+         typename FEMContext::FENeeded<OutputType>::grad_getter fe_getter,
          FEMContext::diff_subsolution_getter subsolution_getter>
 void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType& du) const
 {
-  typedef typename TensorTools::MakeReal
-    <typename TensorTools::DecrementRank<OutputType>::type>::type
-    OutputShape;
-
   // Get local-to-global dof index lookup
   libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -240,11 +228,13 @@ void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType& du
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape>* fe = NULL;
+  typename FENeeded<OutputType>::grad_base* fe = NULL;
   (this->*fe_getter)( var, fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = fe->get_dphi();
+  const std::vector<std::vector
+    <typename FENeeded<OutputType>::grad_base::OutputGradient> >
+    &dphi = fe->get_dphi();
 
   // Accumulate solution derivatives
   du = 0;
@@ -259,23 +249,10 @@ void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType& du
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template<typename OutputType,
-         void (FEMContext::*fe_getter)
-           (unsigned int,
-            FEGenericBase
-              <typename TensorTools::MakeReal
-                <typename TensorTools::DecrementRank
-                  <typename TensorTools::DecrementRank
-                    <OutputType>::type>::type>::type> *&)
-           const,
+         typename FEMContext::FENeeded<OutputType>::hess_getter fe_getter,
          FEMContext::diff_subsolution_getter subsolution_getter>
 void FEMContext::some_hessian(unsigned int var, unsigned int qp, OutputType& d2u) const
 {
-  typedef typename TensorTools::MakeReal<
-    typename TensorTools::DecrementRank<
-    typename TensorTools::DecrementRank<
-    OutputType>::type>::type>::type
-    OutputShape;
-
   // Get local-to-global dof index lookup
   libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -285,11 +262,13 @@ void FEMContext::some_hessian(unsigned int var, unsigned int qp, OutputType& d2u
   const DenseSubVector<Number> &coef = (this->*subsolution_getter)(var);
 
   // Get finite element object
-  FEGenericBase<OutputShape>* fe = NULL;
+  typename FENeeded<OutputType>::hess_base* fe = NULL;
   (this->*fe_getter)( var, fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = fe->get_d2phi();
+  const std::vector<std::vector
+    <typename FENeeded<OutputType>::hess_base::OutputTensor> >
+    &d2phi = fe->get_d2phi();
 
   // Accumulate solution second derivatives
   d2u = 0.0;
