@@ -201,10 +201,16 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  float embedding_matrix (const unsigned int,
-                          const unsigned int,
-                          const unsigned int) const
-  { libmesh_not_implemented(); return 0.; }
+  float embedding_matrix (const unsigned int i,
+                          const unsigned int j,
+                          const unsigned int k) const
+  { return _embedding_matrix[i][j][k]; }
+
+  /**
+   * Matrix that computes new nodal locations/solution values
+   * from current nodes/solution.
+   */
+  static const float _embedding_matrix[8][15][15];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
