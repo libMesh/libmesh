@@ -808,20 +808,51 @@ public:
 
 protected:
   /**
+   * Helper nested class for C++03-compatible "template typedef"
+   */
+  template <typename OutputType>
+  struct FENeeded {
+    typedef typename TensorTools::MakeReal
+      <OutputType>::type value_shape;
+    typedef FEGenericBase<value_shape> value_base;
+    typedef void (FEMContext::*value_getter)
+      (unsigned int, value_base *&) const;
+
+    typedef typename TensorTools::MakeReal
+      <typename TensorTools::DecrementRank
+        <OutputType>::type>::type grad_shape;
+    typedef FEGenericBase<grad_shape> grad_base;
+    typedef void (FEMContext::*grad_getter)
+      (unsigned int, grad_base *&) const;
+
+    typedef typename TensorTools::MakeReal
+      <typename TensorTools::DecrementRank
+        <typename TensorTools::DecrementRank
+          <OutputType>::type>::type>::type hess_shape;
+    typedef FEGenericBase<hess_shape> hess_base;
+    typedef void (FEMContext::*hess_getter)
+      (unsigned int, hess_base *&) const;
+  };
+
+
+
+  /**
    * Helper function to reduce some code duplication in the
    * *interior_value methods.
    */
   template<typename OutputType,
+           typename FENeeded<OutputType>::value_getter fe_getter,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_value(unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_value(unsigned int var, unsigned int qp, OutputType& u) const;
 
   /**
    * Helper function to reduce some code duplication in the
    * *interior_gradient methods.
    */
   template<typename OutputType,
+           typename FENeeded<OutputType>::grad_getter fe_getter,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_gradient(unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_gradient(unsigned int var, unsigned int qp, OutputType& u) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -829,18 +860,10 @@ protected:
    * *interior_hessian methods.
    */
   template<typename OutputType,
+           typename FENeeded<OutputType>::hess_getter fe_getter,
            diff_subsolution_getter subsolution_getter>
-  void some_interior_hessian(unsigned int var, unsigned int qp, OutputType& u) const;
+  void some_hessian(unsigned int var, unsigned int qp, OutputType& u) const;
 #endif
-
-  /**
-   * Helper function to reduce some code duplication in the
-   * *side_value methods.
-   */
-  template<typename OutputType,
-           diff_subsolution_getter subsolution_getter>
-  void some_side_value(unsigned int var, unsigned int qp, OutputType& u) const;
-
 
   /**
    * Finite element objects for each variable's interior, sides and edges.
