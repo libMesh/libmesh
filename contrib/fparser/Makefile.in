@@ -63,8 +63,7 @@ noinst_PROGRAMS = $(am__EXEEXT_1)
 @FPARSER_SUPPORT_JIT_TRUE@am__append_4 = -DFPARSER_JIT_COMPILER="\"$(CXX)\""
 @FPARSER_DEVEL_TRUE@am__append_5 = fpoptimizer/grammar_data.cc
 @FPARSER_DEVEL_TRUE@am__append_6 = util/tree_grammar_parser \
-@FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
-@FPARSER_DEVEL_TRUE@	util/cpp_compress
+@FPARSER_DEVEL_TRUE@	util/bytecoderules_parser
 @FPARSER_DEVEL_TRUE@am__append_7 = $(FPOPTIMIZER_CC_FILES)
 @FPARSER_DEVEL_TRUE@am__append_8 = $(BUILT_SOURCES)
 @FPARSER_DEVEL_FALSE@am__append_9 = fpoptimizer.cc
@@ -392,8 +391,7 @@ libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
 @FPARSER_DEVEL_TRUE@am__EXEEXT_1 = util/tree_grammar_parser$(EXEEXT) \
-@FPARSER_DEVEL_TRUE@	util/bytecoderules_parser$(EXEEXT) \
-@FPARSER_DEVEL_TRUE@	util/cpp_compress$(EXEEXT)
+@FPARSER_DEVEL_TRUE@	util/bytecoderules_parser$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_util_bytecoderules_parser_OBJECTS =  \
 	util/util_bytecoderules_parser-bytecoderules_parser.$(OBJEXT)
@@ -404,15 +402,6 @@ util_bytecoderules_parser_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(util_bytecoderules_parser_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-am_util_cpp_compress_OBJECTS =  \
-	util/util_cpp_compress-cpp_compress.$(OBJEXT) \
-	util/util_cpp_compress-cpp_compress_main.$(OBJEXT)
-util_cpp_compress_OBJECTS = $(am_util_cpp_compress_OBJECTS)
-util_cpp_compress_LDADD = $(LDADD)
-util_cpp_compress_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 am_util_tree_grammar_parser_OBJECTS =  \
 	util/util_tree_grammar_parser-tree_grammar_parser.$(OBJEXT) \
 	fpoptimizer/util_tree_grammar_parser-opcodename.$(OBJEXT) \
@@ -491,14 +480,12 @@ am__v_CCLD_1 =
 SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
 	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
 	$(libprof_la_SOURCES) $(util_bytecoderules_parser_SOURCES) \
-	$(util_cpp_compress_SOURCES) \
 	$(util_tree_grammar_parser_SOURCES)
 DIST_SOURCES = $(am__libdbg_la_SOURCES_DIST) \
 	$(am__libdevel_la_SOURCES_DIST) \
 	$(am__liboprof_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST) \
 	$(am__libprof_la_SOURCES_DIST) \
 	$(util_bytecoderules_parser_SOURCES) \
-	$(util_cpp_compress_SOURCES) \
 	$(util_tree_grammar_parser_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -894,11 +881,14 @@ EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 	fpoptimizer/fpoptimizer_footer.txt
 BUILT_SOURCES = extrasrc/fp_opcode_add.inc $(am__append_5)
 
+#  util_cpp_compress_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
+#  util_cpp_compress_SOURCES  = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
+
 # when doing 'make clean' we need to remove the generated sources
 CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_8)
 # in case they weren't conditionally cleaned:
-DISTCLEANFILES = util/bytecoderules_parser util/cpp_compress \
-	util/tree_grammar_parser
+# DISTCLEANFILES += util/cpp_compress
+DISTCLEANFILES = util/bytecoderules_parser util/tree_grammar_parser
 include_HEADERS = fparser.hh fparser_ad.hh
 FPOPTIMIZER_CC_FILES = \
 	    lib/crc32.hh \
@@ -972,7 +962,6 @@ util_tree_grammar_parser_SOURCES = \
                                  fpoptimizer/rangeestimation.hh \
                                  fpoptimizer/logic_boolgroups.hh \
                                  fpoptimizer/logic_powoperations.hh \
-                                 util/cpp_compress.hh \
                                  fpconfig.hh \
                                  lib/functional.hh \
                                  lib/crc32.hh \
@@ -986,8 +975,6 @@ util_tree_grammar_parser_SOURCES = \
 
 util_bytecoderules_parser_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
 util_bytecoderules_parser_SOURCES = util/bytecoderules_parser.cc
-util_cpp_compress_CXXFLAGS = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
-util_cpp_compress_SOURCES = util/cpp_compress.hh util/cpp_compress.cc util/cpp_compress_main.cc
 @FPARSER_DEVEL_FALSE@SUBDIRS = extrasrc
 
 ######################################################################
@@ -1338,13 +1325,6 @@ util/util_bytecoderules_parser-bytecoderules_parser.$(OBJEXT):  \
 util/bytecoderules_parser$(EXEEXT): $(util_bytecoderules_parser_OBJECTS) $(util_bytecoderules_parser_DEPENDENCIES) $(EXTRA_util_bytecoderules_parser_DEPENDENCIES) util/$(am__dirstamp)
 	@rm -f util/bytecoderules_parser$(EXEEXT)
 	$(AM_V_CXXLD)$(util_bytecoderules_parser_LINK) $(util_bytecoderules_parser_OBJECTS) $(util_bytecoderules_parser_LDADD) $(LIBS)
-util/util_cpp_compress-cpp_compress.$(OBJEXT): util/$(am__dirstamp) \
-	util/$(DEPDIR)/$(am__dirstamp)
-util/util_cpp_compress-cpp_compress_main.$(OBJEXT):  \
-	util/$(am__dirstamp) util/$(DEPDIR)/$(am__dirstamp)
-util/cpp_compress$(EXEEXT): $(util_cpp_compress_OBJECTS) $(util_cpp_compress_DEPENDENCIES) $(EXTRA_util_cpp_compress_DEPENDENCIES) util/$(am__dirstamp)
-	@rm -f util/cpp_compress$(EXEEXT)
-	$(AM_V_CXXLD)$(util_cpp_compress_LINK) $(util_cpp_compress_OBJECTS) $(util_cpp_compress_LDADD) $(LIBS)
 util/util_tree_grammar_parser-tree_grammar_parser.$(OBJEXT):  \
 	util/$(am__dirstamp) util/$(DEPDIR)/$(am__dirstamp)
 fpoptimizer/util_tree_grammar_parser-opcodename.$(OBJEXT):  \
@@ -1486,8 +1466,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lib/$(DEPDIR)/libprof_la-sha1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lib/$(DEPDIR)/util_tree_grammar_parser-sha1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util_bytecoderules_parser-bytecoderules_parser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util_cpp_compress-cpp_compress.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util_cpp_compress-cpp_compress_main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@util/$(DEPDIR)/util_tree_grammar_parser-tree_grammar_parser.Po@am__quote@
 
 .cc.o:
@@ -2333,34 +2311,6 @@ util/util_bytecoderules_parser-bytecoderules_parser.obj: util/bytecoderules_pars
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_bytecoderules_parser_CXXFLAGS) $(CXXFLAGS) -c -o util/util_bytecoderules_parser-bytecoderules_parser.obj `if test -f 'util/bytecoderules_parser.cc'; then $(CYGPATH_W) 'util/bytecoderules_parser.cc'; else $(CYGPATH_W) '$(srcdir)/util/bytecoderules_parser.cc'; fi`
 
-util/util_cpp_compress-cpp_compress.o: util/cpp_compress.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -MT util/util_cpp_compress-cpp_compress.o -MD -MP -MF util/$(DEPDIR)/util_cpp_compress-cpp_compress.Tpo -c -o util/util_cpp_compress-cpp_compress.o `test -f 'util/cpp_compress.cc' || echo '$(srcdir)/'`util/cpp_compress.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) util/$(DEPDIR)/util_cpp_compress-cpp_compress.Tpo util/$(DEPDIR)/util_cpp_compress-cpp_compress.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util/cpp_compress.cc' object='util/util_cpp_compress-cpp_compress.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -c -o util/util_cpp_compress-cpp_compress.o `test -f 'util/cpp_compress.cc' || echo '$(srcdir)/'`util/cpp_compress.cc
-
-util/util_cpp_compress-cpp_compress.obj: util/cpp_compress.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -MT util/util_cpp_compress-cpp_compress.obj -MD -MP -MF util/$(DEPDIR)/util_cpp_compress-cpp_compress.Tpo -c -o util/util_cpp_compress-cpp_compress.obj `if test -f 'util/cpp_compress.cc'; then $(CYGPATH_W) 'util/cpp_compress.cc'; else $(CYGPATH_W) '$(srcdir)/util/cpp_compress.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) util/$(DEPDIR)/util_cpp_compress-cpp_compress.Tpo util/$(DEPDIR)/util_cpp_compress-cpp_compress.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util/cpp_compress.cc' object='util/util_cpp_compress-cpp_compress.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -c -o util/util_cpp_compress-cpp_compress.obj `if test -f 'util/cpp_compress.cc'; then $(CYGPATH_W) 'util/cpp_compress.cc'; else $(CYGPATH_W) '$(srcdir)/util/cpp_compress.cc'; fi`
-
-util/util_cpp_compress-cpp_compress_main.o: util/cpp_compress_main.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -MT util/util_cpp_compress-cpp_compress_main.o -MD -MP -MF util/$(DEPDIR)/util_cpp_compress-cpp_compress_main.Tpo -c -o util/util_cpp_compress-cpp_compress_main.o `test -f 'util/cpp_compress_main.cc' || echo '$(srcdir)/'`util/cpp_compress_main.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) util/$(DEPDIR)/util_cpp_compress-cpp_compress_main.Tpo util/$(DEPDIR)/util_cpp_compress-cpp_compress_main.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util/cpp_compress_main.cc' object='util/util_cpp_compress-cpp_compress_main.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -c -o util/util_cpp_compress-cpp_compress_main.o `test -f 'util/cpp_compress_main.cc' || echo '$(srcdir)/'`util/cpp_compress_main.cc
-
-util/util_cpp_compress-cpp_compress_main.obj: util/cpp_compress_main.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -MT util/util_cpp_compress-cpp_compress_main.obj -MD -MP -MF util/$(DEPDIR)/util_cpp_compress-cpp_compress_main.Tpo -c -o util/util_cpp_compress-cpp_compress_main.obj `if test -f 'util/cpp_compress_main.cc'; then $(CYGPATH_W) 'util/cpp_compress_main.cc'; else $(CYGPATH_W) '$(srcdir)/util/cpp_compress_main.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) util/$(DEPDIR)/util_cpp_compress-cpp_compress_main.Tpo util/$(DEPDIR)/util_cpp_compress-cpp_compress_main.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util/cpp_compress_main.cc' object='util/util_cpp_compress-cpp_compress_main.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_cpp_compress_CXXFLAGS) $(CXXFLAGS) -c -o util/util_cpp_compress-cpp_compress_main.obj `if test -f 'util/cpp_compress_main.cc'; then $(CYGPATH_W) 'util/cpp_compress_main.cc'; else $(CYGPATH_W) '$(srcdir)/util/cpp_compress_main.cc'; fi`
-
 util/util_tree_grammar_parser-tree_grammar_parser.o: util/tree_grammar_parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(util_tree_grammar_parser_CXXFLAGS) $(CXXFLAGS) -MT util/util_tree_grammar_parser-tree_grammar_parser.o -MD -MP -MF util/$(DEPDIR)/util_tree_grammar_parser-tree_grammar_parser.Tpo -c -o util/util_tree_grammar_parser-tree_grammar_parser.o `test -f 'util/tree_grammar_parser.cc' || echo '$(srcdir)/'`util/tree_grammar_parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) util/$(DEPDIR)/util_tree_grammar_parser-tree_grammar_parser.Tpo util/$(DEPDIR)/util_tree_grammar_parser-tree_grammar_parser.Po
@@ -2805,6 +2755,8 @@ fpoptimizer/grammar_data.cc: \
 	@echo "Parsing Grammar from "$(srcdir)/fpoptimizer/treerules.dat" using "$<" ..."
 	@util/tree_grammar_parser < $(srcdir)/fpoptimizer/treerules.dat > $@
 
+                                 # util/cpp_compress.hh
+
   # 'util/make_function_name_parser' is used to create extrasrc/fp_identifier_parser.inc,
   # but it seems to only define a snippet.  So for now we use the distributed version
   # of that file rather than treating it as a built source.
@@ -2814,20 +2766,19 @@ fpoptimizer/grammar_data.cc: \
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
-		util/bytecoderules_header.txt \
-		util/cpp_compress
+		util/bytecoderules_header.txt
 	@echo "Creating system-specific Bytecode in "$@" ..."
 	@$(MKDIR_P) extrasrc
 	@cat $(srcdir)/util/bytecoderules_header.txt > $@
 	@util/bytecoderules_parser \
 		< $(srcdir)/util/bytecoderules.dat \
-		| util/cpp_compress \
 		>> $@
 
 fparser.cc: extrasrc/fp_opcode_add.inc
 
 @FPARSER_DEVEL_TRUE@  # Build up utility programs used to define parsing, not needed
 @FPARSER_DEVEL_TRUE@  # for installation
+@FPARSER_DEVEL_TRUE@  # noinst_PROGRAMS           += util/cpp_compress
 @FPARSER_DEVEL_TRUE@  # noinst_PROGRAMS           += util/make_function_name_parser
 
 @FPARSER_DEVEL_TRUE@  # when doing 'make clean' we need to remove the generated sources
