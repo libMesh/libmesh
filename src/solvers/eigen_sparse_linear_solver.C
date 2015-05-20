@@ -257,7 +257,21 @@ void EigenSparseLinearSolver<T>::print_converged_reason() const
 template <typename T>
 LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
 {
-  libmesh_not_implemented();
+  std::map<Eigen::ComputationInfo, LinearConvergenceReason>::iterator it =
+    _convergence_reasons.find(_comp_info);
+
+  // If later versions of Eigen start returning new enumerations,
+  // we'll need to add them to the map...
+  if (it == _convergence_reasons.end())
+    {
+      libmesh_warning("Warning: unknown Eigen::ComputationInfo: " \
+                      << _comp_info \
+                      << " returning CONVERGED_ITS." \
+                      << std::endl);
+      return CONVERGED_ITS;
+    }
+  else
+    return it->second;
 }
 
 
