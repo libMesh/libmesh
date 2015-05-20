@@ -32,7 +32,18 @@
 namespace libMesh
 {
 
-/*----------------------- functions ----------------------------------*/
+template <typename T>
+EigenSparseLinearSolver<T>::
+EigenSparseLinearSolver(const Parallel::Communicator &comm_in) :
+  LinearSolver<T>(comm_in),
+  _comp_info(Eigen::Success)
+{
+  // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead
+  this->_solver_type = BICGSTAB;
+}
+
+
+
 template <typename T>
 void EigenSparseLinearSolver<T>::clear ()
 {
@@ -95,6 +106,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
         libMesh::out << "#iterations: " << solver.iterations() << std::endl;
         libMesh::out << "estimated error: " << solver.error() << std::endl;
         retval = std::make_pair(solver.iterations(), solver.error());
+        _comp_info = solver.info();
         break;
       }
 
@@ -108,6 +120,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
         libMesh::out << "#iterations: " << solver.iterations() << std::endl;
         libMesh::out << "estimated error: " << solver.error() << std::endl;
         retval = std::make_pair(solver.iterations(), solver.error());
+        _comp_info = solver.info();
         break;
       }
 

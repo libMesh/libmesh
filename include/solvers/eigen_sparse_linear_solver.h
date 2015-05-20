@@ -144,6 +144,11 @@ private:
   void set_eigen_preconditioner_type ();
 
   /**
+   * Store the result of the last solve.
+   */
+  Eigen::ComputationInfo _comp_info;
+
+  /**
    * Static map between Eigen ComputationInfo enumerations and libMesh
    * LinearConvergenceReason enumerations.
    */
@@ -171,17 +176,6 @@ private:
 template <typename T>
 std::map<Eigen::ComputationInfo, LinearConvergenceReason>
 EigenSparseLinearSolver<T>::_convergence_reasons = EigenSparseLinearSolver<T>::build_map();
-
-
-
-template <typename T>
-inline
-EigenSparseLinearSolver<T>::EigenSparseLinearSolver(const libMesh::Parallel::Communicator &comm_in) :
-  LinearSolver<T>(comm_in)
-{
-  // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead
-  this->_solver_type = BICGSTAB;
-}
 
 
 
