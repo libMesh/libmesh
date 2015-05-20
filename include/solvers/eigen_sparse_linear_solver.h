@@ -125,12 +125,6 @@ public:
          const unsigned int m_its);
 
   /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
-   */
-  virtual void print_converged_reason() const;
-
-  /**
    * Returns the solver's convergence flag
    */
   virtual LinearConvergenceReason get_converged_reason() const;

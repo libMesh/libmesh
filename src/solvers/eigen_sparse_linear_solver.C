@@ -246,15 +246,6 @@ void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
 
 
 template <typename T>
-void EigenSparseLinearSolver<T>::print_converged_reason() const
-{
-  libMesh::out << "print_converged_reason() is currently only supported"
-               << "with Petsc 2.3.1 and later." << std::endl;
-}
-
-
-
-template <typename T>
 LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
 {
   std::map<Eigen::ComputationInfo, LinearConvergenceReason>::iterator it =
