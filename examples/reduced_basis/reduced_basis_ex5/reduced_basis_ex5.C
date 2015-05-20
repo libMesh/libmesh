@@ -79,9 +79,6 @@ int main(int argc, char** argv) {
   // XDR binary support requires double precision
   libmesh_example_requires(false, "--disable-singleprecision");
 #endif
-  // FIXME: with Eigen sparse solvers, libMesh::EigenSparseLinearSolver<double>::get_converged_reason()
-  // aborts with not implemented
-  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // This example only works if libMesh was compiled for 3D
   const unsigned int dim = 3;
@@ -203,6 +200,10 @@ int main(int argc, char** argv) {
 
   if(!online_mode) // Perform the Offline stage of the RB method
     {
+      // Use CG solver.  This echoes the Petsc command line options set
+      // in run.sh, but also works for non-PETSc linear solvers.
+      rb_con.get_linear_solver()->set_solver_type(CG);
+
       // Read in the data that defines this problem from the specified text file
       rb_con.process_parameters_file(parameters_filename);
 

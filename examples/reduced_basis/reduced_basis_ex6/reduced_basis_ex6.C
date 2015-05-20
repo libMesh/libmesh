@@ -101,9 +101,6 @@ int main (int argc, char** argv)
   // XDR binary support requires double precision
   libmesh_example_requires(false, "--disable-singleprecision");
 #endif
-  // FIXME: with Eigen sparse solvers, libMesh::EigenSparseLinearSolver<double>::get_converged_reason()
-  // aborts with not implemented
-  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // This is a 3D example
   libmesh_example_requires(3 == LIBMESH_DIM, "3D support");
