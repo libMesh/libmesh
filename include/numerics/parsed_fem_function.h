@@ -33,6 +33,7 @@
 #endif
 
 // C++ includes
+#include <cctype>
 
 namespace libMesh
 {
@@ -54,7 +55,17 @@ public:
                      const std::vector<Output>* initial_vals=NULL)
     : _sys(sys),
       _expression(expression),
-      _n_vars(sys.n_vars())
+      _n_vars(sys.n_vars()),
+      _n_requested_vars(0),
+      _n_requested_grad_components(0),
+      _n_requested_hess_components(0),
+      _need_var(_n_vars, false),
+      _need_var_grad(_n_vars*LIBMESH_DIM, false)
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+      ,
+      _need_var_hess(_n_vars*LIBMESH_DIM*LIBMESH_DIM, false)
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
   {
     std::string variables = "x";
 #if LIBMESH_DIM > 1
@@ -65,13 +76,40 @@ public:
 #endif
     variables += ",t";
 
-    _spacetime.resize(LIBMESH_DIM+1 + _n_vars + (additional_vars ? additional_vars->size() : 0));
-
     for (unsigned int v=0; v != _n_vars; ++v)
       {
+        const std::string & varname = sys.variable_name(v);
+        const std::size_t namesize = varname.size();
+        std::size_t varname_i = _expression.find(varname);
+
+        // If we found our variable name but only as a prefix or
+        // suffix of something else, let's keep searching.
+        while ((varname_i != std::string::npos) &&
+               (((varname_i > 0) &&
+                 (std::isalnum(_expression[varname_i-1]) ||
+                  (_expression[varname_i-1] == '_'))) ||
+                ((varname_i+namesize < _expression.size()) &&
+                 (std::isalnum(_expression[varname_i+namesize]) ||
+                  (_expression[varname_i+namesize] == '_')))))
+          {
+            varname_i = _expression.find(varname, varname_i+1);
+          }
+
+        // If we didn't find our variable name then let's go to the
+        // next.
+        if (varname_i == std::string::npos)
+          continue;
+
+        _need_var[v] = true;
         variables += ',';
-        variables += sys.variable_name(v);
+        variables += varname;
+        _n_requested_vars++;
       }
+
+    _spacetime.resize
+      (LIBMESH_DIM + 1 + _n_requested_vars +
+       _n_requested_grad_components + _n_requested_hess_components +
+       (additional_vars ? additional_vars->size() : 0));
 
     // If additional vars were passed, append them to the string
     // that we send to the function parser. Also add them to the
@@ -83,12 +121,17 @@ public:
 
         std::copy(additional_vars->begin(), additional_vars->end(), std::back_inserter(_additional_vars));
 
+        unsigned int offset = LIBMESH_DIM + 1 + _n_requested_vars +
+          _n_requested_grad_components + _n_requested_hess_components;
+
         for (unsigned int i=0; i < additional_vars->size(); ++i)
           {
             variables += "," + (*additional_vars)[i];
             // Initialize extra variables to the vector passed in or zero
             // Note: The initial_vals vector can be shorter than the additional_vars vector
-            _spacetime[LIBMESH_DIM+1+_n_vars + i] = (initial_vals && i < initial_vals->size()) ? (*initial_vals)[i] : 0;
+            _spacetime[offset + i] =
+              (initial_vals && i < initial_vals->size()) ?
+                (*initial_vals)[i] : 0;
           }
       }
 
@@ -193,9 +236,14 @@ public:
 #endif
     _spacetime[LIBMESH_DIM] = time;
 
+    unsigned int request_index = 0;
     for (unsigned int v=0; v != _n_vars; ++v)
       {
-        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+v]);
+        if (!_need_var[v])
+          continue;
+
+        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
+        request_index++;
       }
 
     // The remaining locations in _spacetime are currently fixed at construction
@@ -228,9 +276,14 @@ public:
 #endif
     _spacetime[LIBMESH_DIM] = time;
 
+    unsigned int request_index = 0;
     for (unsigned int v=0; v != _n_vars; ++v)
       {
-        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+v]);
+        if (!_need_var[v])
+          continue;
+
+        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
+        request_index++;
       }
 
     unsigned int size = output.size();
@@ -265,9 +318,14 @@ public:
 #endif
     _spacetime[LIBMESH_DIM] = time;
 
+    unsigned int request_index = 0;
     for (unsigned int v=0; v != _n_vars; ++v)
       {
-        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+v]);
+        if (!_need_var[v])
+          continue;
+
+        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
+        request_index++;
       }
 #ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_less (i, parsers.size());
@@ -284,11 +342,28 @@ public:
 private:
   const System& _sys;
   std::string _expression;
-  unsigned int _n_vars;
+  unsigned int _n_vars,
+               _n_requested_vars,
+               _n_requested_grad_components,
+               _n_requested_hess_components;
 #ifdef LIBMESH_HAVE_FPARSER
   std::vector<FunctionParserBase<Output> > parsers;
 #endif
   std::vector<Output> _spacetime;
+
+  // Flags for which variables need to be computed
+
+  // _need_var[v] is true iff value(v) is needed
+  std::vector<bool> _need_var;
+
+  // _need_var_grad[v*LIBMESH_DIM+i] is true iff grad(v,i) is needed
+  std::vector<bool> _need_var_grad;
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // _need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+i*LIBMESH_DIM+j] is true
+  // iff grad(v,i,j) is needed
+  std::vector<bool> _need_var_hess;
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Additional variables/values that can be parsed and handled by the function parser
   std::vector<std::string> _additional_vars;
