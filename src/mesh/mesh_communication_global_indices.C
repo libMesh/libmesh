@@ -613,7 +613,8 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
   // (4) determine the position in the global ranking for
   //     each local object
   index_map.clear();
-  index_map.reserve(std::distance (begin, end));
+  std::size_t n_objects = std::distance (begin, end);
+  index_map.reserve(n_objects);
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
@@ -623,8 +624,8 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
   std::vector<Hilbert::HilbertIndices>
     sorted_hilbert_keys,
     hilbert_keys;
-  sorted_hilbert_keys.reserve(index_map.capacity());
-  hilbert_keys.reserve(index_map.capacity());
+  sorted_hilbert_keys.reserve(n_objects);
+  hilbert_keys.reserve(n_objects);
   {
     START_LOG("compute_hilbert_indices()", "MeshCommunication");
     for (ForwardIterator it=begin; it!=end; ++it)
@@ -828,6 +829,8 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
         }
     }
   }
+
+  libmesh_assert_equal_to(index_map.size(), n_objects);
 
   STOP_LOG ("find_global_indices()", "MeshCommunication");
 }
