@@ -249,6 +249,14 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "PETSc >= 3.5.0 with built-in TAO support");
 #endif
 
+  if (libMesh::on_command_line ("--use-eigen"))
+    {
+      libMesh::err << "This example requires an OptimizationSolver, and therefore does not "
+                   << "support --use-eigen on the command line."
+                   << std::endl;
+      return 0;
+    }
+
   GetPot infile("optimization_ex1.in");
   const std::string approx_order = infile("approx_order", "FIRST");
   const std::string fe_family = infile("fe_family", "LAGRANGE");

@@ -395,6 +395,14 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "--enable-petsc or --enable-trilinos");
 #endif
 
+  if (libMesh::on_command_line ("--use-eigen"))
+    {
+      libMesh::err << "This example requires a NonlinearSolver, and therefore does not "
+                   << "support --use-eigen on the command line."
+                   << std::endl;
+      return 0;
+    }
+
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_requires(false, "--enable-amr");
 #else
