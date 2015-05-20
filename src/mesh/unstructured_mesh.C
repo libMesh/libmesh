@@ -605,6 +605,12 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   // in it, get rid of it.
   new_mesh.clear();
 
+  // If we're not serial, our submesh isn't either.
+  // There are no remote elements to delete on an empty mesh, but
+  // calling the method to do so marks the mesh as parallel.
+  if (!this->is_serial())
+    new_mesh.delete_remote_elements();
+
   // Fail if (*this == new_mesh), we cannot create a submesh inside ourself!
   // This may happen if the user accidently passes the original mesh into
   // this function!  We will check this by making sure we did not just
@@ -612,58 +618,37 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   libmesh_assert_not_equal_to (this->n_nodes(), 0);
   libmesh_assert_not_equal_to (this->n_elem(), 0);
 
-  // How the nodes on this mesh will be renumbered to nodes
-  // on the new_mesh.
-  std::vector<dof_id_type> new_node_numbers (this->n_nodes());
-
-  std::fill (new_node_numbers.begin(),
-             new_node_numbers.end(),
-             DofObject::invalid_id);
-
-
-
-  // the number of nodes on the new mesh, will be incremented
-  dof_id_type n_new_nodes = 0;
-  dof_id_type n_new_elem  = 0;
-
   for (; it != it_end; ++it)
     {
-      // increment the new element counter
-      n_new_elem++;
-
       const Elem* old_elem = *it;
 
-      // Add an equivalent element type to the new_mesh
-      Elem* new_elem =
-        new_mesh.add_elem (Elem::build(old_elem->type()).release());
+      // Add an equivalent element type to the new_mesh.
+      // Copy ids for this element.
+      Elem* new_elem = Elem::build(old_elem->type()).release();
+      new_elem->set_id() = old_elem->id();
+      new_elem->subdomain_id() = old_elem->subdomain_id();
+      new_elem->processor_id() = old_elem->processor_id();
+
+      new_mesh.add_elem (new_elem);
 
       libmesh_assert(new_elem);
 
       // Loop over the nodes on this element.
       for (unsigned int n=0; n<old_elem->n_nodes(); n++)
         {
-          libmesh_assert_less (old_elem->node(n), new_node_numbers.size());
+          const dof_id_type node_id = old_elem->node(n);
 
-          if (new_node_numbers[old_elem->node(n)] == DofObject::invalid_id)
+          // Add this node to the new mesh if it's not there already
+          if (!new_mesh.query_node_ptr(node_id))
             {
-              new_node_numbers[old_elem->node(n)] = n_new_nodes;
-
-              // Add this node to the new mesh
-              new_mesh.add_point (old_elem->point(n));
-
-              // Increment the new node counter
-              n_new_nodes++;
+              new_mesh.add_point (old_elem->point(n),
+                                  node_id,
+                                  old_elem->get_node(n)->processor_id());
             }
 
           // Define this element's connectivity on the new mesh
-          libmesh_assert_less (new_node_numbers[old_elem->node(n)], new_mesh.n_nodes());
-
-          new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
+          new_elem->set_node(n) = new_mesh.node_ptr(node_id);
         }
-
-      // Copy ids for this element
-      new_elem->subdomain_id() = old_elem->subdomain_id();
-      new_elem->processor_id() = old_elem->processor_id();
 
       // Maybe add boundary conditions for this element
       for (unsigned short s=0; s<old_elem->n_sides(); s++)
