@@ -32,7 +32,18 @@
 namespace libMesh
 {
 
-/*----------------------- functions ----------------------------------*/
+template <typename T>
+EigenSparseLinearSolver<T>::
+EigenSparseLinearSolver(const Parallel::Communicator &comm_in) :
+  LinearSolver<T>(comm_in),
+  _comp_info(Eigen::Success)
+{
+  // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead
+  this->_solver_type = BICGSTAB;
+}
+
+
+
 template <typename T>
 void EigenSparseLinearSolver<T>::clear ()
 {
@@ -95,6 +106,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
         libMesh::out << "#iterations: " << solver.iterations() << std::endl;
         libMesh::out << "estimated error: " << solver.error() << std::endl;
         retval = std::make_pair(solver.iterations(), solver.error());
+        _comp_info = solver.info();
         break;
       }
 
@@ -108,6 +120,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
         libMesh::out << "#iterations: " << solver.iterations() << std::endl;
         libMesh::out << "estimated error: " << solver.error() << std::endl;
         retval = std::make_pair(solver.iterations(), solver.error());
+        _comp_info = solver.info();
         break;
       }
 
@@ -233,18 +246,23 @@ void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
 
 
 template <typename T>
-void EigenSparseLinearSolver<T>::print_converged_reason() const
-{
-  libMesh::out << "print_converged_reason() is currently only supported"
-               << "with Petsc 2.3.1 and later." << std::endl;
-}
-
-
-
-template <typename T>
 LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
 {
-  libmesh_not_implemented();
+  std::map<Eigen::ComputationInfo, LinearConvergenceReason>::iterator it =
+    _convergence_reasons.find(_comp_info);
+
+  // If later versions of Eigen start returning new enumerations,
+  // we'll need to add them to the map...
+  if (it == _convergence_reasons.end())
+    {
+      libmesh_warning("Warning: unknown Eigen::ComputationInfo: " \
+                      << _comp_info \
+                      << " returning CONVERGED_ITS." \
+                      << std::endl);
+      return CONVERGED_ITS;
+    }
+  else
+    return it->second;
 }
 
 

@@ -68,8 +68,6 @@ int main (int argc, char** argv)
   libmesh_example_requires(false, "--disable-singleprecision");
 #endif
   // FIXME: This example currently segfaults with Trilinos?
-  // FIXME: with Eigen sparse solvers, libMesh::EigenSparseLinearSolver<double>::get_converged_reason()
-  // aborts with not implemented
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Skip this 2D example if libMesh was compiled as 1D-only.

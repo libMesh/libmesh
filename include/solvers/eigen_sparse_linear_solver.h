@@ -125,12 +125,6 @@ public:
          const unsigned int m_its);
 
   /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
-   */
-  virtual void print_converged_reason() const;
-
-  /**
    * Returns the solver's convergence flag
    */
   virtual LinearConvergenceReason get_converged_reason() const;
@@ -143,18 +137,39 @@ private:
    */
   void set_eigen_preconditioner_type ();
 
+  /**
+   * Store the result of the last solve.
+   */
+  Eigen::ComputationInfo _comp_info;
+
+  /**
+   * Static map between Eigen ComputationInfo enumerations and libMesh
+   * LinearConvergenceReason enumerations.
+   */
+  static std::map<Eigen::ComputationInfo, LinearConvergenceReason> _convergence_reasons;
+
+  /**
+   * Static function used to initialize _covergence_reasons map
+   */
+  static std::map<Eigen::ComputationInfo, LinearConvergenceReason> build_map()
+    {
+      std::map<Eigen::ComputationInfo, LinearConvergenceReason> ret;
+      ret[Eigen::Success]        = CONVERGED_ITS;
+      ret[Eigen::NumericalIssue] = DIVERGED_BREAKDOWN;
+      ret[Eigen::NoConvergence]  = DIVERGED_ITS;
+      ret[Eigen::InvalidInput]   = DIVERGED_NULL;
+      return ret;
+    }
 };
 
 
-/*----------------------- functions ----------------------------------*/
+
+// Call the class-static function to define the class-static member.
+// Since it's a template class, you actually do this in the header,
+// not the source file.
 template <typename T>
-inline
-EigenSparseLinearSolver<T>::EigenSparseLinearSolver(const libMesh::Parallel::Communicator &comm_in) :
-  LinearSolver<T>(comm_in)
-{
-  // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead
-  this->_solver_type = BICGSTAB;
-}
+std::map<Eigen::ComputationInfo, LinearConvergenceReason>
+EigenSparseLinearSolver<T>::_convergence_reasons = EigenSparseLinearSolver<T>::build_map();
 
 
 
