@@ -104,12 +104,20 @@ private:
   {
     Elem *elem = mesh->elem(0);
 
-    ParsedFEMFunction<Number> parsed_func(*sys, "x2*y4");
-
     FEMContext c(*sys);
 
     c.pre_fe_reinit(*sys, elem);
     c.elem_fe_reinit();
+
+    ParsedFEMFunction<Number> x2(*sys, "x2");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (x2(c,Point(0.5,0.5,0.5)), 1.0, 1.e-12);
+
+    ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (xy8(c,Point(0.5,0.5,0.5)), 2.0, 1.e-12);
   }
 
 };
