@@ -710,8 +710,10 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
   // We'll refer back to the Node ID several times
   dof_id_type global_id = node.id();
 
-  // Clear out the input nighbors vector in case there are leftover entries in there.
-  neighbors.clear();
+  // We'll construct a std::set<const Node*> for more efficient
+  // searching while finding the nodal neighbors, and return it to the
+  // user in a std::vector.
+  std::set<const Node*> neighbor_set;
 
   // Iterators to iterate through the elements that include this node
   std::vector<const Elem*>::const_iterator
@@ -748,12 +750,12 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
                       {
                       case 0:
                         // The other node is a nodal neighbor
-                        neighbors.push_back(elem->get_node(1));
+                        neighbor_set.insert(elem->get_node(1));
                         break;
 
                       case 1:
                         // The other node is a nodal neighbor
-                        neighbors.push_back(elem->get_node(0));
+                        neighbor_set.insert(elem->get_node(0));
                         break;
 
                       default:
@@ -769,13 +771,13 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
                         // The outside nodes have node 2 as a neighbor
                       case 0:
                       case 1:
-                        neighbors.push_back(elem->get_node(2));
+                        neighbor_set.insert(elem->get_node(2));
                         break;
 
                         // The middle node has the outer nodes as neighbors
                       case 2:
-                        neighbors.push_back(elem->get_node(0));
-                        neighbors.push_back(elem->get_node(1));
+                        neighbor_set.insert(elem->get_node(0));
+                        neighbor_set.insert(elem->get_node(1));
                         break;
 
                       default:
@@ -790,24 +792,24 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
                       {
                       case 0:
                         // The left-middle node is a nodal neighbor
-                        neighbors.push_back(elem->get_node(2));
+                        neighbor_set.insert(elem->get_node(2));
                         break;
 
                       case 1:
                         // The right-middle node is a nodal neighbor
-                        neighbors.push_back(elem->get_node(3));
+                        neighbor_set.insert(elem->get_node(3));
                         break;
 
                         // The left-middle node
                       case 2:
-                        neighbors.push_back(elem->get_node(0));
-                        neighbors.push_back(elem->get_node(3));
+                        neighbor_set.insert(elem->get_node(0));
+                        neighbor_set.insert(elem->get_node(3));
                         break;
 
                         // The right-middle node
                       case 3:
-                        neighbors.push_back(elem->get_node(1));
-                        neighbors.push_back(elem->get_node(2));
+                        neighbor_set.insert(elem->get_node(1));
+                        neighbor_set.insert(elem->get_node(2));
                         break;
 
                       default:
@@ -853,21 +855,19 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
                   // Make sure we found something
                   libmesh_assert(node_to_save != NULL);
 
-                  // Search to see if we've already found this one
-                  std::vector<const Node*>::const_iterator result = std::find(neighbors.begin(),
-                                                                              neighbors.end(),
-                                                                              node_to_save);
-
-                  // If we didn't already have it, add it to the vector
-                  if (result == neighbors.end())
-                    neighbors.push_back(node_to_save);
+                  neighbor_set.insert(node_to_save);
                 }
 
               // Keep looking for edges, node may be on more than one edge
               current_edge++;
             }
-        }
-    }
+        } // if (elem->active())
+    } // for
+
+  // Assign the entries from the set to the vector.  Note: this
+  // replaces any existing contents in neighbors and modifies its size
+  // accordingly.
+  neighbors.assign(neighbor_set.begin(), neighbor_set.end());
 }
 
 
