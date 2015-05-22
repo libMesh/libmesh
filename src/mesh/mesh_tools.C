@@ -34,6 +34,7 @@
 #include "libmesh/serial_mesh.h"
 #include "libmesh/sphere.h"
 #include "libmesh/threads.h"
+#include "libmesh/string_to_enum.h"
 
 #ifdef DEBUG
 #  include "libmesh/remote_elem.h"
@@ -735,6 +736,90 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
 
           // Make sure it was found
           libmesh_assert_not_equal_to(local_node_number, libMesh::invalid_uint);
+
+          // If this element has no edges, the edge-based algorithm below doesn't make sense.
+          if (elem->n_edges() == 0)
+            {
+              switch (elem->type())
+                {
+                case EDGE2:
+                  {
+                    switch (local_node_number)
+                      {
+                      case 0:
+                        // The other node is a nodal neighbor
+                        neighbors.push_back(elem->get_node(1));
+                        break;
+
+                      case 1:
+                        // The other node is a nodal neighbor
+                        neighbors.push_back(elem->get_node(0));
+                        break;
+
+                      default:
+                        libmesh_error_msg("Invalid local node number: " << local_node_number << " found." << std::endl);
+                      }
+                    break;
+                  }
+
+                case EDGE3:
+                  {
+                    switch (local_node_number)
+                      {
+                        // The outside nodes have node 2 as a neighbor
+                      case 0:
+                      case 1:
+                        neighbors.push_back(elem->get_node(2));
+                        break;
+
+                        // The middle node has the outer nodes as neighbors
+                      case 2:
+                        neighbors.push_back(elem->get_node(0));
+                        neighbors.push_back(elem->get_node(1));
+                        break;
+
+                      default:
+                        libmesh_error_msg("Invalid local node number: " << local_node_number << " found." << std::endl);
+                      }
+                    break;
+                  }
+
+                case EDGE4:
+                  {
+                    switch (local_node_number)
+                      {
+                      case 0:
+                        // The left-middle node is a nodal neighbor
+                        neighbors.push_back(elem->get_node(2));
+                        break;
+
+                      case 1:
+                        // The right-middle node is a nodal neighbor
+                        neighbors.push_back(elem->get_node(3));
+                        break;
+
+                        // The left-middle node
+                      case 2:
+                        neighbors.push_back(elem->get_node(0));
+                        neighbors.push_back(elem->get_node(3));
+                        break;
+
+                        // The right-middle node
+                      case 3:
+                        neighbors.push_back(elem->get_node(1));
+                        neighbors.push_back(elem->get_node(2));
+                        break;
+
+                      default:
+                        libmesh_error_msg("Invalid local node number: " << local_node_number << " found." << std::endl);
+                      }
+                    break;
+                  }
+
+                default:
+                  libmesh_error_msg("Unrecognized ElemType: " << Utility::enum_to_string(elem->type()) << std::endl);
+                }
+            }
 
           // Index of the current edge
           unsigned current_edge = 0;
