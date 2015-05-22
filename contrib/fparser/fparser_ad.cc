@@ -376,7 +376,22 @@ template<typename Value_t>
 int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 {
   this->CopyOnWrite();
-  return ad->AutoDiff(LookUpVarOpcode(var_name), this->mData);
+
+  try
+  {
+    return ad->AutoDiff(LookUpVarOpcode(var_name), this->mData);
+  }
+  catch(std::exception &e)
+  {
+    static bool printed_error = false;
+    if (!printed_error && !mSilenceErrors)
+    {
+      std::cerr << "AutoDiff exception: " << e.what() << " (this message will only be shown once per process)"<< std::endl;
+      printed_error = true;
+    }
+    setZero();
+    return 0;
+  }
 }
 
 template<typename Value_t>
@@ -423,26 +438,7 @@ int ADImplementation<Value_t>::AutoDiff(unsigned int _var, typename FunctionPars
   var = _var;
 
   // start recursing the code tree
-  CodeTree<Value_t> diff;
-  try
-  {
-    diff = D(orig);
-  }
-  catch(std::exception &e)
-  {
-    static bool printed_error = false;
-    if (!printed_error && !this->parser->mSilenceErrors)
-    {
-      std::cerr << "AutoDiff exception: " << e.what() << " (this message will only be shown once per process)"<< std::endl;
-      printed_error = true;
-    }
-    this->parser->setZero();
-    return 0;
-  }
-
-  // std::cout << '\n';
-  // FPoptimizer_Optimize::ApplyGrammars(diff);
-  // DumpTreeWithIndent(diff);
+  CodeTree<Value_t> diff = D(orig);
 
   std::vector<unsigned> byteCode;
   std::vector<Value_t> immed;
