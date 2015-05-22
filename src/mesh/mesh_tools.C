@@ -703,15 +703,19 @@ unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
 
 void MeshTools::find_nodal_neighbors(const MeshBase&,
                                      const Node& node,
-                                     std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
+                                     const std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
                                      std::vector<const Node*>& neighbors)
 {
   // We'll refer back to the Node ID several times
   dof_id_type global_id = node.id();
 
+  // Clear out the input nighbors vector in case there are leftover entries in there.
+  neighbors.clear();
+
   // Iterators to iterate through the elements that include this node
-  std::vector<const Elem*>::const_iterator el     = nodes_to_elem_map[global_id].begin();
-  std::vector<const Elem*>::const_iterator end_el = nodes_to_elem_map[global_id].end();
+  std::vector<const Elem*>::const_iterator
+    el = nodes_to_elem_map[global_id].begin(),
+    end_el = nodes_to_elem_map[global_id].end();
 
   // Look through the elements that contain this node
   // find the local node id... then find the side that
