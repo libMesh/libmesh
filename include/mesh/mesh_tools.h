@@ -313,7 +313,7 @@ unsigned int max_level (const MeshBase &mesh);
  * every node directly attached to the given one.
  */
 void find_nodal_neighbors(const MeshBase &mesh, const Node &n,
-                          std::vector<std::vector<const Elem*> > &nodes_to_elem_map,
+                          const std::vector<std::vector<const Elem*> > &nodes_to_elem_map,
                           std::vector<const Node*> &neighbors);
 
 /**

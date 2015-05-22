@@ -34,6 +34,7 @@
 #include "libmesh/serial_mesh.h"
 #include "libmesh/sphere.h"
 #include "libmesh/threads.h"
+#include "libmesh/string_to_enum.h"
 
 #ifdef DEBUG
 #  include "libmesh/remote_elem.h"
@@ -703,15 +704,21 @@ unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
 
 void MeshTools::find_nodal_neighbors(const MeshBase&,
                                      const Node& node,
-                                     std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
+                                     const std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
                                      std::vector<const Node*>& neighbors)
 {
   // We'll refer back to the Node ID several times
   dof_id_type global_id = node.id();
 
+  // We'll construct a std::set<const Node*> for more efficient
+  // searching while finding the nodal neighbors, and return it to the
+  // user in a std::vector.
+  std::set<const Node*> neighbor_set;
+
   // Iterators to iterate through the elements that include this node
-  std::vector<const Elem*>::const_iterator el     = nodes_to_elem_map[global_id].begin();
-  std::vector<const Elem*>::const_iterator end_el = nodes_to_elem_map[global_id].end();
+  std::vector<const Elem*>::const_iterator
+    el = nodes_to_elem_map[global_id].begin(),
+    end_el = nodes_to_elem_map[global_id].end();
 
   // Look through the elements that contain this node
   // find the local node id... then find the side that
@@ -731,6 +738,90 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
 
           // Make sure it was found
           libmesh_assert_not_equal_to(local_node_number, libMesh::invalid_uint);
+
+          // If this element has no edges, the edge-based algorithm below doesn't make sense.
+          if (elem->n_edges() == 0)
+            {
+              switch (elem->type())
+                {
+                case EDGE2:
+                  {
+                    switch (local_node_number)
+                      {
+                      case 0:
+                        // The other node is a nodal neighbor
+                        neighbor_set.insert(elem->get_node(1));
+                        break;
+
+                      case 1:
+                        // The other node is a nodal neighbor
+                        neighbor_set.insert(elem->get_node(0));
+                        break;
+
+                      default:
+                        libmesh_error_msg("Invalid local node number: " << local_node_number << " found." << std::endl);
+                      }
+                    break;
+                  }
+
+                case EDGE3:
+                  {
+                    switch (local_node_number)
+                      {
+                        // The outside nodes have node 2 as a neighbor
+                      case 0:
+                      case 1:
+                        neighbor_set.insert(elem->get_node(2));
+                        break;
+
+                        // The middle node has the outer nodes as neighbors
+                      case 2:
+                        neighbor_set.insert(elem->get_node(0));
+                        neighbor_set.insert(elem->get_node(1));
+                        break;
+
+                      default:
+                        libmesh_error_msg("Invalid local node number: " << local_node_number << " found." << std::endl);
+                      }
+                    break;
+                  }
+
+                case EDGE4:
+                  {
+                    switch (local_node_number)
+                      {
+                      case 0:
+                        // The left-middle node is a nodal neighbor
+                        neighbor_set.insert(elem->get_node(2));
+                        break;
+
+                      case 1:
+                        // The right-middle node is a nodal neighbor
+                        neighbor_set.insert(elem->get_node(3));
+                        break;
+
+                        // The left-middle node
+                      case 2:
+                        neighbor_set.insert(elem->get_node(0));
+                        neighbor_set.insert(elem->get_node(3));
+                        break;
+
+                        // The right-middle node
+                      case 3:
+                        neighbor_set.insert(elem->get_node(1));
+                        neighbor_set.insert(elem->get_node(2));
+                        break;
+
+                      default:
+                        libmesh_error_msg("Invalid local node number: " << local_node_number << " found." << std::endl);
+                      }
+                    break;
+                  }
+
+                default:
+                  libmesh_error_msg("Unrecognized ElemType: " << Utility::enum_to_string(elem->type()) << std::endl);
+                }
+            }
 
           // Index of the current edge
           unsigned current_edge = 0;
@@ -764,21 +855,19 @@ void MeshTools::find_nodal_neighbors(const MeshBase&,
                   // Make sure we found something
                   libmesh_assert(node_to_save != NULL);
 
-                  // Search to see if we've already found this one
-                  std::vector<const Node*>::const_iterator result = std::find(neighbors.begin(),
-                                                                              neighbors.end(),
-                                                                              node_to_save);
-
-                  // If we didn't already have it, add it to the vector
-                  if (result == neighbors.end())
-                    neighbors.push_back(node_to_save);
+                  neighbor_set.insert(node_to_save);
                 }
 
               // Keep looking for edges, node may be on more than one edge
               current_edge++;
             }
-        }
-    }
+        } // if (elem->active())
+    } // for
+
+  // Assign the entries from the set to the vector.  Note: this
+  // replaces any existing contents in neighbors and modifies its size
+  // accordingly.
+  neighbors.assign(neighbor_set.begin(), neighbor_set.end());
 }
 
 
