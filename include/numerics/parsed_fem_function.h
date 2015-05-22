@@ -43,6 +43,28 @@ namespace libMesh
 template <typename Output=Number>
 class ParsedFEMFunction : public FEMFunctionBase<Output>
 {
+protected:
+  // Helper function
+  std::size_t find_name (const std::string & varname,
+                         const std::string & expr)
+  {
+    const std::size_t namesize = varname.size();
+    std::size_t varname_i = expr.find(varname);
+
+    while ((varname_i != std::string::npos) &&
+           (((varname_i > 0) &&
+             (std::isalnum(expr[varname_i-1]) ||
+              (expr[varname_i-1] == '_'))) ||
+            ((varname_i+namesize < expr.size()) &&
+             (std::isalnum(expr[varname_i+namesize]) ||
+              (expr[varname_i+namesize] == '_')))))
+      {
+        varname_i = expr.find(varname, varname_i+1);
+      }
+
+    return varname_i;
+  }
+
 public:
 
   /**
@@ -79,21 +101,7 @@ public:
     for (unsigned int v=0; v != _n_vars; ++v)
       {
         const std::string & varname = sys.variable_name(v);
-        const std::size_t namesize = varname.size();
-        std::size_t varname_i = _expression.find(varname);
-
-        // If we found our variable name but only as a prefix or
-        // suffix of something else, let's keep searching.
-        while ((varname_i != std::string::npos) &&
-               (((varname_i > 0) &&
-                 (std::isalnum(_expression[varname_i-1]) ||
-                  (_expression[varname_i-1] == '_'))) ||
-                ((varname_i+namesize < _expression.size()) &&
-                 (std::isalnum(_expression[varname_i+namesize]) ||
-                  (_expression[varname_i+namesize] == '_')))))
-          {
-            varname_i = _expression.find(varname, varname_i+1);
-          }
+        std::size_t varname_i = find_name(varname, _expression);
 
         // If we didn't find our variable name then let's go to the
         // next.
@@ -105,6 +113,53 @@ public:
         variables += varname;
         _n_requested_vars++;
       }
+
+    for (unsigned int v=0; v != _n_vars; ++v)
+      {
+        const std::string & varname = sys.variable_name(v);
+
+        for (unsigned int d=0; d != LIBMESH_DIM; ++d)
+          {
+            std::string gradname = std::string("grad_") + "xyz"[d] + '_';
+            std::size_t gradname_i = find_name(gradname, _expression);
+
+            // If we didn't find that gradient component of our
+            // variable name then let's go to the next.
+            if (gradname_i == std::string::npos)
+              continue;
+
+            _need_var_grad[v*LIBMESH_DIM+d] = true;
+            variables += ',';
+            variables += gradname;
+            _n_requested_grad_components++;
+          }
+      }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    for (unsigned int v=0; v != _n_vars; ++v)
+      {
+        const std::string & varname = sys.variable_name(v);
+
+        for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
+          for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
+            {
+              std::string hessname = std::string("hess_") +
+                "xyz"[d1] + "xyz"[d2] + '_';
+              std::size_t hessname_i = find_name(hessname, _expression);
+
+              // If we didn't find that hessian component of our
+              // variable name then let's go to the next.
+              if (hessname_i == std::string::npos)
+                continue;
+
+              _need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+d1*LIBMESH_DIM+d2]
+                = true;
+              variables += ',';
+              variables += hessname;
+              _n_requested_hess_components++;
+            }
+      }
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
     _spacetime.resize
       (LIBMESH_DIM + 1 + _n_requested_vars +
