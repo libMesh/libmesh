@@ -345,7 +345,14 @@ public:
       {
         FEBase* elem_fe;
         c.get_element_fe(v, elem_fe);
-        elem_fe->get_phi();
+        if (_n_requested_vars)
+          elem_fe->get_phi();
+        if (_n_requested_grad_components)
+          elem_fe->get_dphi();
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+        if (_n_requested_hess_components)
+          elem_fe->get_d2phi();
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
       }
   }
 
