@@ -44,7 +44,7 @@ template <typename Output=Number>
 class ParsedFEMFunction : public FEMFunctionBase<Output>
 {
 protected:
-  // Helper function
+  // Helper function for initial parsing
   std::size_t find_name (const std::string & varname,
                          const std::string & expr)
   {
@@ -63,6 +63,94 @@ protected:
       }
 
     return varname_i;
+  }
+
+  // Helper function for evaluating function arguments
+  void eval_args(const FEMContext& c, const Point& p, const Real time)
+  {
+    _spacetime[0] = p(0);
+#if LIBMESH_DIM > 1
+    _spacetime[1] = p(1);
+#endif
+#if LIBMESH_DIM > 2
+    _spacetime[2] = p(2);
+#endif
+    _spacetime[LIBMESH_DIM] = time;
+
+    unsigned int request_index = 0;
+    for (unsigned int v=0; v != _n_vars; ++v)
+      {
+        if (!_need_var[v])
+          continue;
+
+        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
+        request_index++;
+      }
+
+    if (_n_requested_grad_components)
+      for (unsigned int v=0; v != _n_vars; ++v)
+        {
+          if (!_need_var_grad[v*LIBMESH_DIM]
+#if LIBMESH_DIM > 1
+              && !_need_var_grad[v*LIBMESH_DIM+1]
+#if LIBMESH_DIM > 2
+              && !_need_var_grad[v*LIBMESH_DIM+2]
+#endif
+#endif
+             )
+            continue;
+
+          Gradient g;
+          c.point_gradient(v, p, g);
+
+          for (unsigned int d=0; d != LIBMESH_DIM; ++d)
+            {
+              if (!_need_var_grad[v*LIBMESH_DIM+d])
+                continue;
+
+              _spacetime[LIBMESH_DIM+1+request_index] = g(d);
+              request_index++;
+            }
+        }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    if (_n_requested_hess_components)
+      for (unsigned int v=0; v != _n_vars; ++v)
+        {
+          if (!_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM]
+#if LIBMESH_DIM > 1
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+1]
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+2]
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+3]
+#if LIBMESH_DIM > 2
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+4]
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+5]
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+6]
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+7]
+              && !_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+8]
+#endif
+#endif
+             )
+            continue;
+
+        Tensor h;
+        c.point_hessian(v, p, h);
+
+        for (unsigned int d1=0; d1 != LIBMESH_DIM; ++d1)
+          for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
+            {
+              if (!_need_var_hess[v*LIBMESH_DIM*LIBMESH_DIM+d1*LIBMESH_DIM+d2])
+                continue;
+
+              _spacetime[LIBMESH_DIM+1+request_index] = h(d1,d2);
+              request_index++;
+            }
+      }
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+
+    // The remaining locations in _spacetime are currently set at construction
+    // but could potentially be made dynamic
   }
 
 public:
@@ -120,7 +208,8 @@ public:
 
         for (unsigned int d=0; d != LIBMESH_DIM; ++d)
           {
-            std::string gradname = std::string("grad_") + "xyz"[d] + '_';
+            std::string gradname = std::string("grad_") + 
+              "xyz"[d] + '_' + varname;
             std::size_t gradname_i = find_name(gradname, _expression);
 
             // If we didn't find that gradient component of our
@@ -144,7 +233,7 @@ public:
           for (unsigned int d2=0; d2 != LIBMESH_DIM; ++d2)
             {
               std::string hessname = std::string("hess_") +
-                "xyz"[d1] + "xyz"[d2] + '_';
+                "xyz"[d1] + "xyz"[d2] + '_' + varname;
               std::size_t hessname_i = find_name(hessname, _expression);
 
               // If we didn't find that hessian component of our
@@ -282,27 +371,8 @@ public:
   virtual Output operator() (const FEMContext& c, const Point& p,
                              const Real time = 0.)
   {
-    _spacetime[0] = p(0);
-#if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
-#endif
-#if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
-#endif
-    _spacetime[LIBMESH_DIM] = time;
+    eval_args(c, p, time);
 
-    unsigned int request_index = 0;
-    for (unsigned int v=0; v != _n_vars; ++v)
-      {
-        if (!_need_var[v])
-          continue;
-
-        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
-        request_index++;
-      }
-
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
 #if LIBMESH_HAVE_FPARSER
     return parsers[0].Eval(&_spacetime[0]);
 #else
@@ -322,24 +392,7 @@ public:
                    const Real time,
                    DenseVector<Output>& output)
   {
-    _spacetime[0] = p(0);
-#if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
-#endif
-#if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
-#endif
-    _spacetime[LIBMESH_DIM] = time;
-
-    unsigned int request_index = 0;
-    for (unsigned int v=0; v != _n_vars; ++v)
-      {
-        if (!_need_var[v])
-          continue;
-
-        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
-        request_index++;
-      }
+    eval_args(c, p, time);
 
     unsigned int size = output.size();
 
@@ -364,24 +417,8 @@ public:
                            const Point& p,
                            Real time=0.)
   {
-    _spacetime[0] = p(0);
-#if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
-#endif
-#if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
-#endif
-    _spacetime[LIBMESH_DIM] = time;
+    eval_args(c, p, time);
 
-    unsigned int request_index = 0;
-    for (unsigned int v=0; v != _n_vars; ++v)
-      {
-        if (!_need_var[v])
-          continue;
-
-        c.point_value(v, p, _spacetime[LIBMESH_DIM+1+request_index]);
-        request_index++;
-      }
 #ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_less (i, parsers.size());
 
