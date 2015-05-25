@@ -675,12 +675,12 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   unsigned int n_bfs;
   {
     file_name << directory_name << "/n_bfs" << suffix;
-    Xdr n_bfs_in(file_name.str(), mode);
+    assert_file_exists(file_name.str());
 
+    Xdr n_bfs_in(file_name.str(), mode);
     n_bfs_in >> n_bfs;
     n_bfs_in.close();
   }
-
   resize_data_structures(n_bfs, read_error_bound_data);
 
   // Read in the parameter ranges
@@ -715,6 +715,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
                     << std::right
                     << q_l;
           file_name << suffix;
+          assert_file_exists(file_name.str());
+
           Xdr output_n_in(file_name.str(), mode);
 
           for(unsigned int j=0; j<n_bfs; j++)
@@ -732,6 +734,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       // Next read in the inner product matrix
       file_name.str("");
       file_name << directory_name << "/RB_inner_product_matrix" << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_inner_product_matrix_in(file_name.str(), mode);
 
       for(unsigned int i=0; i<n_bfs; i++)
@@ -757,6 +761,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
                 << std::right
                 << q_f;
       file_name << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Fq_f_in(file_name.str(), mode);
 
       for(unsigned int i=0; i<n_bfs; i++)
@@ -779,6 +785,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
                 << std::right
                 << q_a;
       file_name << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Aq_a_in(file_name.str(), mode);
 
       for(unsigned int i=0; i<n_bfs; i++)
@@ -799,6 +807,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       // Next read in Fq representor norm data
       file_name.str("");
       file_name << directory_name << "/Fq_innerprods" << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Fq_innerprods_in(file_name.str(), mode);
 
       unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
@@ -819,6 +829,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
                     << std::right
                     << n;
           file_name << "_dual_innerprods" << suffix;
+          assert_file_exists(file_name.str());
+
           Xdr output_dual_innerprods_in(file_name.str(), mode);
 
           unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
@@ -833,6 +845,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       // Next read in Fq_Aq representor norm data
       file_name.str("");
       file_name << directory_name << "/Fq_Aq_innerprods" << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Fq_Aq_innerprods_in(file_name.str(), mode);
 
       for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
@@ -850,6 +864,8 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       // Next read in Aq_Aq representor norm data
       file_name.str("");
       file_name << directory_name << "/Aq_Aq_innerprods" << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Aq_Aq_innerprods_in(file_name.str(), mode);
 
       unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
@@ -881,6 +897,14 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     }
 
   STOP_LOG("read_offline_data_from_files()", "RBEvaluation");
+}
+
+void RBEvaluation::assert_file_exists(const std::string& file_name)
+{
+  if(!std::ifstream(file_name))
+  {
+    libmesh_error_msg("File missing: " + file_name);
+  }
 }
 
 void RBEvaluation::write_out_basis_functions(System& sys,
@@ -1044,6 +1068,8 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System& sys,
   // Assume that all the headers are the same, hence we can just use the first one.
   file_name << multiple_directory_names[0] << "/"
             << multiple_data_names[0] << "_header" << basis_function_suffix;
+  assert_file_exists(file_name.str());
+
   Xdr header_data(file_name.str(),
                   read_binary_vectors ? DECODE : READ);
 
@@ -1072,6 +1098,14 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System& sys,
       // Allocate storage for each vector
       for (unsigned int i=0; i<vectors.size(); i++)
         {
+          // vectors should all be NULL, otherwise we get a memory leak when
+          // we create the new vectors in RBEvaluation::read_in_vectors.
+          if(vectors[i])
+            {
+              libmesh_error_msg(
+                "Non-NULL vector passed to read_in_vectors_from_multiple_files");
+            }
+
           vectors[i] = NumericVector<Number>::build(sys.comm()).release();
 
           vectors[i]->init (sys.n_dofs(),
@@ -1094,6 +1128,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System& sys,
             libmesh_error_msg("File does not exist: " << file_name.str());
         }
 
+      assert_file_exists(file_name.str());
       Xdr vector_data(file_name.str(),
                       read_binary_vectors ? DECODE : READ);
 

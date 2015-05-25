@@ -481,6 +481,8 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   // Read in the interpolation matrix
   file_name.str("");
   file_name << directory_name << "/interpolation_matrix" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr interpolation_matrix_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
@@ -497,6 +499,8 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   // Also, read in the "extra" row
   file_name.str("");
   file_name << directory_name << "/extra_interpolation_matrix_row" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr extra_interpolation_matrix_row_in(file_name.str(), mode);
 
   for(unsigned int j=0; j<n_bfs; j++)
@@ -510,6 +514,8 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   // Next read in interpolation_points
   file_name.str("");
   file_name << directory_name << "/interpolation_points" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr interpolation_points_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
@@ -531,6 +537,8 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   // Also, read in the extra interpolation point
   file_name.str("");
   file_name << directory_name << "/extra_interpolation_point" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr extra_interpolation_point_in(file_name.str(), mode);
 
   {
@@ -552,6 +560,8 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   // Next read in interpolation_points_var
   file_name.str("");
   file_name << directory_name << "/interpolation_points_var" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr interpolation_points_var_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
@@ -565,6 +575,8 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   // Also, read in extra_interpolation_point_var
   file_name.str("");
   file_name << directory_name << "/extra_interpolation_point_var" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr extra_interpolation_point_var_in(file_name.str(), mode);
 
   {
@@ -594,6 +606,12 @@ void RBEIMEvaluation::read_in_interpolation_points_elem
     // These are just integers, so no need for a binary format here
     std::ifstream interpolation_elem_ids_in
       ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ifstream::in);
+
+    if(!interpolation_elem_ids_in)
+    {
+      libmesh_error_msg("RB data missing: " +
+        directory_name + "/interpolation_elem_ids.dat");
+    }
 
     for(unsigned int i=0; i<n_bfs; i++)
       {

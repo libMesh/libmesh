@@ -330,6 +330,13 @@ public:
    */
   bool compute_RB_inner_product;
 
+protected:
+
+  /**
+   * Helper function that checks if \p file_name exists.
+   */
+  void assert_file_exists(const std::string& file_name);
+
 private:
 
   /**

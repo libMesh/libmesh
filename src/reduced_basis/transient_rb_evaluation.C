@@ -949,6 +949,8 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   // Write out the temporal discretization data
   file_name.str("");
   file_name << directory_name << "/temporal_discretization_data" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr temporal_discretization_data_in(file_name.str(), mode);
 
   Real real_value; unsigned int int_value;
@@ -960,6 +962,8 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
 
   file_name.str("");
   file_name << directory_name << "/RB_L2_matrix" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr RB_L2_matrix_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
@@ -985,6 +989,8 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
                 << q_m;
 
       file_name << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_M_q_m_in(file_name.str(), mode);
 
       for(unsigned int i=0; i<n_bfs; i++)
@@ -1004,10 +1010,14 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   // and the initial L2 error for all N
   file_name.str("");
   file_name << directory_name << "/initial_conditions" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr initial_conditions_in(file_name.str(), mode);
 
   file_name.str("");
   file_name << directory_name << "/initial_L2_error" << suffix;
+  assert_file_exists(file_name.str());
+
   Xdr initial_L2_error_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
@@ -1027,6 +1037,8 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
       // Next read in the Fq_Mq representor norm data
       file_name.str("");
       file_name << directory_name << "/Fq_Mq_terms" << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Fq_Mq_terms_in(file_name.str(), mode);
 
       for(unsigned int q_f=0; q_f<Q_f; q_f++)
@@ -1044,6 +1056,8 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
       // Next read in the Mq_Mq representor norm data
       file_name.str("");
       file_name << directory_name << "/Mq_Mq_terms" << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Mq_Mq_terms_in(file_name.str(), mode);
 
       unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
@@ -1062,6 +1076,8 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
       // Next read in the Aq_Mq representor norm data
       file_name.str("");
       file_name << directory_name << "/Aq_Mq_terms" << suffix;
+      assert_file_exists(file_name.str());
+
       Xdr RB_Aq_Mq_terms_in(file_name.str(), mode);
 
       for(unsigned int q_a=0; q_a<Q_a; q_a++)
