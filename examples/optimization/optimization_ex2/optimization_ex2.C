@@ -50,7 +50,7 @@ using namespace libMesh;
 
 /**
  * This class encapsulate all functionality required for assembling
- * and solving a linear elastic model with contact.
+ * the objective function, gradient, hessian, and constraints.
  */
 class AssembleOptimization :
   public OptimizationSystem::ComputeObjective,
