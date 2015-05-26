@@ -58,6 +58,7 @@ AC_CONFIG_FILES(contrib/bin/libmesh-config,          [chmod +x contrib/bin/libme
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                 [chmod +x contrib/bin/xda2mgf])
 AC_CONFIG_FILES(contrib/bin/create_libmesh_release,  [chmod +x contrib/bin/create_libmesh_release])
 AC_CONFIG_FILES(doc/dot,                             [chmod +x doc/dot])
+AC_CONFIG_FILES(tests/run_unit_tests.sh,             [chmod +x tests/run_unit_tests.sh])
 
 # Create a temporary file with e.g. HAVE_MPI
 AC_CONFIG_HEADER(include/libmesh_config.h.tmp:include/libmesh_config.h.in)
