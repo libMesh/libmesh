@@ -901,7 +901,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
 
 void RBEvaluation::assert_file_exists(const std::string& file_name)
 {
-  if(!std::ifstream(file_name))
+  if(!std::ifstream(file_name.c_str()))
   {
     libmesh_error_msg("File missing: " + file_name);
   }
