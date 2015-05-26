@@ -69,7 +69,7 @@ noinst_PROGRAMS = $(am__EXEEXT_6)
 @LIBMESH_OPROF_MODE_TRUE@am__append_7 = unit_tests-oprof
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/depcomp
+	$(srcdir)/run_unit_tests.sh.in $(top_srcdir)/build-aux/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/all_static.m4 \
@@ -115,7 +115,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = run_unit_tests.sh
 CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
@@ -754,7 +754,7 @@ EXTRA_DIST = base/getpot_test_input.in
 @LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
 @LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
-TESTS = $(check_PROGRAMS)
+TESTS = run_unit_tests.sh
 
 ######################################################################
 #
@@ -794,6 +794,8 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+run_unit_tests.sh: $(top_builddir)/config.status $(srcdir)/run_unit_tests.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; test -n "$$list" || exit 0; \
