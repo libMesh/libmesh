@@ -74,8 +74,8 @@ namespace Parallel {
   struct Attributes<cxxtype>                                            \
   {                                                                     \
     static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::max(); } \
-    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+    static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::infinity(); } \
+    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::infinity(); } \
   }
 
 #define CONTAINER_TYPE(cxxtype)                                         \
