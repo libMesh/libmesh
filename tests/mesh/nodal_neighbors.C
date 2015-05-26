@@ -5,7 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/libmesh.h>
-#include <libmesh/mesh.h>
+#include <libmesh/serial_mesh.h>
 #include <libmesh/node.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_tools.h>
@@ -21,7 +21,8 @@ class NodalNeighborsTest : public CppUnit::TestCase
    * works in 1D.  If the numbering of MeshGeneration::build_line()
    * ever changes, this test will break, as it compares hand-checked
    * hard-coded "validation" data with the results of
-   * MeshTools::find_nodal_neighbors().
+   * MeshTools::find_nodal_neighbors().  We also use a SerialMesh here
+   * to match the hard-coded numbering.
    */
 public:
   CPPUNIT_TEST_SUITE( NodalNeighborsTest );
@@ -39,7 +40,7 @@ protected:
                ElemType elem_type,
                dof_id_type * validation_data)
   {
-    Mesh mesh(*TestCommWorld, /*dim=*/1);
+    SerialMesh mesh(*TestCommWorld, /*dim=*/1);
 
     MeshTools::Generation::build_line(mesh,
                                       n_elem,
