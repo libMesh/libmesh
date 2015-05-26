@@ -3,5 +3,5 @@
 set -e
 
 for method in @METHODS@; do
-    $LIBMESH_RUN unit_tests-$method
+    $LIBMESH_RUN ./unit_tests-$method
 done
