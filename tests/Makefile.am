@@ -122,7 +122,7 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 
 
-TESTS = $(check_PROGRAMS)
+TESTS = run_unit_tests.sh
 
 ######################################################################
 #
