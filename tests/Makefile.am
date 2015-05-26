@@ -22,6 +22,7 @@ unit_tests_sources = \
 	numerics/distributed_vector_test.C \
 	numerics/laspack_vector_test.C \
 	numerics/numeric_vector_test.h \
+	numerics/parsed_fem_function_test.C \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h \

@@ -1,0 +1,164 @@
+// Ignore unused parameter warnings coming from cppuint headers
+#include <libmesh/ignore_warnings.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/TestCase.h>
+#include <libmesh/restore_warnings.h>
+
+// libmesh includes
+#include "libmesh/auto_ptr.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parsed_fem_function.h"
+#include "libmesh/system.h"
+
+// test includes
+#include "test_comm.h"
+
+using namespace libMesh;
+
+class ParsedFEMFunctionTest : public CppUnit::TestCase
+{
+public:
+  void setUp() {
+    mesh.reset(new Mesh(*TestCommWorld));
+    MeshTools::Generation::build_cube(*mesh, 1, 1, 1);
+    es.reset(new EquationSystems(*mesh));
+    sys = &(es->add_system<System> ("SimpleSystem"));
+    sys->add_variable("x2");
+    sys->add_variable("x3");
+    sys->add_variable("c05");
+    sys->add_variable("y4");
+    sys->add_variable("xy");
+    sys->add_variable("yz");
+    sys->add_variable("xyz");
+
+    es->init();
+
+    NumericVector<Number> & sol = *sys->solution;
+    Elem *elem = mesh->elem(0);
+
+    // Set x2 = 2*x
+    sol.set(elem->get_node(1)->dof_number(0,0,0), 2);
+    sol.set(elem->get_node(2)->dof_number(0,0,0), 2);
+    sol.set(elem->get_node(5)->dof_number(0,0,0), 2);
+    sol.set(elem->get_node(6)->dof_number(0,0,0), 2);
+
+    // Set x3 = 3*x
+    sol.set(elem->get_node(1)->dof_number(0,1,0), 3);
+    sol.set(elem->get_node(2)->dof_number(0,1,0), 3);
+    sol.set(elem->get_node(5)->dof_number(0,1,0), 3);
+    sol.set(elem->get_node(6)->dof_number(0,1,0), 3);
+
+    // Set c05 = 0.5
+    sol.set(elem->get_node(0)->dof_number(0,2,0), 0.5);
+    sol.set(elem->get_node(1)->dof_number(0,2,0), 0.5);
+    sol.set(elem->get_node(2)->dof_number(0,2,0), 0.5);
+    sol.set(elem->get_node(3)->dof_number(0,2,0), 0.5);
+    sol.set(elem->get_node(4)->dof_number(0,2,0), 0.5);
+    sol.set(elem->get_node(5)->dof_number(0,2,0), 0.5);
+    sol.set(elem->get_node(6)->dof_number(0,2,0), 0.5);
+    sol.set(elem->get_node(7)->dof_number(0,2,0), 0.5);
+
+    // Set y4 = 4*y
+    sol.set(elem->get_node(2)->dof_number(0,3,0), 4);
+    sol.set(elem->get_node(3)->dof_number(0,3,0), 4);
+    sol.set(elem->get_node(6)->dof_number(0,3,0), 4);
+    sol.set(elem->get_node(7)->dof_number(0,3,0), 4);
+
+    // Set xy = x*y
+    sol.set(elem->get_node(2)->dof_number(0,4,0), 1);
+    sol.set(elem->get_node(6)->dof_number(0,4,0), 1);
+
+    // Set yz = y*z
+    sol.set(elem->get_node(6)->dof_number(0,5,0), 1);
+    sol.set(elem->get_node(7)->dof_number(0,5,0), 1);
+
+    // Set xyz = x*y*z
+    sol.set(elem->get_node(6)->dof_number(0,6,0), 1);
+
+    sol.close();
+    sys->update();
+
+    c.reset(new FEMContext(*sys));
+    c->pre_fe_reinit(*sys, elem);
+    c->elem_fe_reinit();
+  }
+
+  void tearDown() {
+    c.reset();
+    es.reset();
+    mesh.reset();
+  }
+
+  CPPUNIT_TEST_SUITE(ParsedFEMFunctionTest);
+
+  CPPUNIT_TEST(testValues);
+  CPPUNIT_TEST(testGradients);
+  CPPUNIT_TEST(testHessians);
+
+  CPPUNIT_TEST_SUITE_END();
+
+
+private:
+  AutoPtr<Mesh> mesh;
+  AutoPtr<EquationSystems> es;
+  System * sys;
+  AutoPtr<FEMContext> c;
+
+  void testValues()
+  {
+    ParsedFEMFunction<Number> x2(*sys, "x2");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (x2(*c,Point(0.5,0.5,0.5)), 1.0, 1.e-12);
+
+    ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (xy8(*c,Point(0.5,0.5,0.5)), 2.0, 1.e-12);
+  }
+
+
+  void testGradients()
+  {
+    ParsedFEMFunction<Number> c2(*sys, "grad_x_x2");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (c2(*c,Point(0.35,0.45,0.55)), 2.0, 1.e-12);
+
+    ParsedFEMFunction<Number> xz(*sys, "grad_y_xyz");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (xz(*c,Point(0.25,0.35,0.75)), 0.1875, 1.e-12);
+
+    ParsedFEMFunction<Number> xyz(*sys, "grad_y_xyz*grad_x_xy");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (xyz(*c,Point(0.25,0.5,0.75)), 0.09375, 1.e-12);
+  }
+
+
+  void testHessians()
+  {
+    ParsedFEMFunction<Number> c1(*sys, "hess_xy_xy");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (c1(*c,Point(0.35,0.45,0.55)), 1.0, 1.e-12);
+
+    ParsedFEMFunction<Number> x(*sys, "hess_yz_xyz");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (x(*c,Point(0.25,0.35,0.55)), 0.25, 1.e-12);
+
+    ParsedFEMFunction<Number> xz(*sys, "hess_yz_xyz*grad_y_yz");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (xz(*c,Point(0.25,0.4,0.75)), 0.1875, 1.e-12);
+  }
+
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION(ParsedFEMFunctionTest);
