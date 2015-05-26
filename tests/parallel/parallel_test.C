@@ -24,6 +24,8 @@ public:
   CPPUNIT_TEST( testBarrier );
   CPPUNIT_TEST( testMin );
   CPPUNIT_TEST( testMax );
+  CPPUNIT_TEST( testInfinityMin );
+  CPPUNIT_TEST( testInfinityMax );
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
 
@@ -169,6 +171,40 @@ public:
 
     CPPUNIT_ASSERT_EQUAL (cast_int<processor_id_type>(max+1),
                           cast_int<processor_id_type>(TestCommWorld->size()));
+  }
+
+
+
+  void testInfinityMin ()
+  {
+    double min = std::numeric_limits<double>::infinity();
+
+    TestCommWorld->min(min);
+
+    CPPUNIT_ASSERT_EQUAL (min, std::numeric_limits<double>::infinity());
+
+    min = -std::numeric_limits<double>::infinity();
+
+    TestCommWorld->min(min);
+
+    CPPUNIT_ASSERT_EQUAL (min, -std::numeric_limits<double>::infinity());
+  }
+
+
+
+  void testInfinityMax ()
+  {
+    double max = std::numeric_limits<double>::infinity();
+
+    TestCommWorld->max(max);
+
+    CPPUNIT_ASSERT_EQUAL (max, std::numeric_limits<double>::infinity());
+
+    max = -std::numeric_limits<double>::infinity();
+
+    TestCommWorld->max(max);
+
+    CPPUNIT_ASSERT_EQUAL (max, -std::numeric_limits<double>::infinity());
   }
 
 
