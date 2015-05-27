@@ -28,6 +28,7 @@ public:
   CPPUNIT_TEST( testInfinityMax );
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
+  CPPUNIT_TEST( testSemiVerify );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -328,6 +329,22 @@ public:
         TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
       }
   }
+
+
+
+  void testSemiVerify ()
+  {
+    double inf = std::numeric_limits<double>::infinity();
+
+    double *infptr = TestCommWorld->rank()%2 ? NULL : &inf;
+
+    CPPUNIT_ASSERT (TestCommWorld->semiverify(infptr));
+
+    inf = -std::numeric_limits<double>::infinity();
+
+    CPPUNIT_ASSERT (TestCommWorld->semiverify(infptr));
+  }
+
 
 };
 
