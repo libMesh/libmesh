@@ -24,8 +24,11 @@ public:
   CPPUNIT_TEST( testBarrier );
   CPPUNIT_TEST( testMin );
   CPPUNIT_TEST( testMax );
+  CPPUNIT_TEST( testInfinityMin );
+  CPPUNIT_TEST( testInfinityMax );
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
+  CPPUNIT_TEST( testSemiVerify );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -173,6 +176,40 @@ public:
 
 
 
+  void testInfinityMin ()
+  {
+    double min = std::numeric_limits<double>::infinity();
+
+    TestCommWorld->min(min);
+
+    CPPUNIT_ASSERT_EQUAL (min, std::numeric_limits<double>::infinity());
+
+    min = -std::numeric_limits<double>::infinity();
+
+    TestCommWorld->min(min);
+
+    CPPUNIT_ASSERT_EQUAL (min, -std::numeric_limits<double>::infinity());
+  }
+
+
+
+  void testInfinityMax ()
+  {
+    double max = std::numeric_limits<double>::infinity();
+
+    TestCommWorld->max(max);
+
+    CPPUNIT_ASSERT_EQUAL (max, std::numeric_limits<double>::infinity());
+
+    max = -std::numeric_limits<double>::infinity();
+
+    TestCommWorld->max(max);
+
+    CPPUNIT_ASSERT_EQUAL (max, -std::numeric_limits<double>::infinity());
+  }
+
+
+
   void testIsendRecv ()
   {
     unsigned int procup = (TestCommWorld->rank() + 1) %
@@ -292,6 +329,22 @@ public:
         TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
       }
   }
+
+
+
+  void testSemiVerify ()
+  {
+    double inf = std::numeric_limits<double>::infinity();
+
+    double *infptr = TestCommWorld->rank()%2 ? NULL : &inf;
+
+    CPPUNIT_ASSERT (TestCommWorld->semiverify(infptr));
+
+    inf = -std::numeric_limits<double>::infinity();
+
+    CPPUNIT_ASSERT (TestCommWorld->semiverify(infptr));
+  }
+
 
 };
 

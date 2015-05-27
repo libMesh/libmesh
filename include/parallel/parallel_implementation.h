@@ -74,8 +74,8 @@ namespace Parallel {
   struct Attributes<cxxtype>                                            \
   {                                                                     \
     static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::max(); } \
-    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+    static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::infinity(); } \
+    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::infinity(); } \
   }
 
 #define CONTAINER_TYPE(cxxtype)                                         \
@@ -1260,7 +1260,7 @@ inline bool Communicator::semiverify(const T *r) const
         }
       this->min(tempmin);
       this->max(tempmax);
-      bool invalid = r && ((*r != tempmin) &&
+      bool invalid = r && ((*r != tempmin) ||
                            (*r != tempmax));
       this->max(invalid);
       return !invalid;
@@ -1297,7 +1297,7 @@ inline bool Communicator::semiverify(const std::vector<T> *r) const
         }
       this->min(tempmin);
       this->max(tempmax);
-      bool invalid = r && ((*r != tempmin) &&
+      bool invalid = r && ((*r != tempmin) ||
                            (*r != tempmax));
       this->max(invalid);
       return !invalid;
