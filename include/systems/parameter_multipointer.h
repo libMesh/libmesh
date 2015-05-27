@@ -35,9 +35,9 @@ namespace libMesh
  * Accessor object allowing reading and modification of the
  * independent variables in a parameter sensitivity calculation.
  *
- * This is the "default" ParameterAccessor subclass: it simply stores
- * a user-provided pointer to the parameter, and modifies the value at
- * that location in memory.
+ * This is a slightly flexible ParameterAccessor subclass: it stores
+ * all user-provided pointers to copies of the parameter, and modifies
+ * the value at each location in memory.
  */
 template <typename T=Number>
 class ParameterMultiPointer : public ParameterAccessor<T>
@@ -91,6 +91,16 @@ public:
       libmesh_assert_equal_to(*_ptrs[i], val);
 #endif
     return val;
+  }
+
+  /**
+   * Returns a new copy of the accessor.
+   */
+  virtual UniquePtr<ParameterAccessor<T> > clone() const {
+    ParameterMultiPointer *pmp = new ParameterMultiPointer<T>();
+    pmp->_ptrs = _ptrs;
+
+    return UniquePtr<ParameterAccessor<T> >(pmp);
   }
 
   void push_back (T* new_ptr) { _ptrs.push_back(new_ptr); }
