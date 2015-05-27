@@ -3733,6 +3733,8 @@ ac_config_files="$ac_config_files contrib/bin/create_libmesh_release"
 
 ac_config_files="$ac_config_files doc/dot"
 
+ac_config_files="$ac_config_files tests/run_unit_tests.sh"
+
 
 # Create a temporary file with e.g. HAVE_MPI
 ac_config_headers="$ac_config_headers include/libmesh_config.h.tmp:include/libmesh_config.h.in"
@@ -38856,6 +38858,7 @@ do
     "contrib/bin/xda2mgf") CONFIG_FILES="$CONFIG_FILES contrib/bin/xda2mgf" ;;
     "contrib/bin/create_libmesh_release") CONFIG_FILES="$CONFIG_FILES contrib/bin/create_libmesh_release" ;;
     "doc/dot") CONFIG_FILES="$CONFIG_FILES doc/dot" ;;
+    "tests/run_unit_tests.sh") CONFIG_FILES="$CONFIG_FILES tests/run_unit_tests.sh" ;;
     "include/libmesh_config.h.tmp") CONFIG_HEADERS="$CONFIG_HEADERS include/libmesh_config.h.tmp:include/libmesh_config.h.in" ;;
     "include/libmesh_config.h") CONFIG_COMMANDS="$CONFIG_COMMANDS include/libmesh_config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
@@ -39541,6 +39544,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
     "contrib/bin/xda2mgf":F) chmod +x contrib/bin/xda2mgf ;;
     "contrib/bin/create_libmesh_release":F) chmod +x contrib/bin/create_libmesh_release ;;
     "doc/dot":F) chmod +x doc/dot ;;
+    "tests/run_unit_tests.sh":F) chmod +x tests/run_unit_tests.sh ;;
     "include/libmesh_config.h":C) ac_prefix_conf_OUT=`echo include/libmesh_config.h`
 ac_prefix_conf_DEF=`echo _$ac_prefix_conf_OUT | sed -e "y:abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:" -e "s/[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]/_/g"`
 ac_prefix_conf_PKG=`echo LIBMESH`
